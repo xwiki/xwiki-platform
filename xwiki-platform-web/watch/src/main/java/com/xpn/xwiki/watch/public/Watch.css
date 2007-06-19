@@ -27,7 +27,7 @@ div#contentcolumn {
   background-position: top left;
   background-repeat: repeat-y;
 }
-
+img.watch-article-logo-icon,
 img.watch-feedtree-logo-icon {
 	width: 16px;
 	height: 16px;
@@ -176,8 +176,9 @@ button.watch-search-button {
 }
 .watch-feedtree-image {
     float: right;
-    padding: 11px;
-    margin-top: -40px;
+    padding: 0px;
+    margin-top: -30px !important;
+    margin-right: 10px;
 }
 div.watch-feedtree-groups div table {
 	font-size: 0.9em;
@@ -186,6 +187,9 @@ div.watch-feedtree-groups div table {
 img.watch-feedtree-logo-icon {
 	margin-right: 5px;
 }
+div.watch-feedtree-groups div table a:link,
+div.watch-feedtree-groups div table a:visited,
+div.watch-feedtree-groups div table a:active,
 div.watch-feedtree-groups div table a{
 	color: #fff;
 	text-decoration: none;
@@ -252,18 +256,24 @@ font-weight: bold;
 .watch-article {
     width: 100%;
     float: left;
+
+}
+.watch-aricle-commentsnb{
+clear: both;
 }
 .watch-article-logo {
   float: left;
   padding-left: 3px;
   margin-right:-20px
 }
-.watch-article-titlebar, .watch-article-titlebar-bis {
+.watch-article-titlebar {
 	position: relative;
-  border: 0px;
+	zoom:1;/* haslayout for IE6  --> to remove*/
+	display: block;
   overflow: auto;
-  margin: 4px 10px 0;
+  margin: 4px 10px 0 10px;
   padding: 5px;
+  border: 0px solid red;
 }
 .watch-article-read div.watch-article-titlebar {
 	background: #fff9d8;
@@ -273,11 +283,15 @@ font-weight: bold;
 }
 .watch-article-titleline{
 	float: left;
+	width: auto !important;
+	width: 90%;
 	margin: 0 50px 0 10px;
+	border: 0px solid yellow;
 }
  div.watch-article-titleline a {
 	font-weight: bold;
 	text-decoration: none;
+
 }
 .watch-article-unread div.watch-article-titleline a {
 	color: #000;
@@ -290,6 +304,7 @@ div.watch-article-actions {
 	position: absolute;
 	right:  7px;
 	top:  5px;
+	border: 0px solid #333;
 }
 div.watch-article-actions img{
 	margin-left: 10px;
@@ -300,17 +315,27 @@ img.watch-article-action-trash {
 }
 
 div.watch-article-feedname {
-	clear: both;
+	position: relative;
 	float: left;
+	clear: both;
 	font-size: 0.9em;
 	color:  #888;
 	margin-right: 10px;
+		zoom:1;/* haslayout for IE6  --> to remove*/
+}
+div.watch-article-feedname-text {
+		position: relative;
+float: left;
+width: auto;
+white-space: nowrap;
 }
 div.watch-article-date {
+	position: relative;
 	float: left;
 	font-size: 0.9em;
 	color:  #888;
 	margin-right: 10px;
+	white-space: nowrap;
 }
 .watch-article-titleline {
 	margin-left: 0px;
@@ -440,16 +465,47 @@ div.watch-tagscloud-9, div.watch-tagscloud-10, div.watch-tagscloud-11, div.watch
 	float: left;
 }
 
-div.watch-tagscloud-9 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  0.9em;}
-div.watch-tagscloud-10 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1em;}
-div.watch-tagscloud-11 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.1em;}
-div.watch-tagscloud-12 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.2em;}
-div.watch-tagscloud-13 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.3em;}
-div.watch-tagscloud-14 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.4em;}
-div.watch-tagscloud-15 a{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.5em;}
+div.watch-tagscloud-9 a,
+div.watch-tagscloud-9 a:link,
+div.watch-tagscloud-9 a:visited,
+div.watch-tagscloud-9 a:active
+{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  0.9em;}
+div.watch-tagscloud-10 a,
+div.watch-tagscloud-10 a:link,
+div.watch-tagscloud-10 a:visited,
+div.watch-tagscloud-10 a:active
+{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1em;}
+div.watch-tagscloud-11 a,
+div.watch-tagscloud-11 a:link,
+div.watch-tagscloud-11 a:visited,
+div.watch-tagscloud-11 a:active
+{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.1em;}
+div.watch-tagscloud-12 a,
+div.watch-tagscloud-12 a:link,
+div.watch-tagscloud-12 a:visited,
+div.watch-tagscloud-12 a:active
+{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.2em;}
+div.watch-tagscloud-13 a,
+div.watch-tagscloud-13 a:link,
+div.watch-tagscloud-13 a:visited,
+div.watch-tagscloud-13 a:active
+{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.3em;}
+div.watch-tagscloud-14 a,
+div.watch-tagscloud-14 a:link,
+div.watch-tagscloud-14 a:visited,
+div.watch-tagscloud-14 a:active
+{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.4em;}
+div.watch-tagscloud-15 a,
+div.watch-tagscloud-15 a:link,
+div.watch-tagscloud-15 a:visited,
+div.watch-tagscloud-15 a:active
+{color: #fff;text-decoration: none;	padding: 0 4px;font-size:  1.5em;}
 
 
- div.watch-keyword-link a, div.watch-tagscloud a{
+ div.watch-keyword-link a, div.watch-tagscloud a
+  div.watch-keyword-link a:link, div.watch-tagscloud a:link,
+   div.watch-keyword-link a:visited, div.watch-tagscloud a:visited,
+    div.watch-keyword-link a:active, div.watch-tagscloud a:active{
 	color: #fff;
 	text-decoration: none;
 line-height:15px;

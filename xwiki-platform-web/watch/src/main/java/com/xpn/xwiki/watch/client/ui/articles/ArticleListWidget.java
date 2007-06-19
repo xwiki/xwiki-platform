@@ -278,6 +278,7 @@ public class ArticleListWidget extends WatchWidget {
                                 article.setTags(tags);
                                 String tagsTitleText = watch.getTranslation("tags") + ": " + article.getTags();
                                 tagsTitle.setHTML(tagsTitleText);
+                                watch.refreshTagCloud();                           
                             }
                         });
                     }

@@ -69,7 +69,7 @@ public class PressReviewWizard extends WatchWizard {
         MessageDialog rssDialog = new MessageDialog(watch, "rss", WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL);
         rssDialog.setCancelText("close");
         args = new String[1];
-        args[0] = watch.getViewUrl(Constants.DEFAULT_CODE_SPACE + "." + Constants.PAGE_PRESSREVIEW_RSS, "space=" + watch.getWatchSpace() + watch.getFilterStatus().getQueryString() + "xpage=rdf");
+        args[0] = watch.getViewUrl(Constants.DEFAULT_CODE_SPACE + "." + Constants.PAGE_PRESSREVIEW_RSS, "space=" + watch.getWatchSpace() + watch.getFilterStatus().getQueryString() + "&amp;xpage=rdf");
         rssDialog.setMessage("rss", args);
         addDialog(rssDialog);
 

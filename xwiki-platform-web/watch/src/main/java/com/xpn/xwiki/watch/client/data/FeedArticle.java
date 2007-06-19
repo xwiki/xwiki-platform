@@ -130,7 +130,10 @@ public class FeedArticle {
     }
 
     public String getTags() {
-        return tags;
+        if (tags==null)
+         return "";
+        else
+         return tags;
     }
 
     public void setTags(String tags) {

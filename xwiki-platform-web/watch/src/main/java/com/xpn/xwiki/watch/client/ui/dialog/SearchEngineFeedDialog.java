@@ -2,6 +2,7 @@ package com.xpn.xwiki.watch.client.ui.dialog;
 
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.core.client.GWT;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 import com.xpn.xwiki.watch.client.Feed;
 
@@ -32,7 +33,8 @@ import java.util.List;
 
 public class SearchEngineFeedDialog extends FeedDialog {
     protected TextBox feedNameTextBox;
-     protected TextBox searchTermTextBox;
+    protected TextBox searchTermTextBox;
+    protected ListBox searchLanguageListBox;
     protected String baseURL = "";
 
     /**
@@ -42,8 +44,8 @@ public class SearchEngineFeedDialog extends FeedDialog {
      * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
      * @param baseURL base url of the search engine
      */
-    public SearchEngineFeedDialog(XWikiGWTApp app, String name, int buttonModes, Feed feed, String baseURL) {
-        super(app, name, buttonModes, feed);
+    public SearchEngineFeedDialog(XWikiGWTApp app, String name, int buttonModes, Feed feed, String baseURL, String[] languages) {
+        super(app, name, buttonModes, feed, languages);
         this.baseURL = baseURL;
     }
 
@@ -59,7 +61,10 @@ public class SearchEngineFeedDialog extends FeedDialog {
             return false;
         }
 
-        feed.setUrl(baseURL + encode(searchTermTextBox.getText()));
+        String query = searchTermTextBox.getText();
+        String language = (searchLanguageListBox==null) ? null : searchLanguageListBox.getItemText(searchLanguageListBox.getSelectedIndex());
+        String url = getURL(query, language);
+        feed.setUrl(url);
         List groups = new ArrayList();
         for (int i=0;i<groupsListBox.getItemCount();i++) {
             if (groupsListBox.isItemSelected(i))
@@ -69,6 +74,27 @@ public class SearchEngineFeedDialog extends FeedDialog {
         return true;
     }
 
+    public String getURL(String queryterm, String language) {
+        String oStr = baseURL;
+        String oStr2;
+        String[] args = new String[(language==null) ? 1 : 2];
+        args[0] = encode(queryterm);
+        if (language !=null) {
+            args[1] = language;
+        }
+
+        for (int i = 0; i<args.length; i++){
+            if (GWT.isScript()) {
+                oStr2 = oStr.replaceAll("\\{"+i+"\\}", args[i]);
+            } else {
+                oStr2 = oStr.replaceAll("\\{"+i+"\\}", args[i]);
+            }
+            oStr = oStr2;
+        }
+
+        return oStr;
+    }
+
     private String encode(String text) {
         return text.replaceAll(" ", "+").replaceAll("\"", "%22");
     }
@@ -76,7 +102,7 @@ public class SearchEngineFeedDialog extends FeedDialog {
     protected Widget getParametersPanel() {
         FlowPanel paramsPanel = new FlowPanel();
         Label feedNameLabel = new Label();
-        feedNameLabel.setStyleName("feedname-label");
+        feedNameLabel.setStyleName("mailsubject-label");
         feedNameLabel.setText(app.getTranslation(getDialogTranslationName() + ".feedname"));
         paramsPanel.add(feedNameLabel);
 
@@ -96,6 +122,21 @@ public class SearchEngineFeedDialog extends FeedDialog {
         searchTermTextBox.setName("query");
         searchTermTextBox.setStyleName(getCSSName("query"));
         paramsPanel.add(searchTermTextBox);
+        if ((languages!=null)&&(languages.length>0)) {
+            Label searchLanguageLabel = new Label();
+            searchLanguageLabel.setStyleName("language-label");
+            searchLanguageLabel.setText(app.getTranslation(getDialogTranslationName() + ".language"));
+            paramsPanel.add(searchLanguageLabel);
+            searchLanguageListBox = new ListBox();
+            searchLanguageListBox.setName("language");
+            searchLanguageListBox.setMultipleSelect(false);
+            for (int i=0;i<languages.length;i++) {
+                String language = languages[i];
+                String languageText = app.getTranslation("language." + language);
+                searchLanguageListBox.addItem(language, languageText);
+            }
+            paramsPanel.add(searchLanguageListBox);
+        }
         paramsPanel.add(getGroupsFields());
         return paramsPanel;
     }

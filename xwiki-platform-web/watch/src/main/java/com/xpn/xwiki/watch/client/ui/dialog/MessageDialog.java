@@ -27,6 +27,7 @@ import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
  */
 
 public class MessageDialog extends WatchDialog {
+    protected HTML messagePanel;
     /**
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
@@ -39,9 +40,9 @@ public class MessageDialog extends WatchDialog {
         FlowPanel main = new FlowPanel();
         main.addStyleName(getCSSName("main"));
 
-        HTMLPanel invitationPanel = new HTMLPanel(app.getTranslation(getDialogTranslationName() + ".invitation"));
-        invitationPanel.addStyleName(getCssPrefix() + "-invitation");
-        main.add(invitationPanel);
+        messagePanel = new HTML(app.getTranslation(getDialogTranslationName() + ".invitation"));
+        messagePanel.addStyleName(getCssPrefix() + "-invitation");
+        main.add(messagePanel);
         main.add(getActionsPanel());
         add(main);
     }
@@ -49,6 +50,11 @@ public class MessageDialog extends WatchDialog {
     protected void endDialog() {
         setCurrentResult(null);
         super.endDialog();
+    }
+
+    public void setMessage(String text, String[] args) {
+        String message = app.getTranslation(text, args);
+        messagePanel.setHTML(message);
     }
 
 }

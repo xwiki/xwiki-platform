@@ -36,6 +36,7 @@ import java.util.Iterator;
 public abstract class FeedDialog extends WatchDialog {
     protected Feed feed;
     protected ListBox groupsListBox = new ListBox();
+    protected String[] languages;
 
     /**
      * Choice dialog
@@ -44,7 +45,19 @@ public abstract class FeedDialog extends WatchDialog {
      * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
      */
     public FeedDialog(XWikiGWTApp app, String name, int buttonModes, Feed feed) {
+        this(app, name, buttonModes, feed, null);
+    }
+
+    /**
+     * Choice dialog
+     * @param app  XWiki GWT App object to access translations and css prefix names
+     * @param name dialog name
+     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @languages list of available languages
+     */
+    public FeedDialog(XWikiGWTApp app, String name, int buttonModes, Feed feed, String[] languages) {
         super(app, name, buttonModes);
+        this.languages = languages;
         this.feed = feed;
 
         FlowPanel main = new FlowPanel();
@@ -71,6 +84,8 @@ public abstract class FeedDialog extends WatchDialog {
                     public void onSuccess(Object object) {
                         endDialog2();
                         ((Watch)app).refreshConfig();
+                        // this will force a reload of feeds on the server
+                        ((Watch)app).forceServerLoading();
                     }
                 });
             } else {
@@ -98,7 +113,9 @@ public abstract class FeedDialog extends WatchDialog {
             String all = ((Watch)app).getTranslation("all");
             if (!groupname.equals(all)) {
                 String grouptitle = (String) groupMap.get(groupname);
-                groupsListBox.addItem(groupname, grouptitle);
+                if (groupname.indexOf(".")==-1)
+                 grouptitle = "[" + grouptitle + "]";
+                groupsListBox.addItem(grouptitle, groupname);
                 if (currentGroups.contains(groupname)) {
                     groupsListBox.setItemSelected(groupsListBox.getItemCount()-1, true);
                 }

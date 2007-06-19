@@ -51,6 +51,7 @@ public class Constants {
 
     // Analysis actions
     public static final String PAGE_PRESSREVIEW = "PressReview";
+    public static final String PAGE_PRESSREVIEW_RSS  = "PressReviewRss";
     public static final String PAGE_TAGCLOUD = "TagCloud";
     public static final String PAGE_LOADING_STATUS = "LoadingStatus";
     public static final String PAGE_PREVIEW_FEED = "PreviewFeed";

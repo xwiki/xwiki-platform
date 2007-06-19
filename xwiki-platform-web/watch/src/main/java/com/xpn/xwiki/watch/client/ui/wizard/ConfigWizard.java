@@ -45,15 +45,18 @@ public class ConfigWizard extends WatchWizard {
         chooseFeedTypeDialog.addChoice("googleblog");
         chooseFeedTypeDialog.addChoice("technoratitag");
         chooseFeedTypeDialog.addChoice("feedster");
+        chooseFeedTypeDialog.addChoice("wikio");
         addDialog(chooseFeedTypeDialog);
 
         StandardFeedDialog standardFeedDialog = new StandardFeedDialog(watch, "standard", WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, new Feed());
         addDialog(standardFeedDialog, "end");
 
-        addSearchEngineDialog("googlenews", "http://news.google.fr/news?hl=en&ned=&ie=UTF-8&output=atom&num=40&q=");
-        addSearchEngineDialog("googleblog", "http://blogsearch.google.com/blogsearch_feeds?hl=en&tab=wb&ie=utf-8&num=40&output=atom&q=");
-        addSearchEngineDialog("technoratitag", "http://feeds.technorati.com/feed/posts/tag/");
-        addSearchEngineDialog("feedster", "http://www.feedster.com/search/type/rss/");
+        String[] languages = { "en", "fr" };
+        addSearchEngineDialog("googlenews", "http://news.google.fr/news?hl={1}&ned={1}&ie=UTF-8&output=atom&num=40&q={0}", languages);
+        addSearchEngineDialog("googleblog", "http://blogsearch.google.com/blogsearch_feeds?hl={1}&tab=wb&ie=utf-8&num=40&output=atom&q={0}", languages);
+        addSearchEngineDialog("technoratitag", "http://feeds.technorati.com/feed/posts/tag/{0}");
+        addSearchEngineDialog("feedster", "http://www.feedster.com/search/type/rss/{0}");
+        addSearchEngineDialog("wikio", "http://rss.wikio.fr/search/{0}.rss");
 
         AddKeywordDialog addKeywordDialog = new AddKeywordDialog(watch, "addkeyword", WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, "", "");
         addDialog(addKeywordDialog, "end");
@@ -71,7 +74,11 @@ public class ConfigWizard extends WatchWizard {
     }
 
     private void addSearchEngineDialog(String dialogName, String baseURL) {
-        SearchEngineFeedDialog searchEngineFeedDialog = new SearchEngineFeedDialog(watch, dialogName, WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, new Feed(),baseURL);
+        addSearchEngineDialog(dialogName, baseURL, null);
+    }
+
+    private void addSearchEngineDialog(String dialogName, String baseURL, String[] languages) {
+        SearchEngineFeedDialog searchEngineFeedDialog = new SearchEngineFeedDialog(watch, dialogName, WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, new Feed(),baseURL,languages);
         addDialog(searchEngineFeedDialog, "end");
     }
 

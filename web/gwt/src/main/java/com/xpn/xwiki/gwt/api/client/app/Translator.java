@@ -74,13 +74,15 @@ public class Translator {
 
     public String getTranslation(String key, String[] args) {
         String oStr = getTranslation(key);
+        String oStr2;
 
         for (int i = 0; i<args.length; i++){
             if (GWT.isScript()) {
-                oStr = oStr.replaceAll("\\{"+i+"\\}", args[i]);
+                oStr2 = oStr.replaceAll("\\{"+i+"\\}", args[i]);
+            } else {
+                oStr2 = oStr.replaceAll("\\{"+i+"\\}", args[i]);
             }
-            else
-                oStr = oStr.replaceAll("{"+i+"}", args[i]);
+            oStr = oStr2;
         }
 
         return oStr;

@@ -190,8 +190,26 @@ public class XWikiRequestWrapper implements XWikiRequest {
     }
 
     public String getParameter(String name) {
-        String retVal = (paramMap==null) ? request.getParameter(name) : (String) paramMap.get(name);
-        return retVal;
+        if (paramMap==null)
+         return request.getParameter(name);
+        Object data = paramMap.get(name);
+        if (data==null) {
+            return "";
+        } else if (data instanceof String)
+         return (String) data;
+        else if (data instanceof String[]) {
+            if (((String[])data).length>0)
+             return (((String[])data))[0];
+            else
+             return "";
+        } else if (data instanceof Collection) {
+            if (((Collection)data).size()>0)
+             return ((Collection)data).toArray()[0].toString();
+            else
+             return "";
+        } else {
+            return data.toString();
+        }
     }
 
     public Enumeration getParameterNames() {
@@ -212,8 +230,29 @@ public class XWikiRequestWrapper implements XWikiRequest {
         if (paramMap==null)
          return request.getParameterValues(name);
         else {
-            Set keys = paramMap.keySet();
-            return (String[]) keys.toArray();
+            Object data = paramMap.get(name);
+            if (data==null) {
+                return new String[0];
+            } else if (data instanceof String) {
+                String[] result = new String[1];
+                result[0] = (String) data;
+                return result;
+            } else if (data instanceof String[]) {
+                return (String[]) data;
+            } else if (data instanceof Collection) {
+                String[] result = new String[((Collection)data).size()];
+                Iterator it = ((Collection)data).iterator();
+                int i = 0;
+                while (it.hasNext()) {
+                    result[i] = (String) it.next();
+                    i++;
+                }
+                return result;
+            } else {
+                String[] result = new String[1];
+                result[0] = data.toString();
+                return result;
+            }
         }
 
     }

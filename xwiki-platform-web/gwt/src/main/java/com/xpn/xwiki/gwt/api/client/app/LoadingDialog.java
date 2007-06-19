@@ -51,7 +51,7 @@ public class LoadingDialog {
             loadingPanel.addStyleName("dialog-loading");
             loadingPanel.add(new Label(app.getTranslation("loading.loading_msg")));
             String iconspinner = app.getTranslation("loading.loading_icon_spinner");
-            if (iconspinner.equals(""))
+            if (iconspinner.equals("loading.loading_icon_spinner"))
              iconspinner = XWikiGWTAppConstants.LOADING_ICON_SPINNER;
             loadingPanel.add(new Image(app.getSkinFile(iconspinner)));
         }

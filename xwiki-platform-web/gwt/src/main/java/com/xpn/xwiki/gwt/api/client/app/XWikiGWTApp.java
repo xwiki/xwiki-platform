@@ -41,6 +41,14 @@ public interface XWikiGWTApp {
     public String getTranslation(String key);
 
     /**
+     * Provides a translation of a text string
+     * @param key
+     * @param args
+     * @return  translated string
+     */
+    public String getTranslation(String key, String[] args);
+
+    /**
      * Retrieves an instance of an XWiki Remove Service
      * @return
      */

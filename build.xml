@@ -237,9 +237,6 @@
     </taskdef>
 
     <target name="prepare">
-        <propertyfile file="${web.standard.webapp.main.src.dir}/WEB-INF/version.properties" >
-            <entry key="build.number" type="int" value="1" operation="+" pattern="0000" />
-        </propertyfile>
         <property file="${web.standard.webapp.main.src.dir}/WEB-INF/version.properties" />
         <property name="version" value="${xwiki.version}.${build.number}" />
         <property name="release.warfile" value="${release.dir}/xwiki-${version}.war" />

@@ -59,7 +59,7 @@ public class XWikiTestSetup extends TestSetup
     {
         // Start XWiki
         Runtime.getRuntime().exec(START_COMMAND, null, new File(EXECUTION_DIRECTORY));
-    
+
         // Wait till the main page becomes available which means the server is started fine
         URL url = new URL("http://localhost:8080/xwiki/bin/view/Main/");
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -67,7 +67,7 @@ public class XWikiTestSetup extends TestSetup
         while (!connected) {
             try {
                 connection.connect();
-                connected = (connection.getResponseCode() == HttpURLConnection.HTTP_OK);
+                connected = (connection.getResponseCode() < 500);
             } catch (IOException e) {
                 // Do nothing as it simply means the server is not ready yet...
             }

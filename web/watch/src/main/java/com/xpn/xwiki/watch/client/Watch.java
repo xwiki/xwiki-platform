@@ -6,8 +6,8 @@ import com.xpn.xwiki.gwt.api.client.app.XWikiGWTAppConstants;
 import com.xpn.xwiki.watch.client.ui.UserInterface;
 import com.xpn.xwiki.watch.client.ui.dialog.AnalysisDialog;
 import com.xpn.xwiki.watch.client.ui.dialog.WatchDialog;
-import com.xpn.xwiki.watch.client.ui.dialog.PressReviewDialog;
 import com.xpn.xwiki.watch.client.ui.wizard.ConfigWizard;
+import com.xpn.xwiki.watch.client.ui.wizard.PressReviewWizard;
 import com.xpn.xwiki.watch.client.data.DataManager;
 import com.xpn.xwiki.watch.client.data.Keyword;
 import com.google.gwt.user.client.Window;
@@ -94,8 +94,19 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
     public void startServerLoading() {
         Map map = filterStatus.getMap();
         map.put("space", getWatchSpace());
-        map.put("confirm", "1");
-        getXWikiServiceInstance().getDocumentContent(Constants.PAGE_LOADING_STATUS, true, map, new AsyncCallback() {
+        getXWikiServiceInstance().getDocumentContent(Constants.DEFAULT_CODE_SPACE + "." + Constants.PAGE_LOADING_STATUS, true, map, new AsyncCallback() {
+            public void onFailure(Throwable throwable) {
+            }
+            public void onSuccess(Object object) {
+            }
+        });
+    }
+
+    public void forceServerLoading() {
+        Map map = filterStatus.getMap();
+        map.put("space", getWatchSpace());
+        map.put("force", "1");
+        getXWikiServiceInstance().getDocumentContent(Constants.DEFAULT_CODE_SPACE + "." + Constants.PAGE_LOADING_STATUS, true, map, new AsyncCallback() {
             public void onFailure(Throwable throwable) {
             }
             public void onSuccess(Object object) {
@@ -192,7 +203,7 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
                 refreshTagCloud();
                 refreshKeywords();
                 refreshArticleList();
-                // Make sure server has started loading feeds
+                // Make sure server has started loading feed
                 startServerLoading();
                 userInterface.resizeWindow();
             }
@@ -386,11 +397,21 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
                + "/view/" + pageName.replaceAll("\\.", "/") +  "?" + querystring;
     }
 
+    public String getPDFUrl(String pageName, String querystring) {
+        return XWikiGWTAppConstants.XWIKI_DEFAULT_BASE_URL + "/" + XWikiGWTAppConstants.XWIKI_DEFAULT_ACTION_PATH
+               + "/pdf/" + pageName.replaceAll("\\.", "/") +  "?" + querystring;
+    }
+
     public void openPressReviewWizard() {
         // Placeholder for PR
-        PressReviewDialog pressReviewDialog = new PressReviewDialog(this, "pressreview", WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, Constants.DEFAULT_CODE_SPACE + "." + Constants.PAGE_PRESSREVIEW);
-        pressReviewDialog.setNextText("sendpressreview");
-        pressReviewDialog.show();
+        PressReviewWizard wizard = new PressReviewWizard(this, new AsyncCallback() {
+            public void onFailure(Throwable throwable) {
+            }
+
+            public void onSuccess(Object object) {
+            }
+        });
+        wizard.launchWizard();
     }
 
     public void openAnalysisWizard() {
@@ -520,5 +541,9 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
         fstatus.setTrashed(-1);
         fstatus.setStart(0);
         refreshArticleList();
+    }
+
+    public String[] getPressReviewPages() {
+        return getParam("pressreviewpages",Constants.DEFAULT_CODE_SPACE + "." + Constants.PAGE_PRESSREVIEW).split(",");
     }
 }

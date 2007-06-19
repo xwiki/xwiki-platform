@@ -210,11 +210,34 @@ public class FilterStatus {
         if (getGroup() !=null)
             map.put("group",getGroup());
         if (getTags().size()>0)
-            map.put("tags", getTags().toString());
+            map.put("tags", getTags());
         if (getKeyword() !=null)
             map.put("keyword",getKeyword());
         if (getDate() !=null)
             map.put("date",getDate());
         return map;
     }
+
+    public String getQueryString() {
+        StringBuffer qs = new StringBuffer();
+        qs.append("&amp;flagged=" + getFlagged());
+        qs.append("&amp;trashed=" + getTrashed());
+        qs.append("&amp;read=" + getRead());
+        if (getFeed() !=null)
+            qs.append("&amp;feed=" + getFeed().getUrl());
+        if (getGroup() !=null)
+            qs.append("&amp;group=" + getGroup());
+        if (getTags().size()>0) {
+            for (int i=0;i<getTags().size();i++) {
+                String tag = (String) getTags().get(i);
+                qs.append("&amp;tags=" +  tag);
+            }
+        }
+        if (getKeyword() !=null)
+            qs.append("&amp;keyword=" + getKeyword());
+        if (getDate() !=null)
+            qs.append("&amp;date=" + getDate());
+        return qs.toString();
+    }
+
 }

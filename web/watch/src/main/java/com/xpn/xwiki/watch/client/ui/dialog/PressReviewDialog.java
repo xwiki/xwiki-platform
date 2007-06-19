@@ -1,12 +1,10 @@
 package com.xpn.xwiki.watch.client.ui.dialog;
 
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.*;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.watch.client.Watch;
+import com.xpn.xwiki.watch.client.ui.wizard.PressReviewWizard;
 
 /**
  * Copyright 2006,XpertNet SARL,and individual contributors as indicated
@@ -49,13 +47,25 @@ public class PressReviewDialog extends WatchDialog {
 
         HTMLPanel invitationPanel = new HTMLPanel(app.getTranslation(getDialogTranslationName() + ".invitation"));
         invitationPanel.addStyleName(getCssPrefix() + "-invitation");
+        ScrollPanel scroll = new ScrollPanel(getPressReviewPanel());
+        scroll.addStyleName(getCssPrefix() + "-scroll");
+        scroll.setHeight("300px");
         main.add(invitationPanel);
-        main.add(getAnalysisPanel());
+        main.add(scroll);
         main.add(getActionsPanel());
         add(main);
     }
 
-    protected Widget getAnalysisPanel() {
+    protected void endDialog() {
+        setCurrentResult(((PressReviewWizard)getWizard()).getPressReviewOutput());
+        super.endDialog();
+    }
+
+    public void setPressReviewPage(String page) {
+        pressReviewPage = page;
+    }
+
+    protected Widget getPressReviewPanel() {
         pressReviewHTML = new HTML();
         Watch watch = (Watch) app;
         watch.getDataManager().getPressReview(watch.getFilterStatus(), pressReviewPage, new XWikiAsyncCallback(watch) {

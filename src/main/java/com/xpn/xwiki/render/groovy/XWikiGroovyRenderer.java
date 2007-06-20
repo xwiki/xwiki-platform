@@ -81,7 +81,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             gcontext.put("response", context.getResponse());
             gcontext.put("context", new Context(context));
 
-            // Put the Grrovy Context in the context
+            // Put the Groovy Context in the context
             // so that includes can use it..
             context.put("gcontext", gcontext);
             //add XWikiMessageTool to the context

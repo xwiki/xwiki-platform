@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>Navigation</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1165426047000</creationDate>
+<date>1180530049000</date>
+<contentUpdateDate>1180530049000</contentUpdateDate>
+<version>1.78</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<name>tags</name>
+<prettyName>Tags</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>1</relationalStorage>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<size>30</size>
+<separator> </separator>
+<cache>0</cache>
+<separators> ,|</separators>
+<values></values>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Panels.Navigation</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<type>
+<name>type</name>
+<prettyName>Panel type</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<separator> </separator>
+<cache>0</cache>
+<separators> ,|</separators>
+<values>view|edit</values>
+<number>2</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+<category>
+<name>category</name>
+<prettyName>Category</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>0</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<size>1</size>
+<separator> </separator>
+<cache>0</cache>
+<separators> ,|</separators>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<number>5</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<description>
+<name>description</name>
+<prettyName>Description</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<rows>5</rows>
+<number>3</number>
+<editor>Text</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<content>
+<name>content</name>
+<prettyName>Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>60</size>
+<rows>25</rows>
+<number>4</number>
+<editor>Text</editor>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<name>
+<name>name</name>
+<prettyName>Name</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>40</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+</class>
+<name>Panels.Navigation</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<property>
+<type>view</type>
+</property>
+<property>
+<description>Lists all spaces and all documents in the spaces. Note that administration spaces and pages are only displayed for Administrators. This Panel provides a default automated navigation. However when your wiki grows you'll usually want to replace it with your own fixed navigation for which you'll create another Panel.</description>
+</property>
+<property>
+<category>Navigation</category>
+</property>
+<property>
+<content>#panelhiddenheader("Navigation")
+#set ($hiddenSpaces = ["XWiki", "Admin", "Panels"])
+#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.BlogRss", "Blog.Macros", "Main.TagsRss", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
+#set ($blackListedPages = ["WebPreferences"])
+&lt;div id="xwikinavcontainer"&gt;
+#set($spaces = $xwiki.spaces)
+#set($i = 0)
+#set($spacecount = 0)
+&lt;div id="xwikinav"&gt;
+#foreach($space in $spaces)
+#if (!$hiddenSpaces.contains($space) || ($hiddenSpaces.contains($space) &amp;&amp; $xwiki.hasAdminRights()))
+#if ($doc.web == $space)
+#set ($spacecount = $i)
+#end
+#set($i = $i + 1)
+&lt;div id="xwikinav${space}"&gt;
+&lt;div id="xwikinav${space}Header" class="accordionTabTitleBar"&gt;&lt;h6&gt;$space&lt;/h6&gt;&lt;/div&gt;
+&lt;div id="xwikinav${space}Content" class="accordionTabContentBox"&gt;
+#set($hql = $xwiki.searchDocuments("doc.web='$space' order by doc.name"))
+#foreach($page in $hql)
+#if (!$hiddenPages.contains($page) || ($hiddenPages.contains($page) &amp;&amp; $xwiki.hasAdminRights()))
+#set($dotIndex = $page.indexOf(".")+1)
+#set($pageName = $page.substring($dotIndex, $page.length()))
+#if (!$blackListedPages.contains($pageName) || ($blackListedPages.contains($pageName) &amp;&amp; $xwiki.hasAdminRights()))
+#if ($doc.fullName == $page)
+- *$xwiki.getDocument($page).name*
+#else
+- [$page]
+#end
+#end
+#end
+#end
+&lt;/div&gt;
+&lt;/div&gt;
+#end
+#end
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;script type="text/javascript"&gt;new Rico.Accordion( 'xwikinav', {panelHeight:'250',onLoadShowTab:'$spacecount'} );&lt;/script&gt;
+#panelfooter()</content>
+</property>
+<property>
+<name>Navigation</name>
+</property>
+</object>
+<content>#includeForm("Panels.PanelSheet")</content>
+</xwikidoc>

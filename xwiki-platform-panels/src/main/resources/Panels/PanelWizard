@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Panels</web>
+<name>PanelWizard</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1157375356000</creationDate>
+<date>1166177445000</date>
+<contentUpdateDate>1169801141000</contentUpdateDate>
+<version>1.123</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<name>tags</name>
+<prettyName>Tags</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>1</relationalStorage>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<size>30</size>
+<separator> </separator>
+<separators> ,|</separators>
+<values></values>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Panels.PanelWizard</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>#if(!$request.getParameter("forceLeftPanels") || !$request.getParameter("forceRightPanels"))
+$response.sendRedirect($doc.getURL("view", "forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant"))
+#end
+#set($showdata = 0)
+#set($showEmptyPanels = 1)
+#if($xwiki.hasAdminRights())
+1 Panel Wizard
+&lt;div class="floatcontainer"&gt;&lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
+&lt;li id="firstwtab" class="active" onclick="switchToWizardPage(this, 'PanelListSection'); return false;"&gt;&lt;a href="#PanelListSection"&gt;Panel List&lt;/a&gt;&lt;/li&gt;
+&lt;li onclick="switchToWizardPage(this, 'PageLayoutSection'); return false;"&gt;&lt;a href="#PageLayoutSection" &gt;Page Layout&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/div&gt;
+&lt;div id="xwikieditcontent" class="clear"&gt;
+##1.1 Panel List
+&lt;div id="PanelListSection"&gt;
+&lt;span class="hastooltip" onmouseover="if(window.isDraggingPanel) return; showtip(this, 'To drag a panel, use your mouse and click on the header of the panel. Keep your left mouse button down while you move your mouse and the panel at the same time. While you move the panel you will see in real-time where the panel will be dropped when you release your left mouse button.', 300)"&gt;Drag and drop&lt;/span&gt; panels to rearrange them inside a column or between columns. To add or remove panels, drag them from the list of available panels to one of the columns or from the column into the list, respectively.
+#set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
+#set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
+#set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
+#set($panelsList = $xwiki.searchDocuments($sql))
+#set($categoryMap = $xwiki.getHashMap())
+#foreach($category in $categoryList)
+  $!categoryMap.put($category, $xwiki.getArrayList())
+#end
+#foreach ($item in $panelsList)
+  #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+  #if($obj.type == 'view')
+    #set($arrayList = $categoryMap.get($obj.category))
+    #if($arrayList)
+      #set($discard = $categoryMap.get($obj.category).add($item))
+      ## TODO: uncategorized?
+    #end
+  #end
+#end
+##
+#set($panelsPerRow = 3)
+{pre}
+&lt;div id="dhtmltooltip" style="visibility: hidden;"&gt;&lt;/div&gt;
+#set($ajaxdoc = $xwiki.getDocument("Panels.AjaxEditor"))
+#if($request.place)
+#set($ajaxurl = $xwiki.getURL("Panels.PanelLayoutUpdate", "view", "xpage=plain&amp;place=${request.place}"))
+#else
+#set($ajaxurl = $xwiki.getURL("Panels.PanelLayoutUpdate", "view", "xpage=plain"))
+#end
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/Drag.js")"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/ieemu.js")"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/toolTip.js")"&gt;&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+window.ajaxurl = '$ajaxurl';
+window.allPanelsPlace = new Object();
+window.panelsavesuccess = "$msg.get("panelsavesuccess")";
+window.panelsaveerror = "$msg.get("panelsaveerror")";
+#set($counter = 0)
+#set($panelsStatus = $xwiki.hashMap)
+$xwiki.hashMap
+#foreach($category in $categoryList)
+  #set($categPanels = $categoryMap.get($category))
+  #foreach ($item in $categPanels)
+    #set($discard = $panelsStatus.put($item, "false"))
+    #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+    window.allPanelsPlace[$counter] = new Object();
+    window.allPanelsPlace[$counter]['fullname'] = '$item';
+    #set($issetleft = 0)
+    #set($counterleft = 0)
+    #set($issetright = 0)
+    #set($counterright = 0)
+    #foreach($element in $leftPanels)
+      #if($item == $element)
+        window.allPanelsPlace[$counter]['left'] = $counterleft;
+        #set($issetleft = 1)
+        #set($discard = $panelsStatus.put($item, "true"))
+      #end
+      #set($counterleft = $counterleft + 1)
+    #end
+    #if($issetleft == 0)
+      window.allPanelsPlace[$counter]['left'] = -1;
+    #end
+    #foreach($element in $rightPanels)
+      #if($item == $element)
+        window.allPanelsPlace[$counter]['right'] = $counterright;
+        #set($issetright = 1)
+        #set($discard = $panelsStatus.put($item, "true"))
+      #end
+      #set($counterright = $counterright + 1)
+    #end
+    #if($issetright == 0)
+      window.allPanelsPlace[$counter]['right'] = -1;
+    #end
+    #set($counter = $counter + 1)
+  #end
+#end
+window.showLeftColumn = $showLeftPanels;
+window.showRightColumn = $showRightPanels;
+&lt;/script&gt;
+&lt;script type="text/javascript" src="$xwiki.getSkinFile("ajax/panelWizard.js")"&gt; &lt;/script&gt;
+{/pre}
+&lt;div id="allviewpanels"&gt;
+## start of accordion:
+  &lt;div id="panellistaccordion"&gt;
+  #foreach($category in $categoryList)
+    ## start of accordion tab:
+    &lt;div&gt;
+      &lt;div class="accordionTabTitleBar"&gt;&lt;h6&gt;$category&lt;/h6&gt;&lt;/div&gt;
+      ## start of accordion tab content:
+      &lt;div class="accordionTabContentBox"&gt;
+      #set($categPanels = $categoryMap.get($category))
+      #if($categPanels.size() == 0)
+        There are no panels from this category.
+      #else
+        #foreach ($item in $categPanels)
+          #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+                &lt;div class="panelitemc"&gt;
+                  &lt;div class="label"&gt;$doc.display("name", $obj)&lt;/div&gt;
+                  &lt;div class="panelcontainer" onmouseover="if(!window.isDraggingPanel){ showtip(this, unescape('$xwiki.getURLEncoded($doc.display("description", $obj)).replaceAll("[+]", "%20")'), 300); }"&gt;#if($panelsStatus.get($item) == "false")#displaypanel("$item")#else&lt;div class="panel"&gt;&lt;/div&gt;#end&lt;/div&gt;
+                  &lt;div class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL("$item", "inline")"&gt;$msg.get("edit")&lt;/a&gt; &lt;a href="$xwiki.getURL("$item", "delete")"&gt;$msg.get("delete")&lt;/a&gt;&lt;/div&gt;
+                &lt;/div&gt;
+        #end
+      #end
+      ## end of accordion tab content:
+      &lt;/div&gt;
+    ## end of accorion tab:
+    &lt;/div&gt;
+  ## end of foreach:
+  #end
+  ## end of accordion:
+  &lt;/div&gt;
+## end of allpanels div
+&lt;/div&gt;
+## end of PanelsListSection
+&lt;/div&gt;
+##1.1 Page Layout
+&lt;div id="PageLayoutSection"&gt;
+Choose a page layout:
+
+#set($crtlayout = 0)
+#if($showLeftPanels == "1")
+#set($crtlayout = $crtlayout + 1)
+#end
+#if($showRightPanels == "1")
+#set($crtlayout = $crtlayout + 2)
+#end
+&lt;div class="pagelayoutoptions"&gt;
+&lt;table&gt;
+&lt;tr&gt;
+&lt;td&gt;
+&lt;div
+#if($crtlayout == 0)id="selectedoption"#end 
+class="pagelayoutoption" onclick="changePreviewLayout(this, 0)"&gt;
+##&lt;input type="radio" name="pagelayout" value="nosidecol" checked="cheched" /&gt;
+&lt;label&gt;No side column&lt;/label&gt;
+&lt;div id="nosidecolumn" class="layoutmaquette"&gt;
+&lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td&gt;
+&lt;div 
+#if($crtlayout == 1)id="selectedoption"#end
+class="pagelayoutoption" onclick="changePreviewLayout(this, 1)"&gt;
+##&lt;input type="radio" name="pagelayout" value="leftcol" "/&gt;
+&lt;label&gt;Left column&lt;/label&gt;
+&lt;div id="leftcolumn" class="layoutmaquette"&gt;
+&lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
+&lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td&gt;
+&lt;div
+#if($crtlayout == 2)id="selectedoption"#end
+class="pagelayoutoption" onclick="changePreviewLayout(this, 2)"&gt;
+##&lt;input type="radio" name="pagelayout" value="rightcol" /&gt;
+&lt;label&gt;Right column&lt;/label&gt;
+&lt;div id="rightcolumn" class="layoutmaquette"&gt;
+&lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
+&lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;td&gt;
+&lt;div 
+#if($crtlayout == 3)id="selectedoption"#end
+class="pagelayoutoption" onclick="changePreviewLayout(this, 3)"&gt;
+&lt;label&gt;Both columns&lt;/label&gt;
+&lt;div  id="bothcolumns" class="layoutmaquette"&gt;
+&lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
+&lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
+&lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt; ## xwikieditcontent
+&lt;div id="panelwizardbuttons" class="floatcontainer"&gt;
+&lt;span class="xwikibuttonlink"&gt;
+&lt;span class="buttonwrapper"&gt;&lt;a href="#" onclick="save(); return false;"&gt;Save the new layout&lt;/a&gt;&lt;/span&gt;
+&lt;span class="buttonwrapper"&gt;&lt;a href="$doc.getURL("view")" onclick="revert(); return false;"&gt;Revert&lt;/a&gt;&lt;/span&gt;
+&lt;span class="buttonwrapper"&gt;&lt;a href="$xwiki.getURL("Panels.WebHome")"&gt;Go to Panels home page&lt;/a&gt;&lt;/span&gt;
+&lt;/span&gt;
+&lt;/div&gt;
+#else
+#xwikimessageboxstart("Panel Editor" "")
+You need to be administrator of the Place to use the Home Page Editor
+#xwikimessageboxend()
+#end</content>
+</xwikidoc>

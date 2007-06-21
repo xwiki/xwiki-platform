@@ -1,0 +1,4 @@
+This directory contains build tools, i.e. tools for the XWiki build.
+Right now it creates a JAR containing Checkstyle configuration files.
+This JAR can then be used in the various other Maven modules to enforce
+compliance. See http://tinyurl.com/yjlgnx for more details.

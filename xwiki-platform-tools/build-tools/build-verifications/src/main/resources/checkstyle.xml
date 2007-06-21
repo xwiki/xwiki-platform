@@ -1,0 +1,353 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.1//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_1.dtd">
+
+        <!-- ==================================================================================== -->
+        <!-- NOTE: THIS FILE HAS NOT BEEN APPROVED YET. IT'S A WORK IN PROGRESS AND SHOULDN'T YET
+             BE CONSIDERED AS THE AUHTORATIVE CHECKSTYLE RULES OF THE XWIKI PROJECT -->
+        <!-- ==================================================================================== -->
+
+<!-- Checkstyle properties for XWiki projects -->
+<module name="Checker">
+
+  <!--
+     ======================================================================================
+       Checks that do not require a TreeWalker (sorted alphabetically)
+     ======================================================================================
+  -->
+
+  <!-- Subversion has a config file in which you specify how to treat end of lines/end of files.
+       The recommendation is to use "svn:eol-style=native".
+       (See http://svnbook.red-bean.com/en/1.1/ch07s02.html#svn-ch-7-sect-2.3.5).
+       As a consequence, checking for end of file markers doesn't make much sense.
+
+       <module name="NewlineAtEndOfFile">
+         <property name="lineSeparator" value="lf"/>
+       </module>
+  -->
+
+  <!-- We'd like to use this one but there's no option to exclude our internal packages
+  <module name="PackageHtml"/>
+  -->
+
+  <!-- We cannot use this rule as it fails on our license headers, considering them as copy-pastes!
+  <module name="StrictDuplicateCode"/>
+  -->
+
+  <module name="Translation"/>
+
+  <!--
+     ======================================================================================
+       Checks that require a TreeWalker (sorted alphabetically)
+     ======================================================================================
+  -->
+  <module name="TreeWalker">
+
+    <!-- Note: for some checks we have defined a warning severity instead of the default error
+         severity. This is because we'd like to make the build fail on error for thise checks
+         but there are errors to fix first -->
+
+    <module name="AbstractClassName"/>
+
+    <module name="AnonInnerLength"/>
+
+    <!--module name="ArrayTrailingComma"/-->
+
+    <module name="ArrayTypeStyle"/>
+
+    <!--module name="AvoidInlineConditionals"/-->
+
+    <module name="AvoidNestedBlocks"/>
+
+    <module name="AvoidStarImport"/>
+
+    <module name="BooleanExpressionComplexity"/>
+
+    <!-- This is a good metric but checkstyle doesn't allow to remove JDK's base classes
+         from the new count thus making this check unusable IMO
+    <module name="ClassDataAbstractionCoupling"/>
+    -->
+
+    <module name="ClassFanOutComplexity"/>
+
+    <module name="ConstantName"/>
+
+    <module name="CovariantEquals"/>
+
+    <module name="CyclomaticComplexity"/>
+
+    <module name="DeclarationOrder"/>
+
+    <module name="DefaultComesLast"/>
+
+    <module name="DescendantToken"/>
+
+    <module name="DoubleCheckedLocking"/>
+
+    <!--module name="DesignForExtension"/-->
+
+    <module name="EmptyBlock">
+      <property name="tokens" value="LITERAL_CATCH"/>
+      <property name="option" value="text"/>
+    </module>
+
+    <module name="EmptyForInitializerPad"/>
+
+    <module name="EmptyForIteratorPad"/>
+
+    <module name="EmptyStatement"/>
+
+    <module name="j2ee.EntityBean"/>
+
+    <module name="EqualsHashCode"/>
+
+    <module name="ExecutableStatementCount"/>
+
+    <module name="ExplicitInitialization"/>
+
+    <module name="FallThrough"/>
+
+    <module name="FileLength"/>
+
+    <module name="FinalClass"/>
+
+    <!--module name="FinalLocalVariable"/-->
+
+    <!--module name="FinalParameters"/-->
+
+    <module name="j2ee.FinalStatic"/>
+
+    <!-- Avoid finalizers (this will not find violations that contain linebreaks) -->
+    <module name="GenericIllegalRegexp">
+      <property name="format" value="((public)|(protected))\s+void\s+finalize\(\s*\)"/>
+      <property name="message" value="Avoid finalizers"/>
+    </module>
+
+    <!-- No direct printing to System.out or System.err -->
+    <module name="GenericIllegalRegexp">
+      <property name="format" value="System\.(out|err)\."/>
+      <property name="message" value="Don't write directly to System.out our System.err"/>
+    </module>
+
+    <!-- No @author tags -->
+    <!-- We're commenting this out until we have sorted out if we want author tags or not.
+    <module name="GenericIllegalRegexp">
+      <property name="format" value="@author"/>
+      <property name="message" value="No @author tag allowed"/>
+    </module>-->
+
+    <!-- Need to put this back when we find a way of making it work
+    <module name="Header">
+      <property name="headerFile" value="${checkstyle.header.file}"/>
+      <property name="ignoreLines" value="4,5,6,7"/>
+    </module>
+    -->
+
+    <!--module name="HiddenField"/-->
+
+    <module name="HideUtilityClassConstructor"/>
+
+    <!--module name="IllegalCatch"/-->
+
+    <module name="IllegalImport"/>
+
+    <module name="IllegalInstantiation">
+      <property name="classes" value="java.lang.Boolean, java.lang.String"/>
+    </module>
+
+    <module name="IllegalThrows"/>
+
+    <!--module name="IllegalToken"/-->
+
+    <module name="IllegalTokenText"/>
+
+    <module name="IllegalType"/>
+
+    <!--module name="ImportControl"/-->
+
+    <!--module name="ImportOrder"/-->
+
+    <module name="Indentation"/>
+
+    <module name="InnerAssignment"/>
+
+    <!--module name="InterfaceIsType"/-->
+
+    <module name="JavadocMethod">
+      <property name="scope" value="private"/>
+      <property name="allowUndeclaredRTE" value="true"/>
+    </module>
+
+    <module name="JavadocStyle"/>
+
+    <module name="JavadocType">
+      <property name="scope" value="private"/>
+      <property name="versionFormat" value="\$Id.*\$"/>
+    </module>
+
+    <module name="JavadocVariable">
+      <property name="scope" value="private"/>
+    </module>
+
+    <module name="JavaNCSS"/>
+
+    <module name="JUnitTestCase"/>
+
+    <module name="LeftCurly">
+      <property name="option" value="nl"/>
+      <property name="tokens" value="CLASS_DEF,INTERFACE_DEF"/>
+    </module>
+
+    <module name="LineLength">
+      <property name="ignorePattern" value="(@version|@see|^import)"/>
+      <property name="max" value="100"/>
+    </module>
+
+    <module name="LocalFinalVariableName"/>
+
+    <module name="j2ee.LocalHomeInterface"/>
+
+    <module name="j2ee.LocalInterface"/>
+
+    <module name="LocalVariableName"/>
+
+    <!--module name="MagicNumber"/-->
+
+    <module name="MemberName"/>
+
+    <module name="j2ee.MessageBean"/>
+
+    <module name="MethodLength"/>
+
+    <!-- Allow for UI methods generated by idea -->
+    <module name="MethodName">
+      <property name="format" value="^[a-z][a-zA-Z0-9]*$|^\$\$\$setupUI\$\$\$$"/>
+    </module>
+
+    <module name="MethodParamPad"/>
+
+    <!--module name="MissingCtor"/-->
+
+    <module name="MissingSwitchDefault"/>
+
+    <module name="ModifiedControlVariable"/>
+
+    <module name="ModifierOrder"/>
+
+    <module name="MultipleStringLiterals">
+      <property name="ignoreStringsRegexp" value='^("")|("[0-9]")|(" ")|("]")$'/>
+    </module>
+
+    <module name="MultipleVariableDeclarations"/>
+
+    <module name="MutableException"/>
+
+    <module name="NeedBraces"/>
+
+    <module name="NestedIfDepth">
+      <property name="max" value="2"/>
+    </module>
+
+    <module name="NestedTryDepth"/>
+
+    <module name="NoWhitespaceAfter"/>
+
+    <module name="NoWhitespaceBefore"/>
+
+    <module name="NPathComplexity"/>
+
+    <module name="OperatorWrap"/>
+
+    <module name="PackageDeclaration"/>
+
+    <module name="PackageName"/>
+
+    <module name="ParameterAssignment"/>
+
+    <module name="ParameterName"/>
+
+    <module name="ParameterNumber"/>
+
+    <module name="ParenPad"/>
+
+    <module name="RedundantImport"/>
+
+    <module name="RedundantThrows">
+      <property name="allowUnchecked" value="true"/>
+    </module>
+
+    <module name="RedundantModifier"/>
+
+    <!--module name="Regexp"/-->
+
+    <!--module name="RegexpHeader"/-->
+
+    <module name="j2ee.RemoteHomeInterface"/>
+
+    <module name="j2ee.RemoteInterface"/>
+
+    <!--module name="RequireThis">
+      <property name="checkMethods" value="false"/>
+    </module-->
+
+    <!--module name="RequiredRegexp"/-->
+
+    <module name="ReturnCount"/>
+
+    <module name="RightCurly"/>
+
+    <module name="j2ee.SessionBean"/>
+
+    <module name="SimplifyBooleanExpression"/>
+
+    <module name="SimplifyBooleanReturn"/>
+
+    <module name="StaticVariableName"/>
+
+    <module name="StringLiteralEquality"/>
+
+    <module name="SuperClone"/>
+
+    <module name="SuperFinalize"/>
+
+    <module name="TabCharacter"/>
+
+    <module name="j2ee.ThisParameter"/>
+
+    <module name="j2ee.ThisReturn"/>
+
+    <!--module name="ThrowsCount"-->
+
+    <module name="TodoComment">
+      <property name="severity" value="warning"/>
+    </module>
+
+    <module name="TrailingComment"/>
+
+    <module name="TypeName"/>
+
+    <module name="TypecastParenPad"/>
+
+    <module name="UncommentedMain">
+      <property name="excludedClasses" value=".*Main$"/>
+    </module>
+
+    <!--module name="UnnecessaryParentheses"/-->
+
+    <module name="UnusedImports"/>
+
+    <module name="UpperEll"/>
+
+    <module name="VisibilityModifier">
+      <property name="protectedAllowed" value="true"/>
+      <property name="publicMemberPattern" value="^[a-z][a-zA-Z0-9]*$"/>
+    </module>
+
+    <module name="WhitespaceAfter"/>
+
+    <module name="WhitespaceAround"/>
+
+  </module>
+  
+</module>

@@ -36,9 +36,9 @@
   <packaging>pom</packaging>
   <description>XWiki Tools</description>
   <scm>
-    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-tools/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-tools/trunk</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-tools/trunk</url>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-tools/trunk</url>
   </scm>
   <modules>
     <module>build-tools</module>

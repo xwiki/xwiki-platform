@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>ExampleLink1</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.KnowledgeBase</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712021000</creationDate>
+<date>1107712021000</date>
+<version>1.2</version>
+<content>1 Example Link 1
+
+This is an example page.</content>
+</xwikidoc>

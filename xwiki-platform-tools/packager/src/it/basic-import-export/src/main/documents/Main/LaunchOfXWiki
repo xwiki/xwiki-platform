@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Main</web>
+<name>LaunchOfXWiki</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Main.WebHome</parent>
+<author>XWiki.Admin</author>
+<creationDate>1107712021000</creationDate>
+<date>1107712021000</date>
+<version>1.2</version>
+<object>
+<class>
+<name>XWiki.ArticleClass</name>
+<title>
+<name>title</name>
+<prettyName>Title</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</title>
+<category>
+<name>category</name>
+<prettyName>Category</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>1</relationalStorage>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<size>5</size>
+<number>2</number>
+<sql>select prop.value from BaseObject as obj, StringProperty as prop where obj.className='Blog.Categories' and prop.id.id = obj.id and prop.id.name='name'</sql>
+<classType>com.xpn.xwiki.objects.classes.DBListClass</classType>
+</category>
+<content>
+<name>content</name>
+<prettyName>Content</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<rows>15</rows>
+<number>3</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<extract>
+<name>extract</name>
+<prettyName>Extract</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>80</size>
+<rows>5</rows>
+<number>4</number>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</extract>
+</class>
+<name>Main.LaunchOfXWiki</name>
+<number>0</number>
+<className>XWiki.ArticleClass</className>
+<property>
+<category>
+<value>News</value>
+</category>
+</property>
+<property>
+<content>&lt;table border="0"&gt;&lt;tr&gt;
+&lt;td valign="top"&gt;
+&lt;br /&gt;
+This is the first news of this XWiki installation. If you want to know what is going on in the XWiki world, don't forget to read the [XWiki Blog&gt;http://www.xwiki.com/xwiki/bin/view/Blog/WebHome].
+
+XWiki is a powerful Wiki allowing you to share information in your group. You can create wiki pages, publish blog articles, comment both wiki and blog pages, create an event calendar, a photo album or a presentation.
+
+Now your XWiki is going to be what you make of it. It is fully customizable as all pages are made editable through your Internet Browser.
+&lt;/td&gt;
+&lt;td width="50%"&gt;
+{rss:feed=http://www.xwiki.com/xwiki/bin/view/Blog/BlogRss?xpage=rdf|count=5}
+&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;</content>
+</property>
+<property>
+<extract>This is the first news of this XWiki installation. If you want to know what is going on in the XWiki world, don't forget to read the [XWiki Blog&gt;http://www.xwiki.com/xwiki/bin/view/Blog/WebHome].
+</extract>
+</property>
+<property>
+<title>Launch of XWiki</title>
+</property>
+</object>
+<content>#includeForm("XWiki.ArticleClassSheet")</content>
+</xwikidoc>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Selenium</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1170602607000</creationDate>
+<date>1170611186000</date>
+<contentUpdateDate>1170611186000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<name>tags</name>
+<prettyName>Tags</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>1</relationalStorage>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<size>30</size>
+<separator> </separator>
+<separators> ,|</separators>
+<values></values>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Selenium.WebHome</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>1 XWiki Application Testing with Selenium
+
+Available tests can be found on the [test suite&gt;Selenium.AllTests] page.
+
+#set($doc = $xwiki.getDocument("Selenium.Selenium"))
+#set($testsuiteurl = $xwiki.getURLEncoded("$xwiki.getURL('Selenium.AllTests', 'view', 'xpage=plain')"))
+#set($queryString = "TestRunner.html?test=$testsuiteurl&amp;resultsUrl=../postResults")
+#set($url = $xwiki.getPlugin("zipexplorer").getFileLink($doc, "selenium.zip", $queryString))
+
+Click &lt;a href="$url"&gt;here&lt;/a&gt; to execute these tests in the Selenium Test Runner.
+</content></xwikidoc>

@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Selenium</web>
+<name>RegisterNewUser</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Selenium.SeleniumTestClass</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1170602704000</creationDate>
+<date>1170602732000</date>
+<contentUpdateDate>1170602732000</contentUpdateDate>
+<version>1.2</version>
+<title></title>
+<template>Selenium.SeleniumTestClassTemplate</template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<name>tags</name>
+<prettyName>Tags</prettyName>
+<unmodifiable>0</unmodifiable>
+<relationalStorage>1</relationalStorage>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<size>30</size>
+<separator> </separator>
+<separators> ,|</separators>
+<values></values>
+<number>1</number>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Selenium.RegisterNewUser</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<object>
+<class>
+<name>Selenium.SeleniumTestClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<Test>
+<name>Test</name>
+<prettyName>Test</prettyName>
+<unmodifiable>0</unmodifiable>
+<size>75</size>
+<rows>25</rows>
+<number>1</number>
+<tooltip>Tests in HTML (as provided by Selenium IDE)</tooltip>
+<customDisplay></customDisplay>
+<validationRegExp></validationRegExp>
+<validationMessage></validationMessage>
+<editor>Text</editor>
+<contenttype>PureText</contenttype>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</Test>
+</class>
+<name>Selenium.RegisterNewUser</name>
+<number>0</number>
+<className>Selenium.SeleniumTestClass</className>
+<property>
+<Test>&lt;html&gt;
+&lt;head&gt;
+&lt;meta http-equiv="Content-Type" content="text/html; charset=UTF-8"&gt;
+&lt;title&gt;New Test&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;table cellpadding="1" cellspacing="1" border="1"&gt;
+&lt;thead&gt;
+&lt;tr&gt;&lt;td rowspan="1" colspan="3"&gt;Register New User&lt;/td&gt;&lt;/tr&gt;
+&lt;/thead&gt;&lt;tbody&gt;
+&lt;tr&gt;
+	&lt;td&gt;open&lt;/td&gt;
+	&lt;td&gt;/xwiki/bin/view/Main/&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;headerlogout&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;headerregister&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;register_first_name&lt;/td&gt;
+	&lt;td&gt;John&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;register_last_name&lt;/td&gt;
+	&lt;td&gt;Smith&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;xwikiname&lt;/td&gt;
+	&lt;td&gt;JohnSmith&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;register_password&lt;/td&gt;
+	&lt;td&gt;john&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;register2_password&lt;/td&gt;
+	&lt;td&gt;john&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;register_email&lt;/td&gt;
+	&lt;td&gt;john@somewhere.com&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;//input\[@value='Register'\]&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;headerlogin&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;j_username&lt;/td&gt;
+	&lt;td&gt;JohnSmith&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;j_password&lt;/td&gt;
+	&lt;td&gt;john&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;//input\[@value='Log-in'\]&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;//img\[@alt='XWiki'\]&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;headerlogout&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;headerlogin&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;j_username&lt;/td&gt;
+	&lt;td&gt;Admin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;type&lt;/td&gt;
+	&lt;td&gt;j_password&lt;/td&gt;
+	&lt;td&gt;admin&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;click&lt;/td&gt;
+	&lt;td&gt;rememberme&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;//input\[@value='Log-in'\]&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;link=JohnSmith in XWiki&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;//div\[4\]/a/strong&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+	&lt;td&gt;clickAndWait&lt;/td&gt;
+	&lt;td&gt;//input\[@value='yes'\]&lt;/td&gt;
+	&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+
+&lt;/tbody&gt;&lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</Test></property></object><content>#includeForm("Selenium.SeleniumTestClassSheet")</content>
+</xwikidoc>

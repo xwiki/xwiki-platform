@@ -32,14 +32,14 @@
   </parent>
   <groupId>com.xpn.xwiki.plugin</groupId>
   <artifactId>xwiki-plugins</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>XWiki Plugins</name>
+  <version>1-SNAPSHOT</version>
   <description>The XWiki Plugins</description>
   <scm>
-    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-plugins/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-plugins/trunk</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-plugins/trunk</url>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-plugins/trunk</url>
   </scm>
   <modules>
     <module>adwords</module>

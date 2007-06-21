@@ -28,7 +28,7 @@
   <parent>
     <groupId>com.xpn.xwiki.plugin</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-adwords</artifactId>
   <version>0.1-SNAPSHOT</version>

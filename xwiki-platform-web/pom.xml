@@ -24,22 +24,22 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki</groupId>
-    <artifactId>xwiki-root</artifactId>
-    <version>1.1-SNAPSHOT</version>
+    <artifactId>xwiki</artifactId>
+    <version>1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web</artifactId>
+  <version>1.1-SNAPSHOT</version>
   <name>XWiki Web</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki/trunk/web</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki/trunk/web</url>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/web/trunk</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/web/trunk</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/web/trunk</url>
   </scm>
   <modules>
     <module>standard</module>
     <module>exo</module>
-    <module>xem</module>
     <!-- Enable again when the GWT module will build fine -->
     <!--module>gwt</module-->
   </modules>

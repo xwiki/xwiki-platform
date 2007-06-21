@@ -28,6 +28,23 @@ import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 public interface XWikiGWTApp {
 
     /**
+     * Returns the name of the app
+     */
+    public String getName();
+
+    /**
+     * Returns the css prefix of the app
+     * @return
+     */
+    public String getCSSPrefix();
+
+    /**
+     * Returns the locale of the app
+     * @return
+     */
+    public String getLocale();
+
+    /**
      * Returns the translation page to load
      * @return
      */
@@ -93,7 +110,4 @@ public interface XWikiGWTApp {
 
     public void showError(String code, String text);
 
-    public String getCSSPrefix();
-
-    public String getLocale();
 }

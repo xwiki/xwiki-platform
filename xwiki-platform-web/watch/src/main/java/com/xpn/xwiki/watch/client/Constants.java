@@ -35,6 +35,7 @@ public class Constants {
 
     public static final String WEBAPPNAME = "xwiki";
 
+    public static final String APPNAME = "watch";
     public static final String CSS_PREFIX = "watch";
 
     public static final String DEFAULT_WATCH_SPACE = "Watch";

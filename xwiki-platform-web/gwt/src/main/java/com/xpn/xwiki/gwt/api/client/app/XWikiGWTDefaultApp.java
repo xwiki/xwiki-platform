@@ -32,7 +32,7 @@ import com.google.gwt.core.client.GWT;
  * @author ldubost
  */
 
-public class XWikiGWTDefaultApp  implements com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp {
+public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     protected Translator translator;
     protected LoadingDialog loadingDialog;
     protected XWikiServiceAsync serviceInstance;
@@ -44,6 +44,10 @@ public class XWikiGWTDefaultApp  implements com.xpn.xwiki.gwt.api.client.app.XWi
 
 
     public void onModuleLoad() {
+    }
+
+    public String getName() {
+        return "";
     }
 
     /**
@@ -114,7 +118,7 @@ public class XWikiGWTDefaultApp  implements com.xpn.xwiki.gwt.api.client.app.XWi
      */
     public String getTranslation(String key) {
         if (translator!=null) {
-            return translator.getTranslation("watch." + key);
+            return translator.getTranslation(getName() + "." + key);
         } else {
             return key;
         }
@@ -127,7 +131,7 @@ public class XWikiGWTDefaultApp  implements com.xpn.xwiki.gwt.api.client.app.XWi
      */
     public String getTranslation(String key, String[] args) {
         if (translator!=null) {
-            return translator.getTranslation("watch." + key, args);
+            return translator.getTranslation(getName() + "." + key, args);
         } else {
             return key;
         }

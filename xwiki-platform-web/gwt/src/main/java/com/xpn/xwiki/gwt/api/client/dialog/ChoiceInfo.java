@@ -1,4 +1,4 @@
-package com.xpn.xwiki.watch.client.ui.dialog;
+package com.xpn.xwiki.gwt.api.client.dialog;
 
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 

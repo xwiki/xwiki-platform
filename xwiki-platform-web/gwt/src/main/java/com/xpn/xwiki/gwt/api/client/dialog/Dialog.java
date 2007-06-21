@@ -1,8 +1,8 @@
-package com.xpn.xwiki.watch.client.ui.dialog;
+package com.xpn.xwiki.gwt.api.client.dialog;
 
 import asquare.gwt.tk.client.ui.ModalDialog;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
-import com.xpn.xwiki.watch.client.ui.wizard.WatchWizard;
+import com.xpn.xwiki.gwt.api.client.wizard.Wizard;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.Window;
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.Window;
  * @author ldubost
  */
 
-public class WatchDialog extends ModalDialog {
+public class Dialog extends ModalDialog {
     public static int BUTTON_CANCEL = 1;
     public static int BUTTON_PREVIOUS = 2;
     public static int BUTTON_NEXT = 4;
@@ -43,30 +43,30 @@ public class WatchDialog extends ModalDialog {
 
     private int buttonModes;
     protected Object currentResult;
-    protected WatchWizard wizard;
+    protected Wizard wizard;
     protected String cancelText = "cancel";
     protected String previousText = "back";
     protected String nextText = "next";
 
 
     /**
-     * Watch dialog
+     * Dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
-    public WatchDialog(XWikiGWTApp app, String name, int buttonModes) {
+    public Dialog(XWikiGWTApp app, String name, int buttonModes) {
         this(app, name, buttonModes, null);
     }
 
     /**
-     * Watch dialog
+     * Dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      * @param nextCallback Callback when dialog is finished
      */
-    public WatchDialog(XWikiGWTApp app, String name, int buttonModes, AsyncCallback nextCallback) {
+    public Dialog(XWikiGWTApp app, String name, int buttonModes, AsyncCallback nextCallback) {
         this.app = app;
         this.nextCallback = nextCallback;
         this.name = name;
@@ -78,14 +78,14 @@ public class WatchDialog extends ModalDialog {
     }
 
     public void setAsyncCallback(AsyncCallback nextCallback) {
-        this.nextCallback = nextCallback;        
+        this.nextCallback = nextCallback;
     }
 
-    public void setWizard(WatchWizard wizard) {
+    public void setWizard(Wizard wizard) {
         this.wizard = wizard;
     }
 
-    public WatchWizard getWizard() {
+    public Wizard getWizard() {
         return wizard;
     }
 

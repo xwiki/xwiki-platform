@@ -4,7 +4,6 @@ import com.xpn.xwiki.watch.client.ui.WatchWidget;
 import com.xpn.xwiki.watch.client.ui.menu.ActionBarWidget;
 import com.xpn.xwiki.watch.client.ui.menu.NavigationBarWidget;
 import com.xpn.xwiki.watch.client.ui.dialog.CommentAddDialog;
-import com.xpn.xwiki.watch.client.ui.dialog.WatchDialog;
 import com.xpn.xwiki.watch.client.ui.dialog.EditTagsDialog;
 import com.xpn.xwiki.watch.client.Watch;
 import com.xpn.xwiki.watch.client.FilterStatus;
@@ -14,6 +13,7 @@ import com.xpn.xwiki.watch.client.data.FeedArticle;
 import com.xpn.xwiki.watch.client.data.FeedArticleComment;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.Document;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -255,7 +255,7 @@ public class ArticleListWidget extends WatchWidget {
         tagsAddImage.addClickListener(new ClickListener() {
             public void onClick(Widget widget) {
                 // Here we launch the tags add dialog
-                final EditTagsDialog tagsEditDialog = new EditTagsDialog(watch, "tagsadd", WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, article.getTags());
+                final EditTagsDialog tagsEditDialog = new EditTagsDialog(watch, "tagsadd", Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, article.getTags());
                 tagsEditDialog.setNextText("finish");
                 tagsEditDialog.setNextCallback(new AsyncCallback() {
                     public void onFailure(Throwable throwable) {
@@ -330,7 +330,7 @@ public class ArticleListWidget extends WatchWidget {
         commentAddImage.addClickListener(new ClickListener() {
             public void onClick(Widget widget) {
                 // Here we launch the comment add dialog
-                final CommentAddDialog commentAddDialog = new CommentAddDialog(watch, "commentadd", WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT);
+                final CommentAddDialog commentAddDialog = new CommentAddDialog(watch, "commentadd", Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT);
                 commentAddDialog.setNextText("finish");
                 commentAddDialog.setNextCallback(new AsyncCallback() {
                     public void onFailure(Throwable throwable) {

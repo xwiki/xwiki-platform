@@ -1,10 +1,8 @@
 package com.xpn.xwiki.watch.client.ui.wizard;
 
 import com.xpn.xwiki.watch.client.Watch;
-import com.xpn.xwiki.watch.client.ui.dialog.MessageDialog;
-import com.xpn.xwiki.watch.client.ui.dialog.WatchDialog;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.Window;
 
 /**
@@ -29,7 +27,7 @@ import com.google.gwt.user.client.Window;
  * @author ldubost
  */
 
-public class PressReviewMailDialog extends WatchDialog {
+public class PressReviewMailDialog extends Dialog {
     protected TextBox mailSubjectTextBox;
     protected TextBox mailToTextBox;
     protected TextArea mailContentTextArea;

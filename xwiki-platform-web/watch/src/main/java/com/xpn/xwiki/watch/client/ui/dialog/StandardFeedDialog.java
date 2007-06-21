@@ -38,7 +38,7 @@ public class StandardFeedDialog extends FeedDialog {
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
     public StandardFeedDialog(XWikiGWTApp app, String name, int buttonModes, Feed feed) {
         super(app, name, buttonModes, feed);

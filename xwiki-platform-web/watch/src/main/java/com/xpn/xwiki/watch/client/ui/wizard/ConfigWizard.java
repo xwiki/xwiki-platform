@@ -3,6 +3,11 @@ package com.xpn.xwiki.watch.client.ui.wizard;
 import com.xpn.xwiki.watch.client.Watch;
 import com.xpn.xwiki.watch.client.Feed;
 import com.xpn.xwiki.watch.client.ui.dialog.*;
+import com.xpn.xwiki.gwt.api.client.wizard.Wizard;
+import com.xpn.xwiki.gwt.api.client.dialog.ChoiceDialog;
+import com.xpn.xwiki.gwt.api.client.dialog.MessageDialog;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
+import com.xpn.xwiki.gwt.api.client.dialog.ChoiceInfo;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -27,19 +32,19 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author ldubost
  */
 
-public class ConfigWizard extends WatchWizard {
+public class ConfigWizard extends Wizard {
 
     public ConfigWizard(Watch watch, AsyncCallback callback) {
         super(watch, callback);
 
-        ChoiceDialog chooseConfigDialog = new ChoiceDialog(watch, "configtype", WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, true);
+        ChoiceDialog chooseConfigDialog = new ChoiceDialog(watch, "configtype", Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, true);
         chooseConfigDialog.addChoice("addfeed");
         chooseConfigDialog.addChoice("addkeyword");
         chooseConfigDialog.addChoice("addgroup");
         chooseConfigDialog.addChoice("loadingstatus");
         addDialog(chooseConfigDialog);
 
-        ChoiceDialog chooseFeedTypeDialog = new ChoiceDialog(watch, "addfeed", WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, true);
+        ChoiceDialog chooseFeedTypeDialog = new ChoiceDialog(watch, "addfeed", Dialog.BUTTON_PREVIOUS | Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, true);
         chooseFeedTypeDialog.addChoice("standard");
         chooseFeedTypeDialog.addChoice("googlenews");
         chooseFeedTypeDialog.addChoice("googleblog");
@@ -48,7 +53,7 @@ public class ConfigWizard extends WatchWizard {
         chooseFeedTypeDialog.addChoice("wikio");
         addDialog(chooseFeedTypeDialog);
 
-        StandardFeedDialog standardFeedDialog = new StandardFeedDialog(watch, "standard", WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, new Feed());
+        StandardFeedDialog standardFeedDialog = new StandardFeedDialog(watch, "standard", Dialog.BUTTON_PREVIOUS | Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, new Feed());
         addDialog(standardFeedDialog, "end");
 
         String[] languages = { "en", "fr" };
@@ -58,17 +63,17 @@ public class ConfigWizard extends WatchWizard {
         addSearchEngineDialog("feedster", "http://www.feedster.com/search/type/rss/{0}");
         addSearchEngineDialog("wikio", "http://rss.wikio.fr/search/{0}.rss");
 
-        AddKeywordDialog addKeywordDialog = new AddKeywordDialog(watch, "addkeyword", WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, "", "");
+        AddKeywordDialog addKeywordDialog = new AddKeywordDialog(watch, "addkeyword", Dialog.BUTTON_PREVIOUS | Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, "", "");
         addDialog(addKeywordDialog, "end");
 
-        AddGroupDialog addGroupDialog = new AddGroupDialog(watch, "addgroup", WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, "");
+        AddGroupDialog addGroupDialog = new AddGroupDialog(watch, "addgroup", Dialog.BUTTON_PREVIOUS | Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, "");
         addDialog(addGroupDialog, "end");
 
-        LoadingStatusDialog loadingStatusDialog = new LoadingStatusDialog(watch, "loadingstatus", WatchDialog.BUTTON_CANCEL);
+        LoadingStatusDialog loadingStatusDialog = new LoadingStatusDialog(watch, "loadingstatus", Dialog.BUTTON_CANCEL);
         loadingStatusDialog.setCancelText("close");
         addDialog(loadingStatusDialog, "");
 
-        MessageDialog messageDialog = new MessageDialog(watch, "end", WatchDialog.BUTTON_CANCEL);
+        MessageDialog messageDialog = new MessageDialog(watch, "end", Dialog.BUTTON_CANCEL);
         messageDialog.setCancelText("close");
         addDialog(messageDialog, "");
     }
@@ -78,7 +83,7 @@ public class ConfigWizard extends WatchWizard {
     }
 
     private void addSearchEngineDialog(String dialogName, String baseURL, String[] languages) {
-        SearchEngineFeedDialog searchEngineFeedDialog = new SearchEngineFeedDialog(watch, dialogName, WatchDialog.BUTTON_PREVIOUS | WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, new Feed(),baseURL,languages);
+        SearchEngineFeedDialog searchEngineFeedDialog = new SearchEngineFeedDialog(app, dialogName, Dialog.BUTTON_PREVIOUS | Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, new Feed(),baseURL,languages);
         addDialog(searchEngineFeedDialog, "end");
     }
 
@@ -103,7 +108,7 @@ public class ConfigWizard extends WatchWizard {
             } else {
                 // If we have a current dialog we will ask the dialog what the next dialog name is
                 // If the next dialog is unknow we will end the wizard
-                WatchDialog currentDialog = (WatchDialog) dialogs.get(status);
+                Dialog currentDialog = (Dialog) dialogs.get(status);
                 if (currentDialog!=null) {
                     String nextDialogName = getNextDialog(currentDialog.getName());
                     if (nextDialogName!=null) {
@@ -122,7 +127,7 @@ public class ConfigWizard extends WatchWizard {
      */
     protected int getStatusIndex(String dialogName) {
          for(int i=0;i<dialogs.size();i++) {
-             WatchDialog dialog = (WatchDialog) dialogs.get(i);
+             Dialog dialog = (Dialog) dialogs.get(i);
              if (dialogName.equals(dialog.getName()))
               return i;
          }

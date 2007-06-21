@@ -1,10 +1,10 @@
-package com.xpn.xwiki.watch.client.ui.dialog;
+package com.xpn.xwiki.gwt.api.client.dialog;
 
+import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
+import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.ui.*;
-import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 
 /**
  * Copyright 2006,XpertNet SARL,and individual contributors as indicated
@@ -29,7 +29,7 @@ import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
  */
 
 
-public class ChoiceDialog extends WatchDialog {
+public class ChoiceDialog extends Dialog {
     FlowPanel buttonPanel = new FlowPanel();
     FlowPanel helpPanel = new FlowPanel();
     SimplePanel helpHeader = new SimplePanel();
@@ -40,8 +40,7 @@ public class ChoiceDialog extends WatchDialog {
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param choices list of choices (ChoiceInfo objects)
-     * @param mode button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
     public ChoiceDialog(XWikiGWTApp app, String name, int buttonModes, boolean autoSelect) {
         this(app, name, buttonModes, autoSelect, null);
@@ -51,8 +50,7 @@ public class ChoiceDialog extends WatchDialog {
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param choices list of choices (ChoiceInfo objects)
-     * @param mode button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      * @param nextCallback Callback when dialog is finished
      */
     public ChoiceDialog(XWikiGWTApp app, String name, int buttonModes, boolean autoSelect, AsyncCallback nextCallback) {
@@ -84,15 +82,15 @@ public class ChoiceDialog extends WatchDialog {
     }
 
     public void addChoice(ChoiceInfo choice) {
-            ChoiceButton button = new ChoiceButton(choice, new ClickListener() {
+            ChoiceDialog.ChoiceButton button = new ChoiceDialog.ChoiceButton(choice, new ClickListener() {
                 public void onClick(Widget widget) {
-                    onChoiceClick((ChoiceButton)widget);
+                    onChoiceClick((ChoiceDialog.ChoiceButton)widget);
                 }
             });
             buttonPanel.add(button);
     }
 
-    public void onChoiceClick(ChoiceButton choiceButton) {
+    public void onChoiceClick(ChoiceDialog.ChoiceButton choiceButton) {
             setCurrentResult(choiceButton.getChoiceInfo());
             if (autoSelect) {
               endDialog();
@@ -151,11 +149,11 @@ public class ChoiceDialog extends WatchDialog {
     private void setActive(Button button) {
         for (int i=0;i< buttonPanel.getWidgetCount();i++) {
             Widget widget = buttonPanel.getWidget(i);
-            if (widget instanceof ChoiceButton) {
-                ChoiceButton choiceButton = (ChoiceButton) widget;
+            if (widget instanceof ChoiceDialog.ChoiceButton) {
+                ChoiceDialog.ChoiceButton choiceButton = (ChoiceDialog.ChoiceButton) widget;
                 widget.removeStyleName(getCSSName("button", choiceButton.getChoiceInfo().getCSSName() + "-active"));
             }
         }
-        ((ChoiceButton)button).addStyleName(getCSSName("button", ((ChoiceButton)button).getChoiceInfo().getCSSName() + "-active"));
+        ((ChoiceDialog.ChoiceButton)button).addStyleName(getCSSName("button", ((ChoiceDialog.ChoiceButton)button).getChoiceInfo().getCSSName() + "-active"));
     }
 }

@@ -5,6 +5,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.xpn.xwiki.watch.client.Watch;
 import com.xpn.xwiki.watch.client.Constants;
 import com.xpn.xwiki.watch.client.Feed;
@@ -32,14 +33,14 @@ import com.xpn.xwiki.watch.client.ui.wizard.ConfigWizard;
  * @author ldubost
  */
 
-public class PreviewFeedDialog extends WatchDialog {
+public class PreviewFeedDialog extends Dialog {
     protected Frame frame;
 
     /**
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
     public PreviewFeedDialog(XWikiGWTApp app, String name, int buttonModes) {
         super(app, name, buttonModes);

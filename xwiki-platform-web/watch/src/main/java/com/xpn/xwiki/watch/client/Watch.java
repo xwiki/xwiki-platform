@@ -3,9 +3,9 @@ package com.xpn.xwiki.watch.client;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTAppConstants;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.xpn.xwiki.watch.client.ui.UserInterface;
 import com.xpn.xwiki.watch.client.ui.dialog.AnalysisDialog;
-import com.xpn.xwiki.watch.client.ui.dialog.WatchDialog;
 import com.xpn.xwiki.watch.client.ui.wizard.ConfigWizard;
 import com.xpn.xwiki.watch.client.ui.wizard.PressReviewWizard;
 import com.xpn.xwiki.watch.client.data.DataManager;
@@ -53,6 +53,10 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
     protected String watchSpace = null;
     
     public Watch() {
+    }
+
+    public String getName() {
+        return Constants.APPNAME;
     }
 
     /**
@@ -416,7 +420,7 @@ public class Watch extends XWikiGWTDefaultApp implements EntryPoint {
 
     public void openAnalysisWizard() {
         // Placeholder for Analysis
-        AnalysisDialog analysisDialog = new AnalysisDialog(this, "analysis", WatchDialog.BUTTON_CANCEL);
+        AnalysisDialog analysisDialog = new AnalysisDialog(this, "analysis", Dialog.BUTTON_CANCEL);
         analysisDialog.show();
     }
 

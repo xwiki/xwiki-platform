@@ -1,8 +1,8 @@
-package com.xpn.xwiki.watch.client.ui.dialog;
+package com.xpn.xwiki.gwt.api.client.dialog;
 
-import com.google.gwt.user.client.ui.*;
-import com.google.gwt.user.client.Window;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 /**
  * Copyright 2006,XpertNet SARL,and individual contributors as indicated
@@ -26,13 +26,13 @@ import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
  * @author ldubost
  */
 
-public class MessageDialog extends WatchDialog {
+public class MessageDialog extends Dialog {
     protected HTML messagePanel;
     /**
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
     public MessageDialog(XWikiGWTApp app, String name, int buttonModes) {
         super(app, name, buttonModes);

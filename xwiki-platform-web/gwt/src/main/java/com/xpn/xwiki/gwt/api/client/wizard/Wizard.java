@@ -1,7 +1,7 @@
-package com.xpn.xwiki.watch.client.ui.wizard;
+package com.xpn.xwiki.gwt.api.client.wizard;
 
-import com.xpn.xwiki.watch.client.Watch;
-import com.xpn.xwiki.watch.client.ui.dialog.WatchDialog;
+import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import java.util.List;
@@ -31,8 +31,8 @@ import java.util.HashMap;
  * @author ldubost
  */
 
-public class WatchWizard {
-    protected Watch watch;
+public class Wizard {
+    protected XWikiGWTApp app;
     protected AsyncCallback callback;
     protected List dialogs = new ArrayList();
     protected Map nextDialog = new HashMap();
@@ -41,16 +41,16 @@ public class WatchWizard {
     protected List previousSteps = new ArrayList();
 
 
-    public WatchWizard(Watch watch, AsyncCallback callback) {
-        this.watch = watch;
+    public Wizard(XWikiGWTApp app, AsyncCallback callback) {
+        this.app = app;
         this.callback = callback;
     }
 
-    public void addDialog(WatchDialog dialog) {
+    public void addDialog(Dialog dialog) {
         addDialog(dialog, null);
     }
 
-    public void addDialog(WatchDialog dialog, String nextDialogName) {
+    public void addDialog(Dialog dialog, String nextDialogName) {
         dialog.setWizard(this);
         dialogs.add(dialog);
         if (nextDialogName!=null)
@@ -79,7 +79,7 @@ public class WatchWizard {
         // Show the next dialog unless we are finished
         previousSteps.add(new Integer(status));
         if (status<dialogs.size()) {
-            WatchDialog nextDialog = (WatchDialog) dialogs.get(status);
+            Dialog nextDialog = (Dialog) dialogs.get(status);
             nextDialog.show();
         } else {
             // We are finished we call the finishWizard function
@@ -143,7 +143,7 @@ public class WatchWizard {
         if (previousSteps.size()>1) {
             previousSteps.remove(previousSteps.size()-1);
             status = ((Integer) previousSteps.get(previousSteps.size()-1)).intValue();
-            WatchDialog previousDialog = (WatchDialog) dialogs.get(status);
+            Dialog previousDialog = (Dialog) dialogs.get(status);
             if (previousDialog!=null) {
                 previousDialog.show();
             } else {

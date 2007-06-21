@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.xpn.xwiki.watch.client.Watch;
 
 /**
@@ -28,7 +29,7 @@ import com.xpn.xwiki.watch.client.Watch;
  * @author ldubost
  */
 
-public class EditTagsDialog extends WatchDialog {
+public class EditTagsDialog extends Dialog {
     protected TextBox tagsTextBox;
     protected String tags;
 
@@ -36,7 +37,7 @@ public class EditTagsDialog extends WatchDialog {
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
     public EditTagsDialog(XWikiGWTApp app, String name, int buttonModes, String tags) {
         super(app, name, buttonModes);

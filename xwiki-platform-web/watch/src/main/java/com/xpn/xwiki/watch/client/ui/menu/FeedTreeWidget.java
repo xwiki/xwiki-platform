@@ -2,13 +2,13 @@ package com.xpn.xwiki.watch.client.ui.menu;
 
 import com.xpn.xwiki.watch.client.ui.WatchWidget;
 import com.xpn.xwiki.watch.client.ui.dialog.StandardFeedDialog;
-import com.xpn.xwiki.watch.client.ui.dialog.WatchDialog;
-import com.xpn.xwiki.watch.client.ui.dialog.ChoiceDialog;
-import com.xpn.xwiki.watch.client.ui.dialog.ChoiceInfo;
 import com.xpn.xwiki.watch.client.Watch;
 import com.xpn.xwiki.watch.client.Feed;
 import com.xpn.xwiki.watch.client.Constants;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
+import com.xpn.xwiki.gwt.api.client.dialog.ChoiceDialog;
+import com.xpn.xwiki.gwt.api.client.dialog.ChoiceInfo;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.*;
 import com.google.gwt.user.client.Timer;
@@ -211,7 +211,7 @@ public class FeedTreeWidget  extends WatchWidget {
         private void chooseAction() {
             if (actionStarted==false) {
                 actionStarted = true;
-                chooseActionDialog = new ChoiceDialog(watch, "chooseaction", WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, false,
+                chooseActionDialog = new ChoiceDialog(watch, "chooseaction", Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, false,
                         new AsyncCallback() {
                             public void onFailure(Throwable throwable) {
                                 actionStarted = false;
@@ -246,7 +246,7 @@ public class FeedTreeWidget  extends WatchWidget {
         }
 
         private void updateFeed() {
-            feedDialog = new StandardFeedDialog(watch, "standardfeed", WatchDialog.BUTTON_CANCEL | WatchDialog.BUTTON_NEXT, feed);
+            feedDialog = new StandardFeedDialog(watch, "standardfeed", Dialog.BUTTON_CANCEL | Dialog.BUTTON_NEXT, feed);
             feedDialog.setAsyncCallback(new AsyncCallback() {
                 public void onFailure(Throwable throwable) {
                     actionStarted = false;

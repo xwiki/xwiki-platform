@@ -4,6 +4,7 @@ import com.google.gwt.user.client.ui.*;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.xpn.xwiki.watch.client.Watch;
 
 import java.util.List;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
  * @author ldubost
  */
 
-public class AddGroupDialog extends WatchDialog {
+public class AddGroupDialog extends Dialog {
     protected TextBox groupTextBox;
     protected String group;
 
@@ -39,7 +40,7 @@ public class AddGroupDialog extends WatchDialog {
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
     public AddGroupDialog(XWikiGWTApp app, String name, int buttonModes, String group) {
         super(app, name, buttonModes);

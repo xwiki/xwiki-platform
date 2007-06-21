@@ -2,6 +2,7 @@ package com.xpn.xwiki.watch.client.ui.dialog;
 
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
+import com.xpn.xwiki.gwt.api.client.dialog.Dialog;
 import com.xpn.xwiki.watch.client.Feed;
 import com.xpn.xwiki.watch.client.Watch;
 import com.google.gwt.user.client.ui.*;
@@ -33,7 +34,7 @@ import java.util.Iterator;
  * @author ldubost
  */
 
-public abstract class FeedDialog extends WatchDialog {
+public abstract class FeedDialog extends Dialog {
     protected Feed feed;
     protected ListBox groupsListBox = new ListBox();
     protected String[] languages;
@@ -42,7 +43,7 @@ public abstract class FeedDialog extends WatchDialog {
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
     public FeedDialog(XWikiGWTApp app, String name, int buttonModes, Feed feed) {
         this(app, name, buttonModes, feed, null);
@@ -52,7 +53,7 @@ public abstract class FeedDialog extends WatchDialog {
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
-     * @param buttonModes button modes WatchDialog.BUTTON_CANCEL|WatchDialog.BUTTON_NEXT for Cancel / Next
+     * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      * @languages list of available languages
      */
     public FeedDialog(XWikiGWTApp app, String name, int buttonModes, Feed feed, String[] languages) {

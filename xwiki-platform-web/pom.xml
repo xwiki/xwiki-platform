@@ -23,13 +23,13 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki</groupId>
+    <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
     <version>1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web</artifactId>
   <version>1.1-SNAPSHOT</version>
-  <name>XWiki Web</name>
+  <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>

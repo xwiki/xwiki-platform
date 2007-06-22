@@ -25,12 +25,12 @@
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki</groupId>
+    <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-web</artifactId>
     <version>1.1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-web-standard</artifactId>
-  <name>XWiki Web - Standard</name>
+  <name>XWiki Platform - Web - Standard</name>
   <!-- We're using a pom packaging type instead of a WAR as we're using the Assembly plugin
        in order to generate the WAR as a secondary artifact with a classifier name as this is not
        possible with a primary artifact -->
@@ -38,12 +38,12 @@
   <description>The standard XWiki WAR</description>
   <dependencies>
     <dependency>
-      <groupId>com.xpn.xwiki</groupId>
+      <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>${version}</version>
     </dependency>
     <!--dependency>
-      <groupId>com.xpn.xwiki</groupId>
+      <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
       <version>${version}</version>
       <type>war</type>

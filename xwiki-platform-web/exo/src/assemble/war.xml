@@ -29,14 +29,14 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>com.xpn.xwiki:xwiki-web-standard</include>
+        <include>com.xpn.xwiki.platform:xwiki-web-standard</include>
       </includes>
       <unpack>true</unpack>
     </dependencySet>
     <dependencySet>
       <outputDirectory>WEB-INF/lib</outputDirectory>
       <excludes>
-        <exclude>com.xpn.xwiki:xwiki-web-standard</exclude>
+        <exclude>com.xpn.xwiki.platform:xwiki-web-standard</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

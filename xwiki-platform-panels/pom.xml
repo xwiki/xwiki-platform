@@ -26,12 +26,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki</groupId>
-    <artifactId>xwiki-applications-xarlets</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>com.xpn.xwiki.applications</groupId>
+    <artifactId>xwiki-applications</artifactId>
+    <version>1-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-applications-xarlet-panels</artifactId>
-  <name>XWiki Applications - Xarlets - Panels</name>
+  <artifactId>xwiki-application-panels</artifactId>
+  <name>XWiki Applications - Panels</name>
+  <version>1.1-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
 </project>

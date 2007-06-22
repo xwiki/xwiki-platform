@@ -1,6 +1,6 @@
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.xpn.xwiki</groupId>
+  <groupId>com.xpn.xwiki.platform</groupId>
   <artifactId>xwiki-backup-sample-basic-import-export</artifactId>
   <packaging>pom</packaging>
   <name>Maven XWiki Backup Plugin Basic Import/EXport Sample</name>
@@ -9,7 +9,7 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>com.xpn.xwiki</groupId>
+        <groupId>com.xpn.xwiki.platform</groupId>
         <artifactId>xwiki-packager</artifactId>
         <dependencies>
           <dependency>

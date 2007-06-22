@@ -8,7 +8,7 @@
       <configuration>
         <phases>
           <process-resources>org.apache.maven.plugins:maven-resources-plugin:resources</process-resources>
-          <package>com.xpn.xwiki:xwiki-build-xar-handlers:xar</package>
+          <package>com.xpn.xwiki.platform:xwiki-build-xar-handlers:xar</package>
           <install>org.apache.maven.plugins:maven-install-plugin:install</install>
           <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
         </phases>

@@ -527,6 +527,21 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <!-- We're currently relying on a timestamped version of JTidy 8.0 as it's not been relased
+         since ... 2000. Thus we need this remote repo definded to get it. -->
+    <repository>
+      <id>jtidy</id>
+      <name>JTidy Snapshot Repository</name>
+      <url>http://jtidy.sourceforge.net/snapshots/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
   <profiles>
     <profile>
       <!-- Use this profile to weave the Log Aspect to trace all method calls. This is useful for

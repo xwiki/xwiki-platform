@@ -24,19 +24,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.plugin</groupId>
+    <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
     <version>1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-exoplatform</artifactId>
   <version>0.1-SNAPSHOT</version>
-  <name>XWiki Plugins - eXo Platform</name>
+  <name>XWiki Platform - Plugins - eXo Platform</name>
   <packaging>jar</packaging>
-  <description>XWiki eXo Platform Plugin</description>
+  <description>XWiki Platform - Plugins - eXo Platform</description>
   <dependencies>
 
     <dependency>
-      <groupId>com.xpn.xwiki</groupId>
+      <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>1.1-SNAPSHOT</version>
     </dependency>

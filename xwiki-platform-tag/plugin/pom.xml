@@ -26,16 +26,16 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki</groupId>
+    <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
     <version>1-SNAPSHOT</version>
   </parent>
-  <groupId>com.xpn.xwiki.plugin</groupId>
+  <groupId>com.xpn.xwiki.platform.plugins</groupId>
   <artifactId>xwiki-plugins</artifactId>
   <packaging>pom</packaging>
-  <name>XWiki Plugins</name>
+  <name>XWiki Platform - Plugins - Parent POM</name>
   <version>1-SNAPSHOT</version>
-  <description>The XWiki Plugins</description>
+  <description>XWiki Platform - Plugins - Parent POM</description>
   <scm>
     <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</connection>
     <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</developerConnection>
@@ -47,9 +47,10 @@
     <module>exoplatform</module>
     <module>multiwiki</module>
   </modules>
-  <!-- Note: Even though this repository is defined in the com.xpn.xwiki:xwiki module we still need
-       to define it here because if com.xpn.xwiki:xwiki is not in the local repository we want to
-       fetch it from the remote repo to provide a seamless build experience -->
+  <!-- Note: Even though this repository is defined in the com.xpn.xwiki.platform:xwiki module we
+       still need to define it here because if com.xpn.xwiki.platform:xwiki is not in the local
+       repository we want to fetch it from the remote repo to provide a seamless build experience
+  -->
   <repositories>
     <repository>
       <id>xwiki</id>

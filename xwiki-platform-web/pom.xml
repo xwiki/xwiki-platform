@@ -43,5 +43,22 @@
     <!-- Enable again when the GWT module will build fine -->
     <!--module>gwt</module-->
   </modules>
+  <!-- Note: Even though this repository is defined in the com.xpn.xwiki.platform:xwiki module we
+       still need to define it here because if com.xpn.xwiki.platform:xwiki is not in the local
+       repository we want to fetch it from the remote repo to provide a seamless build experience
+  -->
+  <repositories>
+    <repository>
+      <id>xwiki</id>
+      <name>XWiki Maven2 Remote Repository</name>
+      <url>http://maven.xwiki.org</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
 </project>
         

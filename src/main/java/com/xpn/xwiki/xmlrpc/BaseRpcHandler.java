@@ -64,7 +64,6 @@ public class BaseRpcHandler implements RequestInitializableHandler
     protected XWikiContext getXWikiContext() throws XWikiException
     {
         XWikiContext context = Utils.prepareContext("", request, response, econtext);
-        context.setDatabase("xwikitest");
         XWiki xwiki = XWiki.getXWiki(context);
         XWikiURLFactory urlf =
             xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);

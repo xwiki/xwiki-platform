@@ -107,16 +107,30 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 
         String heading = formatter.format(new Object[]{id, level.replaceAll("\\.", "-"), numbering, text, hlevel});
 
-        Object beforeAction = xcontext.get("action");
+        // Only show the section edit button for view action and when the user has edit rights on
+        // the current document
         boolean showEditButton = false;
-        // only show sectional edit button for view action
-        if (xcontext.getWiki().hasSectionEdit(xcontext)&&("view".equals(xcontext.getAction()))) {
+        if (xcontext.getWiki().hasSectionEdit(xcontext) && ("view".equals(xcontext.getAction()))) {
             try {
-             if ((doc!=null)&&(xcontext.getWiki().checkAccess("edit", doc, xcontext)))
-              showEditButton = true;
-            } catch  (Exception e) {}
+                // TODO: The user should always be set and never be null when this code gets
+                // executed. Unfortunately this is currently happening. It should be set to XWiki
+                // Guest immediatly in the initialization phase.
+                // TODO: Similarly the current document should never be null when this code gets
+                // executed as it would mean we're trying to render the headings for a null
+                // document and that doesn't make sense... 
+                if ((doc != null) && ((xcontext.getUser() != null)
+                    && xcontext.getWiki().getRightService().hasAccessLevel(
+                        "edit", xcontext.getUser(), doc.getFullName(), xcontext)))
+                {
+                    showEditButton = true;
+                }
+            } catch (XWikiException e) {
+                // TODO: Remove this try/catch block by removing the throw exception on
+                // hasAccessLevel() as it never throws any exception...
+            }
         }
 
+        Object beforeAction = xcontext.get("action");
         if (showEditButton) {
             if (beforeAction != null) {
                 if(!beforeAction.toString().equals("HeadingFilter")) {

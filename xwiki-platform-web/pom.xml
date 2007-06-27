@@ -40,8 +40,7 @@
   <modules>
     <module>standard</module>
     <module>exo</module>
-    <!-- Enable again when the GWT module will build fine -->
-    <!--module>gwt</module-->
+    <module>gwt</module>
   </modules>
   <!-- Note: Even though this repository is defined in the com.xpn.xwiki.platform:xwiki module we
        still need to define it here because if com.xpn.xwiki.platform:xwiki is not in the local

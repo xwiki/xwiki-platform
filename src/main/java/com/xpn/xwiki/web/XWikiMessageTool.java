@@ -65,6 +65,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class XWikiMessageTool
 {
     /**
+     * The encoding used for storing unicode characters as bytes.
+     */
+    public static final String BYTE_ENCODING = "UTF-8";
+
+    /**
      * Log4J logger object to log messages in this class.
      */
     private static final Logger LOG = Logger.getLogger(XWikiMessageTool.class);
@@ -74,11 +79,6 @@ public class XWikiMessageTool
      * ("documentBundles") or in the xwiki.cfg configuration file ("xwiki.documentBundles").
      */
     private static final String KEY = "documentBundles";
-
-    /**
-     * The encoding used for storing unicode characters as bytes.
-     */
-    public static final String BYTE_ENCODING = "UTF-8";
 
     /**
      * The default Resource Bundle to fall back to if no document bundle is found when trying to get

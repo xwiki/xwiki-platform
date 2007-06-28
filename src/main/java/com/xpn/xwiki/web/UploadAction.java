@@ -79,7 +79,7 @@ public class UploadAction extends XWikiAction
         }
 
         byte[] data = fileupload.getFileItemData("filepath", context);
-        if (filename == null) {
+        if (filename == null || filename.trim().equals("")) {
             String fname = fileupload.getFileName("filepath", context);
             int i = fname.lastIndexOf("\\");
             if (i == -1)

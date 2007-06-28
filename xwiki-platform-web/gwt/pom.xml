@@ -35,8 +35,6 @@
   <packaging>jar</packaging>
   <description>The Common GWT API XWiki JAR</description>
   <dependencies>
-    <!-- These 3 GWT libraries are not yet in the Maven2 central repository. For the time being we
-         have uploaded them in our custom Maven repository on http://maven.xwiki.org. -->
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
@@ -50,6 +48,8 @@
            WAR -->
       <scope>provided</scope>
     </dependency>
+    <!-- The GWT TK library is not in any Maven2 remote repository. For the time being we
+         have uploaded it in our custom Maven repository on http://maven.xwiki.org. -->
     <dependency>
       <groupId>gwttk</groupId>
       <artifactId>gwttk</artifactId>
@@ -84,4 +84,10 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>gwt-maven</id>
+      <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo/</url>
+    </repository>
+  </repositories>
 </project>

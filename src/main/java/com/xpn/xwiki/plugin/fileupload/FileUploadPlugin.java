@@ -163,6 +163,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      */
     public void cleanFileList(XWikiContext context)
     {
+        LOG.debug("Cleaning uploaded files");
         List fileuploadlist = (List) context.get(FILE_LIST_KEY);
         if (fileuploadlist != null) {
             for (int i = 0; i < fileuploadlist.size(); i++) {
@@ -211,6 +212,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir,
         XWikiContext context) throws XWikiException
     {
+        LOG.debug("Loading uploaded files");
         // Get the FileUpload Data
         DiskFileItemFactory factory = new DiskFileItemFactory();
         factory.setSizeThreshold(uploadSizeThreashold);
@@ -231,6 +233,9 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
 
         try {
             List list = fileupload.parseRequest(reqContext);
+            if (list.size() > 0) {
+                LOG.info("Loaded " + list.size() + " uploaded files");
+            }
             // We store the file list in the context
             context.put(FILE_LIST_KEY, list);
         } catch (FileUploadBase.SizeLimitExceededException e) {
@@ -381,6 +386,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      */
     public FileItem getFile(String formfieldName, XWikiContext context)
     {
+        LOG.debug("Searching file uploaded for field " + formfieldName);
         List fileuploadlist = getFileItems(context);
         if (fileuploadlist == null) {
             return null;
@@ -391,6 +397,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
             FileItem item = (FileItem) fileuploadlist.get(i);
             if (formfieldName.equals(item.getFieldName())) {
                 fileitem = item;
+                LOG.debug("Found uploaded file!");
                 break;
             }
         }

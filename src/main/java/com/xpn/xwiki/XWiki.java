@@ -146,7 +146,7 @@ import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface
 {
-    private static final Log log = LogFactory.getLog(XWiki.class);
+    protected static final Log LOG = LogFactory.getLog(XWiki.class);
 
     private XWikiConfig config;
 
@@ -227,8 +227,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 configPath = (String) envContext.lookup(CFG_ENV_NAME);
             } catch (Exception e) {
                 // Allow a config path from WEB-INF
-                if (log.isInfoEnabled())
-                    log
+                if (LOG.isInfoEnabled())
+                    LOG
                         .info("xwiki.cfg taken from /WEB-INF/xwiki.cfg because the XWikiConfig variable is not set in the context");
                 configPath = "/WEB-INF/xwiki.cfg";
             }
@@ -270,7 +270,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     } else {
                         xwikicfgis = econtext.getResourceAsStream(xwikicfg);
                         if (xwikicfgis == null) {
-                            if (context.getMode() == XWikiContext.MODE_GWT || context.getMode()==XWikiContext.MODE_GWT_DEBUG)
+                            if (context.getMode() == XWikiContext.MODE_GWT
+                                || context.getMode() == XWikiContext.MODE_GWT_DEBUG)
                                 xwikicfgis =
                                     XWiki.class.getClassLoader().getResourceAsStream(
                                         "xwiki-gwt.cfg");
@@ -888,7 +889,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         saveDocument(doc, "", context);
     }
 
-    public void saveDocument(XWikiDocument doc, String comment, XWikiContext context) throws XWikiException
+    public void saveDocument(XWikiDocument doc, String comment, XWikiContext context)
+        throws XWikiException
     {
         String server = null, database = null;
         try {
@@ -900,7 +902,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
 
             // Setting comment before saving
-            doc.setComment((comment==null) ? "" : comment);
+            doc.setComment((comment == null) ? "" : comment);
 
             getStore().saveXWikiDoc(doc, context);
         } finally {
@@ -910,14 +912,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, XWikiContext context) throws XWikiException
+    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, XWikiContext context)
+        throws XWikiException
     {
         // If no comment is provided we should use an empty comment
         saveDocument(doc, olddoc, "", context);
     }
 
-    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, String comment, XWikiContext context)
-            throws XWikiException
+    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, String comment,
+        XWikiContext context) throws XWikiException
     {
         String server = null, database = null;
         try {
@@ -929,11 +932,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
 
             // Setting comment before saving
-            doc.setComment((comment==null) ? "" : comment);
-    
+            doc.setComment((comment == null) ? "" : comment);
+
             getStore().saveXWikiDoc(doc, context);
             getNotificationManager().verify(doc, olddoc,
-                    XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+                XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         } finally {
             if ((server != null) && (database != null)) {
                 context.setDatabase(database);
@@ -1111,7 +1114,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         textarea.setID("content");
         // Forcing a new line after the <textarea> tag, as
         // http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 causes an empty line at the start
-        // of the document content to be trimmed. 
+        // of the document content to be trimmed.
         textarea.addElement("\n" + scontent);
         return textarea.toString();
     }
@@ -1194,8 +1197,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         String parsedContent;
 
         if ((content != null) && (!content.equals(""))) {
-            parsedContent = context.getWiki().getRenderingEngine().interpretText(content,
-                context.getDoc(), context);
+            parsedContent =
+                context.getWiki().getRenderingEngine().interpretText(content, context.getDoc(),
+                    context);
         } else {
             parsedContent = "";
         }
@@ -1277,7 +1281,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 parseTemplate(template, skin, context), context.getDoc(), context.getDoc(),
                 context);
         } catch (Exception ex) {
-            log.error(ex);
+            LOG.error(ex);
             return parseTemplate(template, skin, context);
         }
     }
@@ -1288,7 +1292,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return getRenderingEngine().getRenderer("wiki").render(
                 parseTemplate(template, context), context.getDoc(), context.getDoc(), context);
         } catch (Exception ex) {
-            log.error(ex);
+            LOG.error(ex);
             return parseTemplate(template, context);
         }
     }
@@ -1309,7 +1313,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return IncludeServletAsString.invokeServletAndReturnAsString(url, servletRequest,
                 servletResponse);
         } catch (Exception e) {
-            log.warn("Exception including url: " + url, e);
+            LOG.warn("Exception including url: " + url, e);
             return "Exception including \"" + url + "\", see logs for details.";
         }
 
@@ -1478,7 +1482,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
             return value;
         } catch (XWikiException ex) {
-            log.warn("", ex);
+            LOG.warn("", ex);
         }
         return default_value;
     }
@@ -1552,7 +1556,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             XWikiDocument doc = getDocument("XWiki.XWikiPreferences", context);
             // First we try to get a translated preference object
             BaseObject object =
-                doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
+                doc.getObject("XWiki.XWikiPreferences", "default_language",
+                    context.getLanguage(), true);
             String result = "";
 
             try {
@@ -1590,7 +1595,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             // First we try to get a translated preference object
             BaseObject object =
-                doc.getObject("XWiki.XWikiPreferences", "default_language", context.getLanguage(), true);
+                doc.getObject("XWiki.XWikiPreferences", "default_language",
+                    context.getLanguage(), true);
             String result = "";
             try {
                 result = object.getStringValue(prefname);
@@ -1658,13 +1664,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * First try to find the current language in use from the XWiki context. If none is used
-     * and if the wiki is not multilingual use the default language defined in the XWiki
-     * preferences. If the wiki is multilingual try to get the language passed in the request.
-     * If none was passed try to get it from a cookie. If no language cookie exists then use the
-     * user default language and barring that use the browser's "Accept-Language" header sent in
-     * HTTP request. If none is defined use the default language.
-     *
+     * First try to find the current language in use from the XWiki context. If none is used and if
+     * the wiki is not multilingual use the default language defined in the XWiki preferences. If
+     * the wiki is multilingual try to get the language passed in the request. If none was passed
+     * try to get it from a cookie. If no language cookie exists then use the user default language
+     * and barring that use the browser's "Accept-Language" header sent in HTTP request. If none is
+     * defined use the default language.
+     * 
      * @return the language to use
      */
     public String getLanguagePreference(XWikiContext context)
@@ -1676,7 +1682,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return language;
 
         // Find out what is the default language from the XWiki preferences settings.
-        String defaultLanguage = context.getWiki().getXWikiPreference("default_language", "", context);
+        String defaultLanguage =
+            context.getWiki().getXWikiPreference("default_language", "", context);
         if (defaultLanguage == null || defaultLanguage.equals("")) {
             defaultLanguage = "en";
         }
@@ -2044,7 +2051,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Make sure we call all classes flushCache function
         try {
             List classes = getClassList(context);
-            for (int i=0;i<classes.size();i++) {
+            for (int i = 0; i < classes.size(); i++) {
                 String className = (String) classes.get(i);
                 try {
                     getClass(className, context).flushCache();
@@ -2587,7 +2594,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     return -4;
                 }
             } catch (RuntimeException ex) {
-                log.warn("Invalid regular expression for xwiki.validusername", ex);
+                LOG.warn("Invalid regular expression for xwiki.validusername", ex);
                 if (!context.getUtil().match("/^[a-zA-Z0-9_]+$/", xwikiname)) {
                     return -4;
                 }
@@ -2641,23 +2648,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * Method allows to create an empty user with no password (he won't be able to login)
-     * This method is usefull for authentication like LDAP or App Server trusted
+     * Method allows to create an empty user with no password (he won't be able to login) This
+     * method is usefull for authentication like LDAP or App Server trusted
+     * 
      * @param xwikiname
      * @param userRights
      * @param context
-     * @return  true if success
+     * @return true if success
      * @throws XWikiException
      */
-    public boolean createEmptyUser(String xwikiname, String userRights, XWikiContext context) throws XWikiException {
+    public boolean createEmptyUser(String xwikiname, String userRights, XWikiContext context)
+        throws XWikiException
+    {
         HashMap map = new HashMap();
         map.put("active", "1");
         map.put("first_name", xwikiname);
         String content = "#includeForm(\"XWiki.XWikiUserSheet\")";
-        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, userRights, context)==1)
-         return true;
+        if (createUser(xwikiname, map, "XWiki.XWikiUsers", content, userRights, context) == 1)
+            return true;
         else
-         return false;
+            return false;
     }
 
     public void sendConfirmationEmail(String xwikiname, String password, String email,
@@ -2836,7 +2846,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             protectUserPage(fullwikiname, userRights, doc, context);
 
-            saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createdUser"), context);
+            saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createdUser"),
+                context);
 
             // Now let's add the user to XWiki.XWikiAllGroup
             setUserDefaultGroup(fullwikiname, context);
@@ -2860,14 +2871,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         XWikiDocument allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
         XWikiDocument oldDoc = (XWikiDocument) allgroupdoc.clone();
 
-
         BaseObject memberobj = (BaseObject) gclass.newObject(context);
         memberobj.setClassName(gclass.getName());
         memberobj.setName(allgroupdoc.getFullName());
         memberobj.setStringValue("member", fullwikiname);
         allgroupdoc.addObject(gclass.getName(), memberobj);
         if (allgroupdoc.isNew()) {
-            saveDocument(allgroupdoc, oldDoc, context.getMessageTool().get("core.comment.addedUserToGroup"), context);
+            saveDocument(allgroupdoc, oldDoc, context.getMessageTool().get(
+                "core.comment.addedUserToGroup"), context);
         } else {
             getHibernateStore().saveXWikiObject(memberobj, context, true);
         }
@@ -3029,7 +3040,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             XWikiDocument doc = null;
             try {
-                log.debug("Including Topic " + topic);
+                LOG.debug("Including Topic " + topic);
 
                 int i0 = topic.indexOf(":");
                 if (i0 != -1) {
@@ -3052,7 +3063,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     if ((includecounter.intValue() > 30)
                         || ((database.equals(incdatabase) && (topic.equals(currentdoc
                             .getFullName()))))) {
-                        log.warn("Error on too many recursive includes for topic " + topic);
+                        LOG.warn("Error on too many recursive includes for topic " + topic);
                         return "Cannot make recursive include";
                     }
                 } catch (Exception e) {
@@ -3068,7 +3079,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 }
 
             } catch (XWikiException e) {
-                log.warn("Exception Including Topic " + topic, e);
+                LOG.warn("Exception Including Topic " + topic, e);
                 return "Topic " + topic + " does not exist";
             }
 
@@ -3253,8 +3264,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 context.setDatabase(sourceWiki);
             XWikiDocument sdoc = getDocument(docname, context);
             if (!sdoc.isNew()) {
-                if (log.isInfoEnabled())
-                    log.info("Copying document: " + docname + " (default) to " + targetdocname
+                if (LOG.isInfoEnabled())
+                    LOG.info("Copying document: " + docname + " (default) to " + targetdocname
                         + " on wiki " + targetWiki);
 
                 // Let's switch to the other database to verify if the document already exists
@@ -3314,8 +3325,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     for (int i = 0; i < tlist.size(); i++) {
                         String clanguage = (String) tlist.get(i);
                         XWikiDocument stdoc = sdoc.getTranslatedDocument(clanguage, context);
-                        if (log.isInfoEnabled())
-                            log.info("Copying document: " + docname + "(" + clanguage + ") to "
+                        if (LOG.isInfoEnabled())
+                            LOG.info("Copying document: " + docname + "(" + clanguage + ") to "
                                 + targetdocname + " on wiki " + targetWiki);
 
                         if (targetWiki != null)
@@ -3417,8 +3428,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             try {
                 context.setDatabase(targetWiki);
                 List list = getStore().searchDocumentsNames(sql, context);
-                if (log.isInfoEnabled())
-                    log.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
+                if (LOG.isInfoEnabled())
+                    LOG.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
 
                 for (Iterator it = list.iterator(); it.hasNext();) {
                     String docname = (String) it.next();
@@ -3433,8 +3444,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             context.setDatabase(sourceWiki);
             List list = getStore().searchDocumentsNames(sql, context);
-            if (log.isInfoEnabled())
-                log.info("Copying " + list.size() + " documents from wiki " + sourceWiki
+            if (LOG.isInfoEnabled())
+                LOG.info("Copying " + list.size() + " documents from wiki " + sourceWiki
                     + " to wiki " + targetWiki);
 
             for (Iterator it = list.iterator(); it.hasNext();) {
@@ -3466,24 +3477,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             // User does not exist
             if (userdoc.isNew()) {
-                if (log.isErrorEnabled())
-                    log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                if (LOG.isErrorEnabled())
+                    LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                         + ") failed: " + "user does not exist");
                 return -2;
             }
 
             // User is not active
             if (!(userdoc.getIntValue("XWiki.XWikiUsers", "active") == 1)) {
-                if (log.isErrorEnabled())
-                    log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                if (LOG.isErrorEnabled())
+                    LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                         + ") failed: " + "user is not active");
                 return -3;
             }
 
             String wikiForbiddenList = Param("xwiki.virtual.reserved_wikis");
             if (Util.contains(wikiName, wikiForbiddenList, ", ")) {
-                if (log.isErrorEnabled())
-                    log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                if (LOG.isErrorEnabled())
+                    LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                         + ") failed: " + "wiki name is forbidden");
                 return -4;
             }
@@ -3511,12 +3522,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 // If we are not allowed to continue if server page already exists
 
                 if (failOnExist) {
-                    if (log.isErrorEnabled())
-                        log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                    if (LOG.isErrorEnabled())
+                        LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                             + ") failed: " + "wiki server page already exists");
                     return -5;
-                } else if (log.isWarnEnabled())
-                    log.warn("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                } else if (LOG.isWarnEnabled())
+                    LOG.warn("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                         + ") failed: " + "wiki server page already exists");
 
             }
@@ -3526,26 +3537,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 context.setDatabase(getDatabase());
                 getStore().createWiki(wikiName, context);
             } catch (XWikiException e) {
-                if (log.isErrorEnabled()) {
+                if (LOG.isErrorEnabled()) {
                     if (e.getCode() == 10010)
-                        log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                        LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                             + ") failed: " + "wiki database already exists");
                     else if (e.getCode() == 10011)
-                        log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                        LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                             + ") failed: " + "wiki database creation failed");
                     else
-                        log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                        LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                             + ") failed: " + "wiki database creation threw exception", e);
                 }
             } catch (Exception e) {
-                log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                     + ") failed: " + "wiki database creation threw exception", e);
             }
 
             try {
                 updateDatabase(wikiName, true, false, context);
             } catch (Exception e) {
-                log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+                LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                     + ") failed: " + "wiki database shema update threw exception", e);
                 return -6;
             }
@@ -3571,7 +3582,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
              */
             return 1;
         } catch (Exception e) {
-            log.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
+            LOG.error("Wiki creation (" + wikiName + "," + wikiUrl + "," + wikiAdmin
                 + ") failed: " + "wiki creation threw exception", e);
             return -10;
         } finally {
@@ -3633,20 +3644,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         doc.setFullName(fullname, context);
 
         URL url =
-            context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action, null, null,
-                doc.getDatabase(), context);
+            context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action,
+                null, null, doc.getDatabase(), context);
         return url.toString();
     }
 
-    public String getExternalURL(String fullname, String action, String querystring, XWikiContext context)
-        throws XWikiException
+    public String getExternalURL(String fullname, String action, String querystring,
+        XWikiContext context) throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullname, context);
 
         URL url =
-            context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action, querystring, null,
-                doc.getDatabase(), context);
+            context.getURLFactory().createExternalURL(doc.getSpace(), doc.getName(), action,
+                querystring, null, doc.getDatabase(), context);
         return url.toString();
     }
 
@@ -3761,12 +3772,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 // Note: Ideally we should modify the getDocumentNameFromPath method but in order
                 // not to introduce any new bug right now we're reconstructing a path info that we
                 // pass to it using the following algorithm:
-                //    path info = requestURI - (contextPath + servletPath)
+                // path info = requestURI - (contextPath + servletPath)
                 String path;
                 if (!request.getRequestURI().startsWith(
-                    request.getContextPath() + request.getServletPath()))
-                {
-                    log.warn("Request URI [" + request.getRequestURI() + "] should have matched "
+                    request.getContextPath() + request.getServletPath())) {
+                    LOG.warn("Request URI [" + request.getRequestURI() + "] should have matched "
                         + "context path [" + request.getContextPath() + "] and servlet path ["
                         + request.getServletPath() + "]");
                     // Even though this branch shouldn't get executed we never know what containers
@@ -3775,16 +3785,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // potential issue with i18n encoding as stated above).
                     path = request.getPathInfo();
                 } else {
-                    path = request.getRequestURI().substring(
-                        request.getContextPath().length() + request.getServletPath().length());
+                    path =
+                        request.getRequestURI()
+                            .substring(
+                                request.getContextPath().length()
+                                    + request.getServletPath().length());
                 }
 
                 // TODO: I think it's safe to remove the fixDecodedURI now that we're not using
                 // getPathInfo() and thus the container doesn't encode anything but I don't want
                 // to break anything at this late stage (we're releasing 1.0 RC2). Remove it when
                 // we start working on 1.1.
-                docname =
-                    getDocumentNameFromPath(fixDecodedURI(request, path), context);
+                docname = getDocumentNameFromPath(fixDecodedURI(request, path), context);
             }
         }
         return docname;
@@ -3803,21 +3815,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 byte[] urib = uri.getBytes("ISO-8859-1");
                 decodedURI = new String(urib, getConfig().getProperty("xwiki.encoding", "UTF-8"));
             } catch (UnsupportedEncodingException e) {
-                log.error("Unsupported Encoding Exception received, check your xwiki config.", e);
+                LOG.error("Unsupported Encoding Exception received, check your xwiki config.", e);
             }
         }
         return decodedURI;
     }
 
     public boolean prepareDocuments(XWikiRequest request, XWikiContext context,
-                                    VelocityContext vcontext) throws XWikiException
+        VelocityContext vcontext) throws XWikiException
     {
         XWikiDocument doc;
         String docName = getDocumentName(request, context);
         if (context.getAction().equals("register")) {
             setPhonyDocument(docName, context, vcontext);
             context.getWiki().prepareResources(context);
-            doc = context.getDoc();        
+            doc = context.getDoc();
         } else {
 
             try {
@@ -3843,20 +3855,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             Object[] args = {doc.getFullName(), context.getUser()};
             setPhonyDocument(docName, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                    XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                    "Access to document {0} has been denied to user {1}",
-                    null,
-                    args);
+                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Access to document {0} has been denied to user {1}",
+                null,
+                args);
         } else if (checkActive(context) == 0) {
             Object[] args = {context.getUser()};
             setPhonyDocument(docName, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                    XWikiException.ERROR_XWIKI_USER_INACTIVE,
-                    "User {0} account is inactive",
-                    null,
-                    args);
+                XWikiException.ERROR_XWIKI_USER_INACTIVE,
+                "User {0} account is inactive",
+                null,
+                args);
         }
-
 
         context.put("doc", doc);
         vcontext.put("doc", doc.newDocument(context));
@@ -3867,7 +3878,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return true;
     }
 
-    public void setPhonyDocument(String docName, XWikiContext context, VelocityContext vcontext) {
+    public void setPhonyDocument(String docName, XWikiContext context, VelocityContext vcontext)
+    {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(docName);
         doc.setElements(XWikiDocument.HAS_ATTACHMENTS | XWikiDocument.HAS_OBJECTS);
@@ -3930,12 +3942,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // for java 1.4 compatibility
                     if (isExo()) {
                         try {
-                            groupService = (XWikiGroupService) Class.forName("com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl").newInstance();
+                            groupService =
+                                (XWikiGroupService) Class.forName(
+                                    "com.xpn.xwiki.user.impl.exo.ExoGroupServiceImpl")
+                                    .newInstance();
                         } catch (Exception e2) {
                             e2.printStackTrace();
                         }
-                    }
-                    else
+                    } else
                         groupService = new XWikiGroupServiceImpl();
                 }
                 groupService.init(this, context);
@@ -3955,12 +3969,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         synchronized (AUTH_SERVICE_LOCK) {
             if (authService == null) {
 
-                log.info("Initializing AuthService...");
+                LOG.info("Initializing AuthService...");
 
                 String authClass = Param("xwiki.authentication.authclass");
                 if (authClass != null) {
-                    if (log.isDebugEnabled())
-                        log.debug("Using custom AuthClass " + authClass + ".");
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Using custom AuthClass " + authClass + ".");
                 } else {
 
                     if (isExo())
@@ -3970,8 +3984,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     else
                         authClass = "com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl";
 
-                    if (log.isDebugEnabled())
-                        log.debug("Using default AuthClass " + authClass + ".");
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Using default AuthClass " + authClass + ".");
 
                 }
 
@@ -3979,11 +3993,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
                     authService = (XWikiAuthService) Class.forName(authClass).newInstance();
 
-                    log.debug("Initialized AuthService using Relfection.");
+                    LOG.debug("Initialized AuthService using Relfection.");
 
                 } catch (Exception e) {
 
-                    log.warn("Failed to initialize AuthService " + authClass
+                    LOG.warn("Failed to initialize AuthService " + authClass
                         + " using Reflection, trying default implementations using 'new'.", e);
 
                     // e.printStackTrace(); - not needed? -LBlaze
@@ -3997,8 +4011,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     else
                         authService = new XWikiAuthServiceImpl();
 
-                    if (log.isDebugEnabled())
-                        log.debug("Initialized AuthService " + authService.getClass().getName()
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Initialized AuthService " + authService.getClass().getName()
                             + " using 'new'.");
 
                 }
@@ -4014,34 +4028,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             if (rightService == null) {
 
-                log.info("Initializing RightService...");
+                LOG.info("Initializing RightService...");
 
                 String rightsClass = Param("xwiki.authentication.rightsclass");
                 if (rightsClass != null) {
-                    if (log.isDebugEnabled())
-                        log.debug("Using custom RightsClass " + rightsClass + ".");
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Using custom RightsClass " + rightsClass + ".");
                 } else {
                     rightsClass = "com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl";
-                    if (log.isDebugEnabled())
-                        log.debug("Using default RightsClass " + rightsClass + ".");
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Using default RightsClass " + rightsClass + ".");
                 }
 
                 try {
 
                     rightService = (XWikiRightService) Class.forName(rightsClass).newInstance();
-                    log.debug("Initialized RightService using Reflection.");
+                    LOG.debug("Initialized RightService using Reflection.");
 
                 } catch (Exception e) {
 
-                    log.warn("Failed to initialize RightService " + rightsClass
+                    LOG.warn("Failed to initialize RightService " + rightsClass
                         + " using Reflection, trying default implementation using 'new'.", e);
 
                     // e.printStackTrace(); - not needed? -LBlaze
 
                     rightService = new XWikiRightServiceImpl();
 
-                    if (log.isDebugEnabled())
-                        log.debug("Initialized RightService " + authService.getClass().getName()
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Initialized RightService " + authService.getClass().getName()
                             + " using 'new'.");
 
                 }
@@ -4077,30 +4091,30 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         synchronized (URLFACTORY_SERVICE_LOCK) {
             if (urlFactoryService == null) {
 
-                log.info("Initializing URLFactory Service...");
+                LOG.info("Initializing URLFactory Service...");
 
                 String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
 
                 if (urlFactoryServiceClass != null) {
                     try {
-                        if (log.isDebugEnabled())
-                            log.debug("Using custom URLFactory Service Class "
+                        if (LOG.isDebugEnabled())
+                            LOG.debug("Using custom URLFactory Service Class "
                                 + urlFactoryServiceClass + ".");
                         urlFactoryService =
                             (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
                                 .newInstance();
                         urlFactoryService.init(this);
-                        log.debug("Initialized URLFactory Service using Reflection.");
+                        LOG.debug("Initialized URLFactory Service using Reflection.");
                     } catch (Exception e) {
                         urlFactoryService = null;
-                        log.warn("Failed to initialize URLFactory Service  "
+                        LOG.warn("Failed to initialize URLFactory Service  "
                             + urlFactoryServiceClass
                             + " using Reflection, trying default implementation using 'new'.", e);
                     }
                 }
                 if (urlFactoryService == null) {
-                    if (log.isDebugEnabled())
-                        log.debug("Using default URLFactory Service Class "
+                    if (LOG.isDebugEnabled())
+                        LOG.debug("Using default URLFactory Service Class "
                             + urlFactoryServiceClass + ".");
                     urlFactoryService = new XWikiURLFactoryServiceImpl();
                     urlFactoryService.init(this);
@@ -4121,7 +4135,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
-     *
+     * 
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4153,7 +4167,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform Portal service from the Wiki Engine
-     *
+     * 
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4495,24 +4509,28 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public int getHttpTimeout(XWikiContext context) {
+    public int getHttpTimeout(XWikiContext context)
+    {
         int defaulttimeout = 60000;
-        return (context==null) ? defaulttimeout : (int) context.getWiki().ParamAsLong("xwiki.http.timeout", defaulttimeout);
+        return (context == null) ? defaulttimeout : (int) context.getWiki().ParamAsLong(
+            "xwiki.http.timeout", defaulttimeout);
     }
 
-    public String getHttpUserAgent(XWikiContext context) {
-        if (context!=null)
-         return context.getWiki().Param("xwiki.http.useragent", "XWikiBot/1.0");
+    public String getHttpUserAgent(XWikiContext context)
+    {
+        if (context != null)
+            return context.getWiki().Param("xwiki.http.useragent", "XWikiBot/1.0");
         else
-         return "XWikiBot/1.0";
+            return "XWikiBot/1.0";
     }
 
-    public static HttpClient getHttpClient(int timeout, String userAgent) {
+    public static HttpClient getHttpClient(int timeout, String userAgent)
+    {
         HttpClient client = new HttpClient();
 
-        if (timeout!=0) {
-         client.getParams().setSoTimeout(timeout);
-         client.getParams().setParameter("http.connection.timeout", "" + timeout);
+        if (timeout != 0) {
+            client.getParams().setSoTimeout(timeout);
+            client.getParams().setParameter("http.connection.timeout", "" + timeout);
         }
 
         client.getParams().setParameter("http.useragent", userAgent);
@@ -4544,12 +4562,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public String getURLContent(String surl, String username, String password, XWikiContext context) throws IOException
+    public String getURLContent(String surl, String username, String password,
+        XWikiContext context) throws IOException
     {
-        return getURLContent(surl, username, password, getHttpTimeout(context), getHttpUserAgent(context));
+        return getURLContent(surl, username, password, getHttpTimeout(context),
+            getHttpUserAgent(context));
     }
 
-    public String getURLContent(String surl, String username, String password, int timeout, String userAgent) throws IOException
+    public String getURLContent(String surl, String username, String password, int timeout,
+        String userAgent) throws IOException
     {
         HttpClient client = getHttpClient(timeout, userAgent);
 
@@ -4587,7 +4608,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return getURLContentAsBytes(surl, getHttpTimeout(context), getHttpUserAgent(context));
     }
 
-    public byte[] getURLContentAsBytes(String surl, int timeout, String userAgent) throws IOException
+    public byte[] getURLContentAsBytes(String surl, int timeout, String userAgent)
+        throws IOException
     {
         HttpClient client = getHttpClient(timeout, userAgent);
 
@@ -4607,13 +4629,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
-    public byte[] getURLContentAsBytes(String surl, String username, String password, XWikiContext context) throws IOException
+    public byte[] getURLContentAsBytes(String surl, String username, String password,
+        XWikiContext context) throws IOException
     {
-        return getURLContentAsBytes(surl, username, password, getHttpTimeout(context), getHttpUserAgent(context));
+        return getURLContentAsBytes(surl, username, password, getHttpTimeout(context),
+            getHttpUserAgent(context));
     }
 
-    public byte[] getURLContentAsBytes(String surl, String username, String password, int timeout, String userAgent)
-        throws IOException
+    public byte[] getURLContentAsBytes(String surl, String username, String password,
+        int timeout, String userAgent) throws IOException
     {
         HttpClient client = getHttpClient(timeout, userAgent);
 
@@ -4663,7 +4687,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
             docs =
                 this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{
-                "doc.web", spaceName}}, context);
+                    "doc.web", spaceName}}, context);
         } else if (getNotCacheStore() instanceof XWikiJcrStore) {
             docs = ((XWikiJcrStore) getNotCacheStore()).getSpaceDocsName(spaceName, context);
         }
@@ -4875,7 +4899,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return false;
         return "1".equals(Param("xwiki.editcomment.mandatory", "0"));
     }
-
 
     /**
      * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
@@ -5158,8 +5181,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (pclass == null)
             return "";
         else
-            return pclass.displaySearch(fieldname, prefix + className + "_", criteria,
-                context);
+            return pclass.displaySearch(fieldname, prefix + className + "_", criteria, context);
     }
 
     public String displaySearchColumns(String className, XWikiQuery query, XWikiContext context)
@@ -5351,15 +5373,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return ("1".equals(context.getWiki().Param("xwiki.store.versioning", "1")));
     }
 
-    public String getExternalAttachmentURL(String fullName, String filename, XWikiContext context) {
+    public String getExternalAttachmentURL(String fullName, String filename, XWikiContext context)
+    {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(fullName, context);
         return doc.getExternalAttachmentURL(filename, "download", context);
     }
 
-    public int getMaxRecursiveSpaceChecks(XWikiContext context) {
+    public int getMaxRecursiveSpaceChecks(XWikiContext context)
+    {
         int max = getXWikiPreferenceAsInt("rights_maxrecursivespacechecks", -1, context);
-        if (max==-1)
+        if (max == -1)
             return (int) ParamAsLong("xwiki.rights.maxrecursivespacechecks", 0);
         else
             return max;

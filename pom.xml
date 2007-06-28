@@ -515,6 +515,8 @@
               **/xmlrpc/SpaceSummary.java,
               **/ViewAction.java,
               **/ZipExplorer*.java,
+              **/FileUpload*.java,
+              **/PluginApi.java,
               **/content/**/*.java,
               **/XWikiMessageTool.java,
               **/XWikiListFilter.java,

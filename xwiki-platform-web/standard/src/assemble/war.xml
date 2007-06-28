@@ -35,11 +35,6 @@
     <fileSet>
       <directory>${basedir}/src/main/webapp</directory>
       <outputDirectory>/</outputDirectory>
-      <!-- We have kept the hibernate.cfg.xml file for compatibility with the Ant build for now.
-           It'll be removed when we make Maven2 the official build. -->
-      <excludes>
-        <exclude>${basedir}/**/hibernate.cfg.xml</exclude>
-      </excludes>
     </fileSet>
   </fileSets>
   <files>

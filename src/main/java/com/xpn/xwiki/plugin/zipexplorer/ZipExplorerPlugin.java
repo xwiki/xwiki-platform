@@ -53,7 +53,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 public class ZipExplorerPlugin extends XWikiDefaultPlugin
 {
     /**
-     * Log4J logger object to log messages in this class.
+     * Log object to log messages in this class.
      */
     private static final Log LOG = LogFactory.getLog(ZipExplorerPlugin.class);
 

@@ -30,7 +30,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.xmlrpc.XWikiXMLRPCRequest;
-import org.apache.commons.fileupload.DefaultFileItem;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
@@ -157,9 +156,9 @@ public class Utils {
     }
 
     public static String getFileName(List filelist, String name) {
-        DefaultFileItem fileitem = null;
+        FileItem fileitem = null;
         for (int i = 0; i < filelist.size(); i++) {
-            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
+            FileItem item = (FileItem) filelist.get(i);
             if (name.equals(item.getFieldName())) {
                 fileitem = item;
                 break;
@@ -173,9 +172,9 @@ public class Utils {
     }
 
     public static byte[] getContent(List filelist, String name) throws XWikiException {
-        DefaultFileItem fileitem = null;
+        FileItem fileitem = null;
         for (int i = 0; i < filelist.size(); i++) {
-            DefaultFileItem item = (DefaultFileItem) filelist.get(i);
+            FileItem item = (FileItem) filelist.get(i);
             if (name.equals(item.getFieldName())) {
                 fileitem = item;
                 break;
@@ -292,7 +291,6 @@ public class Utils {
         Map map = new HashMap();
 
         if (data != null && data.length > 0) {
-            int pos = 0;
             int ix = 0;
             int ox = 0;
             String key = null;

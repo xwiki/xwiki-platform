@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.rcs.Version;
@@ -1596,7 +1596,7 @@ public class Document extends Api
 
         Iterator it = fileuploadlist.iterator();
         while (it.hasNext()) {
-            DiskFileItem item = (DiskFileItem) it.next();
+            FileItem item = (FileItem) it.next();
             String name = item.getFieldName();
             if (fieldName != null && !fieldName.equals(name)) {
                 continue;

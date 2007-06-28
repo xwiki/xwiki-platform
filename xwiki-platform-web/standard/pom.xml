@@ -42,12 +42,6 @@
       <artifactId>xwiki-core</artifactId>
       <version>${version}</version>
     </dependency>
-    <!--dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-web-gwt</artifactId>
-      <version>${version}</version>
-      <type>war</type>
-    </dependency-->
   </dependencies>
   <build>
     <plugins>

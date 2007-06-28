@@ -19,6 +19,22 @@
  */
 package com.xpn.xwiki.plugin.zipexplorer;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -28,20 +44,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
-import java.net.URLDecoder;
 
 /**
  * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
@@ -53,7 +55,7 @@ public class ZipExplorerPlugin extends XWikiDefaultPlugin
     /**
      * Log4J logger object to log messages in this class.
      */
-    private static final Logger LOG = Logger.getLogger(ZipExplorerPlugin.class);
+    private static final Log LOG = LogFactory.getLog(ZipExplorerPlugin.class);
 
     /**
      * Path separators for URL.

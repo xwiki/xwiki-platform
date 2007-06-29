@@ -3838,13 +3838,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         VelocityContext vcontext) throws XWikiException
     {
         XWikiDocument doc;
+        context.getWiki().prepareResources(context);
         String docName = getDocumentName(request, context);
         if (context.getAction().equals("register")) {
             setPhonyDocument(docName, context, vcontext);
-            context.getWiki().prepareResources(context);
             doc = context.getDoc();
         } else {
-
             try {
                 doc = getDocument(docName, context);
             } catch (XWikiException e) {

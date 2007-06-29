@@ -121,7 +121,6 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 
             // Save the user
             context.setUser(username);
-            context.getWiki().prepareResources(context);
             logAllow(username, doc.getFullName(), action, "login/logout pages");
             return true;
         }
@@ -131,7 +130,6 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             String creator = doc.getCreator();
             if ((user != null) && (user.getUser() != null) && (creator != null)) {
                 if (user.getUser().equals(creator)) {
-                    context.getWiki().prepareResources(context);
                     return true;
                 }
             }
@@ -150,7 +148,6 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                     user = new XWikiUser(context.getUser());
 
                 if ((user == null) && (needsAuth)) {
-                    context.getWiki().prepareResources(context);
                     if (context.getRequest() != null)
                         context.getWiki().getAuthService().showLogin(context);
                     logDeny("unauthentified", doc.getFullName(), action, "Authentication needed");
@@ -171,7 +168,6 @@ public class XWikiRightServiceImpl implements XWikiRightService {
         } else {
             username = user.getUser();
         }
-        context.getWiki().prepareResources(context);
 
 // Check Rights
         try {

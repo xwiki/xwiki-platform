@@ -810,7 +810,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         String param = Param(key);
         try {
-
             return getRealPath(param);
         } catch (Exception e) {
             return param;
@@ -2866,27 +2865,41 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public void setUserDefaultGroup(String fullwikiname, XWikiContext context)
         throws XWikiException
     {
-        BaseClass gclass = getGroupClass(context);
+        String groupsPreference = this.Param("xwiki.users.initialGroups", "XWiki.XWikiAllGroup");
 
-        XWikiDocument allgroupdoc = getDocument("XWiki.XWikiAllGroup", context);
-        XWikiDocument oldDoc = (XWikiDocument) allgroupdoc.clone();
+        if (groupsPreference != null) {
+            String[] groups = groupsPreference.split(",");
+            for (int i = 0; i < groups.length; ++i) {
+                if (groups[i].trim().equals("")) {
+                    continue;
+                }
+                addUserToGroup(fullwikiname, groups[i].trim(), context);
+            }
+        }
+    }
 
-        BaseObject memberobj = (BaseObject) gclass.newObject(context);
-        memberobj.setClassName(gclass.getName());
-        memberobj.setName(allgroupdoc.getFullName());
-        memberobj.setStringValue("member", fullwikiname);
-        allgroupdoc.addObject(gclass.getName(), memberobj);
-        if (allgroupdoc.isNew()) {
-            saveDocument(allgroupdoc, oldDoc, context.getMessageTool().get(
+    protected void addUserToGroup(String userName, String groupName, XWikiContext context)
+        throws XWikiException
+    {
+        BaseClass groupClass = getGroupClass(context);
+        XWikiDocument groupDoc = getDocument(groupName, context);
+        XWikiDocument oldDoc = (XWikiDocument) groupDoc.clone();
+
+        BaseObject memberObject = (BaseObject) groupClass.newObject(context);
+        memberObject.setClassName(groupClass.getName());
+        memberObject.setName(groupDoc.getFullName());
+        memberObject.setStringValue("member", userName);
+        groupDoc.addObject(groupClass.getName(), memberObject);
+        if (groupDoc.isNew()) {
+            saveDocument(groupDoc, oldDoc, context.getMessageTool().get(
                 "core.comment.addedUserToGroup"), context);
         } else {
-            getHibernateStore().saveXWikiObject(memberobj, context, true);
+            getHibernateStore().saveXWikiObject(memberObject, context, true);
         }
 
         try {
             XWikiGroupService gservice = getGroupService(context);
-            gservice.addUserToGroup(fullwikiname, context.getDatabase(), "XWiki.XWikiAllGroup",
-                context);
+            gservice.addUserToGroup(userName, context.getDatabase(), groupName, context);
         } catch (Exception e) {
             e.printStackTrace();
         }

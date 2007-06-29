@@ -140,13 +140,6 @@
       <location>/xwiki/bin/view/Main/DocumentDoesNotExist</location>
     </error-page>
 
-    <!-- Example Application Tag Library Descriptor
-<taglib>
-<taglib-uri>/WEB-INF/app.tld</taglib-uri>
-<taglib-location>/WEB-INF/app.tld</taglib-location>
-</taglib>
-  -->
-
     <!-- Struts Tag Library Descriptors -->
     <taglib>
         <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
@@ -163,12 +156,14 @@
         <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
     </taglib>
 
+    <!-- Uncomment if you wish to use a DataSource to define the Database connection
     <resource-ref>
         <description>DB Connection</description>
         <res-ref-name>jdbc/XWikiDS</res-ref-name>
         <res-type>javax.sql.DataSource</res-type>
         <res-auth>Container</res-auth>
     </resource-ref>
+    -->
 
     <env-entry>
         <env-entry-name>XWikiConfig</env-entry-name>

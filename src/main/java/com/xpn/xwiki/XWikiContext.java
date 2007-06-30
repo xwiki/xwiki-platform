@@ -336,7 +336,12 @@ public class XWikiContext extends Hashtable {
     }
 
     public XWikiMessageTool getMessageTool() {
-      return ((XWikiMessageTool) get("msg"));
+      XWikiMessageTool msg = ((XWikiMessageTool) get("msg"));
+      if (msg == null) {
+          getWiki().prepareResources(this);
+          msg = ((XWikiMessageTool) get("msg"));
+      }
+      return msg;
     }
 
     public XWikiValidationStatus getValidationStatus() {

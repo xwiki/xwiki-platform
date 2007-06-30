@@ -43,6 +43,11 @@
       <outputDirectory>WEB-INF/</outputDirectory>
       <filtered>true</filtered>
     </file>
+    <file>
+      <source>${basedir}/src/main/resources/version.properties</source>
+      <outputDirectory>WEB-INF/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
   </files>
 </assembly>
     

@@ -81,7 +81,48 @@
           <webApp>${project.build.directory}/${project.build.finalName}-${xwiki.db}.war</webApp>
         </configuration>
       </plugin>
-
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <!-- Use the build numer plugin to add the SVN revision number to XWiki's version.properties
+               file so that it's included when displaying XWiki's version.
+               Note: This plugin works by making the buildNumber property available. We then filter
+               the version.properties file so that the property is replaced by its value. -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>maven-buildnumber-plugin</artifactId>
+            <executions>
+              <execution>
+                <phase>validate</phase>
+                <goals>
+                  <goal>create</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <doCheck>true</doCheck>
+              <doUpdate>true</doUpdate>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <pluginRepositories>
+        <!-- We need this repository defined in order to download the buildnumber plugin -->
+        <pluginRepository>
+          <id>tlc</id>
+          <name>TLC Repository</name>
+          <url>http://commons.ucalgary.ca/pub/m2</url>
+        </pluginRepository>
+      </pluginRepositories>
+    </profile>
+  </profiles>
 </project>

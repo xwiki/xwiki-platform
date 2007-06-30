@@ -99,43 +99,43 @@
 <category>Information</category>
 </property>
 <property>
-<content>#if ($xwiki.isMultiLingual()==true)
-#largepanelheader($msg.get("Translations"))
-#if(!$tdoc.language || $tdoc.language == "" || $tdoc.language == $doc.defaultLanguage)
-&lt;div class="important"&gt;&lt;strong&gt;$xwiki.parseMessage("youareeditingoriginal") (${doc.defaultLanguage}).&lt;/strong&gt;&lt;/div&gt;
-#if($!doc.translationList.size() &gt; 0)
-&lt;div&gt;$msg.get("existingtranslations"):
-#foreach($translation in $doc.translationList)
-&lt;a href="$doc.getURL("edit", "editor=${editor}&amp;amp;language=${translation}")"&gt;$translation&lt;/a&gt;
-#end
-&lt;/div&gt;
-#end
-#else
-&lt;div class="important"&gt;&lt;strong&gt;$msg.get("youareeditingtranslation"): ${tdoc.language}.&lt;/strong&gt;&lt;/div&gt;
-&lt;div&gt;$msg.get("originallanguage") &lt;a href="$doc.getURL("edit", "editor=${editor}&amp;amp;language=${doc.defaultLanguage}")"&gt;${doc.defaultLanguage}&lt;/a&gt;.&lt;/div&gt;
-#if($doc.translationList.size() &gt; 1)
-&lt;div&gt;$msg.get("othertranslations"):
-#foreach($translation in $doc.translationList)
-#if($translation != $tdoc.language)
-&lt;a href="$doc.getURL("edit", "editor=${editor}&amp;amp;language=${translation}")"&gt;$translation&lt;/a&gt;
-#end
-#end
-&lt;/div&gt;
-#end
-#end
-&lt;div&gt;
-$msg.get("translatedocin"):
-#set($elangs = ",")
-#foreach($elang in $doc.translationList)
-#set($elangs = $elangs.concat($elang).concat(","))
-#end
-#foreach($olang in $xwiki.getXWikiPreference("languages").split(","))
-#if(($elangs.indexOf(",$olang,") == -1) &amp;&amp; ($olang != $doc.defaultLanguage))
-&lt;a href="$doc.getURL("edit", "language=${olang}")"&gt;$olang&lt;/a&gt;
-#end
-#end
-&lt;/div&gt;
-#panelfooter()
+<content>#if($xwiki.isMultiLingual()==true)
+  #largepanelheader($msg.get("panels.translation.title"))
+  #if(!$tdoc.language || $tdoc.language == "" || $tdoc.language == $doc.defaultLanguage)
+    &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingOriginal", [${doc.defaultLanguage}])&lt;/strong&gt;&lt;/div&gt;
+    #if($!doc.translationList.size() &gt; 0)
+      &lt;div&gt;$msg.get("panels.translation.existingTranslations")
+      #foreach($translation in $doc.translationList)
+        &lt;a href="$doc.getURL("edit", "editor=${editor}&amp;amp;language=${translation}")"&gt;$translation&lt;/a&gt;
+      #end
+      &lt;/div&gt;
+    #end
+  #else
+    &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingTranslation", [${tdoc.language}])&lt;/strong&gt;&lt;/div&gt;
+    &lt;div&gt;$msg.get("panels.translation.originalLanguage", [$doc.getURL("edit", "editor=${editor}&amp;amp;language=${doc.defaultLanguage}"), ${doc.defaultLanguage}])&lt;/div&gt;
+    #if($doc.translationList.size() &gt; 1)
+      &lt;div&gt;$msg.get("panels.translation.otherTranslations")
+      #foreach($translation in $doc.translationList)
+        #if($translation != $tdoc.language)
+          &lt;a href="$doc.getURL("edit", "editor=${editor}&amp;amp;language=${translation}")"&gt;$translation&lt;/a&gt;
+        #end
+      #end
+      &lt;/div&gt;
+    #end
+  #end
+  &lt;div&gt;
+  $msg.get("panels.translation.translate")
+  #set($elangs = ",")
+  #foreach($elang in $doc.translationList)
+    #set($elangs = "${elangs}$elang,")
+  #end
+  #foreach($olang in $xwiki.getXWikiPreference("languages").split("[|, ]"))
+    #if(($elangs.indexOf(",$olang,") == -1) &amp;&amp; ($olang != $doc.defaultLanguage))
+      &lt;a href="$doc.getURL("edit", "language=${olang}")"&gt;$olang&lt;/a&gt;
+    #end
+  #end
+  &lt;/div&gt;
+  #panelfooter()
 #end</content>
 </property>
 <property>

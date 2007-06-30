@@ -129,23 +129,23 @@
 </property>
 <property>
 <content>#set($pages = $tdoc.includedPages)
-#largepanelheader("XWiki document information")
-&lt;dl&gt;&lt;dt&gt;&lt;label for="xwikidocparentinput2"&gt;$msg.get("parentfield"):&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/&gt;&lt;/dd&gt;
+#largepanelheader($msg.get("panels.documentInformation.title"))
+&lt;dl&gt;&lt;dt&gt;&lt;label for="xwikidocparentinput2"&gt;$msg.get("panels.documentInformation.parent")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/&gt;&lt;/dd&gt;
 #if($pages.size() != 0)
-#if($pages.size() == 1)
-&lt;dt&gt;$xwiki.parseMessage("editincludepagemsgone"):&lt;/dt&gt;
-#else
-&lt;dt&gt;$xwiki.parseMessage("editincludepagemsgmore"):&lt;/dt&gt;
-#end
-&lt;dd&gt;
-&lt;table summary="$msg.get("includeddocumentssummary")" id="xwikiincludeddocuments"&gt;
-&lt;tbody&gt;
-#foreach ($page in $pages)
-&lt;tr&gt;&lt;td&gt;&lt;a href="$xwiki.getURL($page, "view")"&gt;$page&lt;/a&gt;&lt;/td&gt;
-&lt;td class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL($page, "edit")"&gt;$msg.get("edit")&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
-#end
-&lt;/tbody&gt;
-&lt;/table&gt;&lt;/dd&gt;
+  #if($pages.size() == 1)
+    &lt;dt&gt;$msg.get("panels.documentInformation.includesOne", [$pages.size()])&lt;/dt&gt;
+  #else
+    &lt;dt&gt;$msg.get("panels.documentInformation.includesMore", [$pages.size()])&lt;/dt&gt;
+  #end
+  &lt;dd&gt;
+  &lt;table summary="$msg.get("panels.documentInformation.includesSummary")" id="xwikiincludeddocuments"&gt;
+  &lt;tbody&gt;
+  #foreach ($page in $pages)
+    &lt;tr&gt;&lt;td&gt;&lt;a href="$xwiki.getURL($page, "view")"&gt;$page&lt;/a&gt;&lt;/td&gt;
+    &lt;td class="xwikibuttonlink"&gt;&lt;a href="$xwiki.getURL($page, "edit")"&gt;$msg.get("panels.documentInformation.editIncluded")&lt;/a&gt;&lt;/td&gt;&lt;/tr&gt;
+  #end
+  &lt;/tbody&gt;
+  &lt;/table&gt;&lt;/dd&gt;
 #end
 &lt;/dl&gt;
 #template("tagedit.vm")

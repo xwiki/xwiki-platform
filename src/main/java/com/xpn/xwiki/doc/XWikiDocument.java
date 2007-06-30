@@ -3958,7 +3958,7 @@ public class XWikiDocument
 
     public static String getInternalPropertyName(String propname, XWikiContext context)
     {
-        XWikiMessageTool msg = ((XWikiMessageTool) context.get("msg"));
+        XWikiMessageTool msg = context.getMessageTool();
         String cpropname = StringUtils.capitalize(propname);
         return (msg == null) ? cpropname : msg.get(cpropname);
     }

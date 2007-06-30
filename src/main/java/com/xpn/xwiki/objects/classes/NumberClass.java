@@ -142,7 +142,7 @@ public class NumberClass  extends PropertyClass {
             input2.setValue(value.toString());
         }
 
-        XWikiMessageTool msg = ((XWikiMessageTool)context.get("msg"));
+        XWikiMessageTool msg = context.getMessageTool();
         buffer.append((msg==null) ? "from" : msg.get("from"));
         buffer.append(input1.toString());
         buffer.append((msg==null) ? "from" : msg.get("to"));

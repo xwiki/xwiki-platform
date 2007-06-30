@@ -5327,7 +5327,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String parseMessage(String id, XWikiContext context)
     {
-        XWikiMessageTool msg = (XWikiMessageTool) context.get("msg");
+        XWikiMessageTool msg = context.getMessageTool();
         return parseContent(msg.get(id), context);
     }
 

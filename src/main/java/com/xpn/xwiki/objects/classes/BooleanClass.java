@@ -292,7 +292,7 @@ public class BooleanClass extends PropertyClass
     private String getDisplayValue(XWikiContext context, int value)
     {
         try {
-            XWikiMessageTool msg = (XWikiMessageTool) context.get("msg");
+            XWikiMessageTool msg = context.getMessageTool();
             String strname = getDisplayType() + "_" + value;
             String result = msg.get(strname);
             if (result.equals(strname)) {

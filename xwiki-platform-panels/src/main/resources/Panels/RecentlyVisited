@@ -141,7 +141,7 @@
 #end
 #set($recentlyViewed = $xwiki.getRecentActions("view", $rv_maxItems))
 #if($recentlyViewed.size() &gt; 0 || $showEmptyPanels)
-#panelheader("Recently Visited")
+#panelheader($msg.get("panels.recentlyVisited.title"))
 #set($first = true)
 #foreach($docname in $recentlyViewed)
 #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())

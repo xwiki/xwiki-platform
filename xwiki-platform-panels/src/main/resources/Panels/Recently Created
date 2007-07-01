@@ -137,7 +137,7 @@
 <property>
 <content>#set($recentlyCreated = $xwiki.searchDocuments("where 1=1 order by doc.creationDate desc", 5, 0))
 #if($recentlyCreated.size() &gt; 0 || $showEmptyPanels)
-#panelheader("Recently Created")
+#panelheader($msg.get("panels.recentlyCreated.title"))
 #set($first = true)
 #foreach($docname in $recentlyCreated)
 #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())

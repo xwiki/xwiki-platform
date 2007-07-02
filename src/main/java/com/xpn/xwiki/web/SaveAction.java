@@ -98,6 +98,7 @@ public class SaveAction extends PreviewAction {
                 String content = doc.updateDocumentSection(sectionNumber, sectionContent);
                 tdoc.setContent(content);
                 tdoc.setTitle(title);
+                tdoc.setComment(sectionDoc.getComment());
             }else{
 		    	tdoc.readFromForm((EditForm) form, context);
             }

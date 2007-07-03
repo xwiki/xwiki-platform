@@ -172,7 +172,7 @@ $xwiki.getUserName("xwiki:${username}")
 #set($mmurl = "http://${request.serverName}:${request.serverPort}${mmurl1}")
 #end
 #end
-<applet code="freemind.main.FreeMindApplet.class" archive="/xwiki/freemind/freemind.jar" width="${width}" height="${height}">
+<applet code="freemind.main.FreeMindApplet.class" archive="${request.contextPath}/freemind/freemind.jar" width="${width}" height="${height}">
 <param name="type" value="application/x-java-applet;version=1.4" />
 <param name="scriptable" value="false" />
 <param name="modes" value="freemind.modes.browsemode.BrowseMode" />

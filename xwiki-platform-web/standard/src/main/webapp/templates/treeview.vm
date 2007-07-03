@@ -8,11 +8,11 @@
 #end
 #if($treeviewid == 1)
 <style type="text/css">
-@import "/xwiki/yui/treeview/assets/tree.css";
+@import "${request.contextPath}/yui/treeview/assets/tree.css";
 </style>
-<script type='text/javascript' src='/xwiki/yui/yahoo/yahoo-min.js' ></script>
-<script type='text/javascript' src='/xwiki/yui/treeview/treeview-min.js' ></script>
-<script type='text/javascript' src='/xwiki/yui/treeview/checknode.js'></script>
+<script type='text/javascript' src='${request.contextPath}/yui/yahoo/yahoo-min.js' ></script>
+<script type='text/javascript' src='${request.contextPath}/yui/treeview/treeview-min.js' ></script>
+<script type='text/javascript' src='${request.contextPath}/yui/treeview/checknode.js'></script>
 #end
 #set($tviewid = $xwiki.getCounter("treeviewid"))
 <div id="treeview${tviewid}"></div>

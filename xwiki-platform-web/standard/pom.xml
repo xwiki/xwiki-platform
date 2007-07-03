@@ -42,6 +42,13 @@
       <artifactId>xwiki-core</artifactId>
       <version>${version}</version>
     </dependency>
+    <!-- Add the database JAR so that it's included in the WAR -->
+    <dependency>
+      <groupId>${xwiki.db.jdbc.groupId}</groupId>
+      <artifactId>${xwiki.db.jdbc.artifactId}</artifactId>
+      <version>${xwiki.db.jdbc.version}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

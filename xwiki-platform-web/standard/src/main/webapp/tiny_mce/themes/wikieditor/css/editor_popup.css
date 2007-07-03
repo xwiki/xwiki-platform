@@ -272,12 +272,40 @@ legend {
 	color: #6666cc;
 }
 
+.loadajaxwrap {
+    margin-left:200px;
+    margin-top:30px;
+    margin-bottom:50px;
+    width:150px;
+    height:70px;
+    border:1px solid #D3E3F5;
+}
+
 .loadingAjax {
     font-weight: bold;
     background-image: url(../images/ajax_loading.gif);
     background-repeat: "none";
     width: 50px;
     height: 50px;
+}
+
+.warning {
+  margin: 4px 0px 4px;
+  border: 1px solid #D3E3F5;
+  padding: 8px 8px 8px 28px;
+  text-align: left;
+  background:#F5F5F5 url(../images/msgwarning.png) 8px 8px no-repeat;
+  color: #c82;
+}
+
+.arrowcollapsed {
+  background: url("../images/arrow-down.png") top right no-repeat;
+  padding-right: 24px;  
+}
+
+.arrowexpanded {
+  background: url("../images/arrow-up.png") top right no-repeat;
+  padding-right: 24px;
 }
 
 

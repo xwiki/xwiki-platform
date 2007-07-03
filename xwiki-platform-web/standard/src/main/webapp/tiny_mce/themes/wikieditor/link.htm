@@ -245,7 +245,12 @@ if (url != null) {
                                                             <script type="text/javascript">
                                                                 loadBrowseList(baseurl);
                                                             </script>
-                                                            <div style="margin: 3px" id="listtobrowse"></div>
+                                                            <div style="margin:3px;" id="listtobrowse">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -274,7 +279,12 @@ if (url != null) {
                                                     </tr>
                                                     <tr>
                                                         <td>
-                                                            <div style="margin: 3px" id="searchresults"></div>
+                                                            <div style="margin: 3px" id="searchresults">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
                                                             <script type="text/javascript">
                                                                 loadSearchResultList(baseurl);
                                                             </script>
@@ -287,7 +297,12 @@ if (url != null) {
                                                 <table border="0" cellpadding="4" cellspacing="0" width="100%">
                                                     <tr>
                                                         <td>
-                                                            <div style="margin: 3px" id="recentviewed"></div>
+                                                            <div style="margin: 3px" id="recentviewed">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
                                                             <script type="text/javascript">
                                                                 loadRecentlyList(baseurl, "view");
                                                             </script>
@@ -300,7 +315,12 @@ if (url != null) {
                                                 <table border="0" cellpadding="4" cellspacing="0" width="100%">
                                                     <tr>
                                                         <td>
-                                                            <div style="margin: 3px" id="recentmodified"></div>
+                                                            <div style="margin: 3px" id="recentmodified">
+                                                                <div class="loadajaxwrap" align="center">
+                                                                    <div class="loadingAjax"></div>
+                                                                    {$lang_loading}
+                                                                </div>
+                                                            </div>
                                                             <script type="text/javascript">
                                                                 loadRecentlyList(baseurl);
                                                             </script>
@@ -367,7 +387,7 @@ if (url != null) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td nowrap="nowrap" colspan="2"><span class="message">{$lang_link_file_warning_title}</span></td>
+                                    <td nowrap="nowrap" colspan="2"><div class="warning">{$lang_link_file_warning_title}</div></td>
                                 </tr>
                             </table>
                         </td>
@@ -399,7 +419,7 @@ if (url != null) {
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td nowrap="nowrap"><a href="#" onclick="if (document.getElementById('uploadattach').innerHTML == '') loadUploadAttachs(baseurl); else document.getElementById('uploadattach').innerHTML = ''">{$lang_link_upload_attachment_title}</a>
+                                    <td nowrap="nowrap"><a id="linkattach" href="#" class="arrowcollapsed" onclick="if (document.getElementById('uploadattach').innerHTML == '') {loadUploadAttachs(baseurl); this.className='arrowexpanded';}else {document.getElementById('uploadattach').innerHTML = '' ; this.className='arrowcollapsed';}">{$lang_link_upload_attachment_title}</a>
                                         <div style="margin: 3px" id="uploadattach"></div>
                                     </td>
                                 </tr>

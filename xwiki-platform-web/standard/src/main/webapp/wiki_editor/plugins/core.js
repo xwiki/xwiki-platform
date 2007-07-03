@@ -164,6 +164,9 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
         }
         if(att && att["href"]) {
             href = this.trimString(att["href"]);
+            if (att["title"] && att["title"] != "") {
+                href = this.trimString(att["title"]);
+            }
             href = unescape(href);
             if ((href.toLowerCase() == txt.toLowerCase()) && (!att["target"] || (att["target"] == "_self"))) {
                 str = "[" + txt + "]";
@@ -921,13 +924,13 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
     var url = (result[4])?(result[4]):(text);
     var target = this.trimString(result[7]);
     var classname;
-	var str;
+	var str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
     if(this.isExternalLink(url)) {
 		classname = this.LINK_EXTERNAL_CLASS_NAME;
-	} else {
+        str += " title=\"" + url + "\"";
+    } else {
 		classname = this.LINK_INTERNAL_CLASS_NAME;
 	}
-    str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
     if (separator == "|") {
         str += " id=\"" +  url + "\"";
     }

@@ -389,12 +389,14 @@ var TinyMCE_WikieditorTheme = {
 
     insertLink : function(href, target, text, space, title, dummy, style_class) {
         var classname;
-	    if(wikiEditor.isExternalLink(href)) {
+	    var tit;
+        if(wikiEditor.isExternalLink(href)) {
 		    classname = wikiEditor.LINK_EXTERNAL_CLASS_NAME;
-	    } else {
+            tit = href;
+        } else {
 		    classname = wikiEditor.LINK_INTERNAL_CLASS_NAME;
 	    }
-        this._insertLink(href, target, text, space, title, dummy, classname);
+        this._insertLink(href, target, text, space, tit, dummy, classname);
     },
 
     _insertLink : function(href, target, text, space, title, onclick, style_class) {

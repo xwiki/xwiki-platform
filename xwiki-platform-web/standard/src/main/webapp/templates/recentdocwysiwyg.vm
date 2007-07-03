@@ -1,3 +1,4 @@
+
 <div class="xwikidatacontent">
     #set($rsvc= $xwiki.xWiki.getRightService())
 
@@ -22,23 +23,34 @@
         #set ($title = $msg.get("listofrecentlymodifiedpages"))
     #end
 
-    <p style="font-weight:bold"> $title : </p>
-
+    #if ($collect.size() != 0)
+        <p style="font-weight:bold"> $title : </p>
+    #end
     <table width="95%" cellspacing="3px">
         #set($counter=0)
-        #foreach ($item in $collect)
-            #if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
-                #if($counter < 13)
-                    <tr>
-                        #set($bentrydoc = $xwiki.getDocument($item))
-                        <td>* <a href="#" onclick="document.forms[0].wiki_page.value='$bentrydoc.name';if ('$doc.web' != '$bentrydoc.web') document.forms[0].wiki_space.value='$bentrydoc.web'; else document.forms[0].wiki_space.value=''; return false;">
+        #if ($collect.size() == 0)
+            <tr>
+                <td align="center">
+                    <div class="warning">
+                        $msg.get("warningstartspluginisnotactivated")
+                    </div>
+                </td>
+            </tr>
+        #else
+            #foreach ($item in $collect)
+                #if ($xwiki.hasAccessLevel("view", "${context.database}:${item}"))
+                    #if($counter < 13)
+                        <tr>
+                            #set($bentrydoc = $xwiki.getDocument($item))
+                            <td>* <a href="#" onclick="document.forms[0].wiki_page.value='$bentrydoc.name';if ('$doc.web' != '$bentrydoc.web') document.forms[0].wiki_space.value='$bentrydoc.web'; else document.forms[0].wiki_space.value=''; return false;">
                                 $bentrydoc.name</a>  $msg.get("inspace") $bentrydoc.web $msg.get("wikiweb"), $msg.get("lastmodifiedby")
                                 $xwiki.getLocalUserName($bentrydoc.author) $msg.get("lastmodifiedon") $xwiki.formatDate($bentrydoc.date,"MMMM dd, yyyy HH:mm")
-                        </td>
-                    </tr>
+                            </td>
+                        </tr>
                 #end
             #end
             #set( $counter = $counter + 1)
+            #end
         #end
     </table>
 </div>

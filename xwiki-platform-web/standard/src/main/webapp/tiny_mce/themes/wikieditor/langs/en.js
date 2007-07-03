@@ -90,4 +90,5 @@ tinyMCELang['lang_insert_macro'] = 'Insert Macro';
 tinyMCELang['macro_macroname_first_name'] = 'First Name';
 tinyMCELang['macro_macroname_last_name'] = 'Last Name';
 tinyMCELang['macro_macrotitle_info'] = 'Fill information';
-tinyMCELang['lang_loading_macro'] = 'Loading Macros ......';
+tinyMCELang['lang_loading_macro'] = 'Loading Macros ...';
+tinyMCELang['lang_loading'] = 'Loading ...';

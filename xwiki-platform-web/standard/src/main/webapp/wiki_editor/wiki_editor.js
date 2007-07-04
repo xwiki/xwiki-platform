@@ -75,6 +75,11 @@ WikiEditor.prototype.init = function(params) {
     if(params["use_linkeditor_tabs"] == null) {
         params["use_linkeditor_tabs"] = "wiki_tab, web_tab, attachments_tab, email_tab, file_tab";
     }
+    if((params["wiki_editor_toolbar"] == null) || (params["wiki_editor_toolbar"].toString() == "")) {
+        params["wiki_editor_toolbar"] = "texttoolbar, listtoolbar, indenttoolbar, undotoolbar, titletoolbar, styletoolbar, "
+                                        + "horizontaltoolbar, attachmenttoolbar, macrostoolbar, tabletoolbar, "
+                                        + "tablerowtoolbar, tablecoltoolbar, linktoolbar";
+    }
     // if don't have this param then it's always default by wiki_tab
 
     this.setImagePath((params["wiki_images_path"] == null) ? "" : params["wiki_images_path"]);

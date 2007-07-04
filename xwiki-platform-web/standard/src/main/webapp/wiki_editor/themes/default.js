@@ -13,23 +13,60 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
 		<table class="mceEditor" border="0" cellpadding="0" cellspacing="0" width="{$width}" height="{$height}"><tbody>\
 		<tr><td class="mceToolbar" align="center" height="1">';
 
-	str += this.getTextToolbar() + this.TOOLBAR_SPACER + this.getListToolbar() + this.TOOLBAR_SPACER +
-           this.getTabToolbar() + this.TOOLBAR_SPACER + this.getUndoToolbar() + this.TOOLBAR_SPACER + this.getTitleToolbar();
-
-    if (this._useStyleToolbar) {
-        str += this.TOOLBAR_SPACER + this.getStyleToolbar();
+    var toolbarParams = tinyMCE.getParam("wiki_editor_toolbar");
+    var toolbars = toolbarParams.split(",");
+    for (var i = 0; i < toolbars.length; i++) {
+        var toolbar = this.trimString(toolbars[i]);
+        switch (toolbar) {
+            case "texttoolbar":
+                str += this.getTextToolbar();
+                break;
+            case "listtoolbar":
+                str += this.TOOLBAR_SPACER + this.getListToolbar();
+                break;
+            case "indenttoolbar":
+                str += this.TOOLBAR_SPACER + this.getTabToolbar();
+                break;
+            case "undotoolbar":
+                str += this.TOOLBAR_SPACER + this.getUndoToolbar();
+                break;
+            case "titletoolbar":
+                 str += this.TOOLBAR_SPACER + this.getTitleToolbar();
+                break;
+            case "styletoolbar":
+                    str += this.TOOLBAR_SPACER + this.getStyleToolbar();
+                break;
+            case "horizontaltoolbar":
+                str += this.TOOLBAR_SPACER + this.getHorizontalruleControls() + this.getRemoveformatControls();
+                break;
+            case "suptoolbar":
+                str += this.TOOLBAR_SPACER + this.getSupAndSubToolbar();
+                break;
+            case "tabletoolbar":
+                str += this.TOOLBAR_SPACER + this.getTableToolbar();
+                break;
+            case "tablerowtoolbar":
+                str += this.TOOLBAR_SPACER + this.getTableRowToolbar();
+                break;
+            case "tablecoltoolbar":
+                str += this.TOOLBAR_SPACER + this.getTableColToolbar();
+                break;
+            case "linktoolbar":
+                str += this.TOOLBAR_SPACER + this.getLinkToolbar();    
+                break;
+            case "attachmenttoolbar":
+                if (this.isPluginLoaded("attachments")) {
+                    str += this.TOOLBAR_SPACER + this.getAttachmentsToolbar();
+                }
+                break;
+            case "macrostoolbar":
+                if (this.isPluginLoaded("macros")) {
+                    str += this.getMacrosToolbar();
+                }
+                break
+        }
     }
-
-    str += this.TOOLBAR_SPACER + this.getTableToolbar() + this.TOOLBAR_SPACER + this.getTableRowToolbar() +
-           this.TOOLBAR_SPACER + this.getTableColToolbar() + this.TOOLBAR_SPACER + this.getLinkToolbar();
-    str += this.TOOLBAR_SPACER + this.getHorizontalruleControls() + this.getRemoveformatControls();
-
-    if (this.isPluginLoaded("attachments")) {
-        str += this.TOOLBAR_SPACER + this.getAttachmentsToolbar();
-	}
-    if (this.isPluginLoaded("macros")) {
-        str +=  this.getMacrosToolbar();
-    }
+    
     str += '</td></tr>\
 			<tr><td align="center">\
 		    <span id="{$editor_id}">IFRAME</span>\

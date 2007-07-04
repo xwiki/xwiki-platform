@@ -78,6 +78,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addToolbarHandler('handleStylesList');
 	this.addToolbarHandler('handleLinkButtons');
     this.addToolbarHandler('handleHorizontalRuleButtons');
+    this.addToolbarHandler('handleSupAndSubButons');
     this.addToolbarHandler('handleTableButtons');
 
     // Add Comands and Fix Commands(workarounds)
@@ -350,6 +351,19 @@ WikiEditor.prototype._cleanBR = function(node) {
 	}
 }
 
+WikiEditor.prototype.handleSupAndSubButons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
+    tinyMCE.switchClass(editor_id + '_sup', 'mceButtonNormal');
+    tinyMCE.switchClass(editor_id + '_sub', 'mceButtonNormal');
+    switch (node.nodeName.toLowerCase()) {
+        case "sup":
+            tinyMCE.switchClass(editor_id + '_sup', 'mceButtonSelected');
+            break;
+        case "sub":
+            tinyMCE.switchClass(editor_id + '_sub', 'mceButtonSelected');
+            break;
+    }
+}
+
 WikiEditor.prototype.handleHorizontalRuleButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
    tinyMCE.switchClass(editor_id + '_hr', 'mceButtonNormal');
    if (node.nodeName == "HR") {
@@ -550,12 +564,29 @@ WikiEditor.prototype.getUndoControls = function(button_name) {
 	return str;
 }
 
+WikiEditor.prototype.getSupAndSubToolbar = function() {
+    return this.getSupAndSubControls('sup') + this.getSupAndSubControls('sub');
+}
+
+WikiEditor.prototype.getSupAndSubControls = function(button_name) {
+    var str = "";
+    switch(button_name) {
+        case 'sup':
+            str = this.createButtonHTML('sup', 'sup.gif', 'lang_theme_sup_desc', 'superscript');
+            break;
+        case 'sub':
+            str = this.createButtonHTML('sub', 'sub.gif', 'lang_theme_sub_desc', 'subscript');
+            break;
+    }
+    return str;
+}
+
 WikiEditor.prototype.getTabToolbar = function() {
 	return this.getTabControls('outdent') + this.getTabControls('indent');
 }
 
 WikiEditor.prototype.getTabControls = function(button_name) {
-	str = "";
+	var str = "";
 	switch(button_name) {
 		case 'outdent':
 			str = this.createButtonHTML('outdent', 'outdent.gif', 'lang_outdent_desc', 'Outdent');

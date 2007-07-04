@@ -47,17 +47,28 @@
     <module>exoplatform</module>
     <module>multiwiki</module>
   </modules>
-  <!-- Note: Even though this repository is defined in the com.xpn.xwiki.platform:xwiki module we
-       still need to define it here because if com.xpn.xwiki.platform:xwiki is not in the local
+  <!-- Note: Even though these repositories are defined in the com.xpn.xwiki.platform:xwiki module
+       we still need to define them here because if com.xpn.xwiki.platform:xwiki is not in the local
        repository we want to fetch it from the remote repo to provide a seamless build experience
   -->
   <repositories>
     <repository>
-      <id>xwiki</id>
-      <name>XWiki Maven2 Remote Repository</name>
-      <url>http://maven.xwiki.org</url>
+      <id>xwiki-releases</id>
+      <name>XWiki Maven2 Remote Repository for Releases</name>
+      <url>http://maven.xwiki.org/releases</url>
       <releases>
         <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>xwiki-snapshots</id>
+      <name>XWiki Maven2 Remote Repository for Snapshots</name>
+      <url>http://maven.xwiki.org/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
       </releases>
       <snapshots>
         <enabled>true</enabled>
@@ -65,4 +76,4 @@
     </repository>
   </repositories>
 </project>
-        
+       

@@ -2399,9 +2399,9 @@ public class XWiki extends Api
      * 
      * @return a string value
      */
-    public String wysiwygToolbars()
+    public String getWysiwygToolbars()
     {
-        return xwiki.wysiwygToolbars(getXWikiContext());
+        return xwiki.getWysiwygToolbars(getXWikiContext());
     }
 
     /**

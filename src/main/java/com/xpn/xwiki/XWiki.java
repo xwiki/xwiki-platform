@@ -5036,9 +5036,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) == 1);
     }
 
-    public String wysiwygToolbars(XWikiContext context)
+    public String getWysiwygToolbars(XWikiContext context)
     {
-        return context.getWiki().Param("xwiki.wysiwyg.toolbar", "");
+        return context.getWiki().Param("xwiki.wysiwyg.toolbars", "");
     }
 
     public String clearName(String name, XWikiContext context)

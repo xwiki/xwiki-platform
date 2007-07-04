@@ -2395,13 +2395,13 @@ public class XWiki extends Api
     }
 
     /**
-     * API to check if using the style toolbar in Wysiwyg editor
+     * API to check if using which toolbars in Wysiwyg editor
      * 
-     * @return a boolean value
+     * @return a string value
      */
-    public boolean useWysiwygStyleToolbar()
+    public String wysiwygToolbars()
     {
-        return xwiki.useWysiwygStyleToolbar(getXWikiContext());
+        return xwiki.wysiwygToolbars(getXWikiContext());
     }
 
     /**

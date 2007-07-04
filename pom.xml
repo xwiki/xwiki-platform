@@ -234,6 +234,22 @@
       <version>3.0-alpha3</version>
     </dependency>
 
+    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
+         http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
+         allow a release (this is for reproducibility). Thus we've had to upload JTidy into
+         our custom repository -->
+    <dependency>
+      <groupId>jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>8.0-20060801.131059-3-dev</version>
+      <exclusions>
+        <exclusion>
+          <groupId>xerces</groupId>
+          <artifactId>dom3-xml-apis</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
     <!-- We need to create a JIRA issue on the Maven project to upload this artifact -->
     <!-- TODO: Check if this dependency is really required at runtime.
          Note: It is commented out as it makes the build fail when the unit tests are executed.
@@ -436,17 +452,6 @@
       <version>1.1.1</version>
     </dependency>
     <dependency>
-      <groupId>jtidy</groupId>
-      <artifactId>jtidy</artifactId>
-      <version>8.0-20060801.131059-3</version>
-      <exclusions>
-        <exclusion>
-          <groupId>xerces</groupId>
-          <artifactId>dom3-xml-apis</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <version>1.2.13</version>
@@ -530,19 +535,6 @@
     </plugins>
   </build>
   <repositories>
-    <!-- We're currently relying on a timestamped version of JTidy 8.0 as it's not been relased
-         since ... 2000. Thus we need this remote repo definded to get it. -->
-    <repository>
-      <id>jtidy</id>
-      <name>JTidy Snapshot Repository</name>
-      <url>http://jtidy.sourceforge.net/snapshots/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
     <!-- Note: Even though these repositories are defined in the com.xpn.xwiki.platform:xwiki module
          we still need to define them here because if com.xpn.xwiki.platform:xwiki is not in the local
          repository we want to fetch it from the remote repo to provide a seamless build experience

@@ -256,7 +256,7 @@ class="pagelayoutoption" onclick="changePreviewLayout(this, 3)"&gt;
 &lt;/div&gt;
 #else
 #xwikimessageboxstart("Panel Editor" "")
-You need to be administrator of the Place to use the Home Page Editor
+You need to have administrative rights to use the Panel Wizard.
 #xwikimessageboxend()
 #end</content>
 </xwikidoc>

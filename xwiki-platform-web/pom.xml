@@ -44,15 +44,16 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>gwt</module>
         <module>standard</module>
         <module>exo</module>
-        <module>gwt</module>
       </modules>
     </profile>
     <profile>
       <!-- XWiki Enterprise -->
       <id>xe</id>
       <modules>
+        <module>gwt</module>
         <module>standard</module>
       </modules>
     </profile>

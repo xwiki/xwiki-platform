@@ -79,8 +79,8 @@
         <!-- Run 'mvn org.mortbay.jetty:maven-jetty-plugin:run-war' to generate the WAR and
              execute it in Jetty. Useful for testing
              Note: You'll need a database set up and running. If you use the HSQLDB profile
-             the database is looked for in target/database so it's very likely you'll get an
-             empty wiki. -->
+             the database is looked for in database/ so it's very likely you'll get an
+             empty wiki. You'll need to import some pages in it using a XAR for example. -->
         <groupId>org.mortbay.jetty</groupId>
         <artifactId>maven-jetty-plugin</artifactId>
         <configuration>

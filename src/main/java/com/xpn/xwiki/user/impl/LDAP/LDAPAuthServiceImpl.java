@@ -56,7 +56,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
         String username  = ldapusername.replaceAll(" ", "");
         String superadmin = "superadmin";
-        if (username.equals(superadmin)) {
+        if (username.equals(superadmin) || username.endsWith("." + superadmin)) {
             String superadminpassword = context.getWiki().Param("xwiki.superadminpassword");
             if ((superadminpassword != null) && (superadminpassword.equals(password))) {
                 principal = new SimplePrincipal("XWiki.superadmin");

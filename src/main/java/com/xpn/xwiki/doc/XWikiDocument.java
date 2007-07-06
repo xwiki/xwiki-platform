@@ -236,6 +236,9 @@ public class XWikiDocument
         this.id = id;
     }
 
+    /**
+     * @return the name of the space of the document
+     */
     public String getSpace()
     {
         return web;
@@ -247,20 +250,19 @@ public class XWikiDocument
     }
 
     /**
-     * @return the name of the space of the document
-     * @deprecated use {@link #getSpace()} instead of this function
+     * @deprecated use {@link #getSpace()} instead
      */
     public String getWeb()
     {
-        return web;
+        return getSpace();
     }
 
     /**
-     * @deprecated use {@link #setSpace(String)} instead of this function
+     * @deprecated use {@link #setSpace(String)} instead
      */
     public void setWeb(String web)
     {
-        this.web = web;
+        setSpace(web);
     }
 
     public String getVersion()
@@ -293,14 +295,14 @@ public class XWikiDocument
 
     public XWikiDocument(String web, String name)
     {
-        this.web = web;
+        setSpace(web);
 
         int i1 = name.indexOf(".");
         if (i1 == -1) {
-            this.name = name;
+            setName(name);
         } else {
-            this.web = name.substring(0, i1);
-            this.name = name.substring(i1 + 1);
+            setSpace(name.substring(0, i1));
+            setName(name.substring(i1 + 1));
         }
         this.updateDate = new Date();
         updateDate.setTime((updateDate.getTime() / 1000) * 1000);
@@ -321,7 +323,7 @@ public class XWikiDocument
 
     public XWikiDocument getParentDoc()
     {
-        return new XWikiDocument(web, getParent());
+        return new XWikiDocument(getSpace(), getParent());
     }
 
     public String getParent()
@@ -378,7 +380,7 @@ public class XWikiDocument
 
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     public void setName(String name)
@@ -2821,8 +2823,6 @@ public class XWikiDocument
 
     /**
      * @deprecated use setStringListValue or setDBStringListProperty
-     * @param name
-     * @param value
      */
     public void setListValue(String className, String fieldName, List value)
     {
@@ -2837,10 +2837,6 @@ public class XWikiDocument
         setContentDirty(true);
     }
 
-    /**
-     * @param name
-     * @param value
-     */
     public void setStringListValue(String className, String fieldName, List value)
     {
         BaseObject bobject = getObject(className);
@@ -2854,10 +2850,6 @@ public class XWikiDocument
         setContentDirty(true);
     }
 
-    /**
-     * @param name
-     * @param value
-     */
     public void setDBStringListValue(String className, String fieldName, List value)
     {
         BaseObject bobject = getObject(className);
@@ -2899,7 +2891,7 @@ public class XWikiDocument
 
     public String getDatabase()
     {
-        return database;
+        return this.database;
     }
 
     public void setDatabase(String database)
@@ -2917,25 +2909,25 @@ public class XWikiDocument
         int i1 = fullname.lastIndexOf(".");
 
         if (i0 != -1) {
-            database = fullname.substring(0, i0);
-            web = fullname.substring(i0 + 1, i1);
-            name = fullname.substring(i1 + 1);
+            setDatabase(fullname.substring(0, i0));
+            setSpace(fullname.substring(i0 + 1, i1));
+            setName(fullname.substring(i1 + 1));
         } else {
             if (i1 == -1) {
                 try {
-                    web = context.getDoc().getSpace();
+                    setSpace(context.getDoc().getSpace());
                 } catch (Exception e) {
-                    web = "XWiki";
+                    setSpace("XWiki");
                 }
-                name = fullname;
+                setName(fullname);
             } else {
-                web = fullname.substring(0, i1);
-                name = fullname.substring(i1 + 1);
+                setSpace(fullname.substring(0, i1));
+                setName(fullname.substring(i1 + 1));
             }
         }
 
-        if (name.equals("")) {
-            name = "WebHome";
+        if (getName().equals("")) {
+            setName("WebHome");
         }
 
         setContentDirty(true);

@@ -1612,7 +1612,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
             if (whereParams != null)
-                sql = sql + generateWhereStatement(sql, whereParams);
+                sql = sql + generateWhereStatement(whereParams);
             Query query = session.createQuery(sql);
             if (whereParams != null)
             {
@@ -1646,7 +1646,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    private String generateWhereStatement(String sql, Object[][] whereParams) {
+    private String generateWhereStatement(Object[][] whereParams) {
         StringBuffer str =  new StringBuffer();
 
         str.append(" where ");

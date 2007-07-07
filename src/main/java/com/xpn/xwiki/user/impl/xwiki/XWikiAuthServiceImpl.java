@@ -27,7 +27,6 @@ import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.plugin.ldap.LDAPPlugin;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -385,28 +384,29 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     protected String findUser(String username, XWikiContext context) throws XWikiException
     {
-        // First lets look in the cache
-        if (context.getWiki().exists("XWiki." + username, context)) {
-            return "XWiki." + username;
-        }
+        String user;
 
-        String sql =
-            "select distinct doc.web, doc.name from XWikiDocument as doc where doc.web='XWiki' and doc.name like '"
-                + Utils.SQLFilter(username) + "'";
-        List list = context.getWiki().search(sql, context);
-        if (list.size() == 0) {
-            return null;
-        }
-        if (list.size() > 1) {
-            for (int i = 0; i < list.size(); i++) {
-                Object[] result = (Object[]) list.get(0);
-                if (result[1].equals(username)) {
-                    return result[0] + "." + result[1];
-                }
+        // First let's look in the cache
+        if (context.getWiki().exists("XWiki." + username, context)) {
+            user = "XWiki." + username;
+        } else {
+            // Note: The result of this search depends on the Database. If the database is
+            // case-insensitive (like MySQL) then users will be able to log in by entering their
+            // username in any case. For case-sensitive databases (like HSQLDB) they'll need to
+            // enter it exactly as they've created it.
+            String sql = "select distinct doc.fullName from XWikiDocument as doc";
+            Object[][] whereParameters =
+                new Object[][] {{"doc.web", "XWiki"}, {"doc.name", username}};
+
+            List list = context.getWiki().search(sql, whereParameters, context);
+            if (list.size() == 0) {
+                user = null;
+            } else {
+                user = (String) list.get(0);
             }
         }
-        Object[] result = (Object[]) list.get(0);
-        return result[0] + "." + result[1];
+
+        return user; 
     }
 
     protected boolean checkPassword(String username, String password, XWikiContext context)

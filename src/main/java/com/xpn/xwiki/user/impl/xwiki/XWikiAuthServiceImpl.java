@@ -278,8 +278,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
          * this would probably be to throw XWikiException-s.
          */
 
+        // Trim the username to allow users to enter their names with spaces before or after
+        String cannonicalUsername = username.replaceAll(" ", "");
+
         // Check for empty usernames
-        if ((username == null) || (username.trim().equals(""))) {
+        if ((cannonicalUsername == null) || (cannonicalUsername.equals(""))) {
             context.put("message", "nousername");
             return null;
         }
@@ -291,7 +294,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
 
         // Check for superadmin
-        if (isSuperAdmin(username)) {
+        if (isSuperAdmin(cannonicalUsername)) {
             return authenticateSuperAdmin(password, context);
         }
 
@@ -299,10 +302,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         // then we should specify the database
         // This is needed for virtual mode to work
         if (context != null) {
-            String susername = username;
-            int i = username.indexOf(".");
+            String susername = cannonicalUsername;
+            int i = cannonicalUsername.indexOf(".");
             if (i != -1)
-                susername = username.substring(i + 1);
+                susername = cannonicalUsername.substring(i + 1);
 
             // First we check in the local database
             try {
@@ -355,24 +358,22 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         }
     }
 
-    protected String findUser(String susername2, XWikiContext context) throws XWikiException
+    protected String findUser(String username, XWikiContext context) throws XWikiException
     {
-        String susername = susername2.replaceAll(" ", "");
-
         // First lets look in the cache
-        if (context.getWiki().exists("XWiki." + susername, context))
-            return "XWiki." + susername;
+        if (context.getWiki().exists("XWiki." + username, context))
+            return "XWiki." + username;
 
         String sql =
             "select distinct doc.web, doc.name from XWikiDocument as doc where doc.web='XWiki' and doc.name like '"
-                + Utils.SQLFilter(susername) + "'";
+                + Utils.SQLFilter(username) + "'";
         List list = context.getWiki().search(sql, context);
         if (list.size() == 0)
             return null;
         if (list.size() > 1) {
             for (int i = 0; i < list.size(); i++) {
                 Object[] result = (Object[]) list.get(0);
-                if (result[1].equals(susername))
+                if (result[1].equals(username))
                     return result[0] + "." + result[1];
             }
         }

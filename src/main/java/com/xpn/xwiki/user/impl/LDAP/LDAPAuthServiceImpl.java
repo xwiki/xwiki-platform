@@ -48,13 +48,14 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
     public Principal authenticate(String ldapusername, String password, XWikiContext context) throws XWikiException {
         Principal principal = null;
 
-        if ((ldapusername==null)||(ldapusername.trim().equals("")))
+        // Trim the username to allow users to enter their names with spaces before or after
+        String username  = ldapusername.replaceAll(" ", "");
+
+        if ((username == null) || (username.equals("")))
             return null;
 
         if ((password == null) || (password.trim().equals("")))
             return null;
-
-        String username  = ldapusername.replaceAll(" ", "");
 
         if (isSuperAdmin(username)) {
             return authenticateSuperAdmin(password, context);

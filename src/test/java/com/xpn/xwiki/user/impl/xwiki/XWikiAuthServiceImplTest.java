@@ -74,4 +74,14 @@ public class XWikiAuthServiceImplTest extends MockObjectTestCase
             this.context);
         assertNull(principal);
     }
+
+    public void testAuthenticateWithSuperAdminWithWhiteSpacesWhenSuperAdminPasswordIsTurnedOff()
+        throws Exception
+    {
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(
+            returnValue(null));
+        Principal principal = this.authService.authenticate(" superadmin ", "whatever",
+            this.context);
+        assertNull(principal);
+    }
 }

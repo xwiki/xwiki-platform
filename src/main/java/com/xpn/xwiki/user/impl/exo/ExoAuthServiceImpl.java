@@ -90,23 +90,26 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
 
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
 
-        if (isSuperAdmin(username)) {
+        // Trim the username to allow users to enter their names with spaces before or after
+        String cannonicalUsername = username.replaceAll(" ", "");
+
+        if (isSuperAdmin(cannonicalUsername)) {
             return authenticateSuperAdmin(password, context);
         }
 
         SecurityService securityService = getSecurityService();
         try {
-            if (securityService.authenticate(username, password))
-                return new SimplePrincipal(username);
+            if (securityService.authenticate(cannonicalUsername, password))
+                return new SimplePrincipal(cannonicalUsername);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         /*
         if(context != null){
-            String susername = username;
+            String susername = cannonicalUsername;
             int i = username.indexOf(".");
-            if (i!=-1) susername = username.substring(i+1);
+            if (i!=-1) susername = cannonicalUsername.substring(i+1);
             String exo = getExo_DN(susername,context) ;
 
         }

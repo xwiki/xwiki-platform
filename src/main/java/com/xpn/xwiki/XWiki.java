@@ -4103,40 +4103,41 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public XWikiURLFactoryService getURLFactoryService()
     {
-        synchronized (URLFACTORY_SERVICE_LOCK) {
-            if (urlFactoryService == null) {
-
-                LOG.info("Initializing URLFactory Service...");
-
-                String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
-
-                if (urlFactoryServiceClass != null) {
-                    try {
+        if (urlFactoryService == null) {
+            synchronized (URLFACTORY_SERVICE_LOCK) {
+                if (urlFactoryService == null) {
+                    LOG.info("Initializing URLFactory Service...");
+    
+                    String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
+    
+                    if (urlFactoryServiceClass != null) {
+                        try {
+                            if (LOG.isDebugEnabled())
+                                LOG.debug("Using custom URLFactory Service Class "
+                                    + urlFactoryServiceClass + ".");
+                            urlFactoryService =
+                                (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
+                                    .newInstance();
+                            urlFactoryService.init(this);
+                            LOG.debug("Initialized URLFactory Service using Reflection.");
+                        } catch (Exception e) {
+                            urlFactoryService = null;
+                            LOG.warn("Failed to initialize URLFactory Service  "
+                                + urlFactoryServiceClass
+                                + " using Reflection, trying default implementation using 'new'.", e);
+                        }
+                    }
+                    if (urlFactoryService == null) {
                         if (LOG.isDebugEnabled())
-                            LOG.debug("Using custom URLFactory Service Class "
+                            LOG.debug("Using default URLFactory Service Class "
                                 + urlFactoryServiceClass + ".");
-                        urlFactoryService =
-                            (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                .newInstance();
+                        urlFactoryService = new XWikiURLFactoryServiceImpl();
                         urlFactoryService.init(this);
-                        LOG.debug("Initialized URLFactory Service using Reflection.");
-                    } catch (Exception e) {
-                        urlFactoryService = null;
-                        LOG.warn("Failed to initialize URLFactory Service  "
-                            + urlFactoryServiceClass
-                            + " using Reflection, trying default implementation using 'new'.", e);
                     }
                 }
-                if (urlFactoryService == null) {
-                    if (LOG.isDebugEnabled())
-                        LOG.debug("Using default URLFactory Service Class "
-                            + urlFactoryServiceClass + ".");
-                    urlFactoryService = new XWikiURLFactoryServiceImpl();
-                    urlFactoryService.init(this);
-                }
             }
-            return urlFactoryService;
         }
+        return urlFactoryService;
     }
 
     /**

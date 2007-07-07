@@ -23,8 +23,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 /**
  * Common code for importing and exporting.
@@ -65,6 +68,13 @@ public class AbstractPackager
 
         XWiki xwiki = new XWiki(config, context);
         context.setWiki(xwiki);
+
+        try {
+            context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
+        } catch (MalformedURLException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
+        }
 
         return context;
     }

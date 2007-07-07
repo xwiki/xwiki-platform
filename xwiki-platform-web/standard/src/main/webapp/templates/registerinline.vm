@@ -10,6 +10,8 @@
       #error("$msg.get('useralreadyexists').")
     #elseif($reg==-4)
       #error("$msg.get('invalidusername').")
+    #elseif($reg==-8)
+      #error("$msg.get('useralreadyexists').")
     #else
       #error("$msg.get('registerfailed') ($msg.get('registerfailedcode') $reg).")
     #end

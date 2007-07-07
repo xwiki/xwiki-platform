@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -70,10 +70,13 @@ public class AbstractPackager
         context.setWiki(xwiki);
 
         try {
-            context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
-        } catch (MalformedURLException ex) {
-            // TODO Auto-generated catch block
-            ex.printStackTrace();
+            context.setURLFactory(
+                new XWikiServletURLFactory(new URL("http://localhost:8080"), "xwiki/", "bin/"));
+        } catch (MalformedURLException e) {
+            // TODO: Remove that way of creating exceptions in XWiki as it's a real plain and
+            // doesn't work with external code.
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
+                XWikiException.ERROR_XWIKI_UNKNOWN, "Failed to set up URL Factory", e);
         }
 
         return context;

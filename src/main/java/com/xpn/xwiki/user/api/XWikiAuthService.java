@@ -43,6 +43,10 @@ public interface XWikiAuthService
 
     public void showLogin(XWikiContext context) throws XWikiException;
 
+    /**
+     * @return a null Principal Object if the user hasn't been authenticated or a valid Principal
+     *         Object if the user is correctly authenticated
+     */
     public Principal authenticate(String username, String password, XWikiContext context)
         throws XWikiException;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,10 +16,7 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author sdumitriu
  */
-
 package com.xpn.xwiki.user.impl.xwiki;
 
 import java.io.IOException;
@@ -46,7 +43,7 @@ import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 
-public class XWikiAuthServiceImpl implements XWikiAuthService
+public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 {
     private static final Log log = LogFactory.getLog(XWikiAuthServiceImpl.class);
 
@@ -268,35 +265,34 @@ public class XWikiAuthServiceImpl implements XWikiAuthService
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see XWikiAuthService#authenticate(String, String, XWikiContext)
+     */
     public Principal authenticate(String username, String password, XWikiContext context)
         throws XWikiException
     {
         /*
-         * This function was returning null on failure so I preserved that behaviour, while adding
+         * This method was returning null on failure so I preserved that behaviour, while adding
          * the exact error messages to the context given as argument. However, the right way to do
          * this would probably be to throw XWikiException-s.
          */
 
+        // Check for empty usernames
         if ((username == null) || (username.trim().equals(""))) {
             context.put("message", "nousername");
             return null;
         }
 
+        // Check for empty passwords
         if ((password == null) || (password.trim().equals(""))) {
             context.put("message", "nopassword");
             return null;
         }
 
-        String superadmin = "superadmin";
-        if (username.equals(superadmin) || username.endsWith("." + superadmin)) {
-            String superadminpassword = context.getWiki().Param("xwiki.superadminpassword");
-            if ((superadminpassword != null) && (superadminpassword.equals(password))) {
-                Principal principal = new SimplePrincipal("XWiki.superadmin");
-                return principal;
-            } else {
-                context.put("message", "wrongpassword");
-                return null;
-            }
+        // Check for superadmin
+        if (isSuperAdmin(username)) {
+            return authenticateSuperAdmin(password, context);
         }
 
         // If we have the context then we are using direct mode
@@ -402,9 +398,9 @@ public class XWikiAuthServiceImpl implements XWikiAuthService
 
             if (log.isDebugEnabled()) {
                 if (result)
-                    log.debug("(debug) Password check for user " + username + " successfull");
+                    log.debug("Password check for user " + username + " successful");
                 else
-                    log.debug("(debug) Password check for user " + username + " failed");
+                    log.debug("Password check for user " + username + " failed");
             }
 
             return result;

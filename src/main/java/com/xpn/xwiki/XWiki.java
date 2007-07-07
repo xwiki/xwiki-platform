@@ -2587,6 +2587,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             String parent = request.getParameter("parent");
             String validkey = null;
 
+            if ("superadmin".equals(xwikiname)) {
+                return -8;
+            }
             try {
                 if (!context.getUtil().match(
                     this.Param("xwiki.validusername", "/^[a-zA-Z0-9_]+$/"), xwikiname)) {

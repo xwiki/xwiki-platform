@@ -39,9 +39,8 @@
   </fileSets>
   <files>
     <file>
-      <source>${basedir}/src/main/resources/hibernate.cfg.xml</source>
+      <source>${basedir}/target/maven-shared-archive-resources/hibernate.cfg.xml</source>
       <outputDirectory>WEB-INF/</outputDirectory>
-      <filtered>true</filtered>
     </file>
     <file>
       <source>${basedir}/src/main/resources/version.properties</source>

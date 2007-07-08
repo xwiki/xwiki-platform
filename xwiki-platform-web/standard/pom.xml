@@ -59,6 +59,23 @@
   </dependencies>
   <build>
     <plugins>
+      <!-- Inject XWiki's configuration -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-remote-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>process</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <resourceBundles>
+            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.1-SNAPSHOT</resourceBundle>
+          </resourceBundles>
+        </configuration>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>

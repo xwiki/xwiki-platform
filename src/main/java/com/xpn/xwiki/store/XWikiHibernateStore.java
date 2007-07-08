@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -16,13 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
- * @author ludovic
- * @author namphunghai
- * @author erwan
- * @author jeremi
- * @author sdumitriu
- * @author thomas
  */
 package com.xpn.xwiki.store;
 
@@ -59,7 +52,6 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.*;
-
 
 public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWikiStoreInterface {
 
@@ -2093,7 +2085,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             return ArrayUtils.contains(validtypes, name);
     }
 
-
     public XWikiBatcherStats getBatcherStats() {
         return null; // XWikiBatcher.getSQLStats();
     }
@@ -2101,7 +2092,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public void resetBatcherStats() {
         // XWikiBatcher.getSQLStats().resetStats();
     }
-
 
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException {
         return searchDocumentsNames(wheresql, 0, 0, "", context);
@@ -2136,36 +2126,11 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
 	public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException {
-		List result = new ArrayList();
         String hql = "select doc.language from XWikiDocument as doc where doc.web = '"
-                + Utils.SQLFilter(doc.getSpace()) + "' and doc.name = '" + Utils.SQLFilter(doc.getName()) + "' and doc.language <> ''";
-
+            + Utils.SQLFilter(doc.getSpace()) + "' and doc.name = '"
+            + Utils.SQLFilter(doc.getName()) + "' and doc.language <> ''";
         List list = context.getWiki().search(hql, context);
-        if ((list == null) || (list.size() == 0)) {
-            return result;
-        }
-
-        for (int i = 0; i < list.size(); i++) {
-            result.add(list.get(i));
-        }
-        return result;
+        return (list == null) ? new ArrayList() : list;
 	}
-
-  /*
-    public void updateArchive(String text) throws XWikiException {
-        try {
-            Lines lines = new Lines(text);
-            if (archive != null)
-                archive.addRevision(lines.toArray(), "");
-            else
-                archive = new Archive(lines.toArray(), getFullName(), getVersion());
-        }
-        catch (Exception e) {
-            Object[] args = {getFullName()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ARCHIVEFORMAT,
-                    "Exception while manipulating the archive for doc {0}", e, args);
-        }
-    }
-  */
 }
 

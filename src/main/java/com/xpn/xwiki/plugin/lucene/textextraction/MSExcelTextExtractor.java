@@ -1,25 +1,25 @@
 package com.xpn.xwiki.plugin.lucene.textextraction;
-import org.apache.poi.hssf.usermodel.*;
-import org.apache.poi.poifs.filesystem.POIFSFileSystem;
-import org.apache.log4j.Logger;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFDataFormat;
+import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
 import java.io.ByteArrayInputStream;
-import java.text.SimpleDateFormat;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/**
- * Created by IntelliJ IDEA.
- * User: lokesh
- * Date: Oct 17, 2006
- * Time: 4:49:10 PM
- * To change this template use File | Settings | File Templates.
- */
-public class MSExcelTextExtractor implements MimetypeTextExtractor {
-
+public class MSExcelTextExtractor implements MimetypeTextExtractor
+{
     private static final Log LOG = LogFactory.getLog(MSExcelTextExtractor.class);
+
     /**
      * The currently preparing Excel workbook.
      */
@@ -33,13 +33,12 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
     public static final int DEFAULT_BUFFER_SIZE = 16384; // 16 k
 
     /**
-     *   Extracts all text from an Excel by parsing all the sheets in that excel document.
-     * @param data
+     * Extracts all text from an Excel by parsing all the sheets in that excel document.
+     *
      * @return String
-     * @throws Exception
      */
-    public String getText(byte[] data) throws Exception {
-
+    public String getText(byte[] data) throws Exception
+    {
         POIFSFileSystem poiFs = new POIFSFileSystem(new ByteArrayInputStream(data));
         mWorkbook = new HSSFWorkbook(poiFs);
         mDataFormat = mWorkbook.createDataFormat();
@@ -56,12 +55,10 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
     }
 
     /**
-     *  It will parse the sheet with row wise and get the text from the sheet.
-     * @param sheet
-     * @param cleanBuffer
+     * It will parse the sheet with row wise and get the text from the sheet.
      */
-
-    private void parseSheet(HSSFSheet sheet, StringBuffer cleanBuffer) {
+    private void parseSheet(HSSFSheet sheet, StringBuffer cleanBuffer)
+    {
         int firstRow = sheet.getFirstRowNum();
         int lastRow = sheet.getLastRowNum();
         for (int rowIdx = firstRow; rowIdx <= lastRow; rowIdx++) {
@@ -74,11 +71,10 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
     }
 
     /**
-     *  It will parse row and return the text
-     * @param row
-     * @param cleanBuffer
+     * It will parse row and return the text
      */
-    private void parseRow(HSSFRow row, StringBuffer cleanBuffer) {
+    private void parseRow(HSSFRow row, StringBuffer cleanBuffer)
+    {
         short firstCell = row.getFirstCellNum();
         short lastCell = row.getLastCellNum();
         for (short cellIdx = firstCell; cellIdx <= lastCell; cellIdx++) {
@@ -91,11 +87,10 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
     }
 
     /**
-     *  Extracts all text from each cell of the sheet
-     * @param cell
-     * @param cleanBuffer
+     * Extracts all text from each cell of the sheet
      */
-    private void parseCell(HSSFCell cell, StringBuffer cleanBuffer) {
+    private void parseCell(HSSFCell cell, StringBuffer cleanBuffer)
+    {
         String cellValue = null;
 
         if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
@@ -153,10 +148,11 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
 
     /**
      * Checks cell is date formatted or not.
-     * @param cell
-     * @return  boolean
+     *
+     * @return boolean
      */
-    private boolean isCellDateFormatted(HSSFCell cell) {
+    private boolean isCellDateFormatted(HSSFCell cell)
+    {
         short format = cell.getCellStyle().getDataFormat();
 
         if (HSSFDateUtil.isValidExcelDate(cell.getNumericCellValue())) {
@@ -169,10 +165,11 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
                     fmtText = fmtText.toLowerCase();
 
                     if (fmtText.indexOf("d") >= 0
-                            || fmtText.indexOf("m") >= 0
-                            || fmtText.indexOf("y") >= 0
-                            || fmtText.indexOf("h") >= 0
-                            || fmtText.indexOf("s") >= 0) {
+                        || fmtText.indexOf("m") >= 0
+                        || fmtText.indexOf("y") >= 0
+                        || fmtText.indexOf("h") >= 0
+                        || fmtText.indexOf("s") >= 0)
+                    {
                         return true;
                     }
                 }
@@ -184,12 +181,11 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
 
     /**
      * It will replace all occurances of pattern in the source with replacement value
-     * @param source
-     * @param pattern
-     * @param replacement
-     * @return    String
+     *
+     * @return String
      */
-    public static String replace(String source, String pattern, String replacement) {
+    public static String replace(String source, String pattern, String replacement)
+    {
         // Check whether the pattern occurs in the source at all
         int firstPatternPos = source.indexOf(pattern);
         if (firstPatternPos == -1) {
@@ -211,5 +207,4 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor {
         // return the String
         return target.toString();
     }
-
 }

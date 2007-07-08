@@ -79,12 +79,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <!-- Seems there's an issue with version 2.2-beta-1 for the application/ module. It does
-             not properly expand a dependency set. Thus we're forcing the usage of 2.1. We have
-             to use that version for all other modules too as Maven seems to have an issue when
-             using several versions of a plugin in the same build execution. To be removed once
-             the assembly plugin is fixed and released. -->
-        <version>2.1</version>
         <configuration>
           <descriptors>
             <descriptor>src/assemble/war.xml</descriptor>

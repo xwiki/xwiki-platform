@@ -43,6 +43,10 @@
       <outputDirectory>WEB-INF/</outputDirectory>
     </file>
     <file>
+      <source>${basedir}/target/maven-shared-archive-resources/xwiki.cfg</source>
+      <outputDirectory>WEB-INF/</outputDirectory>
+    </file>
+    <file>
       <source>${basedir}/src/main/resources/version.properties</source>
       <outputDirectory>WEB-INF/</outputDirectory>
       <filtered>true</filtered>

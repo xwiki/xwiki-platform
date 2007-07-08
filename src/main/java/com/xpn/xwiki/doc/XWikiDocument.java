@@ -100,6 +100,13 @@ public class XWikiDocument
 {
     private static final Log log = LogFactory.getLog(XWikiDocument.class);
 
+    /**
+     * Regex Pattern to recognize if there's HTML code in a XWiki page.
+     */
+    private static final Pattern HTML_TAG_PATTERN = Pattern.compile(
+        "</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|"
+        + "font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>");
+
     private String title;
 
     private String parent;
@@ -3723,16 +3730,10 @@ public class XWikiDocument
             }
         }
 
-        String htmlregexp =
-            "</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>";
-        try {
-            Util util = new Util();
-            List list = util.getUniqueMatches(content2, htmlregexp, 1);
-            if (list.size() > 0) {
-                return true;
-            }
-        } catch (MalformedPatternException e) {
+        if (HTML_TAG_PATTERN.matcher(content2).find()) {
+            return true;
         }
+
         return false;
     }
 

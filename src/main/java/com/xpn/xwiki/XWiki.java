@@ -1105,7 +1105,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         int cols = 80;
         try {
-            context.getWiki().getUserPreferenceAsInt("editbox_width", context);
+            cols = context.getWiki().getUserPreferenceAsInt("editbox_width", context);
         } catch (Exception e) {
         }
         textarea.setCols(cols);
@@ -1137,7 +1137,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         int cols = 80;
         try {
-            context.getWiki().getUserPreferenceAsInt("editbox_width", context);
+            cols = context.getWiki().getUserPreferenceAsInt("editbox_width", context);
         } catch (Exception e) {
         }
         textarea.setCols(cols);

@@ -31,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.hibernate.Session;
+import org.hibernate.dialect.Dialect;
+import org.hibernate.dialect.HSQLDialect;
 
 /**
  * Import a set of XWiki documents into an existing database.
@@ -99,6 +101,10 @@ public class Importer extends AbstractPackager
 
         if (XWikiHibernateStore.class.isAssignableFrom(store.getClass())) {
             XWikiHibernateStore hibernateStore = (XWikiHibernateStore) store;
+
+            // check that is HSQLDB
+            Dialect dialect = Dialect.getDialect(hibernateStore.getConfiguration().getProperties());
+            if (!(dialect instanceof HSQLDialect)) return;
 
             boolean bTransaction = true;
             try {

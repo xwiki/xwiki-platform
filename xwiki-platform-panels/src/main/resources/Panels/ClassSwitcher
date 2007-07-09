@@ -106,7 +106,7 @@
 &lt;table&gt;
 &lt;tr&gt;&lt;td&gt;&lt;label for="classname"&gt;$msg.get("classname"):&lt;/label&gt;&lt;/td&gt;&lt;td&gt;
 &lt;select id="classname" name="xredirect" size="1"&gt;
-&lt;option value="---"&gt;$msg.get("selectclass")&lt;/option&gt;
+&lt;option value="-"&gt;$msg.get("selectclass")&lt;/option&gt;
 #foreach ($classname in $xwiki.classList)
 #if($!xwiki.hasAccessLevel("edit", $classname))
 #set($classdoc = $xwiki.getDocument($classname))
@@ -117,7 +117,7 @@
 &lt;tr&gt;&lt;td class="center padded" colspan="2"&gt;
 &lt;script type="text/javascript"&gt;
 function gotoclass(dest) {
- if (dest!="---") {
+ if (dest!="-") {
    location = dest;
    }
    return false;

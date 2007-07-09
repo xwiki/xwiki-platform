@@ -40,7 +40,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>${version}</version>
+      <version>1.1-milestone-3</version>
     </dependency>
     <!-- Add the GWT JAR so that XWiki Core is GWT-ready and so that the XWiki GWT Servlet can
          be activated by default -->

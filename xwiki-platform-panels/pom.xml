@@ -22,8 +22,7 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
@@ -32,7 +31,13 @@
   </parent>
   <artifactId>xwiki-application-panels</artifactId>
   <name>XWiki Platform - Applications - Panels</name>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1-milestone-3</version>
   <packaging>xar</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
+
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1-milestone-3</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1-milestone-3</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1-milestone-3</url>
+  </scm>
 </project>

@@ -106,7 +106,7 @@
 &lt;form id="changeclass" method="post" action="$doc.getURL("redirect")"&gt;
 &lt;div class="centered"&gt;
 &lt;select id="classname" name="xredirect" size="1"&gt;
-&lt;option value="---"&gt;--Edit another class--&lt;/option&gt;
+&lt;option value="-"&gt;Edit another class&lt;/option&gt;
 #foreach ($classname in $xwiki.classList)
 #if($!xwiki.hasAccessLevel("edit", $classname))
 #set($classdoc = $xwiki.getDocument($classname))
@@ -116,7 +116,7 @@
 &lt;/select&gt;
 &lt;script type="text/javascript"&gt;
 function gotoclass(dest) {
- if (dest!="---") {
+ if (dest!="-") {
    location = dest;
    }
    return false;

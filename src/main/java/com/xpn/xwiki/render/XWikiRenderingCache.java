@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,19 +17,11 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
  */
 package com.xpn.xwiki.render;
 
 import java.util.Date;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 8 sept. 2005
- * Time: 14:59:01
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiRenderingCache {
     private String key;
     private String content;

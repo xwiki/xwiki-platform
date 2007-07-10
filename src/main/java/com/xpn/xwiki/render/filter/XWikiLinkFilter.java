@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,10 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
- * @author sdumitriu
  */
-
 
 package com.xpn.xwiki.render.filter;
 
@@ -38,16 +35,11 @@ import java.io.IOException;
 import java.io.Writer;
 
 
-/*
-* LinkTestFilter finds [text] in its input and transforms this
-* to <a href="text">...</a> if the wiki page exists. If not
-* it adds a [create text] to the output.
-*
-* @author stephan
-* @team sonicteam
-* @version $Id: XWikiLinkFilter.java 448 2005-01-26 08:37:17Z ldubost $
-*/
-
+/**
+ * XWikiLinkFilter finds [text] in its input and transforms this
+ * to <a href="text">...</a> if the wiki page exists. If not
+ * it adds a [create text] to the output.
+ */
 public class XWikiLinkFilter extends LocaleRegexTokenFilter {
 
     private static Log log = LogFactory.getLog(XWikiLinkFilter.class);

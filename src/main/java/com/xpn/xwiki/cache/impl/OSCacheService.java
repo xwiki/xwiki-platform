@@ -1,22 +1,5 @@
-package com.xpn.xwiki.cache.impl;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.lang.ref.WeakReference;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -34,15 +17,30 @@ import java.util.*;
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
+ */
+
+package com.xpn.xwiki.cache.impl;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+/**
  * Allows initilization of OSCache in the proper way to use JGroups for
  * clustering. Basically this involves reading the oscache.properties file
  * located in WEB-INF/classes. This contains a listener setting for JGroups (and
  * other settings we could use if desired).
- * 
-
- * @author sdumitriu
- * @author markj
- * @author wr0ngway
  * 
  */
 public class OSCacheService implements XWikiCacheService, Runnable

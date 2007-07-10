@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,18 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author sdumitriu
  */
-/**
- * 
- */
+
 package com.xpn.xwiki.atom.lifeblog;
 
 import com.xpn.xwiki.XWikiException;
 
 /**
- * @author Luis
- * 
  * UserBlog represents a UserBlog entry as per the Lifeblog Posting Protocol Specification.
  */
 

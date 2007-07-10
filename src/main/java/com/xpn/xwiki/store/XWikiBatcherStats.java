@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
  */
 package com.xpn.xwiki.store;
 
@@ -28,13 +27,6 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 25 sept. 2005
- * Time: 11:40:10
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiBatcherStats {
     private static final Log log = LogFactory.getLog(XWikiBatcherStats.class);
 

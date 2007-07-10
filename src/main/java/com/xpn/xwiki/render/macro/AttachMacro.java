@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -18,6 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
+package com.xpn.xwiki.render.macro;
+
+import java.io.IOException;
+import java.io.Writer;
+
+import org.radeox.api.engine.RenderEngine;
+import org.radeox.api.engine.context.RenderContext;
+import org.radeox.macro.BaseLocaleMacro;
+import org.radeox.macro.parameter.MacroParameter;
+import org.radeox.util.Encoder;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+
 /**
  * Macro that outputs links to document attachments.
  * 
@@ -35,22 +50,6 @@
  *   This is useful for templates, for example.</li>
  * </ul>
  */
-
-package com.xpn.xwiki.render.macro;
-
-import java.io.IOException;
-import java.io.Writer;
-
-import org.radeox.api.engine.RenderEngine;
-import org.radeox.api.engine.context.RenderContext;
-import org.radeox.macro.BaseLocaleMacro;
-import org.radeox.macro.parameter.MacroParameter;
-import org.radeox.util.Encoder;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
-
 public class AttachMacro extends BaseLocaleMacro {
     public String getLocaleKey() {
         return "macro.attach";

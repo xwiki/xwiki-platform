@@ -1,14 +1,5 @@
-package com.xpn.xwiki.cache.impl;
-
-import com.opensymphony.oscache.base.events.*;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.doc.XWikiDocument;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -30,15 +21,24 @@ import org.apache.commons.logging.LogFactory;
  * clustering. Basically this involves reading the oscache.properties file
  * located in WEB-INF/classes. This contains a listener setting for JGroups (and
  * other settings we could use if desired).
+ *
+ */
 
+package com.xpn.xwiki.cache.impl;
+
+import com.opensymphony.oscache.base.events.*;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+/**
  * Catch when a doc is flushed from the cache so we can send our own
  * event.
  *
  * This event is mostly called due to jgroups flushing items from the cache.
  *
- * @author fitzgerald
- * @author wr0ngway
- * 
  */
 public class XWikiCacheListener implements CacheEntryEventListener
 {

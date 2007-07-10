@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -19,14 +19,9 @@
  *
  */
 
-
-
-
 package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-
-
 
 public class EditBean extends Object
 {

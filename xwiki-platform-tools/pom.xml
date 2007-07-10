@@ -26,23 +26,15 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
-    <artifactId>xwiki</artifactId>
-    <version>3</version>
+    <artifactId>xwiki-tools</artifactId>
+    <version>1.2-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-tools</artifactId>
-  <name>XWiki Platform - Tools - Parent POM</name>
-  <version>1</version>
-  <packaging>pom</packaging>
-  <description>XWiki Tools</description>
-  <scm>
-    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-1</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-1</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-1</url>
-  </scm>
-  <modules>
-    <module>build-tools</module>
-    <module>packager</module>
-    <module>xwiki-configuration-resources</module>
-    <module>xwiki-jetty-resources</module>
-  </modules>
+  <artifactId>xwiki-jetty-resources</artifactId>
+  <name>XWiki Platform - Tools - Jetty Configuration Resources</name>
+  <packaging>jar</packaging>
+  <description>
+    Packages a Jetty installation. This module is used to generate a valid Jetty installation.
+    In the future we should rather use Cargo for doing this (but some work has to be done on
+    Cargo before it's ready to be used).
+  </description>
 </project>

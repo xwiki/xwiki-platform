@@ -55,7 +55,7 @@
         </executions>
         <configuration>
           <resourceBundles>
-            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.1</resourceBundle>
+            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.2-SNAPSHOT</resourceBundle>
           </resourceBundles>
           <properties>
             <xwikiCfgExo>1</xwikiCfgExo>

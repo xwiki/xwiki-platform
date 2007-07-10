@@ -29,8 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * A simple action that redirects to the main page of the wiki
- * 
- * @author sgm
  */
 public class HomePageRedirect extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

@@ -31,10 +31,6 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 
-/**
- *
- * @author LBlaze
- */
 public class BufferedResponse
 extends HttpServletResponseWrapper {
   

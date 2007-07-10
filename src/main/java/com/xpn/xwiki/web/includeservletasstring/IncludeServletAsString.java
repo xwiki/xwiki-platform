@@ -31,10 +31,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- *
- * @author LBlaze
- */
 public class IncludeServletAsString {
   
     private static final Log log = LogFactory.getLog(IncludeServletAsString.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -17,8 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
- * @author ludovic
- * @author sdumitriu
  */
 
 package com.xpn.xwiki.plugin.calendar;
@@ -43,8 +41,6 @@ import java.util.*;
  * The internal data is of type {@link com.xpn.xwiki.plugin.calendar.CalendarEvent}.
  * The list can be populated with CalendarEvent XWiki objects from a document, with
  * document names retrieved by a custom hibernate query, or  with recently changed document names.
- * @author ludovic
- * @author sdumitriu
  */
 public class CalendarData {
     private Map cdata = new HashMap();

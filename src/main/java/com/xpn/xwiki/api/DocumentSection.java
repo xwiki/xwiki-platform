@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -20,10 +20,6 @@
  */
 package com.xpn.xwiki.api;
 
-/**
- * @author Phung Hai Nam (phunghainam@xwiki.com)
- * @version 25 Aug 2006
- */
 public class DocumentSection {
     private int sectionNumber;
     private int sectionIndex;

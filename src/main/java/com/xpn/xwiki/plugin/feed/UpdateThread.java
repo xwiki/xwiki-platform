@@ -1,12 +1,5 @@
-package com.xpn.xwiki.plugin.feed;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-
-import java.util.Date;
-
-/**
- * Copyright 2006,XpertNet SARL,and individual contributors as indicated
+/*
+ * Copyright 2006-2007, XpertNet SARL,and individual contributors as indicated
  * by the contributors.txt.
  * <p/>
  * This is free software;you can redistribute it and/or modify it
@@ -24,8 +17,14 @@ import java.util.Date;
  * Software Foundation,Inc.,51 Franklin St,Fifth Floor,Boston,MA
  * 02110-1301 USA,or see the FSF site:http://www.fsf.org.
  *
- * @author ldubost
  */
+
+package com.xpn.xwiki.plugin.feed;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+
+import java.util.Date;
 
 public class UpdateThread implements Runnable {
     protected boolean fullContent;

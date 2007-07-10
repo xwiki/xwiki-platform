@@ -24,7 +24,7 @@
          database -->
 
     <property name="connection.url">$xwikiDbConnectionUrl</property>
-    <property name="connection.username">$xwikiDbConnectionUsername</property>
+    <property name="connection.username">$!xwikiDbConnectionUsername</property>
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
     <property name="connection.driver_class">$xwikiDbConnectionDriverClass</property>
     <property name="dialect">$xwikiDbDialect</property>

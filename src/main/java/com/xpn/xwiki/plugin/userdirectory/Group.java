@@ -14,13 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-/**
- * Created by IntelliJ IDEA.
- * User: jeremi
- * Date: Aug 16, 2006
- * Time: 2:06:34 PM
- * To change this template use File | Settings | File Templates.
- */
 public class Group {
     private Document        doc;
     private Object          objDirectoryGroup;

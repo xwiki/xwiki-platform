@@ -34,14 +34,6 @@ import java.util.Iterator;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.InvocationHandler;
 
-
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 10 mars 2006
- * Time: 14:04:13
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiHibernateBaseStore {
     private static final Log log = LogFactory.getLog(XWikiHibernateBaseStore.class);
 

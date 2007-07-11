@@ -12,13 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 23 avr. 2007
- * Time: 14:16:25
- * To change this template use File | Settings | File Templates.
- */
 public class GroovyAuthServiceImpl extends XWikiAuthServiceImpl {
     private static final Log log = LogFactory.getLog(GroovyAuthServiceImpl.class);
 

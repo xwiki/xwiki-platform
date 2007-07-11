@@ -8,13 +8,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 8 avr. 2006
- * Time: 00:13:39
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiPageNotification implements XWikiActionNotificationInterface {
     private static final Log log = LogFactory.getLog(XWikiPageNotification.class);
 

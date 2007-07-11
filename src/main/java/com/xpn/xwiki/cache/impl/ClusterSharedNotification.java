@@ -4,13 +4,6 @@ import com.opensymphony.oscache.plugins.clustersupport.ClusterNotification;
 
 import java.io.Serializable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 30 juil. 2006
- * Time: 17:22:32
- * To change this template use File | Settings | File Templates.
- */
 /*
  * Copyright (c) 2002-2003 by OpenSymphony
  * All rights reserved.

@@ -20,13 +20,6 @@
  */
 package com.xpn.xwiki.store;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 25 sept. 2005
- * Time: 12:02:10
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiBatcherFactory {
 }
 /*

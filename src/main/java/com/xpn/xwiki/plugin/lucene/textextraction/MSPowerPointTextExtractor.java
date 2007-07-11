@@ -1,11 +1,3 @@
-/**
- * Created by IntelliJ IDEA.
- * User: lokesh
- * Date: Oct 17, 2006
- * Time: 3:31:38 PM
- * To change this template use File | Settings | File Templates.
- */
-
 package com.xpn.xwiki.plugin.lucene.textextraction;
 import org.apache.poi.hslf.extractor.PowerPointExtractor;
 

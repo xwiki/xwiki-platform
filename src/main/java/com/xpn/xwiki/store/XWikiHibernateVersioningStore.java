@@ -15,13 +15,6 @@ import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Node;
 import org.suigeneris.jrcs.rcs.Version;
 
-/**
- * Created by IntelliJ IDEA.                                                   
- * User: ludovic
- * Date: 6 juin 2006
- * Time: 21:32:07
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface {
 
     private static final Log log = LogFactory.getLog(XWikiHibernateVersioningStore.class);

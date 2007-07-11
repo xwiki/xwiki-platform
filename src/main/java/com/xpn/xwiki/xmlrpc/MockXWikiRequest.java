@@ -13,10 +13,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 import java.io.BufferedReader;
 
-/**
- * Created by IntelliJ IDEA. User: ldubost Date: 19 nov. 2006 Time: 20:39:12 To change this template
- * use File | Settings | File Templates.
- */
 public class MockXWikiRequest implements HttpServletRequest
 {
     public String getAuthType()

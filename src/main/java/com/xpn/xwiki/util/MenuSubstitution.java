@@ -26,13 +26,6 @@ import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.PatternMatcherInput;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 6 oct. 2005
- * Time: 22:19:39
- * To change this template use File | Settings | File Templates.
- */
 public class MenuSubstitution extends WikiSubstitution {
 
     public MenuSubstitution(com.xpn.xwiki.util.Util util) {

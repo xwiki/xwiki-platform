@@ -15,13 +15,6 @@ import org.hibernate.Session;
 import java.util.List;
 import java.util.Iterator;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 10 mars 2006
- * Time: 14:02:58
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore implements XWikiAttachmentStoreInterface {
     private static final Log log = LogFactory.getLog(XWikiHibernateAttachmentStore.class);
 

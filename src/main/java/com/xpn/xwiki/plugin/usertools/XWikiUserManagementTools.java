@@ -3,13 +3,6 @@ package com.xpn.xwiki.plugin.usertools;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-/**
- * Created by IntelliJ IDEA.
- * User: jeremi
- * Date: Aug 18, 2006
- * Time: 4:11:32 PM
- * To change this template use File | Settings | File Templates.
- */
 public interface XWikiUserManagementTools {
 
     public String inviteUser(String name, String email, XWikiContext context) throws XWikiException;

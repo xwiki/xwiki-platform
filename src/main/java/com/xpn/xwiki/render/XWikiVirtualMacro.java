@@ -26,13 +26,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ludovic
- * Date: 29 juil. 2005
- * Time: 16:39:46
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiVirtualMacro {
     private String name;
     private String language;

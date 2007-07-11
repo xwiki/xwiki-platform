@@ -4,13 +4,6 @@ import com.xpn.xwiki.util.Util;
 
 import java.util.*;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 7 sept. 2006
- * Time: 20:00:39
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiCriteria {
     protected HashMap params = new HashMap();
 

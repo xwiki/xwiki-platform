@@ -5,13 +5,6 @@ import com.xpn.xwiki.XWikiContext;
 import java.net.URL;
 import java.net.MalformedURLException;
 
-/**
- * Created by IntelliJ IDEA.
- * User: jerem
- * Date: Jan 18, 2007
- * Time: 3:14:06 PM
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiDebugGWTURLFactory  extends XWikiServletURLFactory{
 
 

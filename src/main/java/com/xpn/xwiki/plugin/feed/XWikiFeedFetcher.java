@@ -24,13 +24,6 @@ import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedInput;
 import com.sun.syndication.io.XmlReader;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 30 avr. 2007
- * Time: 10:02:59
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiFeedFetcher extends AbstractFeedFetcher {
 
     private FeedFetcherCache feedInfoCache;

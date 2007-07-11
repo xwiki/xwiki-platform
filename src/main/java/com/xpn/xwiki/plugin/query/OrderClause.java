@@ -1,12 +1,5 @@
 package com.xpn.xwiki.plugin.query;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 7 sept. 2006
- * Time: 20:20:29
- * To change this template use File | Settings | File Templates.
- */
 public class OrderClause extends Object {
     public final static int ASC = 1;
     public final static int DESC = 2;

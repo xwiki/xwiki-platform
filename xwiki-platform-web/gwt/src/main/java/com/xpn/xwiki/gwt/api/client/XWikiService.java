@@ -30,14 +30,6 @@ import com.google.gwt.core.client.GWT;
 import java.util.List;
 import java.util.Map;
 
-
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 19 nov. 2006
- * Time: 19:40:30
- * To change this template use File | Settings | File Templates.
- */
 public interface XWikiService extends RemoteService {
 
     public Document getDocument(String fullName) throws XWikiGWTException;

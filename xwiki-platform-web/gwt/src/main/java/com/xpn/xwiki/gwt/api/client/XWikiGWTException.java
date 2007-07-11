@@ -2,13 +2,6 @@ package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 8 mai 2007
- * Time: 16:38:24
- * To change this template use File | Settings | File Templates.
- */
 public class XWikiGWTException extends Exception implements IsSerializable {
     private String message;
     private String fullMessage;

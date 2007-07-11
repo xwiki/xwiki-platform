@@ -29,13 +29,6 @@ import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Created by IntelliJ IDEA.
- * User: ldubost
- * Date: 19 nov. 2006
- * Time: 19:40:30
- * To change this template use File | Settings | File Templates.
- */
 public interface XWikiServiceAsync {
 
     void getDocument(String fullName, AsyncCallback async);

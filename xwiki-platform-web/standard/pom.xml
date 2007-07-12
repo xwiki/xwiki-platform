@@ -52,39 +52,80 @@
           </resourceBundles>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <configuration>
-          <descriptors>
-            <descriptor>src/assemble/war.xml</descriptor>
-          </descriptors>
-        </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <!-- Run 'mvn org.mortbay.jetty:maven-jetty-plugin:run-war' to generate the WAR and
-             execute it in Jetty. Useful for testing
-             Note: You'll need a database set up and running. If you use the HSQLDB profile
-             the database is looked for in database/ so it's very likely you'll get an
-             empty wiki. You'll need to import some pages in it using a XAR for example. -->
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>maven-jetty-plugin</artifactId>
-        <configuration>
-          <contextPath>/xwiki</contextPath>
-          <webApp>${project.build.directory}/${project.build.finalName}-${xwiki.db}.war</webApp>
-        </configuration>
-      </plugin>
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>war</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assemble/war.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>jettyrun</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <configuration>
+              <descriptors>
+                <descriptor>src/assemble/jetty.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>compile</phase>
+                <goals>
+                  <goal>directory</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <!-- Run 'mvn install -Pjettyrun' to execute xwiki in Jetty. Useful for testing.
+                 Note: You'll need a database set up and running. If you use the HSQLDB profile
+                 the database is looked for in database/ so it's very likely you'll get an
+                 empty wiki. You'll need to import some pages in it using a XAR for example. -->
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>maven-jetty-plugin</artifactId>
+            <configuration>
+              <contextPath>/xwiki</contextPath>
+              <classesDirectory>${project.build.directory}/${project.build.finalName}-${xwiki.db}.dir/WEB-INF</classesDirectory>
+            </configuration>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>ci</id>
       <activation>

@@ -1958,7 +1958,13 @@ public class XWiki extends Api
     }
 
     /**
-     * Returns a plugin from the plugin API. Plugin Rights can be verified.
+     * Returns a plugin from the plugin API. Plugin Rights can be verified. Note that although
+     * this API is a duplicate of {@link #getPlugin(String)} it used to provide an easy access
+     * from Velocity to XWiki plugins. Indeed Velocity has a feature in that if a class has
+     * a get method, using the dot notation will automatically call the get method for the class.
+     * See http://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#propertylookuprules.
+     * This this allows the following constructs:
+     * <code>$xwiki.pluginName.somePluginMethod()</code>
      * 
      * @param name Name of the plugin to retrieve (either short of full class name)
      * @return a plugin object

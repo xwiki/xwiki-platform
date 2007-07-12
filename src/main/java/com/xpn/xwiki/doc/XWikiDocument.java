@@ -54,7 +54,6 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.filter.CharacterFilter;
-import org.apache.oro.text.regex.MalformedPatternException;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;
 import org.dom4j.Document;

@@ -48,11 +48,6 @@ public class SchedulerPluginApi extends Api
     public SchedulerPluginApi(SchedulerPlugin plugin, XWikiContext context)
     {
         super(context);
-        init(plugin, context);
-    }
-
-    private void init(SchedulerPlugin plugin, XWikiContext context)
-    {
         setPlugin(plugin);
     }
 
@@ -107,6 +102,9 @@ public class SchedulerPluginApi extends Api
         }
     }
 
+    /**
+     * Schedule for execution all XWiki Tasks found in the passed Document object.
+     */
     public boolean scheduleTasks(Document document)
     {
         try {
@@ -126,7 +124,7 @@ public class SchedulerPluginApi extends Api
     public boolean resumeTask(String number)
     {
         return resumeTask(
-            context.getDoc().getObject("XWiki.Task", Integer.valueOf(number).intValue()));
+            context.getDoc().getObject(SchedulerPlugin.TASK_CLASS, Integer.valueOf(number).intValue()));
     }
 
     public boolean resumeTask(Object object)
@@ -150,7 +148,7 @@ public class SchedulerPluginApi extends Api
     public boolean unscheduleTask(String number)
     {
         return unscheduleTask(
-            context.getDoc().getObject("XWiki.Task", Integer.valueOf(number).intValue()));
+            context.getDoc().getObject(SchedulerPlugin.TASK_CLASS, Integer.valueOf(number).intValue()));
     }
 
     public boolean unscheduleTask(Object object)
@@ -189,7 +187,7 @@ public class SchedulerPluginApi extends Api
     private void saveStatus(String status, BaseObject object)
         throws XWikiException
     {
-        context.getDoc().getObject(plugin.TASK_CLASS, object.getNumber())
+        context.getDoc().getObject(SchedulerPlugin.TASK_CLASS, object.getNumber())
             .setStringValue("status", status);
         saveDocument(context.getDoc());
     }

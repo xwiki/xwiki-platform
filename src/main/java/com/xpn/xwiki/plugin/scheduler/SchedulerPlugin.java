@@ -71,16 +71,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public static final String TASK_CLASS = "XWiki.Task";
 
     /**
-     * name of the XWiki class representing a schedulable task
-     */
-    protected static final String TASK_NAME = "Task";
-
-    /**
-     * XWiki Web space in which the schedulable task XClass is located
-     */
-    protected static final String TASK_WEB = "XWiki";
-
-    /**
      * {@inheritDoc}
      *
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
@@ -108,8 +98,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         } catch (Exception e) {
             doc = new XWikiDocument();
 
-            doc.setSpace(TASK_WEB);
-            doc.setName(TASK_NAME);
+            doc.setFullName(TASK_CLASS);
             needsUpdate = true;
         }
 

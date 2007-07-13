@@ -65,9 +65,7 @@ public class GroovyTask implements Job
             // the script to execute from it.
             Context xcontext = (Context) data.get("context");
 
-            Api api = new Api(xcontext.getContext());
-
-            if (api.hasProgrammingRights()) {
+            if (xcontext.hasProgrammingRights()) {
 
                 // The current task id. This is needed to find the correct XWiki Task object that
                 // was stored in the current document as there can be several tasks stored in that

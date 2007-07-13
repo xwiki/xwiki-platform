@@ -74,6 +74,9 @@ public class GroovyTask implements Job
 
                 // Get the correct task object from the current doc set when the Job was
                 // scheduled.
+                // TODO: I think it would be much cleaner to store the XWiki Task object directly
+                // in the Job execution context rather than having to assume it's in the current
+                // document that was set at that time... Fix this!
                 BaseObject object = xcontext.getDoc().getObject(SchedulerPlugin.TASK_CLASS, task);
 
                 Binding binding = new Binding(data.getWrappedMap());

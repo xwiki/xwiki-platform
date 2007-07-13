@@ -481,6 +481,12 @@
       <artifactId>poi</artifactId>
       <version>3.0-FINAL</version>
     </dependency>
+    <!-- Required for the Scheduler Plugin -->
+    <dependency>
+      <groupId>quartz</groupId>
+      <artifactId>quartz</artifactId>
+      <version>1.5.2</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

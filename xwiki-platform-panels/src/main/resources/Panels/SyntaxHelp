@@ -275,7 +275,7 @@ http://www.xwiki.org&lt;br/&gt;
     &lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;
-&lt;div id="xwikihelpsyntax"&gt;$msg.get("helponsyntax") &lt;a href="http://www.xwiki.com/xwiki/bin/view/Doc/XWikiSyntax?xpage=plain" onclick="openHelp(); return false;"&gt;$msg.get("xwikisyntax")&lt;/a&gt;&lt;/div&gt;
+&lt;div id="xwikihelpsyntax"&gt;$msg.get("helponsyntax") &lt;a href="http://www.xwiki.org/xwiki/bin/view/UserGuide/XWikiSyntax?xpage=print" onclick="openHelp(); return false;"&gt;$msg.get("xwikisyntax")&lt;/a&gt;&lt;/div&gt;
 #panelfooter()
 &lt;/div&gt;
 &lt;script type="text/javascript"&gt;new Rico.Accordion( 'xwikisyntaxhelp', {panelHeight:'max'} );togglePanelVisibility((document.getElementById('xwikisyntaxhelppanel')).getElementsByTagName( 'div').item(0));&lt;/script&gt;</content>

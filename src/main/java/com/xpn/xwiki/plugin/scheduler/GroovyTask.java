@@ -79,10 +79,11 @@ public class GroovyTask implements Job
                 // document that was set at that time... Fix this!
                 BaseObject object = xcontext.getDoc().getObject(SchedulerPlugin.TASK_CLASS, task);
 
+                // Make the Job execution data available to the Groovy script
                 Binding binding = new Binding(data.getWrappedMap());
-                GroovyShell shell = new GroovyShell(binding);
 
                 // Execute the Groovy script
+                GroovyShell shell = new GroovyShell(binding);
                 shell.evaluate(object.getLargeStringValue("script"));
                 
             } else {

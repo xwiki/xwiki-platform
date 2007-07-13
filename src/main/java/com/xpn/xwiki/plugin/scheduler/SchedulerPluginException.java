@@ -39,6 +39,8 @@ public class SchedulerPluginException extends PluginException
 
     protected static final int ERROR_SCHEDULERPLUGIN_TASK_DOES_NOT_EXITS = 90007;
 
+    protected static final int ERROR_SCHEDULERPLUGIN_GET_SCHEDULER = 90007;
+
     public SchedulerPluginException(int code, String message)
     {
         super(SchedulerPlugin.class, code, message);

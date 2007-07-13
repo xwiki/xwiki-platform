@@ -56,19 +56,19 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     private static final Log LOG = LogFactory.getLog(SchedulerPlugin.class);
 
     /**
-     * Quartz scheduler instance
-     */
-    protected static Scheduler scheduler;
-
-    /**
-     * Map that holds state information for Job instances.
-     */
-    private JobDataMap data = new JobDataMap();
-
-    /**
-     * Fullname of the XClass representing a task that can be scheduled by this plugin
+     * Fullname of the XWiki Task Class representing a task that can be scheduled by this plugin.
      */
     public static final String TASK_CLASS = "XWiki.Task";
+    
+    /**
+     * Default Quartz scheduler instance.
+     */
+    private Scheduler scheduler;
+
+    /**
+     * Map that holds Job execution data.
+     */
+    private JobDataMap data = new JobDataMap();
 
     /**
      * {@inheritDoc}
@@ -82,132 +82,38 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
-     * Creates the Task XClass if it does not exists in the wiki. Update the XWiki Task class if it
-     * already exists but needs update.
-     *
-     * @param context the XWiki context
-     */
-    protected void updateTaskClass(XWikiContext context) throws SchedulerPluginException
-    {
-        XWikiDocument doc;
-        XWiki xwiki = context.getWiki();
-        boolean needsUpdate = false;
-
-        try {
-            doc = xwiki.getDocument(TASK_CLASS, context);
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-
-            doc.setFullName(TASK_CLASS);
-            needsUpdate = true;
-        }
-
-        BaseClass bclass = doc.getxWikiClass();
-        bclass.setName(TASK_CLASS);
-        needsUpdate |= bclass.addTextField("taskName", "Task Name", 30);
-        needsUpdate |= bclass.addTextField("taskClass", "Task Class", 30);
-        needsUpdate |= bclass.addTextField("status", "Status", 30);
-        needsUpdate |= bclass.addTextField("cron", "Cron Expression", 30);
-        needsUpdate |= bclass.addTextAreaField("script", "Groovy Script", 45, 10);
-
-        if (needsUpdate) {
-            try {
-                xwiki.saveDocument(doc, context);
-            } catch (XWikiException ex) {
-                throw new SchedulerPluginException(
-                    SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SAVE_TASK_CLASS,
-                    "Error while saving " + TASK_CLASS + " class document in XWiki", ex);
-            }
-        }
-    }
-
-    /**
-     * Obtains the Scheduler instance
-     *
-     * @return the Scheduler instance
-     */
-    private static synchronized Scheduler getSchedulerInstance() throws SchedulerException
-    {
-        if (scheduler == null) {
-            scheduler = StdSchedulerFactory.getDefaultScheduler();
-        }
-        return scheduler;
-    }
-
-    /**
-     * Associates the scheduler with a StatusListener
-     */
-    private void setStatusListener() throws SchedulerPluginException
-    {
-        StatusListener listener = new StatusListener();
-        try {
-            scheduler.addSchedulerListener(listener);
-            scheduler.addGlobalJobListener(listener);
-        } catch (SchedulerException ex) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_INITIALIZE_STATUS_LISTENER,
-                "Error while initializing the StatusListener", ex);
-        }
-    }
-
-    /**
      * {@inheritDoc}
-     *
-     * Initialization method for the SchedulerPlugin
-     *
-     * @param context the XWikiContext needed to create/update the XWiki Task class
+     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#init(com.xpn.xwiki.XWikiContext)
      */
     public void init(XWikiContext context)
     {
         super.init(context);
         try {
             updateTaskClass(context);
-            scheduler = getSchedulerInstance();
+            setScheduler(getDefaultSchedulerInstance());
             setStatusListener();
-            scheduler.start();
-        } catch (XWikiException e) {
-            LOG.error("Cannot init Scheduler plugin", e);
+            getScheduler().start();
         } catch (SchedulerException e) {
-            LOG.error("Cannot init Scheduler plugin", e);
+            LOG.error("Failed to start the scheduler", e);
+        } catch (SchedulerPluginException e) {
+            LOG.error("Failed to initialize the scheduler", e);
         }
     }
 
     /**
-     * Pause the task with the given name by pausing all of its current triggers.
-     *
-     * @param taskName the name of the task to be paused
+     * {@inheritDoc}
+     * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
      */
-    public void pauseTask(String taskName) throws SchedulerPluginException
+    public void virtualInit(XWikiContext context)
     {
-        try {
-            scheduler.pauseJob(taskName, Scheduler.DEFAULT_GROUP);
-        } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_TASK,
-                "Error occured while trying to pause task " + taskName, e);
-        }
-    }
-
-    /**
-     * Resume the task with the given name (un-pause)
-     *
-     * @param taskName the name of the task to be paused
-     */
-    public void resumeTask(String taskName) throws PluginException
-    {
-        try {
-            scheduler.resumeJob(taskName, Scheduler.DEFAULT_GROUP);
-        } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_TASK,
-                "Error occured while trying to resume task " + taskName, e);
-        }
+        super.virtualInit(context);
+        init(context);
     }
 
     /**
      * Schedule the given task by creating a job and associating a cron trigger with it
      *
-     * @param object the XWiki task object
+     * @param object the XWiki Task object 
      * @param context the XWiki context
      */
     public boolean scheduleTask(BaseObject object, XWikiContext context)
@@ -223,15 +129,16 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
                 Scheduler.DEFAULT_GROUP, object.getStringValue("cron"));
 
             data.put("task", object.getNumber());
-            //we offer the Job a wrapped copy of the request context and of the XWiki API
+
+            // We offer the Job a wrapped copy of the request context and of the XWiki API
             Context copy = new Context((XWikiContext) context.clone());
             data.put("context", copy);
             data.put("xwiki", new com.xpn.xwiki.api.XWiki(copy.getXWiki(), copy.getContext()));
 
             job.setJobDataMap(data);
 
-            scheduler.addJob(job, true);
-            int state = scheduler.getTriggerState(task, Scheduler.DEFAULT_GROUP);
+            getScheduler().addJob(job, true);
+            int state = getScheduler().getTriggerState(task, Scheduler.DEFAULT_GROUP);
             switch (state) {
                 case Trigger.STATE_PAUSED:
                     object.setStringValue("status", "Paused");
@@ -240,15 +147,15 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
                     if (getTrigger(task).compareTo(trigger) != 0) {
                         LOG.debug("Reschedule Task : " + object.getStringValue("taskName"));
                     }
-                    scheduler.rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
+                    getScheduler().rescheduleJob(trigger.getName(), trigger.getGroup(), trigger);
                     object.setStringValue("status", "Scheduled");
                     break;
                 case Trigger.STATE_NONE:
                     LOG.debug("Schedule Task : " + object.getStringValue("taskName"));
-                    scheduler.scheduleJob(trigger);
+                    getScheduler().scheduleJob(trigger);
                     LOG.info("XWiki Task Status :" + object.getStringValue("status"));
                     if (object.getStringValue("status").equals("Paused")) {
-                        scheduler.pauseJob(task, Scheduler.DEFAULT_GROUP);
+                        getScheduler().pauseJob(task, Scheduler.DEFAULT_GROUP);
                         object.setStringValue("status", "Paused");
                     } else {
                         object.setStringValue("status", "Scheduled");
@@ -256,7 +163,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
                     break;
                 default:
                     LOG.debug("Schedule Task : " + object.getStringValue("taskName"));
-                    scheduler.scheduleJob(trigger);
+                    getScheduler().scheduleJob(trigger);
                     object.setStringValue("status", "Scheduled");
                     break;
             }
@@ -279,6 +186,38 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
+     * Pause the task with the given name by pausing all of its current triggers.
+     *
+     * @param taskName the name of the task to be paused
+     */
+    public void pauseTask(String taskName) throws SchedulerPluginException
+    {
+        try {
+            getScheduler().pauseJob(taskName, Scheduler.DEFAULT_GROUP);
+        } catch (SchedulerException e) {
+            throw new SchedulerPluginException(
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_TASK,
+                "Error occured while trying to pause task " + taskName, e);
+        }
+    }
+
+    /**
+     * Resume the task with the given name (un-pause)
+     *
+     * @param taskName the name of the task to be paused
+     */
+    public void resumeTask(String taskName) throws PluginException
+    {
+        try {
+            getScheduler().resumeJob(taskName, Scheduler.DEFAULT_GROUP);
+        } catch (SchedulerException e) {
+            throw new SchedulerPluginException(
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_TASK,
+                "Error occured while trying to resume task " + taskName, e);
+        }
+    }
+
+    /**
      * Unschedule the given task
      *
      * @param taskName the task name for the task to be unscheduled
@@ -286,7 +225,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public void unscheduleTask(String taskName) throws SchedulerPluginException
     {
         try {
-            scheduler.deleteJob(taskName, Scheduler.DEFAULT_GROUP);
+            getScheduler().deleteJob(taskName, Scheduler.DEFAULT_GROUP);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(
                 SchedulerPluginException.ERROR_SCHEDULERPLUGIN_TASK_CLASS_NOT_FOUND,
@@ -300,11 +239,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * @param task the task name for which the trigger will be given
      * @return the trigger object of the given task
      */
-    public Trigger getTrigger(String task) throws SchedulerPluginException
+    private Trigger getTrigger(String task) throws SchedulerPluginException
     {
         Trigger trigger;
         try {
-            trigger = scheduler.getTrigger(task, Scheduler.DEFAULT_GROUP);
+            trigger = getScheduler().getTrigger(task, Scheduler.DEFAULT_GROUP);
         } catch (SchedulerException e) {
             throw new SchedulerPluginException(
                 SchedulerPluginException.ERROR_SCHEDULERPLUGIN_TASK_CLASS_NOT_FOUND,
@@ -347,10 +286,96 @@ public class SchedulerPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
-     * {@inheritDoc}
+     * @param scheduler the scheduler to use
      */
-    public void virtualInit(XWikiContext context)
+    public void setScheduler(Scheduler scheduler)
     {
-        init(context);
+        this.scheduler = scheduler;
+    }
+
+    /**
+     * @return the scheduler in use
+     */
+    public Scheduler getScheduler()
+    {
+        return this.scheduler;
+    }
+
+    /**
+     * @return the default Scheduler instance
+     * @exception SchedulerPluginException if the default Scheduler instance failed to be
+     *            retrieved for any reason. Note that on the first call the default scheduler is
+     *            also initialized.
+     */
+    private synchronized Scheduler getDefaultSchedulerInstance()
+        throws SchedulerPluginException
+    {
+        Scheduler scheduler;
+        try {
+            scheduler = StdSchedulerFactory.getDefaultScheduler();
+        } catch (SchedulerException e) {
+            throw new SchedulerPluginException(
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_GET_SCHEDULER,
+                "Error getting default Scheduler instance", e);
+        }
+        return scheduler;
+    }
+
+    /**
+     * Associates the scheduler with a StatusListener
+     * @exception SchedulerPluginException if the status listener failed to be set properly
+     */
+    private void setStatusListener() throws SchedulerPluginException
+    {
+        StatusListener listener = new StatusListener();
+        try {
+            getScheduler().addSchedulerListener(listener);
+            getScheduler().addGlobalJobListener(listener);
+        } catch (SchedulerException e) {
+            throw new SchedulerPluginException(
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_INITIALIZE_STATUS_LISTENER,
+                "Error while initializing the status listener", e);
+        }
+    }
+
+    /**
+     * Creates the XWiki Task Class if it does not exist in the wiki. Update it if it exists but
+     * is missing some properties.
+     *
+     * @param context the XWiki context
+     * @exception SchedulerPluginException if the updated Task Class failed to be saved
+     */
+    private void updateTaskClass(XWikiContext context) throws SchedulerPluginException
+    {
+        XWiki xwiki = context.getWiki();
+        boolean needsUpdate = false;
+
+        XWikiDocument doc;
+        try {
+            doc = xwiki.getDocument(SchedulerPlugin.TASK_CLASS, context);
+        } catch (Exception e) {
+            doc = new XWikiDocument();
+            doc.setFullName(SchedulerPlugin.TASK_CLASS);
+            needsUpdate = true;
+        }
+
+        BaseClass bclass = doc.getxWikiClass();
+        bclass.setName(SchedulerPlugin.TASK_CLASS);
+        needsUpdate |= bclass.addTextField("taskName", "Task Name", 30);
+        needsUpdate |= bclass.addTextField("taskClass", "Task Class", 30);
+        needsUpdate |= bclass.addTextField("status", "Status", 30);
+        needsUpdate |= bclass.addTextField("cron", "Cron Expression", 30);
+        needsUpdate |= bclass.addTextAreaField("script", "Groovy Script", 45, 10);
+
+        if (needsUpdate) {
+            try {
+                xwiki.saveDocument(doc, context);
+            } catch (XWikiException ex) {
+                throw new SchedulerPluginException(
+                    SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SAVE_TASK_CLASS,
+                    "Error while saving " + SchedulerPlugin.TASK_CLASS
+                    + " class document in XWiki", ex);
+            }
+        }
     }
 }

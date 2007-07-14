@@ -42,33 +42,40 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  * --LICENSE NOTICE--
  */
-
 package com.xpn.xwiki.render.macro;
+
+import org.radeox.macro.CodeMacro;
+import org.radeox.macro.parameter.MacroParameter;
 
 import java.io.IOException;
 import java.io.Writer;
 
-import org.apache.commons.lang.StringUtils;
-import org.radeox.macro.CodeMacro;
-import org.radeox.macro.parameter.MacroParameter;
+public class XWikiCodeMacro extends CodeMacro
+{
+    public XWikiCodeMacro()
+    {
+        super();
+    }
 
-public class XWikiCodeMacro extends CodeMacro {
+    public String getLocaleKey()
+    {
+        return "macro.code";
+    }
 
-  public XWikiCodeMacro() {
-    super();
-  }
+    public void execute(Writer writer, MacroParameter params)
+        throws IllegalArgumentException, IOException
+    {
+        // Add some special characters that should be escaped by the CodeMacro macro, using
+        // hex character entity codes. The CodeMacro already escapes a few characters
+        // ('[', ']', '{', '}', '*', '-', '\\') and we're adding new ones as we don't want the
+        // content inside the {code} macro to be rendered. If we don't do this then XWiki Radeox
+        // filters will get executed and will transform the content of the code macro.
+        addSpecial('<');
+        addSpecial('>');
+        addSpecial('$');
+        addSpecial('#');
 
-  public String getLocaleKey() {
-    return "macro.code";
-  }
-
-  public void execute(Writer writer, MacroParameter params)
-        throws IllegalArgumentException, IOException {
-      String content = params.getContent();
-      content = StringUtils.replace(content, "<", "&#60;");
-      content = StringUtils.replace(content, ">", "&#62;");
-      params.setContent(content);
-      super.execute(writer, params);
-      return;
+        super.execute(writer, params);
+        return;
     }
 }

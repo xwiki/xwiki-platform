@@ -25,6 +25,7 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
+import org.apache.commons.lang.StringUtils;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseInitialRenderContext;
@@ -84,11 +85,32 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         this.removePre = removePre;
     }
 
-    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
-        return render(allcontent, null, null, context);
+    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context)
+    {
+        String result;
+
+        // This is huge hack to ensure that the {code} macro content is not parsed by the Velocity
+        // or Groovy Renderers. It relies on the fact that the MacroMapping executes before these
+        // Renderers and the code macro must be defined in the macros.txt file, as otherwise this
+        // will not work.
+        if (macroname.equals("code")) {
+            // Escape the Velocity special characters: '$' and '#' so that they are not interpreted.
+            result = StringUtils.replace(allcontent, "#", "&#35;");
+            result = StringUtils.replace(result, "$", "&#36;");
+            // Escape the Groovy special characters '<%' and '%>' so that the Groovy Rendered
+            // doesn't execute.
+            result = StringUtils.replace(result, "<%", "&#60;%");
+            result = StringUtils.replace(result, "%>", "&#62;%");
+        } else {
+            result = allcontent;
+        }
+
+        return result;
     }
 
-    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
-        return render(allcontent, null, null, context);
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context)
+    {
+        // Do not render anything here as otherwise the Radeox renderer will be executed twice.
+        return allcontent;
     }
 }

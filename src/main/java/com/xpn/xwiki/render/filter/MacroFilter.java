@@ -18,23 +18,107 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
-
 package com.xpn.xwiki.render.filter;
 
 import com.xpn.xwiki.render.macro.MacroRepository;
 import org.radeox.api.engine.context.InitialRenderContext;
+import org.radeox.api.engine.RenderEngine;
+import org.radeox.api.engine.IncludeRenderEngine;
 import org.radeox.macro.Repository;
+import org.radeox.macro.Macro;
+import org.radeox.macro.parameter.MacroParameter;
+import org.radeox.regex.MatchResult;
+import org.radeox.filter.context.FilterContext;
+import org.radeox.util.StringBufferWriter;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public class MacroFilter extends org.radeox.filter.MacroFilter {
- private MacroRepository macros;
+import java.io.Writer;
 
- public void setInitialContext(InitialRenderContext context) {
-   macros = MacroRepository.getInstance();
-   macros.setInitialContext(context);
- }
+public class MacroFilter extends org.radeox.filter.MacroFilter
+{
+    private static Log log = LogFactory.getLog(MacroFilter.class);
+    private MacroRepository macros;
 
- protected Repository getMacroRepository() {
-   return macros;
- }
+    public void setInitialContext(InitialRenderContext context)
+    {
+        macros = MacroRepository.getInstance();
+        macros.setInitialContext(context);
+    }
+
+    protected Repository getMacroRepository()
+    {
+        return macros;
+    }
+
+    /**
+     * We override the {@link org.radeox.filter.MacroFilter#handleMatch} method so that we can
+     * prevent nested macro evaluation for the code macro as we don't want the content of the code
+     * macro to be evaluated at all.
+     */
+    public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context) {
+      String command = result.group(1);
+
+      if (command != null) {
+        // {$peng} are variables not macros.
+        if (!command.startsWith("$")) {
+          MacroParameter mParams = context.getMacroParameter();
+          switch(result.groups()) {
+            case 3:
+              mParams.setContent(result.group(3));
+              mParams.setContentStart(result.beginOffset(3));
+              mParams.setContentEnd(result.endOffset(3));
+            case 2: mParams.setParams(result.group(2));
+          }
+          mParams.setStart(result.beginOffset(0));
+          mParams.setEnd(result.endOffset(0));
+
+          // @DANGER: recursive calls may replace macros in included source code
+          try {
+            if (getMacroRepository().containsKey(command)) {
+              Macro macro = (Macro) getMacroRepository().get(command);
+              // recursively filter macros within macros
+              if (null != mParams.getContent()) {
+                  // Only recursively evaluate nested macros if the current macro isn't the code
+                  // macro as we don't want any substitution for the code macro.
+                  if (!command.equals("code")) {
+                    mParams.setContent(filter(mParams.getContent(), context));
+                  }
+              }
+              Writer writer = new StringBufferWriter(buffer);
+              macro.execute(writer, mParams);
+            } else if (command.startsWith("!")) {
+              // @TODO including of other snips
+              RenderEngine engine = context.getRenderContext().getRenderEngine();
+              if (engine instanceof IncludeRenderEngine) {
+                String include = ((IncludeRenderEngine) engine).include(command.substring(1));
+                if (null != include) {
+                  // Filter paramFilter = new ParamFilter(mParams);
+                  // included = paramFilter.filter(included, null);
+                  buffer.append(include);
+                } else {
+                  buffer.append(command.substring(1) + " not found.");
+                }
+              }
+              return;
+            } else {
+              buffer.append(result.group(0));
+              return;
+            }
+          } catch (IllegalArgumentException e) {
+            buffer.append("<div class=\"error\">" + command + ": " + e.getMessage() + "</div>");
+          } catch (Throwable e) {
+            log.warn("MacroFilter: unable to format macro: " + result.group(1), e);
+            buffer.append("<div class=\"error\">" + command + ": " + e.getMessage() + "</div>");
+            return;
+          }
+        } else {
+          buffer.append("<");
+          buffer.append(command.substring(1));
+          buffer.append(">");
+        }
+      } else {
+        buffer.append(result.group(0));
+      }
+    }
 }

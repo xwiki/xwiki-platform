@@ -211,7 +211,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                     for (int i=0;i<renderers.size();i++){
                         XWikiRenderer renderer = ((XWikiRenderer)renderers.get(i));
                         String rendererName = renderer.getClass().getName();
-                        if (isRendered(contentdoc, rendererName, context)) {
+                        if (shouldRender(contentdoc, rendererName, context)) {
                             // Check if only XWikiInterpreter should be executed
                             if (onlyInterpret) {
                                 if (XWikiInterpreter.class.isAssignableFrom(renderer.getClass())) {
@@ -261,7 +261,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         }
     }
 
-    private boolean isRendered(XWikiDocument doc, String rendererName, XWikiContext context){
+    private boolean shouldRender(XWikiDocument doc, String rendererName, XWikiContext context){
         try{
             if (rendererName.indexOf('.')>=0){
                 rendererName = rendererName.substring(rendererName.lastIndexOf(".") + 1);
@@ -276,7 +276,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             return true;
         }
         catch(Exception e){
-            log.error("Error in the function isRendered", e);
+            log.error("Error in the function shouldRender", e);
             return true;
         }
     }

@@ -34,14 +34,13 @@ import org.radeox.util.StringBufferWriter;
 import java.io.IOException;
 import java.io.Writer;
 
-
 /**
  * XWikiLinkFilter finds [text] in its input and transforms this
  * to <a href="text">...</a> if the wiki page exists. If not
  * it adds a [create text] to the output.
  */
-public class XWikiLinkFilter extends LocaleRegexTokenFilter {
-
+public class XWikiLinkFilter extends LocaleRegexTokenFilter
+{
     private static Log log = LogFactory.getLog(XWikiLinkFilter.class);
 
     /**

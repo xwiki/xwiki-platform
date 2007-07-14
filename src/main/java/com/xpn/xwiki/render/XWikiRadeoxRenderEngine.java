@@ -25,6 +25,7 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.filter.XWikiFilter;
+import com.xpn.xwiki.render.filter.XWikiFilterPipe;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -33,9 +34,12 @@ import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.ImageRenderEngine;
 import org.radeox.api.engine.WikiRenderEngine;
 import org.radeox.api.engine.context.InitialRenderContext;
+import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.BaseRenderEngine;
 import org.radeox.filter.Filter;
 import org.radeox.filter.FilterPipe;
+import org.radeox.filter.context.FilterContext;
+import org.radeox.filter.context.BaseFilterContext;
 import org.radeox.util.Service;
 
 import java.net.URL;
@@ -46,6 +50,7 @@ import java.util.List;
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine {
     private static Log log = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
     private XWikiContext context;
+    protected XWikiFilterPipe fp;
 
     public XWikiRadeoxRenderEngine(XWikiContext context) {
         // super();
@@ -68,7 +73,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     // Overidding to load our own Filter list.
     protected void init() {
         if (null == fp) {
-            fp = new FilterPipe(initialContext);
+            fp = new XWikiFilterPipe(initialContext);
 
             Iterator iterator = Service.providers(XWikiFilter.class);
             while (iterator.hasNext()) {
@@ -84,6 +89,22 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             fp.init();
             //Logger.debug("FilterPipe = "+fp.toString());
         }
+    }
+
+    /**
+     * Render an input with text markup and return a String with
+     * e.g. HTML
+     *
+     * @param content String with the input to render
+     * @param context Special context for the filter engine, e.g. with
+     *                configuration information
+     * @return result Output with rendered content
+     */
+    public String render(String content, RenderContext context) {
+      init();
+      FilterContext filterContext = new BaseFilterContext();
+      filterContext.setRenderContext(context);
+      return fp.filter(content, filterContext);
     }
 
     public String noaccents(String name) {

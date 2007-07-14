@@ -57,13 +57,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         if (xwiki.Param("xwiki.render.plugin", "1").equals("1"))
             addRenderer("plugin", new XWikiPluginRenderer());
 
-        // The first should not removePre
-        // The last one should removePre
         if (xwiki.Param("xwiki.render.wiki", "1").equals("1"))
             addRenderer("wiki", new XWikiRadeoxRenderer(false));
-
-        // if (xwiki.Param("xwiki.render.wiki2", "1").equals("1"))
-        // addRenderer("wiki2", new XWikiWikiParser2Renderer(false));
 
         if (xwiki.Param("xwiki.render.wikiwiki", "0").equals("1")) {
             addRenderer("xwiki", new XWikiWikiBaseRenderer(true, true));

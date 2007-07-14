@@ -85,10 +85,10 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
     }
 
     public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
-        return allcontent;
+        return render(allcontent, null, null, context);
     }
 
     public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
-        return allcontent;
-    }    
+        return render(allcontent, null, null, context);
+    }
 }

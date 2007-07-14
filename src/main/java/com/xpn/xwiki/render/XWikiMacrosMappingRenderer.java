@@ -38,6 +38,19 @@ import java.util.regex.Pattern;
 public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChangeNotificationInterface {
     private static final Log log = LogFactory.getLog(XWikiMacrosMappingRenderer.class);
 
+    /**
+     * Regex pattern for matching macros that are written on single line.
+     */
+    private static final Pattern SINGLE_LINE_MACRO_PATTERN =
+        Pattern.compile("\\{(\\w+)(:(.+))?\\}");
+
+    /**
+     * Regex pattern for matching macros that span several lines (i.e. macros that have a body
+     * block).
+     */
+    private static final Pattern MULTI_LINE_MACRO_PATTERN =
+        Pattern.compile("\\{(\\w+)(:(.+))?\\}(.+?)\\{\\1\\}");
+
     protected HashMap macros_libraries = null;
     protected HashMap macros_mappings = null;
 
@@ -89,9 +102,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
 
     private String convertSingleLines(String content, XWikiContext context) {
         StringBuffer result = new StringBuffer();
-        String regexp = "\\{(\\w+)(:(.+))?\\}";
-        Pattern p = Pattern.compile(regexp);
-        Matcher m = p.matcher(content);
+        Matcher m = SINGLE_LINE_MACRO_PATTERN.matcher(content);
         int current = 0;
         while (m.find()) {
             result.append(content.substring(current, m.start()));
@@ -115,9 +126,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
 
     private String convertMultiLines(String content, XWikiContext context) {
         StringBuffer result = new StringBuffer();
-        String regexp = "\\{(\\w+)(:(.+))?\\}(.+?)\\{\\1\\}";
-        Pattern p = Pattern.compile(regexp);
-        Matcher m = p.matcher(content);
+        Matcher m = MULTI_LINE_MACRO_PATTERN.matcher(content);
         int current = 0;
         while (m.find()) {
             result.append(content.substring(current, m.start()));

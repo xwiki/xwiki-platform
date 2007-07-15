@@ -55,6 +55,7 @@ import org.apache.tools.ant.filters.StringInputStream;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.xpn.xwiki.XWikiContext;
@@ -634,7 +635,7 @@ public class Util {
     public org.w3c.dom.Document getDOMForString(String str)
     {
         try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new StringInputStream(str));
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(str)));
         } catch (SAXException ex) {
             log.warn("Cannot parse string:" + str, ex);
         } catch (IOException ex) {

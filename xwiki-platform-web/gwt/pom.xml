@@ -41,6 +41,17 @@
            overlayed with the Standard WAR which already contains all the required libs -->
       <scope>provided</scope>
     </dependency>
+    <!-- Not sure why we have to add again this dependency. It's already defined in xwiki-core
+         but it doesn't get imported as a transitive dependency. Maybe because we're importing
+         xwiki-ocre with a provided scope... -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <!-- Note: The 2.4 version is not technically correct as 2.4 corresponds to a specification
+           # and is not an implementation version. The central repo would need to be fixed... -->
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

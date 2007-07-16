@@ -77,7 +77,7 @@ WikiEditor.prototype.init = function(params) {
     }
     if((params["wiki_editor_toolbar"] == null) || (params["wiki_editor_toolbar"].toString() == "")) {
         params["wiki_editor_toolbar"] = "texttoolbar, listtoolbar, indenttoolbar, undotoolbar, titletoolbar, styletoolbar, "
-                                        + "horizontaltoolbar, attachmenttoolbar, macrostoolbar, tabletoolbar, "
+                                        + "horizontaltoolbar, symboltoolbar, attachmenttoolbar, macrostoolbar, tabletoolbar, "
                                         + "tablerowtoolbar, tablecoltoolbar, linktoolbar";
     }
     // if don't have this param then it's always default by wiki_tab

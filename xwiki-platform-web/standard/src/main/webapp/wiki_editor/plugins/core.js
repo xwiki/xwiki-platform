@@ -564,6 +564,20 @@ WikiEditor.prototype.getUndoControls = function(button_name) {
 	return str;
 }
 
+WikiEditor.prototype.getSymbolToolbar = function() {
+    return this.getSymbolControls("charmap");
+}
+
+WikiEditor.prototype.getSymbolControls = function(button_name) {
+    var str = "";
+    switch (button_name) {
+        case 'charmap':
+            str = this.createButtonHTML('charmap', 'charmap.gif', 'lang_theme_charmap_desc', 'mceCharMap');
+            break;
+    }
+    return str;
+}
+
 WikiEditor.prototype.getSupAndSubToolbar = function() {
     return this.getSupAndSubControls('sup') + this.getSupAndSubControls('sub');
 }

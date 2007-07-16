@@ -31,14 +31,17 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
                 str += this.TOOLBAR_SPACER + this.getUndoToolbar();
                 break;
             case "titletoolbar":
-                 str += this.TOOLBAR_SPACER + this.getTitleToolbar();
+                str += this.TOOLBAR_SPACER + this.getTitleToolbar();
                 break;
             case "styletoolbar":
-                    str += this.TOOLBAR_SPACER + this.getStyleToolbar();
+                str += this.TOOLBAR_SPACER + this.getStyleToolbar();
                 break;
             case "horizontaltoolbar":
                 str += this.TOOLBAR_SPACER + this.getHorizontalruleControls() + this.getRemoveformatControls();
                 break;
+            case "symboltoolbar":
+                str += this.getSymbolToolbar();
+                break
             case "suptoolbar":
                 str += this.TOOLBAR_SPACER + this.getSupAndSubToolbar();
                 break;

@@ -250,6 +250,15 @@ var TinyMCE_WikieditorTheme = {
 				tinyMCE.openWindow(template, {editor_id : editor_id, inline : "yes", command : "HiliteColor", input_color : inputColor});
 				//mceBackColor
 			    return true;
+            case "mceCharMap":
+				var template = new Array();
+
+				template['file'] = 'charmap.htm';
+				template['width'] = 550 + (tinyMCE.isOpera ? 40 : 0);
+				template['height'] = 250;
+
+				tinyMCE.openWindow(template, {editor_id : editor_id, inline : "yes"});
+				return true;       
 
             default :
                 return wikiEditor.execCommand(editor_id, element, command, user_interface, value);

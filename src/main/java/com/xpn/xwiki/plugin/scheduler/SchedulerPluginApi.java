@@ -53,8 +53,8 @@ public class SchedulerPluginApi extends Api
 
     public boolean pauseTask(String number)
     {
-        return pauseTask(
-            context.getDoc().getObject("XWiki.Task", Integer.valueOf(number).intValue()));
+        return pauseTask(context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
+            Integer.valueOf(number).intValue()));
     }
 
     public boolean pauseTask(Object object)
@@ -93,7 +93,6 @@ public class SchedulerPluginApi extends Api
     {
         try {
             plugin.scheduleTask(object, context);
-            System.out.println("Doc fullName : " + context.getDoc().getFullName());
             saveStatus("Scheduled", object);
             return true;
         } catch (Exception e) {
@@ -123,8 +122,8 @@ public class SchedulerPluginApi extends Api
 
     public boolean resumeTask(String number)
     {
-        return resumeTask(
-            context.getDoc().getObject(SchedulerPlugin.TASK_CLASS, Integer.valueOf(number).intValue()));
+        return resumeTask(context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
+            Integer.valueOf(number).intValue()));
     }
 
     public boolean resumeTask(Object object)
@@ -147,8 +146,8 @@ public class SchedulerPluginApi extends Api
 
     public boolean unscheduleTask(String number)
     {
-        return unscheduleTask(
-            context.getDoc().getObject(SchedulerPlugin.TASK_CLASS, Integer.valueOf(number).intValue()));
+        return unscheduleTask(context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
+            Integer.valueOf(number).intValue()));
     }
 
     public boolean unscheduleTask(Object object)
@@ -187,14 +186,13 @@ public class SchedulerPluginApi extends Api
     private void saveStatus(String status, BaseObject object)
         throws XWikiException
     {
-        context.getDoc().getObject(SchedulerPlugin.TASK_CLASS, object.getNumber())
-            .setStringValue("status", status);
+        context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
+            object.getNumber()).setStringValue("status", status);
         saveDocument(context.getDoc());
     }
 
     private void saveDocument(XWikiDocument document) throws XWikiException
     {
-
         context.getWiki().saveDocument(document, context);
     }
 

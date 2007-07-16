@@ -261,31 +261,8 @@ public class XWikiMessageTool
     }
 
     /**
-     * @param documentName the Resource bundle's name (eg Space.Document)
-     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *        primitives for loading documents
-     * @return the properties object corresponding to the passed Resource Bundle. A translated
-     *         version of the document for the current Locale is looked for.
-     */
-    public Properties getDocumentBundleProperties(String documentName, XWikiContext context)
-    {
-        Properties props = null;
-        try {
-            XWikiDocument docBundle = context.getWiki().getDocument(documentName, context);
-            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(),
-                documentName, context) && !docBundle.isNew())
-            {
-                props = getDocumentBundleProperties(docBundle);
-            }
-        } catch (XWikiException e) {
-            // Cannot do anything
-        }
-        return props;
-    }
-
-    /**
-     * @param docBundle the documentwho contains the bundle
-     * @return the properties object corresponding to the docBundle. A translated version
+     * @param docBundle the resource bundle document containing Translation Resources
+     * @return the properties found in the passed resource bundle document. A translated version
      *         of the document for the current Locale is looked for.
      */
     public Properties getDocumentBundleProperties(XWikiDocument docBundle)

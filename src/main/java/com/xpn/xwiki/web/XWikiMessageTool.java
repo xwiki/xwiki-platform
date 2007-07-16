@@ -229,11 +229,14 @@ public class XWikiMessageTool
     }
 
     /**
+     * Helper method to help get a translated version of a document. It handles any exception
+     * raised to make it easy to use.
+     *  
      * @param documentName the document's name (eg Space.Document)
      * @return the document object corresponding to the passed document's name. A translated version
      *         of the document for the current Locale is looked for.
      */
-    public XWikiDocument getDocumentBundle(String documentName)
+    private XWikiDocument getDocumentBundle(String documentName)
     {
         XWikiDocument docBundle;
 

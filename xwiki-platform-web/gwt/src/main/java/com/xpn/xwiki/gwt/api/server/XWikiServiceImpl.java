@@ -27,7 +27,6 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.PropertyClass;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
@@ -1001,7 +1000,12 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         try {
             XWikiContext context = getXWikiContext();
             XWikiMessageTool msg = context.getMessageTool();
-            Properties encproperties = (msg==null) ? null : msg.getDocumentBundleProperties(msg.getDocumentBundle(translationPage));
+
+            // Get the translated version of the translation page document
+            XWikiDocument docBundle = context.getWiki().getDocument(translationPage, context);
+            docBundle = docBundle.getTranslatedDocument(context);
+
+            Properties encproperties = (msg==null) ? null : msg.getDocumentBundleProperties(docBundle);
             Properties properties = new Properties();
             // Let's convert properties from internal encoding to xwiki encoding
             Iterator it = encproperties.keySet().iterator();

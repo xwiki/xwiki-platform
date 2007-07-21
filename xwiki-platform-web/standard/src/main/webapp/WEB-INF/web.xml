@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!DOCTYPE web-app
-  PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
-  "http://java.sun.com/dtd/web-app_2_3.dtd">
+    PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
+    "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
 
@@ -36,133 +36,133 @@
   <listener>
     <listener-class>com.xpn.xwiki.web.InitializationServletContextListener</listener-class>
   </listener>
-  
-    <servlet>
-        <servlet-name>action</servlet-name>
-        <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
-        <init-param>
-            <param-name>application</param-name>
-            <param-value>ApplicationResources</param-value>
-        </init-param>
-        <init-param>
-            <param-name>xwiki</param-name>
-            <param-value>com.xpn.xwiki.XWiki</param-value>
-        </init-param>
-        <init-param>
-            <param-name>config</param-name>
-            <param-value>/WEB-INF/struts-config.xml</param-value>
-        </init-param>
-        <init-param>
-            <param-name>debug</param-name>
-            <param-value>2</param-value>
-        </init-param>
-        <init-param>
-            <param-name>detail</param-name>
-            <param-value>2</param-value>
-        </init-param>
-        <init-param>
-            <param-name>validate</param-name>
-            <param-value>true</param-value>
-        </init-param>
-        <load-on-startup>2</load-on-startup>
-    </servlet>
 
-    <servlet>
-        <servlet-name>redirectHome</servlet-name>
-        <servlet-class>com.xpn.xwiki.web.HomePageRedirect</servlet-class>
-    </servlet>
+  <servlet>
+    <servlet-name>action</servlet-name>
+    <servlet-class>org.apache.struts.action.ActionServlet</servlet-class>
+    <init-param>
+      <param-name>application</param-name>
+      <param-value>ApplicationResources</param-value>
+    </init-param>
+    <init-param>
+      <param-name>xwiki</param-name>
+      <param-value>com.xpn.xwiki.XWiki</param-value>
+    </init-param>
+    <init-param>
+      <param-name>config</param-name>
+      <param-value>/WEB-INF/struts-config.xml</param-value>
+    </init-param>
+    <init-param>
+      <param-name>debug</param-name>
+      <param-value>2</param-value>
+    </init-param>
+    <init-param>
+      <param-name>detail</param-name>
+      <param-value>2</param-value>
+    </init-param>
+    <init-param>
+      <param-name>validate</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>2</load-on-startup>
+  </servlet>
 
-     <servlet>
-        <servlet-name>xmlrpc</servlet-name>
-        <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
-        <init-param>
-          <param-name>enabledForExtensions</param-name>
-          <param-value>false</param-value>
-          <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
-        </init-param>
-     </servlet>
+  <servlet>
+    <servlet-name>redirectHome</servlet-name>
+    <servlet-class>com.xpn.xwiki.web.HomePageRedirect</servlet-class>
+  </servlet>
 
-    <!-- This is the entry pointy for XWiki GWT services -->
-    <servlet>
-        <servlet-name>XWikiService</servlet-name>
-        <servlet-class>com.xpn.xwiki.gwt.api.server.XWikiServiceImpl</servlet-class>
-    </servlet>
+  <servlet>
+    <servlet-name>xmlrpc</servlet-name>
+    <servlet-class>com.xpn.xwiki.xmlrpc.XWikiXmlRpcServlet</servlet-class>
+    <init-param>
+      <param-name>enabledForExtensions</param-name>
+      <param-value>false</param-value>
+      <description>Sets, whether the servlet supports vendor extensions for XML-RPC.</description>
+    </init-param>
+  </servlet>
 
-    <servlet-mapping>
-        <servlet-name>action</servlet-name>
-        <url-pattern>/bin/*</url-pattern>
-    </servlet-mapping>
+  <!-- This is the entry pointy for XWiki GWT services -->
+  <servlet>
+    <servlet-name>XWikiService</servlet-name>
+    <servlet-class>com.xpn.xwiki.gwt.api.server.XWikiServiceImpl</servlet-class>
+  </servlet>
 
-    <servlet-mapping>
-        <servlet-name>action</servlet-name>
-        <url-pattern>/testbin/*</url-pattern>
-    </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>/bin/*</url-pattern>
+  </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>action</servlet-name>
-        <url-pattern>/xwiki/*</url-pattern>
-    </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>/testbin/*</url-pattern>
+  </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>xmlrpc</servlet-name>
-        <url-pattern>/xmlrpc/*</url-pattern>
-    </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>action</servlet-name>
+    <url-pattern>/xwiki/*</url-pattern>
+  </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>redirectHome</servlet-name>
-        <url-pattern>/index.redirect</url-pattern>
-    </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>xmlrpc</servlet-name>
+    <url-pattern>/xmlrpc/*</url-pattern>
+  </servlet-mapping>
 
-    <servlet-mapping>
-        <servlet-name>XWikiService</servlet-name>
-        <url-pattern>/XWikiService</url-pattern>
-    </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>redirectHome</servlet-name>
+    <url-pattern>/index.redirect</url-pattern>
+  </servlet-mapping>
 
-    <!-- The Usual Welcome File List -->
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-        <welcome-file>index.redirect</welcome-file>
-    </welcome-file-list>
+  <servlet-mapping>
+    <servlet-name>XWikiService</servlet-name>
+    <url-pattern>/XWikiService</url-pattern>
+  </servlet-mapping>
 
-    <!--
-    <error-page>
-      <error-code>500</error-code>
-      <location>/error.jsp</location>
-    </error-page>
-    -->
-    <error-page>
-      <error-code>404</error-code>
-      <location>/xwiki/bin/view/Main/DocumentDoesNotExist</location>
-    </error-page>
+  <!-- The Usual Welcome File List -->
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.redirect</welcome-file>
+  </welcome-file-list>
 
-    <!-- Struts Tag Library Descriptors -->
-    <taglib>
-        <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
-        <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
-    </taglib>
+  <!--
+  <error-page>
+    <error-code>500</error-code>
+    <location>/error.jsp</location>
+  </error-page>
+  -->
+  <error-page>
+    <error-code>404</error-code>
+    <location>/xwiki/bin/view/Main/DocumentDoesNotExist</location>
+  </error-page>
 
-    <taglib>
-        <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
-        <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
-    </taglib>
+  <!-- Struts Tag Library Descriptors -->
+  <taglib>
+    <taglib-uri>/WEB-INF/struts-bean.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts-bean.tld</taglib-location>
+  </taglib>
 
-    <taglib>
-        <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
-        <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
-    </taglib>
+  <taglib>
+    <taglib-uri>/WEB-INF/struts-html.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts-html.tld</taglib-location>
+  </taglib>
 
-    <!-- Uncomment if you wish to use a DataSource to define the Database connection
-    <resource-ref>
-        <description>DB Connection</description>
-        <res-ref-name>jdbc/XWikiDS</res-ref-name>
-        <res-type>javax.sql.DataSource</res-type>
-        <res-auth>Container</res-auth>
-    </resource-ref>
-    -->
+  <taglib>
+    <taglib-uri>/WEB-INF/struts-logic.tld</taglib-uri>
+    <taglib-location>/WEB-INF/struts-logic.tld</taglib-location>
+  </taglib>
 
-    <env-entry>
-        <env-entry-name>XWikiConfig</env-entry-name>
-        <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
-        <env-entry-type>java.lang.String</env-entry-type>
-    </env-entry>
+  <!-- Uncomment if you wish to use a DataSource to define the Database connection
+  <resource-ref>
+      <description>DB Connection</description>
+      <res-ref-name>jdbc/XWikiDS</res-ref-name>
+      <res-type>javax.sql.DataSource</res-type>
+      <res-auth>Container</res-auth>
+  </resource-ref>
+  -->
+
+  <env-entry>
+    <env-entry-name>XWikiConfig</env-entry-name>
+    <env-entry-value>/WEB-INF/xwiki.cfg</env-entry-value>
+    <env-entry-type>java.lang.String</env-entry-type>
+  </env-entry>
 </web-app>

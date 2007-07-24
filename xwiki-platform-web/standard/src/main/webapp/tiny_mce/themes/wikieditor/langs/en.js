@@ -75,6 +75,7 @@ tinyMCELang['lang_wiki_title_2'] = ' Title 2 ';
 tinyMCELang['lang_wiki_title_3'] = ' Title 3 ';
 tinyMCELang['lang_wiki_title_4'] = ' Title 4 ';
 tinyMCELang['lang_wiki_title_5'] = ' Title 5 ';
+tinyMCELang['lang_wiki_title_6'] = ' Code ';
 tinyMCELang['lang_attachment_desc'] = 'Insert an Attachment Link';
 tinyMCELang['lang_macro_desc'] = 'Insert a Macro';
 tinyMCELang['lang_insert_image_name'] = 'Image(attachment) name';

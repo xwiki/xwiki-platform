@@ -21,6 +21,9 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
             case "texttoolbar":
                 str += this.getTextToolbar();
                 break;
+            case "justifytoolbar":
+                str += this.TOOLBAR_SPACER + this.getJustifyToolbar();
+                break;
             case "listtoolbar":
                 str += this.TOOLBAR_SPACER + this.getListToolbar();
                 break;

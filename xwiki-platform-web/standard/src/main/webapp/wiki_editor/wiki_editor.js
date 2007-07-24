@@ -76,7 +76,7 @@ WikiEditor.prototype.init = function(params) {
         params["use_linkeditor_tabs"] = "wiki_tab, web_tab, attachments_tab, email_tab, file_tab";
     }
     if((params["wiki_editor_toolbar"] == null) || (params["wiki_editor_toolbar"].toString() == "")) {
-        params["wiki_editor_toolbar"] = "texttoolbar, listtoolbar, indenttoolbar, undotoolbar, titletoolbar, styletoolbar, "
+        params["wiki_editor_toolbar"] = "texttoolbar, justifytoolbar, listtoolbar, indenttoolbar, undotoolbar, titletoolbar, styletoolbar, "
                                         + "horizontaltoolbar, symboltoolbar, attachmenttoolbar, macrostoolbar, tabletoolbar, "
                                         + "tablerowtoolbar, tablecoltoolbar, linktoolbar";
     }

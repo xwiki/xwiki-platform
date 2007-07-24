@@ -80,6 +80,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addToolbarHandler('handleHorizontalRuleButtons');
     this.addToolbarHandler('handleSupAndSubButons');
     this.addToolbarHandler('handleTableButtons');
+    this.addToolbarHandler('handleAlignButtons');
 
     // Add Comands and Fix Commands(workarounds)
 	this.addCommand('Title', 'titleCommand');
@@ -392,6 +393,47 @@ WikiEditor.prototype.handleTableButtons = function(editor_id, node, undo_index, 
     tinyMCE.switchClass(editor_id + '_table', 'mceButtonNormal', false);
 }
 
+WikiEditor.prototype.handleAlignButtons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
+    tinyMCE.switchClass(editor_id + '_justifyleft', 'mceButtonNormal');
+    tinyMCE.switchClass(editor_id + '_justifyright', 'mceButtonNormal');
+    tinyMCE.switchClass(editor_id + '_justifycenter', 'mceButtonNormal');
+    tinyMCE.switchClass(editor_id + '_justifyfull', 'mceButtonNormal');
+
+    var alignNode = node;
+	var	breakOut = false;
+    do {
+        if (!alignNode.getAttribute || !alignNode.getAttribute('align'))
+            continue;
+
+        switch (alignNode.getAttribute('align').toLowerCase()) {
+            case "left":
+                tinyMCE.switchClass(editor_id + '_justifyleft', 'mceButtonSelected');
+                breakOut = true;
+            break;
+
+            case "right":
+                tinyMCE.switchClass(editor_id + '_justifyright', 'mceButtonSelected');
+                breakOut = true;
+            break;
+
+            case "middle":
+            case "center":
+                tinyMCE.switchClass(editor_id + '_justifycenter', 'mceButtonSelected');
+                breakOut = true;
+            break;
+
+            case "justify":
+                tinyMCE.switchClass(editor_id + '_justifyfull', 'mceButtonSelected');
+                breakOut = true;
+            break;
+        }
+    } while (!breakOut && (alignNode = alignNode.parentNode) != null);
+
+    var div = tinyMCE.getParentElement(node, "div");
+	if (div && div.style.textAlign == "center")
+	    tinyMCE.switchClass(editor_id + '_justifycenter', 'mceButtonSelected');
+}
+
 WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
 	var list = document.getElementById(editor_id + "_titleSelect");
 	if(list) {
@@ -578,6 +620,29 @@ WikiEditor.prototype.getSymbolControls = function(button_name) {
     return str;
 }
 
+WikiEditor.prototype.getJustifyToolbar = function() {
+    return this.getJustifyControls('justifyleft') + this.getJustifyControls('justifycenter') + this.getJustifyControls('justifyright') + this.getJustifyControls('justifyfull');
+}
+
+WikiEditor.prototype.getJustifyControls = function(button_name) {
+    var str = "";
+    switch (button_name) {
+        case 'justifyleft':
+            str = this.createButtonHTML('justifyleft', 'justifyleft.gif', 'lang_justifyleft_desc', 'JustifyLeft');
+            break;
+        case 'justifycenter':
+            str = this.createButtonHTML('justifycenter', 'justifycenter.gif', 'lang_justifycenter_desc', 'JustifyCenter');
+            break;
+        case 'justifyright' :
+            str = this.createButtonHTML('justifyright', 'justifyright.gif', 'lang_justifyright_desc', 'JustifyRight');
+            break;
+        case 'justifyfull' :
+            str = this.createButtonHTML('justifyfull', 'justifyfull.gif', 'lang_justifyfull_desc', 'JustifyFull');
+            break;
+    }
+    return str;
+}
+
 WikiEditor.prototype.getSupAndSubToolbar = function() {
     return this.getSupAndSubControls('sup') + this.getSupAndSubControls('sub');
 }
@@ -705,6 +770,7 @@ WikiEditor.prototype.getTitleControl = function(button_name) {
             '<option value="3">{$lang_wiki_title_3}</option>' +
             '<option value="4">{$lang_wiki_title_4}</option>' +
             '<option value="5">{$lang_wiki_title_5}</option>' +
+            '<option value="6">{$lang_wiki_title_6}</option>' +
            '</select>';
 }
 
@@ -1130,7 +1196,7 @@ WikiEditor.prototype._convertListInternal = function(content, lclass) {
 WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
     var str = "";
     var atts = result[1].split("|");
-    var tag = "font", style = "", myclass = "", id = "", name = "", doc = "";
+    var tag = "font", style = "", myclass = "", id = "", name = "", doc = "", align = "";
     var hasIcon = false;
     for (var i=0; i < atts.length; i++) {
         var att = this.trimString(atts[i].substring(0, atts[i].indexOf("=")));
@@ -1146,6 +1212,9 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
         }
         else if (att == "type") {
             tag = value;
+        }
+        else if (att == "align") {
+            align = value;
         }
         else if (att == "icon") {
             style += "background-image: url(" + value + ");";
@@ -1165,6 +1234,9 @@ WikiEditor.prototype.convertStyleExternal = function(regexp, result, content) {
     }
     if (name != "") {
         str += " name=\"" + name + "\"";
+    }
+    if (align != "") {
+        str += " align=\"" + align + "\"";
     }
     if (style != "") {
         str += " style=\"" + style + "\"";
@@ -1192,6 +1264,9 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
         if (attributes) {
             if (attributes["id"]) {
                 str += "|id=" + attributes["id"] ;
+            }
+            if (attributes["align"]) {
+                str += "|align=" + attributes["align"] ;
             }
             if (attributes["class"] && attributes["class"] != "stylemacro") {
                 str += "|class=" + attributes["class"] ;

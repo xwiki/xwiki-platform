@@ -258,7 +258,58 @@ var TinyMCE_WikieditorTheme = {
 				template['height'] = 250;
 
 				tinyMCE.openWindow(template, {editor_id : editor_id, inline : "yes"});
-				return true;       
+				return true;
+
+            case "JustifyLeft":
+                var focusElm = tinyMCE.selectedInstance.getFocusElement();
+                if (focusElm && (focusElm.nodeName == "P")) {
+                    tinyMCE.execInstanceCommand(editor_id, "FormatBlock", false, "<div>");
+                    var selectedElm = tinyMCE.selectedInstance.selection.getFocusElement();
+                    selectedElm.setAttribute('align', 'left');
+                } else {
+                    return wikiEditor.execCommand(editor_id, element, "justifyLeft", user_interface, value);
+                }
+                tinyMCE.triggerNodeChange();
+                return true;
+
+            case "JustifyCenter":
+
+                var focusElm = tinyMCE.selectedInstance.getFocusElement();
+                if (focusElm && (focusElm.nodeName == "P")) {
+                    tinyMCE.execInstanceCommand(editor_id, "FormatBlock", false, "<div>");
+                    var selectedElm = tinyMCE.selectedInstance.selection.getFocusElement();
+                    selectedElm.setAttribute('align', 'center');
+                } else {
+                    return wikiEditor.execCommand(editor_id, element, "justifyCenter", user_interface, value);
+                }
+                tinyMCE.triggerNodeChange();
+                return true;
+        
+             case "JustifyRight":
+
+                var focusElm = tinyMCE.selectedInstance.getFocusElement();
+                if (focusElm && (focusElm.nodeName == "P")) {
+                    tinyMCE.execInstanceCommand(editor_id, "FormatBlock", false, "<div>");
+                    var selectedElm = tinyMCE.selectedInstance.selection.getFocusElement();
+                    selectedElm.setAttribute('align', 'right');
+                } else {
+                    return wikiEditor.execCommand(editor_id, element, "justifyRight", user_interface, value);
+                }
+                tinyMCE.triggerNodeChange();
+                return true;
+
+             case "JustifyFull":
+
+                var focusElm = tinyMCE.selectedInstance.getFocusElement();
+                if (focusElm && (focusElm.nodeName == "P")) {
+                    tinyMCE.execInstanceCommand(editor_id, "FormatBlock", false, "<div>");
+                    var selectedElm = tinyMCE.selectedInstance.selection.getFocusElement();
+                    selectedElm.setAttribute('align', 'justify');
+                } else {
+                    return wikiEditor.execCommand(editor_id, element, "justifyFull", user_interface, value);
+                }
+                tinyMCE.triggerNodeChange();
+                return true;
 
             default :
                 return wikiEditor.execCommand(editor_id, element, command, user_interface, value);

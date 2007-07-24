@@ -319,9 +319,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setStringValue(className, propertyname, value);
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateProperty"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else
                 return false;
@@ -336,9 +335,8 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setIntValue(className, propertyname, value);
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateProperty"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else
                 return false;
@@ -353,12 +351,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 BaseClass bclass = context.getWiki().getClass(className, context);
                 ListClass lclass = (ListClass) ((bclass==null) ? null : bclass.get(propertyname));
                 BaseProperty prop = lclass.fromValue(value);
                 doc.setProperty(className, propertyname, prop);
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateProperty"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else
                 return false;
@@ -444,11 +441,9 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), fullName, context)) {
                 XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
-
                 XObject obj = addObject(doc, className);
 
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateProperty"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
 
                 return obj;
             }
@@ -462,14 +457,13 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         try{
             XWikiContext context = getXWikiContext();
             XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-            XWikiDocument oldDoc = (XWikiDocument) doc.clone();
             Iterator it = classesName.iterator();
             List objs = new ArrayList();
             while(it.hasNext()){
                 objs.add(addObject(doc, (String) it.next()));
             }
 
-            context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.addObject"), context);
+            context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), context);
             return objs;
         } catch (Exception e) {
             throw getXWikiGWTException(e);
@@ -483,11 +477,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 BaseObject newObject = doc.newObject(xobject.getClassName(), context);
 
                 mergeObject(xobject, newObject, context);
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.addObject"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), context);
                 return true;
             } else
                 return false;
@@ -520,12 +513,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), fullName, context)) {
                 XWikiDocument doc = context.getWiki().getDocument(fullName, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setContent(content);
                 doc.setAuthor(context.getUser());
                 if (doc.isNew())
 				    doc.setCreator(context.getUser());
-                context.getWiki().saveDocument(doc, oldDoc, (comment==null) ? context.getMessageTool().get("core.comment.updateContent") : comment, context);
+                context.getWiki().saveDocument(doc, (comment==null) ? context.getMessageTool().get("core.comment.updateContent") : comment, context);
                 return Boolean.valueOf(true);
             } else {
                 return Boolean.valueOf(false);
@@ -541,13 +533,12 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), object.getName(), context)) {
                 XWikiDocument doc = context.getWiki().getDocument(object.getName(), context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 BaseObject bObject = newBaseObject(doc.getObject(object.getClassName(), object.getNumber()),object, context);
                 doc.setObject(object.getClassName(), object.getNumber(), bObject);
                 doc.setAuthor(context.getUser());
                 if (doc.isNew())
 				    doc.setCreator(context.getUser());
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.updateObject"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateObject"), context);
                 return Boolean.valueOf(true);
             } else {
                 return Boolean.valueOf(false);
@@ -566,7 +557,6 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             XWikiContext context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docName, context)) {
                 XWikiDocument doc = context.getWiki().getDocument(docName, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
 
                 BaseObject bObj = doc.getObject(className, number);
 
@@ -576,7 +566,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 doc.setAuthor(context.getUser());
                 if (doc.isNew())
 				    doc.setCreator(context.getUser());
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.deleteObject"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), context);
                 return Boolean.valueOf(true);
             } else {
                 return Boolean.valueOf(false);
@@ -678,12 +668,11 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("comment", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 BaseObject newObject = doc.newObject("XWiki.XWikiComments", context);
                 newObject.set("author", context.getUser(), context);
                 newObject.set("date", new Date(), context);
                 newObject.set("comment", message, context);
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.addComment"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), context);
                 return true;
             } else
                 return false;

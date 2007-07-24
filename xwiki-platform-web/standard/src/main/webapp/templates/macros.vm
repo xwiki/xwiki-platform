@@ -480,48 +480,48 @@ $xwiki.getUserName("xwiki:${username}")
 ### @param fname The name of the file
 ###
 #macro(mimetypeimg $mime $fname)
-#set($idx = $fname.lastIndexOf("."))
-#set($idx = $idx + 1)
-#if(($idx != 0) && ($idx != -1))
-#set($ext = $fname.substring($idx))
-#else
-#set($ext = "")
-#end
-#####    images
-#if($mime.equals("image/svg"))
-<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="[svg]" title="[svg]"/>#elseif($mime.equals("application/svg+xml"))
-<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="[svg]" title="[svg]"/>#elseif($mime.startsWith("image/"))
-<img src="$xwiki.getSkinFile("mimetypes/jpg.png")" alt="[img]" title="[img]"/>#####    text based
-#elseif($mime.equals("text/plain"))
-<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="[text]" title="[text]"/>#elseif($mime.equals("text/html"))
-<img src="$xwiki.getSkinFile("mimetypes/html.png")" alt="[html]" title="[html]"/>#elseif($mime.equals("text/css"))
-<img src="$xwiki.getSkinFile("mimetypes/url.png")" alt="[css]" title="[css]"/>#elseif($mime.startsWith("text/"))
-<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="[text]" title="[text]"/>#####    documents
-#elseif($mime.equals("application/xml"))
-<img src="$xwiki.getSkinFile("mimetypes/xml.png")" alt="[xml]" title="[xml]"/>#elseif($mime.equals("application/pdf"))
-<img src="$xwiki.getSkinFile("mimetypes/pdf.png")" alt="[pdf]" title="[pdf]"/>#elseif($mime.equals("application/postscript"))
-<img src="$xwiki.getSkinFile("mimetypes/ps.png")" alt="[ps]" title="[ps]"/>#elseif($mime.equals("application/msword"))
-<img src="$xwiki.getSkinFile("mimetypes/word.png")" alt="[doc]" title="[doc]"/>#elseif($mime.equals("application/powerpoint"))
-<img src="$xwiki.getSkinFile("mimetypes/ppt.png")" alt="[ppt]" title="[ppt]"/>#elseif($mime.equals("application/x-shockwave-flash"))
-<img src="$xwiki.getSkinFile("mimetypes/swf.png")" alt="[swf]" title="[swf]"/>#####    archives
-#elseif($mime.equals("application/x-tar"))
-<img src="$xwiki.getSkinFile("mimetypes/tar.png")" alt="[tar]" title="[tar]"/>#elseif($mime.equals("application/zip"))
-<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="[zip]" title="[zip]"/>#elseif($mime.equals("application/x-gzip"))
-<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="[gz]" title="[gz]"/>#elseif($mime.equals("application/java-archive"))
-<img src="$xwiki.getSkinFile("mimetypes/jar.png")" alt="[jar]" title="[jar]"/>#####    media
-#elseif($mime.startsWith("audio/"))
-<img src="$xwiki.getSkinFile("mimetypes/wav.png")" alt="[audio]" title="[audio]"/>#elseif($mime.startsWith("video/"))
-<img src="$xwiki.getSkinFile("mimetypes/video.png")" alt="[video]" title="[video]"/>#####    octet-streams extensions
-#elseif($mime.equals("application/octet-stream"))
-#if($ext.equals("xls"))
-<img src="$xwiki.getSkinFile("mimetypes/excel.png")" alt="[xls]" title="[xls]"/>#elseif($ext.equals("bz") || $ext.equals("bz2") || $ext.equals("tbz"))
-<img src="$xwiki.getSkinFile("mimetypes/tar_bz.png")" alt="[bz]" title="[bz]"/>#elseif($ext.equals("tgz"))
-<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="[gz]" title="[gz]"/>#elseif($ext.equals("rar"))
-<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="[rar]" title="[rar]"/>#elseif($ext.equals("odp") || $ext.equals("odt") || $ext.equals("odf") || $ext.equals("sxw") || $ext.equals("stw"))
-<img src="$xwiki.getSkinFile("mimetypes/openoffice.png")" alt="[odf]" title="[odf]"/>#else
-<img src="$xwiki.getSkinFile("mimetypes/bin.png")" alt="[bin]" title="[bin]"/>#end
-#elseif($mime.startsWith("application/"))
-<img src="$xwiki.getSkinFile("mimetypes/exec.png")" alt="[app]" title="[app]"/>#end
+  #set($idx = $fname.lastIndexOf("."))
+  #set($idx = $idx + 1)
+  #if(($idx != 0) && ($idx != -1))
+    #set($ext = $fname.substring($idx))
+  #else
+    #set($ext = "")
+  #end
+  #####    images
+  #if($mime.equals("image/svg"))<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="SVG" title="SVG"/>
+  #elseif($mime.equals("application/svg+xml"))<img src="$xwiki.getSkinFile("mimetypes/vectorgfx.png")" alt="SVG" title="SVG"/>
+  #elseif($mime.startsWith("image/"))<img src="$xwiki.getSkinFile("mimetypes/jpg.png")" alt="Image" title="Image"/>
+  #####    text based
+  #elseif($mime.equals("text/plain"))<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="Text" title="Text"/>
+  #elseif($mime.equals("text/html"))<img src="$xwiki.getSkinFile("mimetypes/html.png")" alt="HTML" title="HTML"/>
+  #elseif($mime.equals("text/css"))<img src="$xwiki.getSkinFile("mimetypes/url.png")" alt="CSS" title="CSS"/>
+  #elseif($mime.startsWith("text/"))<img src="$xwiki.getSkinFile("mimetypes/txt.png")" alt="Text" title="Text"/>
+  #####    documents
+  #elseif($mime.equals("application/xml"))<img src="$xwiki.getSkinFile("mimetypes/xml.png")" alt="XML" title="XML"/>
+  #elseif($mime.equals("application/pdf"))<img src="$xwiki.getSkinFile("mimetypes/pdf.png")" alt="PDF" title="PDF"/>
+  #elseif($mime.equals("application/postscript"))<img src="$xwiki.getSkinFile("mimetypes/ps.png")" alt="PS" title="PS"/>
+  #elseif($mime.equals("application/msword"))<img src="$xwiki.getSkinFile("mimetypes/word.png")" alt="Word" title="Word"/>
+  #elseif($mime.equals("application/powerpoint"))<img src="$xwiki.getSkinFile("mimetypes/ppt.png")" alt="PPT" title="PPT"/>
+  #elseif($mime.equals("application/x-shockwave-flash"))<img src="$xwiki.getSkinFile("mimetypes/swf.png")" alt="SWF" title="SWF"/>
+  #####    archives
+  #elseif($mime.equals("application/x-tar"))<img src="$xwiki.getSkinFile("mimetypes/tar.png")" alt="TAR" title="TAR"/>
+  #elseif($mime.equals("application/zip"))<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="ZIP" title="ZIP"/>
+  #elseif($mime.equals("application/x-gzip"))<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="GZ" title="GZ"/>
+  #elseif($mime.equals("application/java-archive"))<img src="$xwiki.getSkinFile("mimetypes/jar.png")" alt="JAR" title="JAR"/>
+  #####    media
+  #elseif($mime.startsWith("audio/"))<img src="$xwiki.getSkinFile("mimetypes/wav.png")" alt="Audio" title="Audio"/>
+  #elseif($mime.startsWith("video/"))<img src="$xwiki.getSkinFile("mimetypes/video.png")" alt="Video" title="Video"/>
+  #####    octet-streams extensions
+  #elseif($mime.equals("application/octet-stream"))
+    #if($ext.equals("xls"))<img src="$xwiki.getSkinFile("mimetypes/excel.png")" alt="XLS" title="XLS"/>
+    #elseif($ext.equals("bz") || $ext.equals("bz2") || $ext.equals("tbz"))<img src="$xwiki.getSkinFile("mimetypes/tar_bz.png")" alt="BZ" title="BZ"/>
+    #elseif($ext.equals("tgz"))<img src="$xwiki.getSkinFile("mimetypes/tar_gz.png")" alt="GZ" title="GZ"/>
+    #elseif($ext.equals("rar"))<img src="$xwiki.getSkinFile("mimetypes/zip1.png")" alt="RAR" title="RAR"/>
+    #elseif($ext.equals("odp") || $ext.equals("odt") || $ext.equals("odf") || $ext.equals("sxw") || $ext.equals("stw"))<img src="$xwiki.getSkinFile("mimetypes/openoffice.png")" alt="OpenOffice" title="OpenOffice"/>
+    #else<img src="$xwiki.getSkinFile("mimetypes/bin.png")" alt="BIN" title="BIN"/>
+    #end
+  #elseif($mime.startsWith("application/"))<img src="$xwiki.getSkinFile("mimetypes/exec.png")" alt="Application" title="Application"/>
+  #end
 #end
 
 ###

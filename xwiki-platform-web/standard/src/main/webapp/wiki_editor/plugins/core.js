@@ -239,6 +239,21 @@ WikiEditor.prototype.fixTitle = function(editor_id, node) {
     var value = "";
     if (this._titleChangeValue==0) {
         this.core.execInstanceCommand(editor_id, "mceRemoveNode", false, node);
+    } if (this._titleChangeValue==6) {
+        this.core.execInstanceCommand(editor_id, "FormatBlock", false, "<div>");
+        var selectedBlock = tinyMCE.selectedInstance.selection.getFocusElement();
+        selectedBlock.setAttribute("class", "code");
+        var b = tinyMCE.selectedInstance.selection.getBookmark();
+        var preNode = tinyMCE.selectedInstance.getDoc().createElement("<pre>");
+        var childsBlock = selectedBlock.childNodes;
+
+        for (var i=0; i<childsBlock.length; i++){
+			preNode.appendChild(childsBlock[i].cloneNode(true));
+            selectedBlock.removeChild(childsBlock[i], true);
+        }
+
+        selectedBlock.appendChild(preNode);
+        tinyMCE.selectedInstance.selection.moveToBookmark(b);
     } else {
         value = "<h" + this._titleChangeValue + ">";
         this.core.execInstanceCommand(editor_id, "FormatBlock", false, value);
@@ -437,7 +452,7 @@ WikiEditor.prototype.handleAlignButtons = function(editor_id, node, undo_index, 
 WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
 	var list = document.getElementById(editor_id + "_titleSelect");
 	if(list) {
-		var h3 = this.core.getParentElement(node, "h1,h2,h3,h4,h5,h6");
+		var h3 = this.core.getParentElement(node, "h1,h2,h3,h4,h5,h6,");
 		if(h3) {
 			var classname = h3.className;
 			var n = (classname.split("-").length)-1;
@@ -445,7 +460,11 @@ WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, un
 		} else {
 			this._selectByValue(list, 0);
 		}
-	}
+        var code = this.core.getParentElement(node, "div");
+        if (code && (code.className == 'code')) {
+            this._selectByValue(list, 6);
+        }
+    }
 }
 
 WikiEditor.prototype.handleStylesList = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
@@ -1259,6 +1278,9 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     var str = "";
     if (type == "span" || type =="div") {
         var attributes = this.readAttributes(result[2]);
+        if (type == 'div') {
+            str += "\r\n";
+        }
         str += "{style:type=" + type;
 
         if (attributes) {
@@ -1299,6 +1321,9 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
         str += "}";
         str += result[3];
         str += "{style}";
+        if (type == 'div') {
+            str += "\r\n";
+        }
     }
     // alert("str = " + str);
     return content.replace(regexp, str);
@@ -1360,9 +1385,9 @@ WikiEditor.prototype.convertCodeMacroInternal = function(regexp, result, content
     if (attributes && attributes["id"]) str += ":" +  this.trimString(attributes["id"].toString());
     str += "}\r\n";
     str += this._escapeText(this.trimString(result[4]).replace(/<br \/>/g, "\r\n"));
-    if (this.core.isMSIE) str += "\r\n";
+    str += "\r\n";
     str += "{code}";
-    if (this.core.isMSIE) str = "\r\n" + str + "\r\n";
+    str = "\r\n" + str + "\r\n";
     return content.replace(regexp, str);
 }
 

@@ -78,7 +78,6 @@ public class SaveAction extends PreviewAction {
 				tdoc.setTranslation(1);
 			}
 
-			XWikiDocument olddoc = (XWikiDocument) tdoc.clone();
 			try {
 				tdoc.readFromTemplate(((EditForm) form).getTemplate(), context);
 			} catch (XWikiException e) {
@@ -111,7 +110,7 @@ public class SaveAction extends PreviewAction {
 
             // We get the comment to be used from the document
             // It was read using readFromForm
-            xwiki.saveDocument(tdoc, olddoc, tdoc.getComment(), context);
+            xwiki.saveDocument(tdoc, tdoc.getComment(), context);
 			XWikiLock lock = tdoc.getLock(context);
 			if (lock != null)
 				tdoc.removeLock(context);

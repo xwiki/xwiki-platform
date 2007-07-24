@@ -396,14 +396,13 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
                 .get("vcontext"));
 
-            XWikiDocument newdoc = (XWikiDocument) document.clone();
             if (page.getParentId() != null)
-                newdoc.setParent(page.getParentId());
+                document.setParent(page.getParentId());
 
-            newdoc.setAuthor(context.getUser());
-            newdoc.setContent(page.getContent());
-            context.getWiki().saveDocument(newdoc, document, page.getComment(), context);
-            return (new Page(newdoc, context)).getParameters();
+            document.setAuthor(context.getUser());
+            document.setContent(page.getContent());
+            context.getWiki().saveDocument(document, page.getComment(), context);
+            return (new Page(document, context)).getParameters();
         } catch (XWikiException e) {
             e.printStackTrace();
             throw e;

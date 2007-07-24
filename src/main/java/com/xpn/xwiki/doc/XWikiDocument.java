@@ -188,7 +188,6 @@ public class XWikiDocument
     // Template by default assign to a view
     private String defaultTemplate;
 
-    //
     private String validationScript;
 
     private Object wikiNode;
@@ -198,6 +197,14 @@ public class XWikiDocument
     private SoftReference archive;
 
     private XWikiStoreInterface store;
+
+    /**
+     * This is a copy of this XWikiDocument before any modification was made to it. It is reset
+     * to the actual values when the document is saved in the database. This copy is used for
+     * finding out differences made to this document (useful for example to send the correct
+     * notifications to document change listeners).
+     */
+    private XWikiDocument originalDocument;
 
     public XWikiStoreInterface getStore(XWikiContext context)
     {
@@ -216,7 +223,7 @@ public class XWikiDocument
 
     public XWikiStoreInterface getStore()
     {
-        return store;
+        return this.store;
     }
 
     public void setStore(XWikiStoreInterface store)
@@ -325,6 +332,28 @@ public class XWikiDocument
         this.attachmentList = new ArrayList();
         this.customClass = "";
         this.comment = "";
+
+        // Note: As there's no notion of an Empty document we don't set the original document
+        // field. Thus getOriginalDocument() may return null.
+    }
+
+    /**
+     * @return the copy of this XWikiDocument instance before any modification was made to it.
+     * @see #originalDocument
+     */
+    public XWikiDocument getOriginalDocument()
+    {
+        return this.originalDocument;
+    }
+
+    /**
+     * @param originalDocument the original document representing this document instance before
+     *        any change was made to it, prior to the last time it was saved
+     * @see #originalDocument
+     */
+    public void setOriginalDocument(XWikiDocument originalDocument)
+    {
+        this.originalDocument = originalDocument;
     }
 
     public XWikiDocument getParentDoc()
@@ -1761,6 +1790,9 @@ public class XWikiDocument
         clonexWikiObjects(document);
         copyAttachments(document);
         elements = document.elements;
+
+        // Note: We don't set the original document as it's already been set in the constructor
+        // when this object was instantiated.
     }
 
     public Object clone()
@@ -1806,6 +1838,11 @@ public class XWikiDocument
             doc.clonexWikiObjects(this);
             doc.copyAttachments(this);
             doc.elements = elements;
+
+            // Note: We don't set the original document in the clone since the clone has already
+            // been instantiated (as it's passed as parameter) and thus its original document is
+            // already set.
+
         } catch (Exception e) {
             // This should not happen
         }
@@ -1950,6 +1987,10 @@ public class XWikiDocument
                 }
             }
         }
+
+        // We consider that 2 documents are still equal even when they have different original
+        // documents (see getOriginalDocument() for more details as to what is an original
+        // document).
 
         return true;
     }
@@ -2351,6 +2392,9 @@ public class XWikiDocument
         // We have been reading from XML so the document does not need a new version when saved
         setMetaDataDirty(false);
         setContentDirty(false);
+
+        // Note: We don't set the original document as it's already been set in the constructor
+        // when this object was instantiated.
     }
 
     public void setAttachmentList(List list)

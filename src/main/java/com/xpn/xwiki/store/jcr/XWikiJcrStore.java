@@ -220,7 +220,11 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
                     // this is a non critical error
                 }
             }
-		} catch (Exception e) {
+
+            // We need to ensure that the saved document becomes the original document
+            doc.setOriginalDocument((XWikiDocument) doc.clone());
+
+        } catch (Exception e) {
 			Object[] args = { doc.getFullName() };
 			throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_SAVING_DOC, "Exception while saving document {0}", e, args);
 		} finally {
@@ -455,7 +459,11 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 		            return retdoc;
 				}
 			});
-			return retdoc;
+
+            // We need to ensure that the loaded document becomes the original document
+            retdoc.setOriginalDocument((XWikiDocument) retdoc.clone());
+
+            return retdoc;
 		} catch (Exception e) {
 			Object[] args = { doc.getFullName() };
 			throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Exception while loading document {0}", e, args);
@@ -486,7 +494,11 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 					return null;
 				}
 			});
-		} catch (Exception e) {
+
+            // We need to ensure that the deleted document becomes the original document
+            doc.setOriginalDocument((XWikiDocument) doc.clone());
+
+        } catch (Exception e) {
 			Object[] args = { doc.getFullName() };
 			throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Exception while deleting document {0}", e, args);
 		}

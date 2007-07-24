@@ -53,8 +53,6 @@ import com.xpn.xwiki.util.Util;
 
 public class Document extends Api
 {
-    protected XWikiDocument olddoc;
-
     protected XWikiDocument doc;
 
     protected Object currentObj;
@@ -62,7 +60,6 @@ public class Document extends Api
     public Document(XWikiDocument doc, XWikiContext context)
     {
         super(context);
-        this.olddoc = doc;
         this.doc = doc;
     }
 
@@ -81,9 +78,6 @@ public class Document extends Api
 
     protected XWikiDocument getDoc()
     {
-        if (doc == olddoc) {
-            doc = (XWikiDocument) doc.clone();
-        }
         return doc;
     }
 
@@ -1446,8 +1440,7 @@ public class Document extends Api
         if (doc.isNew()) {
             doc.setCreator(context.getUser());
         }
-        getXWikiContext().getWiki().saveDocument(doc, olddoc, comment, getXWikiContext());
-        olddoc = doc;
+        getXWikiContext().getWiki().saveDocument(doc, comment, getXWikiContext());
     }
 
     public com.xpn.xwiki.api.Object addObjectFromRequest() throws XWikiException
@@ -1642,7 +1635,8 @@ public class Document extends Api
         XWikiAttachment attachment = getDoc().getAttachment(filename);
         if (attachment == null) {
             attachment = new XWikiAttachment();
-            olddoc.getAttachmentList().add(attachment);
+            // TODO: Review this code and understand why it's needed.
+            getDoc().getOriginalDocument().getAttachmentList().add(attachment);
         }
 
         attachment.setContent(data);

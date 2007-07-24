@@ -31,12 +31,10 @@ import java.util.Vector;
 public class ObjectRemoveAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
-        XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
 
-        XWikiDocument olddoc = (XWikiDocument) doc.clone();
         String className = ((ObjectRemoveForm) form).getClassName();
         int classId = ((ObjectRemoveForm) form).getClassId();
         Vector objects = doc.getObjects(className);
@@ -45,7 +43,7 @@ public class ObjectRemoveAction extends XWikiAction {
         objects.set(classId, null);
         doc.addObjectsToRemove(object);
         doc.setAuthor(context.getUser());
-        xwiki.saveDocument(doc, olddoc, context.getMessageTool().get("core.comment.deleteObject"), context);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), context);
 
         // forward to edit
         String redirect = Utils.getRedirect("edit", context);

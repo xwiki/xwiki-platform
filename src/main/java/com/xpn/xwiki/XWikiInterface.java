@@ -87,8 +87,6 @@ public interface XWikiInterface {
 
     void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
-    void saveDocument(XWikiDocument doc, XWikiDocument olddoc, XWikiContext context) throws XWikiException;
-
     XWikiDocument getDocument(XWikiDocument doc, String revision, XWikiContext context) throws XWikiException;
 
     XWikiDocument getDocument(String fullname, XWikiContext context) throws XWikiException;

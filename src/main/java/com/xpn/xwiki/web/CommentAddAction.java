@@ -31,7 +31,6 @@ import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 public class CommentAddAction extends XWikiAction {
     public boolean action(XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
-        XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
@@ -49,7 +48,6 @@ public class CommentAddAction extends XWikiAction {
             if (doc.isNew()) {
                 return true;
             } else {
-                XWikiDocument olddoc = (XWikiDocument) doc.clone();
                 String className = "XWiki.XWikiComments";
                 int nb = doc.createNewObject(className, context);
                 BaseObject oldobject = doc.getObject(className, nb);
@@ -57,7 +55,7 @@ public class CommentAddAction extends XWikiAction {
                 newobject.setNumber(oldobject.getNumber());
                 newobject.setName(doc.getFullName());
                 doc.setObject(className, nb, newobject);
-                xwiki.saveDocument(doc, olddoc, context.getMessageTool().get("core.comment.addComment"), context);
+                xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), context);
             }
             // forward to edit
             String redirect = Utils.getRedirect("edit", context);

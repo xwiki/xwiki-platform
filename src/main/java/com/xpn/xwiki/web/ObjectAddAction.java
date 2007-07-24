@@ -34,13 +34,11 @@ import java.util.Map;
 public class ObjectAddAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
-        XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         String username = context.getUser();
         XWikiDocument doc = context.getDoc();
         ObjectAddForm oform = (ObjectAddForm) context.getForm();
 
-        XWikiDocument olddoc = (XWikiDocument) doc.clone();
         String className = oform.getClassName();
         int nb = doc.createNewObject(className, context);
 
@@ -65,7 +63,7 @@ public class ObjectAddAction extends XWikiAction {
         if (doc.isNew()) {
             doc.setCreator(username);
         }
-        xwiki.saveDocument(doc, olddoc, context.getMessageTool().get("core.comment.addObject"), context);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), context);
 
         // forward to edit
         String redirect = Utils.getRedirect("edit", context);

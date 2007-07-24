@@ -299,7 +299,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-
             if (context.getWiki().hasBacklinks(context)){
                 saveLinks(doc, context, true);
             }
@@ -307,7 +306,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             if (bTransaction) {
                 endTransaction(context, true);
             }
+
             doc.setNew(false);
+
+            // We need to ensure that the saved document becomes the original document
+            doc.setOriginalDocument((XWikiDocument) doc.clone());
+
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_DOC,
@@ -437,6 +441,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     }
                 }
             }
+
+            // We need to ensure that the loaded document becomes the original document
+            doc.setOriginalDocument((XWikiDocument) doc.clone());
+            
             if (bTransaction)
                 endTransaction(context, false, false);
         } catch (Exception e) {
@@ -525,6 +533,10 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
 
             session.delete(doc);
+
+            // We need to ensure that the deleted document becomes the original document
+            doc.setOriginalDocument((XWikiDocument) doc.clone());
+            
             if (bTransaction)
                 endTransaction(context, true);
         } catch (Exception e) {

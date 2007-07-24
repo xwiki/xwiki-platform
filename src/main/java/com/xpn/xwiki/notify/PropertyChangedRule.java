@@ -55,7 +55,7 @@ public class PropertyChangedRule extends DocChangeRule {
     public boolean hasEqualProperty(XWikiDocument newdoc, XWikiDocument olddoc,
                                     String className, String propertyName) {
         BaseObject obj1 = newdoc.getxWikiObject();
-        BaseObject obj2 = olddoc.getxWikiObject();
+        BaseObject obj2 = (olddoc==null) ? null : olddoc.getxWikiObject();
         if ((obj1==null) && (obj2==null))
             return true;
         if (obj1==null) {

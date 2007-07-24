@@ -414,12 +414,11 @@ public class LDAPPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
             if (wikiname != null && wikiname.length() > 0) {
                 XWikiDocument doc = context.getWiki().getDocument(fullwikiname, context);
-                XWikiDocument oldDoc = (XWikiDocument) doc.clone();
                 doc.setParent("");
                 doc.addObject(bclass.getName(), bobj);
                 doc.setContent("#includeForm(\"XWiki.XWikiUserSheet\")");
                 context.getWiki().protectUserPage(fullwikiname, "edit", doc, context);
-                context.getWiki().saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createdUser"), context);
+                context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.createdUser"), context);
                 context.getWiki().setUserDefaultGroup(fullwikiname, context);
                 return true;
             }

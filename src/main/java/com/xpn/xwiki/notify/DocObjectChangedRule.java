@@ -65,7 +65,7 @@ public class DocObjectChangedRule extends DocChangeRule {
 
     public boolean hasEqualsObjectsForAllClasses(XWikiDocument newdoc, XWikiDocument olddoc) {
         Map fields1 = newdoc.getxWikiObjects();
-        Map fields2 = olddoc.getxWikiObjects();
+        Map fields2 = (olddoc==null) ? null : olddoc.getxWikiObjects();
         if ((fields1==null)&&(fields2==null))
             return true;
         if ((fields1==null)||(fields2==null))

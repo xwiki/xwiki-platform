@@ -904,37 +904,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             doc.setComment((comment == null) ? "" : comment);
 
             getStore().saveXWikiDoc(doc, context);
-        } finally {
-            if ((server != null) && (database != null)) {
-                context.setDatabase(database);
-            }
-        }
-    }
 
-    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, XWikiContext context)
-        throws XWikiException
-    {
-        // If no comment is provided we should use an empty comment
-        saveDocument(doc, olddoc, "", context);
-    }
-
-    public void saveDocument(XWikiDocument doc, XWikiDocument olddoc, String comment,
-        XWikiContext context) throws XWikiException
-    {
-        String server = null, database = null;
-        try {
-            server = doc.getDatabase();
-
-            if (server != null) {
-                database = context.getDatabase();
-                context.setDatabase(server);
-            }
-
-            // Setting comment before saving
-            doc.setComment((comment == null) ? "" : comment);
-
-            getStore().saveXWikiDoc(doc, context);
-            getNotificationManager().verify(doc, olddoc,
+            // Notify listeners about the document change
+            getNotificationManager().verify(doc, doc.getOriginalDocument(),
                 XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         } finally {
             if ((server != null) && (database != null)) {
@@ -2116,7 +2088,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             }
         }
 
-        flushVirtualWikis(olddoc);
+        if (olddoc != null) {
+            flushVirtualWikis(olddoc);
+        }
         flushVirtualWikis(newdoc);
     }
 
@@ -2832,8 +2806,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 return -3;
             }
 
-            XWikiDocument oldDoc = (XWikiDocument) doc.clone();
-
             /*
              * if(!this.checkAccess("register", doc, context)){ return -1; }
              */
@@ -2848,8 +2820,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             protectUserPage(fullwikiname, userRights, doc, context);
 
-            saveDocument(doc, oldDoc, context.getMessageTool().get("core.comment.createdUser"),
-                context);
+            saveDocument(doc, context.getMessageTool().get("core.comment.createdUser"), context);
 
             // Now let's add the user to XWiki.XWikiAllGroup
             setUserDefaultGroup(fullwikiname, context);
@@ -2886,7 +2857,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         BaseClass groupClass = getGroupClass(context);
         XWikiDocument groupDoc = getDocument(groupName, context);
-        XWikiDocument oldDoc = (XWikiDocument) groupDoc.clone();
 
         BaseObject memberObject = (BaseObject) groupClass.newObject(context);
         memberObject.setClassName(groupClass.getName());
@@ -2894,8 +2864,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         memberObject.setStringValue("member", userName);
         groupDoc.addObject(groupClass.getName(), memberObject);
         if (groupDoc.isNew()) {
-            saveDocument(groupDoc, oldDoc, context.getMessageTool().get(
-                "core.comment.addedUserToGroup"), context);
+            saveDocument(groupDoc, context.getMessageTool().get("core.comment.addedUserToGroup"),
+                context);
         } else {
             getHibernateStore().saveXWikiObject(memberObject, context, true);
         }

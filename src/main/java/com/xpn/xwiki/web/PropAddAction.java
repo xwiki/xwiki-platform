@@ -32,12 +32,10 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 public class PropAddAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
-        XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
 
-        XWikiDocument olddoc = (XWikiDocument) doc.clone();
         String propName = ((PropAddForm) form).getPropName();
 
         if(propName ==null || propName.equals("") || !propName.matches("[\\w\\.\\-\\_]+") ){
@@ -64,7 +62,7 @@ public class PropAddAction extends XWikiAction {
                 if (doc.isNew()) {
                     doc.setCreator(username);
                 }
-                xwiki.saveDocument(doc, olddoc, context.getMessageTool().get("core.comment.addClassProperty"), context);
+                xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addClassProperty"), context);
             }
         }
         // forward to edit

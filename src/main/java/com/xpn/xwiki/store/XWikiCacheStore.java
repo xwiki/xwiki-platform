@@ -148,6 +148,10 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
                  log.debug("Cache: Trying to get doc " + key + " from cache");
                 doc = (XWikiDocument) getCache().getFromCache(key);
                 doc.setFromCache(true);
+
+                // We need to ensure that the loaded document becomes the original document
+                doc.setOriginalDocument((XWikiDocument) doc.clone());
+
                 if (log.isDebugEnabled())
                  log.debug("Cache: got doc " + key + " from cache");
             } catch (XWikiCacheNeedsRefreshException e) {
@@ -171,6 +175,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
                 getPageExistCache().putInCache(key, new Boolean(!doc.isNew()));
             }
         }
+
         if (log.isDebugEnabled())
          log.debug("Cache: end for doc " + key + " in cache");
         return doc;

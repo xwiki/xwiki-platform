@@ -1,5 +1,3 @@
-xwiki.version=${project.version}
-
 xwiki.base=../../
 
 xwiki.store.class=com.xpn.xwiki.store.XWikiHibernateStore

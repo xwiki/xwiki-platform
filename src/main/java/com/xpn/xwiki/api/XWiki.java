@@ -71,9 +71,8 @@ public class XWiki extends Api
     }
 
     /**
-     * API allowing to access the current XWiki Version
-     * 
-     * @return Current XWiki Version (x.y.nnnn)
+     * @return XWiki's version in the format <code>(version).(SVN build number)</code>, or
+     *         "Unknown version" if it failed to be retrieved
      */
     public String getVersion()
     {

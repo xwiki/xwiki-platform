@@ -213,6 +213,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public static final String MACROS_FILE = "/templates/macros.txt";
 
+    /**
+     * File containing XWiki's version, in the format: <version name>.<SVN revision number>.
+     */
+    private static final String VERSION_FILE = "/WEB-INF/version.properties";
+
+    /**
+     * Property containing the version value in the {@link #VERSION_FILE} file.
+     */
+    private static final String VERSION_FILE_PROPERTY = "version";
+
     /*
      * i don't like using static variables like, but this avoid making a JNDI lookup with each
      * request ...
@@ -712,19 +722,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see XWikiInterface#getVersion()
+     */
     public String getVersion()
     {
-        if (version == null) {
-            version = Param("xwiki.version", "");
-            String bnb = null;
+        if (this.version == null) {
             try {
-                InputStream is = getResourceAsStream("/WEB-INF/version.properties");
-                XWikiConfig vprop = new XWikiConfig(is);
-                bnb = vprop.getProperty("build.number");
+                InputStream is = getResourceAsStream(VERSION_FILE);
+                XWikiConfig properties = new XWikiConfig(is);
+                this.version = properties.getProperty(VERSION_FILE_PROPERTY);
             } catch (Exception e) {
+                // Failed to retrieve the version, log a warning and default to "Unknown"
+                LOG.warn("Failed to retrieve XWiki's version from [" + VERSION_FILE
+                    + "], using the [" + VERSION_FILE_PROPERTY + "] property.", e);
+                this.version = "Unknown version";
             }
-            if (bnb != null)
-                version = version + "." + bnb;
         }
         return version;
     }

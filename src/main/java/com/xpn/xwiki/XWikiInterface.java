@@ -55,6 +55,10 @@ public interface XWikiInterface {
 
     void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context, boolean noupdate) throws XWikiException;
 
+    /**
+     * @return XWiki's version in the format <code>(version).(SVN build number)</code>, or
+     *         "Unknown version" if it failed to be retrieved
+     */
     String getVersion();
 
     URL getResource(String s) throws MalformedURLException;

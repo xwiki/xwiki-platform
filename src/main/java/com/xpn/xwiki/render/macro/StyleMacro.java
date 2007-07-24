@@ -50,6 +50,7 @@ public class StyleMacro extends BaseLocaleMacro {
         String type = params.get("type");
         String id = params.get("id");
         String classes = params.get("class");
+        String align = params.get("align");
         String name = params.get("name");
         String size = params.get("font-size");
         String font = params.get("font-family");
@@ -116,6 +117,9 @@ public class StyleMacro extends BaseLocaleMacro {
         }
         if ((!"none".equals(name)) && (name != null) && (!"".equals(name.trim()))) {
             str.append("name=\"" + name.trim() + "\" ");
+        }
+        if ((!"none".equals(align)) && (align != null) && (!"".equals(align.trim()))) {
+            str.append("align=\"" + align.trim() + "\" ");
         }
 
         str.append("style=\"");

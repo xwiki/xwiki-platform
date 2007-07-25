@@ -125,6 +125,7 @@ public class XWikiRightServiceImpl implements XWikiRightService {
             String creator = doc.getCreator();
             if ((user != null) && (user.getUser() != null) && (creator != null)) {
                 if (user.getUser().equals(creator)) {
+                    context.setUser(user.getUser());
                     return true;
                 }
             }

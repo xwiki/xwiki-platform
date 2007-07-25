@@ -60,7 +60,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor((/&lt;%([\s\S]+?)%&gt;/i), 'convertGroovyScriptsInternal');
 
     this.addExternalProcessorBefore('convertParagraphExternal', (/##([^\r\n]*)$|(#\*([\s\S]+?)\*#)/im), 'convertVelocityCommentExternal');
-    this.addInternalProcessorBefore('convertStyleInternal', (/<span\s*([^>]*)class=\"vcomment\"\s*([^>]*)>([\s\S]+?)(\r?\n?)<\/span>/i), 'convertVelocityCommentInternal');
+    this.addInternalProcessorBefore('convertStyleInternal', (/<div\s*([^>]*)class=\"vcomment\"\s*([^>]*)>([\s\S]+?)(\r?\n?)<\/div>/i), 'convertVelocityCommentInternal');
 
     this.addExternalProcessorBefore('convertTableExternal', (/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
     this.addInternalProcessorBefore('convertTableInternal', (/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
@@ -239,10 +239,10 @@ WikiEditor.prototype.fixTitle = function(editor_id, node) {
     var value = "";
     if (this._titleChangeValue==0) {
         this.core.execInstanceCommand(editor_id, "mceRemoveNode", false, node);
-    } if (this._titleChangeValue==6) {
+    } else if (this._titleChangeValue==6) {
         this.core.execInstanceCommand(editor_id, "FormatBlock", false, "<div>");
         var selectedBlock = tinyMCE.selectedInstance.selection.getFocusElement();
-        selectedBlock.setAttribute("class", "code");
+        selectedBlock.className = 'code';
         var b = tinyMCE.selectedInstance.selection.getBookmark();
         var preNode = tinyMCE.selectedInstance.getDoc().createElement("<pre>");
         var childsBlock = selectedBlock.childNodes;
@@ -254,6 +254,10 @@ WikiEditor.prototype.fixTitle = function(editor_id, node) {
 
         selectedBlock.appendChild(preNode);
         tinyMCE.selectedInstance.selection.moveToBookmark(b);
+    } else if (this._titleChangeValue==7) {
+        this.core.execInstanceCommand(editor_id, "FormatBlock", false, "<div>");
+        var selectedBlock = tinyMCE.selectedInstance.selection.getFocusElement();
+        selectedBlock.className = 'vcomment';
     } else {
         value = "<h" + this._titleChangeValue + ">";
         this.core.execInstanceCommand(editor_id, "FormatBlock", false, value);
@@ -460,9 +464,13 @@ WikiEditor.prototype.handleTitlesList = function(editor_id, node, undo_index, un
 		} else {
 			this._selectByValue(list, 0);
 		}
-        var code = this.core.getParentElement(node, "div");
-        if (code && (code.className == 'code')) {
+        var selectedDiv = this.core.getParentElement(node, "div");
+        if (selectedDiv && (selectedDiv.className == 'code')) {
             this._selectByValue(list, 6);
+        }
+        
+        if (selectedDiv && (selectedDiv.className == "vcomment")) {
+            this._selectByValue(list, 7);
         }
     }
 }
@@ -789,7 +797,8 @@ WikiEditor.prototype.getTitleControl = function(button_name) {
             '<option value="3">{$lang_wiki_title_3}</option>' +
             '<option value="4">{$lang_wiki_title_4}</option>' +
             '<option value="5">{$lang_wiki_title_5}</option>' +
-            '<option value="6">{$lang_wiki_title_6}</option>' +
+            '<option value="6">{$lang_wiki_code}</option>' +
+            '<option value="7">{$lang_wiki_velocity_comment}</option>' +
            '</select>';
 }
 
@@ -1339,14 +1348,14 @@ WikiEditor.prototype.convertVelocityCommentExternal = function(regexp, result, c
     } else if ((result[3] != null) && (result[3] != "undefined") && (result[3] != "")) {
         vcomment = result[3];
     }
-    str = "<span class='" + this.VELOCITY_COMMENT_CLASS_NAME + "'>" + vcomment + "</span>";
+    str = "<div class='" + this.VELOCITY_COMMENT_CLASS_NAME + "'>" + vcomment + "</div>";
     return content.replace(regexp, str);
 }
 
 WikiEditor.prototype.convertVelocityCommentInternal = function(regexp, result, content) {
     var str = "";
     var vcomment = result[3];
-    if ((vcomment.indexOf("\n") > -1) || (vcomment.indexOf("<p") > -1)) {
+    if (((vcomment.indexOf("<br") > -1) || vcomment.indexOf("\n") > -1) || (vcomment.indexOf("<p") > -1)) {
         str = "#*" + vcomment + "*#";
     } else {
         if (this.core.isMSIE) {

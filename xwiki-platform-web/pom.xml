@@ -57,5 +57,13 @@
         <module>standard</module>
       </modules>
     </profile>
+    <profile>
+      <!-- XWiki Enterprise Manager -->
+      <id>xem</id>
+      <modules>
+        <module>gwt</module>
+        <module>standard</module>
+      </modules>
+    </profile>
   </profiles>
 </project>

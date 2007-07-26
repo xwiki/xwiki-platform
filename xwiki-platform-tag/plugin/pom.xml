@@ -41,11 +41,26 @@
     <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</developerConnection>
     <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-plugins/trunk</url>
   </scm>
-  <modules>
-    <module>adwords</module>
-    <module>alexa</module>
-    <module>exoplatform</module>
-    <module>multiwiki</module>
-  </modules>
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>adwords</module>
+        <module>alexa</module>
+        <module>exoplatform</module>
+        <module>multiwiki</module>
+      </modules>
+    </profile>
+    <profile>
+      <!-- XWiki Enterprise Manager -->
+      <id>xem</id>
+      <modules>
+        <module>multiwiki</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>
        

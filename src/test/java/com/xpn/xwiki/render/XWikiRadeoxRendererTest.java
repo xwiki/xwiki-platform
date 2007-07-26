@@ -99,4 +99,43 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
             + "<span class=\"wikicreatelinktext\">new link</span>"
             + "<span class=\"wikicreatelinkqm\">?</span></a>", result);
     }
+
+    public void testRenderStyleMacro() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("{style:type=div|align=justify}Hello{style}", contentDocument, document, context);
+        assertEquals("<div align=\"justify\" style=\"\" >Hello</div>", result);
+    }
+
+    public void testRenderStyleMacroImbricated() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style}", contentDocument, document, context);
+        assertEquals("<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside</span> the paragraph.</div>", result);
+    }
+
+    public void testRenderStyleMacroImbricated2() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style} and this is very fun {style}", contentDocument, document, context);
+        assertEquals("<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside<span style=\"\" ></span> the paragraph.</span> and this is very fun </div>", result);
+    }
+
+    public void testRenderCodeMacroImbricated() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("{code}ABC{code}DEF", contentDocument, document, context);
+        assertEquals("<div class=\"code\"><pre>ABC</pre></div>DEF", result);
+        result = renderer.render("{code}ABC{code}DEF{code}GHI{code}", contentDocument, document, context);
+        assertEquals("<div class=\"code\"><pre>ABC</pre></div>DEF<div class=\"code\"><pre>GHI</pre></div>", result);
+    }
+
 }

@@ -92,13 +92,15 @@ public class StyleMacro extends BaseLocaleMacro {
             doc = xcontext.getDoc();
         }
 
-        XWikiAttachment image = doc.getAttachment(icon);
         String path = "";
-        if (image != null) {
-            path = doc.getAttachmentURL(icon, "download", xcontext);
-        } else {
-            icon = "icons/" + icon; // icons default directory that contain icon image. 
-            path = xcontext.getWiki().getSkinFile(icon, xcontext);
+        if (icon!=null) {
+            XWikiAttachment image = doc.getAttachment(icon);
+            if (image != null) {
+                path = doc.getAttachmentURL(icon, "download", xcontext);
+            } else {
+                icon = "icons/" + icon; // icons default directory that contain icon image.
+                path = xcontext.getWiki().getSkinFile(icon, xcontext);
+            }
         }
 
         if (("none".equals(type)) || (type == null) || ("".equals(type.trim()))) {

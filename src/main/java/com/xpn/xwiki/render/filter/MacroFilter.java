@@ -21,24 +21,32 @@
 package com.xpn.xwiki.render.filter;
 
 import com.xpn.xwiki.render.macro.MacroRepository;
-import org.radeox.api.engine.context.InitialRenderContext;
-import org.radeox.api.engine.RenderEngine;
-import org.radeox.api.engine.IncludeRenderEngine;
-import org.radeox.macro.Repository;
-import org.radeox.macro.Macro;
-import org.radeox.macro.parameter.MacroParameter;
-import org.radeox.regex.MatchResult;
-import org.radeox.filter.context.FilterContext;
-import org.radeox.util.StringBufferWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.radeox.api.engine.IncludeRenderEngine;
+import org.radeox.api.engine.RenderEngine;
+import org.radeox.api.engine.context.InitialRenderContext;
+import org.radeox.filter.context.FilterContext;
+import org.radeox.filter.regex.RegexTokenFilter;
+import org.radeox.macro.Macro;
+import org.radeox.macro.Repository;
+import org.radeox.macro.parameter.MacroParameter;
+import org.radeox.regex.MatchResult;
+import org.radeox.util.StringBufferWriter;
 
 import java.io.Writer;
+import java.util.regex.Pattern;
 
-public class MacroFilter extends org.radeox.filter.MacroFilter
+public class MacroFilter extends RegexTokenFilter
 {
     private static Log log = LogFactory.getLog(MacroFilter.class);
     private MacroRepository macros;
+
+    public MacroFilter() {
+        super("\\{(style)(?::([^\\}]*))?\\}(.*)\\{style}", SINGLELINE);
+        addRegex("\\{([^:}]+)(?::([^\\}]*))?\\}(.*?)\\{\\1\\}", "", SINGLELINE);
+        addRegex("\\{([^:}]+)(?::([^\\}]*))?\\}", "", MULTILINE);
+    }
 
     public void setInitialContext(InitialRenderContext context)
     {
@@ -85,6 +93,7 @@ public class MacroFilter extends org.radeox.filter.MacroFilter
                     mParams.setContent(filter(mParams.getContent(), context));
                   }
               }
+
               Writer writer = new StringBufferWriter(buffer);
               macro.execute(writer, mParams);
             } else if (command.startsWith("!")) {

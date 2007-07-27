@@ -310,12 +310,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             } catch (Exception e) {
                 // Error loading the file. Most likely, the Security Manager prevented it.
                 // We'll try loading it as a resource below.
+                LOG.debug("Failed to load the file [" + configurationLocation + "] using direct "
+                    + "file access. The error was [" + e.getMessage() + "]. Trying to load it "
+                    + "as a resource using the Servlet Context...");
             }
         }
 
         // Second, try loading it as a resource using the Servlet Context
         if (xwikicfgis == null) {
             xwikicfgis = econtext.getResourceAsStream(configurationLocation);
+            LOG.debug("Failed to load the file [" + configurationLocation + "] as a resource "
+                + "using the Servlet Context. Trying to load it as classpath resource...");
         }
 
         // Third, try loading it from the classloader used to load this current class
@@ -331,6 +336,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki.cfg");
             }
         }
+
+        LOG.debug("Failed to load the file [" + configurationLocation + "] using any method.");
+
+        // TODO: Should throw an exception instead of return null...
 
         return xwikicfgis;
     }

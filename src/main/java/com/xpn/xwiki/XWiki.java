@@ -236,13 +236,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 Context envContext = (Context) new InitialContext().lookup("java:comp/env");
                 configPath = (String) envContext.lookup(CFG_ENV_NAME);
             } catch (Exception e) {
-                // Allow a config path from WEB-INF
-                if (LOG.isInfoEnabled())
-                    LOG
-                        .info("xwiki.cfg taken from /WEB-INF/xwiki.cfg because the XWikiConfig variable is not set in the context");
                 configPath = "/WEB-INF/xwiki.cfg";
+                LOG.debug("The xwiki.cfg file will be read from [" + configPath + "] because "
+                    + "its location couldn't be read from the JNDI [" + CFG_ENV_NAME + "] "
+                    + "variable in [java:comp/env].");
             }
-
         }
         return configPath;
     }
@@ -270,26 +268,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             synchronized (XWiki.class) {
                 xwiki = (XWiki) econtext.getAttribute(xwikiname);
                 if (xwiki == null) {
-                    InputStream xwikicfgis = null;
-
-                    // first try to load the file pointed by the given path
-                    // if it does not exist, look for it relative to the classpath
-                    File f = new File(xwikicfg);
-                    if (f.exists()) {
-                        xwikicfgis = new FileInputStream(f);
-                    } else {
-                        xwikicfgis = econtext.getResourceAsStream(xwikicfg);
-                        if (xwikicfgis == null) {
-                            if (context.getMode() == XWikiContext.MODE_GWT
-                                || context.getMode() == XWikiContext.MODE_GWT_DEBUG)
-                                xwikicfgis =
-                                    XWiki.class.getClassLoader().getResourceAsStream(
-                                        "xwiki-gwt.cfg");
-                            else
-                                xwikicfgis =
-                                    XWiki.class.getClassLoader().getResourceAsStream("xwiki.cfg");
-                        }
-                    }
+                    InputStream xwikicfgis =
+                        XWiki.readXWikiConfiguration(xwikicfg, econtext, context);
                     xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                     econtext.setAttribute(xwikiname, xwiki);
                 }
@@ -304,6 +284,55 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 "Could not initialize main XWiki context",
                 e);
         }
+    }
+
+    /**
+     * First try to find the configuration file pointed by the passed location as a file. If it
+     * does not exist or if the file cannot be read (for example if the security manager
+     * doesn't allow it), then try to load the file as a resource using the Servlet Context and
+     * failing that from teh classpath.
+     *
+     * @param configurationLocation the location where the XWiki configuration file is located
+     *        (either an absolute or relative file path or a resource location)
+     * @return the stream containing the configuration data or null if not found
+     * @todo this code should be moved to a Configuration class proper
+     */
+    private static InputStream readXWikiConfiguration(String configurationLocation,
+        XWikiEngineContext econtext, XWikiContext context)
+    {
+        InputStream xwikicfgis = null;
+
+        // First try loading from a file.
+        File f = new File(configurationLocation);
+        if (f.exists()) {
+            try {
+                xwikicfgis = new FileInputStream(f);
+            } catch (Exception e) {
+                // Error loading the file. Most likely, the Security Manager prevented it.
+                // We'll try loading it as a resource below.
+            }
+        }
+
+        // Second, try loading it as a resource using the Servlet Context
+        if (xwikicfgis == null) {
+            xwikicfgis = econtext.getResourceAsStream(configurationLocation);
+        }
+
+        // Third, try loading it from the classloader used to load this current class
+        if (xwikicfgis == null) {
+            // TODO: Verify if checking on MODE_GWT is correct. I think we should only check for
+            // the debug mode and even for that we need to find some better way of doing it so
+            // that we don't have hardcoded code only for development debugging purposes.
+            if (context.getMode() == XWikiContext.MODE_GWT
+                || context.getMode() == XWikiContext.MODE_GWT_DEBUG)
+            {
+                xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki-gwt.cfg");
+            } else {
+                xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki.cfg");
+            }
+        }
+
+        return xwikicfgis;
     }
 
     public XWikiStoreInterface getNotCacheStore()

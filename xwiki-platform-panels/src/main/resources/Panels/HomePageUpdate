@@ -19,13 +19,14 @@
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<content>#set($place = $request.place)
+<content>#set($vWiki = $request.vWiki)
+#if("$!vWiki" == '') #set($vWiki = $request.place) #end
 #if(!$xwiki.hasAdminRights())
-#xwikimessageboxstart("Place Manager" "")
-You are not admin on this place ($place).
+#xwikimessageboxstart("Panel Layout Manager" "")
+You are not admin on this wiki ($vWiki).
 #xwikimessageboxend()
 #else
-#if((!$place)||($place==""))
+#if((!$vWiki)||($vWiki==""))
 #set($prefsdoc = $xwiki.getDocument("XWiki.XWikiPreferences"))
 #set($ok = $prefsdoc.use("XWiki.XWikiPreferences"))
 #set($leftPanels = $request.leftPanels)
@@ -39,7 +40,7 @@ You are not admin on this place ($place).
 #set($ok = $prefsdoc.saveWithProgrammingRights())
 SUCCESS
 #else
-#set($prefsdoc = $xwiki.getDocument("${place}:XWiki.XWikiPreferences"))
+#set($prefsdoc = $xwiki.getDocument("${vWiki}:XWiki.XWikiPreferences"))
 #set($ok = $prefsdoc.use("XWiki.XWikiPreferences"))
 #set($leftPanels = $request.leftPanels)
 #set($rightPanels = $request.rightPanels)

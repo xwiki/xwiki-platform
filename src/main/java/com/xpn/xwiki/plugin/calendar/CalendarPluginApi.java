@@ -42,6 +42,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Locale;
 
 public class CalendarPluginApi extends Api {
     private CalendarPlugin plugin;
@@ -106,13 +107,21 @@ public class CalendarPluginApi extends Api {
     }
 
     public Calendar getCalendar(long time) {
-        Calendar cal = Calendar.getInstance(getXWikiContext().getResponse().getLocale());
+        Locale locale = getXWikiContext().getResponse().getLocale();
+        if (locale == null) {
+            locale = new Locale("en");
+        }
+        Calendar cal = Calendar.getInstance(locale);
         cal.setTime(new Date(time));
         return cal;
     }
 
     public Calendar getCalendar() {
-        Calendar cal = Calendar.getInstance(getXWikiContext().getResponse().getLocale());
+        Locale locale = getXWikiContext().getResponse().getLocale();
+        if (locale == null) {
+            locale = new Locale("en");
+        }
+        Calendar cal = Calendar.getInstance(locale);
         cal.setTime(new Date());
         return cal;
     }

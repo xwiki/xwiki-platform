@@ -117,6 +117,9 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         Calendar todayCal; // Today
 
         Locale locale = context.getResponse().getLocale();
+        if(locale == null) {
+            locale = new Locale("en");
+        }
         todayCal = Calendar.getInstance(locale);
         // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future JDK-s.
         fixJDKLocaleBugs(todayCal, locale);

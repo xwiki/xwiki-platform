@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Panels.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -138,7 +138,7 @@
 <content>#panelheader('Blog Entries')
 #set($blogcatdoc = $xwiki.getDocument("Blog.Categories"))
 #if($xwiki.hasAdminRights())
-&lt;font size="-2"&gt;(&lt;a href="$blogcatdoc.getURL("inline")"&gt;Edit Categories&lt;/a&gt;)&lt;/font&gt;
+&lt;div style="font-size:75%;"&gt;(&lt;a href="$blogcatdoc.getURL("inline")"&gt;Edit Categories&lt;/a&gt;)&lt;/div&gt;
 #end
 #set($catdoc = $xwiki.getDocument("Blog.Categories"))
 #foreach($catobj in $catdoc.getObjects("Blog.Categories"))

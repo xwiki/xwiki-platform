@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Panels.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -20,8 +20,10 @@
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <content>&lt;form method="post" action="$doc.getURL("view", "xpage=create")" onsubmit="cancelCancelEdit()"&gt;
+&lt;div&gt;
 &lt;input type="hidden" value="panel" name="tocreate"/&gt;
 Create new panel: &lt;input type="text" name="title" value="Panel Title" class="panelinput" onfocus="if(this.value=='Panel Title') this.value=''" onblur="if(this.value=='') this.value='Panel Title'"/&gt;
 &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
+&lt;/div&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

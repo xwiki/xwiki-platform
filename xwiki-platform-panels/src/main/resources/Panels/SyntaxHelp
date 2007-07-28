@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Panels.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -168,24 +168,26 @@ This paragraph is a new one.&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
     &lt;div id="xwikihelplistsContent" class="accordionTabContentBox"&gt;
 &lt;table&gt;
 &lt;tr&gt;&lt;th&gt;$msg.get("type")&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
-{pre}
-* Level 1&lt;br/&gt;
-** Level 2&lt;br/&gt;
-*** Level 3&lt;br/&gt;
-** Level 2&lt;br/&gt;
-{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;tr&gt;&lt;td&gt;
+{pre}&lt;div&gt;
+* &lt;tt&gt;Level 1&lt;/tt&gt;&lt;br/&gt;
+** &lt;tt&gt;Level 2&lt;/tt&gt;&lt;br/&gt;
+*** &lt;tt&gt;Level 3&lt;/tt&gt;&lt;br/&gt;
+** &lt;tt&gt;Level 2&lt;/tt&gt;&lt;br/&gt;
+&lt;/div&gt;
+{/pre}&lt;/td&gt;&lt;td&gt;
 * Level 1
 ** Level 2
 *** Level 3
 ** Level 2
 &lt;/td&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;tt&gt;
-{pre}1. Item&lt;br/&gt;
-11.Subitem&lt;br/&gt;
-1. Item&lt;br/&gt;
-1*. Subitem
-{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;tr&gt;&lt;td&gt;
+{pre}&lt;div&gt;&lt;tt&gt;1. Item&lt;/tt&gt;&lt;br/&gt;
+&lt;tt&gt;11.Subitem&lt;/tt&gt;&lt;br/&gt;
+&lt;tt&gt;1. Item&lt;/tt&gt;&lt;br/&gt;
+&lt;tt&gt;1*. Subitem&lt;/tt&gt;
+&lt;/div&gt;
+{/pre}&lt;/td&gt;&lt;td&gt;
 1. Item
 11. Subitem
 1. Item
@@ -199,7 +201,7 @@ This paragraph is a new one.&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
     &lt;div id="xwikihelptablesContent" class="accordionTabContentBox"&gt;
 &lt;table&gt;
 &lt;tr&gt;&lt;th&gt;$msg.get("type")&lt;/th&gt;&lt;th&gt;$msg.get("toget")&lt;/th&gt;&lt;/tr&gt;
-&lt;tr&gt;&lt;td&gt;&lt;tt&gt;{pre}
+&lt;tr&gt;&lt;td&gt;{pre}&lt;div&gt;
 {table}&lt;br/&gt;
 Category | Sales (KE)&lt;br/&gt;
 Category 1 | 100&lt;br/&gt;
@@ -207,7 +209,7 @@ Category 2 | 50&lt;br/&gt;
 Category 3 | 50&lt;br/&gt;
 Total | =sum(B2:B4)&lt;br/&gt;
 {table}
-{/pre}&lt;/tt&gt;&lt;/td&gt;&lt;td&gt;
+&lt;/div&gt;{/pre}&lt;/td&gt;&lt;td&gt;
 {table}
 Category | Sales (KE)
 Category 1 | 100

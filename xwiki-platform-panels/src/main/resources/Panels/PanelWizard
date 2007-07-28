@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Panels.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -197,7 +197,7 @@ Choose a page layout:
 &lt;tr&gt;
 &lt;td&gt;
 &lt;div
-#if($crtlayout == 0)id="selectedoption"#end 
+#if($crtlayout == 0)id="selectedoption" #end 
 class="pagelayoutoption" onclick="changePreviewLayout(this, 0)"&gt;
 ##&lt;input type="radio" name="pagelayout" value="nosidecol" checked="cheched" /&gt;
 &lt;label&gt;No side column&lt;/label&gt;
@@ -208,7 +208,7 @@ class="pagelayoutoption" onclick="changePreviewLayout(this, 0)"&gt;
 &lt;/td&gt;
 &lt;td&gt;
 &lt;div 
-#if($crtlayout == 1)id="selectedoption"#end
+#if($crtlayout == 1)id="selectedoption" #end
 class="pagelayoutoption" onclick="changePreviewLayout(this, 1)"&gt;
 ##&lt;input type="radio" name="pagelayout" value="leftcol" "/&gt;
 &lt;label&gt;Left column&lt;/label&gt;
@@ -220,7 +220,7 @@ class="pagelayoutoption" onclick="changePreviewLayout(this, 1)"&gt;
 &lt;/td&gt;
 &lt;td&gt;
 &lt;div
-#if($crtlayout == 2)id="selectedoption"#end
+#if($crtlayout == 2)id="selectedoption" #end
 class="pagelayoutoption" onclick="changePreviewLayout(this, 2)"&gt;
 ##&lt;input type="radio" name="pagelayout" value="rightcol" /&gt;
 &lt;label&gt;Right column&lt;/label&gt;
@@ -232,7 +232,7 @@ class="pagelayoutoption" onclick="changePreviewLayout(this, 2)"&gt;
 &lt;/td&gt;
 &lt;td&gt;
 &lt;div 
-#if($crtlayout == 3)id="selectedoption"#end
+#if($crtlayout == 3)id="selectedoption" #end
 class="pagelayoutoption" onclick="changePreviewLayout(this, 3)"&gt;
 &lt;label&gt;Both columns&lt;/label&gt;
 &lt;div  id="bothcolumns" class="layoutmaquette"&gt;

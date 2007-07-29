@@ -131,6 +131,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
 
         // Add Class
         if (bclass != null) {
+            // If the class has fields, add field information to XML
             Collection fields = bclass.getFieldList();
             if (fields.size() > 0) {
                 oel.add(bclass.toXML());
@@ -149,7 +150,9 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         el.addText(getClassName());
         oel.add(el);
 
-        Iterator it = getFieldList().iterator();
+        // Iterate over values/properties sorted by field name so that the values are 
+        // exported to XML in a consistent order.
+        Iterator it = getSortedIterator();
         while (it.hasNext()) {
             Element pel = new DOMElement("property");
             PropertyInterface bprop = (PropertyInterface) it.next();

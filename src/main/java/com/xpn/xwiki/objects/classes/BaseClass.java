@@ -24,6 +24,7 @@ package com.xpn.xwiki.objects.classes;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -44,10 +45,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ElementComparator;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.plugin.query.OrderClause;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.plugin.query.OrderClause;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 
@@ -219,8 +221,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         el.addText((getValidationScript()==null) ? "" : getValidationScript());
         cel.add(el);
 
-
-        Iterator it = getFieldList().iterator();
+        // Iterate over values sorted by field name so that the values are 
+        // exported to XML in a consistent order.
+        Iterator it = getSortedIterator();
         while (it.hasNext()) {
             PropertyClass bprop = (PropertyClass)it.next();
             cel.add(bprop.toXML());

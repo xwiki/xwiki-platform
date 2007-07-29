@@ -352,6 +352,30 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return array;
     }
 
+    /**
+     * Return an iterator that will operate on a collection of values (as would be returned
+     * by getProperties or getFieldList) sorted by their name (ElementInterface.getName()).
+     */
+    public Iterator getSortedIterator() {
+        Iterator it = null;
+        try {
+            // Use getProperties to get the values in list form (rather than as generic collection)
+            List propList = Arrays.asList(getProperties());
+            
+            // Use the element comparator to sort the properties by name (based on ElementInterface)
+            Collections.sort(propList, new ElementComparator());
+            
+            // Iterate over the sorted property list
+            it = propList.iterator();
+        } catch (ClassCastException ccex ) {
+            // If sorting by the comparator resulted in a ClassCastException (possible), 
+            // iterate over the generic collection of values.         
+            it = getFieldList().iterator();
+        }
+        
+        return it;
+    }
+
     public boolean equals(Object coll) {
      if (!super.equals(coll))
       return false;

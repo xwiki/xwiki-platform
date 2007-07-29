@@ -19,37 +19,34 @@
  */
 package com.xpn.xwiki.doc;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConstant;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.content.parsers.LinkParser;
-import com.xpn.xwiki.content.parsers.DocumentParser;
-import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
-import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
-import com.xpn.xwiki.content.Link;
-import com.xpn.xwiki.api.DocumentSection;
-import com.xpn.xwiki.notify.XWikiNotificationRule;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ListProperty;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.PropertyClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
-import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.validation.XWikiValidationInterface;
-import com.xpn.xwiki.validation.XWikiValidationStatus;
-import com.xpn.xwiki.web.EditForm;
-import com.xpn.xwiki.web.ObjectAddForm;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.web.XWikiRequest;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.lang.ref.SoftReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,30 +67,38 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.lang.ref.SoftReference;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URL;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConstant;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.DocumentSection;
+import com.xpn.xwiki.content.Link;
+import com.xpn.xwiki.content.parsers.DocumentParser;
+import com.xpn.xwiki.content.parsers.LinkParser;
+import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
+import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.ElementComparator;
+import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.validation.XWikiValidationInterface;
+import com.xpn.xwiki.validation.XWikiValidationStatus;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiDocument
 {
@@ -176,7 +181,12 @@ public class XWikiDocument
 
     private String xWikiClassXML;
 
-    private Map xWikiObjects = new HashMap();
+    /** 
+     * Map holding document objects grouped by classname (className -> Vector of objects).
+     * The map is not synchronized, and uses a TreeMap implementation to preserve className 
+     * ordering (consistent sorted order for output to XML, rendering in velocity, etc.)
+     */
+    private Map xWikiObjects = new TreeMap();
 
     private List attachmentList;
 
@@ -927,6 +937,8 @@ public class XWikiDocument
     public List getxWikiClasses(XWikiContext context)
     {
         List list = new ArrayList();
+        
+        // xWikiObjects is a TreeMap, with elements sorted by className
         for (Iterator it = getxWikiObjects().keySet().iterator(); it.hasNext();) {
             String classname = (String) it.next();
             BaseClass bclass = null;
@@ -1659,28 +1671,6 @@ public class XWikiDocument
         readObjectsFromForm(eform, context);
     }
 
-    /*
-    public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException {
-    // Get the class from the template
-    String template = eform.getTemplate();
-    if ((template!=null)&&(!template.equals(""))) {
-    if (template.indexOf('.')==-1) {
-    template = getSpace() + "." + template;
-    }
-    XWiki xwiki = context.getWiki();
-    XWikiDocument templatedoc = xwiki.getDocument(template, context);
-    if (templatedoc.isNew()) {
-    Object[] args = { template, getFullName() };
-    throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
-    "Template document {0} does not exist when adding to document {1}", null, args);
-    } else {
-    setTemplate(template);
-    mergexWikiObjects(templatedoc);
-    }
-    }
-    }
-    */
-
     public void readFromTemplate(EditForm eform, XWikiContext context) throws XWikiException
     {
         String template = eform.getTemplate();
@@ -1721,9 +1711,9 @@ public class XWikiDocument
 
                     if (isNew()) {
                         // We might have received the object from the cache
-                        // and the templace objects might have been copied already
+                        // and the template objects might have been copied already
                         // we need to remove them
-                        setxWikiObjects(new HashMap());
+                        setxWikiObjects(new TreeMap());
                     }
                     // Merge the external objects
                     // Currently the choice is not to merge the base class and object because it is not
@@ -2168,13 +2158,24 @@ public class XWikiDocument
             // Add Class
             BaseClass bclass = getxWikiClass();
             if (bclass.getFieldList().size() > 0) {
+                // If the class has fields, add class definition and field information to XML
                 docel.add(bclass.toXML(null));
             }
 
             // Add Objects
+            // Objects are in a vector, held in map by className: className -> vector(objects)
+            // To generate consistent XML, we want to work through the classes in order,
+            // and then the objects for each class type in order.
+            // xWikiObjects should be a TreeMap (and is, provided it was created in this class,
+            // and not set externally using setxWikiObjects), so the keys should already be sorted by className
             Iterator it = getxWikiObjects().values().iterator();
             while (it.hasNext()) {
                 Vector objects = (Vector) it.next();
+
+                // Use the ElementComparator to sort BaseObjects contained within
+                // the vector by name
+                Collections.sort(objects, new ElementComparator());
+                
                 for (int i = 0; i < objects.size(); i++) {
                     BaseObject obj = (BaseObject) objects.get(i);
                     if (obj != null) {

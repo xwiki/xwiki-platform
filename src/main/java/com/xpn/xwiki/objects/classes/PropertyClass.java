@@ -381,7 +381,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     public Element toXML()
     {
         Element pel = new DOMElement(getName());
-        Iterator it = getFieldList().iterator();
+
+        // Iterate over values sorted by field name so that the values are 
+        // exported to XML in a consistent order.
+        Iterator it = getSortedIterator();
         while (it.hasNext()) {
             BaseProperty bprop = (BaseProperty) it.next();
             pel.add(bprop.toXML());

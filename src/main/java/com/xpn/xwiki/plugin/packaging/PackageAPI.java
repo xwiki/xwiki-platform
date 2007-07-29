@@ -100,6 +100,14 @@ public class PackageAPI   extends Api {
         plugin.setBackupPack(backupPack);
     }
 
+    public boolean isVersionPreserved() {
+        return plugin.isVersionPreserved();
+    }
+
+    public void setPreserveVersion(boolean preserveVersion) {
+        plugin.setPreserveVersion(preserveVersion);
+    }
+
     public boolean isWithVersions() {
          return plugin.isWithVersions();
      }

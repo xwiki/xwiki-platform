@@ -75,6 +75,8 @@ public class Package
 
     private boolean backupPack = false;
 
+    private boolean preserveVersion = false;
+
     private boolean withVersions = true;
 
     private List documentFilters = new ArrayList();
@@ -137,6 +139,13 @@ public class Package
         this.authorName = authorName;
     }
 
+    /**
+     * If true, the package will preserve the original author
+     * during import, rather than updating the author to the current (importing) user.
+     *
+     * @see #isWithVersions()
+     * @see #isVersionPreserved()
+     */
     public boolean isBackupPack()
     {
         return backupPack;
@@ -145,6 +154,23 @@ public class Package
     public void setBackupPack(boolean backupPack)
     {
         this.backupPack = backupPack;
+    }
+
+    /**
+     * If true, the package will preserve the current document version
+     * during import, regardless of whether or not the document history is included.
+     *
+     * @see #isWithVersions()
+     * @see #isBackupPack()
+     */
+    public boolean isVersionPreserved()
+    {
+        return preserveVersion;
+    }
+
+    public void setPreserveVersion(boolean preserveVersion)
+    {
+        this.preserveVersion = preserveVersion;
     }
 
     public List getFiles()
@@ -162,9 +188,18 @@ public class Package
         return withVersions;
     }
 
+    /**
+     * If set to true, Package will include the change history for the document
+     * when exporting the package. This implies that the old version is preserved.
+     *
+     * @see #isVersionPreserved(boolean)
+     */
     public void setWithVersions(boolean withVersions)
     {
         this.withVersions = withVersions;
+        if ( withVersions ) {
+            this.preserveVersion = true;
+        }
     }
 
     public void addDocumentFilter(Object filter) throws PackageException
@@ -551,7 +586,9 @@ public class Package
 
                 if ((doc.getDoc().getDocumentArchive() == null)
                     || (doc.getDoc().getDocumentArchive().getRCSArchive() == null)) {
-                    doc.getDoc().setVersion("1.1");
+                    if (!preserveVersion) {
+                        doc.getDoc().setVersion("1.1");
+                    }
                     doc.getDoc().resetArchive(context);
                 }
             } catch (XWikiException e) {
@@ -715,6 +752,10 @@ public class Package
         el = new DOMElement("backupPack");
         el.addText(new Boolean(backupPack).toString());
         elInfos.add(el);
+        
+        el = new DOMElement("preserveVersion");
+        el.addText(new Boolean(preserveVersion).toString());
+        elInfos.add(el);        
 
         Element elfiles = new DOMElement("files");
         docel.add(elfiles);
@@ -859,6 +900,7 @@ public class Package
         authorName = getElementText(infosEl, "author");
         version = getElementText(infosEl, "version");
         backupPack = new Boolean(getElementText(infosEl, "backupPack")).booleanValue();
+        preserveVersion = new Boolean(getElementText(infosEl, "preserveVersion")).booleanValue();
 
         return domdoc;
     }

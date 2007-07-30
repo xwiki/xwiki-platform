@@ -1,28 +1,24 @@
 package com.xpn.xwiki.plugin.feed;
 
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.fetcher.FetcherEvent;
+import com.sun.syndication.fetcher.FetcherException;
+import com.sun.syndication.fetcher.impl.AbstractFeedFetcher;
+import com.sun.syndication.fetcher.impl.FeedFetcherCache;
+import com.sun.syndication.fetcher.impl.SyndFeedInfo;
+import com.sun.syndication.io.FeedException;
+import com.sun.syndication.io.SyndFeedInput;
+import com.sun.syndication.io.XmlReader;
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.auth.AuthScope;
+import org.apache.commons.httpclient.methods.GetMethod;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.GZIPInputStream;
-
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.Header;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.HttpException;
-import org.apache.commons.httpclient.HttpMethod;
-import org.apache.commons.httpclient.methods.GetMethod;
-
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.fetcher.FetcherEvent;
-import com.sun.syndication.fetcher.FetcherException;
-import com.sun.syndication.fetcher.impl.FeedFetcherCache;
-import com.sun.syndication.fetcher.impl.AbstractFeedFetcher;
-import com.sun.syndication.fetcher.impl.SyndFeedInfo;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedInput;
-import com.sun.syndication.io.XmlReader;
 
 public class XWikiFeedFetcher extends AbstractFeedFetcher {
 
@@ -98,6 +94,23 @@ public class XWikiFeedFetcher extends AbstractFeedFetcher {
 
         System.setProperty("http.useragent", getUserAgent());
         client.getParams().setParameter("httpclient.useragent", getUserAgent());
+
+        String proxyHost = System.getProperty("http.proxyHost");
+        String proxyPort = System.getProperty("http.proxyPort");
+        if ((proxyHost!=null)&&(!proxyHost.equals(""))) {
+            int port = 3128;
+            if ((proxyPort!=null)&&(!proxyPort.equals(""))) {
+                port = Integer.parseInt(proxyPort);
+            }
+            client.getHostConfiguration().setProxy(proxyHost, port);
+        }
+
+        String proxyUser = System.getProperty("http.proxyUser");
+        if ((proxyUser!=null)&&(!proxyUser.equals(""))) {
+            String proxyPassword = System.getProperty("http.proxyPassword");
+            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
+            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
+        }
 
         String urlStr = feedUrl.toString();
         FeedFetcherCache cache = getFeedInfoCache();

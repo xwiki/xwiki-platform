@@ -64,6 +64,7 @@ import com.xpn.xwiki.web.*;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
+import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.lang.RandomStringUtils;
@@ -4546,7 +4547,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
 
         client.getParams().setParameter("http.useragent", userAgent);
-        return client;
+
+        String proxyHost = System.getProperty("http.proxyHost");
+        String proxyPort = System.getProperty("http.proxyPort");
+        if ((proxyHost!=null)&&(!proxyHost.equals(""))) {
+            int port = 3128;
+            if ((proxyPort!=null)&&(!proxyPort.equals(""))) {
+                port = Integer.parseInt(proxyPort);
+            }
+            client.getHostConfiguration().setProxy(proxyHost, port);
+        }
+
+        String proxyUser = System.getProperty("http.proxyUser");
+        if ((proxyUser!=null)&&(!proxyUser.equals(""))) {
+            String proxyPassword = System.getProperty("http.proxyPassword");
+            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
+            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
+        }
+       return client;
     }
 
     public String getURLContent(String surl, XWikiContext context) throws IOException

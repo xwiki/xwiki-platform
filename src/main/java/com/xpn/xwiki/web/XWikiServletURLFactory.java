@@ -226,7 +226,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         newpath.append("/");
         if (encode)
-            newpath.append(encode(filename, context));
+            newpath.append(encode(filename, context).replaceAll("\\+", "%20"));
         else
             newpath.append(filename);
     }

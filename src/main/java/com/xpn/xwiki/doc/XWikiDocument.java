@@ -301,7 +301,7 @@ public class XWikiDocument
     public Version getRCSVersion()
     {
         if (version == null) {
-            version = new Version("1.1");
+            version = new Version("1.0");
         }
         return version;
     }
@@ -679,7 +679,10 @@ public class XWikiDocument
         if (version == null) {
             version = new Version("1.1");
         } else {
-            version = version.next();
+            if (version.toString().equals("1"))
+                version = new Version("1.1");
+            else
+                version = version.next();
         }
     }
 
@@ -4207,5 +4210,14 @@ public class XWikiDocument
         } catch (XWikiException ex) {
             log.warn("Unhandled exception setting context", ex);
         }
+    }
+
+    public String getPreviousVersion() {
+        Version version = getRCSVersion();
+        int last = version.last();
+        if (last<=1)
+         return "";
+        int prev = last - 1;
+        return "1." + prev;
     }
 }

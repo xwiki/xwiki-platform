@@ -152,6 +152,14 @@ public class Document extends Api
     }
 
     /**
+     * return a String with the previous version of the document.
+     */
+    public String getPreviousVersion()
+    {
+        return doc.getPreviousVersion();
+    }
+
+    /**
      * return the title of a document
      */
     public String getTitle()
@@ -1711,4 +1719,24 @@ public class Document extends Api
     {
         doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
     }
+
+    /**
+     * Allow to easily access any revision of a document
+     * @param revision version to access
+     * @return Document object
+     * @throws XWikiException
+     */
+    public Document getDocumentRevision(String revision) throws XWikiException {
+        return new Document(context.getWiki().getDocument(getDoc(), revision, context), context);
+    }
+
+    /**
+     * Allow to easily access the previous revision of a document
+     * @return Document
+     * @throws XWikiException
+     */
+    public Document getPreviousDocument() throws XWikiException {
+        return getDocumentRevision(getPreviousVersion());
+    }
+
 }

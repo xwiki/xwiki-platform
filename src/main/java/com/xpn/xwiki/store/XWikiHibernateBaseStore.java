@@ -452,8 +452,10 @@ public class XWikiHibernateBaseStore {
                         }
 
                     } else {
-                        if (!database.equals(session.connection().getCatalog()))
-                            session.connection().setCatalog(database);
+                        String catalog = session.connection().getCatalog();
+                        catalog = (catalog==null) ? null : catalog.replace('_', '-');
+                        if (!database.equals(catalog))
+                            session.connection().setCatalog(database.replace('-','_'));
                     }
                 }
             } catch (Exception e) {

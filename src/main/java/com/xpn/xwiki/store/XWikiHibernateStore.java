@@ -121,7 +121,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 stmt.execute("create user " + wikiName + " identified by " + wikiName);
                 stmt.execute("grant resource to " + wikiName);
             } else {
-                stmt.execute("create database " + wikiName);
+                stmt.execute("create database " + wikiName.replace('-','_'));
             }
 
             endTransaction(context, true);

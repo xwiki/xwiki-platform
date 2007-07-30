@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
+ * Copyright 2006, XpertNet SARL, and individual contributors as indicated
  * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
@@ -72,7 +72,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
         // Adding the rule which will allow this module to be called on each page view
         if ("1".equals(context.getWiki().Param("xwiki.stats","1")))
-         context.getWiki().getNotificationManager().addGeneralRule(new XWikiActionRule(this));
+         context.getWiki().getNotificationManager().addGeneralRule(new XWikiActionRule(this, true, true));
     }
 
     /**
@@ -163,6 +163,10 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
         // Unless this is a "view", "save" or "download" action, we are not interested
         if (!(action.equals("view")||action.equals("save")||action.equals("download")))
             return;
+
+        if (findCookie(context)) {
+            return;
+        }
 
         // Let's save in the session the last elements view, saved
         synchronized (this) {
@@ -290,6 +294,29 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
         }
     }
 
+    /**
+      * Try to find the cookie of the current request or create it
+      *
+      * @param context The context of this request.
+      * @return The visiting session, retrieved from the database or created.
+      */
+    private boolean findCookie(XWikiContext context) {
+        if (context.get("stats_cookie")!=null)
+         return false;
+
+        Cookie cookie = Util.getCookie("visitid", context);
+        boolean newcookie = false;
+
+        // If the cookie does not exist we need to set it
+        if (cookie==null) {
+            cookie = addCookie(context);
+            newcookie = true;
+        }
+
+        context.put("stats_cookie", cookie);
+        context.put("stats_newcookie", new Boolean(newcookie));
+        return true;
+    }
 
     /**
       * Try to find the visiting session of the current request, or create a new one
@@ -315,14 +342,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
         VisitStats vobject = (VisitStats) session.getAttribute("visitObject");
 
         Date nowDate = new Date();
-        Cookie cookie = Util.getCookie("visitid", context);
-        boolean newcookie = false;
-
-        // If the cookie does not exist we need to set it
-        if (cookie==null) {
-            cookie = addCookie(context);
-            newcookie = true;
-        }
+        Cookie cookie = (Cookie) context.get("stats_cookie");
+        boolean newcookie = ((Boolean)context.get("stats_newcookie")).booleanValue();
 
         if (vobject==null) {
            if (!newcookie) {

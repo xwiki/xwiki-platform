@@ -1956,6 +1956,15 @@ public class XWiki extends Api
         return xwiki.formatDate(date, format, getXWikiContext());
     }
 
+    /*
+     Allow to read user setting providing the user timezone
+     All dates will be expressed with this timezone
+     @return the timezone
+    */
+    public String getUserTimeZone() {
+        return xwiki.getUserTimeZone(context);
+    }
+
     /**
      * Returns a plugin from the plugin API. Plugin Rights can be verified. Note that although
      * this API is a duplicate of {@link #getPlugin(String)} it used to provide an easy access

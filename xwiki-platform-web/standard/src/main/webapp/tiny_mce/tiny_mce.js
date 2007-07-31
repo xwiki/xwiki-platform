@@ -1063,7 +1063,11 @@ TinyMCE_Engine.prototype = {
 					tinyMCE.selectedInstance.switchSettings();
 
 				// Insert P element
-				if (tinyMCE.isGecko && tinyMCE.settings['force_p_newlines'] && e.keyCode == 13 && !e.shiftKey) {
+                var selectedDiv = tinyMCE.getParentElement(tinyMCE.selectedInstance.selection.getFocusElement(), "div");
+                if (tinyMCE.isGecko && tinyMCE.settings['force_p_newlines'] && e.keyCode == 13 && !e.shiftKey) {
+                    if (selectedDiv && (selectedDiv.className == 'code')) {
+                        return false;
+                    }
 					// Insert P element instead of BR
 					if (TinyMCE_ForceParagraphs._insertPara(tinyMCE.selectedInstance, e)) {
 						// Cancel event
@@ -1085,15 +1089,16 @@ TinyMCE_Engine.prototype = {
 				}
 
 				// Return key pressed
-				if (tinyMCE.isMSIE && tinyMCE.settings['force_br_newlines'] && e.keyCode == 13) {
-					if (e.target.editorId)
+				if (tinyMCE.isMSIE && selectedDiv && (selectedDiv.className == 'code') && e.keyCode == 13 && !e.shiftKey) {
+                    if (e.target.editorId)
 						tinyMCE.selectedInstance = tinyMCE.instances[e.target.editorId];
 
 					if (tinyMCE.selectedInstance) {
-						var sel = tinyMCE.selectedInstance.getDoc().selection;
+                        var sel = tinyMCE.selectedInstance.getDoc().selection;
 						var rng = sel.createRange();
 
-						if (tinyMCE.getParentElement(rng.parentElement(), "li") != null)
+
+                        if (tinyMCE.getParentElement(rng.parentElement(), "li") != null)
 							return false;
 
 						// Cancel event
@@ -1101,7 +1106,7 @@ TinyMCE_Engine.prototype = {
 						e.cancelBubble = true;
 
 						// Insert BR element
-						rng.pasteHTML("<br />");
+						rng.pasteHTML("<br />&nbsp;");
 						rng.collapse(false);
 						rng.select();
 

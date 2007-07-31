@@ -798,7 +798,7 @@ WikiEditor.prototype.getTitleControl = function(button_name) {
             '<option value="4">{$lang_wiki_title_4}</option>' +
             '<option value="5">{$lang_wiki_title_5}</option>' +
             '<option value="6">{$lang_wiki_code}</option>' +
-            '<option value="7">{$lang_wiki_velocity_comment}</option>' +
+            //'<option value="7">{$lang_wiki_velocity_comment}</option>' +
            '</select>';
 }
 

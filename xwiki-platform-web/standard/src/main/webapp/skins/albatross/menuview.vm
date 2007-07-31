@@ -81,7 +81,7 @@
 ##
 ## Delete menu
 ##
-#if((!$doc.isNew()) && $hasadmin)
+#if((!$doc.isNew()) && $xwiki.checkAccess($doc.fullName, "delete"))
 #xwikitopmenuentry($doc.getURL("delete", $languageparams) $msg.get("core.menu.delete") "tmDelete")
 #end
 ##

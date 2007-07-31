@@ -132,8 +132,7 @@ public class XWiki extends Api
     public boolean checkAccess(String docname, String right)
     {
         try {
-            XWikiDocument doc = new XWikiDocument();
-            doc.setFullName(docname, getXWikiContext());
+            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, context);
             return getXWikiContext().getWiki().checkAccess(right, doc, getXWikiContext());
         } catch (XWikiException e) {
             return false;

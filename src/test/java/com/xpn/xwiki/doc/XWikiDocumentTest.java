@@ -19,12 +19,16 @@
  */
 package com.xpn.xwiki.doc;
 
+import java.util.Date;
+
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.Mock;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -37,6 +41,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
     private XWikiDocument document;
     private Mock mockXWiki;
     private Mock mockXWikiRenderingEngine;
+    private Mock mockXWikiVersioningStore;
     
     protected void setUp()
     {
@@ -45,11 +50,20 @@ public class XWikiDocumentTest extends MockObjectTestCase
 
         this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
             new Object[] {new XWikiConfig(), this.context});
+        this.mockXWiki.stubs().method("Param").will(returnValue(null));
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
+        
+        this.mockXWikiVersioningStore =
+            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class,
+            XWikiContext.class}, new Object[] {this.mockXWiki.proxy(), this.context});
+        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
+            returnValue(null));
 
         this.mockXWiki.stubs().method("getRenderingEngine").will(returnValue(
             this.mockXWikiRenderingEngine.proxy()));
+        this.mockXWiki.stubs().method("getVersioningStore").will(
+            returnValue(this.mockXWikiVersioningStore.proxy()));
         
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
@@ -78,5 +92,35 @@ public class XWikiDocumentTest extends MockObjectTestCase
             .with(eq("Title"), ANYTHING, ANYTHING).will(returnValue("Title"));
 
         assertEquals("Title", this.document.getDisplayTitle(this.context));
+    }
+    
+    public void testAuthorAfterDocumentCopy() throws XWikiException
+    {
+        String author = "Albatross";
+        this.document.setAuthor(author);
+        XWikiDocument copy =
+            this.document.copyDocument(this.document.getName() + " Copy", this.context);
+
+        assertTrue(author.equals(copy.getAuthor()));
+    }
+
+    public void testCreatorAfterDocumentCopy() throws XWikiException
+    {
+        String creator = "Condor";
+        this.document.setCreator(creator);
+        XWikiDocument copy =
+            this.document.copyDocument(this.document.getName() + " Copy", this.context);
+
+        assertTrue(creator.equals(copy.getCreator()));
+    }
+    
+    public void testCreationDateAfterDocumentCopy() throws XWikiException, InterruptedException
+    {
+        Date sourceCreationDate = this.document.getCreationDate();
+        Thread.sleep(1000);
+        XWikiDocument copy =
+            this.document.copyDocument(this.document.getName() + " Copy", this.context);
+        
+        assertTrue(copy.getCreationDate().equals(sourceCreationDate));
     }
 }

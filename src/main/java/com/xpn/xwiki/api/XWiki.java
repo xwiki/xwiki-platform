@@ -1130,10 +1130,7 @@ public class XWiki extends Api
      */
     public boolean copyDocument(String docname, String targetdocname) throws XWikiException
     {
-        if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, targetdocname, null, null, null, false,
-                getXWikiContext());
-        return false;
+        return this.copyDocument(docname, targetdocname, null, null, null, false, false);
     }
 
     /**
@@ -1148,10 +1145,7 @@ public class XWiki extends Api
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage)
         throws XWikiException
     {
-        if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, targetdocname, null, null, wikilanguage, false,
-                getXWikiContext());
-        return false;
+        return this.copyDocument(docname, targetdocname, null, null, wikilanguage, false, false);
     }
 
     /**
@@ -1168,10 +1162,8 @@ public class XWiki extends Api
     public boolean copyDocument(String docname, String sourceWiki, String targetWiki,
         String wikilanguage) throws XWikiException
     {
-        if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage,
-                true, getXWikiContext());
-        return false;
+        return this.copyDocument(docname, docname, sourceWiki, targetWiki, wikilanguage, true,
+            false);
     }
 
     /**
@@ -1189,10 +1181,8 @@ public class XWiki extends Api
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki,
         String targetWiki, String wikilanguage, boolean reset) throws XWikiException
     {
-        if (hasProgrammingRights())
-            return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki,
-                wikilanguage, reset, getXWikiContext());
-        return false;
+        return this.copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage,
+            reset, false);
     }
 
     /**
@@ -1212,9 +1202,10 @@ public class XWiki extends Api
         String targetWiki, String wikilanguage, boolean reset, boolean force)
         throws XWikiException
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             return xwiki.copyDocument(docname, targetdocname, sourceWiki, targetWiki,
-                wikilanguage, reset, force, getXWikiContext());
+                wikilanguage, reset, force, true, getXWikiContext());
+        }
         return false;
     }
 

@@ -3249,6 +3249,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         String targetWiki, String wikilanguage, boolean reset, boolean force, XWikiContext context)
         throws XWikiException
     {
+        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force,
+            false, context);
+    }
+
+    public boolean copyDocument(String docname, String targetdocname, String sourceWiki,
+        String targetWiki, String wikilanguage, boolean reset, boolean force, boolean resetCreationData,
+        XWikiContext context)
+        throws XWikiException
+    {
         String db = context.getDatabase();
         if (sourceWiki == null)
             sourceWiki = db;
@@ -3285,6 +3294,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
+                    }
+                    if (resetCreationData) {
+                        tdoc.setCreationDate(new Date());
+                        tdoc.setCreator(context.getUser());
+                        tdoc.setAuthor(context.getUser());
                     }
                     if (targetWiki != null)
                         tdoc.setDatabase(targetWiki);
@@ -3341,6 +3355,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         if (reset) {
                             ttdoc.setVersion("1.1");
                         }
+                        if (resetCreationData) {
+                            ttdoc.setCreationDate(new Date());
+                            ttdoc.setCreator(context.getUser());
+                            ttdoc.setAuthor(context.getUser());
+                        }
                         if (targetWiki != null)
                             ttdoc.setDatabase(targetWiki);
                         saveDocument(ttdoc, context);
@@ -3368,6 +3387,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // forget past versions
                     if (reset) {
                         tdoc.setVersion("1.1");
+                    }
+                    if (resetCreationData) {
+                        tdoc.setCreationDate(new Date());
+                        tdoc.setCreator(context.getUser());
+                        tdoc.setAuthor(context.getUser());
                     }
 
                     if (targetWiki != null)

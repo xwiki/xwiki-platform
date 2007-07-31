@@ -3241,7 +3241,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         String targetWiki, String wikilanguage, boolean reset, XWikiContext context)
         throws XWikiException
     {
-        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, true,
+        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset,
             false, context);
     }
 

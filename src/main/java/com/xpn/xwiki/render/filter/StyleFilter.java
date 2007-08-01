@@ -38,14 +38,13 @@ import java.io.Writer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MacroFilter extends RegexTokenFilter
+public class StyleFilter extends RegexTokenFilter
 {
     private static Log log = LogFactory.getLog(MacroFilter.class);
     private MacroRepository macros;
 
-    public MacroFilter() {
-        super("\\{([^:}]+)(?::([^\\}]*))?\\}(.*?)\\{\\1\\}", SINGLELINE);
-        addRegex("\\{([^:}]+)(?::([^\\}]*))?\\}", "", MULTILINE);
+    public StyleFilter() {
+        super("\\{(style)(?::([^\\}]*))?\\}(.*)\\{style}", MULTILINE);
     }
 
     public void setInitialContext(InitialRenderContext context)
@@ -84,34 +83,54 @@ public class MacroFilter extends RegexTokenFilter
 
           // @DANGER: recursive calls may replace macros in included source code
             try {
-               if (getMacroRepository().containsKey(command)) {
+                if (command.equals("style")&&(mParams.getContent()!=null)) {
+                    // We need to handle recursivity here
+                    String content = mParams.getContent();
+                    Pattern pattern = Pattern.compile("\\{" + command + ".*?\\}");
+
+                    // This code allows to find the real end tag
+                    Matcher matcher = pattern.matcher(content);
+                    int startTagNumber = 1;
+                    int endPosition = content.length();
+                    while (matcher.find()) {
+                       String match = matcher.group();
+                       if (match.equals("{" + command + "}")) {
+                           startTagNumber--;
+                           if (startTagNumber==0) {
+                               endPosition = matcher.start();
+                               break;
+                           }
+                       } else {
+                           startTagNumber++;
+                       }
+                    }
+
+                    // Get the content up to the real end tag
+                    String realContent = content.substring(0, endPosition);
+
+                    // Execute any nested macros and filters
+                    mParams.setContent(realContent);
+                    Writer writer = new StringBufferWriter(buffer);
+                    Macro macro = (Macro) getMacroRepository().get(command);
+                    // Execute the macro resulting content
+                    macro.execute(writer, mParams);
+
+                    if (content.length()!=endPosition) {
+                        // Get the content after the real end tag
+                        String nextContent = content.substring(endPosition + 2 + command.length()) + "{style}";
+                        // Execute other macros on content after the real end tag
+                        writer.append(nextContent);
+                    }
+                } else if (getMacroRepository().containsKey(command)) {
                     Macro macro = (Macro) getMacroRepository().get(command);
                     // recursively filter macros within macros
                     if (null != mParams.getContent()) {
-                        // Only recursively evaluate nested macros if the current macro isn't the code
-                        // macro as we don't want any substitution for the code macro.
-                        if (!command.equals("code")) {
-                            mParams.setContent(filter(mParams.getContent(), context));
-                        }
+                        mParams.setContent(mParams.getContent());
                     }
 
                     Writer writer = new StringBufferWriter(buffer);
                     macro.execute(writer, mParams);
-                } else if (command.startsWith("!")) {
-                    // @TODO including of other snips
-                    RenderEngine engine = context.getRenderContext().getRenderEngine();
-                    if (engine instanceof IncludeRenderEngine) {
-                        String include = ((IncludeRenderEngine) engine).include(command.substring(1));
-                if (null != include) {
-                  // Filter paramFilter = new ParamFilter(mParams);
-                  // included = paramFilter.filter(included, null);
-                  buffer.append(include);
                 } else {
-                  buffer.append(command.substring(1) + " not found.");
-                }
-              }
-              return;
-            } else {
               buffer.append(result.group(0));
               return;
             }

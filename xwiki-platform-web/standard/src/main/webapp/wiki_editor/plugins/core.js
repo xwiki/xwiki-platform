@@ -1290,7 +1290,7 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     if (type == "span" || type =="div") {
         var attributes = this.readAttributes(result[2]);
         if (type == 'div') {
-            str += "\r\n";
+            // str += "\r\n";
         }
         str += "{style:type=" + type;
 
@@ -1333,7 +1333,7 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
         str += result[3];
         str += "{style}";
         if (type == 'div') {
-            str += "\r\n";
+            // str += "\r\n";
         }
     }
     // alert("str = " + str);

@@ -13,7 +13,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor(/<div\s*([^>]*)(class=\"code\")\s*([^>]*)>\s*<pre>([\s\S]+?)<\/pre>\s*<\/div>/i, 'convertCodeMacroInternal');
 
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
-	this.addInternalProcessor((/\s*<h[1-7]\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h[1-7]>/i), 'convertHeadingInternal');
+	this.addInternalProcessor((/<h[1-7]\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h[1-7]>/i), 'convertHeadingInternal');
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;<\/p>/gi), "");
 
@@ -914,8 +914,10 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 		line = lines[i];
 		var hh = this._hasHTML(line);
         var hbr = this._onlyHasBr(line);
+        line = line.replace(/(\r$)|(\n$)|(\r\n$)/gi, "");
+
         if(line != "" && (!hh || hbr)) {
-			if(!insideP) {
+            if(!insideP) {
 				insideP=true;
 				firstLine = true;
 				str += '<p class="' + this.PARAGRAPH_CLASS_NAME + '" >\r\n';
@@ -925,7 +927,7 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 			firstLine = false;
 			continue;
 		} else if(insideP) {
-			insideP = false;
+            insideP = false;
 			str += '<\/p>\r\n';
 		}
 		if(hh) {

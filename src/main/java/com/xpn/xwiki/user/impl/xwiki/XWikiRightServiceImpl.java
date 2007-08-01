@@ -37,7 +37,8 @@ import org.apache.commons.logging.LogFactory;
 
 import java.util.*;
 
-public class XWikiRightServiceImpl implements XWikiRightService {
+public class XWikiRightServiceImpl implements XWikiRightService
+{
     private static final Log log = LogFactory.getLog(XWikiRightServiceImpl.class);
     private static Map actionMap;
     private static List allLevels = Arrays.asList(
@@ -144,9 +145,12 @@ public class XWikiRightServiceImpl implements XWikiRightService {
                     user = new XWikiUser(context.getUser());
 
                 if ((user == null) && (needsAuth)) {
-                    if (context.getRequest() != null)
-                        context.getWiki().getAuthService().showLogin(context);
                     logDeny("unauthentified", doc.getFullName(), action, "Authentication needed");
+                    if (context.getRequest() != null) {
+                        if (!context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
+                            context.getWiki().getAuthService().showLogin(context);
+                        }
+                    }
                     return false;
                 }
             } catch (XWikiException e) {
@@ -189,9 +193,10 @@ public class XWikiRightServiceImpl implements XWikiRightService {
 
         if (user == null) {
 // Denied Guest need to be authenticated
-            logDeny("unauthentified", (doc==null) ? "" : doc.getFullName(), action, "Guest has been denied - Redirecting to authentication");
-            if (context.getRequest() != null)
+            logDeny("unauthentified", (doc==null) ? "" : doc.getFullName(), action, "Guest has been denied");
+            if (context.getRequest() != null && !context.getWiki().Param("xwiki.hidelogin", "false").equalsIgnoreCase("true")) {
                 context.getWiki().getAuthService().showLogin(context);
+            }
             return false;
         } else {
             logDeny(username, doc.getFullName(), action, "access manager denied right");

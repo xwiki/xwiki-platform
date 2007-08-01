@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.securityfilter.authenticator.FormAuthenticator;
 import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
+import org.securityfilter.filter.URLPatternMatcher;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,7 +88,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
 
         // process any persistent login information, if user is not already logged in,
         // persistent logins are enabled, and the persistent login info is present in this request
-        if (persistentLoginManager != null && persistentLoginManager.rememberingLogin(request)) {
+        if (persistentLoginManager != null) {
             String username = convertUsername(persistentLoginManager.getRememberedUsername(request, response), context);
             String password = persistentLoginManager.getRememberedPassword(request, response);
 
@@ -108,6 +109,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             String username = convertUsername(request.getParameter(FORM_USERNAME), context);
             String password = request.getParameter(FORM_PASSWORD);
             String rememberme = request.getParameter(FORM_REMEMBERME);
+            rememberme = (rememberme==null) ? "false" : rememberme;
             return processLogin(username, password, rememberme, request, response, context);
         }
         return false;
@@ -192,4 +194,15 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
     public static Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
         return context.getWiki().getAuthService().authenticate(username, password, context);
     }
+
+    public boolean processLogout(SecurityRequestWrapper securityRequestWrapper, HttpServletResponse httpServletResponse, URLPatternMatcher urlPatternMatcher) throws Exception {
+        boolean result = super.processLogout(securityRequestWrapper, httpServletResponse, urlPatternMatcher);    //To change body of overridden methods use File | Settings | File Templates.
+        if (result==true) {
+              if (persistentLoginManager!=null) {
+                  persistentLoginManager.forgetLogin(securityRequestWrapper, httpServletResponse);
+              }
+        }
+        return result;
+    }
+
 }

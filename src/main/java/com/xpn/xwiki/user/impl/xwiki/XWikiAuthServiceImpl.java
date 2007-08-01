@@ -193,6 +193,10 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         XWikiAuthenticator auth = getAuthenticator(context);
         SecurityRequestWrapper wrappedRequest =
             new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
+        // We need to make we will not user the principal
+        // associated with the app server session
+        wrappedRequest.setUserPrincipal(null);
+
         try {
 
             // Process login out (this only works with FORMS
@@ -302,11 +306,16 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
          * this would probably be to throw XWikiException-s.
          */
 
+        if (username==null) {
+            // If we can't find the username field then we are probably on the login screen
+            return null;
+        }
+
         // Trim the username to allow users to enter their names with spaces before or after
         String cannonicalUsername = username.replaceAll(" ", "");
 
         // Check for empty usernames
-        if ((cannonicalUsername == null) || (cannonicalUsername.equals(""))) {
+        if (cannonicalUsername.equals("")) {
             context.put("message", "nousername");
             return null;
         }

@@ -231,10 +231,14 @@ public class XWikiServletRequest implements XWikiRequest {
     }
 
     public String getRemoteAddr() {
+	if (request.getHeader("x-forwarded-for") != null)
+	    return request.getHeader("x-forwarded-for");
         return request.getRemoteAddr();
     }
 
     public String getRemoteHost() {
+	if (request.getHeader("x-forwarded-for") != null)
+	    return request.getHeader("x-forwarded-for");
         return request.getRemoteHost();
     }
 

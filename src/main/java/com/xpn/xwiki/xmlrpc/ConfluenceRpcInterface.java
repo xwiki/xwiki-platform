@@ -25,7 +25,7 @@ import java.util.Map;
 
 /**
  * Implement the <a href="http://confluence.atlassian.com/display/DOC/Remote+API+Specification">
- * Confluence XML-RPC interface</a>. Provides all the operations that can be done remotelty on a
+ * Confluence XML-RPC interface</a>. Provides all the operations that can be done remotely on a
  * XWiki instance using the XML-RPC protocol.
  * 
  * <p>

@@ -24,6 +24,13 @@ package com.xpn.xwiki.xmlrpc;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * This helper class is not referenced (yet)
+ * (ConfluenceRpcInterface.getServerInfo throws "Not implemented" exception) 
+ * 
+ * The parameters here are somehow different than the ones given here:
+ * http://docs.atlassian.com/software/jira/docs/api/rpc-jira-plugin/latest/com/atlassian/jira/rpc/soap/beans/RemoteServerInfo.html 
+ */
 public class ServerInfo
 {
     private int majorVersion;
@@ -43,7 +50,7 @@ public class ServerInfo
         Map params = new HashMap();
         params.put("majorVersion", new Integer(getMajorVersion()));
         params.put("minorVersion", new Integer(getMinorVersion()));
-        params.put("patcheLevel", new Integer(getPatchLevel()));
+        params.put("patchLevel", new Integer(getPatchLevel()));
         params.put("buildId", getBuildId());
         params.put("developmentBuild", new Boolean(isDevelopmentBuild()));
         params.put("baseUrl", getBaseUrl());

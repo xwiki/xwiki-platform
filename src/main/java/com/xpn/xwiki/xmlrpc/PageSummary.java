@@ -67,7 +67,7 @@ public class PageSummary
         this.setId(doc.getFullName());
         this.setSpace(doc.getSpace());
         this.setParentId(doc.getParent());
-        this.setTitle(doc.getFullName());
+        this.setTitle(doc.getName());
         this.setUrl(doc.getURL("view", context));
         this.setLocks(0);
     }

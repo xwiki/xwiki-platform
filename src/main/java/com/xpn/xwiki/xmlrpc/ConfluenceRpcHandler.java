@@ -179,6 +179,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         checkToken(token, context);
 
         XWikiDocument doc = new XWikiDocument(spaceKey, "WebHome");
+        // TODO Note that there is no description or name saved anywere
+        // so they are just made up using the spaceKey
         return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome"))
             .getParameters();
     }
@@ -390,8 +392,20 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
             // Verify authentication token
             checkToken(token, context);
-
-            XWikiDocument document = xwiki.getDocument(page.getId(), context);
+            XWikiDocument document = null;
+            // Check whether pageid is set (save page scenario)
+            if (page.getId() != null) {
+            	document = xwiki.getDocument(page.getId(), context);
+            } else {            	
+            	/* Create a new Page.
+            	 * [Space, Title, Content] fields are mandatory.
+            	 * If any of the get methods return null, a null pointer exception will trigger.
+            	 * This will make sure that the user supply those minimum params. A better solution would
+            	 * be to check the parameters and throw an exception appropriately (with an explanation). 
+            	 */ 
+            	document = new XWikiDocument(page.getSpace(), page.getTitle());
+            	document.setContent(page.getContent());
+            }
             context.setDoc(document);
             xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
                 .get("vcontext"));

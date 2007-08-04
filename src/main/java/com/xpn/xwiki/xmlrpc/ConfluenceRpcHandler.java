@@ -98,10 +98,18 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     private void checkToken(String token, XWikiContext context) throws XWikiException
     {
-        RemoteUser user = null;
-        String ip = context.getRequest().getRemoteAddr();
-        if (token != null)
-            user = (RemoteUser) getTokens(context).get(token);
+    	RemoteUser user = null;
+    	String ip = context.getRequest().getRemoteAddr();
+        
+        if (token != null) {
+        	if (!token.equals("")) {
+        		user = (RemoteUser) getTokens(context).get(token);
+        	} else {
+        		// anonymous access
+            	user = new RemoteUser("XWiki.XWikiGuest", ip);
+        	}
+        }
+        
         if ((user == null) || (!user.ip.equals(ip))) {
             Object[] args = {token, ip};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -110,6 +118,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
                 null,
                 args);
         }
+
         context.setUser(user.username);
     }
 

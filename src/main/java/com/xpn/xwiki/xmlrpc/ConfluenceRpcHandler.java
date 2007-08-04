@@ -184,8 +184,38 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome"))
             .getParameters();
     }
-
+    
     /**
+     *  {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.xmlrpc.ConfluenceRpcInterface#removeSpace(java.lang.String, java.lang.String)
+     */
+    public boolean removeSpace(String token, String spaceKey) throws XWikiException {
+    	XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        context.setAction("delete");
+        
+        // Verify authentication token
+        checkToken(token, context);
+        
+        // Retrieve names of all the child pages under this space
+        List docs =
+            xwiki.getStore().searchDocumentsNames(
+                "where doc.web='" + Utils.SQLFilter(spaceKey) + "'", context);
+        
+        // Delete each page individually
+        for (int i = 0; i < docs.size(); i++) {
+        	String docname = (String) docs.get(i);
+            XWikiDocument doc = xwiki.getDocument(docname, context);
+            context.setDoc(doc);
+            xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+                .get("vcontext"));
+            context.getWiki().deleteDocument(doc, context);
+        }        
+    	return true;
+	}
+
+	/**
      * {@inheritDoc}
      * 
      * @see ConfluenceRpcInterface#getPages(String, String)

@@ -110,6 +110,16 @@ public interface ConfluenceRpcInterface
      */
     Map addSpace(String token, Map spaceProperties) throws XWikiException;
 
+    /**
+     * Remove a space completely by removing all of it's child documents.
+     * 
+     * @param token the authentication token retrieved when calling the login method
+     * @param spaceKey the space to be deleted
+     * @return whether the operation suceeded or not
+     * @throws XWikiException in case of error
+     */
+    boolean removeSpace(String token, String spaceKey) throws XWikiException;
+    
     // Page Retrieval
 
     /**

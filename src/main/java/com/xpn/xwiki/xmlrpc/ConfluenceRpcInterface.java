@@ -216,9 +216,10 @@ public interface ConfluenceRpcInterface
      * 
      * @param token the authentication token retrieved when calling the login method
      * @param pageId id of page to delete
+     * @return whether the page deletion was successful or not
      * @throws XWikiException in case of error
      */
-    void deletePage(String token, String pageId) throws XWikiException;
+    boolean removePage(String token, String pageId) throws XWikiException;
 
     // Search
 

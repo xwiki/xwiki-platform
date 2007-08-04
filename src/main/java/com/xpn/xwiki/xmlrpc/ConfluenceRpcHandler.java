@@ -458,7 +458,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
      * 
      * @see ConfluenceRpcInterface#deletePage(String, String)
      */
-    public void deletePage(String token, String pageId) throws XWikiException
+    public boolean removePage(String token, String pageId) throws XWikiException
     {
         XWikiContext context = null;
         context = getXWikiContext();
@@ -473,6 +473,9 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
             .get("vcontext"));
         context.getWiki().deleteDocument(document, context);
+        // false is never be returned from this function,
+        // instead an exception is thrown in case of error.
+        return true;
     }
 
     /**

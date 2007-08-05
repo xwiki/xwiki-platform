@@ -52,6 +52,14 @@ public class PageHistorySummary
         this.modified = document.getDate();
         this.modifier = document.getAuthor();
     }
+    
+    public PageHistorySummary(Map parameters)
+    {
+    	this.id = (String)parameters.get("id");
+    	this.version = ((Integer)parameters.get("version")).intValue();
+    	this.modified = (Date)parameters.get("modified");
+    	this.modifier = (String)parameters.get("modifier");
+    }
 
     Map getParameters()
     {

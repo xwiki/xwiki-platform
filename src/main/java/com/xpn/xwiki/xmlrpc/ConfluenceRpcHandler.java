@@ -316,7 +316,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         for (int i = 0; i < doclist.size(); i++) {
             String docname = (String) doclist.get(i);
             XWikiDocument document = xwiki.getDocument(docname, context);
-            SearchResult sresult = new SearchResult(document);
+            SearchResult sresult = new SearchResult(document, context);
             result.add(sresult.getParameters());
         }
         return result.toArray();
@@ -432,18 +432,27 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             // Verify authentication token
             checkToken(token, context);
             XWikiDocument document = null;
-            // Check whether pageid is set (save page scenario)
+
             if (page.getId() != null) {
+            	// page id is set -> save page
             	document = xwiki.getDocument(page.getId(), context);
-            } else {            	
-            	/* Create a new Page.
-            	 * [Space, Title, Content] fields are mandatory.
-            	 * If any of the get methods return null, a null pointer exception will trigger.
-            	 * This will make sure that the user supply those minimum params. A better solution would
-            	 * be to check the parameters and throw an exception appropriately (with an explanation). 
-            	 */ 
-            	document = new XWikiDocument(page.getSpace(), page.getTitle());
-            	document.setContent(page.getContent());
+            } else {
+            	// page id not set -> create new page or overwrite existing one
+            	String space = page.getSpace();
+            	String title = page.getTitle();
+            	if (space == null || title == null) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_XMLRPC,
+                            XWikiException.ERROR_XWIKI_UNKNOWN,
+                            "Space and title argument are required when calling storePage with no id");
+            	}
+            	
+            	// if page already exists then overwrite it
+            	document = xwiki.getDocument(space+"."+title, context);
+            	
+            	if (document == null) {
+            		// otherwise create a new page
+                	document = new XWikiDocument(space, title);
+            	}
             }
             context.setDoc(document);
             xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context

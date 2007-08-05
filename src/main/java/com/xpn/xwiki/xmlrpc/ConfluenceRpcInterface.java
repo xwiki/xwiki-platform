@@ -24,7 +24,7 @@ import com.xpn.xwiki.XWikiException;
 import java.util.Map;
 
 /**
- * Implement the <a href="http://confluence.atlassian.com/display/DOC/Remote+API+Specification">
+ * Implements the <a href="http://confluence.atlassian.com/display/DOC/Remote+API+Specification">
  * Confluence XML-RPC interface</a>. Provides all the operations that can be done remotely on a
  * XWiki instance using the XML-RPC protocol.
  * 
@@ -35,7 +35,6 @@ import java.util.Map;
  * </p>
  * 
  * @version $Id: $
- * @todo rename deletePage to removePage
  * @todo add missing functionality to fully support version 2.0 of Remote API Specification
  */
 public interface ConfluenceRpcInterface
@@ -57,7 +56,8 @@ public interface ConfluenceRpcInterface
 
     /**
      * Logs the user into XWiki. The security token which is returned is used in all subsequent
-     * method calls.
+     * method calls. You can supply an empty string as the token to be treated as being the
+     * anonymous user (XWiki.XWikiGuest).
      * 
      * @param username the username of the person logged in as
      * @param password the appropriate password

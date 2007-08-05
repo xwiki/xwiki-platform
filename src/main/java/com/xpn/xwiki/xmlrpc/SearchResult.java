@@ -21,6 +21,7 @@
 
 package com.xpn.xwiki.xmlrpc;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.util.Map;
@@ -47,18 +48,27 @@ public class SearchResult
         setType(type);
     }
 
-    public SearchResult(XWikiDocument document)
+    public SearchResult(XWikiDocument document, XWikiContext context)
     {
-        setTitle(document.getFullName());
+        setTitle(document.getName());
         setId(document.getFullName());
-        setUrl("http://127.0.0.1:9080/xwiki/bin/view/" + document.getSpace() + "/"
-            + document.getName());
+        setUrl(document.getURL("view", context));
         setType("page");
         String content = document.getContent();
+        // TODO is this a good way to generate excerpts?
         if (content.length() <= 256)
             setExcerpt(content);
         else
             setExcerpt(content.substring(0, 256));
+    }
+    
+    public SearchResult(Map parameters)
+    {
+    	setTitle((String)parameters.get("title"));
+    	setUrl((String)parameters.get("url"));
+    	setExcerpt((String)parameters.get("excerpt"));
+    	setId((String)parameters.get("id"));
+    	setType((String)parameters.get("type"));
     }
 
     Map getParameters()

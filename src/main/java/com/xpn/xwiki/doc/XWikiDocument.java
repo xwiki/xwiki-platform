@@ -2165,19 +2165,10 @@ public class XWikiDocument
                 docel.add(bclass.toXML(null));
             }
 
-            // Add Objects
-            // Objects are in a vector, held in map by className: className -> vector(objects)
-            // To generate consistent XML, we want to work through the classes in order,
-            // and then the objects for each class type in order.
-            // xWikiObjects should be a TreeMap (and is, provided it was created in this class,
-            // and not set externally using setxWikiObjects), so the keys should already be sorted by className
+            // Add Objects (THEIR ORDER IS MOLDED IN STONE!)
             Iterator it = getxWikiObjects().values().iterator();
             while (it.hasNext()) {
                 Vector objects = (Vector) it.next();
-
-                // Use the ElementComparator to sort BaseObjects contained within
-                // the vector by name
-                Collections.sort(objects, new ElementComparator());
                 
                 for (int i = 0; i < objects.size(); i++) {
                     BaseObject obj = (BaseObject) objects.get(i);

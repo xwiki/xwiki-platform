@@ -48,7 +48,7 @@ public class CommentAddAction extends XWikiAction {
             if (doc.isNew()) {
                 return true;
             } else {
-                String className = "XWiki.XWikiComments";
+                String className = baseclass.getName(); // XWiki.XWikiComments
                 int nb = doc.createNewObject(className, context);
                 BaseObject oldobject = doc.getObject(className, nb);
                 BaseObject newobject = (BaseObject) baseclass.fromMap(oform.getObject(className), oldobject);

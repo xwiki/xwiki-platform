@@ -284,4 +284,10 @@ public interface ConfluenceRpcInterface
      * @throws XWikiException in case of error
      */
     void addUserToGroup(String token, String username, String groupname) throws XWikiException;
+    
+    public Map addComment(String token, Map commentParams)  throws XWikiException;
+    
+    public Map getComment(String token, String commentId) throws XWikiException;
+    
+    public boolean removeComment(String token, String commentId) throws XWikiException;
 }

@@ -26,8 +26,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
-import java.util.Vector;
-
 public class ObjectRemoveAction extends XWikiAction {
 	public boolean action(XWikiContext context) throws XWikiException {
         XWiki xwiki = context.getWiki();
@@ -37,12 +35,8 @@ public class ObjectRemoveAction extends XWikiAction {
 
         String className = ((ObjectRemoveForm) form).getClassName();
         int classId = ((ObjectRemoveForm) form).getClassId();
-        Vector objects = doc.getObjects(className);
-        BaseObject object = (BaseObject)objects.get(classId);
-        // Remove it from the object list
-        objects.set(classId, null);
-        doc.addObjectsToRemove(object);
-        doc.setAuthor(context.getUser());
+        BaseObject obj = doc.getObject(className, classId);
+        doc.removeObject(obj);
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), context);
 
         // forward to edit

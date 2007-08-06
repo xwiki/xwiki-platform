@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -168,8 +169,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         for (int i = 0; i < webs.size(); i++) {
             String web = (String) webs.get(i);
             SpaceSummary spacesum =
-                new SpaceSummary(web, web, "http://127.0.0.1:9080/xwiki/bin/view/" + web
-                    + "/WebHome");
+                new SpaceSummary(web, web,  xwiki.getURL(web + ".WebHome", "view", context));
             spaces.add(spacesum.getParameters());
         }
         return spaces.toArray();
@@ -188,7 +188,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         checkToken(token, context);
 
         XWikiDocument doc = new XWikiDocument(spaceKey, "WebHome");
-        // TODO Note that there is no description or name saved anywere
+        // TODO Note that there is no description or name saved
         // so they are just made up using the spaceKey
         return (new Space(spaceKey, spaceKey, doc.getURL("view", context), spaceKey, "WebHome"))
             .getParameters();
@@ -359,8 +359,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
      */
     public Object[] getAttachments(String token, String pageId) throws XWikiException
     {
-        XWikiContext context = null;
-        context = getXWikiContext();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         context.setAction("view");
 
@@ -389,8 +388,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
      */
     public Object[] getComments(String token, String pageId) throws XWikiException
     {
-        XWikiContext context = null;
-        context = getXWikiContext();
+        XWikiContext context = getXWikiContext();
         XWiki xwiki = context.getWiki();
         context.setAction("view");
 
@@ -402,16 +400,22 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
             .get("vcontext"));
 
-        List commentlist = document.getObjects("XWiki.XWikiComments");
+        List commentlist = document.getObjects(xwiki.getCommentsClass(context).getName());
         if (commentlist != null) {
             ArrayList result = new ArrayList(commentlist.size());
             for (int i = 0; i < commentlist.size(); i++) {
-                Comment comment = new Comment(document, (BaseObject) commentlist.get(i), context);
-                result.add(comment);
+            	BaseObject obj = (BaseObject)commentlist.get(i);
+            	if (obj != null) {
+            		// checking for null values here is crucial
+            		// because old comments are just set to null
+                    Comment comment = new Comment(document, obj, context);                    
+                    result.add(comment.getParameters());
+            	}
             }
             return result.toArray();
+        } else {
+        	return new Object[0];
         }
-        return new Object[0];
     }
 
     /**
@@ -615,8 +619,104 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         // Set space settings
         space.setUrl(document.getURL("view", context));
-        space.setHomepage(new Long(document.getId()).toString());
+        space.setHomepage(new Long(document.getId()).toString()); // TODO: What is this?
 
         return space.getParameters();
+    }
+    
+    /**
+     * Returns a comment given a comment id
+     * 
+     * @see ConfluenceRpcInterface#getComment(String, String)
+     */
+    public Map getComment(String token, String commentId) throws XWikiException
+    {
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        context.setAction("view");
+        
+        checkToken(token, context);
+        
+        // split the comment id in two parts: document name and comment number
+        String fullDocName = commentId.substring(0, commentId.indexOf(":"));
+        int nb = (new Integer(commentId.substring(commentId.indexOf(":")+1))).intValue();
+        
+        XWikiDocument doc = xwiki.getDocument(fullDocName, context);
+        context.setDoc(doc);
+        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+            .get("vcontext"));
+        
+        BaseObject obj = doc.getObject(xwiki.getCommentsClass(context).getName(), nb);
+
+    	return (new Comment(doc, obj, context)).getParameters();
+    }
+    
+    /**
+     * Adds a comment to a page.
+     * 
+     * @see ConfluenceRpcInterface#addComment(String, java.util.Map)
+     */
+    public Map addComment(String token, Map commentParams) throws XWikiException
+    {
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        context.setAction("commentadd");
+        
+        checkToken(token, context);
+        
+        Comment comment = new Comment(commentParams); 
+        XWikiDocument doc = xwiki.getDocument(comment.getPageId(), context);
+        context.setDoc(doc);
+        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+            .get("vcontext"));
+
+        Map map = new HashMap();
+        map.put("author", context.getUser());
+        map.put("date", ""); // dummy value needed
+        map.put("comment", comment.getContent());
+        
+        // Q: does this really have to be so complex ?
+        // (taken from CommentAddAction)
+        BaseClass baseclass = xwiki.getCommentsClass(context);
+        String className = baseclass.getName();
+        int nb = doc.createNewObject(className, context);
+        BaseObject oldobject = doc.getObject(className, nb);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(map, oldobject);
+
+        newobject.setNumber(oldobject.getNumber());
+        newobject.setName(doc.getFullName());
+        doc.setObject(className, nb, newobject);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), context);
+        
+        return (new Comment(doc, newobject, context)).getParameters();
+    }
+    
+    /**
+     * Removes a comment given a comment id
+     * 
+     * @see ConfluenceRpcInterface#getComment(String, String)
+     */
+    public boolean removeComment(String token, String commentId) throws XWikiException
+    {
+        XWikiContext context = getXWikiContext();
+        XWiki xwiki = context.getWiki();
+        context.setAction("view");
+        
+        checkToken(token, context);
+        
+        // split the comment id in two parts: document name and comment number
+        String fullDocName = commentId.substring(0, commentId.indexOf(":"));
+        int nb = (new Integer(commentId.substring(commentId.indexOf(":")+1))).intValue();
+        
+        XWikiDocument doc = xwiki.getDocument(fullDocName, context);
+        context.setDoc(doc);
+        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
+            .get("vcontext"));
+        
+        BaseObject obj = doc.getObject(xwiki.getCommentsClass(context).getName(), nb);
+        doc.removeObject(obj);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.deleteObject"), context);
+
+    	return true;
     }
 }

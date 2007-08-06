@@ -26,6 +26,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Comment
 {
@@ -45,16 +47,40 @@ public class Comment
 
     public Comment(XWikiDocument doc, BaseObject obj, XWikiContext context)
     {
-        setId("" + obj.getNumber());
+        setId(doc.getFullName() + ":" + obj.getNumber());
         setPageId(doc.getFullName());
-        setTitle(obj.getStringValue("title"));
-        setContent(obj.getStringValue("content"));
-        // setDate(obj.getDateValue("created"));
-        setCreator(obj.getStringValue("creator"));
+        setTitle(doc.getName());
+        setContent(obj.getStringValue("comment"));
+        setCreated(obj.getDateValue("date"));
+        setCreator(obj.getStringValue("author"));
         setUrl(doc.getURL("view", context));
     }
 
-    public String getId()
+    public Comment(Map parameters)
+    {
+    	setId((String)parameters.get("id"));
+    	setPageId((String)parameters.get("pageId"));
+    	setTitle((String)parameters.get("title"));
+    	setContent((String)parameters.get("content"));
+    	setUrl((String)parameters.get("url"));
+    	setCreated((Date)parameters.get("created"));
+    	setCreator((String)parameters.get("creator"));
+	}
+    
+	public Map getParameters()
+	{
+        Map params = new HashMap();
+        params.put("id", getId());
+        params.put("pageId", getPageId());
+        params.put("title", getTitle());
+        params.put("content", getContent());
+        params.put("url", getUrl());
+        params.put("created", getCreated());
+        params.put("creator", getCreator());
+        return params;
+    }
+	
+	public String getId()
     {
         return id;
     }

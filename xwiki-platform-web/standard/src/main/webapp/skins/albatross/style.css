@@ -10,6 +10,7 @@
 @import "presentation.css"; 
 @import "colorsblack.css";
 /*@import "ie.css";   masque temporairement : modif spécifique IE à réintéger*/
+@import "fullscreenEdit.css";
 
 /* Styles for custom hand written <table> tables */
 @import "css/table/table.css";

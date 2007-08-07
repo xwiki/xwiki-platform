@@ -13,7 +13,7 @@
 </div> ## hidden
 <div id="xwikitext">
 <div id="xwikieditcontent">
-<div>
+<div id="xwikieditcontentinner">
 #template("simpleedittoolbar.vm")
 $xwiki.getTextArea($tdoc.content)
 #*
@@ -34,3 +34,4 @@ function endresize(){
 ## #template("tagedit.vm")
 </div> ## noname
 <div class="bottombuttons">#template("editactions.vm")</div>
+<script type="text/javascript">fullscreenEdit("wiki");</script>

@@ -1,0 +1,115 @@
+#show-dialog-btn {
+	background: url(fullscreen_img/fullscreen22.gif);
+	width: 20px;
+	height: 20px;
+	cursor: pointer;
+	position: relative;
+	top: -8px;
+	left: -12px;
+	float:right;
+}
+	
+#fullscreen-dlg {
+	display:none;
+	position:absolute;
+	top:0px;
+	left:0px;
+	bottom: 0px;
+	right: 0px;
+	margin: 0px auto;
+	z-index:30000;
+	background-color:#fff;
+	width: 100%;
+	height: 97%;
+	padding: 0px;
+}
+
+#fullscreen-dlg-head{
+	background: url(fullscreen_img/hd-sprite.gif) repeat-x 0 -82px;
+	background-color:navy;
+	color:#FFF;
+	font:bold 12px "sans serif", tahoma, verdana, helvetica;
+	padding: 5px;
+	overflow: hidden;
+	white-space: nowrap;
+	width: 100%;
+}
+
+#fullscreen-dlg-body {
+	background-color: #9cbbe9;
+	color: #fff;
+	width: 100%;
+	height: 100%;
+	border:1px solid #6593cf;
+	border-top:0 none;
+	/*padding:10px;*/
+	position:absolute;
+	top:25px;
+	left:0;
+	overflow:hidden;
+}
+
+#fullscreen-dlg-body-tab {
+	background-color: #fff;
+	border:1px solid #6593cf;
+	position: relative;
+	width: 97%;
+	margin: 10px auto;
+	height: 90%;
+	text-align:center;
+}
+
+
+
+#parentswapDiv {
+	width: 100%;
+	height: 100%;
+	text-align: center;
+}
+
+#swapDiv {
+	width: 100%;
+	height: 100%;
+}
+
+.backBtn {	
+	z-index: 30001;
+    position: relative;
+    left: 1.5%;
+	background: url(fullscreen_img/button.gif) no-repeat;
+	width:75px;
+	height: 20px;
+	cursor:pointer;
+}
+
+#closeBtn {
+	float:right;
+    height:15px;
+	width:15px;
+	margin:0;
+    margin-right:10px;
+    padding:0;
+	line-height:1px;
+	font-size:1px;
+	background-repeat:no-repeat;
+	cursor:pointer;
+	background-image: url(fullscreen_img/close.gif);
+}
+
+.btnText {
+	text-align:center;
+	font:12px "sans serif", tahoma, verdana, helvetica;
+	color: #fff;
+	padding-top: 1px;
+}
+
+
+.titleText {
+	float:left;
+    height:15px;
+	width:15px;
+	margin:0;
+    margin-left:2px;
+    padding:0;
+	cursor:pointer;
+}

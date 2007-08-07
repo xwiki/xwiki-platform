@@ -41,7 +41,10 @@ $xwiki.getTextArea($tdoc.content)
             wiki_macro_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
             wiki_plugins: 'core,attachments,macros'
 });
-} else {
-        alert("$msg.get('browsernoncompatible')");
-}
+     
+   } else {
+            alert("$msg.get('browsernoncompatible')");
+	  }
 </script>
+## fullscreen editing
+<script type="text/javascript">fullscreenEdit("wysiwyg");</script>

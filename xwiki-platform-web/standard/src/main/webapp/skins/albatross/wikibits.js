@@ -302,6 +302,7 @@ function escapeQuotesHTML(text) {
 function insertTags(tagOpen, tagClose, sampleText) {
 
 	var txtarea = document.forms.edit.content;
+	if(!txtarea) txtarea = document.getElementById("content");
 	// IE
 	if(document.selection  && !is_gecko) {
 		var theSelection = document.selection.createRange().text;

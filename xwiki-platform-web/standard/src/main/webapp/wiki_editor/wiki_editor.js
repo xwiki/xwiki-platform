@@ -78,7 +78,7 @@ WikiEditor.prototype.init = function(params) {
     if((params["wiki_editor_toolbar"] == null) || (params["wiki_editor_toolbar"].toString() == "")) {
         params["wiki_editor_toolbar"] = "texttoolbar, justifytoolbar, listtoolbar, indenttoolbar, undotoolbar, titletoolbar, styletoolbar, "
                                         + "horizontaltoolbar, symboltoolbar, attachmenttoolbar, macrostoolbar, tabletoolbar, "
-                                        + "tablerowtoolbar, tablecoltoolbar, linktoolbar";
+                                        + "tablerowtoolbar, tablecoltoolbar, linktoolbar, togglebutton";
     }
     // if don't have this param then it's always default by wiki_tab
 
@@ -298,7 +298,7 @@ WikiEditor.prototype.convertExternal = function(content) {
 	and returning a Wiki Syntax equivalent.
 */
 WikiEditor.prototype.convertInternal = function(content) {
-	var regexp, r;
+    var regexp, r;
 	var lines;
 	var lastIndex;
     content = content.replace(/\$(\d)/g, "&#036;$1");
@@ -521,5 +521,28 @@ WikiEditor.prototype.trimRNString = function(str) {
 
     return str;
 }
+
+WikiEditor.prototype.toolbars = ["texttoolbar", "justifytoolbar", "listtoolbar", "indenttoolbar", "undotoolbar", "titletoolbar", "styletoolbar",
+                                         "horizontaltoolbar", "symboltoolbar", "attachmenttoolbar", "macrostoolbar", "tabletoolbar",
+                                         "tablerowtoolbar", "tablecoltoolbar", "linktoolbar", "suptoolbar"];
+
+WikiEditor.prototype.disableButtonsInWikiMode = function(editor_id) {
+    for (var i=0; i< this.toolbars.length; i++) {
+        var toolbar = document.getElementById(this.toolbars[i]);
+        if (toolbar) {
+            toolbar.style.display = "none";
+        }
+    }
+}
+
+WikiEditor.prototype.showButtonsInWywisygMode = function(editor_id) {
+    for (var i=0; i< this.toolbars.length; i++) {
+        var toolbar = document.getElementById(this.toolbars[i]);
+        if (toolbar) {
+            toolbar.style.display = "inline";
+        }
+    }
+}
+
 <!-- Initilization global variable and include core editor -->
 wikiEditor = new WikiEditor();

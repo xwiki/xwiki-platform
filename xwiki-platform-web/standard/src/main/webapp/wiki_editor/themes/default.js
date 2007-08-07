@@ -19,57 +19,60 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
         var toolbar = this.trimString(toolbars[i]);
         switch (toolbar) {
             case "texttoolbar":
-                str += this.getTextToolbar();
+                str += "<span id='texttoolbar'>" + this.getTextToolbar() + "</span>";
                 break;
             case "justifytoolbar":
-                str += this.TOOLBAR_SPACER + this.getJustifyToolbar();
+                str += "<span id='justifytoolbar'>" + this.TOOLBAR_SPACER + this.getJustifyToolbar() + "</span>";
                 break;
             case "listtoolbar":
-                str += this.TOOLBAR_SPACER + this.getListToolbar();
+                str += "<span id='listtoolbar'>" + this.TOOLBAR_SPACER + this.getListToolbar()+ "</span>";
                 break;
             case "indenttoolbar":
-                str += this.TOOLBAR_SPACER + this.getTabToolbar();
+                str += "<span id='indenttoolbar'>" + this.TOOLBAR_SPACER + this.getTabToolbar() + "</span>";
                 break;
             case "undotoolbar":
-                str += this.TOOLBAR_SPACER + this.getUndoToolbar();
+                str += "<span id='undotoolbar'>" + this.TOOLBAR_SPACER + this.getUndoToolbar() + "</span>";
                 break;
             case "titletoolbar":
-                str += this.TOOLBAR_SPACER + this.getTitleToolbar();
+                str += "<span id='titletoolbar'>" + this.TOOLBAR_SPACER + this.getTitleToolbar() + "</span>";
                 break;
             case "styletoolbar":
-                str += this.TOOLBAR_SPACER + this.getStyleToolbar();
+                str += "<span id='styletoolbar'>" + this.TOOLBAR_SPACER + this.getStyleToolbar() + "</span>";
                 break;
             case "horizontaltoolbar":
-                str += this.TOOLBAR_SPACER + this.getHorizontalruleControls() + this.getRemoveformatControls();
+                str += "<span id='horizontaltoolbar'>" + this.TOOLBAR_SPACER + this.getHorizontalruleControls() + this.getRemoveformatControls() + "</span>";
                 break;
             case "symboltoolbar":
-                str += this.getSymbolToolbar();
+                str += "<span id='symboltoolbar'>" + this.getSymbolToolbar() + "</span>";
                 break
             case "suptoolbar":
-                str += this.TOOLBAR_SPACER + this.getSupAndSubToolbar();
+                str += "<span id='suptoolbar'>" + this.TOOLBAR_SPACER + this.getSupAndSubToolbar() + "</span>";
                 break;
             case "tabletoolbar":
-                str += this.TOOLBAR_SPACER + this.getTableToolbar();
+                str += "<span id='tabletoolbar'>" + this.TOOLBAR_SPACER + this.getTableToolbar() + "</span>";
                 break;
             case "tablerowtoolbar":
-                str += this.TOOLBAR_SPACER + this.getTableRowToolbar();
+                str += "<span id='tablerowtoolbar'>" + this.TOOLBAR_SPACER + this.getTableRowToolbar() + "</span>";
                 break;
             case "tablecoltoolbar":
-                str += this.TOOLBAR_SPACER + this.getTableColToolbar();
+                str += "<span id='tablecoltoolbar'>" + this.TOOLBAR_SPACER + this.getTableColToolbar() + "</span>";
                 break;
             case "linktoolbar":
-                str += this.TOOLBAR_SPACER + this.getLinkToolbar();    
+                str += "<span id='linktoolbar'>" + this.TOOLBAR_SPACER + this.getLinkToolbar() + "</span>";
                 break;
             case "attachmenttoolbar":
                 if (this.isPluginLoaded("attachments")) {
-                    str += this.TOOLBAR_SPACER + this.getAttachmentsToolbar();
+                    str += "<span id='attachmenttoolbar'>" + this.TOOLBAR_SPACER + this.getAttachmentsToolbar() + "</span>";
                 }
                 break;
             case "macrostoolbar":
                 if (this.isPluginLoaded("macros")) {
-                    str += this.getMacrosToolbar();
+                    str += "<span id='macrostoolbar'>" + this.getMacrosToolbar() + "</span>";
                 }
                 break
+            case "togglebutton":
+                str += "<span id='togglebutton'>" + this.getToggleButton() + "</span>";
+                break;
         }
     }
     
@@ -77,6 +80,9 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
 			<tr><td align="center">\
 		    <span id="{$editor_id}">IFRAME</span>\
 		    </td></tr>\
+            <tr><td>\
+            <textarea name="wikisource" id="wikisource" cols="98" rows="23" style="display:none"></textarea>\
+            </td></tr>\
             </tbody></table>';
 	template['html'] = str;
 	template['delta_width'] = 0;

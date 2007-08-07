@@ -1,8 +1,9 @@
 // UK lang variables
 
 tinyMCELang['lang_theme_style_select'] = '-- Styles --';
-tinyMCELang['lang_theme_code_desc'] = 'Edit HTML Source';
-tinyMCELang['lang_theme_code_title'] = 'HTML Source Editor';
+tinyMCELang['lang_theme_code_desc'] = 'Edit WIKI Source ';
+tinyMCELang['lang_theme_switch_desc'] = 'Switch Editor ';
+tinyMCELang['lang_theme_code_title'] = 'WIKI Editor';
 tinyMCELang['lang_theme_code_wordwrap'] = 'Word wrap';
 tinyMCELang['lang_theme_sub_desc'] = 'Subscript';
 tinyMCELang['lang_theme_sup_desc'] = 'Superscript';

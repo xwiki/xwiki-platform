@@ -311,6 +311,22 @@ var TinyMCE_WikieditorTheme = {
                 tinyMCE.triggerNodeChange();
                 return true;
 
+             case "mceToggleEditor":
+                var ins = tinyMCE.selectedInstance;
+                var insDisplay = document.getElementById(ins.editorId).style.display;
+                if (!insDisplay || (insDisplay == "block")) {
+                    document.getElementById("wikisource").value = tinyMCE.getContent(tinyMCE.getWindowArg('editor_id'));
+                    document.getElementById(ins.editorId).style.display = "none";
+                    document.getElementById("wikisource").style.display = "block";
+                    wikiEditor.disableButtonsInWikiMode(editor_id);
+                } else {
+                    document.getElementById(ins.editorId).style.display = "block";
+                    tinyMCE.setContent(document.getElementById("wikisource").value);
+                    document.getElementById("wikisource").style.display = "none";
+                    wikiEditor.showButtonsInWywisygMode(editor_id);
+                }
+                return true;
+
             default :
                 return wikiEditor.execCommand(editor_id, element, command, user_interface, value);
         }

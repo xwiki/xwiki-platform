@@ -670,6 +670,10 @@ WikiEditor.prototype.getJustifyControls = function(button_name) {
     return str;
 }
 
+WikiEditor.prototype.getToggleButton = function() {
+    return this.createButtonHTML('code', 'switch.gif', 'lang_theme_switch_desc', 'mceToggleEditor');
+}
+
 WikiEditor.prototype.getSupAndSubToolbar = function() {
     return this.getSupAndSubControls('sup') + this.getSupAndSubControls('sub');
 }

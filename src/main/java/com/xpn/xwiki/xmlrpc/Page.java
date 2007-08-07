@@ -25,6 +25,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import java.util.Date;
 import java.util.Map;
 
+import org.suigeneris.jrcs.rcs.Version;
+
 /**
  * Represents a Page as described in the <a href="Confluence specification">
  * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
@@ -68,11 +70,16 @@ public class Page extends PageSummary
         this.setHomepage(homepage);
         this.setComment(comment);
     }
+    
+    public static int constructVersion(Version ver)
+    {
+        return ((ver.at(0)-1) << 16) + ver.at(1);
+    }
 
     public Page(XWikiDocument doc, XWikiContext context)
     {
         super(doc, context);
-        this.setVersion(doc.getRCSVersion().getNumbers()[1]);
+        this.setVersion(constructVersion(doc.getRCSVersion()));
         this.setContent(doc.getContent());
         this.setCreated(doc.getCreationDate());
         this.setCreator(doc.getAuthor());

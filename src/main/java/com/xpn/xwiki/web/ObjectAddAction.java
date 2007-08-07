@@ -63,7 +63,7 @@ public class ObjectAddAction extends XWikiAction {
         if (doc.isNew()) {
             doc.setCreator(username);
         }
-        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), context);
+        xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addObject"), true, context);
 
         // forward to edit
         String redirect = Utils.getRedirect("edit", context);

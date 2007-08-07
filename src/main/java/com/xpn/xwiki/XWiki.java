@@ -895,8 +895,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // If no comment is provided we should use an empty comment
         saveDocument(doc, "", context);
     }
+    
+    public void saveDocument(XWikiDocument doc, String comment, XWikiContext context) 
+        throws XWikiException
+    {
+        saveDocument(doc, comment, false, context);
+    }
 
-    public void saveDocument(XWikiDocument doc, String comment, XWikiContext context)
+    public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit, XWikiContext context)
         throws XWikiException
     {
         String server = null, database = null;
@@ -910,6 +916,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             // Setting comment before saving
             doc.setComment((comment == null) ? "" : comment);
+            doc.setMinorEdit(isMinorEdit);
 
             getStore().saveXWikiDoc(doc, context);
 
@@ -4952,6 +4959,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if ("0".equals(bl))
             return false;
         return "1".equals(Param("xwiki.editcomment.mandatory", "0"));
+    }
+    
+    public boolean hasMinorEdit(XWikiContext context)
+    {
+        String bl = getXWikiPreference("minoredit", "", context);
+        if ("1".equals(bl))
+            return true;
+        if ("0".equals(bl))
+            return false;
+        return "1".equals(Param("xwiki.minoredit", "1"));
     }
 
     /**

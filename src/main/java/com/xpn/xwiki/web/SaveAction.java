@@ -95,6 +95,7 @@ public class SaveAction extends PreviewAction {
                 tdoc.setContent(content);
                 tdoc.setTitle(title);
                 tdoc.setComment(sectionDoc.getComment());
+                tdoc.setMinorEdit(sectionDoc.isMinorEdit());
             }else{
 		    	tdoc.readFromForm((EditForm) form, context);
             }
@@ -110,7 +111,7 @@ public class SaveAction extends PreviewAction {
 
             // We get the comment to be used from the document
             // It was read using readFromForm
-            xwiki.saveDocument(tdoc, tdoc.getComment(), context);
+            xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
 			XWikiLock lock = tdoc.getLock(context);
 			if (lock != null)
 				tdoc.removeLock(context);

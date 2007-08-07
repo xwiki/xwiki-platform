@@ -99,16 +99,32 @@
             <column name="XWD_COMMENT" length="1023" not-null="true" />
         </property>
         
+        <property name="minorEdit1" type="boolean">
+            <column name="XWD_MINOREDIT" not-null="true" />
+        </property>
     </class>
 
-    <class name="com.xpn.xwiki.doc.XWikiDocumentArchive" table="xwikidoc">
-        <id name="id" type="long" unsaved-value="undefined">
-            <column name="XWD_ID" not-null="true"/>
-            <generator class="assigned" />
-        </id>
-        <property name="archive" type="string">
-            <column name="XWD_ARCHIVE" length="200000" not-null="false" />
-        </property>
+    <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">
+        <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
+            <key-property name="docId" column="XWR_DOCID" type="long" />
+            <key-property name="version1" column="XWR_VERSION1" type="integer" />
+            <key-property name="version2" column="XWR_VERSION2" type="integer" />
+        </composite-id>
+        <property name="date"    type="timestamp" column="XWR_DATE"    not-null="true" />
+        <property name="comment" type="text"      column="XWR_COMMENT" not-null="true" />
+        <property name="author"  type="string"    column="XWR_AUTHOR"  not-null="true" />
+        <property name="diff"    type="boolean"   column="XWR_ISDIFF"  not-null="false" update="false" insert="false" />
+    </class>
+    <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent" table="xwikircs">
+        <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
+            <key-property name="docId"    column="XWR_DOCID" type="long" />
+            <key-property name="version1" column="XWR_VERSION1" type="integer" />
+            <key-property name="version2" column="XWR_VERSION2" type="integer" />
+        </composite-id>
+        <component name="patch">
+        	<property name="diff" type="boolean" column="XWR_ISDIFF" not-null="false" />
+        	<property name="content" type="text" column="XWR_PATCH"  not-null="false" />
+        </component>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">

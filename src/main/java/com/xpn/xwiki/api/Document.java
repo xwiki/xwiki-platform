@@ -288,6 +288,11 @@ public class Document extends Api
     {
         return doc.getComment();
     }
+    
+    public boolean isMinorEdit()
+    {
+        return doc.isMinorEdit();
+    }
 
     /**
      * return the list of possible traduction for this document
@@ -362,7 +367,7 @@ public class Document extends Api
      */
     public String getArchive() throws XWikiException
     {
-        return doc.getDocumentArchive(getXWikiContext()).getArchive();
+        return doc.getDocumentArchive(getXWikiContext()).getArchive(getXWikiContext());
     }
 
     /**
@@ -687,6 +692,10 @@ public class Document extends Api
     public String[] getRecentRevisions(int nb) throws XWikiException
     {
         return doc.getRecentRevisions(nb, getXWikiContext());
+    }
+    
+    public RevisionInfo getRevisionInfo(String version) throws XWikiException {
+        return new RevisionInfo( doc.getRevisionInfo(version, getXWikiContext()), getXWikiContext() );
     }
 
     public List getAttachmentList()
@@ -1405,6 +1414,10 @@ public class Document extends Api
     public void setComment(String comment)
     {
         getDoc().setComment(comment);
+    }
+    
+    public void setMinorEdit(boolean isMinor) {
+        getDoc().setMinorEdit(isMinor);
     }
 
     public void save() throws XWikiException

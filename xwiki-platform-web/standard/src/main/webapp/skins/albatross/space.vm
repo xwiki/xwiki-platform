@@ -19,7 +19,7 @@ $string
 <hr/>
   <div id="breadcrumbs">
     <span class="breadcrumbspace"><a href="$spaceviewurl">$doc.web</a>: </span>
-#breadcrumb($doc "<a href='$doc.getURL('view')'>$doc.displayTitle</a>" 0)
+#breadcrumb($doc "<a href='$doc.getURL('view')'>$tdoc.displayTitle</a>" 0)
   </div>
 <hr/>
 </div>

@@ -78,28 +78,28 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     }
 
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
-        XWikiDocumentArchive archivedoc = doc.getDocumentArchive();
-        if (archivedoc != null)
-            return archivedoc;
+        XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
+        if (archiveDoc != null)
+            return archiveDoc;
         String key = ((doc.getDatabase()==null)?"xwiki":doc.getDatabase()) + ":" + doc.getFullName();
         synchronized (key) {
-            archivedoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
-            if (archivedoc==null) {
+            archiveDoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
+            if (archiveDoc==null) {
                 String db = context.getDatabase();
                 try {
                     if (doc.getDatabase()!=null)
                         context.setDatabase(doc.getDatabase());
-                    archivedoc = new XWikiDocumentArchive(doc.getId());
-                    loadXWikiDocArchive(archivedoc, true, context);
-                    doc.setDocumentArchive(archivedoc);
+                    archiveDoc = new XWikiDocumentArchive(doc.getId());
+                    loadXWikiDocArchive(archiveDoc, true, context);
+                    doc.setDocumentArchive(archiveDoc);
                 } finally {
                     context.setDatabase(db);
                 }
                 // This will also make sure that the Archive has a strong reference
                 // and will not be discarded as long as the context exists.
-                context.addDocumentArchive(key, archivedoc);
+                context.addDocumentArchive(key, archiveDoc);
             }
-            return archivedoc;
+            return archiveDoc;
         }
     }
 
@@ -119,18 +119,18 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             public Object doInHibernate(Session session) throws Exception
             {
                 for (Iterator it = archivedoc.getDeletedNodeInfo().iterator(); it.hasNext(); ) {
-                    XWikiRCSNodeInfo nodeinfo = (XWikiRCSNodeInfo) it.next();
-                    session.delete(nodeinfo);
+                    XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+                    session.delete(nodeInfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdetedNodeInfos().iterator(); it.hasNext(); ) {
-                    XWikiRCSNodeInfo nodeinfo = (XWikiRCSNodeInfo) it.next();
-                    session.saveOrUpdate(nodeinfo);
+                for (Iterator it = archivedoc.getUpdatedNodeInfos().iterator(); it.hasNext(); ) {
+                    XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+                    session.saveOrUpdate(nodeInfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdetedNodeContents().iterator(); it.hasNext(); ) {
-                    XWikiRCSNodeContent nodecontent = (XWikiRCSNodeContent) it.next();
-                    session.update(nodecontent);
+                for (Iterator it = archivedoc.getUpdatedNodeContents().iterator(); it.hasNext(); ) {
+                    XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
+                    session.update(nodeContent);
                     it.remove();
                 }
                 return null;
@@ -145,8 +145,8 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         
         XWikiDocumentArchive archive = getXWikiDocumentArchive(basedoc, context);
         Version ver = new Version(sversion);
-        XWikiRCSNodeInfo nodeinfo = archive.getNode(ver);
-        if (nodeinfo==null) {
+        XWikiRCSNodeInfo nodeInfo = archive.getNode(ver);
+        if (nodeInfo==null) {
             Object[] args = { doc.getFullName(), sversion };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
                 "Version {1} does not exist while reading document {0}", null, args);
@@ -154,14 +154,14 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         try {    
             Version nearestFullVersion = archive.getNearestFullVersion(ver);
             
-            List lstcontent = loadRCSNodeContents(context, archive, nearestFullVersion, ver, true);
-            List origtext = new ArrayList();
-            for (Iterator it = lstcontent.iterator(); it.hasNext();) {
-                XWikiRCSNodeContent nodecontent = (XWikiRCSNodeContent) it.next();
-                nodecontent.getPatch().patch(origtext);
+            List lstContent = loadRCSNodeContents(context, archive, nearestFullVersion, ver, true);
+            List origText = new ArrayList();
+            for (Iterator it = lstContent.iterator(); it.hasNext();) {
+                XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
+                nodeContent.getPatch().patch(origText);
             }
             
-            String content = ToString.arrayToString(origtext.toArray());
+            String content = ToString.arrayToString(origText.toArray());
             doc.fromXML(content);
             // Make sure the document has the same name
             // as the new document (in case there was a name change
@@ -169,10 +169,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             doc.setSpace(basedoc.getSpace());
             
             doc.setVersion(sversion);
-            doc.setComment(nodeinfo.getComment());
-            doc.setDate(nodeinfo.getDate());
-            doc.setAuthor(nodeinfo.getAuthor());
-            doc.setMinorEdit( nodeinfo.isMinorEdit() );
+            doc.setComment(nodeInfo.getComment());
+            doc.setDate(nodeInfo.getDate());
+            doc.setAuthor(nodeInfo.getAuthor());
+            doc.setMinorEdit( nodeInfo.isMinorEdit() );
             return doc;
         } catch (Exception e) {
             Object[] args = { basedoc.getFullName(), sversion };
@@ -201,10 +201,10 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException {
         try {
-            XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
-            archivedoc.updateArchive(doc.getAuthor(), doc.getDate(), doc.getComment(), doc.isMinorEdit(), doc, context);
-            doc.setVersion( archivedoc.getLatestVersion().toString() );
-            saveXWikiDocArchive(archivedoc, bTransaction, context);
+            XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
+            archiveDoc.updateArchive(doc.getAuthor(), doc.getDate(), doc.getComment(), doc.isMinorEdit(), doc, context);
+            doc.setVersion( archiveDoc.getLatestVersion().toString() );
+            saveXWikiDocArchive(archiveDoc, bTransaction, context);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
@@ -242,9 +242,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     {
         List result = new ArrayList();
         for (Iterator it=archive.getNodes(vfrom, vto).iterator(); it.hasNext(); ) {
-            XWikiRCSNodeInfo nodeinfo = (XWikiRCSNodeInfo) it.next();
-            XWikiRCSNodeContent nodecontent = nodeinfo.getContent(context);
-            result.add(nodecontent);
+            XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+            XWikiRCSNodeContent nodeContent = nodeInfo.getContent(context);
+            result.add(nodeContent);
         }
         return result;
     }

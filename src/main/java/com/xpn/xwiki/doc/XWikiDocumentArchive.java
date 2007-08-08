@@ -116,18 +116,18 @@ public class XWikiDocumentArchive
         XWikiRCSNodeContent result = new XWikiRCSNodeContent();
         result.setPatch(new XWikiPatch().setFullVersion(doc, context));
         newnode.setContent(result);
-        XWikiRCSNodeInfo latestnode = getLatestNode();
-        if (latestnode != null) {
-            int nodescount = getNodes().size();
-            int nodesperfull = context.getWiki() == null ? 5 : Integer.parseInt(
+        XWikiRCSNodeInfo latestNode = getLatestNode();
+        if (latestNode != null) {
+            int nodesCount = getNodes().size();
+            int nodesPerFull = context.getWiki() == null ? 5 : Integer.parseInt(
                 context.getWiki().getConfig().getProperty("xwiki.store.rcs.nodesPerFull", "5"));
-            if (nodesperfull <= 0 || (nodescount % nodesperfull) != 0) {
-                XWikiRCSNodeContent latestcontent = latestnode.getContent(context);
-                latestcontent.getPatch().setDiffVersion(doc, 
-                    latestcontent.getPatch().getContent(), context);
-                latestnode.setContent(latestcontent);
-                updateNode(latestnode);
-                getUpdetedNodeContents().add(latestcontent);
+            if (nodesPerFull <= 0 || (nodesCount % nodesPerFull) != 0) {
+                XWikiRCSNodeContent latestContent = latestNode.getContent(context);
+                latestContent.getPatch().setDiffVersion(doc, 
+                    latestContent.getPatch().getContent(), context);
+                latestNode.setContent(latestContent);
+                updateNode(latestNode);
+                getUpdatedNodeContents().add(latestContent);
             }
         }
         return result;
@@ -194,11 +194,11 @@ public class XWikiDocumentArchive
         resetArchive();
         Collection nodes = archive.getNodes(getId());
         for (Iterator it = nodes.iterator(); it.hasNext();) {
-            XWikiRCSNodeInfo    nodeinfo    = (XWikiRCSNodeInfo) it.next();
-            XWikiRCSNodeContent nodecontent = (XWikiRCSNodeContent) it.next();
-            updateNode(nodeinfo);
-            updatedNodeInfos.add(nodeinfo);
-            updatedNodeContents.add(nodecontent);
+            XWikiRCSNodeInfo    nodeInfo    = (XWikiRCSNodeInfo) it.next();
+            XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
+            updateNode(nodeInfo);
+            updatedNodeInfos.add(nodeInfo);
+            updatedNodeContents.add(nodeContent);
         }
     }
     /**
@@ -214,16 +214,16 @@ public class XWikiDocumentArchive
     public void updateArchive(String author, Date date, String comment, boolean isMinor, 
         XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        XWikiRCSNodeInfo newnode = new XWikiRCSNodeInfo(newNodeId(
+        XWikiRCSNodeInfo newNode = new XWikiRCSNodeInfo(newNodeId(
             createNextVersion(getLatestVersion(), isMinor)));
-        newnode.setAuthor(author);
-        newnode.setComment(comment);
-        newnode.setDate(date);
-        XWikiRCSNodeContent newcontent = makePatch(newnode, doc, context);
+        newNode.setAuthor(author);
+        newNode.setComment(comment);
+        newNode.setDate(date);
+        XWikiRCSNodeContent newContent = makePatch(newNode, doc, context);
         
-        updateNode(newnode);
-        updatedNodeInfos.add(newnode);
-        updatedNodeContents.add(newcontent);
+        updateNode(newNode);
+        updatedNodeInfos.add(newNode);
+        updatedNodeContents.add(newContent);
     }
     /**
      * Remove document versions from vfrom to vto, inclusive.
@@ -257,7 +257,7 @@ public class XWikiDocumentArchive
             ncto1.getPatch().setFullVersion(docto1, context);
             nito1.setContent(ncto1);
             updateNode(nito1);
-            getUpdetedNodeContents().add(ncto1);
+            getUpdatedNodeContents().add(ncto1);
         } else if (vto1 != null) {
             XWikiDocument docfrom1    = loadDocument(doc, vfrom1, context);
             XWikiDocument docto1      = loadDocument(doc, vto1, context);
@@ -266,7 +266,7 @@ public class XWikiDocumentArchive
             ncto1.getPatch().setDiffVersion(docfrom1, docto1, context);
             nito1.setContent(ncto1);
             updateNode(nito1);
-            getUpdetedNodeContents().add(ncto1);
+            getUpdatedNodeContents().add(ncto1);
         } // if (vto1==null) => nothing to do, except delete
         for (Iterator it = getNodes(vfrom0, vto0).iterator(); it.hasNext();) {
             XWikiRCSNodeInfo ni = (XWikiRCSNodeInfo) it.next();
@@ -355,12 +355,12 @@ public class XWikiDocumentArchive
         return deletedNodes;
     }
     /** @return mutable Set of {@link XWikiRCSNodeInfo} which are need for saveOrUpdate */
-    public Set getUpdetedNodeInfos()
+    public Set getUpdatedNodeInfos()
     {
         return updatedNodeInfos; 
     }
     /** @return mutable Set of {@link XWikiRCSNodeContent} which are need for update */
-    public Set getUpdetedNodeContents()
+    public Set getUpdatedNodeContents()
     {
         return updatedNodeContents; 
     }    

@@ -95,33 +95,33 @@ public class XWikiPatch
     }
     /**
      * Create difference patch for document curdoc, using origdoc as previous version.
-     * @param curdoc  - current document
-     * @param origdoc - original document
+     * @param curDoc  - current document
+     * @param origDoc - original document
      * @param context - used for serialization documents to xml
      * @return self
      * @throws XWikiException if any error
      */
-    public XWikiPatch setDiffVersion(XWikiDocument curdoc, XWikiDocument origdoc,
+    public XWikiPatch setDiffVersion(XWikiDocument curDoc, XWikiDocument origDoc,
         XWikiContext context) throws XWikiException
     {
-        return setDiffVersion(curdoc, origdoc.toXML(context), context);
+        return setDiffVersion(curDoc, origDoc.toXML(context), context);
     }
     /**
      * Create difference patch for document curdoc, using origdoc as previous version.
-     * @param curdoc     - current document
-     * @param origdocxml - xml of original document
+     * @param curDoc     - current document
+     * @param origDocXml - xml of original document
      * @param context    - used for serialization document to xml
      * @return self
      * @throws XWikiException if any error
      */
-    public XWikiPatch setDiffVersion(XWikiDocument curdoc, String origdocxml,
+    public XWikiPatch setDiffVersion(XWikiDocument curDoc, String origDocXml,
         XWikiContext context) throws XWikiException
     {
         setDiff(true);
         try {
-            setContent(XWikiPatchUtils.getDiff(curdoc.toXML(context), origdocxml));
+            setContent(XWikiPatchUtils.getDiff(curDoc.toXML(context), origDocXml));
         } catch (Exception e) {
-            Object[] args = {curdoc.getFullName()};
+            Object[] args = {curDoc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, 
                 XWikiException.ERROR_XWIKI_DIFF_XML_ERROR, 
                 "Failed to create diff for doc {}", e, args);
@@ -130,17 +130,17 @@ public class XWikiPatch
     }
     /**
      * patch text.
-     * @param origtext - text to patch
+     * @param origText - text to patch
      * @throws XWikiException if exception while patching
      */
-    public void patch(List origtext) throws XWikiException
+    public void patch(List origText) throws XWikiException
     {
         if (!isDiff()) {
-            origtext.clear();
-            origtext.addAll(new ArrayList(Arrays.asList(ToString.stringToArray(getContent()))));
+            origText.clear();
+            origText.addAll(new ArrayList(Arrays.asList(ToString.stringToArray(getContent()))));
         } else {
             try {
-                XWikiPatchUtils.patch(origtext, getContent());
+                XWikiPatchUtils.patch(origText, getContent());
             } catch (Exception e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, 
                     XWikiException.ERROR_XWIKI_DIFF_XML_ERROR, "Exception while patching", e);

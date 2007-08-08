@@ -55,13 +55,13 @@ public class XWikiRCSArchive extends Archive
         head = null;
         if (nodeInfos.size() > 0) {
             for (Iterator it = nodeInfos.iterator(); it.hasNext();) {
-                XWikiRCSNodeInfo nodeinfo = (XWikiRCSNodeInfo) it.next();
-                XWikiJRCSNode node = new XWikiJRCSNode(nodeinfo.getId().getVersion(), null);
-                node.setAuthor(nodeinfo.getAuthor());
-                node.setDate(nodeinfo.getDate());
-                node.setLog(nodeinfo.getComment());
-                node.setDiff(nodeinfo.isDiff());
-                XWikiRCSNodeContent content = nodeinfo.getContent(context);
+                XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+                XWikiJRCSNode node = new XWikiJRCSNode(nodeInfo.getId().getVersion(), null);
+                node.setAuthor(nodeInfo.getAuthor());
+                node.setDate(nodeInfo.getDate());
+                node.setLog(nodeInfo.getComment());
+                node.setDiff(nodeInfo.isDiff());
+                XWikiRCSNodeContent content = nodeInfo.getContent(context);
                 node.setText(content.getPatch().getContent());
                 nodes.put(node.getVersion(), node);
             }
@@ -81,12 +81,12 @@ public class XWikiRCSArchive extends Archive
     }
     /**
      * Used to deserialize {@link XWikiDocumentArchive}.
-     * @param archivetext - archive text in JRCS format
+     * @param archiveText - archive text in JRCS format
      * @throws ParseException if syntax errors
      */
-    public XWikiRCSArchive(String archivetext) throws ParseException
+    public XWikiRCSArchive(String archiveText) throws ParseException
     {
-        super("", new StringInputStream(archivetext));
+        super("", new StringInputStream(archiveText));
     }
     /**
      * Helper class for convert from {@link XWikiRCSNodeInfo} to JRCS {@link Node}.
@@ -125,7 +125,7 @@ public class XWikiRCSArchive extends Archive
         /** {@inheritDoc} */
         public void setAuthor(String user)
         {
-            // 
+            // empty author is error in jrcs
             if (user == null || "".equals(user)) {
                 super.setAuthor(sauthorIfEmpty);
             } else {
@@ -151,17 +151,17 @@ public class XWikiRCSArchive extends Archive
         Collection result = new ArrayList(nodes.values().size());
         for (Iterator it = nodes.values().iterator(); it.hasNext();) {
             XWikiJRCSNode node = new XWikiJRCSNode((Node) it.next());
-            XWikiRCSNodeInfo nodeinfo = new XWikiRCSNodeInfo();
-            nodeinfo.setId(new XWikiRCSNodeId(docId, node.getVersion()));
-            nodeinfo.setAuthor(XWikiJRCSNode.sauthorIfEmpty.equals(node.getAuthor())
+            XWikiRCSNodeInfo nodeInfo = new XWikiRCSNodeInfo();
+            nodeInfo.setId(new XWikiRCSNodeId(docId, node.getVersion()));
+            nodeInfo.setAuthor(XWikiJRCSNode.sauthorIfEmpty.equals(node.getAuthor())
                 ? "" : node.getAuthor());
-            nodeinfo.setComment(node.getLog());
-            nodeinfo.setDate(node.getDate());
-            nodeinfo.setDiff(node.isDiff());
-            XWikiRCSNodeContent content = new XWikiRCSNodeContent(nodeinfo.getId());
+            nodeInfo.setComment(node.getLog());
+            nodeInfo.setDate(node.getDate());
+            nodeInfo.setDiff(node.isDiff());
+            XWikiRCSNodeContent content = new XWikiRCSNodeContent(nodeInfo.getId());
             content.setPatch(new XWikiPatch(ToString.arrayToString(node.getText()), node.isDiff()));
-            nodeinfo.setContent(content);
-            result.add(nodeinfo);
+            nodeInfo.setContent(content);
+            result.add(nodeInfo);
             result.add(content);
         }
         // ensure latest version is full

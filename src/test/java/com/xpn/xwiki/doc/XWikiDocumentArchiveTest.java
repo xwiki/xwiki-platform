@@ -164,34 +164,34 @@ public class XWikiDocumentArchiveTest extends MockObjectTestCase
         archive.updateArchive(author, new Date(), "initial, 1.1", false, doc, context);
         String archive11 = archive.getArchive(context);
         assertEquals(1, archive.getNodes().size());
-        assertEquals(1, archive.getUpdetedNodeInfos().size());
-        assertEquals(1, archive.getUpdetedNodeContents().size());
+        assertEquals(1, archive.getUpdatedNodeInfos().size());
+        assertEquals(1, archive.getUpdatedNodeContents().size());
         
         XWikiDocumentArchive archive2 = new XWikiDocumentArchive(doc.getId());
         archive2.setArchive(archive11);
         assertEquals(archive11, archive2.getArchive(context));
         assertEquals(1, archive2.getNodes().size());
-        assertEquals(1, archive2.getUpdetedNodeInfos().size());
-        assertEquals(1, archive2.getUpdetedNodeContents().size());
+        assertEquals(1, archive2.getUpdatedNodeInfos().size());
+        assertEquals(1, archive2.getUpdatedNodeContents().size());
         
         doc.setContent("content\n1.2");
         archive.updateArchive(author, new Date(), "1.2", true, doc, context);
         String archive12 = archive.getArchive(context);
         assertEquals(2, archive.getNodes().size());
-        assertEquals(2, archive.getUpdetedNodeInfos().size());
-        assertEquals(2, archive.getUpdetedNodeContents().size());
+        assertEquals(2, archive.getUpdatedNodeInfos().size());
+        assertEquals(2, archive.getUpdatedNodeContents().size());
         
         XWikiDocumentArchive archive3 = new XWikiDocumentArchive(doc.getId());
         archive3.setArchive(archive12);
         assertEquals(2, archive3.getNodes().size());
-        assertEquals(2, archive3.getUpdetedNodeInfos().size());
-        assertEquals(2, archive3.getUpdetedNodeContents().size());
+        assertEquals(2, archive3.getUpdatedNodeInfos().size());
+        assertEquals(2, archive3.getUpdatedNodeContents().size());
         
         doc.setContent("major change\ncontent\n2.1");
         archive.updateArchive(author, new Date(), "2.1", false, doc, context);
         assertEquals(3, archive.getNodes().size());
-        assertEquals(3, archive.getUpdetedNodeInfos().size());
-        assertEquals(3, archive.getUpdetedNodeContents().size());
+        assertEquals(3, archive.getUpdatedNodeInfos().size());
+        assertEquals(3, archive.getUpdatedNodeContents().size());
     }
     
     public void testRemoveVersions() throws XWikiException {

@@ -157,17 +157,17 @@ public class XWikiRCSNodeInfo implements Comparable
      */
     public XWikiRCSNodeContent getContent(XWikiContext context) throws XWikiException
     {
-        XWikiRCSNodeContent nodecontent = null;
+        XWikiRCSNodeContent nodeContent = null;
         if (contentRef != null) {
-            nodecontent = (XWikiRCSNodeContent) contentRef.get();
+            nodeContent = (XWikiRCSNodeContent) contentRef.get();
         }
-        if (nodecontent != null || context == null) {
-            return nodecontent;
+        if (nodeContent != null || context == null) {
+            return nodeContent;
         }
-        nodecontent = context.getWiki().getVersioningStore()
+        nodeContent = context.getWiki().getVersioningStore()
             .loadRCSNodeContent(context, this.id, true);
-        contentRef = new SoftReference(nodecontent);
-        return nodecontent;
+        contentRef = new SoftReference(nodeContent);
+        return nodeContent;
     }
     /**
      * @param content - {@link XWikiRCSNodeContent} for this node.

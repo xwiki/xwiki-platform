@@ -118,17 +118,17 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         executeWrite(context, bTransaction, new HibernateCallBack(){
             public Object doInHibernate(Session session) throws Exception
             {
-                for (Iterator it = archivedoc.getDeleteNodeInfo().iterator(); it.hasNext(); ) {
+                for (Iterator it = archivedoc.getDeletedNodeInfo().iterator(); it.hasNext(); ) {
                     XWikiRCSNodeInfo nodeinfo = (XWikiRCSNodeInfo) it.next();
                     session.delete(nodeinfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdeteNodeInfos().iterator(); it.hasNext(); ) {
+                for (Iterator it = archivedoc.getUpdetedNodeInfos().iterator(); it.hasNext(); ) {
                     XWikiRCSNodeInfo nodeinfo = (XWikiRCSNodeInfo) it.next();
                     session.saveOrUpdate(nodeinfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdeteNodeContents().iterator(); it.hasNext(); ) {
+                for (Iterator it = archivedoc.getUpdetedNodeContents().iterator(); it.hasNext(); ) {
                     XWikiRCSNodeContent nodecontent = (XWikiRCSNodeContent) it.next();
                     session.update(nodecontent);
                     it.remove();
@@ -187,7 +187,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             {
                 XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
                 archive.resetArchive();
-                archive.getDeleteNodeInfo().clear();
+                archive.getDeletedNodeInfo().clear();
                 doc.setMinorEdit(false);
                 
                 session.createQuery("delete from "+XWikiRCSNodeInfo.class.getName()+" where id.docId=?")

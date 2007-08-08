@@ -4099,7 +4099,10 @@ public class XWikiDocument
         setMetaDataDirty(true);
     }
     
-    // methods for easy table update. because default value == null
+    // methods for easy table update. It is need only for hibernate.
+    // when hibernate update old database without minorEdit field, hibernate will create field with null in despite of notnull in hbm. (http://opensource.atlassian.com/projects/hibernate/browse/HB-1151) 
+    // so minorEdit will be null for old documents. But hibernate can't convert null to boolean.
+    // so we need convert Boolean to boolean
     protected Boolean getMinorEdit1()
     {
         return Boolean.valueOf(isMinorEdit);

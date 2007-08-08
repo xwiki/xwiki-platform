@@ -58,7 +58,7 @@ public class XWikiRCSNodeInfo implements Comparable
     /**
      * reference to its XWikiRCSNodeContent.
      */
-    private SoftReference contentref;
+    private SoftReference contentRef;
     /**
      * default constructor used in Hibernate to load this class.
      */
@@ -151,22 +151,22 @@ public class XWikiRCSNodeInfo implements Comparable
     }
 
     /**
-     * @return {@link XWikiRCSNodeInfo} for this node.
-     * @param context - load with this context. If null, do not load.
+     * @return {@link XWikiRCSNodeContent} for this node.
+     * @param context - load with this context. If null then do not load.
      * @throws XWikiException if can't load
      */
     public XWikiRCSNodeContent getContent(XWikiContext context) throws XWikiException
     {
         XWikiRCSNodeContent nodecontent = null;
-        if (contentref != null) {
-            nodecontent = (XWikiRCSNodeContent) contentref.get();
+        if (contentRef != null) {
+            nodecontent = (XWikiRCSNodeContent) contentRef.get();
         }
         if (nodecontent != null || context == null) {
             return nodecontent;
         }
         nodecontent = context.getWiki().getVersioningStore()
             .loadRCSNodeContent(context, this.id, true);
-        contentref = new SoftReference(nodecontent);
+        contentRef = new SoftReference(nodecontent);
         return nodecontent;
     }
     /**
@@ -175,7 +175,7 @@ public class XWikiRCSNodeInfo implements Comparable
     public void setContent(XWikiRCSNodeContent content)
     {
         content.setId(getId());
-        contentref = new SoftReference(content);
+        contentRef = new SoftReference(content);
         setDiff(content.getPatch().isDiff());
     }
 

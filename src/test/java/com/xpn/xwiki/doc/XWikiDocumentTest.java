@@ -95,7 +95,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
     }
     
     public void testMinorMajorVersions() {
-        // there is no version in doc yet, so 1.1
+        // there is no version in doc yet, so 1.0 = 1
         assertEquals("1", this.document.getVersion());
         
         this.document.setMinorEdit(false);

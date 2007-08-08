@@ -71,7 +71,7 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
             XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
             loadXWikiDocArchive(archivedoc, bTransaction, context);
             archivedoc.resetArchive();
-            archivedoc.getDeleteNodeInfo().clear();
+            archivedoc.getDeletedNodeInfo().clear();
             doc.setMinorEdit(false);
             updateXWikiDocArchive(doc, false, context);
             saveXWikiDocArchive(archivedoc, bTransaction, context);

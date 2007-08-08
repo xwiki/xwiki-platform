@@ -54,11 +54,11 @@ public class XWikiDocumentArchive
     
     // store-specific information
     /** Set of {@link XWikiRCSNodeInfo} which need to delete. */
-    private Set deleteNodes = new TreeSet();
+    private Set deletedNodes = new TreeSet();
     /** Set of {@link XWikiRCSNodeInfo} which need to saveOrUpdate. */
-    private Set updateNodeInfos = new TreeSet();
+    private Set updatedNodeInfos = new TreeSet();
     /** Set of {@link XWikiRCSNodeContent} which need to update. */
-    private Set updateNodeContents = new TreeSet();
+    private Set updatedNodeContents = new TreeSet();
     
     /** @param id = {@link XWikiDocument#getId()} */
     public XWikiDocumentArchive(long id) {
@@ -127,7 +127,7 @@ public class XWikiDocumentArchive
                     latestcontent.getPatch().getContent(), context);
                 latestnode.setContent(latestcontent);
                 updateNode(latestnode);
-                getUpdeteNodeContents().add(latestcontent);
+                getUpdetedNodeContents().add(latestcontent);
             }
         }
         return result;
@@ -197,8 +197,8 @@ public class XWikiDocumentArchive
             XWikiRCSNodeInfo    nodeinfo    = (XWikiRCSNodeInfo) it.next();
             XWikiRCSNodeContent nodecontent = (XWikiRCSNodeContent) it.next();
             updateNode(nodeinfo);
-            updateNodeInfos.add(nodeinfo);
-            updateNodeContents.add(nodecontent);
+            updatedNodeInfos.add(nodeinfo);
+            updatedNodeContents.add(nodecontent);
         }
     }
     /**
@@ -222,8 +222,8 @@ public class XWikiDocumentArchive
         XWikiRCSNodeContent newcontent = makePatch(newnode, doc, context);
         
         updateNode(newnode);
-        updateNodeInfos.add(newnode);
-        updateNodeContents.add(newcontent);
+        updatedNodeInfos.add(newnode);
+        updatedNodeContents.add(newcontent);
     }
     /**
      * Remove document versions from vfrom to vto, inclusive.
@@ -257,7 +257,7 @@ public class XWikiDocumentArchive
             ncto1.getPatch().setFullVersion(docto1, context);
             nito1.setContent(ncto1);
             updateNode(nito1);
-            getUpdeteNodeContents().add(ncto1);
+            getUpdetedNodeContents().add(ncto1);
         } else if (vto1 != null) {
             XWikiDocument docfrom1    = loadDocument(doc, vfrom1, context);
             XWikiDocument docto1      = loadDocument(doc, vto1, context);
@@ -266,12 +266,12 @@ public class XWikiDocumentArchive
             ncto1.getPatch().setDiffVersion(docfrom1, docto1, context);
             nito1.setContent(ncto1);
             updateNode(nito1);
-            getUpdeteNodeContents().add(ncto1);
+            getUpdetedNodeContents().add(ncto1);
         } // if (vto1==null) => nothing to do, except delete
         for (Iterator it = getNodes(vfrom0, vto0).iterator(); it.hasNext();) {
             XWikiRCSNodeInfo ni = (XWikiRCSNodeInfo) it.next();
             fullVersions.remove(ni.getId().getVersion());
-            deleteNodes.add(ni);
+            deletedNodes.add(ni);
             it.remove();
         }
     }
@@ -345,23 +345,23 @@ public class XWikiDocumentArchive
     {
         versionToNode.clear();
         fullVersions.clear();
-        deleteNodes.addAll(updateNodeInfos);
-        updateNodeInfos.clear();
-        updateNodeContents.clear();
+        deletedNodes.addAll(updatedNodeInfos);
+        updatedNodeInfos.clear();
+        updatedNodeContents.clear();
     }
     /** @return mutable Set of {@link XWikiRCSNodeInfo} which are need for delete  */
-    public Set getDeleteNodeInfo()
+    public Set getDeletedNodeInfo()
     {
-        return deleteNodes;
+        return deletedNodes;
     }
     /** @return mutable Set of {@link XWikiRCSNodeInfo} which are need for saveOrUpdate */
-    public Set getUpdeteNodeInfos()
+    public Set getUpdetedNodeInfos()
     {
-        return updateNodeInfos; 
+        return updatedNodeInfos; 
     }
     /** @return mutable Set of {@link XWikiRCSNodeContent} which are need for update */
-    public Set getUpdeteNodeContents()
+    public Set getUpdetedNodeContents()
     {
-        return updateNodeContents; 
+        return updatedNodeContents; 
     }    
 }

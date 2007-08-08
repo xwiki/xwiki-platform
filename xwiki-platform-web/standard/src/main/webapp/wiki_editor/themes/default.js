@@ -81,7 +81,7 @@ WikiEditor.prototype.getEditorTemplate = function(settings, editor_id) {
 		    <span id="{$editor_id}">IFRAME</span>\
 		    </td></tr>\
             <tr><td>\
-            <textarea name="wikisource" id="wikisource" cols="98" rows="23" style="display:none"></textarea>\
+            <textarea name="content" id="content" cols="98" rows="23" style="display:none"></textarea>\
             </td></tr>\
             </tbody></table>';
 	template['html'] = str;

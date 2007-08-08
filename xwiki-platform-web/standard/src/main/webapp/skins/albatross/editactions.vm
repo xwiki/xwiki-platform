@@ -7,6 +7,7 @@
 function checkDocumentContent() {
   if (document.forms.${formname}.content) { // There is a content editor
     if (window.wikiEditor!=null) {
+      wikiEditor.setContent(document.getElementById("content").value);  
       if (wikiEditor.getContent()=="") { // There is a wysiwyg editor, and it's content is empty
         alert("$msg.get('wikicontentcannotbeempty')");
         return false ;

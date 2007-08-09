@@ -16,22 +16,11 @@
 <div id="xwikieditcontentinner">
 #template("simpleedittoolbar.vm")
 $xwiki.getTextArea($tdoc.content)
-#*
-<script type="text/javascript">
-<!--
-function startresize(){
-  alert(1);
-}
-function endresize(){
-  alert(2);
-}
--->
-</script>
-<div id="resizeta" onstartdrag="startresize()" onenddrag="endresize()" ></div>
-*#
 </div></div> ## xwikieditcontent
 </div> ## xwikitext
 ## #template("tagedit.vm")
 </div> ## noname
 <div class="bottombuttons">#template("editactions.vm")</div>
-<script type="text/javascript">fullscreenEdit("wiki");</script>
+<script type="text/javascript">
+Event.observe(window, "load", function() {fullscreenEdit('wiki'); }, true);
+</script>

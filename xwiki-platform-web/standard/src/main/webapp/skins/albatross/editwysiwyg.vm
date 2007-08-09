@@ -47,4 +47,6 @@ $xwiki.getTextArea($tdoc.content)
 	  }
 </script>
 ## fullscreen editing
-<script type="text/javascript">fullscreenEdit("wysiwyg");</script>
+<script type="text/javascript">
+Event.observe(window, "load", function() {fullscreenEdit('wysiwyg'); }, true);
+</script>

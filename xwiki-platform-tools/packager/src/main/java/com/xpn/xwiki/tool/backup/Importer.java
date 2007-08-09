@@ -81,8 +81,6 @@ public class Importer extends AbstractPackager
         // very high chance of not making it...
         // TODO: Find a way to implement this generically for all databases and inside
         // XWikiHibernateStore (cf http://jira.xwiki.org/jira/browse/XWIKI-471).
-        // WARNING: This Packager may not work with databases other than HSQLDB because of this
-        // and this needs to be fixed ASAP...
         shutdownHSQLDB(context);
     }
 

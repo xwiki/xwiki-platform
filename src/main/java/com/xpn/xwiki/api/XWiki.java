@@ -35,6 +35,8 @@ import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import org.suigeneris.jrcs.diff.delta.Chunk;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -44,6 +46,8 @@ import java.util.*;
 
 public class XWiki extends Api
 {
+    protected static final Log LOG = LogFactory.getLog(XWiki.class);
+
     private com.xpn.xwiki.XWiki xwiki;
 
     /**
@@ -2103,6 +2107,7 @@ public class XWiki extends Api
         try {
             return xwiki.getURLContent(surl, username, password, context);
         } catch (Exception e) {
+            LOG.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
         }
     }
@@ -2119,6 +2124,7 @@ public class XWiki extends Api
         try {
             return xwiki.getURLContent(surl, context);
         } catch (Exception e) {
+            LOG.warn("Failed to retrieve content from [" + surl + "]", e);
             return "";
         }
     }

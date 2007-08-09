@@ -4574,7 +4574,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         if (timeout != 0) {
             client.getParams().setSoTimeout(timeout);
-            client.getParams().setParameter("http.connection.timeout", "" + timeout);
+            client.getParams().setParameter("http.connection.timeout", new Integer(timeout));
         }
 
         client.getParams().setParameter("http.useragent", userAgent);
@@ -4605,22 +4605,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String getURLContent(String surl, int timeout, String userAgent) throws IOException
     {
+        String content;
         HttpClient client = getHttpClient(timeout, userAgent);
-
-        // create a GET method that reads a file over HTTPS, we're assuming
-        // that this file requires basic authentication using the realm above.
         GetMethod get = new GetMethod(surl);
 
         try {
-            // execute the GET
-            int status = client.executeMethod(get);
-
-            // print the status and response
-            return get.getResponseBodyAsString();
+            client.executeMethod(get);
+            content = get.getResponseBodyAsString();
         } finally {
-            // release any connection resources used by the method
+            // Release any connection resources used by the method
             get.releaseConnection();
         }
+        return content;
     }
 
     public String getURLContent(String surl, String username, String password,

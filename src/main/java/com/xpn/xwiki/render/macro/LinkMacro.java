@@ -32,6 +32,9 @@ import org.radeox.util.Encoder;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWiki;
+
 public class LinkMacro extends BaseLocaleMacro {
   public String getLocaleKey() {
     return "macro.link";
@@ -64,6 +67,11 @@ public class LinkMacro extends BaseLocaleMacro {
 
       writer.write("<a href=\"");
       writer.write(Encoder.escape(url));
+      XWikiContext xcontext = (XWikiContext)params.getContext().get("xcontext");
+      XWiki xwiki = xcontext.getWiki();
+      String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "_blank");
+      if (!defaulttarget.equals(""))
+            writer.write(" target=\"" + defaulttarget + "\"");
       writer.write("\">");
       writer.write(text);
       writer.write("</a></span>");

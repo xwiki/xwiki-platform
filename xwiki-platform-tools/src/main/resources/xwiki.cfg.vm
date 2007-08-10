@@ -39,8 +39,6 @@ xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl
 
 xwiki.encoding=ISO-8859-1
 
-xwiki.render.macromapping=1
-
 xwiki.backlinks=1
 
 xwiki.tags=1

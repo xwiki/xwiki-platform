@@ -1,7 +1,6 @@
 <div id="historycontent" class="xwikiintracontent">
 #if($inline && ($inline == true))    <div class="xwikititlewrapper" onclick="toggleClass($('history'), 'hidden'); toggleClass($('historycontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("history")</h3></div>#end
-    <form id="history" action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
-      #set($formname="history")
+    <form action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
       <div id="history">
       <div class="centered">
       <table class="xwikidatatable" summary="$msg.get(document) ${doc.displayTitle} &mdash; $msg.get("history")">
@@ -21,51 +20,37 @@
 #if(!$revisionscount)
 #set($revisionscount = 0)
 #end
-#set($skipnext = false)
-#set($versionshown = 0)
 #if ($tdoc.realLanguage!="")
 #set($lang = "&amp;language=${tdoc.realLanguage}")
 #else
 #set($lang = "")
 #end
 #foreach ($version in $tdoc.getRecentRevisions($revisionscount))
+#set($origdoc = "")
+#set($newdoc = "")
 #set($nextversion = $version)
-#set($revinfo = $tdoc.getRevisionInfo($nextversion))
-#if($xwiki.hasMinorEdit() && (!$request.getParameter("showminor")))
-  #set($skipcur = $skipnext)
-  #set($skipnext = $revinfo.isMinorEdit())
-#end
-#if(!$skipcur)
-  #set($versionshown = $versionshown + 1)
-        <tr class="row#if($versionshown % 2 == 1) even #else odd #end">
+#set($newdoc = $xwiki.getDocument($tdoc, $nextversion))
+        <tr class="row#if($velocityCount % 2 == 1) even #else odd #end">
           <td><input type="radio" name="rev1" value="$nextversion" /></td>
           <td><input type="radio" name="rev2" value="$nextversion" /></td>
           <td><a href="$tdoc.getURL("viewrev","rev=$nextversion")">$nextversion</a></td>
-          <td>$xwiki.getLocalUserName($revinfo.author)</td>
-          <td>$xwiki.formatDate($revinfo.date, "dd/MM/yyyy hh:mm")</td>
+#if($newdoc=="")
+          <td>&ndash;</td>
+          <td>&ndash;</td>
+#else
+          <td>$xwiki.getLocalUserName($newdoc.author)</td>
+          <td>$xwiki.formatDate($newdoc.date, "dd/MM/yyyy hh:mm")</td>
+#end
 #if($xwiki.hasEditComment())
-          <td>$!{revinfo.comment}</td>
+          <td>$!{newdoc.comment}</td>
 #end
 #if($hasedit || $hasadmin)
           <td class="xwikibuttonlink"><a href="$tdoc.getURL("rollback","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("readytorollback") $nextversion')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("rollback")</a></td>
 #end
         </tr>
 #end
-#end
 </table>
-      <div class="buttons">
-        <div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>
-        #if($hasadmin)
-          <div class="buttonwrapper"><input class="button" type="submit" name="deleteversions" value="$msg.get("core.versions.delete")" onclick="if (confirm('$msg.get("core.versions.delete.confirm")')) { document.forms.${formname}.action='$doc.getURL("deleteversions", "$!{param}&confirm=1")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit(); return true; } return false;" /></div>
-        #end
-        #if($xwiki.hasMinorEdit())
-          #if(!$request.getParameter("showminor"))
-            <div class="buttonwrapper"><a href="$tdoc.getURL("view","viewer=history&amp;showminor=1&amp;$docvariant")">$msg.get("core.minoredit.show")</a></div>
-          #else
-            <div class="buttonwrapper"><a href="$tdoc.getURL("view","viewer=history&amp;$docvariant")">$msg.get("core.minoredit.hide")</a></div>
-          #end
-        #end
-      </div>
+      <div class="buttons"><div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div></div>
       </div>
     </div>
   </form>

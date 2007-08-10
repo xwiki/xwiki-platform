@@ -40,12 +40,6 @@ function checkDocumentContent() {
 }
 // ]]>
 </script>
-
-#if((!$tdoc.isNew())&&(!$minorFieldAdded)&&($xwiki.hasMinorEdit()))
-#set($minorFieldAdded = 1)
-$msg.get("core.minoredit"): <input type="checkbox" name="minorEdit" /> 
-#end
-
 #if((!$commentFieldAdded)&&($xwiki.hasEditComment()))
 #set($commentFieldAdded = 1)
 #if($xwiki.isEditCommentHidden())
@@ -54,7 +48,6 @@ $msg.get("core.minoredit"): <input type="checkbox" name="minorEdit" />
 $msg.get("core.comment"): <input type="text" name="comment" value="" size="80" />
 #end
 #end
-
 #set($param = "")
 #if ($sectionNumber && ($sectionNumber != 0))
    #set($param = "section=$sectionNumber")

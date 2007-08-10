@@ -44,7 +44,6 @@
  */
 package com.xpn.xwiki.render.macro;
 
-import com.xpn.xwiki.render.filter.XWikiFilter;
 import org.radeox.macro.CodeMacro;
 import org.radeox.macro.parameter.MacroParameter;
 import org.apache.commons.lang.StringUtils;
@@ -67,11 +66,6 @@ public class XWikiCodeMacro extends CodeMacro
     public void execute(Writer writer, MacroParameter params)
         throws IllegalArgumentException, IOException
     {
-        // We need to tell other Filters not to execute as we want the content of the code macro
-        // to be left as is. We set a property in the Radeox Filter Context so that other Filters
-        // and macros can check it and behave well.
-        // params.getContext().set(XWikiFilter.STOP_FILTERING_KEY, Boolean.TRUE);
-
         // We need to escape any HTML tag before we execute the macro. This is because the macro
         // generates HTML itself and we must only escape the HTML that was there before the
         // generation.

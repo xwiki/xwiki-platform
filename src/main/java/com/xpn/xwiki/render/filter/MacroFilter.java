@@ -59,11 +59,6 @@ public class MacroFilter extends RegexTokenFilter
         return macros;
     }
 
-    /**
-     * We override the {@link org.radeox.filter.MacroFilter#handleMatch} method so that we can
-     * prevent nested macro evaluation for the code macro as we don't want the content of the code
-     * macro to be evaluated at all.
-     */
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context) {
       String command = result.group(1);
 
@@ -88,11 +83,7 @@ public class MacroFilter extends RegexTokenFilter
                     Macro macro = (Macro) getMacroRepository().get(command);
                     // recursively filter macros within macros
                     if (null != mParams.getContent()) {
-                        // Only recursively evaluate nested macros if the current macro isn't the code
-                        // macro as we don't want any substitution for the code macro.
-                        if (!command.equals("code")) {
-                            mParams.setContent(filter(mParams.getContent(), context));
-                        }
+                        mParams.setContent(filter(mParams.getContent(), context));
                     }
 
                     Writer writer = new StringBufferWriter(buffer);

@@ -24,10 +24,4 @@ import org.radeox.filter.Filter;
 
 public interface XWikiFilter extends Filter
 {
-    /**
-     * A property set in the Radeox Filter Context to tell XWiki Filters and Macros to stop
-     * filtering when it's set. This is especially useful for the {code} macro as it needs to
-     * tell the other filters to leave its content untouched.
-     */
-    public static final String STOP_FILTERING_KEY = "stopFiltering";
 }

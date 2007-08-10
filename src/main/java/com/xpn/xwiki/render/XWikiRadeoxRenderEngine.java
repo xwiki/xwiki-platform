@@ -25,7 +25,6 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.filter.XWikiFilter;
-import com.xpn.xwiki.render.filter.XWikiFilterPipe;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.StringUtils;
@@ -50,7 +49,7 @@ import java.util.List;
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine {
     private static Log log = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
     private XWikiContext context;
-    protected XWikiFilterPipe fp;
+    protected FilterPipe fp;
 
     public XWikiRadeoxRenderEngine(XWikiContext context) {
         // super();
@@ -73,7 +72,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     // Overidding to load our own Filter list.
     protected void init() {
         if (null == fp) {
-            fp = new XWikiFilterPipe(initialContext);
+            fp = new FilterPipe(initialContext);
 
             Iterator iterator = Service.providers(XWikiFilter.class);
             while (iterator.hasNext()) {

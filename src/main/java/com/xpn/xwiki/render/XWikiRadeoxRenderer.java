@@ -97,7 +97,7 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
             // Escape the Velocity special characters: '$' and '#' so that they are not interpreted.
             result = StringUtils.replace(allcontent, "#", "&#35;");
             result = StringUtils.replace(result, "$", "&#36;");
-            // Escape the Groovy special characters '<%' and '%>' so that the Groovy Rendered
+            // Escape the Groovy special characters '<%' and '%>' so that the Groovy Renderer
             // doesn't execute.
             result = StringUtils.replace(result, "<%", "&#60;%");
             result = StringUtils.replace(result, "%>", "&#62;%");

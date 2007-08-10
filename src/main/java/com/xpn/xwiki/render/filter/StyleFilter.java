@@ -58,11 +58,6 @@ public class StyleFilter extends RegexTokenFilter
         return macros;
     }
 
-    /**
-     * We override the {@link org.radeox.filter.MacroFilter#handleMatch} method so that we can
-     * prevent nested macro evaluation for the code macro as we don't want the content of the code
-     * macro to be evaluated at all.
-     */
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context) {
       String command = result.group(1);
 

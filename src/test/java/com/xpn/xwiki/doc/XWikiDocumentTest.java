@@ -94,26 +94,6 @@ public class XWikiDocumentTest extends MockObjectTestCase
         assertEquals("Title", this.document.getDisplayTitle(this.context));
     }
     
-    public void testMinorMajorVersions() {
-        // there is no version in doc yet, so 1.0 = 1
-        assertEquals("1", this.document.getVersion());
-        
-        this.document.setMinorEdit(false);
-        this.document.incrementVersion();
-        // no version => incrementVersion sets 1.1 
-        assertEquals("1.1", this.document.getVersion());
-        
-        this.document.setMinorEdit(false);
-        this.document.incrementVersion();
-        // increment major version
-        assertEquals("2.1", this.document.getVersion());
-        
-        this.document.setMinorEdit(true);
-        this.document.incrementVersion();
-        // increment minor version
-        assertEquals("2.2", this.document.getVersion());
-    }
-    
     public void testAuthorAfterDocumentCopy() throws XWikiException
     {
         String author = "Albatross";

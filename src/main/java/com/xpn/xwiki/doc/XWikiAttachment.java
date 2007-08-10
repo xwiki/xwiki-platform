@@ -34,7 +34,7 @@ import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
 import org.hibernate.ObjectNotFoundException;
 import org.suigeneris.jrcs.rcs.Archive;
-import org.suigeneris.jrcs.rcs.impl.Node;
+import org.suigeneris.jrcs.rcs.Node;
 import org.suigeneris.jrcs.rcs.Version;
 
 import java.io.IOException;

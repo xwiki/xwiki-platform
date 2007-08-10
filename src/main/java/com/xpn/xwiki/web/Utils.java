@@ -136,16 +136,12 @@ public class Utils {
         return redirect;
     }
 
-    public static String getRedirect(String action, String params, XWikiContext context) {
+    public static String getRedirect(String action, XWikiContext context) {
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
         if ((redirect == null) || (redirect.equals("")))
-            redirect = context.getDoc().getURL(action, params, true, context);
+            redirect = context.getDoc().getURL(action, true, context);
         return redirect;
-    }
-
-    public static String getRedirect(String action, XWikiContext context) {
-        return getRedirect(action, null, context);
     }
 
     public static String getPage(XWikiRequest request, String defaultpage) {

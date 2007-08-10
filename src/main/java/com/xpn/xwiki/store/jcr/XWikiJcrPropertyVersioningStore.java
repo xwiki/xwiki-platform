@@ -1,24 +1,20 @@
 package com.xpn.xwiki.store.jcr;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Iterator;
-
-import javax.jcr.Node;
-import javax.jcr.PathNotFoundException;
-import javax.jcr.Property;
-
-import org.suigeneris.jrcs.rcs.Version;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
-import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
-import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
-import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.util.Util;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Version;
+
+import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
+import javax.jcr.Property;
+import java.lang.reflect.InvocationTargetException;
 
 /** Versions store in jcr property '@archive' of xwiki:document */
 public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implements XWikiVersioningStoreInterface {
@@ -26,13 +22,13 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
 		super(xwiki, context);
 	}
 	
-	public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction, final XWikiContext context) throws XWikiException {
+	public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException {
 		try {
 			executeWrite(context, new JcrCallBack() {
 				public Object doInJcr(XWikiJcrSession session) throws Exception {
 					Node docNode = getDocNodeById(session, archivedoc.getId());
 					if (docNode==null) return null;
-					String s = archivedoc.getArchive(context);
+					String s = archivedoc.getArchive();
 					docNode.setProperty("archive", s);
 					session.save();
 					return null;
@@ -66,14 +62,12 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
 	}
 
 	// From XWikiHibernateVersioningStore:
+		
 	public void resetRCSArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException {
 		try {
             XWikiDocumentArchive archivedoc = new XWikiDocumentArchive(doc.getId());
             loadXWikiDocArchive(archivedoc, bTransaction, context);
-            archivedoc.resetArchive();
-            archivedoc.getDeletedNodeInfo().clear();
-            doc.setMinorEdit(false);
-            updateXWikiDocArchive(doc, false, context);
+            archivedoc.resetArchive(doc.getFullName(), doc.getContent(), doc.getVersion());
             saveXWikiDocArchive(archivedoc, bTransaction, context);
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
@@ -84,10 +78,10 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
 
 	
 
-	public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException {
+	public void updateXWikiDocArchive(XWikiDocument doc, String text, boolean bTransaction, XWikiContext context) throws XWikiException {
 		try {
 			XWikiDocumentArchive archivedoc = getXWikiDocumentArchive(doc, context);
-            archivedoc.updateArchive(doc.getContentAuthor(), doc.getDate(), doc.getComment(), doc.isMinorEdit(), doc, context);
+            archivedoc.updateArchive(doc.getFullName(), text);
             saveXWikiDocArchive(archivedoc, bTransaction, context);            
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
@@ -97,8 +91,6 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
 	}
 
 	public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String version, XWikiContext context) throws XWikiException {
-	    return null;
-	    /* TODO: it will be rewrited
 		XWikiDocument doc = new XWikiDocument(basedoc.getSpace(), basedoc.getName());
 		doc.setDatabase(basedoc.getDatabase());
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
@@ -147,21 +139,20 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
             if (monitor!=null)
                 monitor.endTimer("jcr");
         }
-        return doc;*/
+        return doc;
 	}
 	public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {
 		try {
-		    XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
+            Archive archive = getXWikiDocumentArchive(doc, context).getRCSArchive();
             if (archive==null)
                 return new Version[0];
-            Collection nodes = archive.getNodes();
-            Version[] versions = new Version[nodes.size()];
-            Iterator it = nodes.iterator();
-            for (int i=0; i<versions.length; i++) {
-                XWikiRCSNodeInfo node = (XWikiRCSNodeInfo) it.next();
-                versions[i] = node.getId().getVersion();
+
+            org.suigeneris.jrcs.rcs.Node[] nodes = archive.changeLog();
+            Version[] versions = new Version[nodes.length];
+            for (int i=0;i<nodes.length;i++) {
+                versions[i] = nodes[i].getVersion();
             }
-            return versions;            
+            return versions;
         } catch (Exception e) {
             Object[] args = { doc.getFullName() };
             throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_READING_REVISIONS,
@@ -189,12 +180,5 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
             }
             return archivedoc;
         }
-    }
-
-    public XWikiRCSNodeContent loadRCSNodeContent(XWikiContext context, XWikiRCSNodeId id,
-        boolean transaction) throws XWikiException
-    {
-        // TODO: todo
-        return null;
     }
 }

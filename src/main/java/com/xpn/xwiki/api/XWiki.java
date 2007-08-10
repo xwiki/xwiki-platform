@@ -34,7 +34,7 @@ import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
-import org.suigeneris.jrcs.diff.delta.Chunk;
+import org.suigeneris.jrcs.diff.Chunk;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -2324,14 +2324,6 @@ public class XWiki extends Api
     public boolean isEditCommentMandatory()
     {
         return xwiki.isEditCommentMandatory(context);
-    }
-    
-    /**
-     * API to check if the minor edit feature is active
-     * minor edit are activated in xwiki.cfg or in the XWiki Preferences
-     */
-    public boolean hasMinorEdit() {
-        return xwiki.hasMinorEdit(context);
     }
 
     /**

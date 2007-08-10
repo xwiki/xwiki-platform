@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Iterator;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.InvocationHandler;
 
 public class XWikiHibernateBaseStore {
     private static final Log log = LogFactory.getLog(XWikiHibernateBaseStore.class);
@@ -787,52 +788,5 @@ public class XWikiHibernateBaseStore {
                 "</class>\n" +
                 "</hibernate-mapping>";
         return custommapping;
-    }
-    
-    /** spring-jcr like Callback interface for working in hibernate */
-    public interface HibernateCallBack {
-        Object doInHibernate(Session session) throws Exception;
-    }
-    
-    /** spring-jcr like execute method for operations in hibernate  
-     * @throws XWikiException */
-    public Object execute(XWikiContext context, boolean bTransaction, boolean doCommit, HibernateCallBack cb) throws XWikiException {
-        MonitorPlugin monitor = Util.getMonitorPlugin(context);
-        try {
-            // Start monitoring timer
-            if (monitor!=null)
-                monitor.startTimer("hibernate");
-            
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(context);
-            }
-            
-            return cb.doInHibernate(getSession(context));
-        } catch (Exception e) {
-            if (e instanceof XWikiException)
-                throw (XWikiException)e;
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Exception while hibernate execute", e);
-        } finally {
-            try {
-                if (bTransaction)
-                    endTransaction(context, doCommit);
-                if (monitor!=null)
-                    monitor.endTimer("hibernate");
-            } catch (Exception e) {}
-        }
-    }
-    
-    /** spring-jcr like execute method for read-only operations in hibernate  
-     * @throws XWikiException */
-    public Object executeRead(XWikiContext context, boolean bTransaction, HibernateCallBack cb) throws XWikiException {
-        return execute(context, bTransaction, false, cb);
-    }
-    
-    /** spring-jcr like execute method for write operations in hibernate  
-     * @throws XWikiException */
-    public Object executeWrite(XWikiContext context, boolean bTransaction, HibernateCallBack cb) throws XWikiException {
-        return execute(context, bTransaction, true, cb);
     }
 }

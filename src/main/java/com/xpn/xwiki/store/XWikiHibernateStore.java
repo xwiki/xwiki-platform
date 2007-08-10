@@ -26,7 +26,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLink;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -236,7 +235,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
                 doc.incrementVersion();
                 if (context.getWiki().hasVersioning(doc.getFullName(), context))
-                 context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
+                 context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, doc.toXML(context), false, context);
 
                 doc.setContentDirty(false);
                 doc.setMetaDataDirty(false);
@@ -532,11 +531,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         deleteXWikiObject(obj, context, false);
                 }
             }
-            // Delete history
-            session.createQuery("delete from "+XWikiRCSNodeInfo.class.getName()+" where id.docId=?")
-                .setLong(0, doc.getId())
-                .executeUpdate();
-            
+
             session.delete(doc);
 
             // We need to ensure that the deleted document becomes the original document

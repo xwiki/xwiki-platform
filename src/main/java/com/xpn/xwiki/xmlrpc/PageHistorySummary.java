@@ -48,7 +48,7 @@ public class PageHistorySummary
     public PageHistorySummary(XWikiDocument document)
     {
         this.id = document.getFullName();
-        this.version = Page.constructVersion( document.getRCSVersion() );
+        this.version = document.getRCSVersion().getNumbers()[1];
         this.modified = document.getDate();
         this.modifier = document.getAuthor();
     }

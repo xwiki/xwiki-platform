@@ -179,8 +179,6 @@ public class XWikiPortlet extends GenericPortlet {
                     form = new ObjectRemoveForm();
                 else if (action.equals("propadd"))
                     form = new PropAddForm();
-                else if (action.equals("deleteversions"))
-                    form = new DeleteVersionsForm();
 
                 if (form != null) {
                     form.reset(null, request);
@@ -219,8 +217,6 @@ public class XWikiPortlet extends GenericPortlet {
                     (new RegisterAction()).action(context);
                 } else if (action.equals("inline")) {
                     (new InlineAction()).action(context);
-                } else if (action.equals("deleteversions")) {
-                    (new DeleteVersionsAction()).action(context);
                 }
             } catch (Throwable e) {
                 handleException(request, response, e, context);

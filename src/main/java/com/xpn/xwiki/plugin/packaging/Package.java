@@ -585,7 +585,7 @@ public class Package
                 doc.getDoc().saveAllAttachments(context);
 
                 if ((doc.getDoc().getDocumentArchive() == null)
-                    || (doc.getDoc().getDocumentArchive().getNodes().size()==0)) {
+                    || (doc.getDoc().getDocumentArchive().getRCSArchive() == null)) {
                     if (!preserveVersion) {
                         doc.getDoc().setVersion("1.1");
                     }

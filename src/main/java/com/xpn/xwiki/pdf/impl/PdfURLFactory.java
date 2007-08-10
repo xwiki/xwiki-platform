@@ -22,6 +22,7 @@
 package com.xpn.xwiki.pdf.impl;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
@@ -81,6 +82,6 @@ public class PdfURLFactory extends XWikiServletURLFactory {
     public String getURL(URL url, XWikiContext context) {
         if (url==null)
             return "";
-        return url.toString();
+        return Util.escapeURL(url.toString());
     }
 }

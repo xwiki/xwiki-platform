@@ -658,4 +658,40 @@ public class Util {
         }
         return null;
     }
+
+    /**
+     * API to protect Text from Radeox transformation
+     * @param text
+     * @return escaped text
+     */
+    public static String escapeText(String text) {
+        text = text.replaceAll("http://", "&#104;ttp://");
+        text = text.replaceAll("ftp://", "&#102;tp://");
+        text = text.replaceAll("\\-", "&#45;");
+        text = text.replaceAll("\\*", "&#42;");
+        text = text.replaceAll("\\~", "&#126;");
+        text = text.replaceAll("\\[", "&#91;");
+        text = text.replaceAll("\\]", "&#93;");
+        text = text.replaceAll("\\{", "&#123;");
+        text = text.replaceAll("\\}", "&#125;");
+        text = text.replaceAll("\\1", "&#49;");
+        return text;
+    }
+
+    /**
+     * API to protect URLs from Radeox transformation
+     * @param url
+     * @return encoded URL
+     */
+    public static String escapeURL(String url) {
+        url = url.replaceAll("-", "%2D");
+        url = url.replaceAll("\\*", "%2A");
+        url = url.replaceAll("\\~", "%7E");
+        url = url.replaceAll("\\[", "%5B");
+        url = url.replaceAll("\\]", "%5D");
+        url = url.replaceAll("\\{", "%7B");
+        url = url.replaceAll("\\}", "%7D");
+        url = url.replaceAll("\\1", "%31");
+        return url;
+    }
 }

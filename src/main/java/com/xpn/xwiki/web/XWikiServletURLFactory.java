@@ -24,6 +24,7 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.commons.logging.Log;
@@ -391,7 +392,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                     sbuf.append("#");
                     sbuf.append(anchor);
                 }
-                return sbuf.toString();
+                return Util.escapeURL(sbuf.toString());
             }
         } catch (Exception e) {
             e.printStackTrace();

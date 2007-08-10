@@ -228,6 +228,24 @@ public class XWiki extends Api
     }
 
     /**
+     * API to protect Text from Wiki transformation
+     * @param text
+     * @return escaped text
+     */
+    public String escapeText(String text) {
+        return Util.escapeText(text);
+    }
+
+    /**
+     * API to protect URLs from Wiki transformation
+     * @param url
+     * @return encoded URL
+     */
+    public String escapeURL(String url) {
+        return Util.escapeURL(url);
+    }
+
+    /**
      * Output content in the edit content textarea
      * 
      * @param content content to output

@@ -34,6 +34,8 @@ import org.radeox.util.StringBufferWriter;
 import java.io.IOException;
 import java.io.Writer;
 
+import com.xpn.xwiki.util.Util;
+
 /**
  * XWikiLinkFilter finds [text] in its input and transforms this
  * to <a href="text">...</a> if the wiki page exists. If not
@@ -125,13 +127,13 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                     ||(href.indexOf("mailto:")==0)) {
                     // External link
                     buffer.append("<span class=\"wikiexternallink\"><a href=\"");
-                    buffer.append(href);
+                    buffer.append(Util.escapeURL(href));
                     buffer.append("\"");
                     if(target != null){
                         buffer.append(" target=\"" + target + "\"");
                     }
                     buffer.append(">");
-                    buffer.append(text.replaceAll("http://", "&#104;ttp://").replaceAll("ftp://", "&#102;tp://"));
+                    buffer.append(cleanText(text));
                     buffer.append("</a></span>");
                     return;
                 }
@@ -151,7 +153,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                     if(!specificText || text.length() == 0) {
                         text = Encoder.unescape(hash);
                     }
-                    buffer.append(text.replaceAll("http://", "&#104;ttp://").replaceAll("ftp://", "&#102;tp://"));
+                    buffer.append(cleanText(text));
                     buffer.append("</a></span>");
                     return;
                 }
@@ -220,6 +222,15 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 buffer.append(Encoder.escape(result.group(0)));
             }
         }
+    }
+
+    /**
+     * Clean the text so that it won't be interpreted by radeox simple syntax
+     * @param text
+     * @return
+     */
+    private String cleanText(String text) {
+        return Util.escapeText(text);
     }
 
     /**

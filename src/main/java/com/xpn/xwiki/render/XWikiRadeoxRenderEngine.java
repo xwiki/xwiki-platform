@@ -234,12 +234,16 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                         "view", querystring, anchor, context);
                 buffer.append(context.getURLFactory().getURL(url, context));
                 buffer.append("\">");
-                buffer.append(view);
+                buffer.append(cleanText(view));
                 buffer.append("</a></span>");
             } finally {
                 context.setDatabase(database);
             }
         }
+    }
+
+    private String cleanText(String text) {
+        return Util.escapeText(text);
     }
 
     private void addLinkToContext(String docname, XWikiContext context) {
@@ -268,7 +272,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append(anchor);
         buffer.append("\">");
         if (view.length() == 0) view = Utils.decode(anchor, context);
-        buffer.append(view);
+        buffer.append(cleanText(view));
         buffer.append("</a></span>");
     }
 
@@ -322,7 +326,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             buffer.append(surl);
             buffer.append("\">");
             buffer.append("<span class=\"wikicreatelinktext\">");
-            buffer.append(view);
+            buffer.append(cleanText(view));
             buffer.append("</span>");
             buffer.append("<span class=\"wikicreatelinkqm\">?</span>");
             buffer.append("</a>");

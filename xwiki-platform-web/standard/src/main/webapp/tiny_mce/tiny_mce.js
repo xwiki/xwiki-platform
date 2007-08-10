@@ -2411,8 +2411,11 @@ TinyMCE_Control.prototype = {
 	},
 
 	getDoc : function() {
-		return this.contentWindow.document;
-	},
+        if (this.contentWindow.document)
+         return this.contentWindow.document;
+        else
+         return this.contentDocument;
+    },
 
 	getWin : function() {
 		return this.contentWindow;

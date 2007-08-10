@@ -193,7 +193,7 @@ WikiEditor.prototype.setImagePath = function(path) {
 }
 
 WikiEditor.prototype.getImagePath = function() {
-	return this._imagePath;
+    return tinyMCE.settings["wiki_images_path"];
 }
 
 <!-- Run-Time HTML Editor Management -->

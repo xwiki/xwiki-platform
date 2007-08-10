@@ -1,6 +1,7 @@
 package com.xpn.xwiki.gwt.api.client.dialog;
 
 import asquare.gwt.tk.client.ui.ModalDialog;
+import asquare.gwt.tk.client.ui.behavior.TabFocusController;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 import com.xpn.xwiki.gwt.api.client.wizard.Wizard;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -75,6 +76,7 @@ public class Dialog extends ModalDialog {
         this.buttonModes = buttonModes;
         addStyleName(getCSSName(null));
         setCaption(app.getTranslation(dialogTranslationName + ".caption"), false);
+        removeController(getController(TabFocusController.class));
     }
 
     public void setAsyncCallback(AsyncCallback nextCallback) {

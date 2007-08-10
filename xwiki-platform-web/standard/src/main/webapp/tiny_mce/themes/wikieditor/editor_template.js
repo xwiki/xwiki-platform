@@ -317,12 +317,28 @@ var TinyMCE_WikieditorTheme = {
                 if (!insDisplay || (insDisplay == "block")) {
                     document.getElementById("content").value = tinyMCE.getContent(tinyMCE.getWindowArg('editor_id'));
                     document.getElementById(ins.editorId).style.display = "none";
+                    if (window.ActiveXObject) {
+                        document.getElementById(ins.editorId).parentNode.style.display = "none";
+                        document.getElementById(ins.editorId).parentNode.parentNode.style.display = "none";
+                    }
                     document.getElementById("content").style.display = "block";
+                    if (window.ActiveXObject) {
+                        document.getElementById("content").parentNode.style.display = "block";
+                        document.getElementById("content").parentNode.parentNode.style.display = "block";
+                    }
                     wikiEditor.disableButtonsInWikiMode(editor_id);
                 } else {
                     document.getElementById(ins.editorId).style.display = "block";
+                    if (window.ActiveXObject) {
+                        document.getElementById(ins.editorId).parentNode.style.display = "block";
+                        document.getElementById(ins.editorId).parentNode.parentNode.style.display = "block";
+                    }
                     tinyMCE.setContent(document.getElementById("content").value);
                     document.getElementById("content").style.display = "none";
+                    if (window.ActiveXObject) {
+                        document.getElementById("content").parentNode.style.display = "none";
+                        document.getElementById("content").parentNode.parentNode.style.display = "none";
+                    }
                     wikiEditor.showButtonsInWywisygMode(editor_id);
                 }
                 return true;

@@ -1062,22 +1062,6 @@ div.attachment {
   font-size: 130%;
   padding: 4px 10px;
 }
-
-#parentswapDiv iframe {
-	width: 100% !important;
-	height: 94.6% !important;
-	position: absolute;
-	left: 0px;
-	top: 27px;
-	right: 0px;
-	bottom: 0px;
-}
-
-#parentswapDiv table {
-	width: 100% !important;
-	height: 100% !important;
-}
-
 	
 .mceEditorContainer {
 	display: block;

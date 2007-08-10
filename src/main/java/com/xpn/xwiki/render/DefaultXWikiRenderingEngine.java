@@ -46,7 +46,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     public DefaultXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException {
 
-        if (xwiki.Param("xwiki.render.macromapping", "0").equals("1"))
+        if (xwiki.Param("xwiki.render.macromapping", "1").equals("1"))
             addRenderer("mapping", new XWikiMacrosMappingRenderer(xwiki, context));
         // addRenderer(new XWikiJSPRenderer());
         if (xwiki.Param("xwiki.render.velocity", "1").equals("1"))

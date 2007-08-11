@@ -80,7 +80,11 @@ public class DownloadAction extends XWikiAction
         // details). We do this so that JPG, GIF, PNG, etc are displayed without prompting a Save
         // dialog box. However, all mime types that cannot be displayed by the browser do prompt a
         // Save dialog box (exe, zip, xar, etc).
-        response.addHeader("Content-disposition", "inline; filename=\"" + ofilename + "\"");
+        String dispType = "inline";
+        if ("1".equals(request.getParameter("force-download"))) {
+        	dispType = "attachment";
+        }
+        response.addHeader("Content-disposition", dispType + "; filename=\"" + ofilename + "\"");
 
         response.setDateHeader("Last-Modified", attachment.getDate().getTime());
 

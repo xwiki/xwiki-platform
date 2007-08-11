@@ -1392,7 +1392,7 @@ public class XWikiDocument
             if (object == null) {
                 return "";
             } else {
-                return display(fieldname, mode, object, context);
+                return display(fieldname, mode, prefix, object, context);
             }
         } catch (Exception e) {
             return "";

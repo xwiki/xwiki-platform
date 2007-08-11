@@ -70,7 +70,6 @@ function fullscreenEdit(what) {
     Event.observe(showBtn, "click", new Function(what+"Fullscreen()"), true);
     showBtn.setAttribute("title", "$msg.get("fullScreenTooltip")");
     var textdiv = document.getElementById("xwikieditcontent");
-    //parentDiv.insertBefore(showBtn, textdiv);
     textdiv.insertBefore(showBtn, textdiv.firstChild);
 
     //fullscreen div
@@ -153,6 +152,8 @@ function wysiwygFullscreen() {
 
   //hide scrollbars
   document.body.style.overflow="hidden";
+  // hide the fullscreen button
+  document.getElementById("show-dialog-btn").style.display="none";
 
   //put the editor back
   tinyMCE.execCommand('mceAddControl', false, 'content');
@@ -187,6 +188,8 @@ function wysiwygHide() {
 
   //show the scrollbars
   document.body.style.overflow="auto";
+  // show the fullscreen button
+  document.getElementById("show-dialog-btn").style.display="block";
 
   //put the editor back
   window.setTimeout("tinyMCE.execCommand('mceAddControl', false, 'content')", 10);

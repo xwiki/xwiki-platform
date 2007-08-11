@@ -136,9 +136,10 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                     } else {
                         XWikiContext xcontext = (XWikiContext)context.getRenderContext().get("xcontext");
                         XWiki xwiki = xcontext.getWiki();
-                        String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "_blank");
-                        if (!defaulttarget.equals(""))
+                        String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "");
+                        if (!defaulttarget.equals("")) {
                             buffer.append(" target=\"" + defaulttarget + "\"");
+                        }
                     }
                     buffer.append(">");
                     buffer.append(cleanText(text));

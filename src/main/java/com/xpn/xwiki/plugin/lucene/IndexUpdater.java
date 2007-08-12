@@ -80,6 +80,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
     static List fields = new ArrayList();
 
+    public boolean needInitialBuild = false;
+
     public void doExit()
     {
         exit = true;
@@ -369,14 +371,18 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         this.context.setDatabase(xwiki.getDatabase());
         this.plugin = plugin;
         // take the first configured index dir as the one for writing
-        String[] indexDirs =
-                StringUtils.split(config.getProperty(LucenePlugin.PROP_INDEX_DIR), " ,");
+        // String[] indexDirs =
+               // StringUtils.split(config.getProperty(LucenePlugin.PROP_INDEX_DIR), " ,");
+        String[] indexDirs = StringUtils.split(plugin.getIndexDirs(), ",");
         if (indexDirs != null && indexDirs.length > 0) {
             this.indexDir = indexDirs[0];
             File f = new File(indexDir);
             if (!f.isDirectory()) {
                 f.mkdirs();
-                cleanIndex();
+                needInitialBuild = true;
+            }
+            if (!IndexReader.indexExists(f)) {
+                needInitialBuild = true;
             }
         }
         indexingInterval =

@@ -50,9 +50,12 @@ public class IndexRebuilder
 
     private IndexUpdater indexUpdater;
 
-    public IndexRebuilder(IndexUpdater indexUpdater)
+    public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
     {
         this.indexUpdater = indexUpdater;
+        if (indexUpdater.needInitialBuild) {
+            LOG.info("Initializing Lucene search index, " +  this.rebuildIndex(context) + " documents found");
+        }
     }
 
     /**

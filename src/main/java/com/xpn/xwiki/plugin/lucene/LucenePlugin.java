@@ -30,15 +30,17 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.index.IndexFileNameFilter;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.store.FSDirectory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +70,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
 
     public static final String PROP_INDEXING_INTERVAL = "xwiki.plugins.lucene.indexinterval";
 
-    private static final String DEFAULT_ANALYZER = "org.apache.lucene.analysis.de.GermanAnalyzer";
+    private static final String DEFAULT_ANALYZER = "org.apache.lucene.analysis.standard.StandardAnalyzer";
 
     private Searcher[] searchers;
 
@@ -94,6 +96,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
      */
     protected void finalize() throws Throwable
     {
+        LOG.error("Lucene plugin will exit !");
         if (indexUpdater != null) {
             indexUpdater.doExit();
         }
@@ -346,16 +349,21 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
             }
         }
         this.indexDirs = config.getProperty(PROP_INDEX_DIR);
-        openSearchers();
+        if (indexDirs == null || indexDirs.equals("")) {
+            File workDir = context.getWiki().getWorkSubdirectory("lucene", context);
+            indexDirs = workDir.getAbsolutePath();
+        }
         indexUpdater = new IndexUpdater();
         indexUpdater.setAnalyzer(analyzer);
         indexUpdater.init(config, this, context.getWiki());
         indexUpdaterThread = new Thread(indexUpdater);
         indexUpdaterThread.start();
-        indexRebuilder = new IndexRebuilder(indexUpdater);
+        indexRebuilder = new IndexRebuilder(indexUpdater, context);
 
         docChangeRule = new DocChangeRule(indexUpdater);
         xwikiActionRule = new XWikiActionRule(indexUpdater);
+
+        openSearchers();
 
         context.getWiki().getNotificationManager().addGeneralRule(docChangeRule);
         context.getWiki().getNotificationManager().addGeneralRule(xwikiActionRule);
@@ -400,7 +408,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
      */
     public static Searcher[] createSearchers(String indexDirs) throws Exception
     {
-        String[] dirs = StringUtils.split(indexDirs, " ,");
+        String[] dirs = StringUtils.split(indexDirs, ",");
         List searchersList = new ArrayList();
         for (int i = 0; i < dirs.length; i++) {
             try {
@@ -442,6 +450,10 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
                 }
             }
         }
+    }
+
+    public String getIndexDirs() {
+        return indexDirs;
     }
 
     public long getQueueSize()

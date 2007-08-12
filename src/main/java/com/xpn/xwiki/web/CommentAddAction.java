@@ -55,6 +55,7 @@ public class CommentAddAction extends XWikiAction {
                 newobject.setNumber(oldobject.getNumber());
                 newobject.setName(doc.getFullName());
                 doc.setObject(className, nb, newobject);
+                doc.setContentDirty(false); // Consider comments not being content
                 xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), context);
             }
             // forward to edit

@@ -8,23 +8,41 @@
   <div id="xwikimessage">$message</div>
 #end
 #set($links=$doc.getBacklinks())
+#set($orphans = $xwiki.searchDocuments(" where doc.fullName <> '${doc.fullName}as' and (doc.parent = '${doc.fullName}' or (doc.parent = '${doc.name}' and doc.web = '${doc.web}'))"))
 #if($request.xredirect)
   #set($redirectparam = "&amp;xredirect=$request.xredirect")
 #end
+#set($quote = '"')
+#set($hasInlinks = false)
+#set($fullmsg = "")
 #if($links && $links.size() > 0)
-  #set($quote = '"')
-  #set ($fullmsg="</p><ul style=${quote}text-align: left;${quote}>")
+  #set($tmpmsg = "</p><ul style=${quote}text-align: left;${quote}>")
   #foreach($docname in $links)
     #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
-    #set($fullmsg = "${fullmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>${rdoc.displayTitle}</a></li>")
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>${rdoc.displayTitle}</a></li>")
   #end
-  #set($fullmsg = "${fullmsg}</ul><p class=${quote}xwikimessage${quote}>")
-  #set($fullmsg=$msg.get("core.delete.backlinksWarning", [$fullmsg]))
-  #set($fullmsg="${fullmsg}</p><p class=${quote}xwikimessage${quote}>"+$msg.get("core.delete.confirmWithBacklinks"))
-  #xwikimessagebox($msg.get("core.delete") $fullmsg $doc.getURL("delete", "confirm=1$!{redirectparam}&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
-#else
-  #xwikimessagebox($msg.get("core.delete") $msg.get("core.delete.confirm") $doc.getURL("delete", "confirm=1$!{redirectparam}&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
+  #set($tmpmsg = "${tmpmsg}</ul><p class=${quote}xwikimessage${quote}>")
+  #set($tmpmsg = $msg.get("core.delete.backlinksWarning", [$tmpmsg]))
+  #set($fullmsg="${fullmsg}${tmpmsg}</p><p class=${quote}xwikimessage${quote}>")
+  #set($hasInlinks = true)
 #end
+#if($orphans && $orphans.size() > 0)
+  #set($tmpmsg ="</p><ul style=${quote}text-align: left;${quote}>")
+  #foreach($docname in $orphans)
+    #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
+    #set($tmpmsg = "${tmpmsg}<li><a href=${quote}${rdoc.getURL('view')}${quote}>${rdoc.displayTitle}</a></li>")
+  #end
+  #set($tmpmsg = "${tmpmsg}</ul><p class=${quote}xwikimessage${quote}>")
+  #set($tmpmsg = $msg.get("core.delete.orphansWarning", [$tmpmsg]))
+  #set($fullmsg="${fullmsg}${tmpmsg}</p><p class=${quote}xwikimessage${quote}>")
+  #set($hasInlinks = true)
+#end
+#if($hasInlinks)
+  #set($fullmsg="${fullmsg}${msg.get('core.delete.confirmWithInlinks')}")
+#else
+  #set($fullmsg = $msg.get("core.delete.confirm"))
+#end
+#xwikimessagebox($msg.get("core.delete") $fullmsg $doc.getURL("delete", "confirm=1$!{redirectparam}&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
 </div>
 <div class="clearfloats"></div>
 #template("endpage.vm")

@@ -574,6 +574,10 @@ public class Package
                 if (!backupPack) {
                     doc.getDoc().setAuthor(context.getUser());
                 }
+                
+                if (!preserveVersion) {   
+                    doc.getDoc().setVersion("1.1");
+                }
 
                 // We don't want date and version to change
                 // So we need to cancel the dirty status
@@ -584,11 +588,11 @@ public class Package
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
 
+                // if there is no archive in xml and content&metaData Dirty is not set
+                //  then archive was not saved
+                //  so we need save it via resetArchive
                 if ((doc.getDoc().getDocumentArchive() == null)
                     || (doc.getDoc().getDocumentArchive().getRCSArchive() == null)) {
-                    if (!preserveVersion) {
-                        doc.getDoc().setVersion("1.1");
-                    }
                     doc.getDoc().resetArchive(context);
                 }
             } catch (XWikiException e) {

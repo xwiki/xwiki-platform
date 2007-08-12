@@ -31,7 +31,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -81,7 +80,6 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ElementComparator;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -301,7 +299,7 @@ public class XWikiDocument
     public Version getRCSVersion()
     {
         if (version == null) {
-            version = new Version("1.0");
+            return new Version("1.1");
         }
         return version;
     }
@@ -679,10 +677,7 @@ public class XWikiDocument
         if (version == null) {
             version = new Version("1.1");
         } else {
-            if (version.toString().equals("1"))
-                version = new Version("1.1");
-            else
-                version = version.next();
+            version = version.next();
         }
     }
 
@@ -4045,7 +4040,6 @@ public class XWikiDocument
     public void setComment(String comment)
     {
         this.comment = comment;
-        setMetaDataDirty(true);
     }
 
     public BaseObject newObject(String classname, XWikiContext context) throws XWikiException

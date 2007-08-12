@@ -672,6 +672,7 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 newObject.set("author", context.getUser(), context);
                 newObject.set("date", new Date(), context);
                 newObject.set("comment", message, context);
+                doc.setContentDirty(false); //consider comments not being content
                 context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), context);
                 return true;
             } else

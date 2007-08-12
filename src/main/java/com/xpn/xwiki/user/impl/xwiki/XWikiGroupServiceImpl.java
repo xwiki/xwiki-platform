@@ -185,16 +185,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     		return null;
     }
 
-    public List listAllLevels(XWikiContext context) throws XWikiException {
-        List list = new ArrayList();
-        String levels = "admin,view,edit,comment,delete,register,programming";
-        String[] level = levels.split(",");
-        for (int i = 0; i < level.length; i++) {
-            list.add(level[i]);
-        }
-        return list;
-    }
-
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
         try {
             if (event == XWikiNotificationInterface.EVENT_CHANGE) {

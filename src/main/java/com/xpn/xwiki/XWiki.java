@@ -185,6 +185,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      */
     private static String configPath = null;
 
+    /*
+     * Work directory
+     */
+    private static File workDir = null;
+
+    /*
+     * Temp directory
+     */
+    private static File tempDir = null;
+
     private static String getConfigPath() throws NamingException
     {
         if (configPath == null) {
@@ -5437,5 +5447,151 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return (int) ParamAsLong("xwiki.rights.maxrecursivespacechecks", 0);
         else
             return max;
+    }
+
+    /**
+     * Get the XWiki temporary filesystem directory (deleted on exit)
+     *
+     * @param context
+     * @return temporary directory
+     * @since 1.1 Milestone 4
+     */
+    public File getTempDirectory(XWikiContext context)
+    {
+        // if tempDir has already been set, return it
+        if (tempDir != null)
+        {
+            return tempDir;
+        }
+
+        // xwiki.cfg
+        String dirPath = context.getWiki().Param("xwiki.temp.dir");
+        if (dirPath != null)
+        {
+            try
+            {
+                tempDir = new File(dirPath.replaceAll("\\s+$", ""));
+                if (tempDir.isDirectory() && tempDir.canWrite())
+                {
+                    tempDir.deleteOnExit();
+                    return tempDir;
+                }
+            }
+            catch(Exception e)
+            {
+                tempDir = null;
+                LOG.warn("xwiki.temp.dir set in xwiki.cfg : " + dirPath + " does not exist or is not writable", e);
+            }
+        }
+
+        Object jsct = context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
+
+        // javax.servlet.context.tempdir (File)
+        if (jsct!=null && (jsct instanceof File))
+        {
+            workDir=(File)jsct;
+            if (workDir.isDirectory() && workDir.canWrite())
+            {
+                return workDir;
+            }
+        }
+
+        // javax.servlet.context.tempdir (String)
+        if (jsct!=null && (jsct instanceof String))
+        {
+            workDir=new File((String)jsct);
+
+            if (workDir.isDirectory() && workDir.canWrite())
+            {
+                return workDir;
+            }
+        }
+
+        // Let's make a tempdir in java.io.tmpdir
+        workDir = new File(System.getProperty("java.io.tmpdir"), "xwikiTemp");
+
+        if (workDir.exists())
+        {
+            workDir.deleteOnExit();
+        }
+        else
+        {
+            workDir.mkdir();
+            workDir.deleteOnExit();
+        }
+
+        return workDir;
+    }
+
+    /**
+     * Get a new directory in the xwiki work directory
+     *
+     * @param subdir desired directory name
+     * @param context
+     * @return work subdirectory
+     * @since 1.1 Milestone 4
+     */
+    public File getWorkSubdirectory(String subdir, XWikiContext context)
+    {
+        File fdir = new File(this.getWorkDirectory(context).getAbsolutePath(), subdir);
+        if (!fdir.exists())
+        {
+            fdir.mkdir();
+        }
+        return fdir;
+    }
+
+    /**
+     * Get the XWiki work directory
+     *
+     * @param context
+     * @return work directory
+     * @since 1.1 Milestone 4
+     */
+    public File getWorkDirectory(XWikiContext context)
+    {
+        String  dirPath;
+
+        // if workDir has already been set, return it
+        if (workDir != null)
+        {
+            return workDir;
+        }
+
+        // xwiki.cfg
+        dirPath = context.getWiki().Param("xwiki.work.dir");
+        if (dirPath != null)
+        {
+            try
+            {
+                workDir = new File(dirPath.replaceAll("\\s+$", ""));
+                if (workDir.exists())
+                {
+                    if (workDir.isDirectory() && workDir.canWrite())
+                    {
+                        return workDir;
+                    }
+                }
+                else
+                {
+                    workDir.mkdir();
+                    return workDir;
+                }
+            } 
+            catch(Exception e)
+            {
+                workDir = null;
+                LOG.warn("xwiki.work.dir set in xwiki.cfg : " + dirPath + " does not exist or is not writable", e);
+            }
+        }
+
+        /*
+         * TODO : it would be nice to create a subdirectory xwiki in APPServer/work or WEBAPP/WEB-INF/work
+         */
+
+        // No choices left, retreiving the temp directory
+        workDir = this.getTempDirectory(context);
+
+        return workDir;
     }
 }

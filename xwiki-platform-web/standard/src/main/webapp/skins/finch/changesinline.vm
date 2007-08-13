@@ -1,6 +1,5 @@
 #set($showactions = 0)
 <div id="changescontent" class="xwikiintracontent">
-    <h4 class="xwikiintratitle">$msg.get("changes")</h4>
 #set($rev1= $request.get("rev1"))
 #set($rev2= $request.get("rev2"))
 #if($request.get("type"))
@@ -13,14 +12,6 @@
 #else
 #set($lang = "")
 #end
-#*
-#set($params="xpage=changes&rev1=${rev1}&rev2=${rev2}$lang")
-$msg.get("currentdifftype"): $type (
-<a href="$doc.getURL("view", "$params&type=wiki")">$msg.get("wikidiff")</a>
-<a href="$doc.getURL("view", "$params&type=source")">$msg.get("sourcediff")</a>
-<a href="$doc.getURL("view", "$params&type=html")">$msg.get("htmldiff")</a>
-)
-*#
 #set($origdoc = $xwiki.getDocument($tdoc, $rev1))
 #set($newdoc = $xwiki.getDocument($tdoc, $rev2))
 #template("changesdoc.vm")

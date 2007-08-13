@@ -1,9 +1,25 @@
-<div style="width: 100%; background-color: #DDDDDD">
-#if($origdoc.getVersion().equals("1"))
-<h3>$msg.get("initialversion") $newdoc.version
-#else
-<h3>$msg.get("From") $msg.get("version") $origdoc.version $msg.get("to") $newdoc.version
+#if($xwiki.diff)
+#if(($request.xpage!="changes")&&($request.viewer!="changes"))
+<style type="text/css">
+.diffmodifiedline {
+  border-left: 8px solid #888888;
+  padding-left: 10px;
+}
+.diffunmodifiedline {
+  border-left: 8px solid #dddddd;
+  padding-left: 10px;
+}
+.diffremoveword {
+  background-color: red;
+  text-decoration: line-through;
+}
+.diffaddword {
+  background-color: lightgreen;
+}
+</style>
 #end
+<div style="width: 100%; background-color: #DDDDDD">
+<h3>$msg.get("from") $msg.get("version") $origdoc.version $msg.get("to") $newdoc.version
 #if(($origdoc=="")||($newdoc==""))
 #if($newdoc!="")
 $msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author),$doc) $msg.get("on") $xwiki.formatDate($newdoc.date)
@@ -14,61 +30,44 @@ $msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author),$
 $msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author), $doc) $msg.get("on") $xwiki.formatDate($newdoc.date)
 </h3>
 </div>
+#end
 
 <ul>
 #foreach($item in $doc.getMetaDataDiff($origdoc, $newdoc))
-<li>$item</li>
+#if($item.field=="author")
+<li>author:  $xwiki.getLocalUserName($item.getPrevvalue()) &gt;  $xwiki.getLocalUserName($item.getNewvalue())</li>
+#else
+<li>
+$item.getField(): $xwiki.diff.getDifferencesAsHTML($item.getPrevValue().toString(),$item.getNewValue().toString(), false)
+</li>
+#end
+#end
+</ul>
+
+<br /><br />
+#set($text1 = $origdoc.content)
+#set($text2 = $newdoc.content)
+$xwiki.diff.getDifferencesAsHTML($text1,$text2,false)
+
+<ul>
+#foreach($item1 in $doc.getClassDiff($origdoc, $newdoc))
+#foreach($item in $$item1)
+<li>
+$item.getClassName() - $item.getPropName(): $xwiki.diff.getDifferencesAsHTML($item.getPrevValue().toString(),$item.getNewValue().toString(),false)
+</li>
+#end
 #end
 </ul>
 
 <ul>
-#foreach($item in $doc.getClassDiff($origdoc, $newdoc))
-<li>$item</li>
+#foreach($item1 in $doc.getObjectDiff($origdoc, $newdoc))
+#foreach($item in $$item1)
+<li>
+$item.getClassName() - $item.getPropName(): $xwiki.diff.getDifferencesAsHTML($item.getPrevValue().toString(),$item.getNewValue().toString(),false)
+</li>
+#end
 #end
 </ul>
-
-<ul>
-#foreach($item in $doc.getObjectDiff($origdoc, $newdoc))
-<li>$item</li>
-#end
-</ul>
-
-
-#if($type=="wiki")
-#set($deltas= $tdoc.getRenderedContentDiff($origdoc, $newdoc))
-#end
-
-#if($type=="xml")
-#set($deltas= $tdoc.getXMLDiff($origdoc, $newdoc))
 #else
-#set($deltas= $tdoc.getContentDiff($origdoc, $newdoc))
-#end
-
-#foreach($delta in $deltas)
-#set($chunk = $delta.revised)
-#if ($chunk.size()>0)
-<div style="border-left: 8px solid #00FF00">
-#if (($type == "source")||($type == "xml"))
-<pre>
-$xwiki.renderChunk($chunk, true, $tdoc)
-</pre>
-#else
-$xwiki.renderChunk($chunk, $tdoc)
-#end
-</div>
-#end
-
-#set($chunk = $delta.original)
-#if ($chunk.size()>0)
-<div style="border-left: 8px solid #FF0000">
-#if (($type == "source")||($type == "xml"))
-<pre>
-$xwiki.renderChunk($chunk, true, $tdoc)
-</pre>
-#else
-$xwiki.renderChunk($chunk, $tdoc)
-#end
-</div>
-#end
-#end
+#template("changesdocold.vm")
 #end

@@ -27,3 +27,22 @@
   margin-left: 5px;
   margin-right: 5px;
 }
+
+.diffmodifiedline {
+  border-left: 8px solid #888888;
+  padding-left: 10px;
+}
+
+.diffunmodifiedline {
+  border-left: 8px solid #dddddd;
+  padding-left: 10px;
+}
+
+.diffremoveword {
+  background-color: red;
+  text-decoration: line-through;
+}
+
+.diffaddword {
+  background-color: lightgreen;
+}

@@ -7,7 +7,7 @@
 $pdfdoc.use("XWiki.PDFClass")
 #template("pdfhtmlheader.vm")
 #set($withPageBreaks = false)
-#if($request.pagebreaks=="1")
+#if($request.pagebreaks&&($request.pagebreaks=="1"))
 #set($withPageBreaks = true)
 #end
 #if($request.pages)
@@ -37,10 +37,10 @@ $cdoc.getRenderedContent()
   #includeLinks($cdoc.fullName $withPageBreaks)
  #end
 #end
-#if ($request.get("comments")=="1")
+#if ($request.comments&&($request.comments=="1"))
 #template("comments2.vm")
 #end
-#if ($request.get("attachments")=="1")
+#if ($request.attachments&&($request.attachments=="1"))
 <div id="xwikiattachments">
 #foreach ($attach in $doc.attachmentList)
 #if ($attach.isImage())

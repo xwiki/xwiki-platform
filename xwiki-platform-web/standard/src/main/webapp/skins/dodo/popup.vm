@@ -6,10 +6,10 @@ $context.setLinksQueryString("xpage=popup")
 $cdoc.getRenderedContent()
 $context.unsetLinksQueryString()
 </div>
-#if ($request.get("comments")=="1")
+#if ($request.comments&&($request.comments=="1"))
 #template("comments2.vm")
 #end
-#if ($request.get("attachments")=="1")
+#if ($request.attachments&&($request.attachments=="1"))
 <div id="xwikiattachments">
 #foreach ($attach in $doc.attachmentList)
 #if ($attach.isImage())

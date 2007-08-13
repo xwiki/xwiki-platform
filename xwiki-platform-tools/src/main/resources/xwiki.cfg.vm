@@ -112,4 +112,14 @@ xwiki.section.edit=1
 xwiki.defaultskin=albatross
 xwiki.defaultbaseskin=albatross
 
+## XWiki temporary directory
+# xwiki.temp.dir=/tmp/xwiki
+## XWiki work directory
+# xwiki.work.dir=/usr/local/xwiki
+
+## Lucene search engine
+# xwiki.plugins.lucene.indexdir=/usr/local/xwiki/lucene
+# xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer
+# xwiki.plugins.lucene.indexinterval=20
+
 $!xwikiCfgAdditionalProperties

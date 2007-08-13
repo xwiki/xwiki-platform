@@ -2241,7 +2241,6 @@ TinyMCE_Engine.prototype = {
 		s = s.replace(/\'/g, '&#39;'); // &apos; is not working in MSIE
 		s = s.replace(/</g, '&lt;');
 		s = s.replace(/>/g, '&gt;');
-
 		return s;
 	},
 
@@ -3019,7 +3018,8 @@ TinyMCE_Control.prototype = {
 				value = tinyMCE.storeAwayURLs(value);
 				value = tinyMCE._customCleanup(this, "insert_to_editor", value);
 				tinyMCE._setHTML(doc, value);
-				tinyMCE.setInnerHTML(doc.body, tinyMCE._cleanupHTML(this, doc, tinyMCE.settings, doc.body));
+				// tinyMCE.setInnerHTML(doc.body, tinyMCE._cleanupHTML(this, doc, tinyMCE.settings, doc.body));
+                tinyMCE.setInnerHTML(doc.body, value);
 				tinyMCE.convertAllRelativeURLs(doc.body);
 
 				// Cleanup any mess left from storyAwayURLs

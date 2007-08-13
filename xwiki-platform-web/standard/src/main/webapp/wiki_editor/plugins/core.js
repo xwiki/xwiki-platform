@@ -15,7 +15,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
 	this.addInternalProcessor((/<h[1-7]\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h[1-7]>/i), 'convertHeadingInternal');
 
-    this.addInternalProcessor((/<p[^>]*>&nbsp;<\/p>/gi), "");
+    this.addInternalProcessor((/<p[^>]*>&nbsp;?<\/p>/gi), "\\\\\r\n");
 
     this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
 
@@ -62,8 +62,8 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessorBefore('convertParagraphExternal', (/##([^\r\n]*)$|(#\*([\s\S]+?)\*#)/im), 'convertVelocityCommentExternal');
     this.addInternalProcessorBefore('convertStyleInternal', (/<div\s*([^>]*)class=\"vcomment\"\s*([^>]*)>([\s\S]+?)(\r?\n?)<\/div>/i), 'convertVelocityCommentInternal');
 
-    this.addExternalProcessorBefore('convertTableExternal', (/\{style:\s*(.*?)\}([\s\S]+?)\{style\}/i), 'convertStyleExternal');
-    this.addInternalProcessorBefore('convertTableInternal', (/<(font|span|div)\s*(.*?)>([\s\S]+?)<\/(font|span|div)>/i), 'convertStyleInternal');
+    this.addExternalProcessorBefore('convertParagraphExternal', (/\r?\n?\{style:\s*(.*?)\}\r?\n?([\s\S]+?)\r?\n?\{style\}/i), 'convertStyleExternal');
+    this.addInternalProcessorBefore('convertTableInternal', (/<(font|span|div)\s*(.*?)>\r?\n?([\s\S]+?)\r?\n?\<\/(font|span|div)>/i), 'convertStyleInternal');
 
     //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");
     this.setHtmlTagRemover('removeHtmlTags_Groovy');
@@ -344,7 +344,8 @@ WikiEditor.prototype._removeBlankParagraphs = function(node) {
 
 WikiEditor.prototype.__removeBlankParagraphs = function(node) {
 	if(node.nodeName.toLowerCase() == "p" && this.trimString(node.innerHTML) == "") {
-		node.parentNode.removeChild(node);
+		node.parentNode.innerHTML += "<br />";
+        node.parentNode.removeChild(node);
 		return;
 	}
 	for(var i=0; node.childNodes[i]; i++) {
@@ -369,6 +370,37 @@ WikiEditor.prototype._cleanBR = function(node) {
 	for(var i=0; node.childNodes[i]; i++) {
 		this._cleanBR(node.childNodes[i]);
 	}
+}
+
+WikiEditor.prototype._encodeNode = function(node) {
+    function encode(s)  {
+        s = "" + s;
+        // Encoding wiki syntax
+        s = s.replace(/\*/g, '&#42;');
+        s = s.replace(/\~/g, '&#126;');
+        s = s.replace(/\[/g, '&#91;');
+        s = s.replace(/\]/g, '&#93;');
+        s = s.replace(/\_/g, '&#95;');
+        s = s.replace(/\{/g, '#123;');
+        s = s.replace(/\}/g, '&#125;');
+        // Encoding HTML
+        // s = s.replace(/\'/g, '&#39;'); // &apos; is not working in MSIE
+        // s = s.replace(/</g, '&lt;');
+        // s = s.replace(/>/g, '&gt;');
+        // Encoding more wiki syntax
+        // s = s.replace(/\-/g, '&#45;');
+        // s = s.replace(/\1/g, '&#49;');
+        return s;
+    }
+
+    function encodeNode(node) {
+        for(var i=0; node.childNodes[i];i++) {
+            encodeNode(node.childNodes[i]);
+        }
+        node.nodeValue = encode(node.nodeValue);
+    }
+
+    encodeNode(node);
 }
 
 WikiEditor.prototype.handleSupAndSubButons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
@@ -1429,7 +1461,7 @@ WikiEditor.prototype.convertHRInternal = function(regexp, result, content) {
     if (this.core.isMSIE) {
         str += "\r\n";
     } else if (result[1] == null || result[1] == "" || this.trimString(result[1].toString()) == "/") {
-        str += "\n";
+        str += "\r\n";
     }
     return content.replace(regexp, str);
 }

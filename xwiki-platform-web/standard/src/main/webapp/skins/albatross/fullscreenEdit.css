@@ -1,5 +1,5 @@
 #show-dialog-btn {
-  background: url(fullscreen_img/fullscreen22.gif) top right no-repeat;
+  background: url(images/fullscreen/fullscreen22.gif) top right no-repeat;
   width: 15px;
   height: 15px;
   cursor: pointer;
@@ -35,7 +35,7 @@ html > body #show-dialog-btn {
 }
 
 #fullscreen-dlg-head {
-  background: url(fullscreen_img/hd-sprite.gif) repeat-x 0px -82px;
+  background: url(images/fullscreen/hd-sprite.gif) repeat-x 0px -82px;
   background-color:navy;
   color:#FFF;
   font: bold 12px tahoma, verdana, helvetica, "sans serif";
@@ -136,7 +136,7 @@ html > body #show-dialog-btn {
   position: absolute;
   left: 5px;
   bottom: 5px;
-  background: transparent url(fullscreen_img/button.gif) no-repeat;
+  background: transparent url(images/fullscreen/button.gif) no-repeat;
   width:75px;
   height: 20px;
   cursor: pointer;
@@ -153,7 +153,7 @@ html > body #show-dialog-btn {
   font-size:1px;
   background-repeat:no-repeat;
   cursor:pointer;
-  background: url(fullscreen_img/close.gif) center no-repeat;
+  background: url(images/fullscreen/close.gif) center no-repeat;
 }
 
 .btnText {

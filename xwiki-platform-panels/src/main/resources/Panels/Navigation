@@ -137,7 +137,7 @@
 <property>
 <content>#panelhiddenheader("Navigation")
 #set ($hiddenSpaces = ["XWiki", "Admin", "Panels"])
-#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.WebSearchRss", "Main.BlogRss", "Blog.Macros", "Main.TagsRss", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
+#set ($hiddenPages = ["Main.WebRss", "Main.WebSearch", "Main.LuceneSearch", "Main.WebSearchRss", "Main.BlogRss", "Blog.Macros", "Main.TagsRss", "Main.RegisterNewUserAction", "Main.SpaceIndex", "Blog.Category"])
 #set ($blackListedPages = ["WebPreferences"])
 &lt;div id="xwikinavcontainer"&gt;
 #set($spaces = $xwiki.spaces)

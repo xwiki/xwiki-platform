@@ -136,7 +136,7 @@
 </property>
 <property>
 <content>#panelhiddenheader($msg.get("Search"))
-  &lt;form action="/xwiki/bin/view/Main/LuceneSearch"&gt;
+  &lt;form action="/xwiki/bin/view/Main/WebSearch"&gt;
     &lt;div id="globalsearch"&gt;
       &lt;input id="globalsearchinput" type="text" name="text" value="$msg.get('panels.search.inputText')" size="15" onfocus="if (this.value == '$msg.get('panels.search.inputText')') value=''; this.select();" onblur="if (this.value == '') value='$msg.get('panels.search.inputText')'; this.blur()"/&gt;
 &amp;nbsp;

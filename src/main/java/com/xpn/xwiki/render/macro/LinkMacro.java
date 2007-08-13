@@ -69,7 +69,7 @@ public class LinkMacro extends BaseLocaleMacro {
       writer.write(Encoder.escape(url));
       XWikiContext xcontext = (XWikiContext)params.getContext().get("xcontext");
       XWiki xwiki = xcontext.getWiki();
-      String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "_blank");
+      String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "");
       if (!defaulttarget.equals(""))
             writer.write(" target=\"" + defaulttarget + "\"");
       writer.write("\">");

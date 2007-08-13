@@ -88,10 +88,12 @@ public class PdfExportImpl implements PdfExport {
         tidy = new Tidy();
         Properties props = new Properties();
         props.setProperty("quiet", "true");
+        /*
         props.setProperty("quoteAmpersand", "true");
         props.setProperty("xHtml", "true");
         props.setProperty("showWarnings", "false");
         props.setProperty("tidyMark", "false");
+        */
         props.setProperty("clean", "true");
         tidy.setConfigurationFromProps(props);
         tidy.setTrimEmptyElements(false);

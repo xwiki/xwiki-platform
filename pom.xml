@@ -27,17 +27,17 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>3</version>
   </parent>
   <artifactId>xwiki-core</artifactId>
   <name>XWiki Platform - Core</name>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1-milestone-4</version>
   <description>XWiki Platform - Core</description>
   <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/core/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/core/trunk</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/core/trunk</url>
+    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/core/tags/xwiki-core-1.1-milestone-4</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/core/tags/xwiki-core-1.1-milestone-4</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/core/tags/xwiki-core-1.1-milestone-4</url>
   </scm>
   <dependencies>
 

@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>1-SNAPSHOT</version>
+    <version>1</version>
   </parent>
   <artifactId>xwiki-packager</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -46,7 +46,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1-milestone-4</version>
     </dependency>
   </dependencies>
   <build>
@@ -59,7 +59,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.2-SNAPSHOT</version>
+            <version>1.2</version>
           </dependency>
         </dependencies>
       </plugin>

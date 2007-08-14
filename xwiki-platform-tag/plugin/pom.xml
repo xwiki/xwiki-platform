@@ -28,7 +28,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>3</version>
   </parent>
   <groupId>com.xpn.xwiki.platform.plugins</groupId>
   <artifactId>xwiki-plugins</artifactId>

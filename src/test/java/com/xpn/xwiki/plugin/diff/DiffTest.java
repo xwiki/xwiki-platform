@@ -4,8 +4,8 @@ import com.xpn.xwiki.XWikiException;
 
 import java.util.List;
 
-import org.suigeneris.jrcs.diff.delta.Chunk;
-import org.suigeneris.jrcs.diff.delta.Delta;
+import org.suigeneris.jrcs.diff.Chunk;
+import org.suigeneris.jrcs.diff.Delta;
 
 
 /**

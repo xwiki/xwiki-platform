@@ -27,14 +27,21 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>1.2-SNAPSHOT</version>
+    <version>1</version>
   </parent>
   <artifactId>xwiki-jetty-resources</artifactId>
   <name>XWiki Platform - Tools - Jetty Configuration Resources</name>
+  <version>1.2</version>
   <packaging>jar</packaging>
   <description>
     Packages a Jetty installation. This module is used to generate a valid Jetty installation.
     In the future we should rather use Cargo for doing this (but some work has to be done on
     Cargo before it's ready to be used).
   </description>
+
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-jetty-resources-1.2</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-jetty-resources-1.2</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-jetty-resources-1.2</url>
+  </scm>
 </project>

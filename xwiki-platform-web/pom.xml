@@ -28,14 +28,14 @@
     <version>3</version>
   </parent>
   <artifactId>xwiki-web</artifactId>
-  <version>1.1-milestone-4</version>
+  <version>1.1-SNAPSHOT</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/web/tags/xwiki-web-1.1-milestone-4</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/web/tags/xwiki-web-1.1-milestone-4</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/web/tags/xwiki-web-1.1-milestone-4</url>
+    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/web/trunk</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/web/trunk</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/web/trunk</url>
   </scm>
   <profiles>
     <profile>

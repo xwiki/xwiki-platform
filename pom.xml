@@ -32,7 +32,7 @@
   <artifactId>xwiki-core</artifactId>
   <name>XWiki Platform - Core</name>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <description>XWiki Platform - Core</description>
   <scm>
     <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/core/trunk</connection>

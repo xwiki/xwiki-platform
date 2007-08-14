@@ -1099,6 +1099,8 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 	var text = result[1];
     var separator = this.trimString(result[3]);
     var url = (result[4])?(result[4]):(text);
+    // encode & in params since wysiwyg will not preserve them
+    url = url.replace(/\&/g, '&amp;')
     var target = this.trimString(result[7]);
     var classname;
 	var str = "<a class=\"" + classname + "\" href=\"" + url + "\"";

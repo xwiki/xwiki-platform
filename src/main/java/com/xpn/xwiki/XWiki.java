@@ -4434,9 +4434,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public String getUserTimeZone(XWikiContext context) {
         String tz = getUserPreference("timezone", context);
         if ((tz==null)||(tz.equals("")))
-            return Param("xwiki.timezone", "GMT");
+        {
+            String defaultTz = TimeZone.getDefault().getID();
+            return Param("xwiki.timezone", defaultTz);
+        }
         else
+        {
             return tz;
+        }
     }
 
 

@@ -27,11 +27,17 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>2-SNAPSHOT</version>
+    <version>2</version>
   </parent>
   <artifactId>xwiki-application-panels</artifactId>
   <name>XWiki Platform - Applications - Panels</name>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1-milestone-4</version>
   <packaging>xar</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
+
+  <scm>
+    <connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1-milestone-4</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1-milestone-4</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1-milestone-4</url>
+  </scm>
 </project>

@@ -26,6 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * This class represents a Queue (FirstInFirstOut) for XWikiDocument objects. It is used during
+ * indexing of the wiki. The rebuilding of the index is done, until the processing queue is empty.
+ * 
  * @version $Id: $
  */
 public class XWikiDocumentQueue
@@ -40,11 +43,17 @@ public class XWikiDocumentQueue
      */
     private Buffer namesQueue = new UnboundedFifoBuffer();
 
+    /**
+     * @return remove an item from our queue and return it.
+     */
     public synchronized IndexData remove()
     {
         return (IndexData) documentsByName.remove(namesQueue.remove());
     }
 
+    /**
+     * @param data IndexData object to add to our queue
+     */
     public synchronized void add(IndexData data)
     {
         final String key = data.getId();
@@ -57,11 +66,17 @@ public class XWikiDocumentQueue
         documentsByName.put(key, data);
     }
 
+    /**
+     * @return true if our queue is empty.
+     */
     public synchronized boolean isEmpty()
     {
         return namesQueue.isEmpty();
     }
 
+    /**
+     * @return number of elements in our queue.
+     */
     public long getSize()
     {
         return namesQueue.size();

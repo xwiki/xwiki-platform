@@ -222,14 +222,18 @@ public class DBListClass extends ListClass
     }
 
     public List getCachedDBList() {
-        return cachedDBList;
+        if (isCache())
+            return cachedDBList;
+        else
+            return null;
     }
 
     public void setCachedDBList(List cachedDBList) {
-        this.cachedDBList = cachedDBList;
+        if (isCache())
+            this.cachedDBList = cachedDBList;
     }
 
     public void flushCache() {
-        setCachedDBList(null);
+        this.cachedDBList = null;
     }
 }

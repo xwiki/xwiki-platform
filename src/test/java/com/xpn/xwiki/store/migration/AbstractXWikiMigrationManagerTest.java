@@ -70,10 +70,10 @@ public class AbstractXWikiMigrationManagerTest extends TestCase
         protected List getAllMigrations(XWikiContext context) throws XWikiException
         {
             List lst = new ArrayList();
-            lst.add(createMigrator(123));
-            lst.add(createMigrator(234));
             lst.add(createMigrator(345));
+            lst.add(createMigrator(123));
             lst.add(createMigrator(456));
+            lst.add(createMigrator(234));
             return lst;
         }
         XWikiDBVersion curversion;

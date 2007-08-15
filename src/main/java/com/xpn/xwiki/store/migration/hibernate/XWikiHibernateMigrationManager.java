@@ -19,7 +19,6 @@
 package com.xpn.xwiki.store.migration.hibernate;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -72,7 +71,8 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         getStore(context).executeWrite(context, true, new HibernateCallback() {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                session.saveOrUpdate(version);
+                session.createQuery("delete from "+XWikiDBVersion.class.getName()).executeUpdate();
+                session.save(version);
                 return null;
             }
         });
@@ -83,6 +83,7 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         // TODO: how to register migrations?
         // 1st way:
         result.add(new R4326SampleMigrator());
+        result.add(new R4340XWIKI883Migrator());
         // 2nd way - via classloader
         
         return result;

@@ -71,7 +71,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
             LOG.info("current data version = " + curversion.toString());
         }
         try {
-            Collection neededMigrations = getAllMigrations(context);
+            Collection neededMigrations = getNeededMigrations(context);
             startMigrations(neededMigrations, context);
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, 

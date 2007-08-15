@@ -19,7 +19,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
     private static final Log log = LogFactory.getLog(XWikiHibernateAttachmentStore.class);
 
     /**
-     * THis allows to initialize our storage engine.
+     * This allows to initialize our storage engine.
      * The hibernate config file path is taken from xwiki.cfg
      * or directly in the WEB-INF directory.
      * @param xwiki
@@ -27,6 +27,13 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
      */
     public XWikiHibernateAttachmentStore(XWiki xwiki, XWikiContext context) {
         super(xwiki, context);
+    }
+    /**
+     * @see #XWikiHibernateAttachmentStore(XWiki, XWikiContext)
+     */
+    public XWikiHibernateAttachmentStore(XWikiContext context)
+    {
+        this(context.getWiki(), context);
     }
 
     /**

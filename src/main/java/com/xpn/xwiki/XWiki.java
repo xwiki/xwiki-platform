@@ -49,6 +49,7 @@ import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.store.*;
 import com.xpn.xwiki.store.jcr.XWikiJcrStore;
+import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -581,7 +582,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         initXWiki(new XWikiConfig(is), context, engine_context, true);
     }
-
+    /**
+     * Initialize all xwiki subsystems.
+     */
     public void initXWiki(XWikiConfig config, XWikiContext context,
         XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
     {
@@ -591,32 +594,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Create the notification manager
         setNotificationManager(new XWikiNotificationManager());
 
-        // Prepare the store
-        XWikiStoreInterface basestore;
+        // Prepare the store        
         setConfig(config);
-        String storeclass = Param("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");
-        try {
-            Class[] classes = new Class[] {XWiki.class, XWikiContext.class};
-            Object[] args = new Object[] {this, context};
-            basestore =
-                (XWikiStoreInterface) Class.forName(storeclass).getConstructor(classes)
-                    .newInstance(args);
-        } catch (InvocationTargetException e) {
-            Object[] args = {storeclass};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load store class {0}",
-                e.getTargetException(),
-                args);
-        } catch (Exception e) {
-            Object[] args = {storeclass};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load store class {0}",
-                e,
-                args);
-        }
-
+        XWikiStoreInterface basestore = (XWikiStoreInterface) createClassFromConfig(
+            "xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore", context);
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache) {
@@ -625,52 +606,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         } else
             setStore(basestore);
 
-        String attachmentStoreclass =
-            Param("xwiki.store.attachment.class",
-                "com.xpn.xwiki.store.XWikiHibernateAttachmentStore");
-        try {
-            Class[] classes = new Class[] {XWiki.class, XWikiContext.class};
-            Object[] args = new Object[] {this, context};
-            setAttachmentStore((XWikiAttachmentStoreInterface) Class
-                .forName(attachmentStoreclass).getConstructor(classes).newInstance(args));
-        } catch (InvocationTargetException e) {
-            Object[] args = {attachmentStoreclass};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load attachment store class {0}",
-                e.getTargetException(),
-                args);
-        } catch (Exception e) {
-            Object[] args = {attachmentStoreclass};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load attachment store class {0}",
-                e,
-                args);
-        }
+        setAttachmentStore((XWikiAttachmentStoreInterface) createClassFromConfig(
+            "xwiki.store.attachment.class",
+            "com.xpn.xwiki.store.XWikiHibernateAttachmentStore", context));
 
-        String versioningStoreclass =
-            Param("xwiki.store.versioning.class",
-                "com.xpn.xwiki.store.XWikiHibernateVersioningStore");
-        try {
-            Class[] classes = new Class[] {XWiki.class, XWikiContext.class};
-            Object[] args = new Object[] {this, context};
-            setVersioningStore((XWikiVersioningStoreInterface) Class
-                .forName(versioningStoreclass).getConstructor(classes).newInstance(args));
-        } catch (InvocationTargetException e) {
-            Object[] args = {versioningStoreclass};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load versioning store class {0}",
-                e.getTargetException(),
-                args);
-        } catch (Exception e) {
-            Object[] args = {versioningStoreclass};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load versioning store class {0}",
-                e,
-                args);
+        setVersioningStore( (XWikiVersioningStoreInterface) createClassFromConfig(
+            "xwiki.store.versioning.class",
+            "com.xpn.xwiki.store.XWikiHibernateVersioningStore", context));
+
+        // Run migrations
+        if ("1".equals(Param("xwiki.store.migration", "0"))) {
+            if (LOG.isInfoEnabled())
+                LOG.info("Running migrations");
+            AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager) 
+                createClassFromConfig( "xwiki.store.migration.manager.class",
+                    "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
+            manager.startMigrations(context);
+            if ("1".equals(Param("xwiki.store.migration.exitAfterEnd", "0"))) {
+                if (LOG.isErrorEnabled())
+                    LOG.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
+                System.exit(0);
+            }
         }
 
         resetRenderingEngine(context);
@@ -711,6 +667,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 .equalsIgnoreCase(ro));
     }
 
+    protected Object createClassFromConfig(String param, String defClass, XWikiContext context)
+        throws XWikiException
+    {
+        String storeclass = Param(param, defClass);
+        try {
+            Class[] classes = new Class[] {XWikiContext.class};
+            Object[] args = new Object[] {context};
+            Object result = Class.forName(storeclass).getConstructor(classes)
+                .newInstance(args);
+            return result;
+        } catch (Exception e) {
+            Throwable ecause = e;
+            if (e instanceof InvocationTargetException)
+                ecause = ((InvocationTargetException)e).getTargetException();
+            Object[] args = {param, storeclass};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
+                "Cannot load class {1} from param {0}", ecause, args);
+        }
+    }
+    
     public void resetRenderingEngine(XWikiContext context) throws XWikiException
     {
         // Prepare the Rendering Engine

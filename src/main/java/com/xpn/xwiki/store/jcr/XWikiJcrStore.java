@@ -85,7 +85,11 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 		// create default wiki
 		createWiki("xwiki", context);
 	}
-	
+
+	public XWikiJcrStore(XWikiContext context) throws SecurityException, IllegalArgumentException, NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, XWikiException {
+        this(context.getWiki(), context);
+    }
+
 	public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException {
 		saveXWikiDoc(doc, context, true);
 	}

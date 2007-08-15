@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
+
 public class XWikiConfig extends Properties {
 
     public XWikiConfig() {
@@ -61,5 +63,13 @@ public class XWikiConfig extends Properties {
                 XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR,
                 "Error reading configuration file", e, args);
         }
+    }
+    /**
+     * @return array of string splited from property.
+     * @param param - name of property
+     */
+    public String[] getPropertyAsList(String param)
+    {
+        return StringUtils.split(getProperty(param, ""), " ,");
     }
 }

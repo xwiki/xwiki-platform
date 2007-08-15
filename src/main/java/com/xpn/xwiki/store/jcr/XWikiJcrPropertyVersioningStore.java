@@ -22,6 +22,10 @@ public class XWikiJcrPropertyVersioningStore extends XWikiJcrBaseStore implement
 		super(xwiki, context);
 	}
 	
+	public XWikiJcrPropertyVersioningStore(XWikiContext context) throws SecurityException, NoSuchMethodException, ClassNotFoundException, IllegalArgumentException, InstantiationException, IllegalAccessException, InvocationTargetException {
+        this(context.getWiki(), context);
+    }
+	
 	public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException {
 		try {
 			executeWrite(context, new JcrCallBack() {

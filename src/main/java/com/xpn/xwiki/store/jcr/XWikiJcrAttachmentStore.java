@@ -21,6 +21,10 @@ public class XWikiJcrAttachmentStore extends XWikiJcrBaseStore implements XWikiA
 		super(xwiki, context);
 	}
 	
+	public XWikiJcrAttachmentStore(XWikiContext context) throws SecurityException, IllegalArgumentException, NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException {
+	    this(context.getWiki(), context);
+    }
+	
 	public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException {
 		saveAttachmentContent(attachment, true, context, bTransaction);		
 	}

@@ -816,5 +816,11 @@
         </property>
     </class>
     -->
+    
+    <class name="com.xpn.xwiki.store.migration.XWikiDBVersion" table="xwikidbversion">
+        <id name="version" type="integer" unsaved-value="undefined">
+            <column name="XWV_VERSION" not-null="true" />
+            <generator class="assigned" />
+        </id>
+    </class>
 </hibernate-mapping>
-

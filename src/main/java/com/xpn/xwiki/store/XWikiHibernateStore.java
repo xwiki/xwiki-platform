@@ -80,6 +80,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         super(hibpath);
         initValidColumTypes();
     }
+    /**
+     * @see #XWikiHibernateStore(XWiki, XWikiContext)
+     */
+    public XWikiHibernateStore(XWikiContext context)
+    {
+        this(context.getWiki(), context);
+    }
 
     /**
      * This initializes the valid custom types

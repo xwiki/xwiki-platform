@@ -90,6 +90,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_FILENOTFOUND = 3002;
     public static final int ERROR_XWIKI_STORE_ARCHIVEFORMAT = 3003;
     public static final int ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT = 3004;
+    public static final int ERROR_XWIKI_STORE_MIGRATION = 3005;
 
     public static final int ERROR_XWIKI_STORE_RCS_SAVING_FILE = 3101;
     public static final int ERROR_XWIKI_STORE_RCS_READING_FILE = 3102;

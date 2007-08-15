@@ -20,7 +20,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     private static final Log log = LogFactory.getLog(XWikiHibernateVersioningStore.class);
 
     /**
-     * THis allows to initialize our storage engine.
+     * This allows to initialize our storage engine.
      * The hibernate config file path is taken from xwiki.cfg
      * or directly in the WEB-INF directory.
      * @param xwiki
@@ -37,6 +37,14 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
      */
     public XWikiHibernateVersioningStore(String hibpath) {
         super(hibpath);
+    }
+    
+    /**
+     * @see #XWikiHibernateVersioningStore(XWiki, XWikiContext)
+     */
+    public XWikiHibernateVersioningStore(XWikiContext context)
+    {
+        this(context.getWiki(), context);
     }
 
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {

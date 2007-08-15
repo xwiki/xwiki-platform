@@ -113,7 +113,8 @@ public class BaseProperty extends BaseElement implements PropertyInterface, Seri
     }
 
     public String toText() {
-        return getValue().toString();
+        Object value = getValue();
+        return (value==null) ? "" : value.toString();
     }
 
     public String toXMLString() {

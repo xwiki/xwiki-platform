@@ -434,11 +434,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         Iterator itfields = getFields().keySet().iterator();
         while (itfields.hasNext()) {
             String name = (String) itfields.next();
-            BaseElement prop = (BaseElement)getFields().get(name);
-            BaseElement prop2 = (BaseElement)collection.getFields().get(name);
+            BaseProperty prop = (BaseProperty) getFields().get(name);
+            BaseProperty prop2 = (BaseProperty) collection.getFields().get(name);
 
             if (prop2==null) {
-                String dprop = ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name, this,context);
+                String dprop = (prop.getValue() instanceof String) ? prop.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,this,context);
                 difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
                         name, dprop , ""));
             } else if (!prop.equals(prop2)) {
@@ -446,10 +446,10 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                 PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
                 if (pclass==null) {
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                            name, prop.toString() , prop2.toString()));
+                            name, prop.toText() , prop2.toText()));
                 } else {
-                    String dprop = pclass.displayView(name,this,context);
-                    String dprop2 = pclass.displayView(name,collection,context);
+                    String dprop = (prop.getValue() instanceof String) ? prop.toText() : pclass.displayView(name,this,context);
+                    String dprop2 = (prop2.getValue() instanceof String) ? prop2.toText() : pclass.displayView(name,collection,context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
                             name, dprop , dprop2));
                 }
@@ -459,17 +459,17 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         itfields = collection.getFields().keySet().iterator();
         while (itfields.hasNext()) {
             String name = (String) itfields.next();
-            BaseElement prop = (BaseElement)getFields().get(name);
-            BaseElement prop2 = (BaseElement)collection.getFields().get(name);
+            BaseProperty prop = (BaseProperty)getFields().get(name);
+            BaseProperty prop2 = (BaseProperty)collection.getFields().get(name);
 
             if (prop==null) {
                 BaseClass bclass = getxWikiClass(context);
                 PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
                 if (pclass==null) {
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                            name, "" , prop2.toString()));
+                            name, "" , prop2.toText()));
                 } else {
-                    String dprop2 = ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,collection,context);
+                    String dprop2 = (prop2.getValue() instanceof String) ? prop2.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,collection,context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
                             name, "" , dprop2));
                 }

@@ -36,16 +36,16 @@ public class Space extends SpaceSummary
         this.setHomepage(homepage);
     }
 
-    public Space(Map parameters)
+    public Space(Map map)
     {
-        super(parameters);
-        this.setDescription(((String) parameters.get("description")));
-        this.setHomepage(((String) parameters.get("homepage")));
+        super(map);
+        this.setDescription(((String) map.get("description")));
+        this.setHomepage(((String) map.get("homepage")));
     }
 
-    Map getParameters()
+    Map toMap()
     {
-        Map params = super.getParameters();
+        Map params = super.toMap();
         params.put("description", getDescription());
         params.put("homepage", getHomepage());
         return params;

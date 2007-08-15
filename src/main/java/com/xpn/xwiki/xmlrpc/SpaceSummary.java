@@ -74,7 +74,7 @@ public class SpaceSummary
     }
 
     /**
-     * @param spaceSummaryProperties te Map containing all informations to setup a SpaceSummary
+     * @param map te Map containing all informations to setup a SpaceSummary
      *            object. More specifically in the map there <b>must</b> be the following keys:
      *            <ul>
      *            <li>"key": key of the SpaceSummary</li>
@@ -83,17 +83,17 @@ public class SpaceSummary
      *            </ul>
      * @see #SpaceSummary(String, String, String)
      */
-    public SpaceSummary(Map spaceSummaryProperties)
+    public SpaceSummary(Map map)
     {
-        this((String) spaceSummaryProperties.get(KEY), (String) spaceSummaryProperties.get(NAME),
-            (String) spaceSummaryProperties.get(URL));
+        this((String) map.get(KEY), (String) map.get(NAME),
+            (String) map.get(URL));
     }
 
     /**
      * @return the SpaceSummary object represented by a Map. The Map keys are the XML-RPC ids and
      *         the values are the property values. This map will be used to build a XML-RPC message.
      */
-    Map getParameters()
+    Map toMap()
     {
         Map params = new HashMap();
         params.put(KEY, getKey());

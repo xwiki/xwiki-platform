@@ -22,6 +22,7 @@
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 
 import java.util.Date;
 import java.util.Map;
@@ -47,28 +48,34 @@ public class PageHistorySummary
 
     public PageHistorySummary(XWikiDocument document)
     {
-        this.id = document.getFullName();
-        this.version = document.getRCSVersion().getNumbers()[1];
-        this.modified = document.getDate();
-        this.modifier = document.getAuthor();
+        setId(document.getFullName() + ":" + document.getVersion());
+        // TODO is this a proper implementation ?
+        // Will it also be proper when we introduce minor edits ? NO
+        setVersion(document.getRCSVersion().getNumbers()[1]);
+        setModified(document.getDate());
+        setModifier(document.getAuthor());
     }
     
-    public PageHistorySummary(Map parameters)
+    public PageHistorySummary(Map map) throws ConversionException
     {
-    	this.id = (String)parameters.get("id");
-    	this.version = ((Integer)parameters.get("version")).intValue();
-    	this.modified = (Date)parameters.get("modified");
-    	this.modifier = (String)parameters.get("modifier");
+    	setId((String)map.get("id"));
+        if (map.containsKey("version")) {
+            setVersion(Convert.str2int((String)map.get("version")));
+        }
+        if (map.containsKey("modified")) {
+            setModified(Convert.str2date((String)map.get("modified")));
+        }
+    	setModifier((String)map.get("modifier"));
     }
 
-    Map getParameters()
+    public Map toMap()
     {
-        Map params = new HashMap();
-        params.put("id", getId());
-        params.put("version", new Integer(getVersion()));
-        params.put("modified", getModified());
-        params.put("modifier", getModifier());
-        return params;
+        Map map = new HashMap();
+        map.put("id", getId());
+        map.put("version", Convert.int2str(getVersion()));
+        map.put("modified", Convert.date2str(getModified()));
+        map.put("modifier", getModifier());
+        return map;
     }
 
     public String getId()

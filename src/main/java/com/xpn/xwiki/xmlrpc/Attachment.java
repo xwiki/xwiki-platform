@@ -26,6 +26,7 @@ import java.util.Map;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 
 /**
  * Represents an Attachment as described in the <a href="Confluence specification">
@@ -150,22 +151,41 @@ public class Attachment
     }
 
     /**
-     * @return the Attachment object represented by a Map. The Map keys are the XML-RPC ids and the
-     *         values are the property values. This map will be used to build a XML-RPC message.
+     * @param map A Map<String,String> that is received from the XML-RPC client.
      */
-    Map getParameters()
+    public Attachment(Map map) throws ConversionException
     {
-        Map params = new HashMap();
-        params.put(ID, getId());
-        params.put(PAGE_ID, getPageId());
-        params.put(TITLE, getTitle());
-        params.put(FILE_NAME, getFileName());
-        params.put(FILE_SIZE, getFileSize());
-        params.put(CONTENT_TYPE, (getContentType() != null) ? getContentType() : "");
-        params.put(CREATED, getCreated());
-        params.put(CREATOR, getCreator());
-        params.put(URL, getUrl());
-        return params;
+        setId((String) map.get(ID));
+        setPageId((String) map.get(PAGE_ID));
+        setTitle((String) map.get(TITLE));
+        setFileName((String) map.get(FILE_NAME));
+        setFileSize((String) map.get(FILE_SIZE));
+        setContentType((String) map.get(CONTENT_TYPE));
+        if (map.containsKey(CREATED)) {
+            setCreated(Convert.str2date((String) map.get(CREATED)));
+        }
+        setCreator((String) map.get(CREATOR));
+        setUrl((String) map.get(URL));    
+    }
+    
+    /**
+     * @return the Attachment object represented by a Map<String,String>. The Map keys are the
+     *         XML-RPC ids and the values are the property values. This map will be used to build a
+     *         XML-RPC message.
+     */
+    public Map toMap()
+    {
+        Map map = new HashMap();
+        map.put(ID, getId());
+        map.put(PAGE_ID, getPageId());
+        map.put(TITLE, getTitle());
+        map.put(FILE_NAME, getFileName());
+        map.put(FILE_SIZE, getFileSize());
+        map.put(CONTENT_TYPE, (getContentType() != null) ? getContentType() : "");
+        map.put(CREATED, Convert.date2str(getCreated()));
+        map.put(CREATOR, getCreator());
+        map.put(URL, getUrl());
+        return map;
     }
 
     /**

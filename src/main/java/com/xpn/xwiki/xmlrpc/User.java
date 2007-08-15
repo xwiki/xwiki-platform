@@ -21,6 +21,9 @@
 
 package com.xpn.xwiki.xmlrpc;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -36,10 +39,28 @@ public class User
 
     public User(XWikiDocument userdoc, XWikiContext context)
     {
-        this.name = userdoc.getName();
-        this.fullname = userdoc.getStringValue("XWiki.XWikiUsers", "fullName");
-        this.email = userdoc.getStringValue("XWiki.XWikiUsers", "email");
-        this.url = userdoc.getURL("view", context);
+        setName(userdoc.getName());
+        setFullname(userdoc.getStringValue("XWiki.XWikiUsers", "fullName"));
+        setEmail(userdoc.getStringValue("XWiki.XWikiUsers", "email"));
+        setUrl(userdoc.getURL("view", context));
+    }
+    
+    public User(Map map)
+    {
+        setName((String) map.get("name"));
+        setFullname((String) map.get("fullname"));
+        setEmail((String) map.get("email"));
+        setUrl((String) map.get("url"));
+    }
+    
+    public Map toMap()
+    {
+        Map map = new HashMap();
+        map.put("name", getName());
+        map.put("fullname", getFullname());
+        map.put("email", getEmail());
+        map.put("url", getUrl());
+        return map;
     }
 
     public String getName()

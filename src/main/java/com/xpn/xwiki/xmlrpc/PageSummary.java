@@ -20,10 +20,14 @@
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.suigeneris.jrcs.rcs.Version;
 
 public class PageSummary
 {
@@ -42,46 +46,55 @@ public class PageSummary
     public PageSummary(String id, String space, String parentId, String title, String url,
         int locks)
     {
-        this.setId(id);
-        this.setSpace(space);
-        this.setParentId(parentId);
-        this.setTitle(title);
-        this.setUrl(url);
-        this.setLocks(locks);
+        setId(id);
+        setSpace(space);
+        setParentId(parentId);
+        setTitle(title);
+        setUrl(url);
+        setLocks(locks);
     }
 
-    public PageSummary(Map parameters)
+    public PageSummary(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        this.setId((String) parameters.get("id"));
-        this.setSpace((String) parameters.get("space"));
-        this.setParentId((String) parameters.get("parentId"));
-        this.setTitle((String) parameters.get("title"));
-        this.setUrl((String) parameters.get("url"));
-        if (parameters.containsKey("locks")) {
-            this.setLocks(((Integer) parameters.get("locks")).intValue());
+        Version[] versions = doc.getRevisions(context);
+        if (versions[versions.length-1].toString().equals(doc.getVersion())) {
+            // Current version of document
+            setId(doc.getFullName());
+            setUrl(doc.getURL("view", context));
+        } else {
+            // Old version of document
+            setId(doc.getFullName() + ":" + doc.getVersion());
+            setUrl(doc.getURL("view", "rev="+doc.getVersion(), context));
+        }
+        
+        setSpace(doc.getSpace());
+        setParentId(doc.getParent());
+        setTitle(doc.getName());
+        setLocks(0);
+    }
+    
+    public PageSummary(Map map) throws ConversionException
+    {
+        setId((String) map.get("id"));
+        setSpace((String) map.get("space"));
+        setParentId((String) map.get("parentId"));
+        setTitle((String) map.get("title"));
+        setUrl((String) map.get("url"));
+        if (map.containsKey("locks")) {
+            setLocks(Convert.str2int((String) map.get("locks")));
         }
     }
 
-    public PageSummary(XWikiDocument doc, XWikiContext context)
+    Map toMap()
     {
-        this.setId(doc.getFullName());
-        this.setSpace(doc.getSpace());
-        this.setParentId(doc.getParent());
-        this.setTitle(doc.getName());
-        this.setUrl(doc.getURL("view", context));
-        this.setLocks(0);
-    }
-
-    Map getParameters()
-    {
-        Map params = new HashMap();
-        params.put("id", getId());
-        params.put("space", getSpace());
-        params.put("parentId", getParentId());
-        params.put("title", getTitle());
-        params.put("url", getUrl());
-        params.put("locks", new Integer(getLocks()));
-        return params;
+        Map map = new HashMap();
+        map.put("id", getId());
+        map.put("space", getSpace());
+        map.put("parentId", getParentId());
+        map.put("title", getTitle());
+        map.put("url", getUrl());
+        map.put("locks", Convert.int2str(getLocks()));
+        return map;
     }
 
     public String getId()

@@ -62,24 +62,24 @@ public class SearchResult
             setExcerpt(content.substring(0, 256));
     }
     
-    public SearchResult(Map parameters)
+    public SearchResult(Map map)
     {
-    	setTitle((String)parameters.get("title"));
-    	setUrl((String)parameters.get("url"));
-    	setExcerpt((String)parameters.get("excerpt"));
-    	setId((String)parameters.get("id"));
-    	setType((String)parameters.get("type"));
+    	setTitle((String)map.get("title"));
+    	setUrl((String)map.get("url"));
+    	setExcerpt((String)map.get("excerpt"));
+    	setId((String)map.get("id"));
+    	setType((String)map.get("type"));
     }
 
-    Map getParameters()
+    Map toMap()
     {
-        Map params = new HashMap();
-        params.put("title", getTitle());
-        params.put("url", getUrl());
-        params.put("excerpt", getExcerpt());
-        params.put("id", getId());
-        params.put("type", getType());
-        return params;
+        Map map = new HashMap();
+        map.put("title", getTitle());
+        map.put("url", getUrl());
+        map.put("excerpt", getExcerpt());
+        map.put("id", getId());
+        map.put("type", getType());
+        return map;
     }
 
     public String getTitle()

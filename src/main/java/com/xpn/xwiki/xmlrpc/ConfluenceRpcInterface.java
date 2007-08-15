@@ -98,6 +98,8 @@ public interface ConfluenceRpcInterface
 
     // Spaces Management
 
+    // TODO JavaDoc: we SAY we require description, but we discard it!
+    // we can also live without a space name
     /**
      * Create a new space.
      * 
@@ -115,7 +117,7 @@ public interface ConfluenceRpcInterface
      * 
      * @param token the authentication token retrieved when calling the login method
      * @param spaceKey the space to be deleted
-     * @return whether the operation suceeded or not
+     * @return true (xml-rpc methods have to return something)
      * @throws XWikiException in case of error
      */
     boolean removeSpace(String token, String spaceKey) throws XWikiException;
@@ -143,7 +145,8 @@ public interface ConfluenceRpcInterface
     Map getPage(String token, String pageId) throws XWikiException;
 
     /**
-     * Returns all the PageHistorySummaries.
+     * Returns all the previous versions of a page as a list of PageHistorySummaries.
+     * We only consider the *old* versions of the document in the page history.
      * 
      * @param token the authentication token retrieved when calling the login method
      * @param pageId page identifier to look for
@@ -178,6 +181,7 @@ public interface ConfluenceRpcInterface
 
     // Page Management
 
+    // TODO Why is the version needed for updating ?
     /**
      * Add or update a page.
      * 
@@ -216,7 +220,7 @@ public interface ConfluenceRpcInterface
      * 
      * @param token the authentication token retrieved when calling the login method
      * @param pageId id of page to delete
-     * @return whether the page deletion was successful or not
+     * @return true (xml-rpc methods have to return something)
      * @throws XWikiException in case of error
      */
     boolean removePage(String token, String pageId) throws XWikiException;
@@ -252,18 +256,20 @@ public interface ConfluenceRpcInterface
      * @param token the authentication token retrieved when calling the login method
      * @param user object of new user
      * @param password of the new user
+     * @return true (xml-rpc methods have to return something)
      * @throws XWikiException in case of error
      */
-    void addUser(String token, Map user, String password) throws XWikiException;
+    boolean addUser(String token, Map user, String password) throws XWikiException;
 
     /**
      * Add a new group.
      * 
      * @param token the authentication token retrieved when calling the login method
      * @param group name of group to add
+     * @return true (xml-rpc methods have to return something)
      * @throws XWikiException in case of error
      */
-    void addGroup(String token, String group) throws XWikiException;
+    boolean addGroup(String token, String group) throws XWikiException;
 
     /**
      * Get a user's current groups.
@@ -281,13 +287,41 @@ public interface ConfluenceRpcInterface
      * @param token the authentication token retrieved when calling the login method
      * @param username name of user to add to a group
      * @param groupname name of group to add user
+     * @return true (xml-rpc methods have to return something)
      * @throws XWikiException in case of error
      */
-    void addUserToGroup(String token, String username, String groupname) throws XWikiException;
+    boolean addUserToGroup(String token, String username, String groupname) throws XWikiException;
     
-    public Map addComment(String token, Map commentParams)  throws XWikiException;
     
+    // TODO extend these descriptions
+    
+    /**
+     * Returns a comment given a comment id.
+     * 
+     * @param token
+     * @param commentId
+     * @return
+     * @throws XWikiException
+     */
     public Map getComment(String token, String commentId) throws XWikiException;
-    
+
+    /**
+     * Adds a comment to a page.
+     * 
+     * @param token
+     * @param commentParams
+     * @return
+     * @throws XWikiException
+     */
+    public Map addComment(String token, Map commentParams)  throws XWikiException;
+
+    /**
+     * Removes a comment given a comment id.
+     * 
+     * @param token
+     * @param commentId
+     * @return true (xml-rpc methods have to return something)
+     * @throws XWikiException
+     */
     public boolean removeComment(String token, String commentId) throws XWikiException;
 }

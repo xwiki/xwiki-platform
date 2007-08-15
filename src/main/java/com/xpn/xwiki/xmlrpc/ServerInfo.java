@@ -24,6 +24,8 @@ package com.xpn.xwiki.xmlrpc;
 import java.util.Map;
 import java.util.HashMap;
 
+import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
+
 /**
  * This helper class is not referenced (yet)
  * (ConfluenceRpcInterface.getServerInfo throws "Not implemented" exception) 
@@ -45,16 +47,34 @@ public class ServerInfo
 
     private String baseUrl;
 
-    Map getParameters()
+    public ServerInfo(Map map) throws ConversionException
     {
-        Map params = new HashMap();
-        params.put("majorVersion", new Integer(getMajorVersion()));
-        params.put("minorVersion", new Integer(getMinorVersion()));
-        params.put("patchLevel", new Integer(getPatchLevel()));
-        params.put("buildId", getBuildId());
-        params.put("developmentBuild", new Boolean(isDevelopmentBuild()));
-        params.put("baseUrl", getBaseUrl());
-        return params;
+        if (map.containsKey("majorVersion")) {
+            setMajorVersion(Convert.str2int((String) map.get("majorVersion")));
+        }        
+        if (map.containsKey("minorVersion")) {
+            setMinorVersion(Convert.str2int((String) map.get("minorVersion")));
+        }
+        if (map.containsKey("patchLevel")) {
+            setPatchLevel(Convert.str2int((String) map.get("patchLevel")));
+        }
+        setBuildId((String) map.get("buildId"));
+        if (map.containsKey("developmentBuild")) {
+            setDevelopmentBuild(Convert.str2bool((String) map.get("developmentBuild")));
+        }
+        setBaseUrl((String) map.get("baseUrl"));
+    }
+    
+    public Map toMap()
+    {
+        Map map = new HashMap();
+        map.put("majorVersion", Convert.int2str(getMajorVersion()));
+        map.put("minorVersion", Convert.int2str(getMinorVersion()));
+        map.put("patchLevel", Convert.int2str(getPatchLevel()));
+        map.put("buildId", getBuildId());
+        map.put("developmentBuild", Convert.bool2str(isDevelopmentBuild()));
+        map.put("baseUrl", getBaseUrl());
+        return map;
     }
 
     public int getMajorVersion()

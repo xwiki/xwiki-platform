@@ -20,7 +20,9 @@
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 
 import java.util.Date;
 import java.util.Map;
@@ -54,64 +56,72 @@ public class Page extends PageSummary
 
     private String comment;
 
+    // This constructor is really ridiculous
     public Page(String id, String space, String parentId, String title, String url, int version,
         String content, Date created, String creator, Date modified, String modifier,
         boolean homepage, String comment, int locks)
     {
         super(id, space, parentId, title, url, locks);
-        this.setVersion(version);
-        this.setContent(content);
-        this.setCreated(created);
-        this.setCreator(creator);
-        this.setModified(modified);
-        this.setModifier(modifier);
-        this.setHomepage(homepage);
-        this.setComment(comment);
+        setVersion(version);
+        setContent(content);
+        setCreated(created);
+        setCreator(creator);
+        setModified(modified);
+        setModifier(modifier);
+        setHomepage(homepage);
+        setComment(comment);
     }
 
-    public Page(XWikiDocument doc, XWikiContext context)
+    public Page(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         super(doc, context);
-        this.setVersion(doc.getRCSVersion().getNumbers()[1]);
-        this.setContent(doc.getContent());
-        this.setCreated(doc.getCreationDate());
-        this.setCreator(doc.getAuthor());
-        this.setModified(doc.getDate());
-        this.setModifier(doc.getAuthor());
-        this.setComment(doc.getComment());
-        this.setHomepage((doc.getName().equals("WebHome")));
+        int[] numbers = doc.getRCSVersion().getNumbers();
+        setVersion(numbers[1]);
+        // TODO This is a super ugly fix
+//        setVersion(numbers[numbers.length-1]);
+        setContent(doc.getContent());
+        setCreated(doc.getCreationDate());
+        setCreator(doc.getAuthor());
+        setModified(doc.getDate());
+        setModifier(doc.getAuthor());
+        setComment(doc.getComment());
+        setHomepage((doc.getName().equals("WebHome")));
     }
 
-    public Page(Map parameters)
+    public Page(Map map) throws ConversionException
     {
-        super(parameters);
+        super(map);
 
-        if (parameters.containsKey("version")) {
-            this.setVersion(((Integer) parameters.get("version")).intValue());
+        if (map.containsKey("version")) {
+            setVersion(Convert.str2int((String) map.get("version")));
         }
-        this.setContent((String) parameters.get("content"));
-        this.setCreated((Date) parameters.get("created"));
-        this.setCreator((String) parameters.get("creator"));
-        this.setModified((Date) parameters.get("modified"));
-        this.setModifier((String) parameters.get("modifier"));
-        this.setComment((String) parameters.get("comment"));
-        if (parameters.containsKey("homepage")) {
-            this.setHomepage(((Boolean) parameters.get("homepage")).booleanValue());
+        setContent((String) map.get("content"));
+        if (map.containsKey("created")) {
+            setCreated(Convert.str2date((String) map.get("created")));
+        }
+        setCreator((String) map.get("creator"));
+        if (map.containsKey("modified")) {
+            setModified(Convert.str2date((String) map.get("modified")));
+        }
+        setModifier((String) map.get("modifier"));
+        setComment((String) map.get("comment"));
+        if (map.containsKey("homepage")) {
+            setHomepage(Convert.str2bool((String) map.get("homepage")));
         }
     }
 
-    Map getParameters()
+    public Map toMap()
     {
-        Map params = super.getParameters();
-        params.put("version", new Integer(getVersion()));
-        params.put("content", getContent());
-        params.put("created", getCreated());
-        params.put("creator", getCreator());
-        params.put("modified", getModified());
-        params.put("modifier", getModifier());
-        params.put("comment", getComment());
-        params.put("homepage", new Boolean(isHomepage()));
-        return params;
+        Map map = super.toMap();
+        map.put("version", Convert.int2str(getVersion()));
+        map.put("content", getContent());
+        map.put("created", Convert.date2str(getCreated()));
+        map.put("creator", getCreator());
+        map.put("modified", Convert.date2str(getModified()));
+        map.put("modifier", getModifier());
+        map.put("comment", getComment());
+        map.put("homepage", Convert.bool2str(isHomepage()));
+        return map;
     }
 
     public int getVersion()

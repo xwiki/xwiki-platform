@@ -22,12 +22,16 @@
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.suigeneris.jrcs.rcs.Version;
 
 public class Comment
 {
@@ -45,42 +49,57 @@ public class Comment
 
     private String creator;
 
-    public Comment(XWikiDocument doc, BaseObject obj, XWikiContext context)
+    public Comment(XWikiDocument doc, BaseObject obj, XWikiContext context) throws XWikiException
     {
-        setId(doc.getFullName() + ":" + obj.getNumber());
-        setPageId(doc.getFullName());
+        Version[] versions = doc.getRevisions(context);
+        if (versions[versions.length - 1].toString().equals(doc.getVersion())) {
+            setId(doc.getFullName() + ";" + obj.getNumber());
+            setPageId(doc.getFullName());
+            setUrl(doc.getURL("view", context));
+        } else {
+            setId(doc.getFullName() + ":" + doc.getVersion() + ";" + obj.getNumber());
+            setPageId(doc.getFullName() + ":" + doc.getVersion());
+            setUrl(doc.getURL("view", "rev=" + doc.getVersion(), context));
+        }
         setTitle(doc.getName());
         setContent(obj.getStringValue("comment"));
         setCreated(obj.getDateValue("date"));
         setCreator(obj.getStringValue("author"));
-        setUrl(doc.getURL("view", context));
     }
 
-    public Comment(Map parameters)
+    /**
+     * @param map A Map<String, String>
+     */
+    public Comment(Map map) throws ConversionException
     {
-    	setId((String)parameters.get("id"));
-    	setPageId((String)parameters.get("pageId"));
-    	setTitle((String)parameters.get("title"));
-    	setContent((String)parameters.get("content"));
-    	setUrl((String)parameters.get("url"));
-    	setCreated((Date)parameters.get("created"));
-    	setCreator((String)parameters.get("creator"));
+    	setId((String)map.get("id"));
+    	setPageId((String)map.get("pageId"));
+    	setTitle((String)map.get("title"));
+    	setContent((String)map.get("content"));
+    	setUrl((String)map.get("url"));
+    	if (map.containsKey("created")) {
+    	    setCreated(Convert.str2date((String)map.get("created")));
+    	}
+    	setCreator((String)map.get("creator"));
 	}
-    
-	public Map getParameters()
-	{
-        Map params = new HashMap();
-        params.put("id", getId());
-        params.put("pageId", getPageId());
-        params.put("title", getTitle());
-        params.put("content", getContent());
-        params.put("url", getUrl());
-        params.put("created", getCreated());
-        params.put("creator", getCreator());
-        return params;
+
+    /**
+     * @return A Map<String, String>
+     */
+    public Map toMap()
+    {
+        Map map = new HashMap();
+        map.put("id", getId());
+        map.put("pageId", getPageId());
+        map.put("title", getTitle());
+        map.put("content", getContent());
+        map.put("url", getUrl());
+        map.put("created", Convert.date2str(getCreated()));
+        map.put("creator", getCreator());
+        return map;
     }
-	
-	public String getId()
+
+    public String getId()
     {
         return id;
     }

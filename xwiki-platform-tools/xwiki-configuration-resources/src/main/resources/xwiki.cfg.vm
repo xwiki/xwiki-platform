@@ -6,6 +6,7 @@ xwiki.store.hibernate.updateschema=1
 xwiki.store.hibernate.custommapping=1
 xwiki.store.cache=1
 xwiki.store.cache.capacity=100
+xwiki.store.migration=1
 
 xwiki.monitor=1
 

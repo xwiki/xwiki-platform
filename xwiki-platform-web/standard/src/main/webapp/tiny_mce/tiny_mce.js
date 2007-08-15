@@ -1824,13 +1824,18 @@ TinyMCE_Engine.prototype = {
                         }
 
                         for (var x=0; x<el.rows[y].cells.length; x++) {
+                            el.rows[y].cells[x].className = "table-cell";
+                            // DO NOT USE INLINE STYLES
+                            //  BUT USE A CLASS
+                            /*
                             el.rows[y].cells[x].style.border = "1px solid #bdd0e9";
                             if (y != 0) {
-                                el.rows[y].cells[x].style.borderTopWidth = "0px"; 
+                                el.rows[y].cells[x].style.borderTopWidth = "0px";
                             }
                             if (x != 0) {
-                                el.rows[y].cells[x].style.borderLeftWidth = "0px"; 
+                                el.rows[y].cells[x].style.borderLeftWidth = "0px";
                             }
+                            */
                         }
                     }
                 }
@@ -2236,7 +2241,7 @@ TinyMCE_Engine.prototype = {
 
 	xmlEncode : function(s) {
 		s = "" + s;
-		s = s.replace(/&/g, '&amp;');
+		// s = s.replace(/&/g, '&amp;');
 		s = s.replace(new RegExp('"', 'g'), '&quot;');
 		s = s.replace(/\'/g, '&#39;'); // &apos; is not working in MSIE
 		s = s.replace(/</g, '&lt;');

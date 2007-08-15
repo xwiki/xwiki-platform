@@ -32,7 +32,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Iterator;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.InvocationHandler;
 
 public class XWikiHibernateBaseStore {
     private static final Log log = LogFactory.getLog(XWikiHibernateBaseStore.class);
@@ -788,5 +787,81 @@ public class XWikiHibernateBaseStore {
                 "</class>\n" +
                 "</hibernate-mapping>";
         return custommapping;
+    }
+
+    /**
+     * Callback (closure) interface for operations in hibernate. spring like.
+     */
+    public interface HibernateCallback {
+        /**
+         * method executed by {@link XWikiHibernateBaseStore} and pass open session to it.
+         * @param session - open hibernate session
+         * @return any you need be returned by {@link XWikiHibernateBaseStore#execute(XWikiContext, boolean, boolean, HibernateCallback)}
+         * @throws HibernateException if any store specific exception
+         */
+        Object doInHibernate(Session session) throws HibernateException;
+    }
+
+    /**
+     * Execute method for operations in hibernate. spring like. 
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @param context - used everywhere.
+     * @param bTransaction - should store use old transaction(false) or create new (true)
+     * @param doCommit - should store commit changes(if any), or rollback it.
+     * @param cb - callback to execute 
+     * @throws XWikiException if any error
+     */
+    public Object execute(XWikiContext context, boolean bTransaction, boolean doCommit, HibernateCallback cb) throws XWikiException {
+        MonitorPlugin monitor = Util.getMonitorPlugin(context);
+        try {
+            // Start monitoring timer
+            if (monitor!=null)
+                monitor.startTimer("hibernate");
+            
+            if (bTransaction) {
+                checkHibernate(context);
+                bTransaction = beginTransaction(context);
+            }
+            
+            return cb.doInHibernate(getSession(context));
+        } catch (Exception e) {
+            if (e instanceof XWikiException)
+                throw (XWikiException)e;
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Exception while hibernate execute", e);
+        } finally {
+            try {
+                if (bTransaction)
+                    endTransaction(context, doCommit);
+                if (monitor!=null)
+                    monitor.endTimer("hibernate");
+            } catch (Exception e) {}
+        }
+    }
+
+    /**
+     * Execute method for read-only operations in hibernate. spring like. 
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @param context - used everywhere.
+     * @param bTransaction - should store to use old transaction(false) or create new (true)
+     * @param cb - callback to execute 
+     * @throws XWikiException if any error
+     * @see #execute(XWikiContext, boolean, boolean, com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback)
+     */
+    public Object executeRead(XWikiContext context, boolean bTransaction, HibernateCallback cb) throws XWikiException {
+        return execute(context, bTransaction, false, cb);
+    }
+
+    /**
+     * Execute method for read-write operations in hibernate. spring like. 
+     * @return {@link HibernateCallback#doInHibernate(Session)}
+     * @param context - used everywhere.
+     * @param bTransaction - should store to use old transaction(false) or create new (true)
+     * @param cb - callback to execute 
+     * @throws XWikiException if any error
+     * @see #execute(XWikiContext, boolean, boolean, com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback)
+     */
+    public Object executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback cb) throws XWikiException {
+        return execute(context, bTransaction, true, cb);
     }
 }

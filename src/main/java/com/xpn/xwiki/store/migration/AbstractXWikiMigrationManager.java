@@ -62,7 +62,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException
     {
         XWikiDBVersion result = getDBVersionFromConfig(context);
-        return result==null ? new XWikiDBVersion(0) : result;
+        return result == null ? new XWikiDBVersion(0) : result;
     }
     /**
      * @param version to set

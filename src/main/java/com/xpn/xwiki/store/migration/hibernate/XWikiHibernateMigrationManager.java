@@ -55,9 +55,9 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
     }
     /** {@inheritDoc} */
     public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException {
-        XWikiDBVersion ver = super.getDBVersion(context);
-        return ver!=null ? ver : (XWikiDBVersion) getStore(context).executeRead(context, true, 
-            new HibernateCallback() {
+        XWikiDBVersion ver = getDBVersionFromConfig(context);
+        return ver != null ? ver : (XWikiDBVersion) getStore(context).executeRead(context, true,
+            new HibernateCallback() { 
             public Object doInHibernate(Session session) throws HibernateException
             {
                 XWikiDBVersion result = (XWikiDBVersion) session.createCriteria(

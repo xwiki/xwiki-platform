@@ -47,12 +47,22 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
      */
     public AbstractXWikiMigrationManager(XWikiContext context) { }
     /**
+     * read data version from xwiki.cfg.
+     * @param context used for read config
+     * @return data version if set, or null.
+     */
+    protected XWikiDBVersion getDBVersionFromConfig(XWikiContext context)
+    {
+        String ver = context.getWiki().getConfig().getProperty("xwiki.store.migration.version");
+        return ver == null ? null : new XWikiDBVersion(Integer.parseInt(ver));
+    }
+    /**
      * {@inheritDoc}
      */
     public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException
     {
-        String ver = context.getWiki().getConfig().getProperty("xwiki.store.migration.version");
-        return ver == null ? new XWikiDBVersion(0) : new XWikiDBVersion(Integer.parseInt(ver));
+        XWikiDBVersion result = getDBVersionFromConfig(context);
+        return result==null ? new XWikiDBVersion(0) : result;
     }
     /**
      * @param version to set

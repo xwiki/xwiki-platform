@@ -58,7 +58,7 @@ public class CommentAddAction extends XWikiAction {
                 doc.setContentDirty(false); // Consider comments not being content
                 // if we consider that it is no contentDirty so it NEED be metaDataDirty for increment version and change history.
                 doc.setMetaDataDirty(true);
-                xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), context);
+                xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addComment"), true, context);
             }
             // forward to edit
             String redirect = Utils.getRedirect("edit", context);

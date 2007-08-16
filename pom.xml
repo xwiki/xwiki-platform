@@ -83,14 +83,12 @@
     <dependency>
       <groupId>org.suigeneris</groupId>
       <artifactId>jrcs.diff</artifactId>
-      <version>0.3.0</version>
-      <classifier>xwiki</classifier>
+      <version>0.4.2</version>
     </dependency>
     <dependency>
       <groupId>org.suigeneris</groupId>
       <artifactId>jrcs.rcs</artifactId>
-      <version>0.3.0</version>
-      <classifier>xwiki</classifier>
+      <version>0.4.2</version>
     </dependency>
 
     <!-- Version 2.3.2 of oscache needs to be uploaded to central repository and XWiki's patch to be applied
@@ -520,10 +518,16 @@
               **/XWikiMessageTool.java,
               **/XWikiListFilter.java,
               **/MyPersistentLoginManager.java,
+              **/XWikiDocumentArchive.java,
+              **/doc/rcs/*.java,
+              **/api/RevisionInfo.java,
+              **/web/DeleteVersions*.java,
 	      **/migration/**.java
           </includes>
           <excludes>
-              **/RenamePageReplaceLinkHandler.java
+              **/RenamePageReplaceLinkHandler.java,
+              **/XWikiPatchUtils.java,
+	      **/XWikiRCSArchive.java <!-- checkstyle is fail for this files for some reason -->
           </excludes>
         </configuration>
       </plugin>
@@ -561,4 +565,4 @@
     </profile>
   </profiles>
 </project>
-       
+

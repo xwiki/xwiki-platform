@@ -592,7 +592,7 @@ public class Package
                 //  then archive was not saved
                 //  so we need save it via resetArchive
                 if ((doc.getDoc().getDocumentArchive() == null)
-                    || (doc.getDoc().getDocumentArchive().getRCSArchive() == null)) {
+                    || (doc.getDoc().getDocumentArchive().getNodes().size()==0)) {
                     doc.getDoc().resetArchive(context);
                 }
             } catch (XWikiException e) {

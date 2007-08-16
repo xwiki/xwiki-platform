@@ -798,8 +798,9 @@ public class XWikiHibernateBaseStore {
          * @param session - open hibernate session
          * @return any you need be returned by {@link XWikiHibernateBaseStore#execute(XWikiContext, boolean, boolean, HibernateCallback)}
          * @throws HibernateException if any store specific exception
+         * @throws XWikiException if exception in xwiki.
          */
-        Object doInHibernate(Session session) throws HibernateException;
+        Object doInHibernate(Session session) throws HibernateException, XWikiException;
     }
 
     /**

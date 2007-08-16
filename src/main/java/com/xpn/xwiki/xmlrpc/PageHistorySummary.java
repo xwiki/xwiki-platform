@@ -49,9 +49,7 @@ public class PageHistorySummary
     public PageHistorySummary(XWikiDocument document)
     {
         setId(document.getFullName() + ":" + document.getVersion());
-        // TODO is this a proper implementation ?
-        // Will it also be proper when we introduce minor edits ? NO
-        setVersion(document.getRCSVersion().getNumbers()[1]);
+        setVersion(Page.constructVersion(document.getRCSVersion()));
         setModified(document.getDate());
         setModifier(document.getAuthor());
     }

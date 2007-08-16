@@ -27,6 +27,8 @@ import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 import java.util.Date;
 import java.util.Map;
 
+import org.suigeneris.jrcs.rcs.Version;
+
 /**
  * Represents a Page as described in the <a href="Confluence specification">
  * http://confluence.atlassian.com/display/DOC/Remote+API+Specification</a>.
@@ -75,10 +77,7 @@ public class Page extends PageSummary
     public Page(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         super(doc, context);
-        int[] numbers = doc.getRCSVersion().getNumbers();
-        setVersion(numbers[1]);
-        // TODO This is a super ugly fix
-//        setVersion(numbers[numbers.length-1]);
+        setVersion(constructVersion(doc.getRCSVersion()));
         setContent(doc.getContent());
         setCreated(doc.getCreationDate());
         setCreator(doc.getAuthor());
@@ -132,6 +131,11 @@ public class Page extends PageSummary
     public void setVersion(int version)
     {
         this.version = version;
+    }
+
+    public static int constructVersion(Version ver)
+    {
+        return ((ver.at(0)-1) << 16) + ver.at(1);
     }
 
     public String getContent()

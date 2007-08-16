@@ -50,11 +50,13 @@ public class EditForm extends XWikiForm
     private String title;
 
     private String comment;
+    
+    private boolean isMinorEdit = false;
 
     private String tags;
 
     private boolean lockForce;
-
+    
     public void readRequest()
     {
         XWikiRequest request = getRequest();
@@ -71,6 +73,7 @@ public class EditForm extends XWikiForm
         setDefaultLanguage(request.getParameter("default_language"));
         setTags(request.getParameterValues("tags"));
         setLockForce("1".equals(request.getParameter("force")));
+        setMinorEdit(request.getParameter("minor_edit")!=null);
     }
 
     public void setTags(String[] parameter)
@@ -230,6 +233,16 @@ public class EditForm extends XWikiForm
     public void setComment(String comment)
     {
         this.comment = comment;
+    }
+    
+    public boolean isMinorEdit()
+    {
+        return isMinorEdit;
+    }
+    
+    public void setMinorEdit(boolean isMinorEdit)
+    {
+        this.isMinorEdit = isMinorEdit;
     }
 
     public boolean isLockForce()

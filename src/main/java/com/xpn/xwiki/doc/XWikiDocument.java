@@ -76,6 +76,7 @@ import com.xpn.xwiki.content.parsers.DocumentParser;
 import com.xpn.xwiki.content.parsers.LinkParser;
 import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
@@ -159,6 +160,9 @@ public class XWikiDocument
 
     // Comment on the latest modification
     private String comment;
+    
+    /** Is latest modification is minor edit */
+    private boolean isMinorEdit = false;
 
     // Used to make sure the MetaData String is regenerated
     private boolean isContentDirty = true;
@@ -293,7 +297,9 @@ public class XWikiDocument
 
     public void setVersion(String version)
     {
-        this.version = new Version(version);
+        if (version!=null && !"".equals(version)) {
+            this.version = new Version(version);
+        }
     }
 
     public Version getRCSVersion()
@@ -677,7 +683,11 @@ public class XWikiDocument
         if (version == null) {
             version = new Version("1.1");
         } else {
-            version = version.next();
+            if (isMinorEdit()) {
+                version = version.next();
+            } else {
+                version = version.getBranchPoint().next().newBranch(1);
+            }
         }
     }
 
@@ -735,10 +745,10 @@ public class XWikiDocument
         return context.getURLFactory().getURL(url, context);
     }
 
-    public String getURL(String action, boolean redirect, XWikiContext context)
+    public String getURL(String action, String params, boolean redirect, XWikiContext context)
     {
         URL url = context.getURLFactory()
-            .createURL(getSpace(), getName(), action, null, null, getDatabase(), context);
+            .createURL(getSpace(), getName(), action, params, null, getDatabase(), context);
         if (redirect) {
             if (url == null) {
                 return null;
@@ -748,6 +758,11 @@ public class XWikiDocument
         } else {
             return context.getURLFactory().getURL(url, context);
         }
+    }
+    
+    public String getURL(String action, boolean redirect, XWikiContext context)
+    {
+        return getURL(action, null, redirect, context);
     }
 
     public String getURL(String action, XWikiContext context)
@@ -891,6 +906,11 @@ public class XWikiDocument
         } catch (Exception e) {
             return new String[0];
         }
+    }
+
+    public XWikiRCSNodeInfo getRevisionInfo(String version, XWikiContext context) throws XWikiException
+    {
+        return getDocumentArchive(context).getNode(new Version(version));
     }
 
     public boolean isMostRecent()
@@ -1558,7 +1578,10 @@ public class XWikiDocument
         if (comment != null) {
             setComment(comment);
         }
-
+        
+        // Read the minor edit checkbox from the form
+        setMinorEdit(eform.isMinorEdit());
+        
         String tags = eform.getTags();
         if (tags != null) {
             setTags(tags, context);
@@ -1774,6 +1797,7 @@ public class XWikiDocument
         setxWikiClass((BaseClass) document.getxWikiClass().clone());
         setxWikiClassXML(document.getxWikiClassXML());
         setComment(document.getComment());
+        setMinorEdit(document.isMinorEdit());
 
         clonexWikiObjects(document);
         copyAttachments(document);
@@ -1823,6 +1847,7 @@ public class XWikiDocument
             doc.setxWikiClass((BaseClass) getxWikiClass().clone());
             doc.setxWikiClassXML(getxWikiClassXML());
             doc.setComment(getComment());
+            doc.setMinorEdit(isMinorEdit());
             doc.clonexWikiObjects(this);
             doc.copyAttachments(this);
             doc.elements = elements;
@@ -1948,6 +1973,10 @@ public class XWikiDocument
         if (!getComment().equals(doc.getComment())) {
             return false;
         }
+        
+        if (isMinorEdit() == doc.isMinorEdit()) {
+            return false;
+        }
 
         if (!getxWikiClass().equals(doc.getxWikiClass())) {
             return false;
@@ -2066,7 +2095,7 @@ public class XWikiDocument
         Document doc = new DOMDocument();
         Element docel = new DOMElement("xwikidoc");
         doc.setRootElement(docel);
-
+        
         Element el = new DOMElement("web");
         el.addText(getSpace());
         docel.add(el);
@@ -2145,13 +2174,17 @@ public class XWikiDocument
         el = new DOMElement("comment");
         el.addText(getComment());
         docel.add(el);
-
+        
+        el = new DOMElement("minorEdit");
+        el.addText(String.valueOf(isMinorEdit()));
+        docel.add(el);
+        
         List alist = getAttachmentList();
         for (int ai = 0; ai < alist.size(); ai++) {
             XWikiAttachment attach = (XWikiAttachment) alist.get(ai);
             docel.add(attach.toXML(bWithAttachmentContent, bWithVersions, context));
         }
-
+        
         if (bWithObjects) {
             // Add Class
             BaseClass bclass = getxWikiClass();
@@ -2203,7 +2236,7 @@ public class XWikiDocument
         if (bWithVersions) {
             el = new DOMElement("versions");
             try {
-                el.addText(getDocumentArchive(context).getArchive());
+                el.addText(getDocumentArchive(context).getArchive( context ));
             } catch (XWikiException e) {
                 return null;
             }
@@ -2330,6 +2363,9 @@ public class XWikiDocument
         setDefaultTemplate(getElement(docel, "defaultTemplate"));
         setValidationScript(getElement(docel, "validationScript"));
         setComment(getElement(docel, "comment"));
+
+        String minorEdit = getElement(docel, "minorEdit");
+        setMinorEdit(Boolean.valueOf(minorEdit).booleanValue());
 
         String strans = getElement(docel, "translation");
         if ((strans == null) || strans.equals("")) {
@@ -4040,6 +4076,28 @@ public class XWikiDocument
     public void setComment(String comment)
     {
         this.comment = comment;
+    }
+    
+    public boolean isMinorEdit()
+    {
+        return isMinorEdit;
+    }
+    public void setMinorEdit(boolean isMinor)
+    {
+        this.isMinorEdit = isMinor;
+    }
+    
+    // methods for easy table update. It is need only for hibernate.
+    // when hibernate update old database without minorEdit field, hibernate will create field with null in despite of notnull in hbm. (http://opensource.atlassian.com/projects/hibernate/browse/HB-1151) 
+    // so minorEdit will be null for old documents. But hibernate can't convert null to boolean.
+    // so we need convert Boolean to boolean
+    protected Boolean getMinorEdit1()
+    {
+        return Boolean.valueOf(isMinorEdit);
+    }
+    protected void setMinorEdit1(Boolean isMinor)
+    {
+        isMinorEdit = (isMinor!=null && isMinor.booleanValue());
     }
 
     public BaseObject newObject(String classname, XWikiContext context) throws XWikiException

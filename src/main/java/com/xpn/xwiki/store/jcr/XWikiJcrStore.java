@@ -214,7 +214,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
             });
             
             if (needUpdateArchive)
-            	context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, doc.toXML(context), false, context);
+            	context.getWiki().getVersioningStore().updateXWikiDocArchive(doc, false, context);
             if (needSaveArchive)
             	context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDocumentArchive(),false, context);
             if (needGetArchive) {
@@ -224,7 +224,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
                     // this is a non critical error
                 }
             }
-
+            
             // We need to ensure that the saved document becomes the original document
             doc.setOriginalDocument((XWikiDocument) doc.clone());
 

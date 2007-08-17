@@ -420,4 +420,16 @@ public class XWikiDocumentArchive
     {
         return updatedNodeContents; 
     }
+    /**
+     * @return full copy of this archive with specified docId
+     * @param docId - new {@link #getId()}
+     * @param context - used for loading content
+     * @throws XWikiException if any error
+     */
+    public XWikiDocumentArchive clone(long docId, XWikiContext context) throws XWikiException
+    {
+        XWikiDocumentArchive result = new XWikiDocumentArchive(docId);
+        result.setArchive(getArchive(context));
+        return result;
+    }
 }

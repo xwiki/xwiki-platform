@@ -96,6 +96,8 @@ public class XWikiTest extends MockObjectTestCase
             XWikiContext.class}, new Object[] {this.xwiki, this.context});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
             returnValue(null));
+        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(
+            returnValue(null));
 
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore

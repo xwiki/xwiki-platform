@@ -3218,6 +3218,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         return copyDocument(docname, targetdocname, null, null, null, true, context);
     }
+    
+    public boolean copyDocument(String docname, String targetdocname, boolean reset, XWikiContext context)
+        throws XWikiException
+    {
+        return copyDocument(docname, targetdocname, null, null, null, reset, context);
+    }
 
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage,
         XWikiContext context) throws XWikiException
@@ -3311,8 +3317,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                             getVersioningStore().getXWikiDocumentArchive(sdoc, context);
                         if (targetWiki != null)
                             context.setDatabase(targetWiki);
-                        txda.setId(tdoc.getId());
+                        txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
+                    } else {
+                        getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 
                     if (targetWiki != null)
@@ -3377,8 +3385,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                                 getVersioningStore().getXWikiDocumentArchive(sdoc, context);
                             if (targetWiki != null)
                                 context.setDatabase(targetWiki);
-                            txda.setId(ttdoc.getId());
+                            txda = txda.clone(tdoc.getId(), context);
                             getVersioningStore().saveXWikiDocArchive(txda, true, context);
+                        } else {
+                            getVersioningStore().resetRCSArchive(tdoc, true, context);
                         }
                     }
                 } else {
@@ -3417,8 +3427,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                             getVersioningStore().getXWikiDocumentArchive(sdoc, context);
                         if (targetWiki != null)
                             context.setDatabase(targetWiki);
-                        txda.setId(tdoc.getId());
+                        txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
+                    } else {
+                        getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 
                     if (targetWiki != null)

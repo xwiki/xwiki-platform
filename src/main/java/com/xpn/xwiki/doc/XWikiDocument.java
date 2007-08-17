@@ -3385,7 +3385,7 @@ public class XWikiDocument
         }
 
         // Step 1: Copy the document under a new name
-        context.getWiki().copyDocument(getFullName(), newDocumentName, context);
+        context.getWiki().copyDocument(getFullName(), newDocumentName, false, context);
 
         // Step 2: For each backlink to rename, parse the backlink document and replace the links
         //         with the new name.
@@ -3439,6 +3439,9 @@ public class XWikiDocument
                 object.setName(newDocumentName);
             }
         }
+        XWikiDocumentArchive archive = newdoc.getDocumentArchive();
+        if (archive!=null)
+            newdoc.setDocumentArchive(archive.clone(newdoc.getId(), context));
         return newdoc;
     }
 

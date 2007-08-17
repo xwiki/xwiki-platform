@@ -3312,6 +3312,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     }
                     if (targetWiki != null)
                         tdoc.setDatabase(targetWiki);
+
+                    // we don't want to trigger a new version
+                    // otherwise the version number will be wrong
+                    tdoc.setMetaDataDirty(false);
+                    tdoc.setContentDirty(false);
+
                     saveDocument(tdoc, context);
 
                     if (!reset) {
@@ -3372,6 +3378,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         }
                         if (targetWiki != null)
                             ttdoc.setDatabase(targetWiki);
+
+                        // we don't want to trigger a new version
+                        // otherwise the version number will be wrong
+                        tdoc.setMetaDataDirty(false);
+                        tdoc.setContentDirty(false);
+
                         saveDocument(ttdoc, context);
 
                         if (!reset) {
@@ -3406,6 +3418,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
                     if (targetWiki != null)
                         tdoc.setDatabase(targetWiki);
+
+                    // we don't want to trigger a new version
+                    // otherwise the version number will be wrong
+                    tdoc.setMetaDataDirty(false);
+                    tdoc.setContentDirty(false);
+
                     saveDocument(tdoc, context);
 
                     if (!reset) {

@@ -109,7 +109,7 @@ WikiEditor.prototype.init = function(params) {
 
 <!-- External Javascript functions -->
 WikiEditor.prototype.getContent = function() {
-	return this.core.getContent();
+     return this.core.getContent();
 }
 
 WikiEditor.prototype.setContent = function(html) {
@@ -528,7 +528,7 @@ WikiEditor.prototype.toolbars = ["texttoolbar", "justifytoolbar", "listtoolbar",
 
 WikiEditor.prototype.disableButtonsInWikiMode = function(editor_id) {
     for (var i=0; i< this.toolbars.length; i++) {
-        var toolbar = document.getElementById(this.toolbars[i]);
+        var toolbar = document.getElementById(editor_id + "_" + this.toolbars[i]);
         if (toolbar) {
             toolbar.style.display = "none";
         }
@@ -537,7 +537,7 @@ WikiEditor.prototype.disableButtonsInWikiMode = function(editor_id) {
 
 WikiEditor.prototype.showButtonsInWywisygMode = function(editor_id) {
     for (var i=0; i< this.toolbars.length; i++) {
-        var toolbar = document.getElementById(this.toolbars[i]);
+        var toolbar = document.getElementById(editor_id + "_" + this.toolbars[i]);
         if (toolbar) {
             toolbar.style.display = "inline";
         }

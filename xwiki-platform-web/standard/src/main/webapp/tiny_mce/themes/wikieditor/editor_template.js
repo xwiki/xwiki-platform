@@ -313,18 +313,19 @@ var TinyMCE_WikieditorTheme = {
 
              case "mceToggleEditor":
                 var ins = tinyMCE.selectedInstance;
+                var tid = ins.editorId + "_content";
                 var insDisplay = document.getElementById(ins.editorId).style.display;
                 if (!insDisplay || (insDisplay == "block")) {
-                    document.getElementById("content").value = tinyMCE.getContent(tinyMCE.getWindowArg('editor_id'));
+                    document.getElementById(tid).value = tinyMCE.getContent(tinyMCE.getWindowArg('editor_id'));
                     document.getElementById(ins.editorId).style.display = "none";
                     if (window.ActiveXObject) {
                         document.getElementById(ins.editorId).parentNode.style.display = "none";
                         document.getElementById(ins.editorId).parentNode.parentNode.style.display = "none";
                     }
-                    document.getElementById("content").style.display = "block";
+                    document.getElementById(tid).style.display = "block";
                     if (window.ActiveXObject) {
-                        document.getElementById("content").parentNode.style.display = "block";
-                        document.getElementById("content").parentNode.parentNode.style.display = "block";
+                        document.getElementById(tid).parentNode.style.display = "block";
+                        document.getElementById(tid).parentNode.parentNode.style.display = "block";
                     }
                     wikiEditor.disableButtonsInWikiMode(editor_id);
                 } else {
@@ -333,11 +334,11 @@ var TinyMCE_WikieditorTheme = {
                         document.getElementById(ins.editorId).parentNode.style.display = "block";
                         document.getElementById(ins.editorId).parentNode.parentNode.style.display = "block";
                     }
-                    tinyMCE.setContent(document.getElementById("content").value);
-                    document.getElementById("content").style.display = "none";
+                    tinyMCE.setContent(document.getElementById(tid).value);
+                    document.getElementById(tid).style.display = "none";
                     if (window.ActiveXObject) {
-                        document.getElementById("content").parentNode.style.display = "none";
-                        document.getElementById("content").parentNode.parentNode.style.display = "none";
+                        document.getElementById(tid).parentNode.style.display = "none";
+                        document.getElementById(tid).parentNode.parentNode.style.display = "none";
                     }
                     wikiEditor.showButtonsInWywisygMode(editor_id);
                 }

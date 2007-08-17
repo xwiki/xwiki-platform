@@ -505,7 +505,8 @@ TinyMCE_Engine.prototype = {
 		this.instances[id] = inst;
 
 		inst._onAdd(replace_element, form_element_name, target_document);
-	},
+        return id;
+    },
 
 	removeMCEControl : function(editor_id) {
 		var inst = tinyMCE.getInstanceById(editor_id);

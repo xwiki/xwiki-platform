@@ -49,7 +49,7 @@
 #end
 #if($isguest && $xwiki.hasAccessLevel("register", "XWiki.XWikiPreferences"))
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))
-      <a class="glink" href="$!regurl" id="headerregister">$!msg.get("register")</a>#sep()
+      <a class="glink" href="$!regurl" id="headerregister">$!msg.get("core.register")</a>#sep()
 #end
 #if($hasadmin)
       <a class="glink" href="$!xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$!msg.get("admin")</a> #sep()

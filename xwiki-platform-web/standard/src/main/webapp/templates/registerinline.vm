@@ -1,33 +1,33 @@
 #if(!$xwiki.hasAccessLevel("view","XWiki.Registration")||$xwiki.getDocument("XWiki.Registration").isNew())
-  <h1>$msg.get("Registration")</h1>
+  <h1>$msg.get("core.register.title")</h1>
   #if(!$reg||$reg<0 )
-    <p>$msg.get("registerwelcome")</p>
+    <p>$msg.get("core.register.welcome")</p>
   #end
   #if($reg && $reg<=0)
     #if($reg==-2)
-      #error("$msg.get('passwordmismatch').")
+      #error("$msg.get('core.register.passwordMismatch')")
     #elseif($reg==-3)
-      #error("$msg.get('useralreadyexists').")
+      #error("$msg.get('core.register.userAlreadyExists')")
     #elseif($reg==-4)
-      #error("$msg.get('invalidusername').")
+      #error("$msg.get('core.register.invalidUsername')")
     #elseif($reg==-8)
-      #error("$msg.get('useralreadyexists').")
+      #error("$msg.get('core.register.userAlreadyExists')")
     #else
-      #error("$msg.get('registerfailed') ($msg.get('registerfailedcode') $reg).")
+      #error("$msg.get('core.register.registerFailed', [$reg])")
     #end
   #elseif($reg)
     #set($xwname = "XWiki.${request.xwikiname}")
-    #info("$xwiki.getUserName($xwname) ($request.xwikiname): $msg.get('registersuccessful').")
+    #info("$msg.get('core.register.successful', [$xwiki.getUserName($xwname), $request.xwikiname])")
   #end
-  #if(!$reg||$reg<0 )
-    <form id="register" name="register" action="" action="" method="post">
+  #if(!$reg||$reg<0)
+    <form id="register" name="register" action="" method="post">
       <div>
         <input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
-        <input type="hidden" name="register" value="1">
-        #set( $class = $xwiki.getClass("XWiki.XWikiUsers"))
-        #set( $obj = $class.newObject() )
-        #set( $serverobj = $class.newObject() )
-        #set( $ok = $doc.use("XWiki.XWikiUsers"))
+        <input type="hidden" name="register" value="1"/>
+        #set($class = $xwiki.getClass("XWiki.XWikiUsers"))
+        #set($obj = $class.newObject())
+        #set($serverobj = $class.newObject())
+        #set($discard = $doc.use("XWiki.XWikiUsers"))
         #if($request.register_first_name)
           $doc.set("first_name", $request.register_first_name)
         #end
@@ -36,26 +36,28 @@
         #end
         <dl>
           #set($prop = $class.first_name)
-          <dt>$msg.get("firstname"):</dt>
+          <dt>$msg.get("core.register.firstName")</dt>
           <dd>$doc.displayEdit($prop, "register_",  $obj)</dd>
 
           #set($prop = $class.last_name)
-          <dt>$msg.get("lastname"):</dt>
+          <dt>$msg.get("core.register.lastName")</dt>
           <dd>$doc.displayEdit($prop, "register_",  $obj)</dd>
-          <dt>$msg.get("loginid"):</dt>
+
+          <dt>$msg.get("core.register.username")</dt>
           <dd><input name="xwikiname" type="text" size="20" onfocus=" prepareName(document.forms.register);" /></dd>
 
           #set($prop = $class.password)
-          <dt>$msg.get("password"):</dt>
+          <dt>$msg.get("core.register.password")</dt>
           <dd>$doc.displayEdit($prop, "register_",  $obj)</dd>
-          <dt>$msg.get("passwordrepeat"):</dt>
+
+          <dt>$msg.get("core.register.passwordRepeat")</dt>
           <dd>$doc.displayEdit($prop, "register2_",  $obj)</dd>
 
           #set($prop = $class.email)
-          <dt>$msg.get("email"):</dt>
+          <dt>$msg.get("core.register.email")</dt>
           <dd>$doc.displayEdit($prop, "register_",  $obj)</dd>
         </dl>
-        <span class="buttonwrapper"><input type="submit" value="$msg.get("iregister")"></span>
+        <span class="buttonwrapper"><input type="submit" value="$msg.get("core.register.submit")"/></span>
       </div>
     </form>
   #end

@@ -734,13 +734,6 @@ a.deletelink:hover{
 
 /*-----------------------------*/
 
-#resizeta{
-  height: 4px;
-  background-color: #DDD;
-  border: 1px #DDD outset;
-  cursor: s-resize;
-}
-
 .about, #footerglobal{
   font-variant: small-caps;
   font-size: 90%;

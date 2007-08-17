@@ -27,9 +27,7 @@ import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.cache.impl.XWikiCacheListener;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.doc.*;
 import com.xpn.xwiki.notify.*;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -5622,5 +5620,109 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         workDir = this.getTempDirectory(context);
 
         return workDir;
+    }
+
+    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException {
+        // let's clone rolledbackDoc since we might modify it
+        XWikiDocument rolledbackDoc = (XWikiDocument) getDocument(tdoc, rev, context).clone();
+
+        if ("1".equals(context.getWiki().Param("xwiki.store.rollbackattachmentwithdocuments", "1"))) {
+            // XWIKI-851 We need to check the attachments..
+            // If attachment exist in both versions (current and older), rollback the attachment to the one in the older document
+            // If attachment does not exist anymore we can't do anything, we have to delete the reference in the older document
+            // If attachment does not exist in the older, readd it and roll it back to the first version uploaded
+            // Delete attachment that do not exist anymore but existed in the version to which we rollback
+            List rolledbackAttachList = rolledbackDoc.getAttachmentList();
+            List toDelete = new ArrayList();
+            for (int i=0;i<rolledbackAttachList.size();i++) {
+                XWikiAttachment attach = (XWikiAttachment) rolledbackAttachList.get(i);
+                String fileName = attach.getFilename();
+                if (tdoc.getAttachment(fileName)==null) {
+                    // we need to remove that attachment because it does not exist in the never one
+                    // TODO: if we have a storage system which keeps track of deleted attachments then we can recover it..
+                    toDelete.add(attach);
+                }
+            }
+            for (int i=0;i<toDelete.size();i++) {
+                XWikiAttachment newAttach = (XWikiAttachment)toDelete.get(i);
+                rolledbackAttachList.remove(newAttach);
+            }
+
+            // Let's look now for attachment that are in both or present in the most recent doc but not in the rolledback doc
+            // if the attachment is in both we want to rollback to the version existing at the time (if it exist)
+            // if the attachment is not present in the rollbacked do we don't want to explicitely loose a reference
+            // to that doc, since we'll never be able to resolve it
+            // so we want to keep this attachment and roll it back to the first ever uploaded attachment
+            List currentAttachList = tdoc.getAttachmentList();
+            Map toRollbackMap = new HashMap();
+            for (int i=0;i<currentAttachList.size();i++) {
+                XWikiAttachment attach = (XWikiAttachment) currentAttachList.get(i);
+                String fileName = attach.getFilename();
+                XWikiAttachment rolledbackAttach = rolledbackDoc.getAttachment(fileName);
+                XWikiAttachment correctAttach = null;
+                if (rolledbackAttach!=null) {
+                    // if the attachment exist in both let's look for the revision existing at the time
+                    try {
+                        correctAttach = rolledbackAttach.getAttachmentRevision(rolledbackAttach.getVersion(), context);
+                    } catch(Exception e) {}
+                }
+
+                // if we had an attachment but correctAttach returned null, then we might be in an even more complex
+                // case where the attachment was uploaded, delete, uploaded and we don't have the same number of versions
+                // in this case we want to still keep the latest attachment we have in the store.
+                if (correctAttach==null) {
+                    // let's re-add the attachment and roll it back to the first ever version
+                    rolledbackAttach = (XWikiAttachment) attach.clone();
+                    XWikiAttachment firstAttach = rolledbackAttach.getAttachmentRevision("1.1", context);
+                    firstAttach.setVersion(attach.getVersion());
+                    XWikiAttachmentArchive firstArchive = (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
+                    firstArchive.setAttachment(firstAttach);
+                    firstAttach.setAttachment_archive(firstArchive);
+                    rolledbackAttachList.add(firstAttach);
+                    toRollbackMap.put(rolledbackAttach.getFilename(), firstAttach);
+                }  else {
+                    // we need to update the version
+                    correctAttach.setVersion(attach.getVersion());
+                    XWikiAttachmentArchive correctArchive = (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
+                    correctArchive.setAttachment(correctAttach);
+                    correctAttach.setAttachment_archive(correctArchive);
+                    toRollbackMap.put(rolledbackAttach.getFilename(), correctAttach);
+                    rolledbackAttachList.remove(rolledbackAttach);
+                    rolledbackAttachList.add(correctAttach);
+                }
+            }
+
+            // now we have the list of attachments to rollback.. let's do it
+            // if this fails we might have saved some attachments without saving the document itself
+            Iterator fileNamesIt = toRollbackMap.keySet().iterator();
+            int attachmentTreated = 0;
+            while (fileNamesIt.hasNext()) {
+                String fileName = (String) fileNamesIt.next();
+                XWikiAttachment newAttach = (XWikiAttachment) toRollbackMap.get(fileName);
+                try {
+                    context.getWiki().getAttachmentStore()
+                            .saveAttachmentContent(newAttach, false, context, true);
+                    attachmentTreated++;
+                } catch (XWikiException e) {
+                    LOG.error("Error rolling back attachment " + fileName + " in document rollback for document " + tdoc.getFullName());
+                    // If we have already treated an attachment it's better to continue and leave only one attachment in bad state
+                    // this is better then leaving the whole document in bad state...
+                    if (attachmentTreated==0)
+                        throw e;
+                }
+            }
+        }
+
+        // now we save the final document..
+        String username = context.getUser();
+        rolledbackDoc.setAuthor(username);
+        rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
+        rolledbackDoc.setVersion(tdoc.getVersion());
+        rolledbackDoc.setContentDirty(true);
+        List params = new ArrayList();
+        params.add(rev);
+
+        saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", params), context);
+        return rolledbackDoc;
     }
 }

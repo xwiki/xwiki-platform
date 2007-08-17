@@ -56,17 +56,7 @@ public class RollbackAction extends XWikiAction {
             tdoc.setTranslation(1);
         }
 
-        XWikiDocument newdoc = xwiki.getDocument(tdoc, rev, context);
-
-        String username = context.getUser();
-        newdoc.setAuthor(username);
-        newdoc.setRCSVersion(tdoc.getRCSVersion());
-        newdoc.setVersion(tdoc.getVersion());
-        newdoc.setContentDirty(true);
-        List params = new ArrayList();
-        params.add(rev);
-        xwiki.saveDocument(newdoc, context.getMessageTool().get("core.comment.rollback", params), context);
-
+        XWikiDocument newdoc = xwiki.rollback(tdoc, rev, context);
         // forward to view
         String redirect = Utils.getRedirect("view", context);
         sendRedirect(response, redirect);

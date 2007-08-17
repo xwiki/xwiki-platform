@@ -27,7 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 
 import java.util.List;
-import java.util.Map;
+import java.util.Map;               
 
 public interface XWikiServiceAsync {
 
@@ -121,4 +121,5 @@ public interface XWikiServiceAsync {
 
     void getTranslation(String translationPage, String local, AsyncCallback async);
 
+    void getDocumentVersions(String pageName, int nb, int start, AsyncCallback async);
 }

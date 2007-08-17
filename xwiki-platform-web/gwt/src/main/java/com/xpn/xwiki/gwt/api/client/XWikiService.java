@@ -25,6 +25,7 @@ package com.xpn.xwiki.gwt.api.client;
 
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.core.client.GWT;
 
 import java.util.List;
@@ -93,6 +94,9 @@ public interface XWikiService extends RemoteService {
     public String getDocumentContent(String fullName) throws XWikiGWTException;
     public String getDocumentContent(String fullName, boolean rendered) throws XWikiGWTException;
     public String getDocumentContent(String fullName, boolean rendered, Map params) throws XWikiGWTException;
+
+    // get version history of a document
+    public List getDocumentVersions(String pageName, int nb, int start) throws XWikiGWTException;
 
     public void logJSError(Map infos) throws XWikiGWTException;
 

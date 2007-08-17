@@ -30,13 +30,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.gwt.api.client.Attachment;
-import com.xpn.xwiki.gwt.api.client.Dictionary;
-import com.xpn.xwiki.gwt.api.client.Document;
-import com.xpn.xwiki.gwt.api.client.User;
-import com.xpn.xwiki.gwt.api.client.XObject;
-import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
-import com.xpn.xwiki.gwt.api.client.XWikiService;
+import com.xpn.xwiki.gwt.api.client.*;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
@@ -974,6 +968,46 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                 }
             } else {
                 return null;
+            }
+        } catch (Exception e) {
+            throw getXWikiGWTException(e);
+        }
+    }
+
+    // get version history of a document
+    public List getDocumentVersions(String fullName, int nb, int start) throws XWikiGWTException {
+        try {
+            List versionsList = new ArrayList();
+            XWikiContext context = getXWikiContext();
+            if (context.getWiki().getRightService().hasAccessLevel("view", context.getUser(), fullName, context)==true) {
+                XWikiDocument doc = context.getWiki().getDocument(fullName, context);
+                String[] versions = (nb==0) ? doc.getRecentRevisions(0, context) : doc.getRecentRevisions(nb+start, context);
+                int nbVersions = (nb==0) ? (versions.length-start) : nb; 
+                for (int i=0;i<nbVersions;i++) {
+                    int j = i+start;
+                    if (j<versions.length) {
+                        String version = versions[j];
+                        XWikiDocument vdoc = null;
+                        try {
+                              vdoc = context.getWiki().getDocument(doc, version, context);
+                        } catch (Exception e) {
+                        }
+                        
+                        if (vdoc!=null) {
+                            String authorLink = context.getWiki().getURL(vdoc.getAuthor(), "view", context);
+                            String author = context.getWiki().getLocalUserName(vdoc.getAuthor(), null, false, context);
+                            versionsList.add(new VersionInfo(vdoc.getVersion(), vdoc.getDate().getTime(), author, authorLink, vdoc.getComment()));
+
+                        } else {
+                            versionsList.add(new VersionInfo(vdoc.getVersion(), 0, "?", "?", "?"));
+                        }
+                    } else {
+                        break;
+                    }
+                }
+                return versionsList;
+            } else {
+                return versionsList;
             }
         } catch (Exception e) {
             throw getXWikiGWTException(e);

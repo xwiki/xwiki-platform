@@ -53,24 +53,32 @@ var TinyMCE_wikipluginPlugin = {
 	 * Gets called when HTML contents is inserted/retrived from a TinyMCE editor instance.
 	 */
 	cleanup : function(type, content, inst) {
+
 		switch (type) {
 			case "get_from_editor":
-                content = wikiEditor.convertInternal(content);
-				break;
+                var sourceTextAreaId = inst.editorId + "_content";
+                var sourceTextArea = document.getElementById(sourceTextAreaId);
+                if (sourceTextArea && sourceTextArea.style.display != "none")
+                  return sourceTextArea.value;
+                else {
+                  content = wikiEditor.convertInternal(inst.getBody().innerHTML);
+                }
+                break;
 
             case "insert_to_editor":
-				content = wikiEditor.convertExternal(content);
+                content = wikiEditor.convertExternal(content);
 				break;
 
             case "get_from_editor_dom":
 				content = wikiEditor.tagListInternal(content);
-				break;
+                break;
 
             case "insert_to_editor_dom":
-				break;
+                break;
 		}
 		return content;
 	}
+
 };
 
 tinyMCE.addPlugin("wikiplugin", TinyMCE_wikipluginPlugin);

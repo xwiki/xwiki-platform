@@ -20,7 +20,7 @@
     #info("$msg.get('core.register.successful', [$xwiki.getUserName($xwname), $request.xwikiname])")
   #end
   #if(!$reg||$reg<0)
-    <form id="register" name="register" action="" method="post">
+    <form id="register" action="" method="post">
       <div>
         <input type="hidden" name="template" value="XWiki.XWikiUserTemplate" />
         <input type="hidden" name="register" value="1"/>

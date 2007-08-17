@@ -996,10 +996,10 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
                         if (vdoc!=null) {
                             String authorLink = context.getWiki().getURL(vdoc.getAuthor(), "view", context);
                             String author = context.getWiki().getLocalUserName(vdoc.getAuthor(), null, false, context);
-                            versionsList.add(new VersionInfo(vdoc.getVersion(), vdoc.getDate().getTime(), author, authorLink, vdoc.getComment()));
+                            versionsList.add(new VersionInfo(version, vdoc.getDate().getTime(), author, authorLink, vdoc.getComment()));
 
                         } else {
-                            versionsList.add(new VersionInfo(vdoc.getVersion(), 0, "?", "?", "?"));
+                            versionsList.add(new VersionInfo(version, 0, "?", "?", "?"));
                         }
                     } else {
                         break;

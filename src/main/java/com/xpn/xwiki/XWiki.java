@@ -3234,6 +3234,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         return copyDocument(docname, targetdocname, null, null, null, true, context);
     }
+    
+    public boolean copyDocument(String docname, String targetdocname, boolean reset, XWikiContext context)
+        throws XWikiException
+    {
+        return copyDocument(docname, targetdocname, null, null, null, reset, context);
+    }
 
     public boolean copyDocument(String docname, String targetdocname, String wikilanguage,
         XWikiContext context) throws XWikiException

@@ -8,6 +8,7 @@
 <div id="xwikimessage">$message</div>
 #end
 #xwikimessageboxstart($msg.get("delete") $msg.get("deleted"))
+#template("recyclebinlist.vm")
 #xwikimessageboxend()
 </div>
 <div class="clearfloats"></div>

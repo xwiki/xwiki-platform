@@ -13,6 +13,7 @@ $response.setStatus(404)
 #set($url = $doc.getURL("edit", $editparams))
 $xwiki.parseMessage("youcanclicktoedit")
 #end
+#template("recyclebinlist.vm")
 #xwikimessageboxend()
 #end
 <div class="clearfloats"></div>

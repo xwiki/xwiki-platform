@@ -1,0 +1,27 @@
+### Show deleted documents
+#set($dds=$xwiki.getDeletedDocuments($tdoc.getFullName()))
+#if($dds)
+<center>
+<p>$msg.get("core.recyclebin.showlistmsg")</p>
+<table>
+ <thead>
+  <tr>
+   <th>$msg.get("core.recyclebin.deleter")</td>
+   <th>$msg.get("core.recyclebin.deleteDate")</td>
+   <th colspan="2">$msg.get("core.recyclebin.actions")</th>
+  </tr>
+ </thead>
+ <tbody>
+ #foreach($dd in $dds)
+  <tr>
+   <td>$dd.getDeleter()</td>
+   ## TODO: <td><a href="$doc.getURL("view", "viewer=recyclebin&id=$dd.getId()")">$xwiki.formatDate($dd.getDate())</a></td>
+   <td>$xwiki.formatDate($dd.getDate())</td>
+   <td>#if($dd.canUndelete()) <a href="$xwiki.getURL($tdoc.getFullName(), "delete", "restore&id=$dd.getId()")">$msg.get("core.recyclebin.restore")</a> #end</td>
+   <td>#if($dd.canDelete()) <a href="$xwiki.getURL($tdoc.getFullName(), "delete", "delete&id=$dd.getId()")">$msg.get("core.recyclebin.delete")</a> #end</td>
+  </tr>
+ #end
+ </tbody>
+</table>
+</center>
+#end

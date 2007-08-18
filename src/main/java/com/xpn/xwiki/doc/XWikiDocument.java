@@ -3294,6 +3294,42 @@ public class XWikiDocument
     }
 
     /**
+     *
+     * @param origdoc
+     * @param newdoc
+     * @param context
+     * @return
+     * @throws XWikiException
+     */
+    public List getAttachmentDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context)
+        throws XWikiException
+    {
+        List difflist = new ArrayList();
+        List origAttachList = origdoc.getAttachmentList();
+        for (int i=0;i<origAttachList.size();i++) {
+            XWikiAttachment origAttach = (XWikiAttachment) origAttachList.get(i);
+            String fileName = origAttach.getFilename();
+            XWikiAttachment newAttach = newdoc.getAttachment(fileName);
+            if (newAttach==null) {
+               difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), null));
+            } else {
+                if (!origAttach.getVersion().equals(newAttach.getVersion()))
+                    difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), newAttach.getVersion()));
+            }
+        }
+        List newAttachList = newdoc.getAttachmentList();
+        for (int i=0;i<newAttachList.size();i++) {
+            XWikiAttachment newAttach = (XWikiAttachment) newAttachList.get(i);
+            String fileName = newAttach.getFilename();
+            XWikiAttachment origAttach = origdoc.getAttachment(fileName);
+            if (origAttach==null) {
+               difflist.add(new AttachmentDiff(fileName, null, newAttach.getVersion()));
+            }
+        }
+        return difflist;
+    }
+
+    /**
      * Rename the current document and all the backlinks leading to it. See
      * {@link #rename(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
      *

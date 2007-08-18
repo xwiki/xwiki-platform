@@ -2445,6 +2445,9 @@ public class XWikiDocument
                 context.setDatabase(getDatabase());
             }
 
+            // We need to make sure there is a version upgrade
+            setMetaDataDirty(true);
+
             context.getWiki().getAttachmentStore()
                 .saveAttachmentContent(attachment, bParentUpdate, context, bTransaction);
         } catch (java.lang.OutOfMemoryError e) {
@@ -2489,6 +2492,8 @@ public class XWikiDocument
                 context.setDatabase(getDatabase());
             }
             try {
+                // We need to make sure there is a version upgrade
+                setMetaDataDirty(true);
                 context.getWiki().getAttachmentStore()
                     .deleteXWikiAttachment(attachment, context, true);
             } catch (java.lang.OutOfMemoryError e) {

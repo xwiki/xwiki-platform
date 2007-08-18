@@ -200,12 +200,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND = 12001;
     public static final int ERROR_XWIKI_EXPORT_PDF_FOP_FAILED = 12002;
     public static final int ERROR_XWIKI_EXPORT_XSL_FAILED = 12003;
-    public static final int ERROR_XWIKI_DIFF_CONTENT_ERROR = 13001;
-    public static final int ERROR_XWIKI_DIFF_RENDERED_ERROR = 13002;
-    public static final int ERROR_XWIKI_DIFF_METADATA_ERROR = 13003;
-    public static final int ERROR_XWIKI_DIFF_CLASS_ERROR = 13004;
-    public static final int ERROR_XWIKI_DIFF_OBJECT_ERROR = 13005;
-    public static final int ERROR_XWIKI_DIFF_XML_ERROR = 13005;
+
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_LOCK = 13006;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_LOCK = 13007;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_LOCK = 13008;
@@ -215,6 +210,14 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SAVING_LINKS = 13012;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETING_LINKS = 13013;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_LOADING_BACKLINKS = 13014;
+
+    public static final int ERROR_XWIKI_DIFF_CONTENT_ERROR = 13021;
+    public static final int ERROR_XWIKI_DIFF_RENDERED_ERROR = 13022;
+    public static final int ERROR_XWIKI_DIFF_METADATA_ERROR = 13023;
+    public static final int ERROR_XWIKI_DIFF_CLASS_ERROR = 13024;
+    public static final int ERROR_XWIKI_DIFF_OBJECT_ERROR = 13025;
+    public static final int ERROR_XWIKI_DIFF_ATTACHMENT_ERROR = 13026;
+    public static final int ERROR_XWIKI_DIFF_XML_ERROR = 13027;
 
     public static final int ERROR_XWIKI_STORE_JCR_SAVING_LOCK = 13106;
     public static final int ERROR_XWIKI_STORE_JCR_LOADING_LOCK = 13107;

@@ -522,12 +522,16 @@
               **/doc/rcs/*.java,
               **/api/RevisionInfo.java,
               **/web/DeleteVersions*.java,
-	      **/migration/**.java
+	      **/migration/**.java,
+	      **/*RecycleBin*.java,
+	      **/*DeletedDocument.java,
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,
+	      <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
               **/XWikiPatchUtils.java,
-	      **/XWikiRCSArchive.java <!-- checkstyle is fail for this files for some reason -->
+	      **/XWikiRCSArchive.java,
+              **/XWikiHibernateRecycleBinStore.java
           </excludes>
         </configuration>
       </plugin>

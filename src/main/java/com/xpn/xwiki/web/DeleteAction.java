@@ -20,13 +20,23 @@
  */
 package com.xpn.xwiki.web;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * Action for delete, restore from recycle bin. 
+ * @version $Id: $
+ */
 public class DeleteAction extends XWikiAction
 {
+    /**
+     * {@inheritDoc}
+     */
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -35,6 +45,42 @@ public class DeleteAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
 
         if (doc.isNew()) {
+            if (xwiki.hasRecycleBin(context)) {
+                String sindex = request.getParameter("id");
+                if (request.getParameter("delete") != null) {
+                    long index = Long.parseLong(sindex);
+                    if (!xwiki.getRightService().checkAccess("delete", doc, context))
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                            "User has no \"delete\" access to document " + doc.getFullName());
+                    xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+                    sendRedirect(response, doc.getURL("view", context));
+                    return false;
+                } else if (request.getParameter("restore") != null) {
+                    long index = Long.parseLong(sindex);
+                    if (!xwiki.getRightService().checkAccess("undelete", doc, context))
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                            "User has no \"undelete\" access to document " + doc.getFullName());
+                    XWikiDocument newdoc = xwiki.getRecycleBinStore().restoreFromRecycleBin(
+                        doc, index, context, true);
+                    xwiki.saveDocument(newdoc, "restored from recycle bin", context);
+                    // save attachments. need for save archive
+                    List attachlist = newdoc.getAttachmentList();
+                    if (attachlist.size() > 0) {
+                        for (int i = 0; i < attachlist.size(); i++) {
+                            XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
+                            // do not increment attachment version
+                            attachment.setMetaDataDirty(false);
+                            attachment.getAttachment_content().setContentDirty(false);
+                            xwiki.getAttachmentStore().saveAttachmentContent(attachment, false,
+                                context, true);
+                        }
+                    }
+                    sendRedirect(response, doc.getURL("view", context));
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -66,6 +112,9 @@ public class DeleteAction extends XWikiAction
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();

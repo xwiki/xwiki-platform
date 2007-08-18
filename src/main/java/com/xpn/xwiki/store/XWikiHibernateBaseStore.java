@@ -836,7 +836,10 @@ public class XWikiHibernateBaseStore {
                     endTransaction(context, doCommit);
                 if (monitor!=null)
                     monitor.endTimer("hibernate");
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                if (log.isErrorEnabled())
+                    log.error("Exeption while close transaction", e);
+            }
         }
     }
 

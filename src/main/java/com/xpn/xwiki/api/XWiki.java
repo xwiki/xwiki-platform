@@ -28,6 +28,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
@@ -111,6 +112,24 @@ public class XWiki extends Api
 
         Document newdoc = doc.newDocument(getXWikiContext());
         return newdoc;
+    }
+
+    /**
+     * @return all deleted documents in recycle bin
+     * @param fullname - {@link XWikiDocument#getFullName()}
+     * @throws XWikiException if any error
+     */
+    public List getDeletedDocuments(String fullname) throws XWikiException
+    {
+        XWikiDeletedDocument[] dds = xwiki.getDeletedDocuments(fullname, context);
+        if (dds == null || dds.length == 0) {
+            return null;
+        }
+        List result = new ArrayList(dds.length);
+        for (int i = 0; i < dds.length; i++) {
+            result.add(new DeletedDocument(dds[i], context));
+        }
+        return result;
     }
 
     /**
@@ -2346,10 +2365,18 @@ public class XWiki extends Api
     
     /**
      * API to check if the minor edit feature is active
-     * minor edit are activated in xwiki.cfg or in the XWiki Preferences
+     * minor edit is activated in xwiki.cfg or in the XWiki Preferences
      */
     public boolean hasMinorEdit() {
         return xwiki.hasMinorEdit(context);
+    }
+
+    /**
+     * API to check if the recycle bin feature is active
+     * recycle bin is activated in xwiki.cfg or in the XWiki Preferences
+     */
+    public boolean hasRecycleBin() {
+        return xwiki.hasRecycleBin(context);
     }
 
     /**

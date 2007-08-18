@@ -110,6 +110,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private XWikiAttachmentStoreInterface attachmentStore;
 
     private XWikiVersioningStoreInterface versioningStore;
+    /** store for deleted documents */
+    private XWikiRecycleBinStoreInterface recycleBinStore;
     
     private XWikiRenderingEngine renderingEngine;
 
@@ -608,9 +610,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             "xwiki.store.attachment.class",
             "com.xpn.xwiki.store.XWikiHibernateAttachmentStore", context));
 
-        setVersioningStore( (XWikiVersioningStoreInterface) createClassFromConfig(
-            "xwiki.store.versioning.class",
-            "com.xpn.xwiki.store.XWikiHibernateVersioningStore", context));
+        if (hasVersioning(null, context)) {
+            setVersioningStore( (XWikiVersioningStoreInterface) createClassFromConfig(
+                "xwiki.store.versioning.class",
+                "com.xpn.xwiki.store.XWikiHibernateVersioningStore", context));
+        }
+
+        if (hasRecycleBin(context)) {
+            setRecycleBinStore( (XWikiRecycleBinStoreInterface) createClassFromConfig(
+                "xwiki.store.recyclebin.class",
+                "com.xpn.xwiki.store.XWikiHibernateRecycleBinStore", context));
+        }
 
         // Run migrations
         if ("1".equals(Param("xwiki.store.migration", "0"))) {
@@ -875,6 +885,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return versioningStore;
     }
 
+    public XWikiRecycleBinStoreInterface getRecycleBinStore()
+    {
+        return recycleBinStore;
+    }
+
     public void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         // If no comment is provided we should use an empty comment
@@ -1013,6 +1028,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         name = Utils.decode(name, context);
         String fullname = web + "." + name;
         return fullname;
+    }
+
+    /**
+     * @see com.xpn.xwiki.api.XWiki#getDeletedDocuments(String)
+     */
+    public XWikiDeletedDocument[] getDeletedDocuments(String fullname, XWikiContext context) throws XWikiException
+    {
+        if (hasRecycleBin(context)) {
+            XWikiDocument doc = new XWikiDocument();
+            doc.setFullName(fullname, context);
+            return getRecycleBinStore().getAllDeletedDocuments(doc, context, true);
+        } else {
+            return null;
+        }
     }
 
     public XWikiRenderingEngine getRenderingEngine()
@@ -2062,6 +2091,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public void setVersioningStore(XWikiVersioningStoreInterface versioningStore)
     {
         this.versioningStore = versioningStore;
+    }
+
+    public void setRecycleBinStore(XWikiRecycleBinStoreInterface recycleBinStore)
+    {
+        this.recycleBinStore = recycleBinStore;
     }
 
     public void setVersion(String version)
@@ -3123,6 +3157,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void deleteDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        deleteDocument(doc, true, context);
+    }
+
+    public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
+    {
+        if (hasRecycleBin(context) && totrash) {
+            getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), true, 
+                context);
+        }
         getStore().deleteXWikiDoc(doc, context);
         getNotificationManager().verify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),
             XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
@@ -4832,12 +4875,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void deleteAllDocuments(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        deleteAllDocuments(doc, true, context);
+    }
+
+    public void deleteAllDocuments(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
+    {
         // Delete all documents
         List list = doc.getTranslationList(context);
         for (int i = 0; i < list.size(); i++) {
             String lang = (String) list.get(i);
             XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
-            deleteDocument(tdoc, context);
+            deleteDocument(tdoc, totrash, context);
         }
         deleteDocument(doc, context);
     }
@@ -4977,6 +5025,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return "1".equals(Param("xwiki.editcomment.mandatory", "0"));
     }
 
+    /**
+     * @see com.xpn.xwiki.api.XWiki#hasMinorEdit()
+     */
     public boolean hasMinorEdit(XWikiContext context)
     {
         String bl = getXWikiPreference("minoredit", "", context);
@@ -4987,6 +5038,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return "1".equals(Param("xwiki.minoredit", "1"));
     }
 
+    /**
+     * @see com.xpn.xwiki.api.XWiki#hasRecycleBin()
+     * @param context maybe will be useful 
+     */
+    public boolean hasRecycleBin(XWikiContext context)
+    {
+        return "1".equals(Param("xwiki.recyclebin", "1"));
+    }
     /**
      * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
      */

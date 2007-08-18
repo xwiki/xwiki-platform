@@ -128,6 +128,21 @@
         </component>
     </class>
 
+    <class name="com.xpn.xwiki.doc.XWikiDeletedDocument" table="xwikirecyclebin" mutable="false">
+    	<id name="id" column="XDD_ID">
+    		<generator class="native" />
+    	</id>
+    	<natural-id mutable="false">
+            <property name="fullName" column="XDD_FULLNAME" type="string" length="255" />
+            <property name="language" column="XDD_LANGUAGE" type="string" length="5" />    		
+            <property name="date" type="timestamp" column="XDD_DATE" />
+            <property name="deleter" type="string" column="XDD_DELETER" />
+    	</natural-id>
+    	<property name="xml" type="text">
+    	    <column name="XDD_XML" not-null="true" />
+    	</property>
+    </class>
+
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">
         <id name="docId" type="long" unsaved-value="undefined">
             <column name="XWL_DOC_ID" not-null="true"/>

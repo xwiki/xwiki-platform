@@ -1141,6 +1141,37 @@ public class Document extends Api
         }
     }
 
+    public List getAttachmentDiff(Document origdoc, Document newdoc) throws XWikiException
+    {
+        try {
+            if ((origdoc == null) && (newdoc == null)) {
+                return new ArrayList();
+            }
+            if (origdoc == null) {
+                return getDoc().getObjectDiff(
+                    new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.getDoc(),
+                    getXWikiContext());
+            }
+            if (newdoc == null) {
+                return getDoc().getObjectDiff(origdoc.getDoc(),
+                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+            }
+
+            return getDoc().getAttachmentDiff(origdoc.getDoc(), newdoc.getDoc(), getXWikiContext());
+        } catch (Exception e) {
+            java.lang.Object[] args =
+                {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+            List list = new ArrayList();
+            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
+                "Error while making attachment diff of {0} between version {1} and version {2}", e,
+                args);
+            String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
+            list.add(errormsg);
+            return list;
+        }
+    }
+
     public List getLastChanges() throws XWikiException, DifferentiationFailedException
     {
         return doc.getLastChanges(getXWikiContext());

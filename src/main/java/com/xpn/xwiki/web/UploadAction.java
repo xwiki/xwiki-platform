@@ -21,11 +21,13 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -104,6 +106,18 @@ public class UploadAction extends XWikiAction
         if (olddoc.isNew()) {
             olddoc.setCreator(username);
         }
+
+        // Adding a comment with a link to the download URL
+        String comment;
+        String nextRev = attachment.getNextVersion();
+        ArrayList params = new ArrayList();
+        params.add(filename);
+        params.add(olddoc.getAttachmentRevisionURL(filename, nextRev, context));
+        if (attachment.isImage(context))
+            comment = context.getMessageTool().get("core.comment.uploadImageComment", params);
+        else
+            comment = context.getMessageTool().get("core.comment.uploadAttachmentComment", params);
+        olddoc.setComment(comment);
 
         // Save the content and the archive
         try {

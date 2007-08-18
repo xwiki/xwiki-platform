@@ -159,11 +159,18 @@ public class XWikiAttachment {
         this.version = new Version(version);
     }
 
+    public String getNextVersion() {
+        if (version==null)
+         return "1.1";
+        else
+         return ((Version)version.clone()).next().toString();
+    }
+
     public Version getRCSVersion() {
         if (version == null) {
-            version = new Version("1.1");
+            return new Version("1.1");
         }
-        return version;
+        return (Version) version.clone();
     }
 
     public void setRCSVersion(Version version) {

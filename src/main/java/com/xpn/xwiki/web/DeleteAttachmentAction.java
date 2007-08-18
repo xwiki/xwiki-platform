@@ -24,6 +24,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+import java.util.ArrayList;
+
 public class DeleteAttachmentAction extends XWikiAction
 {
     public boolean action(XWikiContext context) throws XWikiException
@@ -42,15 +44,27 @@ public class DeleteAttachmentAction extends XWikiAction
             filename = Utils.decode(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
         }
 
+        XWikiDocument newdoc = (XWikiDocument) doc.clone();
+
         if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
-            attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
+            attachment = (XWikiAttachment) newdoc.getAttachmentList().get(id);
         } else {
-            attachment = doc.getAttachment(filename);
+            attachment = newdoc.getAttachment(filename);
         }
 
-        doc.setAuthor(context.getUser());
-        doc.deleteAttachment(attachment, context);
+
+        newdoc.setAuthor(context.getUser());
+
+        // set delete Attachment comment
+        ArrayList params = new ArrayList();
+        params.add(filename);
+        if (attachment.isImage(context))
+            newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment", params));
+        else
+            newdoc.setComment(context.getMessageTool().get("core.comment.deleteAttachmentComment", params));
+
+        newdoc.deleteAttachment(attachment, context);
         // forward to attach page
         String redirect = Utils.getRedirect("attach", context);
         sendRedirect(response, redirect);

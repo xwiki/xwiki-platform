@@ -37,10 +37,18 @@
   #set($fullmsg="${fullmsg}${tmpmsg}</p><p class=${quote}xwikimessage${quote}>")
   #set($hasInlinks = true)
 #end
-#if($hasInlinks)
-  #set($fullmsg="${fullmsg}${msg.get('core.delete.confirmWithInlinks')}")
+#if($xwiki.hasRecycleBin())
+  #if($hasInlinks)
+    #set($fullmsg="${fullmsg}${msg.get('core.recyclebin.confirmWithInlinks')}")
+  #else
+    #set($fullmsg = $msg.get("core.recyclebin.confirm"))
+  #end
 #else
-  #set($fullmsg = $msg.get("core.delete.confirm"))
+  #if($hasInlinks)
+    #set($fullmsg="${fullmsg}${msg.get('core.delete.confirmWithInlinks')}")
+  #else
+    #set($fullmsg = $msg.get("core.delete.confirm"))
+  #end
 #end
 #xwikimessagebox($msg.get("core.delete") $fullmsg $doc.getURL("delete", "confirm=1$!{redirectparam}&amp;$languageparams") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
 </div>

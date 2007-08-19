@@ -42,7 +42,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private static final Log log = LogFactory.getLog(XWikiRightServiceImpl.class);
     private static Map actionMap;
     private static List allLevels = Arrays.asList(
-        new String[] {"admin","view","edit","comment","delete","register","programming"});
+        new String[] {"admin","view","edit","comment","delete","undelete","register","programming"});
 
     protected void logAllow(String username, String page, String action, String info) {
         if (log.isDebugEnabled())
@@ -85,6 +85,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             actionMap.put("svg", "view");
             actionMap.put("pdf", "view");
             actionMap.put("delete", "delete");
+            actionMap.put("undelete", "undelete");
             actionMap.put("reset", "delete");
             actionMap.put("commentadd", "comment");
             actionMap.put("register", "register");
@@ -442,6 +443,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
             if ("edit".equals(accessLevel) ||
                     "delete".equals(accessLevel) ||
+                    "undelete".equals(accessLevel) ||
                     "comment".equals(accessLevel) ||
                     "register".equals(accessLevel)) {
                 logDeny(name, resourceKey, accessLevel, "server in read-only mode");

@@ -48,7 +48,7 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
      * {@inheritDoc}
      */
     public void saveToRecycleBin(XWikiDocument doc, String deleter, Date date,
-        boolean bTransaction, XWikiContext context) throws XWikiException
+        XWikiContext context, boolean bTransaction) throws XWikiException
     {
         final XWikiDeletedDocument trashdoc = new XWikiDeletedDocument(doc, deleter, date,
             context);
@@ -72,6 +72,20 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
                 XWikiDeletedDocument trashdoc = (XWikiDeletedDocument) session.load(
                     XWikiDeletedDocument.class, Long.valueOf(index));
                 return trashdoc.restoreDocument(null, context);
+            }
+        });
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, final long index,
+        XWikiContext context, boolean bTransaction) throws XWikiException
+    {
+        return (XWikiDeletedDocument) executeRead(context, bTransaction, new HibernateCallback() {
+            public Object doInHibernate(Session session) throws HibernateException,
+                XWikiException
+            {
+                return session.get(XWikiDeletedDocument.class, Long.valueOf(index));
             }
         });
     }

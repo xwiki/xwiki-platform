@@ -525,6 +525,8 @@
 	      **/migration/**.java,
 	      **/*RecycleBin*.java,
 	      **/*DeletedDocument.java,
+	      **/DeleteAction.java,
+	      **/UndeleteAction.java,
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,

@@ -3163,8 +3163,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
         if (hasRecycleBin(context) && totrash) {
-            getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), true, 
-                context);
+            getRecycleBinStore().saveToRecycleBin(
+                doc, context.getUser(), new Date(), context, true); 
         }
         getStore().deleteXWikiDoc(doc, context);
         getNotificationManager().verify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),

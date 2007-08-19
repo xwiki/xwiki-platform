@@ -113,7 +113,7 @@ public class DeletedDocument extends Api
         if (hasAdminRights()) {
             waitdays = config.getProperty("xwiki.store.recyclebin.adminWaitDays", "0");
         } else {
-            waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "0.1");
+            waitdays = config.getProperty("xwiki.store.recyclebin.waitDays", "7");
         }
         int seconds = (int) (Double.parseDouble(waitdays) * 24 * 60 * 60 + 0.5);
         Calendar cal = Calendar.getInstance();

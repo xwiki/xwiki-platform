@@ -20,20 +20,21 @@
  */
 package com.xpn.xwiki.web;
 
-import java.util.List;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.api.DeletedDocument;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Action for delete, restore from recycle bin. 
+ * Action for delete document to recycle bin and for delete documents from recycle bin. 
  * @version $Id: $
  */
 public class DeleteAction extends XWikiAction
 {
+    /** confirm parameter name. */
+    private static String confirmParam = "confirm";
     /**
      * {@inheritDoc}
      */
@@ -43,73 +44,52 @@ public class DeleteAction extends XWikiAction
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
-
+        boolean redirected = false;
+        
         if (doc.isNew()) {
+            // delete from recycle bin
             if (xwiki.hasRecycleBin(context)) {
                 String sindex = request.getParameter("id");
-                if (request.getParameter("delete") != null) {
-                    long index = Long.parseLong(sindex);
-                    if (!xwiki.getRightService().checkAccess("delete", doc, context))
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                            "User has no \"delete\" access to document " + doc.getFullName());
-                    xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
-                    sendRedirect(response, doc.getURL("view", context));
-                    return false;
-                } else if (request.getParameter("restore") != null) {
-                    long index = Long.parseLong(sindex);
-                    if (!xwiki.getRightService().checkAccess("undelete", doc, context))
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                            "User has no \"undelete\" access to document " + doc.getFullName());
-                    XWikiDocument newdoc = xwiki.getRecycleBinStore().restoreFromRecycleBin(
-                        doc, index, context, true);
-                    xwiki.saveDocument(newdoc, "restored from recycle bin", context);
-                    // save attachments. need for save archive
-                    List attachlist = newdoc.getAttachmentList();
-                    if (attachlist.size() > 0) {
-                        for (int i = 0; i < attachlist.size(); i++) {
-                            XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                            // do not increment attachment version
-                            attachment.setMetaDataDirty(false);
-                            attachment.getAttachment_content().setContentDirty(false);
-                            xwiki.getAttachmentStore().saveAttachmentContent(attachment, false,
-                                context, true);
-                        }
-                    }
-                    sendRedirect(response, doc.getURL("view", context));
-                    return false;
+                long index = Long.parseLong(sindex);
+                XWikiDeletedDocument dd = xwiki.getRecycleBinStore()
+                    .getDeletedDocument(doc, index, context, true);
+                DeletedDocument ddapi = new DeletedDocument(dd, context);
+                if (!ddapi.canDelete()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, 
+                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                        "You can't delete from recycle bin before certain time will passed");
+                }
+                xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+                sendRedirect(response, doc.getURL("view", context));
+                redirected = true;
+            }
+        } else {
+            // delete to recycle bin
+            // If confirm=1 then delete the page. If not, the render action will go to the "delete"
+            // page so that the user can confirm. That "delete" page will then call 
+            // the delete action again with confirm=1.
+            String confirm = request.getParameter(confirmParam);
+            if ((confirm != null) && (confirm.equals("1"))) {
+                String language = xwiki.getLanguagePreference(context);
+                if ((language == null) || (language.equals(""))
+                    || language.equals(doc.getDefaultLanguage()))
+                {
+                    xwiki.deleteAllDocuments(doc, context);
+                } else {
+                    // Only delete the translation
+                    XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
+                    xwiki.deleteDocument(tdoc, context);
                 }
             }
-            return true;
         }
-
-        // If confirm=1 then delete the page. If not, the render action will go to the "delete"
-        // page so that the user can confirm. That "delete" page will then call the delete action
-        // again with confirm=1.
-        String confirm = request.getParameter("confirm");
-        if ((confirm != null) && (confirm.equals("1"))) {
-            String language = xwiki.getLanguagePreference(context);
-            if ((language == null) || (language.equals("")) ||
-                language.equals(doc.getDefaultLanguage()))
-            {
-                xwiki.deleteAllDocuments(doc, context);
-            } else {
-                // Only delete the translation
-                XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
-                xwiki.deleteDocument(tdoc, context);
-            }
-
-            // If a xredirect param is passed then redirect to the page specified instead of
-            // going to the default confirmation page.
-            String redirect = Utils.getRedirect(request, null);
-            if (redirect != null) {
-                sendRedirect(response, redirect);
-                return false;
-            }
+        // If a xredirect param is passed then redirect to the page specified instead of
+        // going to the default confirmation page.
+        String redirect = Utils.getRedirect(request, null);
+        if (redirect != null) {
+            sendRedirect(response, redirect);
+            redirected = true;
         }
-
-        return true;
+        return !redirected;
     }
 
     /**
@@ -118,7 +98,7 @@ public class DeleteAction extends XWikiAction
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        String confirm = request.getParameter("confirm");
+        String confirm = request.getParameter(confirmParam);
         if ((confirm != null) && (confirm.equals("1"))) {
             return "deleted";
         } else {

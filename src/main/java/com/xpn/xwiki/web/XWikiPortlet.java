@@ -197,6 +197,8 @@ public class XWikiPortlet extends GenericPortlet {
                     (new LockAction()).action(context);
                 } else if (action.equals("delete")) {
                     (new DeleteAction()).action(context);
+                } else if (action.equals("undelete")) {
+                    (new UndeleteAction()).action(context);
                 } else if (action.equals("propupdate")) {
                     (new PropUpdateAction()).action(context);
                 } else if (action.equals("propadd")) {
@@ -287,6 +289,8 @@ public class XWikiPortlet extends GenericPortlet {
                 renderResult = (new PreviewAction()).render(context);
             } else if (action.equals("delete")) {
                 renderResult = (new DeleteAction()).render(context);
+            } else if (action.equals("undelete")) {
+                renderResult = (new UndeleteAction()).render(context);
             } else if (action.equals("download")) {
                 renderResult = (new DownloadAction()).render(context);
             } else if (action.equals("downloadrev")) {

@@ -43,11 +43,15 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/\{table\}([\s\S]+?)\{table\}/i), 'convertTableExternal');
     this.addInternalProcessor((/<table\s*([^>]*)class=\"wiki-table\"\s*([^>]*)>([\s\S]+?)<\/table>/i), 'convertTableInternal');
 
-    this.addExternalProcessor((/\*(\s*)(.+?)(\s*)\*/gi), '$1<b class="bold">$2<\/b>$3');
+    this.addExternalProcessor((/\*(\s*)(.+?)(\s*)\*/gi), '$1<strong class="bold">$2<\/strong>$3');
     this.addInternalProcessor((/<strong[^>]*>(\s*)(.*?)(\s*)<\/strong>/i), 'convertBoldTextInternal');
+    // this added in security in conversion
+    this.addInternalProcessor((/<b[^>]*>(\s*)(.*?)(\s*)<\/b>/i), 'convertBoldTextInternal');
 
-	this.addExternalProcessor((/~~(\s*)(.+?)(\s*)~~/gi), '$1<i class="italic">$2<\/i>$3');
+	this.addExternalProcessor((/~~(\s*)(.+?)(\s*)~~/gi), '$1<em class="italic">$2<\/em>$3');
 	this.addInternalProcessor((/<em[^>]*>(\s*)(.*?)(\s*)<\/em>/i), 'convertItalicTextInternal');
+    // this added for security in conversion
+    this.addInternalProcessor((/<i[^>]*>(\s*)(.*?)(\s*)<\/i>/i), 'convertItalicTextInternal');
 
     this.addExternalProcessor((/__(\s*)(.+?)(\s*)__/gi), '$1<u>$2<\/u>$3');
     this.addInternalProcessor((/<u[^>]*>(\s*)(.*?)(\s*)<\/u>/i), 'convertUnderLineTextInternal');
@@ -372,24 +376,31 @@ WikiEditor.prototype._cleanBR = function(node) {
 	}
 }
 
-WikiEditor.prototype._encodeNode = function(node) {
+WikiEditor.prototype.encodeNode = function(node) {
     function encode(s)  {
         s = "" + s;
-        // Encoding wiki syntax
+        // Encoding wiki syntax to allow copy/pasting big text
+        // without it being broken by the wiki syntax.
+        s = s.replace(/^(\s+)1/g, '&#49;');
         s = s.replace(/\*/g, '&#42;');
         s = s.replace(/\~/g, '&#126;');
         s = s.replace(/\[/g, '&#91;');
         s = s.replace(/\]/g, '&#93;');
         s = s.replace(/\_/g, '&#95;');
-        s = s.replace(/\{/g, '#123;');
-        s = s.replace(/\}/g, '&#125;');
+        s = s.replace(/\-/g, '&#45;');
+
+        // Encoding more Wiki syntax
+        // we don't want to encode this for now
+        // we don't want to encode this for now
+        // s = s.replace(/\{/g, '&#123;');
+        // s = s.replace(/\}/g, '&#125;');
         // Encoding HTML
-        // s = s.replace(/\'/g, '&#39;'); // &apos; is not working in MSIE
+        // we don't want to encode this for now
+        // because we want to support entering html as text
         // s = s.replace(/</g, '&lt;');
         // s = s.replace(/>/g, '&gt;');
+        // s = s.replace(/\'/g, '&#39;'); // &apos; is not working in MSIE
         // Encoding more wiki syntax
-        // s = s.replace(/\-/g, '&#45;');
-        // s = s.replace(/\1/g, '&#49;');
         return s;
     }
 
@@ -397,10 +408,14 @@ WikiEditor.prototype._encodeNode = function(node) {
         for(var i=0; node.childNodes[i];i++) {
             encodeNode(node.childNodes[i]);
         }
-        node.nodeValue = encode(node.nodeValue);
+        var newValue = encode(node.nodeValue)
+        if (newValue!=node.nodeValue) {
+        }
+        node.nodeValue = newValue;
     }
 
     encodeNode(node);
+    return node;
 }
 
 WikiEditor.prototype.handleSupAndSubButons = function(editor_id, node, undo_index, undo_levels, visual_aid, any_selection) {
@@ -1323,7 +1338,7 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
     content = content.replace(/<div class="paragraph">([\s\S]+?)<\/div>/g,'$1');
     content = content.replace(/<span class="(wikilink|wikiexternallink)">\s*([\s\S]+?)<\/span>/g,'$2');
     content = content.replace(/<span class="(bold|italic|underline|strike)">([\s\S]+?)<\/span>/g,'$2');
-    var type = result[1];
+    var type = result[1].toLowerCase();
     var str = "";
     if (type == "span" || type =="div") {
         var attributes = this.readAttributes(result[2]);
@@ -1348,7 +1363,7 @@ WikiEditor.prototype.convertStyleInternal = function(regexp, result, content) {
             if (attributes["style"]) {
                 var atts = attributes["style"].split(";");
                 for (var i=0; i < atts.length ; i++) {
-                    var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":")));
+                    var att = this.trimString(atts[i].substring(0, atts[i].indexOf(":"))).toLowerCase();
                     var value = this.trimString(atts[i].substring(atts[i].indexOf(":") + 1 , atts[i].length));
                     var styleAtts = ["font-size", "font-family", "background-color", "color", "width", "height", "float", "border"];
                     for (var j=0 ; j < styleAtts.length; j++) {

@@ -447,7 +447,7 @@ WikiEditor.prototype.readAttributes = function(str) {
         for(var i=0; i < result.length; i++) {
             var attrib = attrib_local_regexp.exec(result[i]);
             n++;
-            attributes[attrib[1]] = attrib[2];
+            attributes[attrib[1].toLowerCase()] = attrib[2];
         }
 
     return (n>0)?attributes:null;

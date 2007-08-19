@@ -334,7 +334,12 @@ var TinyMCE_WikieditorTheme = {
                         document.getElementById(ins.editorId).parentNode.style.display = "block";
                         document.getElementById(ins.editorId).parentNode.parentNode.style.display = "block";
                     }
+
                     tinyMCE.setContent(document.getElementById(tid).value);
+                    // we need to make sure this is called
+                    // because apparently FF has switched back to using CSS for styles
+                    if (tinyMCE.isGecko)
+                        ins._setUseCSS(false);
                     document.getElementById(tid).style.display = "none";
                     if (window.ActiveXObject) {
                         document.getElementById(tid).parentNode.style.display = "none";

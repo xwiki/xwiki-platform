@@ -61,7 +61,7 @@ var TinyMCE_wikipluginPlugin = {
                 if (sourceTextArea && sourceTextArea.style.display != "none")
                   return sourceTextArea.value;
                 else {
-                  content = wikiEditor.convertInternal(inst.getBody().innerHTML);
+                  content = wikiEditor.convertInternal(content);
                 }
                 break;
 
@@ -70,7 +70,8 @@ var TinyMCE_wikipluginPlugin = {
 				break;
 
             case "get_from_editor_dom":
-				content = wikiEditor.tagListInternal(content);
+                content = wikiEditor.encodeNode(content);
+                content = wikiEditor.tagListInternal(content);
                 break;
 
             case "insert_to_editor_dom":

@@ -34,6 +34,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.suigeneris.jrcs.rcs.Version;
 
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -52,6 +53,16 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     // TODO Q: if we use swizzle then is ConfluenceRpcInterface still needed ?
 
     // TODO either use this log or remove it
+    
+    // TODO Refactor - Get rid of duplicate code:
+    // - inside the xml-rpc itself (there is too much plumbing)
+    // - between xml-rpc and swizzle
+    // - between xml-rpc and actions (possible)
+
+    // TODO check that enabling exceptions really worked
+    
+    // TODO our ids are unique still they are sensitive to renaming 
+    // Q: is this a problem ? If so we really need the numeric ids (globally unique)
 
     private static final Log log = LogFactory.getLog(ConfluenceRpcHandler.class);
 
@@ -323,11 +334,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         // We only consider the old(!) versions of the document in the page history
         Version[] versions = doc.getRevisions(context);
-        ArrayList result = new ArrayList();
+        List result = new LinkedList();
         for (int i = 0; i < versions.length && !versions[i].toString().equals(doc.getVersion()); i++) {
             String version = versions[i].toString();
             XWikiDocument revdoc = xwiki.getDocument(doc, version, context);
-            result.add((new PageHistorySummary(revdoc)).toMap());
+            result.add(0, (new PageHistorySummary(revdoc)).toMap());
         }
         return result.toArray();
     }

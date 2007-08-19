@@ -1783,4 +1783,11 @@ public class Document extends Api
         return getDocumentRevision(getPreviousVersion());
     }
 
+    /**
+     * @return is document most recent.
+     *  false if and only if there are older versions of this document.
+     */
+    public boolean isMostRecent() {
+        return getDoc().isMostRecent();
+    }
 }

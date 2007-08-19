@@ -318,6 +318,7 @@ public class XWikiDocumentArchive
             doc.setDate(nodeInfo.getDate());
             doc.setAuthor(nodeInfo.getAuthor());
             doc.setMinorEdit(nodeInfo.isMinorEdit());
+            doc.setMostRecent(version.equals(getLatestVersion()));
             return doc;
         } catch (Exception e) {
             Object[] args = {version.toString()};

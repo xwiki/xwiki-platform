@@ -361,6 +361,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 session.load(doc, new Long(doc.getId()));
                 doc.setDatabase(context.getDatabase());
                 doc.setNew(false);
+                doc.setMostRecent(true);
             } catch (ObjectNotFoundException e)
             { // No document
                 doc.setNew(true);

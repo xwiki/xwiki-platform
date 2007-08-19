@@ -142,7 +142,7 @@ public class XWikiDocument
 
     private long id = 0;
 
-    private boolean mostRecent = false;
+    private boolean mostRecent = true;
 
     private boolean isNew = true;
 
@@ -912,12 +912,18 @@ public class XWikiDocument
     {
         return getDocumentArchive(context).getNode(new Version(version));
     }
-
+    /**
+     * @return is document most recent.
+     *  false if and only if there are older versions of this document
+     */
     public boolean isMostRecent()
     {
         return mostRecent;
     }
-
+    /**
+     * must not be used unless in store system.
+     * @param mostRecent - mark document as most recent.
+     */
     public void setMostRecent(boolean mostRecent)
     {
         this.mostRecent = mostRecent;

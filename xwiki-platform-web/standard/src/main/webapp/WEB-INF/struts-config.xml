@@ -171,6 +171,12 @@
             <forward name="deleted" path="/templates/deleted.vm"/>
         </action>
 
+        <action path="/undelete/"
+                type="com.xpn.xwiki.web.UndeleteAction"
+                name="undelete"
+                scope="request">
+        </action>
+
         <action path="/reset/"
                 type="com.xpn.xwiki.web.ResetVersionsAction"
                 name="reset"

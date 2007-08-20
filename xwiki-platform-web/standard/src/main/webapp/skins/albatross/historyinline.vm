@@ -15,7 +15,7 @@
           <th>$msg.get("comment")</th>
 #end
 #if($hasedit || $hasadmin)
-          <th></th>
+          <th colspan="2"></th>
 #end
         </tr>
 #if(!$revisionscount)
@@ -49,6 +49,9 @@
 #if($hasedit || $hasadmin)
           <td class="xwikibuttonlink"><a href="$tdoc.getURL("rollback","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("readytorollback") $nextversion')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("rollback")</a></td>
 #end
+#if($hasadmin)
+          <td class="xwikibuttonlink"><a href="$tdoc.getURL("deleteversions","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("core.versions.delete.confirm.single") $nextversion')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("core.versions.delete.single")</a></td>
+#end
         </tr>
 #end
 #end
@@ -56,7 +59,7 @@
       <div class="buttons">
         <div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>
         #if($hasadmin)
-          <div class="buttonwrapper"><input class="button" type="submit" name="deleteversions" value="$msg.get("core.versions.delete")" onclick="if (confirm('$msg.get("core.versions.delete.confirm")')) { document.forms.${formname}.action='$doc.getURL("deleteversions", "$!{param}&confirm=1")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit(); return true; } return false;" /></div>
+          <div class="buttonwrapper"><input class="button" type="submit" name="deleteversions" value="$msg.get("core.versions.delete.many")" onclick="if (confirm('$msg.get("core.versions.delete.confirm.many")')) { document.forms.${formname}.action='$doc.getURL("deleteversions", "$!{param}&confirm=1")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit(); return true; } return false;" /></div>
         #end
         #if($xwiki.hasMinorEdit())
           #if(!$request.getParameter("showminor"))

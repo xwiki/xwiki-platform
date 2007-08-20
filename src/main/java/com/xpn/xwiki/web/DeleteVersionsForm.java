@@ -28,6 +28,8 @@ public class DeleteVersionsForm extends XWikiForm
     private String rev1;
     /** to revision. */
     private String rev2;
+    /** single version */
+    private String rev;
     /** document language. */
     private String language;
     /** is action confirmed. */
@@ -38,6 +40,7 @@ public class DeleteVersionsForm extends XWikiForm
         XWikiRequest request = getRequest();
         rev1 = request.getParameter("rev1");
         rev2 = request.getParameter("rev2");
+        rev = request.getParameter("rev");
         language = request.getParameter("language");
         confirm = request.getParameter("confirm") != null;
     }
@@ -54,6 +57,13 @@ public class DeleteVersionsForm extends XWikiForm
     public String getRev2()
     {
         return rev2;
+    }
+    /**
+     * @return single revision
+     */
+    public String getRev()
+    {
+        return rev;
     }
     /**
      * @return document language

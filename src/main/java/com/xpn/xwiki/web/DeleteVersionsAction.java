@@ -36,13 +36,13 @@ public class DeleteVersionsAction extends XWikiAction
      */
     public boolean action(XWikiContext context) throws XWikiException
     {
-        XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();
         
         boolean confirm = form.isConfirmed();
         String rev1 = form.getRev1();
         String rev2 = form.getRev2();
+        String rev = form.getRev();
         String language = form.getLanguage();
         XWikiDocument tdoc;
         
@@ -64,8 +64,13 @@ public class DeleteVersionsAction extends XWikiAction
             Version v1;
             Version v2;
             try {
-                v1 = new Version(rev1);
-                v2 = new Version(rev2);
+                if (rev!=null) {
+                    v1 = new Version(rev);
+                    v2 = v1;
+                } else {
+                    v1 = new Version(rev1);
+                    v2 = new Version(rev2);
+                }
             } catch (NullPointerException e) {
                 // incorrect or unselected versions
                 sendRedirect(context);

@@ -52,14 +52,15 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     // TODO Q: if we use swizzle then is ConfluenceRpcInterface still needed ?
 
-    // TODO either use this log or remove it
+    // TODO either use the log or remove it
     
     // TODO Refactor - Get rid of duplicate code:
-    // - inside the xml-rpc itself (there is too much plumbing)
+    // - inside the xml-rpc implementation itself (there is too much plumbing)
     // - between xml-rpc and swizzle
-    // - between xml-rpc and actions (possible)
+    // - between xml-rpc and actions (maybe)
 
     // TODO check that enabling exceptions really worked
+    // -> it seems it didn't !!!
     
     // TODO our ids are unique still they are sensitive to renaming 
     // Q: is this a problem ? If so we really need the numeric ids (globally unique)
@@ -314,7 +315,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         checkToken(token, context);
 
-        XWikiDocument doc = getPageDoc(pageId, context);
+        XWikiDocument doc = getDocFromPageId(pageId, context);
         Page page = new Page(doc, context);
         return page.toMap();
     }
@@ -330,7 +331,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         XWiki xwiki = context.getWiki();
         checkToken(token, context);
 
-        XWikiDocument doc = getPageDoc(pageId, context);
+        XWikiDocument doc = getDocFromPageId(pageId, context);
 
         // We only consider the old(!) versions of the document in the page history
         Version[] versions = doc.getRevisions(context);
@@ -359,7 +360,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        XWikiDocument doc = getPageDoc(pageId, context);
+        XWikiDocument doc = getDocFromPageId(pageId, context);
 
         List attachlist = doc.getAttachmentList();
         ArrayList result = new ArrayList(attachlist.size());
@@ -373,6 +374,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     // TODO test history + comments
     // TODO generalize this to arbitrary objects (there the class name is no longer fixed)
+    //         - this would be an extension to the confluence api
     /**
      * {@inheritDoc}
      * 
@@ -385,12 +387,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        XWikiDocument doc = getPageDoc(pageId, context);
+        XWikiDocument doc = getDocFromPageId(pageId, context);
 
         String className = xwiki.getCommentsClass(context).getName();
         List commentlist = doc.getObjects(className);
         if (commentlist != null) {
-            ArrayList result = new ArrayList(commentlist.size());
+            ArrayList result = new ArrayList();
             for (int i = 0; i < commentlist.size(); i++) {
                 BaseObject obj = (BaseObject) commentlist.get(i);
                 if (obj != null) {
@@ -418,7 +420,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         checkToken(token, context);
 
         DocObjectPair pair = getDocObjectPair(commentId, context);
-        return (new Comment(pair.doc, pair.obj, context)).toMap();
+        Comment comment = new Comment(pair.doc, pair.obj, context);
+        return comment.toMap();
     }
 
     /**
@@ -435,7 +438,9 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         checkToken(token, context);
 
         Comment comment = new Comment(commentParams);
-        XWikiDocument doc = getPageDoc(comment.getPageId(), context);
+        XWikiDocument doc = getDocFromPageId(comment.getPageId(), context);
+        
+        // TODO check that doc is most recent ?
 
         // TODO Q: does this really have to be so complex ? (taken from CommentAddAction)
         Map map = new HashMap();
@@ -470,6 +475,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         checkToken(token, context);
 
         DocObjectPair pair = getDocObjectPair(commentId, context);
+        // TODO check that doc is most recent ?
         pair.doc.removeObject(pair.obj);
         String msg = context.getMessageTool().get("core.comment.deleteObject");
         xwiki.saveDocument(pair.doc, msg, context);
@@ -497,8 +503,10 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         XWikiDocument doc = null;
         if (page.getId() != null) {
             // page id is set -> save page
-            doc = xwiki.getDocument(page.getId(), context);
-            // TODO Q: What should happen when storing an old version of a page ?
+            doc = getDocFromPageId(page.getId(), context);
+            if (!doc.isMostRecent()) {
+                throw exception("You can only edit the latest version of a page");
+            }
         } else {
             // page id not set -> create new page or overwrite existing one
             String space = page.getSpace();
@@ -537,12 +545,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        XWikiDocument doc = getPageDoc(pageId, context);
+        XWikiDocument doc = getDocFromPageId(pageId, context);
         context.setDoc(doc);
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         xwiki.prepareDocuments(context.getRequest(), context, vcontext);
         if (content.length() == 0) {
-            // If content is not provided, then the existing content of the page is used instead
+            // If content is not provided, then the existing content of the page is used
             content = doc.getContent();
         }
         String result = xwiki.getRenderingEngine().renderText(content, doc, context);
@@ -557,21 +565,17 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     public boolean removePage(String token, String pageId) throws XWikiException
     {
         XWikiContext context = getXWikiContext();
-        XWiki xwiki = context.getWiki();
         context.setAction("delete");
         checkToken(token, context);
 
-        // TODO page has to exist
-        // TODO What about deleting old revisions?
-        // Should they cause the page to be deleted or an exception?
-        XWikiDocument doc = xwiki.getDocument(pageId, context);
-        context.setDoc(doc);
-        xwiki.prepareDocuments(context.getRequest(), context, (VelocityContext) context
-            .get("vcontext"));
-        context.getWiki().deleteDocument(doc, context);
-        // Note: false is never be returned from this function,
-        // instead an exception is thrown in case of error.
-        return true;
+        XWikiDocument doc = getDocFromPageId(pageId, context);
+        if (doc.isMostRecent()) {
+            context.setDoc(doc);
+            context.getWiki().deleteDocument(doc, context);
+            return true;
+        } else {
+            throw exception("You cannot remove an old version of a page");
+        }
     }
 
     // //////////
@@ -597,6 +601,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         // TODO: This is not enough and search is implemented in velocity (SUPER STUPID!!!)
         // http://localhost:8080/xwiki/bin/edit/XWiki/WebSearchCode
         // xwiki.search(sql, context)
+        // Would using the Lucene search be a solution?
         
         // TODO Can i use the Lucerne search JV just added ?
 
@@ -726,7 +731,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setUser(user.username);
     }
 
-    private XWikiDocument getPageDoc(String pageId, XWikiContext context) throws XWikiException
+    private XWikiDocument getDocFromPageId(String pageId, XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         if (!pageId.contains(":")) {
@@ -752,10 +757,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     private DocObjectPair getDocObjectPair(String commentId, XWikiContext context)
         throws XWikiException
     {
+        // TODO error handling
         XWiki xwiki = context.getWiki();
         String pageId = commentId.substring(0, commentId.indexOf(";"));
         int nb = (new Integer(commentId.substring(commentId.indexOf(";") + 1))).intValue();
-        XWikiDocument doc = getPageDoc(pageId, context);
+        XWikiDocument doc = getDocFromPageId(pageId, context);
         BaseObject obj = doc.getObject(xwiki.getCommentsClass(context).getName(), nb);
         return new DocObjectPair(doc, obj);
     }

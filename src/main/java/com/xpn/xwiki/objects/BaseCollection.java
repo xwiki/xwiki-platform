@@ -438,10 +438,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseProperty prop2 = (BaseProperty) collection.getFields().get(name);
 
             if (prop2==null) {
-                String dprop = (prop.getValue() instanceof String) ? prop.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,this,context);
-                difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
-                        name, dprop , ""));
-            } else if (!prop.equals(prop2)) {
+                if ((prop!=null)&&(!prop.toText().equals(""))) {
+                    String dprop = (prop.getValue() instanceof String) ? prop.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,this,context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
+                            name, dprop , ""));
+                }
+            } else if (!prop2.toText().equals(((prop==null) ? "" : prop.toText()))) {
                 BaseClass bclass = getxWikiClass(context);
                 PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
                 if (pclass==null) {
@@ -463,15 +465,17 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseProperty prop2 = (BaseProperty)collection.getFields().get(name);
 
             if (prop==null) {
-                BaseClass bclass = getxWikiClass(context);
-                PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
-                if (pclass==null) {
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                            name, "" , prop2.toText()));
-                } else {
-                    String dprop2 = (prop2.getValue() instanceof String) ? prop2.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,collection,context);
-                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
-                            name, "" , dprop2));
+                if ((prop2!=null)&&(!prop2.toText().equals(""))) {
+                    BaseClass bclass = getxWikiClass(context);
+                    PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
+                    if (pclass==null) {
+                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
+                                name, "" , prop2.toText()));
+                    } else {
+                        String dprop2 = (prop2.getValue() instanceof String) ? prop2.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,collection,context);
+                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
+                                name, "" , dprop2));
+                    }
                 }
             }
         }

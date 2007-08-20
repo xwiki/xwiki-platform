@@ -18,6 +18,7 @@
  */
 package com.xpn.xwiki.web;
 
+import org.suigeneris.jrcs.rcs.InvalidVersionNumberException;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -40,42 +41,36 @@ public class DeleteVersionsAction extends XWikiAction
         DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();
         
         boolean confirm = form.isConfirmed();
-        String rev1 = form.getRev1();
-        String rev2 = form.getRev2();
-        String rev = form.getRev();
+        Version v1;
+        Version v2;
+        Version rev = form.getRev();
+        if (rev==null) {
+            v1 = form.getRev1();
+            v2 = form.getRev2();
+        } else {
+            v1 = v2 = rev;
+        }
         String language = form.getLanguage();
         XWikiDocument tdoc;
         
-        if (confirm) {
-            if (language == null || language.equals("") || language.equals("default")
-                || language.equals(doc.getDefaultLanguage())) {
-                // Need to save parent and defaultLanguage if they have changed
-                tdoc = doc;
-            } else {
-                tdoc = doc.getTranslatedDocument(language, context);
-                if (tdoc == doc) {
-                    tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
-                    tdoc.setLanguage(language);
-                }
-                tdoc.setTranslation(1);
+        if (!confirm) {
+            return true;
+        }
+        if (language == null || language.equals("") || language.equals("default")
+            || language.equals(doc.getDefaultLanguage())) {
+            // Need to save parent and defaultLanguage if they have changed
+            tdoc = doc;
+        } else {
+            tdoc = doc.getTranslatedDocument(language, context);
+            if (tdoc == doc) {
+                tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                tdoc.setLanguage(language);
             }
-            
+            tdoc.setTranslation(1);
+        }
+        
+        if (v1 != null && v2 != null) {
             XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
-            Version v1;
-            Version v2;
-            try {
-                if (rev!=null) {
-                    v1 = new Version(rev);
-                    v2 = v1;
-                } else {
-                    v1 = new Version(rev1);
-                    v2 = new Version(rev2);
-                }
-            } catch (NullPointerException e) {
-                // incorrect or unselected versions
-                sendRedirect(context);
-                return false;
-            }
             archive.removeVersions(v1, v2, context);
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
             tdoc.setDocumentArchive(archive);
@@ -92,5 +87,12 @@ public class DeleteVersionsAction extends XWikiAction
         // forward to view
         String redirect = Utils.getRedirect("view", "viewer=history", context);
         sendRedirect(context.getResponse(), redirect);
+    }
+    /**
+     * {@inheritDoc}
+     */
+    public String render(XWikiContext context) throws XWikiException
+    {
+        return "deleteversionsconfirm";
     }
 }

@@ -18,6 +18,8 @@
  */
 package com.xpn.xwiki.web;
 
+import org.suigeneris.jrcs.rcs.Version;
+
 /**
  * Struts form for {@link DeleteVersionsAction}.
  * @version $Id: $
@@ -25,11 +27,11 @@ package com.xpn.xwiki.web;
 public class DeleteVersionsForm extends XWikiForm
 {
     /** from revision. */
-    private String rev1;
+    private Version rev1;
     /** to revision. */
-    private String rev2;
-    /** single version */
-    private String rev;
+    private Version rev2;
+    /** single version. */
+    private Version rev;
     /** document language. */
     private String language;
     /** is action confirmed. */
@@ -38,30 +40,41 @@ public class DeleteVersionsForm extends XWikiForm
     public void readRequest()
     {
         XWikiRequest request = getRequest();
-        rev1 = request.getParameter("rev1");
-        rev2 = request.getParameter("rev2");
-        rev = request.getParameter("rev");
+        rev1 = getVersion( request.getParameter("rev1") );
+        rev2 = getVersion( request.getParameter("rev2") );
+        rev =  getVersion( request.getParameter("rev") );
         language = request.getParameter("language");
         confirm = request.getParameter("confirm") != null;
     }
     /**
+     * @return {@link Version}, or null if ver is incorrect
+     * @param ver string representation of {@link Version}
+     */
+    private Version getVersion(String ver) {
+        try {
+            return new Version(ver);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    /**
      * @return from revision
      */
-    public String getRev1()
+    public Version getRev1()
     {
         return rev1;
     }
     /**
      * @return to revision
      */
-    public String getRev2()
+    public Version getRev2()
     {
         return rev2;
     }
     /**
      * @return single revision
      */
-    public String getRev()
+    public Version getRev()
     {
         return rev;
     }

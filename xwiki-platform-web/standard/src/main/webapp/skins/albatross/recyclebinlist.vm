@@ -1,5 +1,5 @@
-### Show deleted documents
-#set($dds=$xwiki.getDeletedDocuments($tdoc.getFullName()))
+### Show list of deleted documents
+#set($dds=$xwiki.getDeletedDocuments($tdoc.getFullName(), $tdoc.getLanguage()))
 #if($dds)
 <center>
 <p>$msg.get("core.recyclebin.showlistmsg")</p>
@@ -14,11 +14,17 @@
  <tbody>
  #foreach($dd in $dds)
   <tr>
-   <td>$dd.getDeleter()</td>
-   ## TODO: <td><a href="$doc.getURL("view", "viewer=recyclebin&id=$dd.getId()")">$xwiki.formatDate($dd.getDate())</a></td>
-   <td>$xwiki.formatDate($dd.getDate())</td>
+   <td>$xwiki.getLocalUserName($dd.getDeleter())</td>
+   <td><a href="$doc.getURL("view", "viewer=recyclebin&id=$dd.getId()")">$xwiki.formatDate($dd.getDate())</a></td>
    <td>#if($dd.canUndelete()) <a href="$xwiki.getURL($tdoc.getFullName(), "undelete", "id=$dd.getId()")">$msg.get("core.recyclebin.restore")</a> #end</td>
-   <td>#if($dd.canDelete()) <a href="$xwiki.getURL($tdoc.getFullName(), "delete", "id=$dd.getId()")">$msg.get("core.recyclebin.delete")</a> #end</td>
+   <td>
+    #if($dd.canDelete())
+     <a href="$xwiki.getURL($tdoc.getFullName(), "delete", "id=$dd.getId()")"
+      onclick="if (confirm('$msg.get("core.recyclebin.completelyDeleteConfirm")')) {this.href += '&amp;confirm=1'; return true;} return false;">
+      $msg.get("core.recyclebin.delete")
+     </a>
+    #end
+   </td>
   </tr>
  #end
  </tbody>

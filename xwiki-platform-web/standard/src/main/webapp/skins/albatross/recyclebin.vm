@@ -1,0 +1,7 @@
+## Preview deleted document in recycle bin
+#set($dd = $xwiki.getDeletedDocument($tdoc.getFullName(), $tdoc.getLanguage(), $request.get("id")))
+#set($doc = $dd.getDocument())
+#set($tdoc = $doc)
+#set($cdoc = $doc)
+#template("contentview.vm")
+#template("docextra.vm")

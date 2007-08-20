@@ -913,8 +913,8 @@ public class XWikiDocument
         return getDocumentArchive(context).getNode(new Version(version));
     }
     /**
-     * @return is document most recent.
-     *  false if and only if there are older versions of this document
+     * @return Is this version the most recent one. False if and only if there are newer versions of this document in the
+     * database.
      */
     public boolean isMostRecent()
     {

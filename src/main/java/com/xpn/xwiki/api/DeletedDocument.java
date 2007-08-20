@@ -138,4 +138,13 @@ public class DeletedDocument extends Api
             return null;
         }
     }
+    
+    /**
+     * @return document, restored from recycle bin 
+     * @throws XWikiException if error 
+     */
+    public Document getDocument() throws XWikiException
+    {
+        return new Document(deldoc.restoreDocument(null, context), context);
+    }
 }

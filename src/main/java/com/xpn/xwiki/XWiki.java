@@ -1033,12 +1033,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * @see com.xpn.xwiki.api.XWiki#getDeletedDocuments(String)
      */
-    public XWikiDeletedDocument[] getDeletedDocuments(String fullname, XWikiContext context) throws XWikiException
+    public XWikiDeletedDocument[] getDeletedDocuments(String fullname, String lang, XWikiContext context) throws XWikiException
     {
         if (hasRecycleBin(context)) {
             XWikiDocument doc = new XWikiDocument();
             doc.setFullName(fullname, context);
+            doc.setLanguage(lang);
             return getRecycleBinStore().getAllDeletedDocuments(doc, context, true);
+        } else {
+            return null;
+        }
+    }
+    /**
+     * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, int)
+     */
+    public XWikiDeletedDocument getDeletedDocument(String fullname, String lang, int index, XWikiContext context) throws XWikiException
+    {
+        if (hasRecycleBin(context)) {
+            XWikiDocument doc = new XWikiDocument();
+            doc.setFullName(fullname, context);
+            doc.setLanguage(lang);
+            return getRecycleBinStore().getDeletedDocument(doc, index, context, true);
         } else {
             return null;
         }

@@ -149,7 +149,8 @@ public abstract class XWikiAction extends Action {
                 }
 
                 if (renderResult != null) {
-                    if ((doc.isNew() && ("view".equals(action) || "delete".equals(action)))) {
+                    if ((doc.isNew() && ("view".equals(action) || "delete".equals(action)))
+                        && !"recyclebin".equals(request.get("viewer"))) {
                         String page = Utils.getPage(request, "docdoesnotexist");
                         Utils.parseTemplate(page, context);
                     } else {

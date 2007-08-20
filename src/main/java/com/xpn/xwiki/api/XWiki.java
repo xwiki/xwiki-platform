@@ -117,11 +117,12 @@ public class XWiki extends Api
     /**
      * @return all deleted documents in recycle bin
      * @param fullname - {@link XWikiDocument#getFullName()}
+     * @param lang - {@link XWikiDocument#getLanguage()}
      * @throws XWikiException if any error
      */
-    public List getDeletedDocuments(String fullname) throws XWikiException
+    public List getDeletedDocuments(String fullname, String lang) throws XWikiException
     {
-        XWikiDeletedDocument[] dds = xwiki.getDeletedDocuments(fullname, context);
+        XWikiDeletedDocument[] dds = xwiki.getDeletedDocuments(fullname, lang, context);
         if (dds == null || dds.length == 0) {
             return null;
         }
@@ -130,6 +131,20 @@ public class XWiki extends Api
             result.add(new DeletedDocument(dds[i], context));
         }
         return result;
+    }
+    /**
+     * @return specified documents in recycle bin
+     * @param fullname - {@link XWikiDocument#getFullName()}
+     * @param lang - {@link XWikiDocument#getLanguage()}
+     * @throws XWikiException if any error
+     */
+    public DeletedDocument getDeletedDocument(String fullname, String lang, String index) throws XWikiException
+    {
+        XWikiDeletedDocument dd = xwiki.getDeletedDocument(fullname, lang, Integer.parseInt(index), context);
+        if (dd == null) {
+            return null;
+        }
+        return new DeletedDocument(dd, context);
     }
 
     /**

@@ -25,6 +25,7 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
+import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Information about deleted document in recycle bin. 
  * @version $Id: $
@@ -105,7 +106,11 @@ public class DeletedDocument extends Api
      */
     public boolean canDelete() throws XWikiException
     {
-        if (!hasAdminRights() && !hasAccessLevel("delete", getFullName())) {
+        XWikiDocument doc = new XWikiDocument();
+        doc.setFullName(getFullName(), context);
+        if (!hasAdminRights()
+            && !getXWikiContext().getWiki().getRightService()
+                .checkAccess("delete", doc, context)) {
             return false;
         }
         String waitdays;

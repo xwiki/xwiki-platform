@@ -40,9 +40,9 @@ public class DeleteVersionsForm extends XWikiForm
     public void readRequest()
     {
         XWikiRequest request = getRequest();
-        rev1 = getVersion( request.getParameter("rev1") );
-        rev2 = getVersion( request.getParameter("rev2") );
-        rev =  getVersion( request.getParameter("rev") );
+        rev1 = getVersion(request.getParameter("rev1"));
+        rev2 = getVersion(request.getParameter("rev2"));
+        rev =  getVersion(request.getParameter("rev"));
         language = request.getParameter("language");
         confirm = request.getParameter("confirm") != null;
     }

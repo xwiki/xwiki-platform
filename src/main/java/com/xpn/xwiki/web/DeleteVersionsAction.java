@@ -18,7 +18,6 @@
  */
 package com.xpn.xwiki.web;
 
-import org.suigeneris.jrcs.rcs.InvalidVersionNumberException;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
@@ -44,11 +43,12 @@ public class DeleteVersionsAction extends XWikiAction
         Version v1;
         Version v2;
         Version rev = form.getRev();
-        if (rev==null) {
+        if (rev == null) {
             v1 = form.getRev1();
             v2 = form.getRev2();
         } else {
-            v1 = v2 = rev;
+            v1 = rev;
+            v2 = rev;
         }
         String language = form.getLanguage();
         XWikiDocument tdoc;

@@ -1,0 +1,21 @@
+###
+### Delete versions confirm message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#if($message)
+  <div id="xwikimessage">$message</div>
+#end
+#set($rev1=$request.get("rev1"))
+#set($rev2=$request.get("rev2"))
+#if(!$rev1 || !$rev2)
+  #error($msg.get("core.versions.delete.needselect"))
+  <center><a href="javascript:history.go(-1)">$msg.get("core.versions.delete.goback")</a></center> 
+#else
+  #set($fullmsg=$msg.get("core.versions.delete.confirm.many", [$rev1, $rev2]))
+  #xwikimessagebox($msg.get("core.delete") $fullmsg $doc.getURL("deleteversions", "confirm=1&amp;rev1=$rev1&amp;rev2=$rev2&amp;$!{redirectparam}&amp;$languageparams") $doc.getURL("view", "viewer=history$!{redirectparam}&amp;$languageparams") $msg.get("yes") $msg.get("no"))
+#end
+</div>
+<div class="clearfloats"></div>
+#template("endpage.vm")

@@ -23,13 +23,13 @@ package com.xpn.xwiki.doc;
 
 public class MetaDataDiff extends Object {
     private String field;
-    private Object prevvalue;
-    private Object newvalue;
+    private Object prevValue;
+    private Object newValue;
 
-    public MetaDataDiff(String field, Object prevvalue, Object newvalue) {
+    public MetaDataDiff(String field, Object prevValue, Object newValue) {
         this.setField(field);
-        this.setPrevvalue(prevvalue);
-        this.setNewvalue(newvalue);
+        this.setPrevValue(prevValue);
+        this.setNewValue(newValue);
     }
 
     public String getField() {
@@ -40,28 +40,28 @@ public class MetaDataDiff extends Object {
         this.field = field;
     }
 
-    public Object getPrevvalue() {
-        return prevvalue;
+    public Object getPrevValue() {
+        return prevValue;
     }
 
-    public void setPrevvalue(Object prevvalue) {
-        this.prevvalue = prevvalue;
+    public void setPrevValue(Object prevvalue) {
+        this.prevValue = prevvalue;
     }
 
-    public Object getNewvalue() {
-        return newvalue;
+    public Object getNewValue() {
+        return newValue;
     }
 
-    public void setNewvalue(Object newvalue) {
-        this.newvalue = newvalue;
+    public void setNewValue(Object newValue) {
+        this.newValue = newValue;
     }
 
     public String toString() {
         StringBuffer buf = new StringBuffer(field);
         buf.append(": ");
-        buf.append(prevvalue.toString());
+        buf.append(prevValue.toString());
         buf.append(" &gt; ");
-        buf.append(newvalue.toString());
+        buf.append(newValue.toString());
         return buf.toString();
     }
 }

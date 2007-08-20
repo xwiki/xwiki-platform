@@ -66,7 +66,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessorBefore('convertParagraphExternal', (/##([^\r\n]*)$|(#\*([\s\S]+?)\*#)/im), 'convertVelocityCommentExternal');
     this.addInternalProcessorBefore('convertStyleInternal', (/<div\s*([^>]*)class=\"vcomment\"\s*([^>]*)>([\s\S]+?)(\r?\n?)<\/div>/i), 'convertVelocityCommentInternal');
 
-    this.addExternalProcessorBefore('convertParagraphExternal', (/\r?\n?\{style:\s*(.*?)\}\r?\n?([\s\S]+?)\r?\n?\{style\}/i), 'convertStyleExternal');
+    this.addExternalProcessorBefore('convertLinkExternal', (/\r?\n?\{style:\s*(.*?)\}\r?\n?([\s\S]+?)\r?\n?\{style\}/i), 'convertStyleExternal');
     this.addInternalProcessorBefore('convertTableInternal', (/<(font|span|div)\s*(.*?)>\r?\n?([\s\S]+?)\r?\n?\<\/(font|span|div)>/i), 'convertStyleInternal');
 
     //this.addInternalProcessor((/&nbsp;(?!\|)/gi), "");

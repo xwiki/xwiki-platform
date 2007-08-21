@@ -3704,14 +3704,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     getDocument("XWiki.XWikiServer" + database.substring(0, 1).toUpperCase()
                         + database.substring(1), context);
                 BaseObject serverobject = doc.getObject("XWiki.XWikiServerClass");
-                String server =
-                    (serverobject != null) ? serverobject.getStringValue("server") : null;
-                if (server != null) {
+                if (serverobject != null) {
+                    String server = serverobject.getStringValue("server");
                     int mode = serverobject.getIntValue("secure");
                     serverurl = ((mode == 1) ? "https://" : "http://") + server + "/";
                 }
-
-            } catch (Exception e) {
+            } catch (Exception ex) {
             } finally {
                 context.setDatabase(db);
             }
@@ -3846,10 +3844,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         String docname;
         if (context.getMode() == XWikiContext.MODE_PORTLET) {
-            if (request.getParameter("topic") != null)
+            if (request.getParameter("topic") != null) {
                 docname = request.getParameter("topic");
-            else
+            } else {
                 docname = "Main.WebHome";
+            }
         } else if (context.getMode() == XWikiContext.MODE_XMLRPC) {
             docname = context.getDoc().getFullName();
         } else {

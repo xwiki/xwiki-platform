@@ -34,7 +34,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public class DeleteAction extends XWikiAction
 {
     /** confirm parameter name. */
-    private static String confirmParam = "confirm";
+    private static final String CONFIRM_PARAM = "confirm";
     /**
      * {@inheritDoc}
      */
@@ -45,7 +45,7 @@ public class DeleteAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         boolean redirected = false;
-        
+
         if (doc.isNew()) {
             // delete from recycle bin
             if (xwiki.hasRecycleBin(context)) {
@@ -68,7 +68,7 @@ public class DeleteAction extends XWikiAction
             // If confirm=1 then delete the page. If not, the render action will go to the "delete"
             // page so that the user can confirm. That "delete" page will then call 
             // the delete action again with confirm=1.
-            String confirm = request.getParameter(confirmParam);
+            String confirm = request.getParameter(CONFIRM_PARAM);
             if ((confirm != null) && (confirm.equals("1"))) {
                 String language = xwiki.getLanguagePreference(context);
                 if ((language == null) || (language.equals(""))
@@ -80,6 +80,8 @@ public class DeleteAction extends XWikiAction
                     XWikiDocument tdoc = doc.getTranslatedDocument(language, context);
                     xwiki.deleteDocument(tdoc, context);
                 }
+            } else {
+                return true;
             }
         }
         // If a xredirect param is passed then redirect to the page specified instead of
@@ -98,7 +100,7 @@ public class DeleteAction extends XWikiAction
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
-        String confirm = request.getParameter(confirmParam);
+        String confirm = request.getParameter(CONFIRM_PARAM);
         if ((confirm != null) && (confirm.equals("1"))) {
             return "deleted";
         } else {

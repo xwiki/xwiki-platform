@@ -172,7 +172,10 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     public void displayView(StringBuffer buffer, String name, String prefix,
         BaseCollection object, XWikiContext context)
     {
-        buffer.append(((BaseProperty) object.safeget(name)).toText());
+        BaseProperty prop = (BaseProperty) object.safeget(name);
+        if (prop != null) {
+            buffer.append(prop.toText());
+        }
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix,

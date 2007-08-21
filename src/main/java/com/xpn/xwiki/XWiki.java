@@ -3842,6 +3842,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                                     + request.getServletPath().length());
                 }
 
+                // Fix error in some containers, which don't hide the jsessionid paramter from the URL
+                if (path.indexOf(";jsessionid=") != -1) {
+                    path = path.substring(0, path.indexOf(";jsessionid="));
+                }
                 // TODO: I think it's safe to remove the fixDecodedURI now that we're not using
                 // getPathInfo() and thus the container doesn't encode anything but I don't want
                 // to break anything at this late stage (we're releasing 1.0 RC2). Remove it when

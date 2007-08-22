@@ -1450,6 +1450,7 @@ public class Document extends Api
     {
         if (hasAccessLevel("edit")) {
             saveDocument(comment);
+            clonedDoc = null;
         } else {
             java.lang.Object[] args = {getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1467,6 +1468,7 @@ public class Document extends Api
     {
         if (hasProgrammingRights()) {
             saveDocument(comment);
+            clonedDoc = null;
         } else {
             java.lang.Object[] args = {getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1574,6 +1576,7 @@ public class Document extends Api
     {
         if (hasAccessLevel("delete")) {
             getXWikiContext().getWiki().deleteDocument(getDocument(), getXWikiContext());
+            clonedDoc = null;
         } else {
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1586,6 +1589,7 @@ public class Document extends Api
     {
         if (hasProgrammingRights()) {
             getXWikiContext().getWiki().deleteDocument(getDocument(), getXWikiContext());
+            clonedDoc = null;
         } else {
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1653,6 +1657,7 @@ public class Document extends Api
         }
         if (nb > 0) {
             getXWikiContext().getWiki().saveDocument(getDoc(), getXWikiContext());
+            clonedDoc = null;
         }
         return nb;
     }

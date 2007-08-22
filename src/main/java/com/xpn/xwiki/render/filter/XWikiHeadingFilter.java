@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.render.filter;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
-import com.xpn.xwiki.util.TOCGenerator;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.context.InitialRenderContext;
@@ -33,10 +33,11 @@ import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.regex.MatchResult;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import com.xpn.xwiki.util.TOCGenerator;
 
 /**
  * A customized version of Radeox Heading Filter
@@ -82,7 +83,8 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         String numbering = "";
 
         RenderContext rcontext = context.getRenderContext();
-        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
+        XWikiContext xcontext =
+            ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
         XWikiDocument doc = xcontext.getDoc();
 
         log.debug("Processing '" + text + "'");
@@ -101,10 +103,9 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         processedHeadings.add(id);
         log.debug("Generated heading id '" + id + "'");
 
-        //  add numbering if the flag is set
-        if (xcontext.containsKey(TOC_NUMBERED) &&
-            ((Boolean) xcontext.get(TOC_NUMBERED)).booleanValue())
-        {
+        // add numbering if the flag is set
+        if (xcontext.containsKey(TOC_NUMBERED)
+            && ((Boolean) xcontext.get(TOC_NUMBERED)).booleanValue()) {
             if (xcontext.containsKey(TOC_DATA)) {
                 Map tocEntry = (Map) ((Map) xcontext.get(TOC_DATA)).get(id);
                 if (tocEntry != null) {
@@ -113,8 +114,9 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             }
         }
 
-        String heading = formatter.format(
-            new Object[] {id, level.replaceAll("\\.", "-"), numbering, text, hlevel});
+        String heading =
+            formatter.format(new Object[] {id, level.replaceAll("\\.", "-"), numbering, text,
+                hlevel});
 
         // Only show the section edit button for view action and when the user has edit rights on
         // the current document
@@ -126,11 +128,10 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                 // Guest immediatly in the initialization phase.
                 // TODO: Similarly the current document should never be null when this code gets
                 // executed as it would mean we're trying to render the headings for a null
-                // document and that doesn't make sense... 
-                if ((doc != null) && ((xcontext.getUser() != null)
-                    && xcontext.getWiki().getRightService().hasAccessLevel(
-                    "edit", xcontext.getUser(), doc.getFullName(), xcontext)))
-                {
+                // document and that doesn't make sense...
+                if ((doc != null)
+                    && ((xcontext.getUser() != null) && xcontext.getWiki().getRightService()
+                        .hasAccessLevel("edit", xcontext.getUser(), doc.getFullName(), xcontext))) {
                     showEditButton = true;
                 }
             } catch (XWikiException e) {
@@ -149,6 +150,11 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             }
 
             if (level.equals("1") || level.equals("1.1")) {
+                // This check is needed so that only the document content generates sectionedit
+                // links.
+                // TODO: Find a better way to make this check, as this prevents generating links for
+                // titles that are transformed by velocity (1.1 about $doc.fullName) or by radeox
+                // (1.1 This is *important*).
                 if (doc != null && doc.getContent().indexOf(title.trim()) != -1) {
                     sectionNumber++;
                     StringBuffer editparams = new StringBuffer();
@@ -158,11 +164,10 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
                         editparams.append("section=").append(sectionNumber);
                     }
                     try {
-                        if ((xcontext.getWiki().isMultiLingual(xcontext)) &&
-                            (doc.getRealLanguage(xcontext) != null))
-                        {
-                            editparams.append("&amp;language=")
-                                .append(doc.getRealLanguage(xcontext));
+                        if ((xcontext.getWiki().isMultiLingual(xcontext))
+                            && (doc.getRealLanguage(xcontext) != null)) {
+                            editparams.append("&amp;language=").append(
+                                doc.getRealLanguage(xcontext));
                         }
                     } catch (XWikiException e) {
                     }

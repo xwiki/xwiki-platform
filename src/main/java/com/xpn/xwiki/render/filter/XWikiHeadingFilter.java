@@ -150,13 +150,15 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             }
 
             if (level.equals("1") || level.equals("1.1")) {
+                // TODO: This is unstable, meaning that it works in the current skin, but it might
+                // fail if there are other headings processed before the document content.
+                sectionNumber++;
                 // This check is needed so that only the document content generates sectionedit
                 // links.
                 // TODO: Find a better way to make this check, as this prevents generating links for
                 // titles that are transformed by velocity (1.1 about $doc.fullName) or by radeox
                 // (1.1 This is *important*).
                 if (doc != null && doc.getContent().indexOf(title.trim()) != -1) {
-                    sectionNumber++;
                     StringBuffer editparams = new StringBuffer();
                     if (xcontext.getWiki().getEditorPreference(xcontext).equals("wysiwyg")) {
                         editparams.append("xpage=wysiwyg&amp;section=").append(sectionNumber);

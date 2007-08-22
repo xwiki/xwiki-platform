@@ -53,6 +53,7 @@ import com.xpn.xwiki.util.Util;
 
 public class Document extends Api
 {
+    protected XWikiDocument clonedDoc = null;
     protected XWikiDocument doc;
 
     protected Object currentObj;
@@ -78,7 +79,9 @@ public class Document extends Api
 
     protected XWikiDocument getDoc()
     {
-        return doc;
+        if (clonedDoc==null)
+         clonedDoc = (XWikiDocument) doc.clone();
+        return clonedDoc;
     }
 
     /**

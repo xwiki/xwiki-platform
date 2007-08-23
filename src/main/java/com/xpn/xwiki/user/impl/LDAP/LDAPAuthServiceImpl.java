@@ -48,7 +48,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         Principal principal = null;
 
         // Trim the username to allow users to enter their names with spaces before or after
-        String username  = ldapusername.replaceAll(" ", "");
+        String username  = (ldapusername==null) ? null : ldapusername.replaceAll(" ", "");
 
         if ((username == null) || (username.equals("")))
             return null;

@@ -89,7 +89,7 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
     public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException {
 
         // Trim the username to allow users to enter their names with spaces before or after
-        String cannonicalUsername = username.replaceAll(" ", "");
+        String cannonicalUsername = (username==null) ? null : username.replaceAll(" ", "");
 
         if (isSuperAdmin(cannonicalUsername)) {
             return authenticateSuperAdmin(password, context);

@@ -1,0 +1,169 @@
+/*
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package com.xpn.xwiki.plugin.fileupload;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.PluginApi;
+
+import java.util.List;
+
+/**
+ * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and
+ * preserved as a list of {@link org.apache.commons.fileupload.FileItem}s.
+ * 
+ * This is the wrapper accessible from in-document scripts.
+ * 
+ * @version $Id: $
+ */
+public class FileUploadPluginApi extends PluginApi
+{
+
+    /**
+     * API constructor.
+     * 
+     * @param plugin The wrapped plugin object.
+     * @param context Context of the request.
+     * @see PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, XWikiContext)
+     */
+    public FileUploadPluginApi(FileUploadPlugin plugin, XWikiContext context)
+    {
+        super(plugin, context);
+    }
+
+    /**
+     * Returns the plugin object behind this API.
+     * 
+     * @return The inner plugin.
+     */
+    private FileUploadPlugin getFileUploadPlugin()
+    {
+        return (FileUploadPlugin) getPlugin();
+    }
+
+    /**
+     * Deletes all temporary files of the upload.
+     */
+    public void cleanFileList()
+    {
+        getFileUploadPlugin().cleanFileList(getXWikiContext());
+    }
+
+    /**
+     * Loads the list of uploaded files in the context if there are any uploaded files.
+     * 
+     * @throws XWikiException if the request could not be parsed, or the maximum file size was
+     *             reached.
+     */
+    public void loadFileList() throws XWikiException
+    {
+        getFileUploadPlugin().loadFileList(getXWikiContext());
+    }
+
+    /**
+     * Loads the list of uploaded files in the context if there are any uploaded files.
+     * 
+     * @param uploadMaxSize Maximum size of the uploaded files.
+     * @param uploadSizeThreashold Threashold over which the file data should be stored on disk, and
+     *            not in memory.
+     * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
+     * @throws XWikiException if the request could not be parsed, or the maximum file size was
+     *             reached.
+     */
+    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir)
+        throws XWikiException
+    {
+        getFileUploadPlugin().loadFileList(uploadMaxSize, uploadSizeThreashold, tempdir,
+            getXWikiContext());
+    }
+
+    /**
+     * Allows to retrieve the current list of uploaded files, as a list of {@link FileItem}s.
+     * {@link #loadFileList()} needs to be called beforehand
+     * 
+     * @return A list of FileItem elements.
+     */
+    public List getFileItems()
+    {
+        return getFileUploadPlugin().getFileItems(getXWikiContext());
+    }
+
+    /**
+     * Allows to retrieve the contents of an uploaded file as a sequence of bytes.
+     * {@link #loadFileList()} needs to be called beforehand.
+     * 
+     * @param formfieldName The name of the form field.
+     * @return The contents of the file.
+     * @throws XWikiException if the data could not be read.
+     */
+    public byte[] getFileItemData(String formfieldName) throws XWikiException
+    {
+        return getFileUploadPlugin().getFileItemData(formfieldName, getXWikiContext());
+    }
+
+    /**
+     * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList()}
+     * needs to be called beforehand.
+     * 
+     * @deprecated not well named, use {@link #getFileItemAsString(String)}
+     * @param formfieldName The name of the form field.
+     * @return The contents of the file.
+     * @throws XWikiException Exception is thrown if the data could not be read.
+     */
+    public String getFileItem(String formfieldName) throws XWikiException
+    {
+        return getFileUploadPlugin().getFileItemAsString(formfieldName, getXWikiContext());
+    }
+
+    /**
+     * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList()}
+     * needs to be called beforehand.
+     * 
+     * @param formfieldName The name of the form field.
+     * @return The contents of the file.
+     * @throws XWikiException if the data could not be read.
+     */
+    public String getFileItemAsString(String formfieldName) throws XWikiException
+    {
+        return getFileUploadPlugin().getFileItemAsString(formfieldName, getXWikiContext());
+    }
+
+    /**
+     * Retrieves the list of FileItem names. {@link #loadFileList()} needs to be called beforehand.
+     * 
+     * @return List of strings of the item names
+     */
+    public List getFileItemNames()
+    {
+        return getFileUploadPlugin().getFileItemNames(getXWikiContext());
+    }
+
+    /**
+     * Get the name of the file uploaded for a form field.
+     * 
+     * @param formfieldName The name of the form field.
+     * @return The file name, or <tt>null</tt> if no file was uploaded for that form field.
+     */
+    public String getFileName(String formfieldName)
+    {
+        return getFileUploadPlugin().getFileName(formfieldName, getXWikiContext());
+    }
+}

@@ -1,0 +1,92 @@
+/*
+ * Copyright 2007, XpertNet SARL, and individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package com.xpn.xwiki.store.migration.hibernate;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
+import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
+
+/**
+ * Migration manager for hibernate store.
+ * @version $Id: $
+ */
+public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManager
+{
+    /** logger */
+    protected static final Log LOG = LogFactory.getLog(XWikiHibernateMigrationManager.class);
+    /** {@inheritDoc} */
+    public XWikiHibernateMigrationManager(XWikiContext context)
+    {
+        super(context);
+    }
+    /**
+     * @return store system for execute store-specific actions.
+     * @param context - used everywhere
+     */
+    public XWikiHibernateBaseStore getStore(XWikiContext context) {
+        return context.getWiki().getHibernateStore();
+    }
+    /** {@inheritDoc} */
+    public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException {
+        XWikiDBVersion ver = getDBVersionFromConfig(context);
+        return ver != null ? ver : (XWikiDBVersion) getStore(context).executeRead(context, true,
+            new HibernateCallback() { 
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                XWikiDBVersion result = (XWikiDBVersion) session.createCriteria(
+                    XWikiDBVersion.class).uniqueResult();
+                return result==null ? new XWikiDBVersion(0) : result;
+            }
+        });
+    }
+    /** {@inheritDoc} */
+    protected void setDBVersion(final XWikiDBVersion version, XWikiContext context) throws XWikiException {
+        getStore(context).executeWrite(context, true, new HibernateCallback() {
+            public Object doInHibernate(Session session) throws HibernateException
+            {
+                session.createQuery("delete from "+XWikiDBVersion.class.getName()).executeUpdate();
+                session.save(version);
+                return null;
+            }
+        });
+    }
+    /** {@inheritDoc} */
+    protected List getAllMigrations(XWikiContext context) {
+        List result = new ArrayList();
+        // TODO: how to register migrations?
+        // 1st way:
+        result.add(new R4326SampleMigrator());
+        result.add(new R4340XWIKI883Migrator());
+        result.add(new R4359XWIKI1459Migrator());
+        // 2nd way - via classloader
+        
+        return result;
+    }
+}

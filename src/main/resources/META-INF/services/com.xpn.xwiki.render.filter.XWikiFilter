@@ -1,0 +1,29 @@
+# Remove any content inside the Code macro so that it doesn't get evaluated by other Radeox macros.
+# The content is restored later on in the CodeRestoreFilter. 
+com.xpn.xwiki.render.filter.CodeRemoveFilter
+org.radeox.filter.ParamFilter
+com.xpn.xwiki.render.filter.StyleFilter
+com.xpn.xwiki.render.filter.MacroFilter
+com.xpn.xwiki.render.filter.XWikiHeadingFilter
+com.xpn.xwiki.render.filter.XWikiLinkFilter
+org.radeox.filter.LineFilter
+org.radeox.filter.NewlineFilter
+# org.radeox.filter.ListFilter
+com.xpn.xwiki.render.filter.XWikiListFilter
+org.radeox.filter.StrikeThroughFilter
+org.radeox.filter.ParagraphFilter
+com.xpn.xwiki.render.filter.UnderlineFilter
+com.xpn.xwiki.render.filter.StrongFilter
+# org.radeox.filter.BoldFilter
+org.radeox.filter.ItalicFilter
+# org.radeox.filter.UrlFilter
+com.xpn.xwiki.render.filter.UrlFilter
+org.radeox.filter.MarkFilter
+org.radeox.filter.KeyFilter
+org.radeox.filter.TypographyFilter
+# Restore the remove Code macro content to that it can be evaluated by the CodeFilter filter
+com.xpn.xwiki.render.filter.CodeRestoreFilter
+# The CodeFilter filter calls the XWikiCodeMacro for performing the rendering
+com.xpn.xwiki.render.filter.CodeFilter
+#Should be called first, done with before()
+org.radeox.filter.EscapeFilter

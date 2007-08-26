@@ -21,38 +21,29 @@
 
 package com.xpn.xwiki.xmlrpc;
 
+import java.util.Map;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.suigeneris.jrcs.rcs.Version;
-
-public class Comment
+public class Comment extends org.codehaus.swizzle.confluence.Comment
 {
-    private String id;
 
-    private String pageId;
-
-    private String title;
-
-    private String content;
-
-    private String url;
-
-    private Date created;
-
-    private String creator;
+    public Comment()
+    {
+        super();
+    }
+    
+    public Comment(Map data)
+    {
+        super(data);
+    }
 
     public Comment(XWikiDocument doc, BaseObject obj, XWikiContext context) throws XWikiException
     {
-        Version[] versions = doc.getRevisions(context);
-        if (versions[versions.length - 1].toString().equals(doc.getVersion())) {
+        if (doc.isMostRecent()) {
             setId(doc.getFullName() + ";" + obj.getNumber());
             setPageId(doc.getFullName());
             setUrl(doc.getURL("view", context));
@@ -65,107 +56,5 @@ public class Comment
         setContent(obj.getStringValue("comment"));
         setCreated(obj.getDateValue("date"));
         setCreator(obj.getStringValue("author"));
-    }
-
-    /**
-     * @param map A Map<String, String>
-     */
-    public Comment(Map map) throws ConversionException
-    {
-    	setId((String)map.get("id"));
-    	setPageId((String)map.get("pageId"));
-    	setTitle((String)map.get("title"));
-    	setContent((String)map.get("content"));
-    	setUrl((String)map.get("url"));
-    	if (map.containsKey("created")) {
-    	    setCreated(Convert.str2date((String)map.get("created")));
-    	}
-    	setCreator((String)map.get("creator"));
-	}
-
-    /**
-     * @return A Map<String, String>
-     */
-    public Map toMap()
-    {
-        Map map = new HashMap();
-        map.put("id", getId());
-        map.put("pageId", getPageId());
-        map.put("title", getTitle());
-        map.put("content", getContent());
-        map.put("url", getUrl());
-        map.put("created", Convert.date2str(getCreated()));
-        map.put("creator", getCreator());
-        return map;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
-    public String getPageId()
-    {
-        return pageId;
-    }
-
-    public void setPageId(String pageId)
-    {
-        this.pageId = pageId;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-    public String getContent()
-    {
-        return content;
-    }
-
-    public void setContent(String content)
-    {
-        this.content = content;
-    }
-
-    public String getUrl()
-    {
-        return url;
-    }
-
-    public void setUrl(String url)
-    {
-        this.url = url;
-    }
-
-    public Date getCreated()
-    {
-        return created;
-    }
-
-    public void setCreated(Date created)
-    {
-        this.created = created;
-    }
-
-    public String getCreator()
-    {
-        return creator;
-    }
-
-    public void setCreator(String creator)
-    {
-        this.creator = creator;
     }
 }

@@ -19,15 +19,13 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
-
-import java.util.Date;
 import java.util.Map;
 
 import org.suigeneris.jrcs.rcs.Version;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Represents a Page as described in the <a href="Confluence specification">
@@ -40,170 +38,49 @@ import org.suigeneris.jrcs.rcs.Version;
  *       classes used where this class is used in the code.
  * @version $Id: $
  */
-public class Page extends PageSummary
+public class Page extends org.codehaus.swizzle.confluence.Page
 {
-    private int version;
-
-    private String content;
-
-    private Date created;
-
-    private String creator;
-
-    private Date modified;
-
-    private String modifier;
-
-    private boolean homepage;
-
-    private String comment;
-
-    // This constructor is really ridiculous
-    public Page(String id, String space, String parentId, String title, String url, int version,
-        String content, Date created, String creator, Date modified, String modifier,
-        boolean homepage, String comment, int locks)
+    public Page()
     {
-        super(id, space, parentId, title, url, locks);
-        setVersion(version);
-        setContent(content);
-        setCreated(created);
-        setCreator(creator);
-        setModified(modified);
-        setModifier(modifier);
-        setHomepage(homepage);
-        setComment(comment);
+        super();
     }
-
+    
+    public Page(Map data)
+    {
+        super(data);
+    }
+    
     public Page(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        super(doc, context);
+        // since we don't have multiple inheritance
+        // we had to copy paste this initial part from PageSummary
+        if (doc.isMostRecent()) {
+            // Current version of document
+            setId(doc.getFullName());
+            setUrl(doc.getURL("view", context));
+        } else {
+            // Old version of document
+            setId(doc.getFullName() + ":" + doc.getVersion());
+            setUrl(doc.getURL("view", "rev="+doc.getVersion(), context));
+        }
+        setSpace(doc.getSpace());
+        setParentId(doc.getParent());
+        setTitle(doc.getName());
+        setLocks(0);
+
         setVersion(constructVersion(doc.getRCSVersion()));
         setContent(doc.getContent());
         setCreated(doc.getCreationDate());
         setCreator(doc.getAuthor());
         setModified(doc.getDate());
         setModifier(doc.getAuthor());
-        setComment(doc.getComment());
-        setHomepage((doc.getName().equals("WebHome")));
+        setHomePage((doc.getName().equals("WebHome")));
     }
 
-    public Page(Map map) throws ConversionException
-    {
-        super(map);
-
-        if (map.containsKey("version")) {
-            setVersion(Convert.str2int((String) map.get("version")));
-        }
-        setContent((String) map.get("content"));
-        if (map.containsKey("created")) {
-            setCreated(Convert.str2date((String) map.get("created")));
-        }
-        setCreator((String) map.get("creator"));
-        if (map.containsKey("modified")) {
-            setModified(Convert.str2date((String) map.get("modified")));
-        }
-        setModifier((String) map.get("modifier"));
-        setComment((String) map.get("comment"));
-        if (map.containsKey("homepage")) {
-            setHomepage(Convert.str2bool((String) map.get("homepage")));
-        }
-    }
-
-    public Map toMap()
-    {
-        Map map = super.toMap();
-        map.put("version", Convert.int2str(getVersion()));
-        map.put("content", getContent());
-        map.put("created", Convert.date2str(getCreated()));
-        map.put("creator", getCreator());
-        map.put("modified", Convert.date2str(getModified()));
-        map.put("modifier", getModifier());
-        map.put("comment", getComment());
-        map.put("homepage", Convert.bool2str(isHomepage()));
-        return map;
-    }
-
-    public int getVersion()
-    {
-        return version;
-    }
-
-    public void setVersion(int version)
-    {
-        this.version = version;
-    }
-
+    // TODO this needs to be documented
+    // also used in PageHistorySummary
     public static int constructVersion(Version ver)
     {
         return ((ver.at(0)-1) << 16) + ver.at(1);
     }
-
-    public String getContent()
-    {
-        return content;
-    }
-
-    public void setContent(String content)
-    {
-        this.content = content;
-    }
-
-    public Date getCreated()
-    {
-        return created;
-    }
-
-    public void setCreated(Date created)
-    {
-        this.created = created;
-    }
-
-    public String getCreator()
-    {
-        return creator;
-    }
-
-    public void setCreator(String creator)
-    {
-        this.creator = creator;
-    }
-
-    public Date getModified()
-    {
-        return modified;
-    }
-
-    public void setModified(Date modified)
-    {
-        this.modified = modified;
-    }
-
-    public String getModifier()
-    {
-        return modifier;
-    }
-
-    public void setModifier(String modifier)
-    {
-        this.modifier = modifier;
-    }
-
-    public boolean isHomepage()
-    {
-        return homepage;
-    }
-
-    public void setHomepage(boolean homepage)
-    {
-        this.homepage = homepage;
-    }
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
-
 }

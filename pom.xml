@@ -231,6 +231,15 @@
         </exclusion>
       </exclusions>
     </dependency>
+    
+    <!-- Required by the XML-RPC implementation and tests.
+         Hopefully they will eventually make it into a swizzle release. -->
+    <dependency>
+      <groupId>org.codehaus.swizzle</groupId>
+      <artifactId>swizzle-confluence</artifactId>
+      <version>1.1-20070825</version>
+      <classifier>xwiki</classifier>
+    </dependency>
 
     <!-- Standard dependencies found in the central repository -->
 

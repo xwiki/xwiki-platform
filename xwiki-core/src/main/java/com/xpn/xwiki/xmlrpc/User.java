@@ -21,21 +21,22 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class User
+public class User extends org.codehaus.swizzle.confluence.User
 {
-    private String name;
+    public User()
+    {
+        super();
+    }
 
-    private String fullname;
-
-    private String email;
-
-    private String url;
+    public User(Map data)
+    {
+        super(data);
+    }
 
     public User(XWikiDocument userdoc, XWikiContext context)
     {
@@ -43,63 +44,5 @@ public class User
         setFullname(userdoc.getStringValue("XWiki.XWikiUsers", "fullName"));
         setEmail(userdoc.getStringValue("XWiki.XWikiUsers", "email"));
         setUrl(userdoc.getURL("view", context));
-    }
-    
-    public User(Map map)
-    {
-        setName((String) map.get("name"));
-        setFullname((String) map.get("fullname"));
-        setEmail((String) map.get("email"));
-        setUrl((String) map.get("url"));
-    }
-    
-    public Map toMap()
-    {
-        Map map = new HashMap();
-        map.put("name", getName());
-        map.put("fullname", getFullname());
-        map.put("email", getEmail());
-        map.put("url", getUrl());
-        return map;
-    }
-
-    public String getName()
-    {
-        return name;
-    }
-
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-
-    public String getFullname()
-    {
-        return fullname;
-    }
-
-    public void setFullname(String fullname)
-    {
-        this.fullname = fullname;
-    }
-
-    public String getEmail()
-    {
-        return email;
-    }
-
-    public void setEmail(String email)
-    {
-        this.email = email;
-    }
-
-    public String getUrl()
-    {
-        return url;
-    }
-
-    public void setUrl(String url)
-    {
-        this.url = url;
     }
 }

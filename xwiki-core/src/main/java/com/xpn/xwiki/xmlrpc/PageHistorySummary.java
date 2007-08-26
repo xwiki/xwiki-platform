@@ -21,98 +21,28 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
-
-import java.util.Date;
 import java.util.Map;
-import java.util.HashMap;
 
-public class PageHistorySummary
+import com.xpn.xwiki.doc.XWikiDocument;
+
+public class PageHistorySummary extends org.codehaus.swizzle.confluence.PageHistorySummary
 {
-    private String id;
 
-    private int version;
-
-    private Date modified;
-
-    private String modifier;
-
-    public PageHistorySummary(String id, int version, Date modified, String modifier)
+    public PageHistorySummary()
     {
-        setId(id);
-        setVersion(version);
-        setModified(modified);
-        setModifier(modifier);
+        super();
     }
 
+    public PageHistorySummary(Map data)
+    {
+        super(data);
+    }
+    
     public PageHistorySummary(XWikiDocument document)
     {
         setId(document.getFullName() + ":" + document.getVersion());
         setVersion(Page.constructVersion(document.getRCSVersion()));
         setModified(document.getDate());
         setModifier(document.getAuthor());
-    }
-    
-    public PageHistorySummary(Map map) throws ConversionException
-    {
-    	setId((String)map.get("id"));
-        if (map.containsKey("version")) {
-            setVersion(Convert.str2int((String)map.get("version")));
-        }
-        if (map.containsKey("modified")) {
-            setModified(Convert.str2date((String)map.get("modified")));
-        }
-    	setModifier((String)map.get("modifier"));
-    }
-
-    public Map toMap()
-    {
-        Map map = new HashMap();
-        map.put("id", getId());
-        map.put("version", Convert.int2str(getVersion()));
-        map.put("modified", Convert.date2str(getModified()));
-        map.put("modifier", getModifier());
-        return map;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
-    public int getVersion()
-    {
-        return version;
-    }
-
-    public void setVersion(int version)
-    {
-        this.version = version;
-    }
-
-    public Date getModified()
-    {
-        return modified;
-    }
-
-    public void setModified(Date modified)
-    {
-        this.modified = modified;
-    }
-
-    public String getModifier()
-    {
-        return modifier;
-    }
-
-    public void setModifier(String modifier)
-    {
-        this.modifier = modifier;
     }
 }

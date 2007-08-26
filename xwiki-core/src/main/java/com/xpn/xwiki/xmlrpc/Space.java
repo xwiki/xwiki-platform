@@ -23,52 +23,25 @@ package com.xpn.xwiki.xmlrpc;
 
 import java.util.Map;
 
-public class Space extends SpaceSummary
+public class Space extends org.codehaus.swizzle.confluence.Space
 {
-    private String description;
+    public Space()
+    {
+        super();
+    }
 
-    private String homepage;
+    public Space(Map data)
+    {
+        super(data);
+    }
 
     public Space(String key, String name, String url, String description, String homepage)
     {
-        super(key, name, url);
-        this.setDescription(description);
-        this.setHomepage(homepage);
-    }
+        setKey(key);
+        setName(name);
+        setUrl(url);
 
-    public Space(Map map)
-    {
-        super(map);
-        this.setDescription(((String) map.get("description")));
-        this.setHomepage(((String) map.get("homepage")));
+        setDescription(description);
+        setHomepage(homepage);
     }
-
-    Map toMap()
-    {
-        Map params = super.toMap();
-        params.put("description", getDescription());
-        params.put("homepage", getHomepage());
-        return params;
-    }
-
-    public String getDescription()
-    {
-        return description;
-    }
-
-    public void setDescription(String description)
-    {
-        this.description = description;
-    }
-
-    public String getHomepage()
-    {
-        return homepage;
-    }
-
-    public void setHomepage(String homepage)
-    {
-        this.homepage = homepage;
-    }
-
 }

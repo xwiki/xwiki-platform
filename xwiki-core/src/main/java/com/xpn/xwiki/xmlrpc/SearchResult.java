@@ -21,31 +21,21 @@
 
 package com.xpn.xwiki.xmlrpc;
 
+import java.util.Map;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-import java.util.Map;
-import java.util.HashMap;
-
-public class SearchResult
+public class SearchResult extends org.codehaus.swizzle.confluence.SearchResult
 {
-    private String title;
-
-    private String url;
-
-    private String excerpt;
-
-    private String id;
-
-    private String type;
-
-    public SearchResult(String title, String url, String excerpt, String id, String type)
+    public SearchResult()
     {
-        setTitle(title);
-        setUrl(url);
-        setExcerpt(excerpt);
-        setId(id);
-        setType(type);
+        super();
+    }
+
+    public SearchResult(Map data)
+    {
+        super(data);
     }
 
     public SearchResult(XWikiDocument document, XWikiContext context)
@@ -56,79 +46,10 @@ public class SearchResult
         setType("page");
         String content = document.getContent();
         // TODO is this a good way to generate excerpts?
-        if (content.length() <= 256)
+        if (content.length() <= 256) {
             setExcerpt(content);
-        else
+        } else {
             setExcerpt(content.substring(0, 256));
-    }
-    
-    public SearchResult(Map map)
-    {
-    	setTitle((String)map.get("title"));
-    	setUrl((String)map.get("url"));
-    	setExcerpt((String)map.get("excerpt"));
-    	setId((String)map.get("id"));
-    	setType((String)map.get("type"));
-    }
-
-    Map toMap()
-    {
-        Map map = new HashMap();
-        map.put("title", getTitle());
-        map.put("url", getUrl());
-        map.put("excerpt", getExcerpt());
-        map.put("id", getId());
-        map.put("type", getType());
-        return map;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-    public String getUrl()
-    {
-        return url;
-    }
-
-    public void setUrl(String url)
-    {
-        this.url = url;
-    }
-
-    public String getExcerpt()
-    {
-        return excerpt;
-    }
-
-    public void setExcerpt(String excerpt)
-    {
-        this.excerpt = excerpt;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
-    public String getType()
-    {
-        return type;
-    }
-
-    public void setType(String type)
-    {
-        this.type = type;
+        }
     }
 }

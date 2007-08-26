@@ -19,45 +19,34 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import java.util.Map;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.xmlrpc.Convert.ConversionException;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.suigeneris.jrcs.rcs.Version;
-
-public class PageSummary
+/**
+ * {@inheritDoc} Notes:
+ * <ul>
+ * <li>XWiki does not have mutex locks to getLocks always returns 0.</li>
+ * </ul>
+ *
+ */
+public class PageSummary extends org.codehaus.swizzle.confluence.PageSummary
 {
-    private String id;
-
-    private String space;
-
-    private String parentId;
-
-    private String title;
-
-    private String url;
-
-    private int locks;
-
-    public PageSummary(String id, String space, String parentId, String title, String url,
-        int locks)
+    public PageSummary()
     {
-        setId(id);
-        setSpace(space);
-        setParentId(parentId);
-        setTitle(title);
-        setUrl(url);
-        setLocks(locks);
+        super();
     }
-
+    
+    public PageSummary(Map data)
+    {
+        super(data);
+    }
+    
     public PageSummary(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        Version[] versions = doc.getRevisions(context);
-        if (versions[versions.length-1].toString().equals(doc.getVersion())) {
+        if (doc.isMostRecent()) {
             // Current version of document
             setId(doc.getFullName());
             setUrl(doc.getURL("view", context));
@@ -71,89 +60,5 @@ public class PageSummary
         setParentId(doc.getParent());
         setTitle(doc.getName());
         setLocks(0);
-    }
-    
-    public PageSummary(Map map) throws ConversionException
-    {
-        setId((String) map.get("id"));
-        setSpace((String) map.get("space"));
-        setParentId((String) map.get("parentId"));
-        setTitle((String) map.get("title"));
-        setUrl((String) map.get("url"));
-        if (map.containsKey("locks")) {
-            setLocks(Convert.str2int((String) map.get("locks")));
-        }
-    }
-
-    Map toMap()
-    {
-        Map map = new HashMap();
-        map.put("id", getId());
-        map.put("space", getSpace());
-        map.put("parentId", getParentId());
-        map.put("title", getTitle());
-        map.put("url", getUrl());
-        map.put("locks", Convert.int2str(getLocks()));
-        return map;
-    }
-
-    public String getId()
-    {
-        return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-
-    public String getSpace()
-    {
-        return space;
-    }
-
-    public void setSpace(String space)
-    {
-        this.space = space;
-    }
-
-    public String getParentId()
-    {
-        return parentId;
-    }
-
-    public void setParentId(String parentId)
-    {
-        this.parentId = parentId;
-    }
-
-    public String getTitle()
-    {
-        return title;
-    }
-
-    public void setTitle(String title)
-    {
-        this.title = title;
-    }
-
-    public String getUrl()
-    {
-        return url;
-    }
-
-    public void setUrl(String url)
-    {
-        this.url = url;
-    }
-
-    public int getLocks()
-    {
-        return locks;
-    }
-
-    public void setLocks(int locks)
-    {
-        this.locks = locks;
     }
 }

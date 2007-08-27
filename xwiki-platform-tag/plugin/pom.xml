@@ -52,6 +52,7 @@
         <module>alexa</module>
         <module>exoplatform</module>
         <module>multiwiki</module>
+        <module>scheduler</module>
       </modules>
     </profile>
     <profile>

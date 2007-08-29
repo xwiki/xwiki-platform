@@ -237,7 +237,7 @@
     <dependency>
       <groupId>org.codehaus.swizzle</groupId>
       <artifactId>swizzle-confluence</artifactId>
-      <version>1.1-20070825</version>
+      <version>1.1-20070829</version>
       <classifier>xwiki</classifier>
     </dependency>
 

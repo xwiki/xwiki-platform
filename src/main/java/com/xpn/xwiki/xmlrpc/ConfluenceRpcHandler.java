@@ -27,7 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;
@@ -35,11 +34,19 @@ import javax.servlet.ServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.codehaus.swizzle.confluence.Attachment;
+import org.codehaus.swizzle.confluence.Comment;
 import org.codehaus.swizzle.confluence.ConfluenceObjectConvertor;
 import org.codehaus.swizzle.confluence.IdentityObjectConvertor;
 import org.codehaus.swizzle.confluence.MapConvertor;
 import org.codehaus.swizzle.confluence.MapObject;
 import org.codehaus.swizzle.confluence.ObjectConvertor;
+import org.codehaus.swizzle.confluence.Page;
+import org.codehaus.swizzle.confluence.PageHistorySummary;
+import org.codehaus.swizzle.confluence.PageSummary;
+import org.codehaus.swizzle.confluence.SearchResult;
+import org.codehaus.swizzle.confluence.Space;
+import org.codehaus.swizzle.confluence.SpaceSummary;
 import org.codehaus.swizzle.confluence.SwizzleConversionException;
 import org.suigeneris.jrcs.rcs.Version;
 
@@ -53,42 +60,40 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * Ids (eg. page ids) should be treated as opaque handlers. If you ever find yourself parsing them
- * then you are doing something wrong.
+ * Implements the <a href="http://confluence.atlassian.com/display/DOC/Remote+API+Specification">
+ * Confluence XML-RPC interface</a>. Provides all the operations that can be done remotely on a
+ * XWiki instance using the XML-RPC protocol.
  * 
- * @author hritcu
+ * <p>
+ * Note: Lots of the Javadoc comments below are borrowed from the <a
+ * href="http://www.atlassian.com/software/jira/docs/api/rpc-jira-plugin/latest/index.html?com/atlassian/jira/rpc/xmlrpc/XmlRpcService.html">
+ * Confluence Javadoc</a>.
+ * </p>
+ * 
+ * <p>Note: Ids (eg. page ids) should be treated as opaque handlers. If you ever find yourself parsing them
+ * then you are doing something wrong.</p>
+ * 
+ * @version $Id: $
+ * 
  */
-public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRpcInterface
+public class ConfluenceRpcHandler extends BaseRpcHandler
 {
     // TODO Also run the tests for unprivileged users with just enough rights
     // -- user management could be a part of the test setup
 
     // Q: Where are access rights checked ? Ensure they are !
 
-    // TODO ensure that the ConfluenceRpcInterface uses the same order as here
-
-    // TODO Q: if we use swizzle then is ConfluenceRpcInterface still needed ?
-    // -- backward compatibility ?
-
-    // TODO either use the log or remove it
-    // -- now we use it for login, logout and errors ... not enough ?
+    // TODO Use the log for more than login, logout and errors
 
     // TODO Refactor - Get rid of duplicate code:
     // - inside the xml-rpc implementation itself (there is too much plumbing)
-    // - between xml-rpc and swizzle
     // - between xml-rpc and actions (maybe)
 
     // TODO enabling exceptions doesn't really work in pre 3.1 versions of xml-rpc
 
-    // TODO our ids are unique still they are sensitive to renaming
-    // Q: is this a problem ? If so we really need the numeric ids (globally unique)
-
-    // TODO ":" is also used in XWiki for selecting a particular database. Change ?
-    private static final String PAGE_VERSION_SEPARATOR = ":";
-
-    private static final String OBJNO_SEPARATOR = ";";
-
     private static final Log log = LogFactory.getLog(ConfluenceRpcHandler.class);
+    
+    private DomainObjectFactory factory = new DomainObjectFactory();
 
     private class RemoteUser
     {
@@ -104,35 +109,27 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         public String username;
     }
 
-    private class DocObjectPair
-    {
-        public DocObjectPair(XWikiDocument doc, BaseObject obj)
-        {
-            this.doc = doc;
-            this.obj = obj;
-        }
-
-        public XWikiDocument doc;
-
-        public BaseObject obj;
-    }
-
     public void init(Servlet servlet, ServletRequest request) throws XWikiException
     {
         super.init(servlet, request);
         
-        // Be interoperabile with Confluence by default
+        // we are interoperable with Confluence by default
         setConvertor(new ConfluenceObjectConvertor());
     }
     
-    // //////////////////////////
-    // Authentication Methods //
-    // //////////////////////////
+
+    // Authentication Methods
+    
 
     /**
-     * {@inheritDoc}
+     * Logs the user into XWiki. The security token which is returned is used in all subsequent
+     * method calls. You can supply an empty string as the token to be treated as being the
+     * anonymous user (XWiki.XWikiGuest).
      * 
-     * @see ConfluenceRpcInterface#login(String, String)
+     * @param username the username of the person logged in as
+     * @param password the appropriate password
+     * @return A string which is a security token to be used in all subsequent calls
+     * @throws XWikiException in case of error
      */
     public String login(String username, String password) throws XWikiException
     {
@@ -153,9 +150,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Logs the user out of XWiki.
      * 
-     * @see ConfluenceRpcInterface#logout(String)
+     * @param token the authentication token retrieved when calling the login method
+     * @return whether the logging out was successful or not
+     * @throws XWikiException in case of error
      */
     public boolean logout(String token) throws XWikiException
     {
@@ -165,14 +164,18 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         return getTokens(context).remove(token) != null;
     }
 
-    // ///////////
-    // General //
-    // ///////////
+    
+    // General
 
+    
     /**
-     * {@inheritDoc}
+     * Retrieve some basic information about the server being connected to. Useful for clients that
+     * need to turn certain features on or off depending on the version of the server.
      * 
-     * @see ConfluenceRpcInterface#getServerInfo(String)
+     * @param token the authentication token retrieved when calling the login method
+     * @return the Server information such as Server base URL and Server version. The returned map
+     *         contains the fields from {@linkServerInfo}.
+     * @throws XWikiException in case of error
      */
     public Map getServerInfo(String token) throws XWikiException
     {
@@ -190,14 +193,16 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         throw exception("Not implemented.", XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED);
     }
 
-    // ///////////////////
-    // Space Retrieval //
-    // ///////////////////
+    
+    // Space Retrieval
 
+    
     /**
-     * {@inheritDoc}
+     * Get the summaries of all spaces the user can view.
      * 
-     * @see ConfluenceRpcInterface#getSpaces(String)
+     * @param token the authentication token retrieved when calling the login method
+     * @return all the SpaceSummaries that the current user can see.
+     * @throws XWikiException in case of error
      */
     public Object[] getSpaces(String token) throws XWikiException
     {
@@ -213,16 +218,19 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             XWikiDocument doc = xwiki.getDocument(fullName, context);
             String name = doc.getTitle();
             String url = doc.getURL("view", context);
-            SpaceSummary spacesum = new SpaceSummary(key, name, url);
+            SpaceSummary spacesum = factory.createSpaceSummary(key, name, url);
             result.add(convert(spacesum));
         }
         return result.toArray();
     }
 
     /**
-     * {@inheritDoc}
+     * Get one Space.
      * 
-     * @see ConfluenceRpcInterface#getSpace(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param spaceKey identifier for space
+     * @return a single Space object as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Map getSpace(String token, String spaceKey) throws XWikiException
     {
@@ -235,7 +243,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             XWikiDocument doc = xwiki.getDocument(fullName, context);
             String url = doc.getURL("view", context);
             String name = doc.getTitle();
-            Space space = new Space(spaceKey, name, url, "", fullName);
+            Space space = factory.createSpace(spaceKey, name, url, "", fullName);
             return convert(space);
         } else {
             throw exception("The space '" + spaceKey + "' does not exist.");
@@ -243,14 +251,21 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     }
 
-    // ////////////////////
-    // Space Management //
-    // ////////////////////
 
+    // Space Management
+
+
+    // TODO JavaDoc: we SAY we require description, but we discard it!
+    // we can also live without a space name
     /**
-     * {@inheritDoc}
+     * Create a new space.
      * 
-     * @see ConfluenceRpcInterface#addSpace(String, java.util.Map)
+     * @param token the authentication token retrieved when calling the login method
+     * @param spaceProperties Map containing all informations, we need to create a new space. We
+     *            need the following keys: - key "name": the name of the space - key "key": the
+     *            space key - key "description": the space description
+     * @return created Space as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Map addSpace(String token, Map spaceMap) throws XWikiException
     {
@@ -272,7 +287,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             xwiki.saveDocument(doc, context);
             String url = doc.getURL("view", context);
             String name = doc.getTitle();
-            Space resultSpace = new Space(spaceKey, name, url, "", fullName);
+            Space resultSpace = factory.createSpace(spaceKey, name, url, "", fullName);
             return convert(resultSpace);
         } else {
             throw exception("The space '" + spaceKey + "' already exists.");
@@ -280,10 +295,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Remove a space completely by removing all of it's child documents.
      * 
-     * @see com.xpn.xwiki.xmlrpc.ConfluenceRpcInterface#removeSpace(java.lang.String,
-     *      java.lang.String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param spaceKey the space to be deleted
+     * @return true (xml-rpc methods have to return something)
+     * @throws XWikiException in case of error
      */
     public boolean removeSpace(String token, String spaceKey) throws XWikiException
     {
@@ -304,14 +321,17 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         }
     }
 
-    // //////////////////
-    // Page Retrieval //
-    // //////////////////
+
+    // Page Retrieval
+
 
     /**
-     * {@inheritDoc}
+     * Get the summaries of all the pages in the space.
      * 
-     * @see ConfluenceRpcInterface#getPages(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param spaceKey to look for pages in
+     * @return a vector of PageSummaries as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Object[] getPages(String token, String spaceKey) throws XWikiException
     {
@@ -326,7 +346,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             for (int i = 0; i < docNames.size(); i++) {
                 String docFullName = spaceKey + "." + docNames.get(i);
                 XWikiDocument doc = xwiki.getDocument(docFullName, context);
-                PageSummary pagesum = new PageSummary(doc, context);
+                PageSummary pagesum = factory.createPageSummary(doc, context);
                 pages.add(convert(pagesum));
             }
             return pages.toArray();
@@ -336,9 +356,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Get one Page.
      * 
-     * @see ConfluenceRpcInterface#getPage(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param pageId page identifier to look for
+     * @return a Page object as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Map getPage(String token, String pageId) throws XWikiException
     {
@@ -346,15 +369,19 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
-        Page page = new Page(doc, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
+        Page page = factory.createPage(doc, context);
         return convert(page);
     }
 
     /**
-     * {@inheritDoc}
+     * Returns all the previous versions of a page as a list of PageHistorySummaries.
+     * We only consider the *old* versions of the document in the page history.
      * 
-     * @see ConfluenceRpcInterface#getPageHistory(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param pageId page identifier to look for
+     * @return a vector of PageHistories as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Object[] getPageHistory(String token, String pageId) throws XWikiException
     {
@@ -362,7 +389,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         XWiki xwiki = context.getWiki();
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
 
         // We only consider the old(!) versions of the document in the page history
         Version[] versions = doc.getRevisions(context);
@@ -370,20 +397,23 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         for (int i = 0; i < versions.length && !versions[i].toString().equals(doc.getVersion()); i++) {
             String version = versions[i].toString();
             XWikiDocument revdoc = xwiki.getDocument(doc, version, context);
-            PageHistorySummary phs = new PageHistorySummary(revdoc);
+            PageHistorySummary phs = factory.createPageHistorySummary(revdoc);
             result.add(0, convert(phs));
         }
         return result.toArray();
     }
 
-    // /////////////////////
-    // Page Dependencies //
-    // /////////////////////
 
+    // Page Dependencies
+
+    
     /**
-     * {@inheritDoc}
+     * Get all the Attachments for a page.
      * 
-     * @see ConfluenceRpcInterface#getAttachments(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param pageId id of page from where we want all Attachments
+     * @return a vector of Attachment objects as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Object[] getAttachments(String token, String pageId) throws XWikiException
     {
@@ -394,13 +424,13 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         // -- if not then ensure it is set everywhere!
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
 
         List attachlist = doc.getAttachmentList();
         ArrayList result = new ArrayList(attachlist.size());
         for (int i = 0; i < attachlist.size(); i++) {
             XWikiAttachment xAttach = (XWikiAttachment) attachlist.get(i);
-            Attachment attach = new Attachment(doc, xAttach, context);
+            Attachment attach = factory.createAttachment(doc, xAttach, context);
             result.add(convert(attach));
         }
         return result.toArray();
@@ -418,9 +448,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     // - this would be an extension to the confluence api, still adding new methods is not(!) a
     // problem for interoperability
     /**
-     * {@inheritDoc}
+     * Get all the comments for a page.
      * 
-     * @see ConfluenceRpcInterface#getComments(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param pageId page identifier to get comments from
+     * @return a vector of Comment objects as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Object[] getComments(String token, String pageId) throws XWikiException
     {
@@ -429,7 +462,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
 
         // TODO: here we can also use getComments
         // TODO: overkill for getting "XWikiComments" (which is hard-coded everywhere anyway)
@@ -442,7 +475,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
                 if (obj != null) {
                     // Note: checking for null values here is crucial
                     // because comments are just set to null when deleted
-                    Comment comment = new Comment(doc, obj, context);
+                    Comment comment = factory.createComment(doc, obj, context);
                     result.add(convert(comment));
                 }
             }
@@ -455,10 +488,15 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     // TODO How is this useful ? Is there a way to get a comment id without getting the comment
     // itself ?
     // -- commentIds are long lived, so they may be useful to save for later use
+    
+    // TODO improve javadoc
     /**
-     * {@inheritDoc}
+     * Returns a comment given a comment id.
      * 
-     * @see ConfluenceRpcInterface#getComment(String, String)
+     * @param token
+     * @param commentId
+     * @return
+     * @throws XWikiException
      */
     public Map getComment(String token, String commentId) throws XWikiException
     {
@@ -466,15 +504,19 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        DocObjectPair pair = getDocObjectPair(commentId, context);
-        Comment comment = new Comment(pair.doc, pair.obj, context);
+        Object[] pair = factory.getDocObjectPair(commentId, context);
+        Comment comment = factory.createComment((XWikiDocument)pair[0], (BaseObject)pair[1], context);
         return convert(comment);
     }
 
+    // TODO improve javadoc
     /**
-     * {@inheritDoc}
+     * Adds a comment to a page.
      * 
-     * @see ConfluenceRpcInterface#addComment(String, java.util.Map)
+     * @param token
+     * @param commentParams
+     * @return
+     * @throws XWikiException
      */
     public Map addComment(String token, Map commentParams) throws XWikiException
     {
@@ -485,7 +527,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         checkToken(token, context);
 
         Comment comment = new Comment(revert(commentParams, Comment.FIELD_TYPES));
-        XWikiDocument doc = getDocFromPageId(comment.getPageId(), context);
+        XWikiDocument doc = factory.getDocFromPageId(comment.getPageId(), context);
         if (doc.isMostRecent()) {
             // TODO Q: does this really have to be so complex ? (taken from CommentAddAction)
             Map map = new HashMap();
@@ -504,16 +546,20 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             String msg = context.getMessageTool().get("core.comment.addComment");
             xwiki.saveDocument(doc, msg, context);
 
-            return convert(new Comment(doc, newobject, context));
+            return convert(factory.createComment(doc, newobject, context));
         } else {
             throw exception("You can only comment on the latest version of a page");
         }
     }
 
+    // TODO improve javadoc
     /**
-     * {@inheritDoc}
+     * Removes a comment given a comment id.
      * 
-     * @see ConfluenceRpcInterface#removeComment(String, String)
+     * @param token
+     * @param commentId
+     * @return true (xml-rpc methods have to return something)
+     * @throws XWikiException
      */
     public boolean removeComment(String token, String commentId) throws XWikiException
     {
@@ -522,25 +568,37 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("objectremove");
         checkToken(token, context);
 
-        DocObjectPair pair = getDocObjectPair(commentId, context);
-        if (pair.doc.isMostRecent()) {
-            pair.doc.removeObject(pair.obj);
+        Object[] pair = factory.getDocObjectPair(commentId, context);
+        XWikiDocument doc = (XWikiDocument)pair[0];
+        BaseObject obj = (BaseObject)pair[1];
+        if (doc.isMostRecent()) {
+            doc.removeObject(obj);
             String msg = context.getMessageTool().get("core.comment.deleteObject");
-            xwiki.saveDocument(pair.doc, msg, context);
+            xwiki.saveDocument(doc, msg, context);
             return true;
         } else {
             throw exception("You can only remove comments attached to the latest version of a page");
         }
     }
 
-    // ///////////////////
-    // Page Management //
-    // ///////////////////
 
+    // Page Management
+
+
+    // TODO Why is the version needed for updating ?
     /**
-     * {@inheritDoc}
+     * Add or update a page.
      * 
-     * @see ConfluenceRpcInterface#storePage(String, java.util.Map)
+     * For adding, the Page given as an argument should have - space - title - content
+     * 
+     * For updating, the Page given should have - id - space - title - content - version
+     * 
+     * The parentId field is always optional. All other fields will be ignored.
+     * 
+     * @param token the authentication token retrieved when calling the login method
+     * @param page a xml-rpc Page
+     * @return a Page object as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Map storePage(String token, Map pageMap) throws XWikiException
     {
@@ -553,7 +611,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         XWikiDocument doc = null;
         if (page.getId() != null) {
             // page id is set -> save page
-            doc = getDocFromPageId(page.getId(), context);
+            doc = factory.getDocFromPageId(page.getId(), context);
             if (!doc.isMostRecent()) {
                 throw exception("You can only edit the latest version of a page");
             }
@@ -580,13 +638,22 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         doc.setContent(page.getContent());
         // TODO "" was page.getComment() (removed)
         context.getWiki().saveDocument(doc, "", context);
-        return convert(new Page(doc, context));
+        return convert(factory.createPage(doc, context));
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the HTML rendered content for a page.
      * 
-     * @see ConfluenceRpcInterface#renderContent(String, String, String, String)
+     * If 'content' is provided, then that is rendered as if it were the body of the page (useful
+     * for a 'preview page' function). If it's not provided, then the existing content of the page
+     * is used instead (ie useful for 'view page' function).
+     * 
+     * @param token the authentication token retrieved when calling the login method
+     * @param spaceKey in which space is our page
+     * @param pageId id of page to get rendered HTML
+     * @param content if this is set, it will replace the original content for rendering
+     * @return string representing rendered content of page as HTML
+     * @throws XWikiException in case of error
      */
     public String renderContent(String token, String spaceKey, String pageId, String content)
         throws XWikiException
@@ -596,7 +663,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         context.setDoc(doc);
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         xwiki.prepareDocuments(context.getRequest(), context, vcontext);
@@ -609,9 +676,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Remove a page.
      * 
-     * @see ConfluenceRpcInterface#removePage(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param pageId id of page to delete
+     * @return true (xml-rpc methods have to return something)
+     * @throws XWikiException in case of error
      */
     public boolean removePage(String token, String pageId) throws XWikiException
     {
@@ -619,7 +689,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("delete");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         if (doc.isMostRecent()) {
             context.setDoc(doc);
             // do not use recycle bin (because it has bugs)
@@ -650,10 +720,10 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         XWikiAttachment xAttach = doc.getAttachment(fileName);
         xAttach = xAttach.getAttachmentRevision(versionNumber, context);
-        Attachment attachment = new Attachment(doc, xAttach, context);
+        Attachment attachment = factory.createAttachment(doc, xAttach, context);
         return convert(attachment);
     }
 
@@ -675,7 +745,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("download");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         XWikiAttachment xAttach = doc.getAttachment(fileName);
         xAttach = xAttach.getAttachmentRevision(versionNumber, context);
         return xAttach.getContent(context);
@@ -703,7 +773,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         Attachment attachment = new Attachment(revert(attachmentMap, Attachment.FIELD_TYPES));
 
         // TODO Does this really have to be so complex ? (taken from UploadAction)
-        XWikiDocument doc = getDocFromPageId(attachment.getPageId(), context);
+        XWikiDocument doc = factory.getDocFromPageId(attachment.getPageId(), context);
         // Read XWikiAttachment
         XWikiAttachment xAttachment = doc.getAttachment(attachment.getFileName());
         if (xAttachment == null) {
@@ -739,7 +809,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         doc.saveAttachmentContent(xAttachment, context);
 
-        Attachment resultAttachment = new Attachment(doc, xAttachment, context);
+        Attachment resultAttachment = factory.createAttachment(doc, xAttachment, context);
         return convert(resultAttachment);
     }
 
@@ -759,7 +829,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("delattachment");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         XWikiAttachment xAttachment = doc.getAttachment(fileName);
 
         doc.setAuthor(context.getUser());
@@ -803,14 +873,16 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         return true;
     }
 
-    // //////////
     // Search //
-    // //////////
 
     /**
-     * {@inheritDoc}
+     * Get a list of SearchResults which match a given search query.
      * 
-     * @see ConfluenceRpcInterface#search(String, String, int)
+     * @param token the authentication token retrieved when calling the login method
+     * @param query search query
+     * @param maxResults number of maximal results
+     * @return a Vector of SearchResults as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Object[] search(String token, String query, int maxResults) throws XWikiException
     {
@@ -835,7 +907,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         for (int i = 0; i < doclist.size(); i++) {
             String docName = (String) doclist.get(i);
             XWikiDocument doc = xwiki.getDocument(docName, context);
-            SearchResult sresult = new SearchResult(doc, context);
+            SearchResult sresult = factory.createSearchResult(doc, context);
             result.add(convert(sresult));
         }
         return result.toArray();
@@ -850,9 +922,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     // ///////////////////
 
     /**
-     * {@inheritDoc}
+     * Get a single User.
      * 
-     * @see ConfluenceRpcInterface#getUser(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param username the name of the user we want the User Object
+     * @return a User object as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Map getUser(String token, String username) throws XWikiException
     {
@@ -861,9 +936,13 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Add a new user with the given password.
      * 
-     * @see ConfluenceRpcInterface#addUser(String, java.util.Map, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param user object of new user
+     * @param password of the new user
+     * @return true (xml-rpc methods have to return something)
+     * @throws XWikiException in case of error
      */
     public boolean addUser(String token, Map user, String password) throws XWikiException
     {
@@ -872,9 +951,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Add a new group.
      * 
-     * @see ConfluenceRpcInterface#addGroup(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param group name of group to add
+     * @return true (xml-rpc methods have to return something)
+     * @throws XWikiException in case of error
      */
     public boolean addGroup(String token, String group) throws XWikiException
     {
@@ -883,9 +965,12 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Get a user's current groups.
      * 
-     * @see ConfluenceRpcInterface#getUserGroups(String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param username for which we want to recive all groups
+     * @return a Vector of Group objects as xml-rpc representation
+     * @throws XWikiException in case of error
      */
     public Object[] getUserGroups(String token, String username) throws XWikiException
     {
@@ -894,9 +979,13 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     }
 
     /**
-     * {@inheritDoc}
+     * Add a user to a particular group.
      * 
-     * @see ConfluenceRpcInterface#addUserToGroup(String, String, String)
+     * @param token the authentication token retrieved when calling the login method
+     * @param username name of user to add to a group
+     * @param groupname name of group to add user
+     * @return true (xml-rpc methods have to return something)
+     * @throws XWikiException in case of error
      */
     public boolean addUserToGroup(String token, String username, String groupname)
         throws XWikiException
@@ -944,64 +1033,6 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setUser(user.username);
     }
 
-    private XWikiDocument getDocFromPageId(String pageId, XWikiContext context)
-        throws XWikiException
-    {
-        XWiki xwiki = context.getWiki();
-        if (!pageId.contains(PAGE_VERSION_SEPARATOR)) {
-            // Current version of document
-            if (xwiki.exists(pageId, context)) {
-                return xwiki.getDocument(pageId, context);
-            } else {
-                throw exception("The page '" + pageId + "' does not exist.");
-            }
-        } else {
-            int i = pageId.indexOf(PAGE_VERSION_SEPARATOR);
-            String fullName = pageId.substring(0, i);
-            String version = pageId.substring(i + 1);
-            if (xwiki.exists(fullName, context)) {
-                XWikiDocument currentDoc = xwiki.getDocument(fullName, context);
-                return xwiki.getDocument(currentDoc, version, context);
-            } else {
-                throw exception("The page '" + fullName + "' does not exist.");
-            }
-        }
-    }
-
-    private DocObjectPair getDocObjectPair(String commentId, XWikiContext context)
-        throws XWikiException
-    {
-        int i = commentId.indexOf(OBJNO_SEPARATOR);
-        if (i < 0) {
-            throw exception("Invalid comment ID.");
-        }
-        String pageId = commentId.substring(0, i);
-        int nb = 0;
-        try {
-            nb = (new Integer(commentId.substring(i + 1))).intValue();
-        } catch (NumberFormatException nfe) {
-            throw exception("Invalid comment ID.");
-        }
-
-        XWikiDocument doc = getDocFromPageId(pageId, context);
-
-        Vector comments = doc.getComments();
-        if (nb >= comments.size()) {
-            throw exception("Invalid comment ID.");
-        }
-        BaseObject obj = (BaseObject) comments.get(nb);
-
-        // TODO this is more general, is it also more efficient?
-        // XWiki xwiki = context.getWiki();
-        // BaseObject obj = doc.getObject(xwiki.getCommentsClass(context).getName(), nb);
-
-        if (obj == null) {
-            throw exception("This comment was already removed.");
-        }
-
-        return new DocObjectPair(doc, obj);
-    }
-
     private XWikiException exception(String message)
     {
         return exception(message, 0);
@@ -1018,7 +1049,6 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
     private XWikiException exception(String message, int code, Throwable cause)
     {
         log.info("Exception thrown to XML-RPC client: " + message);
-        // return new Exception(message);
         XWikiException ex = new XWikiException();
         ex.setModule(XWikiException.MODULE_XWIKI_XMLRPC);
         ex.setCode(code);
@@ -1035,7 +1065,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         XWikiContext context = getXWikiContext();
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         return doc.getxWikiClasses(context).toArray();
     }
 
@@ -1052,7 +1082,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("view");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
 
         List commentlist = doc.getObjects(className);
         if (commentlist != null) {
@@ -1063,7 +1093,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
                     // Note: checking for null values here is crucial
                     // because comments are just set to null when deleted
                     // TODO - we need a new DSO type!
-                    Comment object = new Comment(doc, obj, context);
+                    Comment object = factory.createComment(doc, obj, context);
                     result.add(object.toMap());
                 }
             }
@@ -1086,7 +1116,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
         Comment object = new Comment(objectMap); // TODO Create another type of DSO ...
         // factory/reflection needed?
-        XWikiDocument doc = getDocFromPageId(object.getPageId(), context);
+        XWikiDocument doc = factory.getDocFromPageId(object.getPageId(), context);
         if (doc.isMostRecent()) {
             // TODO Q: does this really have to be so complex ? (taken from CommentAddAction)
             // TODO Check ObjectAddAction here!!!
@@ -1110,7 +1140,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
             // the DSO
             xwiki.saveDocument(doc, msg, context);
 
-            return (new Comment(doc, newobject, context)).toMap(); // TODO Create another type of
+            return (factory.createComment(doc, newobject, context)).toMap(); // TODO Create another type of
             // DSO here ..
             // factory/reflection needed ?
         } else {
@@ -1127,12 +1157,14 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("objectremove");
         checkToken(token, context);
 
-        DocObjectPair pair = getDocObjectPair(objectId, context); // Class should also be used
+        Object[] pair = factory.getDocObjectPair(objectId, context); // Class should also be used
+        XWikiDocument doc = (XWikiDocument)pair[0];
+        BaseObject obj = (BaseObject)pair[1];
         // here!!!
-        if (pair.doc.isMostRecent()) {
-            pair.doc.removeObject(pair.obj);
+        if (doc.isMostRecent()) {
+            doc.removeObject(obj);
             String msg = context.getMessageTool().get("core.comment.deleteObject");
-            xwiki.saveDocument(pair.doc, msg, context);
+            xwiki.saveDocument(doc, msg, context);
             return true;
         } else {
             throw exception("You can only remove objects from the latest version of a page");
@@ -1144,7 +1176,8 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
 
     
     /**
-     * Function needed, but missing from the confluence api
+     * Function needed, but missing from the confluence api.
+     * Supported only by XWiki.
      * @return A list of strings
      */
     public Object[] getAttachmentVersions(String token, String pageId, String fileName)
@@ -1154,7 +1187,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         context.setAction("viewattachrev");
         checkToken(token, context);
 
-        XWikiDocument doc = getDocFromPageId(pageId, context);
+        XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         XWikiAttachment xAttach = doc.getAttachment(fileName);
         Version[] versions = xAttach.getVersions();
         Object[] result = new Object[versions.length];
@@ -1166,11 +1199,16 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         
     /**
      * No longer perform useless conversions to String
-     * Supported only by XWiki. 
+     * Supported only by XWiki.
      * @return true
+     * @throws XWikiException 
      */
-    public boolean setNoConversion()
+    public boolean setNoConversion(String token) throws XWikiException
     {
+        XWikiContext context = getXWikiContext();
+        context.setAction("viewattachrev");
+        checkToken(token, context);
+        
         setConvertor(new IdentityObjectConvertor());
         return true;
     }

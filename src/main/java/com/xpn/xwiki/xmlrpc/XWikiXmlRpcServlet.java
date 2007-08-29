@@ -56,14 +56,8 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
                         } catch (XWikiException ex) {
                             throw new XmlRpcException("Initialization Error", ex);
                         }
-                    } else if (proc instanceof InitializableHandler) {
-                        InitializableHandler initProc = (InitializableHandler) proc;
-                        try {
-                            initProc.init(XWikiXmlRpcServlet.this);
-                        } catch (XWikiException ex) {
-                            throw new XmlRpcException("Initialization Error", ex);
-                        }
                     }
+
                     return proc;
                 }
             };

@@ -21,27 +21,14 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.Map;
+import com.xpn.xwiki.web.XWikiServletContext;
 
-public class Space extends org.codehaus.swizzle.confluence.Space
+import javax.servlet.ServletContext;
+
+public class XWikiXmlRpcContext extends XWikiServletContext
 {
-    public Space()
+    public XWikiXmlRpcContext(ServletContext scontext)
     {
-        super();
-    }
-
-    public Space(Map data)
-    {
-        super(data);
-    }
-
-    public Space(String key, String name, String url, String description, String homepage)
-    {
-        setKey(key);
-        setName(name);
-        setUrl(url);
-
-        setDescription(description);
-        setHomepage(homepage);
+        super(scontext);
     }
 }

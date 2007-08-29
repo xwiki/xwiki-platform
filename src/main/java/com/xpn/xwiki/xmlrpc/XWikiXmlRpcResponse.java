@@ -21,19 +21,28 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.XWikiServletURLFactory;
+import com.xpn.xwiki.web.XWikiServletResponse;
 
-import java.net.URL;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
-public class XWikiXMLRPCURLFactory extends XWikiServletURLFactory
+public class XWikiXmlRpcResponse extends XWikiServletResponse
 {
-    public XWikiXMLRPCURLFactory()
+
+    public XWikiXmlRpcResponse(HttpServletResponse response)
     {
+        super(response);
     }
 
-    public String getURL(URL url, XWikiContext context)
+    public PrintWriter getWriter() throws IOException
     {
-        return url.toString();
+        return null;
+    }
+
+    public ServletOutputStream getOutputStream() throws IOException
+    {
+        return null;
     }
 }

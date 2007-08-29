@@ -25,10 +25,10 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class XWikiXMLRPCRequest extends XWikiServletRequest
+public class XWikiXmlRpcRequest extends XWikiServletRequest
 {
 
-    public XWikiXMLRPCRequest(HttpServletRequest request)
+    public XWikiXmlRpcRequest(HttpServletRequest request)
     {
         super(request);
     }

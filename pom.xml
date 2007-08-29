@@ -28,6 +28,7 @@
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
     <version>5-SNAPSHOT</version>
+    <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>

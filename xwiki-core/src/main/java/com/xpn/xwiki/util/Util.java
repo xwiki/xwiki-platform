@@ -626,7 +626,7 @@ public class Util {
             return null;
         }
     }
-    
+
     /**
      * API to obtain a DOM document for the specified string
      * @param str The parsed text
@@ -684,14 +684,17 @@ public class Util {
      * @return encoded URL
      */
     public static String escapeURL(String url) {
-        url = url.replaceAll("-", "%2D");
-        url = url.replaceAll("\\*", "%2A");
         url = url.replaceAll("\\~", "%7E");
         url = url.replaceAll("\\[", "%5B");
         url = url.replaceAll("\\]", "%5D");
         url = url.replaceAll("\\{", "%7B");
         url = url.replaceAll("\\}", "%7D");
-        url = url.replaceAll("\\1", "%31");
+        // We should not encode the following char for non local urls
+        // since this might not be handle correctly by FF
+        if (url.indexOf("//")==-1) {
+            url = url.replaceAll("-", "%2D");
+            url = url.replaceAll("\\*", "%2A");
+        }
         return url;
     }
 }

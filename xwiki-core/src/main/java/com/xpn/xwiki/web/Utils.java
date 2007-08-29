@@ -26,7 +26,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
-import com.xpn.xwiki.xmlrpc.XWikiXMLRPCRequest;
+import com.xpn.xwiki.xmlrpc.XWikiXmlRpcRequest;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
@@ -216,7 +216,7 @@ public class Utils {
         context.setDatabase(dbname);
 
         int mode = 0;
-        if (request instanceof XWikiXMLRPCRequest) {
+        if (request instanceof XWikiXmlRpcRequest) {
             mode = XWikiContext.MODE_XMLRPC;
         } else if (request instanceof XWikiServletRequest) {
             mode = XWikiContext.MODE_SERVLET;

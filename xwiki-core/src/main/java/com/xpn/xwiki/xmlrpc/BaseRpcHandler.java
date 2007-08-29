@@ -21,16 +21,24 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.web.*;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiResponse;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 public class BaseRpcHandler implements RequestInitializableHandler
 {
@@ -43,9 +51,12 @@ public class BaseRpcHandler implements RequestInitializableHandler
 
     public void init(Servlet servlet, ServletRequest request) throws XWikiException
     {
-        this.request = new XWikiXMLRPCRequest((HttpServletRequest) request); // use the real
-                                                                                // request
-        this.response = new XWikiXMLRPCResponse(new MockXWikiResponse()); // use fake response
+        // use the real request
+        this.request = new XWikiXmlRpcRequest((HttpServletRequest) request);
+
+        // use fake response (created as dynamic proxy)
+        XWikiResponse responseDummy = (XWikiResponse) generateDummy(XWikiResponse.class);
+        this.response = new XWikiXmlRpcResponse(responseDummy);
 
         ServletContext sContext = null;
         try {
@@ -53,10 +64,26 @@ public class BaseRpcHandler implements RequestInitializableHandler
         } catch (Exception ignore) {
         }
         if (sContext != null) {
-            this.econtext = new XWikiXMLRPCContext(sContext);
+            this.econtext = new XWikiXmlRpcContext(sContext);
         } else {
-            this.econtext = new XWikiXMLRPCContext(new MockXWikiServletContext());
+            // use fake server context (created as dynamic proxy)
+            ServletContext contextDummy = (ServletContext)generateDummy(ServletContext.class);
+            this.econtext = new XWikiXmlRpcContext(contextDummy);
         }
+    }
+
+    private Object generateDummy(Class someClass)
+    {
+        ClassLoader loader = someClass.getClassLoader();
+        InvocationHandler handler = new InvocationHandler()
+        {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+            {
+                return null;
+            }
+        };
+        Class[] interfaces = new Class[] {someClass};
+        return Proxy.newProxyInstance(loader, interfaces, handler);
     }
 
     protected XWikiContext getXWikiContext() throws XWikiException

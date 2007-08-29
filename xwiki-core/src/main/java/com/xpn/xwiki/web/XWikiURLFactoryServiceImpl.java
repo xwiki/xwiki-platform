@@ -24,7 +24,7 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.pdf.impl.PdfURLFactory;
-import com.xpn.xwiki.xmlrpc.XWikiXMLRPCURLFactory;
+import com.xpn.xwiki.xmlrpc.XWikiXmlRpcURLFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -44,7 +44,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
     public void init(XWiki xwiki)
     {
         factoryMap = new HashMap();
-        register(xwiki, XWikiContext.MODE_XMLRPC, XWikiXMLRPCURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
+        register(xwiki, XWikiContext.MODE_XMLRPC, XWikiXmlRpcURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
         register(xwiki, XWikiContext.MODE_SERVLET, XWikiServletURLFactory.class, "xwiki.urlfactory.servletclass");
         register(xwiki, XWikiContext.MODE_PORTLET, XWikiPortletURLFactory.class, "xwiki.urlfactory.portletclass");
         register(xwiki, XWikiContext.MODE_PDF, PdfURLFactory.class, "xwiki.urlfactory.pdfclass");

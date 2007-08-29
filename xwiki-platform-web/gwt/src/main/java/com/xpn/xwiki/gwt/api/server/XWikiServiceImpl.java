@@ -23,6 +23,10 @@
  */
 package com.xpn.xwiki.gwt.api.server;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -44,8 +48,7 @@ import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import com.xpn.xwiki.xmlrpc.MockXWikiServletContext;
-import com.xpn.xwiki.xmlrpc.XWikiXMLRPCResponse;
+import com.xpn.xwiki.xmlrpc.XWikiXmlRpcResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -86,12 +89,14 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             if (sContext != null) {
                 engine = new XWikiServletContext(sContext);
             } else {
-                engine = new XWikiServletContext(new MockXWikiServletContext());
+                // use fake server context (created as dynamic proxy)
+                ServletContext contextDummy = (ServletContext)generateDummy(ServletContext.class);
+                engine = new XWikiServletContext(contextDummy);
             }
         }
 
         XWikiRequest  request = (this.request!=null) ? this.request : new XWikiServletRequest(getThreadLocalRequest()); // use fake request
-        XWikiResponse response = (this.response!=null) ? this.response : new XWikiXMLRPCResponse(getThreadLocalResponse()); // use fake response
+        XWikiResponse response = (this.response!=null) ? this.response : new XWikiXmlRpcResponse(getThreadLocalResponse()); // use fake response
         XWikiContext context = Utils.prepareContext("", request, response, engine);
         context.setMode(XWikiContext.MODE_GWT);
         context.setDatabase("xwiki");
@@ -117,7 +122,20 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         return context;
     }
 
-
+    private Object generateDummy(Class someClass)
+    {
+        ClassLoader loader = someClass.getClassLoader();
+        InvocationHandler handler = new InvocationHandler()
+        {
+            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+            {
+                return null;
+            }
+        };
+        Class[] interfaces = new Class[] {someClass};
+        return Proxy.newProxyInstance(loader, interfaces, handler);
+    }
+    
     protected XWikiGWTException getXWikiGWTException(Exception e) {
         // let's make sure we are informed
         if (log.isErrorEnabled()) {

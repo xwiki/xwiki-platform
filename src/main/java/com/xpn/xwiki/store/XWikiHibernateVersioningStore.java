@@ -61,7 +61,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiHibernateVersioningStore(String hibpath) {
         super(hibpath);
     }
-    
+
     /**
      * @see #XWikiHibernateVersioningStore(XWiki, XWikiContext)
      */
@@ -95,6 +95,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         if (archiveDoc != null)
             return archiveDoc;
         String key = ((doc.getDatabase()==null)?"xwiki":doc.getDatabase()) + ":" + doc.getFullName();
+        if (!"".equals(doc.getLanguage()))
+            key = key + ":" + doc.getLanguage();
+
         synchronized (key) {
             archiveDoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
             if (archiveDoc==null) {
@@ -154,7 +157,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext context) throws XWikiException {
         XWikiDocumentArchive archive = getXWikiDocumentArchive(basedoc, context);
         Version version = new Version(sversion);
-        
+
         XWikiDocument doc = archive.loadDocument(version, context);
         if (doc==null) {
             Object[] args = { basedoc.getFullName(), version.toString() };
@@ -165,7 +168,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         // as the new document (in case there was a name change
         doc.setName(basedoc.getName());
         doc.setSpace(basedoc.getSpace());
-        
+
         doc.setDatabase(basedoc.getDatabase());
         doc.setStore(basedoc.getStore());
         return doc;

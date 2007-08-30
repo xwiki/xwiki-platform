@@ -1,0 +1,23 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.action.Action</role>
+      <implementation>org.xwiki.action.ErrorAction</implementation>
+      <role-hint>error</role-hint>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+    </component>
+    <component>
+      <role>org.xwiki.action.ActionManager</role>
+      <implementation>org.xwiki.action.DefaultActionManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.action.Action</role>
+          <role-hint>error</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

@@ -9,38 +9,6 @@
 <Configure class="org.mortbay.jetty.Server">
 
   <!-- =============================================================== -->
-  <!-- Configure Logging                                               -->
-  <!-- =============================================================== -->
-
-  
-  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  <!-- Configure Jetty Logging.                                        -->
-  <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
-  <!-- Uncomment if using jetty logging.
-  <Call class="org.mortbay.log.LogFactory" name="getFactory">
-    <Call name="getInstance">
-      <Arg/>
-      <Call name="reset"/>
-      <Call name="add">
-        <Arg>
-          <New class="org.mortbay.log.OutputStreamLogSink">
-            <Set name="filename"><SystemProperty name="jetty.home" default="."/>/logs/yyyy_mm_dd.jetty.log</Set>
-            <Set name="retainDays">90</Set>
-            <Set name="append">true</Set>
-            <Set name="logLabels">true</Set>
-            <Set name="logStackSize">true</Set>
-            <Set name="logStackTrace">false</Set>
-            <Set name="logOneLine">false</Set>
-            <Set name="suppressStack">false</Set>
-            <Set name="logTimeZone">GMT</Set>
-          </New>
-        </Arg>
-      </Call>
-    </Call>
-  </Call>
-  -->
-  
-  <!-- =============================================================== -->
   <!-- Configure the Request Listeners                                 -->
   <!-- =============================================================== -->
 
@@ -198,7 +166,8 @@
       <Set name="retainDays">90</Set>
       <Set name="append">true</Set>
       <Set name="extended">false</Set>
-      <Set name="LogTimeZone">GMT</Set>
+      <Set name="logTimeZone">GMT</Set>
+      <Set name="logLatency">true</Set>
     </New>
   </Set>
 

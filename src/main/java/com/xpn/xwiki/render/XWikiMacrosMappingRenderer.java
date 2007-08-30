@@ -50,7 +50,7 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
      * "." should match any characters, including new lines.
      */
     private static final Pattern MULTI_LINE_MACRO_PATTERN =
-        Pattern.compile("\\{(\\w+)(:(.+))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
+        Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
 
     protected HashMap macros_libraries = null;
     protected HashMap macros_mappings = null;

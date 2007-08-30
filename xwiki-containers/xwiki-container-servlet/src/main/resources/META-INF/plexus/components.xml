@@ -1,0 +1,17 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.container.Container</role>
+      <role-hint>servlet</role-hint>
+      <implementation>org.xwiki.container.servlet.ServletContainer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.url.URLFactory</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

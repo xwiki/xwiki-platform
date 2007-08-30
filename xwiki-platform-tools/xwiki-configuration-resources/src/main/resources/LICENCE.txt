@@ -17,12 +17,12 @@ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 
 This distribution includes software developed outside of XWiki:
 
-http://jakarta.apache.org: velocity, struts, commons, etc...
+http://jakarta.apache.org: Velocity, Struts, Commons, etc...
 This distribution also includes libraries from the Apache Software
 Foundation distributed under the terms of the Apache Software License.
 See http://apache.org/licenses/
 
 http://www.hibernate.org:
-This distribution includes libraries from hibernate.org distributed
+This distribution includes libraries from Hibernate distributed
 under the terms of the Lesser General Public License.
 See http://www.gnu.org/copyleft/lesser.html

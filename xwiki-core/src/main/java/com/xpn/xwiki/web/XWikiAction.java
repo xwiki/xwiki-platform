@@ -254,8 +254,8 @@ public abstract class XWikiAction extends Action {
             context.put("rev", rev);
             XWikiDocument doc = (XWikiDocument) context.get("doc");
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
-            XWikiDocument rdoc = context.getWiki().getDocument(doc, rev, context);
-            XWikiDocument rtdoc = context.getWiki().getDocument(tdoc, rev, context);
+            XWikiDocument rdoc = (!doc.getLanguage().equals(tdoc.getLanguage())) ? doc : context.getWiki().getDocument(doc, rev, context);
+            XWikiDocument rtdoc = (doc.getLanguage().equals(tdoc.getLanguage())) ? rdoc : context.getWiki().getDocument(tdoc, rev, context);
             context.put("tdoc", rtdoc);
             context.put("cdoc", rdoc);
             context.put("doc", rdoc);

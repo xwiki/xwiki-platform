@@ -24,6 +24,11 @@ import org.radeox.filter.context.FilterContext;
 import org.radeox.filter.regex.RegexTokenFilter;
 import org.radeox.regex.MatchResult;
 
+import java.util.LinkedList;
+
+/**
+ * @see CodeRemoveFilter
+ */
 public class CodeRestoreFilter extends RegexTokenFilter
 {
     public CodeRestoreFilter()
@@ -31,11 +36,16 @@ public class CodeRestoreFilter extends RegexTokenFilter
         super("(\\{(code)(?::([^\\}]*))?\\})\\{code}", SINGLELINE);
     }
 
+    /**
+     * @see CodeRemoveFilter#handleMatch(StringBuffer, MatchResult, FilterContext) 
+     */
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
-    	String content = (String) context.getRenderContext().get(CodeRemoveFilter.CODE_MACRO_CONTENT);
+        LinkedList contentList =
+            (LinkedList) context.getRenderContext().get(CodeRemoveFilter.CODE_MACRO_CONTENT);
+        
     	buffer.append(result.group(1));
-    	buffer.append(content);
+    	buffer.append((String) contentList.removeFirst());
     	buffer.append("{code}");
     }
 }

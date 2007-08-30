@@ -42,7 +42,7 @@ public class CodeFilter extends RegexTokenFilter
     
     public CodeFilter()
     {
-        super("\\{(code)(?::([^\\}]*))?\\}(.*)\\{code}", MULTILINE);
+        super("\\{(code)(?::([^\\}]*))?\\}(.*?)\\{code}", MULTILINE);
     }
 
     public void setInitialContext(InitialRenderContext context)

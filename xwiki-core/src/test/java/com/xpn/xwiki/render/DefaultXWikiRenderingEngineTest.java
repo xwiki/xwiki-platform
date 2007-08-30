@@ -65,29 +65,35 @@ public class DefaultXWikiRenderingEngineTest extends MockObjectTestCase
     {
         // We verify that the code macro doesn't render wiki markup, velocity, HTML, or other radeox macros. 
 		// We also ensure that any Radeox macro coming after the code macro is rendered properly.
-		String text = "{code:none}\n"
+        // Last we also ensure that a second code macro works too.
+        String text = "{code:none}\n"
         	+ "1 Title\n"
             + "#info(\"test\")\n"
             + "<pre>hello</pre>\n"
             + "$xwiki.getVersion()\n"
             + "{style}style{style}\n"
-            + "{code}nested{code}\n"
+            + "&#123;code}nested&#123;code}\n"
             + "{code}\n"
             + "{table}\n"
             + "a | b\n"
             + "c | d\n"
-            + "{table}";
+            + "{table}\n"
+            + "#set ($var = 'dummy')\n"
+            + "{code:none}\n"
+            + "1 Something\n"
+            + "{code}";
         
         String expectedText = "<div class=\"code\"><pre>1 Title\n"
         	+ "&#35;info(\"test\")\n"
         	+ "&#60;pre&#62;hello&#60;/pre&#62;\n"
         	+ "&#36;xwiki.getVersion()\n"
         	+ "&#123;style&#125;style&#123;style&#125;\n"
-        	+ "&#123;code&#125;nested&#123;code&#125;</pre></div>\n"
+        	+ "&&#35;123;code&#125;nested&&#35;123;code&#125;</pre></div>\n"
         	+ "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>a</th>"
-     		+ "<th>b</th></tr><tr class=\"table-odd\"><td>c</td><td>d</td></tr></table>";
+     		+ "<th>b</th></tr><tr class=\"table-odd\"><td>c</td><td>d</td></tr></table>\n"
+            + "<div class=\"code\"><pre>1 Something</pre></div>";
         
         XWikiDocument document = new XWikiDocument();
-        assertEquals(expectedText, engine.renderText(text, document, context)); 
+        assertEquals(expectedText, engine.renderText(text, document, context));
     }
 }

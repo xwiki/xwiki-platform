@@ -1,0 +1,22 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.url.URLFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.url.DefaultURLFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <!-- The configuration below allows customizing the XWiki URL format to any syntax the user
+           wants -->
+      <configuration>
+        <pattern>http[s]?://\w*[:]?\d*/\w*/(\w*)/(\w*)/?(\w*)\??(.*)</pattern>
+        <regexMappings>
+          <action>1</action>
+          <space>2</space>
+          <document>3</document>
+          <queryString>4</queryString>
+        </regexMappings>
+      </configuration>
+    </component>
+  </components>
+</component-set>

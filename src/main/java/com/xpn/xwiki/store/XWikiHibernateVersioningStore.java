@@ -73,6 +73,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = ((doc.getDatabase()==null)?"xwiki":doc.getDatabase()) + ":" + doc.getFullName();
+        if (!"".equals(doc.getLanguage()))
+            key = key + ":" + doc.getLanguage();
+
         synchronized (key) {
             XWikiDocumentArchive archivedoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
             if (archivedoc==null) {
@@ -148,6 +151,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc,String version, XWikiContext context) throws XWikiException {
         XWikiDocument doc = new XWikiDocument(basedoc.getSpace(), basedoc.getName());
         doc.setDatabase(basedoc.getDatabase());
+        doc.setLanguage(basedoc.getLanguage());
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer

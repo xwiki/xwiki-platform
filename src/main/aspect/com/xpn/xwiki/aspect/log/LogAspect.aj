@@ -22,17 +22,27 @@ package com.xpn.xwiki.aspect.log;
 import org.aspectj.lang.reflect.*;
 import org.aspectj.lang.*;
 import org.apache.log4j.Logger;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Log every entry and exit of methods. This is useful for debugging XWiki, especially in the
  * case when you cannot debug the application (for example when you cannot reproduce the problem
  * on your machine you can send an aspectified XWiki JAR and ask the user to run it and send you
- * the logs).
+ * the logs). As this logs everything you'll need to control what is logged by tuning the Log4J
+ * configuration file to log only what you want.
  *
  * @version $Id: $
  */
 public aspect LogAspect
 {
+    private static final boolean ISACTIVE =
+        Boolean.parseBoolean(System.getProperty("debug.active", "false"));
+    private static final long TIMER_MIN = Long.parseLong(System.getProperty("debug.minTime", "100"));
+    private static final boolean SHOW_DETAILS =
+        Boolean.parseBoolean(System.getProperty("debug.showDetails", "true"));
+
+    private int depth = 1;
+    
     /**
      * All objects in the log package. We don't want to log these as they are
      * the object that perform the logging and thus at execution time we would
@@ -71,22 +81,32 @@ public aspect LogAspect
         && publicStaticMethodsWithParameterCalls()
         && !publicMethodsWithReturnValueCalls()
     {
-        // Get The logger to perform logging
-        Logger logger = Logger.getLogger(thisJoinPoint.getSignature().getDeclaringType());
+        if (ISACTIVE) {
+            // Get The logger to perform logging
+            Logger logger = Logger.getLogger(thisJoinPoint.getSignature().getDeclaringType());
 
-        if (logger.isDebugEnabled())
-        {
-            // Log the entry
-            logger.debug('<' + getFullSignature(thisJoinPoint));
+            if (logger.isDebugEnabled()) {
 
-            // Execute the method
-            final Object result = proceed();
+                // Execute the method
+                long startTime = System.currentTimeMillis();
+                depth++;
+                final Object result = proceed();
+                depth--;
+                long endTime = System.currentTimeMillis();
 
-            // Log the exit
-            logger.debug('>' + thisJoinPoint.getSignature().getName());
-            return result;
+                if (endTime - startTime > TIMER_MIN) {
+                    String prefix = '[' + (endTime - startTime) + ']'
+                        + StringUtils.repeat(".", depth);
+                    if (SHOW_DETAILS) {
+                        logger.debug(prefix + getFullSignature(thisJoinPoint));
+                    } else {
+                        logger.debug(prefix + thisJoinPoint.getSignature().getName());
+                    }
+                }
+
+                return result;
+            }
         }
-
         return proceed();
     }
 
@@ -100,25 +120,35 @@ public aspect LogAspect
         && !publicStaticMethodsWithParameterCalls()
         && !publicMethodsWithReturnValueCalls()
     {
-        // The class that uses the method that has been called
-        final Class target = thisJoinPoint.getTarget().getClass();
+        if (ISACTIVE) {
+            // The class that uses the method that has been called
+            final Class target = thisJoinPoint.getTarget().getClass();
 
-        // Get The logger to perform logging
-        Logger logger = Logger.getLogger(target);
+            // Get The logger to perform logging
+            Logger logger = Logger.getLogger(target);
 
-        if (logger.isDebugEnabled())
-        {
-            // Log the entry
-            logger.debug('<' + getFullSignature(thisJoinPoint));
+            if (logger.isDebugEnabled()) {
 
-            // Execute the method
-            final Object result = proceed();
+                // Execute the method
+                long startTime = System.currentTimeMillis();
+                depth++;
+                final Object result = proceed();
+                depth--;
+                long endTime = System.currentTimeMillis();
 
-            // Log the exit
-            logger.debug('>' + thisJoinPoint.getSignature().getName());
-            return result;
+                if (endTime - startTime > TIMER_MIN) {
+                    String prefix = '[' + (endTime - startTime) + ']'
+                        + StringUtils.repeat(".", depth);
+                    if (SHOW_DETAILS) {
+                        logger.debug(prefix + getFullSignature(thisJoinPoint));
+                    } else {
+                        logger.debug(prefix + thisJoinPoint.getSignature().getName());
+                    }
+                }
+
+                return result;
+            }
         }
-
         return proceed();
     }
 
@@ -131,33 +161,43 @@ public aspect LogAspect
         && publicMethodsWithReturnValueCalls()
         && publicStaticMethodsWithParameterCalls()
     {
-        // Get The logger to perform logging
-        Logger logger = Logger.getLogger(thisJoinPoint.getSignature().getDeclaringType());
+        if (ISACTIVE) {
+            // Get The logger to perform logging
+            Logger logger = Logger.getLogger(thisJoinPoint.getSignature().getDeclaringType());
 
-        if (logger.isDebugEnabled())
-        {
-            // Log the entry
-            logger.debug('<' + getFullSignature(thisJoinPoint));
+            if (logger.isDebugEnabled()) {
 
-            // Execute the method
-            final Object result = proceed();
+                // Execute the method
+                long startTime = System.currentTimeMillis();
+                depth++;
+                final Object result = proceed();
+                depth--;
+                long endTime = System.currentTimeMillis();
 
-            // Compute the exit string to print
-            final StringBuffer exitString =
-                new StringBuffer(thisJoinPoint.getSignature().getName());
+                if (endTime - startTime > TIMER_MIN) {
+                    String prefix = '[' + (endTime - startTime) + ']'
+                        + StringUtils.repeat(".", depth);
+                    if (SHOW_DETAILS) {
 
-            exitString.append(' ');
-            exitString.append('=');
-            exitString.append(' ');
-            exitString.append('[');
-            exitString.append(result);
-            exitString.append(']');
+                        final StringBuffer returnValue =
+                            new StringBuffer(thisJoinPoint.getSignature().getName());
+                        returnValue.append(' ');
+                        returnValue.append('=');
+                        returnValue.append(' ');
+                        returnValue.append('[');
+                        returnValue.append(result);
+                        returnValue.append(']');
 
-            // Log the exit
-            logger.debug('>' + exitString.toString());
-            return result;
+                        logger.debug(prefix + getFullSignature(thisJoinPoint)
+                            + returnValue.toString()); 
+                    } else {
+                        logger.debug(prefix + thisJoinPoint.getSignature().getName());
+                    }
+                }
+
+                return result;
+            }
         }
-
         return proceed();
     }
 
@@ -170,36 +210,46 @@ public aspect LogAspect
         && publicMethodsWithReturnValueCalls()
         && !publicStaticMethodsWithParameterCalls()
     {
-        // The class that uses the method that has been called
-        final Class target = thisJoinPoint.getTarget().getClass();
+        if (ISACTIVE) {
+            // The class that uses the method that has been called
+            final Class target = thisJoinPoint.getTarget().getClass();
 
-        // Get The logger to perform logging
-        Logger logger = Logger.getLogger(target);
+            // Get The logger to perform logging
+            Logger logger = Logger.getLogger(target);
 
-        if (logger.isDebugEnabled())
-        {
-            // Log the entry
-            logger.debug('<' + getFullSignature(thisJoinPoint));
+            if (logger.isDebugEnabled()) {
 
-            // Execute the method
-            final Object result = proceed();
+                // Execute the method
+                long startTime = System.currentTimeMillis();
+                depth++;
+                final Object result = proceed();
+                depth--;
+                long endTime = System.currentTimeMillis();
 
-            // Compute the exit string to print
-            final StringBuffer exitString =
-                new StringBuffer(thisJoinPoint.getSignature().getName());
+                if (endTime - startTime > TIMER_MIN) {
+                    String prefix = '[' + (endTime - startTime) + ']'
+                        + StringUtils.repeat(".", depth);
+                    if (SHOW_DETAILS) {
 
-            exitString.append(' ');
-            exitString.append('=');
-            exitString.append(' ');
-            exitString.append('[');
-            exitString.append(result);
-            exitString.append(']');
+                        final StringBuffer returnValue =
+                            new StringBuffer(thisJoinPoint.getSignature().getName());
+                        returnValue.append(' ');
+                        returnValue.append('=');
+                        returnValue.append(' ');
+                        returnValue.append('[');
+                        returnValue.append(result);
+                        returnValue.append(']');
 
-            // Log the exit
-            logger.debug('>' + exitString.toString());
-            return result;
+                        logger.debug(prefix + getFullSignature(thisJoinPoint)
+                            + returnValue.toString());
+                    } else {
+                        logger.debug(prefix + thisJoinPoint.getSignature().getName());
+                    }
+                }
+
+                return result;
+            }
         }
-
         return proceed();
     }
 

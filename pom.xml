@@ -547,7 +547,9 @@
       <!-- Use this profile to weave the Log Aspect to trace all method calls. This is useful for
            debugging XWiki, especially in the case when you cannot debug the application (for
            example when you cannot reproduce the problem on your machine you can send an
-           aspectified XWiki JAR and ask the user to run it and send you the logs). -->
+           aspectified XWiki JAR and ask the user to run it and send you the logs). As this logs
+           everything you'll need to control what is logged by tuning the Log4J configuration file
+           to log only what you want. -->
       <id>debug</id>
       <dependencies>
         <dependency>

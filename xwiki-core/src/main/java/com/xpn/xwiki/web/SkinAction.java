@@ -47,7 +47,8 @@ public class SkinAction extends XWikiAction
         XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
         String path = request.getPathInfo();
-        log.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin + " ; defaultbaseskin: " + defaultbaseskin);
+        log.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
+            + " ; defaultbaseskin: " + defaultbaseskin);
         int idx = path.lastIndexOf("/");
         while (idx > 0) {
             try {
@@ -77,7 +78,8 @@ public class SkinAction extends XWikiAction
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
-        log.debug("Rendering file '" + filename + "' within the '" + doc.getFullName() + "' document");
+        log.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
+            + "' document");
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
 
@@ -94,7 +96,8 @@ public class SkinAction extends XWikiAction
 
                 if ((content != null) && (!content.equals(""))) {
                     // Choose the right content type
-                    String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+                    String mimetype =
+                        xwiki.getEngineContext().getMimeType(filename.toLowerCase());
                     if (mimetype.equals("text/css") || isJavascriptMimeType(mimetype)) {
                         content = context.getWiki().parseContent(content, context);
                     }
@@ -111,9 +114,11 @@ public class SkinAction extends XWikiAction
                 if (attachment != null) {
                     // Sending the content of the attachment
                     byte[] data = attachment.getContent(context);
-                    String mimetype = xwiki.getEngineContext().getMimeType(filename.toLowerCase());
+                    String mimetype =
+                        xwiki.getEngineContext().getMimeType(filename.toLowerCase());
                     if ("text/css".equals(mimetype) || isJavascriptMimeType(mimetype)) {
-                        data = context.getWiki().parseContent(new String(data), context).getBytes();
+                        data =
+                            context.getWiki().parseContent(new String(data), context).getBytes();
                     }
                     response.setContentType(mimetype);
                     response.setDateHeader("Last-Modified", attachment.getDate().getTime());
@@ -132,7 +137,9 @@ public class SkinAction extends XWikiAction
                 }
                 if (!context.getWiki().resourceExists(path)) {
                     log.info("Skin file '" + path + "' does not exist");
-                    path = "/skins/" + context.getWiki().getDefaultBaseSkin(context) + "/" + filename;
+                    path =
+                        "/skins/" + context.getWiki().getDefaultBaseSkin(context) + "/"
+                            + filename;
                 }
                 if (!context.getWiki().resourceExists(path)) {
                     log.info("Skin file '" + path + "' does not exist");
@@ -210,9 +217,12 @@ public class SkinAction extends XWikiAction
      * @param mimetype The mime type to check
      * @return true if the mime type represents a javascript file
      */
-    private boolean isJavascriptMimeType(String mimetype)
+    public boolean isJavascriptMimeType(String mimetype)
     {
-        return ("text/javascript".equals(mimetype) || "application/x-javascript".equals(mimetype)
-            || "application/javascript".equals(mimetype));
+        return ("text/javascript".equalsIgnoreCase(mimetype)
+            || "application/x-javascript".equalsIgnoreCase(mimetype)
+            || "application/javascript".equalsIgnoreCase(mimetype)
+            || "application/ecmascript".equalsIgnoreCase(mimetype) || "text/ecmascript"
+            .equalsIgnoreCase(mimetype));
     }
 }

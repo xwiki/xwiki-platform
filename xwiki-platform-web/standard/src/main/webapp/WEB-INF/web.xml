@@ -32,10 +32,25 @@
 
   <!-- XWiki's initialization is done in a Servlet Context Listener. This is where we set up
        everything that should be initialized prior to XWiki servicing requests. For example this
-       is where we initialize Velocity. -->
+       is where we initialize Velocity.
+       TODO: Remove this in favor of the new Velocity Plexus Component -->
   <listener>
     <listener-class>com.xpn.xwiki.web.InitializationServletContextListener</listener-class>
   </listener>
+
+  <!-- Initializes Plexus and puts a reference to the Plexus Component Manager in the Servlet
+       Context. Also initializes the Container Manager component with the Servlet Context. -->
+  <listener>
+    <listener-class>org.xwiki.plexus.XWikiPlexusServletContextListener</listener-class>
+  </listener>
+
+  <!-- Main Plexus Servlet receiving all requests. For now this is mapped to some unused URL
+       contex path since we're still using Struts but in the near future, Struts will go away
+       and be replaced by XWiki's own Action component. -->
+  <servlet>
+    <servlet-name>PlexusServlet</servlet-name>
+    <servlet-class>org.xwiki.plexus.XWikiPlexusServlet</servlet-class>
+  </servlet>
 
   <servlet>
     <servlet-name>action</servlet-name>
@@ -88,6 +103,13 @@
     <servlet-class>com.xpn.xwiki.gwt.api.server.XWikiServiceImpl</servlet-class>
   </servlet>
 
+  <!-- Unused mapping for now. In the future the correct mapping will be /* when the action servlet
+       will be decommissioned in favor of the XWiki Action component --> 
+  <servlet-mapping>
+    <servlet-name>PlexusServlet</servlet-name>
+    <url-pattern>/plexus/*</url-pattern>
+  </servlet-mapping>
+  
   <servlet-mapping>
     <servlet-name>action</servlet-name>
     <url-pattern>/bin/*</url-pattern>
@@ -124,12 +146,6 @@
     <welcome-file>index.redirect</welcome-file>
   </welcome-file-list>
 
-  <!--
-  <error-page>
-    <error-code>500</error-code>
-    <location>/error.jsp</location>
-  </error-page>
-  -->
   <error-page>
     <error-code>404</error-code>
     <location>/xwiki/bin/view/Main/DocumentDoesNotExist</location>

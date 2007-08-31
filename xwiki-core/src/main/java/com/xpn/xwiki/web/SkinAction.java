@@ -205,12 +205,14 @@ public class SkinAction extends XWikiAction
     }
 
     /**
-     * @param mimetype the mime type to check
+     * Checks if a mimetype indicates a javascript file.
+     * 
+     * @param mimetype The mime type to check
      * @return true if the mime type represents a javascript file
      */
     private boolean isJavascriptMimeType(String mimetype)
     {
-        return (mimetype.equals("text/javascript") || mimetype.equals("application/x-javascript")
-            || mimetype.equals("application/javascript"));
+        return ("text/javascript".equals(mimetype) || "application/x-javascript".equals(mimetype)
+            || "application/javascript".equals(mimetype));
     }
 }

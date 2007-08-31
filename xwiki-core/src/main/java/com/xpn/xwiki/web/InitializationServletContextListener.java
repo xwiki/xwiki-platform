@@ -19,7 +19,12 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.InputStream;
+
 import org.apache.velocity.app.Velocity;
+import org.apache.velocity.tools.view.ToolboxManager;
+import org.apache.velocity.tools.view.XMLToolboxManager;
+import org.apache.velocity.tools.view.servlet.ServletToolboxManager;
 import org.apache.commons.collections.ExtendedProperties;
 
 import javax.servlet.ServletContextListener;
@@ -35,6 +40,25 @@ import javax.servlet.ServletContext;
 public class InitializationServletContextListener implements ServletContextListener
 {
     /**
+     * Key used to access the toolbox configuration file path from the
+     * Servlet or webapp init parameters ("org.apache.velocity.toolbox").
+     */
+    protected static final String TOOLBOX_KEY = "org.apache.velocity.toolbox";
+
+    /**
+     * Key used to access the velocity configuration file path from the
+     * Servlet or webapp init parameters ("org.apache.velocity.properties").
+     */
+    protected static final String VELOCITY_PROPERTIES_KEY = "org.apache.velocity.properties";
+
+    /**
+     * Default toolbox configuration file path. If no alternate value for
+     * this is specified, the servlet will look here.
+     */
+    protected static final String DEFAULT_TOOLBOX_PATH =
+        "/WEB-INF/toolbox.xml";
+
+    /**
      * {@inheritDoc}
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
@@ -42,6 +66,7 @@ public class InitializationServletContextListener implements ServletContextListe
     {
         try {
             initializeVelocity(event.getServletContext());
+            initializeVelocityTools(event.getServletContext());
         } catch (Exception e) {
             throw new RuntimeException("Failed to initialize XWiki", e);
         }
@@ -80,11 +105,30 @@ public class InitializationServletContextListener implements ServletContextListe
 
         // Get our custom Velocity configuration file location from context-param defined in web.xml
         String velocityPropertiesFile =
-            servletContext.getInitParameter("org.apache.velocity.properties");
+            servletContext.getInitParameter(VELOCITY_PROPERTIES_KEY);
         ExtendedProperties customProperties = new ExtendedProperties();
         customProperties.load(servletContext.getResourceAsStream(velocityPropertiesFile));
         Velocity.setExtendedProperties(customProperties);
 
         Velocity.init();
+    }
+
+    private void initializeVelocityTools(ServletContext servletContext) throws Exception
+    {
+        XMLToolboxManager toolboxManager;
+        /* check the servlet config and context for a toolbox param */
+        String toolboxConfigFile =
+            servletContext.getInitParameter(TOOLBOX_KEY);
+        if (toolboxConfigFile == null)
+        {
+            // ok, look in the default location
+            toolboxConfigFile = DEFAULT_TOOLBOX_PATH;
+        }
+
+        /* try to get a manager for this toolbox file */
+        toolboxManager = new XMLToolboxManager();
+        toolboxManager.load(servletContext.getResourceAsStream(toolboxConfigFile));
+
+        Velocity.setApplicationAttribute(ToolboxManager.class.getName(), toolboxManager);
     }
 }

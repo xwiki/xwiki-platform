@@ -317,7 +317,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
 
             String editor = context.getWiki().getEditorPreference(context);
             if ((!editor.equals("")&&(!editor.equals("text")))&&(!editor.equals("---")))
-                querystring += "&editor=" + editor;
+                querystring += "&amp;editor=" + editor;
 
             URL url = context.getURLFactory().createURL(newdoc.getSpace(), newdoc.getName(),
                     "edit", querystring, null, context);

@@ -254,14 +254,19 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                     links = new ArrayList();
                     context.put("links", links);
                 }
-                if (!links.contains(docname))
+                // We restrict the number of bytes in the document name as:
+                // 1. It will throw an error on some DBMSs, as 255 is the column length
+                // 2. Such a long document name is not likely to occur, since the same limit is
+                //    imposed on the document name length.
+                if (!links.contains(docname) && docname.getBytes().length <= 255) {
                     links.add(docname);
+                }
         } catch (Exception e) {
-            if (log.isErrorEnabled())
+            if (log.isErrorEnabled()) {
                 log.error("Error adding link to context", e);
+            }
         }
     }
-
 
     public void appendLink(StringBuffer buffer, String name, String view) {
         appendLink(buffer, name, view, null);

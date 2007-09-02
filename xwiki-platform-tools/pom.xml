@@ -38,5 +38,6 @@
     <module>build-verifications</module>
     <module>build-xar-plugin</module>
     <module>build-xar-handlers</module>
+    <module>shared-test</module>
   </modules>
 </project>

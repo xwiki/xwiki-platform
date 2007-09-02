@@ -132,12 +132,12 @@
     	<id name="id" column="XDD_ID">
     		<generator class="native" />
     	</id>
-    	<natural-id mutable="false">
+        <natural-id mutable="false">
             <property name="fullName" column="XDD_FULLNAME" type="string" length="255" />
             <property name="language" column="XDD_LANGUAGE" type="string" length="5" />    		
             <property name="date" type="timestamp" column="XDD_DATE" />
-            <property name="deleter" type="string" column="XDD_DELETER" />
-    	</natural-id>
+        </natural-id>
+        <property name="deleter" type="string" column="XDD_DELETER" index="deleter"/>
     	<property name="xml" type="text">
     	    <column name="XDD_XML" not-null="true" />
     	</property>

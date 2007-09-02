@@ -11,7 +11,7 @@ else
 fi
 
 echo Starting Jetty on port $JETTY_PORT ...
-echo Logs are in the logs/ directory
+echo Logs are in the xwiki.log file in the current directory
 
 mkdir -p logs 2>/dev/null
-LANG=fr_FR.ISO8859-1 nohup java $JAVA_OPTS -Dfile.encoding=iso-8859-1 -Djetty.port=$JETTY_PORT -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/start.jar > logs/xwiki_output.log 2> logs/xwiki_errors.log &
+LANG=fr_FR.ISO8859-1 java $JAVA_OPTS -Dfile.encoding=iso-8859-1 -Djetty.port=$JETTY_PORT -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/start.jar

@@ -24,6 +24,9 @@ import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 
+/**
+ * Allow logging Ant messages to the console. This is used by the {@link XWikiTestSetup
+ */
 public class AntBuildListener implements BuildListener
 {
     private boolean isDebugModeOn;

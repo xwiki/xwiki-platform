@@ -130,7 +130,10 @@
 <property>
 <content>#set($pages = $tdoc.includedPages)
 #largepanelheader($msg.get("panels.documentInformation.title"))
+#if ($tdoc.language=="")
 &lt;dl&gt;&lt;dt&gt;&lt;label for="xwikidocparentinput2"&gt;$msg.get("panels.documentInformation.parent")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidocparentinput2" name="parent" value="$!tdoc.parent" size="30"/&gt;&lt;/dd&gt;
+&lt;dl&gt;&lt;dt&gt;&lt;label for="xwikidoclanguageinput2"&gt;$msg.get("panels.documentInformation.defaultLanguage")&lt;/label&gt;&lt;/dt&gt; &lt;dd&gt;&lt;input type="text" id="xwikidoclanguageinput2" name="defaultLanguage" value="$!tdoc.defaultLanguage" size="30"/&gt;&lt;/dd&gt;
+#end
 #if($pages.size() != 0)
   #if($pages.size() == 1)
     &lt;dt&gt;$msg.get("panels.documentInformation.includesOne", [$pages.size()])&lt;/dt&gt;

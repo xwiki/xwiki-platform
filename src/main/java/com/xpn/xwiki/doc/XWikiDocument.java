@@ -3242,16 +3242,18 @@ public class XWikiDocument
             Vector objects = (Vector) itobjs.next();
             for (Iterator itobjs2 = objects.iterator(); itobjs2.hasNext();) {
                 BaseObject origobj = (BaseObject) itobjs2.next();
-                BaseObject newobj = newdoc.getObject(origobj.getClassName(), origobj.getNumber());
+                if (origobj!=null) {
+                    BaseObject newobj = newdoc.getObject(origobj.getClassName(), origobj.getNumber());
 
-                List dlist;
-                if (newobj == null) {
-                    dlist = origobj.getDiff(new BaseObject(), context);
-                } else {
-                    dlist = origobj.getDiff(newobj, context);
-                }
-                if (dlist.size() > 0) {
-                    difflist.add(dlist);
+                    List dlist;
+                    if (newobj == null) {
+                        dlist = origobj.getDiff(new BaseObject(), context);
+                    } else {
+                        dlist = origobj.getDiff(newobj, context);
+                    }
+                    if (dlist.size() > 0) {
+                        difflist.add(dlist);
+                    }
                 }
             }
         }
@@ -3259,15 +3261,17 @@ public class XWikiDocument
             Vector objects = (Vector) itobjs.next();
             for (Iterator itobjs2 = objects.iterator(); itobjs2.hasNext();) {
                 BaseObject newobj = (BaseObject) itobjs2.next();
-                BaseObject origobj = origdoc.getObject(newobj.getClassName(), newobj.getNumber());
+                if (newobj!=null) {
+                    BaseObject origobj = origdoc.getObject(newobj.getClassName(), newobj.getNumber());
 
-                if (origobj == null) {
-                    origobj = new BaseObject();
-                    origobj.setClassName(newobj.getClassName());
-                    origobj.setNumber(newobj.getNumber());
-                    List dlist = origobj.getDiff(newobj, context);
-                    if (dlist.size() > 0) {
-                        difflist.add(dlist);
+                    if (origobj == null) {
+                        origobj = new BaseObject();
+                        origobj.setClassName(newobj.getClassName());
+                        origobj.setNumber(newobj.getNumber());
+                        List dlist = origobj.getDiff(newobj, context);
+                        if (dlist.size() > 0) {
+                            difflist.add(dlist);
+                        }
                     }
                 }
             }

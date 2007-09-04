@@ -575,7 +575,7 @@ public class Package
                     doc.getDoc().setAuthor(context.getUser());
                 }
                 
-                if (!preserveVersion) {   
+                if ((!preserveVersion)&&(!withVersions)) {
                     doc.getDoc().setVersion("1.1");
                 }
 
@@ -588,11 +588,16 @@ public class Package
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
 
+                if (withVersions) {
+                    // we need to force the saving the document archive.
+                    if (doc.getDoc().getDocumentArchive()!=null)
+                        context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
+                }
                 // if there is no archive in xml and content&metaData Dirty is not set
                 //  then archive was not saved
                 //  so we need save it via resetArchive
                 if ((doc.getDoc().getDocumentArchive() == null)
-                    || (doc.getDoc().getDocumentArchive().getRCSArchive() == null)) {
+                    || (doc.getDoc().getDocumentArchive().getRCSArchive() == null) || (!withVersions)) {
                     doc.getDoc().resetArchive(context);
                 }
             } catch (XWikiException e) {
@@ -688,7 +693,7 @@ public class Package
     private XWikiDocument readFromXML(InputStream is) throws XWikiException
     {
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
-        if (backupPack && withVersions)
+        if (withVersions)
             doc.fromXML(is, true);
         else {
             doc.fromXML(is);

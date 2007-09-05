@@ -75,6 +75,7 @@ public class PropUpdateAction extends XWikiAction
 
         doc.setxWikiClass(bclass2);
         doc.renameProperties(bclass.getName(), fieldsToRename);
+        doc.setMetaDataDirty(true);
         xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.updateClassProperty"), true, context);
 
         // We need to load all documents that use this property and rename it

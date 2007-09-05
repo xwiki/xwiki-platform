@@ -24,6 +24,8 @@ package com.xpn.xwiki.pdf.impl;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,7 +33,9 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class XWikiURIResolver implements EntityResolver {
+public class XWikiURIResolver implements EntityResolver
+{
+    private static final Log LOG = LogFactory.getLog(XWikiURIResolver.class);
 
     /**
      * Allow the application to resolve external entities.
@@ -67,22 +71,30 @@ public class XWikiURIResolver implements EntityResolver {
      *                                  or Reader for the InputSource.
      * @see org.xml.sax.InputSource
      */
-    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+    public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException
+    {
+        InputSource source = null;
+
         try {
             URI uri = new URI(systemId);
 
-            if ("http".equals(uri.getScheme())) {
+            if ("http".equals(uri.getScheme()) || "file".equals(uri.getScheme())) {
                 String filename = (new File(uri.getPath())).getName();
                 InputStream istream =  getClass().getClassLoader().getResourceAsStream(filename);
-                return new InputSource(istream);
-            } else if ("file".equals(uri.getScheme())) {
-                String filename = (new File(uri.getPath())).getName();
-                InputStream istream =  getClass().getClassLoader().getResourceAsStream(filename);
-                return new InputSource(istream);                
+                if (istream != null) {
+                    source = new InputSource(istream);
+                } else {
+                    LOG.warn("Failed to load resource [" + filename
+                        + "] locally. Will try to get it online at [" + systemId + "]");
+                }
+            } else {
+                LOG.warn("Unknown URI scheme [" + uri.getScheme() + "] for entity ["
+                    + systemId + "].");
             }
         } catch (URISyntaxException e) {
+            LOG.warn("Invalid URI [" + systemId + "].", e);
         }
-        // Returning null causes the caller to try accessing the href
-        return null;
+        // Returning null causes the caller to try accessing the entity online
+        return source;
     }
 }

@@ -82,12 +82,19 @@ public class EditAction extends XWikiAction {
 
             String language = context.getWiki().getLanguagePreference(context);
             String languagefromrequest = context.getRequest().getParameter("language");
-            String languagetoedit = ((languagefromrequest==null)||(languagefromrequest.equals(""))) ?
-                    language : languagefromrequest;
+            languagefromrequest = (languagefromrequest==null) ? "" : languagefromrequest;
+            String languagetoedit = languagefromrequest.equals("") ? language : languagefromrequest;
 
+            // if no specific language is set or if it is "default" then we edit the current doc
             if ((languagetoedit==null)||(languagetoedit.equals("default")))
                 languagetoedit = "";
+            // if the document is new then we edit it as the default
+            // if the language to edit is the one of the default document then the language is the default
             if (doc.isNew()||(doc.getDefaultLanguage().equals(languagetoedit)))
+                languagetoedit = "";
+            // if the doc does not exist in the language to edit and the language was not explicitely set in the URL
+            // then we edit the default doc, otherwise this can cause to create translations without wanting it.
+            if ((tdoc==doc)&&languagefromrequest.equals(""))
                 languagetoedit = "";
 
             if (languagetoedit.equals("")) {

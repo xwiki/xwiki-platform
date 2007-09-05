@@ -261,7 +261,6 @@ public class DiffPlugin extends XWikiDefaultPlugin {
                         html.append(escape(origline));
                         html.append("</span></div>");
                     }
-                    j1++;
                     addBR = true;
                     cursor++;
                 }

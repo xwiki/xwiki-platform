@@ -122,7 +122,7 @@ public class DiffPlugin extends XWikiDefaultPlugin {
 
         StringBuffer html = new StringBuffer("<div class=\"diffmodifiedline\">");
         List list = getWordDifferencesAsList(text1, text2);
-        String[] words = StringUtils.split(text1, ' ');
+        String[] words = StringUtils.splitPreserveAllTokens(text1, ' ');
         int cursor = 0;
         boolean addSpace = false;
 

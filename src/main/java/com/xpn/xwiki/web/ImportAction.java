@@ -84,6 +84,8 @@ public class ImportAction extends XWikiAction
                         }
                     }
                     // Import files
+                    String withVersions = request.get("withversions");
+                    importer.setWithVersions("1".equals(withVersions));
                     importer.install();
                     return "import";
                 }

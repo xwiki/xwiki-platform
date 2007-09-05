@@ -574,8 +574,8 @@ public class Package
                 if (!backupPack) {
                     doc.getDoc().setAuthor(context.getUser());
                 }
-                
-                if (!preserveVersion) {   
+
+                if ((!preserveVersion)&&(!withVersions)) {
                     doc.getDoc().setVersion("1.1");
                 }
 
@@ -588,11 +588,16 @@ public class Package
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(context);
 
+                if (withVersions) {
+                    // we need to force the saving the document archive.
+                    if (doc.getDoc().getDocumentArchive()!=null)
+                        context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
+                }
                 // if there is no archive in xml and content&metaData Dirty is not set
                 //  then archive was not saved
                 //  so we need save it via resetArchive
                 if ((doc.getDoc().getDocumentArchive() == null)
-                    || (doc.getDoc().getDocumentArchive().getNodes().size()==0)) {
+                    || (doc.getDoc().getDocumentArchive().getNodes() == null) || (!withVersions)) {
                     doc.getDoc().resetArchive(context);
                 }
             } catch (XWikiException e) {
@@ -688,7 +693,7 @@ public class Package
     private XWikiDocument readFromXML(InputStream is) throws XWikiException
     {
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
-        if (backupPack && withVersions)
+        if (withVersions)
             doc.fromXML(is, true);
         else {
             doc.fromXML(is);
@@ -756,10 +761,10 @@ public class Package
         el = new DOMElement("backupPack");
         el.addText(new Boolean(backupPack).toString());
         elInfos.add(el);
-        
+
         el = new DOMElement("preserveVersion");
         el.addText(new Boolean(preserveVersion).toString());
-        elInfos.add(el);        
+        elInfos.add(el);
 
         Element elfiles = new DOMElement("files");
         docel.add(elfiles);

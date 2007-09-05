@@ -2453,6 +2453,22 @@ public class XWiki extends Api
      * @return An object instanciating this class
      * @throws XWikiException
      */
+    public Object parseGroovyFromPage(String fullname, String jarWikiPage) throws XWikiException
+    {
+        XWikiDocument doc = xwiki.getDocument(fullname, getXWikiContext());
+        if (xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext()))
+            return xwiki.parseGroovyFromString(doc.getContent(), jarWikiPage, getXWikiContext());
+        return "groovy_missingrights";
+    }
+
+    /**
+     * Priviledged API to retrieve an object instanciated from groovy code in a String Groovy
+     * scripts compilation is cached
+     *
+     * @param fullname // script containing a Groovy class definition (public class MyClass { ... })
+     * @return An object instanciating this class
+     * @throws XWikiException
+     */
     public Object parseGroovyFromPage(String fullname) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(fullname, getXWikiContext());

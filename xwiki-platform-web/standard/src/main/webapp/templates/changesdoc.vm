@@ -1,73 +1,279 @@
-#if($xwiki.diff)
-#if(($request.xpage!="changes")&&($request.viewer!="changes"))
-<style type="text/css">
-.diffmodifiedline {
-  border-left: 8px solid #888888;
-  padding-left: 10px;
-}
-.diffunmodifiedline {
-  border-left: 8px solid #dddddd;
-  padding-left: 10px;
-}
-.diffremoveword {
-  background-color: red;
-  text-decoration: line-through;
-}
-.diffaddword {
-  background-color: lightgreen;
-}
-</style>
-#end
-<div style="width: 100%; background-color: #DDDDDD">
-<h3>$msg.get("from") $msg.get("version") $origdoc.version $msg.get("to") $newdoc.version
-#if(($origdoc=="")||($newdoc==""))
-#if($newdoc!="")
-$msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author),$doc) $msg.get("on") $xwiki.formatDate($newdoc.date)
-#end
- ($msg.get("cannotreaddocumentversion") $newdoc.version)</h3>
+<div id="changes-title">
+<h1>$msg.get("changes.changesofpage") $doc.name $msg.get("changes.in") $msg.get("changes.space") $doc.web</h1>
 </div>
-#else
-$msg.get("editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author), $doc) $msg.get("on") $xwiki.formatDate($newdoc.date)
-</h3>
-</div>
+<div id="changes-info">
+<div id="changes-info-boxes">
+<div id="changes-info-boxes-inside">
+<div id="changes-info-box-from" class="changes-info-box">
+<div class="changes-info-title">$msg.get("changes.from") $msg.get("changes.version") $request.rev1</div>
+<div class="changes-info-content">
+#if($origdoc)
+$msg.get("changes.editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author),$doc)
+<br />
+$msg.get("changes.on") $xwiki.formatDate($origdoc.date)
 #end
+</div>
+</div>
+<div id="changes-info-box-to" class="changes-info-box">
+<div class="changes-info-title">$msg.get("changes.to") $msg.get("changes.version") $request.rev2</div>
+<div class="changes-info-content">
+#if($newdoc)
+$msg.get("changes.editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author),$doc)
+<br />
+$msg.get("changes.on") $xwiki.formatDate($newdoc.date)
+#end
+</div>
+</div>
+<div class="clearfloats"></div>
+</div>
+</div>
+<div class="clearfloats"></div>
+<div id="changes-info-comment">
+$msg.get("changes.comment"): #if($newdoc.comment=="") $msg.get("changes.nocomment") #else $newdoc.comment #end
+</div>
+</div>
+<div class="clearfloats"></div>
 
-<ul>
+<div id="changes-metadata">
+<table class="changes-table">
+<tr class="changes-table-title">
+<th colspan="3">$msg.get("changes.metadatachanges")</th>
+</tr>
+<tr class="changes-table-title">
+<th>$msg.get("changes.property")</th><th>$msg.get("changes.version") $request.rev1</th><th>$msg.get("changes.version") $request.rev2</th>
+</tr>
+#set($hasmetadatachanges = 0)
 #foreach($item in $doc.getMetaDataDiff($origdoc, $newdoc))
+#set($hasmetadatachanges = 1)
+<tr>
 #if($item.field=="author")
-<li>author:  $xwiki.getLocalUserName($item.getPrevvalue()) &gt;  $xwiki.getLocalUserName($item.getNewvalue())</li>
+<td>$msg.get("changes.metadata.author")</td><td>$xwiki.getLocalUserName($item.getPrevValue())</td><td>$xwiki.getLocalUserName($item.getNewValue())</td>
 #else
-<li>
-$item.getField(): $xwiki.diff.getDifferencesAsHTML($item.getPrevValue().toString(),$item.getNewValue().toString(), false)
-</li>
+#set($propname = $item.getField())
+<td>$msg.get("changes.metadata.${propname}")</td><td> $!item.getPrevValue() </td><td> $!item.getNewValue() </td>
 #end
+</tr>
 #end
-</ul>
+#foreach($objdiffs in $doc.getObjectDiff($origdoc, $newdoc))
+#foreach($objdiff in $objdiffs)
+#if($objdiff.getClassName().equals("XWiki.ArticleClass"))
+#set($hasmetadatachanges = 1)
+#set($propname = $objdiff.getPropName())
+#if($propname!="content")
+<tr>
+<td>$msg.get("changes.blog.${propname}")</td>
+<td>
+#set($value = $objdiff.getPrevValue().toString())
+$value
+</td>
+<td>
+#set($value = $objdiff.getNewValue().toString())
+$value
+</td>
+</tr>
+#end
+#end ## end ArticleClass
+#if($objdiff.getClassName().equals("XWiki.TagClass"))
+#set($hasmetadatachanges = 1)
+#set($propname = $objdiff.getPropName())
+<tr>
+<td>$msg.get("changes.tag.${propname}")</td>
+<td>
+#set($value = $objdiff.getPrevValue().toString())
+$value
+</td>
+<td>
+#set($value = $objdiff.getNewValue().toString())
+$value
+</td>
+</tr>
+#end ## end TagClass
 
-<br /><br />
-#set($text1 = $origdoc.content)
-#set($text2 = $newdoc.content)
-$xwiki.diff.getDifferencesAsHTML($text1,$text2,false)
+#end
+#end
+#if($hasmetadatachanges==0)
+<tr><td colspan="3">$msg.get("changes.nometadatachanges")</td></tr>
+#end
+</table>
+</div>
 
-<ul>
-#foreach($item1 in $doc.getClassDiff($origdoc, $newdoc))
-#foreach($item in $$item1)
-<li>
-$item.getClassName() - $item.getPropName(): $xwiki.diff.getDifferencesAsHTML($item.getPrevValue().toString(),$item.getNewValue().toString(),false)
-</li>
-#end
-#end
-</ul>
-
-<ul>
-#foreach($item1 in $doc.getObjectDiff($origdoc, $newdoc))
-#foreach($item in $$item1)
-<li>
-$item.getClassName() - $item.getPropName(): $xwiki.diff.getDifferencesAsHTML($item.getPrevValue().toString(),$item.getNewValue().toString(),false)
-</li>
-#end
-#end
-</ul>
+<div id="changes-content">
+#if($origdoc.get("XWiki.ArticleClass"))
+#set($ok = $origdoc.use("XWiki.ArticleClass"))
+#set($origcontent = $!origdoc.getValue("content").trim())
+#if(!$origcontent)
+#set($text1 = "")
 #else
-#template("changesdocold.vm")
+#set($text1 = $origcontent)
 #end
+#set($ok = $newdoc.use("XWiki.ArticleClass"))
+#set($newcontent = $!newdoc.getValue("content").trim())
+#if(!$newcontent)
+#set($text2 = "")
+#else
+#set($text2 = $newcontent)
+#end
+<table class="changes-table">
+<tr class="changes-table-title">
+<th>$msg.get("changes.contentchanges")</th>
+</tr>
+<tr>
+<td>
+#if($text1.equals($text2))
+$msg.get("changes.nocontentchanges")
+#else
+$xwiki.diff.getDifferencesAsHTML($text1, $text2 ,false)
+#end
+</td>
+</tr>
+</table>
+#else
+#set($origcontent = $!origdoc.content.trim())
+#if(!$origcontent)
+#set($text1 = "")
+#else
+#set($text1 = $origcontent)
+#end
+#set($newcontent = $!newdoc.content.trim())
+#if(!$newcontent)
+#set($text2 = "")
+#else
+#set($text2 = $newcontent)
+#end
+<table class="changes-table">
+<tr class="changes-table-title">
+<th>$msg.get("changes.contentchanges")</th>
+</tr>
+<tr>
+<td>
+#if($text1.equals($text2))
+$msg.get("changes.nocontentchanges")
+#else
+$xwiki.diff.getDifferencesAsHTML($text1, $text2 ,false)
+#end
+</td>
+</tr>
+</table>
+#end
+</div>
+
+<div id="changes-attachments">
+<table class="changes-table">
+<tr class="changes-table-title">
+<th colspan="3">$msg.get("changes.attachmentchanges")</th>
+</tr>
+<tr class="changes-table-title">
+<th>$msg.get("changes.filename")</th><th>$msg.get("changes.action")</th>
+</tr>
+#set($hasattachmentchanges = 0)
+#foreach($attachChange in $doc.getAttachmentDiff($origdoc, $newdoc))
+#set($hasattachmentchanges = 1)
+<tr>
+<td>
+$attachChange.fileName
+</td>
+<td>
+#if(!$attachChange.origVersion)
+<a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)">$msg.get("changes.attachmentadded")</a>
+#elseif(!$attachChange.newVersion)
+$msg.get("changes.attachmentdeleted")
+#else
+$msg.get("changes.attachmentupdatedfromversion") <a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.origVersion)">$attachChange.origVersion</a>
+$msg.get("changes.toversion") <a href="$newdoc.getAttachmentRevisionURL($attachChange.fileName,$attachChange.newVersion)">$attachChange.newVersion</a>
+#end
+</td>
+</tr>
+#end
+#if($hasattachmentchanges==0)
+<tr><td colspan="3">$msg.get("changes.noattachmentchanges")</td></tr>
+#end
+</table>
+</div>
+
+<div id="changes-comments">
+<table class="changes-table">
+<tr class="changes-table-title">
+<th colspan="3">$msg.get("changes.commentchanges")</th>
+</tr>
+#set($commentchanges = 0)
+#foreach($objdiffs in $doc.getObjectDiff($origdoc, $newdoc))
+#set($commentchangetitledone = 0)
+#foreach($objdiff in $objdiffs)
+#if($objdiff.getClassName().equals("XWiki.XWikiComments"))
+#if($commentchangetitledone==0)
+#set($commentchanges = 1 + $commentchanges)
+#set($commentchangetitledone = 1)
+<tr class="changes-table-title changes-table-comment-subtitle">
+<th>$msg.get("changes.comment.property")</th>
+<th>$msg.get("changes.comment.previousvalue")</th>
+<th>$msg.get("changes.comment.newvalue")</th>
+</tr>
+#end
+#set($propname = $objdiff.getPropName())
+<tr>
+<td>$msg.get("changes.comment.${propname}")</td>
+<td>
+#if($propname=="author")
+#set($author = $objdiff.getPrevValue().toString())
+#if($author!="")
+$xwiki.renderText($xwiki.getLocalUserName($author),$doc)
+#end
+#else
+$objdiff.getPrevValue().toString()
+#end
+</td>
+<td>
+#if($propname=="author")
+#set($author = $objdiff.getNewValue().toString())
+#if($author!="")
+$xwiki.renderText($xwiki.getLocalUserName($author),$doc)
+#end
+#else
+$objdiff.getNewValue().toString()
+#end
+</td>
+</tr>
+#end
+#end
+#end
+#if($commentchanges==0)
+<tr><td colspan="3">$msg.get("changes.nocommentchanges")</td></tr>
+#end
+</table>
+</div>
+
+<div id="changes-objects">
+<table class="changes-table">
+<tr class="changes-table-title">
+<th colspan="3">$msg.get("changes.objectchanges")</th>
+</tr>
+<tr class="changes-table-title">
+<th>$msg.get("changes.property")</th><th>$msg.get("changes.version") $request.rev1</th><th>$msg.get("changes.version") $request.rev2</th>
+</tr>
+#set($hasobjectchanges = 0)
+#foreach($objdiffs in $doc.getObjectDiff($origdoc, $newdoc))
+#foreach($objdiff in $objdiffs)
+#if((!$objdiff.getClassName().equals("XWiki.ArticleClass"))&&(!$objdiff.getClassName().equals("XWiki.TagClass"))&&(!$objdiff.getClassName().equals("XWiki.XWikiComments")))
+#set($hasobjectchanges = 1)
+#set($propname = $objdiff.getPropName())
+#if($propname!="content")
+<tr>
+<td>$propname $msg.get("changes.ofclass") $objdiff.getClassName()</td>
+<td>
+#set($value = $objdiff.getPrevValue().toString())
+$value
+</td>
+<td>
+#set($value = $objdiff.getNewValue().toString())
+$value
+</td>
+</tr>
+#end
+#end
+#end
+#end
+#if($hasobjectchanges==0)
+<tr><td colspan="3">$msg.get("changes.noobjectchanges")</td></tr>
+#end
+</table>
+</div>

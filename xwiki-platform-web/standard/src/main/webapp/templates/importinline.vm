@@ -13,14 +13,14 @@
 ##---------------------------------------------------------------------------
 #if($request.action && $request.action=="import")
 
-  <h3 class="heading-1-1">$msg.get("import")</h3>
+  <h3 class="heading-1-1">$msg.get("import") #if($request.withversions=="1")$msg.get("export_addhistory")#end</h3>
 
   #macro(showfilelist $list $text)
     #if($list.size()>0)
       <h4 class="heading-1-1-1">$msg.get("import_listof${text}files")</h4>
       <ul>
         #foreach($item in $list)
-          <li>$item</li>
+          <li><a href="$xwiki.getURL($item)">$item</a></li>
         #end
       </ul>
     #end
@@ -109,6 +109,7 @@
       <span id="importDocName"></span>
 
       <span id="importDocs" style="display: none;">
+        <div><br /><label><input type="checkbox" name="withversions" id="withversions" value="1"/><i>$msg.get("export_addhistory")</i></label></div>
         <input type="submit" value="$msg.get("import")" />
       </span>
     </div>

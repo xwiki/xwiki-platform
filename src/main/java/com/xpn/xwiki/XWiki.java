@@ -42,6 +42,7 @@ import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
+import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
@@ -5038,19 +5039,47 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public Object parseGroovyFromString(String script, XWikiContext context)
-        throws XWikiException
+            throws XWikiException
     {
-        if (getRenderingEngine().getRenderer("groovy") != null)
+        if (getRenderingEngine().getRenderer("groovy") == null)
+            return null;
+        else
             return ((XWikiGroovyRenderer) getRenderingEngine().getRenderer("groovy"))
-                .parseGroovyFromString(script, context);
-        return null;
+                    .parseGroovyFromString(script, context);
+    }
+
+    public Object parseGroovyFromString(String script, String jarWikiPage, XWikiContext context)
+            throws XWikiException
+    {
+        if (getRenderingEngine().getRenderer("groovy") == null)
+            return null;
+
+
+        XWikiPageClassLoader pcl = new XWikiPageClassLoader(jarWikiPage, context);
+        Object prevParentClassLoader = context.get("parentclassloader");
+        try {
+            context.put("parentclassloader", pcl);
+            return parseGroovyFromString(script, context);
+        } finally {
+            if (prevParentClassLoader==null)
+                context.remove("parentclassloader");
+            else
+                context.put("parentclassloader", prevParentClassLoader);
+        }
     }
 
     public Object parseGroovyFromPage(String fullname, XWikiContext context)
-        throws XWikiException
+            throws XWikiException
     {
         return parseGroovyFromString(context.getWiki().getDocument(fullname, context)
-            .getContent(), context);
+                .getContent(), context);
+    }
+
+    public Object parseGroovyFromPage(String fullName, String jarWikiPage, XWikiContext context)
+            throws XWikiException
+    {
+        return parseGroovyFromString(context.getWiki().getDocument(fullName, context)
+                .getContent(), context);
     }
 
     public String getMacroList(XWikiContext context)

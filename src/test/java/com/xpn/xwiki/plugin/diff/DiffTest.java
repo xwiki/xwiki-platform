@@ -112,7 +112,7 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals("Revised 2 should be", "Paris", revised2.toString());
     }
 
-    /*
+
     public void testSimpleWordDiffAsHTML() throws XWikiException {
          String text1 = "A";
          String text2 = "A B";
@@ -154,5 +154,12 @@ public class DiffTest extends org.jmock.cglib.MockObjectTestCase
          String html = this.plugin.getDifferencesAsHTML(text1, text2);
          assertEquals("Diff is incorrect", "<div class=\"diff\"><div class=\"diffunmodifiedline\">A B C</div><div class=\"diffmodifiedline\"><span class=\"diffremoveword\">D E F</span></div><div class=\"diffunmodifiedline\">G H I</div><div class=\"diffmodifiedline\"><span class=\"diffaddword\">D E F</span></div><div class=\"diffunmodifiedline\">J K L</div></div>", html);
      }
-     */
+
+    public void testMultiLineDiffAsHTML() throws XWikiException {
+         String text1 = "A\n";
+         String text2 = "AA\nAB\n";
+         String html = this.plugin.getDifferencesAsHTML(text1, text2);
+         assertEquals("Diff is incorrect", "<div class=\"diff\"><div class=\"diffmodifiedline\"><span class=\"diffremoveword\">A</span><span class=\"diffaddword\">AA</span></div><div class=\"diffmodifiedline\"><span class=\"diffaddword\">AB</span></div></div>", html);
+     }
+
 }

@@ -62,6 +62,7 @@ public class PropAddAction extends XWikiAction {
                 if (doc.isNew()) {
                     doc.setCreator(username);
                 }
+                doc.setMetaDataDirty(true);
                 xwiki.saveDocument(doc, context.getMessageTool().get("core.comment.addClassProperty"), context);
             }
         }

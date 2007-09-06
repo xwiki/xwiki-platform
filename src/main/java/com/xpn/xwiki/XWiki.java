@@ -552,6 +552,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 }
 
                 wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
+                if (wikiOwner.indexOf(":") == -1)
+                    wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
             } finally {
                 context.setDatabase(currentdatabase);
             }

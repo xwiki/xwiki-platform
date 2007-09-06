@@ -1480,8 +1480,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             XWikiDocument originalDocument = context.getDoc();
             context.setDoc(doc);
             try {
-                XWikiRenderer renderer = context.getWiki().getRenderingEngine().getRenderer("wiki");
-                renderer.render(doc.getContent(), doc, doc, context);
+                // Create new clean context to avoid multiwiki requests in same session
+                XWikiContext renderContext = (XWikiContext)context.clone();
+                setSession(null, renderContext);
+                setTransaction(null, renderContext);
+
+                XWikiRenderer renderer = renderContext.getWiki().getRenderingEngine().getRenderer("wiki");
+                renderer.render(doc.getContent(), doc, doc, renderContext);
             } catch (Exception e) {
                 // If the rendering fails lets forget backlinks without errors
             } finally {

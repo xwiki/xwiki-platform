@@ -461,7 +461,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             // Verify Wiki Owner
-            String wikiOwner = context.getWikiOwner();
+            String wikiOwner = context.getWiki().getWikiOwner(database, context);
             if (wikiOwner != null) {
                 if (wikiOwner.equals(name)) {
                     logAllow(name, resourceKey, accessLevel, "admin level from wiki ownership");

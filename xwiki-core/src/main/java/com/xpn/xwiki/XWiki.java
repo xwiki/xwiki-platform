@@ -534,6 +534,35 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return "XWiki.XWikiServer" + servername.substring(0, 1).toUpperCase()
             + servername.substring(1);
     }
+    
+    public String getWikiOwner(String servername, XWikiContext context) throws XWikiException
+    {       
+        String wikiOwner = context.getWikiOwner();
+        
+        if (isVirtual()) {
+            String serverwikipage = getServerWikiPage(servername);
+            
+            String currentdatabase = context.getDatabase();
+
+            try {
+                context.setDatabase(context.getMainXWiki());
+                
+                XWikiDocument doc = getDocument(serverwikipage, context);
+                
+                if (doc.isNew()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI,
+                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                        "The wiki " + servername + " does not exist");
+                }
+                
+                wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");                
+            } finally {
+                context.setDatabase(currentdatabase);
+            }
+        }
+        
+        return wikiOwner;
+    }
 
     public XWiki(XWikiConfig config, XWikiContext context) throws XWikiException
     {

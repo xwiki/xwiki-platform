@@ -42,11 +42,7 @@ import org.dom4j.io.SAXReader;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.BaseProperty;
-import com.xpn.xwiki.objects.ElementComparator;
-import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.plugin.query.OrderClause;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
@@ -769,4 +765,36 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         }
     }
 
+    public List getDiff(Object coll, XWikiContext context) {
+        ArrayList difflist = new ArrayList();
+        BaseClass bclass = (BaseClass) coll;
+        Iterator itfields = getFieldList().iterator();
+        while (itfields.hasNext()) {
+            PropertyClass prop = (PropertyClass) itfields.next();
+            String name = prop.getName();
+            PropertyClass prop2 = (PropertyClass) bclass.get(name);
+
+            if (prop2==null) {
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
+                            name, "" , ""));
+            } else if (!prop2.equals(prop)) {
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
+                            name, "", ""));
+            }
+        }
+
+        itfields = bclass.getFieldList().iterator();
+        while (itfields.hasNext()) {
+            PropertyClass prop2 = (PropertyClass) itfields.next();
+            String name = prop2.getName();
+            PropertyClass prop = (PropertyClass) get(name);
+
+            if (prop==null) {
+                difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
+                        name, "" , ""));
+            }
+        }
+
+        return difflist;
+    }
 }

@@ -113,7 +113,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private XWikiVersioningStoreInterface versioningStore;
     /** store for deleted documents */
     private XWikiRecycleBinStoreInterface recycleBinStore;
-    
+
     private XWikiRenderingEngine renderingEngine;
 
     private XWikiPluginManager pluginManager;
@@ -534,33 +534,35 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return "XWiki.XWikiServer" + servername.substring(0, 1).toUpperCase()
             + servername.substring(1);
     }
-    
+
     public String getWikiOwner(String servername, XWikiContext context) throws XWikiException
-    {       
+    {
         String wikiOwner = context.getWikiOwner();
-        
+
         if (isVirtual()) {
             String serverwikipage = getServerWikiPage(servername);
-            
+
             String currentdatabase = context.getDatabase();
 
             try {
                 context.setDatabase(context.getMainXWiki());
-                
+
                 XWikiDocument doc = getDocument(serverwikipage, context);
-                
+
                 if (doc.isNew()) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI,
                         XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
                         "The wiki " + servername + " does not exist");
                 }
-                
-                wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");                
+
+                wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
+                if (wikiOwner.indexOf(":") == -1)
+                    wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
             } finally {
                 context.setDatabase(currentdatabase);
             }
         }
-        
+
         return wikiOwner;
     }
 
@@ -624,7 +626,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Create the notification manager
         setNotificationManager(new XWikiNotificationManager());
 
-        // Prepare the store        
+        // Prepare the store
         setConfig(config);
         XWikiStoreInterface basestore = (XWikiStoreInterface) createClassFromConfig(
             "xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore", context);
@@ -656,7 +658,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if ("1".equals(Param("xwiki.store.migration", "0"))) {
             if (LOG.isInfoEnabled())
                 LOG.info("Running migrations");
-            AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager) 
+            AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager)
                 createClassFromConfig( "xwiki.store.migration.manager.class",
                     "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
             manager.startMigrations(context);
@@ -704,7 +706,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1"
                 .equalsIgnoreCase(ro));
     }
-    
+
     protected Object createClassFromConfig(String param, String defClass, XWikiContext context)
         throws XWikiException
     {
@@ -725,7 +727,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 "Cannot load class {1} from param {0}", ecause, args);
         }
     }
-    
+
     public void resetRenderingEngine(XWikiContext context) throws XWikiException
     {
         // Prepare the Rendering Engine
@@ -925,8 +927,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // If no comment is provided we should use an empty comment
         saveDocument(doc, "", context);
     }
-    
-    public void saveDocument(XWikiDocument doc, String comment, XWikiContext context) 
+
+    public void saveDocument(XWikiDocument doc, String comment, XWikiContext context)
         throws XWikiException
     {
         saveDocument(doc, comment, false, context);
@@ -1345,7 +1347,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates;
      * works by creating a RequestDispatcher, buffering the output, then returning it as a string.
-     * 
+     *
      * @author LBlaze
      */
     public String invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
@@ -1715,7 +1717,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * try to get it from a cookie. If no language cookie exists then use the user default language
      * and barring that use the browser's "Accept-Language" header sent in HTTP request. If none is
      * defined use the default language.
-     * 
+     *
      * @return the language to use
      */
     public String getLanguagePreference(XWikiContext context)
@@ -2279,7 +2281,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the
      * required configuration properties to make XWiki work properly. If some properties are missing
      * they are created and saved in the database.
-     * 
+     *
      * @param context the XWiki Context
      * @return the XWiki Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2705,7 +2707,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * Method allows to create an empty user with no password (he won't be able to login) This
      * method is usefull for authentication like LDAP or App Server trusted
-     * 
+     *
      * @param xwikiname
      * @param userRights
      * @param context
@@ -3024,7 +3026,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Prepares the localized resources, according to the selected language. From any point in the
      * code (java, velocity or groovy) the "msg" parameter holds an instance of the localized
      * resource bundle, and the "locale" parameter holds the current locale settings.
-     * 
+     *
      * @param context The request context.
      */
     public void prepareResources(XWikiContext context)
@@ -3209,7 +3211,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         if (hasRecycleBin(context) && totrash) {
             getRecycleBinStore().saveToRecycleBin(
-                doc, context.getUser(), new Date(), context, true); 
+                doc, context.getUser(), new Date(), context, true);
         }
         getStore().deleteXWikiDoc(doc, context);
         getNotificationManager().verify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),
@@ -3304,7 +3306,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         return copyDocument(docname, targetdocname, null, null, null, true, context);
     }
-    
+
     public boolean copyDocument(String docname, String targetdocname, boolean reset, XWikiContext context)
         throws XWikiException
     {
@@ -4222,9 +4224,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             synchronized (URLFACTORY_SERVICE_LOCK) {
                 if (urlFactoryService == null) {
                     LOG.info("Initializing URLFactory Service...");
-    
+
                     String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
-    
+
                     if (urlFactoryServiceClass != null) {
                         try {
                             if (LOG.isDebugEnabled())
@@ -4266,7 +4268,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
-     * 
+     *
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4298,7 +4300,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform Portal service from the Wiki Engine
-     * 
+     *
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4908,7 +4910,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * accessor for the isReadOnly instance var.
-     * 
+     *
      * @see #isReadOnly
      */
     public boolean isReadOnly()
@@ -5088,7 +5090,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * @see com.xpn.xwiki.api.XWiki#hasRecycleBin()
-     * @param context maybe will be useful 
+     * @param context maybe will be useful
      */
     public boolean hasRecycleBin(XWikiContext context)
     {
@@ -5739,7 +5741,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     workDir.mkdir();
                     return workDir;
                 }
-            } 
+            }
             catch(Exception e)
             {
                 workDir = null;

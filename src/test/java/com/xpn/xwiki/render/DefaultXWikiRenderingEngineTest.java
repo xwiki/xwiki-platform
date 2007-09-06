@@ -68,6 +68,7 @@ public class DefaultXWikiRenderingEngineTest extends MockObjectTestCase
         // Last we also ensure that a second code macro works too.
         String text = "{code:none}\n"
         	+ "1 Title\n"
+            + "c:\\dev\n"
             + "#info(\"test\")\n"
             + "<pre>hello</pre>\n"
             + "$xwiki.getVersion()\n"
@@ -84,7 +85,8 @@ public class DefaultXWikiRenderingEngineTest extends MockObjectTestCase
             + "{code}";
         
         String expectedText = "<div class=\"code\"><pre>1 Title\n"
-        	+ "&#35;info(\"test\")\n"
+            + "c:&#92;dev\n"
+            + "&#35;info(\"test\")\n"
         	+ "&#60;pre&#62;hello&#60;/pre&#62;\n"
         	+ "&#36;xwiki.getVersion()\n"
         	+ "&#123;style&#125;style&#123;style&#125;\n"

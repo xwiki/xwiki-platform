@@ -277,3 +277,32 @@ $value
 #end
 </table>
 </div>
+
+#set($cchanges = $doc.getClassDiff($origdoc, $newdoc))
+#if(($cchanges.size()>0)&&($cchanges.get(0).size()>0))
+<div id="changes-classes">
+<table class="changes-table">
+<tr class="changes-table-title">
+<th colspan="3">$msg.get("changes.classeschanges")</th>
+</tr>
+<tr class="changes-table-title">
+<th>$msg.get("changes.property")</th>
+</tr>
+#set($hasclasseschanges = 0)
+#foreach($objdiffs in $cchanges)
+#foreach($objdiff in $objdiffs)
+#set($hasclasseschanges = 1)
+#set($propname = $objdiff.getPropName())
+#if($propname!="content")
+<tr>
+<td>$propname</td>
+</tr>
+#end
+#end
+#end
+#if($hasclasseschanges==0)
+<tr><td colspan="3">$msg.get("changes.noclasseschanges")</td></tr>
+#end
+</table>
+</div>
+#end

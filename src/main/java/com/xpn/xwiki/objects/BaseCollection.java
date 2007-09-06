@@ -438,12 +438,14 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseProperty prop2 = (BaseProperty) collection.getFields().get(name);
 
             if (prop2==null) {
+                // this is the case property exist in object 1 and not in object 2
                 if ((prop!=null)&&(!prop.toText().equals(""))) {
                     String dprop = (prop.getValue() instanceof String) ? prop.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,this,context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
                             name, dprop , ""));
                 }
             } else if (!prop2.toText().equals(((prop==null) ? "" : prop.toText()))) {
+                // this is the case property exists in both and is different
                 BaseClass bclass = getxWikiClass(context);
                 PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
                 if (pclass==null) {
@@ -465,6 +467,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             BaseProperty prop2 = (BaseProperty)collection.getFields().get(name);
 
             if (prop==null) {
+                // this is the case property exists in object2 and not in object1
                 if ((prop2!=null)&&(!prop2.toText().equals(""))) {
                     BaseClass bclass = getxWikiClass(context);
                     PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));

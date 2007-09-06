@@ -88,8 +88,22 @@ public class XWikiURIResolver implements EntityResolver
                         + "] locally. Will try to get it online at [" + systemId + "]");
                 }
             } else {
-                LOG.warn("Unknown URI scheme [" + uri.getScheme() + "] for entity ["
-                    + systemId + "].");
+                // As there's no scheme we'll assume that it's an already resolved systemId that is
+                // passed. This happens when a DTD file uses a relative systemId for dependent
+                // entity files. For example the default xhtml1-strict.dtd and
+                // xhtml1-transitional.dtd files reference xhtml-lat1.ent, xhtml-special.ent and
+                // xhtml1-symbol.ent relatively. Normally these relative declarations generate a
+                // URL with a "file" scheme but apparently there are some cases when the raw
+                // entity file names is passed to this resolveEntity method...
+                LOG.debug("Unknown URI scheme [" + uri.getScheme() + "] for entity ["
+                    + systemId + "]. Assuming the entity is already resolved and looking for it "
+                    + "in the file system.");
+                InputStream istream =  getClass().getClassLoader().getResourceAsStream(systemId);
+                if (istream != null) {
+                    source = new InputSource(istream);
+                } else {
+                    LOG.warn("Failed to load resource [" + systemId + "] locally.");
+                }
             }
         } catch (URISyntaxException e) {
             LOG.warn("Invalid URI [" + systemId + "].", e);

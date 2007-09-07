@@ -32,12 +32,12 @@
   <artifactId>xwiki-core</artifactId>
   <name>XWiki Platform - Core</name>
   <packaging>jar</packaging>
-  <version>1.1-rc-2</version>
+  <version>1.1-SNAPSHOT</version>
   <description>XWiki Platform - Core</description>
   <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/core/tags/xwiki-core-1.1-rc-2</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/core/tags/xwiki-core-1.1-rc-2</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/core/tags/xwiki-core-1.1-rc-2</url>
+    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/core/branches/xwiki-core-1.1</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/core/branches/xwiki-core-1.1</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/core/branches/xwiki-core-1.1</url>
   </scm>
   <dependencies>
 

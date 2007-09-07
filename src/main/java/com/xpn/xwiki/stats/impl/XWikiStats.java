@@ -94,7 +94,7 @@ public class XWikiStats extends BaseCollection {
         if (!super.equals(obj))
             return false;
 
-        if (getNumber()!=((BaseObject)obj).getNumber())
+        if (getNumber()!=((BaseCollection)obj).getNumber())
             return false;
 
         return true;

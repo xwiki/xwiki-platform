@@ -46,14 +46,6 @@ public class StaticListClass extends ListClass {
         setStringValue("values", values);
     }
 
-    public String getSeparators() {
-        return getStringValue("separators");
-    }
-
-    public void setSeparators(String separators) {
-        setStringValue("separators", separators);
-    }
-
     public List getList(XWikiContext context) {
         String values = getValues();
         return getListFromString(values);

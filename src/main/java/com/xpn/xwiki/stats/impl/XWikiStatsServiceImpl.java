@@ -197,10 +197,11 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
         if (store == null) return;
 
         VisitStats vobject = findVisit(context);
+        synchronized(vobject) {
             // We count page views in the sessions only for the "view" action
             if (action.equals("view"))
                 vobject.incPageViews();
-            // We count "save" and "download" actions separately
+                // We count "save" and "download" actions separately
             else if (action.equals("save"))
                 vobject.incPageSaves();
             else if (action.equals("download"))
@@ -216,7 +217,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                 if (oldObject!=null) {
                     // Catch exception to not fail here
                     try {
-                     store.deleteXWikiCollection(oldObject, context, true, true);
+                        store.deleteXWikiCollection(oldObject, context, true, true);
+                        vobject.unrememberOldObject();
                     } catch (Exception e) {}
                 }
 
@@ -226,12 +228,13 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                 e.printStackTrace();
             }
 
-        addPageView(doc.getFullName(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
-        addPageView(doc.getSpace(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
-        addPageView("", action, XWikiStats.PERIOD_MONTH, store, context, vobject);
-        addPageView(doc.getFullName(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
-        addPageView(doc.getSpace(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
-        addPageView("", action, XWikiStats.PERIOD_DAY, store, context, vobject);
+            addPageView(doc.getFullName(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
+            addPageView(doc.getSpace(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
+            addPageView("", action, XWikiStats.PERIOD_MONTH, store, context, vobject);
+            addPageView(doc.getFullName(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
+            addPageView(doc.getSpace(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
+            addPageView("", action, XWikiStats.PERIOD_DAY, store, context, vobject);
+        }
 
         // In case of a "view" action we want to store referer info
         if (action.equals("view")) {
@@ -239,19 +242,20 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             if ((referer !=null)&&(!referer.equals(""))) {
                 // Visits of the web
                 RefererStats robject = new RefererStats(doc.getFullName(), referer, new Date(), XWikiStats.PERIOD_MONTH);
-                try {
-                    store.loadXWikiCollection(robject, context, true);
-                } catch (XWikiException e) {
-                }
+                synchronized(robject) {
+                    try {
+                        store.loadXWikiCollection(robject, context, true);
+                    } catch (XWikiException e) {
+                    }
 
-                robject.incPageViews();
-                try {
-                    store.saveXWikiCollection(robject, context, true);
-                } catch (XWikiException e) {
-                    // Statistics should never make xwiki fail !
-                    e.printStackTrace();
+                    robject.incPageViews();
+                    try {
+                        store.saveXWikiCollection(robject, context, true);
+                    } catch (XWikiException e) {
+                        // Statistics should never make xwiki fail !
+                        e.printStackTrace();
+                    }
                 }
-
             }
         }
 

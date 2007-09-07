@@ -45,6 +45,10 @@ public class VisitStats extends XWikiStats {
          oldObject = vobject;
     }
 
+    public void unrememberOldObject() {
+        oldObject=null;
+    }
+
     public VisitStats getOldObject() {
         return oldObject;
     }

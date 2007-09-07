@@ -103,8 +103,10 @@
   #largepanelheader($msg.get("panels.translation.title"))
   #if(($request.language)&amp;&amp;($request.language!="default")&amp;&amp;($doc.defaultLanguage!=$request.language))
     #set($forcetrans = $request.language)
+    #set($rlanguage = $request.language)
   #else
     #set($forcetrans = "")
+    #set($rlanguage = $tdoc.language)
   #end
   #if((!$tdoc.language || $tdoc.language == "" || $tdoc.language == $doc.defaultLanguage)&amp;&amp;($forcetrans==""))
     &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingOriginal", [${doc.defaultLanguage}])&lt;/strong&gt;&lt;/div&gt;
@@ -116,7 +118,7 @@
       &lt;/div&gt;
     #end
   #else
-    &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingTranslation", [${tdoc.language}])&lt;/strong&gt;&lt;/div&gt;
+    &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingTranslation", [${rlanguage}])&lt;/strong&gt;&lt;/div&gt;
     &lt;div&gt;$msg.get("panels.translation.originalLanguage", [$doc.getURL("edit", "editor=${editor}&amp;amp;language=${doc.defaultLanguage}"), ${doc.defaultLanguage}])&lt;/div&gt;
     #if($doc.translationList.size() &gt; 1)
       &lt;div&gt;$msg.get("panels.translation.otherTranslations")

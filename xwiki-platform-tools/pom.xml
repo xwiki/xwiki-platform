@@ -46,6 +46,9 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
+      <!-- Note: We have to use 1.1-SNAPSHOT and not 1.2-SNAPSHOT here since the 1.1 branch of
+           XWiki is using the packager and is not compatible with Core 1.2-SNAPSHOT. Ideally the
+           Packager should be branched too -->
       <version>1.1-rc-2</version>
     </dependency>
   </dependencies>

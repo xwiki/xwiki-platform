@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>3</version>
+    <version>4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-packager</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -46,7 +46,10 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.1-rc-2</version>
+      <!-- Note: We have to use 1.1-SNAPSHOT and not 1.2-SNAPSHOT here since the 1.1 branch of
+           XWiki is using the packager and is not compatible with Core 1.2-SNAPSHOT. Ideally the
+           Packager should be branched too -->
+      <version>1.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <build>
@@ -59,7 +62,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.4</version>
+            <version>1.5-SNAPSHOT</version>
           </dependency>
         </dependencies>
       </plugin>

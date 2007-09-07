@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-configuration-resources</artifactId>
   <name>XWiki Platform - Tools - XWiki Configuration Resources</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4</version>
   <packaging>jar</packaging>
   <description>
     Common XWiki resources for configuring XWiki. Contains config files like Hibernate
@@ -53,4 +53,10 @@
      </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-configuration-resources-1.4</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-configuration-resources-1.4</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-configuration-resources-1.4</url>
+  </scm>
 </project>

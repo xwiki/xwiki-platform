@@ -536,7 +536,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         String wikiOwner = context.getWikiOwner();
 
-        if (isVirtual()) {
+        if (isVirtual()&&(!servername.equals(context.getMainXWiki()))) {
             String serverwikipage = getServerWikiPage(servername);
             String currentdatabase = context.getDatabase();
 

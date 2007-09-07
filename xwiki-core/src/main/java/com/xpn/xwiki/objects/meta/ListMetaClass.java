@@ -68,10 +68,16 @@ public class ListMetaClass extends PropertyMetaClass {
         size_class.setNumberType("integer");
         safeput("size", size_class);
 
+        StringClass separators_class = new StringClass(this);
+        separators_class.setName("separators");
+        separators_class.setPrettyName("Multiselect separators (for editing)");
+        separators_class.setSize(5);
+        safeput("separators", separators_class);
+
         StringClass separator_class = new StringClass(this);
         separator_class.setName("separator");
-        separator_class.setPrettyName("Join separator");
-        separator_class.setSize(20);
+        separator_class.setPrettyName("Join separator (for display)");
+        separator_class.setSize(5);
         safeput("separator", separator_class);
 
         StaticListClass sort_class = new StaticListClass(this);

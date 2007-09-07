@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-build-tools</artifactId>
   <name>XWiki Platform - Tools - Build - Parent POM</name>
-  <version>1.4</version>
+  <version>1.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>XWiki Platform - Tools - Build - Parent POM</description>
   <modules>
@@ -40,10 +40,4 @@
     <module>build-xar-handlers</module>
     <module>shared-test</module>
   </modules>
-
-  <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-build-tools-1.4</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-build-tools-1.4</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-build-tools-1.4</url>
-  </scm>
 </project>

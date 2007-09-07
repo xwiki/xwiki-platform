@@ -101,7 +101,14 @@
 <property>
 <content>#if($xwiki.isMultiLingual()==true)
   #largepanelheader($msg.get("panels.translation.title"))
-  #if(!$tdoc.language || $tdoc.language == "" || $tdoc.language == $doc.defaultLanguage)
+  #if(($request.language)&amp;&amp;($request.language!="default")&amp;&amp;($doc.defaultLanguage!=$request.language))
+    #set($forcetrans = $request.language)
+    #set($rlanguage = $request.language)
+  #else
+    #set($forcetrans = "")
+    #set($rlanguage = $tdoc.language)
+  #end
+  #if((!$tdoc.language || $tdoc.language == "" || $tdoc.language == $doc.defaultLanguage)&amp;&amp;($forcetrans==""))
     &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingOriginal", [${doc.defaultLanguage}])&lt;/strong&gt;&lt;/div&gt;
     #if($!doc.translationList.size() &gt; 0)
       &lt;div&gt;$msg.get("panels.translation.existingTranslations")
@@ -111,7 +118,7 @@
       &lt;/div&gt;
     #end
   #else
-    &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingTranslation", [${tdoc.language}])&lt;/strong&gt;&lt;/div&gt;
+    &lt;div class="important"&gt;&lt;strong&gt;$msg.get("panels.translation.editingTranslation", [${rlanguage}])&lt;/strong&gt;&lt;/div&gt;
     &lt;div&gt;$msg.get("panels.translation.originalLanguage", [$doc.getURL("edit", "editor=${editor}&amp;amp;language=${doc.defaultLanguage}"), ${doc.defaultLanguage}])&lt;/div&gt;
     #if($doc.translationList.size() &gt; 1)
       &lt;div&gt;$msg.get("panels.translation.otherTranslations")
@@ -130,7 +137,7 @@
     #set($elangs = "${elangs}$elang,")
   #end
   #foreach($olang in $xwiki.getXWikiPreference("languages").split("[|, ]"))
-    #if(($elangs.indexOf(",$olang,") == -1) &amp;&amp; ($olang != $doc.defaultLanguage))
+    #if(($elangs.indexOf(",$olang,") == -1) &amp;&amp; ($olang != $doc.defaultLanguage) &amp;&amp; ($olang != $forcetrans))
       &lt;a href="$doc.getURL("edit", "language=${olang}")"&gt;$olang&lt;/a&gt;
     #end
   #end

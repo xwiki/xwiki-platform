@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>5</version>
+    <version>6-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-core</artifactId>
   <name>XWiki Platform - Core</name>
@@ -503,7 +503,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.4</version>
+            <version>1.5-SNAPSHOT</version>
           </dependency>
         </dependencies>
         <configuration>

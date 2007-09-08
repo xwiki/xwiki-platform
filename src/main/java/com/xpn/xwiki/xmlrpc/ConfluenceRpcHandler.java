@@ -21,7 +21,6 @@
 
 package com.xpn.xwiki.xmlrpc;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -34,20 +33,9 @@ import javax.servlet.ServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
-import org.codehaus.swizzle.confluence.Attachment;
-import org.codehaus.swizzle.confluence.Comment;
 import org.codehaus.swizzle.confluence.ConfluenceObjectConvertor;
 import org.codehaus.swizzle.confluence.IdentityObjectConvertor;
 import org.codehaus.swizzle.confluence.MapConvertor;
-import org.codehaus.swizzle.confluence.MapObject;
-import org.codehaus.swizzle.confluence.ObjectConvertor;
-import org.codehaus.swizzle.confluence.Page;
-import org.codehaus.swizzle.confluence.PageHistorySummary;
-import org.codehaus.swizzle.confluence.PageSummary;
-import org.codehaus.swizzle.confluence.SearchResult;
-import org.codehaus.swizzle.confluence.Space;
-import org.codehaus.swizzle.confluence.SpaceSummary;
-import org.codehaus.swizzle.confluence.SwizzleConversionException;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWiki;
@@ -58,6 +46,19 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.xmlrpc.model.Attachment;
+import com.xpn.xwiki.xmlrpc.model.Comment;
+import com.xpn.xwiki.xmlrpc.model.MapObject;
+import com.xpn.xwiki.xmlrpc.model.Page;
+import com.xpn.xwiki.xmlrpc.model.PageHistorySummary;
+import com.xpn.xwiki.xmlrpc.model.PageSummary;
+import com.xpn.xwiki.xmlrpc.model.SearchResult;
+import com.xpn.xwiki.xmlrpc.model.Space;
+import com.xpn.xwiki.xmlrpc.model.SpaceSummary;
+import com.xpn.xwiki.xmlrpc.model.swizzle.AttachmentImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.CommentImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.PageImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.SpaceImpl;
 
 /**
  * Implements the <a href="http://confluence.atlassian.com/display/DOC/Remote+API+Specification">
@@ -87,13 +88,15 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
 
     // TODO Refactor - Get rid of duplicate code:
     // - inside the xml-rpc implementation itself (there is too much plumbing)
-    // - between xml-rpc and actions (maybe)
+    // - between xml-rpc and actions (important but hard!)
 
-    // TODO enabling exceptions doesn't really work in pre 3.1 versions of xml-rpc
+    // TODO enabling exceptions doesn't really work in xml-rpc versions before 3.1 
 
     private static final Log log = LogFactory.getLog(ConfluenceRpcHandler.class);
     
     private DomainObjectFactory factory = new DomainObjectFactory();
+    
+    private MapConvertor convertor;
 
     private class RemoteUser
     {
@@ -114,7 +117,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         super.init(servlet, request);
         
         // we are interoperable with Confluence by default
-        setConvertor(new ConfluenceObjectConvertor());
+        setConvertor(new MapConvertor( new ConfluenceObjectConvertor()));
     }
     
 
@@ -274,7 +277,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         context.setAction("save");
         checkToken(token, context);
 
-        Space space = new Space(revert(spaceMap, Space.FIELD_TYPES));
+        Space space = new SpaceImpl(spaceMap, convertor);
         String spaceKey = space.getKey();
         String fullName = spaceKey + "." + "WebHome";
         if (!xwiki.exists(fullName, context)) {
@@ -372,6 +375,19 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         XWikiDocument doc = factory.getDocFromPageId(pageId, context);
         Page page = factory.createPage(doc, context);
         return convert(page);
+    }
+    
+    /**
+     * Get one Page.
+     * @param token token the authentication token retrieved when calling the login method
+     * @param spaceKey the parent space of the page 
+     * @param pageTitle the title of the page
+     * @return a Page object represented as a Map
+     * @throws XWikiException 
+     */
+    public Map getPage(String token, String spaceKey, String pageTitle) throws XWikiException
+    {
+        return getPage(token, factory.getPageId(spaceKey, pageTitle));
     }
 
     /**
@@ -526,7 +542,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
 
         checkToken(token, context);
 
-        Comment comment = new Comment(revert(commentParams, Comment.FIELD_TYPES));
+        Comment comment = new CommentImpl(commentParams, convertor);
         XWikiDocument doc = factory.getDocFromPageId(comment.getPageId(), context);
         if (doc.isMostRecent()) {
             // TODO Q: does this really have to be so complex ? (taken from CommentAddAction)
@@ -607,7 +623,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         context.setAction("save");
         checkToken(token, context);
 
-        Page page = new Page(revert(pageMap, Page.FIELD_TYPES));
+        Page page = new PageImpl(pageMap, convertor);
         XWikiDocument doc = null;
         if (page.getId() != null) {
             // page id is set -> save page
@@ -770,7 +786,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         context.setAction("upload");
         checkToken(token, context);
 
-        Attachment attachment = new Attachment(revert(attachmentMap, Attachment.FIELD_TYPES));
+        Attachment attachment = new AttachmentImpl(attachmentMap, convertor);
 
         // TODO Does this really have to be so complex ? (taken from UploadAction)
         XWikiDocument doc = factory.getDocFromPageId(attachment.getPageId(), context);
@@ -1114,7 +1130,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
 
         checkToken(token, context);
 
-        Comment object = new Comment(objectMap); // TODO Create another type of DSO ...
+        Comment object = new CommentImpl(objectMap); // TODO Create another type of DSO ...
         // factory/reflection needed?
         XWikiDocument doc = factory.getDocFromPageId(object.getPageId(), context);
         if (doc.isMostRecent()) {
@@ -1209,47 +1225,43 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         context.setAction("viewattachrev");
         checkToken(token, context);
         
-        setConvertor(new IdentityObjectConvertor());
+        setConvertor(new MapConvertor(new IdentityObjectConvertor()));
         return true;
     }
-
-    // TODO all following copy-pasted from swizzle (can I factor them out?) 
     
-    private MapConvertor mapConvertor;
-    
-    public void setConvertor(ObjectConvertor convertor) {
-        mapConvertor = new MapConvertor(convertor);
+    public void setConvertor(MapConvertor convertor) {
+        this.convertor = convertor;
     }
     
     protected Map convert(MapObject mo) {
-        return mapConvertor.convert(mo.toMap());
+        return convertor.convert(mo.toMap());
     }
     
-    protected Map revert(Map map, Map typeMap) throws XWikiException {
-        try {
-            return mapConvertor.revert(map, typeMap);
-        } catch (SwizzleConversionException e) {
-            throw exception(e.getMessage(), e);
-        }
-    }
-    
-    protected List toList(Object[] vector, Class type) throws XWikiException  {
-        try {
-            List list = new ArrayList(vector.length);
-            
-            Constructor constructor = type.getConstructor(new Class[]{Map.class});
-            for (int i = 0; i < vector.length; i++) {
-                Map data = revert((Map) vector[i], (Map)type.getField("FIELD_TYPES").get(null));
-                Object object = constructor.newInstance(new Object[]{data});
-                list.add(object);
-            }
-            
-            return list;
-
-        } catch (Exception e) {
-            throw exception(e.getMessage(), e);
-        }
-    }
+//    protected Map revert(Map map, Map typeMap) throws XWikiException {
+//        try {
+//            return mapConvertor.revert(map, typeMap);
+//        } catch (SwizzleConversionException e) {
+//            throw exception(e.getMessage(), e);
+//        }
+//    }
+//    
+//    protected List toList(Object[] vector, Class type) throws XWikiException  {
+//        try {
+//            List list = new ArrayList(vector.length);
+//            
+//            Constructor constructor = type.getConstructor(new Class[]{Map.class});
+//            for (int i = 0; i < vector.length; i++) {
+//                Map data = revert((Map) vector[i], (Map)type.getField("FIELD_TYPES").get(null));
+//                Object object = constructor.newInstance(new Object[]{data});
+//                list.add(object);
+//            }
+//            
+//            return list;
+//
+//        } catch (Exception e) {
+//            throw exception(e.getMessage(), e);
+//        }
+//    }
     
     protected Object[] toArray(List list) throws XWikiException  {
         Object[] array = new Object[list.size()];

@@ -25,14 +25,6 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.codehaus.swizzle.confluence.Attachment;
-import org.codehaus.swizzle.confluence.Page;
-import org.codehaus.swizzle.confluence.PageHistorySummary;
-import org.codehaus.swizzle.confluence.PageSummary;
-import org.codehaus.swizzle.confluence.SearchResult;
-import org.codehaus.swizzle.confluence.Space;
-import org.codehaus.swizzle.confluence.SpaceSummary;
-import org.codehaus.swizzle.confluence.User;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -41,8 +33,25 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.xmlrpc.model.Attachment;
+import com.xpn.xwiki.xmlrpc.model.Comment;
+import com.xpn.xwiki.xmlrpc.model.Page;
+import com.xpn.xwiki.xmlrpc.model.PageHistorySummary;
+import com.xpn.xwiki.xmlrpc.model.PageSummary;
+import com.xpn.xwiki.xmlrpc.model.SearchResult;
+import com.xpn.xwiki.xmlrpc.model.Space;
+import com.xpn.xwiki.xmlrpc.model.SpaceSummary;
+import com.xpn.xwiki.xmlrpc.model.User;
+import com.xpn.xwiki.xmlrpc.model.swizzle.AttachmentImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.CommentImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.PageHistorySummaryImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.PageImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.PageSummaryImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.SearchResultImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.SpaceImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.SpaceSummaryImpl;
+import com.xpn.xwiki.xmlrpc.model.swizzle.UserImpl;
 
-import org.codehaus.swizzle.confluence.Comment;
 import org.suigeneris.jrcs.rcs.Version;
 
 /**
@@ -59,6 +68,11 @@ public class DomainObjectFactory
     private static final String OBJNO_SEPARATOR = ";";
     
     private static final Log log = LogFactory.getLog(DomainObjectFactory.class);
+
+    public String getPageId(String spaceKey, String pageTitle)
+    {
+        return spaceKey + "." + pageTitle;
+    }
 
     // TODO our ids are unique still they are sensitive to renaming
     // Q: is this a problem ? If so we really need the numeric ids (globally unique)
@@ -147,7 +161,7 @@ public class DomainObjectFactory
     public Attachment createAttachment(XWikiDocument doc, XWikiAttachment attachment,
         XWikiContext context)
     {
-        Attachment result = new Attachment();
+        Attachment result = new AttachmentImpl();
 
         // Ids for attachments are useless so we don't set them (Confluence does)
         result.setId("");
@@ -173,7 +187,7 @@ public class DomainObjectFactory
 
     public Comment createComment(XWikiDocument doc, BaseObject obj, XWikiContext context)
     {
-        Comment result = new Comment();
+        Comment result = new CommentImpl();
 
         if (doc.isMostRecent()) {
             result.setId(doc.getFullName() + ";" + obj.getNumber());
@@ -194,7 +208,7 @@ public class DomainObjectFactory
 
     public Page createPage(XWikiDocument doc, XWikiContext context)
     {
-        Page result = new Page();
+        Page result = new PageImpl();
 
         // since we don't have multiple inheritance
         // we had to copy paste this initial part from PageSummary
@@ -231,7 +245,7 @@ public class DomainObjectFactory
      */
     public PageSummary createPageSummary(XWikiDocument doc, XWikiContext context)
     {
-        PageSummary result = new PageSummary();
+        PageSummary result = new PageSummaryImpl();
 
         if (doc.isMostRecent()) {
             // Current version of document
@@ -253,7 +267,7 @@ public class DomainObjectFactory
 
     public PageHistorySummary createPageHistorySummary(XWikiDocument document)
     {
-        PageHistorySummary result = new PageHistorySummary();
+        PageHistorySummary result = new PageHistorySummaryImpl();
 
         result.setId(document.getFullName() + ":" + document.getVersion());
         result.setVersion(constructVersion(document.getRCSVersion()));
@@ -265,7 +279,7 @@ public class DomainObjectFactory
 
     public SearchResult createSearchResult(XWikiDocument document, XWikiContext context)
     {
-        SearchResult result = new SearchResult();
+        SearchResult result = new SearchResultImpl();
 
         result.setTitle(document.getName());
         result.setId(document.getFullName());
@@ -285,14 +299,14 @@ public class DomainObjectFactory
     public Space createSpace(String key, String name, String url, String description,
         String homepage)
     {
-        Space result = new Space();
+        Space result = new SpaceImpl();
 
         result.setKey(key);
         result.setName(name);
         result.setUrl(url);
 
         result.setDescription(description);
-        result.setHomepage(homepage);
+        result.setHomePage(homepage);
 
         return result;
     }
@@ -304,7 +318,7 @@ public class DomainObjectFactory
      */
     public SpaceSummary createSpaceSummary(String key, String name, String url)
     {
-        SpaceSummary result = new SpaceSummary();
+        SpaceSummary result = new SpaceSummaryImpl();
 
         result.setKey(key);
         result.setName(name);
@@ -316,7 +330,7 @@ public class DomainObjectFactory
 
     public User createUser(XWikiDocument userdoc, XWikiContext context)
     {
-        User result = new User();
+        User result = new UserImpl();
 
         result.setName(userdoc.getName());
         result.setFullname(userdoc.getStringValue("XWiki.XWikiUsers", "fullName"));

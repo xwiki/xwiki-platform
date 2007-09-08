@@ -75,7 +75,7 @@ public class DBListClass extends ListClass
     public List getDBList(XWikiContext context)
     {
         List list = getCachedDBList();
-        if (list==null) {
+        if (list==null || getIntValue("cache") != 1) {
 
             XWiki xwiki = context.getWiki();
             String query = getQuery(context);

@@ -139,7 +139,7 @@
         </natural-id>
         <property name="deleter" type="string" column="XDD_DELETER" index="deleter"/>
     	<property name="xml" type="text">
-    	    <column name="XDD_XML" not-null="true" />
+    	    <column name="XDD_XML" not-null="true" length="1000000000"/>
     	</property>
     </class>
 

@@ -43,6 +43,11 @@ public class EditAction extends XWikiAction {
         XWikiForm form = context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
+        // we need to clone so that nothing happens in memory
+        doc = (XWikiDocument) doc.clone();
+        context.put("doc", doc);
+        vcontext.put("doc", doc.newDocument(context));
+
         // Add captcha plugin to avoid spam robots
         if (xwiki.hasCaptcha(context)) {
             CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);

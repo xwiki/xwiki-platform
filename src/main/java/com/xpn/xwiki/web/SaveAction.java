@@ -65,7 +65,7 @@ public class SaveAction extends PreviewAction {
 			// String defaultLanguage = ((EditForm) form).getDefaultLanguage();
 			XWikiDocument tdoc;
 
-			if ((language == null) || (language.equals("")) || (language.equals("default")) || (language.equals(doc.getDefaultLanguage()))) {
+			if (doc.isNew() || (language == null) || (language.equals("")) || (language.equals("default")) || (language.equals(doc.getDefaultLanguage()))) {
 				// Need to save parent and defaultLanguage if they have changed
 				tdoc = doc;
 			} else {
@@ -78,7 +78,13 @@ public class SaveAction extends PreviewAction {
 				tdoc.setTranslation(1);
 			}
 
-			try {
+            if (doc.isNew()) {
+                doc.setLanguage("");
+                if ((doc.getDefaultLanguage()==null)||(doc.getDefaultLanguage().equals("")))
+                    doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
+            }
+
+            try {
 				tdoc.readFromTemplate(((EditForm) form).getTemplate(), context);
 			} catch (XWikiException e) {
 				if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {

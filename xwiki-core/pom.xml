@@ -504,7 +504,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.1</version>
+            <version>1.5-SNAPSHOT</version>
           </dependency>
         </dependencies>
         <configuration>
@@ -525,17 +525,17 @@
               **/doc/rcs/*.java,
               **/api/RevisionInfo.java,
               **/web/DeleteVersions*.java,
-	      **/migration/**.java,
-	      **/*RecycleBin*.java,
-	      **/*DeletedDocument.java,
-	      **/DeleteAction.java,
-	      **/UndeleteAction.java,
+	            **/migration/**.java,
+	            **/*RecycleBin*.java,
+	            **/*DeletedDocument.java,
+	            **/DeleteAction.java,
+	            **/UndeleteAction.java,
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,
-	      <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
+	            <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
               **/XWikiPatchUtils.java,
-	      **/XWikiRCSArchive.java,
+	            **/XWikiRCSArchive.java,
               **/XWikiHibernateRecycleBinStore.java
           </excludes>
         </configuration>

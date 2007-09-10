@@ -62,7 +62,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.4</version>
+            <version>1.5-SNAPSHOT</version>
           </dependency>
         </dependencies>
       </plugin>

@@ -36,7 +36,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.1-rc-2</version>
+      <version>1.1-SNAPSHOT</version>
       <!-- We don't want all the Core libs to be put in WEB-INF/lib as this GWT WAR will be
            overlayed with the Standard WAR which already contains all the required libs -->
       <scope>provided</scope>

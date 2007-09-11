@@ -31,7 +31,7 @@
     <version>1-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-multiwiki</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Multiwiki</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Multiwiki</description>

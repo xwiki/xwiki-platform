@@ -97,7 +97,7 @@ function fullscreenEdit(what) {
     newdivbd.appendChild(newdivhd);
 
     var newdivbdtab = document.createElement("div");
-    newdivbdtab.setAttribute("id", "fullscreen-dlg-body-tab");
+    newdivbdtab.setAttribute("id", "fullscreen-dlg-body-tab-"+what);
     newdivbd.appendChild(newdivbdtab);
 
     newdiv.appendChild(newdivbd);
@@ -120,7 +120,7 @@ function fullscreenEdit(what) {
 ///////////////////////////////////////
 function wysiwygFullscreen() {
   var flscrDiv = document.getElementById("fullscreen-dlg");
-  var flscrDivBdTab = document.getElementById("fullscreen-dlg-body-tab");
+  var flscrDivBdTab = document.getElementById("fullscreen-dlg-body-tab-wysiwyg");
   setStyle(flscrDiv, "display", "block");
 
   var parentswapDiv = document.getElementById("parentswapDiv");
@@ -136,7 +136,6 @@ function wysiwygFullscreen() {
     parentswapDiv.appendChild(swapDiv);
     flscrDivBdTab.appendChild(parentswapDiv);
   }
-
   //swaps the swapDiv with xwikieditcontent
   var xwikidiv = document.getElementById("xwikieditcontent");
 
@@ -154,13 +153,9 @@ function wysiwygFullscreen() {
   document.body.style.overflow="hidden";
   // hide the fullscreen button
   document.getElementById("show-dialog-btn").style.display="none";
-
+   
   //put the editor back
   tinyMCE.execCommand('mceAddControl', false, 'content');
-  if (window.ActiveXObject) {
-    document.getElementById("content").parentNode.style.display = "none";
-    document.getElementById("content").parentNode.parentNode.style.display = "none";
-  }
 }
 
 
@@ -190,7 +185,7 @@ function wysiwygHide() {
   document.body.style.overflow="auto";
   // show the fullscreen button
   document.getElementById("show-dialog-btn").style.display="block";
-
+  
   //put the editor back
   window.setTimeout("tinyMCE.execCommand('mceAddControl', false, 'content')", 10);
 }
@@ -216,7 +211,7 @@ function wikiFullscreen() {
   }
 
   parentswapDiv.appendChild(swapDiv);
-  var flscrDivBdTab = document.getElementById("fullscreen-dlg-body-tab");
+  var flscrDivBdTab = document.getElementById("fullscreen-dlg-body-tab-wiki");
   flscrDivBdTab.appendChild(parentswapDiv);
   }
 
@@ -229,17 +224,9 @@ function wikiFullscreen() {
   moveChildren(xwikidiv, parentswapDiv);
   moveChildren(auxdiv, xwikidiv);
   document.body.removeChild(auxdiv);
-
+  
   //hide scrollbars
   document.body.style.overflow="hidden";
-
-  var textarea  = document.getElementById("content");
-  //save textarea dimensions
-  taWidth = getStyle(textarea, "width");
-  taHeight = getStyle(textarea, "height");
-
-  setStyle(textarea, "width", "99%");
-  setStyle(textarea, "height", "94%");
 }
 
 //hide dialog and restore the textarea
@@ -261,9 +248,4 @@ function wikiHide() {
 
   //show the scrollbars
   document.body.style.overflow="auto";
-
-  //restore textarea size
-  var textarea  = document.getElementById("content");
-  setStyle(textarea, "width", "");
-  setStyle(textarea, "height", "");
 }

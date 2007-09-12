@@ -1,6 +1,5 @@
 /*
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -23,8 +22,8 @@ package com.xpn.xwiki.plugin.multiwiki.doc;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
+import com.xpn.xwiki.doc.objects.classes.AbstractSuperClass;
+import com.xpn.xwiki.doc.objects.classes.ISuperDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
 import com.xpn.xwiki.plugin.multiwiki.WikiManagerException;
@@ -217,8 +216,8 @@ public class XWikiServerClass extends AbstractSuperClass
             context);
     }
     
-    public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
+    public ISuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
     {
-        return (SuperDocument)doc.newDocument(XWikiServer.class.getName(), context);
+        return (ISuperDocument)doc.newDocument(XWikiServer.class.getName(), context);
     }
 }

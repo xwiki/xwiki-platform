@@ -1,6 +1,5 @@
 /*
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -17,6 +16,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package com.xpn.xwiki.plugin.multiwiki.doc;
 
 import org.apache.commons.logging.Log;
@@ -24,12 +24,15 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.objects.classes.DefaultSuperDocument;
 
 public class XWikiServer extends DefaultSuperDocument
 {
     protected static final Log LOG = LogFactory.getLog(XWikiServer.class);
+
+    // ///////////////////////////////////////////////////////////////////
+    // object section
 
     public XWikiServer(XWikiDocument xdoc, XWikiContext context) throws XWikiException
     {
@@ -39,7 +42,21 @@ public class XWikiServer extends DefaultSuperDocument
     public void delete() throws XWikiException
     {
         super.delete(context);
+
+        /*XWiki xwiki = context.getWiki();
+
+        try {
+            // delete database
+            xwiki.getStore().deleteWiki(getWikiName(), context);
+        } catch (XWikiException e) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("Wiki delete \"" + getWikiName()
+                    + "\" failed: wiki database delete threw exception", e);
+            }
+        }*/
     }
+
+    // ///
 
     public String getWikiName()
     {
@@ -111,9 +128,12 @@ public class XWikiServer extends DefaultSuperDocument
         setStringValue(XWikiServerClass.FIELD_state, state);
     }
 
-    /**
-     * {@inheritDoc}
-     * @see Object#toString()
+    // ///
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
      */
     public String toString()
     {

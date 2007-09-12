@@ -26,7 +26,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
-public interface ISuperClass
+public interface SuperClass
 {
     /**
      * Default class document suffix.
@@ -242,22 +242,22 @@ public interface ISuperClass
      * @param doc               Document to encapsulate.
      * @param context           Context.
      *
-     * @return ISuperDocument   Super document.
+     * @return SuperDocument   Super document.
      * 
      * @throws XWikiException
      */
-    ISuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
      * Create new empty super document.
      *
      * @param context           Context.
      * 
-     * @return ISuperDocument   Super document.
+     * @return SuperDocument   Super document.
      * 
      * @throws XWikiException
      */
-    ISuperDocument newSuperDocument(XWikiContext context) throws XWikiException;
+    SuperDocument newSuperDocument(XWikiContext context) throws XWikiException;
 
     /**
      * Create new super document.
@@ -265,9 +265,9 @@ public interface ISuperClass
      * @param docFullName       Full name of document to encapsulate.
      * @param context           Context.
      * 
-     * @return ISuperDocument   Super document.
+     * @return SuperDocument   Super document.
      * 
      * @throws XWikiException
      */
-    ISuperDocument newSuperDocument(String docFullName, XWikiContext context) throws XWikiException;
+    SuperDocument newSuperDocument(String docFullName, XWikiContext context) throws XWikiException;
 }

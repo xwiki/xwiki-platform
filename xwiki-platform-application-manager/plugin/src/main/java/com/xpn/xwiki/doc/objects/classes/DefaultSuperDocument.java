@@ -28,26 +28,26 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Default implementation of ISuperDocument.
+ * Default implementation of SuperDocument.
  */
-public class DefaultSuperDocument extends Document implements ISuperDocument
+public class DefaultSuperDocument extends Document implements SuperDocument
 {
-    protected ISuperClass sclass;
+    protected SuperClass sclass;
 
     protected boolean isNew = false;
 
-    public DefaultSuperDocument(ISuperClass sclass, XWikiContext context) throws XWikiException
+    public DefaultSuperDocument(SuperClass sclass, XWikiContext context) throws XWikiException
     {
         this(sclass, new XWikiDocument(), context);
     }
 
-    public DefaultSuperDocument(ISuperClass sclass, String docFullName, XWikiContext context)
+    public DefaultSuperDocument(SuperClass sclass, String docFullName, XWikiContext context)
         throws XWikiException
     {
         this(sclass, context.getWiki().getDocument(docFullName, context), context);
     }
 
-    public DefaultSuperDocument(ISuperClass sclass, XWikiDocument xdoc, XWikiContext context)
+    public DefaultSuperDocument(SuperClass sclass, XWikiDocument xdoc, XWikiContext context)
         throws XWikiException
     {
         super(xdoc, context);
@@ -65,7 +65,7 @@ public class DefaultSuperDocument extends Document implements ISuperDocument
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperDocument#reload(com.xpn.xwiki.api.Document,
+     * @see com.xpn.xwiki.util.SuperDocument#reload(com.xpn.xwiki.api.Document,
      *      com.xpn.xwiki.XWikiContext)
      */
     public void reload(XWikiContext context) throws XWikiException
@@ -92,9 +92,9 @@ public class DefaultSuperDocument extends Document implements ISuperDocument
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperDocument#merge(com.xpn.xwiki.util.ISuperDocument)
+     * @see com.xpn.xwiki.util.SuperDocument#merge(com.xpn.xwiki.util.SuperDocument)
      */
-    public void mergeBaseObject(ISuperDocument sdoc)
+    public void mergeBaseObject(SuperDocument sdoc)
     {
         if (getSuperClass() != sdoc.getSuperClass())
             return ;
@@ -106,9 +106,9 @@ public class DefaultSuperDocument extends Document implements ISuperDocument
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperDocument#getSuperClass()
+     * @see com.xpn.xwiki.util.SuperDocument#getSuperClass()
      */
-    public ISuperClass getSuperClass()
+    public SuperClass getSuperClass()
     {
         return this.sclass;
     }
@@ -116,7 +116,7 @@ public class DefaultSuperDocument extends Document implements ISuperDocument
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperDocument#isNew()
+     * @see com.xpn.xwiki.util.SuperDocument#isNew()
      */
     public boolean isNew()
     {
@@ -126,7 +126,7 @@ public class DefaultSuperDocument extends Document implements ISuperDocument
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperDocument#save(com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperDocument#save(com.xpn.xwiki.XWikiContext)
      */
     public void save() throws XWikiException
     {
@@ -137,7 +137,7 @@ public class DefaultSuperDocument extends Document implements ISuperDocument
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperDocument#delete(com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperDocument#delete(com.xpn.xwiki.XWikiContext)
      */
     public void delete(XWikiContext context) throws XWikiException
     {

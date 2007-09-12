@@ -29,12 +29,12 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Abstract implementation of ISuperClass.
+ * Abstract implementation of SuperClass.
  * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. When that issue is applied in XWiki
  *       Core and when this plugin moves to the version of XWiki Core where it was applied then
  *       remove this class.
  */
-public abstract class AbstractSuperClass implements ISuperClass
+public abstract class AbstractSuperClass implements SuperClass
 {
     /**
      * Space prefix of class document.
@@ -123,7 +123,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassSpace()
+     * @see com.xpn.xwiki.util.SuperClass#getClassSpace()
      */
     public String getClassSpace()
     {
@@ -133,7 +133,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassPrefix()
+     * @see com.xpn.xwiki.util.SuperClass#getClassPrefix()
      */
     public String getClassPrefix()
     {
@@ -143,7 +143,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassName()
      */
     public String getClassName()
     {
@@ -153,7 +153,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassFullName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassFullName()
      */
     public String getClassFullName()
     {
@@ -163,7 +163,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassTemplateName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateName()
      */
     public String getClassTemplateSpace()
     {
@@ -173,7 +173,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassTemplateName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateName()
      */
     public String getClassTemplateName()
     {
@@ -183,7 +183,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassTemplateFullName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateFullName()
      */
     public String getClassTemplateFullName()
     {
@@ -193,7 +193,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassSheetName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassSheetName()
      */
     public String getClassSheetSpace()
     {
@@ -203,7 +203,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassSheetName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassSheetName()
      */
     public String getClassSheetName()
     {
@@ -213,7 +213,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassSheetFullName()
+     * @see com.xpn.xwiki.util.SuperClass#getClassSheetFullName()
      */
     public String getClassSheetFullName()
     {
@@ -342,7 +342,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassSheetDefaultContent()
+     * @see com.xpn.xwiki.util.SuperClass#getClassSheetDefaultContent()
      */
     public String getClassSheetDefaultContent()
     {
@@ -381,7 +381,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassTemplateDefaultContent()
+     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateDefaultContent()
      */
     public String getClassTemplateDefaultContent()
     {
@@ -444,7 +444,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getBaseClass()
+     * @see com.xpn.xwiki.util.SuperClass#getBaseClass()
      */
     public BaseClass getBaseClass()
     {
@@ -459,7 +459,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassDocument(com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperClass#getClassDocument(com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getClassDocument(XWikiContext context) throws XWikiException
     {
@@ -471,7 +471,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassSheetDocument(com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperClass#getClassSheetDocument(com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getClassSheetDocument(XWikiContext context) throws XWikiException
     {
@@ -483,7 +483,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getClassTemplateDocument(com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateDocument(com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getClassTemplateDocument(XWikiContext context) throws XWikiException
     {
@@ -495,7 +495,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#isInstanceOf(com.xpn.xwiki.doc.XWikiDocument,
+     * @see com.xpn.xwiki.util.SuperClass#isInstanceOf(com.xpn.xwiki.doc.XWikiDocument,
      *      com.xpn.xwiki.XWikiContext)
      */
     public boolean isInstance(XWikiDocument doc, XWikiContext context)
@@ -506,7 +506,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getItemDocumentName(java.lang.String)
+     * @see com.xpn.xwiki.util.SuperClass#getItemDocumentName(java.lang.String)
      */
     public String getItemDocumentDefaultName(String itemName, XWikiContext context)
     {
@@ -518,7 +518,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     /*
      * (non-Javadoc)
      * 
-     * @see com.xpn.xwiki.util.ISuperClass#getItemDocumentFullName(java.lang.String)
+     * @see com.xpn.xwiki.util.SuperClass#getItemDocumentFullName(java.lang.String)
      */
     public String getItemDocumentDefaultFullName(String itemName, XWikiContext context)
     {
@@ -526,7 +526,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.ISuperClass#getItemDefaultName(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#getItemDefaultName(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public String getItemDefaultName(String docFullName, XWikiContext context)
     {
@@ -534,7 +534,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.util.ISuperClass#getItemDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperClass#getItemDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getItemDocument(String itemName, XWikiContext context) throws XWikiException
     {
@@ -552,7 +552,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.ISuperClass#searchItemDocumentsByField(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#searchItemDocumentsByField(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
         XWikiContext context) throws XWikiException
@@ -561,7 +561,7 @@ public abstract class AbstractSuperClass implements ISuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.ISuperClass#searchItemDocumentsByFields(java.lang.String, java.lang.String[][], com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#searchItemDocumentsByFields(java.lang.String, java.lang.String[][], com.xpn.xwiki.XWikiContext)
      */
     public List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors, XWikiContext context) throws XWikiException
     {
@@ -591,25 +591,25 @@ public abstract class AbstractSuperClass implements ISuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.ISuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
      */
-    public ISuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         return new DefaultSuperDocument(this, doc, context);
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.util.ISuperClass#newSuperDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperClass#newSuperDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
-    public ISuperDocument newSuperDocument(String docFullName, XWikiContext context) throws XWikiException
+    public SuperDocument newSuperDocument(String docFullName, XWikiContext context) throws XWikiException
     {
         return newSuperDocument(context.getWiki().getDocument(docFullName, context), context);
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.util.ISuperClass#newSuperDocument(com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.util.SuperClass#newSuperDocument(com.xpn.xwiki.XWikiContext)
      */
-    public ISuperDocument newSuperDocument(XWikiContext context) throws XWikiException
+    public SuperDocument newSuperDocument(XWikiContext context) throws XWikiException
     {
         return newSuperDocument(new XWikiDocument(), context);
     }

@@ -2,8 +2,7 @@
 
 <!--
  *
- * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
- * by the contributors.txt.
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -22,30 +21,37 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
-    <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
+    <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <version>1-SNAPSHOT</version>
   </parent>
+  <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-plugin-multiwiki</artifactId>
-  <version>1.0-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Multiwiki</name>
-  <packaging>jar</packaging>
+  <version>1.0-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Multiwiki</description>
   <dependencies>
-
-    <!-- Standard dependencies found in the main Maven remote repository -->
-
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <!-- Currently this Multiwiki plugin is used by XEM which is based on XWiki Core
+           version 1.1.x, hence this dependency on 1.1.X and not on 1.2.x. If this becomes a
+           problem we can branch this plugin. -->
+      <version>1.1-SNAPSHOT</version>
     </dependency>
-
+     <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-application-manager</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-
 </project>
-        
+

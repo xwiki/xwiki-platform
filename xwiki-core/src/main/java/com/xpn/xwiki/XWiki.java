@@ -950,10 +950,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             doc.setComment((comment == null) ? "" : comment);
             doc.setMinorEdit(isMinorEdit);
 
+            // We need to save the original document since saveXWikiDoc() will reset it and we
+            // need that original document for the notification below.
+            XWikiDocument originalDocument = doc.getOriginalDocument();
+
             getStore().saveXWikiDoc(doc, context);
 
             // Notify listeners about the document change
-            getNotificationManager().verify(doc, doc.getOriginalDocument(),
+            getNotificationManager().verify(doc, originalDocument,
                 XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         } finally {
             if ((server != null) && (database != null)) {
@@ -1063,7 +1067,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * @see com.xpn.xwiki.api.XWiki#getDeletedDocuments(String)
+     * @see com.xpn.xwiki.api.XWiki#getDeletedDocuments(String, String)
      */
     public XWikiDeletedDocument[] getDeletedDocuments(String fullname, String lang, XWikiContext context) throws XWikiException
     {
@@ -1076,8 +1080,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             return null;
         }
     }
+
     /**
-     * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, int)
+     * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, String)  
      */
     public XWikiDeletedDocument getDeletedDocument(String fullname, String lang, int index, XWikiContext context) throws XWikiException
     {

@@ -950,10 +950,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             // Setting comment before saving
             doc.setComment((comment == null) ? "" : comment);
 
+            // We need to save the original document since saveXWikiDoc() will reset it and we
+            // need that original document for the notification below.
+            XWikiDocument originalDocument = doc.getOriginalDocument();
+
             getStore().saveXWikiDoc(doc, context);
 
             // Notify listeners about the document change
-            getNotificationManager().verify(doc, doc.getOriginalDocument(),
+            getNotificationManager().verify(doc, originalDocument,
                 XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         } finally {
             if ((server != null) && (database != null)) {

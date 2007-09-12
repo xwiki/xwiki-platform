@@ -26,7 +26,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.objects.classes.AbstractSuperClass;
-import com.xpn.xwiki.doc.objects.classes.ISuperDocument;
+import com.xpn.xwiki.doc.objects.classes.SuperDocument;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -251,8 +251,8 @@ public class XWikiApplicationClass extends AbstractSuperClass
         return (XWikiApplication)newSuperDocument(getApplicationDocument(appName, context, validate), context);
     }
     
-    public ISuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
+    public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
     {
-        return (ISuperDocument)doc.newDocument(XWikiApplication.class.getName(), context);
+        return (SuperDocument)doc.newDocument(XWikiApplication.class.getName(), context);
     }
 }

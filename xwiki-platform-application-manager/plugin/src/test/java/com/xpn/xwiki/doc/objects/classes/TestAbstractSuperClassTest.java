@@ -116,15 +116,21 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     private static final String CLASS_SPACE_PREFIX = "Space";
     private static final String CLASS_PREFIX = "Prefix";
     
-    private static final String CLASS_NAME = CLASS_PREFIX + ISuperClass.XWIKI_CLASS_SUFFIX;
-    private static final String CLASSSHEET_NAME = CLASS_PREFIX + ISuperClass.XWIKI_CLASSSHEET_SUFFIX;
-    private static final String CLASSTEMPLATE_NAME = CLASS_PREFIX + ISuperClass.XWIKI_CLASSTEMPLATE_SUFFIX;
+    private static final String CLASS_NAME = CLASS_PREFIX + com.xpn.xwiki.doc.objects.classes.SuperClass
+        .XWIKI_CLASS_SUFFIX;
+    private static final String CLASSSHEET_NAME = CLASS_PREFIX + com.xpn.xwiki.doc.objects.classes.SuperClass
+        .XWIKI_CLASSSHEET_SUFFIX;
+    private static final String CLASSTEMPLATE_NAME = CLASS_PREFIX + com.xpn.xwiki.doc.objects.classes.SuperClass
+        .XWIKI_CLASSTEMPLATE_SUFFIX;
     
-    private static final String DISPATCH_CLASS_SPACE = CLASS_SPACE_PREFIX + ISuperClass.XWIKI_CLASS_SPACE_SUFFIX;
+    private static final String DISPATCH_CLASS_SPACE = CLASS_SPACE_PREFIX + com.xpn.xwiki.doc.objects.classes.SuperClass
+        .XWIKI_CLASS_SPACE_SUFFIX;
     private static final String DISPATCH_CLASS_FULLNAME = DISPATCH_CLASS_SPACE + "." + CLASS_NAME;
-    private static final String DISPATCH_CLASSSHEET_SPACE = CLASS_SPACE_PREFIX + ISuperClass.XWIKI_CLASSSHEET_SPACE_SUFFIX;
+    private static final String DISPATCH_CLASSSHEET_SPACE = CLASS_SPACE_PREFIX + com.xpn.xwiki.doc.objects.classes.SuperClass
+        .XWIKI_CLASSSHEET_SPACE_SUFFIX;
     private static final String DISPATCH_CLASSSHEET_FULLNAME = DISPATCH_CLASSSHEET_SPACE + "." + CLASSSHEET_NAME;
-    private static final String DISPATCH_CLASSTEMPLATE_SPACE = CLASS_SPACE_PREFIX + ISuperClass.XWIKI_CLASSTEMPLATE_SPACE_SUFFIX;
+    private static final String DISPATCH_CLASSTEMPLATE_SPACE = CLASS_SPACE_PREFIX + com.xpn.xwiki.doc.objects.classes.SuperClass
+        .XWIKI_CLASSTEMPLATE_SPACE_SUFFIX;
     private static final String DISPATCH_CLASSTEMPLATE_FULLNAME = DISPATCH_CLASSTEMPLATE_SPACE + "." + CLASSTEMPLATE_NAME;
     
     private static final String NODISPATCH_CLASS_SPACE = CLASS_SPACE_PREFIX;

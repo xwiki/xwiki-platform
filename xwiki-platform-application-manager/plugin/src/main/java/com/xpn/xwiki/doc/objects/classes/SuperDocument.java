@@ -26,7 +26,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * SuperDocument inteface.
  */
-public interface ISuperDocument
+public interface SuperDocument
 {   
     /**
      * Reload document.
@@ -42,14 +42,14 @@ public interface ISuperDocument
      * 
      * @param sdoc Document to merge.
      */
-    void mergeBaseObject(ISuperDocument sdoc);
+    void mergeBaseObject(SuperDocument sdoc);
        
     /**
      * Return super class.
      * 
-     * @return ISuperClass  Class manager for this document.
+     * @return SuperClass  Class manager for this document.
      */
-    ISuperClass getSuperClass();
+    SuperClass getSuperClass();
       
     /**
      * Indicate if document already exists in database.

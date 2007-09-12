@@ -23,7 +23,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.objects.classes.AbstractSuperClass;
-import com.xpn.xwiki.doc.objects.classes.ISuperDocument;
+import com.xpn.xwiki.doc.objects.classes.SuperDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
 import com.xpn.xwiki.plugin.multiwiki.WikiManagerException;
@@ -216,8 +216,8 @@ public class XWikiServerClass extends AbstractSuperClass
             context);
     }
     
-    public ISuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
+    public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
     {
-        return (ISuperDocument)doc.newDocument(XWikiServer.class.getName(), context);
+        return (SuperDocument)doc.newDocument(XWikiServer.class.getName(), context);
     }
 }

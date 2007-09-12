@@ -16,7 +16,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.multiwiki.doc;
 
 import org.apache.commons.logging.Log;
@@ -31,9 +30,6 @@ public class XWikiServer extends DefaultSuperDocument
 {
     protected static final Log LOG = LogFactory.getLog(XWikiServer.class);
 
-    // ///////////////////////////////////////////////////////////////////
-    // object section
-
     public XWikiServer(XWikiDocument xdoc, XWikiContext context) throws XWikiException
     {
         super(XWikiServerClass.getInstance(context), xdoc, context);
@@ -42,21 +38,7 @@ public class XWikiServer extends DefaultSuperDocument
     public void delete() throws XWikiException
     {
         super.delete(context);
-
-        /*XWiki xwiki = context.getWiki();
-
-        try {
-            // delete database
-            xwiki.getStore().deleteWiki(getWikiName(), context);
-        } catch (XWikiException e) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn("Wiki delete \"" + getWikiName()
-                    + "\" failed: wiki database delete threw exception", e);
-            }
-        }*/
     }
-
-    // ///
 
     public String getWikiName()
     {
@@ -128,12 +110,9 @@ public class XWikiServer extends DefaultSuperDocument
         setStringValue(XWikiServerClass.FIELD_state, state);
     }
 
-    // ///
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see java.lang.Object#toString()
+    /**
+     * {@inheritDoc}
+     * @see Object#toString()
      */
     public String toString()
     {

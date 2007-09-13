@@ -31,12 +31,12 @@
   </parent>
   <artifactId>xwiki-application-panels</artifactId>
   <name>XWiki Platform - Applications - Panels</name>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <packaging>xar</packaging>
   <description>Panels and Panel Wizard to easily create menus for XWiki</description>
   <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/xwiki-applications/branches/xwiki-application-panels-1.1-0</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-applications/branches/xwiki-application-panels-1.1-0</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-applications/branches/xwiki-application-panels-1.1-0</url>
+    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1.0</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1.0</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-applications/tags/xwiki-application-panels-1.1.0</url>
   </scm>
 </project>

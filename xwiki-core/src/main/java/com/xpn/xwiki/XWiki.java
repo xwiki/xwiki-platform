@@ -954,6 +954,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             // need that original document for the notification below.
             XWikiDocument originalDocument = doc.getOriginalDocument();
 
+            // Notify listeners about the document change
+            getNotificationManager().preverify(doc, originalDocument,
+                XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+
             getStore().saveXWikiDoc(doc, context);
 
             // Notify listeners about the document change
@@ -3214,6 +3218,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
     {
+        getNotificationManager().preverify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),
+            XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         if (hasRecycleBin(context) && totrash) {
             getRecycleBinStore().saveToRecycleBin(
                 doc, context.getUser(), new Date(), context, true);

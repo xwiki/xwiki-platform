@@ -1,6 +1,5 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
- * by the contributors.txt.
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -24,31 +23,72 @@ package com.xpn.xwiki.notify;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class DocChangeRule implements XWikiNotificationRule {
+public class DocChangeRule implements XWikiNotificationRule
+{
     private XWikiDocChangeNotificationInterface target;
+    private boolean preverify = false;
+    private boolean postverify = true;
 
-    public DocChangeRule() {
-      }
+    public DocChangeRule()
+    {
+    }
 
-    public DocChangeRule(XWikiDocChangeNotificationInterface target) {
+    public DocChangeRule(XWikiDocChangeNotificationInterface target)
+    {
         setTarget(target);
     }
 
-    public XWikiDocChangeNotificationInterface getTarget() {
+    public DocChangeRule(XWikiDocChangeNotificationInterface target, boolean pre, boolean post) {
+        setTarget(target);
+        setPreverify(pre);
+        setPostverify(post);
+    }
+
+    public XWikiDocChangeNotificationInterface getTarget()
+    {
         return target;
     }
 
-    public void setTarget(XWikiDocChangeNotificationInterface target) {
+    public void setTarget(XWikiDocChangeNotificationInterface target)
+    {
         this.target = target;
     }
 
-    public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context) {
-        getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+    public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
+    {
+        if(!isPostverify()) return;
+        getTarget().notify(this, newdoc, olddoc,
+            XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 
-    public void verify(XWikiDocument doc, String action, XWikiContext context) {
+    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context)
+    {
+        if(!isPreverify()) return;
+        getTarget().notify(this, newdoc, olddoc,
+            XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 
-    public void preverify(XWikiDocument doc, String action, XWikiContext context) {
+    public void verify(XWikiDocument doc, String action, XWikiContext context)
+    {
+    }
+
+    public void preverify(XWikiDocument doc, String action, XWikiContext context)
+    {
+    }
+
+    public boolean isPostverify() {
+        return postverify;
+    }
+
+    public void setPostverify(boolean postnotify) {
+        this.postverify = postnotify;
+    }
+
+    public boolean isPreverify() {
+        return preverify;
+    }
+
+    public void setPreverify(boolean prenotify) {
+        this.preverify = prenotify;
     }
 }

@@ -923,8 +923,6 @@ public class Package
     {
         XWiki wiki = context.getWiki();
         List spaces = wiki.getSpaces(context);
-        name = "Backup";
-        description = "on " + (new Date().toString()) + " by " + context.getUser();
         for (int i = 0; i < spaces.size(); i++) {
             List DocsName = wiki.getSpaceDocsName((String) spaces.get(i), context);
             for (int j = 0; j < DocsName.size(); j++) {
@@ -932,7 +930,6 @@ public class Package
                     context);
             }
         }
-        this.backupPack = true;
     }
 
     public void deleteAllWikiDocuments(XWikiContext context) throws XWikiException

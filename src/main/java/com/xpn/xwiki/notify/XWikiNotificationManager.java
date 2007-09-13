@@ -75,6 +75,40 @@ public class XWikiNotificationManager {
         }
     }
 
+    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
+        // Call rules explicitely for any actions of this document
+        Vector vnamedrules;
+        String name = newdoc.getFullName();
+        synchronized (namedrules) {
+            vnamedrules = getNamedRules(name);
+            if (vnamedrules!=null)
+             vnamedrules = (Vector) vnamedrules.clone();
+        }
+        if (vnamedrules!=null) {
+            for (int i=0;i<vnamedrules.size();i++)
+               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(newdoc, olddoc, context);
+        }
+
+        name = context.getDatabase() + ":" + newdoc.getFullName();
+
+        synchronized (namedrules) {
+            vnamedrules = getNamedRules(name);
+            if (vnamedrules!=null)
+             vnamedrules = (Vector) vnamedrules.clone();
+        }
+        if (vnamedrules!=null) {
+            for (int i=0;i<vnamedrules.size();i++)
+               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(newdoc, olddoc, context);
+        }
+
+        Vector grules;
+        synchronized (generalrules) {
+            grules = (Vector) generalrules.clone();
+        }
+        for (int i=0;i<grules.size();i++)
+            ((XWikiNotificationRule)grules.get(i)).preverify(newdoc, olddoc, context);
+    }
+
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
         // Call the document notification function itself..
         newdoc.notify(null, newdoc, olddoc, event, context);

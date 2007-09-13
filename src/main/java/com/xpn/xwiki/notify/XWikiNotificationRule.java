@@ -30,6 +30,8 @@ public interface XWikiNotificationRule {
      */
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context);
 
+    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context);
+
     public void verify(XWikiDocument doc, String action, XWikiContext context);
 
     public void preverify(XWikiDocument doc, String action, XWikiContext context);

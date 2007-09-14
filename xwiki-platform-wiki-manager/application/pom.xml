@@ -2,8 +2,7 @@
 
 <!--
  *
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright 2007, XpertNet SARL, and individual contributors.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -29,9 +28,9 @@
     <artifactId>xwiki-applications</artifactId>
     <version>5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-wiki-manager</artifactId>
-  <name>XWiki Platform - Applications - Wiki Manager</name>
+  <artifactId>xwiki-application-multiwiki</artifactId>
+  <name>XWiki Platform - Applications - Multiwiki</name>
   <version>1.0-SNAPSHOT</version>
   <packaging>xar</packaging>
-  <description>Manages creation and installation of children Wikis</description>
+  <description>Manages creation and installation of child Wikis</description>
 </project>

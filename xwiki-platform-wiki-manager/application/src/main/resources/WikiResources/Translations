@@ -116,7 +116,7 @@ wikimanager.successsetvisibility=Wiki \"{0}\" visibility changed to \"{1}\".
 wikimanager.errorsetvisibility=Wiki \"{0}' visibility changing failed with error code \"{1}\".
 wikimanager.successscreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: http://{1}.
 wikimanager.errorcreatewiki=Wiki \"{0}\" creation failed with error code \"{1}\".
-wikimanager.errorcreatewiki.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS=This wiki \"{0}\" already exist. Please choose another name.
+wikimanager.errorcreatewiki.ERROR_MULTIWIKI_WIKISERVER_ALREADY_EXISTS=This wiki \"{0}\" already exist. Please choose another name.
 wikimanager.listwikiempty=There are no open wikis.
 
 ## MOVE IN STANDARD XWIKI

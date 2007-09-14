@@ -109,14 +109,17 @@ public class XWikiHibernateBaseStore {
     }
 
     /**
-     * Get Database Product Name
+     * @return the database product name
      */
-    public String getDatabaseProductName(XWikiContext context) {
+    public DatabaseProduct getDatabaseProductName(XWikiContext context)
+    {
+        String productName;
         try {
-            return getSession(context).connection().getMetaData().getDatabaseProductName();
+            productName = getSession(context).connection().getMetaData().getDatabaseProductName();
         } catch (Exception e) {
-            return "";
+            productName = "Unknown";
         }
+        return DatabaseProduct.toProduct(productName);
     }
 
     /**
@@ -292,8 +295,8 @@ public class XWikiHibernateBaseStore {
             session = getSession(context);
             connection = session.connection();
             setDatabase(session, context);
-            isOracle = "Oracle".equals(connection.getMetaData().getDatabaseProductName());
-
+            isOracle = (DatabaseProduct.ORACLE == getDatabaseProductName(context)); 
+            
             if (isOracle) {
                 dschema = config.getProperty(Environment.DEFAULT_SCHEMA);
                 config.setProperty(Environment.DEFAULT_SCHEMA, context.getDatabase());
@@ -442,7 +445,9 @@ public class XWikiHibernateBaseStore {
             try {
                 if ( log.isDebugEnabled() ) log.debug("Switch database to: " + database);
                 if (database!=null) {
-                    if ("Oracle".equals(getDatabaseProductName(context))) {
+                	
+                	DatabaseProduct databaseProduct = getDatabaseProductName(context);
+                    if (DatabaseProduct.ORACLE == databaseProduct) {
                         Statement stmt = null;
                         try {
                             stmt = session.connection().createStatement();
@@ -453,8 +458,37 @@ public class XWikiHibernateBaseStore {
                                     stmt.close();
                             } catch (Exception e) {}
                         }
-
-                    } else {
+                    } else if (DatabaseProduct.DERBY == databaseProduct) {
+						Statement stmt = null;
+						try {
+							stmt = session.connection().createStatement();
+							// Use the default Derby database ("APP") instead of "xwiki" 
+                            // (considering that "xwiki" is main wiki)
+							stmt.execute("SET SCHEMA "
+                                + (database.toLowerCase().equals("xwiki") ? "APP" : database));
+						} finally {
+							try {
+								if (stmt != null)
+									stmt.close();
+							} catch (Exception e) {
+							}
+						}
+                    } else if (DatabaseProduct.HSQLDB == databaseProduct) {
+						Statement stmt = null;
+						try {
+							stmt = session.connection().createStatement();
+							// Use the default HSQL database ("PUBLIC") instead of "xwiki"
+                            // (considering that "xwiki" is main wiki)
+							stmt.execute("SET SCHEMA "
+                                + (database.toLowerCase().equals("xwiki") ? "PUBLIC" : database));
+						} finally {
+							try {
+								if (stmt != null)
+									stmt.close();
+							} catch (Exception e) {
+							}
+						}
+					} else {
                         String catalog = session.connection().getCatalog();
                         catalog = (catalog==null) ? null : catalog.replace('_', '-');
                         if (!database.equals(catalog))
@@ -463,7 +497,8 @@ public class XWikiHibernateBaseStore {
                 }
             } catch (Exception e) {
                 Object[] args = { database };
-                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
+                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE,
                         "Exception while switching to database {0}", e, args);
             }
         }

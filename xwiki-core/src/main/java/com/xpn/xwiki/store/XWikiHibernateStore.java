@@ -115,7 +115,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @throws XWikiException
      */
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
-        boolean bTransaction = true;
+    	boolean bTransaction = true;
         String database = context.getDatabase();
         Statement stmt = null;
         try {
@@ -124,10 +124,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Connection connection = session.connection();
             stmt = connection.createStatement();
 
-            String dbproduct = getDatabaseProductName(context);
-            if ("Oracle".equals(dbproduct)) {
+            DatabaseProduct databaseProduct = getDatabaseProductName(context);
+            if (DatabaseProduct.ORACLE == databaseProduct) {
                 stmt.execute("create user " + wikiName + " identified by " + wikiName);
                 stmt.execute("grant resource to " + wikiName);
+            } else if (DatabaseProduct.DERBY == databaseProduct) {
+				stmt.execute("CREATE SCHEMA " + wikiName.replace('-', '_'));
+            } else if (DatabaseProduct.HSQLDB == databaseProduct) {
+				stmt.execute("CREATE SCHEMA " + wikiName.replace('-', '_') + " AUTHORIZATION DBA");
             } else {
                 stmt.execute("create database " + wikiName.replace('-','_'));
             }
@@ -136,7 +140,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
         catch (Exception e) {
             Object[] args = { wikiName  };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE,
+            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE,
                     "Exception while create wiki database {0}", e, args);
         } finally {
             context.setDatabase(database);

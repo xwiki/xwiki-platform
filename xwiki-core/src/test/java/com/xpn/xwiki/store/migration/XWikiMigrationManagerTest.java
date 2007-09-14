@@ -33,7 +33,7 @@ import com.xpn.xwiki.web.XWikiEngineContext;
  * Test for {@link AbstractXWikiMigrationManager}
  * @version $Id: $
  */
-public class AbstractXWikiMigrationManagerTest extends TestCase
+public class XWikiMigrationManagerTest extends TestCase
 {
     XWikiContext context;
     /** {@inheritDoc} */

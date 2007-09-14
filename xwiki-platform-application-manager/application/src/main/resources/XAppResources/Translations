@@ -13,14 +13,13 @@
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186671402000</creationDate>
 <date>1188311676000</date>
-<contentUpdateDate>1188466983000</contentUpdateDate>
+<contentUpdateDate>1189614079000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -84,113 +83,4 @@ xapp.errorcreateapp=An error occurred while creating application \"{0}\" (code \
 xapp.errorcreateapp.ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS=Application \"{0}\" already exists. Choose another name.
 xapp.successreloadapp=Reload application \"{0}\" succes.
 xapp.errorreloadapp=An error occurred while reloading application \"{0}\" (code \"{1}\").</content>
-<versions>head	1.1;
-access;
-symbols;
-locks; strict;
-comment	@# @;
-
-
-1.1
-date	2007.08.28.16.34.36;	author XWiki.Admin;	state full;
-branches;
-next	;
-
-
-desc
-@@
-
-
-1.1
-log
-@@
-text
-@&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
-
-&lt;xwikidoc&gt;
-&lt;web&gt;XAppResources&lt;/web&gt;
-&lt;name&gt;Translations&lt;/name&gt;
-&lt;language&gt;&lt;/language&gt;
-&lt;defaultLanguage&gt;en&lt;/defaultLanguage&gt;
-&lt;translation&gt;0&lt;/translation&gt;
-&lt;parent&gt;&lt;/parent&gt;
-&lt;creator&gt;XWiki.Admin&lt;/creator&gt;
-&lt;author&gt;XWiki.Admin&lt;/author&gt;
-&lt;customClass&gt;&lt;/customClass&gt;
-&lt;contentAuthor&gt;XWiki.Admin&lt;/contentAuthor&gt;
-&lt;creationDate&gt;1186671402000&lt;/creationDate&gt;
-&lt;date&gt;1188311676000&lt;/date&gt;
-&lt;contentUpdateDate&gt;1188466983000&lt;/contentUpdateDate&gt;
-&lt;version&gt;1.1&lt;/version&gt;
-&lt;title&gt;&lt;/title&gt;
-&lt;template&gt;&lt;/template&gt;
-&lt;defaultTemplate&gt;&lt;/defaultTemplate&gt;
-&lt;validationScript&gt;&lt;/validationScript&gt;
-&lt;comment&gt;&lt;/comment&gt;
-&lt;minorEdit&gt;false&lt;/minorEdit&gt;
-&lt;object&gt;
-&lt;class&gt;
-&lt;name&gt;XWiki.TagClass&lt;/name&gt;
-&lt;customClass&gt;&lt;/customClass&gt;
-&lt;customMapping&gt;&lt;/customMapping&gt;
-&lt;defaultViewSheet&gt;&lt;/defaultViewSheet&gt;
-&lt;defaultEditSheet&gt;&lt;/defaultEditSheet&gt;
-&lt;defaultWeb&gt;&lt;/defaultWeb&gt;
-&lt;nameField&gt;&lt;/nameField&gt;
-&lt;validationScript&gt;&lt;/validationScript&gt;
-&lt;tags&gt;
-&lt;cache&gt;0&lt;/cache&gt;
-&lt;displayType&gt;input&lt;/displayType&gt;
-&lt;multiSelect&gt;1&lt;/multiSelect&gt;
-&lt;name&gt;tags&lt;/name&gt;
-&lt;number&gt;1&lt;/number&gt;
-&lt;prettyName&gt;Tags&lt;/prettyName&gt;
-&lt;relationalStorage&gt;1&lt;/relationalStorage&gt;
-&lt;separator&gt; &lt;/separator&gt;
-&lt;separators&gt; ,|&lt;/separators&gt;
-&lt;size&gt;30&lt;/size&gt;
-&lt;unmodifiable&gt;0&lt;/unmodifiable&gt;
-&lt;values&gt;&lt;/values&gt;
-&lt;classType&gt;com.xpn.xwiki.objects.classes.StaticListClass&lt;/classType&gt;
-&lt;/tags&gt;
-&lt;/class&gt;
-&lt;name&gt;XAppResources.Translations&lt;/name&gt;
-&lt;number&gt;0&lt;/number&gt;
-&lt;className&gt;XWiki.TagClass&lt;/className&gt;
-&lt;property&gt;
-&lt;tags/&gt;
-&lt;/property&gt;
-&lt;/object&gt;
-&lt;content&gt;xapp.appmanager=Applications manager
-xapp.totalnumberofapp=Total number of applications
-xapp.createapplication=Create new application
-
-## LABELS
-xapp.appname=Application
-xapp.description=Description
-xapp.docname=Document Name
-xapp.availablefilestoimport=Available files to import
-
-## ACTIONS
-
-xapp.action.reloadapp=Reload
-
-## ANSWER
-xapp.answer.deleteapp.title=Delete application
-xapp.answer.deleteapp.msg=Are you sure you wish to delete application \"{0}\" ?
-
-## MESSAGES
-xapp.successexportapp=Export application \"{0}\" succes.
-xapp.errorexportapp=An error occurred while exporting application \"{0}\" (code \"{1}\").
-xapp.successimportapp=Import application package \"{0}\" succes.
-xapp.errorimportapp=An error occurred while importing application package \"{0}\" (code \"{1}\").
-xapp.successdeleteapp=Delete application \"{0}\" succes.
-xapp.errordeleteapp=An error occurred while deleting application \"{0}\" (code \"{1}\").
-xapp.successcreateapp=Application \"{0}\" has been created. You can access it at [{1}].
-xapp.errorcreateapp=An error occurred while creating application \"{0}\" (code \"{1}\").
-xapp.errorcreateapp.ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS=Application \"{0}\" already exists. Choose another name.
-xapp.successreloadapp=Reload application \"{0}\" succes.
-xapp.errorreloadapp=An error occurred while reloading application \"{0}\" (code \"{1}\").&lt;/content&gt;
-&lt;/xwikidoc&gt;
-@
-</versions></xwikidoc>
+</xwikidoc>

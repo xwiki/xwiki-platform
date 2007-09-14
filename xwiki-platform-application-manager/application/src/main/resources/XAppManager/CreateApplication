@@ -13,14 +13,13 @@
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186500200000</creationDate>
 <date>1188308778000</date>
-<contentUpdateDate>1188466983000</contentUpdateDate>
+<contentUpdateDate>1189614079000</contentUpdateDate>
 <version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -112,141 +111,4 @@
 
   &lt;input type="submit" value="$msg.get("create")"&gt;
 &lt;/form&gt;</content>
-<versions>head	1.1;
-access;
-symbols;
-locks; strict;
-comment	@# @;
-
-
-1.1
-date	2007.08.28.15.46.18;	author XWiki.Admin;	state full;
-branches;
-next	;
-
-
-desc
-@@
-
-
-1.1
-log
-@@
-text
-@&lt;?xml version="1.0" encoding="ISO-8859-1"?&gt;
-
-&lt;xwikidoc&gt;
-&lt;web&gt;XAppManager&lt;/web&gt;
-&lt;name&gt;CreateApplication&lt;/name&gt;
-&lt;language&gt;&lt;/language&gt;
-&lt;defaultLanguage&gt;en&lt;/defaultLanguage&gt;
-&lt;translation&gt;0&lt;/translation&gt;
-&lt;parent&gt;XAppManager.WebHome&lt;/parent&gt;
-&lt;creator&gt;XWiki.Admin&lt;/creator&gt;
-&lt;author&gt;XWiki.Admin&lt;/author&gt;
-&lt;customClass&gt;&lt;/customClass&gt;
-&lt;contentAuthor&gt;XWiki.Admin&lt;/contentAuthor&gt;
-&lt;creationDate&gt;1186500200000&lt;/creationDate&gt;
-&lt;date&gt;1188308778000&lt;/date&gt;
-&lt;contentUpdateDate&gt;1188466983000&lt;/contentUpdateDate&gt;
-&lt;version&gt;1.1&lt;/version&gt;
-&lt;title&gt;&lt;/title&gt;
-&lt;template&gt;&lt;/template&gt;
-&lt;defaultTemplate&gt;&lt;/defaultTemplate&gt;
-&lt;validationScript&gt;&lt;/validationScript&gt;
-&lt;comment&gt;&lt;/comment&gt;
-&lt;minorEdit&gt;false&lt;/minorEdit&gt;
-&lt;object&gt;
-&lt;class&gt;
-&lt;name&gt;XWiki.TagClass&lt;/name&gt;
-&lt;customClass&gt;&lt;/customClass&gt;
-&lt;customMapping&gt;&lt;/customMapping&gt;
-&lt;defaultViewSheet&gt;&lt;/defaultViewSheet&gt;
-&lt;defaultEditSheet&gt;&lt;/defaultEditSheet&gt;
-&lt;defaultWeb&gt;&lt;/defaultWeb&gt;
-&lt;nameField&gt;&lt;/nameField&gt;
-&lt;validationScript&gt;&lt;/validationScript&gt;
-&lt;tags&gt;
-&lt;cache&gt;0&lt;/cache&gt;
-&lt;displayType&gt;input&lt;/displayType&gt;
-&lt;multiSelect&gt;1&lt;/multiSelect&gt;
-&lt;name&gt;tags&lt;/name&gt;
-&lt;number&gt;1&lt;/number&gt;
-&lt;prettyName&gt;Tags&lt;/prettyName&gt;
-&lt;relationalStorage&gt;1&lt;/relationalStorage&gt;
-&lt;separator&gt; &lt;/separator&gt;
-&lt;separators&gt; ,|&lt;/separators&gt;
-&lt;size&gt;30&lt;/size&gt;
-&lt;unmodifiable&gt;0&lt;/unmodifiable&gt;
-&lt;values&gt;&lt;/values&gt;
-&lt;classType&gt;com.xpn.xwiki.objects.classes.StaticListClass&lt;/classType&gt;
-&lt;/tags&gt;
-&lt;/class&gt;
-&lt;name&gt;XAppManager.CreateApplication&lt;/name&gt;
-&lt;number&gt;0&lt;/number&gt;
-&lt;className&gt;XWiki.TagClass&lt;/className&gt;
-&lt;property&gt;
-&lt;tags/&gt;
-&lt;/property&gt;
-&lt;/object&gt;
-&lt;content&gt;#set($AppManager = $xwiki.applicationmanager)
-#set($Exception = $AppManager.DefaultException)
-
-#set($appdocument = $AppManager.createApplicationDocument())
-#set($appdocumentobject = $appdocument.updateObjectFromRequest("XAppClasses.XWikiApplicationClass"))
-
-#set($action = $request.getParameter("action"))
-
-#############################################################################
-
-1 $msg.get("xapp.createapplication")
-
-#if ($action)
-  #if($action == "create")
-    #set($result = $AppManager.createApplication($appdocument, true))
-    #if ($result == $Exception.ERROR_NOERROR)
-      &amp;lt;font color=green&amp;gt;
-        $msg.get("xapp.successcreateapp", [$appdocument.appname, $appdocument.getFullName()])
-      &amp;lt;/font&amp;gt;
-    #else
-      &amp;lt;font color=red&amp;gt;
-        #if ($result == $Exception.ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS)
-          $msg.get("xapp.errorcreateapp.ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS", [$appdocument.appname])
-        #else
-          $msg.get("xapp.errorcreateapp", [$appdocument.appname, $result])
-        #end
-      &amp;lt;/font&amp;gt;
-    #end
-  #end
-#end
-
-&amp;lt;style&amp;gt;
-  .xem_userlisttable td {}
-&amp;lt;/style&amp;gt;
-
-&amp;lt;form method="get" name="createapplication"&amp;gt;
-  &amp;lt;input type="hidden" name="action" value="create"&amp;gt;
-
-  &amp;lt;table width="100%"&amp;gt;
-    &amp;lt;tr&amp;gt;
-      &amp;lt;td&amp;gt;$msg.get("xapp.appname")&amp;lt;/td&amp;gt;
-      &amp;lt;td&amp;gt;$appdocument.display("appname", "edit")&amp;lt;/td&amp;gt;
-      &amp;lt;td id="appnameerrormsg" width="40%"&amp;gt;&amp;lt;/td&amp;gt;
-    &amp;lt;/tr&amp;gt;
-    &amp;lt;tr&amp;gt;
-      &amp;lt;td&amp;gt;$msg.get("xapp.description")&amp;lt;/td&amp;gt;
-      &amp;lt;td&amp;gt;$appdocument.display("description", "edit")&amp;lt;/td&amp;gt;
-      &amp;lt;td id="appdescerrormsg" width="40%"&amp;gt;&amp;lt;/td&amp;gt;
-    &amp;lt;/tr&amp;gt;
-    &amp;lt;tr&amp;gt;
-      &amp;lt;td&amp;gt;$msg.get("version")&amp;lt;/td&amp;gt;
-      &amp;lt;td&amp;gt;$appdocument.display("appversion", "edit")&amp;lt;/td&amp;gt;
-      &amp;lt;td id="appversionerrormsg" width="40%"&amp;gt;&amp;lt;/td&amp;gt;
-    &amp;lt;/tr&amp;gt;
-  &amp;lt;/table&amp;gt;
-
-  &amp;lt;input type="submit" value="$msg.get("create")"&amp;gt;
-&amp;lt;/form&amp;gt;&lt;/content&gt;
-&lt;/xwikidoc&gt;
-@
-</versions></xwikidoc>
+</xwikidoc>

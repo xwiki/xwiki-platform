@@ -23,8 +23,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.objects.classes.DefaultSuperDocument;
 
 public class XWikiServer extends DefaultSuperDocument
 {

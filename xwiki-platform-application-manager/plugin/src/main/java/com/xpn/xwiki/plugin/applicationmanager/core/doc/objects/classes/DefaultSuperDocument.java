@@ -17,7 +17,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.doc.objects.classes;
+package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import java.util.List;
 

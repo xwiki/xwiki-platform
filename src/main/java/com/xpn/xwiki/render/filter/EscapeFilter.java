@@ -1,6 +1,6 @@
 /*
- * Copyright 2007, XpertNet SARL, and individual contributors as indicated
- * by the contributors.txt.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This file was initally copied from Radeox. See below for the Radeox license and
  * copyright.

@@ -17,7 +17,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.doc.objects.classes;
+package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import java.util.HashSet;
 import java.util.List;
@@ -526,7 +526,7 @@ public abstract class AbstractSuperClass implements SuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#getItemDefaultName(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#getItemDefaultName(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public String getItemDefaultName(String docFullName, XWikiContext context)
     {
@@ -552,7 +552,7 @@ public abstract class AbstractSuperClass implements SuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#searchItemDocumentsByField(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByField(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
         XWikiContext context) throws XWikiException
@@ -561,7 +561,7 @@ public abstract class AbstractSuperClass implements SuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#searchItemDocumentsByFields(java.lang.String, java.lang.String[][], com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByFields(java.lang.String, java.lang.String[][], com.xpn.xwiki.XWikiContext)
      */
     public List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors, XWikiContext context) throws XWikiException
     {
@@ -591,7 +591,7 @@ public abstract class AbstractSuperClass implements SuperClass
     }
     
     /* (non-Javadoc)
-     * @see com.xpn.xwiki.doc.objects.classes.SuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
      */
     public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {

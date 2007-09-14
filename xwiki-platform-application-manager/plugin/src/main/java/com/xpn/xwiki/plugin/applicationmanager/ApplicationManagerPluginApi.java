@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.xpn.xwiki.api.XWikiExceptionApi;
+import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;

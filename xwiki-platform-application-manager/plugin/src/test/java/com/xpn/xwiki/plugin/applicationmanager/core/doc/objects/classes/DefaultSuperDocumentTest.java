@@ -17,7 +17,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.doc.objects.classes;
+package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -38,7 +38,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.doc.objects.classes.DefaultSuperDocument}.
+ * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument}.
  *
  * @version $Id: $
  */

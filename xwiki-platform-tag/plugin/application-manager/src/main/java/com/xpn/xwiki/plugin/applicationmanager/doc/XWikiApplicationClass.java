@@ -183,7 +183,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
         // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
         // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
         // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
+        slc = (StaticListClass)baseClass.getField(FIELD_applications);
         slc.setSeparators("|");
         slc.setSeparator("|");
 
@@ -192,7 +192,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
         // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
         // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
         // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
+        slc = (StaticListClass)baseClass.getField(FIELD_documents);
         slc.setSeparators("|");
         slc.setSeparator("|");
 
@@ -201,7 +201,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
         // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
         // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
         // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
+        slc = (StaticListClass)baseClass.getField(FIELD_docstoinclude);
         slc.setSeparators("|");
         slc.setSeparator("|");
 
@@ -210,7 +210,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
         // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
         // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
         // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
+        slc = (StaticListClass)baseClass.getField(FIELD_docstolink);
         slc.setSeparators("|");
         slc.setSeparator("|");
 
@@ -219,7 +219,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
         // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
         // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
         // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
+        slc = (StaticListClass)baseClass.getField(FIELD_translationdocs);
         slc.setSeparators("|");
         slc.setSeparator("|");
 

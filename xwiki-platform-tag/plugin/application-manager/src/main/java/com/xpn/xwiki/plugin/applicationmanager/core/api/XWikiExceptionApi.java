@@ -17,12 +17,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.api;
+package com.xpn.xwiki.plugin.applicationmanager.core.api;
 
 import java.lang.reflect.Field;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Api;
 
 /**
  * Permit to manipulate XWikiException in velocity code.

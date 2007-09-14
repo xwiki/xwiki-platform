@@ -19,7 +19,7 @@
 
 package com.xpn.xwiki.plugin.multiwiki;
 
-import com.xpn.xwiki.api.XWikiExceptionApi;
+import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.multiwiki.doc.XWikiServer;

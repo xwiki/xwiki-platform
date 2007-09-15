@@ -25,7 +25,6 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.archiver.ArchiverException;
 import org.codehaus.plexus.archiver.ArchiveFileFilter;
 import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
@@ -47,6 +46,9 @@ import java.util.StringTokenizer;
 /**
  * Gather all resources in a XAR file (which is actually a ZIP file). Also generates a XAR
  * descriptor if none is provided.
+ *
+ * <p>Note that the generated descriptor currently doesn't handle
+ * translations.</p>
  *
  * @version $Id: $
  * @goal xar
@@ -90,7 +92,12 @@ public class XarMojo extends AbstractMojo
         }
     }
 
-    private void performArchive() throws ArchiverException, IOException, MojoExecutionException
+    /**
+     * Create the XAR by zipping the resource files.
+     *
+     * @throws Exception if the zipping failed for some reason
+     */
+    private void performArchive() throws Exception
     {
         File xarFile = new File(this.project.getBuild().getDirectory(),
             this.project.getArtifactId() + ".xar");

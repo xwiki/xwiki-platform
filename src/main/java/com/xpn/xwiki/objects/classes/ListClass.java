@@ -368,6 +368,9 @@ public abstract class ListClass extends PropertyClass
      */
     protected String getDisplayValue(Object rawvalue, String name, Map map, XWikiContext context)
     {
+        if (rawvalue == null) {
+            return "";
+        }
         if (rawvalue instanceof Object[]) {
             return ((Object[]) rawvalue)[1].toString();
         }
@@ -383,6 +386,9 @@ public abstract class ListClass extends PropertyClass
      */
     protected String getElementValue(Object rawvalue)
     {
+        if (rawvalue == null) {
+            return "";
+        }
         if (rawvalue instanceof Object[]) {
             return ((Object[]) rawvalue)[0].toString();
         }

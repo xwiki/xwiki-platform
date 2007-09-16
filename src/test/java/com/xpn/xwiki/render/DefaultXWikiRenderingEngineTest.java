@@ -74,6 +74,7 @@ public class DefaultXWikiRenderingEngineTest extends MockObjectTestCase
             + "$xwiki.getVersion()\n"
             + "{style}style{style}\n"
             + "&#123;code}nested&#123;code}\n"
+            + "<% print(\"hello\") %>\n"
             + "{code}\n"
             + "{table}\n"
             + "a | b\n"
@@ -90,7 +91,8 @@ public class DefaultXWikiRenderingEngineTest extends MockObjectTestCase
         	+ "&#60;pre&#62;hello&#60;/pre&#62;\n"
         	+ "&#36;xwiki.getVersion()\n"
         	+ "&#123;style&#125;style&#123;style&#125;\n"
-        	+ "&&#35;123;code&#125;nested&&#35;123;code&#125;</pre></div>\n"
+        	+ "&&#35;123;code&#125;nested&&#35;123;code&#125;\n"
+            + "&#60;% print(\"hello\") %&#62;</pre></div>\n"
         	+ "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>a</th>"
      		+ "<th>b</th></tr><tr class=\"table-odd\"><td>c</td><td>d</td></tr></table>\n"
             + "<div class=\"code\"><pre>1 Something</pre></div>";

@@ -100,7 +100,7 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
             // Escape the Groovy special characters '<%' and '%>' so that the Groovy Renderer
             // doesn't execute.
             result = StringUtils.replace(result, "<%", "&#60;%");
-            result = StringUtils.replace(result, "%>", "&#62;%");
+            result = StringUtils.replace(result, "%>", "%&#62;");
         } else {
             result = allcontent;
         }

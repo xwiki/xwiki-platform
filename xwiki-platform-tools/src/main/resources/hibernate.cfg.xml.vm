@@ -21,8 +21,14 @@
 
     <!-- Please refer to the installation guide on
          http://www.xwiki.org/xwiki/bin/view/AdminGuide/Installation for configuring your
-         database -->
+         database. You'll need to do 2 things:
+         1) Copy your database driver JAR in WEB-INF/lib or in some shared lib directory
+         2) Uncomment the properties below for your specific DB
+    -->
 
+    ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "non". I would
+    ## have preferred to use an empty value but I couldn't make that work with Maven. 
+    #if ($xwikiDbConnectionUrl != "none")
     <property name="connection.url">$xwikiDbConnectionUrl</property>
     <property name="connection.username">$!xwikiDbConnectionUsername</property>
     <property name="connection.password">$!xwikiDbConnectionPassword</property>
@@ -36,7 +42,8 @@
     <!-- Mapping files -->
     <mapping resource="$xwikiDbHbmXwiki"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
-
+    #end
+    
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
          Note that the database will be created automatically if it doesn't already exist.

@@ -38,6 +38,15 @@
       <version>${version}</version>
       <type>war</type>
     </dependency>
+    <!-- We shouldn't need this dependency but Surefire plugin v2.3 fails with a "Null" if it's
+         not defined. Seems to be fixed in the latest Surefire plugin in Maven's trunk so when
+         2.3.1 or 2.4 is out, switch to it and remove this dependency. -->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.2</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

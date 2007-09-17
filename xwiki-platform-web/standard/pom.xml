@@ -7,10 +7,7 @@
   </parent>
   <artifactId>xwiki-web-standard</artifactId>
   <name>XWiki Platform - Web - Standard</name>
-  <!-- We're using a pom packaging type instead of a WAR as we're using the Assembly plugin
-       in order to generate the WAR as a secondary artifact with a classifier name as this is not
-       possible with a primary artifact -->
-  <packaging>pom</packaging>
+  <packaging>war</packaging>
   <description>The standard XWiki WAR</description>
   <dependencies>
     <dependency>
@@ -19,18 +16,11 @@
       <version>1.2-SNAPSHOT</version>
     </dependency>
     <!-- Add the GWT JAR so that XWiki Core is GWT-ready and so that the XWiki GWT Servlet can
-         be activated by default -->
+         be activated by default in web.xml -->
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
       <version>${version}</version>
-    </dependency>
-    <!-- Add the database JAR so that it's included in the WAR -->
-    <dependency>
-      <groupId>${xwiki.db.jdbc.groupId}</groupId>
-      <artifactId>${xwiki.db.jdbc.artifactId}</artifactId>
-      <version>${xwiki.db.jdbc.version}</version>
-      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
@@ -46,6 +36,17 @@
         <artifactId>maven-remote-resources-plugin</artifactId>
         <executions>
           <execution>
+            <!-- The remote resources plugin adds its output directory as a resource directory
+                 so that the Maven resources plugin copies these resources to target/classes.
+                 However copying them to target/classes will make them appear in WEB-INF/classes
+                 in the generated WAR since the WAR plugin copies resources in target/classes in
+                 WEB-INF/classes. Thus to prevent this we're binding this execution to a phase
+                 that comes after the execution of the resources plugin (which executes in the
+                 process-resources phase). Thus this remote resources plugin will execute just
+                 after the resources plugin and the resources won't be copied, which is why we're
+                 adding a webResource configuration element below in the WAR plugin's
+                 configuration. -->
+            <phase>process-resources</phase>
             <goals>
               <goal>process</goal>
             </goals>
@@ -55,51 +56,56 @@
           <resourceBundles>
             <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.5-SNAPSHOT</resourceBundle>
           </resourceBundles>
+          <properties>
+            <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>
+          </properties>
         </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
+        <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <descriptors>
-            <descriptor>src/assemble/war.xml</descriptor>
-          </descriptors>
+          <webResources>
+            <resource>
+              <directory>${project.build.directory}/maven-shared-archive-resources</directory>
+              <targetPath>WEB-INF</targetPath>
+              <includes>
+                <include>hibernate.cfg.xml</include>
+                <include>xwiki.cfg</include>
+              </includes>
+            </resource>
+            <resource>
+              <directory>${basedir}/src/main/webInfResources</directory>
+              <targetPath>WEB-INF</targetPath>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
         </configuration>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>single</goal>
-            </goals>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>
   <profiles>
     <profile>
-      <id>jettyrun</id>
+      <id>jettyrun</id>      
       <build>
         <plugins>
+          <!-- Run 'mvn install -Pjettyrun' to execute xwiki in Jetty. Useful for testing.
+               Note: You'll need a database set up and running. If you use the HSQLDB profile
+               the database is looked for in database/ so it's very likely you'll get an
+               empty wiki. You'll need to import some pages in it using a XAR for example. -->
           <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <configuration>
-              <descriptors>
-                <descriptor>src/assemble/jetty.xml</descriptor>
-              </descriptors>
-            </configuration>
-          </plugin>
-          <plugin>
-            <!-- Run 'mvn install -Pjettyrun' to execute xwiki in Jetty. Useful for testing.
-                 Note: You'll need a database set up and running. If you use the HSQLDB profile
-                 the database is looked for in database/ so it's very likely you'll get an
-                 empty wiki. You'll need to import some pages in it using a XAR for example. -->
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>maven-jetty-plugin</artifactId>
             <configuration>
               <contextPath>/xwiki</contextPath>
-              <classesDirectory>${project.build.directory}/${project.build.finalName}-${xwiki.db}.dir/WEB-INF</classesDirectory>
+              <classesDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF</classesDirectory>
+              <scanIntervalSeconds>10</scanIntervalSeconds>
+              <connectors>
+                <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                  <port>8080</port>
+                  <maxIdleTime>60000</maxIdleTime>
+                </connector>
+              </connectors>
             </configuration>
             <executions>
               <execution>
@@ -109,6 +115,25 @@
                 </goals>
               </execution>
             </executions>
+            <!-- Add the database JAR since it's not included in the WAR. The Hibernate config
+                 file is automtically added by the remote resources plugin -->
+            <dependencies>
+              <dependency>
+                <groupId>${xwiki.db.jdbc.groupId}</groupId>
+                <artifactId>${xwiki.db.jdbc.artifactId}</artifactId>
+                <version>${xwiki.db.jdbc.version}</version>
+                <scope>runtime</scope>
+              </dependency>
+            </dependencies>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-remote-resources-plugin</artifactId>
+            <configuration>
+              <properties>
+                <xwikiDbConnectionUrl>${xwiki.db.connection.url}</xwikiDbConnectionUrl>
+              </properties>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -124,8 +149,8 @@
       </activation>
       <build>
         <plugins>
-          <!-- Use the build numer plugin to add the SVN revision number to XWiki's version.properties
-               file so that it's included when displaying XWiki's version.
+          <!-- Use the build number plugin to add the SVN revision number to XWiki's
+               version.properties file so that it's included when displaying XWiki's version.
                Note: This plugin works by making the buildNumber property available. We then filter
                the version.properties file so that the property is replaced by its value. -->
           <plugin>

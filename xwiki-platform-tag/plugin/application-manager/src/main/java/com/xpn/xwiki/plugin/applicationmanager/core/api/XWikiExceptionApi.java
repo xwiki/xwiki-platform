@@ -63,6 +63,11 @@ public class XWikiExceptionApi extends Api
         this.exception = exception;
     }
 
+    public String toString()
+    {
+        return this.exception.toString();
+    }
+
     // ///////////////////////////////////////////////////////////:
 
     /**

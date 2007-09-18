@@ -36,10 +36,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * API for managing multiwikis
+ * Plugin for managing applications: installation, export, creation. The plugin uses the concept
+ * of an Application Descriptor describing an application (its version, the documents it contains,
+ * the translations, etc).
  * 
  * @version $Id: $
- * @see com.xpn.xwiki.plugin.multiwiki.MultiWikiPlugin
+ * @see com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
  */
 public class ApplicationManagerPluginApi extends PluginApi
 {

@@ -306,6 +306,7 @@ public class WikiManager
             if (templateWikiName != null) {
                 copyWiki(templateWikiName, newWikiName, language, context);
             }
+            
             if (packageName != null) {
                 // Prepare to import
                 XWikiDocument doc = context.getDoc();
@@ -313,11 +314,8 @@ public class WikiManager
                 XWikiAttachment packFile = doc.getAttachment(packageName);
 
                 if (packFile == null)
-                    throw new WikiManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                    throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_CANNOT_CREATE_WIKI,
                         "Package " + packageName + " does not exists.");
-
-                // Change database
-                context.setDatabase(newWikiName);
 
                 // Import
                 PackageAPI importer =
@@ -326,14 +324,17 @@ public class WikiManager
                 try {
                     importer.Import(packFile.getContent(context));
                 } catch (IOException e) {
-                    throw new WikiManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                    throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_CANNOT_CREATE_WIKI,
                         "Fail to import package " + packageName,
                         e);
                 }
 
+                // Change database
+                context.setDatabase(newWikiName);                
+
                 if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE)
-                    throw new WikiManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                        "Fail to import package " + packageName);
+                    throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_CANNOT_CREATE_WIKI,
+                        "Fail to install package " + packageName);
             }
 
             // Create user page in his wiki

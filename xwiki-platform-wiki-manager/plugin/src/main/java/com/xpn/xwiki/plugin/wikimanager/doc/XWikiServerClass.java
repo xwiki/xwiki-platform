@@ -181,7 +181,7 @@ public class XWikiServerClass extends AbstractSuperClass
         XWikiDocument doc = getItemDocument(wikiName, context);
 
         if (validate && doc.isNew())
-            throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_SERVER_DOES_NOT_EXIST,
+            throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST,
                 wikiName + " wiki server does not exist");
 
         return doc;
@@ -194,10 +194,10 @@ public class XWikiServerClass extends AbstractSuperClass
 
         if (validate) {
             if (doc.isNew())
-                throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_SERVER_DOES_NOT_EXIST,
+                throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST,
                     wikiName + " wiki server does not exist");
             if (!doc.getStringValue(FIELD_visibility).equals(FIELDL_visibility_template))
-                throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_SERVER_DOES_NOT_EXIST,
+                throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST,
                     wikiName + " wiki server template does not exist");
         }
 

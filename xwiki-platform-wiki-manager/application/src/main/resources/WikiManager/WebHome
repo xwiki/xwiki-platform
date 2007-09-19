@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>WikiManager</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1186669668000</creationDate>
+<date>1188486870000</date>
+<contentUpdateDate>1189614079000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>WikiManager.WebHome</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>#set($wikimanager = $xwiki.wikimanager)
+#set($Exception = $wikimanager.DefaultException)
+
+#set($action = $request.getParameter("action"))
+#set($confirm = $request.getParameter("confirm"))
+
+#set($wikiname = $request.getParameter("wikiname"))
+#set($wikivisibility = $request.getParameter("wikivisibility"))
+
+#############################################################################
+
+#if($action)
+  #if($action == "delete")
+    #if($confirm == 1)
+      #set($result = $wikimanager.deleteWiki($wikiname))
+      #if ($result == $Exception.ERROR_NOERROR)
+        &lt;font color=green&gt;
+          $msg.get("wikimanager.successdeletewiki", [$wikiname])
+        &lt;/font&gt;
+      #else
+        &lt;font color=red&gt;
+          $msg.get("wikimanager.errordeletewiki", [$wikiname, $result])
+        &lt;/font&gt;
+      #end
+    #else
+      #xwikimessagebox($msg.get("wikimanager.answer.deletewiki.title") $msg.get("wikimanager.answer.deletewiki.msg", [$wikiname]) $doc.getURL("view", "confirm=1&amp;action=delete&amp;wikiname=$wikiname") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
+    #end
+  #elseif($action == "setvisibility")
+    #set($result = $wikimanager.setWikiVisibility($wikiname, $wikivisibility))
+    #if ($result == $Exception.ERROR_NOERROR)
+      &lt;font color=green&gt;
+        $msg.get("wikimanager.successsetvisibility", [$wikiname, $wikivisibility])
+      &lt;/font&gt;
+    #else
+      &lt;font color=red&gt;
+        $msg.get("wikimanager.errorsetvisibility", [$wikiname, $result])
+      &lt;/font&gt;
+    #end
+  #end
+#end
+
+#############################################################################
+
+1 Wikis
+
+#############################################################################
+
+#if($context.user!="XWiki.XWikiGuest")
+  #set($domainname = "localdomain.com")
+  #set($port = ":"+$request.getServerPort())
+  #set($created = 0)
+	
+  #if(!$wikidesc)
+    #set($wikidesc = "")
+  #end
+#end
+
+#set($list = $wikimanager.getWikiDocumentList())
+&lt;div style="font-weight:bold;"&gt;
+  $msg.get("wikimanager.totalnumberofwiki") : $list.size()&lt;br /&gt;
+  [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki]&lt;br /&gt;
+&lt;/div&gt;
+
+#if($list.size()!=0)
+  &lt;table id="wikiTable" class="grid sortable filterable doOddEven"&gt;
+      &lt;tr class="sortHeader"&gt;
+        &lt;th&gt;$msg.get("wikimanager.listwikiname")&lt;/th&gt;
+        &lt;th&gt;$msg.get("wikimanager.listwikiadmin")&lt;/th&gt;
+        &lt;th&gt;$msg.get("wikimanager.listwikicreation")&lt;/th&gt;
+        &lt;th&gt;$msg.get("wikimanager.listwikistate")&lt;/th&gt;
+        &lt;th&gt;$msg.get("wikimanager.listwikivisibility")&lt;/th&gt;
+        &lt;th class="unsortable noFilter"&gt;$msg.get("more")&lt;/th&gt;
+      &lt;/tr&gt;
+    #foreach($serverdoc in $list)
+      &lt;tr&gt;
+        &lt;td&gt;http://$serverdoc.server&lt;/td&gt;
+        &lt;td&gt;[$serverdoc.owner]&lt;/td&gt;
+        &lt;td&gt;$xwiki.formatDate($serverdoc.creationDate,"dd/MM/yyyy")&lt;/td&gt;
+        &lt;td&gt;$serverdoc.state&lt;/td&gt;
+        &lt;td&gt;$serverdoc.visibility&lt;/td&gt;
+        &lt;td&gt;
+          #if($serverdoc.visibility == "public")
+            [$msg.get("wikimanager.action.setvisibility.private")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;wikivisibility=private] | 
+          #elseif($serverdoc.visibility == "private")
+            [$msg.get("wikimanager.action.setvisibility.template")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;wikivisibility=template] | 
+          #elseif($serverdoc.visibility == "template")
+            [$msg.get("wikimanager.action.setvisibility.public")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;wikivisibility=public] | 
+          #end
+          [$msg.get("delete")&gt;?action=delete&amp;wikiname=$serverdoc.WikiName] |
+          &lt;a href="$serverdoc.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    #end
+  &lt;/table&gt;
+#else
+  $msg.get("wikimanager.listwikiempty")
+#end
+</content></xwikidoc>

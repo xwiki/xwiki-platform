@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>WikiResources</web>
+<name>Translations</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1186671807000</creationDate>
+<date>1188313246000</date>
+<contentUpdateDate>1189614079000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>WikiResources.Translations</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>wikimanager.checkall=Check all
+wikimanager.uncheckall=Uncheck all
+wikimanager.nouserforthisletter=There is nobody whose name starts with this letter
+wikimanager.addselectedusertolist=Add
+wikimanager.wikinameneeded=A name for the wiki is necessary
+wikimanager.wikidescneeded=A description for the wiki is necessary
+wikimanager.wikiadminneeded=A administrator for the wiki is necessary
+wikimanager.wikitemplateneeded=A template for the wiki is necessary
+wikimanager.wikivisibilityneeded=A visibility parameter for the wiki is necessary
+wikimanager.search=Search
+wikimanager.createuser=Create a new user
+wikimanager.userfirstname=First name
+wikimanager.userlastname=Last name
+wikimanager.userlogin=User login
+wikimanager.useremail=e-Mail adress
+wikimanager.submitlabelcreateuser=Create user
+wikimanager.userfirstnameneeded=A user's first name is needed
+wikimanager.userlastnameneeded=A user's last name is needed
+wikimanager.userloginneeded=A user's login is needed
+wikimanager.useremailneeded=A user's e-Mail is needed
+
+## LABELS
+
+wikimanager.createwiki=Create a new wiki
+wikimanager.totalnumberofwiki=Total number of wiki
+wikimanager.wikiname=Wiki name
+wikimanager.wikidesc=Description
+wikimanager.wikiadmin=Administrator
+wikimanager.wikivisibility=Visibility
+wikimanager.wikistate=State
+wikimanager.wikitemplate=From wiki template
+wikimanager.wikipackage=From package
+wikimanager.listwikiname=Name
+wikimanager.listwikirank=Rank
+wikimanager.listwikiadmin=Admin
+wikimanager.listwikicreation=Creation
+wikimanager.listwikistate=State
+wikimanager.listwikivisibility=Visibility
+
+## ANSWERS
+
+wikimanager.answer.deletewiki.title=Delete wiki
+wikimanager.answer.deletewiki.msg=Are you sure you wish to delete wiki \"{0}\" ?
+
+## ACTIONS
+
+wikimanager.listwikiactions=Actions
+wikimanager.listwikiactionspref=Pref
+wikimanager.listwikiactionsmembers=Members
+wikimanager.listwikiactionsrights=Rights
+wikimanager.listwikiactionsgroups=Groups
+wikimanager.listwikiactionsstat=Stat
+wikimanager.action.setvisibility.public=Set as public
+wikimanager.action.setvisibility.private=Set as private
+wikimanager.action.setvisibility.template=Set as template
+
+## MESSAGES
+wikimanager.successdeletewiki=Wiki \"{0}\" deleted.
+wikimanager.errordeletewiki=Wiki \"{0}\" delete failed with error code \"{1}\".
+wikimanager.successsetvisibility=Wiki \"{0}\" visibility changed to \"{1}\".
+wikimanager.errorsetvisibility=Wiki \"{0}' visibility changing failed with error code \"{1}\".
+wikimanager.successscreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: http://{1}.
+wikimanager.errorcreatewiki=Wiki \"{0}\" creation failed with error code \"{1}\".
+wikimanager.errorcreatewiki.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS=This wiki \"{0}\" already exist. Please choose another name.
+wikimanager.listwikiempty=There are no open wikis.
+
+## MOVE IN STANDARD XWIKI
+error.ERROR_XWIKI_ACCESS_DENIED=You don't have permission to make this action.
+error.ERROR_XWIKI_USER_INACTIVE=Your account is not yet active. An email has been sent to you during the registration process to allow you to activate it. If you did not receive this email please contact the [support&gt;Support.WebHome].</content>
+</xwikidoc>

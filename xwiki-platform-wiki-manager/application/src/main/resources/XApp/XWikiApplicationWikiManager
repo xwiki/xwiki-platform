@@ -2,7 +2,7 @@
 
 <xwikidoc>
 <web>XApp</web>
-<name>XWikiApplicationMultiwiki</name>
+<name>XWikiApplicationWikiManager</name>
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
@@ -196,7 +196,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </translationdocs>
 </class>
-<name>XApp.XWikiApplicationMultiwiki</name>
+<name>XApp.XWikiApplicationWikiManager</name>
 <number>0</number>
 <className>XAppClasses.XWikiApplicationClass</className>
 <property>
@@ -264,7 +264,7 @@
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </tags>
 </class>
-<name>XApp.XWikiApplicationMultiwiki</name>
+<name>XApp.XWikiApplicationWikiManager</name>
 <number>0</number>
 <className>XWiki.TagClass</className>
 <property>

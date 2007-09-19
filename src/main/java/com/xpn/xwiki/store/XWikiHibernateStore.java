@@ -1495,7 +1495,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             XWikiDocument originalDocument = context.getDoc();
             context.setDoc(doc);
             try {
-            	// Create new clean context to avoid multiwiki requests in same session
+            	// Create new clean context to avoid wiki manager plugin requests in same session
                 XWikiContext renderContext = (XWikiContext)context.clone();
                 setSession(null, renderContext);
                 setTransaction(null, renderContext);

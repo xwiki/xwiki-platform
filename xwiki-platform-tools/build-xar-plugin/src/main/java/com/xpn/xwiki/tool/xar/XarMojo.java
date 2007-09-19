@@ -101,12 +101,19 @@ public class XarMojo extends AbstractMojo
     {
         File xarFile = new File(this.project.getBuild().getDirectory(),
             this.project.getArtifactId() + ".xar");
+
+        // The source dir points to the target/classes directory where the Maven resources plugin
+        // has copied the XAR files during the process-resources phase.
         File sourceDir = new File(this.project.getBuild().getOutputDirectory());
+
         ZipArchiver archiver = new ZipArchiver();
         archiver.setDestFile(xarFile);
         archiver.setIncludeEmptyDirs(false);
         archiver.setCompress(true);
 
+        // Unzip dependent XARs on top of this project's XML documents but without overwriting
+        // existing files since we want this projet's files to be used if they override a file
+        // present in a XAR dependency.
         unpackDependentXars();
         archiver.addDirectory(sourceDir);
 
@@ -192,13 +199,13 @@ public class XarMojo extends AbstractMojo
         try {
             unpack(file, outputLocation);
         } catch (NoSuchArchiverException e) {
-            this.getLog().info(
-                "Skip unpacking dependency file with unknown extension: " + file.getPath());
+            this.getLog().info("Skip unpacking dependency file with unknown extension ["
+                + file.getPath() + "]"); 
         }
     }
 
     /**
-     * Unpacks the archive file (exclude the package.xml file if it exists)
+     * Unpacks the XAR file (exclude the package.xml file if it exists)
      *
      * @param file File to be unpacked.
      * @param location Location where to put the unpacked files.
@@ -211,7 +218,10 @@ public class XarMojo extends AbstractMojo
             unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, "XarMojo"));
             unArchiver.setSourceFile(file);
             unArchiver.setDestDirectory(location);
-            unArchiver.setOverwrite(true);
+
+            // Ensure that we don't overwrite XML document files present in this project since
+            // we want those to be used and not the ones in the dependent XAR.
+            unArchiver.setOverwrite(false);
 
             // Do not unpack any package.xml file in dependant XARs. We'll generate a complete one
             // automatically.

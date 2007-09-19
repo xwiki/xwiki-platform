@@ -7,7 +7,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>xwiki-plugin-application-manager</artifactId>
   <name>XWiki Platform - Plugins - Application Manager</name>
-  <version>1.0-milestone-1</version>
+  <version>1.0-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Application Manager</description>
   <dependencies>
     <dependency>
@@ -25,10 +25,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.0-milestone-1</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.0-milestone-1</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-application-manager-1.0-milestone-1</url>
-  </scm>
 </project>

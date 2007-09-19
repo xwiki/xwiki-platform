@@ -29,14 +29,14 @@ public class WikiManagerException extends PluginException
     
     ////////
 
-    public static final int MODULE_PLUGIN_MULTIWIKI = 50;
+    public static final int MODULE_PLUGIN_WIKIMANAGER = 50;
     
-    public static final int ERROR_MULTIWIKI_CANNOT_CREATE_WIKI = 50032;
+    public static final int ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI = 50032;
     
-    public static final int ERROR_MULTIWIKI_SERVER_DOES_NOT_EXIST = 50034;
-    public static final int ERROR_MULTIWIKI_WIKISERVER_ALREADY_EXISTS = 50020;
+    public static final int ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST = 50034;
+    public static final int ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS = 50020;
     
-    public static final int ERROR_MULTIWIKI_WIKI_NAME_FORBIDDEN = 50035;
+    public static final int ERROR_WIKIMANAGER_WIKI_NAME_FORBIDDEN = 50035;
     
     ////////
     

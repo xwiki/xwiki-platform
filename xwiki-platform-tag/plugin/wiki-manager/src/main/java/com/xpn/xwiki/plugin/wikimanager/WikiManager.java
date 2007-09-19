@@ -234,7 +234,7 @@ public class WikiManager
                 if (LOG.isErrorEnabled())
                     LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                         + "wiki name is forbidden");
-                throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_WIKI_NAME_FORBIDDEN,
+                throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_WIKI_NAME_FORBIDDEN,
                     "Wiki name \"" + newWikiName + "\" forbidden");
             }
 
@@ -252,7 +252,7 @@ public class WikiManager
                         if (LOG.isErrorEnabled())
                             LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                                 + "wiki server page already exists");
-                        throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_WIKISERVER_ALREADY_EXISTS,
+                        throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS,
                             "Wiki \"" + userWikiSuperDoc.getFullName() + "\" document already exist");
                     } else if (LOG.isWarnEnabled())
                         LOG.warn("Wiki creation (" + userWikiSuperDoc + ") failed: "
@@ -293,7 +293,7 @@ public class WikiManager
             try {
                 xwiki.updateDatabase(newWikiName, true, false, context);
             } catch (Exception e) {
-                throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_WIKISERVER_ALREADY_EXISTS,
+                throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS,
                     "Wiki \"" + newWikiName + "\" database update failed",
                     e);
             }
@@ -314,7 +314,7 @@ public class WikiManager
                 XWikiAttachment packFile = doc.getAttachment(packageName);
 
                 if (packFile == null)
-                    throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_CANNOT_CREATE_WIKI,
+                    throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI,
                         "Package " + packageName + " does not exists.");
 
                 // Import
@@ -324,7 +324,7 @@ public class WikiManager
                 try {
                     importer.Import(packFile.getContent(context));
                 } catch (IOException e) {
-                    throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_CANNOT_CREATE_WIKI,
+                    throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI,
                         "Fail to import package " + packageName,
                         e);
                 }
@@ -333,7 +333,7 @@ public class WikiManager
                 context.setDatabase(newWikiName);                
 
                 if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE)
-                    throw new WikiManagerException(WikiManagerException.ERROR_MULTIWIKI_CANNOT_CREATE_WIKI,
+                    throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI,
                         "Fail to install package " + packageName);
             }
 

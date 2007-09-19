@@ -28,19 +28,19 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>6-SNAPSHOT</version>
+    <version>5</version>
     <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform.plugins</groupId>
   <artifactId>xwiki-plugins</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Plugins - Parent POM</name>
-  <version>1-SNAPSHOT</version>
+  <version>1</version>
   <description>XWiki Platform - Plugins - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/xwiki-plugins/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-plugins/trunk</url>
+    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugins-1</connection>
+    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugins-1</developerConnection>
+    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugins-1</url>
   </scm>
   <profiles>
     <profile>

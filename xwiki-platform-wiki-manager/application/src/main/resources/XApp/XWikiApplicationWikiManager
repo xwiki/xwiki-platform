@@ -205,14 +205,14 @@
 </applications>
 </property>
 <property>
-<appname>multiwiki</appname>
+<appname>wikimanager</appname>
 </property>
 <property>
 <appversion>1.0</appversion>
 </property>
 <property>
 <dependencies>
-<value>multiwiki</value>
+<value>wikimanager</value>
 <value>applicationmanager</value>
 </dependencies>
 </property>

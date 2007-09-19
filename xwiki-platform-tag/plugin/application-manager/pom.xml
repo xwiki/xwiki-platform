@@ -40,7 +40,7 @@
       <!-- Currently this Application Manager plugin is used by XEM which is based on XWiki Core
            version 1.1.x, hence this dependency on 1.1.X and not on 1.2.x. If this becomes a
            problem we can branch this plugin. -->
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>jmock</groupId>

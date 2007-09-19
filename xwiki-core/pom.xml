@@ -504,7 +504,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.5-SNAPSHOT</version>
+            <version>1.6-SNAPSHOT</version>
           </dependency>
         </dependencies>
         <configuration>

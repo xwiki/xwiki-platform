@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.plugin.multiwiki.doc;
+package com.xpn.xwiki.plugin.wikimanager.doc;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

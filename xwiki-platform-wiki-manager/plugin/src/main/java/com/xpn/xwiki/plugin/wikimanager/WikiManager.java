@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.plugin.multiwiki;
+package com.xpn.xwiki.plugin.wikimanager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -26,8 +26,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
-import com.xpn.xwiki.plugin.multiwiki.doc.XWikiServer;
-import com.xpn.xwiki.plugin.multiwiki.doc.XWikiServerClass;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 import com.xpn.xwiki.util.Util;

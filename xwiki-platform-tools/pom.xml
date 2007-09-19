@@ -27,11 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>3</version>
+    <version>4</version>
   </parent>
   <artifactId>xwiki-packager</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
-  <version>1.5-SNAPSHOT</version>
+  <version>1.5</version>
   <packaging>maven-plugin</packaging>
   <description>
     A packager tool to import/export XWiki pages into/from a database. This tool can be used either

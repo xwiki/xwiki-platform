@@ -36,7 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * API for managing multiwikis
+ * API for managing wikis (create wiki, delete wiki, create wiki from template, etc).
  * 
  * @version $Id: $
  * @see com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.plugin.multiwiki;
+package com.xpn.xwiki.plugin.wikimanager;
 
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
@@ -33,7 +33,7 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
 
     // ////////////////////////////////////////////////////////////////////////////
 
-    private static final String PLUGIN_NAME = "multiwiki";
+    private static final String PLUGIN_NAME = "wikimanager";
 
     // ////////////////////////////////////////////////////////////////////////////
 

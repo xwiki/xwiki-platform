@@ -1,5 +1,6 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -23,8 +24,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.objects.classes.DefaultSuperDocument;
 
 public class XWikiServer extends DefaultSuperDocument
 {

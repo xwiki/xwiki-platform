@@ -1,5 +1,6 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -19,7 +20,7 @@
 
 package com.xpn.xwiki.plugin.multiwiki;
 
-import com.xpn.xwiki.api.XWikiExceptionApi;
+import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.multiwiki.doc.XWikiServer;

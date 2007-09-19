@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.plugin.multiwiki;
+package com.xpn.xwiki.plugin.wikimanager;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.plugin.multiwiki.WikiManager}.
+ * Unit tests for {@link com.xpn.xwiki.plugin.wikimanager.WikiManager}.
  * 
  * @version $Id: $
  */

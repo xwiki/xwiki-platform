@@ -18,13 +18,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.plugin.multiwiki;
+package com.xpn.xwiki.plugin.wikimanager;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
-import com.xpn.xwiki.plugin.multiwiki.doc.XWikiServer;
-import com.xpn.xwiki.plugin.multiwiki.doc.XWikiServerClass;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * API for managing multiwikis
  * 
  * @version $Id: $
- * @see com.xpn.xwiki.plugin.multiwiki.WikiManagerPlugin
+ * @see com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin
  */
 public class WikiManagerPluginApi extends PluginApi
 {

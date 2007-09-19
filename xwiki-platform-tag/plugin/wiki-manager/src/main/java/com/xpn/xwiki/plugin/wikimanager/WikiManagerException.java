@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.plugin.multiwiki;
+package com.xpn.xwiki.plugin.wikimanager;
 
 import com.xpn.xwiki.plugin.PluginException;
 

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.plugin.multiwiki.doc;
+package com.xpn.xwiki.plugin.wikimanager.doc;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -27,7 +27,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.Abstract
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
-import com.xpn.xwiki.plugin.multiwiki.WikiManagerException;
+import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 
 public class XWikiServerClass extends AbstractSuperClass
 {

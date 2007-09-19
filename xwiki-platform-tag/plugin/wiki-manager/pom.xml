@@ -29,15 +29,15 @@
     <version>1-SNAPSHOT</version>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>xwiki-plugin-multiwiki</artifactId>
-  <name>XWiki Platform - Plugins - Multiwiki</name>
+  <artifactId>xwiki-plugin-wiki-manager</artifactId>
+  <name>XWiki Platform - Plugins - Wiki Manager</name>
   <version>1.0-SNAPSHOT</version>
-  <description>XWiki Platform - Plugins - Multiwiki</description>
+  <description>XWiki Platform - Plugins - Wiki Manager</description>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <!-- Currently this Multiwiki plugin is used by XEM which is based on XWiki Core
+      <!-- Currently this Wiki Manager plugin is used by XEM which is based on XWiki Core
            version 1.1.x, hence this dependency on 1.1.X and not on 1.2.x. If this becomes a
            problem we can branch this plugin. -->
       <version>1.1-SNAPSHOT</version>

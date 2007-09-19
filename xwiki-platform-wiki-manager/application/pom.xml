@@ -29,9 +29,9 @@
     <artifactId>xwiki-applications</artifactId>
     <version>5-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-multiwiki</artifactId>
-  <name>XWiki Platform - Applications - Multiwiki</name>
+  <artifactId>xwiki-application-wiki-manager</artifactId>
+  <name>XWiki Platform - Applications - Wiki Manager</name>
   <version>1.0-SNAPSHOT</version>
   <packaging>xar</packaging>
-  <description>Manages creation and installation of child Wikis</description>
+  <description>Manages creation and installation of children Wikis</description>
 </project>

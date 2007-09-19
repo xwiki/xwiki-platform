@@ -53,8 +53,8 @@
 <tags/>
 </property>
 </object>
-<content>#set($Multiwiki = $xwiki.multiwiki)
-#set($Exception = $Multiwiki.DefaultException)
+<content>#set($wikimanager = $xwiki.wikimanager)
+#set($Exception = $wikimanager.DefaultException)
 
 #set($action = $request.getParameter("action"))
 #set($confirm = $request.getParameter("confirm"))
@@ -67,7 +67,7 @@
 #if($action)
   #if($action == "delete")
     #if($confirm == 1)
-      #set($result = $Multiwiki.deleteWiki($wikiname))
+      #set($result = $wikimanager.deleteWiki($wikiname))
       #if ($result == $Exception.ERROR_NOERROR)
         &lt;font color=green&gt;
           $msg.get("wikimanager.successdeletewiki", [$wikiname])
@@ -81,7 +81,7 @@
       #xwikimessagebox($msg.get("wikimanager.answer.deletewiki.title") $msg.get("wikimanager.answer.deletewiki.msg", [$wikiname]) $doc.getURL("view", "confirm=1&amp;action=delete&amp;wikiname=$wikiname") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
     #end
   #elseif($action == "setvisibility")
-    #set($result = $Multiwiki.setWikiVisibility($wikiname, $wikivisibility))
+    #set($result = $wikimanager.setWikiVisibility($wikiname, $wikivisibility))
     #if ($result == $Exception.ERROR_NOERROR)
       &lt;font color=green&gt;
         $msg.get("wikimanager.successsetvisibility", [$wikiname, $wikivisibility])
@@ -110,7 +110,7 @@
   #end
 #end
 
-#set($list = $Multiwiki.getWikiDocumentList())
+#set($list = $wikimanager.getWikiDocumentList())
 &lt;div style="font-weight:bold;"&gt;
   $msg.get("wikimanager.totalnumberofwiki") : $list.size()&lt;br /&gt;
   [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki]&lt;br /&gt;

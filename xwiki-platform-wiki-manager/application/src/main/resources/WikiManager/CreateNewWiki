@@ -53,12 +53,12 @@
 <tags/>
 </property>
 </object>
-<content>#set($Multiwiki = $xwiki.multiwiki)
-#set($Exception = $Multiwiki.DefaultException)
+<content>#set($wikimanager = $xwiki.wikimanager)
+#set($Exception = $wikimanager.DefaultException)
 
 #set($domainname = "localdomain.com")
 
-#set($wikidocument = $Multiwiki.createWikiDocument())
+#set($wikidocument = $wikimanager.createWikiDocument())
 #set($wikidocumentobject = $wikidocument.updateObjectFromRequest("XWiki.XWikiServerClass"))
 
 #set($action = $request.getParameter("action"))
@@ -77,7 +77,7 @@
 1 $msg.get("wikimanager.createwiki")
 
 #if ($action &amp;&amp; $action == "create")
-  #set($result = $Multiwiki.createNewWiki($wikiname, $wikitemplate, $wikidocument, true))
+  #set($result = $wikimanager.createNewWiki($wikiname, $wikitemplate, $wikidocument, true))
 
   #if ($result == $Exception.ERROR_NOERROR)
     &lt;font color=green&gt;
@@ -85,8 +85,8 @@
     &lt;/font&gt;
   #else
     &lt;font color=red&gt;
-      #if ($result == $Exception.ERROR_MULTIWIKI_WIKISERVER_ALREADY_EXISTS)
-        $msg.get("wikimanager.errorcreatewiki.ERROR_MULTIWIKI_WIKISERVER_ALREADY_EXISTS", [$wikiname, $result])
+      #if ($result == $Exception.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS)
+        $msg.get("wikimanager.errorcreatewiki.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS", [$wikiname, $result])
       #elseif ($result == $Exception.ERROR_XWIKI_USER_INACTIVE)
         $msg.get("error.ERROR_XWIKI_USER_INACTIVE")
       #else
@@ -139,9 +139,9 @@
       &lt;td&gt;
         &lt;select name="wikitemplate" id="wikitemplate"&gt;
           &lt;option value=""&gt;&lt;/option&gt;
-          #set($listtemplate=$Multiwiki.getWikiTemplateList())
+          #set($listtemplate=$wikimanager.getWikiTemplateList())
           #foreach ($template in $listtemplate)
-            &lt;option value="$Multiwiki.getWikiName($template)"&gt;$Multiwiki.getWikiName($template)&lt;/option&gt;
+            &lt;option value="$wikimanager.getWikiName($template)"&gt;$wikimanager.getWikiName($template)&lt;/option&gt;
           #end
         &lt;/select&gt;
       &lt;/td&gt;

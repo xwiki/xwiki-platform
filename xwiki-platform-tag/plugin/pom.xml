@@ -52,17 +52,17 @@
         <module>adwords</module>
         <module>alexa</module>
         <module>exoplatform</module>
+        <module>multiwiki</module>
         <module>scheduler</module>
         <module>application-manager</module>
-        <module>wiki-manager</module>
       </modules>
     </profile>
     <profile>
       <!-- XWiki Enterprise Manager -->
       <id>xem</id>
       <modules>
+        <module>multiwiki</module>
         <module>application-manager</module>
-        <module>wiki-manager</module>
       </modules>
     </profile>
   </profiles>

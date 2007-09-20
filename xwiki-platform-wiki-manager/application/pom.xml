@@ -34,4 +34,12 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Manages creation and installation of children Wikis</description>
+  <dependencies>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.plugins</groupId>
+      <artifactId>xwiki-plugin-wiki-manager</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>runtime</scope>
+    </dependency>
+  </dependencies>
 </project>

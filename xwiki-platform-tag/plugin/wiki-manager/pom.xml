@@ -45,7 +45,7 @@
      <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-application-manager</artifactId>
-      <version>1.0-SNAPSHOT</version>
+      <version>1.0-milestone-1</version>
     </dependency>
     <dependency>
       <groupId>jmock</groupId>

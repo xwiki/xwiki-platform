@@ -41,6 +41,11 @@
       <artifactId>xwiki-core</artifactId>
       <version>1.2-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>quartz</groupId>
+      <artifactId>quartz</artifactId>
+      <version>1.5.2</version>
+    </dependency>
   </dependencies>
 </project>
         

@@ -480,6 +480,11 @@
       <artifactId>poi</artifactId>
       <version>3.0-FINAL</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-component</artifactId>
+      <version>${version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

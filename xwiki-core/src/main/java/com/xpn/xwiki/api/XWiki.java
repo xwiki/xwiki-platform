@@ -124,7 +124,7 @@ public class XWiki extends Api
     {
         XWikiDeletedDocument[] dds = xwiki.getDeletedDocuments(fullname, lang, context);
         if (dds == null || dds.length == 0) {
-            return null;
+            return Collections.EMPTY_LIST;
         }
         List result = new ArrayList(dds.length);
         for (int i = 0; i < dds.length; i++) {
@@ -334,7 +334,7 @@ public class XWiki extends Api
     {
         if (hasProgrammingRights())
             return xwiki.search(wheresql, getXWikiContext());
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -351,7 +351,7 @@ public class XWiki extends Api
     {
         if (hasProgrammingRights())
             return xwiki.search(wheresql, nb, start, getXWikiContext());
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -418,7 +418,7 @@ public class XWiki extends Api
         if (hasProgrammingRights())
             return xwiki.getStore().searchDocumentsNames(wheresql, nb, start, selectColumns,
                 getXWikiContext());
-        return null;
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -2050,7 +2050,7 @@ public class XWiki extends Api
     {
         XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (stats == null)
-            return new ArrayList();
+            return Collections.EMPTY_LIST;
         return stats.getRecentActions(action, size, getXWikiContext());
     }
 

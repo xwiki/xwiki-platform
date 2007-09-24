@@ -1482,6 +1482,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             //       renderer uses context.getDoc().getSpace() to find out the space name if no
             //       space is specified in the link. A better implementation would be to pass
             //       explicitely the current space to the render() method.
+            List links;
             XWikiDocument originalDocument = context.getDoc();
             context.setDoc(doc);
             try {
@@ -1492,15 +1493,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
                 XWikiRenderer renderer = renderContext.getWiki().getRenderingEngine().getRenderer("wiki");
                 renderer.render(doc.getContent(), doc, doc, renderContext);
+                links = (List) renderContext.get("links");
             } catch (Exception e) {
                 // If the rendering fails lets forget backlinks without errors
+                links = Collections.EMPTY_LIST;
             } finally {
                 if (originalDocument != null) {
                     context.setDoc(originalDocument);
                 }
             }
-
-            List links = (List)context.get("links");
 
             if (links != null){
                 for (int i=0;i<links.size();i++) {

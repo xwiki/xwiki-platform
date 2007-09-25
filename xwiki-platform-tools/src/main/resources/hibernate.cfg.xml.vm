@@ -76,6 +76,9 @@
 
     <!-- Oracle configuration.
          Uncomment if you want to use Oracle and comment out other database configurations.
+         Note: the 2 properties named "hibernate.connection.SetBigStringTryClob" and
+         "hibernate.jdbc.batch_size". They are required to tell Oracle to allow CLOBs larger than
+         32K. 
     <property name="connection.url">jdbc:oracle:thin:@localhost:1521:XE</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
@@ -84,6 +87,8 @@
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>
+    <property name="hibernate.connection.SetBigStringTryClob">true</property>
+    <property name="hibernate.jdbc.batch_size">0</property>
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>
     -->

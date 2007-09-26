@@ -248,6 +248,18 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.searchDocuments(wheresql, distinctbyname, customMapping, checkRight, nb, start, context);
     }
 
+    public List searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        return store.searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues, context);
+    }
+
+    public List searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        return store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);
+    }
+
     public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction) throws XWikiException {
         return store.loadLock(docId, context, bTransaction);
     }

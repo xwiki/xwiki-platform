@@ -464,6 +464,20 @@ public class XWiki extends Api
         return wrapDocs(xwiki.getStore().searchDocuments(wheresql, nb, start, getXWikiContext()));
     }
 
+    public List searchDocuments(String parametrizedSqlClause, int nb, int start,
+        List parameterValues) throws XWikiException
+    {
+        return xwiki.getStore().searchDocumentsNames(parametrizedSqlClause, nb, start,
+            parameterValues, getXWikiContext());
+    }
+
+    public List searchDocuments(String parametrizedSqlClause, List parameterValues)
+        throws XWikiException
+    {
+        return xwiki.getStore().searchDocumentsNames(parametrizedSqlClause,
+            parameterValues, getXWikiContext());
+    }
+
     /**
      * Function to wrap a list of XWikiDocument into Document objects
      * 

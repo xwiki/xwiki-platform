@@ -40,6 +40,8 @@ public interface XWikiStoreInterface {
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
     public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
     public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException;
+    public List searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List parameterValues, XWikiContext context) throws XWikiException;
+    public List searchDocumentsNames(String parametrizedSqlClause, List parameterValues, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException;

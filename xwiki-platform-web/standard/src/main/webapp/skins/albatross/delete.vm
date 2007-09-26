@@ -8,7 +8,7 @@
   <div id="xwikimessage">$message</div>
 #end
 #set($links=$doc.getBacklinks())
-#set($orphans = $xwiki.searchDocuments(" where doc.fullName <> '${doc.fullName}as' and (doc.parent = '${doc.fullName}' or (doc.parent = '${doc.name}' and doc.web = '${doc.web}'))"))
+#set($orphans = $xwiki.searchDocuments(" where doc.fullName <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))", ["${doc.fullName}as", ${doc.fullName}, ${doc.name}, ${doc.web}]))
 #if($request.xredirect)
   #set($redirectparam = "&amp;xredirect=$request.xredirect")
 #end

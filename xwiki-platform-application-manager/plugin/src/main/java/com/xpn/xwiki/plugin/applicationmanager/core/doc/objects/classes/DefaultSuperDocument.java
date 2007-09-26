@@ -30,6 +30,8 @@ import com.xpn.xwiki.objects.BaseObject;
 
 /**
  * Default implementation of SuperDocument.
+ * 
+ * @see SuperDocument
  */
 public class DefaultSuperDocument extends Document implements SuperDocument
 {
@@ -63,9 +65,9 @@ public class DefaultSuperDocument extends Document implements SuperDocument
         getDoc().setFullName(docFullName, context);
     }
     
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * {@inheritDoc}
+     *
      * @see com.xpn.xwiki.util.SuperDocument#reload(com.xpn.xwiki.api.Document,
      *      com.xpn.xwiki.XWikiContext)
      */
@@ -90,9 +92,9 @@ public class DefaultSuperDocument extends Document implements SuperDocument
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * {@inheritDoc}
+     *
      * @see com.xpn.xwiki.util.SuperDocument#merge(com.xpn.xwiki.util.SuperDocument)
      */
     public void mergeBaseObject(SuperDocument sdoc)
@@ -104,9 +106,9 @@ public class DefaultSuperDocument extends Document implements SuperDocument
             sdoc.getDocument().getObject(this.sclass.getClassFullName()));
     }
    
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * {@inheritDoc}
+     *
      * @see com.xpn.xwiki.util.SuperDocument#getSuperClass()
      */
     public SuperClass getSuperClass()
@@ -114,19 +116,19 @@ public class DefaultSuperDocument extends Document implements SuperDocument
         return this.sclass;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * {@inheritDoc}
+     *
      * @see com.xpn.xwiki.util.SuperDocument#isNew()
      */
     public boolean isNew()
     {
-        return this.isNew;
+        return super.isNew() || this.isNew;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * {@inheritDoc}
+     *
      * @see com.xpn.xwiki.util.SuperDocument#save(com.xpn.xwiki.XWikiContext)
      */
     public void save() throws XWikiException
@@ -135,11 +137,6 @@ public class DefaultSuperDocument extends Document implements SuperDocument
         this.isNew = false;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.xpn.xwiki.util.SuperDocument#delete(com.xpn.xwiki.XWikiContext)
-     */
     public void delete(XWikiContext context) throws XWikiException
     {
         super.delete();

@@ -25,14 +25,16 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * SuperDocument inteface.
+ * SuperDocument interface.
+ * 
+ * @see SuperClass
  */
 public interface SuperDocument
 {   
     /**
-     * Reload document.
+     * Reload XWiki document from database using Document full name.
      * 
-     * @param context   Context.
+     * @param context   the XWiki context.
      * 
      * @throws XWikiException
      */
@@ -41,28 +43,23 @@ public interface SuperDocument
     /**
      * Merge two documents BaseObject.
      * 
-     * @param sdoc Document to merge.
+     * @param sdoc the document to merge.
+     * @see com.xpn.xwiki.objects.BaseCollection#merge(BaseObject)
      */
     void mergeBaseObject(SuperDocument sdoc);
        
     /**
-     * Return super class.
-     * 
-     * @return SuperClass  Class manager for this document.
+     * @return the class manager for this document.
      */
     SuperClass getSuperClass();
       
     /**
-     * Indicate if document already exists in database.
-     *
-     * @return boolean  True if this is a new document of this class (this document can exist but not for this class).
+     * @return true if this is a new document of this class (this document can exist but does not contains object of this class).
      */
     boolean isNew();
 
     /**
-     * Return the document.
-     * 
-     * @return XWikiDocument The document.
+     * @return the XWiki document.
      */
     XWikiDocument getDocument();
 }

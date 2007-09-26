@@ -27,248 +27,301 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
+/**
+ * Interface that give way to manage a XWiki class :
+ * <ul>
+ * <li>assume that the XWiki class exist in the context we are working
+ * <li>search in documents that contains this class with conditions on class fields
+ * <li>support the XWiki norm about spaces and documents naming
+ * </ul>
+ */
 public interface SuperClass
 {
     /**
-     * Default class document suffix.
+     * Default suffix for the document containing the class.
      */
     static final String XWIKI_CLASS_SUFFIX = "Class";
 
     /**
-     * Default class sheet document suffix.
+     * Default suffix for a document containing a class sheet.
      */
     static final String XWIKI_CLASSSHEET_SUFFIX = "ClassSheet";
-    
+
     /**
-     * Default class template document suffix.
+     * Default suffix for a document containing a class template.
      */
     static final String XWIKI_CLASSTEMPLATE_SUFFIX = "ClassTemplate";
-   
+
     /**
-     * Default class document space.
+     * Default prefix for a document's space containing a class.
      */
     static final String XWIKI_CLASS_SPACE_PREFIX = "XWiki";
 
     /**
-     * Default class document space.
+     * Default suffix for a document's space containing a class.
      */
     static final String XWIKI_CLASS_SPACE_SUFFIX = "Classes";
-    
+
     /**
-     * Default class document space.
+     * Default suffix for a document's space containing a class sheet.
      */
     static final String XWIKI_CLASSSHEET_SPACE_SUFFIX = "Sheets";
-    
+
     /**
-     * Default class document space.
+     * Default suffix for a document's space containing a class template.
      */
     static final String XWIKI_CLASSTEMPLATE_SPACE_SUFFIX = "Templates";
-    
+
     // ///
 
     /**
-     * @return String   Space prefix of class document.
+     * @return the space prefix name of the document containing the class.
      */
     String getClassSpacePrefix();
-    
+
     /**
-     * @return String   Space of class document.
+     * @return the prefix name of the document containing the class. Usually extracted from :
+     *         ClassSpace.ClassPrefixXWIKI_CLASS_SUFFIX.
+     * @see #getClassSpace()
+     */
+    String getClassPrefix();
+
+    // Classes
+
+    /**
+     * @return the space name of the document containing the class. Usually class space is :
+     *         SpacePrefixXWIKI_CLASS_SPACE_SUFFIX.
+     * @see #getClassSpacePrefix()
+     * @see #XWIKI_CLASS_SPACE_SUFFIX
      */
     String getClassSpace();
 
     /**
-     * @return String   Prefix of class document.
-     */
-    String getClassPrefix();
-
-    /**
-     * @return String   Name of class document.
+     * @return the name of the document containing the class. Usually class name is :
+     *         ClassPrefixXWIKI_CLASS_SUFFIX.
+     * @see #getClassFullName()
+     * @see #getClassPrefix()
+     * @see #XWIKI_CLASS_SUFFIX
      */
     String getClassName();
 
     /**
-     * @return String   Full name of class document.
+     * @return the full name of the document containing the class. Usually class full name is :
+     *         ClassSpace.ClassName.
+     * @see #getClassName()
+     * @see #getClassSpace()
      */
     String getClassFullName();
 
+    // Templates
+
     /**
-     * @return String   Name of class template document.
+     * @return the space name of the document containing the class template. Usually class template
+     *         space name is : ClassSpacePrefixXWIKI_CLASSTEMPLATE_SPACE_SUFFIX.
+     * @see #getClassPrefix()
+     * @see #XWIKI_CLASSTEMPLATE_SPACE_SUFFIX
+     */
+    String getClassTemplateSpace();
+
+    /**
+     * @return the name of the document containing the class template. Usually class template name
+     *         is : ClassPrefixClassXWIKI_CLASSTEMPLATE_SUFFIX.
+     * @see #getClassPrefix()
+     * @see #getClassTemplateFullName()
+     * @see #XWIKI_CLASSTEMPLATE_SUFFIX
      */
     String getClassTemplateName();
 
     /**
-     * @return String   Full name of class template document.
+     * @return the full name of the document containing the class template. Usually class template
+     *         full name is : ClassTemplateSpace.ClassTemplateName.
+     * @see #getClassTemplateSpace()
+     * @see #getClassTemplateName()
      */
     String getClassTemplateFullName();
 
+    // Sheets
+
     /**
-     * @return String   Name of class sheet document.
+     * @return the space name of the document containing the class sheet. Usually class sheet space
+     *         name is : ClassSpacePrefixXWIKI_CLASSSHEET_SPACE_SUFFIX.
+     * @see #getClassSpacePrefix()
+     * @see #XWIKI_CLASSSHEET_SPACE_SUFFIX
+     */
+    String getClassSheetSpace();
+
+    /**
+     * @return the name of the document containing the class sheet. Usually class sheet name is :
+     *         ClassPrefixXWIKI_CLASSSHEET_SUFFIX.
+     * @see #getClassPrefix()
+     * @see #getClassSheetFullName()
+     * @see #XWIKI_CLASSSHEET_SUFFIX
      */
     String getClassSheetName();
 
     /**
-     * @return String   Full name of class sheet document.
+     * @return the full name of the document containing the class sheet. Usually class sheet full
+     *         name is : ClassSheetSpace.ClassSheetName.
+     * @see #getClassSheetSpace()
+     * @see #getClassSheetName()
      */
     String getClassSheetFullName();
 
+    // ///
+
     /**
-     * @return BaseClass   BaseClass object managed.
+     * @return the BaseClass managed by this SuperClass.
      */
     BaseClass getBaseClass() throws XWikiException;
 
     /**
-     * Return super class document for this context.
-     *
-     * @param context           Context.
+     * Get the document containing the class in this context's database.
      * 
-     * @return XWikiDocument   Class document for this context.
+     * @param context the XWiki context.
+     * @return the document containing the class for this context.
      */
     XWikiDocument getClassDocument(XWikiContext context) throws XWikiException;
-    
+
     /**
-     * Return super class sheet document content.
-     * 
-     * @return String   Default new class sheet document content.
+     * @return the default content to add in a new class sheet document.
      */
     String getClassSheetDefaultContent();
 
     /**
-     * Return super class sheet document for this context.
-     *
-     * @param context           Context.
-     *
-     * @return XWikiDocument    Class sheet document for this context.
+     * Get the document containing the class sheet for this context's database.
+     * 
+     * @param context the XWiki context.
+     * @return the document containing the class sheet for this context.
      */
     XWikiDocument getClassSheetDocument(XWikiContext context) throws XWikiException;
 
     /**
-     * Return super class template document content.
-     * 
-     * @return String   Default new class template document content.
+     * @return the default content to add in a new class template document.
      */
     String getClassTemplateDefaultContent();
-    
+
     /**
-     * Return super class template document for this context.
+     * Get the document containing the class template for this context's database.
      * 
-     * @param context       Context.
-     * 
-     * @return XWikiDocument   Class template document for this context.
+     * @param context the XWiki context.
+     * @return the class template document for this context.
      */
     XWikiDocument getClassTemplateDocument(XWikiContext context) throws XWikiException;
-        
+
     /**
-     * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he contains class object).
+     * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he
+     * contains class object).
      * 
-     * @param doc       XWikidocument to test.
-     * @param context   Context.
-     * 
-     * @return boolean  True if <code>doc</code> support this class.
-     * 
+     * @param doc the XWikidocument to test.
+     * @param context the XWiki context.
+     * @return true if <code>doc</code> support this class, false otherwise.
      * @throws XWikiException
      */
     boolean isInstance(XWikiDocument doc, XWikiContext context) throws XWikiException;
-    
+
     /**
-     * Get document name for item name <code>item</code>.
+     * Get document name from item name <code>item</code>. Usually a Document name is
+     * DocumentTypeItemName.
      * 
-     * @param itemName  Name of the item.
-     * @param context   Context.
-     * 
-     * @return String   Name of the document.
+     * @param itemName the name of the item to find.
+     * @param context the XWiki context.
+     * @return the name of the document.
+     * @see #getItemDocumentDefaultFullName(String, XWikiContext)
+     * @see #getItemDefaultName(String, XWikiContext)
      */
     String getItemDocumentDefaultName(String itemName, XWikiContext context);
-    
+
     /**
-     * Get document full name for item name <code>itemName</code>.
+     * Get document full name from item name <code>item</code>. Usually a Document full name is
+     * Space.DocumentTypeItemName.
      * 
-     * @param itemName  Full name of the item.
-     * @param context   Context.
-     * 
-     * @return String   Full name of the document.
+     * @param itemName the name of the item.
+     * @param context the XWiki context.
+     * @return the full name of the document.
+     * @see #getItemDocumentDefaultName(String, XWikiContext)
+     * @see #getItemDefaultName(String, XWikiContext)
      */
     String getItemDocumentDefaultFullName(String itemName, XWikiContext context);
-    
+
     /**
-     * Get item name extracted from document full name.
+     * Get item name extracted from document full name. Usually a Document full name is
+     * Space.DocumentTypeItemName.
      * 
-     * @param docFullName   Full name of the document.
-     * @param context       Context.
-     * 
-     * @return String       Item Name.
+     * @param docFullName the full name of the document.
+     * @param context the XWiki context.
+     * @return the item name extracted from document name.
+     * @see #getItemDocumentDefaultFullName(String, XWikiContext)
      */
     public String getItemDefaultName(String docFullName, XWikiContext context);
-    
+
     /**
-     * Get document by full name for item name <code>itemName</code>.
+     * Get document by full name from item name <code>itemName</code>.
      * 
-     * @param itemName  Full name of the item.
-     * @param context   Context.
-     *
-     * @return String   Full name of the document.
-     * 
-     * @throws XWikiException 
+     * @param itemName the full name of the item.
+     * @param context the XWiki context.
+     * @return the full name of the document.
+     * @throws XWikiException
+     * @see #getItemDefaultName(String, XWikiContext)
+     * @see #getItemDocumentDefaultFullName(String, XWikiContext)
      */
     XWikiDocument getItemDocument(String itemName, XWikiContext context) throws XWikiException;
-    
-    /**
-     * Search in instances of this document class.
-     * @param fieldName     Name of field.
-     * @param fieldValue    Value of field.
-     * @param fieldType     Type of field.
-     * @param context       Context.
-     *
-     * @return List         List of found XWikiDocuments.
-     *
-     * @throws XWikiException
-     */
-    List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType, XWikiContext context) throws XWikiException;
 
     /**
      * Search in instances of this document class.
      * 
-     * @param docFullName       Full name of the document. If Null, it is not consider.
-     * @param fieldDescriptors  List of fields name/value constraints.
-     * @param context           Context.
-     *
-     * @return List             List of found XWikiDocuments.
-     * 
+     * @param fieldName the name of field.
+     * @param fieldValue the value of field.
+     * @param fieldType the type of field.
+     * @param context the XWiki context.
+     * @return the list of found XWikiDocuments.
      * @throws XWikiException
      */
-    List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors, XWikiContext context) throws XWikiException;
+    List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
+        XWikiContext context) throws XWikiException;
 
     /**
-     * Create new super document.
+     * Search in instances of this document class.
      * 
-     * @param doc               Document to encapsulate.
-     * @param context           Context.
-     *
-     * @return SuperDocument   Super document.
+     * @param docFullName the full name of the document. If Null, it is not consider.
+     * @param fieldDescriptors the list of fields name/value constraints.
+     * @param context the XWiki context.
+     * @return the list of found XWikiDocuments.
+     * @throws XWikiException
+     */
+    List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors,
+        XWikiContext context) throws XWikiException;
+
+    /**
+     * Create new super document containing object of class {@link #getClassFullName()}. If
+     * document already exist it is returned with new object if it does not contains any.
      * 
+     * @param doc the XWiki document to manage.
+     * @param context the XWiki context.
+     * @return a new SuperDocument instance.
      * @throws XWikiException
      */
     SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
-     * Create new empty super document.
-     *
-     * @param context           Context.
+     * Create new super document containing object of class {@link #getClassFullName()}. If
+     * document already exist it is returned with new object if it does not contains any.
      * 
-     * @return SuperDocument   Super document.
-     * 
+     * @param context the XWiki context.
+     * @return a new SuperDocument instance.
      * @throws XWikiException
      */
     SuperDocument newSuperDocument(XWikiContext context) throws XWikiException;
 
     /**
-     * Create new super document.
+     * Create new super document containing object of class {@link #getClassFullName()}. If
+     * document already exist it is returned with new object if it does not contains any.
      * 
-     * @param docFullName       Full name of document to encapsulate.
-     * @param context           Context.
-     * 
-     * @return SuperDocument   Super document.
-     * 
+     * @param docFullName the full name of document to manage.
+     * @param context the XWiki context.
+     * @return a new SuperDocument instance.
      * @throws XWikiException
+     * @see #getClassFullName()
      */
-    SuperDocument newSuperDocument(String docFullName, XWikiContext context) throws XWikiException;
+    SuperDocument newSuperDocument(String docFullName, XWikiContext context)
+        throws XWikiException;
 }

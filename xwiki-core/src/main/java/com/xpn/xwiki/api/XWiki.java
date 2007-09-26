@@ -355,26 +355,39 @@ public class XWiki extends Api
     }
 
     /**
-     * API allowing to search for document names matching a query Examples: Query: "where
-     * doc.web='Main' order by doc.creationDate desc" Result: All the documents in space 'Main'
-     * ordered by the creation date from the most recent Query: "where doc.name like '%sport%' order
-     * by doc.name asc" Result: All the documents containing 'sport' in their name ordered by
-     * document name Query: "where doc.content like '%sport%' order by doc.author" Result: All the
-     * documents containing 'sport' in their content ordered by the author Query: "where doc.creator =
-     * 'XWiki.LudovicDubost' order by doc.creationDate desc" Result: All the documents with creator
-     * LudovicDubost ordered by the creation date from the most recent Query: "where doc.author =
-     * 'XWiki.LudovicDubost' order by doc.date desc" Result: All the documents with last author
-     * LudovicDubost ordered by the last modification date from the most recent Query: ",BaseObject
-     * as obj where doc.fullName=obj.name and obj.className='XWiki.XWikiComments' order by doc.date
-     * desc" Result: All the documents with at least one comment ordered by the last modification
-     * date from the most recent Query: ",BaseObject as obj, StringProperty as prop where
-     * doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id.id and
-     * prop.id.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date desc" Result:
-     * All the documents with at least one comment from LudovicDubost ordered by the last
-     * modification date from the most recent
-     * 
+     * API allowing to search for document names matching a query.
+     * Examples:
+     * <ul>
+     *   <li>Query: <code>where doc.web='Main' order by doc.creationDate desc</code>.
+     *       Result: All the documents in space 'Main' ordered by the creation date from the most
+     *       recent</li>
+     *   <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>.
+     *       Result: All the documents containing 'sport' in their name ordered by document
+     *       name</li>
+     *   <li>Query: <code>where doc.content like '%sport%' order by doc.author</code>
+     *       Result: All the documents containing 'sport' in their content ordered by the
+     *       author</li>
+     *   <li>Query: <code>where doc.creator = 'XWiki.LudovicDubost' order by doc.creationDate
+     *       desc</code>.
+     *       Result: All the documents with creator LudovicDubost ordered by the creation date
+     *       from the most recent</li>
+     *   <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>.
+     *       Result: All the documents with last author LudovicDubost ordered by the last
+     *       modification date from the most recent.</li>
+     *   <li>Query: <code>,BaseObject as obj where doc.fullName=obj.name and
+     *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>.
+     *       Result: All the documents with at least one comment ordered by the last modification
+     *       date from the most recent</li>
+     *   <li>Query: <code>,BaseObject as obj, StringProperty as prop where
+     *       doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id.id
+     *       and prop.id.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date
+     *       desc</code>.
+     *       Result: All the documents with at least one comment from LudovicDubost ordered by the
+     *       last modification date from the most recent</li>
+     * </ul>
+     *
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by
-     *            "where ..."
+     *        "where ..."
      * @return List of document names matching (Main.Page1, Main.Page2)
      * @throws XWikiException
      */

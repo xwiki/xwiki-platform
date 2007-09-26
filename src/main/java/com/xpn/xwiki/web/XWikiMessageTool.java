@@ -151,7 +151,7 @@ public class XWikiMessageTool
      * params parameters. The format is the one used by {@link java.text.MessageFormat}.
      * <p>
      * Note: The reason we're using a List instead of an Object array is because we haven't found
-     * how to easily create an Array in Velocity whereas an Array is easily created. For example:
+     * how to easily create an Array in Velocity whereas a List is easily created. For example:
      * <code>$msg.get("key", ["1", "2", "3"])</code>.
      * </p>
      * 

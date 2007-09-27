@@ -21,7 +21,7 @@
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,9 +36,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Plugin for managing applications: installation, export, creation. The plugin uses the concept
- * of an Application Descriptor describing an application (its version, the documents it contains,
- * the translations, etc).
+ * Plugin for managing applications: installation, export, creation. The plugin uses the concept of
+ * an Application Descriptor describing an application (its version, the documents it contains, the
+ * translations, etc).
  * 
  * @version $Id: $
  * @see com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin
@@ -46,14 +46,15 @@ import org.apache.commons.logging.LogFactory;
 public class ApplicationManagerPluginApi extends PluginApi
 {
     protected static final Log LOG = LogFactory.getLog(ApplicationManagerPluginApi.class);
-    
+
     private XWikiExceptionApi defaultException;
 
     public ApplicationManagerPluginApi(ApplicationManagerPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
-        
-        defaultException = new XWikiExceptionApi(ApplicationManagerException.getDefaultException(), context);
+
+        defaultException =
+            new XWikiExceptionApi(ApplicationManagerException.getDefaultException(), context);
     }
 
     public XWikiExceptionApi getDefaultException()
@@ -72,10 +73,12 @@ public class ApplicationManagerPluginApi extends PluginApi
      */
     public XWikiApplication createApplicationDocument() throws XWikiException
     {
-        return (XWikiApplication)XWikiApplicationClass.getInstance(context).newSuperDocument(context);
+        return (XWikiApplication) XWikiApplicationClass.getInstance(context).newSuperDocument(
+            context);
     }
 
-    public int createApplication(XWikiApplication appSuperDocument, boolean failOnExist) throws XWikiException
+    public int createApplication(XWikiApplication appSuperDocument, boolean failOnExist)
+        throws XWikiException
     {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
@@ -118,7 +121,7 @@ public class ApplicationManagerPluginApi extends PluginApi
 
     public List getApplicationDocumentList() throws XWikiException
     {
-        List listDocument = new ArrayList();
+        List listDocument = Collections.EMPTY_LIST;
 
         try {
             listDocument = ApplicationManager.getInstance().getApplicationList(this.context);
@@ -137,8 +140,7 @@ public class ApplicationManagerPluginApi extends PluginApi
         XWikiApplication app = null;
 
         try {
-            app =
-                ApplicationManager.getInstance().getApplication(appName, context, true);
+            app = ApplicationManager.getInstance().getApplication(appName, context, true);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
 
@@ -151,115 +153,117 @@ public class ApplicationManagerPluginApi extends PluginApi
 
     public int exportApplicationXAR(String appName) throws XWikiException, IOException
     {
+        return exportApplicationXAR(appName, true, false);
+    }
+    
+    public int exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory) throws XWikiException, IOException
+    {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            ApplicationManager.getInstance().exportApplicationXAR(appName, false, context);
+            ApplicationManager.getInstance().exportApplicationXAR(appName, recurse, withDocHistory, context);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
 
             context.put("lasterrorcode", new Integer(e.getCode()));
             context.put("lastexception", new XWikiExceptionApi(e, context));
-            
+
             returncode = e.getCode();
         }
 
         return returncode;
     }
-    
+
     public int importApplication(String packageName) throws XWikiException
     {
         if (!hasAdminRights())
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
-        
+
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            ApplicationManager.getInstance().importApplication(context.getDoc(), packageName, context);
+            ApplicationManager.getInstance().importApplication(context.getDoc(), packageName,
+                context);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
 
             context.put("lasterrorcode", new Integer(e.getCode()));
             context.put("lastexception", new XWikiExceptionApi(e, context));
-            
+
             returncode = e.getCode();
         }
 
         return returncode;
     }
-    
+
     /**
-	 * Reload xwiki application. It means : - update XWikiPreferences with
-	 * application translation documents
-	 * 
-	 * @return int Error code.
-	 * 
-	 * @throws XWikiException
-	 */
-	public int reloadApplication(String appName) throws XWikiException {
-		if (!hasAdminRights())
-			return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+     * Reload xwiki application. It means : - update XWikiPreferences with application translation
+     * documents
+     * 
+     * @return int Error code.
+     * @throws XWikiException
+     */
+    public int reloadApplication(String appName) throws XWikiException
+    {
+        if (!hasAdminRights())
+            return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
 
-		int returncode = XWikiExceptionApi.ERROR_NOERROR;
+        int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
-		try {
-			XWikiApplication app = ApplicationManager.getInstance()
-					.getApplication(appName, context, true);
-			ApplicationManager.getInstance().updateApplicationTranslation(app,
-					context);
-		} catch (ApplicationManagerException e) {
-			LOG.error("Try to get application document", e);
+        try {
+            XWikiApplication app =
+                ApplicationManager.getInstance().getApplication(appName, context, true);
+            ApplicationManager.getInstance().updateApplicationTranslation(app, context);
+        } catch (ApplicationManagerException e) {
+            LOG.error("Try to get application document", e);
 
-			context.put("lasterrorcode", new Integer(e.getCode()));
-			context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put("lasterrorcode", new Integer(e.getCode()));
+            context.put("lastexception", new XWikiExceptionApi(e, context));
 
-			returncode = e.getCode();
-		}
+            returncode = e.getCode();
+        }
 
-		return returncode;
-	}
+        return returncode;
+    }
 
-	/**
-	 * Reload all xwiki applications. It means : - update XWikiPreferences with
-	 * each application translation documents
-	 * 
-	 * @return int Error code.
-	 * 
-	 * @throws XWikiException
-	 */
-	public int reloadAllApplications() throws XWikiException {
-		if (!hasAdminRights())
-			return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+    /**
+     * Reload all xwiki applications. It means : - update XWikiPreferences with each application
+     * translation documents
+     * 
+     * @return int Error code.
+     * @throws XWikiException
+     */
+    public int reloadAllApplications() throws XWikiException
+    {
+        if (!hasAdminRights())
+            return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
 
-		int returncode = XWikiExceptionApi.ERROR_NOERROR;
+        int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
-		try {
-			List applist = ApplicationManager.getInstance().getApplicationList(
-					context);
-			for (Iterator it = applist.iterator(); it.hasNext();) {
-				XWikiApplication app = (XWikiApplication) it.next();
-				ApplicationManager.getInstance().updateApplicationTranslation(
-						app, context);
-			}
-		} catch (ApplicationManagerException e) {
-			LOG.error("Try to get application document", e);
+        try {
+            List applist = ApplicationManager.getInstance().getApplicationList(context);
+            for (Iterator it = applist.iterator(); it.hasNext();) {
+                XWikiApplication app = (XWikiApplication) it.next();
+                ApplicationManager.getInstance().updateApplicationTranslation(app, context);
+            }
+        } catch (ApplicationManagerException e) {
+            LOG.error("Try to get application document", e);
 
-			context.put("lasterrorcode", new Integer(e.getCode()));
-			context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put("lasterrorcode", new Integer(e.getCode()));
+            context.put("lastexception", new XWikiExceptionApi(e, context));
 
-			returncode = e.getCode();
-		}
+            returncode = e.getCode();
+        }
 
-		return returncode;
-	}
-    
+        return returncode;
+    }
+
     public XWikiApplication getRootApplication(XWikiContext context) throws XWikiException
     {
         XWikiApplication app = null;
 
         try {
-            app =
-                ApplicationManager.getInstance().getRootApplication(context);
+            app = ApplicationManager.getInstance().getRootApplication(context);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
 

@@ -217,7 +217,7 @@ public class ApplicationManager
         return updateprefs;
     }
 
-    public void exportApplicationXAR(String appName, boolean withDocHistory, XWikiContext context) throws XWikiException,
+    public void exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory, XWikiContext context) throws XWikiException,
         IOException
     {
         XWikiApplication app =
@@ -227,7 +227,7 @@ public class ApplicationManager
 
         export.setName(app.getAppName() + "-" + app.getAppVersion());
 
-        Set documents = app.getDocumentsNames(true, true, context);
+        Set documents = app.getDocumentsNames(recurse, true, context);
         for (Iterator it = documents.iterator(); it.hasNext();) {
             export.add((String) it.next(), DocumentInfo.ACTION_OVERWRITE);
         }

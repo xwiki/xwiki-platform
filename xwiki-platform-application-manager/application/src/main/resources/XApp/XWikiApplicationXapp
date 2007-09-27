@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1188210392000</creationDate>
-<date>1188464736000</date>
-<contentUpdateDate>1189614079000</contentUpdateDate>
-<version>1.1</version>
+<date>1190919242000</date>
+<contentUpdateDate>1190919242000</contentUpdateDate>
+<version>1.2</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -229,6 +229,10 @@
 <value>XAppManager.WebHome</value>
 <value>XAppManager.CreateApplication</value>
 <value>XAppResources.Translations</value>
+<value>XAppCode.DeleteAppCode</value>
+<value>XAppCode.ExportAppCode</value>
+<value>XAppCode.ImportAppCode</value>
+<value>XAppCode.ReloadAppCode</value>
 </documents>
 </property>
 <property>

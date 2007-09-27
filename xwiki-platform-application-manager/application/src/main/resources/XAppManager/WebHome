@@ -12,14 +12,14 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186499908000</creationDate>
-<date>1189787342000</date>
-<contentUpdateDate>1189787342000</contentUpdateDate>
-<version>1.3</version>
+<date>1190919524000</date>
+<contentUpdateDate>1190919524000</contentUpdateDate>
+<version>1.28</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
-<comment>Deletion of attachment xwiki-enterprise-wiki.xar</comment>
+<comment></comment>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -61,64 +61,27 @@
 
 #set($appname = $request.getParameter("appname"))
 #set($packagename = $request.getParameter("packagename"))
+#set($recurse = $request.getParameter("recurse"))
+#set($withversion = $request.getParameter("withversion"))
+
+
+1 $msg.get("xapp.appmanager")
 
 #############################################################################
 
 #if($action)
   #if($action == "delete")
-    #if($confirm == 1)
-      #set($result = $Appmanager.deleteApplication($appname))
-      #if ($result == $Exception.ERROR_NOERROR)
-        &lt;font color=green&gt;
-          $msg.get("xapp.successdeleteapp", [$appname])
-        &lt;/font&gt;
-      #else
-        &lt;font color=red&gt;
-          $msg.get("xapp.errordeleteapp", [$appname, $result])
-        &lt;/font&gt;
-      #end
-    #else
-      #xwikimessagebox($msg.get("xapp.answer.deleteapp.title") $msg.get("xapp.answer.deleteapp.msg", [$appname]) $doc.getURL("view", "confirm=1&amp;action=delete&amp;appname=$appname") $doc.getURL("view") $msg.get("yes") $msg.get("no"))
-    #end
+    #includeInContext("XAppCode.DeleteAppCode")
   #elseif($action == "export")
-    #set($result = $Appmanager.exportApplicationXAR($appname))
-    #if ($result == $Exception.ERROR_NOERROR)
-      &lt;font color=green&gt;
-        $msg.get("xapp.successexportapp", [$appname])
-      &lt;/font&gt;
-    #else
-      &lt;font color=red&gt;
-        $msg.get("xapp.errorexportapp", [$appname, $result])
-      &lt;/font&gt;
-    #end
+    #includeInContext("XAppCode.ExportAppCode")
   #elseif($action == "import")
-    #set($result = $Appmanager.importApplication($packagename))
-    #if ($result == $Exception.ERROR_NOERROR)
-      &lt;font color=green&gt;
-        $msg.get("xapp.successimportapp", [$packagename])
-      &lt;/font&gt;
-    #else
-      &lt;font color=red&gt;
-        $msg.get("xapp.errorimportapp", [$packagename, $result])
-      &lt;/font&gt;
-    #end
+    #includeInContext("XAppCode.ImportAppCode")
   #elseif($action == "reload")
-    #set($result = $Appmanager.reloadApplication($appname))
-    #if ($result == $Exception.ERROR_NOERROR)
-      &lt;font color=green&gt;
-        $msg.get("xapp.successreloadapp", [$appname])
-      &lt;/font&gt;
-    #else
-      &lt;font color=red&gt;
-        $msg.get("xapp.errorreloadapp", [$appname, $result])
-      &lt;/font&gt;
-    #end
+    #includeInContext("XAppCode.ReloadAppCode")
   #end
 #end
 
 #############################################################################
-
-1 $msg.get("xapp.appmanager")
 
 #set($listApp = $Appmanager.getApplicationDocumentList())
 
@@ -130,7 +93,7 @@ $msg.get("xapp.totalnumberofapp") : $listApp.size()
   {table}
     $msg.get("xapp.appname") | $msg.get("version") | $msg.get("xapp.description") | $msg.get("more")
     #foreach($app in $listApp)
-      [$app.appname&gt;$app.getFullName()] | $app.appversion | $app.description | [$msg.get("delete")&gt;?action=delete&amp;appname=$app.appname] [$msg.get("export")&gt;?action=export&amp;appname=$app.appname] [$msg.get("xapp.action.reloadapp")&gt;?action=reload&amp;appname=$app.appname] &lt;a href="$app.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;
+      [$app.appname&gt;$app.getFullName()] | $app.appversion | $app.description | [$msg.get("delete")&gt;?action=delete&amp;appname=$app.appname] [$msg.get("xapp.action.exportrecurse")&gt;?action=export&amp;appname=$app.appname] [$msg.get("xapp.action.reloadapp")&gt;?action=reload&amp;appname=$app.appname] &lt;a href="$app.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;
     #end
   {table}
 #end

@@ -34,9 +34,9 @@ import org.quartz.Trigger;
 public class StatusListener implements SchedulerListener, JobListener
 {
     /**
-     * Log object to log messages in this class.
+     * Log4j logger that records events for this class
      */
-    private static final Log LOG = LogFactory.getLog(SchedulerPlugin.class);
+    private static final Log LOG = LogFactory.getLog(StatusListener.class);
 
     /**
      * {@inheritDoc}

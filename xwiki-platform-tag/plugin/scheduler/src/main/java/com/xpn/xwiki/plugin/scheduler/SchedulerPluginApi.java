@@ -19,21 +19,31 @@
  */
 package com.xpn.xwiki.plugin.scheduler;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.Vector;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Object;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.quartz.SchedulerException;
+
+import java.util.Date;
+import java.util.Iterator;
+import java.util.Vector;
 
 /**
+ * A Scheduler plugin to plan execution of Jobs from XWiki with cron expressions. The plugin uses
+ * Quartz's scheduling library. <p/> Jobs are represented by {@link com.xpn.xwiki.api.Object}
+ * XObjects, instances of the {@link SchedulerPlugin#XWIKI_JOB_CLASS} XClass. These XObjects do
+ * store a job name, the implementation class name of the job to be executed, the cron expression to
+ * precise when the job should be fired, and possibly a groovy script with the job's program. <p/>
+ * The plugin offers a {@link GroovyJob} Groovy Job wrapper to execute groovy scripts (typically for
+ * use inside the Wiki), but can also be used with any Java class implementing {@link
+ * org.quartz.Job}
+ *
  * @version $Id: $
  */
 public class SchedulerPluginApi extends Api
@@ -43,6 +53,9 @@ public class SchedulerPluginApi extends Api
      */
     private static final Log LOG = LogFactory.getLog(SchedulerPluginApi.class);
 
+    /**
+     * The instance of the actual implementation class of the plugin
+     */
     private SchedulerPlugin plugin;
 
     public SchedulerPluginApi(SchedulerPlugin plugin, XWikiContext context)
@@ -51,49 +64,56 @@ public class SchedulerPluginApi extends Api
         setPlugin(plugin);
     }
 
-    public boolean pauseTask(String number)
-    {
-        return pauseTask(context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
-            Integer.valueOf(number).intValue()));
-    }
-
-    public boolean pauseTask(Object object)
-    {
-        return pauseTask(object.getXWikiObject());
-    }
-
-    public boolean pauseTask(BaseObject object)
+    /**
+     * Return the trigger state of the given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS}
+     * XObject job. Possible values are : None (the trigger does not exists yet, or has been
+     * deleted), Normal, Blocked, Complete, Error and Paused
+     *
+     * @param object the XObject job to give the state of
+     * @return a String representing this state
+     */
+    public String getStatus(Object object)
     {
         try {
-            plugin.pauseTask(String.valueOf(object.getNumber()));
-            saveStatus("Paused", object);
-            LOG.debug("Pause Task : " + object.getStringValue("taskName"));
-            return true;
-        } catch (XWikiException e) {
+            return getJobStatus(object.getXWikiObject()).getValue();
+        } catch (SchedulerException e) {
             context.put("error", e.getMessage());
-            return false;
+            return null;
         }
     }
 
     /**
-     * Schedule the given XObject to be executed according to its parameters. Errors are returned in
-     * the context map. Scheduling can be called for example: <code> #if($xwiki.scheduler.scheduleTask($task)!=true)
-     * #error($context.get("error") #else #info("Task scheduled") #end </code> Where $task is an
-     * XObject, instance of the XWiki.Task XClass
-     *
-     * @param object the XObject to be scheduled, an instance of the XClass XWiki.Task
-     * @return true on success, false on failure
+     * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner
+     * value of the state and a String as a human readable representation of that state
      */
-    public boolean scheduleTask(Object object)
+    public JobState getJobStatus(BaseObject object) throws SchedulerException
     {
-        return scheduleTask(object.getXWikiObject());
+        return plugin.getJobStatus(object);
     }
 
-    public boolean scheduleTask(BaseObject object)
+    public JobState getJobStatus(Object object) throws SchedulerException
+    {
+        return plugin.getJobStatus(object.getXWikiObject());
+    }
+
+    /**
+     * Schedule the given XObject to be executed according to its parameters. Errors are returned in
+     * the context map. Scheduling can be called for example: <code> #if($xwiki.scheduler.scheduleJob($job)!=true)
+     * #error($context.get("error") #else #info("Job scheduled") #end </code> Where $job is an
+     * XObject, instance of the {@link SchedulerPlugin#XWIKI_JOB_CLASS} XClass
+     *
+     * @param object the XObject to be scheduled, an instance of the XClass XWiki.SchedulerJobClass
+     * @return true on success, false on failure
+     */
+    public boolean scheduleJob(Object object)
+    {
+        return scheduleJob(object.getXWikiObject());
+    }
+
+    public boolean scheduleJob(BaseObject object)
     {
         try {
-            plugin.scheduleTask(object, context);
-            saveStatus("Scheduled", object);
+            plugin.scheduleJob(object, context);
             return true;
         } catch (Exception e) {
             context.put("error", e.getMessage());
@@ -102,17 +122,40 @@ public class SchedulerPluginApi extends Api
     }
 
     /**
-     * Schedule for execution all XWiki Tasks found in the passed Document object.
+     * Schedule all {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS} XObjects
+     * stored inside the given Wiki document, according to each XObject own parameters.
+     *
+     * @param document the document holding the XObjects Jobs to be scheduled
+     * @return true on success, false on failure.
      */
-    public boolean scheduleTasks(Document document)
+    public boolean scheduleJobs(Document document)
+    {
+        boolean result = true;
+        Vector objects = document.getObjects(SchedulerPlugin.XWIKI_JOB_CLASS);
+        for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
+            Object object = (Object) iterator.next();
+            result &= scheduleJob(object.getXWikiObject());
+        }
+        return result;
+    }
+
+    /**
+     * Pause the given XObject job by pausing all of its current triggers. Can be called the same
+     * way as {@link #scheduleJob}
+     *
+     * @param object the wrapped XObject Job to be paused
+     * @return true on success, false on failure.
+     */
+    public boolean pauseJob(Object object)
+    {
+        return pauseJob(object.getXWikiObject());
+    }
+
+    public boolean pauseJob(BaseObject object)
     {
         try {
-            Vector objects = document.getObjects(SchedulerPlugin.TASK_CLASS);
-            for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
-                Object object = (Object) iterator.next();
-                scheduleTask(object.getXWikiObject());
-            }
-            saveDocument(document.getDocument());
+            plugin.pauseJob(object, context);
+            LOG.debug("Pause Job : " + object.getStringValue("jobName"));
             return true;
         } catch (XWikiException e) {
             context.put("error", e.getMessage());
@@ -120,23 +163,23 @@ public class SchedulerPluginApi extends Api
         }
     }
 
-    public boolean resumeTask(String number)
+    /**
+     * Resume a XObject job that is in a {@link JobState#PAUSED} state. Can be called the same
+     * way as {@link #scheduleJob}
+     *
+     * @param object the wrapped XObject Job to be paused
+     * @return true on success, false on failure.
+     */
+    public boolean resumeJob(Object object)
     {
-        return resumeTask(context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
-            Integer.valueOf(number).intValue()));
+        return resumeJob(object.getXWikiObject());
     }
 
-    public boolean resumeTask(Object object)
-    {
-        return resumeTask(object.getXWikiObject());
-    }
-
-    public boolean resumeTask(BaseObject object)
+    public boolean resumeJob(BaseObject object)
     {
         try {
-            plugin.resumeTask(String.valueOf(object.getNumber()));
-            saveStatus("Scheduled", object);
-            LOG.debug("Resume Task : " + object.getStringValue("taskName"));
+            plugin.resumeJob(object, context);
+            LOG.debug("Resume Job : " + object.getStringValue("jobName"));
             return true;
         } catch (XWikiException e) {
             context.put("error", e.getMessage());
@@ -144,23 +187,23 @@ public class SchedulerPluginApi extends Api
         }
     }
 
-    public boolean unscheduleTask(String number)
+    /**
+     * Unschedule a XObject job by deleting it from the jobs table. Can be called the same way as
+     * {@link #scheduleJob}
+     *
+     * @param object the wrapped XObject Job to be paused
+     * @return true on success, false on failure.
+     */
+    public boolean unscheduleJob(Object object)
     {
-        return unscheduleTask(context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
-            Integer.valueOf(number).intValue()));
+        return unscheduleJob(object.getXWikiObject());
     }
 
-    public boolean unscheduleTask(Object object)
-    {
-        return unscheduleTask(object.getXWikiObject());
-    }
-
-    public boolean unscheduleTask(BaseObject object)
+    public boolean unscheduleJob(BaseObject object)
     {
         try {
-            saveStatus("Unscheduled", object);
-            plugin.unscheduleTask(String.valueOf(object.getNumber()));
-            LOG.debug("Delete Task : " + object.getStringValue("taskName"));
+            plugin.unscheduleJob(object, context);
+            LOG.debug("Delete Job : " + object.getStringValue("jobName"));
             return true;
         } catch (XWikiException e) {
             context.put("error", e.getMessage());
@@ -168,36 +211,40 @@ public class SchedulerPluginApi extends Api
         }
     }
 
+    /**
+     * Give, for a XObject job in a {@JobState#STATE_NORMAL} state, the next date at which the job
+     * will be executed, according to its cron expression. Errors are returned in the context map.
+     * Can be called for example: <code> #set($firetime = $xwiki.scheduler.getNextFireTime($job))
+     * #if (!$firetime || $firetime=="") #error($context.get("error") #else #info("Fire time :
+     * $firetime") #end </code> Where $job is an XObject, instance of the {@link
+     * SchedulerPlugin#XWIKI_JOB_CLASS} XClass
+     *
+     * @param object the wrapped XObject for which to give the fire date
+     * @return the date the job will be executed
+     */
     public Date getNextFireTime(Object object)
     {
+        return getNextFireTime(object.getXWikiObject());
+    }
+
+    public Date getNextFireTime(BaseObject object)
+    {
         try {
-            return plugin.getNextFireTime(String.valueOf(object.getXWikiObject().getNumber()));
-        } catch (SchedulerPluginException e) {
+            return plugin.getNextFireTime(object);
+        }
+        catch (SchedulerPluginException e) {
             context.put("error", e.getMessage());
             return null;
         }
     }
 
-    public SchedulerPlugin getPlugin()
-    {
-        return plugin;
-    }
-
-    private void saveStatus(String status, BaseObject object)
-        throws XWikiException
-    {
-        context.getDoc().getObject(SchedulerPlugin.TASK_CLASS,
-            object.getNumber()).setStringValue("status", status);
-        saveDocument(context.getDoc());
-    }
-
-    private void saveDocument(XWikiDocument document) throws XWikiException
-    {
-        context.getWiki().saveDocument(document, context);
-    }
-
     public void setPlugin(SchedulerPlugin plugin)
     {
         this.plugin = plugin;
+    }
+
+    public XWikiPluginInterface getPlugin()
+    {
+        return plugin;
     }
 }

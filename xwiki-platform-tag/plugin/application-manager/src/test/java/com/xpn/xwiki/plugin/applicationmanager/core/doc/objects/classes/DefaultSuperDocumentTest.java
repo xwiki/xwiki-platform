@@ -29,6 +29,8 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
+
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
@@ -36,6 +38,7 @@ import org.jmock.core.stub.CustomStub;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,6 +63,9 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         this.context = new XWikiContext();
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
 
+        ////////////////////////////////////////////////////
+        // XWikiHibernateStore
+        
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {this.xwiki, this.context});
@@ -105,6 +111,43 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
             .proxy());
+        
+        
+        //////////////////////////////////////////////////////////////////////////////////
+        // XWikiRightService
+        
+        this.xwiki.setRightService(new XWikiRightService() {
+            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
+            {
+                return true;
+            }
+
+            public boolean hasAccessLevel(String right, String username, String docname,
+                XWikiContext context) throws XWikiException
+            {
+                return true;
+            }
+
+            public boolean hasAdminRights(XWikiContext context)
+            {
+                return true;
+            }
+
+            public boolean hasProgrammingRights(XWikiContext context)
+            {
+                return true;
+            }
+
+            public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
+            {
+                return true;
+            }
+
+            public List listAllLevels(XWikiContext context) throws XWikiException
+            {
+                return Collections.EMPTY_LIST;
+            }
+        });
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////:
@@ -120,7 +163,7 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
 
         /////
 
-        TestAbstractSuperClassTest.DispatchSuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
+        SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
         DefaultSuperDocument sdoc = (DefaultSuperDocument)sclass.newSuperDocument(context);
 
         assertNotNull(sdoc);
@@ -138,7 +181,7 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
 
         /////
 
-        TestAbstractSuperClassTest.DispatchSuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
+        SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
         DefaultSuperDocument sdoc = (DefaultSuperDocument)sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
 
         assertNotNull(sdoc);
@@ -159,7 +202,7 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, context);
         xwiki.saveDocument(doc, context);
 
-        TestAbstractSuperClassTest.DispatchSuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
+        SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
         DefaultSuperDocument sdoc = (DefaultSuperDocument)sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
 
         assertNotNull(sdoc);

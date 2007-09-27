@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jmock.Mock;
@@ -41,6 +42,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass}.
@@ -63,6 +65,9 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         this.context = new XWikiContext();
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
+        
+        ////////////////////////////////////////////////////
+        // XWikiHibernateStore
         
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
@@ -105,10 +110,46 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
             returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(
             returnValue(null));
-
+        
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
             .proxy());
+        
+        //////////////////////////////////////////////////////////////////////////////////
+        // XWikiRightService
+        
+        this.xwiki.setRightService(new XWikiRightService() {
+            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
+            {
+                return true;
+            }
+
+            public boolean hasAccessLevel(String right, String username, String docname,
+                XWikiContext context) throws XWikiException
+            {
+                return true;
+            }
+
+            public boolean hasAdminRights(XWikiContext context)
+            {
+                return true;
+            }
+
+            public boolean hasProgrammingRights(XWikiContext context)
+            {
+                return true;
+            }
+
+            public boolean hasProgrammingRights(XWikiDocument doc, XWikiContext context)
+            {
+                return true;
+            }
+
+            public List listAllLevels(XWikiContext context) throws XWikiException
+            {
+                return Collections.EMPTY_LIST;
+            }
+        });
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////:
@@ -164,12 +205,12 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
      */
     public static final String FIELDPN_stringlist = "String List";
     
-    static abstract public class SuperClass extends AbstractSuperClass
+    static abstract public class TestSuperClass extends AbstractSuperClass
     {
          /**
          * Default constructor for XWikiApplicationClass.
          */
-        protected SuperClass(String spaceprefix, String prefix, boolean dispatch)
+        protected TestSuperClass(String spaceprefix, String prefix, boolean dispatch)
         {
             super(spaceprefix, prefix, dispatch);
         }
@@ -185,7 +226,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         }
     }
     
-    static public class DispatchSuperClass extends SuperClass
+    static public class DispatchSuperClass extends TestSuperClass
     {
         /**
          * Unique instance of XWikiApplicationClass;
@@ -218,7 +259,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         }
     }
     
-    static public class NoDispatchSuperClass extends SuperClass
+    static public class NoDispatchSuperClass extends TestSuperClass
     {
         /**
          * Unique instance of XWikiApplicationClass;
@@ -257,7 +298,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         
         /////
         
-        DispatchSuperClass sclass = DispatchSuperClass.getInstance(context);
+        SuperClass sclass = DispatchSuperClass.getInstance(context);
         
         assertEquals(CLASS_SPACE_PREFIX, sclass.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, sclass.getClassPrefix());
@@ -280,7 +321,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         /////
         
-        NoDispatchSuperClass sclass = NoDispatchSuperClass.getInstance(context);
+        SuperClass sclass = NoDispatchSuperClass.getInstance(context);
         
         assertEquals(CLASS_SPACE_PREFIX, sclass.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, sclass.getClassPrefix());
@@ -454,13 +495,25 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchSuperClass.getInstance(context).getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
     }
     
-    public void getItemDocumentDefaultFullNameDispatch() throws XWikiException
+    public void testGetItemDocumentDefaultFullNameDispatch() throws XWikiException
     {
         assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchSuperClass.getInstance(context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
     }
     
-    public void getItemDocumentDefaultFullNameNoDispatch() throws XWikiException
+    public void testGetItemDocumentDefaultFullNameNoDispatch() throws XWikiException
     {
         assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchSuperClass.getInstance(context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
+    }
+    
+    public void testIsInstanceNoDispatch() throws XWikiException
+    {
+        assertTrue(NoDispatchSuperClass.getInstance(context).isInstance(NoDispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument(), context));
+        assertFalse(NoDispatchSuperClass.getInstance(context).isInstance(new XWikiDocument(), context));
+    }
+    
+    public void testIsInstanceDispatch() throws XWikiException
+    {
+        assertTrue(DispatchSuperClass.getInstance(context).isInstance(DispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument(), context));
+        assertFalse(DispatchSuperClass.getInstance(context).isInstance(new XWikiDocument(), context));
     }
 }

@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xwikidoc>
+<web>Scheduler</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.jerome</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1190368898000</creationDate>
+<date>1190401180000</date>
+<contentUpdateDate>1190401180000</contentUpdateDate>
+<version>1.22</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Scheduler.WebHome</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>## First, set a shortcut to our Scheduler plugin
+##
+#set($scheduler=$xwiki.scheduler)
+##
+## If the sheet is called with an action ($request.do), let us first process this action
+## Possible values are : "schedule", "pause", "resume", "unschedule", "delete"
+##
+#if($request.do!="")
+ ##
+ ## Obtain the Job document and object for which the action has been called
+ ##
+ #set($tJobHolder=$request.which)
+ #set($jobDoc=$xwiki.getDocument($tJobHolder))
+ #set($jobObj=$jobDoc.getObject('XWiki.SchedulerJobClass'))
+ #if($request.do=="schedule")
+  ##
+  ## Schedule a job
+  ##
+  #set($ok=$scheduler.scheduleJob($jobObj))
+  #if($ok==false) 
+   #error("$context.get('error')")
+  #else 
+   #info("Job ~~$jobObj.get('jobName')~~ *scheduled*. Next fire time : *$scheduler.getNextFireTime($jobObj)*")
+  #end
+ #elseif($request.do=="pause")
+  ##
+  ## Pause a scheduled job
+  ##
+  #set($ok=$scheduler.pauseJob($jobObj))
+  #if($ok==false) 
+   #error("$context.get('error')")
+  #else
+   #info("Job ~~$jobObj.get('jobName')~~ *paused*.")
+  #end
+ #elseif($request.do=="resume")
+  ##
+  ## Resume a paused job
+  ##
+  #set($ok=$scheduler.resumeJob($jobObj))
+  #if($ok==false) 
+   #error("$context.get('error')")
+  #else
+   #info("Job ~~$jobObj.get('jobName')~~ *resumed*. Next fire time : *$scheduler.getNextFireTime($jobObj)*")
+  #end
+ #elseif($request.do=="unschedule")
+  ##
+  ## Unschedule a scheduled job (paused or not)
+  ##
+  #set($ok=$scheduler.unscheduleJob($jobObj))
+  #if($ok==false)
+   #error("$context.get('error')")
+  #else
+   #info("Job ~~$jobObj.get('jobName')~~ *unscheduled*")
+  #end
+ #elseif($request.do=="delete")
+  ##
+  ## Delete a job
+  ## First unschedule it (if needed), then delete its document holder
+  ##
+  #set($jobName=$jobObj.get('jobName'))
+  #if($jobObj.get("status")=="Normal"||$jobObj.get('status')=="Paused")
+   #set($ok=$scheduler.unscheduleJob($jobObj))
+   #if($ok==true)    
+    #set($ok=$jobDoc.delete())
+    #info("~~$jobName~~ *deleted*")
+   #else
+    #error("$context.get('error')")
+   #end
+  #else
+    $jobDoc.delete()
+    #info("~~$jobName~~ *deleted*")
+  #end
+ #end
+#end
+1 List of existing jobs
+##
+## Retrieve all scheduler jobs living in this space
+## Display their name, status, possible next fire time, and avaible actions
+##
+{table}
+Job Name|Job Status|Next firetime|Actions
+#set($hql = ", BaseObject as job where doc.web='Scheduler' and job.name=doc.fullName and job.className='XWiki.SchedulerJobClass' ")
+#foreach($docName in $xwiki.searchDocuments($hql))
+ #set($jobHolder = $xwiki.getDocument($docName))
+ #set($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
+ #set($status = "") #set($status = $job.get('status')) #if($status=="") #set($status="None") #end
+ #set($firetime = "") #if($status!="None") #set($firetime = $scheduler.getNextFireTime($job))  #else #set($firetime="NA") #end
+ #set($actions="") 
+  #if($status=="None") 
+   #set($scheduleURL = $doc.getURL("view","do=schedule&amp;which=${jobHolder.fullName}"))
+   #set($actions="&lt;a href=${scheduleURL}&gt;schedule&lt;/a&gt;") 
+  #elseif($status=="Normal")
+   #set($pauseURL = $doc.getURL("view","do=pause&amp;which=${jobHolder.fullName}"))
+   #set($unscheduleURL = $doc.getURL("view","do=unschedule&amp;which=${jobHolder.fullName}"))
+   #set($actions="&lt;a href=${pauseURL}&gt;pause&lt;/a&gt; &lt;a href=${unscheduleURL}&gt;unschedule&lt;/a&gt;") 
+  #elseif($status=="Paused")
+   #set($resumeURL = $doc.getURL("view","do=resume&amp;which=${jobHolder.fullName}"))
+   #set($unscheduleURL = $doc.getURL("view","do=unschedule&amp;which=${jobHolder.fullName}"))
+   #set($actions="&lt;a href=${resumeURL}&gt;resume&lt;/a&gt; &lt;a href=${unscheduleURL}&gt;unschedule&lt;/a&gt;")   
+  #end
+  #set($deleteURL = $doc.getURL("view","do=delete&amp;which=${jobHolder.fullName}"))
+  #set($actions="${actions} &lt;a href=${deleteURL}&gt;delete&lt;/a&gt;")
+$job.get("jobName")|$status|$firetime| *Infos* : [view&gt;$jobHolder.fullName] &lt;a href=$jobHolder.getURL('inline')&gt;edit&lt;/a&gt; *Job* : $actions
+#end
+{table}
+
+1.1 Create a new job
+##
+## Form to create a new Job
+##
+ 
+&lt;form action="" id="newdoc"&gt;
+&lt;input type="hidden" name="parent" value="Scheduler.WebHome" /&gt;
+&lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
+&lt;input type="hidden" name="sheet" value="1" /&gt;
+&lt;input type="hidden" name="webname" value="Scheduler"/&gt;
+&lt;input type="hidden" name="name" value=""/&gt;
+&lt;input type="text" name="title" value="Job page name" size="30"/&gt;
+&lt;input type="button" value="Add" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;
+&lt;/form&gt;
+</content></xwikidoc>

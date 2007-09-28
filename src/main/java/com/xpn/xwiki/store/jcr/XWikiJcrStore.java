@@ -925,7 +925,21 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 		return null;
 	}
 
-	public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
+    public List searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    public List searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
 		notSupportedCall();
 		return null;
 	}

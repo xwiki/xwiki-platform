@@ -40,6 +40,42 @@ public interface XWikiStoreInterface {
     public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
     public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
     public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException;
+
+    /**
+     * Search documents by passing HQL where clause values as parameters. This allows generating
+     * a Named HQL query which will automatically encode the passed values (like escaping single
+     * quotes). This API is recommended to be used over the other similar methods where the values
+     * are passed inside the where clause and for which you'll need to do the encoding/escpaing
+     * yourself before calling them.
+     *
+     * <p>Example</p>
+     * <pre><code>
+     * #set($orphans = $xwiki.searchDocuments(" where doc.fullName <> ? and (doc.parent = ? or "
+     *     + "(doc.parent = ? and doc.web = ?))",
+     *     ["${doc.fullName}as", ${doc.fullName}, ${doc.name}, ${doc.web}]))
+     * </code></pre>
+     *
+     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"
+     * @param nb the number of rows to return. If 0 then all rows are returned
+     * @param start the number of rows to skip. If 0 don't skip any row
+     * @param parameterValues the where clause values that replace the question marks (?)
+     * @param context the XWiki context required for getting information about the execution context 
+     * @return a list of document names
+     * @throws XWikiException in case of error while performing the query
+     */
+    public List searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException;
+
+    /**
+     * Same as {@link #searchDocumentsNames(String, int, int, List, XWikiContext)} but returns all
+     * rows.
+     *
+     * @see #searchDocumentsNames(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext) 
+     */
+    public List searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
+        XWikiContext context) throws XWikiException;
+
     public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, XWikiContext context) throws XWikiException;
     public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException;

@@ -418,6 +418,47 @@ public class XWiki extends Api
     }
 
     /**
+     * Search documents by passing HQL where clause values as parameters. This allows generating
+     * a Named HQL query which will automatically encode the passed values (like escaping single
+     * quotes). This API is recommended to be used over the other similar methods where the values
+     * are passed inside the where clause and for which you'll need to do the encoding/escpaing
+     * yourself before calling them.
+     *
+     * <p>Example</p>
+     * <pre><code>
+     * #set($orphans = $xwiki.searchDocuments(" where doc.fullName <> ? and (doc.parent = ? or "
+     *     + "(doc.parent = ? and doc.web = ?))",
+     *     ["${doc.fullName}as", ${doc.fullName}, ${doc.name}, ${doc.web}]))
+     * </code></pre>
+     *
+     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"
+     * @param nb the number of rows to return. If 0 then all rows are returned
+     * @param start the number of rows to skip. If 0 don't skip any row
+     * @param parameterValues the where clause values that replace the question marks (?)
+     * @return a list of document names
+     * @throws XWikiException in case of error while performing the query 
+     */
+    public List searchDocuments(String parametrizedSqlClause, int nb, int start,
+        List parameterValues) throws XWikiException
+    {
+        return xwiki.getStore().searchDocumentsNames(parametrizedSqlClause, nb, start,
+            parameterValues, getXWikiContext());
+    }
+
+    /**
+     * Same as {@link #searchDocuments(String, int, int, java.util.List)} but returns all rows.
+     * 
+     * @see #searchDocuments(String, int, int, java.util.List)
+     */
+    public List searchDocuments(String parametrizedSqlClause, List parameterValues)
+        throws XWikiException
+    {
+        return xwiki.getStore().searchDocumentsNames(parametrizedSqlClause,
+            parameterValues, getXWikiContext());
+    }
+
+    /**
      * Function to wrap a list of XWikiDocument into Document objects
      * 
      * @param docs list of XWikiDocument

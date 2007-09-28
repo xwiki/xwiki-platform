@@ -1612,6 +1612,19 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
          return ("1".equals(context.getWiki().Param(param + ".read", "1")));
     }
 
+    public List searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        return searchDocumentsNames(parametrizedSqlClause, 0, 0, parameterValues, context);
+    }
+
+    public List searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        String sql = createSQLQuery("select distinct doc.web, doc.name", parametrizedSqlClause);
+        return searchDocumentsNamesInternal(sql, nb, start, parameterValues, context);
+    }
+
     public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
         boolean bTransaction = true;
 
@@ -1740,12 +1753,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         }
     }
 
-    public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException {
+    public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException
+    {
+        String sql = createSQLQuery("select distinct doc.web, doc.name", wheresql);
+        return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
+    }
+
+    private List searchDocumentsNamesInternal(String sql, int nb, int start, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
         boolean bTransaction = false;
         MonitorPlugin monitor  = Util.getMonitorPlugin(context);
         try {
-            String sql = createSQLQuery("select distinct doc.web, doc.name", wheresql);
-
             // Start monitoring timer
             if (monitor!=null)
                 monitor.startTimer("hibernate", sql);
@@ -1754,6 +1773,16 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             bTransaction = beginTransaction(false, context);
             Session session = getSession(context);
             Query query = session.createQuery(sql);
+
+            if (parameterValues != null)
+            {
+                int i = 0;
+                for (Iterator values = parameterValues.iterator(); values.hasNext();) {
+                    query.setString(i, (String) values.next());
+                    i++;
+                }
+            }
+
             if (start!=0)
                 query.setFirstResult(start);
             if (nb!=0)
@@ -1770,7 +1799,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SEARCH,
-                "Exception while searching documents with sql [{0}]", e, new Object[]{ wheresql });
+                "Exception while searching documents with SQL [{0}]", e, new Object[]{ sql });
         } finally {
             try {
                 if (bTransaction)
@@ -1782,6 +1811,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 monitor.endTimer("hibernate");
         }
     }
+
 
     /**
      * @todo refactor it to remove duplications with the searchDocument API without the distrinctbylanguage parameter

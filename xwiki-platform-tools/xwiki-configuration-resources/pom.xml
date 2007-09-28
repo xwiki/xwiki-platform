@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>5-SNAPSHOT</version>
+    <version>4</version>
   </parent>
   <artifactId>xwiki-configuration-resources</artifactId>
   <name>XWiki Platform - Tools - XWiki Configuration Resources</name>

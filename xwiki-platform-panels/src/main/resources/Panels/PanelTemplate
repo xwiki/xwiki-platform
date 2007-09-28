@@ -93,6 +93,9 @@
 <type>view</type>
 </property>
 <property>
+<category>Information</category>
+</property>
+<property>
 <description>Panel Description</description>
 </property>
 <property>
@@ -101,7 +104,7 @@
 #panelfooter()</content>
 </property>
 <property>
-<name>Panel  Name</name>
+<name>Panel Name</name>
 </property>
 </object>
 <content>#includeForm("Panels.PanelSheet")</content>

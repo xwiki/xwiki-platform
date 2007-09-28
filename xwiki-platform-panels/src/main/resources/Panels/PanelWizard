@@ -186,10 +186,10 @@ window.showRightColumn = $showRightPanels;
 Choose a page layout:
 
 #set($crtlayout = 0)
-#if($showLeftPanels == "1")
+#if($showLeftPanels and $showLeftPanels == "1")
 #set($crtlayout = $crtlayout + 1)
 #end
-#if($showRightPanels == "1")
+#if($showRightPanels and $showRightPanels == "1")
 #set($crtlayout = $crtlayout + 2)
 #end
 &lt;div class="pagelayoutoptions"&gt;

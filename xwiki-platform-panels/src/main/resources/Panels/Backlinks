@@ -138,6 +138,7 @@
 <content>#set($blinks = $doc.getBacklinks())
 #if($blinks.size()&gt;0)
 #panelheader('Backlinks')
+#set($first = true)
 #foreach($docname in $blinks)
 #set($rdoc = $xwiki.getDocument($docname).getTranslatedDocument())
 #if($first == true)

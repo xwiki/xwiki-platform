@@ -24,7 +24,7 @@
 #xwikimessageboxstart("Place Manager" "")
 You are not admin on this place ($place).
 #xwikimessageboxend()
-#elseif($request.xpage == "plain")
+#elseif($request.xpage and $request.xpage == "plain")
 #if((!$place)||($place==""))
 #set($prefsdoc = $xwiki.getDocument("XWiki.XWikiPreferences"))
 #set($ok = $prefsdoc.use("XWiki.XWikiPreferences"))

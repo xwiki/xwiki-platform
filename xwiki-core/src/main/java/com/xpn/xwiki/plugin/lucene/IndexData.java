@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.util.Date;
 
-import org.apache.log4j.Logger;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
@@ -108,11 +107,11 @@ public abstract class IndexData
         }
         if (modificationDate != null) {
             luceneDoc.add(new Field(IndexFields.DOCUMENT_DATE, IndexFields
-                .dateToString(modificationDate), Field.Store.YES, Field.Index.NO));
+                .dateToString(modificationDate), Field.Store.YES, Field.Index.UN_TOKENIZED));
         }
         if (creationDate != null) {
             luceneDoc.add(new Field(IndexFields.DOCUMENT_CREATIONDATE, IndexFields
-                .dateToString(creationDate), Field.Store.YES, Field.Index.NO));
+                .dateToString(creationDate), Field.Store.YES, Field.Index.UN_TOKENIZED));
         }
 
         // stored Text fields: tokenized and indexed

@@ -39,6 +39,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Space of class document.
      */
     private static final String CLASS_SPACE_PREFIX = "XApp";
+
     /**
      * Prefix of class document.
      */
@@ -50,6 +51,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>appname</code>.
      */
     public static final String FIELD_appname = "appname";
+
     /**
      * Pretty name of field <code>appname</code>.
      */
@@ -59,6 +61,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>description</code>.
      */
     public static final String FIELD_description = "description";
+
     /**
      * Pretty name of field <code>description</code>.
      */
@@ -68,6 +71,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>version</code>.
      */
     public static final String FIELD_appversion = "appversion";
+
     /**
      * Pretty name of field <code>version</code>.
      */
@@ -77,6 +81,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>dependencies</code>.
      */
     public static final String FIELD_dependencies = "dependencies";
+
     /**
      * Pretty name of field <code>dependencies</code>.
      */
@@ -86,6 +91,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>applications</code>.
      */
     public static final String FIELD_applications = "applications";
+
     /**
      * Pretty name of field <code>applications</code>.
      */
@@ -95,6 +101,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>documents</code>.
      */
     public static final String FIELD_documents = "documents";
+
     /**
      * Pretty name of field <code>documents</code>.
      */
@@ -104,6 +111,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>docstoinclude</code>.
      */
     public static final String FIELD_docstoinclude = "docstoinclude";
+
     /**
      * Pretty name of field <code>docstoinclude</code>.
      */
@@ -113,15 +121,17 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * Name of field <code>docstolink</code>.
      */
     public static final String FIELD_docstolink = "docstolink";
+
     /**
      * Pretty name of field <code>docstolink</code>.
      */
     public static final String FIELDPN_docstolink = "Documents to link";
-    
+
     /**
      * Name of field <code>translationdocs</code>.
      */
     public static final String FIELD_translationdocs = "translationdocs";
+
     /**
      * Pretty name of field <code>translationdocs</code>.
      */
@@ -161,6 +171,10 @@ public class XWikiApplicationClass extends AbstractSuperClass
         super(CLASS_SPACE_PREFIX, CLASS_PREFIX);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
+     */
     protected boolean updateBaseClass(BaseClass baseClass)
     {
         boolean needsUpdate = super.updateBaseClass(baseClass);
@@ -168,61 +182,84 @@ public class XWikiApplicationClass extends AbstractSuperClass
         needsUpdate |= baseClass.addTextField(FIELD_appname, FIELDPN_appname, 30);
         needsUpdate |= baseClass.addTextAreaField(FIELD_description, FIELDPN_description, 40, 5);
         needsUpdate |= baseClass.addTextField(FIELD_appversion, FIELDPN_appversion, 30);
-        
+
         StaticListClass slc;
-        needsUpdate |= baseClass.addStaticListField(FIELD_dependencies, FIELDPN_dependencies, 80, true, "", "input");
+        
+        if (baseClass.addStaticListField(FIELD_dependencies, FIELDPN_dependencies, 80, true, "",
+            "input")) {
+            // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
+            // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
+            // starts depending on that version where it's applied.
+            slc = (StaticListClass) baseClass.getField(FIELD_dependencies);
+            slc.setSeparators("|");
+            slc.setSeparator("|");
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_dependencies);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+            needsUpdate = true;
+        }
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_applications, FIELDPN_applications, 80, true, "", "input");
+        if (baseClass.addStaticListField(FIELD_applications, FIELDPN_applications, 80, true, "",
+            "input")) {
+            // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
+            // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
+            // starts depending on that version where it's applied.
+            slc = (StaticListClass) baseClass.getField(FIELD_applications);
+            slc.setSeparators("|");
+            slc.setSeparator("|");
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_applications);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+            needsUpdate = true;
+        }
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_documents, FIELDPN_documents, 80, true, "", "input");
+        if (baseClass.addStaticListField(FIELD_documents, FIELDPN_documents, 80, true, "",
+            "input")) {
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_documents);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+            // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
+            // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
+            // starts depending on that version where it's applied.
+            slc = (StaticListClass) baseClass.getField(FIELD_documents);
+            slc.setSeparators("|");
+            slc.setSeparator("|");
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_docstoinclude, FIELDPN_docstoinclude, 80, true, "", "input");
+            needsUpdate = true;
+        }
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_docstoinclude);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+        if (baseClass.addStaticListField(FIELD_docstoinclude, FIELDPN_docstoinclude, 80, true,
+            "", "input")) {
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_docstolink, FIELDPN_docstolink, 80, true, "", "input");
+            // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
+            // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
+            // starts depending on that version where it's applied.
+            slc = (StaticListClass) baseClass.getField(FIELD_docstoinclude);
+            slc.setSeparators("|");
+            slc.setSeparator("|");
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_docstolink);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+            needsUpdate = true;
+        }
 
-        needsUpdate |= baseClass.addStaticListField(FIELD_translationdocs, FIELDPN_translationdocs, 80, true, "", "input");
+        if (baseClass.addStaticListField(FIELD_docstolink, FIELDPN_docstolink, 80, true, "",
+            "input")) {
 
-        // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
-        // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
-        // starts depending on that version where it's applied.
-        slc = (StaticListClass)baseClass.getField(FIELD_translationdocs);
-        slc.setSeparators("|");
-        slc.setSeparator("|");
+            // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
+            // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
+            // starts depending on that version where it's applied.
+            slc = (StaticListClass) baseClass.getField(FIELD_docstolink);
+            slc.setSeparators("|");
+            slc.setSeparator("|");
+
+            needsUpdate = true;
+        }
+
+        if (baseClass.addStaticListField(FIELD_translationdocs, FIELDPN_translationdocs, 80,
+            true, "", "input")) {
+
+            // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
+            // http://jira.xwiki.org/jira/browse/XWIKI-1683 is applied in XWiki Core and when this
+            // starts depending on that version where it's applied.
+            slc = (StaticListClass) baseClass.getField(FIELD_translationdocs);
+            slc.setSeparators("|");
+            slc.setSeparator("|");
+
+            needsUpdate = true;
+        }
 
         return needsUpdate;
     }
@@ -232,7 +269,9 @@ public class XWikiApplicationClass extends AbstractSuperClass
     {
         XWiki xwiki = context.getWiki();
 
-        List listApp = searchItemDocumentsByField(FIELD_appname, appName, StringProperty.class.getSimpleName(), context);
+        List listApp =
+            searchItemDocumentsByField(FIELD_appname, appName, StringProperty.class
+                .getSimpleName(), context);
 
         if (listApp.size() == 0) {
             if (validate)
@@ -249,11 +288,12 @@ public class XWikiApplicationClass extends AbstractSuperClass
     public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
         throws XWikiException
     {
-        return (XWikiApplication)newSuperDocument(getApplicationDocument(appName, context, validate), context);
+        return (XWikiApplication) newSuperDocument(getApplicationDocument(appName, context,
+            validate), context);
     }
-    
+
     public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
     {
-        return (SuperDocument)doc.newDocument(XWikiApplication.class.getName(), context);
+        return (SuperDocument) doc.newDocument(XWikiApplication.class.getName(), context);
     }
 }

@@ -35,6 +35,7 @@ public class XWikiServerClass extends AbstractSuperClass
      * Space of class document.
      */
     private static final String CLASS_SPACE = "XWiki";
+
     /**
      * Prefix of class document.
      */
@@ -46,6 +47,7 @@ public class XWikiServerClass extends AbstractSuperClass
      * Name of field <code>owner</code>.
      */
     public static final String FIELD_owner = "owner";
+
     /**
      * Pretty name of field <code>owner</code>.
      */
@@ -55,6 +57,7 @@ public class XWikiServerClass extends AbstractSuperClass
      * Name of field <code>description</code>.
      */
     public static final String FIELD_description = "description";
+
     /**
      * Pretty name of field <code>description</code>.
      */
@@ -64,6 +67,7 @@ public class XWikiServerClass extends AbstractSuperClass
      * Name of field <code>server</code>.
      */
     public static final String FIELD_server = "server";
+
     /**
      * Pretty name of field <code>server</code>.
      */
@@ -73,15 +77,20 @@ public class XWikiServerClass extends AbstractSuperClass
      * Name of field <code>visibility</code>.
      */
     public static final String FIELD_visibility = "visibility";
+
     public static final String FIELDL_visibility_public = "public";
+
     public static final String FIELDL_visibility_private = "private";
+
     public static final String FIELDL_visibility_template = "template";
+
     /**
      * List of possible values for <code>visibility</code>.
      */
     public static final String FIELDL_visibility =
         FIELDL_visibility_public + "|" + FIELDL_visibility_private + "|"
             + FIELDL_visibility_template;
+
     /**
      * Pretty name of field <code>visibility</code>.
      */
@@ -91,14 +100,19 @@ public class XWikiServerClass extends AbstractSuperClass
      * Name of field <code>state</code>.
      */
     public static final String FIELD_state = "state";
+
     public static final String FIELDL_state_active = "active";
+
     public static final String FIELDL_state_inactive = "inactive";
+
     public static final String FIELDL_state_locked = "locked";
+
     /**
      * List of possible values for <code>state</code>.
      */
     public static final String FIELDL_state =
         FIELDL_state_active + "|" + FIELDL_state_inactive + "|" + FIELDL_state_locked;
+
     /**
      * Pretty name of field <code>state</code>.
      */
@@ -108,10 +122,12 @@ public class XWikiServerClass extends AbstractSuperClass
      * Name of field <code>language</code>.
      */
     public static final String FIELD_language = "language";
+
     /**
      * List of possible values for <code>language</code>.
      */
     public static final String FIELDL_language = "en|fr";
+
     /**
      * Pretty name of field <code>language</code>.
      */
@@ -148,9 +164,8 @@ public class XWikiServerClass extends AbstractSuperClass
         super(CLASS_SPACE, CLASS_PREFIX, false);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
+     * {@inheritDoc}
      * @see com.xpn.xwiki.util.AbstractSuperClass#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
      */
     protected boolean updateBaseClass(BaseClass baseClass)
@@ -159,11 +174,16 @@ public class XWikiServerClass extends AbstractSuperClass
 
         baseClass.setName(getClassFullName());
 
-        needsUpdate |= baseClass.addUsersField(FIELD_owner, FIELDPN_owner);
-        // TODO : move into addUserField with "multiselect" parameter
-        UsersClass userclass = (UsersClass)baseClass.getField(FIELD_owner);
-        userclass.setMultiSelect(false);
-        
+        if (baseClass.addUsersField(FIELD_owner, FIELDPN_owner)) {
+            // TODO : move into addUserField with "multiselect" parameter
+            // http://jira.xwiki.org/jira/browse/XWIKI-1666 is applied in XWiki Core and when this
+            // starts depending on that version where it's applied.
+            UsersClass userclass = (UsersClass) baseClass.getField(FIELD_owner);
+            userclass.setMultiSelect(false);
+
+            needsUpdate = true;
+        }
+
         needsUpdate |= baseClass.addTextAreaField(FIELD_description, FIELDPN_description, 40, 5);
         needsUpdate |= baseClass.addTextField(FIELD_server, FIELDPN_server, 30);
         needsUpdate |=
@@ -207,18 +227,19 @@ public class XWikiServerClass extends AbstractSuperClass
     public XWikiServer getWikiServer(String wikiName, XWikiContext context, boolean validate)
         throws XWikiException
     {
-        return (XWikiServer)newSuperDocument(getWikiServerDocument(wikiName, context, validate), context);
+        return (XWikiServer) newSuperDocument(getWikiServerDocument(wikiName, context, validate),
+            context);
     }
 
     public XWikiServer getWikiTemplateServer(String wikiName, XWikiContext context,
         boolean validate) throws XWikiException
     {
-        return (XWikiServer)newSuperDocument(getWikiTemplateServerDocument(wikiName, context, validate),
-            context);
+        return (XWikiServer) newSuperDocument(getWikiTemplateServerDocument(wikiName, context,
+            validate), context);
     }
-    
+
     public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
     {
-        return (SuperDocument)doc.newDocument(XWikiServer.class.getName(), context);
+        return (SuperDocument) doc.newDocument(XWikiServer.class.getName(), context);
     }
 }

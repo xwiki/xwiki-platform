@@ -56,7 +56,7 @@ public interface XWikiStoreInterface {
      * </code></pre>
      *
      * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"
+     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"</code>
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)

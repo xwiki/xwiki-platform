@@ -54,7 +54,7 @@
         </executions>
         <configuration>
           <resourceBundles>
-            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.6-SNAPSHOT</resourceBundle>
+            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.7-SNAPSHOT</resourceBundle>
           </resourceBundles>
           <properties>
             <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>

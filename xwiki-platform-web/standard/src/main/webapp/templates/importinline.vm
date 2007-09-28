@@ -20,7 +20,7 @@
       <h4 class="heading-1-1-1">$msg.get("import_listof${text}files")</h4>
       <ul>
         #foreach($item in $list)
-          <li><a href="$xwiki.getURL($item)">$item</a></li>
+          <li>$item</li>
         #end
       </ul>
     #end

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1190905536000</creationDate>
-<date>1190914311000</date>
-<contentUpdateDate>1190914311000</contentUpdateDate>
-<version>1.5</version>
+<date>1190975990000</date>
+<contentUpdateDate>1190975990000</contentUpdateDate>
+<version>1.6</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -53,7 +53,7 @@
 <tags/>
 </property>
 </object>
-<content>if($action == "reload")
+<content>#if($action == "reload")
   #set($result = $Appmanager.reloadApplication($appname))
   #if ($result == $Exception.ERROR_NOERROR)
     #info($msg.get("xapp.successreloadapp", [$appname]))

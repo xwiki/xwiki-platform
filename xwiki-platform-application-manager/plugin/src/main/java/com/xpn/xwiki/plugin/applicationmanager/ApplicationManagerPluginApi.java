@@ -68,7 +68,7 @@ public class ApplicationManagerPluginApi extends PluginApi
     /**
      * Create empty application document
      * 
-     * @return Document Empty application document
+     * @return an empty application descriptor document.
      * @throws XWikiException
      */
     public XWikiApplication createApplicationDocument() throws XWikiException
@@ -77,6 +77,26 @@ public class ApplicationManagerPluginApi extends PluginApi
             context);
     }
 
+    /**
+     * Create a new application descriptor base on provided application descriptor.
+     * 
+     * @param appSuperDocument the user application descriptor from which new descriptor will be
+     *            created.
+     * @param failOnExist if true fail if the application descriptor to create already exists.
+     * @return error code . If there is error, it add error code in context "lasterrorcode" field
+     *         and exception in context's "lastexception" field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
+     *         rights to do this action.
+     *         <li>
+     *         {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS} :
+     *         application descriptor already exists.
+     *         </ul>
+     * @throws XWikiException
+     */
     public int createApplication(XWikiApplication appSuperDocument, boolean failOnExist)
         throws XWikiException
     {
@@ -99,6 +119,23 @@ public class ApplicationManagerPluginApi extends PluginApi
         return returncode;
     }
 
+    /**
+     * Delete an application descriptor document.
+     * 
+     * @param appName the name of the application.
+     * @return error code . If there is error, it add error code in context "lasterrorcode" field
+     *         and exception in context's "lastexception" field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
+     *         rights to do this action.
+     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         provided application does not exist.
+     *         </ul>
+     * @throws XWikiException
+     */
     public int deleteApplication(String appName) throws XWikiException
     {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
@@ -119,6 +156,12 @@ public class ApplicationManagerPluginApi extends PluginApi
         return returncode;
     }
 
+    /**
+     * Get all applications descriptors documents.
+     * 
+     * @return a list of XWikiApplication.
+     * @throws XWikiException
+     */
     public List getApplicationDocumentList() throws XWikiException
     {
         List listDocument = Collections.EMPTY_LIST;
@@ -135,6 +178,19 @@ public class ApplicationManagerPluginApi extends PluginApi
         return listDocument;
     }
 
+    /**
+     * Get the application descriptor document of the provided application.
+     * 
+     * @param appName the name of the application.
+     * @return the application descriptor document. If there is error, it add error code in context
+     *         "lasterrorcode" field and exception in context's "lastexception" field. Error codes
+     *         can be :
+     *         <ul>
+     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         provided application does not exist.
+     *         </ul>
+     * @throws XWikiException
+     */
     public XWikiApplication getApplicationDocument(String appName) throws XWikiException
     {
         XWikiApplication app = null;
@@ -151,17 +207,53 @@ public class ApplicationManagerPluginApi extends PluginApi
         return app;
     }
 
+    /**
+     * Export an application into XAR using Packaging plugin.
+     * 
+     * @param appName the name of the application.
+     * @return error code . If there is error, it add error code in context "lasterrorcode" field
+     *         and exception in context's "lastexception" field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         provided application does not exist.
+     *         </ul>
+     * @throws XWikiException
+     * @throws IOException
+     */
     public int exportApplicationXAR(String appName) throws XWikiException, IOException
     {
         return exportApplicationXAR(appName, true, false);
     }
-    
-    public int exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory) throws XWikiException, IOException
+
+    /**
+     * Export an application into XAR using Packaging plugin.
+     * 
+     * @param appName the name of the application.
+     * @param recurse if true include all dependencies applications into XAR.
+     * @param withDocHistory if true export with documents history.
+     * @return error code . If there is error, it add error code in context "lasterrorcode" field
+     *         and exception in context's "lastexception" field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         provided application does not exist.
+     *         </ul>
+     * @throws XWikiException
+     * @throws IOException
+     */
+    public int exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory)
+        throws XWikiException, IOException
     {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            ApplicationManager.getInstance().exportApplicationXAR(appName, recurse, withDocHistory, context);
+            ApplicationManager.getInstance().exportApplicationXAR(appName, recurse,
+                withDocHistory, context);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
 
@@ -174,6 +266,25 @@ public class ApplicationManagerPluginApi extends PluginApi
         return returncode;
     }
 
+    /**
+     * Import attached application XAR into current wiki and do all actions needed to installation
+     * an application. See {@link #reloadApplication(String)} for more.
+     * 
+     * @param packageName the name of the attached XAR file.
+     * @return error code . If there is error, it add error code in context "lasterrorcode" field
+     *         and exception in context's "lastexception" field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
+     *         rights to do this action.
+     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         provided application does not exist.
+     *         </ul>
+     * @throws XWikiException
+     * @see {@link #reloadApplication(String)}
+     */
     public int importApplication(String packageName) throws XWikiException
     {
         if (!hasAdminRights())
@@ -197,10 +308,22 @@ public class ApplicationManagerPluginApi extends PluginApi
     }
 
     /**
-     * Reload xwiki application. It means : - update XWikiPreferences with application translation
-     * documents
+     * Reload xwiki application. It means :
+     * <ul>
+     * <li> update XWikiPreferences with application translation documents.
+     * </ul>
      * 
-     * @return int Error code.
+     * @return error code . If there is error, it add error code in context "lasterrorcode" field
+     *         and exception in context's "lastexception" field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
+     *         rights to do this action.
+     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         provided application does not exist.
+     *         </ul>
      * @throws XWikiException
      */
     public int reloadApplication(String appName) throws XWikiException
@@ -230,7 +353,12 @@ public class ApplicationManagerPluginApi extends PluginApi
      * Reload all xwiki applications. It means : - update XWikiPreferences with each application
      * translation documents
      * 
-     * @return int Error code.
+     * @return error code.
+     *         <ul>
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
+     *         rights to do this action.
+     *         <ul>
      * @throws XWikiException
      */
     public int reloadAllApplications() throws XWikiException
@@ -257,8 +385,22 @@ public class ApplicationManagerPluginApi extends PluginApi
 
         return returncode;
     }
-
+    
+    /**
+     * @deprecated use {@link #getRootApplication()}.
+     */
     public XWikiApplication getRootApplication(XWikiContext context) throws XWikiException
+    {
+        return getRootApplication();
+    }
+
+    /**
+     * Get the current wiki root application.
+     * 
+     * @return the root application descriptor document. If can't find root application return null.
+     * @throws XWikiException
+     */
+    public XWikiApplication getRootApplication() throws XWikiException
     {
         XWikiApplication app = null;
 

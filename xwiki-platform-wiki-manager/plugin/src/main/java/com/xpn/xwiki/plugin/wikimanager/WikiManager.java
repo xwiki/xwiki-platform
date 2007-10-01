@@ -129,7 +129,7 @@ public class WikiManager
         try {
             context.setDatabase(wiki);
             
-            XWikiApplication rootApp = appmanager.getRootApplication(context);
+            XWikiApplication rootApp = appmanager.getRootApplication();
 
             if (rootApp != null)
                 docsToInclude = rootApp.getDocsNameToInclude(true, context);
@@ -329,8 +329,7 @@ public class WikiManager
                         e);
                 }
 
-                // Change database
-                context.setDatabase(newWikiName);                
+                context.setDatabase(newWikiName);
 
                 if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE)
                     throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI,

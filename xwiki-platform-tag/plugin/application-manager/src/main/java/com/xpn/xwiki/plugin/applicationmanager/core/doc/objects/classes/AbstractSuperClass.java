@@ -241,7 +241,9 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * Constructor for AbstractSuperClass.
      * 
-     * @param prefix Prefix of class document.
+     * @param prefix the prefix of class document.
+     * @see #AbstractSuperClass(String, String)
+     * @see #AbstractSuperClass(String, String, boolean)
      */
     protected AbstractSuperClass(String prefix)
     {
@@ -251,8 +253,10 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * Constructor for AbstractSuperClass.
      * 
-     * @param spaceprefix Space of class document.
-     * @param prefix Prefix of class document.
+     * @param spaceprefix the space prefix of class document.
+     * @param prefix the prefix of class document.
+     * @see #AbstractSuperClass(String)
+     * @see #AbstractSuperClass(String, String, boolean)
      */
     protected AbstractSuperClass(String spaceprefix, String prefix)
     {
@@ -262,9 +266,11 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * Constructor for AbstractSuperClass.
      * 
-     * @param spaceprefix Space of class document.
-     * @param prefix Prefix of class document.
-     * @param dispatch Use XWiki applications space names.
+     * @param spaceprefix the space of class document.
+     * @param prefix the prefix of class document.
+     * @param dispatch Indicate if it had to use standard XWiki applications space names.
+     * @see #AbstractSuperClass(String)
+     * @see #AbstractSuperClass(String, String)
      */
     protected AbstractSuperClass(String spaceprefix, String prefix, boolean dispatch)
     {
@@ -311,16 +317,17 @@ public abstract class AbstractSuperClass implements SuperClass
      * Check if all necessary documents for manage this class in this context exists and update.
      * Create if not exists. Thread safe.
      * 
-     * @param context Context.
+     * @param context the XWiki context.
      * @throws XWikiException
+     * @see #checkClassDocument(XWikiContext)
      */
     protected void check(XWikiContext context) throws XWikiException
     {
         synchronized (databasesInitedMap) {
             if (!this.databasesInitedMap.contains(context.getDatabase())) {
-                _checkClassDocument(context);
-                _checkClassSheetDocument(context);
-                _checkClassTemplateDocument(context);
+                checkClassDocument(context);
+                checkClassSheetDocument(context);
+                checkClassTemplateDocument(context);
 
                 this.databasesInitedMap.add(context.getDatabase());
             }
@@ -330,10 +337,10 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * Check if class document exists in this context and update. Create if not exists.
      * 
-     * @param context Context.
+     * @param context the XWiki context.
      * @throws XWikiException
      */
-    private void _checkClassDocument(XWikiContext context) throws XWikiException
+    private void checkClassDocument(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
         XWiki xwiki = context.getWiki();
@@ -369,10 +376,10 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * Check if class sheet document exists in this context and update. Create if not exists.
      * 
-     * @param context Context.
+     * @param context the XWiki context.
      * @throws XWikiException
      */
-    private void _checkClassSheetDocument(XWikiContext context) throws XWikiException
+    private void checkClassSheetDocument(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
         XWiki xwiki = context.getWiki();
@@ -408,10 +415,10 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * Check if class template document exists in this context and update. Create if not exists.
      * 
-     * @param context Context.
+     * @param context the XWiki context.
      * @throws XWikiException
      */
-    private void _checkClassTemplateDocument(XWikiContext context) throws XWikiException
+    private void checkClassTemplateDocument(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
         XWiki xwiki = context.getWiki();
@@ -443,8 +450,8 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * Configure BaseClass.
      * 
-     * @param baseClass BaseClass to configure.
-     * @return boolean True if <code>baseClass</code> modified.
+     * @param baseClass the baseClass to configure.
+     * @return true if <code>baseClass</code> modified.
      */
     protected boolean updateBaseClass(BaseClass baseClass)
     {
@@ -568,11 +575,29 @@ public abstract class AbstractSuperClass implements SuperClass
             context);
     }
 
+    /**
+     * Find all XWikiDocument containing object of this XWiki class.
+     * 
+     * @param context the XWiki context.
+     * @return a list of XWikiDocument containing object of this XWiki class.
+     * @throws XWikiException
+     * @see #getClassFullName()
+     */
     public List searchItemDocuments(XWikiContext context) throws XWikiException
     {
         return searchItemDocumentsByFields(null, null, context);
     }
 
+    /**
+     * Find XWikiDocument containing object of this XWiki class with provided full name. Difference
+     * with {@link XWiki#getDocument(String, XWikiContext)} is that it will not return "new"
+     * XWikiDocument.
+     * 
+     * @param docFullName the full name of the document.
+     * @param context the XWiki context.
+     * @return a list with just one XWikiDocument containing object of this XWiki class.
+     * @throws XWikiException
+     */
     public List searchItemDocuments(String docFullName, XWikiContext context)
         throws XWikiException
     {

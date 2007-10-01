@@ -29,9 +29,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 
 /**
- * Default implementation of SuperDocument.
+ * Default implementation of SuperDocument. This class manage an XWiki document containing provided
+ * XWiki class. It add some specifics methods, getters and setters for this type of object and
+ * fields. It also override {@link Document} (and then {@link XWikiDocument}) isNew concept
+ * considering as new a document that does not contains an XWiki object of the provided XWiki class.
  * 
  * @see SuperDocument
+ * @see SuperClass
  */
 public class DefaultSuperDocument extends Document implements SuperDocument
 {
@@ -54,7 +58,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
         throws XWikiException
     {
         super(xdoc, context);
-        
+
         this.sclass = sclass;
 
         reload(context);
@@ -64,10 +68,10 @@ public class DefaultSuperDocument extends Document implements SuperDocument
     {
         getDoc().setFullName(docFullName, context);
     }
-    
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.util.SuperDocument#reload(com.xpn.xwiki.api.Document,
      *      com.xpn.xwiki.XWikiContext)
      */
@@ -79,7 +83,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
 
             XWikiDocument docTemplate = this.sclass.getClassTemplateDocument(context);
             BaseObject templateObject = docTemplate.getObject(this.sclass.getClassFullName());
-            
+
             if (templateObject != null)
                 object.merge(templateObject);
 
@@ -87,28 +91,28 @@ public class DefaultSuperDocument extends Document implements SuperDocument
                 setParent(this.sclass.getClassFullName());
                 setContent(docTemplate.getContent());
             }
-            
+
             this.isNew = true;
         }
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.util.SuperDocument#merge(com.xpn.xwiki.util.SuperDocument)
      */
     public void mergeBaseObject(SuperDocument sdoc)
     {
         if (getSuperClass() != sdoc.getSuperClass())
-            return ;
-        
+            return;
+
         getDoc().getObject(this.sclass.getClassFullName()).merge(
             sdoc.getDocument().getObject(this.sclass.getClassFullName()));
     }
-   
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.util.SuperDocument#getSuperClass()
      */
     public SuperClass getSuperClass()
@@ -118,7 +122,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.util.SuperDocument#isNew()
      */
     public boolean isNew()
@@ -128,7 +132,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.util.SuperDocument#save(com.xpn.xwiki.XWikiContext)
      */
     public void save() throws XWikiException
@@ -143,12 +147,11 @@ public class DefaultSuperDocument extends Document implements SuperDocument
         this.isNew = true;
     }
 
-    
     /**
      * @see com.xpn.xwiki.doc.XWikiDocument#getStringValue(java.lang.String)
      */
     public String getStringValue(String fieldName)
-    {       
+    {
         return this.doc.getStringValue(this.sclass.getClassFullName(), fieldName);
     }
 
@@ -164,10 +167,10 @@ public class DefaultSuperDocument extends Document implements SuperDocument
      * @see com.xpn.xwiki.doc.XWikiDocument#getStringValue(java.lang.String)
      */
     public String getLargeStringValue(String fieldName)
-    {       
+    {
         return this.doc.getStringValue(this.sclass.getClassFullName(), fieldName);
     }
-    
+
     /**
      * @see com.xpn.xwiki.doc.XWikiDocument#setLargeStringValue(java.lang.String,java.lang.String,java.lang.String)
      */
@@ -175,7 +178,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
     {
         getDoc().setLargeStringValue(this.sclass.getClassFullName(), fieldName, value);
     }
-    
+
     /**
      * @see com.xpn.xwiki.doc.XWikiDocument#getListValue(java.lang.String)
      */

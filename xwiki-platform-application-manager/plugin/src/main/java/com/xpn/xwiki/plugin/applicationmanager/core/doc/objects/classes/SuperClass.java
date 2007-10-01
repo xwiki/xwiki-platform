@@ -34,6 +34,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * <li>search in documents that contains this class with conditions on class fields
  * <li>support the XWiki norm about spaces and documents naming
  * </ul>
+ * 
+ * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. When that issue is applied in XWiki Core
+ *       and when this plugin moves to the version of XWiki Core where it was applied then remove
+ *       this class.
  */
 public interface SuperClass
 {

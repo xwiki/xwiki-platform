@@ -290,6 +290,10 @@ public class WikiManagerPluginApi extends PluginApi
         return doc;
     }
 
+    /** 
+     * @return all the template wiki. Wiki with "visibility" field equals to "template".
+     * @throws XWikiException
+     */
     public List getWikiTemplateList() throws XWikiException
     {
         List listDocument = Collections.EMPTY_LIST;
@@ -310,4 +314,6 @@ public class WikiManagerPluginApi extends PluginApi
 
         return listDocument;
     }
+    
+    
 }

@@ -36,9 +36,9 @@
   <version>1.2-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svnmirror.xwiki.org/svn/mirror/xwiki/xwiki-platform/core/trunk</connection>
-    <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/core/trunk</developerConnection>
-    <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/core/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/trunk</url>
   </scm>
   <dependencies>
     <dependency>

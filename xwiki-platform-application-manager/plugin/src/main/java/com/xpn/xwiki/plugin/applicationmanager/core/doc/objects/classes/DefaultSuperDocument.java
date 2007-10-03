@@ -77,9 +77,8 @@ public class DefaultSuperDocument extends Document implements SuperDocument
      */
     public void reload(XWikiContext context) throws XWikiException
     {
-        if (this.doc.getObject(this.sclass.getClassFullName()) == null) {
-            createNewObject(this.sclass.getClassFullName());
-            BaseObject object = this.doc.getObject(this.sclass.getClassFullName());
+        if (this.getObjectNumbers(this.sclass.getClassFullName()) == 0) {
+            BaseObject object = getDoc().newObject(this.sclass.getClassFullName(), context);
 
             XWikiDocument docTemplate = this.sclass.getClassTemplateDocument(context);
             BaseObject templateObject = docTemplate.getObject(this.sclass.getClassFullName());
@@ -87,7 +86,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
             if (templateObject != null)
                 object.merge(templateObject);
 
-            if (this.doc.isNew()) {
+            if (super.isNew()) {
                 setParent(this.sclass.getClassFullName());
                 setContent(docTemplate.getContent());
             }

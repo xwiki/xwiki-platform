@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>6-SNAPSHOT</version>
+    <version>5</version>
     <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
@@ -38,6 +38,11 @@
     <developerConnection>scm:svn:svn+ssh://svn.forge.objectweb.org/svnroot/xwiki/xwiki-platform/web/trunk</developerConnection>
     <url>http://svn.forge.objectweb.org/cgi-bin/viewcvs.cgi/xwiki/xwiki-platform/web/trunk</url>
   </scm>
+  <properties>
+    <!-- Versions of XWiki dependencies used in Platform/Web modules -->
+    <platform.tools.version>1.6</platform.tools.version>
+    <platform.core.version>1.2-milestone-1</platform.core.version>
+  </properties>
   <profiles>
     <profile>
       <id>default</id>

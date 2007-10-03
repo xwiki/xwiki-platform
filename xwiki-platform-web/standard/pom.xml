@@ -13,7 +13,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>${platform.core.version}</version>
     </dependency>
     <!-- Add the GWT JAR so that XWiki Core is GWT-ready and so that the XWiki GWT Servlet can
          be activated by default in web.xml -->
@@ -25,7 +25,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-plexus</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>${platform.core.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -54,7 +54,7 @@
         </executions>
         <configuration>
           <resourceBundles>
-            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.7-SNAPSHOT</resourceBundle>
+            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:${platform.tools.version}</resourceBundle>
           </resourceBundles>
           <properties>
             <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>

@@ -262,6 +262,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
             needsUpdate = true;
         }
 
+        /* TODO : add support for real linked documents in xwiki-core to be able to use it 
         if (baseClass.addStaticListField(FIELD_docstolink, FIELDPN_docstolink, 80, true, "",
             "input")) {
 
@@ -274,6 +275,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
 
             needsUpdate = true;
         }
+        */
 
         if (baseClass.addStaticListField(FIELD_translationdocs, FIELDPN_translationdocs, 80,
             true, "", "input")) {

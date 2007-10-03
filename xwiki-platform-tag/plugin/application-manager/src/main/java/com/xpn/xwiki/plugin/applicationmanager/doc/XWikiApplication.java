@@ -229,6 +229,7 @@ public class XWikiApplication extends DefaultSuperDocument
         setListValue(XWikiApplicationClass.FIELD_docstoinclude, docstoinclude);
     }
 
+    /* TODO : add support for real linked documents in xwiki-core to be able to use it 
     public List getDocsToLink()
     {
         return getListValue(XWikiApplicationClass.FIELD_docstolink);
@@ -238,6 +239,7 @@ public class XWikiApplication extends DefaultSuperDocument
     {
         setListValue(XWikiApplicationClass.FIELD_docstolink, docstolink);
     }
+    */
 
     /**
      * @return the list of documents containing translations strings.
@@ -509,7 +511,9 @@ public class XWikiApplication extends DefaultSuperDocument
         return docsToInclude;
     }
 
-    /**
+    /*
+     * TODO : add support for real linked documents in xwiki-core to be able to use it 
+     * 
      * Get and resolve all documents names to link application contains.
      * <p>
      * For each of these documents names, if are between "[" and "]", are considered as SQL matching
@@ -523,8 +527,9 @@ public class XWikiApplication extends DefaultSuperDocument
      * @see #getDocsToLink()
      * @see XWikiApplicationClass#FIELD_docstolink
      */
+    /* TODO : add support for real linked documents in xwiki-core to be able to use it 
     public Set getDocsNameToLink(boolean recurse, XWikiContext context) throws XWikiException
     {
         return getDocsNameSet(XWikiApplicationClass.FIELD_docstolink, recurse, false, context);
-    }
+    }*/
 }

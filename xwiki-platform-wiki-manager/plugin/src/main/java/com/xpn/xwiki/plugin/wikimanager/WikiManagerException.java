@@ -38,6 +38,8 @@ public class WikiManagerException extends PluginException
     
     public static final int ERROR_WIKIMANAGER_WIKI_NAME_FORBIDDEN = 50035;
     
+    public static final int ERROR_WIKIMANAGER_XWIKI_NOT_VIRTUAL = 50036;
+    
     ////////
     
     public WikiManagerException(int code, String message)

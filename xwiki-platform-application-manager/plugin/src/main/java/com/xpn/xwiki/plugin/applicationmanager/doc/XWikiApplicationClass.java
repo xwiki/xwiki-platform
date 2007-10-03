@@ -33,6 +33,12 @@ import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerException;
 
+/**
+ * {@link SuperClass} implementation for XAppClasses.XWikiApplicationClass class.
+ * 
+ * @see SuperClass
+ * @see AbstractSuperClass
+ */
 public class XWikiApplicationClass extends AbstractSuperClass
 {
     /**
@@ -48,92 +54,113 @@ public class XWikiApplicationClass extends AbstractSuperClass
     // ///
 
     /**
-     * Name of field <code>appname</code>.
+     * Name of field <code>appname</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     * The name of the application.
      */
     public static final String FIELD_appname = "appname";
 
     /**
-     * Pretty name of field <code>appname</code>.
+     * Pretty name of field <code>appname</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_appname = "Application Name";
 
     /**
-     * Name of field <code>description</code>.
+     * Name of field <code>description</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The description of the application.
      */
     public static final String FIELD_description = "description";
 
     /**
-     * Pretty name of field <code>description</code>.
+     * Pretty name of field <code>description</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_description = "Description";
 
     /**
-     * Name of field <code>version</code>.
+     * Name of field <code>version</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     * The version of the application.
      */
     public static final String FIELD_appversion = "appversion";
 
     /**
-     * Pretty name of field <code>version</code>.
+     * Pretty name of field <code>version</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_appversion = "Application Version";
 
     /**
-     * Name of field <code>dependencies</code>.
+     * Name of field <code>dependencies</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The list of plugins on which application depends.
      */
     public static final String FIELD_dependencies = "dependencies";
 
     /**
-     * Pretty name of field <code>dependencies</code>.
+     * Pretty name of field <code>dependencies</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_dependencies = "Dependencies";
 
     /**
-     * Name of field <code>applications</code>.
+     * Name of field <code>applications</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The list of other applications on which current
+     * application depends.
      */
     public static final String FIELD_applications = "applications";
 
     /**
-     * Pretty name of field <code>applications</code>.
+     * Pretty name of field <code>applications</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_applications = "Applications";
 
     /**
-     * Name of field <code>documents</code>.
+     * Name of field <code>documents</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     * The list of documents application contains.
      */
     public static final String FIELD_documents = "documents";
 
     /**
-     * Pretty name of field <code>documents</code>.
+     * Pretty name of field <code>documents</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_documents = "Documents";
 
     /**
-     * Name of field <code>docstoinclude</code>.
+     * Name of field <code>docstoinclude</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The list of document application contains that will be
+     * included in place of copy from wiki template.
      */
     public static final String FIELD_docstoinclude = "docstoinclude";
 
     /**
-     * Pretty name of field <code>docstoinclude</code>.
+     * Pretty name of field <code>docstoinclude</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_docstoinclude = "Documents to include";
 
     /**
-     * Name of field <code>docstolink</code>.
+     * Name of field <code>docstolink</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The list of document application contains that will be
+     * linked in place of copy from wiki template.
      */
     public static final String FIELD_docstolink = "docstolink";
 
     /**
-     * Pretty name of field <code>docstolink</code>.
+     * Pretty name of field <code>docstolink</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_docstolink = "Documents to link";
 
     /**
-     * Name of field <code>translationdocs</code>.
+     * Name of field <code>translationdocs</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELD_translationdocs = "translationdocs";
 
     /**
-     * Pretty name of field <code>translationdocs</code>.
+     * Pretty name of field <code>translationdocs</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_translationdocs = "Translations documents";
 
@@ -145,10 +172,12 @@ public class XWikiApplicationClass extends AbstractSuperClass
     private static XWikiApplicationClass instance = null;
 
     /**
-     * Return unique instance of XWikiApplicationClass and update documents for this context.
+     * Return unique instance of XWikiApplicationClass and update documents for this context. It
+     * also check if the corresponding Xwiki class/template/sheet exist in context's database and
+     * create it if not.
      * 
-     * @param context Context.
-     * @return XWikiApplicationClass Instance of XWikiApplicationClass.
+     * @param context the XWiki context.
+     * @return a unique instance of XWikiApplicationClass.
      * @throws XWikiException
      */
     public static XWikiApplicationClass getInstance(XWikiContext context) throws XWikiException
@@ -163,16 +192,14 @@ public class XWikiApplicationClass extends AbstractSuperClass
         return instance;
     }
 
-    /**
-     * Default constructor for XWikiApplicationClass.
-     */
     private XWikiApplicationClass()
     {
         super(CLASS_SPACE_PREFIX, CLASS_PREFIX);
     }
-
+    
     /**
      * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
      */
     protected boolean updateBaseClass(BaseClass baseClass)
@@ -184,7 +211,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
         needsUpdate |= baseClass.addTextField(FIELD_appversion, FIELDPN_appversion, 30);
 
         StaticListClass slc;
-        
+
         if (baseClass.addStaticListField(FIELD_dependencies, FIELDPN_dependencies, 80, true, "",
             "input")) {
             // TODO : move into BaseClass.addStaticListField with "separators' parameter when/if
@@ -264,6 +291,18 @@ public class XWikiApplicationClass extends AbstractSuperClass
         return needsUpdate;
     }
 
+    /**
+     * Get the XWiki document descriptor of containing XAppClasses.XWikiApplication XWiki object
+     * with "appname" field equals to <code>appName</code>.
+     * 
+     * @param appName the name of the application.
+     * @param context the XWiki context.
+     * @param validate indicate if it return new XWikiDocument or throw exception if application
+     *            descriptor does not exist.
+     * @return the XWikiDocument representing application descriptor.
+     * @throws XWikiException
+     * @see #getApplication(String, XWikiContext, boolean)
+     */
     private XWikiDocument getApplicationDocument(String appName, XWikiContext context,
         boolean validate) throws XWikiException
     {
@@ -285,6 +324,18 @@ public class XWikiApplicationClass extends AbstractSuperClass
         return (XWikiDocument) listApp.get(0);
     }
 
+    /**
+     * Get the XWiki document descriptor of containing XAppClasses.XWikiApplication XWiki object
+     * with "appname" field equals to <code>appName</code>.
+     * 
+     * @param appName the name of the application.
+     * @param context the XWiki context.
+     * @param validate indicate if it return new XWikiDocument or throw exception if application
+     *            descriptor does not exist.
+     * @return the XWikiDocument representing application descriptor.
+     * @throws XWikiException
+     * @see #getApplicationDocument(String, XWikiContext, boolean)
+     */
     public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
         throws XWikiException
     {
@@ -292,6 +343,14 @@ public class XWikiApplicationClass extends AbstractSuperClass
             validate), context);
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Override abstract method using {@link XWikiApplication} as {@link XWikiApplication}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument,
+     *      com.xpn.xwiki.XWikiContext)
+     */
     public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
     {
         return (SuperDocument) doc.newDocument(XWikiApplication.class.getName(), context);

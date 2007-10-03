@@ -565,7 +565,7 @@ public class WikiManager
      * "template".
      * 
      * @param context the XWiki context.
-     * @return a list of XWikiServer.
+     * @return a list of XWikiDocuments.
      * @throws XWikiException
      */
     public List getWikiTemplateList(XWikiContext context) throws XWikiException

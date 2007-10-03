@@ -28,6 +28,7 @@ import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -296,7 +297,7 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public List getWikiTemplateList() throws XWikiException
     {
-        List listDocument = Collections.EMPTY_LIST;
+        List listDocument = new ArrayList();
 
         try {
             List listXWikiDocument = WikiManager.getInstance().getWikiTemplateList(this.context);

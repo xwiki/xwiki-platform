@@ -28,8 +28,10 @@
 
 &lt;dl&gt;
   #foreach($prop in $class.properties)
-    &lt;dt&gt; ${prop.prettyName} &lt;/dt&gt;
-    &lt;dd&gt;$doc.display($prop.getName())&lt;/dd&gt;
+    #if($prop.name != "docstolink")
+      &lt;dt&gt; ${prop.prettyName} &lt;/dt&gt;
+      &lt;dd&gt;$doc.display($prop.getName())&lt;/dd&gt;
+    #end
   #end
 &lt;/dl&gt;
 </content></xwikidoc>

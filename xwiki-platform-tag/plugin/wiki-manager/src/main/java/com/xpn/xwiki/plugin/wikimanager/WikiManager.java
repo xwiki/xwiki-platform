@@ -184,26 +184,55 @@ public class WikiManager
 
         return docsToInclude;
     }
+    
+    private Collection getDocsNameToLink(String wiki, XWikiContext context) throws XWikiException
+    {
+        // Get applications manger
+        ApplicationManagerPluginApi appmanager =
+            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(
+                ApplicationManagerPlugin.PLUGIN_NAME, context);
+
+        if (appmanager == null)
+            return null;
+
+        // //////////////////////////////////
+        // Get documents to link
+
+        String database = context.getDatabase();
+
+        Collection docsToLink = null;
+
+        try {
+            context.setDatabase(wiki);
+
+            XWikiApplication rootApp = appmanager.getRootApplication();
+
+            if (rootApp != null)
+                docsToLink = rootApp.getDocsNameToLink(true, context);
+            else
+                docsToLink =
+                    XWikiApplication.getDocsNameToLink(
+                        appmanager.getApplicationDocumentList(), true, context);
+        } finally {
+            context.setDatabase(database);
+        }
+
+        return docsToLink;
+    }
 
     private void copyWiki(String sourceWiki, String targetWiki, String language,
         XWikiContext context) throws XWikiException
     {
-        /*
-         * TODO : add included copy support to xwiki-core and use this code
-         * context.getWiki().copyWikiWeb(null, sourceWiki, getDocsNameToInclude(sourceWiki,
-         * context), targetWiki, language, true, context);
-         */
-
         XWiki xwiki = context.getWiki();
 
         // Copy all the wiki
         xwiki.copyWikiWeb(null, sourceWiki, targetWiki, language, true, context);
 
-        // Replace documents contents to include
         String database = context.getDatabase();
         try {
             context.setDatabase(targetWiki);
 
+            // Replace documents contents to include
             Collection docsNameToInclude = getDocsNameToInclude(sourceWiki, context);
             for (Iterator it = docsNameToInclude.iterator(); it.hasNext();) {
                 String docFullName = (String) it.next();
@@ -211,6 +240,15 @@ public class WikiManager
 
                 targetDoc.setContent("#includeInContext(\"" + sourceWiki + ":" + docFullName
                     + "\")");
+            }
+
+            // Replace documents contents to link
+            Collection docsNameToLink = getDocsNameToLink(sourceWiki, context);
+            for (Iterator it = docsNameToLink.iterator(); it.hasNext();) {
+                String docFullName = (String) it.next();
+                XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
+
+                targetDoc.setContent("#includeTopic(\"" + sourceWiki + ":" + docFullName + "\")");
             }
         } finally {
             context.setDatabase(database);

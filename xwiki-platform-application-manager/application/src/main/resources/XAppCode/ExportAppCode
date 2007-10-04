@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1190905378000</creationDate>
-<date>1190919670000</date>
-<contentUpdateDate>1190919670000</contentUpdateDate>
-<version>1.25</version>
+<date>1191512138000</date>
+<contentUpdateDate>1191512138000</contentUpdateDate>
+<version>1.28</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -81,7 +81,7 @@
         &lt;input type="hidden" id="action" name="action" value="$action"&gt;
         &lt;input type="hidden" id="appname" name="appname" value="$appname"&gt;
 
-        &lt;input type="checkbox" id="recursive" name="recursive" value="1" checked="true"/&gt;&lt;label for="recursive"&gt;$msg.get("xapp.answer.exportapp.recursive")&lt;/label&gt;&lt;br/&gt;
+        &lt;input type="checkbox" id="recurse" name="recurse" value="1" checked="true"/&gt;&lt;label for="recursive"&gt;$msg.get("xapp.answer.exportapp.recursive")&lt;/label&gt;&lt;br/&gt;
         &lt;input type="checkbox" id="withdetails" name="withdetails" value="1"/&gt;&lt;label for="withdetails"&gt;$msg.get("xapp.answer.exportapp.withdetails")&lt;/label&gt;
 
         #xwikimessageboxsubmit($msg.get("ok"))

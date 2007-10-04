@@ -221,7 +221,7 @@ public class XWikiApplication extends DefaultSuperDocument
      * wiki template.
      * 
      * @param docstoinclude the new list of document application contains that will be included in
-     *            place of copy from wiki template.
+     *            place of copy from a wiki template.
      * @see #getDocsToInclude()
      */
     public void setDocsToInclude(List docstoinclude)
@@ -229,17 +229,28 @@ public class XWikiApplication extends DefaultSuperDocument
         setListValue(XWikiApplicationClass.FIELD_docstoinclude, docstoinclude);
     }
 
-    /* TODO : add support for real linked documents in xwiki-core to be able to use it 
+    /**
+     * @return the list of document application contains that will be linked in place of copy from a
+     *         wiki template.
+     * @see #setDocsToLink(List)
+     */
     public List getDocsToLink()
     {
         return getListValue(XWikiApplicationClass.FIELD_docstolink);
     }
 
+    /**
+     * Modify the list of document application contains that will be included in place of copy from
+     * wiki template.
+     * 
+     * @param docstolink the new list of document application contains that will be linked in place
+     *            of copy from a wiki template.
+     * @see #getDocsToLink()
+     */
     public void setDocsToLink(List docstolink)
     {
         setListValue(XWikiApplicationClass.FIELD_docstolink, docstolink);
     }
-    */
 
     /**
      * @return the list of documents containing translations strings.
@@ -493,7 +504,7 @@ public class XWikiApplication extends DefaultSuperDocument
      * @param applications the applications containing documents names to resolve and add to
      *            <code>docsNames</code>.
      * @param recurse if true it follow recursively all applications dependencies, if false parse
-     *            only direct dependencies.
+     *            only provided applications.
      * @param context the XWiki context.
      * @return all documents names to include <code>applications</code> contains.
      * @throws XWikiException
@@ -511,9 +522,7 @@ public class XWikiApplication extends DefaultSuperDocument
         return docsToInclude;
     }
 
-    /*
-     * TODO : add support for real linked documents in xwiki-core to be able to use it 
-     * 
+    /**
      * Get and resolve all documents names to link application contains.
      * <p>
      * For each of these documents names, if are between "[" and "]", are considered as SQL matching
@@ -527,9 +536,36 @@ public class XWikiApplication extends DefaultSuperDocument
      * @see #getDocsToLink()
      * @see XWikiApplicationClass#FIELD_docstolink
      */
-    /* TODO : add support for real linked documents in xwiki-core to be able to use it 
     public Set getDocsNameToLink(boolean recurse, XWikiContext context) throws XWikiException
     {
         return getDocsNameSet(XWikiApplicationClass.FIELD_docstolink, recurse, false, context);
-    }*/
+    }
+
+    /**
+     * Get and resolve all documents names to link <code>applications</code> XWikiApplication list
+     * contains.
+     * <p>
+     * For each of these documents names, if are between "[" and "]", are considered as SQL matching
+     * string to use with "like".
+     * 
+     * @param applications the applications containing documents names to resolve and add to
+     *            <code>docsNames</code>.
+     * @param recurse if true it follow recursively all applications dependencies, if false parse
+     *            only provided applications.
+     * @param context the XWiki context.
+     * @return all documents names to link <code>applications</code> contains.
+     * @throws XWikiException
+     * @see #getDocsToLink()
+     * @see XWikiApplicationClass#FIELD_docstolink
+     */
+    public static Set getDocsNameToLink(Collection applications, boolean recurse,
+        XWikiContext context) throws XWikiException
+    {
+        Set docsToLink = new HashSet();
+
+        resolveApplicationsDocsNames(docsToLink, applications,
+            XWikiApplicationClass.FIELD_docstolink, false, context);
+
+        return docsToLink;
+    }
 }

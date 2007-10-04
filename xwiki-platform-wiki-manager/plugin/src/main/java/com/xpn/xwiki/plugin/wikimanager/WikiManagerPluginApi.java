@@ -315,6 +315,4 @@ public class WikiManagerPluginApi extends PluginApi
 
         return listDocument;
     }
-    
-    
 }

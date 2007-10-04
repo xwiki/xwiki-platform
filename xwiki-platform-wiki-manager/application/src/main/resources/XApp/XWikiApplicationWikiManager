@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1188210403000</creationDate>
-<date>1191425537000</date>
-<contentUpdateDate>1191425537000</contentUpdateDate>
-<version>1.7</version>
+<date>1191510248000</date>
+<contentUpdateDate>1191510248000</contentUpdateDate>
+<version>1.8</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -232,6 +232,7 @@
 <value>WikiResources.Translations</value>
 <value>[WikiCode.%Code]</value>
 <value>[WikiCode.%Macros]</value>
+<value>[WikiCode.%Widget]</value>
 </documents>
 </property>
 <property>

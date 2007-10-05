@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1190974436000</creationDate>
-<date>1191509752000</date>
-<contentUpdateDate>1191509752000</contentUpdateDate>
-<version>1.42</version>
+<date>1191596262000</date>
+<contentUpdateDate>1191596262000</contentUpdateDate>
+<version>1.43</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -53,8 +53,7 @@
 <tags/>
 </property>
 </object>
-<content>#includeMacros("WikiCode.WidgetMacros")
-#includeMacros("WikiCode.Macros")
+<content>#includeMacros("WikiCode.Macros")
 
 #set($WikiManager = $xwiki.wikimanager)
 #set($Exception = $WikiManager.DefaultException)

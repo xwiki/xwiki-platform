@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1191493346000</creationDate>
-<date>1191506483000</date>
-<contentUpdateDate>1191506483000</contentUpdateDate>
-<version>1.38</version>
+<date>1191596123000</date>
+<contentUpdateDate>1191596123000</contentUpdateDate>
+<version>1.51</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -53,7 +53,19 @@
 <tags/>
 </property>
 </object>
-<content>#macro(sortDocumentByCreationDate $documentlist $sorteddocumentlist $asc)
+<content>#macro(widgetbegin $title $rss)
+&lt;h2 class="heading-1-1-1"&gt; $title
+  #if($rss &amp;&amp; $rss != "")
+    &lt;a href="$xwiki.getURL($rss, "view", "xpage=rdf")" style=""&gt;&lt;img src="$xwiki.getSkinFile("icons/black-rss-mini.png")"&gt;&lt;/a&gt;
+  #end
+&lt;/h2&gt;
+#end
+
+#macro(widgetend )
+&lt;!-- --&gt;
+#end
+
+#macro(sortDocumentByCreationDate $documentlist $sorteddocumentlist $asc)
   #set($sorteddocumentlist = [])
 
   #if($documentlist.size() &gt;0)
@@ -71,6 +83,38 @@
 
       #set($added = $sorteddocumentlist.add($doc0))
     #end
+  #end
+#end
+
+#macro(addlastwikimodifications $documentlist $wikiname $usermodifications $usermodificationswiki $nb)
+  #set($currentwiki = $context.database)
+  #if($wikiname)
+    $context.setDatabase($wikiname)
+  #else
+    #set($wikiname = $context.Database)
+  #end
+
+  #set($sql = "where 1=1")
+  #if($usermodifications)
+    #if($context.database != $usermodificationswiki)
+      #set($sql = "${sql} and doc.author='${usermodificationswiki}:${usermodifications}'")
+    #else
+      #set($sql = "${sql} and doc.author='${usermodifications}'")
+    #end
+  #end
+  #set($sql = "${sql} order by doc.date desc")
+
+  #set ($list = $xwiki.searchDocuments($sql , $nb , 0))
+  
+  #foreach($docname in $list)
+    #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${docname}"))
+      #set($item = $xwiki.getDocument($docname))
+      #set($added = $documentlist.add($item))
+    #end
+  #end
+
+  #if($context.database != $currentwiki)
+    $context.setDatabase($currentwiki)
   #end
 #end</content>
 </xwikidoc>

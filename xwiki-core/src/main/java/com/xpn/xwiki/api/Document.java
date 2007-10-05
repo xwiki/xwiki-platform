@@ -112,13 +112,21 @@ public class Document extends Api
     /**
      * return the name of the space of the document
      *
-     * for exemple if the fullName of a document is "MySpace.Mydoc", the name is MySpace
+     * for example if the fullName of a document is "MySpace.Mydoc", the name is MySpace
      *
      * @return the name of the space of the document
      */
     public String getSpace()
     {
         return doc.getSpace();
+    }
+
+    /**
+     * @return the name of the wiki where this document is stored.
+     */
+    public String getWikiName()
+    {
+        return doc.getDatabase();
     }
 
     /**
@@ -134,7 +142,7 @@ public class Document extends Api
     }
 
     /**
-     * return the fullName of a doucment
+     * return the fullName of a document
      *
      * if a document has for name "MyDoc" and space "MySpace", the fullname is "MySpace.MyDoc" In a
      * wiki, all the documents have a different fullName.
@@ -142,6 +150,15 @@ public class Document extends Api
     public String getFullName()
     {
         return doc.getFullName();
+    }
+
+    /**
+     * @return the real full name of a document containing wiki name where document is stored.
+     * For document in "xwiki" wiki, with name "MyDoc" and space "MySpace" the extended full name is "xwiki:MySpace.MyDoc".
+     */
+    public String getPrefixedFullName()
+    {
+        return getWikiName() + ":" + getFullName();
     }
 
     public Version getRCSVersion()

@@ -158,7 +158,7 @@ public class Document extends Api
      */
     public String getPrefixedFullName()
     {
-        return getWikiName() + ":" + getFullName();
+        return (getWikiName() != null ? getWikiName() + ":" : "") + getFullName();
     }
 
     public Version getRCSVersion()

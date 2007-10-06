@@ -360,8 +360,7 @@ public class XWikiHibernateBaseStore {
         }
         catch (Exception e) {
             if ( log.isErrorEnabled() ) {
-                log.error("While executing query: " + sql);
-                log.error("Failed updating schema: " + e.getMessage());
+                log.error("Failed updating schema while executing query \"" + sql + "\":" + e.getMessage());
             }
         }
         finally {

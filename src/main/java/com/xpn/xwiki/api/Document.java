@@ -124,7 +124,7 @@ public class Document extends Api
     /**
      * @return the name of the wiki where this document is stored.
      */
-    public String getWikiName()
+    public String getWiki()
     {
         return doc.getDatabase();
     }
@@ -158,7 +158,7 @@ public class Document extends Api
      */
     public String getPrefixedFullName()
     {
-        return (getWikiName() != null ? getWikiName() + ":" : "") + getFullName();
+        return (getWiki() != null ? getWiki() + ":" : "") + getFullName();
     }
 
     public Version getRCSVersion()

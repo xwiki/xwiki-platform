@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1190983126000</creationDate>
-<date>1191596490000</date>
-<contentUpdateDate>1191596490000</contentUpdateDate>
-<version>1.19</version>
+<date>1191602625000</date>
+<contentUpdateDate>1191602625000</contentUpdateDate>
+<version>1.20</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -60,17 +60,17 @@
 
 #############################################################################
 
-#if(!$wikilist)
-  #set($wikilist = $WikiManager.getWikiDocumentList())
+#if(!$allwikilist)
+  #set($allwikilist = $WikiManager.getWikiDocumentList())
 #end
 
 #############################################################################
 
 #widgetbegin($msg.get("wikimanager.widget.userwikisuser.title"), "")
-#if(!$wikilist.isEmpty())
+#if(!$allwikilist.isEmpty())
   &lt;table id="userwikisadmintable"&gt;
     #set($currentwiki = $context.database)
-    #foreach($wikidoc in $wikilist)
+    #foreach($wikidoc in $allwikilist)
       $context.setDatabase($wikidoc.wikiName)
       #if($xwiki.hasAccessLevel("view", "${currentwiki}:${context.localUser}", "XWiki.XWikiPreferences"))
         &lt;tr&gt;

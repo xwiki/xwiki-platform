@@ -311,7 +311,7 @@ public class XWikiHibernateBaseStore {
             schemaSQL = config.generateSchemaUpdateScript(dialect, meta);
         }
         catch (Exception e) {
-            if ( log.isErrorEnabled() ) log.error("Failed updating schema: " + e.getMessage());
+            if ( log.isErrorEnabled() ) log.error("Failed creating schema update script", e);
         }
         finally {
             try {
@@ -360,7 +360,7 @@ public class XWikiHibernateBaseStore {
         }
         catch (Exception e) {
             if ( log.isErrorEnabled() ) {
-                log.error("Failed updating schema while executing query \"" + sql + "\":" + e.getMessage());
+                log.error("Failed updating schema while executing query \"" + sql + "\"", e);
             }
         }
         finally {

@@ -87,7 +87,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
                 object.merge(templateObject);
 
             if (super.isNew()) {
-                setParent(this.sclass.getClassFullName());
+                setParent(docTemplate.getParent());
                 setContent(docTemplate.getContent());
             }
 

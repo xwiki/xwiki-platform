@@ -68,3 +68,90 @@ li.selected {
 #xwikieditcontent .accordionTabTitleBar h6 {
   width: 100%;
 }
+
+#xwikicontent .panel {
+	display: -moz-inline-box;
+	-moz-box-orient: vertical;
+	display: inline-block;
+	vertical-align: top;
+	word-wrap: break-word;
+	border: 1px solid;
+	margin: 0px 20px 20px 0px;
+	width: 300px;
+}
+
+* html #xwikicontent .panel {
+	display: inline;
+}
+
+*+html #xwikicontent .panel {
+	display: inline;
+}
+
+* html #xwikicontent .panel {
+	width: 300px;
+}
+
+#xwikicontent .panel {
+	display: -moz-inline-box;
+	-moz-box-orient: vertical;
+	display: inline-block;
+	vertical-align: top;
+	word-wrap: break-word;
+	border: 1px solid;
+	margin: 0px 20px 20px 0px;
+	width: 300px;
+}
+
+* html #xwikicontent .panel {
+	display: inline;
+}
+
+*+html #xwikicontent .panel {
+	display: inline;
+}
+
+* html #xwikicontent .panel {
+	width: 300px;
+}
+
+#xwikicontent .panel ul {
+	margin: 0 5px;
+	padding: 0;
+	list-style-position: inside;
+}
+
+#xwikicontent .panel .xwikipanelcontents {
+	background-color: transparent;
+}
+
+#xwikicontent .panel .xwikipanelcontents {
+	color: #333;
+}
+
+#xwikicontent .panel .xwikipanelcontents a {
+	color: #000;
+}
+
+#xwikicontent .panel .xwikipanelcontents a:hover {
+	color: #06F;
+}
+
+#xwikicontent .expanded .xwikipaneltitle {
+	background-color: #fff;
+	color: #000;
+	border-bottom: 1px solid #ddd;
+}
+
+#xwikicontent .collapsed .xwikipaneltitle {
+	background-color: #384554;
+	color: #fff;
+}
+
+#xwikicontent .expanded .xwikipaneltitle:hover {
+	color: #006ACC;
+}
+
+#xwikicontent .collapsed .xwikipaneltitle:hover {
+	color: #C0D4E7;
+}

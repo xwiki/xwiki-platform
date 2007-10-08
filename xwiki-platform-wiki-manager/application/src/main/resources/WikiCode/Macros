@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1191493346000</creationDate>
-<date>1191663165000</date>
-<contentUpdateDate>1191663165000</contentUpdateDate>
-<version>1.63</version>
+<date>1191860997000</date>
+<contentUpdateDate>1191860997000</contentUpdateDate>
+<version>1.86</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -53,19 +53,7 @@
 <tags/>
 </property>
 </object>
-<content>#macro(widgetbegin $title $rss)
-&lt;h2 class="heading-1-1-1"&gt; $title
-  #if($rss &amp;&amp; $rss != "")
-    &lt;a href="$xwiki.getURL($rss, "view", "xpage=rdf")" style=""&gt;&lt;img src="$xwiki.getSkinFile("icons/black-rss-mini.png")"&gt;&lt;/a&gt;
-  #end
-&lt;/h2&gt;
-#end
-
-#macro(widgetend )
-&lt;!-- --&gt;
-#end
-
-#macro(sortDocumentByCreationDate $documentlist $sorteddocumentlist $asc)
+<content>#macro(sortDocumentByCreationDate $documentlist $sorteddocumentlist $asc)
   #set($sorteddocumentlist = [])
 
   #if($documentlist.size() &gt;0)
@@ -84,6 +72,19 @@
       #set($added = $sorteddocumentlist.add($doc0))
     #end
   #end
+#end
+
+#macro(displaymodification $pagename $pagelink $date $formatDate $user $star)
+  #if(!$formatDate)
+    #set($formatDate = $msg.get("wikimanager.defaultdatetimeformat"))
+  #end
+
+  #set($username = $xwiki.getUserName($user))
+  #if ($username == "XWikiGuest")
+    #set($username = "Guest")
+  #end
+
+  #if($star)*#end [$pagename&gt;$pagelink] $xwiki.formatDate($date, $formatDate) $username
 #end
 
 #macro(addlastwikimodifications $documentlist $wikiname $usermodifications $usermodificationswiki $nb)
@@ -105,7 +106,7 @@
   #set($sql = "${sql} order by doc.date desc")
 
   #set ($list = $xwiki.searchDocuments($sql , $nb , 0))
- 
+
   #foreach($docname in $list)
     #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${docname}"))
       #set($item = $xwiki.getDocument($docname))

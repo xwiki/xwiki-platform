@@ -6,20 +6,135 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Panels.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1190983126000</creationDate>
-<date>1191602625000</date>
-<contentUpdateDate>1191602625000</contentUpdateDate>
-<version>1.20</version>
+<creationDate>1191854770000</creationDate>
+<date>1191860772000</date>
+<contentUpdateDate>1191860772000</contentUpdateDate>
+<version>1.10</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<category>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<content>
+<editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<description>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<type>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+</class>
+<name>WikiCode.UserWikisIsUserWidget</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<property>
+<category>Information</category>
+</property>
+<property>
+<content>#panelheader($msg.get("wikimanager.widget.userwikisuser.title")) 
+
+  #includeMacros("WikiCode.Macros")
+
+  #set($WikiManager = $xwiki.wikimanager)
+  #set($Exception = $WikiManager.DefaultException)
+
+#############################################################################
+
+  #if(!$allwikilist)
+    #set($allwikilist = $WikiManager.getWikiDocumentList())
+  #end
+
+#############################################################################
+
+  #if(!$allwikilist.isEmpty())
+      #set($currentwiki = $context.database)
+      #foreach($wikidoc in $allwikilist)
+        $context.setDatabase($wikidoc.wikiName)
+        #if($xwiki.hasAccessLevel("view", "${currentwiki}:${context.localUser}", "XWiki.XWikiPreferences"))
+          $context.setDatabase($currentwiki)
+          #displaymodification("http://$wikidoc.server" "http://$wikidoc.server" $wikidoc.creationDate $formatDate $wikidoc.creator true)
+        #end
+      #end
+      $context.setDatabase($currentwiki)
+  #end
+
+#panelfooter()</content>
+</property>
+<property>
+<description>Panel Description</description>
+</property>
+<property>
+<name>UserWikisIsUserWidget</name>
+</property>
+<property>
+<type>view</type>
+</property>
+</object>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -53,35 +168,5 @@
 <tags/>
 </property>
 </object>
-<content>#includeMacros("WikiCode.Macros")
-
-#set($WikiManager = $xwiki.wikimanager)
-#set($Exception = $WikiManager.DefaultException)
-
-#############################################################################
-
-#if(!$allwikilist)
-  #set($allwikilist = $WikiManager.getWikiDocumentList())
-#end
-
-#############################################################################
-
-#widgetbegin($msg.get("wikimanager.widget.userwikisuser.title"), "")
-#if(!$allwikilist.isEmpty())
-  &lt;table id="userwikisadmintable"&gt;
-    #set($currentwiki = $context.database)
-    #foreach($wikidoc in $allwikilist)
-      $context.setDatabase($wikidoc.wikiName)
-      #if($xwiki.hasAccessLevel("view", "${currentwiki}:${context.localUser}", "XWiki.XWikiPreferences"))
-        &lt;tr&gt;
-          &lt;td&gt;http://$wikidoc.server&lt;/td&gt;
-          &lt;td&gt;[$wikidoc.creator]&lt;/td&gt;
-          &lt;td&gt;$wikidoc.creationDate&lt;/td&gt;
-        &lt;tr&gt;
-      #end
-    #end
-    $context.setDatabase($currentwiki)
-  &lt;/table&gt;
-#end
-#widgetend()
-</content></xwikidoc>
+<content>#includeForm("Panels.PanelSheet")</content>
+</xwikidoc>

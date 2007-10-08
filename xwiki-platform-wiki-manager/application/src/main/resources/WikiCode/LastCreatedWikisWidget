@@ -6,20 +6,139 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Panels.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1190974436000</creationDate>
-<date>1191602683000</date>
-<contentUpdateDate>1191602683000</contentUpdateDate>
-<version>1.45</version>
+<creationDate>1191854731000</creationDate>
+<date>1191860811000</date>
+<contentUpdateDate>1191860811000</contentUpdateDate>
+<version>1.8</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<object>
+<class>
+<name>Panels.PanelClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<category>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>Information|Navigation|Tools|Administration|Other</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</category>
+<content>
+<editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</content>
+<description>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
+<name>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<type>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
+</class>
+<name>WikiCode.LastCreatedWikisWidget</name>
+<number>0</number>
+<className>Panels.PanelClass</className>
+<property>
+<category>Information</category>
+</property>
+<property>
+<content>#panelheader($msg.get("wikimanager.widget.lastcreatedwikis.title"))
+
+  #includeMacros("WikiCode.Macros")
+
+  #set($WikiManager = $xwiki.wikimanager)
+  #set($Exception = $WikiManager.DefaultException)
+
+#############################################################################
+
+  #if(!$nb)
+    #set($nb = 5)
+  #end
+
+  #if(!$allwikilist)
+    #set($allwikilist = $WikiManager.getWikiDocumentList())
+  #end
+
+  #if(!$creationsortedallwikilist)
+    #sortDocumentByCreationDate($allwikilist $creationsortedallwikilist false)
+  #end
+
+#############################################################################
+
+  #if(!$creationsortedallwikilist.isEmpty())
+    #foreach($wikidoc in $creationsortedallwikilist)
+      #if($velocityCount &lt; $nb)
+        #displaymodification("http://$wikidoc.server" "http://$wikidoc.server" $wikidoc.creationDate $formatDate $wikidoc.creator true)
+      #end
+    #end
+  #end
+
+#panelfooter()</content>
+</property>
+<property>
+<description>Panel Description</description>
+</property>
+<property>
+<name>LastCreatedWikisWidget</name>
+</property>
+<property>
+<type>view</type>
+</property>
+</object>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -53,40 +172,5 @@
 <tags/>
 </property>
 </object>
-<content>#includeMacros("WikiCode.Macros")
-
-#set($WikiManager = $xwiki.wikimanager)
-#set($Exception = $WikiManager.DefaultException)
-
-#############################################################################
-
-#if(!$nb)
-  #set($nb = 5)
-#end
-
-#if(!$allwikilist)
-  #set($allwikilist = $WikiManager.getWikiDocumentList())
-#end
-
-#if(!$creationsortedallwikilist)
-  #sortDocumentByCreationDate($allwikilist $creationsortedallwikilist false)
-#end
-
-#############################################################################
-
-#widgetbegin($msg.get("wikimanager.widget.lastcreatedwikis.title"), "")
-#if(!$creationsortedallwikilist.isEmpty())
-  &lt;table id="lastcreatedwikistable"&gt;
-    #foreach($wikidoc in $creationsortedallwikilist)
-      #if($velocityCount &lt; $nb)
-        &lt;tr&gt;
-          &lt;td&gt;http://$wikidoc.server&lt;/td&gt;
-          &lt;td&gt;[$wikidoc.creator]&lt;/td&gt;
-          &lt;td&gt;$wikidoc.creationDate&lt;/td&gt;
-        &lt;tr&gt;
-      #end
-    #end
-  &lt;/table&gt;
-#end
-#widgetend()
-</content></xwikidoc>
+<content>#includeForm("Panels.PanelSheet")</content>
+</xwikidoc>

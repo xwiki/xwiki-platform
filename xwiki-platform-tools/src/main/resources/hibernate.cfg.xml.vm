@@ -74,6 +74,21 @@
     <mapping resource="feeds.hbm.xml"/>
     -->
 
+    <!-- PostgreSQL configuration.
+         Uncomment if you want to use PostgreSQL and comment out other database configurations.
+         Note that the database will be created automatically if it doesn't already exist.
+    <property name="connection.url">jdbc:postgresql:xwiki</property>
+    <property name="connection.username">xwiki</property>
+    <property name="connection.password">xwiki</property>
+    <property name="connection.driver_class">org.postgresql.Driver</property>
+    <property name="dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+    <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
+    <property name="connection.pool_size">2</property>
+    <property name="statement_cache.size">2</property>
+    <mapping resource="xwiki.hbm.xml"/>
+    <mapping resource="feeds.hbm.xml"/>
+    -->
+
     <!-- Oracle configuration.
          Uncomment if you want to use Oracle and comment out other database configurations.
          Note: the 2 properties named "hibernate.connection.SetBigStringTryClob" and

@@ -133,6 +133,11 @@ public abstract class AbstractSuperClass implements SuperClass
      */
     private final String classTemplateDefaultContent;
 
+    /**
+     * FullName of the default parent page for a document containing xwiki class.
+     */
+    private final String DEFAULT_XWIKICLASS_PARENT = "XWiki.XWikiClasses";
+
     public String getClassSpacePrefix()
     {
         return CLASS_SPACE_PREFIX;
@@ -352,6 +357,7 @@ public abstract class AbstractSuperClass implements SuperClass
             doc = new XWikiDocument();
             doc.setSpace(getClassSpace());
             doc.setName(getClassName());
+            doc.setParent(DEFAULT_XWIKICLASS_PARENT);
             needsUpdate = true;
         }
 
@@ -391,6 +397,7 @@ public abstract class AbstractSuperClass implements SuperClass
             doc = new XWikiDocument();
             doc.setSpace(getClassSheetSpace());
             doc.setName(getClassSheetName());
+            doc.setParent(getClassFullName());
             needsUpdate = true;
         }
 
@@ -441,10 +448,23 @@ public abstract class AbstractSuperClass implements SuperClass
 
         if (doc.isNew()) {
             doc.setContent(getClassTemplateDefaultContent());
+            doc.setParent(getClassFullName());
         }
 
+        needsUpdate |= updateClassTemplateDocument(doc);
+        
         if (doc.isNew() || needsUpdate)
             xwiki.saveDocument(doc, context);
+    }
+
+    /**
+     * Initialize template document with default content.
+     * 
+     * @param doc the class template document that will be saved.
+     */
+    protected boolean updateClassTemplateDocument(XWikiDocument doc)
+    {
+        return false;
     }
 
     /**

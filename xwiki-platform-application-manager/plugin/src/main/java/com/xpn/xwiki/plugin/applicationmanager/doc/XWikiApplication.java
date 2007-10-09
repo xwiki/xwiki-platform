@@ -61,30 +61,6 @@ public class XWikiApplication extends DefaultSuperDocument
         super(XWikiApplicationClass.getInstance(context), xdoc, context);
     }
 
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Add some specifics action for Application Manager descriptors document.
-     * <ul>
-     * <li> Initialize application version to "1.0".
-     * <li> Set descriptor document default parent to Application Manager home page :
-     * XAppManager.WebHome.
-     * </ul>
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument#reload(com.xpn.xwiki.XWikiContext)
-     */
-    public void reload(XWikiContext context) throws XWikiException
-    {
-        super.reload(context);
-
-        if (getAppVersion().length() == 0)
-            setAppVersion("1.0");
-
-        if (super.isNew())
-            // set Application Manager home as default parent for all applications descriptors
-            setParent(sclass.getClassSpacePrefix() + "Manager.WebHome");
-    }
-
     // ///
 
     /**

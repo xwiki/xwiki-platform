@@ -1495,7 +1495,7 @@ public class Document extends Api
         }
     }
 
-    private void saveDocument(String comment) throws XWikiException
+    protected void saveDocument(String comment) throws XWikiException
     {
         XWikiDocument doc = getDoc();
         doc.setAuthor(context.getUser());
@@ -1591,11 +1591,21 @@ public class Document extends Api
         return getDoc().removeObjects(className);
     }
 
+    /**
+     * Remove document from the wiki. Reinit <code>cloned</code>.
+     * 
+     * @throws XWikiException
+     */
+    protected void deleteDocument() throws XWikiException
+    {
+        getXWikiContext().getWiki().deleteDocument(getDocument(), getXWikiContext());
+        cloned = false;
+    }
+    
     public void delete() throws XWikiException
     {
         if (hasAccessLevel("delete")) {
-            getXWikiContext().getWiki().deleteDocument(getDocument(), getXWikiContext());
-            cloned = false;
+            deleteDocument();
         } else {
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1607,8 +1617,7 @@ public class Document extends Api
     public void deleteWithProgrammingRights() throws XWikiException
     {
         if (hasProgrammingRights()) {
-            getXWikiContext().getWiki().deleteDocument(getDocument(), getXWikiContext());
-            cloned = false;
+            deleteDocument();
         } else {
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,

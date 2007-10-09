@@ -142,7 +142,7 @@ public class ApplicationManager
     {
         XWikiApplication app = getApplication(appName, context, true);
 
-        app.delete(context);
+        app.delete();
     }
 
     public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)

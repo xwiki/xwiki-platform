@@ -128,19 +128,23 @@ public class DefaultSuperDocument extends Document implements SuperDocument
     {
         return super.isNew() || this.isNew;
     }
-
+   
     /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperDocument#save(com.xpn.xwiki.XWikiContext)
+     * @param comment
+     * @throws XWikiException
      */
-    public void save() throws XWikiException
+    protected void saveDocument(String comment) throws XWikiException
     {
-        super.save();
+        super.save(comment);
         this.isNew = false;
     }
 
-    public void delete(XWikiContext context) throws XWikiException
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.api.Document#deleteDocument()
+     */
+    protected void deleteDocument() throws XWikiException
     {
         super.delete();
         this.isNew = true;

@@ -489,7 +489,7 @@ public class WikiManager
      * <p>
      * Only delete the wiki descriptor the corresponding database always exist after delete.
      * 
-     * @param wikiNameToDelete the name of te wiki to delete.
+     * @param wikiNameToDelete the name of the wiki to delete.
      * @param context the XWiki context.
      * @throws XWikiException
      */
@@ -497,7 +497,7 @@ public class WikiManager
     {
         XWikiServer doc = getWiki(wikiNameToDelete, context, true);
 
-        doc.delete(context);
+        doc.delete();
     }
 
     /**

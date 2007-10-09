@@ -36,11 +36,6 @@ public class XWikiServer extends DefaultSuperDocument
         super(XWikiServerClass.getInstance(context), xdoc, context);
     }
     
-    public void delete() throws XWikiException
-    {
-        super.delete(context);
-    }
-
     public String getWikiName()
     {
         return sclass.getItemDefaultName(getFullName(), context);

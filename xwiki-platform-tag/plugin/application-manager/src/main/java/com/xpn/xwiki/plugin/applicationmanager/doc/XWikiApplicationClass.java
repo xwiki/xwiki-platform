@@ -196,7 +196,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
     {
         super(CLASS_SPACE_PREFIX, CLASS_PREFIX);
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -261,7 +261,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
 
             needsUpdate = true;
         }
- 
+
         if (baseClass.addStaticListField(FIELD_docstolink, FIELDPN_docstolink, 80, true, "",
             "input")) {
 
@@ -285,6 +285,28 @@ public class XWikiApplicationClass extends AbstractSuperClass
             slc.setSeparators("|");
             slc.setSeparator("|");
 
+            needsUpdate = true;
+        }
+
+        return needsUpdate;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
+     */
+    protected boolean updateClassTemplateDocument(XWikiDocument doc)
+    {
+        boolean needsUpdate = false;
+
+        if ((getClassSpacePrefix() + "Manager.WebHome").equals(doc.getParent())) {
+            doc.setParent(getClassSpacePrefix() + "Manager.WebHome");
+            needsUpdate = true;
+        }
+
+        if ("1.0".equals(doc.getStringValue(getClassFullName(), FIELD_appversion))) {
+            doc.setStringValue(getClassFullName(), FIELD_appversion, "1.0");
             needsUpdate = true;
         }
 

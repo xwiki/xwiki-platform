@@ -114,11 +114,11 @@
     
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">
         <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
-            <key-property name="docId" column="XWR_DOCID" type="long" />
+            <key-property name="docId"    column="XWR_DOCID" type="long" />
             <key-property name="version1" column="XWR_VERSION1" type="integer" />
             <key-property name="version2" column="XWR_VERSION2" type="integer" />
         </composite-id>
-        <property name="date" type="timestamp" column="XWR_UPDATE_DATE" not-null="true" />
+        <property name="date"    type="timestamp" column="XWR_DATE"    not-null="true" />
         <property name="comment" type="text">
             <column name="XWR_COMMENT" sql-type="clob" not-null="true" />
         </property>
@@ -127,31 +127,31 @@
     </class>
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent" table="xwikircs">
         <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
-            <key-property name="docId" column="XWR_DOCID" type="long" />
+            <key-property name="docId"    column="XWR_DOCID" type="long" />
             <key-property name="version1" column="XWR_VERSION1" type="integer" />
             <key-property name="version2" column="XWR_VERSION2" type="integer" />
         </composite-id>
         <component name="patch">
-        	<property name="diff" type="boolean" column="XWR_ISDIFF" not-null="false" />
-        	<property name="content" type="text">
-        		<column name="XWR_PATCH" sql-type="clob" not-null="false" />
-        	</property>
+            <property name="diff" type="boolean" column="XWR_ISDIFF" not-null="false" />
+            <property name="content" type="text">
+                <column name="XWR_PATCH" sql-type="clob" not-null="false" length="1000000000" />
+            </property>
         </component>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiDeletedDocument" table="xwikirecyclebin" mutable="false">
-    	<id name="id" column="XDD_ID">
-    		<generator class="native" />
-    	</id>
-    	<natural-id mutable="false">
+        <id name="id" column="XDD_ID">
+            <generator class="native" />
+        </id>
+        <natural-id mutable="false">
             <property name="fullName" column="XDD_FULLNAME" type="string" length="255" />
-            <property name="language" column="XDD_LANGUAGE" type="string" length="5" />    		
+            <property name="language" column="XDD_LANGUAGE" type="string" length="5" />
             <property name="date" type="timestamp" column="XDD_DATE" />
-            <property name="deleter" type="string" column="XDD_DELETER" />
-    	</natural-id>
-    	<property name="xml" type="text">
-    	    <column name="XDD_XML" sql-type="clob" not-null="true" />
-    	</property>
+        </natural-id>
+        <property name="deleter" type="string" column="XDD_DELETER" index="deleter"/>
+        <property name="xml" type="text">
+            <column name="XDD_XML" sql-type="clob" not-null="true" length="1000000000"/>
+        </property>
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">
@@ -859,5 +859,12 @@
         </property>
     </class>
     -->
+
+    <class name="com.xpn.xwiki.store.migration.XWikiDBVersion" table="xwikidbversion">
+        <id name="version" type="integer" unsaved-value="undefined">
+            <column name="XWV_VERSION" not-null="true" />
+            <generator class="assigned" />
+        </id>
+    </class>
 </hibernate-mapping>
 

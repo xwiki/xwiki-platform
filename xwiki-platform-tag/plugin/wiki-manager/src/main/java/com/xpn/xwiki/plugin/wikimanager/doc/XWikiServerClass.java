@@ -194,6 +194,23 @@ public class XWikiServerClass extends AbstractSuperClass
 
         return needsUpdate;
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
+     */
+    protected boolean updateClassTemplateDocument(XWikiDocument doc)
+    {
+        boolean needsUpdate = false;
+
+        if ("WikiManager.WebHome".equals(doc.getParent())) {
+            doc.setParent(getClassSpacePrefix() + "Manager.WebHome");
+            needsUpdate = true;
+        }
+
+        return needsUpdate;
+    }
 
     private XWikiDocument getWikiServerDocument(String wikiName, XWikiContext context,
         boolean validate) throws XWikiException

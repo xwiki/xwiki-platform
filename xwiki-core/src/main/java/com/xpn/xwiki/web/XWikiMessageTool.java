@@ -84,13 +84,13 @@ public class XWikiMessageTool
      * The default Resource Bundle to fall back to if no document bundle is found when trying to get
      * a key.
      */
-    private ResourceBundle bundle;
+    protected ResourceBundle bundle;
 
     /**
      * The {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for
      * loading documents.
      */
-    private XWikiContext context;
+    protected XWikiContext context;
 
     /**
      * Cache properties loaded from the document bundles for maximum efficiency. The map is of type
@@ -170,7 +170,7 @@ public class XWikiMessageTool
     }
 
     /**
-     * @return the list of internationalisation document bundle names as a list of XWiki page names
+     * @return the list of internationalization document bundle names as a list of XWiki page names
      *         ("Space.Document") or an empty list if no such documents have been found
      * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
      *      document bundles

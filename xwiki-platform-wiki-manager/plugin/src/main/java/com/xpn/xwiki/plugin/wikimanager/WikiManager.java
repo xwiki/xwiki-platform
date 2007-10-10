@@ -84,14 +84,14 @@ public class WikiManager
      * @throws XWikiException
      * @see com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)
      */
-    public void saveDocument(String wikiName, XWikiDocument doc, XWikiContext context)
+    public void saveDocument(String wikiName, XWikiDocument doc, String comment, XWikiContext context)
         throws XWikiException
     {
         String database = context.getDatabase();
 
         try {
             context.setDatabase(wikiName);
-            context.getWiki().saveDocument(doc, context);
+            context.getWiki().saveDocument(doc, comment, context);
         } finally {
             context.setDatabase(database);
         }
@@ -221,7 +221,7 @@ public class WikiManager
     }
 
     private void copyWiki(String sourceWiki, String targetWiki, String language,
-        XWikiContext context) throws XWikiException
+        String comment, XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -270,9 +270,9 @@ public class WikiManager
      * @see #createNewWikiFromTemplate(XWikiServer, String, boolean, XWikiContext)
      */
     public XWikiServer createNewWikiFromPackage(XWikiServer userWikiSuperDoc, String packageName,
-        boolean failOnExist, XWikiContext context) throws XWikiException
+        boolean failOnExist, String comment, XWikiContext context) throws XWikiException
     {
-        return createNewWiki(userWikiSuperDoc, failOnExist, null, packageName, context);
+        return createNewWiki(userWikiSuperDoc, failOnExist, null, packageName, comment, context);
     }
 
     /**
@@ -290,9 +290,9 @@ public class WikiManager
      * @see #createNewWikiFromPackage(XWikiServer, String, boolean, XWikiContext)
      */
     public XWikiServer createNewWikiFromTemplate(XWikiServer userWikiSuperDoc,
-        String templateWikiName, boolean failOnExist, XWikiContext context) throws XWikiException
+        String templateWikiName, boolean failOnExist, String comment, XWikiContext context) throws XWikiException
     {
-        return createNewWiki(userWikiSuperDoc, failOnExist, templateWikiName, null, context);
+        return createNewWiki(userWikiSuperDoc, failOnExist, templateWikiName, null, comment, context);
     }
 
     /**
@@ -307,13 +307,13 @@ public class WikiManager
      * @throws XWikiException
      */
     public XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist,
-        XWikiContext context) throws XWikiException
+        String comment, XWikiContext context) throws XWikiException
     {
-        return createNewWiki(userWikiSuperDoc, failOnExist, null, null, context);
+        return createNewWiki(userWikiSuperDoc, failOnExist, null, null, comment, context);
     }
 
     private XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist,
-        String templateWikiName, String packageName, XWikiContext context) throws XWikiException
+        String templateWikiName, String packageName, String comment, XWikiContext context) throws XWikiException
     {
         if (userWikiSuperDoc.getOwner().length() == 0)
             throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USER_INACTIVE,
@@ -435,7 +435,7 @@ public class WikiManager
 
             // Copy base wiki
             if (templateWikiName != null) {
-                copyWiki(templateWikiName, newWikiName, language, context);
+                copyWiki(templateWikiName, newWikiName, language, comment, context);
             }
 
             if (packageName != null) {
@@ -476,7 +476,7 @@ public class WikiManager
             // Return to root database
             context.setDatabase(context.getMainXWiki());
 
-            wikiSuperDocToSave.save();
+            wikiSuperDocToSave.save(comment);
 
             return wikiSuperDocToSave;
         } finally {
@@ -626,12 +626,12 @@ public class WikiManager
      * @throws XWikiException
      */
     public void createWikiTemplate(XWikiServer wikiSuperDocument, String packageName,
-        XWikiContext context) throws XWikiException
+        String comment, XWikiContext context) throws XWikiException
     {
         wikiSuperDocument.setVisibility(XWikiServerClass.FIELDL_visibility_template);
 
         // Create empty wiki
         WikiManager.getInstance().createNewWikiFromPackage(wikiSuperDocument, packageName, false,
-            context);
+            comment, context);
     }
 }

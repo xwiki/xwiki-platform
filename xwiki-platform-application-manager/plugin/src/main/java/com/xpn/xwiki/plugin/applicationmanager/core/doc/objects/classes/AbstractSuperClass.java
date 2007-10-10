@@ -434,7 +434,7 @@ public abstract class AbstractSuperClass implements SuperClass
 
         if (doc.isNew()) {
             String content =
-                getResourceDocumentContent("templates/" + getClassSheetFullName() + ".vm");
+                getResourceDocumentContent("sheets/" + getClassSheetFullName() + ".vm");
             doc.setContent(content != null ? content.toString() : getClassSheetDefaultContent());
         }
 

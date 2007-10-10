@@ -173,7 +173,7 @@ public class WikiManager
             XWikiApplication rootApp = appmanager.getRootApplication();
 
             if (rootApp != null)
-                docsToInclude = rootApp.getDocsNameToInclude(true, context);
+                docsToInclude = rootApp.getDocsNameToInclude(true);
             else
                 docsToInclude =
                     XWikiApplication.getDocsNameToInclude(
@@ -208,7 +208,7 @@ public class WikiManager
             XWikiApplication rootApp = appmanager.getRootApplication();
 
             if (rootApp != null)
-                docsToLink = rootApp.getDocsNameToLink(true, context);
+                docsToLink = rootApp.getDocsNameToLink(true);
             else
                 docsToLink =
                     XWikiApplication.getDocsNameToLink(

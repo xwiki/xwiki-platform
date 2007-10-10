@@ -78,7 +78,8 @@ public class ApplicationManager
             XWikiDocument doc = xwiki.getDocument(docFullName, context);
 
             if (!doc.isNew()) {
-                return (XWikiApplication)XWikiApplicationClass.getInstance(context).newSuperDocument(doc, context);
+                return (XWikiApplication) XWikiApplicationClass.getInstance(context)
+                    .newSuperDocument(doc, context);
             }
         }
 
@@ -97,14 +98,15 @@ public class ApplicationManager
         List applicationList = new ArrayList(documentList.size());
 
         for (Iterator it = documentList.iterator(); it.hasNext();) {
-            applicationList.add(XWikiApplicationClass.getInstance(context).newSuperDocument((XWikiDocument) it.next(), context));
+            applicationList.add(XWikiApplicationClass.getInstance(context).newSuperDocument(
+                (XWikiDocument) it.next(), context));
         }
 
         return applicationList;
     }
 
     public void createApplication(XWikiApplication userAppSuperDoc, boolean failOnExist,
-        XWikiContext context) throws XWikiException
+        String comment, XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiApplicationClass appClass = XWikiApplicationClass.getInstance(context);
@@ -128,11 +130,13 @@ public class ApplicationManager
 
         }
 
-        XWikiApplication appSuperDocToSave = (XWikiApplication)XWikiApplicationClass.getInstance(context).newSuperDocument(docToSave, context);
+        XWikiApplication appSuperDocToSave =
+            (XWikiApplication) XWikiApplicationClass.getInstance(context).newSuperDocument(
+                docToSave, context);
 
         appSuperDocToSave.mergeBaseObject(userAppSuperDoc);
 
-        appSuperDocToSave.save();
+        appSuperDocToSave.save(comment);
 
         // Update user document with the new document name
         userAppSuperDoc.setFullName(appSuperDocToSave.getFullName());
@@ -152,7 +156,8 @@ public class ApplicationManager
             validate);
     }
 
-    public void updateAllApplicationTranslation(XWikiContext context) throws XWikiException
+    public void updateAllApplicationTranslation(String comment, XWikiContext context)
+        throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -175,12 +180,12 @@ public class ApplicationManager
         if (updateprefs) {
             prefsObject.setStringValue("documentBundles", StringUtils.join(translationPrefs
                 .toArray(), ","));
-            xwiki.saveDocument(prefsDoc, context);
+            xwiki.saveDocument(prefsDoc, comment, context);
         }
     }
 
-    public void updateApplicationTranslation(XWikiApplication app, XWikiContext context)
-        throws XWikiException
+    public void updateApplicationTranslation(XWikiApplication app, String comment,
+        XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -195,7 +200,7 @@ public class ApplicationManager
         if (updateprefs) {
             prefsObject.setStringValue("documentBundles", StringUtils.join(translationPrefs
                 .toArray(), ","));
-            xwiki.saveDocument(prefsDoc, context);
+            xwiki.saveDocument(prefsDoc, comment, context);
         }
     }
 
@@ -217,8 +222,8 @@ public class ApplicationManager
         return updateprefs;
     }
 
-    public void exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory, XWikiContext context) throws XWikiException,
-        IOException
+    public void exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory,
+        XWikiContext context) throws XWikiException, IOException
     {
         XWikiApplication app =
             ApplicationManager.getInstance().getApplication(appName, context, true);
@@ -231,13 +236,13 @@ public class ApplicationManager
         for (Iterator it = documents.iterator(); it.hasNext();) {
             export.add((String) it.next(), DocumentInfo.ACTION_OVERWRITE);
         }
-        
+
         export.setWithVersions(withDocHistory);
 
         export.export();
     }
 
-    public void importApplication(XWikiDocument packageDoc, String packageName,
+    public void importApplication(XWikiDocument packageDoc, String packageName, String comment,
         XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -278,14 +283,15 @@ public class ApplicationManager
 
             if (XWikiApplicationClass.getInstance(context).isInstance(doc, context))
                 updateprefs |=
-                    updateApplicationTranslation(translationPrefs, (XWikiApplication)XWikiApplicationClass.getInstance(context).newSuperDocument(doc,
-                        context), context);
+                    updateApplicationTranslation(translationPrefs,
+                        (XWikiApplication) XWikiApplicationClass.getInstance(context)
+                            .newSuperDocument(doc, context), context);
         }
 
         if (updateprefs) {
             prefsObject.setStringValue("documentBundles", StringUtils.join(translationPrefs
                 .toArray(), ","));
-            xwiki.saveDocument(prefsDoc, context);
+            xwiki.saveDocument(prefsDoc, comment, context);
         }
     }
 }

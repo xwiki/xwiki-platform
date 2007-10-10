@@ -1,0 +1,49 @@
+#set($Appmanager = $xwiki.applicationmanager)
+#set($Exception = $Appmanager.DefaultException)
+
+#set($object = $doc.getObject("XAppClasses.XWikiApplicationClass"))
+#set($class = $object.xWikiClass)
+#set($app = $Appmanager.getApplicationDocument($doc.getValue("appname", $object)))
+
+#############################################################################
+
+1 Application \"$app.appName\"
+
+<dl>
+  #foreach($prop in $class.properties)
+    <dt> ${prop.prettyName} </dt>
+    #if($context.action == "view" && $prop.name == "documents")
+      <dd>
+        #foreach($docfullname in $app.getDocumentsNames(false, false))
+          [$docfullname>$docfullname]
+        #end
+      </dd>
+    #elseif($context.action == "view" && $prop.name == "docstoinclude")
+      <dd>
+        #foreach($docfullname in $app.getDocsNameToInclude(false))
+          [$docfullname>$docfullname]
+        #end
+      </dd>
+    #elseif($context.action == "view" && $prop.name == "docstolink")
+      <dd>
+        #foreach($docfullname in $app.getDocsNameToLink(false))
+          [$docfullname>$docfullname]
+        #end
+      </dd>
+    #elseif($context.action == "view" && $prop.name == "translationdocs")
+      <dd>
+        #foreach($docfullname in $app.getTranslationDocs())
+          [$docfullname>$docfullname]
+        #end
+      </dd>
+    #elseif($context.action == "view" && $prop.name == "applications")
+      <dd>
+        #foreach($appname in $app.getApplications())
+          [$appname>$Appmanager.getApplicationDocument($object.appname).fullName]
+        #end
+      </dd>
+    #else
+      <dd>$doc.display($prop.getName())</dd>
+    #end
+  #end
+</dl>

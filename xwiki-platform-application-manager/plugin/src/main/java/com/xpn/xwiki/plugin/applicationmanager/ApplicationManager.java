@@ -232,7 +232,7 @@ public class ApplicationManager
 
         export.setName(app.getAppName() + "-" + app.getAppVersion());
 
-        Set documents = app.getDocumentsNames(recurse, true, context);
+        Set documents = app.getDocumentsNames(recurse, true);
         for (Iterator it = documents.iterator(); it.hasNext();) {
             export.add((String) it.next(), DocumentInfo.ACTION_OVERWRITE);
         }

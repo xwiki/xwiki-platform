@@ -24,8 +24,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
+import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
@@ -49,17 +52,31 @@ public class ApplicationManagerPluginApi extends PluginApi
 
     private XWikiExceptionApi defaultException;
 
+    private XWikiPluginMessageTool messageTool;
+
     public ApplicationManagerPluginApi(ApplicationManagerPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
 
+        // Default Exception
         defaultException =
             new XWikiExceptionApi(ApplicationManagerException.getDefaultException(), context);
+
+        // Message Tool
+        Locale locale = (Locale) context.get("locale");
+        ResourceBundle bundle =
+            ResourceBundle.getBundle(getPlugin().getName() + "/ApplicationResources", locale);
+        this.messageTool = new XWikiPluginMessageTool(bundle, context);
     }
 
     public XWikiExceptionApi getDefaultException()
     {
         return defaultException;
+    }
+
+    public XWikiPluginMessageTool getMessageTool()
+    {
+        return this.messageTool;
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -105,8 +122,11 @@ public class ApplicationManagerPluginApi extends PluginApi
         // TODO : check rights
 
         try {
-            ApplicationManager.getInstance().createApplication(appSuperDocument, failOnExist,
-                context);
+            ApplicationManager.getInstance().createApplication(
+                appSuperDocument,
+                failOnExist,
+                this.messageTool.get("applicationmanager.plugin.createapplication.comment",
+                    appSuperDocument.toString()), context);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to create application \"" + appSuperDocument + "\"", e);
 
@@ -293,8 +313,11 @@ public class ApplicationManagerPluginApi extends PluginApi
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            ApplicationManager.getInstance().importApplication(context.getDoc(), packageName,
-                context);
+            ApplicationManager.getInstance().importApplication(
+                context.getDoc(),
+                packageName,
+                this.messageTool.get("applicationmanager.plugin.importapplication.comment",
+                    packageName), context);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
 
@@ -336,7 +359,10 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             XWikiApplication app =
                 ApplicationManager.getInstance().getApplication(appName, context, true);
-            ApplicationManager.getInstance().updateApplicationTranslation(app, context);
+            ApplicationManager.getInstance().updateApplicationTranslation(
+                app,
+                this.messageTool.get("applicationmanager.plugin.reloadapplication.comment", app
+                    .getAppName()), context);
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
 
@@ -372,7 +398,10 @@ public class ApplicationManagerPluginApi extends PluginApi
             List applist = ApplicationManager.getInstance().getApplicationList(context);
             for (Iterator it = applist.iterator(); it.hasNext();) {
                 XWikiApplication app = (XWikiApplication) it.next();
-                ApplicationManager.getInstance().updateApplicationTranslation(app, context);
+                ApplicationManager.getInstance().updateApplicationTranslation(
+                    app,
+                    this.messageTool.get("applicationmanager.plugin.reloadapplication.comment",
+                        app.getAppName()), context);
             }
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get application document", e);
@@ -384,14 +413,6 @@ public class ApplicationManagerPluginApi extends PluginApi
         }
 
         return returncode;
-    }
-    
-    /**
-     * @deprecated use {@link #getRootApplication()}.
-     */
-    public XWikiApplication getRootApplication(XWikiContext context) throws XWikiException
-    {
-        return getRootApplication();
     }
 
     /**

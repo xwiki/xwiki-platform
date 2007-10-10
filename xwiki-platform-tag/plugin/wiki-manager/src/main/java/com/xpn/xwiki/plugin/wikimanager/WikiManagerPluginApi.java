@@ -21,6 +21,7 @@
 package com.xpn.xwiki.plugin.wikimanager;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
+import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -47,6 +50,8 @@ public class WikiManagerPluginApi extends PluginApi
     protected static final Log LOG = LogFactory.getLog(WikiManagerPluginApi.class);
 
     private XWikiExceptionApi defaultException;
+    
+    private XWikiPluginMessageTool messageTool;
 
     public WikiManagerPluginApi(WikiManagerPlugin plugin, XWikiContext context)
     {
@@ -54,6 +59,12 @@ public class WikiManagerPluginApi extends PluginApi
 
         this.defaultException =
             new XWikiExceptionApi(WikiManagerException.getDefaultException(), this.context);
+        
+     // Message Tool
+        Locale locale = (Locale) context.get("locale");
+        ResourceBundle bundle =
+            ResourceBundle.getBundle(getPlugin().getName() + "/ApplicationResources", locale);
+        this.messageTool = new XWikiPluginMessageTool(bundle, context);
     }
 
     public XWikiExceptionApi getDefaultException()
@@ -86,11 +97,11 @@ public class WikiManagerPluginApi extends PluginApi
 
         try {
             if (templateWiki != null)
-                WikiManager.getInstance().createNewWikiFromTemplate(wikiSuperDocument, templateWiki, failOnExist, this.context);
+                WikiManager.getInstance().createNewWikiFromTemplate(wikiSuperDocument, templateWiki, failOnExist, this.messageTool.get("wikimanager.plugin.createwikifromtemplate.comment", new String[] {wikiname, templateWiki}), this.context);
             else if (pkg != null)
-                WikiManager.getInstance().createNewWikiFromPackage(wikiSuperDocument, pkg, failOnExist, this.context);
+                WikiManager.getInstance().createNewWikiFromPackage(wikiSuperDocument, pkg, failOnExist, this.messageTool.get("wikimanager.plugin.createwikifrompackage.comment", new String[] {wikiname, pkg}), this.context);
             else
-                WikiManager.getInstance().createNewWiki(wikiSuperDocument, failOnExist, this.context);
+                WikiManager.getInstance().createNewWiki(wikiSuperDocument, failOnExist, this.messageTool.get("wikimanager.plugin.createwiki.comment", wikiname), this.context);
         } catch (WikiManagerException e) {
             LOG.error("Try to create wiki \"" + wikiSuperDocument + "\"", e);
 
@@ -260,7 +271,7 @@ public class WikiManagerPluginApi extends PluginApi
         wikiSuperDocument.setOwner(this.context.getUser());
 
         try {
-            WikiManager.getInstance().createWikiTemplate(wikiSuperDocument, packageName,
+            WikiManager.getInstance().createWikiTemplate(wikiSuperDocument, packageName, this.messageTool.get("wikimanager.plugin.createwikitemplate.comment", new String[] {templateName, packageName}),
                 this.context);
         } catch (WikiManagerException e) {
             LOG.error("Try to create wiki template \"" + wikiSuperDocument + "\"", e);

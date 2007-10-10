@@ -190,7 +190,7 @@ public class WikiManagerTest extends MockObjectTestCase
         
         XWikiDocument doc = new XWikiDocument("DocumentSpace", "DocumentName");
         
-        WikiManager.getInstance().saveDocument(TARGET_WIKI_NAME, doc, context);
+        WikiManager.getInstance().saveDocument(TARGET_WIKI_NAME, doc, "", context);
         
         assertEquals(WIKI_NAME, context.getDatabase());
         assertTrue(databases.containsKey(TARGET_WIKI_NAME) && ((Map)databases.get(TARGET_WIKI_NAME)).containsKey(doc.getFullName()));

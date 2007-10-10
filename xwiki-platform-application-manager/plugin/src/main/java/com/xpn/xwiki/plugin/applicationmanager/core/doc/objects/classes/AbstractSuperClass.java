@@ -20,6 +20,10 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
 
@@ -380,6 +384,33 @@ public abstract class AbstractSuperClass implements SuperClass
     }
 
     /**
+     * Load an entire resource text file into {@link String}.
+     * 
+     * @param path the path to the resource file.
+     * @return the entire content of the resource text file.
+     */
+    private String getResourceDocumentContent(String path)
+    {
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
+
+        if (in != null)
+            try {
+                StringBuffer content = new StringBuffer(in.available());
+
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                for (String str; (str = reader.readLine()) != null;) {
+                    content.append(str);
+                    content.append('\n');
+                }
+
+                return content.toString();
+            } catch (IOException e) {
+            }
+
+        return null;
+    }
+
+    /**
      * Check if class sheet document exists in this context and update. Create if not exists.
      * 
      * @param context the XWiki context.
@@ -402,7 +433,9 @@ public abstract class AbstractSuperClass implements SuperClass
         }
 
         if (doc.isNew()) {
-            doc.setContent(getClassSheetDefaultContent());
+            String content =
+                getResourceDocumentContent("templates/" + getClassSheetFullName() + ".vm");
+            doc.setContent(content != null ? content.toString() : getClassSheetDefaultContent());
         }
 
         if (doc.isNew() || needsUpdate)
@@ -447,12 +480,16 @@ public abstract class AbstractSuperClass implements SuperClass
         }
 
         if (doc.isNew()) {
-            doc.setContent(getClassTemplateDefaultContent());
+            String content =
+                getResourceDocumentContent("templates/" + getClassTemplateFullName() + ".vm");
+            doc.setContent(content != null ? content.toString()
+                : getClassTemplateDefaultContent());
+
             doc.setParent(getClassFullName());
         }
 
         needsUpdate |= updateClassTemplateDocument(doc);
-        
+
         if (doc.isNew() || needsUpdate)
             xwiki.saveDocument(doc, context);
     }

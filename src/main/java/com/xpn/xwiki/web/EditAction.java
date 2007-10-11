@@ -43,6 +43,10 @@ public class EditAction extends XWikiAction {
         XWikiForm form = context.getForm();
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
+        boolean hasTranslation = false;
+        if (doc!=context.get("tdoc"))
+                hasTranslation = true;
+
         // we need to clone so that nothing happens in memory
         doc = (XWikiDocument) doc.clone();
         context.put("doc", doc);
@@ -99,7 +103,7 @@ public class EditAction extends XWikiAction {
                 languagetoedit = "";
             // if the doc does not exist in the language to edit and the language was not explicitely set in the URL
             // then we edit the default doc, otherwise this can cause to create translations without wanting it.
-            if ((tdoc==doc)&&languagefromrequest.equals(""))
+            if ((!hasTranslation)&&languagefromrequest.equals(""))
                 languagetoedit = "";
 
             if (languagetoedit.equals("")) {
@@ -114,7 +118,7 @@ public class EditAction extends XWikiAction {
             } else {
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
-                if ((tdoc==doc)&&context.getWiki().isMultiLingual(context)) {
+                if ((!hasTranslation)&&context.getWiki().isMultiLingual(context)) {
                     tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());

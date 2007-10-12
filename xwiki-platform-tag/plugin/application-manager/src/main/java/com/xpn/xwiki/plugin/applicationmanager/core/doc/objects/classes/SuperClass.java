@@ -28,13 +28,14 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
- * Interface that give way to manage a XWiki class :
+ * Interface that give way to manage a XWiki class.
  * <ul>
  * <li>assume that the XWiki class exist in the context we are working
  * <li>search in documents that contains this class with conditions on class fields
  * <li>support the XWiki norm about spaces and documents naming
  * </ul>
  * 
+ * @version $Id: $
  * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. When that issue is applied in XWiki Core
  *       and when this plugin moves to the version of XWiki Core where it was applied then remove
  *       this class.
@@ -42,39 +43,44 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public interface SuperClass
 {
     /**
+     * The separator between space name and document name in document full name.
+     */
+    String SPACE_DOC_SEPARATOR = ".";
+    
+    /**
      * Default suffix for the document containing the class.
      */
-    static final String XWIKI_CLASS_SUFFIX = "Class";
+    String XWIKI_CLASS_SUFFIX = "Class";
 
     /**
      * Default suffix for a document containing a class sheet.
      */
-    static final String XWIKI_CLASSSHEET_SUFFIX = "ClassSheet";
+    String XWIKI_CLASSSHEET_SUFFIX = "ClassSheet";
 
     /**
      * Default suffix for a document containing a class template.
      */
-    static final String XWIKI_CLASSTEMPLATE_SUFFIX = "ClassTemplate";
+    String XWIKI_CLASSTEMPLATE_SUFFIX = "ClassTemplate";
 
     /**
      * Default prefix for a document's space containing a class.
      */
-    static final String XWIKI_CLASS_SPACE_PREFIX = "XWiki";
+    String XWIKI_CLASS_SPACE_PREFIX = "XWiki";
 
     /**
      * Default suffix for a document's space containing a class.
      */
-    static final String XWIKI_CLASS_SPACE_SUFFIX = "Classes";
+    String XWIKI_CLASS_SPACE_SUFFIX = "Classes";
 
     /**
      * Default suffix for a document's space containing a class sheet.
      */
-    static final String XWIKI_CLASSSHEET_SPACE_SUFFIX = "Sheets";
+    String XWIKI_CLASSSHEET_SPACE_SUFFIX = "Sheets";
 
     /**
      * Default suffix for a document's space containing a class template.
      */
-    static final String XWIKI_CLASSTEMPLATE_SPACE_SUFFIX = "Templates";
+    String XWIKI_CLASSTEMPLATE_SPACE_SUFFIX = "Templates";
 
     // ///
 
@@ -176,13 +182,14 @@ public interface SuperClass
     /**
      * @return the BaseClass managed by this SuperClass.
      */
-    BaseClass getBaseClass() throws XWikiException;
+    BaseClass getBaseClass();
 
     /**
      * Get the document containing the class in this context's database.
      * 
      * @param context the XWiki context.
      * @return the document containing the class for this context.
+     * @throws XWikiException error when getting class document from the database.
      */
     XWikiDocument getClassDocument(XWikiContext context) throws XWikiException;
 
@@ -196,6 +203,7 @@ public interface SuperClass
      * 
      * @param context the XWiki context.
      * @return the document containing the class sheet for this context.
+     * @throws XWikiException error when getting class sheet document from the database.
      */
     XWikiDocument getClassSheetDocument(XWikiContext context) throws XWikiException;
 
@@ -209,6 +217,7 @@ public interface SuperClass
      * 
      * @param context the XWiki context.
      * @return the class template document for this context.
+     * @throws XWikiException error when getting class template document from the database.
      */
     XWikiDocument getClassTemplateDocument(XWikiContext context) throws XWikiException;
 
@@ -217,11 +226,9 @@ public interface SuperClass
      * contains class object).
      * 
      * @param doc the XWikidocument to test.
-     * @param context the XWiki context.
      * @return true if <code>doc</code> support this class, false otherwise.
-     * @throws XWikiException
      */
-    boolean isInstance(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    boolean isInstance(XWikiDocument doc);
 
     /**
      * Get document name from item name <code>item</code>. Usually a Document name is
@@ -231,7 +238,7 @@ public interface SuperClass
      * @param context the XWiki context.
      * @return the name of the document.
      * @see #getItemDocumentDefaultFullName(String, XWikiContext)
-     * @see #getItemDefaultName(String, XWikiContext)
+     * @see #getItemDefaultName(String)
      */
     String getItemDocumentDefaultName(String itemName, XWikiContext context);
 
@@ -243,7 +250,7 @@ public interface SuperClass
      * @param context the XWiki context.
      * @return the full name of the document.
      * @see #getItemDocumentDefaultName(String, XWikiContext)
-     * @see #getItemDefaultName(String, XWikiContext)
+     * @see #getItemDefaultName(String)
      */
     String getItemDocumentDefaultFullName(String itemName, XWikiContext context);
 
@@ -252,11 +259,10 @@ public interface SuperClass
      * Space.DocumentTypeItemName.
      * 
      * @param docFullName the full name of the document.
-     * @param context the XWiki context.
      * @return the item name extracted from document name.
      * @see #getItemDocumentDefaultFullName(String, XWikiContext)
      */
-    public String getItemDefaultName(String docFullName, XWikiContext context);
+    String getItemDefaultName(String docFullName);
 
     /**
      * Get document by full name from item name <code>itemName</code>.
@@ -264,8 +270,8 @@ public interface SuperClass
      * @param itemName the full name of the item.
      * @param context the XWiki context.
      * @return the full name of the document.
-     * @throws XWikiException
-     * @see #getItemDefaultName(String, XWikiContext)
+     * @throws XWikiException error when getting document from the database.
+     * @see #getItemDefaultName(String)
      * @see #getItemDocumentDefaultFullName(String, XWikiContext)
      */
     XWikiDocument getItemDocument(String itemName, XWikiContext context) throws XWikiException;
@@ -278,7 +284,7 @@ public interface SuperClass
      * @param fieldType the type of field.
      * @param context the XWiki context.
      * @return the list of found XWikiDocuments.
-     * @throws XWikiException
+     * @throws XWikiException error when searching for documents from in database.
      */
     List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
         XWikiContext context) throws XWikiException;
@@ -290,7 +296,7 @@ public interface SuperClass
      * @param fieldDescriptors the list of fields name/value constraints.
      * @param context the XWiki context.
      * @return the list of found XWikiDocuments.
-     * @throws XWikiException
+     * @throws XWikiException error when searching for documents from in database.
      */
     List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors,
         XWikiContext context) throws XWikiException;
@@ -302,7 +308,7 @@ public interface SuperClass
      * @param doc the XWiki document to manage.
      * @param context the XWiki context.
      * @return a new SuperDocument instance.
-     * @throws XWikiException
+     * @throws XWikiException error when calling SuperDocument implementation constructor.
      */
     SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
@@ -312,7 +318,7 @@ public interface SuperClass
      * 
      * @param context the XWiki context.
      * @return a new SuperDocument instance.
-     * @throws XWikiException
+     * @throws XWikiException error when calling SuperDocument implementation constructor.
      */
     SuperDocument newSuperDocument(XWikiContext context) throws XWikiException;
 
@@ -323,7 +329,7 @@ public interface SuperClass
      * @param docFullName the full name of document to manage.
      * @param context the XWiki context.
      * @return a new SuperDocument instance.
-     * @throws XWikiException
+     * @throws XWikiException error when calling SuperDocument implementation constructor.
      * @see #getClassFullName()
      */
     SuperDocument newSuperDocument(String docFullName, XWikiContext context)

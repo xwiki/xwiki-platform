@@ -3,6 +3,7 @@ package com.xpn.xwiki.plugin.applicationmanager.core.plugin;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Arrays;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -28,8 +29,8 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
     /**
      * {@inheritDoc}
      * <p>
-     * Start calling <code>context</code>'s {@link XWikiMessageTool#get(String)} then if nothing is found
-     * use plugin's {@link ResourceBundle}.
+     * Start calling <code>context</code>'s {@link XWikiMessageTool#get(String)} then if nothing
+     * is found use plugin's {@link ResourceBundle}.
      * 
      * @see com.xpn.xwiki.web.XWikiMessageTool#getTranslation(java.lang.String)
      */
@@ -37,6 +38,7 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
     {
         String translation = this.context.getMessageTool().get(key);
 
+        // Want to know if XWikiMessageTool.get return excatly what it get means it found nothing
         if (translation == key) {
             try {
                 translation = this.bundle.getString(key);
@@ -60,13 +62,7 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
      */
     public String get(String key, String[] params)
     {
-        List paramList = new ArrayList(params.length);
-
-        for (int i = 0; i < params.length; ++i) {
-            paramList.add(params[i]);
-        }
-
-        return get(key, paramList);
+        return get(key, Arrays.asList(params));
     }
 
     /**
@@ -74,7 +70,7 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
      * param parameter. The format is the one used by {@link java.text.MessageFormat}.
      * 
      * @param key the key of the string to find
-     * @param params the parameter to use for replacing "{0}" element in the string. See
+     * @param param the parameter to use for replacing "{0}" element in the string. See
      *            {@link java.text.MessageFormat} for the full syntax
      * @return the translated string with parameters resolved
      * @see com.xpn.xwiki.web.XWikiMessageTool#get(String, List)

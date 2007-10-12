@@ -42,8 +42,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument}.
- *
+ * Unit tests for
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument}.
+ * 
  * @version $Id: $
  */
 public class DefaultSuperDocumentTest extends MockObjectTestCase
@@ -63,9 +64,9 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         this.context = new XWikiContext();
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
 
-        ////////////////////////////////////////////////////
+        // //////////////////////////////////////////////////
         // XWikiHibernateStore
-        
+
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {this.xwiki, this.context});
@@ -105,19 +106,19 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
             XWikiContext.class}, new Object[] {this.xwiki, this.context});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
             returnValue(null));
-        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(
-            returnValue(null));
+        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
             .proxy());
-        
-        
-        //////////////////////////////////////////////////////////////////////////////////
+
+        // ////////////////////////////////////////////////////////////////////////////////
         // XWikiRightService
-        
-        this.xwiki.setRightService(new XWikiRightService() {
-            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
+
+        this.xwiki.setRightService(new XWikiRightService()
+        {
+            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context)
+                throws XWikiException
             {
                 return true;
             }
@@ -150,21 +151,23 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         });
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////:
+    // ///////////////////////////////////////////////////////////////////////////////////////:
     // Tests
 
     private final String DEFAULT_SPACE = "Space";
+
     private final String DEFAULT_DOCNAME = "Space";
+
     private final String DEFAULT_DOCFULLNAME = DEFAULT_SPACE + "." + DEFAULT_DOCNAME;
 
     public void testInitSuperDocumentEmpty() throws XWikiException
     {
         documents.clear();
 
-        /////
+        // ///
 
         SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
-        DefaultSuperDocument sdoc = (DefaultSuperDocument)sclass.newSuperDocument(context);
+        DefaultSuperDocument sdoc = (DefaultSuperDocument) sclass.newSuperDocument(context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -179,10 +182,11 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
     {
         documents.clear();
 
-        /////
+        // ///
 
         SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
-        DefaultSuperDocument sdoc = (DefaultSuperDocument)sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
+        DefaultSuperDocument sdoc =
+            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -197,13 +201,14 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
     {
         documents.clear();
 
-        /////
+        // ///
 
         XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, context);
         xwiki.saveDocument(doc, context);
 
         SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
-        DefaultSuperDocument sdoc = (DefaultSuperDocument)sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
+        DefaultSuperDocument sdoc =
+            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());

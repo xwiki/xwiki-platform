@@ -45,7 +45,8 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
- * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass}.
+ * Unit tests for
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass}.
  * 
  * @version $Id: $
  */
@@ -65,10 +66,10 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         this.context = new XWikiContext();
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
-        
-        ////////////////////////////////////////////////////
+
+        // //////////////////////////////////////////////////
         // XWikiHibernateStore
-        
+
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {this.xwiki, this.context});
@@ -78,7 +79,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
-                    
+
                     if (documents.containsKey(shallowDoc.getFullName())) {
                         return documents.get(shallowDoc.getFullName());
                     } else {
@@ -92,11 +93,11 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
-                    
+
                     document.setNew(false);
                     document.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
                     documents.put(document.getFullName(), document);
-                    
+
                     return null;
                 }
             });
@@ -108,18 +109,19 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
             XWikiContext.class}, new Object[] {this.xwiki, this.context});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
             returnValue(null));
-        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(
-            returnValue(null));
-        
+        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
+
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
             .proxy());
-        
-        //////////////////////////////////////////////////////////////////////////////////
+
+        // ////////////////////////////////////////////////////////////////////////////////
         // XWikiRightService
-        
-        this.xwiki.setRightService(new XWikiRightService() {
-            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
+
+        this.xwiki.setRightService(new XWikiRightService()
+        {
+            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context)
+                throws XWikiException
             {
                 return true;
             }
@@ -152,45 +154,75 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         });
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////:
+    // ///////////////////////////////////////////////////////////////////////////////////////:
     // Tests
-    
+
     private static final String CLASS_SPACE_PREFIX = "Space";
+
     private static final String CLASS_PREFIX = "Prefix";
-    
-    private static final String CLASS_NAME = CLASS_PREFIX + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
-        .XWIKI_CLASS_SUFFIX;
-    private static final String CLASSSHEET_NAME = CLASS_PREFIX + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
-        .XWIKI_CLASSSHEET_SUFFIX;
-    private static final String CLASSTEMPLATE_NAME = CLASS_PREFIX + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
-        .XWIKI_CLASSTEMPLATE_SUFFIX;
-    
-    private static final String DISPATCH_CLASS_SPACE = CLASS_SPACE_PREFIX + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
-        .XWIKI_CLASS_SPACE_SUFFIX;
+
+    private static final String CLASS_NAME =
+        CLASS_PREFIX
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASS_SUFFIX;
+
+    private static final String CLASSSHEET_NAME =
+        CLASS_PREFIX
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSSHEET_SUFFIX;
+
+    private static final String CLASSTEMPLATE_NAME =
+        CLASS_PREFIX
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSTEMPLATE_SUFFIX;
+
+    private static final String DISPATCH_CLASS_SPACE =
+        CLASS_SPACE_PREFIX
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASS_SPACE_SUFFIX;
+
     private static final String DISPATCH_CLASS_FULLNAME = DISPATCH_CLASS_SPACE + "." + CLASS_NAME;
-    private static final String DISPATCH_CLASSSHEET_SPACE = CLASS_SPACE_PREFIX + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
-        .XWIKI_CLASSSHEET_SPACE_SUFFIX;
-    private static final String DISPATCH_CLASSSHEET_FULLNAME = DISPATCH_CLASSSHEET_SPACE + "." + CLASSSHEET_NAME;
-    private static final String DISPATCH_CLASSTEMPLATE_SPACE = CLASS_SPACE_PREFIX + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
-        .XWIKI_CLASSTEMPLATE_SPACE_SUFFIX;
-    private static final String DISPATCH_CLASSTEMPLATE_FULLNAME = DISPATCH_CLASSTEMPLATE_SPACE + "." + CLASSTEMPLATE_NAME;
-    
+
+    private static final String DISPATCH_CLASSSHEET_SPACE =
+        CLASS_SPACE_PREFIX
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSSHEET_SPACE_SUFFIX;
+
+    private static final String DISPATCH_CLASSSHEET_FULLNAME =
+        DISPATCH_CLASSSHEET_SPACE + "." + CLASSSHEET_NAME;
+
+    private static final String DISPATCH_CLASSTEMPLATE_SPACE =
+        CLASS_SPACE_PREFIX
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSTEMPLATE_SPACE_SUFFIX;
+
+    private static final String DISPATCH_CLASSTEMPLATE_FULLNAME =
+        DISPATCH_CLASSTEMPLATE_SPACE + "." + CLASSTEMPLATE_NAME;
+
     private static final String NODISPATCH_CLASS_SPACE = CLASS_SPACE_PREFIX;
-    private static final String NODISPATCH_CLASS_FULLNAME = NODISPATCH_CLASS_SPACE + "." + CLASS_NAME;
+
+    private static final String NODISPATCH_CLASS_FULLNAME =
+        NODISPATCH_CLASS_SPACE + "." + CLASS_NAME;
+
     private static final String NODISPATCH_CLASSSHEET_SPACE = CLASS_SPACE_PREFIX;
-    private static final String NODISPATCH_CLASSSHEET_FULLNAME = NODISPATCH_CLASSSHEET_SPACE + "." + CLASSSHEET_NAME;
+
+    private static final String NODISPATCH_CLASSSHEET_FULLNAME =
+        NODISPATCH_CLASSSHEET_SPACE + "." + CLASSSHEET_NAME;
+
     private static final String NODISPATCH_CLASSTEMPLATE_SPACE = CLASS_SPACE_PREFIX;
-    private static final String NODISPATCH_CLASSTEMPLATE_FULLNAME = NODISPATCH_CLASSTEMPLATE_SPACE + "." + CLASSTEMPLATE_NAME;
-    
+
+    private static final String NODISPATCH_CLASSTEMPLATE_FULLNAME =
+        NODISPATCH_CLASSTEMPLATE_SPACE + "." + CLASSTEMPLATE_NAME;
+
     private static final String DEFAULT_ITEM_NAME = "item";
+
     private static final String DEFAULT_ITEMDOCUMENT_NAME = CLASS_PREFIX + "Item";
-    private static final String DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME = CLASS_SPACE_PREFIX + "." + DEFAULT_ITEMDOCUMENT_NAME;
-    private static final String NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME = CLASS_SPACE_PREFIX + "." + DEFAULT_ITEMDOCUMENT_NAME;
-        
+
+    private static final String DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME =
+        CLASS_SPACE_PREFIX + "." + DEFAULT_ITEMDOCUMENT_NAME;
+
+    private static final String NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME =
+        CLASS_SPACE_PREFIX + "." + DEFAULT_ITEMDOCUMENT_NAME;
+
     /**
      * Name of field <code>string</code>.
      */
     public static final String FIELD_string = "string";
+
     /**
      * Pretty name of field <code>string</code>.
      */
@@ -200,14 +232,15 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
      * Name of field <code>stringlist</code>.
      */
     public static final String FIELD_stringlist = "stringlist";
+
     /**
      * Pretty name of field <code>stringlist</code>.
      */
     public static final String FIELDPN_stringlist = "String List";
-    
+
     static abstract public class TestSuperClass extends AbstractSuperClass
     {
-         /**
+        /**
          * Default constructor for XWikiApplicationClass.
          */
         protected TestSuperClass(String spaceprefix, String prefix, boolean dispatch)
@@ -225,7 +258,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
             return needsUpdate;
         }
     }
-    
+
     static public class DispatchSuperClass extends TestSuperClass
     {
         /**
@@ -242,8 +275,8 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
          */
         public static DispatchSuperClass getInstance(XWikiContext context) throws XWikiException
         {
-            //if (instance == null)
-                instance = new DispatchSuperClass();
+            // if (instance == null)
+            instance = new DispatchSuperClass();
 
             instance.check(context);
 
@@ -258,7 +291,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
             super(CLASS_SPACE_PREFIX, CLASS_PREFIX, true);
         }
     }
-    
+
     static public class NoDispatchSuperClass extends TestSuperClass
     {
         /**
@@ -273,10 +306,11 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
          * @return XWikiApplicationClass Instance of XWikiApplicationClass.
          * @throws XWikiException
          */
-        public static NoDispatchSuperClass getInstance(XWikiContext context) throws XWikiException
+        public static NoDispatchSuperClass getInstance(XWikiContext context)
+            throws XWikiException
         {
-            //if (instance == null)
-                instance = new NoDispatchSuperClass();
+            // if (instance == null)
+            instance = new NoDispatchSuperClass();
 
             instance.check(context);
 
@@ -291,22 +325,22 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
             super(CLASS_SPACE_PREFIX, CLASS_PREFIX, false);
         }
     }
-    
+
     public void testInitSuperClassDispatch() throws XWikiException
     {
         documents.clear();
-        
-        /////
-        
+
+        // ///
+
         SuperClass sclass = DispatchSuperClass.getInstance(context);
-        
+
         assertEquals(CLASS_SPACE_PREFIX, sclass.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, sclass.getClassPrefix());
-        
+
         assertEquals(CLASS_NAME, sclass.getClassName());
         assertEquals(CLASSSHEET_NAME, sclass.getClassSheetName());
         assertEquals(CLASSTEMPLATE_NAME, sclass.getClassTemplateName());
-        
+
         assertEquals(DISPATCH_CLASS_SPACE, sclass.getClassSpace());
         assertEquals(DISPATCH_CLASS_FULLNAME, sclass.getClassFullName());
         assertEquals(DISPATCH_CLASSSHEET_SPACE, sclass.getClassSheetSpace());
@@ -314,22 +348,22 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         assertEquals(DISPATCH_CLASSTEMPLATE_SPACE, sclass.getClassTemplateSpace());
         assertEquals(DISPATCH_CLASSTEMPLATE_FULLNAME, sclass.getClassTemplateFullName());
     }
-    
+
     public void testInitSuperClassNoDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         SuperClass sclass = NoDispatchSuperClass.getInstance(context);
-        
+
         assertEquals(CLASS_SPACE_PREFIX, sclass.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, sclass.getClassPrefix());
-        
+
         assertEquals(CLASS_NAME, sclass.getClassName());
         assertEquals(CLASSSHEET_NAME, sclass.getClassSheetName());
         assertEquals(CLASSTEMPLATE_NAME, sclass.getClassTemplateName());
-        
+
         assertEquals(NODISPATCH_CLASS_SPACE, sclass.getClassSpace());
         assertEquals(NODISPATCH_CLASS_FULLNAME, sclass.getClassFullName());
         assertEquals(NODISPATCH_CLASSSHEET_SPACE, sclass.getClassSheetSpace());
@@ -337,183 +371,194 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         assertEquals(NODISPATCH_CLASSTEMPLATE_SPACE, sclass.getClassTemplateSpace());
         assertEquals(NODISPATCH_CLASSTEMPLATE_FULLNAME, sclass.getClassTemplateFullName());
     }
-    
+
     private void ptestCkeck(SuperClass sclass) throws XWikiException
-    {        
+    {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassFullName(), context);
-        
+
         assertFalse(doc.isNew());
-        
+
         BaseClass baseclass = doc.getxWikiClass();
-        
+
         assertEquals(sclass.getClassFullName(), baseclass.getName());
-        
+
         PropertyInterface prop = baseclass.getField(FIELD_string);
-        
+
         assertNotNull(prop);
-        
+
         prop = baseclass.getField(FIELD_stringlist);
-        
+
         assertNotNull(prop);
-        
-        /////
-        
+
+        // ///
+
         XWikiDocument docSheet = xwiki.getDocument(sclass.getClassSheetFullName(), context);
-        
+
         assertFalse(docSheet.isNew());
-        
-        /////
-        
+
+        // ///
+
         XWikiDocument docTemplate = xwiki.getDocument(sclass.getClassTemplateFullName(), context);
-        
+
         assertFalse(docTemplate.isNew());
-        
+
         BaseObject baseobject = docTemplate.getObject(sclass.getClassFullName());
-        
+
         assertNotNull(baseobject);
     }
-    
+
     public void testCkeckDispatch() throws XWikiException
     {
         documents.clear();
-        
-        /////
-        
+
+        // ///
+
         ptestCkeck(NoDispatchSuperClass.getInstance(context));
     }
-    
+
     public void testCkeckNoDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         ptestCkeck(NoDispatchSuperClass.getInstance(context));
     }
-    
+
     private void ptestGetClassDocument(SuperClass sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassFullName(), context);
         XWikiDocument docFromClass = sclass.getClassDocument(context);
-    
+
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
     }
-    
+
     public void testGetClassDocumentDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         ptestGetClassDocument(DispatchSuperClass.getInstance(context));
     }
-    
+
     public void testGetClassDocumentNoDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         ptestGetClassDocument(NoDispatchSuperClass.getInstance(context));
     }
-    
+
     private void ptestGetClassSheetDocument(SuperClass sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassSheetFullName(), context);
         XWikiDocument docFromClass = sclass.getClassSheetDocument(context);
-        
+
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
     }
-    
+
     public void testGetClassSheetDocumentDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         ptestGetClassSheetDocument(DispatchSuperClass.getInstance(context));
     }
-    
+
     public void testGetClassSheetDocumentNoDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         ptestGetClassSheetDocument(NoDispatchSuperClass.getInstance(context));
     }
-    
+
     private void ptestGetClassTemplateDocument(SuperClass sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassTemplateFullName(), context);
         XWikiDocument docFromClass = sclass.getClassTemplateDocument(context);
-        
+
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
     }
-    
+
     public void testGetClassTemplateDocumentDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         ptestGetClassTemplateDocument(DispatchSuperClass.getInstance(context));
     }
-    
+
     public void testGetClassTemplateDocumentNoDispatch() throws XWikiException
     {
         documents.clear();
 
-        /////
-        
+        // ///
+
         ptestGetClassTemplateDocument(NoDispatchSuperClass.getInstance(context));
     }
 
     public void testGetItemDefaultNameDisptach() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEM_NAME, DispatchSuperClass.getInstance(context).getItemDefaultName(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, context));
+        assertEquals(DEFAULT_ITEM_NAME, DispatchSuperClass.getInstance(context)
+            .getItemDefaultName(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME));
     }
-    
+
     public void testGetItemDefaultNameNoDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEM_NAME, NoDispatchSuperClass.getInstance(context).getItemDefaultName(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, context));
+        assertEquals(DEFAULT_ITEM_NAME, NoDispatchSuperClass.getInstance(context)
+            .getItemDefaultName(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME));
     }
-    
+
     public void testGetItemDocumentDefaultNameDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context).getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context).getItemDocumentDefaultName(DEFAULT_ITEM_NAME+" ", context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context).getItemDocumentDefaultName(DEFAULT_ITEM_NAME+"\t", context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context).getItemDocumentDefaultName(DEFAULT_ITEM_NAME+".", context));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME + " ", context));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME + "\t", context));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME + ".", context));
     }
-    
+
     public void testGetItemDocumentDefaultNameNoDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchSuperClass.getInstance(context).getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchSuperClass.getInstance(context)
+            .getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
     }
-    
+
     public void testGetItemDocumentDefaultFullNameDispatch() throws XWikiException
     {
-        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchSuperClass.getInstance(context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
+        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchSuperClass.getInstance(
+            context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
     }
-    
+
     public void testGetItemDocumentDefaultFullNameNoDispatch() throws XWikiException
     {
-        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchSuperClass.getInstance(context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
+        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchSuperClass.getInstance(
+            context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
     }
-    
+
     public void testIsInstanceNoDispatch() throws XWikiException
     {
-        assertTrue(NoDispatchSuperClass.getInstance(context).isInstance(NoDispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument(), context));
-        assertFalse(NoDispatchSuperClass.getInstance(context).isInstance(new XWikiDocument(), context));
+        assertTrue(NoDispatchSuperClass.getInstance(context).isInstance(
+            NoDispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument()));
+        assertFalse(NoDispatchSuperClass.getInstance(context).isInstance(new XWikiDocument()));
     }
-    
+
     public void testIsInstanceDispatch() throws XWikiException
     {
-        assertTrue(DispatchSuperClass.getInstance(context).isInstance(DispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument(), context));
-        assertFalse(DispatchSuperClass.getInstance(context).isInstance(new XWikiDocument(), context));
+        assertTrue(DispatchSuperClass.getInstance(context).isInstance(
+            DispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument()));
+        assertFalse(DispatchSuperClass.getInstance(context).isInstance(new XWikiDocument()));
     }
 }

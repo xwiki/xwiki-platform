@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -32,6 +31,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
+import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -48,12 +48,42 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ApplicationManagerPluginApi extends PluginApi
 {
+    /**
+     * Field name of the last error code inserted in context.
+     */
+    public static final String CONTEXT_LASTERRORCODE = "lasterrorcode";
+
+    /**
+     * Field name of the last api exception inserted in context.
+     */
+    public static final String CONTEXT_LASTEXCEPTION = "lastexception";
+
+    /**
+     * The logging tool.
+     */
     protected static final Log LOG = LogFactory.getLog(ApplicationManagerPluginApi.class);
 
+    /**
+     * Quote string.
+     */
+    private static final String QUOTE_STRING = "\"";
+
+    /**
+     * The default ApplicationManager managed exception.
+     */
     private XWikiExceptionApi defaultException;
 
+    /**
+     * The plugin internationalization service.
+     */
     private XWikiPluginMessageTool messageTool;
 
+    /**
+     * Create an instance of the Application Manager plugin user api.
+     * 
+     * @param plugin the entry point of the Application Manager plugin.
+     * @param context the XWiki context.
+     */
     public ApplicationManagerPluginApi(ApplicationManagerPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
@@ -69,12 +99,18 @@ public class ApplicationManagerPluginApi extends PluginApi
         this.messageTool = new XWikiPluginMessageTool(bundle, context);
     }
 
+    /**
+     * @return the default plugin api exception.
+     */
     public XWikiExceptionApi getDefaultException()
     {
-        return defaultException;
+        return this.defaultException;
     }
 
-    public XWikiPluginMessageTool getMessageTool()
+    /**
+     * @return the plugin internationalization service.
+     */
+    public XWikiMessageTool getMessageTool()
     {
         return this.messageTool;
     }
@@ -83,10 +119,10 @@ public class ApplicationManagerPluginApi extends PluginApi
     // Applications management
 
     /**
-     * Create empty application document
+     * Create empty application document.
      * 
      * @return an empty application descriptor document.
-     * @throws XWikiException
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public XWikiApplication createApplicationDocument() throws XWikiException
     {
@@ -100,8 +136,9 @@ public class ApplicationManagerPluginApi extends PluginApi
      * @param appSuperDocument the user application descriptor from which new descriptor will be
      *            created.
      * @param failOnExist if true fail if the application descriptor to create already exists.
-     * @return error code . If there is error, it add error code in context "lasterrorcode" field
-     *         and exception in context's "lastexception" field.
+     * @return error code . If there is error, it add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
@@ -112,7 +149,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS} :
      *         application descriptor already exists.
      *         </ul>
-     * @throws XWikiException
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public int createApplication(XWikiApplication appSuperDocument, boolean failOnExist)
         throws XWikiException
@@ -128,10 +165,11 @@ public class ApplicationManagerPluginApi extends PluginApi
                 this.messageTool.get("applicationmanager.plugin.createapplication.comment",
                     appSuperDocument.toString()), context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to create application \"" + appSuperDocument + "\"", e);
+            LOG.error("Try to create application " + QUOTE_STRING + appSuperDocument
+                + QUOTE_STRING, e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
 
             returncode = e.getCode();
         }
@@ -143,8 +181,9 @@ public class ApplicationManagerPluginApi extends PluginApi
      * Delete an application descriptor document.
      * 
      * @param appName the name of the application.
-     * @return error code . If there is error, it add error code in context "lasterrorcode" field
-     *         and exception in context's "lastexception" field.
+     * @return error code . If there is error, it add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
@@ -154,7 +193,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
      *         provided application does not exist.
      *         </ul>
-     * @throws XWikiException
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public int deleteApplication(String appName) throws XWikiException
     {
@@ -165,10 +204,10 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             ApplicationManager.getInstance().deleteApplication(appName, context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to delete application \"" + appName + "\"", e);
+            LOG.error("Try to delete application " + QUOTE_STRING + appName + QUOTE_STRING, e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
 
             returncode = e.getCode();
         }
@@ -180,7 +219,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      * Get all applications descriptors documents.
      * 
      * @return a list of XWikiApplication.
-     * @throws XWikiException
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public List getApplicationDocumentList() throws XWikiException
     {
@@ -191,25 +230,25 @@ public class ApplicationManagerPluginApi extends PluginApi
         } catch (ApplicationManagerException e) {
             LOG.error("Try to get all applications documents", e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
         }
 
         return listDocument;
     }
 
     /**
-     * Get the application descriptor document of the provided application.
+     * Get the application descriptor document of the provided application name.
      * 
      * @param appName the name of the application.
      * @return the application descriptor document. If there is error, it add error code in context
-     *         "lasterrorcode" field and exception in context's "lastexception" field. Error codes
-     *         can be :
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field. Error codes can be :
      *         <ul>
      *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
      *         provided application does not exist.
      *         </ul>
-     * @throws XWikiException
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public XWikiApplication getApplicationDocument(String appName) throws XWikiException
     {
@@ -218,10 +257,10 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             app = ApplicationManager.getInstance().getApplication(appName, context, true);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get application document", e);
+            LOG.error("Try to get application document from application name", e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
         }
 
         return app;
@@ -230,9 +269,10 @@ public class ApplicationManagerPluginApi extends PluginApi
     /**
      * Export an application into XAR using Packaging plugin.
      * 
-     * @param appName the name of the application.
-     * @return error code . If there is error, it add error code in context "lasterrorcode" field
-     *         and exception in context's "lastexception" field.
+     * @param appName the name of the application to export.
+     * @return error code . If there is error, it add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
@@ -240,8 +280,8 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
      *         provided application does not exist.
      *         </ul>
-     * @throws XWikiException
-     * @throws IOException
+     * @throws XWikiException all error that does not caused by user of this method.
+     * @throws IOException all error that does not caused by user of this method.
      */
     public int exportApplicationXAR(String appName) throws XWikiException, IOException
     {
@@ -254,8 +294,9 @@ public class ApplicationManagerPluginApi extends PluginApi
      * @param appName the name of the application.
      * @param recurse if true include all dependencies applications into XAR.
      * @param withDocHistory if true export with documents history.
-     * @return error code . If there is error, it add error code in context "lasterrorcode" field
-     *         and exception in context's "lastexception" field.
+     * @return error code . If there is error, it add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
@@ -263,8 +304,8 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
      *         provided application does not exist.
      *         </ul>
-     * @throws XWikiException
-     * @throws IOException
+     * @throws XWikiException all error that does not caused by user of this method.
+     * @throws IOException all error that does not caused by user of this method.
      */
     public int exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory)
         throws XWikiException, IOException
@@ -275,10 +316,10 @@ public class ApplicationManagerPluginApi extends PluginApi
             ApplicationManager.getInstance().exportApplicationXAR(appName, recurse,
                 withDocHistory, context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get application document", e);
+            LOG.error("Try to export application in a XAR package", e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
 
             returncode = e.getCode();
         }
@@ -290,9 +331,10 @@ public class ApplicationManagerPluginApi extends PluginApi
      * Import attached application XAR into current wiki and do all actions needed to installation
      * an application. See {@link #reloadApplication(String)} for more.
      * 
-     * @param packageName the name of the attached XAR file.
-     * @return error code . If there is error, it add error code in context "lasterrorcode" field
-     *         and exception in context's "lastexception" field.
+     * @param packageName the name of the attached XAR file to import.
+     * @return error code . If there is error, it add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
@@ -302,13 +344,13 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
      *         provided application does not exist.
      *         </ul>
-     * @throws XWikiException
-     * @see {@link #reloadApplication(String)}
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public int importApplication(String packageName) throws XWikiException
     {
-        if (!hasAdminRights())
+        if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+        }
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
@@ -319,10 +361,10 @@ public class ApplicationManagerPluginApi extends PluginApi
                 this.messageTool.get("applicationmanager.plugin.importapplication.comment",
                     packageName), context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get application document", e);
+            LOG.error("Try to import applications from XAR package", e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
 
             returncode = e.getCode();
         }
@@ -336,8 +378,10 @@ public class ApplicationManagerPluginApi extends PluginApi
      * <li> update XWikiPreferences with application translation documents.
      * </ul>
      * 
-     * @return error code . If there is error, it add error code in context "lasterrorcode" field
-     *         and exception in context's "lastexception" field.
+     * @param appName the name of the application to reload.
+     * @return error code . If there is error, it add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
@@ -347,27 +391,28 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
      *         provided application does not exist.
      *         </ul>
-     * @throws XWikiException
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public int reloadApplication(String appName) throws XWikiException
     {
-        if (!hasAdminRights())
+        if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+        }
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
             XWikiApplication app =
                 ApplicationManager.getInstance().getApplication(appName, context, true);
-            ApplicationManager.getInstance().updateApplicationTranslation(
+            ApplicationManager.getInstance().reloadApplication(
                 app,
                 this.messageTool.get("applicationmanager.plugin.reloadapplication.comment", app
                     .getAppName()), context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get application document", e);
+            LOG.error("Try to reload application", e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
 
             returncode = e.getCode();
         }
@@ -384,30 +429,26 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
      *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
      *         rights to do this action.
-     *         <ul>
-     * @throws XWikiException
+     *         </ul>
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public int reloadAllApplications() throws XWikiException
     {
-        if (!hasAdminRights())
+        if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+        }
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            List applist = ApplicationManager.getInstance().getApplicationList(context);
-            for (Iterator it = applist.iterator(); it.hasNext();) {
-                XWikiApplication app = (XWikiApplication) it.next();
-                ApplicationManager.getInstance().updateApplicationTranslation(
-                    app,
-                    this.messageTool.get("applicationmanager.plugin.reloadapplication.comment",
-                        app.getAppName()), context);
-            }
+            ApplicationManager.getInstance().reloadAllApplications(
+                this.messageTool.get("applicationmanager.plugin.reloadallapplications.comment"),
+                context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get application document", e);
+            LOG.error("Try to reload all applications", e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
 
             returncode = e.getCode();
         }
@@ -419,7 +460,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      * Get the current wiki root application.
      * 
      * @return the root application descriptor document. If can't find root application return null.
-     * @throws XWikiException
+     * @throws XWikiException all error that does not caused by user of this method.
      */
     public XWikiApplication getRootApplication() throws XWikiException
     {
@@ -428,10 +469,10 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             app = ApplicationManager.getInstance().getRootApplication(context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get application document", e);
+            LOG.error("Try to get root application document", e);
 
-            context.put("lasterrorcode", new Integer(e.getCode()));
-            context.put("lastexception", new XWikiExceptionApi(e, context));
+            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
         }
 
         return app;

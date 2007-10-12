@@ -31,13 +31,13 @@ import java.util.regex.Pattern;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * This class manage an XWiki document containing XWiki.XWikiApplicationClass object. It add some
  * specifics methods, getters and setters for this type of object and fields.
  * 
+ * @version $Id: $
  * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument
  */
 public class XWikiApplication extends DefaultSuperDocument
@@ -45,15 +45,19 @@ public class XWikiApplication extends DefaultSuperDocument
     /**
      * Pattern to match that indicate if a document name contains SQL "like" matching string.
      */
-    static private final Pattern extDocNamePattern = Pattern.compile("^\\[(.*)\\]$");
+    private static final Pattern EXT_DOCNAME_PATTERN = Pattern.compile("^\\[(.*)\\]$");
 
     /**
      * Create new XWikiApplication managing provided XWikiDocument.
      * 
      * @param xdoc the encapsulated XWikiDocument
      * @param context the XWiki context
-     * @throws XWikiException
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument#DefaultSuperDocument(SuperClass,
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>getting XWikiApplicationClass instance.</li>
+     *             <li>or when calling {@link #reload(XWikiContext)}</li>
+     *             </ul>
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
      *      XWikiDocument, XWikiContext)
      */
     public XWikiApplication(XWikiDocument xdoc, XWikiContext context) throws XWikiException
@@ -69,7 +73,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public String getAppName()
     {
-        return getStringValue(XWikiApplicationClass.FIELD_appname);
+        return getStringValue(XWikiApplicationClass.FIELD_APPNAME);
     }
 
     /**
@@ -80,7 +84,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setAppName(String appname)
     {
-        setStringValue(XWikiApplicationClass.FIELD_appname, appname);
+        setStringValue(XWikiApplicationClass.FIELD_APPNAME, appname);
     }
 
     /**
@@ -89,7 +93,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public String getDescription()
     {
-        return getStringValue(XWikiApplicationClass.FIELD_description);
+        return getStringValue(XWikiApplicationClass.FIELD_DESCRIPTION);
     }
 
     /**
@@ -100,7 +104,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setDescription(String description)
     {
-        setStringValue(XWikiApplicationClass.FIELD_description, description);
+        setStringValue(XWikiApplicationClass.FIELD_DESCRIPTION, description);
     }
 
     /**
@@ -109,18 +113,18 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public String getAppVersion()
     {
-        return getStringValue(XWikiApplicationClass.FIELD_appversion);
+        return getStringValue(XWikiApplicationClass.FIELD_APPVERSION);
     }
 
     /**
      * Modify the version of the application.
      * 
-     * @param appversion
+     * @param appversion the version of the application.
      * @see #getAppVersion()
      */
     public void setAppVersion(String appversion)
     {
-        setStringValue(XWikiApplicationClass.FIELD_appversion, appversion);
+        setStringValue(XWikiApplicationClass.FIELD_APPVERSION, appversion);
     }
 
     /**
@@ -129,7 +133,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public List getDependencies()
     {
-        return getListValue(XWikiApplicationClass.FIELD_dependencies);
+        return getListValue(XWikiApplicationClass.FIELD_DEPENDENCIES);
     }
 
     /**
@@ -140,7 +144,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setDependencies(List dependencies)
     {
-        setListValue(XWikiApplicationClass.FIELD_dependencies, dependencies);
+        setListValue(XWikiApplicationClass.FIELD_DEPENDENCIES, dependencies);
     }
 
     /**
@@ -148,7 +152,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public List getApplications()
     {
-        return getListValue(XWikiApplicationClass.FIELD_applications);
+        return getListValue(XWikiApplicationClass.FIELD_APPLICATIONS);
     }
 
     /**
@@ -159,7 +163,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setApplications(List applications)
     {
-        setListValue(XWikiApplicationClass.FIELD_applications, applications);
+        setListValue(XWikiApplicationClass.FIELD_APPLICATIONS, applications);
     }
 
     /**
@@ -168,7 +172,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public List getDocuments()
     {
-        return getListValue(XWikiApplicationClass.FIELD_documents);
+        return getListValue(XWikiApplicationClass.FIELD_DOCUMENTS);
     }
 
     /**
@@ -179,7 +183,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setDocuments(List documents)
     {
-        setListValue(XWikiApplicationClass.FIELD_documents, documents);
+        setListValue(XWikiApplicationClass.FIELD_DOCUMENTS, documents);
     }
 
     /**
@@ -189,7 +193,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public List getDocsToInclude()
     {
-        return getListValue(XWikiApplicationClass.FIELD_docstoinclude);
+        return getListValue(XWikiApplicationClass.FIELD_DOCSTOINCLUDE);
     }
 
     /**
@@ -202,7 +206,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setDocsToInclude(List docstoinclude)
     {
-        setListValue(XWikiApplicationClass.FIELD_docstoinclude, docstoinclude);
+        setListValue(XWikiApplicationClass.FIELD_DOCSTOINCLUDE, docstoinclude);
     }
 
     /**
@@ -212,7 +216,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public List getDocsToLink()
     {
-        return getListValue(XWikiApplicationClass.FIELD_docstolink);
+        return getListValue(XWikiApplicationClass.FIELD_DOCSTOLINK);
     }
 
     /**
@@ -225,7 +229,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setDocsToLink(List docstolink)
     {
-        setListValue(XWikiApplicationClass.FIELD_docstolink, docstolink);
+        setListValue(XWikiApplicationClass.FIELD_DOCSTOLINK, docstolink);
     }
 
     /**
@@ -236,7 +240,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public List getTranslationDocs()
     {
-        return getListValue(XWikiApplicationClass.FIELD_translationdocs);
+        return getListValue(XWikiApplicationClass.FIELD_TRANSLATIONDOCS);
     }
 
     /**
@@ -251,7 +255,7 @@ public class XWikiApplication extends DefaultSuperDocument
      */
     public void setTranslationDocs(List translationdocs)
     {
-        setListValue(XWikiApplicationClass.FIELD_translationdocs, translationdocs);
+        setListValue(XWikiApplicationClass.FIELD_TRANSLATIONDOCS, translationdocs);
     }
 
     // ///
@@ -275,7 +279,7 @@ public class XWikiApplication extends DefaultSuperDocument
      *            direct dependencies.
      * @param context the XWiki context.
      * @return the set list of XWikiApplication.
-     * @throws XWikiException
+     * @throws XWikiException error when getting application descriptor document from the database.
      * @see #getApplications()
      */
     public Set getXWikiApplicationSet(boolean recurse, XWikiContext context)
@@ -290,8 +294,9 @@ public class XWikiApplication extends DefaultSuperDocument
                     .getApplication((String) it.next(), context, true);
             applicationSet.add(app);
 
-            if (recurse)
+            if (recurse) {
                 applicationSet.addAll(app.getXWikiApplicationSet(recurse, context));
+            }
 
         }
 
@@ -308,8 +313,8 @@ public class XWikiApplication extends DefaultSuperDocument
      * @param docsNames the collection to complete with resolved documents names.
      * @param docsNamesToResolve the documents names to resolve.
      * @param context the XWiki context.
-     * @throws XWikiException
-     * @see #extDocNamePattern
+     * @throws XWikiException error when resolving SQL matching.
+     * @see #EXT_DOCNAME_PATTERN
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocumentsNames(String, XWikiContext)
      */
     private static void resolveDocumentsNames(Collection docsNames,
@@ -321,18 +326,21 @@ public class XWikiApplication extends DefaultSuperDocument
         for (Iterator it = docsNamesToResolve.iterator(); it.hasNext();) {
             String docName = (String) it.next();
 
-            matcher = extDocNamePattern.matcher(docName);
+            matcher = EXT_DOCNAME_PATTERN.matcher(docName);
             if (matcher.matches()) {
-                if (where.length() > 0)
+                if (where.length() > 0) {
                     where.append(" or ");
+                }
                 where.append("doc.fullName like '").append(matcher.group(1)).append("'");
-            } else
+            } else {
                 docsNames.add(docName);
+            }
         }
 
-        if (where.length() > 0)
+        if (where.length() > 0) {
             docsNames.addAll(context.getWiki().getStore().searchDocumentsNames("where " + where,
                 context));
+        }
     }
 
     /**
@@ -344,21 +352,23 @@ public class XWikiApplication extends DefaultSuperDocument
      * 
      * @param docsNames the collection to complete with resolved documents names.
      * @param type the XWikiApplicationClass field where to find documents names list :
-     *            {@link XWikiApplicationClass#FIELD_documents},
-     *            {@link XWikiApplicationClass#FIELD_docstoinclude},
-     *            {@link XWikiApplicationClass#FIELD_docstolink}.
+     *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
      * @param includeAppDesc if true application descriptor document names is add to
      *            <code>docsNames</code>.
-     * @throws XWikiException
-     * @see XWikiApplicationClass#FIELD_documents
-     * @see XWikiApplicationClass#FIELD_docstoinclude
-     * @see XWikiApplicationClass#FIELD_docstolink
+     * @throws XWikiException error when resolving SQL matching.
+     * @see XWikiApplicationClass#FIELD_DOCUMENTS
+     * @see XWikiApplicationClass#FIELD_DOCSTOINCLUDE
+     * @see XWikiApplicationClass#FIELD_DOCSTOLINK
      * @see #resolveDocumentsNames(Collection, Collection, XWikiContext)
      */
-    private void resolveDocumentsNames(Collection docsNames, String type, boolean includeAppDesc) throws XWikiException
+    private void resolveDocumentsNames(Collection docsNames, String type, boolean includeAppDesc)
+        throws XWikiException
     {
-        if (includeAppDesc)
+        if (includeAppDesc) {
             docsNames.add(getFullName());
+        }
 
         resolveDocumentsNames(docsNames, getListValue(type), context);
     }
@@ -374,16 +384,15 @@ public class XWikiApplication extends DefaultSuperDocument
      * @param applications the applications containing documents names to resolve and add to
      *            <code>docsNames</code>.
      * @param type the XWikiApplicationClass field where to find documents names list :
-     *            {@link XWikiApplicationClass#FIELD_documents},
-     *            {@link XWikiApplicationClass#FIELD_docstoinclude},
-     *            {@link XWikiApplicationClass#FIELD_docstolink}.
+     *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
      * @param includeAppDesc if true application descriptor document names is add to
      *            <code>docsNames</code>.
-     * @throws XWikiException
+     * @throws XWikiException error when resolving SQL matching.
      */
     private static void resolveApplicationsDocsNames(Collection docsNames,
-        Collection applications, String type, boolean includeAppDesc)
-        throws XWikiException
+        Collection applications, String type, boolean includeAppDesc) throws XWikiException
     {
         for (Iterator it = applications.iterator(); it.hasNext();) {
             XWikiApplication app = (XWikiApplication) it.next();
@@ -399,17 +408,23 @@ public class XWikiApplication extends DefaultSuperDocument
      * string to use with "like".
      * 
      * @param type the XWikiApplicationClass field where to find documents names list :
-     *            {@link XWikiApplicationClass#FIELD_documents},
-     *            {@link XWikiApplicationClass#FIELD_docstoinclude},
-     *            {@link XWikiApplicationClass#FIELD_docstolink}.
+     *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
      * @param recurse if true it follow recursively all applications dependencies, if false parse
      *            only direct dependencies.
      * @param includeAppDesc if true application descriptor document names is add to
      *            <code>docsNames</code>.
      * @return all documents names of type <code>type</code> application contains.
-     * @throws XWikiException
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>resolving SQL matching.</li>
+     *             <li>or getting applications dependencies descriptors documents from the
+     *             database.</li>
+     *             </ul>
      */
-    private Set getDocsNameSet(String type, boolean recurse, boolean includeAppDesc) throws XWikiException
+    private Set getDocsNameSet(String type, boolean recurse, boolean includeAppDesc)
+        throws XWikiException
     {
         Set documents = new HashSet();
 
@@ -434,14 +449,18 @@ public class XWikiApplication extends DefaultSuperDocument
      * @param includeAppDesc if true application descriptor document names is add to
      *            <code>docsNames</code>.
      * @return all documents names application contains.
-     * @throws XWikiException
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>resolving SQL matching.</li>
+     *             <li>or getting applications dependencies descriptors documents from the
+     *             database.</li>
+     *             </ul>
      * @see #getDocuments()
-     * @see XWikiApplicationClass#FIELD_documents
+     * @see XWikiApplicationClass#FIELD_DOCUMENTS
      */
-    public Set getDocumentsNames(boolean recurse, boolean includeAppDesc)
-        throws XWikiException
+    public Set getDocumentsNames(boolean recurse, boolean includeAppDesc) throws XWikiException
     {
-        return getDocsNameSet(XWikiApplicationClass.FIELD_documents, recurse, includeAppDesc);
+        return getDocsNameSet(XWikiApplicationClass.FIELD_DOCUMENTS, recurse, includeAppDesc);
     }
 
     /**
@@ -453,13 +472,18 @@ public class XWikiApplication extends DefaultSuperDocument
      * @param recurse if true it follow recursively all applications dependencies, if false parse
      *            only direct dependencies.
      * @return all documents names to include application contains.
-     * @throws XWikiException
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>resolving SQL matching.</li>
+     *             <li>or getting applications dependencies descriptors documents from the
+     *             database.</li>
+     *             </ul>
      * @see #getDocsToInclude()
-     * @see XWikiApplicationClass#FIELD_docstoinclude
+     * @see XWikiApplicationClass#FIELD_DOCSTOINCLUDE
      */
     public Set getDocsNameToInclude(boolean recurse) throws XWikiException
     {
-        return getDocsNameSet(XWikiApplicationClass.FIELD_docstoinclude, recurse, false);
+        return getDocsNameSet(XWikiApplicationClass.FIELD_DOCSTOINCLUDE, recurse, false);
     }
 
     /**
@@ -471,21 +495,22 @@ public class XWikiApplication extends DefaultSuperDocument
      * 
      * @param applications the applications containing documents names to resolve and add to
      *            <code>docsNames</code>.
-     * @param recurse if true it follow recursively all applications dependencies, if false parse
-     *            only provided applications.
-     * @param context the XWiki context.
      * @return all documents names to include <code>applications</code> contains.
-     * @throws XWikiException
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>resolving SQL matching.</li>
+     *             <li>or getting applications dependencies descriptors documents from the
+     *             database.</li>
+     *             </ul>
      * @see #getDocsToInclude()
-     * @see XWikiApplicationClass#FIELD_docstoinclude
+     * @see XWikiApplicationClass#FIELD_DOCSTOINCLUDE
      */
-    public static Set getDocsNameToInclude(Collection applications, boolean recurse,
-        XWikiContext context) throws XWikiException
+    public static Set getDocsNameToInclude(Collection applications) throws XWikiException
     {
         Set docsToInclude = new HashSet();
 
         resolveApplicationsDocsNames(docsToInclude, applications,
-            XWikiApplicationClass.FIELD_docstoinclude, false);
+            XWikiApplicationClass.FIELD_DOCSTOINCLUDE, false);
 
         return docsToInclude;
     }
@@ -499,13 +524,18 @@ public class XWikiApplication extends DefaultSuperDocument
      * @param recurse if true it follow recursively all applications dependencies, if false parse
      *            only direct dependencies.
      * @return all documents names to link application contains.
-     * @throws XWikiException
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>resolving SQL matching.</li>
+     *             <li>or getting applications dependencies descriptors documents from the
+     *             database.</li>
+     *             </ul>
      * @see #getDocsToLink()
-     * @see XWikiApplicationClass#FIELD_docstolink
+     * @see XWikiApplicationClass#FIELD_DOCSTOLINK
      */
     public Set getDocsNameToLink(boolean recurse) throws XWikiException
     {
-        return getDocsNameSet(XWikiApplicationClass.FIELD_docstolink, recurse, false);
+        return getDocsNameSet(XWikiApplicationClass.FIELD_DOCSTOLINK, recurse, false);
     }
 
     /**
@@ -517,21 +547,22 @@ public class XWikiApplication extends DefaultSuperDocument
      * 
      * @param applications the applications containing documents names to resolve and add to
      *            <code>docsNames</code>.
-     * @param recurse if true it follow recursively all applications dependencies, if false parse
-     *            only provided applications.
-     * @param context the XWiki context.
      * @return all documents names to link <code>applications</code> contains.
-     * @throws XWikiException
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>resolving SQL matching.</li>
+     *             <li>or getting applications dependencies descriptors documents from the
+     *             database.</li>
+     *             </ul>
      * @see #getDocsToLink()
-     * @see XWikiApplicationClass#FIELD_docstolink
+     * @see XWikiApplicationClass#FIELD_DOCSTOLINK
      */
-    public static Set getDocsNameToLink(Collection applications, boolean recurse,
-        XWikiContext context) throws XWikiException
+    public static Set getDocsNameToLink(Collection applications) throws XWikiException
     {
         Set docsToLink = new HashSet();
 
         resolveApplicationsDocsNames(docsToLink, applications,
-            XWikiApplicationClass.FIELD_docstolink, false);
+            XWikiApplicationClass.FIELD_DOCSTOLINK, false);
 
         return docsToLink;
     }

@@ -43,6 +43,7 @@ import org.dom4j.io.SAXReader;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.*;
+import com.xpn.xwiki.objects.classes.UsersClass;
 import com.xpn.xwiki.plugin.query.OrderClause;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
@@ -347,22 +348,35 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addUsersField(String fieldName, String fieldPrettyName) {
-        return addUsersField(fieldName, fieldPrettyName, 5);
+    public boolean addUsersField(String fieldName, String fieldPrettyName)
+    {
+        return addUsersField(fieldName, fieldPrettyName, true);
     }
 
-    public boolean addUsersField(String fieldName, String fieldPrettyName,int size) {
+    public boolean addUsersField(String fieldName, String fieldPrettyName, boolean multiSelect)
+    {
+        return addUsersField(fieldName, fieldPrettyName, 5, multiSelect);
+    }
+
+    public boolean addUsersField(String fieldName, String fieldPrettyName, int size)
+    {
+        return addUsersField(fieldName, fieldPrettyName, size, true);
+    }
+
+    public boolean addUsersField(String fieldName, String fieldPrettyName, int size,
+        boolean multiSelect)
+    {
         if (get(fieldName) == null) {
             UsersClass users_class = new UsersClass();
             users_class.setName(fieldName);
             users_class.setPrettyName(fieldPrettyName);
             users_class.setSize(size);
-            users_class.setMultiSelect(true);
+            users_class.setMultiSelect(multiSelect);
             users_class.setObject(this);
             put(fieldName, users_class);
             return true;
         }
-        return false ;
+        return false;
     }
 
     public boolean addLevelsField(String fieldName, String fieldPrettyName) {

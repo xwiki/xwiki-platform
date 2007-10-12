@@ -3345,7 +3345,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {
-                        tdoc.setCreationDate(new Date());
+                        Date now = new Date();
+                        tdoc.setCreationDate(now);
+                        tdoc.setContentUpdateDate(now);
+                        tdoc.setDate(now);
                         tdoc.setCreator(context.getUser());
                         tdoc.setAuthor(context.getUser());
                     }
@@ -3411,7 +3414,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                             ttdoc.setVersion("1.1");
                         }
                         if (resetCreationData) {
-                            ttdoc.setCreationDate(new Date());
+                            Date now = new Date();
+                        	ttdoc.setCreationDate(now);
+                        	ttdoc.setContentUpdateDate(now);
+                        	ttdoc.setDate(now);
                             ttdoc.setCreator(context.getUser());
                             ttdoc.setAuthor(context.getUser());
                         }
@@ -3450,7 +3456,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                         tdoc.setVersion("1.1");
                     }
                     if (resetCreationData) {
-                        tdoc.setCreationDate(new Date());
+                        Date now = new Date();
+                        tdoc.setCreationDate(now);
+                        tdoc.setContentUpdateDate(now);
+                        tdoc.setDate(now);
                         tdoc.setCreator(context.getUser());
                         tdoc.setAuthor(context.getUser());
                     }

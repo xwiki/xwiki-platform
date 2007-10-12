@@ -24,7 +24,6 @@ package com.xpn.xwiki.objects.classes;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -347,22 +346,35 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return false;
     }
 
-    public boolean addUsersField(String fieldName, String fieldPrettyName) {
-        return addUsersField(fieldName, fieldPrettyName, 5);
+    public boolean addUsersField(String fieldName, String fieldPrettyName)
+    {
+        return addUsersField(fieldName, fieldPrettyName, true);
     }
 
-    public boolean addUsersField(String fieldName, String fieldPrettyName,int size) {
+    public boolean addUsersField(String fieldName, String fieldPrettyName, boolean multiSelect)
+    {
+        return addUsersField(fieldName, fieldPrettyName, 5, multiSelect);
+    }
+
+    public boolean addUsersField(String fieldName, String fieldPrettyName, int size)
+    {
+        return addUsersField(fieldName, fieldPrettyName, size, true);
+    }
+
+    public boolean addUsersField(String fieldName, String fieldPrettyName, int size,
+        boolean multiSelect)
+    {
         if (get(fieldName) == null) {
             UsersClass users_class = new UsersClass();
             users_class.setName(fieldName);
             users_class.setPrettyName(fieldPrettyName);
             users_class.setSize(size);
-            users_class.setMultiSelect(true);
+            users_class.setMultiSelect(multiSelect);
             users_class.setObject(this);
             put(fieldName, users_class);
             return true;
         }
-        return false ;
+        return false;
     }
 
     public boolean addLevelsField(String fieldName, String fieldPrettyName) {

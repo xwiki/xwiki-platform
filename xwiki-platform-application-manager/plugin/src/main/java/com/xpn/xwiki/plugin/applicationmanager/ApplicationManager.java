@@ -43,31 +43,76 @@ import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.DocumentInfoAPI;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 
-public class ApplicationManager
+/**
+ * Hidden toolkit used by the plugin API that make all the plugins actions.
+ * 
+ * @version $Id: $
+ */
+public final class ApplicationManager
 {
+    /**
+     * The logging tool.
+     */
     protected static final Log LOG = LogFactory.getLog(ApplicationManager.class);
+
+    /**
+     * Wiki preferences document and class full name.
+     */
+    private static final String XWIKIPREFERENCES = "XWiki.XWikiPreferences";
+
+    /**
+     * "documentBundles" list field name of the XWiki.XWikiPreferences class.
+     */
+    private static final String XWIKIPREFERENCES_DOCUMENTBUNDLES = "documentBundles";
+
+    /**
+     * "documentBundles" list field separator of the XWiki.XWikiPreferences class.
+     */
+    private static final String XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP = ",";
+
+    /**
+     * The name of the internal packaging plugin.
+     */
+    private static final String PACKAGEPLUGIN_NAME = "package";
+
+    /**
+     * Unique instance of ApplicationManager.
+     */
+    private static ApplicationManager instance;
 
     // ////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * Hidden constructor of ApplicationManager only access via getInstance().
+     */
     private ApplicationManager()
     {
     }
 
-    private static ApplicationManager _instance = null;
-
+    /**
+     * @return a unique instance of ApplicationManager.
+     */
     public static ApplicationManager getInstance()
     {
         synchronized (ApplicationManager.class) {
-            if (_instance == null)
-                _instance = new ApplicationManager();
+            if (instance == null) {
+                instance = new ApplicationManager();
+            }
         }
 
-        return _instance;
+        return instance;
     }
 
     // ////////////////////////////////////////////////////////////////////////////
     // Applications management
 
+    /**
+     * Get the current wiki root application.
+     * 
+     * @param context the XWiki context.
+     * @return the root application descriptor document. If can't find root application return null.
+     * @throws XWikiException error when getting root application descriptor document from database.
+     */
     public XWikiApplication getRootApplication(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -86,11 +131,27 @@ public class ApplicationManager
         return null;
     }
 
+    /**
+     * Search for all document containing a object of class XWikiApplicationClass.
+     * 
+     * @param context the XWiki context.
+     * @return a list of {@link XWikiDocument}.
+     * @throws XWikiException error when calling for
+     *             {@link XWikiApplicationClass#searchItemDocuments(XWikiContext)}
+     */
     public List getApplicationDocumentList(XWikiContext context) throws XWikiException
     {
         return XWikiApplicationClass.getInstance(context).searchItemDocuments(context);
     }
 
+    /**
+     * Search for all document containing a object of class XWikiApplicationClass.
+     * 
+     * @param context the XWiki context.
+     * @return a list if {@link XWikiApplication}.
+     * @throws XWikiException error when calling for
+     *             {@link XWikiApplicationClass#searchItemDocuments(XWikiContext)}
+     */
     public List getApplicationList(XWikiContext context) throws XWikiException
     {
         List documentList = getApplicationDocumentList(context);
@@ -105,6 +166,16 @@ public class ApplicationManager
         return applicationList;
     }
 
+    /**
+     * Create a new application descriptor base on provided application descriptor.
+     * 
+     * @param userAppSuperDoc appSuperDocument the user application descriptor from which new
+     *            descriptor will be created.
+     * @param failOnExist if true fail if the application descriptor to create already exists.
+     * @param comment a comment used when saving application descriptor document.
+     * @param context the XWiki Context.
+     * @throws XWikiException error when calling for {@link XWiki#getDocument(String, XWikiContext)}
+     */
     public void createApplication(XWikiApplication userAppSuperDoc, boolean failOnExist,
         String comment, XWikiContext context) throws XWikiException
     {
@@ -116,17 +187,21 @@ public class ApplicationManager
             xwiki.getDocument(appClass.getItemDocumentDefaultFullName(userAppSuperDoc
                 .getAppName(), context), context);
 
-        if (!docToSave.isNew() && appClass.isInstance(docToSave, context)) {
+        if (!docToSave.isNew() && appClass.isInstance(docToSave)) {
             // If we are not allowed to continue if server page already exists
             if (failOnExist) {
-                if (LOG.isErrorEnabled())
-                    LOG.error("Wiki creation (" + userAppSuperDoc + ") failed: "
-                        + "wiki server page already exists");
-                throw new ApplicationManagerException(ApplicationManagerException.ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS,
+                if (LOG.isErrorEnabled()) {
+                    LOG.error("Wiki creation (" + userAppSuperDoc
+                        + ") failed: wiki server page already exists");
+                }
+
+                throw new ApplicationManagerException(
+                    ApplicationManagerException.ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS,
                     "Application \"" + userAppSuperDoc.getAppName() + "\" document already exist");
-            } else if (LOG.isWarnEnabled())
-                LOG.warn("Application creation (" + userAppSuperDoc + ") failed: "
-                    + "application page already exists");
+            } else if (LOG.isWarnEnabled()) {
+                LOG.warn("Application creation (" + userAppSuperDoc
+                    + ") failed: application page already exists");
+            }
 
         }
 
@@ -142,6 +217,13 @@ public class ApplicationManager
         userAppSuperDoc.setFullName(appSuperDocToSave.getFullName());
     }
 
+    /**
+     * Delete an application descriptor document.
+     * 
+     * @param appName the name of the application.
+     * @param context the XWiki context.
+     * @throws XWikiException error when calling for {@link XWikiApplication#delete()}
+     */
     public void deleteApplication(String appName, XWikiContext context) throws XWikiException
     {
         XWikiApplication app = getApplication(appName, context, true);
@@ -149,6 +231,16 @@ public class ApplicationManager
         app.delete();
     }
 
+    /**
+     * Get the application descriptor document of the provided application name.
+     * 
+     * @param appName the name of the application.
+     * @param context the XWiki context.
+     * @param validate indicate if it return new XWikiDocument or throw exception if application
+     *            descriptor does not exist.
+     * @return the XWikiApplication representing application descriptor.
+     * @throws XWikiException error when searching for application descriptor document.
+     */
     public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
         throws XWikiException
     {
@@ -156,16 +248,77 @@ public class ApplicationManager
             validate);
     }
 
+    /**
+     * Reload xwiki application. It means :
+     * <ul>
+     * <li> update XWikiPreferences with application translation documents.
+     * </ul>
+     * 
+     * @param app the application to reload.
+     * @param comment the comment to use when saving documents.
+     * @param context the XWiki context.
+     * @throws XWikiException error when :
+     *             <ul>
+     *             <li>getting wiki preferences document.</li>
+     *             <li>or saving wiki preferences document.</li>
+     *             </ul>
+     */
+    public void reloadApplication(XWikiApplication app, String comment, XWikiContext context)
+        throws XWikiException
+    {
+        updateApplicationTranslation(app, comment, context);
+    }
+
+    /**
+     * Reload all xwiki applications. It means :
+     * <ul>
+     * <li> update XWikiPreferences with application translation documents.
+     * </ul>
+     * 
+     * @param comment the comment to use when saving documents.
+     * @param context the XWiki context.
+     * @throws XWikiException error when :
+     *             <ul>
+     *             <li>getting wiki preferences document.</li>
+     *             <li>or searching for all applications in the wiki.</li>
+     *             <li>or saving wiki preferences document.</li>
+     *             </ul>
+     */
+    public void reloadAllApplications(String comment, XWikiContext context) throws XWikiException
+    {
+        List applist = getApplicationList(context);
+
+        for (Iterator it = applist.iterator(); it.hasNext();) {
+            XWikiApplication app = (XWikiApplication) it.next();
+            ApplicationManager.getInstance().updateApplicationTranslation(app, comment, context);
+        }
+    }
+
+    /**
+     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of all
+     * applications in the context's wiki.
+     * 
+     * @param comment a comment used when saving XWiki.
+     * @param context the XWiki context.
+     * @throws XWikiException error when :
+     *             <ul>
+     *             <li>getting wiki preferences document.</li>
+     *             <li>or searching for all applications in the wiki.</li>
+     *             <li>or saving wiki preferences document.</li>
+     *             </ul>
+     */
     public void updateAllApplicationTranslation(String comment, XWikiContext context)
         throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
-        XWikiDocument prefsDoc = xwiki.getDocument("XWiki.XWikiPreferences", context);
-        BaseObject prefsObject = prefsDoc.getObject("XWiki.XWikiPreferences");
+        XWikiDocument prefsDoc = xwiki.getDocument(XWIKIPREFERENCES, context);
+        BaseObject prefsObject = prefsDoc.getObject(XWIKIPREFERENCES);
 
-        String documentBundles = prefsObject.getStringValue("documentBundles");
-        List translationPrefs = ListClass.getListFromString(documentBundles, ",", true);
+        String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
+        List translationPrefs =
+            ListClass.getListFromString(documentBundles, XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP,
+                true);
 
         boolean updateprefs = false;
 
@@ -174,38 +327,60 @@ public class ApplicationManager
         for (Iterator it = applist.iterator(); it.hasNext();) {
             XWikiApplication app = (XWikiApplication) it.next();
 
-            updateprefs |= updateApplicationTranslation(translationPrefs, app, context);
+            updateprefs |= updateApplicationTranslation(translationPrefs, app);
         }
 
         if (updateprefs) {
-            prefsObject.setStringValue("documentBundles", StringUtils.join(translationPrefs
-                .toArray(), ","));
+            prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
+                translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
             xwiki.saveDocument(prefsDoc, comment, context);
         }
     }
 
+    /**
+     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of the
+     * provided application.
+     * 
+     * @param app the application descriptor.
+     * @param comment a comment used when saving XWiki.
+     * @param context the XWiki context.
+     * @throws XWikiException error when :
+     *             <ul>
+     *             <li>getting wiki preferences document.</li>
+     *             <li>or saving wiki preferences document.</li>
+     *             </ul>
+     */
     public void updateApplicationTranslation(XWikiApplication app, String comment,
         XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
-        XWikiDocument prefsDoc = xwiki.getDocument("XWiki.XWikiPreferences", context);
-        BaseObject prefsObject = prefsDoc.getObject("XWiki.XWikiPreferences");
+        XWikiDocument prefsDoc = xwiki.getDocument(XWIKIPREFERENCES, context);
+        BaseObject prefsObject = prefsDoc.getObject(XWIKIPREFERENCES);
 
-        String documentBundles = prefsObject.getStringValue("documentBundles");
-        List translationPrefs = ListClass.getListFromString(documentBundles, ",", true);
+        String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
+        List translationPrefs =
+            ListClass.getListFromString(documentBundles, XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP,
+                true);
 
-        boolean updateprefs = updateApplicationTranslation(translationPrefs, app, context);
+        boolean updateprefs = updateApplicationTranslation(translationPrefs, app);
 
         if (updateprefs) {
-            prefsObject.setStringValue("documentBundles", StringUtils.join(translationPrefs
-                .toArray(), ","));
+            prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
+                translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
             xwiki.saveDocument(prefsDoc, comment, context);
         }
     }
 
-    public boolean updateApplicationTranslation(List translationPrefs, XWikiApplication app,
-        XWikiContext context)
+    /**
+     * Insert in <code>translationPrefs</code> the translation documents of the provided
+     * application.
+     * 
+     * @param translationPrefs the list of translation documents to complete.
+     * @param app the application's descriptor.
+     * @return true if at least one document has been inserted in <code>translationPrefs</code>.
+     */
+    public boolean updateApplicationTranslation(List translationPrefs, XWikiApplication app)
     {
         boolean updateprefs = false;
 
@@ -222,13 +397,29 @@ public class ApplicationManager
         return updateprefs;
     }
 
+    /**
+     * Export an application into XAR using Packaging plugin.
+     * 
+     * @param appName the name of the application to export.
+     * @param recurse indicate if dependencies applications has to be included in the package.
+     * @param withDocHistory indicate if history of documents is exported.
+     * @param context the XWiki context.
+     * @throws XWikiException error when :
+     *             <ul>
+     *             <li>getting application descriptor document to export.</li>
+     *             <li>or getting application's documents to export.</li>
+     *             <li>or when apply export.</li>
+     *             </ul>
+     * @throws IOException error when apply export.
+     */
     public void exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory,
         XWikiContext context) throws XWikiException, IOException
     {
         XWikiApplication app =
             ApplicationManager.getInstance().getApplication(appName, context, true);
 
-        PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+        PackageAPI export =
+            ((PackageAPI) context.getWiki().getPluginApi(PACKAGEPLUGIN_NAME, context));
 
         export.setName(app.getAppName() + "-" + app.getAppVersion());
 
@@ -242,19 +433,37 @@ public class ApplicationManager
         export.export();
     }
 
+    /**
+     * Import attached application XAR into current wiki and do all actions needed to installation
+     * an application. See {@link #reloadApplication(XWikiApplication, String, XWikiContext)} for
+     * more.
+     * 
+     * @param packageDoc the document where package to import is attached.
+     * @param packageName the name of the attached XAR file to import.
+     * @param comment a comment used update XWiki.XWikiPreferences.
+     * @param context the XWiki context.
+     * @throws XWikiException error when :
+     *             <ul>
+     *             <li>getting attached package file.</li>
+     *             <li>or load package in memory.</li>
+     *             <li>or installing loaded document in database</li>
+     *             <li>or apply application initialization for each application descriptor
+     *             document.</li>
+     *             </ul>
+     */
     public void importApplication(XWikiDocument packageDoc, String packageName, String comment,
         XWikiContext context) throws XWikiException
     {
-        XWiki xwiki = context.getWiki();
-
         XWikiAttachment packFile = packageDoc.getAttachment(packageName);
 
-        if (packFile == null)
+        if (packFile == null) {
             throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, "Package "
                 + packageName + " does not exists.");
+        }
 
         // Import
-        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
+        PackageAPI importer =
+            ((PackageAPI) context.getWiki().getPluginApi(PACKAGEPLUGIN_NAME, context));
 
         try {
             importer.Import(packFile.getContent(context));
@@ -264,34 +473,20 @@ public class ApplicationManager
                 e);
         }
 
-        if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE)
+        if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
             throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Fail to import package " + packageName);
+                "Fail to install package " + packageName);
+        }
 
-        // Update translation documents
-        XWikiDocument prefsDoc = xwiki.getDocument("XWiki.XWikiPreferences", context);
-        BaseObject prefsObject = prefsDoc.getObject("XWiki.XWikiPreferences");
-
-        String documentBundles = prefsObject.getStringValue("documentBundles");
-        List translationPrefs = ListClass.getListFromString(documentBundles, ",", true);
-
-        boolean updateprefs = false;
-
+        // Apply applications installation
         for (Iterator it = importer.getFiles().iterator(); it.hasNext();) {
             DocumentInfoAPI docinfo = (DocumentInfoAPI) it.next();
             XWikiDocument doc = docinfo.getDocInfo().getDoc();
 
-            if (XWikiApplicationClass.getInstance(context).isInstance(doc, context))
-                updateprefs |=
-                    updateApplicationTranslation(translationPrefs,
-                        (XWikiApplication) XWikiApplicationClass.getInstance(context)
-                            .newSuperDocument(doc, context), context);
-        }
-
-        if (updateprefs) {
-            prefsObject.setStringValue("documentBundles", StringUtils.join(translationPrefs
-                .toArray(), ","));
-            xwiki.saveDocument(prefsDoc, comment, context);
+            if (XWikiApplicationClass.getInstance(context).isInstance(doc)) {
+                reloadApplication((XWikiApplication) XWikiApplicationClass.getInstance(context)
+                    .newSuperDocument(doc, context), comment, context);
+            }
         }
     }
 }

@@ -20,6 +20,7 @@
 
 package com.xpn.xwiki.plugin.applicationmanager;
 
+import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.XWikiContext;
@@ -27,24 +28,42 @@ import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Entry point of the Application Manager plugin.
+ * 
+ * @version $Id: $
+ */
 public class ApplicationManagerPlugin extends XWikiDefaultPlugin
 {
-    protected static final Log LOG = LogFactory.getLog(ApplicationManagerPlugin.class);
-
-    // ////////////////////////////////////////////////////////////////////////////
-
+    /**
+     * Identifier of Application Manager plugin.
+     */
     public static final String PLUGIN_NAME = "applicationmanager";
 
     // ////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * The logging tool.
+     */
+    protected static final Log LOG = LogFactory.getLog(ApplicationManagerPlugin.class);
+    
+    // ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Construction the entry point of the Application Manager plugin.
+     * 
+     * @param name the identifier of the plugin.
+     * @param className the class name of the entry point of the plugin.
+     * @param context the XWiki context.
+     */
     public ApplicationManagerPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
@@ -53,19 +72,19 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
         return PLUGIN_NAME;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ApplicationManagerPluginApi((ApplicationManagerPlugin) plugin, context);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
      */

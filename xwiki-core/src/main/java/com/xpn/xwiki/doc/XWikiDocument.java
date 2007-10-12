@@ -2361,7 +2361,8 @@ public class XWikiDocument
         setAuthor(getElement(docel, "author"));
         setCustomClass(getElement(docel, "customClass"));
         setContentAuthor(getElement(docel, "contentAuthor"));
-        setVersion(getElement(docel, "version"));
+        if (docel.element("version") != null)
+            setVersion(getElement(docel, "version"));
         setContent(getElement(docel, "content"));
         setLanguage(getElement(docel, "language"));
         setDefaultLanguage(getElement(docel, "defaultLanguage"));

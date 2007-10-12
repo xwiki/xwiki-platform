@@ -239,7 +239,7 @@ public class WikiManagerPluginApi extends PluginApi
         try {
             wikiName =
                 XWikiServerClass.getInstance(this.context).getItemDefaultName(
-                    document.getFullName(), this.context);
+                    document.getFullName());
         } catch (WikiManagerException e) {
             LOG.error("Try to get wiki name \"" + document.getFullName() + "\"", e);
 

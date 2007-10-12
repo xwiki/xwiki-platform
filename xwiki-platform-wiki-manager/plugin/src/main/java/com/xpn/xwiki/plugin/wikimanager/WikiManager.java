@@ -30,6 +30,7 @@ import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
+import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -43,6 +44,11 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Hidden toolkit use by the plugin API that make all the plugins actions.
+ * 
+ * @version $Id: $
+ */
 public class WikiManager
 {
     protected static final Log LOG = LogFactory.getLog(WikiManager.class);
@@ -80,12 +86,13 @@ public class WikiManager
      * 
      * @param wikiName the name of the wiki where to save the document.
      * @param doc the document to save.
+     * @param comment the comment to use when saving document.
      * @param context the XWiki Context.
      * @throws XWikiException
      * @see com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)
      */
-    public void saveDocument(String wikiName, XWikiDocument doc, String comment, XWikiContext context)
-        throws XWikiException
+    public void saveDocument(String wikiName, XWikiDocument doc, String comment,
+        XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
 
@@ -106,7 +113,7 @@ public class WikiManager
      * @return the document with full name equals to <code>fullname</code> and wiki
      *         <code>wikiName</code>. If it dos not exist return new XWikiDocument.
      * @throws XWikiException
-     * @see om.xpn.xwiki.XWiki#getDocument(String, XWikiContext)
+     * @see com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)
      */
     public XWikiDocument getDocument(String wikiName, String fullname, XWikiContext context)
         throws XWikiException
@@ -122,7 +129,7 @@ public class WikiManager
     }
 
     /**
-     * Encapsulate {@link com.xpn.xwiki.XWiki#searchDocuments(String, XWikiContext)} adding wiki
+     * Encapsulate {@link XWikiStoreInterface#searchDocuments(String, XWikiContext)} adding wiki
      * switch.
      * 
      * @param wikiName the name of the wiki where to search for documents.
@@ -131,7 +138,7 @@ public class WikiManager
      * @return the list of documents that match the <code>wheresql</code> conditions. If nothing
      *         found return empty List.
      * @throws XWikiException
-     * @see com.xpn.xwiki.XWiki#searchDocuments(String, XWikiContext)
+     * @see XWikiStoreInterface#searchDocuments(String, XWikiContext)
      */
     public List searchDocuments(String wikiName, String wheresql, XWikiContext context)
         throws XWikiException
@@ -176,15 +183,15 @@ public class WikiManager
                 docsToInclude = rootApp.getDocsNameToInclude(true);
             else
                 docsToInclude =
-                    XWikiApplication.getDocsNameToInclude(
-                        appmanager.getApplicationDocumentList(), true, context);
+                    XWikiApplication
+                        .getDocsNameToInclude(appmanager.getApplicationDocumentList());
         } finally {
             context.setDatabase(database);
         }
 
         return docsToInclude;
     }
-    
+
     private Collection getDocsNameToLink(String wiki, XWikiContext context) throws XWikiException
     {
         // Get applications manger
@@ -211,8 +218,7 @@ public class WikiManager
                 docsToLink = rootApp.getDocsNameToLink(true);
             else
                 docsToLink =
-                    XWikiApplication.getDocsNameToLink(
-                        appmanager.getApplicationDocumentList(), true, context);
+                    XWikiApplication.getDocsNameToLink(appmanager.getApplicationDocumentList());
         } finally {
             context.setDatabase(database);
         }
@@ -220,8 +226,8 @@ public class WikiManager
         return docsToLink;
     }
 
-    private void copyWiki(String sourceWiki, String targetWiki, String language,
-        String comment, XWikiContext context) throws XWikiException
+    private void copyWiki(String sourceWiki, String targetWiki, String language, String comment,
+        XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -263,11 +269,12 @@ public class WikiManager
      * @param packageName the name of the attached XAR file to import in the new wiki.
      * @param failOnExist if true throw exception when wiki already exist. If false overwrite
      *            existing wiki.
+     * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @return the new wiki descriptor document.
      * @throws XWikiException
-     * @see #createNewWiki(XWikiServer, boolean, XWikiContext)
-     * @see #createNewWikiFromTemplate(XWikiServer, String, boolean, XWikiContext)
+     * @see #createNewWiki(XWikiServer, boolean, String, XWikiContext)
+     * @see #createNewWikiFromTemplate(XWikiServer, String, boolean, String, XWikiContext)
      */
     public XWikiServer createNewWikiFromPackage(XWikiServer userWikiSuperDoc, String packageName,
         boolean failOnExist, String comment, XWikiContext context) throws XWikiException
@@ -283,16 +290,19 @@ public class WikiManager
      * @param templateWikiName the of the wiki from where to copy document to the new wiki.
      * @param failOnExist if true throw exception when wiki already exist. If false overwrite
      *            existing wiki.
+     * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @return the new wiki descriptor document.
      * @throws XWikiException
-     * @see #createNewWiki(XWikiServer, boolean, XWikiContext)
-     * @see #createNewWikiFromPackage(XWikiServer, String, boolean, XWikiContext)
+     * @see #createNewWiki(XWikiServer, boolean, String, XWikiContext)
+     * @see #createNewWikiFromPackage(XWikiServer, String, boolean, String, XWikiContext)
      */
     public XWikiServer createNewWikiFromTemplate(XWikiServer userWikiSuperDoc,
-        String templateWikiName, boolean failOnExist, String comment, XWikiContext context) throws XWikiException
+        String templateWikiName, boolean failOnExist, String comment, XWikiContext context)
+        throws XWikiException
     {
-        return createNewWiki(userWikiSuperDoc, failOnExist, templateWikiName, null, comment, context);
+        return createNewWiki(userWikiSuperDoc, failOnExist, templateWikiName, null, comment,
+            context);
     }
 
     /**
@@ -302,6 +312,7 @@ public class WikiManager
      *            document will be created.
      * @param failOnExist if true throw exception when wiki already exist. If false overwrite
      *            existing wiki.
+     * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @return the new wiki descriptor document.
      * @throws XWikiException
@@ -313,7 +324,8 @@ public class WikiManager
     }
 
     private XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist,
-        String templateWikiName, String packageName, String comment, XWikiContext context) throws XWikiException
+        String templateWikiName, String packageName, String comment, XWikiContext context)
+        throws XWikiException
     {
         if (userWikiSuperDoc.getOwner().length() == 0)
             throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USER_INACTIVE,
@@ -374,7 +386,7 @@ public class WikiManager
                 XWikiDocument docToSave =
                     getDocument(context.getMainXWiki(), userWikiSuperDoc.getFullName(), context);
 
-                if (!docToSave.isNew() && wikiClass.isInstance(docToSave, context)) {
+                if (!docToSave.isNew() && wikiClass.isInstance(docToSave)) {
                     // If we are not allowed to continue if server page already exists
                     if (failOnExist) {
                         if (LOG.isErrorEnabled())
@@ -622,6 +634,7 @@ public class WikiManager
      * @param wikiSuperDocument a wiki descriptor document from which the new template wiki
      *            descriptor document will be created.
      * @param packageName the name of the attached XAR file to import in the new template wiki.
+     * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @throws XWikiException
      */

@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -41,8 +42,9 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * <li>overload {@link #updateBaseClass(BaseClass)}
  * <li>in constructor call AbstractSuperClass constructor with a name that will be used to generate
  * all the documents and spaces needed.
- * </p>
+ * </ul>
  * 
+ * @version $Id: $
  * @see SuperClass
  * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. When that issue is applied in XWiki Core
  *       and when this plugin moves to the version of XWiki Core where it was applied then remove
@@ -51,81 +53,106 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 public abstract class AbstractSuperClass implements SuperClass
 {
     /**
+     * FullName of the default parent page for a document containing xwiki class.
+     */
+    private static final String DEFAULT_XWIKICLASS_PARENT = "XWiki.XWikiClasses";
+
+    /**
+     * The resource file extension containing pages contents.
+     */
+    private static final String DOCUMENTCONTENT_EXT = ".svn";
+
+    /**
+     * Resource path prefix for the class sheets documents content.
+     */
+    private static final String DOCUMENTCONTENT_SHEET_PREFIX = "sheets/";
+
+    /**
+     * Resource path prefix for the class templates documents content.
+     */
+    private static final String DOCUMENTCONTENT_TEMPLATE_PREFIX = "templates/";
+
+    /**
+     * String used to protect value in HQL request.
+     */
+    private static final String HQL_PROTECT_STRING = "'";
+
+    /**
      * Space prefix of class document.
      * 
      * @see #getClassSpace()
      */
-    private final String CLASS_SPACE_PREFIX;
+    private final String classSpacePrefix;
 
     /**
      * Prefix of class document.
      * 
      * @see #getClassPrefix()
      */
-    private final String CLASS_PREFIX;
+    private final String classPrefix;
 
     /**
      * Space of class document.
      * 
      * @see #getClassSpace()
      */
-    private final String CLASS_SPACE;
+    private final String classSpace;
 
     /**
      * Name of class document.
      * 
      * @see #getClassName()
      */
-    private final String CLASS_NAME;
+    private final String className;
 
     /**
      * Full name of class document.
      * 
      * @see #getClassFullName()
      */
-    private final String CLASS_FULLNAME;
+    private final String classFullName;
 
     /**
      * Space of class sheet document.
      * 
      * @see #getClassSpace()
      */
-    private final String CLASSSHEET_SPACE;
+    private final String classSheetSpace;
 
     /**
      * Name of class sheet document.
      * 
      * @see #getClassSheetName()
      */
-    private final String CLASSSHEET_NAME;
+    private final String classSheetName;
 
     /**
      * Full name of class sheet document.
      * 
      * @see #getClassSheetFullName()
      */
-    private final String CLASSSHEET_FULLNAME;
+    private final String classSheetFullName;
 
     /**
      * Space of class template document.
      * 
      * @see #getClassSpace()
      */
-    private final String CLASSTEMPLATE_SPACE;
+    private final String classTemplateSpace;
 
     /**
      * Name of class template document.
      * 
      * @see #getClassTemplateName()
      */
-    private final String CLASSTEMPLATE_NAME;
+    private final String classTemplateName;
 
     /**
      * Full name of class template document.
      * 
      * @see #getClassTemplateFullName()
      */
-    private final String CLASSTEMPLATE_FULLNAME;
+    private final String classTemplateFullName;
 
     /**
      * Default content of class template document.
@@ -138,114 +165,14 @@ public abstract class AbstractSuperClass implements SuperClass
     private final String classTemplateDefaultContent;
 
     /**
-     * FullName of the default parent page for a document containing xwiki class.
+     * Base class managed.
      */
-    private final String DEFAULT_XWIKICLASS_PARENT = "XWiki.XWikiClasses";
-
-    public String getClassSpacePrefix()
-    {
-        return CLASS_SPACE_PREFIX;
-    }
+    private BaseClass baseClass;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassSpace()
+     * Store for any database name if documents used for manage this class has been checked.
      */
-    public String getClassSpace()
-    {
-        return CLASS_SPACE;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassPrefix()
-     */
-    public String getClassPrefix()
-    {
-        return CLASS_PREFIX;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassName()
-     */
-    public String getClassName()
-    {
-        return CLASS_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassFullName()
-     */
-    public String getClassFullName()
-    {
-        return CLASS_FULLNAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateName()
-     */
-    public String getClassTemplateSpace()
-    {
-        return CLASSTEMPLATE_SPACE;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateName()
-     */
-    public String getClassTemplateName()
-    {
-        return CLASSTEMPLATE_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateFullName()
-     */
-    public String getClassTemplateFullName()
-    {
-        return CLASSTEMPLATE_FULLNAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassSheetName()
-     */
-    public String getClassSheetSpace()
-    {
-        return CLASSSHEET_SPACE;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassSheetName()
-     */
-    public String getClassSheetName()
-    {
-        return CLASSSHEET_NAME;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassSheetFullName()
-     */
-    public String getClassSheetFullName()
-    {
-        return CLASSSHEET_FULLNAME;
-    }
+    private final Set databasesInitedMap = new HashSet();
 
     /**
      * Constructor for AbstractSuperClass.
@@ -283,51 +210,151 @@ public abstract class AbstractSuperClass implements SuperClass
      */
     protected AbstractSuperClass(String spaceprefix, String prefix, boolean dispatch)
     {
-        CLASS_SPACE_PREFIX = spaceprefix;
-        CLASS_PREFIX = prefix;
+        classSpacePrefix = spaceprefix;
+        classPrefix = prefix;
 
-        CLASS_SPACE =
-            dispatch ? CLASS_SPACE_PREFIX + XWIKI_CLASS_SPACE_SUFFIX : CLASS_SPACE_PREFIX;
-        CLASS_NAME = CLASS_PREFIX + XWIKI_CLASS_SUFFIX;
-        CLASS_FULLNAME = CLASS_SPACE + "." + CLASS_NAME;
+        classSpace = dispatch ? classSpacePrefix + XWIKI_CLASS_SPACE_SUFFIX : classSpacePrefix;
+        className = classPrefix + XWIKI_CLASS_SUFFIX;
+        classFullName = classSpace + SuperClass.SPACE_DOC_SEPARATOR + className;
 
-        CLASSSHEET_SPACE =
-            dispatch ? CLASS_SPACE_PREFIX + XWIKI_CLASSSHEET_SPACE_SUFFIX : CLASS_SPACE_PREFIX;
-        CLASSSHEET_NAME = CLASS_PREFIX + XWIKI_CLASSSHEET_SUFFIX;
-        CLASSSHEET_FULLNAME = CLASSSHEET_SPACE + "." + CLASSSHEET_NAME;
+        classSheetSpace =
+            dispatch ? classSpacePrefix + XWIKI_CLASSSHEET_SPACE_SUFFIX : classSpacePrefix;
+        classSheetName = classPrefix + XWIKI_CLASSSHEET_SUFFIX;
+        classSheetFullName = classSheetSpace + SuperClass.SPACE_DOC_SEPARATOR + classSheetName;
 
-        CLASSTEMPLATE_SPACE =
-            dispatch ? CLASS_SPACE_PREFIX + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : CLASS_SPACE_PREFIX;
-        CLASSTEMPLATE_NAME = CLASS_PREFIX + XWIKI_CLASSTEMPLATE_SUFFIX;
-        CLASSTEMPLATE_FULLNAME = CLASSTEMPLATE_SPACE + "." + CLASSTEMPLATE_NAME;
+        classTemplateSpace =
+            dispatch ? classSpacePrefix + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : classSpacePrefix;
+        classTemplateName = classPrefix + XWIKI_CLASSTEMPLATE_SUFFIX;
+        classTemplateFullName =
+            classTemplateSpace + SuperClass.SPACE_DOC_SEPARATOR + classTemplateName;
 
         classSheetDefaultContent =
-            "## you can modify this page to customize the presentation of your object\n" + "\n"
-                + "1 Document $doc.name\n" + "\n" + "#set($class = $doc.getObject(\""
-                + CLASS_FULLNAME + "\").xWikiClass)\n" + "\n" + "<dl>\n"
+            "## you can modify this page to customize the presentation of your object\n\n"
+                + "1 Document $doc.name\n\n#set($class = $doc.getObject(\"" + classFullName
+                + "\").xWikiClass)\n" + "\n" + "<dl>\n"
                 + "  #foreach($prop in $class.properties)\n"
                 + "    <dt> ${prop.prettyName} </dt>\n"
-                + "    <dd>$doc.display($prop.getName())</dd>\n" + "  #end\n" + "</dl>\n";
+                + "    <dd>$doc.display($prop.getName())</dd>\n  #end\n" + "</dl>\n";
 
-        classTemplateDefaultContent = "#includeForm(\"" + CLASSSHEET_FULLNAME + "\")\n";
+        classTemplateDefaultContent = "#includeForm(\"" + classSheetFullName + "\")\n";
     }
 
     /**
-     * Base class managed.
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#getClassSpacePrefix()
      */
-    private BaseClass baseClass = null;
+    public String getClassSpacePrefix()
+    {
+        return classSpacePrefix;
+    }
 
     /**
-     * Store for any database name if documents used for manage this class has been checked;
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassSpace()
      */
-    private final HashSet databasesInitedMap = new HashSet();
+    public String getClassSpace()
+    {
+        return classSpace;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassPrefix()
+     */
+    public String getClassPrefix()
+    {
+        return classPrefix;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassName()
+     */
+    public String getClassName()
+    {
+        return className;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassFullName()
+     */
+    public String getClassFullName()
+    {
+        return classFullName;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassTemplateName()
+     */
+    public String getClassTemplateSpace()
+    {
+        return classTemplateSpace;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassTemplateName()
+     */
+    public String getClassTemplateName()
+    {
+        return classTemplateName;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassTemplateFullName()
+     */
+    public String getClassTemplateFullName()
+    {
+        return classTemplateFullName;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassSheetName()
+     */
+    public String getClassSheetSpace()
+    {
+        return classSheetSpace;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassSheetName()
+     */
+    public String getClassSheetName()
+    {
+        return classSheetName;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#getClassSheetFullName()
+     */
+    public String getClassSheetFullName()
+    {
+        return classSheetFullName;
+    }
 
     /**
      * Check if all necessary documents for manage this class in this context exists and update.
      * Create if not exists. Thread safe.
      * 
      * @param context the XWiki context.
-     * @throws XWikiException
+     * @throws XWikiException error when saving documents.
      * @see #checkClassDocument(XWikiContext)
      */
     protected void check(XWikiContext context) throws XWikiException
@@ -347,7 +374,7 @@ public abstract class AbstractSuperClass implements SuperClass
      * Check if class document exists in this context and update. Create if not exists.
      * 
      * @param context the XWiki context.
-     * @throws XWikiException
+     * @throws XWikiException error when saving document.
      */
     private void checkClassDocument(XWikiContext context) throws XWikiException
     {
@@ -369,14 +396,15 @@ public abstract class AbstractSuperClass implements SuperClass
 
         needsUpdate |= updateBaseClass(this.baseClass);
 
-        if (doc.isNew() || needsUpdate)
+        if (doc.isNew() || needsUpdate) {
             xwiki.saveDocument(doc, context);
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassSheetDefaultContent()
+     * @see SuperClass#getClassSheetDefaultContent()
      */
     public String getClassSheetDefaultContent()
     {
@@ -393,19 +421,21 @@ public abstract class AbstractSuperClass implements SuperClass
     {
         InputStream in = this.getClass().getClassLoader().getResourceAsStream(path);
 
-        if (in != null)
+        if (in != null) {
             try {
                 StringBuffer content = new StringBuffer(in.available());
 
                 BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                for (String str; (str = reader.readLine()) != null;) {
+                for (String str = reader.readLine(); str != null; str = reader.readLine()) {
                     content.append(str);
                     content.append('\n');
                 }
 
                 return content.toString();
             } catch (IOException e) {
+                // No resource file as been found or there is a problem when read it.
             }
+        }
 
         return null;
     }
@@ -414,7 +444,7 @@ public abstract class AbstractSuperClass implements SuperClass
      * Check if class sheet document exists in this context and update. Create if not exists.
      * 
      * @param context the XWiki context.
-     * @throws XWikiException
+     * @throws XWikiException error when saving document.
      */
     private void checkClassSheetDocument(XWikiContext context) throws XWikiException
     {
@@ -434,18 +464,20 @@ public abstract class AbstractSuperClass implements SuperClass
 
         if (doc.isNew()) {
             String content =
-                getResourceDocumentContent("sheets/" + getClassSheetFullName() + ".vm");
-            doc.setContent(content != null ? content.toString() : getClassSheetDefaultContent());
+                getResourceDocumentContent(DOCUMENTCONTENT_SHEET_PREFIX + getClassSheetFullName()
+                    + DOCUMENTCONTENT_EXT);
+            doc.setContent(content != null ? content : getClassSheetDefaultContent());
         }
 
-        if (doc.isNew() || needsUpdate)
+        if (doc.isNew() || needsUpdate) {
             xwiki.saveDocument(doc, context);
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateDefaultContent()
+     * @see SuperClass#getClassTemplateDefaultContent()
      */
     public String getClassTemplateDefaultContent()
     {
@@ -456,7 +488,7 @@ public abstract class AbstractSuperClass implements SuperClass
      * Check if class template document exists in this context and update. Create if not exists.
      * 
      * @param context the XWiki context.
-     * @throws XWikiException
+     * @throws XWikiException error when saving document.
      */
     private void checkClassTemplateDocument(XWikiContext context) throws XWikiException
     {
@@ -481,23 +513,25 @@ public abstract class AbstractSuperClass implements SuperClass
 
         if (doc.isNew()) {
             String content =
-                getResourceDocumentContent("templates/" + getClassTemplateFullName() + ".vm");
-            doc.setContent(content != null ? content.toString()
-                : getClassTemplateDefaultContent());
+                getResourceDocumentContent(DOCUMENTCONTENT_TEMPLATE_PREFIX
+                    + getClassTemplateFullName() + DOCUMENTCONTENT_EXT);
+            doc.setContent(content != null ? content : getClassTemplateDefaultContent());
 
             doc.setParent(getClassFullName());
         }
 
         needsUpdate |= updateClassTemplateDocument(doc);
 
-        if (doc.isNew() || needsUpdate)
+        if (doc.isNew() || needsUpdate) {
             xwiki.saveDocument(doc, context);
+        }
     }
 
     /**
      * Initialize template document with default content.
      * 
      * @param doc the class template document that will be saved.
+     * @return true if <code>doc</code> modified.
      */
     protected boolean updateClassTemplateDocument(XWikiDocument doc)
     {
@@ -525,7 +559,7 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getBaseClass()
+     * @see SuperClass#getBaseClass()
      */
     public BaseClass getBaseClass()
     {
@@ -540,7 +574,7 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassDocument(com.xpn.xwiki.XWikiContext)
+     * @see SuperClass#getClassDocument(com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getClassDocument(XWikiContext context) throws XWikiException
     {
@@ -552,7 +586,7 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassSheetDocument(com.xpn.xwiki.XWikiContext)
+     * @see SuperClass#getClassSheetDocument(com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getClassSheetDocument(XWikiContext context) throws XWikiException
     {
@@ -564,7 +598,7 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getClassTemplateDocument(com.xpn.xwiki.XWikiContext)
+     * @see SuperClass#getClassTemplateDocument(com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getClassTemplateDocument(XWikiContext context) throws XWikiException
     {
@@ -576,10 +610,9 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#isInstanceOf(com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see SuperClass#isInstance(com.xpn.xwiki.doc.XWikiDocument)
      */
-    public boolean isInstance(XWikiDocument doc, XWikiContext context)
+    public boolean isInstance(XWikiDocument doc)
     {
         return doc.getObject(getClassFullName()) != null;
     }
@@ -587,43 +620,43 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getItemDocumentName(java.lang.String)
+     * @see SuperClass#getItemDocumentDefaultName(java.lang.String, XWikiContext)
      */
     public String getItemDocumentDefaultName(String itemName, XWikiContext context)
     {
-        itemName = context.getWiki().clearName(itemName, true, true, context);
+        String name = context.getWiki().clearName(itemName, true, true, context);
 
-        return getClassPrefix() + itemName.substring(0, 1).toUpperCase()
-            + itemName.substring(1).toLowerCase();
+        return getClassPrefix() + name.substring(0, 1).toUpperCase()
+            + name.substring(1).toLowerCase();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getItemDocumentFullName(java.lang.String)
+     * @see SuperClass#getItemDocumentDefaultFullName(java.lang.String, XWikiContext)
      */
     public String getItemDocumentDefaultFullName(String itemName, XWikiContext context)
     {
-        return getClassSpacePrefix() + "." + getItemDocumentDefaultName(itemName, context);
+        return getClassSpacePrefix() + SuperClass.SPACE_DOC_SEPARATOR
+            + getItemDocumentDefaultName(itemName, context);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#getItemDefaultName(java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#getItemDefaultName(java.lang.String)
      */
-    public String getItemDefaultName(String docFullName, XWikiContext context)
+    public String getItemDefaultName(String docFullName)
     {
-        return docFullName.substring((getClassSpacePrefix() + "." + getClassPrefix()).length())
+        return docFullName.substring(
+            (getClassSpacePrefix() + SuperClass.SPACE_DOC_SEPARATOR + getClassPrefix()).length())
             .toLowerCase();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#getItemDocument(java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see SuperClass#getItemDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public XWikiDocument getItemDocument(String itemName, XWikiContext context)
         throws XWikiException
@@ -637,7 +670,7 @@ public abstract class AbstractSuperClass implements SuperClass
      * 
      * @param context the XWiki context.
      * @return a list of XWikiDocument containing object of this XWiki class.
-     * @throws XWikiException
+     * @throws XWikiException error when searching for document in database.
      * @see #getClassFullName()
      */
     public List searchItemDocuments(XWikiContext context) throws XWikiException
@@ -653,7 +686,7 @@ public abstract class AbstractSuperClass implements SuperClass
      * @param docFullName the full name of the document.
      * @param context the XWiki context.
      * @return a list with just one XWikiDocument containing object of this XWiki class.
-     * @throws XWikiException
+     * @throws XWikiException error when searching for document in database.
      */
     public List searchItemDocuments(String docFullName, XWikiContext context)
         throws XWikiException
@@ -670,8 +703,9 @@ public abstract class AbstractSuperClass implements SuperClass
     public List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
         XWikiContext context) throws XWikiException
     {
-        return searchItemDocumentsByFields(null, new String[][] {{fieldType, fieldName,
-        fieldValue}}, context);
+        String[][] fieldDescriptors = new String[][] {{fieldType, fieldName, fieldValue}};
+
+        return searchItemDocumentsByFields(null, fieldDescriptors, context);
     }
 
     /**
@@ -687,23 +721,33 @@ public abstract class AbstractSuperClass implements SuperClass
 
         String from = ", BaseObject as obj";
 
-        String where =
-            " where doc.fullName=obj.name" + " and obj.className='" + getClassFullName() + "'";
+        StringBuffer where =
+            new StringBuffer(" where doc.fullName=obj.name" + " and obj.className="
+                + HQL_PROTECT_STRING + getClassFullName() + HQL_PROTECT_STRING);
 
-        if (docFullName != null)
-            where += " and obj.name='" + docFullName + "'";
-        else
-            where += " and obj.name<>'" + getClassTemplateFullName() + "'";
+        if (docFullName != null) {
+            where
+                .append(" and obj.name=" + HQL_PROTECT_STRING + docFullName + HQL_PROTECT_STRING);
+        } else {
+            where.append(" and obj.name<>" + HQL_PROTECT_STRING + getClassTemplateFullName()
+                + HQL_PROTECT_STRING);
+        }
 
-        if (fieldDescriptors != null)
+        if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {
                 from += ", " + fieldDescriptors[i][0] + " as field" + i;
 
-                where +=
-                    " and obj.id=field" + i + ".id.id" + " and field" + i + ".id.name='"
-                        + fieldDescriptors[i][1] + "'" + " and field" + i + ".id.value='"
-                        + fieldDescriptors[i][2] + "'";
+                String fieldPrefix = "field" + i;
+                String andSymbol = " and ";
+                
+                where.append(andSymbol + "obj.id=" + fieldPrefix + ".id.id");
+                
+                where.append(andSymbol + fieldPrefix + ".id.name=" + HQL_PROTECT_STRING
+                    + fieldDescriptors[i][1] + HQL_PROTECT_STRING);
+                where.append(andSymbol + fieldPrefix + ".id.value=" + HQL_PROTECT_STRING
+                    + fieldDescriptors[i][2] + HQL_PROTECT_STRING);
             }
+        }
 
         return context.getWiki().getStore().searchDocuments(from + where, context);
     }
@@ -723,8 +767,7 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#newSuperDocument(java.lang.String,
-     *      com.xpn.xwiki.XWikiContext)
+     * @see SuperClass#newSuperDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public SuperDocument newSuperDocument(String docFullName, XWikiContext context)
         throws XWikiException
@@ -735,7 +778,7 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.SuperClass#newSuperDocument(com.xpn.xwiki.XWikiContext)
+     * @see SuperClass#newSuperDocument(com.xpn.xwiki.XWikiContext)
      */
     public SuperDocument newSuperDocument(XWikiContext context) throws XWikiException
     {

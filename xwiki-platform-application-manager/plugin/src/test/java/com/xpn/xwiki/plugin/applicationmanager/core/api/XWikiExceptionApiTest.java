@@ -24,25 +24,27 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi}.
- *
+ * 
  * @version $Id: $
  */
 public class XWikiExceptionApiTest extends TestCase
 {
     /**
      * We only verify here we get the correct error code for some static error field name.
+     * @throws XWikiException error occurred.
      */
     public void testGetStaticErrorCode() throws XWikiException
     {
         XWikiExceptionApi exceptionapi = new XWikiExceptionApi(new XWikiException(), null);
 
-        assertEquals("Error code is incorrect", XWikiException.ERROR_XWIKI_UNKNOWN,
-            exceptionapi.get("ERROR_XWIKI_UNKNOWN"));
+        assertEquals("Error code is incorrect", XWikiException.ERROR_XWIKI_UNKNOWN, exceptionapi
+            .get("ERROR_XWIKI_UNKNOWN"));
         assertEquals("Error code is incorrect",
-            XWikiException.ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND,
-            exceptionapi.get("ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND"));
-        assertEquals("Error code is incorrect", XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI,
-            exceptionapi.get("ERROR_XWIKI_CONTENT_LINK_INVALID_URI"));
+            XWikiException.ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND, exceptionapi
+                .get("ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND"));
+        assertEquals("Error code is incorrect",
+            XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI, exceptionapi
+                .get("ERROR_XWIKI_CONTENT_LINK_INVALID_URI"));
     }
 
     /**
@@ -62,6 +64,9 @@ public class XWikiExceptionApiTest extends TestCase
         }
     }
 
+    /**
+     * Example of XWikiException overload.
+     */
     public class SomeExtendedException extends XWikiException
     {
         public static final int ERROR_EXTENDED_ERROR1 = 80001;
@@ -69,6 +74,9 @@ public class XWikiExceptionApiTest extends TestCase
         public static final int ERROR_EXTENDED_ERROR2 = 80002;
     }
 
+    /**
+     * Example of XWikiException overload.
+     */
     public class SomeOtherExtendedException extends XWikiException
     {
         public static final int ERROR_EXTENDED_ERROR1 = 90001;
@@ -78,10 +86,12 @@ public class XWikiExceptionApiTest extends TestCase
 
     /**
      * We only verify here we get the correct error code for some static error field name.
+     * @throws XWikiException error occurred.
      */
     public void testGetExtendedStaticErrorCode() throws XWikiException
     {
-        XWikiExceptionApi exceptionapi1 = new XWikiExceptionApi(new SomeExtendedException(), null);
+        XWikiExceptionApi exceptionapi1 =
+            new XWikiExceptionApi(new SomeExtendedException(), null);
 
         assertEquals("Error code is incorrect", SomeExtendedException.ERROR_EXTENDED_ERROR1,
             exceptionapi1.get("ERROR_EXTENDED_ERROR1"));

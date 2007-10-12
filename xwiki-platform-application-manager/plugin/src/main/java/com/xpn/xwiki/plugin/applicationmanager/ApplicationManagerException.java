@@ -22,42 +22,90 @@ package com.xpn.xwiki.plugin.applicationmanager;
 
 import com.xpn.xwiki.plugin.PluginException;
 
+/**
+ * Application Manager plugin base exception.
+ * 
+ * @version $Id: $
+ */
 public class ApplicationManagerException extends PluginException
 {
-	public static final int MODULE_PLUGIN_APPLICATIONMANAGER = 60;
-	
+    /**
+     * Application Manager plugin error identifier.
+     */
+    public static final int MODULE_PLUGIN_APPLICATIONMANAGER = 60;
+
+    /**
+     * Error used when trying to create application descriptor that already exist in the database.
+     */
     public static final int ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS = 60010;
-    
+
+    /**
+     * Error when trying to get application descriptor that does not exist in the database.
+     */
     public static final int ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST = 60011;
     
-    ////////
-    
+    /**
+     * The default ApplicationManagerException.
+     */
+    private static final ApplicationManagerException DEFAULT_EXCEPTION =
+        new ApplicationManagerException();
+
+    // //////
+
+    /**
+     * Create an ApplicationManagerException.
+     * 
+     * @param code the error code.
+     * @param message a literal message about this error.
+     */
     public ApplicationManagerException(int code, String message)
     {
         super(ApplicationManagerPlugin.class, code, message);
     }
 
+    /**
+     * Create an ApplicationManagerException. Replace any parameters found in the
+     * <code>message</code> by the passed <code>args</code> parameters. The format is the one
+     * used by {@link java.text.MessageFormat}.
+     * 
+     * @param code the error code.
+     * @param message a literal message about this error.
+     * @param e the exception this exception wrap.
+     * @param args the array of parameters to use for replacing "{N}" elements in the string. See
+     *            {@link java.text.MessageFormat} for the full syntax
+     */
     public ApplicationManagerException(int code, String message, Throwable e, Object[] args)
     {
         super(ApplicationManagerPlugin.class, code, message, e, args);
     }
 
+    /**
+     * Create an ApplicationManagerException.
+     * 
+     * @param code the error code.
+     * @param message a literal message about this error.
+     * @param e the exception this exception wrap.
+     */
     public ApplicationManagerException(int code, String message, Throwable e)
     {
         super(ApplicationManagerPlugin.class, code, message, e);
     }
-    
-    ////////
-    
+
+    // //////
+
+    /**
+     * Create default ApplicationManagerException.
+     */
     private ApplicationManagerException()
     {
         super(ApplicationManagerPlugin.class, 0, "No error");
     }
-    
-    private static final ApplicationManagerException _defaultException = new ApplicationManagerException();
-    
+
+    /**
+     * @return unique instance of the default ApplicationManagerException.
+     */
     public static ApplicationManagerException getDefaultException()
     {
-        return _defaultException;
+        return DEFAULT_EXCEPTION;
     }
 }

@@ -480,6 +480,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
             needsUpdate = true;
             doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
         }
+        
+        String parent = doc.getParent();
+        if ((parent == null) || (parent.trim().equals(""))) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
+        }
 
         if (needsUpdate)
             context.getWiki().saveDocument(doc, context);
@@ -520,6 +526,12 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         if ((content == null) || (content.equals(""))) {
             needsUpdate = true;
             doc.setContent("#includeForm(\"XWiki.ClassSheet\")");
+        }
+        
+        String parent = doc.getParent();
+        if ((parent == null) || (parent.trim().equals(""))) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
         }
 
         if (needsUpdate)

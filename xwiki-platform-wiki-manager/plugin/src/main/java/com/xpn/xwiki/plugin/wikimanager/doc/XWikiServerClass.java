@@ -26,7 +26,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.objects.classes.UsersClass;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 
 public class XWikiServerClass extends AbstractSuperClass
@@ -174,16 +173,7 @@ public class XWikiServerClass extends AbstractSuperClass
 
         baseClass.setName(getClassFullName());
 
-        if (baseClass.addUsersField(FIELD_owner, FIELDPN_owner)) {
-            // TODO : move into addUserField with "multiselect" parameter
-            // http://jira.xwiki.org/jira/browse/XWIKI-1666 is applied in XWiki Core and when this
-            // starts depending on that version where it's applied.
-            UsersClass userclass = (UsersClass) baseClass.getField(FIELD_owner);
-            userclass.setMultiSelect(false);
-
-            needsUpdate = true;
-        }
-
+        needsUpdate |= baseClass.addUsersField(FIELD_owner, FIELDPN_owner, false);
         needsUpdate |= baseClass.addTextAreaField(FIELD_description, FIELDPN_description, 40, 5);
         needsUpdate |= baseClass.addTextField(FIELD_server, FIELDPN_server, 30);
         needsUpdate |=

@@ -35,10 +35,10 @@ public class XWikiServer extends DefaultSuperDocument
     {
         super(XWikiServerClass.getInstance(context), xdoc, context);
     }
-    
+
     public String getWikiName()
     {
-        return sclass.getItemDefaultName(getFullName(), context);
+        return sclass.getItemDefaultName(getFullName());
     }
 
     public void setWikiName(String wikiName)
@@ -108,6 +108,7 @@ public class XWikiServer extends DefaultSuperDocument
 
     /**
      * {@inheritDoc}
+     * 
      * @see Object#toString()
      */
     public String toString()

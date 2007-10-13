@@ -2091,8 +2091,39 @@ public class XWikiDocument
         el.addText(getParent());
         docel.add(el);
 
+        el = new DOMElement("creator");
+        el.addText(getCreator());
+        docel.add(el);
+
+        el = new DOMElement("author");
+        el.addText(getAuthor());
+        docel.add(el);
+
         el = new DOMElement("customClass");
         el.addText(getCustomClass());
+        docel.add(el);
+
+        el = new DOMElement("contentAuthor");
+        el.addText(getContentAuthor());
+        docel.add(el);
+
+        long d = getCreationDate().getTime();
+        el = new DOMElement("creationDate");
+        el.addText("" + d);
+        docel.add(el);
+
+        d = getDate().getTime();
+        el = new DOMElement("date");
+        el.addText("" + d);
+        docel.add(el);
+
+        d = getContentUpdateDate().getTime();
+        el = new DOMElement("contentUpdateDate");
+        el.addText("" + d);
+        docel.add(el);
+
+        el = new DOMElement("version");
+        el.addText(getVersion());
         docel.add(el);
 
         el = new DOMElement("title");
@@ -2176,37 +2207,6 @@ public class XWikiDocument
             } catch (XWikiException e) {
                 return null;
             }
-            docel.add(el);
-            
-            el = new DOMElement("creator");
-            el.addText(getCreator());
-            docel.add(el);
-
-            el = new DOMElement("author");
-            el.addText(getAuthor());
-            docel.add(el);
-            
-            el = new DOMElement("contentAuthor");
-            el.addText(getContentAuthor());
-            docel.add(el);
-
-            long d = getCreationDate().getTime();
-            el = new DOMElement("creationDate");
-            el.addText("" + d);
-            docel.add(el);
-
-            d = getDate().getTime();
-            el = new DOMElement("date");
-            el.addText("" + d);
-            docel.add(el);
-
-            d = getContentUpdateDate().getTime();
-            el = new DOMElement("contentUpdateDate");
-            el.addText("" + d);
-            docel.add(el);
-
-            el = new DOMElement("version");
-            el.addText(getVersion());
             docel.add(el);
         }
 

@@ -48,62 +48,62 @@ public class XWikiServer extends DefaultSuperDocument
 
     public String getOwner()
     {
-        return getStringValue(XWikiServerClass.FIELD_owner);
+        return getStringValue(XWikiServerClass.FIELD_OWNER);
     }
 
     public void setOwner(String owner)
     {
-        setStringValue(XWikiServerClass.FIELD_owner, owner);
+        setStringValue(XWikiServerClass.FIELD_OWNER, owner);
     }
 
     public String getDescription()
     {
-        return getStringValue(XWikiServerClass.FIELD_description);
+        return getStringValue(XWikiServerClass.FIELD_DESCRIPTION);
     }
 
     public void setDescription(String description)
     {
-        setLargeStringValue(XWikiServerClass.FIELD_description, description);
+        setLargeStringValue(XWikiServerClass.FIELD_DESCRIPTION, description);
     }
 
     public String getServer()
     {
-        return getStringValue(XWikiServerClass.FIELD_server);
+        return getStringValue(XWikiServerClass.FIELD_SERVER);
     }
 
     public void setServer(String server)
     {
-        setStringValue(XWikiServerClass.FIELD_server, server);
+        setStringValue(XWikiServerClass.FIELD_SERVER, server);
     }
 
     public String getVisibility()
     {
-        return getStringValue(XWikiServerClass.FIELD_visibility);
+        return getStringValue(XWikiServerClass.FIELD_VISIBILITY);
     }
 
     public void setVisibility(String visibility)
     {
-        setStringValue(XWikiServerClass.FIELD_visibility, visibility);
+        setStringValue(XWikiServerClass.FIELD_VISIBILITY, visibility);
     }
 
     public String getLanguage()
     {
-        return getStringValue(XWikiServerClass.FIELD_language);
+        return getStringValue(XWikiServerClass.FIELD_LANGUAGE);
     }
 
     public void setLanguage(String language)
     {
-        setStringValue(XWikiServerClass.FIELD_language, language);
+        setStringValue(XWikiServerClass.FIELD_LANGUAGE, language);
     }
 
     public String getState()
     {
-        return getStringValue(XWikiServerClass.FIELD_state);
+        return getStringValue(XWikiServerClass.FIELD_STATE);
     }
 
     public void setState(String state)
     {
-        setStringValue(XWikiServerClass.FIELD_state, state);
+        setStringValue(XWikiServerClass.FIELD_STATE, state);
     }
 
     /**

@@ -28,8 +28,108 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDoc
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 
+/**
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass}
+ * implementation for XWiki.XWikiServerClass class.
+ * 
+ * @version $Id: $
+ * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
+ * @see AbstractSuperClass
+ */
 public class XWikiServerClass extends AbstractSuperClass
 {
+    /**
+     * Name of field <code>owner</code>.
+     */
+    public static final String FIELD_OWNER = "owner";
+
+    /**
+     * Pretty name of field <code>owner</code>.
+     */
+    public static final String FIELDPN_OWNER = "Owner";
+
+    /**
+     * Name of field <code>description</code>.
+     */
+    public static final String FIELD_DESCRIPTION = "description";
+
+    /**
+     * Pretty name of field <code>description</code>.
+     */
+    public static final String FIELDPN_DESCRIPTION = "Description";
+
+    /**
+     * Name of field <code>server</code>.
+     */
+    public static final String FIELD_SERVER = "server";
+
+    /**
+     * Pretty name of field <code>server</code>.
+     */
+    public static final String FIELDPN_SERVER = "Server";
+
+    /**
+     * Name of field <code>visibility</code>.
+     */
+    public static final String FIELD_VISIBILITY = "visibility";
+
+    public static final String FIELDL_VISIBILITY_PUBLIC = "public";
+
+    public static final String FIELDL_VISIBILITY_PRIVATE = "private";
+
+    public static final String FIELDL_VISIBILITY_TEMPLATE = "template";
+
+    /**
+     * List of possible values for <code>visibility</code>.
+     */
+    public static final String FIELDL_VISIBILITY =
+        FIELDL_VISIBILITY_PUBLIC + "|" + FIELDL_VISIBILITY_PRIVATE + "|"
+            + FIELDL_VISIBILITY_TEMPLATE;
+
+    /**
+     * Pretty name of field <code>visibility</code>.
+     */
+    public static final String FIELDPN_VISIBILITY = "Visibility";
+
+    /**
+     * Name of field <code>state</code>.
+     */
+    public static final String FIELD_STATE = "state";
+
+    public static final String FIELDL_STATE_ACTIVE = "active";
+
+    public static final String FIELDL_STATE_INACTIVE = "inactive";
+
+    public static final String FIELDL_STATE_LOCKED = "locked";
+
+    /**
+     * List of possible values for <code>state</code>.
+     */
+    public static final String FIELDL_STATE =
+        FIELDL_STATE_ACTIVE + "|" + FIELDL_STATE_INACTIVE + "|" + FIELDL_STATE_LOCKED;
+
+    /**
+     * Pretty name of field <code>state</code>.
+     */
+    public static final String FIELDPN_STATE = "State";
+
+    /**
+     * Name of field <code>language</code>.
+     */
+    public static final String FIELD_LANGUAGE = "language";
+
+    /**
+     * List of possible values for <code>language</code>.
+     */
+    public static final String FIELDL_LANGUAGE = "en|fr";
+
+    /**
+     * Pretty name of field <code>language</code>.
+     */
+    public static final String FIELDPN_LANGUAGE = "Language";
+
+    // ///
+
     /**
      * Space of class document.
      */
@@ -42,99 +142,15 @@ public class XWikiServerClass extends AbstractSuperClass
 
     // ///
 
-    /**
-     * Name of field <code>owner</code>.
-     */
-    public static final String FIELD_owner = "owner";
+    private static XWikiServerClass instance;
 
     /**
-     * Pretty name of field <code>owner</code>.
+     * Default constructor for XWikiServerClass.
      */
-    public static final String FIELDPN_owner = "Owner";
-
-    /**
-     * Name of field <code>description</code>.
-     */
-    public static final String FIELD_description = "description";
-
-    /**
-     * Pretty name of field <code>description</code>.
-     */
-    public static final String FIELDPN_description = "Description";
-
-    /**
-     * Name of field <code>server</code>.
-     */
-    public static final String FIELD_server = "server";
-
-    /**
-     * Pretty name of field <code>server</code>.
-     */
-    public static final String FIELDPN_server = "Server";
-
-    /**
-     * Name of field <code>visibility</code>.
-     */
-    public static final String FIELD_visibility = "visibility";
-
-    public static final String FIELDL_visibility_public = "public";
-
-    public static final String FIELDL_visibility_private = "private";
-
-    public static final String FIELDL_visibility_template = "template";
-
-    /**
-     * List of possible values for <code>visibility</code>.
-     */
-    public static final String FIELDL_visibility =
-        FIELDL_visibility_public + "|" + FIELDL_visibility_private + "|"
-            + FIELDL_visibility_template;
-
-    /**
-     * Pretty name of field <code>visibility</code>.
-     */
-    public static final String FIELDPN_visibility = "Visibility";
-
-    /**
-     * Name of field <code>state</code>.
-     */
-    public static final String FIELD_state = "state";
-
-    public static final String FIELDL_state_active = "active";
-
-    public static final String FIELDL_state_inactive = "inactive";
-
-    public static final String FIELDL_state_locked = "locked";
-
-    /**
-     * List of possible values for <code>state</code>.
-     */
-    public static final String FIELDL_state =
-        FIELDL_state_active + "|" + FIELDL_state_inactive + "|" + FIELDL_state_locked;
-
-    /**
-     * Pretty name of field <code>state</code>.
-     */
-    public static final String FIELDPN_state = "State";
-
-    /**
-     * Name of field <code>language</code>.
-     */
-    public static final String FIELD_language = "language";
-
-    /**
-     * List of possible values for <code>language</code>.
-     */
-    public static final String FIELDL_language = "en|fr";
-
-    /**
-     * Pretty name of field <code>language</code>.
-     */
-    public static final String FIELDPN_language = "Language";
-
-    // ///
-
-    private static XWikiServerClass instance = null;
+    protected XWikiServerClass()
+    {
+        super(CLASS_SPACE, CLASS_PREFIX, false);
+    }
 
     /**
      * Return unique instance of XWikiServerClass and update documents for this context.
@@ -146,8 +162,9 @@ public class XWikiServerClass extends AbstractSuperClass
     public static XWikiServerClass getInstance(XWikiContext context) throws XWikiException
     {
         synchronized (XWikiServerClass.class) {
-            if (instance == null)
+            if (instance == null) {
                 instance = new XWikiServerClass();
+            }
         }
 
         instance.check(context);
@@ -156,15 +173,8 @@ public class XWikiServerClass extends AbstractSuperClass
     }
 
     /**
-     * Default constructor for XWikiServerClass.
-     */
-    private XWikiServerClass()
-    {
-        super(CLASS_SPACE, CLASS_PREFIX, false);
-    }
-
-    /**
      * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.util.AbstractSuperClass#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
      */
     protected boolean updateBaseClass(BaseClass baseClass)
@@ -173,18 +183,18 @@ public class XWikiServerClass extends AbstractSuperClass
 
         baseClass.setName(getClassFullName());
 
-        needsUpdate |= baseClass.addUsersField(FIELD_owner, FIELDPN_owner, false);
-        needsUpdate |= baseClass.addTextAreaField(FIELD_description, FIELDPN_description, 40, 5);
-        needsUpdate |= baseClass.addTextField(FIELD_server, FIELDPN_server, 30);
+        needsUpdate |= baseClass.addUsersField(FIELD_OWNER, FIELDPN_OWNER, false);
+        needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
+        needsUpdate |= baseClass.addTextField(FIELD_SERVER, FIELDPN_SERVER, 30);
         needsUpdate |=
-            baseClass.addStaticListField(FIELD_visibility, FIELDPN_visibility, FIELDL_visibility);
-        needsUpdate |= baseClass.addStaticListField(FIELD_state, FIELDPN_state, FIELDL_state);
+            baseClass.addStaticListField(FIELD_VISIBILITY, FIELDPN_VISIBILITY, FIELDL_VISIBILITY);
+        needsUpdate |= baseClass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
         needsUpdate |=
-            baseClass.addStaticListField(FIELD_language, FIELDPN_language, FIELDL_language);
+            baseClass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
 
         return needsUpdate;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -207,9 +217,10 @@ public class XWikiServerClass extends AbstractSuperClass
     {
         XWikiDocument doc = getItemDocument(wikiName, context);
 
-        if (validate && doc.isNew())
+        if (validate && doc.isNew()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST,
                 wikiName + " wiki server does not exist");
+        }
 
         return doc;
     }
@@ -220,12 +231,15 @@ public class XWikiServerClass extends AbstractSuperClass
         XWikiDocument doc = getItemDocument(wikiName, context);
 
         if (validate) {
-            if (doc.isNew())
+            if (doc.isNew()) {
                 throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST,
                     wikiName + " wiki server does not exist");
-            if (!doc.getStringValue(FIELD_visibility).equals(FIELDL_visibility_template))
+            }
+
+            if (!doc.getStringValue(FIELD_VISIBILITY).equals(FIELDL_VISIBILITY_TEMPLATE)) {
                 throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST,
                     wikiName + " wiki server template does not exist");
+            }
         }
 
         return doc;

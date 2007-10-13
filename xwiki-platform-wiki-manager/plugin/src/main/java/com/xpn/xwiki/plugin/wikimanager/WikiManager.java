@@ -49,20 +49,26 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @version $Id: $
  */
-public class WikiManager
+public final class WikiManager
 {
+    /**
+     * The logging tool.
+     */
     protected static final Log LOG = LogFactory.getLog(WikiManager.class);
 
     // ////////////////////////////////////////////////////////////////////////////
 
-    private WikiManager()
-    {
-    }
-
     /**
      * Unique instance of WikiManager.
      */
-    private static WikiManager _instance = null;
+    private static WikiManager instance;
+
+    /**
+     * Hidden constructor of WikiManager only access via getInstance().
+     */
+    private WikiManager()
+    {
+    }
 
     /**
      * @return a unique instance of WikiManager. Thread safe.
@@ -70,11 +76,12 @@ public class WikiManager
     public static WikiManager getInstance()
     {
         synchronized (WikiManager.class) {
-            if (_instance == null)
-                _instance = new WikiManager();
+            if (instance == null) {
+                instance = new WikiManager();
+            }
         }
 
-        return _instance;
+        return instance;
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -88,7 +95,8 @@ public class WikiManager
      * @param doc the document to save.
      * @param comment the comment to use when saving document.
      * @param context the XWiki Context.
-     * @throws XWikiException
+     * @throws XWikiException error when calling
+     *             {@link XWiki#saveDocument(XWikiDocument, String, XWikiContext)}.
      * @see com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)
      */
     public void saveDocument(String wikiName, XWikiDocument doc, String comment,
@@ -112,7 +120,7 @@ public class WikiManager
      * @param context the XWiki context.
      * @return the document with full name equals to <code>fullname</code> and wiki
      *         <code>wikiName</code>. If it dos not exist return new XWikiDocument.
-     * @throws XWikiException
+     * @throws XWikiException error when calling {@link XWiki#getDocument(String, XWikiContext)}}.
      * @see com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)
      */
     public XWikiDocument getDocument(String wikiName, String fullname, XWikiContext context)
@@ -137,7 +145,8 @@ public class WikiManager
      * @param context the XWiki context.
      * @return the list of documents that match the <code>wheresql</code> conditions. If nothing
      *         found return empty List.
-     * @throws XWikiException
+     * @throws XWikiException error when calling
+     *             {@link XWikiStoreInterface#searchDocuments(String, XWikiContext)}}.
      * @see XWikiStoreInterface#searchDocuments(String, XWikiContext)
      */
     public List searchDocuments(String wikiName, String wheresql, XWikiContext context)
@@ -164,8 +173,9 @@ public class WikiManager
             (ApplicationManagerPluginApi) context.getWiki().getPluginApi(
                 ApplicationManagerPlugin.PLUGIN_NAME, context);
 
-        if (appmanager == null)
+        if (appmanager == null) {
             return null;
+        }
 
         // //////////////////////////////////
         // Get documents to include
@@ -179,12 +189,13 @@ public class WikiManager
 
             XWikiApplication rootApp = appmanager.getRootApplication();
 
-            if (rootApp != null)
+            if (rootApp != null) {
                 docsToInclude = rootApp.getDocsNameToInclude(true);
-            else
+            } else {
                 docsToInclude =
                     XWikiApplication
                         .getDocsNameToInclude(appmanager.getApplicationDocumentList());
+            }
         } finally {
             context.setDatabase(database);
         }
@@ -199,8 +210,9 @@ public class WikiManager
             (ApplicationManagerPluginApi) context.getWiki().getPluginApi(
                 ApplicationManagerPlugin.PLUGIN_NAME, context);
 
-        if (appmanager == null)
+        if (appmanager == null) {
             return null;
+        }
 
         // //////////////////////////////////
         // Get documents to link
@@ -214,11 +226,12 @@ public class WikiManager
 
             XWikiApplication rootApp = appmanager.getRootApplication();
 
-            if (rootApp != null)
+            if (rootApp != null) {
                 docsToLink = rootApp.getDocsNameToLink(true);
-            else
+            } else {
                 docsToLink =
                     XWikiApplication.getDocsNameToLink(appmanager.getApplicationDocumentList());
+            }
         } finally {
             context.setDatabase(database);
         }
@@ -327,15 +340,17 @@ public class WikiManager
         String templateWikiName, String packageName, String comment, XWikiContext context)
         throws XWikiException
     {
-        if (userWikiSuperDoc.getOwner().length() == 0)
+        if (userWikiSuperDoc.getOwner().length() == 0) {
             throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USER_INACTIVE,
                 "Invalid user \"" + userWikiSuperDoc.getOwner() + "\"");
+        }
 
         XWiki xwiki = context.getWiki();
 
-        if (!xwiki.isVirtual())
+        if (!xwiki.isVirtual()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_XWIKI_NOT_VIRTUAL,
                 "XWiki is not in virtual mode. Make sure property \"xwiki.virtual\" is setted to \"xwiki.virtual=1\" in xwiki.cfg file");
+        }
 
         XWikiServerClass wikiClass = XWikiServerClass.getInstance(context);
 
@@ -352,18 +367,22 @@ public class WikiManager
 
             // User does not exist
             if (userdoc.isNew()) {
-                if (LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled()) {
                     LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                         + "user does not exist");
+                }
+
                 throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USER_DOES_NOT_EXIST,
                     "User \"" + userWikiSuperDoc.getOwner() + "\" does not exist");
             }
 
             // User is not active
             if (!(userdoc.getIntValue("XWiki.XWikiUsers", "active") == 1)) {
-                if (LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled()) {
                     LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                         + "user is not active");
+                }
+
                 throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USER_INACTIVE,
                     "User \"" + userWikiSuperDoc.getOwner() + "\" is not active");
             }
@@ -371,9 +390,11 @@ public class WikiManager
             // Wiki name forbidden
             String wikiForbiddenList = xwiki.Param("xwiki.virtual.reserved_wikis");
             if (Util.contains(newWikiName, wikiForbiddenList, ", ")) {
-                if (LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled()) {
                     LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                         + "wiki name is forbidden");
+                }
+
                 throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_WIKI_NAME_FORBIDDEN,
                     "Wiki name \"" + newWikiName + "\" forbidden");
             }
@@ -389,15 +410,18 @@ public class WikiManager
                 if (!docToSave.isNew() && wikiClass.isInstance(docToSave)) {
                     // If we are not allowed to continue if server page already exists
                     if (failOnExist) {
-                        if (LOG.isErrorEnabled())
+                        if (LOG.isErrorEnabled()) {
                             LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                                 + "wiki server page already exists");
+                        }
+
                         throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS,
                             "Wiki \"" + userWikiSuperDoc.getFullName()
                                 + "\" document already exist");
-                    } else if (LOG.isWarnEnabled())
+                    } else if (LOG.isWarnEnabled()) {
                         LOG.warn("Wiki creation (" + userWikiSuperDoc + ") failed: "
                             + "wiki server page already exists");
+                    }
 
                 }
 
@@ -406,27 +430,30 @@ public class WikiManager
                         docToSave, context);
 
                 // clear entry in virtual wiki cache
-                if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer()))
+                if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {
                     xwiki.getVirtualWikiMap().flushEntry(userWikiSuperDoc.getServer());
+                }
 
                 wikiSuperDocToSave.mergeBaseObject(userWikiSuperDoc);
-            } else
+            } else {
                 wikiSuperDocToSave = userWikiSuperDoc;
+            }
 
             // Create wiki database
             try {
                 xwiki.getStore().createWiki(newWikiName, context);
             } catch (XWikiException e) {
                 if (LOG.isErrorEnabled()) {
-                    if (e.getCode() == 10010)
+                    if (e.getCode() == 10010) {
                         LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                             + "wiki database already exists");
-                    else if (e.getCode() == 10011)
+                    } else if (e.getCode() == 10011) {
                         LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                             + "wiki database creation failed");
-                    else
+                    } else {
                         LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
                             + "wiki database creation threw exception", e);
+                    }
                 }
             } catch (Exception e) {
                 LOG.error("Wiki creation (" + userWikiSuperDoc + ") failed: "
@@ -442,8 +469,9 @@ public class WikiManager
             }
 
             String language = userWikiSuperDoc.getLanguage();
-            if (language.length() == 0)
+            if (language.length() == 0) {
                 language = null;
+            }
 
             // Copy base wiki
             if (templateWikiName != null) {
@@ -456,9 +484,10 @@ public class WikiManager
 
                 XWikiAttachment packFile = doc.getAttachment(packageName);
 
-                if (packFile == null)
+                if (packFile == null) {
                     throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI,
                         "Package " + packageName + " does not exists.");
+                }
 
                 // Import
                 PackageAPI importer =
@@ -474,9 +503,10 @@ public class WikiManager
 
                 context.setDatabase(newWikiName);
 
-                if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE)
+                if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
                     throw new WikiManagerException(WikiManagerException.ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI,
                         "Fail to install package " + packageName);
+                }
             }
 
             // Create user page in his wiki
@@ -621,7 +651,7 @@ public class WikiManager
     public List getWikiTemplateList(XWikiContext context) throws XWikiException
     {
         return XWikiServerClass.getInstance(context).searchItemDocumentsByField(
-            XWikiServerClass.FIELD_visibility, XWikiServerClass.FIELDL_visibility_template,
+            XWikiServerClass.FIELD_VISIBILITY, XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE,
             "StringProperty", context);
     }
 
@@ -641,7 +671,7 @@ public class WikiManager
     public void createWikiTemplate(XWikiServer wikiSuperDocument, String packageName,
         String comment, XWikiContext context) throws XWikiException
     {
-        wikiSuperDocument.setVisibility(XWikiServerClass.FIELDL_visibility_template);
+        wikiSuperDocument.setVisibility(XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE);
 
         // Create empty wiki
         WikiManager.getInstance().createNewWikiFromPackage(wikiSuperDocument, packageName, false,

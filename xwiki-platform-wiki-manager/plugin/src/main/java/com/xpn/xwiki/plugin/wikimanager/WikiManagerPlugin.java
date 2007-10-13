@@ -27,24 +27,42 @@ import com.xpn.xwiki.XWikiContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Entry point of the Wiki Manager plugin.
+ * 
+ * @version $Id: $
+ */
 public class WikiManagerPlugin extends XWikiDefaultPlugin
 {
+    /**
+     * Identifier of Wiki Manager plugin.
+     */
+    public static final String PLUGIN_NAME = "wikimanager";
+
+    // ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * The logging tool.
+     */
     protected static final Log LOG = LogFactory.getLog(WikiManagerPlugin.class);
 
     // ////////////////////////////////////////////////////////////////////////////
 
-    private static final String PLUGIN_NAME = "wikimanager";
-
-    // ////////////////////////////////////////////////////////////////////////////
-
+    /**
+     * Construction the entry point of the Wiki Manager plugin.
+     * 
+     * @param name the identifier of the plugin.
+     * @param className the class name of the entry point of the plugin.
+     * @param context the XWiki context.
+     */
     public WikiManagerPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
         init(context);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
@@ -53,8 +71,8 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
         return PLUGIN_NAME;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
      *      com.xpn.xwiki.XWikiContext)
@@ -64,8 +82,8 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
         return new WikiManagerPluginApi((WikiManagerPlugin) plugin, context);
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
      */

@@ -50,7 +50,7 @@ public class WikiManagerPluginApi extends PluginApi
     protected static final Log LOG = LogFactory.getLog(WikiManagerPluginApi.class);
 
     private XWikiExceptionApi defaultException;
-    
+
     private XWikiPluginMessageTool messageTool;
 
     public WikiManagerPluginApi(WikiManagerPlugin plugin, XWikiContext context)
@@ -59,8 +59,8 @@ public class WikiManagerPluginApi extends PluginApi
 
         this.defaultException =
             new XWikiExceptionApi(WikiManagerException.getDefaultException(), this.context);
-        
-     // Message Tool
+
+        // Message Tool
         Locale locale = (Locale) context.get("locale");
         ResourceBundle bundle =
             ResourceBundle.getBundle(getPlugin().getName() + "/ApplicationResources", locale);
@@ -84,24 +84,39 @@ public class WikiManagerPluginApi extends PluginApi
     public int createNewWiki(String wikiname, String templateWiki, String pkg,
         XWikiServer wikiSuperDocument, boolean failOnExist) throws XWikiException
     {
-        if (!hasAdminRights())
+        if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+        }
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         wikiSuperDocument.setWikiName(wikiname);
 
         // Some initializations dues to Velocity
-        if ("".equals(templateWiki))
+        if ("".equals(templateWiki)) {
             templateWiki = null;
+        }
 
         try {
-            if (templateWiki != null)
-                WikiManager.getInstance().createNewWikiFromTemplate(wikiSuperDocument, templateWiki, failOnExist, this.messageTool.get("wikimanager.plugin.createwikifromtemplate.comment", new String[] {wikiname, templateWiki}), this.context);
-            else if (pkg != null)
-                WikiManager.getInstance().createNewWikiFromPackage(wikiSuperDocument, pkg, failOnExist, this.messageTool.get("wikimanager.plugin.createwikifrompackage.comment", new String[] {wikiname, pkg}), this.context);
-            else
-                WikiManager.getInstance().createNewWiki(wikiSuperDocument, failOnExist, this.messageTool.get("wikimanager.plugin.createwiki.comment", wikiname), this.context);
+            if (templateWiki != null) {
+                WikiManager.getInstance().createNewWikiFromTemplate(
+                    wikiSuperDocument,
+                    templateWiki,
+                    failOnExist,
+                    this.messageTool.get("wikimanager.plugin.createwikifromtemplate.comment",
+                        new String[] {wikiname, templateWiki}), this.context);
+            } else if (pkg != null) {
+                WikiManager.getInstance().createNewWikiFromPackage(
+                    wikiSuperDocument,
+                    pkg,
+                    failOnExist,
+                    this.messageTool.get("wikimanager.plugin.createwikifrompackage.comment",
+                        new String[] {wikiname, pkg}), this.context);
+            } else {
+                WikiManager.getInstance().createNewWiki(wikiSuperDocument, failOnExist,
+                    this.messageTool.get("wikimanager.plugin.createwiki.comment", wikiname),
+                    this.context);
+            }
         } catch (WikiManagerException e) {
             LOG.error("Try to create wiki \"" + wikiSuperDocument + "\"", e);
 
@@ -116,8 +131,9 @@ public class WikiManagerPluginApi extends PluginApi
 
     public int deleteWiki(String wikiName) throws XWikiException
     {
-        if (!hasAdminRights())
+        if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+        }
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
@@ -140,8 +156,7 @@ public class WikiManagerPluginApi extends PluginApi
         XWikiServer doc = null;
 
         try {
-            doc =
-                WikiManager.getInstance().getWiki(wikiName, this.context, true);
+            doc = WikiManager.getInstance().getWiki(wikiName, this.context, true);
         } catch (WikiManagerException e) {
             LOG.error("Try to get wiki \"" + wikiName + "\" document", e);
 
@@ -153,7 +168,7 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
-     * Get the list of wiki associated to a given username
+     * Get the list of wiki associated to a given username.
      * 
      * @param username the name of the user that own the wikis to be retrieved
      * @return the list of wikis owned by the user
@@ -164,12 +179,13 @@ public class WikiManagerPluginApi extends PluginApi
         List listDocument = Collections.EMPTY_LIST;
 
         try {
-            listDocument = WikiManager.getInstance().getWikiList(/*username, */this.context);
+            listDocument = WikiManager.getInstance().getWikiList(/* username, */this.context);
         } catch (WikiManagerException e) {
-            if (username != null)
+            if (username != null) {
                 LOG.error("Try to get wikis documents for user \"" + username + "\"", e);
-            else
+            } else {
                 LOG.error("Try to get all wikis documents", e);
+            }
 
             this.context.put("lasterrorcode", new Integer(e.getCode()));
             this.context.put("lastexception", new XWikiExceptionApi(e, this.context));
@@ -179,7 +195,7 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
-     * Get all wikis
+     * Get all wikis.
      * 
      * @return a list of all the wikis
      * @throws XWikiException
@@ -190,19 +206,19 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
-     * Create empty wiki document
+     * Create empty wiki document.
      * 
      * @return Document Empty wiki document
      * @throws XWikiException
      */
     public XWikiServer createWikiDocument() throws XWikiException
     {
-        return (XWikiServer)XWikiServerClass.getInstance(context).newSuperDocument(context);
+        return (XWikiServer) XWikiServerClass.getInstance(context).newSuperDocument(context);
     }
 
     /**
      * Check if a Server of the given name exists in the master Wiki by checking if the
-     * "XWiki.XWikiServer{serverName}" document is new
+     * "XWiki.XWikiServer{serverName}" document is new.
      * 
      * @param wikiName the name of the server to be checked
      * @return true if server exists, false otherwise
@@ -256,23 +272,28 @@ public class WikiManagerPluginApi extends PluginApi
     public int createWikiTemplate(String templateName, String templateDescription,
         String packageName) throws XWikiException
     {
-        if (!hasAdminRights())
+        if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
+        }
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
-        XWikiServer wikiSuperDocument = (XWikiServer)XWikiServerClass.getInstance(context).newSuperDocument(context);
+        XWikiServer wikiSuperDocument =
+            (XWikiServer) XWikiServerClass.getInstance(context).newSuperDocument(context);
         wikiSuperDocument.setWikiName(templateName);
         wikiSuperDocument.setDescription(templateDescription);
 
         wikiSuperDocument.setServer(templateName + ".template.local");
 
-        wikiSuperDocument.setState(XWikiServerClass.FIELDL_state_active);
+        wikiSuperDocument.setState(XWikiServerClass.FIELDL_STATE_ACTIVE);
         wikiSuperDocument.setOwner(this.context.getUser());
 
         try {
-            WikiManager.getInstance().createWikiTemplate(wikiSuperDocument, packageName, this.messageTool.get("wikimanager.plugin.createwikitemplate.comment", new String[] {templateName, packageName}),
-                this.context);
+            WikiManager.getInstance().createWikiTemplate(
+                wikiSuperDocument,
+                packageName,
+                this.messageTool.get("wikimanager.plugin.createwikitemplate.comment",
+                    new String[] {templateName, packageName}), this.context);
         } catch (WikiManagerException e) {
             LOG.error("Try to create wiki template \"" + wikiSuperDocument + "\"", e);
 
@@ -290,8 +311,7 @@ public class WikiManagerPluginApi extends PluginApi
         XWikiServer doc = null;
 
         try {
-            doc =
-                WikiManager.getInstance().getWikiTemplate(wikiName, this.context, true);
+            doc = WikiManager.getInstance().getWikiTemplate(wikiName, this.context, true);
         } catch (WikiManagerException e) {
             LOG.error("Try to get wiki \"" + wikiName + "\" document", e);
 
@@ -302,7 +322,7 @@ public class WikiManagerPluginApi extends PluginApi
         return doc;
     }
 
-    /** 
+    /**
      * @return all the template wiki. Wiki with "visibility" field equals to "template".
      * @throws XWikiException
      */
@@ -312,7 +332,7 @@ public class WikiManagerPluginApi extends PluginApi
 
         try {
             List listXWikiDocument = WikiManager.getInstance().getWikiTemplateList(this.context);
-            
+
             for (Iterator it = listXWikiDocument.iterator(); it.hasNext();) {
                 XWikiDocument doc = (XWikiDocument) it.next();
                 listDocument.add(doc.newDocument(this.context));

@@ -271,12 +271,12 @@ public class XWikiApplicationClass extends AbstractSuperClass
     {
         boolean needsUpdate = false;
 
-        if ((DEFAULT_APPLICATION_PARENT).equals(doc.getParent())) {
+        if (!(DEFAULT_APPLICATION_PARENT).equals(doc.getParent())) {
             doc.setParent(DEFAULT_APPLICATION_PARENT);
             needsUpdate = true;
         }
 
-        if (DEFAULT_APPLICATION_VERSION.equals(doc.getStringValue(getClassFullName(),
+        if (!DEFAULT_APPLICATION_VERSION.equals(doc.getStringValue(getClassFullName(),
             FIELD_APPVERSION))) {
             doc.setStringValue(getClassFullName(), FIELD_APPVERSION, DEFAULT_APPLICATION_VERSION);
             needsUpdate = true;

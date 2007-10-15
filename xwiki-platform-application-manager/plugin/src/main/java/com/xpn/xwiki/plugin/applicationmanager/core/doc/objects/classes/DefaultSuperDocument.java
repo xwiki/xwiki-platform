@@ -41,6 +41,21 @@ import com.xpn.xwiki.objects.BaseObject;
 public class DefaultSuperDocument extends Document implements SuperDocument
 {
     /**
+     * Value in int for {@link Boolean#TRUE}.
+     */
+    private static final int BOOLEANFIELD_TRUE = 1;
+
+    /**
+     * Value in int for {@link Boolean#FALSE}.
+     */
+    private static final int BOOLEANFIELD_FALSE = 0;
+    
+    /**
+     * Value in int for {@link Boolean} = null.
+     */
+    private static final int BOOLEANFIELD_MAYBE = 2;
+
+    /**
      * The class manager for this document.
      */
     protected SuperClass sclass;
@@ -269,5 +284,65 @@ public class DefaultSuperDocument extends Document implements SuperDocument
     public void setListValue(String fieldName, List value)
     {
         getDoc().setStringListValue(this.sclass.getClassFullName(), fieldName, value);
+    }
+
+    /**
+     * Get the value of the field <code>fieldName</code> of the class "XWikiApplicationClass".
+     * 
+     * @param fieldName the name of the field from the class "XWikiApplicationClass" where to find
+     *            the value.
+     * @return the value in int of the field <code>fieldName</code> of the class
+     *         "XWikiApplicationClass".
+     * @see com.xpn.xwiki.doc.XWikiDocument#getListValue(java.lang.String)
+     */
+    public int getIntValue(String fieldName)
+    {
+        return this.doc.getIntValue(this.sclass.getClassFullName(), fieldName);
+    }
+
+    /**
+     * Modify the value of the field <code>fieldName</code> of the class "XWikiApplicationClass".
+     * 
+     * @param fieldName the name of the field from the class "XWikiApplicationClass" where to find
+     *            the value.
+     * @param value the new value of the field <code>fieldName</code> of the class
+     *            "XWikiApplicationClass".
+     * @see com.xpn.xwiki.doc.XWikiDocument#setIntValue(String, String, int)
+     */
+    public void setIntValue(String fieldName, int value)
+    {
+        getDoc().setIntValue(this.sclass.getClassFullName(), fieldName, value);
+    }
+
+    /**
+     * Get the value of the field <code>fieldName</code> of the class "XWikiApplicationClass".
+     * 
+     * @param fieldName the name of the field from the class "XWikiApplicationClass" where to find
+     *            the value.
+     * @return the value in {@link Boolean} of the field <code>fieldName</code> of the class
+     *         "XWikiApplicationClass".
+     * @see com.xpn.xwiki.doc.XWikiDocument#getListValue(java.lang.String)
+     */
+    public Boolean getBooleanValue(String fieldName)
+    {
+        int intValue = getIntValue(fieldName);
+
+        return intValue == BOOLEANFIELD_TRUE ? Boolean.TRUE : (intValue == BOOLEANFIELD_FALSE
+            ? Boolean.FALSE : null);
+    }
+
+    /**
+     * Modify the value of the field <code>fieldName</code> of the class "XWikiApplicationClass".
+     * 
+     * @param fieldName the name of the field from the class "XWikiApplicationClass" where to find
+     *            the value.
+     * @param value the new value of the field <code>fieldName</code> of the class
+     *            "XWikiApplicationClass".
+     * @see com.xpn.xwiki.doc.XWikiDocument#setIntValue(String, String, int)
+     */
+    public void setBooleanValue(String fieldName, Boolean value)
+    {
+        setIntValue(fieldName, value == null ? BOOLEANFIELD_MAYBE : (value.booleanValue()
+            ? BOOLEANFIELD_TRUE : BOOLEANFIELD_FALSE));
     }
 }

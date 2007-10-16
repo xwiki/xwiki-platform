@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1191854809000</creationDate>
-<date>1191860750000</date>
-<contentUpdateDate>1191860750000</contentUpdateDate>
-<version>1.9</version>
+<date>1192542007000</date>
+<contentUpdateDate>1192542007000</contentUpdateDate>
+<version>1.10</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -114,7 +114,7 @@
   #if(!$allwikilist.isEmpty())
     #foreach($wikidoc in $allwikilist)
       #if($wikidoc.owner == $context.user)
-        #displaymodification("http://$wikidoc.server" "http://$wikidoc.server" $wikidoc.creationDate $formatDate $wikidoc.creator true)
+        #displaymodification($wikidoc.wikiName $wikidoc.homePageUrl $wikidoc.creationDate $formatDate $wikidoc.creator true)
       #end
     #end
   #end

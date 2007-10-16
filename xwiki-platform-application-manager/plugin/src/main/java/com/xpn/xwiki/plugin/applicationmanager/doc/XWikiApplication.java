@@ -34,7 +34,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultS
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * This class manage an XWiki document containing XWiki.XWikiApplicationClass object. It add some
+ * This class manage an XWiki document containing XApp.XWikiApplicationClass object. It add some
  * specifics methods, getters and setters for this type of object and fields.
  * 
  * @version $Id: $
@@ -57,7 +57,7 @@ public class XWikiApplication extends DefaultSuperDocument
      *             <li>getting XWikiApplicationClass instance.</li>
      *             <li>or when calling {@link #reload(XWikiContext)}</li>
      *             </ul>
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
+     * @see DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
      *      XWikiDocument, XWikiContext)
      */
     public XWikiApplication(XWikiDocument xdoc, XWikiContext context) throws XWikiException

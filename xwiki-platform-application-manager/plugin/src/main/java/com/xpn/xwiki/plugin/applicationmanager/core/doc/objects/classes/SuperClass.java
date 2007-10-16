@@ -41,12 +41,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  *       this class.
  */
 public interface SuperClass
-{
-    /**
-     * The separator between space name and document name in document full name.
-     */
-    String SPACE_DOC_SEPARATOR = ".";
-    
+{   
     /**
      * Default suffix for the document containing the class.
      */

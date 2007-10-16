@@ -27,6 +27,15 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
     }
 
     /**
+     * @param bundle the default Resource Bundle to fall back to if no document bundle is found when
+     *            trying to get a key
+     */
+    public XWikiPluginMessageTool(ResourceBundle bundle)
+    {
+        super(bundle, null);
+    }
+
+    /**
      * {@inheritDoc}
      * <p>
      * Start calling <code>context</code>'s {@link XWikiMessageTool#get(String)} then if nothing
@@ -36,9 +45,14 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
      */
     protected String getTranslation(String key)
     {
-        String translation = this.context.getMessageTool().get(key);
+        String translation = key;
+        
+        if (context != null) {
+            translation = this.context.getMessageTool().get(key);
+        }
 
-        // Want to know if XWikiMessageTool.get return excatly what it get means it found nothing
+        // Want to know if XWikiMessageTool.get return exactly the provided key string (means it
+        // found nothing).
         if (translation == key) {
             try {
                 translation = this.bundle.getString(key);

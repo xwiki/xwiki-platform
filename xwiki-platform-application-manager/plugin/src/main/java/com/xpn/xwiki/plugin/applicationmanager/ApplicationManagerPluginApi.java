@@ -142,12 +142,12 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <p>
      *         Error codes can be :
      *         <ul>
-     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : method succeed with no error.</li>
      *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
-     *         rights to do this action.
+     *         rights to do this action.</li>
      *         <li>
-     *         {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS} :
-     *         application descriptor already exists.
+     *         {@link ApplicationManagerException#ERROR_AM_APPDOCALREADYEXISTS} :
+     *         application descriptor already exists.</li>
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
      */
@@ -190,7 +190,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
      *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
      *         rights to do this action.
-     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         <li> {@link ApplicationManagerException#ERROR_AM_DOESNOTEXIST} :
      *         provided application does not exist.
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
@@ -245,7 +245,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
      *         {@link #CONTEXT_LASTEXCEPTION} field. Error codes can be :
      *         <ul>
-     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         <li> {@link ApplicationManagerException#ERROR_AM_DOESNOTEXIST} :
      *         provided application does not exist.
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
@@ -277,7 +277,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         Error codes can be :
      *         <ul>
      *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
-     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         <li> {@link ApplicationManagerException#ERROR_AM_DOESNOTEXIST} :
      *         provided application does not exist.
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
@@ -301,7 +301,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         Error codes can be :
      *         <ul>
      *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
-     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         <li> {@link ApplicationManagerException#ERROR_AM_DOESNOTEXIST} :
      *         provided application does not exist.
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
@@ -341,7 +341,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
      *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
      *         rights to do this action.
-     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         <li> {@link ApplicationManagerException#ERROR_AM_DOESNOTEXIST} :
      *         provided application does not exist.
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
@@ -388,7 +388,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
      *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have
      *         rights to do this action.
-     *         <li> {@link ApplicationManagerException#ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST} :
+     *         <li> {@link ApplicationManagerException#ERROR_AM_DOESNOTEXIST} :
      *         provided application does not exist.
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.

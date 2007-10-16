@@ -35,14 +35,14 @@ public class ApplicationManagerException extends PluginException
     public static final int MODULE_PLUGIN_APPLICATIONMANAGER = 60;
 
     /**
-     * Error used when trying to create application descriptor that already exist in the database.
+     * Error when trying to create application descriptor that already exist in the database.
      */
-    public static final int ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS = 60010;
+    public static final int ERROR_AM_APPDOCALREADYEXISTS = 60010;
 
     /**
      * Error when trying to get application descriptor that does not exist in the database.
      */
-    public static final int ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST = 60011;
+    public static final int ERROR_AM_DOESNOTEXIST = 60011;
     
     /**
      * The default ApplicationManagerException.

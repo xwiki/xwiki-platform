@@ -29,8 +29,12 @@ import com.xpn.xwiki.plugin.PluginException;
  */
 public class WikiManagerException extends PluginException
 {
-    // TODO : move in XWikiException
-    public static final int ERROR_XWIKI_USER_DOES_NOT_EXIST = 50091;
+    /**
+     * Error when trying to use provided user that does not exists.
+     * <p>
+     * TODO : move in XWikiException
+     */
+    public static final int ERROR_XWIKI_USERDOESNOTEXIST = 50091;
 
     // //////
 
@@ -39,15 +43,47 @@ public class WikiManagerException extends PluginException
      */
     public static final int MODULE_PLUGIN_WIKIMANAGER = 50;
 
-    public static final int ERROR_WIKIMANAGER_CANNOT_CREATE_WIKI = 50032;
+    /**
+     * Error when trying to create wiki descriptor that already exists.
+     */
+    public static final int ERROR_WM_WIKIALREADYEXISTS = 50033;
 
-    public static final int ERROR_WIKIMANAGER_SERVER_DOES_NOT_EXIST = 50034;
+    /**
+     * Error when trying to use a provide wiki descriptor that does not exist.
+     */
+    public static final int ERROR_WM_WIKIDOESNOTEXISTS = 50034;
 
-    public static final int ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS = 50020;
+    /**
+     * Error when trying to update the database/schema.
+     */
+    public static final int ERROR_WM_UPDATEDATABASE = 50035;
 
-    public static final int ERROR_WIKIMANAGER_WIKI_NAME_FORBIDDEN = 50035;
+    /**
+     * Error when trying to create a wiki with a forbidden provided name.
+     */
+    public static final int ERROR_WM_WIKINAMEFORBIDDEN = 50036;
 
-    public static final int ERROR_WIKIMANAGER_XWIKI_NOT_VIRTUAL = 50036;
+    /**
+     * Error when trying to execute action that need xwiki engine to be in virtual mode and is not.
+     */
+    public static final int ERROR_WM_XWIKINOTVIRTUAL = 50037;
+
+    /**
+     * Error when trying to get an attached XAR package that does not exists.
+     */
+    public static final int ERROR_WM_PACKAGEDOESNOTEXISTS = 50038;
+
+    /**
+     * Error when trying to load a XAR package file in a list of
+     * {@link com.xpn.xwiki.doc.XWikiDocument}.
+     */
+    public static final int ERROR_WM_PACKAGEIMPORT = 50039;
+
+    /**
+     * Error when trying to insert in wiki a loaded XAR package list of
+     * {@link com.xpn.xwiki.doc.XWikiDocument}.
+     */
+    public static final int ERROR_WM_PACKAGEINSTALL = 50040;
 
     // //////
 

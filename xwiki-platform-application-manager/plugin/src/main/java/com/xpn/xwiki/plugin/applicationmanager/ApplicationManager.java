@@ -196,7 +196,7 @@ public final class ApplicationManager
                 }
 
                 throw new ApplicationManagerException(
-                    ApplicationManagerException.ERROR_APPLICATIONMANAGER_APPDOC_ALREADY_EXISTS,
+                    ApplicationManagerException.ERROR_AM_APPDOCALREADYEXISTS,
                     "Application \"" + userAppSuperDoc.getAppName() + "\" document already exist");
             } else if (LOG.isWarnEnabled()) {
                 LOG.warn("Application creation (" + userAppSuperDoc

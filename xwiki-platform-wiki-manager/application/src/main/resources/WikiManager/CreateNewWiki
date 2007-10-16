@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186669764000</creationDate>
-<date>1189428823000</date>
-<contentUpdateDate>1189614079000</contentUpdateDate>
-<version>1.1</version>
+<date>1192542613000</date>
+<contentUpdateDate>1192542613000</contentUpdateDate>
+<version>1.7</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -65,6 +65,7 @@
 
 #set($wikiname = $request.getParameter("wikiname"))
 #set($wikitemplate = $request.getParameter("wikitemplate"))
+#set($wikipackage = $request.getParameter("wikipackage"))
 #if ($wikidocument.owner == "")
   $wikidocument.set("owner", $context.user)
 #end
@@ -77,7 +78,7 @@
 1 $msg.get("wikimanager.createwiki")
 
 #if ($action &amp;&amp; $action == "create")
-  #set($result = $wikimanager.createNewWiki($wikiname, $wikitemplate, $wikidocument, true))
+  #set($result = $wikimanager.createNewWiki($wikiname, $wikitemplate, $wikipackage, $wikidocument, true))
 
   #if ($result == $Exception.ERROR_NOERROR)
     &lt;font color=green&gt;
@@ -85,10 +86,8 @@
     &lt;/font&gt;
   #else
     &lt;font color=red&gt;
-      #if ($result == $Exception.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS)
-        $msg.get("wikimanager.errorcreatewiki.ERROR_WIKIMANAGER_WIKISERVER_ALREADY_EXISTS", [$wikiname, $result])
-      #elseif ($result == $Exception.ERROR_XWIKI_USER_INACTIVE)
-        $msg.get("error.ERROR_XWIKI_USER_INACTIVE")
+      #if ($result == $Exception.ERROR_WM_WIKIALREADYEXISTS)
+        $msg.get("wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS", [$wikiname, $result])
       #else
         $msg.get("wikimanager.errorcreatewiki", [$wikiname, $result])
       #end
@@ -141,7 +140,7 @@
           &lt;option value=""&gt;&lt;/option&gt;
           #set($listtemplate=$wikimanager.getWikiTemplateList())
           #foreach ($template in $listtemplate)
-            &lt;option value="$wikimanager.getWikiName($template)"&gt;$wikimanager.getWikiName($template)&lt;/option&gt;
+            &lt;option value="$template.wikiName"&gt;$template.wikiName&lt;/option&gt;
           #end
         &lt;/select&gt;
       &lt;/td&gt;

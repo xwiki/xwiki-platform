@@ -39,7 +39,7 @@
     #elseif($context.action == "view" && $prop.name == "applications")
       <dd>
         #foreach($appname in $app.getApplications())
-          [$appname>$Appmanager.getApplicationDocument($object.appname).fullName]
+          [$appname>$Appmanager.getApplicationDocument($appname).fullName]
         #end
       </dd>
     #else

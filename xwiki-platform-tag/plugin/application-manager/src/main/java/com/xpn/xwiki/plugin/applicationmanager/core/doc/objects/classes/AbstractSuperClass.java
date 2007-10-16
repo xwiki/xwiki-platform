@@ -215,18 +215,18 @@ public abstract class AbstractSuperClass implements SuperClass
 
         classSpace = dispatch ? classSpacePrefix + XWIKI_CLASS_SPACE_SUFFIX : classSpacePrefix;
         className = classPrefix + XWIKI_CLASS_SUFFIX;
-        classFullName = classSpace + SuperClass.SPACE_DOC_SEPARATOR + className;
+        classFullName = classSpace + SuperDocument.SPACE_DOC_SEPARATOR + className;
 
         classSheetSpace =
             dispatch ? classSpacePrefix + XWIKI_CLASSSHEET_SPACE_SUFFIX : classSpacePrefix;
         classSheetName = classPrefix + XWIKI_CLASSSHEET_SUFFIX;
-        classSheetFullName = classSheetSpace + SuperClass.SPACE_DOC_SEPARATOR + classSheetName;
+        classSheetFullName = classSheetSpace + SuperDocument.SPACE_DOC_SEPARATOR + classSheetName;
 
         classTemplateSpace =
             dispatch ? classSpacePrefix + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : classSpacePrefix;
         classTemplateName = classPrefix + XWIKI_CLASSTEMPLATE_SUFFIX;
         classTemplateFullName =
-            classTemplateSpace + SuperClass.SPACE_DOC_SEPARATOR + classTemplateName;
+            classTemplateSpace + SuperDocument.SPACE_DOC_SEPARATOR + classTemplateName;
 
         classSheetDefaultContent =
             "## you can modify this page to customize the presentation of your object\n\n"
@@ -637,7 +637,7 @@ public abstract class AbstractSuperClass implements SuperClass
      */
     public String getItemDocumentDefaultFullName(String itemName, XWikiContext context)
     {
-        return getClassSpacePrefix() + SuperClass.SPACE_DOC_SEPARATOR
+        return getClassSpacePrefix() + SuperDocument.SPACE_DOC_SEPARATOR
             + getItemDocumentDefaultName(itemName, context);
     }
 
@@ -649,7 +649,7 @@ public abstract class AbstractSuperClass implements SuperClass
     public String getItemDefaultName(String docFullName)
     {
         return docFullName.substring(
-            (getClassSpacePrefix() + SuperClass.SPACE_DOC_SEPARATOR + getClassPrefix()).length())
+            (getClassSpacePrefix() + SuperDocument.SPACE_DOC_SEPARATOR + getClassPrefix()).length())
             .toLowerCase();
     }
 

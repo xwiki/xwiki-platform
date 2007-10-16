@@ -50,7 +50,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
     /**
      * Default list separators of XAppClasses.XWikiApplicationClass fields.
      */
-    public static final String FIELDS_DESCRIPTION = "|";
+    public static final String DEFAULT_FIELDS = "|";
 
     /**
      * Name of field <code>appname</code> for the XWiki class XAppClasses.XWikiApplicationClass.
@@ -237,27 +237,27 @@ public class XWikiApplicationClass extends AbstractSuperClass
 
         needsUpdate |=
             baseClass.addStaticListField(FIELD_DEPENDENCIES, FIELDPN_DEPENDENCIES, 80, true, "",
-                DEFAULT_FIELDDT, FIELDS_DESCRIPTION);
+                DEFAULT_FIELDDT, DEFAULT_FIELDS);
 
         needsUpdate |=
             baseClass.addStaticListField(FIELD_APPLICATIONS, FIELDPN_APPLICATIONS, 80, true, "",
-                DEFAULT_FIELDDT, FIELDS_DESCRIPTION);
+                DEFAULT_FIELDDT, DEFAULT_FIELDS);
 
         needsUpdate |=
             baseClass.addStaticListField(FIELD_DOCUMENTS, FIELDPN_DOCUMENTS, 80, true, "",
-                DEFAULT_FIELDDT, FIELDS_DESCRIPTION);
+                DEFAULT_FIELDDT, DEFAULT_FIELDS);
 
         needsUpdate |=
             baseClass.addStaticListField(FIELD_DOCSTOINCLUDE, FIELDPN_DOCSTOINCLUDE, 80, true,
-                "", DEFAULT_FIELDDT, FIELDS_DESCRIPTION);
+                "", DEFAULT_FIELDDT, DEFAULT_FIELDS);
 
         needsUpdate |=
             baseClass.addStaticListField(FIELD_DOCSTOLINK, FIELDPN_DOCSTOLINK, 80, true, "",
-                DEFAULT_FIELDDT, FIELDS_DESCRIPTION);
+                DEFAULT_FIELDDT, DEFAULT_FIELDS);
 
         needsUpdate |=
             baseClass.addStaticListField(FIELD_TRANSLATIONDOCS, FIELDPN_TRANSLATIONDOCS, 80,
-                true, "", DEFAULT_FIELDDT, FIELDS_DESCRIPTION);
+                true, "", DEFAULT_FIELDDT, DEFAULT_FIELDS);
 
         return needsUpdate;
     }
@@ -291,9 +291,9 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * 
      * @param appName the name of the application.
      * @param context the XWiki context.
-     * @param validate indicate if it return new XWikiDocument or throw exception if application
-     *            descriptor does not exist.
-     * @return the XWikiDocument representing application descriptor.
+     * @param validate indicate if it return new {@link XWikiDocument} or throw exception if
+     *            application descriptor does not exist.
+     * @return the {@link XWikiDocument} representing application descriptor.
      * @throws XWikiException error when searching for application descriptor document.
      * @see #getApplication(String, XWikiContext, boolean)
      */
@@ -309,7 +309,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
         if (listApp.size() == 0) {
             if (validate) {
                 throw new ApplicationManagerException(
-                    ApplicationManagerException.ERROR_APPLICATIONMANAGER_DOES_NOT_EXIST,
+                    ApplicationManagerException.ERROR_AM_DOESNOTEXIST,
                     appName + " application does not exist");
             } else {
                 return xwiki.getDocument(getItemDocumentDefaultFullName(appName, context),

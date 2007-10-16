@@ -33,6 +33,16 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface SuperDocument
 {
     /**
+     * The separator between space name and document name in document full name.
+     */
+    String SPACE_DOC_SEPARATOR = ".";
+    
+    /**
+     * The separator between wiki name and space name and document extended full name.
+     */
+    String WIKI_SPACE_SEPARATOR = ":";
+    
+    /**
      * Reload XWiki document from database using Document full name.
      * 
      * @param context the XWiki context.

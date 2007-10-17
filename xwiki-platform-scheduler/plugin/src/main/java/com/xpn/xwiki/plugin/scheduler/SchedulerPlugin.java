@@ -186,9 +186,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             data.put("xjob", object);
 
             // We offer the Job a wrapped copy of the request context and of the XWiki API
-            Context copy = new Context((XWikiContext) context.clone());
+            XWikiContext cloneContext = (XWikiContext) context.clone();
+            Context copy = new Context(cloneContext);
             data.put("context", copy);
-            data.put("xwiki", new com.xpn.xwiki.api.XWiki(copy.getXWiki(), copy.getContext()));
+            data.put("xwiki", new com.xpn.xwiki.api.XWiki(cloneContext.getWiki(), cloneContext));
 
             job.setJobDataMap(data);
 

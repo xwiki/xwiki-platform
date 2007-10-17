@@ -78,6 +78,11 @@ public abstract class AbstractSuperClass implements SuperClass
     private static final String HQL_PROTECT_STRING = "'";
 
     /**
+     * String that replace {@link #HQL_PROTECT_STRING} in value strings.
+     */
+    private static final String HQL_I_PROTECT_STRING = "\\'";
+
+    /**
      * Space prefix of class document.
      * 
      * @see #getClassSpace()
@@ -649,8 +654,8 @@ public abstract class AbstractSuperClass implements SuperClass
     public String getItemDefaultName(String docFullName)
     {
         return docFullName.substring(
-            (getClassSpacePrefix() + SuperDocument.SPACE_DOC_SEPARATOR + getClassPrefix()).length())
-            .toLowerCase();
+            (getClassSpacePrefix() + SuperDocument.SPACE_DOC_SEPARATOR + getClassPrefix())
+                .length()).toLowerCase();
     }
 
     /**
@@ -703,9 +708,38 @@ public abstract class AbstractSuperClass implements SuperClass
     public List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
         XWikiContext context) throws XWikiException
     {
-        String[][] fieldDescriptors = new String[][] {{fieldType, fieldName, fieldValue}};
+        String[][] fieldDescriptors = new String[][] {{fieldName, fieldType, fieldValue}};
 
         return searchItemDocumentsByFields(null, fieldDescriptors, context);
+    }
+
+    /**
+     * Protect a {@link String} value used in Hql request.
+     * 
+     * @param value the value to protect.
+     * @return the protected version of <code>value</code>.
+     */
+    private String hqlProtectValue(String value)
+    {
+        return hqlProtectValue(value, false);
+    }
+    
+    /**
+     * Protect a {@link String} value used in Hql request.
+     * 
+     * @param value the value to protect.
+     * @param toLower if true <code>toLower</code> is lowered.
+     * @return the protected version of <code>value</code>.
+     */
+    private String hqlProtectValue(String value, boolean toLower)
+    {
+        String protectedValue = value.replace(HQL_PROTECT_STRING, HQL_I_PROTECT_STRING);
+
+        if (toLower) {
+            protectedValue = protectedValue.toLowerCase();
+        }
+
+        return HQL_PROTECT_STRING + protectedValue + HQL_PROTECT_STRING;
     }
 
     /**
@@ -719,37 +753,46 @@ public abstract class AbstractSuperClass implements SuperClass
     {
         check(context);
 
-        String from = ", BaseObject as obj";
+        StringBuffer from = new StringBuffer(", BaseObject as obj");
 
         StringBuffer where =
-            new StringBuffer(" where doc.fullName=obj.name" + " and obj.className="
-                + HQL_PROTECT_STRING + getClassFullName() + HQL_PROTECT_STRING);
+            new StringBuffer(" where doc.fullName=obj.name and obj.className="
+                + hqlProtectValue(getClassFullName()));
 
         if (docFullName != null) {
-            where
-                .append(" and obj.name=" + HQL_PROTECT_STRING + docFullName + HQL_PROTECT_STRING);
+            where.append(" and obj.name=" + hqlProtectValue(docFullName));
         } else {
-            where.append(" and obj.name<>" + HQL_PROTECT_STRING + getClassTemplateFullName()
-                + HQL_PROTECT_STRING);
+            where.append(" and obj.name<>" + hqlProtectValue(getClassTemplateFullName()));
         }
 
         if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {
-                from += ", " + fieldDescriptors[i][0] + " as field" + i;
+                String fieldName = fieldDescriptors[i][0];
+                String type = fieldDescriptors[i][1];
+                String value = fieldDescriptors[i][2];
 
-                String fieldPrefix = "field" + i;
-                String andSymbol = " and ";
-                
-                where.append(andSymbol + "obj.id=" + fieldPrefix + ".id.id");
-                
-                where.append(andSymbol + fieldPrefix + ".id.name=" + HQL_PROTECT_STRING
-                    + fieldDescriptors[i][1] + HQL_PROTECT_STRING);
-                where.append(andSymbol + fieldPrefix + ".id.value=" + HQL_PROTECT_STRING
-                    + fieldDescriptors[i][2] + HQL_PROTECT_STRING);
+                if (type != null) {
+                    String fieldPrefix = "field" + i;
+
+                    from.append(", " + type + " as " + fieldPrefix);
+
+                    String andSymbol = " and ";
+
+                    where.append(andSymbol + "obj.id=" + fieldPrefix + ".id.id");
+
+                    where.append(andSymbol + fieldPrefix + ".name="
+                        + hqlProtectValue(fieldName));
+                    where.append(andSymbol + "lower(" + fieldPrefix + ".value)="
+                        + hqlProtectValue(value, true));
+                } else {
+                    where.append(" and lower(doc." + fieldName + ")="
+                        + hqlProtectValue(value, true));
+                }
             }
         }
 
-        return context.getWiki().getStore().searchDocuments(from + where, context);
+        return context.getWiki().getStore().searchDocuments(from.append(where).toString(),
+            context);
     }
 
     /**

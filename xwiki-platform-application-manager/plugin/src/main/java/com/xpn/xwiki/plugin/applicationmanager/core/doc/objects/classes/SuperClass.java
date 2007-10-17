@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  *       this class.
  */
 public interface SuperClass
-{   
+{
     /**
      * Default suffix for the document containing the class.
      */
@@ -288,7 +288,8 @@ public interface SuperClass
      * Search in instances of this document class.
      * 
      * @param docFullName the full name of the document. If Null, it is not consider.
-     * @param fieldDescriptors the list of fields name/value constraints.
+     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
+     *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
      * @param context the XWiki context.
      * @return the list of found XWikiDocuments.
      * @throws XWikiException error when searching for documents from in database.

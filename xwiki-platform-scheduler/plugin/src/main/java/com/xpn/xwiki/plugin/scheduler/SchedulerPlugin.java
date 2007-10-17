@@ -90,7 +90,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             setScheduler(getDefaultSchedulerInstance());
             setStatusListener();
             getScheduler().start();
-            restaureExistingJobs(context);
+            restoreExistingJobs(context);
         } catch (SchedulerException e) {
             LOG.error("Failed to start the scheduler", e);
         } catch (SchedulerPluginException e) {
@@ -110,14 +110,14 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Restaure the existing job, by looking up for such job in the database and re-scheduling those
+     * Restore the existing job, by looking up for such job in the database and re-scheduling those
      * according to their stored status. If a Job is stored with the status "Normal", it is just
      * scheduled If a Job is stored with the status "Paused", then it is both scheduled and paused
      * Jobs with other status (None, Complete) are not rescheduled.
      *
      * @param context The XWikiContext when initializing the plugin
      */
-    private void restaureExistingJobs(XWikiContext context) throws SchedulerPluginException
+    private void restoreExistingJobs(XWikiContext context) throws SchedulerPluginException
     {
         String hql = ", BaseObject as obj where doc.web='Scheduler'" +
             " and obj.name=doc.fullName and obj.className='XWiki.SchedulerJobClass'";
@@ -146,7 +146,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             }
         } catch (XWikiException e) {
             throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTAURE_EXISTING_JOBS,
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_EXISTING_JOBS,
                 "Failed to restaure existing scheduler jobs", e);
         }
     }

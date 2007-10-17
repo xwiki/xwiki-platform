@@ -43,7 +43,7 @@ public class SchedulerPluginException extends PluginException
 
     protected static final int ERROR_SCHEDULERPLUGIN_RESTORE_JOB = 90008;
 
-    protected static final int ERROR_SCHEDULERPLUGIN_RESTAURE_EXISTING_JOBS = 90009;
+    protected static final int ERROR_SCHEDULERPLUGIN_RESTORE_EXISTING_JOBS = 90009;
 
     public SchedulerPluginException(int code, String message)
     {

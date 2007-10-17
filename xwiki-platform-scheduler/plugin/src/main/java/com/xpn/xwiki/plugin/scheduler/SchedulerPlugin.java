@@ -141,13 +141,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                 } catch (XWikiException e) {
                     throw new SchedulerPluginException(
                         SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_JOB,
-                        "Failed to restaure job with job name " + jobName, e);
+                        "Failed to restore job with job name " + jobName, e);
                 }
             }
         } catch (XWikiException e) {
             throw new SchedulerPluginException(
                 SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_EXISTING_JOBS,
-                "Failed to restaure existing scheduler jobs", e);
+                "Failed to restore existing scheduler jobs", e);
         }
     }
     

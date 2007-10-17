@@ -27,19 +27,19 @@ import org.quartz.Trigger;
  */
 public class JobState
 {
-    public static final String NORMAL = "Normal";
-
-    public static final String PAUSED = "Paused";
-
-    public static final String BLOCKED = "Blocked";
-
-    public static final String COMPLETE = "Complete";
-
-    public static final String ERROR = "Error";
-
-    public static final String NONE = "None";
-
     private int state;
+
+    public static final String STATE_NORMAL = "Normal";
+
+    public static final String STATE_PAUSED = "Paused";
+
+    public static final String STATE_BLOCKED = "Blocked";
+
+    public static final String STATE_COMPLETE = "Complete";
+
+    public static final String STATE_ERROR = "Error";
+
+    public static final String STATE_NONE = "None";
 
     public JobState(int state)
     {
@@ -53,25 +53,25 @@ public class JobState
 
     public int getState()
     {
-        return this.state;
+        return state;
     }
 
     public String getValue()
     {
-        switch (this.state) {
+        switch (state) {
             case Trigger.STATE_NORMAL:
-                return JobState.NORMAL;
+                return JobState.STATE_NORMAL;
             case Trigger.STATE_BLOCKED:
-                return JobState.BLOCKED;
+                return JobState.STATE_BLOCKED;
             case Trigger.STATE_COMPLETE:
-                return JobState.COMPLETE;
+                return JobState.STATE_COMPLETE;
             case Trigger.STATE_ERROR:
-                return JobState.ERROR;
+                return JobState.STATE_ERROR;
             case Trigger.STATE_PAUSED:
-                return JobState.PAUSED;
+                return JobState.STATE_PAUSED;
             case Trigger.STATE_NONE:
             default:
-                return JobState.NONE;
+                return JobState.STATE_NONE;
         }
     }
 }

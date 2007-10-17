@@ -41,6 +41,7 @@ import org.quartz.impl.StdSchedulerFactory;
 
 import java.text.ParseException;
 import java.util.Date;
+import java.util.List;
 
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
@@ -74,7 +75,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     {
         super(name, className, context);
         init(context);
-        //TODO: restaure existing jobs (according to their stored status)
     }
 
     /**
@@ -90,6 +90,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             setScheduler(getDefaultSchedulerInstance());
             setStatusListener();
             getScheduler().start();
+            restaureExistingJobs(context);
         } catch (SchedulerException e) {
             LOG.error("Failed to start the scheduler", e);
         } catch (SchedulerPluginException e) {
@@ -108,6 +109,48 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         init(context);
     }
 
+    /**
+     * Restaure the existing job, by looking up for such job in the database and re-scheduling those
+     * according to their stored status. If a Job is stored with the status "Normal", it is just
+     * scheduled If a Job is stored with the status "Paused", then it is both scheduled and paused
+     * Jobs with other status (None, Complete) are not rescheduled.
+     *
+     * @param context The XWikiContext when initializing the plugin
+     */
+    private void restaureExistingJobs(XWikiContext context) throws SchedulerPluginException
+    {
+        String hql = ", BaseObject as obj where doc.web='Scheduler'" +
+            " and obj.name=doc.fullName and obj.className='XWiki.SchedulerJobClass'";
+        try {
+            List jobsDocsNames = context.getWiki().getStore().searchDocumentsNames(hql, context);
+            for (int i = 0; i < jobsDocsNames.size(); i++) {
+                XWikiDocument jobDoc =
+                    context.getWiki().getDocument((String) jobsDocsNames.get(i), context);
+                BaseObject jobObj = jobDoc.getObject(XWIKI_JOB_CLASS);
+                String jobName = jobObj.getStringValue("jobName");
+                try {
+                    String status = jobObj.getStringValue("status");
+                    if (status.equals(JobState.STATE_NORMAL) ||
+                        status.equals(JobState.STATE_PAUSED))
+                    {
+                        this.scheduleJob(jobObj, context);
+                    }
+                    if (status.equals(JobState.STATE_PAUSED)) {
+                        this.pauseJob(jobObj, context);
+                    }
+                } catch (XWikiException e) {
+                    throw new SchedulerPluginException(
+                        SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_JOB,
+                        "Failed to restaure job with job name " + jobName, e);
+                }
+            }
+        } catch (XWikiException e) {
+            throw new SchedulerPluginException(
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTAURE_EXISTING_JOBS,
+                "Failed to restaure existing scheduler jobs", e);
+        }
+    }
+    
     /**
      * Retrieve the job's status of a given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS}
      * job XObject, by asking the actual job status to the quartz scheduler instance. It's the

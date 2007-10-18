@@ -217,3 +217,22 @@ $msg.get($prop.name)#end
 #macro(displaypanelcontent $doc $obj)
 $doc.display("content", $obj)
 #end
+
+###
+###    Display in page panels layout
+###
+###
+#macro(displayPanelLayout $nbcolumns $panelNameList)
+  <div class="panellayoutcontainer-${nbcolumns}col">
+    #set($lastColumnId = ($nbcolumns - 1))
+    #foreach($colId in [0..$lastColumnId])
+      <div class="panellayoutcol">
+        #foreach($panelName in $panelNameList)
+          #if(((($velocityCount - 1) + $nbcolumns) % $nbcolumns) == $colId)
+            #displaypanel($panelName)
+          #end
+        #end
+      </div>
+    #end
+  </div>
+#end

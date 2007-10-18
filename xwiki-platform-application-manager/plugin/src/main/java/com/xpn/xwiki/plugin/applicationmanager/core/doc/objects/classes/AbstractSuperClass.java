@@ -676,23 +676,7 @@ public abstract class AbstractSuperClass implements SuperClass
      */
     public List searchItemDocuments(XWikiContext context) throws XWikiException
     {
-        return searchItemDocumentsByFields(null, null, context);
-    }
-
-    /**
-     * Find XWikiDocument containing object of this XWiki class with provided full name. Difference
-     * with {@link XWiki#getDocument(String, XWikiContext)} is that it will not return "new"
-     * XWikiDocument.
-     * 
-     * @param docFullName the full name of the document.
-     * @param context the XWiki context.
-     * @return a list with just one XWikiDocument containing object of this XWiki class.
-     * @throws XWikiException error when searching for document in database.
-     */
-    public List searchItemDocuments(String docFullName, XWikiContext context)
-        throws XWikiException
-    {
-        return searchItemDocumentsByFields(docFullName, null, context);
+        return searchItemDocumentsByFields(null, context);
     }
 
     /**
@@ -706,21 +690,19 @@ public abstract class AbstractSuperClass implements SuperClass
     {
         String[][] fieldDescriptors = new String[][] {{fieldName, fieldType, fieldValue}};
 
-        return searchItemDocumentsByFields(null, fieldDescriptors, context);
+        return searchItemDocumentsByFields(fieldDescriptors, context);
     }
 
     /**
      * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface}
      * "searchDocuments" methods.
      * 
-     * @param docFullName the full name of the document. If Null, it is not consider.
      * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
      *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
      * @param parameterValues the where clause values that replace the question marks (?).
      * @return a HQL where clause.
      */
-    public String createWhereClause(String docFullName, String[][] fieldDescriptors,
-        List parameterValues)
+    public String createWhereClause(String[][] fieldDescriptors, List parameterValues)
     {
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
@@ -728,14 +710,6 @@ public abstract class AbstractSuperClass implements SuperClass
             new StringBuffer(" where doc.fullName=obj.name and obj.className="
                 + HQL_PARAMETER_STRING);
         parameterValues.add(getClassFullName());
-
-        if (docFullName != null) {
-            where.append(" and obj.name=" + HQL_PARAMETER_STRING);
-            parameterValues.add(docFullName);
-        } else {
-            where.append(" and obj.name<>" + HQL_PARAMETER_STRING);
-            parameterValues.add(getClassTemplateFullName());
-        }
 
         if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {
@@ -771,16 +745,16 @@ public abstract class AbstractSuperClass implements SuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByFields(java.lang.String,
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByFields(
      *      java.lang.String[][], com.xpn.xwiki.XWikiContext)
      */
-    public List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors,
-        XWikiContext context) throws XWikiException
+    public List searchItemDocumentsByFields(String[][] fieldDescriptors, XWikiContext context)
+        throws XWikiException
     {
         check(context);
 
         List parameterValues = new ArrayList();
-        String where = createWhereClause(docFullName, fieldDescriptors, parameterValues);
+        String where = createWhereClause(fieldDescriptors, parameterValues);
 
         return context.getWiki().getStore().searchDocuments(where, parameterValues, context);
     }

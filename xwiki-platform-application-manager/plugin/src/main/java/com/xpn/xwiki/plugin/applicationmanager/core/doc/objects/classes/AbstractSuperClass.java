@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -73,14 +74,9 @@ public abstract class AbstractSuperClass implements SuperClass
     private static final String DOCUMENTCONTENT_TEMPLATE_PREFIX = "templates/";
 
     /**
-     * String used to protect value in HQL request.
+     * Symbol used in HQL request to insert and protect value when executing the request.
      */
-    private static final String HQL_PROTECT_STRING = "'";
-
-    /**
-     * String that replace {@link #HQL_PROTECT_STRING} in value strings.
-     */
-    private static final String HQL_I_PROTECT_STRING = "\\'";
+    private static final String HQL_PARAMETER_STRING = "?";
 
     /**
      * Space prefix of class document.
@@ -714,55 +710,31 @@ public abstract class AbstractSuperClass implements SuperClass
     }
 
     /**
-     * Protect a {@link String} value used in Hql request.
+     * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface}
+     * "searchDocuments" methods.
      * 
-     * @param value the value to protect.
-     * @return the protected version of <code>value</code>.
+     * @param docFullName the full name of the document. If Null, it is not consider.
+     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
+     *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
+     * @param parameterValues the where clause values that replace the question marks (?).
+     * @return a HQL where clause.
      */
-    private String hqlProtectValue(String value)
+    public String createWhereClause(String docFullName, String[][] fieldDescriptors,
+        List parameterValues)
     {
-        return hqlProtectValue(value, false);
-    }
-    
-    /**
-     * Protect a {@link String} value used in Hql request.
-     * 
-     * @param value the value to protect.
-     * @param toLower if true <code>toLower</code> is lowered.
-     * @return the protected version of <code>value</code>.
-     */
-    private String hqlProtectValue(String value, boolean toLower)
-    {
-        String protectedValue = value.replace(HQL_PROTECT_STRING, HQL_I_PROTECT_STRING);
-
-        if (toLower) {
-            protectedValue = protectedValue.toLowerCase();
-        }
-
-        return HQL_PROTECT_STRING + protectedValue + HQL_PROTECT_STRING;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByFields(java.lang.String,
-     *      java.lang.String[][], com.xpn.xwiki.XWikiContext)
-     */
-    public List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors,
-        XWikiContext context) throws XWikiException
-    {
-        check(context);
-
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
         StringBuffer where =
             new StringBuffer(" where doc.fullName=obj.name and obj.className="
-                + hqlProtectValue(getClassFullName()));
+                + HQL_PARAMETER_STRING);
+        parameterValues.add(getClassFullName());
 
         if (docFullName != null) {
-            where.append(" and obj.name=" + hqlProtectValue(docFullName));
+            where.append(" and obj.name=" + HQL_PARAMETER_STRING);
+            parameterValues.add(docFullName);
         } else {
-            where.append(" and obj.name<>" + hqlProtectValue(getClassTemplateFullName()));
+            where.append(" and obj.name<>" + HQL_PARAMETER_STRING);
+            parameterValues.add(getClassTemplateFullName());
         }
 
         if (fieldDescriptors != null) {
@@ -780,19 +752,37 @@ public abstract class AbstractSuperClass implements SuperClass
 
                     where.append(andSymbol + "obj.id=" + fieldPrefix + ".id.id");
 
-                    where.append(andSymbol + fieldPrefix + ".name="
-                        + hqlProtectValue(fieldName));
+                    where.append(andSymbol + fieldPrefix + ".name=" + HQL_PARAMETER_STRING);
+                    parameterValues.add(fieldName);
+
                     where.append(andSymbol + "lower(" + fieldPrefix + ".value)="
-                        + hqlProtectValue(value, true));
+                        + HQL_PARAMETER_STRING);
+                    parameterValues.add(value.toLowerCase());
                 } else {
-                    where.append(" and lower(doc." + fieldName + ")="
-                        + hqlProtectValue(value, true));
+                    where.append(" and lower(doc." + fieldName + ")=" + HQL_PARAMETER_STRING);
+                    parameterValues.add(value.toLowerCase());
                 }
             }
         }
 
-        return context.getWiki().getStore().searchDocuments(from.append(where).toString(),
-            context);
+        return from.append(where).toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByFields(java.lang.String,
+     *      java.lang.String[][], com.xpn.xwiki.XWikiContext)
+     */
+    public List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors,
+        XWikiContext context) throws XWikiException
+    {
+        check(context);
+
+        List parameterValues = new ArrayList();
+        String where = createWhereClause(docFullName, fieldDescriptors, parameterValues);
+
+        return context.getWiki().getStore().searchDocuments(where, parameterValues, context);
     }
 
     /**

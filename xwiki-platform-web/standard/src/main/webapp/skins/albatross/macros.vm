@@ -228,7 +228,7 @@ $doc.display("content", $obj)
     #foreach($colId in [0..$lastColumnId])
       <div class="panellayoutcol">
         #foreach($panelName in $panelNameList)
-          #if(((($velocityCount - 1) + $nbcolumns) % $nbcolumns) == $colId)
+          #if($panelName && ($panelName != "") && (((($velocityCount - 1) + $nbcolumns) % $nbcolumns) == $colId))
             #displaypanel($panelName)
           #end
         #end

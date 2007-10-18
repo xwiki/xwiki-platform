@@ -97,7 +97,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
      */
     public DocumentStats getDocMonthStats(String docname, String action, Date month, XWikiContext context) {
         XWikiHibernateStore store = context.getWiki().getHibernateStore();
-        DocumentStats object = new DocumentStats(docname, action, month, XWikiStats.PERIOD_MONTH);
+        DocumentStats object = new DocumentStats(docname, action, month, StatsUtil.PERIOD_MONTH);
         try {
             store.loadXWikiCollection(object, context, true);
             return object;
@@ -228,12 +228,12 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
                 e.printStackTrace();
             }
 
-            addPageView(doc.getFullName(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
-            addPageView(doc.getSpace(), action, XWikiStats.PERIOD_MONTH, store, context, vobject);
-            addPageView("", action, XWikiStats.PERIOD_MONTH, store, context, vobject);
-            addPageView(doc.getFullName(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
-            addPageView(doc.getSpace(), action, XWikiStats.PERIOD_DAY, store, context, vobject);
-            addPageView("", action, XWikiStats.PERIOD_DAY, store, context, vobject);
+            addPageView(doc.getFullName(), action, StatsUtil.PERIOD_MONTH, store, context, vobject);
+            addPageView(doc.getSpace(), action, StatsUtil.PERIOD_MONTH, store, context, vobject);
+            addPageView("", action, StatsUtil.PERIOD_MONTH, store, context, vobject);
+            addPageView(doc.getFullName(), action, StatsUtil.PERIOD_DAY, store, context, vobject);
+            addPageView(doc.getSpace(), action, StatsUtil.PERIOD_DAY, store, context, vobject);
+            addPageView("", action, StatsUtil.PERIOD_DAY, store, context, vobject);
         }
 
         // In case of a "view" action we want to store referer info
@@ -241,7 +241,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             String referer = getReferer(context);
             if ((referer !=null)&&(!referer.equals(""))) {
                 // Visits of the web
-                RefererStats robject = new RefererStats(doc.getFullName(), referer, new Date(), XWikiStats.PERIOD_MONTH);
+                RefererStats robject = new RefererStats(doc.getFullName(), referer, new Date(), StatsUtil.PERIOD_MONTH);
                 synchronized(robject) {
                     try {
                         store.loadXWikiCollection(robject, context, true);
@@ -408,7 +408,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             }
 
             vobject = new VisitStats(context.getUser(), uniqueID, cookie.getValue(),
-                                     ip, ua, nowDate, XWikiStats.PERIOD_MONTH);
+                                     ip, ua, nowDate, StatsUtil.PERIOD_MONTH);
             vobject.setEndDate(nowDate);
         } else {
             if (!newcookie) {

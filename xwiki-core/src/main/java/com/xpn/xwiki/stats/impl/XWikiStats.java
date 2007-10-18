@@ -34,15 +34,12 @@ import org.dom4j.dom.DOMElement;
 import java.util.*;
 
 public class XWikiStats extends BaseCollection {
-    public static int PERIOD_MONTH = 0;
-    public static int PERIOD_DAY = 1;
-
     public XWikiStats() {
         super();
     }
 
     public XWikiStats(Date period, int periodtype) {
-        setPeriod(getPeriodAsInt(period, periodtype));
+        setPeriod(StatsUtil.getPeriodAsInt(period, periodtype));
     }
 
     public int getPeriod() {
@@ -51,15 +48,6 @@ public class XWikiStats extends BaseCollection {
 
     public void setPeriod(int period) {
         setIntValue("period", period);
-    }
-
-    public int getPeriodAsInt(Date date, int type) {
-        Calendar cal = Calendar.getInstance();
-        cal.setTime(date);
-        if (type == PERIOD_MONTH)
-         return cal.get(Calendar.YEAR) * 100 + (cal.get(Calendar.MONTH)+1);
-       else
-         return cal.get(Calendar.YEAR) * 10000 + (cal.get(Calendar.MONTH)+1) * 100 + (cal.get(Calendar.DAY_OF_MONTH)+1);
     }
 
     public int getPageViews() {

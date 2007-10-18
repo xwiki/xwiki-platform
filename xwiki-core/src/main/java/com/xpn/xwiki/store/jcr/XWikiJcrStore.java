@@ -874,35 +874,138 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 		notSupportedCall();
 	}
 
-	public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}
+	/**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 
-	public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 
-	public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int, int, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 
-	public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, int, int, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+        int nb, int start, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 
-	public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 
-	public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbylanguage,
+        boolean customMapping, int nb, int start, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, int nb, int start, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, boolean, boolean, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbylanguage,
+        boolean customMapping, boolean checkRight, int nb, int start, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 
 	public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException {
 		notSupportedCall();
@@ -943,13 +1046,54 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
         return null;
     }
 
-    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 
-	public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
-		notSupportedCall();
-		return null;
-	}	
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      java.lang.Object[][], com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      java.lang.Object[][], java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, Object[][] whereParams,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        notSupportedCall();
+        return null;
+    }
 }

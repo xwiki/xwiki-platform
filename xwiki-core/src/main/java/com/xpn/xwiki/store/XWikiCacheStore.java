@@ -220,34 +220,155 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         return store.injectCustomMappings(doc, context);
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context)
+        throws XWikiException
+    {
         return store.searchDocuments(wheresql, distinctbyname, context);
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
+     *      boolean, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+        XWikiContext context) throws XWikiException
+    {
         return store.searchDocuments(wheresql, distinctbyname, customMapping, context);
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int,
+     *      int, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start,
+        XWikiContext context) throws XWikiException
+    {
         return store.searchDocuments(wheresql, distinctbyname, nb, start, context);
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
+     *      boolean, int, int, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+        int nb, int start, XWikiContext context) throws XWikiException
+    {
         return store.searchDocuments(wheresql, distinctbyname, customMapping, nb, start, context);
     }
 
-    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException
+    {
         return store.searchDocuments(wheresql, context);
     }
 
-    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context)
+        throws XWikiException
+    {
         return store.searchDocuments(wheresql, nb, start, context);
     }
 
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException {
-        return store.searchDocuments(wheresql, distinctbyname, customMapping, checkRight, nb, start, context);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
+     *      boolean, boolean, int, int, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+        boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException
+    {
+        return store.searchDocuments(wheresql, distinctbyname, customMapping, checkRight, nb,
+            start, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int,
+     *      int, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        return store.searchDocuments(wheresql, distinctbylanguage, nb, start, parameterValues,
+            context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String,
+     *      java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        return store.searchDocuments(wheresql, parameterValues, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
+     *      boolean, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbylanguage,
+        boolean customMapping, int nb, int start, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        return store.searchDocuments(wheresql, distinctbylanguage, customMapping, nb, start,
+            parameterValues, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int,
+     *      java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, int nb, int start, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        return store.searchDocuments(wheresql, nb, start, parameterValues, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
+     *      boolean, boolean, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List searchDocuments(String wheresql, boolean distinctbylanguage,
+        boolean customMapping, boolean checkRight, int nb, int start, List parameterValues,
+        XWikiContext context) throws XWikiException
+    {
+        return store.searchDocuments(wheresql, distinctbylanguage, customMapping, checkRight, nb,
+            start, parameterValues, context);
+    }
+    
     public List searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
         List parameterValues, XWikiContext context) throws XWikiException
     {
@@ -288,12 +409,51 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         store.deleteLinks(docId, context, bTransaction);
     }
 
-     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException
+    {
         return store.search(sql, nb, start, context);
     }
 
-    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context) throws XWikiException {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      java.lang.Object[][], com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
+        throws XWikiException
+    {
         return store.search(sql, nb, start, whereParams, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, List parameterValues, XWikiContext context)
+        throws XWikiException
+    {
+        return store.search(sql, nb, start, parameterValues, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#search(java.lang.String, int, int,
+     *      java.lang.Object[][], java.util.List, com.xpn.xwiki.XWikiContext)
+     */
+    public List search(String sql, int nb, int start, Object[][] whereParams,
+        List parameterValues, XWikiContext context) throws XWikiException
+    {
+        return store.search(sql, nb, start, whereParams, parameterValues, context);
     }
 
     public synchronized void cleanUp(XWikiContext context) {

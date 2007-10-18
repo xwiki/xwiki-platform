@@ -275,14 +275,13 @@ public interface SuperClass
      * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface}
      * "searchDocuments" methods.
      * 
-     * @param docFullName the full name of the document. If null, it is not used.
      * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
      *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
      * @param parameterValues the where clause values filled by the method that replace the question
      *            marks (?).
      * @return a HQL where clause.
      */
-    String createWhereClause(String docFullName, String[][] fieldDescriptors, List parameterValues);
+    String createWhereClause(String[][] fieldDescriptors, List parameterValues);
 
     /**
      * Search in instances of this document class.
@@ -300,15 +299,14 @@ public interface SuperClass
     /**
      * Search in instances of this document class.
      * 
-     * @param docFullName the full name of the document. If Null, it is not consider.
      * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
      *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
      * @param context the XWiki context.
      * @return the list of found XWikiDocuments.
      * @throws XWikiException error when searching for documents from in database.
      */
-    List searchItemDocumentsByFields(String docFullName, String[][] fieldDescriptors,
-        XWikiContext context) throws XWikiException;
+    List searchItemDocumentsByFields(String[][] fieldDescriptors, XWikiContext context)
+        throws XWikiException;
 
     /**
      * Create new super document containing object of class {@link #getClassFullName()}. If

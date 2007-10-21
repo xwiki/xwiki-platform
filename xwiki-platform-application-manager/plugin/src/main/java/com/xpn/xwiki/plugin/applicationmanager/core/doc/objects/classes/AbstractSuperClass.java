@@ -710,6 +710,9 @@ public abstract class AbstractSuperClass implements SuperClass
             new StringBuffer(" where doc.fullName=obj.name and obj.className="
                 + HQL_PARAMETER_STRING);
         parameterValues.add(getClassFullName());
+        
+        where.append(" and obj.name<>" + HQL_PARAMETER_STRING);
+        parameterValues.add(getClassTemplateFullName());
 
         if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {

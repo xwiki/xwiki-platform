@@ -424,7 +424,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     {
         XWikiDocument jobHolder = context.getWiki().getDocument(object.getName(), context);
         object.setStringValue("status", status);
-        jobHolder.setMinorEdit(true);
         context.getWiki().saveDocument(jobHolder, context);
     }
 

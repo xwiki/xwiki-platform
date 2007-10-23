@@ -154,19 +154,24 @@ public class WikiManagerPluginApi extends PluginApi
 
         wikiSuperDocument.setWikiName(wikiname);
 
+        String realTemplateWikiName =
+            templateWiki == null || templateWiki.trim().length() == 0 ? null : templateWiki;
+
+        String realPkgName = pkgName == null || pkgName.trim().length() == 0 ? null : pkgName;
+
         try {
             String comment;
 
-            if (templateWiki != null) {
+            if (realTemplateWikiName != null) {
                 comment = WikiManagerMessageTool.COMMENT_CREATEWIKIFROMTEMPLATE;
-            } else if (pkgName != null) {
+            } else if (realPkgName != null) {
                 comment = WikiManagerMessageTool.COMMENT_CREATEWIKIFROMPACKAGE;
             } else {
                 comment = WikiManagerMessageTool.COMMENT_CREATEEMPTYWIKI;
             }
 
-            WikiManager.getInstance().createNewWiki(wikiSuperDocument, failOnExist, templateWiki,
-                pkgName, comment, this.context);
+            WikiManager.getInstance().createNewWiki(wikiSuperDocument, failOnExist,
+                realTemplateWikiName, realPkgName, comment, this.context);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiSuperDocument
                 .toString()), e);

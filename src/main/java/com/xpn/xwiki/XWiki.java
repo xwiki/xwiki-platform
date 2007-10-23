@@ -3175,7 +3175,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public void deleteDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         getStore().deleteXWikiDoc(doc, context);
-        getNotificationManager().verify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),
+        getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
             XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 

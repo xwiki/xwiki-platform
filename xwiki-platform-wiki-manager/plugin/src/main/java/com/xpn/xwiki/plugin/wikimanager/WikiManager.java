@@ -51,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @version $Id: $
  */
-public final class WikiManager
+final class WikiManager
 {
     /**
      * Key to use with {@link XWikiContext#get(Object)}.

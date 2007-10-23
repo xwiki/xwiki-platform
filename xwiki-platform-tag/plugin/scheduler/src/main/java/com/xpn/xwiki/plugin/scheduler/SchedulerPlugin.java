@@ -150,7 +150,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                 "Failed to restore existing scheduler jobs", e);
         }
     }
-    
+
     /**
      * Retrieve the job's status of a given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS}
      * job XObject, by asking the actual job status to the quartz scheduler instance. It's the
@@ -424,6 +424,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     {
         XWikiDocument jobHolder = context.getWiki().getDocument(object.getName(), context);
         object.setStringValue("status", status);
+        jobHolder.setMinorEdit(true);
         context.getWiki().saveDocument(jobHolder, context);
     }
 

@@ -48,7 +48,7 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
  * 
  * @version $Id: $
  */
-public final class ApplicationManager
+final class ApplicationManager
 {
     /**
      * The logging tool.

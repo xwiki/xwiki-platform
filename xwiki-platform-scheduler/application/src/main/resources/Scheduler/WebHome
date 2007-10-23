@@ -60,7 +60,7 @@
 ## If the sheet is called with an action ($request.do), let us first process this action
 ## Possible values are : "schedule", "pause", "resume", "unschedule", "delete"
 ##
-#if($request.do && $request.do!="")
+#if($request.do &amp;&amp; $request.do!="")
  ##
  ## Obtain the Job document and object for which the action has been called
  ##

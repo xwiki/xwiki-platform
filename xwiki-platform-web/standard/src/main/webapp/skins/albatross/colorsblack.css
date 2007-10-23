@@ -185,6 +185,11 @@ Menu
 #tmCreate a strong{
   background-image: url(icons/black-create-ab.png);
 }
+
+#tmFile a strong{
+  background-image: url(icons/black-file2.png);
+}
+
 #tmEdit a strong{
   background-image: url(icons/black-edit-ab.png);
 }
@@ -196,6 +201,9 @@ Menu
 }
 #tmWatch a strong{
   background-image: url(icons/black-fav-ab.png);
+}
+#tmWatched a strong{
+  background-image: url(icons/black-fav-ab3.png);
 }
 #tmDoc strong{
   background-image: url(icons/black-doc-ab.png);

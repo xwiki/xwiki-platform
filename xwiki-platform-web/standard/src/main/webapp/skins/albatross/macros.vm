@@ -78,7 +78,8 @@ $doc.display("content", $obj)
 ### @param linktext The menu item text
 ###
 #macro(xwikitopmenuentrystart $actionurl $linktext $id)
-<div class="topmenuentry" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);" id="$id"><a class="tme" href="$actionurl"><strong>$linktext</strong></a><span class="hidden menucolon">: </span><span class="submenu hidden">
+<div class="topmenuentry" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);" id="$id">
+<a class="tme" #if ($actionurl != "") href="$actionurl" #else style="cursor:default;" #end><strong>$linktext</strong></a><span class="hidden menucolon">: </span><span class="submenu hidden">
 #end
 
 ###
@@ -103,6 +104,25 @@ $doc.display("content", $obj)
 ###
 #macro(submenuitem $actionurl $linktext) 
 <span class="submenuitem"><a href="$actionurl">$linktext</a></span>
+#end
+
+###
+###    Menu disabled subitem entry
+###
+### Generate a disabled submenu entry
+###
+### @param text The menu item text
+###
+#macro(submenuitemdisabled $text)
+<span class="submenuitem disable">$text</span>
+#end
+
+
+###
+###    Menu submenu separator
+###
+#macro(submenuseparator)
+<span class="submenuseparator">&nbsp;</span>
 #end
 
 ###

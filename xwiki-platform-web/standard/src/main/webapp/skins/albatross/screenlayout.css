@@ -544,10 +544,19 @@ text-decoration:none;
 
 .submenu .submenuitem{
   display: block;
-  padding: 5px;
+  padding: 2px;
   border-bottom: 1px dashed ;
   margin-bottom: -1px;
 }
+
+.submenu .submenuseparator {
+  display: block;
+  font-size: 1px;
+  line-height: 1px;
+  border-top: 1px solid ;
+  //margin-top: 1px;
+}
+
 .submenu.hidden{
   display: none;
 }

@@ -3225,7 +3225,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 doc, context.getUser(), new Date(), context, true);
         }
         getStore().deleteXWikiDoc(doc, context);
-        getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc, doc.getName()),
+        getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
             XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }
 

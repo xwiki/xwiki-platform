@@ -52,6 +52,7 @@
         <module>adwords</module>
         <module>alexa</module>
         <module>exoplatform</module>
+        <module>jodatime</module>
         <module>scheduler</module>
         <module>application-manager</module>
         <module>wiki-manager</module>

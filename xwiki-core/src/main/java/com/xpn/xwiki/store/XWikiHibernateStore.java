@@ -35,6 +35,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
+import com.xpn.xwiki.store.DatabaseProduct;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 import org.apache.commons.lang.ArrayUtils;
@@ -124,16 +125,18 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Connection connection = session.connection();
             stmt = connection.createStatement();
 
+            String schema = getSchemaFromWikiName(wikiName, context);
+
             DatabaseProduct databaseProduct = getDatabaseProductName(context);
             if (DatabaseProduct.ORACLE == databaseProduct) {
-                stmt.execute("create user " + wikiName + " identified by " + wikiName);
-                stmt.execute("grant resource to " + wikiName);
+                stmt.execute("create user " + schema + " identified by " + schema);
+                stmt.execute("grant resource to " + schema);
             } else if (DatabaseProduct.DERBY == databaseProduct) {
-				stmt.execute("CREATE SCHEMA " + wikiName.replace('-', '_'));
+                stmt.execute("CREATE SCHEMA " + schema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
-				stmt.execute("CREATE SCHEMA " + wikiName.replace('-', '_') + " AUTHORIZATION DBA");
+                stmt.execute("CREATE SCHEMA " + schema + " AUTHORIZATION DBA");
             } else {
-                stmt.execute("create database " + wikiName.replace('-','_'));
+                stmt.execute("create database " + schema);
             }
 
             endTransaction(context, true);

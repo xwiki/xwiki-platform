@@ -55,6 +55,8 @@
         <module>scheduler</module>
         <module>application-manager</module>
         <module>wiki-manager</module>
+	<module>mailsender</module>
+	<module>watchlist</module>
       </modules>
     </profile>
     <profile>

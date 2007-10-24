@@ -1,0 +1,1351 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package com.xpn.xwiki.plugin.rightsmanager;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.plugin.rightsmanager.utils.AllowDeny;
+import com.xpn.xwiki.plugin.rightsmanager.utils.LevelTree;
+import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
+import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
+
+/**
+ * Hidden toolkit use by the plugin API that make all the plugins actions.
+ * 
+ * @version $Id: $
+ */
+final class RightsManager implements XWikiDocChangeNotificationInterface
+{
+    /**
+     * Name of the defaut space where users and groups are stored.
+     */
+    public static final String DEFAULT_USERORGROUP_SPACE = "XWiki";
+
+    /**
+     * The logging tool.
+     */
+    private static final Log LOG = LogFactory.getLog(RightsManager.class);
+
+    /**
+     * Separator symbol between wiki name and page full name.
+     */
+    private static final String WIKIFULLNAME_SEP = ":";
+
+    /**
+     * Separator symbol between space name and page name.
+     */
+    private static final String SPACEPAGENAME_SEP = ".";
+
+    /**
+     * Full name of the wiki preferences document.
+     */
+    private static final String WIKI_PREFERENCES = "XWiki.XWikiPreferences";
+
+    /**
+     * Name of the space preferences document.
+     */
+    private static final String SPACE_PREFERENCES = "WebPreferences";
+
+    /**
+     * Full name of the class containing document rights informations.
+     */
+    private static final String RIGHTS_CLASS = "XWiki.XWikiRights";
+
+    /**
+     * Full name of the class containing global rights informations.
+     */
+    private static final String GLOBAL_RIGHTS_CLASS = "XWiki.XWikiGlobalRights";
+
+    /**
+     * Name of the "levels" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
+     * classes.
+     */
+    private static final String RIGHTSFIELD_LEVELS = "levels";
+
+    /**
+     * Name of the "users" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
+     * classes.
+     */
+    private static final String RIGHTSFIELD_USERS = "users";
+
+    /**
+     * Name of the "groups" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
+     * classes.
+     */
+    private static final String RIGHTSFIELD_GROUPS = "groups";
+
+    /**
+     * Name of the "allow" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
+     * classes.
+     */
+    private static final String RIGHTSFIELD_ALLOW = "allow";
+
+    /**
+     * Separator symbols of the list fields for the {@link #RIGHTS_CLASS} and
+     * {@link #GLOBAL_RIGHTS_CLASS} classes.
+     */
+    private static final String RIGHTSLISTFIELD_SEP = " ,|";
+
+    /**
+     * Join symbol of the list fields for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
+     * classes.
+     */
+    private static final String RIGHTSLISTFIELD_JOIN = "|";
+
+    /**
+     * Full name of the xwiki.cfg super administrator.
+     */
+    private static final String SUPER_ADMIN_NAME = "XWiki.superadmin";
+
+    /**
+     * Symbol use in HQL "like" command that means "all characters".
+     */
+    private static final String HQLLIKE_ALL_SYMBOL = "%";
+
+    // ////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * Unique instance of RightsManager.
+     */
+    private static RightsManager instance;
+
+    /**
+     * Hidden constructor of RightsManager only access via getInstance().
+     */
+    private RightsManager()
+    {
+    }
+
+    /**
+     * @return a unique instance of RightsManager. Thread safe.
+     */
+    public static RightsManager getInstance()
+    {
+        synchronized (RightsManager.class) {
+            if (instance == null) {
+                instance = new RightsManager();
+            }
+        }
+
+        return instance;
+    }
+
+    /**
+     * Indicate if context target the main wiki.
+     * 
+     * @param context the XWiki context.
+     * @return true if in main wiki, false otherwise.
+     */
+    public boolean isInMainWiki(XWikiContext context)
+    {
+        return !context.isVirtual()
+            || context.getDatabase().equalsIgnoreCase(context.getMainXWiki());
+    }
+
+    /**
+     * Remove reference to provided user or group in all groups and rights in current wiki.
+     * 
+     * @param userOrGroupWiki the wiki name of the group or user.
+     * @param userOrGroupSpace the space name of the group or user.
+     * @param userOrGroupName the name of the group or user.
+     * @param user indicate if it is a user or a group.
+     * @param context the XWiki context.
+     * @throws XWikiException error when browsing groups or rights.
+     */
+    private void cleanDeletedUserOrGroupInLocalWiki(String userOrGroupWiki,
+        String userOrGroupSpace, String userOrGroupName, boolean user, XWikiContext context)
+        throws XWikiException
+    {
+        removeUserOrGroupFromAllRights(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
+            context);
+        context.getWiki().getGroupService(context).removeUserOrGroupFromAllGroups(
+            userOrGroupWiki, userOrGroupSpace, userOrGroupName, context);
+    }
+
+    /**
+     * Remove reference to provided user or group in all groups and rights in all wikis.
+     * 
+     * @param userOrGroupWiki the wiki name of the group or user.
+     * @param userOrGroupSpace the space name of the group or user.
+     * @param userOrGroupName the name of the group or user.
+     * @param user indicate if it is a user or a group.
+     * @param context the XWiki context.
+     * @throws XWikiException error when browsing groups or rights.
+     */
+    private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace,
+        String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
+    {
+        if (!context.isVirtual()) {
+            cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
+                userOrGroupName, user, context);
+        } else {
+            List wikiList = context.getWiki().getVirtualWikiList();
+
+            String database = context.getDatabase();
+            try {
+                boolean foundMainWiki = false;
+
+                for (Iterator it = wikiList.iterator(); it.hasNext();) {
+                    String wikiName = (String) it.next();
+
+                    if (wikiName.equalsIgnoreCase(context.getMainXWiki())) {
+                        foundMainWiki = true;
+                    }
+
+                    context.setDatabase(wikiName);
+                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
+                        userOrGroupName, user, context);
+                }
+
+                if (!foundMainWiki) {
+                    context.setDatabase(context.getMainXWiki());
+                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
+                        userOrGroupName, user, context);
+                }
+            } finally {
+                context.setDatabase(database);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
+        int event, XWikiContext context)
+    {
+        if (newdoc == null || newdoc.isNew()) {
+            String userOrGroupWiki = olddoc.getDatabase();
+            String userOrGroupSpace = olddoc.getSpace();
+            String userOrGroupName = olddoc.getName();
+
+            if (olddoc.getObject("XWiki.XWikiUsers") != null) {
+                try {
+                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName,
+                        true, context);
+                } catch (XWikiException e) {
+                    LOG.warn("Error when cleaning for deleted user", e);
+                }
+            } else if (olddoc.getObject("XWiki.XWikiGroups") != null) {
+                try {
+                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName,
+                        false, context);
+                } catch (XWikiException e) {
+                    LOG.warn("Error when cleaning for deleted group", e);
+                }
+            }
+        }
+
+    }
+
+    // Groups and users management
+
+    /**
+     * Get the number of users or groups in the main wiki and the current wiki.
+     * 
+     * @param user indicate if methods search for users or groups.
+     * @param context the XWiki context.
+     * @return the number of groups in the main wiki and the current wiki.
+     * @throws XWikiException error when getting number of users or groups.
+     */
+    public int countAllUsersOrGroups(boolean user, XWikiContext context) throws XWikiException
+    {
+        if (isInMainWiki(context)) {
+            return countAllLocalUsersOrGroups(user, context);
+        }
+
+        return countAllGlobalUsersOrGroups(user, context)
+            + countAllLocalUsersOrGroups(user, context);
+    }
+
+    /**
+     * Get the number of users or groups in the provided wiki.
+     * 
+     * @param user indicate if methods search for users or groups.
+     * @param wikiName the name of the wiki where to search for users or groups.
+     * @param context the XWiki context.
+     * @return the number of groups in the provided wiki.
+     * @throws XWikiException error when getting number of users or groups.
+     */
+    public int countAllWikiUsersOrGroups(boolean user, String wikiName, XWikiContext context)
+        throws XWikiException
+    {
+        if (isInMainWiki(context)) {
+            return countAllLocalUsersOrGroups(user, context);
+        }
+
+        String database = context.getDatabase();
+
+        try {
+            context.setDatabase(wikiName);
+            return countAllLocalUsersOrGroups(user, context);
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+
+    /**
+     * Get the number of users or groups in the main wiki.
+     * 
+     * @param user indicate if methods search for users or groups.
+     * @param context the XWiki context.
+     * @return the number of groups in the main wiki.
+     * @throws XWikiException error when getting number of users or groups.
+     */
+    public int countAllGlobalUsersOrGroups(boolean user, XWikiContext context)
+        throws XWikiException
+    {
+        if (isInMainWiki(context)) {
+            return countAllLocalUsersOrGroups(user, context);
+        }
+
+        return countAllWikiUsersOrGroups(user, context.getMainXWiki(), context);
+    }
+
+    /**
+     * Get the number of users or groups in the current wiki.
+     * 
+     * @param user indicate if methods search for users or groups.
+     * @param context the XWiki context.
+     * @return the number of groups in the current wiki.
+     * @throws XWikiException error when getting number of users or groups.
+     */
+    public int countAllLocalUsersOrGroups(boolean user, XWikiContext context)
+        throws XWikiException
+    {
+        if (user) {
+            return context.getWiki().getGroupService(context).countAllMatchedUsers(null, 0, 0,
+                context);
+        } else {
+            return context.getWiki().getGroupService(context).countAllMatchedUsers(null, 0, 0,
+                context);
+        }
+    }
+
+    /**
+     * Get all users or groups in the main wiki and the current.
+     * 
+     * @param user indicate if it is a user or a group.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or
+     *            {@link List} of {@link XWikiDocument}.
+     * @param limit the maximum number of result to return and index of the first element.
+     * @param order the fields to order from. It is a table of table with :
+     *            <ul>
+     *            <li>fieldname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            </ul>
+     * @param context the XWiki context.
+     * @return a {@link List} of {@link String} containing user or group name if
+     *         <code>withdetails</code> is false, otherwise a {@link List} of
+     *         {@link XWikiDocument} containing user or group.
+     * @throws XWikiException error when searching from users or groups.
+     */
+    public List getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
+        boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
+        throws XWikiException
+    {
+        if (isInMainWiki(context)) {
+            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
+                context);
+        }
+
+        List groupList = new ArrayList();
+
+        int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, context);
+
+        int newstart = limit.getStart();
+
+        // Get global groups
+        if (newstart < nbGlobalUsersOrGroups) {
+            groupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(limit.getNb(), newstart), order, context));
+            newstart = 0;
+        } else {
+            newstart = newstart - nbGlobalUsersOrGroups;
+        }
+
+        // Get local groups
+        if (limit.getNb() > groupList.size()) {
+            groupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(limit.getNb() - groupList.size(), newstart), order, context));
+        } else if (limit.getNb() <= 0) {
+            groupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+                new RequestLimit(0, newstart), order, context));
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all users or groups in the main wiki.
+     * 
+     * @param user indicate if it is a user or a group.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or
+     *            {@link List} of {@link XWikiDocument}.
+     * @param limit the maximum number of result to return and index of the first element.
+     * @param order the fields to order from. It is a table of table with :
+     *            <ul>
+     *            <li>fieldname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            </ul>
+     * @param context the XWiki context.
+     * @return a {@link List} of {@link String} containing user or group name if
+     *         <code>withdetails</code> is false, otherwise a {@link List} of
+     *         {@link XWikiDocument} containing user or group.
+     * @throws XWikiException error when searching from users or groups.
+     */
+    public List getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields,
+        boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
+        throws XWikiException
+    {
+        if (!context.isVirtual()
+            || context.getDatabase().equalsIgnoreCase(context.getMainXWiki())) {
+            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
+                context);
+        }
+
+        return getAllMatchedWikiUsersOrGroups(user, context.getMainXWiki(), matchFields,
+            withdetails, limit, order, context);
+    }
+
+    /**
+     * Get all users or groups in the provided wiki.
+     * 
+     * @param user indicate if it is a user or a group.
+     * @param wikiName the name of the wiki where to search.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or
+     *            {@link List} of {@link XWikiDocument}.
+     * @param limit the maximum number of result to return and index of the first element.
+     * @param order the fields to order from. It is a table of table with :
+     *            <ul>
+     *            <li>fieldname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            </ul>
+     * @param context the XWiki context.
+     * @return a {@link List} of {@link String} containing user or group name if
+     *         <code>withdetails</code> is false, otherwise a {@link List} of
+     *         {@link XWikiDocument} containing user or group.
+     * @throws XWikiException error when searching from users or groups.
+     */
+    public List getAllMatchedWikiUsersOrGroups(boolean user, String wikiName,
+        Object[][] matchFields, boolean withdetails, RequestLimit limit, Object[][] order,
+        XWikiContext context) throws XWikiException
+    {
+        if (isInMainWiki(context)) {
+            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
+                context);
+        }
+
+        String database = context.getDatabase();
+
+        try {
+            context.setDatabase(wikiName);
+
+            List localGroupList =
+                getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
+                    context);
+
+            if (localGroupList != null && !withdetails) {
+                List wikiGroupList = new ArrayList(localGroupList.size());
+                for (Iterator it = localGroupList.iterator(); it.hasNext();) {
+                    wikiGroupList.add(wikiName + WIKIFULLNAME_SEP + it.next());
+                }
+
+                localGroupList = wikiGroupList;
+            }
+
+            return localGroupList;
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+
+    /**
+     * Get all users or groups in the current wiki.
+     * 
+     * @param user indicate if it is a user or a group.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or
+     *            {@link List} of {@link XWikiDocument}.
+     * @param limit the maximum number of result to return and index of the first element.
+     * @param order the fields to order from. It is a table of table with :
+     *            <ul>
+     *            <li>fieldname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            </ul>
+     * @param context the XWiki context.
+     * @return a {@link List} of {@link String} containing user or group name if
+     *         <code>withdetails</code> is false, otherwise a {@link List} of
+     *         {@link XWikiDocument} containing user or group.
+     * @throws XWikiException error when searching from users or groups.
+     */
+    public List getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields,
+        boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
+        throws XWikiException
+    {
+        if (user) {
+            return context.getWiki().getGroupService(context).getAllMatchedUsers(matchFields,
+                withdetails, limit.getNb(), limit.getStart(), order, context);
+        } else {
+            return context.getWiki().getGroupService(context).getAllMatchedGroups(matchFields,
+                withdetails, limit.getNb(), limit.getStart(), order, context);
+        }
+    }
+
+    /**
+     * Get all groups containing provided user.
+     * 
+     * @param user the name of the user.
+     * @param context the XWiki context.
+     * @return the {@link Collection} of {@link String} containing group name.
+     * @throws XWikiException error when browsing groups.
+     */
+    public Collection getAllGroupsForUser(String user, XWikiContext context)
+        throws XWikiException
+    {
+        return context.getWiki().getGroupService(context).listGroupsForUser(user, context);
+    }
+
+    /**
+     * Get all users provided group contains.
+     * 
+     * @param group the name of the group.
+     * @param context the XWiki context.
+     * @return the {@link Collection} of {@link String} containing user name.
+     * @throws XWikiException error when browsing groups.
+     */
+    public Collection getAllUsersForGroup(String group, XWikiContext context)
+        throws XWikiException
+    {
+        return context.getWiki().getGroupService(context).listMemberForGroup(group, context);
+    }
+
+    // Rights management
+
+    /**
+     * Get the {@link LevelTree} {@link Map} for he provided rights levels.
+     * 
+     * @param preferences the document containing rights preferences.
+     * @param levelsToMatch the levels names to check ("view", "edit", etc.).
+     * @param global indicate it is global rights (wiki or space) or document rights.
+     * @param context the XWiki context.
+     * @return the {@link Map} containing [levelname : {@link LevelTree}].
+     * @throws XWikiException error when browsing rights preferences.
+     */
+    private Map getLevelTreeMap(XWikiDocument preferences, List levelsToMatch, boolean global,
+        XWikiContext context) throws XWikiException
+    {
+        Map rightsMap = new HashMap();
+
+        fillLevelTreeMap(rightsMap, preferences, levelsToMatch, global, true, context);
+
+        return rightsMap;
+    }
+
+    /**
+     * Get the {@link LevelTree} {@link Map} for he provided rights levels.
+     * 
+     * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
+     * @param levelsToMatch the levels names to check ("view", "edit", etc.).
+     * @param context the Xwiki context.
+     * @return the {@link Map} containing [levelname : {@link LevelTree}].
+     * @throws XWikiException error when browsing rights preferences.
+     */
+    public Map getLevelTreeMap(String spaceOrPage, List levelsToMatch, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
+
+        return getLevelTreeMap(preferences, levelsToMatch, isGlobal(preferences, spaceOrPage),
+            context);
+    }
+
+    /**
+     * Fill the {@link LevelTree} {@link Map}.
+     * 
+     * @param rightsMap the {@link LevelTree} {@link Map} to fill.
+     * @param levelInherited the levels names for which to find inheritance.
+     * @param bobj the object containing rights preferences.
+     * @param levelsToMatch the levels names to check ("view", "edit", etc.).
+     * @param direct if true fill the {@link LevelTree#direct} field, otherwise fill the
+     *            {@link LevelTree#inherited}.
+     * @param context the XWiki context.
+     */
+    private void fillLevelTreeMap(Map rightsMap, List levelInherited, BaseObject bobj,
+        List levelsToMatch, boolean direct, XWikiContext context)
+    {
+        List users =
+            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_USERS),
+                RIGHTSLISTFIELD_SEP, false);
+        List groups =
+            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_GROUPS),
+                RIGHTSLISTFIELD_SEP, false);
+        List levels =
+            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS),
+                RIGHTSLISTFIELD_SEP, false);
+        boolean allow = (bobj.getIntValue(RIGHTSFIELD_ALLOW) == 1);
+
+        for (Iterator itLevel = levels.iterator(); itLevel.hasNext();) {
+            String levelName = (String) itLevel.next();
+
+            if (levelsToMatch == null || levelsToMatch.contains(levelName)) {
+                LevelTree level;
+                if (!rightsMap.containsKey(levelName)) {
+                    level = new LevelTree();
+                    rightsMap.put(levelName, level);
+                } else {
+                    level = (LevelTree) rightsMap.get(levelName);
+                }
+
+                AllowDeny allowdeny;
+                if (direct) {
+                    if (levelInherited != null) {
+                        levelInherited.add(levelName);
+                    }
+
+                    if (level.direct == null) {
+                        level.direct = new AllowDeny();
+                    }
+                    allowdeny = level.direct;
+                } else {
+                    if (level.inherited == null) {
+                        level.inherited = new AllowDeny();
+                    }
+                    allowdeny = level.inherited;
+                }
+
+                UsersGroups usersgroups = allow ? allowdeny.allow : allowdeny.deny;
+
+                usersgroups.users.addAll(users);
+                usersgroups.groups.addAll(groups);
+            }
+        }
+    }
+
+    /**
+     * Fill the {@link LevelTree} {@link Map} inherited part.
+     * 
+     * @param rightsMap the {@link LevelTree} {@link Map} to fill.
+     * @param levelInheritedIn the levels names for which to find inheritance.
+     * @param preferences the document containing rights preferences.
+     * @param levelsToMatch the levels names to check ("view", "edit", etc.).
+     * @param global indicate it is global rights (wiki or space) or document rights.
+     * @param context the XWiki context.
+     * @throws XWikiException error when browsing rights preferences.
+     */
+    private void fillLevelTreeMapInherited(Map rightsMap, List levelInheritedIn,
+        XWikiDocument preferences, List levelsToMatch, boolean global, XWikiContext context)
+        throws XWikiException
+    {
+        List levelInherited = levelInheritedIn;
+
+        // Get document containing inherited rights
+        XWikiDocument parentPreferences = getParentPreference(preferences, global, context);
+
+        if (parentPreferences != null) {
+            // Fill levels where to find inheritance
+            if (levelInherited == null) {
+                levelInherited = new ArrayList();
+            }
+
+            for (Iterator it = levelsToMatch.iterator(); it.hasNext();) {
+                String levelName = (String) it.next();
+
+                if (!rightsMap.containsKey(levelName)
+                    || ((LevelTree) rightsMap.get(levelName)).inherited == null) {
+                    levelInherited.add(levelName);
+                }
+            }
+
+            // Find inheritance if needed
+            if (!levelInherited.isEmpty()) {
+                fillLevelTreeMap(rightsMap, parentPreferences, levelInherited, true, false,
+                    context);
+            }
+        }
+    }
+
+    /**
+     * Fill the {@link LevelTree} {@link Map}.
+     * 
+     * @param rightsMap the {@link LevelTree} {@link Map} to fill.
+     * @param preferences the document containing rights preferences.
+     * @param levelsToMatch the levels names to check ("view", "edit", etc.).
+     * @param global indicate it is global rights (wiki or space) or document rights.
+     * @param direct if true fill the {@link LevelTree#direct} field, otherwise fill the
+     *            {@link LevelTree#inherited}.
+     * @param context the XWiki context.
+     * @throws XWikiException error when browsing rights preferences.
+     */
+    private void fillLevelTreeMap(Map rightsMap, XWikiDocument preferences, List levelsToMatch,
+        boolean global, boolean direct, XWikiContext context) throws XWikiException
+    {
+        List levelInherited = null;
+        if (levelsToMatch == null) {
+            levelInherited = new ArrayList();
+        }
+
+        if (!preferences.isNew()) {
+            String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+            List vobj = preferences.getObjects(rightsClass);
+            if (vobj != null) {
+                for (Iterator it = vobj.iterator(); it.hasNext();) {
+                    BaseObject bobj = (BaseObject) it.next();
+
+                    fillLevelTreeMap(rightsMap, levelInherited, bobj, levelsToMatch, direct,
+                        context);
+                }
+            }
+        }
+
+        fillLevelTreeMapInherited(rightsMap, levelInherited, preferences, levelsToMatch, global,
+            context);
+    }
+
+    /**
+     * Get the document containing inherited rights of provided document.
+     * 
+     * @param currentPreference the document for which to find parent preferences document.
+     * @param currentGlobal indicate if current preferences document is global.
+     * @param context the XWiki context.
+     * @return the document containing inherited rights of provided document.
+     * @throws XWikiException error when browsing rights preferences.
+     */
+    public XWikiDocument getParentPreference(XWikiDocument currentPreference,
+        boolean currentGlobal, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument parentPreferences = null;
+
+        if (currentGlobal) {
+            if (currentPreference.getFullName().equals(WIKI_PREFERENCES)) {
+                if (!context.getMainXWiki().equalsIgnoreCase(context.getDatabase())) {
+                    parentPreferences =
+                        context.getWiki()
+                            .getDocument(
+                                context.getMainXWiki() + WIKIFULLNAME_SEP + WIKI_PREFERENCES,
+                                context);
+                }
+            } else if (currentPreference.getName().equals(SPACE_PREFERENCES)) {
+                String parentspace = currentPreference.getStringValue(WIKI_PREFERENCES, "parent");
+                if (parentspace.trim().length() > 0) {
+                    parentPreferences =
+                        context.getWiki().getDocument(
+                            parentspace + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
+                } else {
+                    parentPreferences = context.getWiki().getDocument(WIKI_PREFERENCES, context);
+                }
+
+                if (parentPreferences == currentPreference) {
+                    parentPreferences = null;
+                }
+            }
+        } else {
+            parentPreferences =
+                context.getWiki()
+                    .getDocument(
+                        currentPreference.getSpace() + SPACEPAGENAME_SEP + SPACE_PREFERENCES,
+                        context);
+        }
+
+        return parentPreferences;
+    }
+
+    /**
+     * Get level right tree.
+     * 
+     * @param doc the document containing rights preferences.
+     * @param levelName the level right name ("view", "delete"...).
+     * @param global indicate it is global rights (wiki or space) or document rights.
+     * @param context the XWiki context.
+     * @return the {@link LevelTree}.
+     * @throws XWikiException error when browsing rights preferences.
+     */
+    private LevelTree getLevel(XWikiDocument doc, String levelName, boolean global,
+        XWikiContext context) throws XWikiException
+    {
+        if (doc.isNew()) {
+            return null;
+        }
+
+        List rights = new ArrayList();
+        rights.add(rights);
+
+        Map rightsMap = getLevelTreeMap(doc, rights, global, context);
+
+        return (LevelTree) rightsMap.get(levelName);
+    }
+
+    /**
+     * Get document containing rights preferences for provided wiki, space or document.
+     * 
+     * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
+     * @param context the XWiki context.
+     * @return the document containing rights preferences.
+     * @throws XWikiException error when getting document from database.
+     */
+    private XWikiDocument getXWikiPreferencesDoc(String spaceOrPage, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument xwikidoc = null;
+
+        if (spaceOrPage != null) {
+            xwikidoc = context.getWiki().getDocument(spaceOrPage, context);
+
+            if (xwikidoc.isNew()) {
+                xwikidoc =
+                    context.getWiki().getDocument(
+                        spaceOrPage + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
+            }
+        } else {
+            xwikidoc = context.getWiki().getDocument(WIKI_PREFERENCES, context);
+        }
+
+        return xwikidoc;
+    }
+
+    /**
+     * Indicate if provided document contains global or document rights.
+     * 
+     * @param preferences the document containing rights preferences.
+     * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
+     * @return true if provided document contains global rights, false otherwise.
+     */
+    private boolean isGlobal(XWikiDocument preferences, String spaceOrPage)
+    {
+        return !preferences.getFullName().equals(spaceOrPage);
+    }
+
+    /**
+     * Get level right tree.
+     * 
+     * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
+     * @param levelName the level right name ("view", "delete"...).
+     * @param context the XWiki context.
+     * @return the {@link LevelTree}.
+     * @throws XWikiException error when browsing rights.
+     */
+    public LevelTree getTreeLevel(String spaceOrPage, String levelName, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
+
+        return getLevel(preferences, levelName, isGlobal(preferences, spaceOrPage), context);
+    }
+
+    /**
+     * Remove a user or group from rights preferences document for provided level.
+     * 
+     * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
+     * @param userOrGroup the name of the user or group.
+     * @param user indicate if it is a user or group.
+     * @param levelName the name of the right level.
+     * @param allow indicate if user is removed from allow right or deny right.
+     * @param comment the comment to use when saving preferences document.
+     * @param context the XWiki context.
+     * @throws XWikiException error when browsing rights.
+     */
+    public void removeUserOrGroupFromLevel(String spaceOrPage, String userOrGroup, boolean user,
+        String levelName, boolean allow, String comment, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
+
+        boolean global = isGlobal(preferences, spaceOrPage);
+
+        String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+
+        boolean needUpdate = false;
+
+        List vobj = preferences.getObjects(rightsClass);
+        if (vobj != null) {
+            for (Iterator it = vobj.iterator(); it.hasNext();) {
+                BaseObject bobj = (BaseObject) it.next();
+
+                List levels =
+                    ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS),
+                        RIGHTSLISTFIELD_SEP, false);
+
+                if (levels.contains(levelName)) {
+                    needUpdate |=
+                        removeUserOrGroupFromRight(bobj, null, null, userOrGroup, user, context);
+                }
+            }
+
+            if (needUpdate) {
+                context.getWiki().saveDocument(preferences, comment, context);
+            }
+        }
+    }
+
+    /**
+     * Remove all references to provided user or group from provided right object.
+     * 
+     * @param right the object containing the right preferences.
+     * @param userOrGroupWiki the name of the wiki of the use or group.
+     * @param userOrGroupSpace the name of the space of the use or group.
+     * @param userOrGroupName the name of the use or group.
+     * @param user indicate if it is a user or a group.
+     * @param context the XWiki context.
+     * @return true if user or group has been found and removed.
+     */
+    public boolean removeUserOrGroupFromRight(BaseObject right, String userOrGroupWiki,
+        String userOrGroupSpace, String userOrGroupName, boolean user, XWikiContext context)
+    {
+        boolean needUpdate = false;
+
+        String userOrGroupField = user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
+
+        List usersOrGroups =
+            ListClass.getListFromString(right.getStringValue(userOrGroupField),
+                RIGHTSLISTFIELD_SEP, false);
+
+        if (userOrGroupWiki != null) {
+            needUpdate |=
+                usersOrGroups.remove(userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName);
+        }
+
+        if (context.getDatabase() == null
+            || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
+            needUpdate |= usersOrGroups.remove(userOrGroupName);
+
+            if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
+                needUpdate |=
+                    usersOrGroups.remove(userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName);
+            }
+        }
+
+        if (needUpdate) {
+            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups.toArray(),
+                RIGHTSLISTFIELD_JOIN));
+        }
+
+        return needUpdate;
+    }
+
+    /**
+     * Remove all references to provided user or group from provided rights document.
+     * 
+     * @param rightsDocument the document containing the rights preferences.
+     * @param userOrGroupWiki the name of the wiki of the use or group.
+     * @param userOrGroupSpace the name of the space of the use or group.
+     * @param userOrGroupName the name of the use or group.
+     * @param user indicate if it is a user or a group.
+     * @param global indicate if user or group is removed from global or document rights.
+     * @param context the XWiki context.
+     * @return true if user or group has been found and removed.
+     */
+    public boolean removeUserOrGroupFromRights(XWikiDocument rightsDocument,
+        String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName, boolean user,
+        boolean global, XWikiContext context)
+    {
+        boolean needUpdate = false;
+
+        String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+
+        List vobj = rightsDocument.getObjects(rightsClass);
+        if (vobj != null) {
+            for (Iterator it = vobj.iterator(); it.hasNext();) {
+                BaseObject bobj = (BaseObject) it.next();
+
+                needUpdate |=
+                    removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace,
+                        userOrGroupName, user, context);
+            }
+        }
+
+        return needUpdate;
+    }
+
+    /**
+     * Remove all references to provided user or group from all rights documents.
+     * 
+     * @param userOrGroupWiki the name of the wiki of the use or group.
+     * @param userOrGroupSpace the name of the space of the use or group.
+     * @param userOrGroupName the name of the use or group.
+     * @param user indicate if it is a user or a group.
+     * @param context the XWiki context.
+     * @throws XWikiException error when browsing rights.
+     */
+    public void removeUserOrGroupFromAllRights(String userOrGroupWiki, String userOrGroupSpace,
+        String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
+    {
+        List parameterValues = new ArrayList();
+
+        StringBuffer where =
+            new StringBuffer(", BaseObject as obj"
+                + ", StringProperty as prop where doc.fullName=obj.name"
+                + " and (obj.className='" + RIGHTS_CLASS + "' or obj.className='"
+                + GLOBAL_RIGHTS_CLASS + "')");
+
+        where.append(" and obj.id=prop.id.id");
+
+        where.append(" and prop.name=?");
+        if (user) {
+            parameterValues.add(RIGHTSFIELD_USERS);
+        } else {
+            parameterValues.add(RIGHTSFIELD_GROUPS);
+        }
+
+        where.append(" and lower(prop.value) like ?");
+
+        if (context.getDatabase() == null
+            || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
+            if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
+                parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupName + HQLLIKE_ALL_SYMBOL);
+            } else {
+                parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP
+                    + userOrGroupName + HQLLIKE_ALL_SYMBOL);
+            }
+        } else {
+            parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP
+                + userOrGroupName + HQLLIKE_ALL_SYMBOL);
+        }
+
+        List documentList =
+            context.getWiki().getStore().searchDocuments(where.toString(), parameterValues,
+                context);
+
+        for (Iterator it = documentList.iterator(); it.hasNext();) {
+            XWikiDocument groupDocument = (XWikiDocument) it.next();
+            if (removeUserOrGroupFromRights(groupDocument, userOrGroupWiki, userOrGroupSpace,
+                userOrGroupName, user, true, context)) {
+                context.getWiki().saveDocument(groupDocument, context);
+            }
+        }
+    }
+
+    /**
+     * Remove "direct" rights for wiki, space or document. This means that after that inherited
+     * right will be used.
+     * 
+     * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
+     * @param levelNames the levels names to check ("view", "edit", etc.).
+     * @param comment the comment to use when saving preferences document.
+     * @param context the XWiki context.
+     * @throws XWikiException error when browsing rights.
+     */
+    public void removeDirectRights(String spaceOrPage, List levelNames, String comment,
+        XWikiContext context) throws XWikiException
+    {
+        XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
+
+        boolean global = isGlobal(preferences, spaceOrPage);
+
+        String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+
+        List vobj = preferences.getObjects(rightsClass);
+        if (vobj != null && !vobj.isEmpty()) {
+            preferences.removeObjects(rightsClass);
+            context.getWiki().saveDocument(preferences, comment, context);
+        }
+    }
+
+    /**
+     * Browse a group and groups it contains to find provided member (user or group).
+     * 
+     * @param groupName the group name where to search for memeber.
+     * @param memberName the name of the memeber to find.
+     * @param groupCacheIn a map containg a set a group and its corresponding memebers already
+     *            retrieved.
+     * @param context the Xwiki context.
+     * @return true if the memeber has been found, false otherwise.
+     * @throws XWikiException error when browsing groups.
+     */
+    public boolean groupContainsMember(String groupName, String memberName, Map groupCacheIn,
+        XWikiContext context) throws XWikiException
+    {
+        boolean found = false;
+
+        Map groupCache = groupCacheIn;
+        if (groupCache == null) {
+            groupCache = new Hashtable();
+        }
+
+        List memberList;
+
+        if (groupCache.containsKey(groupName)) {
+            memberList = (List) groupCache.get(groupName);
+        } else {
+            memberList =
+                context.getWiki().getGroupService(context).listMemberForGroup(groupName, context);
+            groupCache.put(groupName, memberList);
+        }
+
+        if (memberList.contains(memberName)
+            || memberList.contains(context.getDatabase() + WIKIFULLNAME_SEP + memberName)) {
+            found = true;
+        } else {
+            for (Iterator it = memberList.iterator(); it.hasNext();) {
+                String groupMemberName = (String) it.next();
+
+                if (groupContainsMember(groupMemberName, memberName, groupCache, context)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Browse a right objet to find provided user or group.
+     * 
+     * @param rightEntry the objet containing rights preferences.
+     * @param userOrGroupName the name of teh user or groups to find.
+     * @param user indicate if it is a user or a group.
+     * @param groupCacheIn a map containg a set a group and its corresponding memebers already
+     *            retrieved.
+     * @param context the Xwiki conxtext.
+     * @return true if the memeber has been found, false otherwise.
+     * @throws XWikiException error when browsing right object.
+     */
+    public boolean rightEntryContainsUserOrGroup(BaseObject rightEntry, String userOrGroupName,
+        boolean user, Map groupCacheIn, XWikiContext context) throws XWikiException
+    {
+        boolean found = false;
+
+        String userOrGroupField = user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
+
+        List userOrGroupList =
+            ListClass.getListFromString(rightEntry.getStringValue(userOrGroupField),
+                RIGHTSLISTFIELD_SEP, false);
+
+        if (userOrGroupList.contains(userOrGroupName)) {
+            found = true;
+        } else {
+            List groupList =
+                !user ? userOrGroupList : ListClass.getListFromString(rightEntry
+                    .getStringValue(RIGHTSFIELD_GROUPS), RIGHTSLISTFIELD_SEP, false);
+
+            Map groupCache = groupCacheIn;
+            if (groupCache == null) {
+                groupCache = new Hashtable();
+            }
+
+            for (Iterator it = groupList.iterator(); it.hasNext();) {
+                String groupName = (String) it.next();
+
+                if (groupContainsMember(groupName, userOrGroupName, groupCache, context)) {
+                    found = true;
+                    break;
+                }
+            }
+        }
+
+        return found;
+    }
+
+    /**
+     * Indicate if provided user is super administrator.
+     * 
+     * @param userName the name of the user.
+     * @param context the XWiki conxtext.
+     * @return true is provided user is super administrator, false otherwise.
+     */
+    public boolean isSuperAdmin(String userName, XWikiContext context)
+    {
+        boolean isSuperAdmin = false;
+
+        // Check if use is xwiki.cfg configured super administrator.
+        if (userName.equals(SUPER_ADMIN_NAME)
+            || userName.endsWith(WIKIFULLNAME_SEP + SUPER_ADMIN_NAME)) {
+            isSuperAdmin = true;
+        } else {
+            // In case of a sub wiki-check if the user is the sub-wiki owner
+            if (context.isVirtual()
+                && !context.getDatabase().equalsIgnoreCase(context.getMainXWiki())) {
+                String wikiOwner = context.getWikiOwner();
+
+                if (wikiOwner.equals(userName)) {
+                    isSuperAdmin = true;
+                }
+            }
+        }
+
+        return isSuperAdmin;
+    }
+
+    /**
+     * Indicate which rights provided user or group has on provided right level on provided right
+     * object.
+     * 
+     * @param rightEntry the object containg rights prferences.
+     * @param levelName the name of the level right to check.
+     * @param userOrGroupName the name of the user or group.
+     * @param user indicate if it is a user or a group.
+     * @param groupCache a map containg a set a group and its corresponding memebers already
+     *            retrieved.
+     * @param context the Xwiki context.
+     * @return {@link Boolean#TRUE} if user has provided right level, {@link Boolean#FALSE} if it is
+     *         denied on provided right level. Can be null if no "allow" or "deny" rights.
+     * @throws XWikiException error when browsing rights.
+     */
+    private Boolean isRightEntryAllowed(BaseObject rightEntry, String levelName,
+        String userOrGroupName, boolean user, Map groupCache, XWikiContext context)
+        throws XWikiException
+    {
+        Boolean allow = null;
+
+        if (rightEntry != null) {
+            List levels =
+                ListClass.getListFromString(rightEntry.getStringValue(RIGHTSFIELD_LEVELS),
+                    RIGHTSLISTFIELD_SEP, false);
+
+            if (levels.contains(levelName)) {
+                if (rightEntryContainsUserOrGroup(rightEntry, userOrGroupName, user, groupCache,
+                    context)) {
+                    allow = Boolean.valueOf(rightEntry.getIntValue(RIGHTSFIELD_ALLOW) == 1);
+                } else {
+                    allow = Boolean.FALSE;
+                }
+            }
+        }
+
+        return allow;
+    }
+
+    /**
+     * Indicate if provided user or group has provided rights level on provided space or page.
+     * 
+     * @param preferences the document containing rights preferences.
+     * @param global indicate it is global rights (wiki or space) or document rights.
+     * @param levelName the name of the level right to check ("view", "edit", etc.).
+     * @param userOrGroupName the name of the user or group.
+     * @param user indicate if it is a user or a group.
+     * @param context the Xwiki context.
+     * @return true if user has provided rights, false otherwise.
+     * @throws XWikiException error when browsing rights.
+     */
+    public boolean isLevelAllowed(XWikiDocument preferences, boolean global, String levelName,
+        String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
+    {
+        if (user && isSuperAdmin(userOrGroupName, context)) {
+            return true;
+        }
+
+        String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
+
+        // boolean founded = false;
+        Boolean allow = null;
+
+        List rightVector = preferences.getObjects(rightsClass);
+        if (rightVector != null) {
+            Map groupCache = new Hashtable();
+
+            for (Iterator it = rightVector.iterator(); it.hasNext();) {
+                BaseObject rightEntry = (BaseObject) it.next();
+
+                allow =
+                    isRightEntryAllowed(rightEntry, levelName, userOrGroupName, user, groupCache,
+                        context);
+            }
+        }
+
+        // If nothing was found try inheritance
+        if (allow == null) {
+            // Get document containing inherited rights
+            XWikiDocument parentPreferences = getParentPreference(preferences, global, context);
+
+            if (parentPreferences != null) {
+                allow =
+                    Boolean.valueOf(isLevelAllowed(parentPreferences, true, levelName,
+                        userOrGroupName, user, context));
+            }
+        }
+
+        return allow != null && allow.booleanValue();
+    }
+
+    /**
+     * Indicate if provided user or group has provided rights level on provided space or page.
+     * 
+     * @param spaceOrPage the space or page for which to check rights. If null check current wiki
+     *            rights.
+     * @param levelName the name of the level right to check ("view", "edit", etc.).
+     * @param userOrGroupName the name of the user or group.
+     * @param user indicate if it is a user or a group.
+     * @param context the Xwiki context.
+     * @return true if user has provided rights, false otherwise.
+     * @throws XWikiException error when browsing rights.
+     */
+    public boolean isLevelAllowed(String spaceOrPage, String levelName, String userOrGroupName,
+        boolean user, XWikiContext context) throws XWikiException
+    {
+        XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
+
+        boolean global = isGlobal(preferences, spaceOrPage);
+
+        return isLevelAllowed(preferences, global, levelName, userOrGroupName, user, context);
+    }
+}

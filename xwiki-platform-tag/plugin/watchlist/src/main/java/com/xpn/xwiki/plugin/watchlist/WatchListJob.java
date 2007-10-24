@@ -197,9 +197,9 @@ public class WatchListJob implements Job
      * @return a collection of document names pointing to the XWikiUsers wishing to get notified.
      * @throws XWikiException
      */
-    protected Collection retrieveNotificationSubscribers() throws XWikiException
+    protected List retrieveNotificationSubscribers() throws XWikiException
     {
-        Collection userDocs =
+        List userDocs =
             xwiki.searchDocuments(
                 ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName and obj.className='"
                     + WatchListPlugin.WATCHLIST_CLASS + "' and prop.id.id=obj.id and prop.name='interval' " +
@@ -235,7 +235,7 @@ public class WatchListJob implements Job
                 break;
         }
         updatedDocumentRequest += " order by doc.date desc";
-        return xwiki.searchDocuments(updatedDocumentRequest);                   
+        return xwiki.searchDocuments(updatedDocumentRequest);
     }
 
     // TODO : 

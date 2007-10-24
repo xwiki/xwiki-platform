@@ -519,7 +519,9 @@
               **/content/**/*.java,
               **/XWikiMessageTool.java,
               **/XWikiListFilter.java,
-              **/MyPersistentLoginManager.java
+              **/MyPersistentLoginManager.java,
+              **/rightsmanager/*.java,
+              **/rightsmanager/**/*.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java

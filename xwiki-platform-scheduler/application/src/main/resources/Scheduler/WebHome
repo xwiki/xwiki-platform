@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="ISO-8859-1"?>
 
 <xwikidoc>
 <web>Scheduler</web>
@@ -6,20 +6,14 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent></parent>
-<creator>XWiki.jerome</creator>
-<author>XWiki.Admin</author>
+<parent>Main.WebHome</parent>
 <customClass></customClass>
-<contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1190368898000</creationDate>
-<date>1190401180000</date>
-<contentUpdateDate>1190401180000</contentUpdateDate>
-<version>1.22</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -51,6 +45,84 @@
 <className>XWiki.TagClass</className>
 <property>
 <tags/>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.XWikiRights</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<allow>
+<defaultValue>1</defaultValue>
+<displayFormType>select</displayFormType>
+<displayType>allow</displayType>
+<name>allow</name>
+<number>4</number>
+<prettyName>Allow/Deny</prettyName>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.BooleanClass</classType>
+</allow>
+<groups>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<name>groups</name>
+<number>4</number>
+<prettyName>Groups</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>5</size>
+<unmodifiable>0</unmodifiable>
+<usesList>1</usesList>
+<classType>com.xpn.xwiki.objects.classes.GroupsClass</classType>
+</groups>
+<levels>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<name>levels</name>
+<number>4</number>
+<prettyName>Levels</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>3</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.LevelsClass</classType>
+</levels>
+<users>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>1</multiSelect>
+<name>users</name>
+<number>4</number>
+<prettyName>Users</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<size>5</size>
+<unmodifiable>0</unmodifiable>
+<usesList>1</usesList>
+<classType>com.xpn.xwiki.objects.classes.UsersClass</classType>
+</users>
+</class>
+<name>Scheduler.WebHome</name>
+<number>0</number>
+<className>XWiki.XWikiRights</className>
+<property>
+<allow></allow>
+</property>
+<property>
+<groups></groups>
+</property>
+<property>
+<levels></levels>
+</property>
+<property>
+<users></users>
 </property>
 </object>
 <content>## First, set a shortcut to our Scheduler plugin
@@ -127,50 +199,66 @@
   #end
  #end
 #end
-1 List of existing jobs
+1 Job Scheduler
+
+Welcome to the Job scheduler. This application allows you to create administration scripts that can be triggered periodically.
+
+1.1 List of existing jobs
 ##
 ## Retrieve all scheduler jobs living in this space
 ## Display their name, status, possible next fire time, and avaible actions
 ##
 {table}
-Job Name|Job Status|Next firetime|Actions
+Job Name|Job Status|Next fire time|Actions
 #set($hql = ", BaseObject as job where doc.web='Scheduler' and job.name=doc.fullName and job.className='XWiki.SchedulerJobClass' ")
 #foreach($docName in $xwiki.searchDocuments($hql))
+ #set($actions = $xwiki.hashMap) ## get a hash to store action urls
  #set($jobHolder = $xwiki.getDocument($docName))
  #set($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
  #set($status = "") #set($status = $job.get('status')) #if($status=="") #set($status="None") #end
- #set($firetime = "") #if($status!="None") #set($firetime = $scheduler.getNextFireTime($job))  #else #set($firetime="NA") #end
- #set($actions="") 
+ #set($firetime = "") #if($status!="None") #set($firetime = $scheduler.getNextFireTime($job))  #else #set($firetime="N/A") #end
   #if($status=="None") 
-   #set($scheduleURL = $doc.getURL("view","do=schedule&amp;which=${jobHolder.fullName}"))
-   #set($actions="&lt;a href=${scheduleURL}&gt;schedule&lt;/a&gt;") 
+   #set( $ok = $!actions.put("schedule",$doc.getURL("view","do=schedule&amp;amp;which=${jobHolder.fullName}")) )
   #elseif($status=="Normal")
-   #set($pauseURL = $doc.getURL("view","do=pause&amp;which=${jobHolder.fullName}"))
-   #set($unscheduleURL = $doc.getURL("view","do=unschedule&amp;which=${jobHolder.fullName}"))
-   #set($actions="&lt;a href=${pauseURL}&gt;pause&lt;/a&gt; &lt;a href=${unscheduleURL}&gt;unschedule&lt;/a&gt;") 
+   #set( $ok = $!actions.put("pause",$doc.getURL("view","do=pause&amp;amp;which=${jobHolder.fullName}")) )
+   #set( $ok = $!actions.put("unschedule",$doc.getURL("view","do=unschedule&amp;amp;which=${jobHolder.fullName}")) )
   #elseif($status=="Paused")
-   #set($resumeURL = $doc.getURL("view","do=resume&amp;which=${jobHolder.fullName}"))
-   #set($unscheduleURL = $doc.getURL("view","do=unschedule&amp;which=${jobHolder.fullName}"))
-   #set($actions="&lt;a href=${resumeURL}&gt;resume&lt;/a&gt; &lt;a href=${unscheduleURL}&gt;unschedule&lt;/a&gt;")   
+   #set( $ok = $!actions.put("resume",$doc.getURL("view","do=resume&amp;amp;which=${jobHolder.fullName}")) )
+   #set( $ok = $!actions.put("unschedule",$doc.getURL("view","do=unschedule&amp;amp;which=${jobHolder.fullName}")) )
   #end
-  #set($deleteURL = $doc.getURL("view","do=delete&amp;which=${jobHolder.fullName}"))
-  #set($actions="${actions} &lt;a href=${deleteURL}&gt;delete&lt;/a&gt;")
-$job.get("jobName")|$status|$firetime| *Infos* : [view&gt;$jobHolder.fullName] &lt;a href=$jobHolder.getURL('inline')&gt;edit&lt;/a&gt; *Job* : $actions
+  #set($ok = $!actions.put("delete",$doc.getURL("view","do=delete&amp;amp;which=${jobHolder.fullName}")) )
+$job.get("jobName")|$status|$firetime| *Infos* : [view&gt;$jobHolder.fullName] #if($jobHolder.hasAccessLevel("programming")) &lt;a href="${jobHolder.getURL('inline')}"&gt;edit&lt;/a&gt; #end *Job* : #foreach($action in $actions.keySet()) &lt;a href="${actions.get($action)}"&gt;$action&lt;/a&gt; #end
+
 #end
 {table}
 
+#if($doc.hasAccessLevel("programming"))
+##
+## Job creation is offered only for programmers, because the job page needs to be saved 
+## with programming right for groovy jobs to be executed.
+## However, this page should stay accessibles to admins, that can manipulate existing jobs :
+## scheduler, pause, etc.
+##
 1.1 Create a new job
 ##
 ## Form to create a new Job
 ##
  
+#info("Enter here the name of the page that will hold your job. The job will be created in the current Scheduler space.")
+
 &lt;form action="" id="newdoc"&gt;
+&lt;div&gt;
 &lt;input type="hidden" name="parent" value="Scheduler.WebHome" /&gt;
 &lt;input type="hidden" name="template" value="XWiki.SchedulerJobTemplate" /&gt;
 &lt;input type="hidden" name="sheet" value="1" /&gt;
 &lt;input type="hidden" name="webname" value="Scheduler"/&gt;
 &lt;input type="hidden" name="name" value=""/&gt;
+&lt;input type="hidden" name="parent" value="${doc.fullName}"/&gt;
 &lt;input type="text" name="title" value="Job page name" size="30"/&gt;
 &lt;input type="button" value="Add" onclick='if (updateName(this.form.title,this.form.name)) { action="../../inline/" + this.form.webname.value + "/" + this.form.name.value; this.form.submit(); }' /&gt;
+&lt;/div&gt;
 &lt;/form&gt;
-</content></xwikidoc>
+#else
+ #warning("Job creation is reserved for programmers. It seems you do not have programming access right allowed on the Scheduler space.")
+#end</content>
+</xwikidoc>

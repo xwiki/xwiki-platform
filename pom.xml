@@ -529,7 +529,6 @@
 	          **/*DeletedDocument.java,
 	          **/DeleteAction.java,
 	          **/UndeleteAction.java,
-              **/rightsmanager/*.java,
               **/rightsmanager/**/*.java
           </includes>
           <excludes>

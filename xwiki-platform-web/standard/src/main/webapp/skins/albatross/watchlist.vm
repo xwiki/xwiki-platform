@@ -30,9 +30,9 @@
     #end
   #end
   #if ($ret == true)
-    #info($msg.get("watchlist.delete.ok", "$el"))
+    #info($msg.get("watchlist.delete.ok", [$el]))
   #else
-    #error($msg.get("watchlist.delete.ko", "$el"))
+    #error($msg.get("watchlist.delete.ko", [$el]))
   #end
 #elseif ($request.removespace)
 #end

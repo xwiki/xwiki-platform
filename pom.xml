@@ -520,7 +520,6 @@
               **/XWikiMessageTool.java,
               **/XWikiListFilter.java,
               **/MyPersistentLoginManager.java,
-              **/rightsmanager/*.java,
               **/rightsmanager/**/*.java
           </includes>
           <excludes>

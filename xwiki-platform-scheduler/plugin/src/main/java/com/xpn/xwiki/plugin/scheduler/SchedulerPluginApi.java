@@ -24,6 +24,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Object;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import org.apache.commons.logging.Log;
@@ -32,7 +33,7 @@ import org.quartz.SchedulerException;
 
 import java.util.Date;
 import java.util.Iterator;
-import java.util.Vector;
+import java.util.List;
 
 /**
  * A Scheduler plugin to plan execution of Jobs from XWiki with cron expressions. The plugin uses
@@ -76,7 +77,7 @@ public class SchedulerPluginApi extends Api
     {
         try {
             return getJobStatus(object.getXWikiObject()).getValue();
-        } catch (SchedulerException e) {
+        } catch (Exception e) {
             context.put("error", e.getMessage());
             return null;
         }
@@ -86,14 +87,42 @@ public class SchedulerPluginApi extends Api
      * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner
      * value of the state and a String as a human readable representation of that state
      */
-    public JobState getJobStatus(BaseObject object) throws SchedulerException
+    public JobState getJobStatus(BaseObject object) throws SchedulerException, SchedulerPluginException
     {
         return plugin.getJobStatus(object);
     }
 
-    public JobState getJobStatus(Object object) throws SchedulerException
+    public JobState getJobStatus(Object object) throws SchedulerException, SchedulerPluginException
     {
-        return plugin.getJobStatus(object.getXWikiObject());
+        return plugin.getJobStatus(retrieveBaseObject(object));
+    }
+
+    /**
+     * This function allow to retrieve a com.xpn.xwiki.objects.BaseObject from a
+     * com.xpn.xwiki.api.Object without that the current user needs programming rights (as in
+     * com.xpn.xwiki.api.Object#getXWikiObject(). The function is used internally by this api class
+     * and allows wiki users to call methods from the scheduler without having programming right.
+     * The programming right is only needed at script execution time.
+     *
+     * @return object the unwrapped version of the passed api object
+     */
+    private BaseObject retrieveBaseObject(Object object) throws SchedulerPluginException
+    {
+        String docName = object.getName();
+        int objNb = object.getNumber();
+        try
+        {
+
+            XWikiDocument jobHolder = context.getWiki().getDocument(docName,context);
+            BaseObject jobObject = jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS,objNb);
+            return jobObject;
+        }
+        catch(XWikiException e)
+        {
+            throw new SchedulerPluginException(
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB,
+                "Job in document [" + docName + "] with object number ["+ objNb +"] could not be retrieved.", e);
+        }
     }
 
     /**
@@ -107,7 +136,14 @@ public class SchedulerPluginApi extends Api
      */
     public boolean scheduleJob(Object object)
     {
-        return scheduleJob(object.getXWikiObject());
+        try{
+            return scheduleJob(retrieveBaseObject(object));
+        }
+        catch(Exception e){
+            // we don't need to push the exception message in the context here
+            // as it should already have been pushed by the throwing exception
+            return false;
+        }
     }
 
     public boolean scheduleJob(BaseObject object)
@@ -131,10 +167,19 @@ public class SchedulerPluginApi extends Api
     public boolean scheduleJobs(Document document)
     {
         boolean result = true;
-        Vector objects = document.getObjects(SchedulerPlugin.XWIKI_JOB_CLASS);
-        for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
-            Object object = (Object) iterator.next();
-            result &= scheduleJob(object.getXWikiObject());
+        try
+        {
+            XWikiDocument doc = context.getWiki().getDocument(document.getFullName(),context);
+            List objects = doc.getObjects(SchedulerPlugin.XWIKI_JOB_CLASS);
+            for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
+                Object object = (Object) iterator.next();
+                result &= scheduleJob(object);
+            }
+        }
+        catch(Exception e)
+        {
+            context.put("error", e.getMessage());
+            return false;
         }
         return result;
     }
@@ -148,7 +193,17 @@ public class SchedulerPluginApi extends Api
      */
     public boolean pauseJob(Object object)
     {
-        return pauseJob(object.getXWikiObject());
+        try
+        {
+            return pauseJob(retrieveBaseObject(object));
+        }
+        catch(Exception e)
+        {
+            // we don't need to push the exception message in the context here
+            // as it should already have been pushed by the throwing exception
+            return false;
+        }
+
     }
 
     public boolean pauseJob(BaseObject object)
@@ -164,7 +219,7 @@ public class SchedulerPluginApi extends Api
     }
 
     /**
-     * Resume a XObject job that is in a {@link JobState#PAUSED} state. Can be called the same
+     * Resume a XObject job that is in a {@link JobState#STATE_PAUSED} state. Can be called the same
      * way as {@link #scheduleJob}
      *
      * @param object the wrapped XObject Job to be paused
@@ -172,7 +227,14 @@ public class SchedulerPluginApi extends Api
      */
     public boolean resumeJob(Object object)
     {
-        return resumeJob(object.getXWikiObject());
+        try{
+            return resumeJob(retrieveBaseObject(object));
+        }
+        catch(Exception e){
+            // we don't need to push the exception message in the context here
+            // as it should already have been pushed by the throwing exception
+            return false;
+        }
     }
 
     public boolean resumeJob(BaseObject object)
@@ -196,7 +258,14 @@ public class SchedulerPluginApi extends Api
      */
     public boolean unscheduleJob(Object object)
     {
-        return unscheduleJob(object.getXWikiObject());
+        try{
+            return unscheduleJob(retrieveBaseObject(object));
+        }
+        catch(Exception e){
+            // we don't need to push the exception message in the context here
+            // as it should already have been pushed by the throwing exception
+            return false;
+        }
     }
 
     public boolean unscheduleJob(BaseObject object)
@@ -224,7 +293,14 @@ public class SchedulerPluginApi extends Api
      */
     public Date getNextFireTime(Object object)
     {
-        return getNextFireTime(object.getXWikiObject());
+        try{
+            return getNextFireTime(retrieveBaseObject(object));
+        }
+        catch(Exception e){
+            // we don't need to push the exception message in the context here
+            // as it should already have been pushed by the throwing exception
+            return null;
+        }
     }
 
     public Date getNextFireTime(BaseObject object)

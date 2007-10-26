@@ -565,29 +565,35 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     /**
      * Get all groups containing provided user.
      * 
-     * @param user the name of the user.
+     * @param member the name of the member (user or group).
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found member to return.
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllGroupsForUser(String user, XWikiContext context)
-        throws XWikiException
+    public Collection getAllGroupsNamesForMember(String member, int nb, int start,
+        XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getGroupService(context).listGroupsForUser(user, context);
+        return context.getWiki().getGroupService(context).getAllGroupsNamesForMember(member, nb,
+            start, context);
     }
 
     /**
      * Get all users provided group contains.
      * 
      * @param group the name of the group.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
      * @param context the XWiki context.
      * @return the {@link Collection} of {@link String} containing user name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllUsersForGroup(String group, XWikiContext context)
-        throws XWikiException
+    public Collection getAllMembersNamesForGroup(String group, int nb, int start,
+        XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getGroupService(context).listMemberForGroup(group, context);
+        return context.getWiki().getGroupService(context).getAllMembersNamesForGroup(group, nb,
+            start, context);
     }
 
     // Rights management

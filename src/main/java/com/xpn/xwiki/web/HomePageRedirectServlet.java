@@ -1,6 +1,6 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
- * by the contributors.txt.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -21,18 +21,21 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
- * A simple action that redirects to the main page of the wiki
+ * A simple action that redirects to the main page of the wiki. This is to allow users to enter
+ * a URL like <code>http://localhost:8080/xwiki</code> and be redirected automatically to
+ * <code>http://localhost:8080/xwiki/bin/view/Main/</code>.
  */
-public class HomePageRedirect extends HttpServlet {
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // TODO: configure the main page?
-        response.sendRedirect("bin/view/Main/");
+public class HomePageRedirectServlet extends HttpServlet
+{
+    public void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
+    {
+        response.sendRedirect("bin/view/Main/WebHome");
     }
 }

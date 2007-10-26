@@ -67,7 +67,7 @@ public class RightsManagerPluginApi extends PluginApi
      * API for managing rights and inheritance.
      */
     private RightsManageRightsApi rightsApi;
-    
+
     /**
      * Create an instance of the Rights Manager plugin user api.
      * 
@@ -77,10 +77,10 @@ public class RightsManagerPluginApi extends PluginApi
     public RightsManagerPluginApi(RightsManagerPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
-        
+
         rightsApi = new RightsManageRightsApi(context);
     }
-    
+
     /**
      * @return the API for managing rights and inheritance.
      */
@@ -512,10 +512,10 @@ public class RightsManagerPluginApi extends PluginApi
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
      * @param order the fields to order from. It is a List containing :
-     *             <ul>
-     *             <li>"field name" for document fields</li>
-     *             <li>or ["filed name", "field type"] for object fields</li>
-     *             </ul>
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
@@ -1883,18 +1883,19 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * Get all groups containing provided user.
      * 
-     * @param user the name of the user.
+     * @param member the name of the member (user or group).
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllGroupsForUser(String user) throws XWikiException
+    public Collection getAllGroupsNamesForMember(String member) throws XWikiException
     {
         Collection userList = Collections.EMPTY_LIST;
 
         try {
-            userList = RightsManager.getInstance().getAllGroupsForUser(user, this.context);
+            userList =
+                RightsManager.getInstance().getAllGroupsNamesForMember(member, 0, 0, this.context);
         } catch (RightsManagerException e) {
-            logError("Try to get all groups containing user " + QUOTE + user + QUOTE
+            logError("Try to get all groups containing user " + QUOTE + member + QUOTE
                 + ") users from local wiki", e);
         }
 
@@ -1902,18 +1903,35 @@ public class RightsManagerPluginApi extends PluginApi
     }
 
     /**
-     * Get all users provided group contains.
+     * Get all members (users or groups) provided group contains.
      * 
      * @param group the name of the group.
-     * @return the {@link Collection} of {@link String} containing user name.
+     * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllUsersForGroup(String group) throws XWikiException
+    public Collection getAllMembersNamesForGroup(String group) throws XWikiException
+    {
+        return getAllMembersNamesForGroup(group, 0, 0);
+    }
+
+    /**
+     * Get all members (users or groups) provided group contains.
+     * 
+     * @param group the name of the group.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return the {@link Collection} of {@link String} containing member (user or group) name.
+     * @throws XWikiException error when browsing groups.
+     */
+    public Collection getAllMembersNamesForGroup(String group, int nb, int start)
+        throws XWikiException
     {
         Collection userList = Collections.EMPTY_LIST;
 
         try {
-            userList = RightsManager.getInstance().getAllUsersForGroup(group, this.context);
+            userList =
+                RightsManager.getInstance().getAllMembersNamesForGroup(group, nb, start,
+                    this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all user group " + QUOTE + group + QUOTE + ") contains", e);
         }

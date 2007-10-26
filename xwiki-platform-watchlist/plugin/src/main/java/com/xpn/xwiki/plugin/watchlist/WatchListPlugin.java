@@ -232,6 +232,13 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             job.setStringValue("cron", cron);
             job.setLargeStringValue("script", Integer.toString(interval));
             job.setLargeStringValue("jobDescription", description);
+
+            // set the needed context params
+            // TODO create a watchlist application that holds those jobs as documents
+            job.setStringValue("contextUser", "XWiki.Admin");
+            job.setStringValue("contextLang","en");
+            job.setStringValue("contextDatabase","xwiki");
+
             doc.setContent("#includeInContext('XWiki.SchedulerJobSheet')");
             doc.setAuthor("XWiki.Admin");
             doc.setCreator("XWiki.Admin");

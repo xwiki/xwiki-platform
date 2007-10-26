@@ -1,6 +1,0 @@
-
-XWiki Installation Instructions
-
-Please refer to the online documentation at:
-
-http://www.xwiki.org/xwiki/bin/view/AdminGuide/

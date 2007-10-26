@@ -277,6 +277,7 @@ public class XWikiHibernateBaseStore {
      * @param wikiName the wiki name to convert.
      * @param context the XWiki context.
      * @return the database/schema name.
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     protected String getSchemaFromWikiName(String wikiName, XWikiContext context)
     {
@@ -303,6 +304,7 @@ public class XWikiHibernateBaseStore {
      * 
      * @param context the XWiki context.
      * @return the database/schema name.
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     protected String getSchemaFromWikiName(XWikiContext context)
     {

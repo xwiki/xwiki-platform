@@ -123,6 +123,7 @@ public class Document extends Api
 
     /**
      * @return the name of the wiki where this document is stored.
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     public String getWiki()
     {
@@ -155,6 +156,7 @@ public class Document extends Api
     /**
      * @return the real full name of a document containing wiki name where document is stored.
      * For document in "xwiki" wiki, with name "MyDoc" and space "MySpace" the extended full name is "xwiki:MySpace.MyDoc".
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     public String getPrefixedFullName()
     {

@@ -17,24 +17,19 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.mailsender;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.plugin.PluginApi;
+import org.apache.velocity.VelocityContext;
 
 import java.util.List;
 
-import org.apache.velocity.VelocityContext;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Attachment;
-import com.xpn.xwiki.plugin.PluginApi;
-
 /**
- * Plugin that brings powerful mailing capbilities to XWiki
- * Recipients : to, cc, bcc
- * Text messages
- * HTML messages with attachments
- * Text + HTML messages from XWiki pages templates
- * Send a collection of mails in one call
+ * Plugin that brings powerful mailing capbilities to XWiki Recipients : to, cc, bcc Text messages
+ * HTML messages with attachments Text + HTML messages from XWiki pages templates Send a collection
+ * of mails in one call
  *
  * This is the wrapper accessible from in-document scripts.
  *
@@ -47,12 +42,11 @@ public class MailSenderPluginApi extends PluginApi
      *
      * @param plugin The wrapped plugin object.
      * @param context Context of the request.
-     * @see PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, XWikiContext)
+     * @see PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,XWikiContext)
      */
     public MailSenderPluginApi(MailSenderPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
-
     }
 
     /**
@@ -62,7 +56,7 @@ public class MailSenderPluginApi extends PluginApi
      */
     public MailSenderPlugin getMailSenderPlugin()
     {
-        return (MailSenderPlugin)getPlugin();
+        return (MailSenderPlugin) getPlugin();
     }
 
     /**
@@ -91,7 +85,7 @@ public class MailSenderPluginApi extends PluginApi
             email.setTextPart(alternative);
             email.setHtmlPart(body);
             email.setAttachments(attachments);
-            getMailSenderPlugin().sendMail(email);
+            getMailSenderPlugin().sendMail(email, context);
             return 0;
         } catch (Exception e) {
             context.put("error", e.getMessage());
@@ -100,11 +94,9 @@ public class MailSenderPluginApi extends PluginApi
         }
     }
 
-
-
     /**
      * Sends a simple text plain mail
-     * 
+     *
      * @param to the recipient of the message
      * @param from the sender
      * @param subject the subject of the message
@@ -114,13 +106,13 @@ public class MailSenderPluginApi extends PluginApi
     public int sendTextMessage(String from, String to, String subject, String message)
     {
         try {
-             Mail email = new Mail();
-             email.setSubject(subject);
-             email.setTextPart(message);
-             email.setFrom(from);
-             email.setTo(to);
-             
-             getMailSenderPlugin().sendMail(email);
+            Mail email = new Mail();
+            email.setSubject(subject);
+            email.setTextPart(message);
+            email.setFrom(from);
+            email.setTo(to);
+
+            getMailSenderPlugin().sendMail(email, context);
             return 0;
         } catch (Exception e) {
             context.put("error", e.getMessage());
@@ -131,7 +123,7 @@ public class MailSenderPluginApi extends PluginApi
 
     /**
      * Sends a simple text plain mail with a list of files attachments
-     * 
+     *
      * @param to the recipient of the message
      * @param from the sender
      * @param cc carbon copy
@@ -153,7 +145,7 @@ public class MailSenderPluginApi extends PluginApi
             email.setCc(cc);
             email.setBcc(bcc);
             email.setAttachments(attachments);
-            getMailSenderPlugin().sendMail(email);
+            getMailSenderPlugin().sendMail(email, context);
             return 0;
         } catch (Exception e) {
             context.put("error", e.getMessage());
@@ -172,7 +164,7 @@ public class MailSenderPluginApi extends PluginApi
      * @param bcc Email Hidden Carbon Copy
      * @param language Language of the email
      * @param documentFullName Full name of the template to be used (example:
-     *            XWiki.MyEmailTemplate). The template needs to have an XWiki.Email object attached
+     * XWiki.MyEmailTemplate). The template needs to have an XWiki.Email object attached
      * @param vcontext Velocity context passed to the velocity renderer
      * @return True if the email has been sent
      */
@@ -180,11 +172,11 @@ public class MailSenderPluginApi extends PluginApi
         String language, String documentFullName, VelocityContext vcontext)
     {
         try {
-            return getMailSenderPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc, language, vcontext);
+            return getMailSenderPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc,
+                language, vcontext, context);
         } catch (Exception e) {
             getMailSenderPlugin().getLogger().error("sendMessageFromTemplate", e);
             return -1;
         }
     }
-
 }

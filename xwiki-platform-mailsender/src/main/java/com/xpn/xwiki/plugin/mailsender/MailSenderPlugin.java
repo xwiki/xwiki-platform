@@ -84,9 +84,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
 
     protected static final String URL_SEPARATOR = "/";
 
-    private static Log log = LogFactory.getLog(MailSenderPlugin.class);
-
-    protected XWikiContext context;         
+    private static Log log = LogFactory.getLog(MailSenderPlugin.class);    
 
     /**
      * {@inheritDoc}
@@ -97,7 +95,6 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
     {
         super(name, className, context);
         init(context);
-        this.context = context;
     }
 
     /**
@@ -233,7 +230,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      * @param mpart Multipart message
      * @param attachments List of attachments
      */
-    public void addAttachments(Multipart mpart, List attachments)
+    public void addAttachments(Multipart mpart, List attachments, XWikiContext context)
         throws XWikiException, IOException, MessagingException
     {
         if (attachments != null) {
@@ -270,7 +267,8 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      * @param session Mail session
      * @return The MIME message
      */
-    private MimeMessage createMimeMessage(Mail mail, Session session) throws MessagingException,
+    private MimeMessage createMimeMessage(Mail mail, Session session, XWikiContext context)
+        throws MessagingException,
         XWikiException, IOException
     {
         // this will also check for email error
@@ -303,7 +301,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
         message.setSubject(mail.getSubject(), "UTF-8");
 
         if (mail.getHtmlPart() != null || mail.getAttachments() != null) {
-            Multipart multipart = createMimeMultipart(mail);
+            Multipart multipart = createMimeMultipart(mail, context);
             message.setContent(multipart);
         } else {
             message.setText(mail.getTextPart());
@@ -321,7 +319,8 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      * @param mail The original Mail
      * @return The Multipart MIME message
      */
-    public Multipart createMimeMultipart(Mail mail) throws MessagingException, XWikiException,
+    public Multipart createMimeMultipart(Mail mail, XWikiContext context)
+        throws MessagingException, XWikiException,
         IOException
     {
 
@@ -331,7 +330,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
             BodyPart part = new MimeBodyPart();
             part.setContent(mail.getTextPart(), "text/plain");
             multipart.addBodyPart(part);
-            addAttachments(multipart, mail.getAttachments());
+            addAttachments(multipart, mail.getAttachments(), context);
             return multipart;
         } else {
 
@@ -360,7 +359,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
                 part.setContent(alternativeMultipart);
                 mixedMultipart.addBodyPart(part);
 
-                addAttachments(mixedMultipart, mail.getAttachments());
+                addAttachments(mixedMultipart, mail.getAttachments(), context);
                 return mixedMultipart;
             }
             return alternativeMultipart;
@@ -404,7 +403,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      *
      * @return The properties
      */
-    private Properties initProperties()
+    private Properties initProperties(XWikiContext context)
     {
         Properties properties = new Properties();
 
@@ -435,7 +434,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      * @return The prepared context
      */
     public VelocityContext prepareVelocityContext(String fromAddr, String toAddr, String bccAddr,
-        VelocityContext vcontext)
+        VelocityContext vcontext, XWikiContext context)
     {
         if (vcontext == null) {
             vcontext = new VelocityContext();
@@ -448,8 +447,10 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
         vcontext.put("to.bcc", bccAddr);
         vcontext.put("bounce", fromAddr);
 
-        // com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
-        // vcontext.put("xwiki", xwikiApi);
+        com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
+        vcontext.put("xwiki", xwikiApi);
+        com.xpn.xwiki.api.Context contextApi = new com.xpn.xwiki.api.Context(context);
+        vcontext.put("context", contextApi);
 
         return vcontext;
     }
@@ -487,12 +488,12 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      * @param mailItem The Mail to send
      * @return True if the the email has been sent
      */
-    public boolean sendMail(Mail mailItem) throws MessagingException,
+    public boolean sendMail(Mail mailItem, XWikiContext context) throws MessagingException,
         UnsupportedEncodingException
     {
         ArrayList mailList = new ArrayList();
         mailList.add(mailItem);
-        return sendMails(mailList);
+        return sendMails(mailList, context);
     }
 
     /**
@@ -501,7 +502,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
-    public boolean sendMails(Collection emails) throws MessagingException,
+    public boolean sendMails(Collection emails, XWikiContext context) throws MessagingException,
         UnsupportedEncodingException
     {
         Session session = null;
@@ -513,7 +514,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
             for (Iterator emailIt = emails.iterator(); emailIt.hasNext();) {
                 count++;
                 if ((transport == null) || (session == null)) {
-                    Properties props = initProperties();
+                    Properties props = initProperties(context);
                     session = Session.getDefaultInstance(props, null);
                     transport = session.getTransport("smtp");
                     transport.connect();
@@ -524,7 +525,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
 
                 try {
 
-                    MimeMessage message = createMimeMessage(mail, session);
+                    MimeMessage message = createMimeMessage(mail, session, context);
                     if (message == null) {
                         continue;
                     }
@@ -594,10 +595,12 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
      * @return True if the email has been sent
      */
     public int sendMailFromTemplate(String templateDocFullName, String from, String to,
-        String cc, String bcc, String language, VelocityContext vcontext) throws XWikiException
+        String cc, String bcc, String language, VelocityContext vcontext, XWikiContext context)
+        throws XWikiException
     {
 
-        VelocityContext updatedVelocityContext = prepareVelocityContext(from, to, bcc, vcontext);
+        VelocityContext updatedVelocityContext =
+            prepareVelocityContext(from, to, bcc, vcontext, context);
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
         BaseObject obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", language);
@@ -633,7 +636,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
             }
             mail.setTextPart(msg);
             mail.setHtmlPart(html);
-            sendMail(mail);
+            sendMail(mail, context);
             return 0;
         } catch (Exception e) {
             log.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: "

@@ -617,7 +617,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * 
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
-     * @param context the Xwiki context.
+     * @param context the XWiki context.
      * @return the {@link Map} containing [levelname : {@link LevelTree}].
      * @throws XWikiException error when browsing rights preferences.
      */
@@ -818,6 +818,24 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
         }
 
         return parentPreferences;
+    }
+
+    /**
+     * Get the document containing inherited rights of provided document.
+     * 
+     * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
+     * @param context the XWiki context.
+     * @return the document containing inherited rights of provided document.
+     * @throws XWikiException error when browsing rights preferences.
+     */
+    public XWikiDocument getParentPreference(String spaceOrPage, XWikiContext context)
+        throws XWikiException
+    {
+        XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
+
+        boolean global = isGlobal(preferences, spaceOrPage);
+
+        return getParentPreference(preferences, global, context);
     }
 
     /**
@@ -1113,12 +1131,12 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     /**
      * Browse a group and groups it contains to find provided member (user or group).
      * 
-     * @param groupName the group name where to search for memeber.
-     * @param memberName the name of the memeber to find.
-     * @param groupCacheIn a map containg a set a group and its corresponding memebers already
+     * @param groupName the group name where to search for member.
+     * @param memberName the name of the member to find.
+     * @param groupCacheIn a map containing a set a group and its corresponding members already
      *            retrieved.
-     * @param context the Xwiki context.
-     * @return true if the memeber has been found, false otherwise.
+     * @param context the XWiki context.
+     * @return true if the member has been found, false otherwise.
      * @throws XWikiException error when browsing groups.
      */
     public boolean groupContainsMember(String groupName, String memberName, Map groupCacheIn,
@@ -1159,15 +1177,15 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Browse a right objet to find provided user or group.
+     * Browse a right object to find provided user or group.
      * 
-     * @param rightEntry the objet containing rights preferences.
-     * @param userOrGroupName the name of teh user or groups to find.
+     * @param rightEntry the object containing rights preferences.
+     * @param userOrGroupName the name of the user or groups to find.
      * @param user indicate if it is a user or a group.
-     * @param groupCacheIn a map containg a set a group and its corresponding memebers already
+     * @param groupCacheIn a map containing a set a group and its corresponding members already
      *            retrieved.
-     * @param context the Xwiki conxtext.
-     * @return true if the memeber has been found, false otherwise.
+     * @param context the XWiki context.
+     * @return true if the member has been found, false otherwise.
      * @throws XWikiException error when browsing right object.
      */
     public boolean rightEntryContainsUserOrGroup(BaseObject rightEntry, String userOrGroupName,
@@ -1210,7 +1228,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * Indicate if provided user is super administrator.
      * 
      * @param userName the name of the user.
-     * @param context the XWiki conxtext.
+     * @param context the XWiki context.
      * @return true is provided user is super administrator, false otherwise.
      */
     public boolean isSuperAdmin(String userName, XWikiContext context)
@@ -1240,13 +1258,13 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * Indicate which rights provided user or group has on provided right level on provided right
      * object.
      * 
-     * @param rightEntry the object containg rights prferences.
+     * @param rightEntry the object containing rights preferences.
      * @param levelName the name of the level right to check.
      * @param userOrGroupName the name of the user or group.
      * @param user indicate if it is a user or a group.
-     * @param groupCache a map containg a set a group and its corresponding memebers already
+     * @param groupCache a map containing a set a group and its corresponding members already
      *            retrieved.
-     * @param context the Xwiki context.
+     * @param context the XWiki context.
      * @return {@link Boolean#TRUE} if user has provided right level, {@link Boolean#FALSE} if it is
      *         denied on provided right level. Can be null if no "allow" or "deny" rights.
      * @throws XWikiException error when browsing rights.
@@ -1283,7 +1301,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param levelName the name of the level right to check ("view", "edit", etc.).
      * @param userOrGroupName the name of the user or group.
      * @param user indicate if it is a user or a group.
-     * @param context the Xwiki context.
+     * @param context the XWiki context.
      * @return true if user has provided rights, false otherwise.
      * @throws XWikiException error when browsing rights.
      */
@@ -1335,7 +1353,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param levelName the name of the level right to check ("view", "edit", etc.).
      * @param userOrGroupName the name of the user or group.
      * @param user indicate if it is a user or a group.
-     * @param context the Xwiki context.
+     * @param context the XWiki context.
      * @return true if user has provided rights, false otherwise.
      * @throws XWikiException error when browsing rights.
      */

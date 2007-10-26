@@ -445,12 +445,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
         vcontext.put("to.name", toAddr);
         vcontext.put("to.address", toAddr);
         vcontext.put("to.bcc", bccAddr);
-        vcontext.put("bounce", fromAddr);
-
-        com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
-        vcontext.put("xwiki", xwikiApi);
-        com.xpn.xwiki.api.Context contextApi = new com.xpn.xwiki.api.Context(context);
-        vcontext.put("context", contextApi);
+        vcontext.put("bounce", fromAddr);        
 
         return vcontext;
     }

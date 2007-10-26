@@ -64,6 +64,11 @@ public class RightsManagerPluginApi extends PluginApi
     protected static final Log LOG = LogFactory.getLog(RightsManagerPluginApi.class);
 
     /**
+     * API for managing rights and inheritance.
+     */
+    private RightsManageRightsApi rightsApi;
+    
+    /**
      * Create an instance of the Rights Manager plugin user api.
      * 
      * @param plugin the entry point of the Rights Manager plugin.
@@ -72,6 +77,16 @@ public class RightsManagerPluginApi extends PluginApi
     public RightsManagerPluginApi(RightsManagerPlugin plugin, XWikiContext context)
     {
         super(plugin, context);
+        
+        rightsApi = new RightsManageRightsApi(context);
+    }
+    
+    /**
+     * @return the API for managing rights and inheritance.
+     */
+    public RightsManageRightsApi getRightsApi()
+    {
+        return rightsApi;
     }
 
     /**

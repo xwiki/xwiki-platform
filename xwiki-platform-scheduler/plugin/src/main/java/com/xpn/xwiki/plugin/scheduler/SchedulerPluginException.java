@@ -47,6 +47,8 @@ public class SchedulerPluginException extends PluginException
 
     protected static final int ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB = 90010;
 
+    protected static final int ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT = 90011;
+
     public SchedulerPluginException(int code, String message)
     {
         super(SchedulerPlugin.class, code, message);

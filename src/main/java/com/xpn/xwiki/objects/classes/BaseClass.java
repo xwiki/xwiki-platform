@@ -353,6 +353,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return addUsersField(fieldName, fieldPrettyName, true);
     }
 
+    /**
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     */
     public boolean addUsersField(String fieldName, String fieldPrettyName, boolean multiSelect)
     {
         return addUsersField(fieldName, fieldPrettyName, 5, multiSelect);
@@ -363,6 +366,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return addUsersField(fieldName, fieldPrettyName, size, true);
     }
 
+    /**
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     */
     public boolean addUsersField(String fieldName, String fieldPrettyName, int size,
         boolean multiSelect)
     {
@@ -444,6 +450,9 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         return addStaticListField(fieldName, fieldPrettyName, size, multiSelect, values, displayType, null);
     }
     
+    /**
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     */
     public boolean addStaticListField(String fieldName, String fieldPrettyName, int size, boolean multiSelect, String values, String displayType, String separators) {
         if (get(fieldName)==null) {
             StaticListClass list_class = new StaticListClass();

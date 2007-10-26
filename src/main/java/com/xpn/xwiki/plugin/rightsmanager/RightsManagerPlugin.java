@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
  * Entry point of the Rights Manager plugin.
  * 
  * @version $Id: $
+ * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
 public class RightsManagerPlugin extends XWikiDefaultPlugin
 {

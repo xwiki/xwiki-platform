@@ -87,7 +87,8 @@ public class SchedulerPluginApi extends Api
      * Return the trigger state as a ${@link JobState}, that holds both the integer trigger's inner
      * value of the state and a String as a human readable representation of that state
      */
-    public JobState getJobStatus(BaseObject object) throws SchedulerException, SchedulerPluginException
+    public JobState getJobStatus(BaseObject object)
+        throws SchedulerException, SchedulerPluginException
     {
         return plugin.getJobStatus(object);
     }
@@ -110,18 +111,17 @@ public class SchedulerPluginApi extends Api
     {
         String docName = object.getName();
         int objNb = object.getNumber();
-        try
-        {
+        try {
 
-            XWikiDocument jobHolder = context.getWiki().getDocument(docName,context);
-            BaseObject jobObject = jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS,objNb);
+            XWikiDocument jobHolder = context.getWiki().getDocument(docName, context);
+            BaseObject jobObject = jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, objNb);
             return jobObject;
         }
-        catch(XWikiException e)
-        {
+        catch (XWikiException e) {
             throw new SchedulerPluginException(
                 SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_RETRIEVE_JOB,
-                "Job in document [" + docName + "] with object number ["+ objNb +"] could not be retrieved.", e);
+                "Job in document [" + docName + "] with object number [" + objNb +
+                    "] could not be retrieved.", e);
         }
     }
 
@@ -136,10 +136,10 @@ public class SchedulerPluginApi extends Api
      */
     public boolean scheduleJob(Object object)
     {
-        try{
+        try {
             return scheduleJob(retrieveBaseObject(object));
         }
-        catch(Exception e){
+        catch (Exception e) {
             // we don't need to push the exception message in the context here
             // as it should already have been pushed by the throwing exception
             return false;
@@ -167,17 +167,15 @@ public class SchedulerPluginApi extends Api
     public boolean scheduleJobs(Document document)
     {
         boolean result = true;
-        try
-        {
-            XWikiDocument doc = context.getWiki().getDocument(document.getFullName(),context);
+        try {
+            XWikiDocument doc = context.getWiki().getDocument(document.getFullName(), context);
             List objects = doc.getObjects(SchedulerPlugin.XWIKI_JOB_CLASS);
             for (Iterator iterator = objects.iterator(); iterator.hasNext();) {
                 Object object = (Object) iterator.next();
                 result &= scheduleJob(object);
             }
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             context.put("error", e.getMessage());
             return false;
         }
@@ -193,17 +191,14 @@ public class SchedulerPluginApi extends Api
      */
     public boolean pauseJob(Object object)
     {
-        try
-        {
+        try {
             return pauseJob(retrieveBaseObject(object));
         }
-        catch(Exception e)
-        {
+        catch (Exception e) {
             // we don't need to push the exception message in the context here
             // as it should already have been pushed by the throwing exception
             return false;
         }
-
     }
 
     public boolean pauseJob(BaseObject object)
@@ -227,10 +222,10 @@ public class SchedulerPluginApi extends Api
      */
     public boolean resumeJob(Object object)
     {
-        try{
+        try {
             return resumeJob(retrieveBaseObject(object));
         }
-        catch(Exception e){
+        catch (Exception e) {
             // we don't need to push the exception message in the context here
             // as it should already have been pushed by the throwing exception
             return false;
@@ -258,10 +253,10 @@ public class SchedulerPluginApi extends Api
      */
     public boolean unscheduleJob(Object object)
     {
-        try{
+        try {
             return unscheduleJob(retrieveBaseObject(object));
         }
-        catch(Exception e){
+        catch (Exception e) {
             // we don't need to push the exception message in the context here
             // as it should already have been pushed by the throwing exception
             return false;
@@ -293,10 +288,10 @@ public class SchedulerPluginApi extends Api
      */
     public Date getNextFireTime(Object object)
     {
-        try{
+        try {
             return getNextFireTime(retrieveBaseObject(object));
         }
-        catch(Exception e){
+        catch (Exception e) {
             // we don't need to push the exception message in the context here
             // as it should already have been pushed by the throwing exception
             return null;

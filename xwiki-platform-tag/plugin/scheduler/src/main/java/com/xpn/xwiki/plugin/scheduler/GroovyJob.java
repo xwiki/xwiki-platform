@@ -60,7 +60,7 @@ public class GroovyJob implements Job
             // The XWiki context was saved in the Job execution data map. Get it as we'll retrieve
             // the script to execute from it.
             Context xcontext = (Context) data.get("context");
- 
+
             if (xcontext.hasProgrammingRights()) {
 
                 // Get the job XObject to be executed

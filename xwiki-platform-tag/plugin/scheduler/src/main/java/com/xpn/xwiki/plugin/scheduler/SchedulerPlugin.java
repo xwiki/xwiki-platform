@@ -29,6 +29,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.XWikiServletRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
@@ -110,6 +111,97 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     }
 
     /**
+     * Create and feed a stub context for the job execution thread. Stub context data are retrieved
+     * from job object fields "contextUser", "contextLang", "contextDatabase". If one of this field
+     * is empty (this would typically happen on the first schedule operation), it is instead
+     * retrieved from the passed context, and the job object is updated with this value. This mean
+     * that this method may modify the passed object.
+     *
+     * @param job the job for which the context will be prepared
+     * @param context the XWikiContext at preparation time. This is a real context associated with a
+     * servlet request
+     * @return the stub context prepared with job datas.
+     */
+    private XWikiContext prepareJobStubContext(BaseObject job, XWikiContext context)
+        throws SchedulerPluginException
+    {
+        boolean jobNeedsUpdate = true;
+        String cUser = job.getStringValue("contextUser");
+        if (cUser.equals("")) {
+            // The context user has not been filled yet.
+            // We can suppose it's the first scheduling. Let's assume it's the context user
+            cUser = context.getUser();
+            job.setStringValue("contextUser", cUser);
+            jobNeedsUpdate = true;
+        }
+        String cLang = job.getStringValue("contextLang");
+        if (cLang.equals("")) {
+            cLang = context.getLanguage();
+            job.setStringValue("contextLang", cLang);
+            jobNeedsUpdate = true;
+        }
+        String cDb = job.getStringValue("contextDatabase");
+        if (cDb.equals("")) {
+            cDb = context.getDatabase();
+            job.setStringValue("contextDatabase", cDb);
+            jobNeedsUpdate = true;
+        }
+
+        if (jobNeedsUpdate) {
+            try {
+                XWikiDocument jobHolder = context.getWiki().getDocument(job.getName(), context);
+                BaseObject jObj =
+                    jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, job.getNumber());
+                jobHolder.setMinorEdit(true);
+                context.getWiki().saveDocument(jobHolder, context);
+            }
+            catch (XWikiException e) {
+                throw new SchedulerPluginException(
+                    SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
+                    "Failed to prepare context for job with job name " +
+                        job.getStringValue("jobName"), e);
+            }
+        }
+
+        //lets now build the stub context
+        XWikiContext scontext = new XWikiContext();
+        scontext.setWiki(context.getWiki());
+
+        // We are sure the context request is a real servlet request
+        // So we force the dummy request with the current host
+        XWikiServletRequestStub dummy = new XWikiServletRequestStub();
+        dummy.setHost(context.getRequest().getHeader("x-forwarded-host"));
+        XWikiServletRequest request = new XWikiServletRequest(dummy);
+        scontext.setRequest(request);
+
+        // feed the dummy context
+        scontext.setUser(cUser);
+        scontext.setLanguage(cLang);
+        scontext.setDatabase(cDb);
+        scontext.setVirtual(context.isVirtual());
+
+        com.xpn.xwiki.web.XWikiURLFactory xurf = context.getURLFactory();
+        if (xurf == null) {
+            xurf = context.getWiki().getURLFactoryService()
+                .createURLFactory(context.getMode(), context);
+        }
+        scontext.setURLFactory(xurf);
+
+        try {
+            XWikiDocument cDoc = context.getWiki().getDocument(job.getName(), context);
+            scontext.setDoc(cDoc);
+        }
+        catch (Exception e) {
+            throw new SchedulerPluginException(
+                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
+                "Failed to prepare context for job with job name " + job.getStringValue("jobName"),
+                e);
+        }
+
+        return scontext;
+    }
+
+    /**
      * Restore the existing job, by looking up for such job in the database and re-scheduling those
      * according to their stored status. If a Job is stored with the status "Normal", it is just
      * scheduled If a Job is stored with the status "Paused", then it is both scheduled and paused
@@ -183,13 +275,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             Trigger trigger = new CronTrigger(xjob, Scheduler.DEFAULT_GROUP, xjob,
                 Scheduler.DEFAULT_GROUP, object.getStringValue("cron"));
 
-            data.put("xjob", object);
+            // Let's prepare an execution context...
+            XWikiContext stubContext = prepareJobStubContext(object, context);
+            Context stub = new Context(stubContext);
 
-            // We offer the Job a wrapped copy of the request context and of the XWiki API
-            XWikiContext cloneContext = (XWikiContext) context.clone();
-            Context copy = new Context(cloneContext);
-            data.put("context", copy);
-            data.put("xwiki", new com.xpn.xwiki.api.XWiki(cloneContext.getWiki(), cloneContext));
+            data.put("context", stub);
+            data.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), stubContext));
+            data.put("xjob", object);
 
             job.setJobDataMap(data);
 
@@ -470,6 +562,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         needsUpdate |= bclass.addTextField("status", "Status", 30);
         needsUpdate |= bclass.addTextField("cron", "Cron Expression", 30);
         needsUpdate |= bclass.addTextAreaField("script", "Job Script", 45, 10);
+        needsUpdate |= bclass.addTextField("contextUser", "Job execution context user", 30);
+        needsUpdate |= bclass.addTextField("contextLang", "Job execution context lang", 30);
+        needsUpdate |= bclass.addTextField("contextDatabase", "Job execution context database", 30);
 
         if (needsUpdate) {
             try {

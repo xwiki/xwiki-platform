@@ -20,17 +20,14 @@
 
 package com.xpn.xwiki.plugin.watchlist;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Object;
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
-import com.xpn.xwiki.user.api.XWikiRightService;
 import org.apache.velocity.VelocityContext;
+import org.hibernate.engine.Collections;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -82,16 +79,7 @@ public class WatchListJob implements Job
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
         // Set required objects
-        init(context);
-
-        try {
-            String user = xcontext.getUser();
-            Document admin = xwiki.getDocument("XWiki.Admin");
-            Object watchlist = admin.getObject(WatchListPlugin.WATCHLIST_CLASS);
-            String watchedPages = (String)watchlist.display("pages", "view");
-            com.xpn.xwiki.web.XWikiURLFactory factory = xcontext.getURLFactory();
-            String externalURL = admin.getExternalURL();
-        } catch (XWikiException e) {}
+        init(context);        
 
         try {
             // Retreive notification subscribers
@@ -139,7 +127,7 @@ public class WatchListJob implements Job
      */
     private List filter(List updatedDocuments,
         Object notificationCriteria, String subscriber) throws XWikiException
-    {
+    {        
         String spaceCriterion = (String)notificationCriteria.display("spaces", "view");
         String documentCriterion = (String)notificationCriteria.display("documents", "view");
         String query = (String)notificationCriteria.display("query", "view");
@@ -147,10 +135,11 @@ public class WatchListJob implements Job
         List watchedDocuments = new ArrayList();
         if (spaceCriterion.length() == 0 && documentCriterion.length() == 0
             && query.length() == 0) {
-            Iterator docIt = updatedDocuments.iterator();
+            /* Iterator docIt = updatedDocuments.iterator();
             while (docIt.hasNext()) {
                 watchedDocuments.add(docIt.next());
-            }
+            } */
+            return new ArrayList();
         }
 
         List filteredDocumentList = new ArrayList();

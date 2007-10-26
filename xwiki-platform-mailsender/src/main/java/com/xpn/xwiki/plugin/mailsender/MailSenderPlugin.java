@@ -86,7 +86,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
 
     private static Log log = LogFactory.getLog(MailSenderPlugin.class);
 
-    protected XWikiContext context;
+    protected XWikiContext context;         
 
     /**
      * {@inheritDoc}

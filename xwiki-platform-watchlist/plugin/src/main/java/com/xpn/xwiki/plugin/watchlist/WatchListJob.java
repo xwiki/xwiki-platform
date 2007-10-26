@@ -273,6 +273,7 @@ public class WatchListJob implements Job
         vcontext.put("documents", updatedDocuments);
         vcontext.put("interval", new Integer(interval));
         vcontext.put("xwiki", xwiki);
+        vcontext.put("context", xcontext);
 
         // Get wiki's default language (default en)
         String language = xwiki.getXWikiPreference("default_language", "en");

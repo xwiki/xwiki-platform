@@ -85,6 +85,15 @@ public class WatchListJob implements Job
         init(context);
 
         try {
+            String user = xcontext.getUser();
+            Document admin = xwiki.getDocument("XWiki.Admin");
+            Object watchlist = admin.getObject(WatchListPlugin.WATCHLIST_CLASS);
+            String watchedPages = (String)watchlist.display("pages", "view");
+            com.xpn.xwiki.web.XWikiURLFactory factory = xcontext.getURLFactory();
+            String externalURL = admin.getExternalURL();
+        } catch (XWikiException e) {}
+
+        try {
             // Retreive notification subscribers
             Collection subscribers = retrieveNotificationSubscribers();
             if (subscribers != null && subscribers.size() > 0) {
@@ -263,6 +272,7 @@ public class WatchListJob implements Job
         vcontext.put("pseudo", userObj.display("first_name", "view"));
         vcontext.put("documents", updatedDocuments);
         vcontext.put("interval", new Integer(interval));
+        vcontext.put("xwiki", xwiki);
 
         // Get wiki's default language (default en)
         String language = xwiki.getXWikiPreference("default_language", "en");

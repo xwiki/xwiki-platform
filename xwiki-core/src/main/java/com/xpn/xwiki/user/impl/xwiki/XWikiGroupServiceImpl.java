@@ -665,4 +665,32 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     {
         return countAllMatchedUsersOrGroups(false, matchFields, nb, start, context);
     }
+    
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#getAllGroupsNamesForMember(java.lang.String,
+     *      int, int, com.xpn.xwiki.XWikiContext)
+     */
+    public Collection getAllGroupsNamesForMember(String member, int nb, int start,
+        XWikiContext context) throws XWikiException
+    {
+        List groupNameList = new ArrayList(listGroupsForUser(member, context));
+
+        return groupNameList.subList(start, start + nb);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#getAllMembersNamesForGroup(java.lang.String,
+     *      int, int, com.xpn.xwiki.XWikiContext)
+     */
+    public Collection getAllMembersNamesForGroup(String group, int nb, int start,
+        XWikiContext context) throws XWikiException
+    {
+        List userNameList = listMemberForGroup(group, context);
+
+        return userNameList.subList(start, start + nb);
+    }
 }

@@ -146,4 +146,30 @@ public interface XWikiGroupService {
      */
     int countAllMatchedGroups(Object[][] matchFields, int nb, int start, XWikiContext context)
         throws XWikiException;
+    
+    /**
+     * Get all groups containing provided user.
+     * 
+     * @param member the name of the member (user or group).
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found member to return.
+     * @param context the XWiki context.
+     * @return the {@link Collection} of {@link String} containing group name.
+     * @throws XWikiException error when browsing groups.
+     */
+    public Collection getAllGroupsNamesForMember(String member, int nb, int start,
+        XWikiContext context) throws XWikiException;
+    
+    /**
+     * Get all users provided group contains.
+     * 
+     * @param group the name of the group.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param context the XWiki context.
+     * @return the {@link Collection} of {@link String} containing user name.
+     * @throws XWikiException error when browsing groups.
+     */
+    public Collection getAllMembersNamesForGroup(String group, int nb, int start,
+        XWikiContext context) throws XWikiException;
 }

@@ -68,8 +68,8 @@
   </servlet>
 
   <servlet>
-    <servlet-name>redirectHome</servlet-name>
-    <servlet-class>com.xpn.xwiki.web.HomePageRedirect</servlet-class>
+    <servlet-name>redirectHomeServlet</servlet-name>
+    <servlet-class>com.xpn.xwiki.web.HomePageRedirectServlet</servlet-class>
   </servlet>
 
   <servlet>
@@ -109,8 +109,8 @@
   </servlet-mapping>
 
   <servlet-mapping>
-    <servlet-name>redirectHome</servlet-name>
-    <url-pattern>/index.redirect</url-pattern>
+    <servlet-name>redirectHomeServlet</servlet-name>
+    <url-pattern>/redirect</url-pattern>
   </servlet-mapping>
 
   <servlet-mapping>
@@ -131,10 +131,14 @@
     <mime-type>text/css</mime-type>
   </mime-mapping>
 
-  <!-- The Usual Welcome File List -->
+  <!-- Redirects to the Main.WebHome page if the user calls the root of the webapp, i.e.
+       http://server:port/xwiki/
+       Note 1: for this to work fine the redirect file needs to exist in the WAR
+       Note 2: with Servlet 2.4 it's possible to have a Servlet directly specified in the welcome
+               file list but right now we'd like XWiki to work out of the box with Servlet 2.3
+  -->               
   <welcome-file-list>
-    <welcome-file>index.html</welcome-file>
-    <welcome-file>index.redirect</welcome-file>
+    <welcome-file>redirect</welcome-file>
   </welcome-file-list>
 
   <!--

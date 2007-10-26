@@ -43,6 +43,9 @@ public interface XWikiGroupService
 
     public void flushCache();
 
+    /**
+     * @deprecated Use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)}.
+     */
     public Collection listGroupsForUser(String username, XWikiContext context)
         throws XWikiException;
 
@@ -61,8 +64,14 @@ public interface XWikiGroupService
     public void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace,
         String userOrGroupName, XWikiContext context) throws XWikiException;
 
+    /**
+     * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
+     */
     public List listMemberForGroup(String s, XWikiContext context) throws XWikiException;
 
+    /**
+     * @deprecated Use {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
+     */
     public List listAllGroups(XWikiContext context) throws XWikiException;
 
     /**

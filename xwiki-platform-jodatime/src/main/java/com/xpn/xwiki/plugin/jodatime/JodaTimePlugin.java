@@ -38,11 +38,6 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 public class JodaTimePlugin extends XWikiDefaultPlugin
 {
     /**
-     * Log object to log messages in this class.
-     */
-    private static final Log LOG = LogFactory.getLog(JodaTimePlugin.class);
-
-    /**
      * {@inheritDoc}
      *
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
@@ -60,7 +55,6 @@ public class JodaTimePlugin extends XWikiDefaultPlugin
      */
     public String getName()
     {
-        LOG.debug("getName()");
         return "jodatime";
     }
 

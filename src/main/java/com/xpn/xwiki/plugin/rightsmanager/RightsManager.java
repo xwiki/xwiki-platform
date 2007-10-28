@@ -45,7 +45,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
 
 /**
- * Hidden toolkit use by the plugin API that make all the plugins actions.
+ * Hidden toolkit use by the plugin API that make all the plugin's actions.
  * 
  * @version $Id: $
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
@@ -53,7 +53,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
 final class RightsManager implements XWikiDocChangeNotificationInterface
 {
     /**
-     * Name of the defaut space where users and groups are stored.
+     * Name of the default space where users and groups are stored.
      */
     public static final String DEFAULT_USERORGROUP_SPACE = "XWiki";
 
@@ -279,18 +279,26 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * Get the number of users or groups in the main wiki and the current wiki.
      * 
      * @param user indicate if methods search for users or groups.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the main wiki and the current wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllUsersOrGroups(boolean user, XWikiContext context) throws XWikiException
+    public int countAllUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
         if (isInMainWiki(context)) {
-            return countAllLocalUsersOrGroups(user, context);
+            return countAllLocalUsersOrGroups(user, matchFields, context);
         }
 
-        return countAllGlobalUsersOrGroups(user, context)
-            + countAllLocalUsersOrGroups(user, context);
+        return countAllGlobalUsersOrGroups(user, matchFields, context)
+            + countAllLocalUsersOrGroups(user, matchFields, context);
     }
 
     /**
@@ -298,22 +306,29 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * 
      * @param user indicate if methods search for users or groups.
      * @param wikiName the name of the wiki where to search for users or groups.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the provided wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllWikiUsersOrGroups(boolean user, String wikiName, XWikiContext context)
-        throws XWikiException
+    public int countAllWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields,
+        XWikiContext context) throws XWikiException
     {
         if (isInMainWiki(context)) {
-            return countAllLocalUsersOrGroups(user, context);
+            return countAllLocalUsersOrGroups(user, matchFields, context);
         }
 
         String database = context.getDatabase();
 
         try {
             context.setDatabase(wikiName);
-            return countAllLocalUsersOrGroups(user, context);
+            return countAllLocalUsersOrGroups(user, matchFields, context);
         } finally {
             context.setDatabase(database);
         }
@@ -323,37 +338,51 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
      * Get the number of users or groups in the main wiki.
      * 
      * @param user indicate if methods search for users or groups.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the main wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllGlobalUsersOrGroups(boolean user, XWikiContext context)
-        throws XWikiException
+    public int countAllGlobalUsersOrGroups(boolean user, Object[][] matchFields,
+        XWikiContext context) throws XWikiException
     {
         if (isInMainWiki(context)) {
-            return countAllLocalUsersOrGroups(user, context);
+            return countAllLocalUsersOrGroups(user, matchFields, context);
         }
 
-        return countAllWikiUsersOrGroups(user, context.getMainXWiki(), context);
+        return countAllWikiUsersOrGroups(user, context.getMainXWiki(), matchFields, context);
     }
 
     /**
      * Get the number of users or groups in the current wiki.
      * 
      * @param user indicate if methods search for users or groups.
+     * @param matchFields the field to math with values. It is a table of table with :
+     *            <ul>
+     *            <li>fiedname : the name of the field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as
+     *            document field</li>
+     *            <li>pattern matching : based on HQL "like" command</li>
+     *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllLocalUsersOrGroups(boolean user, XWikiContext context)
-        throws XWikiException
+    public int countAllLocalUsersOrGroups(boolean user, Object[][] matchFields,
+        XWikiContext context) throws XWikiException
     {
         if (user) {
-            return context.getWiki().getGroupService(context).countAllMatchedUsers(null, 0, 0,
-                context);
+            return context.getWiki().getGroupService(context).countAllMatchedUsers(matchFields,
+                0, 0, context);
         } else {
-            return context.getWiki().getGroupService(context).countAllMatchedUsers(null, 0, 0,
-                context);
+            return context.getWiki().getGroupService(context).countAllMatchedUsers(matchFields,
+                0, 0, context);
         }
     }
 
@@ -394,7 +423,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
 
         List groupList = new ArrayList();
 
-        int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, context);
+        int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, null, context);
 
         int newstart = limit.getStart();
 
@@ -1151,13 +1180,14 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
             groupCache = new Hashtable();
         }
 
-        List memberList;
+        Collection memberList;
 
         if (groupCache.containsKey(groupName)) {
             memberList = (List) groupCache.get(groupName);
         } else {
             memberList =
-                context.getWiki().getGroupService(context).listMemberForGroup(groupName, context);
+                context.getWiki().getGroupService(context).getAllMembersNamesForGroup(groupName,
+                    0, 0, context);
             groupCache.put(groupName, memberList);
         }
 

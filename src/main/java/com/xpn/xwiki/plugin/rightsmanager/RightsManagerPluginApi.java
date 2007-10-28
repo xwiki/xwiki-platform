@@ -70,6 +70,16 @@ public class RightsManagerPluginApi extends PluginApi
     private RightsManageRightsApi rightsApi;
 
     /**
+     * API for managing users.
+     */
+    private RightsManageUsersApi usersApi;
+
+    /**
+     * API for managing groups.
+     */
+    private RightsManageGroupsApi groupsApi;
+
+    /**
      * Create an instance of the Rights Manager plugin user api.
      * 
      * @param plugin the entry point of the Rights Manager plugin.
@@ -79,7 +89,9 @@ public class RightsManagerPluginApi extends PluginApi
     {
         super(plugin, context);
 
-        rightsApi = new RightsManageRightsApi(context);
+        this.rightsApi = new RightsManageRightsApi(context);
+        this.usersApi = new RightsManageUsersApi(context);
+        this.groupsApi = new RightsManageGroupsApi(context);
     }
 
     /**
@@ -87,7 +99,23 @@ public class RightsManagerPluginApi extends PluginApi
      */
     public RightsManageRightsApi getRightsApi()
     {
-        return rightsApi;
+        return this.rightsApi;
+    }
+
+    /**
+     * @return the API for managing rights and inheritance.
+     */
+    public RightsManageUsersApi getUsersApi()
+    {
+        return this.usersApi;
+    }
+
+    /**
+     * @return the API for managing rights and inheritance.
+     */
+    public RightsManageGroupsApi getGroupsApi()
+    {
+        return this.groupsApi;
     }
 
     /**
@@ -97,7 +125,7 @@ public class RightsManagerPluginApi extends PluginApi
      * @param map a map of list from Velocity.
      * @return a table of table for {@link RightsManager} methods.
      */
-    private static Object[][] createMatchingTable(Map map)
+    static Object[][] createMatchingTable(Map map)
     {
         if (map == null || map.size() == 0) {
             return null;
@@ -131,7 +159,7 @@ public class RightsManagerPluginApi extends PluginApi
      * @param list a list of list from Velocity.
      * @return a table of table for {@link RightsManager} methods.
      */
-    private static Object[][] createOrderTable(List list)
+    static Object[][] createOrderTable(List list)
     {
         if (list == null || list.size() == 0) {
             return null;
@@ -179,18 +207,11 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of groups.
+     * @deprecated Use {@link #getGroupsApi()}: {@link RightsManageGroupsApi#countAllGroups()}.
      */
     public int countAllGroups() throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count = RightsManager.getInstance().countAllUsersOrGroups(false, this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all groups", e);
-        }
-
-        return count;
+        return this.groupsApi.countAllGroups();
     }
 
     /**
@@ -199,54 +220,33 @@ public class RightsManagerPluginApi extends PluginApi
      * @param wikiName the name of the wiki where to search for groups.
      * @return the number of groups in the provided wiki.
      * @throws XWikiException error when getting number of groups.
+     * @deprecated Use {@link #getGroupsApi()}:
+     *             {@link RightsManageGroupsApi#countAllWikiGroups(String wikiName)}.
      */
     public int countAllWikiGroups(String wikiName) throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count =
-                RightsManager.getInstance().countAllWikiUsersOrGroups(false, wikiName,
-                    this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all groups in wiki " + QUOTE + wikiName + QUOTE, e);
-        }
-
-        return count;
+        return this.groupsApi.countAllWikiGroups(wikiName);
     }
 
     /**
      * @return the number of groups in the main wiki.
      * @throws XWikiException error when getting number of groups.
+     * @deprecated Use {@link #getGroupsApi()}:
+     *             {@link RightsManageGroupsApi#countAllGlobalGroups()}.
      */
     public int countAllGlobalGroups() throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count = RightsManager.getInstance().countAllGlobalUsersOrGroups(false, this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all groups in main wiki", e);
-        }
-
-        return count;
+        return this.groupsApi.countAllGlobalGroups();
     }
 
     /**
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of groups.
+     * @deprecated Use {@link #getGroupsApi()}: {@link RightsManageGroupsApi#countAllLocalGroups()}.
      */
     public int countAllLocalGroups() throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count = RightsManager.getInstance().countAllLocalUsersOrGroups(false, this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all groups in current wiki", e);
-        }
-
-        return count;
+        return this.groupsApi.countAllLocalGroups();
     }
 
     /**
@@ -1032,18 +1032,11 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * @return the number of users in the main wiki and the current wiki.
      * @throws XWikiException error when getting number of users.
+     * @deprecated Use {@link #getUsersApi()}: {@link RightsManageUsersApi#countAllUsers()}.
      */
     public int countAllUsers() throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count = RightsManager.getInstance().countAllUsersOrGroups(true, this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all users", e);
-        }
-
-        return count;
+        return this.usersApi.countAllUsers();
     }
 
     /**
@@ -1052,54 +1045,32 @@ public class RightsManagerPluginApi extends PluginApi
      * @param wikiName the wiki where to search for users.
      * @return the number of users in the provided wiki.
      * @throws XWikiException error when getting number of users.
+     * @deprecated Use {@link #getUsersApi()}:
+     *             {@link RightsManageUsersApi#countAllWikiUsers(String wikiName)}.
      */
     public int countAllWikiUsers(String wikiName) throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count =
-                RightsManager.getInstance().countAllWikiUsersOrGroups(true, wikiName,
-                    this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all wiki users", e);
-        }
-
-        return count;
+        return this.usersApi.countAllWikiUsers(wikiName);
     }
 
     /**
      * @return the number of users in the main wiki.
      * @throws XWikiException error when getting number of users.
+     * @deprecated Use {@link #getUsersApi()}: {@link RightsManageUsersApi#countAllGlobalUsers()}.
      */
     public int countAllGlobalUsers() throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count = RightsManager.getInstance().countAllGlobalUsersOrGroups(true, this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all global users", e);
-        }
-
-        return count;
+        return this.usersApi.countAllGlobalUsers();
     }
 
     /**
      * @return the number of users in the current wiki.
      * @throws XWikiException error when getting number of users.
+     * @deprecated Use {@link #getUsersApi()}: {@link RightsManageUsersApi#countAllLocalUsers()}.
      */
     public int countAllLocalUsers() throws XWikiException
     {
-        int count = 0;
-
-        try {
-            count = RightsManager.getInstance().countAllLocalUsersOrGroups(true, this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to count all local users", e);
-        }
-
-        return count;
+        return this.usersApi.countAllLocalUsers();
     }
 
     /**
@@ -1894,7 +1865,8 @@ public class RightsManagerPluginApi extends PluginApi
 
         try {
             userList =
-                RightsManager.getInstance().getAllGroupsNamesForMember(member, 0, 0, this.context);
+                RightsManager.getInstance()
+                    .getAllGroupsNamesForMember(member, 0, 0, this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all groups containing user " + QUOTE + member + QUOTE
                 + ") users from local wiki", e);

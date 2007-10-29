@@ -1911,4 +1911,45 @@ public class RightsManagerPluginApi extends PluginApi
 
         return userList;
     }
+
+    /**
+     * Return the number of groups containing provided member.
+     * 
+     * @param member the name of the member (user or group).
+     * @return the number of groups.
+     * @throws XWikiException error when getting number of users.
+     */
+    public int countAllGroupsNamesForMember(String member) throws XWikiException
+    {
+        int count = 0;
+
+        try {
+            count =
+                RightsManager.getInstance().countAllGroupsNamesForMember(member, this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to count groups containing provided user", e);
+        }
+
+        return count;
+    }
+
+    /**
+     * Return the number of members provided group contains.
+     * 
+     * @param group the name of the group.
+     * @return the number of members.
+     * @throws XWikiException error when getting number of groups.
+     */
+    public int countAllMembersNamesForGroup(String group) throws XWikiException
+    {
+        int count = 0;
+
+        try {
+            count = RightsManager.getInstance().countAllMembersNamesForGroup(group, this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to count all members provided group contains", e);
+        }
+
+        return count;
+    }
 }

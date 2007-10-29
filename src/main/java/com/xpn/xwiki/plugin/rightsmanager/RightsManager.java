@@ -621,6 +621,36 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
             start, context);
     }
 
+    /**
+     * Return the number of groups containing provided member.
+     * 
+     * @param member the name of the member (user or group).
+     * @param context the XWiki context.
+     * @return the number of groups.
+     * @throws XWikiException error when getting number of users.
+     */
+    public int countAllGroupsNamesForMember(String member, XWikiContext context)
+        throws XWikiException
+    {
+        return context.getWiki().getGroupService(context).countAllGroupsNamesForMember(member,
+            context);
+    }
+
+    /**
+     * Return the number of members provided group contains.
+     * 
+     * @param group the name of the group.
+     * @param context the XWiki context.
+     * @return the number of members.
+     * @throws XWikiException error when getting number of groups.
+     */
+    public int countAllMembersNamesForGroup(String group, XWikiContext context)
+        throws XWikiException
+    {
+        return context.getWiki().getGroupService(context).countAllMembersNamesForGroup(group,
+            context);
+    }
+
     // Rights management
 
     /**

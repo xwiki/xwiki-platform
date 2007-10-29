@@ -1,6 +1,6 @@
 /*
- * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
- * by the contributors.txt.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -679,9 +679,19 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     public Collection getAllGroupsNamesForMember(String member, int nb, int start,
         XWikiContext context) throws XWikiException
     {
+        //TODO: improve using real request
         List groupNameList = new ArrayList(listGroupsForUser(member, context));
 
-        return groupNameList.subList(start, start + nb);
+        if (start <= 0 & (nb <= 0 || nb >= groupNameList.size()))
+            return groupNameList;
+
+        if (nb == 0 && start == 0)
+            return groupNameList;
+
+        if (start + nb > groupNameList.size())
+            return groupNameList.subList(start, groupNameList.size() - 1);
+        else
+            return groupNameList.subList(start, start + nb);
     }
 
     /**
@@ -693,8 +703,38 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     public Collection getAllMembersNamesForGroup(String group, int nb, int start,
         XWikiContext context) throws XWikiException
     {
+        //TODO: improve using real request
         List userNameList = listMemberForGroup(group, context);
 
-        return userNameList.subList(start, start + nb);
+        if (nb == 0 && start == 0)
+            return userNameList;
+
+        if (start + nb > userNameList.size())
+            return userNameList.subList(start, userNameList.size() - 1);
+        else
+            return userNameList.subList(start, start + nb);
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllGroupsNamesForMember(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * TODO: improve using real request
+     */
+    public int countAllGroupsNamesForMember(String member, XWikiContext context) throws XWikiException
+    {
+        //TODO: improve using real request
+        return getAllGroupsNamesForMember(member, 0, 0, context).size();
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMembersNamesForGroup(java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    public int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException
+    {
+        //TODO: improve using real request
+        return getAllMembersNamesForGroup(group, 0, 0, context).size();
     }
 }

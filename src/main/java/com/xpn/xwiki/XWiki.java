@@ -2195,7 +2195,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     String host = bobj.getStringValue("server");
                     if ((host != null) && (!"".equals(host))) {
                         try {
-                            if (virtualWikiMap.getFromCache(host) != null)
+                            if (virtualWikiMap != null && virtualWikiMap.getFromCache(host) != null)
                                 virtualWikiMap.flushEntry(host);
                         } catch (XWikiCacheNeedsRefreshException e) {
                             virtualWikiMap.cancelUpdate(host);

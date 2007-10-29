@@ -688,7 +688,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
             return groupNameList;
 
         if (start + nb > groupNameList.size())
-            return groupNameList.subList(start, groupNameList.size() - 1);
+            return groupNameList.subList(start, groupNameList.size());
         else
             return groupNameList.subList(start, start + nb);
     }
@@ -709,7 +709,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
             return userNameList;
 
         if (start + nb > userNameList.size())
-            return userNameList.subList(start, userNameList.size() - 1);
+            return userNameList.subList(start, userNameList.size());
         else
             return userNameList.subList(start, start + nb);
     }

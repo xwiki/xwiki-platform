@@ -152,8 +152,13 @@ public class XWikiHibernateBaseStore {
     public Session getSession(XWikiContext context) {
         Session session = (Session) context.get("hibsession");
         // Make sure we are in this mode
-        if (session!=null)
-         session.setFlushMode(FlushMode.COMMIT);
+        try {
+            if (session!=null) {
+                session.setFlushMode(FlushMode.COMMIT);
+            }
+        } catch (org.hibernate.SessionException ex) {
+            session = null;
+        }
         return session;
     }
 

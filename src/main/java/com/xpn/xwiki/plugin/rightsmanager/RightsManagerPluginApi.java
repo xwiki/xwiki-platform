@@ -20,16 +20,13 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
-import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -207,7 +204,7 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of groups.
-     * @deprecated Use {@link #getGroupsApi()}: {@link RightsManageGroupsApi#countAllGroups()}.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public int countAllGroups() throws XWikiException
     {
@@ -220,8 +217,7 @@ public class RightsManagerPluginApi extends PluginApi
      * @param wikiName the name of the wiki where to search for groups.
      * @return the number of groups in the provided wiki.
      * @throws XWikiException error when getting number of groups.
-     * @deprecated Use {@link #getGroupsApi()}:
-     *             {@link RightsManageGroupsApi#countAllWikiGroups(String wikiName)}.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public int countAllWikiGroups(String wikiName) throws XWikiException
     {
@@ -231,8 +227,7 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * @return the number of groups in the main wiki.
      * @throws XWikiException error when getting number of groups.
-     * @deprecated Use {@link #getGroupsApi()}:
-     *             {@link RightsManageGroupsApi#countAllGlobalGroups()}.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public int countAllGlobalGroups() throws XWikiException
     {
@@ -242,7 +237,7 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of groups.
-     * @deprecated Use {@link #getGroupsApi()}: {@link RightsManageGroupsApi#countAllLocalGroups()}.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public int countAllLocalGroups() throws XWikiException
     {
@@ -256,10 +251,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGroupsNames(int nb, int start) throws XWikiException
     {
-        return getAllMatchedGroupsNames(null, nb, start);
+        return this.groupsApi.getAllGroupsNames(nb, start);
     }
 
     /**
@@ -267,10 +263,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGroupsNames() throws XWikiException
     {
-        return getAllMatchedGroupsNames(null);
+        return this.groupsApi.getAllGroupsNames();
     }
 
     /**
@@ -283,10 +280,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGroupsNames(Map matchFields) throws XWikiException
     {
-        return getAllMatchedGroupsNames(matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedGroupsNames(matchFields);
     }
 
     /**
@@ -301,11 +299,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGroupsNames(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedGroupsNames(matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedGroupsNames(matchFields, nb, start);
     }
 
     /**
@@ -325,22 +324,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGroupsNames(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
-
-        try {
-            groupList =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups names", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedGroupsNames(matchFields, nb, start, order);
     }
 
     /**
@@ -350,10 +339,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGlobalGroupsNames(int nb, int start) throws XWikiException
     {
-        return getAllMatchedGlobalGroupsNames(null, nb, start);
+        return this.groupsApi.getAllGlobalGroupsNames(nb, start);
     }
 
     /**
@@ -361,10 +351,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGlobalGroupsNames() throws XWikiException
     {
-        return getAllMatchedGlobalGroupsNames(null);
+        return this.groupsApi.getAllGlobalGroupsNames();
     }
 
     /**
@@ -377,10 +368,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGlobalGroupsNames(Map matchFields) throws XWikiException
     {
-        return getAllMatchedGlobalGroupsNames(matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedGlobalGroupsNames(matchFields);
     }
 
     /**
@@ -395,11 +387,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGlobalGroupsNames(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedGlobalGroupsNames(matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedGlobalGroupsNames(matchFields, nb, start);
     }
 
     /**
@@ -419,22 +412,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGlobalGroupsNames(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
-
-        try {
-            groupList =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups names from global wiki", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedGlobalGroupsNames(matchFields, nb, start, order);
     }
 
     /**
@@ -445,10 +428,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllWikiGroupsNames(String wikiName, int nb, int start) throws XWikiException
     {
-        return getAllMatchedWikiGroupsNames(wikiName, null, nb, start);
+        return this.groupsApi.getAllWikiGroupsNames(wikiName, nb, start);
     }
 
     /**
@@ -457,10 +441,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param wikiName the name of the wiki where to search.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllWikiGroupsNames(String wikiName) throws XWikiException
     {
-        return getAllMatchedWikiGroupsNames(wikiName, null);
+        return this.groupsApi.getAllWikiGroupsNames(wikiName);
     }
 
     /**
@@ -474,11 +459,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields)
         throws XWikiException
     {
-        return getAllMatchedWikiGroupsNames(wikiName, matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedWikiGroupsNames(wikiName, matchFields);
     }
 
     /**
@@ -494,11 +480,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedWikiGroupsNames(wikiName, matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedWikiGroupsNames(wikiName, matchFields, nb, start);
     }
 
     /**
@@ -519,22 +506,13 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields, int nb, int start,
         List order) throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
-
-        try {
-            groupList =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups names from provided wiki", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedWikiGroupsNames(wikiName, matchFields, nb, start,
+            order);
     }
 
     /**
@@ -544,10 +522,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllLocalGroupsNames(int nb, int start) throws XWikiException
     {
-        return getAllMatchedLocalGroupsNames(null, nb, start);
+        return this.groupsApi.getAllLocalGroupsNames(nb, start);
     }
 
     /**
@@ -555,10 +534,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllLocalGroupsNames() throws XWikiException
     {
-        return getAllMatchedLocalGroupsNames(null);
+        return this.groupsApi.getAllLocalGroupsNames();
     }
 
     /**
@@ -571,10 +551,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedLocalGroupsNames(Map matchFields) throws XWikiException
     {
-        return getAllMatchedLocalGroupsNames(matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedLocalGroupsNames(matchFields);
     }
 
     /**
@@ -589,11 +570,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedLocalGroupsNames(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedLocalGroupsNames(matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedLocalGroupsNames(matchFields, nb, start);
     }
 
     /**
@@ -613,22 +595,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedLocalGroupsNames(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
-
-        try {
-            groupList =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups names from local wiki", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedLocalGroupsNames(matchFields, nb, start, order);
     }
 
     /**
@@ -638,10 +610,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGroups(int nb, int start) throws XWikiException
     {
-        return getAllMatchedGroups(null, nb, start);
+        return this.groupsApi.getAllGroups(nb, start);
     }
 
     /**
@@ -649,10 +622,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGroups() throws XWikiException
     {
-        return getAllMatchedGroups(null);
+        return this.groupsApi.getAllGroups();
     }
 
     /**
@@ -665,10 +639,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGroups(Map matchFields) throws XWikiException
     {
-        return getAllMatchedGroups(matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedGroups(matchFields);
     }
 
     /**
@@ -683,10 +658,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGroups(Map matchFields, int nb, int start) throws XWikiException
     {
-        return getAllMatchedGroups(matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedGroups(matchFields, nb, start);
     }
 
     /**
@@ -706,26 +682,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGroups(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List groupList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups documents", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedGroups(matchFields, nb, start, order);
     }
 
     /**
@@ -735,10 +697,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGlobalGroups(int nb, int start) throws XWikiException
     {
-        return getAllMatchedGlobalGroups(null, nb, start);
+        return this.groupsApi.getAllGlobalGroups(nb, start);
     }
 
     /**
@@ -746,10 +709,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllGlobalGroups() throws XWikiException
     {
-        return getAllMatchedGlobalGroups(null);
+        return this.groupsApi.getAllGlobalGroups();
     }
 
     /**
@@ -762,10 +726,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGlobalGroups(Map matchFields) throws XWikiException
     {
-        return getAllMatchedGlobalGroups(matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedGlobalGroups(matchFields);
     }
 
     /**
@@ -780,11 +745,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGlobalGroups(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedGlobalGroups(matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedGlobalGroups(matchFields, nb, start);
     }
 
     /**
@@ -804,26 +770,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedGlobalGroups(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List groupList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups documents from global wiki", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedGlobalGroups(matchFields, nb, start, order);
     }
 
     /**
@@ -834,10 +786,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllWikiGroups(String wikiName, int nb, int start) throws XWikiException
     {
-        return getAllMatchedWikiGroups(wikiName, null, nb, start);
+        return this.groupsApi.getAllWikiGroups(wikiName, nb, start);
     }
 
     /**
@@ -846,10 +799,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param wikiName the name of the wiki where to search.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllWikiGroups(String wikiName) throws XWikiException
     {
-        return getAllMatchedWikiGroups(wikiName, null);
+        return this.groupsApi.getAllWikiGroups(wikiName);
     }
 
     /**
@@ -863,10 +817,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedWikiGroups(String wikiName, Map matchFields) throws XWikiException
     {
-        return getAllMatchedWikiGroups(wikiName, matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedWikiGroups(wikiName, matchFields);
     }
 
     /**
@@ -882,11 +837,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedWikiGroups(String wikiName, Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedWikiGroups(wikiName, matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedWikiGroups(wikiName, matchFields, nb, start);
     }
 
     /**
@@ -907,26 +863,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedWikiGroups(String wikiName, Map matchFields, int nb, int start,
         List order) throws XWikiException
     {
-        List groupList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups documents from provided wiki", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedWikiGroups(wikiName, matchFields, nb, start, order);
     }
 
     /**
@@ -936,10 +878,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllLocalGroups(int nb, int start) throws XWikiException
     {
-        return getAllMatchedLocalGroups(null, nb, start);
+        return this.groupsApi.getAllLocalGroups(nb, start);
     }
 
     /**
@@ -947,10 +890,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllLocalGroups() throws XWikiException
     {
-        return getAllMatchedLocalGroups(null);
+        return this.groupsApi.getAllLocalGroups();
     }
 
     /**
@@ -963,10 +907,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedLocalGroups(Map matchFields) throws XWikiException
     {
-        return getAllMatchedLocalGroups(matchFields, 0, 0, null);
+        return this.groupsApi.getAllMatchedLocalGroups(matchFields);
     }
 
     /**
@@ -981,11 +926,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found group to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedLocalGroups(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedLocalGroups(matchFields, nb, start, null);
+        return this.groupsApi.getAllMatchedLocalGroups(matchFields, nb, start);
     }
 
     /**
@@ -1005,26 +951,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
      * @throws XWikiException error when searching for groups.
+     * @deprecated Use {@link #getGroupsApi()} to get {@link RightsManageGroupsApi}.
      */
     public List getAllMatchedLocalGroups(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List groupList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched groups documents from local wiki", e);
-        }
-
-        return groupList;
+        return this.groupsApi.getAllMatchedLocalGroups(matchFields, nb, start, order);
     }
 
     // Users management
@@ -1080,10 +1012,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllUsersNames(int nb, int start) throws XWikiException
     {
-        return getAllMatchedUsersNames(null, nb, start);
+        return this.usersApi.getAllUsersNames(nb, start);
     }
 
     /**
@@ -1091,10 +1024,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllUsersNames() throws XWikiException
     {
-        return getAllMatchedUsersNames(null);
+        return this.usersApi.getAllUsersNames();
     }
 
     /**
@@ -1107,10 +1041,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedUsersNames(Map matchFields) throws XWikiException
     {
-        return getAllMatchedUsersNames(matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedUsersNames(matchFields);
     }
 
     /**
@@ -1125,10 +1060,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedUsersNames(Map matchFields, int nb, int start) throws XWikiException
     {
-        return getAllMatchedUsersNames(matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedUsersNames(matchFields, nb, start);
     }
 
     /**
@@ -1148,22 +1084,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedUsersNames(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
-
-        try {
-            userList =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users names", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedUsersNames(matchFields, nb, start, order);
     }
 
     /**
@@ -1173,10 +1099,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllGlobalUsersNames(int nb, int start) throws XWikiException
     {
-        return getAllMatchedGlobalUsersNames(null, nb, start);
+        return this.usersApi.getAllGlobalUsersNames(nb, start);
     }
 
     /**
@@ -1184,10 +1111,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllGlobalUsersNames() throws XWikiException
     {
-        return getAllMatchedGlobalUsersNames(null);
+        return this.usersApi.getAllGlobalUsersNames();
     }
 
     /**
@@ -1200,10 +1128,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedGlobalUsersNames(Map matchFields) throws XWikiException
     {
-        return getAllMatchedGlobalUsersNames(matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedGlobalUsersNames(matchFields);
     }
 
     /**
@@ -1218,11 +1147,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedGlobalUsersNames(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedGlobalUsersNames(matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedGlobalUsersNames(matchFields, nb, start);
     }
 
     /**
@@ -1242,22 +1172,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedGlobalUsersNames(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
-
-        try {
-            userList =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users names from global wiki", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedGlobalUsersNames(matchFields, nb, start, order);
     }
 
     /**
@@ -1268,10 +1188,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllWikiUsersNames(String wikiName, int nb, int start) throws XWikiException
     {
-        return getAllMatchedWikiUsersNames(wikiName, null, nb, start);
+        return this.usersApi.getAllWikiUsersNames(wikiName, nb, start);
     }
 
     /**
@@ -1280,10 +1201,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param wikiName the wiki where to search for users.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllWikiUsersNames(String wikiName) throws XWikiException
     {
-        return getAllMatchedWikiUsersNames(wikiName, null);
+        return this.usersApi.getAllWikiUsersNames(wikiName);
     }
 
     /**
@@ -1297,11 +1219,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields)
         throws XWikiException
     {
-        return getAllMatchedWikiUsersNames(wikiName, matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedWikiUsersNames(wikiName, matchFields);
     }
 
     /**
@@ -1317,11 +1240,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedWikiUsersNames(wikiName, matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedWikiUsersNames(wikiName, matchFields, nb, start);
     }
 
     /**
@@ -1342,22 +1266,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields, int nb, int start,
         List order) throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
-
-        try {
-            userList =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users names from provided wiki", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedWikiUsersNames(wikiName, matchFields, nb, start, order);
     }
 
     /**
@@ -1367,10 +1281,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllLocalUsersNames(int nb, int start) throws XWikiException
     {
-        return getAllMatchedLocalUsersNames(null, nb, start);
+        return this.usersApi.getAllLocalUsersNames(nb, start);
     }
 
     /**
@@ -1378,10 +1293,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllLocalUsersNames() throws XWikiException
     {
-        return getAllMatchedLocalUsersNames(null);
+        return this.usersApi.getAllLocalUsersNames();
     }
 
     /**
@@ -1394,10 +1310,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedLocalUsersNames(Map matchFields) throws XWikiException
     {
-        return getAllMatchedLocalUsersNames(matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedLocalUsersNames(matchFields);
     }
 
     /**
@@ -1412,11 +1329,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedLocalUsersNames(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedLocalUsersNames(matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedLocalUsersNames(matchFields, nb, start);
     }
 
     /**
@@ -1437,22 +1355,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            of {@link String} containing user names.
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedLocalUsersNames(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
-
-        try {
-            userList =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
-                    createMatchingTable(matchFields), false, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users names from local wiki", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedLocalUsersNames(matchFields, nb, start, order);
     }
 
     /**
@@ -1462,10 +1370,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllUsers(int nb, int start) throws XWikiException
     {
-        return getAllMatchedUsers(null, nb, start);
+        return this.usersApi.getAllUsers(nb, start);
     }
 
     /**
@@ -1473,10 +1382,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllUsers() throws XWikiException
     {
-        return getAllMatchedUsers(null);
+        return this.usersApi.getAllUsers();
     }
 
     /**
@@ -1489,10 +1399,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedUsers(Map matchFields) throws XWikiException
     {
-        return getAllMatchedUsers(matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedUsers(matchFields);
     }
 
     /**
@@ -1507,10 +1418,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedUsers(Map matchFields, int nb, int start) throws XWikiException
     {
-        return getAllMatchedUsers(matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedUsers(matchFields, nb, start);
     }
 
     /**
@@ -1530,26 +1442,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedUsers(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List userList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedUsers(matchFields, nb, start, order);
     }
 
     /**
@@ -1559,10 +1457,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllGlobalUsers(int nb, int start) throws XWikiException
     {
-        return getAllMatchedGlobalUsers(null, nb, start);
+        return this.usersApi.getAllGlobalUsers(nb, start);
     }
 
     /**
@@ -1570,10 +1469,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllGlobalUsers() throws XWikiException
     {
-        return getAllMatchedGlobalUsers(null);
+        return this.usersApi.getAllGlobalUsers();
     }
 
     /**
@@ -1586,10 +1486,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedGlobalUsers(Map matchFields) throws XWikiException
     {
-        return getAllMatchedGlobalUsers(matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedGlobalUsers(matchFields);
     }
 
     /**
@@ -1604,11 +1505,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedGlobalUsers(Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedGlobalUsers(matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedGlobalUsers(matchFields, nb, start);
     }
 
     /**
@@ -1628,26 +1530,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedGlobalUsers(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List userList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users from global wiki", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedGlobalUsers(matchFields, nb, start, order);
     }
 
     /**
@@ -1658,10 +1546,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllWikiUsers(String wikiName, int nb, int start) throws XWikiException
     {
-        return getAllMatchedWikiUsers(wikiName, null, nb, start);
+        return this.usersApi.getAllWikiUsers(wikiName, nb, start);
     }
 
     /**
@@ -1670,10 +1559,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param wikiName the wiki where to search for users.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllWikiUsers(String wikiName) throws XWikiException
     {
-        return getAllMatchedWikiUsers(wikiName, null);
+        return this.usersApi.getAllWikiUsers(wikiName);
     }
 
     /**
@@ -1687,10 +1577,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedWikiUsers(String wikiName, Map matchFields) throws XWikiException
     {
-        return getAllMatchedWikiUsers(wikiName, matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedWikiUsers(wikiName, matchFields);
     }
 
     /**
@@ -1706,11 +1597,12 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedWikiUsers(String wikiName, Map matchFields, int nb, int start)
         throws XWikiException
     {
-        return getAllMatchedWikiUsers(wikiName, matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedWikiUsers(wikiName, matchFields, nb, start);
     }
 
     /**
@@ -1731,26 +1623,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedWikiUsers(String wikiName, Map matchFields, int nb, int start,
         List order) throws XWikiException
     {
-        List userList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users from provided wiki", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedWikiUsers(wikiName, matchFields, nb, start, order);
     }
 
     /**
@@ -1760,10 +1638,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllLocalUsers(int nb, int start) throws XWikiException
     {
-        return getAllMatchedLocalUsers(null, nb, start);
+        return this.usersApi.getAllLocalUsers(nb, start);
     }
 
     /**
@@ -1771,10 +1650,11 @@ public class RightsManagerPluginApi extends PluginApi
      * 
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllLocalUsers() throws XWikiException
     {
-        return getAllMatchedLocalUsers(null);
+        return this.usersApi.getAllLocalUsers();
     }
 
     /**
@@ -1787,10 +1667,11 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedLocalUsers(Map matchFields) throws XWikiException
     {
-        return getAllMatchedLocalUsers(matchFields, 0, 0, null);
+        return this.usersApi.getAllMatchedLocalUsers(matchFields);
     }
 
     /**
@@ -1805,10 +1686,11 @@ public class RightsManagerPluginApi extends PluginApi
      * @param start the index of the first found user to return.
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedLocalUsers(Map matchFields, int nb, int start) throws XWikiException
     {
-        return getAllMatchedLocalUsers(matchFields, nb, start, null);
+        return this.usersApi.getAllMatchedLocalUsers(matchFields, nb, start);
     }
 
     /**
@@ -1828,26 +1710,12 @@ public class RightsManagerPluginApi extends PluginApi
      *            </ul>
      * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
      * @throws XWikiException error when searching for users.
+     * @deprecated Use {@link #getUsersApi()} to get {@link RightsManageUsersApi}.
      */
     public List getAllMatchedLocalUsers(Map matchFields, int nb, int start, List order)
         throws XWikiException
     {
-        List userList = new ArrayList();
-
-        try {
-            List list =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
-                    createMatchingTable(matchFields), true, new RequestLimit(nb, start),
-                    createOrderTable(order), this.context);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
-        } catch (RightsManagerException e) {
-            logError("Try to get all matched users from local wiki", e);
-        }
-
-        return userList;
+        return this.usersApi.getAllMatchedLocalUsers(matchFields, nb, start, order);
     }
 
     // Groups and users management

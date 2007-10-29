@@ -142,15 +142,12 @@ public interface XWikiGroupService
      *            document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>.
-     * @param nb the maximum number of result to return.
-     * @param start the index of the first found user to return.
      * @param context the {@link XWikiContext}.
      * @return the of found users.
      * @throws XWikiException error when getting number of users.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    int countAllMatchedUsers(Object[][] matchFields, int nb, int start, XWikiContext context)
-        throws XWikiException;
+    int countAllMatchedUsers(Object[][] matchFields, XWikiContext context) throws XWikiException;
 
     /**
      * Return number of groups with provided constraints.
@@ -162,15 +159,12 @@ public interface XWikiGroupService
      *            document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>.
-     * @param nb the maximum number of result to return.
-     * @param start the index of the first found user to return.
      * @param context the {@link XWikiContext}.
      * @return the of found groups.
      * @throws XWikiException error when getting number of groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    int countAllMatchedGroups(Object[][] matchFields, int nb, int start, XWikiContext context)
-        throws XWikiException;
+    int countAllMatchedGroups(Object[][] matchFields, XWikiContext context) throws XWikiException;
 
     /**
      * Get all groups containing provided member.

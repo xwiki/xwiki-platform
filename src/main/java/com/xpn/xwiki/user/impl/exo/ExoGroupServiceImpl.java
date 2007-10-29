@@ -211,13 +211,13 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
                 args);
         }
     }
-    
+
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedUsers(java.lang.Object[][], boolean, int, int, java.lang.Object[][], com.xpn.xwiki.XWikiContext)
      * 
-     * TODO: fully implements this method.
+     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedUsers(java.lang.Object[][],
+     *      boolean, int, int, java.lang.Object[][], com.xpn.xwiki.XWikiContext) TODO: fully
+     *      implements this method.
      */
     public List getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb,
         int start, Object[][] order, XWikiContext context) throws XWikiException
@@ -238,11 +238,12 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
 
         return usersList;
     }
-    
+
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedGroups(java.lang.Object[][], boolean, int, int, java.lang.Object[][], com.xpn.xwiki.XWikiContext)
+     * 
+     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#getAllMatchedGroups(java.lang.Object[][],
+     *      boolean, int, int, java.lang.Object[][], com.xpn.xwiki.XWikiContext)
      */
     public List getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb,
         int start, Object[][] order, XWikiContext context) throws XWikiException
@@ -268,31 +269,34 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedUsers(java.lang.Object[][], int, int, com.xpn.xwiki.XWikiContext)
+     * 
+     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedUsers(java.lang.Object[][],
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedUsers(Object[][] matchFields, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public int countAllMatchedUsers(Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
-        return getAllMatchedGroups(matchFields, false, nb, start, null, context).size();
+        return getAllMatchedGroups(matchFields, false, 0, 0, null, context).size();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedGroups(java.lang.Object[][], int, int, com.xpn.xwiki.XWikiContext)
+     * 
+     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedGroups(java.lang.Object[][],
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedGroups(Object[][] matchFields, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public int countAllMatchedGroups(Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
-        return getAllMatchedUsers(matchFields, false, nb, start, null, context).size();
+        return getAllMatchedUsers(matchFields, false, 0, 0, null, context).size();
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#removeUserOrGroupFromAllGroups(java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     * TODO: fully implements this method.
+     * 
+     * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#removeUserOrGroupFromAllGroups(java.lang.String,
+     *      java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext) TODO: fully implements
+     *      this method.
      */
     public void removeUserOrGroupFromAllGroups(String memberWiki, String memberSpace,
         String memberName, XWikiContext context) throws XWikiException

@@ -20,6 +20,10 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -28,6 +32,8 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 
 /**
  * API for managing groups.
@@ -221,5 +227,791 @@ public class RightsManageGroupsApi extends Api
         }
 
         return count;
+    }
+
+    /**
+     * Get all groups names in the main wiki and the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGroupsNames(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedGroupsNames(null, nb, start);
+    }
+
+    /**
+     * Get all groups names in the main wiki and the current wiki.
+     * 
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGroupsNames() throws XWikiException
+    {
+        return getAllMatchedGroupsNames(null);
+    }
+
+    /**
+     * Get all groups names in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGroupsNames(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedGroupsNames(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups names in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGroupsNames(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedGroupsNames(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups names in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGroupsNames(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List groupList = Collections.EMPTY_LIST;
+
+        try {
+            groupList =
+                RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups names", e);
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all groups names in the main wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGlobalGroupsNames(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedGlobalGroupsNames(null, nb, start);
+    }
+
+    /**
+     * Get all groups names in the main wiki.
+     * 
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGlobalGroupsNames() throws XWikiException
+    {
+        return getAllMatchedGlobalGroupsNames(null);
+    }
+
+    /**
+     * Get all groups names in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGlobalGroupsNames(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedGlobalGroupsNames(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups names in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGlobalGroupsNames(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedGlobalGroupsNames(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups names in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGlobalGroupsNames(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List groupList = Collections.EMPTY_LIST;
+
+        try {
+            groupList =
+                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups names from global wiki", e);
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all groups names in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllWikiGroupsNames(String wikiName, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedWikiGroupsNames(wikiName, null, nb, start);
+    }
+
+    /**
+     * Get all groups names in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllWikiGroupsNames(String wikiName) throws XWikiException
+    {
+        return getAllMatchedWikiGroupsNames(wikiName, null);
+    }
+
+    /**
+     * Get all groups names in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields)
+        throws XWikiException
+    {
+        return getAllMatchedWikiGroupsNames(wikiName, matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups names in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedWikiGroupsNames(wikiName, matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups names in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields, int nb, int start,
+        List order) throws XWikiException
+    {
+        List groupList = Collections.EMPTY_LIST;
+
+        try {
+            groupList =
+                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups names from provided wiki", e);
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all groups names in the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllLocalGroupsNames(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedLocalGroupsNames(null, nb, start);
+    }
+
+    /**
+     * Get all groups names in the current wiki.
+     * 
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllLocalGroupsNames() throws XWikiException
+    {
+        return getAllMatchedLocalGroupsNames(null);
+    }
+
+    /**
+     * Get all groups names in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedLocalGroupsNames(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedLocalGroupsNames(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups names in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedLocalGroupsNames(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedLocalGroupsNames(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups names in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing group names.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedLocalGroupsNames(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List groupList = Collections.EMPTY_LIST;
+
+        try {
+            groupList =
+                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups names from local wiki", e);
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all groups in the main wiki and the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGroups(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedGroups(null, nb, start);
+    }
+
+    /**
+     * Get all groups in the main wiki and the current wiki.
+     * 
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGroups() throws XWikiException
+    {
+        return getAllMatchedGroups(null);
+    }
+
+    /**
+     * Get all groups in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGroups(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedGroups(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGroups(Map matchFields, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedGroups(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGroups(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List groupList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                groupList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups documents", e);
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all groups in the main wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGlobalGroups(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedGlobalGroups(null, nb, start);
+    }
+
+    /**
+     * Get all groups in the main wiki.
+     * 
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllGlobalGroups() throws XWikiException
+    {
+        return getAllMatchedGlobalGroups(null);
+    }
+
+    /**
+     * Get all groups in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGlobalGroups(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedGlobalGroups(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGlobalGroups(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedGlobalGroups(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedGlobalGroups(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List groupList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                groupList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups documents from global wiki", e);
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all groups in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllWikiGroups(String wikiName, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedWikiGroups(wikiName, null, nb, start);
+    }
+
+    /**
+     * Get all groups in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllWikiGroups(String wikiName) throws XWikiException
+    {
+        return getAllMatchedWikiGroups(wikiName, null);
+    }
+
+    /**
+     * Get all groups in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedWikiGroups(String wikiName, Map matchFields) throws XWikiException
+    {
+        return getAllMatchedWikiGroups(wikiName, matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedWikiGroups(String wikiName, Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedWikiGroups(wikiName, matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups in the provided wiki.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedWikiGroups(String wikiName, Map matchFields, int nb, int start,
+        List order) throws XWikiException
+    {
+        List groupList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                groupList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups documents from provided wiki", e);
+        }
+
+        return groupList;
+    }
+
+    /**
+     * Get all groups in the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllLocalGroups(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedLocalGroups(null, nb, start);
+    }
+
+    /**
+     * Get all groups in the current wiki.
+     * 
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllLocalGroups() throws XWikiException
+    {
+        return getAllMatchedLocalGroups(null);
+    }
+
+    /**
+     * Get all groups in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedLocalGroups(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedLocalGroups(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all groups in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedLocalGroups(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedLocalGroups(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all groups in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found group to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @throws XWikiException error when searching for groups.
+     */
+    public List getAllMatchedLocalGroups(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List groupList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                groupList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched groups documents from local wiki", e);
+        }
+
+        return groupList;
     }
 }

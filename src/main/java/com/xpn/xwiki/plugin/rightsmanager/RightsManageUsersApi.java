@@ -20,6 +20,10 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -28,6 +32,8 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 
 /**
  * API for managing users.
@@ -221,5 +227,790 @@ public class RightsManageUsersApi extends Api
         }
 
         return count;
+    }
+
+    /**
+     * Get all users names in the main wiki and the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllUsersNames(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedUsersNames(null, nb, start);
+    }
+
+    /**
+     * Get all users names in the main wiki and the current wiki.
+     * 
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllUsersNames() throws XWikiException
+    {
+        return getAllMatchedUsersNames(null);
+    }
+
+    /**
+     * Get all users names in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedUsersNames(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedUsersNames(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users names in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedUsersNames(Map matchFields, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedUsersNames(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users names in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedUsersNames(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List userList = Collections.EMPTY_LIST;
+
+        try {
+            userList =
+                RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users names", e);
+        }
+
+        return userList;
+    }
+
+    /**
+     * Get all users names in the main wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllGlobalUsersNames(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedGlobalUsersNames(null, nb, start);
+    }
+
+    /**
+     * Get all users names in the main wiki.
+     * 
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllGlobalUsersNames() throws XWikiException
+    {
+        return getAllMatchedGlobalUsersNames(null);
+    }
+
+    /**
+     * Get all users names in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedGlobalUsersNames(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedGlobalUsersNames(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users names in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedGlobalUsersNames(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedGlobalUsersNames(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users names in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedGlobalUsersNames(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List userList = Collections.EMPTY_LIST;
+
+        try {
+            userList =
+                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users names from global wiki", e);
+        }
+
+        return userList;
+    }
+
+    /**
+     * Get all users names in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllWikiUsersNames(String wikiName, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedWikiUsersNames(wikiName, null, nb, start);
+    }
+
+    /**
+     * Get all users names in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllWikiUsersNames(String wikiName) throws XWikiException
+    {
+        return getAllMatchedWikiUsersNames(wikiName, null);
+    }
+
+    /**
+     * Get all users names in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields)
+        throws XWikiException
+    {
+        return getAllMatchedWikiUsersNames(wikiName, matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users names in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedWikiUsersNames(wikiName, matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users names in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields, int nb, int start,
+        List order) throws XWikiException
+    {
+        List userList = Collections.EMPTY_LIST;
+
+        try {
+            userList =
+                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users names from provided wiki", e);
+        }
+
+        return userList;
+    }
+
+    /**
+     * Get all users names in the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllLocalUsersNames(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedLocalUsersNames(null, nb, start);
+    }
+
+    /**
+     * Get all users names in the current wiki.
+     * 
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllLocalUsersNames() throws XWikiException
+    {
+        return getAllMatchedLocalUsersNames(null);
+    }
+
+    /**
+     * Get all users names in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedLocalUsersNames(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedLocalUsersNames(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users names in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedLocalUsersNames(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedLocalUsersNames(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users names in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     *            of {@link String} containing user names.
+     * @return a {@link List} of {@link String} containing user names.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedLocalUsersNames(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List userList = Collections.EMPTY_LIST;
+
+        try {
+            userList =
+                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users names from local wiki", e);
+        }
+
+        return userList;
+    }
+
+    /**
+     * Get all users in the main wiki and the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllUsers(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedUsers(null, nb, start);
+    }
+
+    /**
+     * Get all users in the main wiki and the current wiki.
+     * 
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllUsers() throws XWikiException
+    {
+        return getAllMatchedUsers(null);
+    }
+
+    /**
+     * Get all users in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedUsers(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedUsers(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedUsers(Map matchFields, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedUsers(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users in the main wiki and the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedUsers(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List userList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                userList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users", e);
+        }
+
+        return userList;
+    }
+
+    /**
+     * Get all users in the main wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllGlobalUsers(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedGlobalUsers(null, nb, start);
+    }
+
+    /**
+     * Get all users in the main wiki.
+     * 
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllGlobalUsers() throws XWikiException
+    {
+        return getAllMatchedGlobalUsers(null);
+    }
+
+    /**
+     * Get all users in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedGlobalUsers(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedGlobalUsers(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedGlobalUsers(Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedGlobalUsers(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users in the main wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedGlobalUsers(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List userList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                userList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users from global wiki", e);
+        }
+
+        return userList;
+    }
+
+    /**
+     * Get all users in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllWikiUsers(String wikiName, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedWikiUsers(wikiName, null, nb, start);
+    }
+
+    /**
+     * Get all users in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllWikiUsers(String wikiName) throws XWikiException
+    {
+        return getAllMatchedWikiUsers(wikiName, null);
+    }
+
+    /**
+     * Get all users in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedWikiUsers(String wikiName, Map matchFields) throws XWikiException
+    {
+        return getAllMatchedWikiUsers(wikiName, matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedWikiUsers(String wikiName, Map matchFields, int nb, int start)
+        throws XWikiException
+    {
+        return getAllMatchedWikiUsers(wikiName, matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users in the provided wiki.
+     * 
+     * @param wikiName the wiki where to search for users.
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedWikiUsers(String wikiName, Map matchFields, int nb, int start,
+        List order) throws XWikiException
+    {
+        List userList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                userList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users from provided wiki", e);
+        }
+
+        return userList;
+    }
+
+    /**
+     * Get all users in the current wiki.
+     * 
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllLocalUsers(int nb, int start) throws XWikiException
+    {
+        return getAllMatchedLocalUsers(null, nb, start);
+    }
+
+    /**
+     * Get all users in the current wiki.
+     * 
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllLocalUsers() throws XWikiException
+    {
+        return getAllMatchedLocalUsers(null);
+    }
+
+    /**
+     * Get all users in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedLocalUsers(Map matchFields) throws XWikiException
+    {
+        return getAllMatchedLocalUsers(matchFields, 0, 0, null);
+    }
+
+    /**
+     * Get all users in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedLocalUsers(Map matchFields, int nb, int start) throws XWikiException
+    {
+        return getAllMatchedLocalUsers(matchFields, nb, start, null);
+    }
+
+    /**
+     * Get all users in the current wiki.
+     * 
+     * @param matchFields the fields to match. It is a Map with field name as key and for value :
+     *            <ul>
+     *            <li>"matching string" for document fields</li>
+     *            <li>or ["field type", "matching string"] for object fields</li>
+     *            </ul>
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param order the fields to order from. It is a List containing :
+     *            <ul>
+     *            <li>"field name" for document fields</li>
+     *            <li>or ["filed name", "field type"] for object fields</li>
+     *            </ul>
+     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @throws XWikiException error when searching for users.
+     */
+    public List getAllMatchedLocalUsers(Map matchFields, int nb, int start, List order)
+        throws XWikiException
+    {
+        List userList = new ArrayList();
+
+        try {
+            List list =
+                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
+                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
+                    this.context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                userList.add(((XWikiDocument) it.next()).newDocument(context));
+            }
+        } catch (RightsManagerException e) {
+            logError("Try to get all matched users from local wiki", e);
+        }
+
+        return userList;
     }
 }

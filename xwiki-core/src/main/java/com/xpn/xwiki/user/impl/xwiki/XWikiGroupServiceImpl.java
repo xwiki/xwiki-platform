@@ -724,7 +724,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         throws XWikiException
     {
         if (member == null)
-            return countAllMatchedGroups(null, context);
+            return 0;
 
         // TODO: improve using real request
         return getAllGroupsNamesForMember(member, 0, 0, context).size();
@@ -740,7 +740,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         throws XWikiException
     {
         if (group == null)
-            return countAllMatchedUsers(null, context);
+            return 0;
         
         // TODO: improve using real request
         return getAllMembersNamesForGroup(group, 0, 0, context).size();

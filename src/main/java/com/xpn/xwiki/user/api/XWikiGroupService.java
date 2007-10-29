@@ -173,7 +173,7 @@ public interface XWikiGroupService
         throws XWikiException;
 
     /**
-     * Get all groups containing provided user.
+     * Get all groups containing provided member.
      * 
      * @param member the name of the member (user or group).
      * @param nb the maximum number of result to return.
@@ -187,7 +187,7 @@ public interface XWikiGroupService
         XWikiContext context) throws XWikiException;
 
     /**
-     * Get all users provided group contains.
+     * Get all members provided group contains.
      * 
      * @param group the name of the group.
      * @param nb the maximum number of result to return.
@@ -199,4 +199,26 @@ public interface XWikiGroupService
      */
     public Collection getAllMembersNamesForGroup(String group, int nb, int start,
         XWikiContext context) throws XWikiException;
+
+    /**
+     * Return the number of groups containing provided member.
+     * 
+     * @param member the name of the member (user or group).
+     * @param context the XWiki context.
+     * @return the number of groups.
+     * @throws XWikiException error when getting number of users.
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     */
+    int countAllGroupsNamesForMember(String member, XWikiContext context) throws XWikiException;
+
+    /**
+     * Return the number of members provided group contains.
+     * 
+     * @param group the name of the group.
+     * @param context the XWiki context.
+     * @return the number of members.
+     * @throws XWikiException error when getting number of groups.
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     */
+    int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException;
 }

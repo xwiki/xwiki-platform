@@ -1322,7 +1322,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates;
      * works by creating a RequestDispatcher, buffering the output, then returning it as a string.
-     * 
+     *
      * @author LBlaze
      */
     public String invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
@@ -1692,7 +1692,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * try to get it from a cookie. If no language cookie exists then use the user default language
      * and barring that use the browser's "Accept-Language" header sent in HTTP request. If none is
      * defined use the default language.
-     * 
+     *
      * @return the language to use
      */
     public String getLanguagePreference(XWikiContext context)
@@ -2155,11 +2155,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if (bobj != null) {
                     String host = bobj.getStringValue("server");
                     if ((host != null) && (!"".equals(host))) {
-                        try {
-                            if (virtualWikiMap != null && virtualWikiMap.getFromCache(host) != null)
-                                virtualWikiMap.flushEntry(host);
-                        } catch (XWikiCacheNeedsRefreshException e) {
-                            virtualWikiMap.cancelUpdate(host);
+                        if (virtualWikiMap != null) {
+                            try {
+                                if (virtualWikiMap.getFromCache(host) != null)
+                                    virtualWikiMap.flushEntry(host);
+                            } catch (XWikiCacheNeedsRefreshException e) {
+                                virtualWikiMap.cancelUpdate(host);
+                            }
                         }
                     }
                 }
@@ -2251,7 +2253,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the
      * required configuration properties to make XWiki work properly. If some properties are missing
      * they are created and saved in the database.
-     * 
+     *
      * @param context the XWiki Context
      * @return the XWiki Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2677,7 +2679,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * Method allows to create an empty user with no password (he won't be able to login) This
      * method is usefull for authentication like LDAP or App Server trusted
-     * 
+     *
      * @param xwikiname
      * @param userRights
      * @param context
@@ -2996,7 +2998,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Prepares the localized resources, according to the selected language. From any point in the
      * code (java, velocity or groovy) the "msg" parameter holds an instance of the localized
      * resource bundle, and the "locale" parameter holds the current locale settings.
-     * 
+     *
      * @param context The request context.
      */
     public void prepareResources(XWikiContext context)
@@ -3267,7 +3269,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         return copyDocument(docname, targetdocname, null, null, null, true, context);
     }
-    
+
     public boolean copyDocument(String docname, String targetdocname, boolean reset, XWikiContext context)
         throws XWikiException
     {
@@ -4202,9 +4204,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             synchronized (URLFACTORY_SERVICE_LOCK) {
                 if (urlFactoryService == null) {
                     LOG.info("Initializing URLFactory Service...");
-    
+
                     String urlFactoryServiceClass = Param("xwiki.urlfactory.serviceclass");
-    
+
                     if (urlFactoryServiceClass != null) {
                         try {
                             if (LOG.isDebugEnabled())
@@ -4246,7 +4248,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
-     * 
+     *
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4278,7 +4280,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform Portal service from the Wiki Engine
-     * 
+     *
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4888,7 +4890,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * accessor for the isReadOnly instance var.
-     * 
+     *
      * @see #isReadOnly
      */
     public boolean isReadOnly()
@@ -5693,7 +5695,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     workDir.mkdir();
                     return workDir;
                 }
-            } 
+            }
             catch(Exception e)
             {
                 workDir = null;

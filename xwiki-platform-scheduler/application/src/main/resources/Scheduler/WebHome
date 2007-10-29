@@ -187,15 +187,15 @@
   #set($jobName=$jobObj.get('jobName'))
   #if($jobObj.get("status")=="Normal"||$jobObj.get('status')=="Paused")
    #set($ok=$scheduler.unscheduleJob($jobObj))
-   #if($ok==true)    
-    #set($ok=$jobDoc.delete())
-    #info("~~$jobName~~ *deleted*")
+   #if($ok==true)
+    #set($deleteRedirect = $xwiki.getURL($jobObj.getName(),"delete"))
+    $response.sendRedirect($deleteRedirect)
    #else
     #error("$context.get('error')")
    #end
   #else
-    $jobDoc.delete()
-    #info("~~$jobName~~ *deleted*")
+    #set($deleteRedirect = $xwiki.getURL($jobObj.getName(),"delete"))
+    $response.sendRedirect($deleteRedirect))
   #end
  #end
 #end

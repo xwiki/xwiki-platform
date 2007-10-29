@@ -295,10 +295,10 @@ public class XWikiHibernateBaseStore {
         wikiName = wikiName.toLowerCase();
 
         if (databaseProduct == DatabaseProduct.DERBY) {
-            return wikiName.equals(context.getMainXWiki().toLowerCase()) ? "APP" : wikiName
+            return wikiName.equalsIgnoreCase(context.getMainXWiki()) ? "APP" : wikiName
                 .replace('-', '_');
         } else if (databaseProduct == DatabaseProduct.HSQLDB) {
-            return wikiName.equals(context.getMainXWiki().toLowerCase()) ? "PUBLIC" : wikiName
+            return wikiName.equalsIgnoreCase(context.getMainXWiki()) ? "PUBLIC" : wikiName
                 .replace('-', '_');
         } else
             return wikiName.replace('-', '_');

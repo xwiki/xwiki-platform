@@ -636,7 +636,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         List parameterValues = new ArrayList();
         String where = createWhereClause(documentClass, matchFields, null, parameterValues);
 
-        String sql = "select count(doc) from XWikiDocument doc" + where;
+        String sql = "select count(distinct doc) from XWikiDocument doc" + where;
 
         List list = context.getWiki().getStore().search(sql, 0, 0, parameterValues, context);
 

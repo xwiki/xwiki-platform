@@ -628,8 +628,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
      * @throws XWikiException error when calling for
      *             {@link XWikiStoreInterface#search(String, int, int, List, XWikiContext)}
      */
-    protected int countAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, int nb,
-        int start, XWikiContext context) throws XWikiException
+    protected int countAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
+        XWikiContext context) throws XWikiException
     {
         String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
 
@@ -638,7 +638,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
 
         String sql = "select count(doc) from XWikiDocument doc" + where;
 
-        List list = context.getWiki().getStore().search(sql, nb, start, parameterValues, context);
+        List list = context.getWiki().getStore().search(sql, 0, 0, parameterValues, context);
 
         if (list == null || list.size() == 0)
             return 0;
@@ -649,25 +649,24 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMatchedUsers(java.lang.Object[][], int,
-     *      int, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMatchedUsers(java.lang.Object[][],
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedUsers(Object[][] matchFields, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public int countAllMatchedUsers(Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
-        return countAllMatchedUsersOrGroups(true, matchFields, nb, start, context);
+        return countAllMatchedUsersOrGroups(true, matchFields, context);
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMatchedGroups(java.lang.Object[][],
-     *      int, int, com.xpn.xwiki.XWikiContext)
+     *
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMatchedGroups(java.lang.Object[][], com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedGroups(Object[][] matchFields, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public int countAllMatchedGroups(Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
-        return countAllMatchedUsersOrGroups(false, matchFields, nb, start, context);
+        return countAllMatchedUsersOrGroups(false, matchFields, context);
     }
 
     /**
@@ -679,7 +678,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     public Collection getAllGroupsNamesForMember(String member, int nb, int start,
         XWikiContext context) throws XWikiException
     {
-        //TODO: improve using real request
+        // TODO: improve using real request
         List groupNameList = new ArrayList(listGroupsForUser(member, context));
 
         if (start <= 0 & (nb <= 0 || nb >= groupNameList.size()))
@@ -703,7 +702,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     public Collection getAllMembersNamesForGroup(String group, int nb, int start,
         XWikiContext context) throws XWikiException
     {
-        //TODO: improve using real request
+        // TODO: improve using real request
         List userNameList = listMemberForGroup(group, context);
 
         if (nb == 0 && start == 0)
@@ -714,27 +713,36 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         else
             return userNameList.subList(start, start + nb);
     }
-    
+
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllGroupsNamesForMember(java.lang.String, com.xpn.xwiki.XWikiContext)
-     * TODO: improve using real request
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllGroupsNamesForMember(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllGroupsNamesForMember(String member, XWikiContext context) throws XWikiException
+    public int countAllGroupsNamesForMember(String member, XWikiContext context)
+        throws XWikiException
     {
-        //TODO: improve using real request
+        if (member == null)
+            return countAllMatchedGroups(null, context);
+
+        // TODO: improve using real request
         return getAllGroupsNamesForMember(member, 0, 0, context).size();
     }
-    
+
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMembersNamesForGroup(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMembersNamesForGroup(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException
+    public int countAllMembersNamesForGroup(String group, XWikiContext context)
+        throws XWikiException
     {
-        //TODO: improve using real request
+        if (group == null)
+            return countAllMatchedUsers(null, context);
+        
+        // TODO: improve using real request
         return getAllMembersNamesForGroup(group, 0, 0, context).size();
     }
 }

@@ -379,10 +379,10 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     {
         if (user) {
             return context.getWiki().getGroupService(context).countAllMatchedUsers(matchFields,
-                0, 0, context);
+                context);
         } else {
             return context.getWiki().getGroupService(context).countAllMatchedUsers(matchFields,
-                0, 0, context);
+                context);
         }
     }
 

@@ -52,6 +52,7 @@ public class AbstractPackager
         XWikiContext context = new XWikiContext();
         context.setUser("XWiki.superadmin");
         context.setDatabase(databaseName);
+        context.setMainXWiki(databaseName);
 
         XWikiConfig config = new XWikiConfig();
         config.put("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore");

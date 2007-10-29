@@ -2194,11 +2194,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if (bobj != null) {
                     String host = bobj.getStringValue("server");
                     if ((host != null) && (!"".equals(host))) {
-                        try {
-                            if (virtualWikiMap != null && virtualWikiMap.getFromCache(host) != null)
-                                virtualWikiMap.flushEntry(host);
-                        } catch (XWikiCacheNeedsRefreshException e) {
-                            virtualWikiMap.cancelUpdate(host);
+                        if (virtualWikiMap != null) {
+                            try {
+                                if (virtualWikiMap.getFromCache(host) != null)
+                                    virtualWikiMap.flushEntry(host);
+                            } catch (XWikiCacheNeedsRefreshException e) {
+                                virtualWikiMap.cancelUpdate(host);
+                            }
                         }
                     }
                 }

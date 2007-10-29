@@ -1,6 +1,6 @@
 /*
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright 2006-2007, XpertNet SARL, and individual contributors as indicated
+ * by the contributors.txt.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -271,24 +271,24 @@ public class ExoGroupServiceImpl extends XWikiGroupServiceImpl implements XWikiG
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedUsers(java.lang.Object[][],
-     *      int, int, com.xpn.xwiki.XWikiContext)
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedUsers(Object[][] matchFields, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public int countAllMatchedUsers(Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
-        return getAllMatchedGroups(matchFields, false, nb, start, null, context).size();
+        return getAllMatchedGroups(matchFields, false, 0, 0, null, context).size();
     }
 
     /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl#countAllMatchedGroups(java.lang.Object[][],
-     *      int, int, com.xpn.xwiki.XWikiContext)
+     *      com.xpn.xwiki.XWikiContext)
      */
-    public int countAllMatchedGroups(Object[][] matchFields, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public int countAllMatchedGroups(Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
-        return getAllMatchedUsers(matchFields, false, nb, start, null, context).size();
+        return getAllMatchedUsers(matchFields, false, 0, 0, null, context).size();
     }
 
     /**

@@ -52,6 +52,24 @@ public class RightsManagerPluginApi extends PluginApi
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
 
     /**
+     * The name of the property in {@link com.xpn.xwiki.XWikiConfig} indicating the user interface
+     * to use for rights management.
+     */
+    public static final String RIGHTS_UI_PROPERTY = "xwiki.rights.defaultui";
+
+    /**
+     * The value of the {@link #RIGHTS_UI_PROPERTY} that indicate to use the stable/basic user
+     * interface.
+     */
+    public static final String RIGHTS_UI_VALUE_STABLE = "stable";
+
+    /**
+     * The value of the {@link #RIGHTS_UI_PROPERTY} that indicate to use the new experimental ajax
+     * user interface.
+     */
+    public static final String RIGHTS_UI_VALUE_NEW = "new";
+
+    /**
      * Quote symbol.
      */
     public static final String QUOTE = "\"";
@@ -197,6 +215,25 @@ public class RightsManagerPluginApi extends PluginApi
 
         this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
         this.context.put(CONTEXT_LASTEXCEPTION, e);
+    }
+
+    /**
+     * @return the user interface to use for rights management. Can be "stable" or "new".
+     */
+    public String getDefaultUi()
+    {
+        return this.context.getWiki().getConfig().getProperty(RIGHTS_UI_PROPERTY,
+            RIGHTS_UI_VALUE_NEW);
+    }
+
+    /**
+     * Modify the user interface to use for rights management.
+     * 
+     * @param ui "stable" or "new".
+     */
+    public void setDefaultUi(String ui)
+    {
+        this.context.getWiki().getConfig().setProperty(RIGHTS_UI_PROPERTY, ui);
     }
 
     // Groups management

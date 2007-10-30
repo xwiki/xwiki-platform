@@ -51,7 +51,6 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * Default implementation of {@link XWikiGroupService} users and groups manager.
@@ -80,11 +79,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
      * Name of the field of class XWiki.XWikiGroups where group's members names are inserted.
      */
     private static final String FIELD_XWIKIGROUPS_MEMBER = "member";
-
-    /**
-     * Separator between members names in XWiki.XWikiGroups class "member" field.
-     */
-    private static final String FIELD_XWIKIGROUPS_MEMBER_SEP = " ,";
 
     /**
      * Default space name for a group or a user.
@@ -208,38 +202,37 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     }
 
     /**
-     * Remove a user or group name from a list of string used in XWiki.XWikiGroups class "member"
-     * field.
+     * Check if provided member is equal to member name found in XWiki.XWikiGroups object.
      * 
-     * @param list the list of members names where to find the one to remove.
+     * @param currentMember the member name found in XWiki.XWikiGroups object.
      * @param memberWiki the name of the wiki of the member.
      * @param memberSpace the name of the space of the member.
      * @param memberName the name of the member.
      * @param context the XWiki context.
-     * @return true if at least one member has been removed from the list.
+     * @return true if equals, false if not.
      */
-    private boolean removeMemberFromList(List list, String memberWiki, String memberSpace,
+    private boolean isMemberEquals(String currentMember, String memberWiki, String memberSpace,
         String memberName, XWikiContext context)
     {
-        boolean needUpdate = false;
+        boolean equals = false;
 
         if (memberWiki != null) {
-            needUpdate |= list.remove(memberWiki + WIKI_FULLNAME_SEP + memberName);
+            equals |= currentMember.equals(memberWiki + WIKI_FULLNAME_SEP + memberName);
 
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
-                needUpdate |= list.remove(memberSpace + SAME_NAME_SEP + memberName);
+                equals |= currentMember.equals(memberSpace + SAME_NAME_SEP + memberName);
             }
         }
 
         if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(memberWiki)) {
-            needUpdate |= list.remove(memberName);
+            equals |= currentMember.equals(memberName);
 
             if (memberSpace == null || memberSpace.equals(DEFAULT_MEMBER_SPACE)) {
-                needUpdate |= list.remove(memberSpace + SAME_NAME_SEP + memberName);
+                equals |= currentMember.equals(memberSpace + SAME_NAME_SEP + memberName);
             }
         }
 
-        return needUpdate;
+        return equals;
     }
 
     /**
@@ -263,21 +256,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
             for (Iterator itGroups = groupVector.iterator(); itGroups.hasNext();) {
                 BaseObject bobj = (BaseObject) itGroups.next();
                 if (bobj != null) {
-                    String members = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
-                    List memberList =
-                        ListClass.getListFromString(members, FIELD_XWIKIGROUPS_MEMBER_SEP, false);
+                    String member = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
 
-                    needUpdate |=
-                        removeMemberFromList(memberList, memberWiki, memberSpace, memberName,
-                            context);
-
-                    if (needUpdate) {
-                        if (memberList.size() > 0) {
-                            bobj.setStringValue(FIELD_XWIKIGROUPS_MEMBER, StringUtils.join(
-                                memberList.toArray(), FIELD_XWIKIGROUPS_MEMBER_SEP.charAt(0)));
-                        } else {
-                            groupDocument.removeObject(bobj);
-                        }
+                    if (isMemberEquals(member, memberWiki, memberSpace, memberName, context)) {
+                        groupDocument.removeObject(bobj);
                     }
                 }
             }
@@ -660,8 +642,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMatchedGroups(java.lang.Object[][], com.xpn.xwiki.XWikiContext)
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#countAllMatchedGroups(java.lang.Object[][],
+     *      com.xpn.xwiki.XWikiContext)
      */
     public int countAllMatchedGroups(Object[][] matchFields, XWikiContext context)
         throws XWikiException
@@ -741,7 +724,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     {
         if (group == null)
             return 0;
-        
+
         // TODO: improve using real request
         return getAllMembersNamesForGroup(group, 0, 0, context).size();
     }

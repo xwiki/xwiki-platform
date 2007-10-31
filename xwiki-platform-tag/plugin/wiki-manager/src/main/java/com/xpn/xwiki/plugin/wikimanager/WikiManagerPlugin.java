@@ -49,7 +49,7 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Construction the entry point of the Wiki Manager plugin.
+     * Construct the entry point of the Wiki Manager plugin.
      * 
      * @param name the identifier of the plugin.
      * @param className the class name of the entry point of the plugin.
@@ -57,18 +57,8 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
      */
     public WikiManagerPlugin(String name, String className, XWikiContext context)
     {
-        super(name, className, context);
+        super(PLUGIN_NAME, className, context);
         init(context);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
-     */
-    public String getName()
-    {
-        return PLUGIN_NAME;
     }
 
     /**

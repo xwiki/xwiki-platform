@@ -553,8 +553,7 @@ text-decoration:none;
   display: block;
   font-size: 1px;
   line-height: 1px;
-  border-top: 1px solid ;
-  //margin-top: 1px;
+  border-top: 1px solid ;  
 }
 
 .submenu.hidden{

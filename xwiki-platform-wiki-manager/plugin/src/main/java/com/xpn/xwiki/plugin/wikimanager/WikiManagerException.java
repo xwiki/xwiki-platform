@@ -144,7 +144,7 @@ public class WikiManagerException extends PluginException
     }
 
     /**
-     * @return unique instance of the default ApplicationManagerException.
+     * @return unique instance of the default WikiManagerException.
      */
     public static WikiManagerException getDefaultException()
     {

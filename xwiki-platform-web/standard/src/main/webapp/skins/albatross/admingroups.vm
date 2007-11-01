@@ -1,6 +1,9 @@
 #set($formname = "update")
 #set($saveaction = "save")
-#set($interface = "$!request.get('interface')")
+#set($interface = $request.get("interface"))
+#if(!$interface)
+  #set($interface = $xwiki.rightsmanager.defaultUi)
+#end
 <div id="xwikieditcontent">
 #set($url = "?xpage=getgroups")
 ## switch between the new and the old interface

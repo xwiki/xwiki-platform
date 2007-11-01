@@ -1,6 +1,9 @@
 #set($formname = "update")
 #set($saveaction = "save")
-#set($interface = "$!request.get('interface')")
+#set($interface = $request.get("interface"))
+#if(!$interface)
+  #set($interface = $xwiki.rightsmanager.defaultUi)
+#end
 <div id="xwikieditcontent">
 ## switch between the new and the old interface
 <select name="switchInterface" onchange="if(this.options[this.selectedIndex].value=='new') { location='?editor=globalrights&amp;space=${doc.space}&amp;interface=new';  } else if(this.options[this.selectedIndex].value=='stable') { location='?editor=globalrights&amp;space=${doc.space}&amp;interface=stable';  } ">

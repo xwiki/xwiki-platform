@@ -1,3 +1,89 @@
+#set($formname = "update")
+#set($saveaction = "save")
+#set($interface = "$!request.get('interface')")
+<div id="xwikieditcontent">## switch between the new and the old interface
+<select name="switchInterface" onchange="if(this.options[this.selectedIndex].value=='new') { location='?editor=rights&amp;interface=new';  } else if(this.options[this.selectedIndex].value=='stable') { location='?editor=rights&amp;interface=stable';  } ">
+<option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
+<option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
+<option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
+</select>
+#if($interface == "new")
+#if($doc.fullName == "XWiki.XWikiPreferences")
+#if($request.editor == "globalrights")   
+#set($clsname = "XWiki.XWikiGlobalRights")
+#else                                    
+#set($clsname = "XWiki.XWikiRights")
+#end
+#elseif($doc.name == "WebPreferences")  
+#if($request.editor == "spacerights")
+#set($clsname = "XWiki.XWikiGlobalRights")
+#else
+#set($clsname = "XWiki.XWikiRights")  
+#end
+#end
+#set($url = "?xpage=getusersandgroups")
+<div id="wrapper" style="display: none;">
+<div id="ajax-loader">Loading...<br />
+  <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
+</div>
+<table cellpadding="0" cellspacing="5" id="usersandgroupstable">
+<tr>
+    <td colspan="2">
+      <select name="uorg" style="width: 130px;">
+        <option value="groups" selected="selected">Groups</option>
+        <option value="users">Users</option>
+        </select>&nbsp;<span id="showLimits"></span>
+    </td>
+</tr>
+<tr><td valign="top" style="width:100%">
+      <table border="0" cellpadding="2" cellspacing="0" width="100%" class="display">
+       <thead class="theader">
+          <tr><td class="huorgname">Group or User</td>
+              <td class="rights">View</td>
+              <td class="rights">Comment</td>
+              <td class="rights">Edit</td>
+			  <td class="rights">Delete</td>
+              ## if global rights and main wiki show programming right column
+              #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
+              #if($hasPrgr)<td class="programmingr">Program</td> #end
+              <td class="huorgmanage" id="huorgmanage">Manage<img src="$xwiki.getSkinFile('icons/rights-manager/filter.png')" alt="Filters" title="Filters" /></td>
+          </tr>
+          <tr id="table-filters">
+              <td class="fuorgname">
+                <input name="name" type="text" />
+	        <input name="progr" type="hidden" value="#if($hasPrgr) true #else false #end" />
+                <input name="admin" type="hidden" value="false" />
+                <input name="reg" type="hidden" value="false" />
+                <input type="hidden" name="clsname" value="$clsname" />
+              </td>
+              <td class="uorgwikiname">
+                #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
+                #if(!$mainwk)
+                <select name="wiki">
+                  <option value="local" selected="selected">Local</option>
+                  <option value="global">Global</option>
+                  <option value="both">Both</option>
+		</select>
+		#else <input type="hidden" value="local" name="wiki" /> #end
+              </td>
+              <td colspan="4"></td>
+          </tr>
+       </thead>
+       <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
+      </table></td>
+    <td valign="top">
+      <div id="scrollbar1" class="scrollbar"><div class="inscrollbar">&nbsp;</div></div>
+    </td>
+    <td id="buff"></td>
+</tr>
+</table>
+</div>
+<script type="text/javascript">
+	$('wrapper').style.display = "block";
+	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstable", displayUsersAndGroups, true); 
+	Event.observe($('huorgmanage'), 'click', showHideFilters(ta));
+</script>
+#else
 #if($request.xpage=="editrights")
 #if($request.global=="1")
 $response.sendRedirect($doc.getURL("admin", "editor=rights&global=1"))
@@ -15,7 +101,6 @@ $response.sendRedirect($doc.getURL($context.action, "editor=rights"))
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
 <form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
-<div id="xwikieditcontent" class="clear">
 <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("edit", "editor=rights")"/></div>
 <div>
 #set ($first = 1)
@@ -38,7 +123,8 @@ $response.sendRedirect($doc.getURL($context.action, "editor=rights"))
 #end
   </table>
  </div> ## noname
-</div> ## xwikieditcontent
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 #end
+#end
+</div>

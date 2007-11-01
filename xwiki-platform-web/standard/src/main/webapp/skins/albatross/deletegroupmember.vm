@@ -1,0 +1,4 @@
+#set($fullname = $request.get("fullname"))
+#set($obj = $doc.getObject("XWiki.XWikiGroups", "member", $fullname))
+#set($discard = $doc.removeObject($obj))
+#set($discard = $doc.save())

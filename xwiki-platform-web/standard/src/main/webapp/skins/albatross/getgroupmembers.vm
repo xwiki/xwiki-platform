@@ -1,0 +1,24 @@
+$response.setContentType("application/x-json")
+#set( $offset = $xwiki.parseInt( $request.get( "offset" ) ) )
+## offset starts from 0 in velocity and 1 in javascript
+#set( $off = $offset - 1 )
+#set( $limit = $xwiki.parseInt( $request.get( "limit" ) ) )
+
+#set( $rm = $xwiki.rightsmanager )
+#set( $countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
+#set( $members = $rm.getAllMembersNamesForGroup($doc.fullName, $limit, $off))
+
+{
+"totalrows": $countm,
+"returnedrows": #if($countm < $limit) $countm #else $limit #end,
+"offset": $offset,
+"rows": [
+#foreach( $m in $members )
+    #if( $velocityCount > 1 ) , #end
+   {
+    "fullname"     : "$m",
+    "memberurl"    : "$xwiki.getURL($m)",
+    "docurl"       : "$doc.getURL()"
+   }
+#end
+]}

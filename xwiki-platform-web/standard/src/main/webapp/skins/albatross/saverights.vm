@@ -1,0 +1,46 @@
+#set($fullname = $request.get("fullname"))
+#set($uorg = $request.get("uorg"))
+#set($allows = "$!request.get('allows')")
+#set($denys = "$!request.get('denys')")
+#set($clsname = $request.get("clsname"))
+## found the user or group
+#set($founda = false)
+#set($foundd = false)
+
+#foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
+  #set($pers = $obj.getProperty($uorg).getValue())
+  ## TO DO: regular expression
+  #if($pers.matches("${fullname},?"))
+    #if($obj.getProperty('allow').getValue() == 1)
+        #set($founda = true) ## found allows -> set the new levels 
+        #if($allows != "") $obj.set('levels', $allows)
+	#else $doc.removeObject($obj) #end
+    #else
+        #set($foundd = true)## found denys -> set the new levels
+        #if($denys != "") $obj.set('levels', $denys)
+	#else $doc.removeObject($obj) #end
+    #end
+  #elseif($pers.matches("^(.*,)?${fullname}(,.*)?$"))
+    #set($pers = $pers.replaceAll("^${fullname}(,|$)", ""))
+    #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
+    $obj.set($uorg, $pers)
+  #end
+#end
+
+#if(($founda == false) && ($allows != ""))
+## could not find the rule -> create one
+#set($obj = $doc.newObject($clsname))
+## set the new rules
+$obj.set($uorg, $fullname)
+$obj.set('levels', $allows)
+$obj.set('allow', '1')
+#end
+#if(($foundd == false) && ($denys != ""))
+## could not find the rule -> create one
+#set($obj = $doc.newObject($clsname))
+## set the new rules
+$obj.set($uorg, $fullname)
+$obj.set('levels', $denys)
+$obj.set('allow', '0')
+#end
+#set($discard = $doc.save())

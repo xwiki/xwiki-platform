@@ -1,0 +1,22 @@
+<div>
+<form name="edituser" method="post">
+#set($force = $!request.get("force"))
+#if (($doc.getLocked()==true)&&(!$force))
+<div>
+$msg.get("doclockedby") $xwiki.getLocalUserName($doc.getLockingUser()).
+<br />
+<a href="$doc.getURL("inline", "$!request.getQueryString()&force=1")">$msg.get("forcelock")</a>
+</div>
+#else
+<div class="clear">
+#foreach($class in $doc.xWikiClasses)
+#set( $nb = $doc.getObjectNumbers("${class.name}"))
+<input type="hidden" name="${class.name}_nb" value="$nb" />
+#end
+$cdoc.getRenderedContent()
+</div>
+#end
+</form>
+<span class="buttonwrapper">
+<input class="button" type="submit" name="formactionsave" value="$msg.get("save")" onclick=" window.lb.lbSaveForm();"/></span>
+</div>

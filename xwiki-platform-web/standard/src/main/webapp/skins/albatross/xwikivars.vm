@@ -3,6 +3,8 @@
 #set($isguest = $context.getUser().equals("XWiki.XWikiGuest"))
 #set($hasedit = $xwiki.hasAccessLevel("edit"))
 #set($hasadmin = $xwiki.hasAccessLevel("admin"))
+#set($hasGlobalAdmin = $xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
+#set($hasSpaceAdmin = $xwiki.hasAccessLevel("admin", $context.user, "${doc.space}.WebPreferences"))
 #set($isReadOnly = $xwiki.isReadOnly())
 #set($spaceviewurl = $spaceDoc.getURL("view"))
 #set($viewurl = $doc.getURL("view"))

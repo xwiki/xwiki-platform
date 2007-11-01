@@ -51,8 +51,10 @@
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))
       <a class="glink" href="$!regurl" id="headerregister">$!msg.get("register")</a>#sep()
 #end
-#if($hasadmin)
+#if($xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
       <a class="glink" href="$!xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$!msg.get("admin")</a> #sep()
+#elseif($xwiki.hasAccessLevel("admin", $context.user, "${doc.space}.WebPreferences"))
+      <a class="glink" href="$!xwiki.getURL("${doc.space}.WebPreferences", "admin")" id="headeradmin">$!msg.get("admin")</a> #sep()
 #end
 #if($xwiki.isMultiLingual())
   <span class="glink" id="headerlanguages">

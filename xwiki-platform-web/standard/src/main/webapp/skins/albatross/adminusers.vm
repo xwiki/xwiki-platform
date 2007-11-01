@@ -1,6 +1,67 @@
 #set($formname = "update")
 #set($saveaction = "save")
+#set($interface = "$!request.get('interface')")
 <div id="xwikieditcontent">
+## switch between the new and the old interface
+<select name="switchInterface" onchange="if(this.options[this.selectedIndex].value=='new') { location='?editor=users&amp;space=XWiki&amp;interface=new';  } else if(this.options[this.selectedIndex].value=='stable') { location='?editor=users&amp;space=XWiki&amp;interface=stable';  } ">
+<option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
+<option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
+<option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
+</select>
+#if($interface == "new")
+#set($url = "?xpage=getusers")
+<div id="wrapper" style="display: none;">
+<div id="ajax-loader">Loading...<br /><img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." /></div>
+<table class="wrap" cellpadding="0" cellspacing="5" id="userstable">
+<tr><td colspan="2" id="showLimits"></td></tr>
+<tr><td valign="top" style="width:800px">
+      <table border="0" cellpadding="2" cellspacing="0" width="100%" class="display">
+       <thead class="theader">
+          <tr>
+              <td class="husername">Username</td>
+              <td class="hfirstname">First Name</td>
+              <td class="hlastname">Last Name</td>
+              <td class="hmanage" id="manage">Filter<img src="$xwiki.getSkinFile('icons/rights-manager/filter.png')" alt="Filters" title="Filters" /></td>
+         </tr>
+          <tr id="table-filters">
+              <td class="fusername"><input name="name" type="text" /></td>
+              <td class="ffirstname"><input name="first_name" type="text" /></td>
+              <td class="flastname"><input name="last_name" type="text" /></td>
+              <td class="manage">
+                #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
+                #if(!$mainwk)
+                <select name="wiki">
+                  <option value="local" selected="selected">Local</option>
+                  <option value="global">Global</option>
+                  <option value="both">Both</option>
+		</select>
+		#else <input name="wiki" type="hidden" value="local" /> #end
+              </td>
+          </tr>
+       </thead>
+       <tbody id="display1"><tr><td colspan="5">&nbsp;</td></tr></tbody>
+      </table></td>
+    <td valign="top">
+      <div id="scrollbar1" class="scrollbar"><div class="inscrollbar">&nbsp;</div></div>
+    </td>
+    <td id="buff"></td>
+</tr>
+<tr><td colspan="2"><div id="add-new-user" class="btn"><span class="btnTxt">Add New User</span></div></td></tr>
+</table>
+
+<script type="text/javascript">
+	$('wrapper').style.display = "block";
+	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "userstable", displayUsers, true); 
+	Event.observe($('manage'), "click", showHideFilters(ta));
+	##//Event.observe($('add-new-user'), "click", ta.createAddHandler(ta));
+        #set($url = $xwiki.getURL("XWiki.Register", "register", "xpage=registeruser"))
+        #set($saveurl = $xwiki.getURL("XWiki.Register", "register"))
+        #set($redirecturl = $doc.getURL())
+        Event.observe($('add-new-user'), "click", makeAddHandler("$url", "$saveurl", "$redirecturl"));
+</script>
+</div>
+#else
 <p>$xwiki.parseMessage("editusersredirect")</p>
 <p>$xwiki.parseMessage("editgroupsredirect")</p>
-</div> ## xwikieditcontent
+#end
+</div>

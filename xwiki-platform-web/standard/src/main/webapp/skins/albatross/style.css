@@ -25,6 +25,12 @@
 /* Styles for custom hand written <table> tables */
 @import "css/table/table.css";
 
+@import "usersandgroups.css";
+
+@import "css/lightbox/lightbox.css";
+
+@import "suggest/ajaxSuggest.css";
+
 .rightmenu a {
 	margin-right: 2px;
 	font-size: 100%;

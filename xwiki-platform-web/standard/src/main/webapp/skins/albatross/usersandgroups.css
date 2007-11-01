@@ -1,0 +1,335 @@
+/* USERS SCROLLING SYSTEM */
+
+div.scrollbar {
+    overflow: auto;
+    height: 250px;
+    margin:0px;
+    padding:0px;
+    width: 25px;
+    left: -10px;
+    _left: -5px;
+    position: relative;
+}
+
+div.inscrollbar {
+    width:1px;
+    margin:0px;
+    padding:0px;
+    height:3000px;
+}
+
+.display {
+    border-collapse: collapse;
+    border: 1px solid #d4dee8;
+}
+
+.display td {
+    border: 1px solid #d4dee8;
+}
+
+#usersandgroupstable {
+   width: 100%;
+   height: 100%;
+}
+
+
+.theader {
+   background-color: #1f66ab;
+   color: #fff;
+   font-weight: bold;
+}
+
+#showLimits {
+   font-size: 12px;
+   font-weight: bold;
+   padding-left: 10px;
+   padding-right: 20px;
+}
+
+.spaceName {
+	text-align: center;
+	font-size: 12px;
+    font-weight: bold;
+    padding-top: 6px;
+    padding-bottom: 5px;
+}
+
+.editSpaceName {
+	padding-right: 10px;
+}
+
+#table-filters {
+    /*display: none;*/
+    background-color: #d4dee8;
+}
+
+.icon-manage {
+   cursor: pointer;
+   padding-left: 5px;
+   padding-right: 5px;
+}
+
+#ajax-loader {
+   margin: 0px;
+   padding: 0px;
+   position: absolute;
+   top: 50%;
+   left: 35%;
+   z-index: 1000000000;
+   display: none;
+   width: 220px;
+   background-color: #fff;
+   border: 1px solid #999;
+   font-size: 11px;
+   padding: 8px;
+   text-indent: 5px;
+}
+
+/* rights classes */
+
+.gname, .uname {
+   width: 20%;
+   background-repeat: no-repeat;
+   background-position: 2% 50%;
+   padding-left: 20px;
+}
+
+.gname {
+   background-image: url("$xwiki.getSkinFile("icons/rights-manager/group.png")");
+  
+}
+
+.uname {
+   background-image: url("$xwiki.getSkinFile("icons/rights-manager/user.png")");
+}
+
+
+.huorgname {
+   padding-left: 10px;
+}
+
+.fuorgname {
+   text-align: center;
+}
+
+.uorgwikiname {
+   width: 10%;
+   text-align: center;
+   padding: 0px;
+   margin: 0px;
+}
+
+
+.huorgmanage {
+  cursor: pointer;
+  width: 12%;
+  padding-left: 10px;
+}
+
+.uorgmanage {
+  width: 12%;
+  text-align: center;
+}
+
+.rights {
+  text-align: center;
+}
+
+
+/* groups css */
+
+.localgroupname, .globalgroupname {
+   width: 40%;
+   background-repeat: no-repeat;
+   background-position: 2% 50%;
+   padding-left: 25px;
+}
+
+.localgroupname {
+	 background-image: url("$xwiki.getSkinFile("icons/rights-manager/group.png")");
+}
+
+.globalgroupname {
+	 background-image: url("$xwiki.getSkinFile("icons/rights-manager/group.png")");
+}
+
+.hgroupname {
+   width: 40%;
+   padding-left: 10px;
+}
+
+.fgroupname {
+  padding-left: 25px;
+}
+
+.gmanage {
+	text-align: center;
+}
+
+.groupmembers {
+   padding-left: 10px;
+}
+
+.hgroupmanage {
+   cursor: pointer;
+   width: 12%;
+   padding-left: 10px;
+}
+
+
+.groupmanage {
+   width: 12%;
+   text-align: center;
+}
+
+/* users css */
+
+.localusername, .globalusername {
+   width: 19%;
+   background-repeat: no-repeat;
+   background-position: 2% 50%;
+   padding-left: 25px;
+}
+
+.localusername {
+	 background-image: url("$xwiki.getSkinFile("icons/rights-manager/user.png")");
+}
+
+.globalusername {
+	 background-image: url("$xwiki.getSkinFile("icons/rights-manager/user.png")");
+}
+
+.husername {
+  width: 19%;
+  padding-left: 10px;
+}
+
+.fusername, .ffirstname, .flastname {
+   width: 19%;
+   text-align: center;
+}
+
+.firstname {
+   width: 19%;
+}
+
+.hfirstname, .hlastname {
+   padding-left: 10px;
+}
+
+.lastname {
+  width: 19%;
+}
+
+.manage {
+   width: 11%;
+   text-align: center;
+}
+
+.hmanage {
+  cursor: pointer;
+  padding-left: 10px;
+}
+
+/***************************************/
+
+#groupwrap {
+	width: 100%;
+   position: relative;
+	left: 3%;
+   margin-bottom: 30px;
+}
+
+#grouptitle {
+	font-size: 16px;
+   font-weight: bold;
+	padding-bottom: 20px;
+	margin-top: 20px;
+   text-align: left;
+}
+
+#groupmembers {
+   border-collapse: collapse;
+   border: 1px solid #d4dee8;
+}
+
+#groupmembers td {
+   border: 1px solid #d4dee8;
+}
+
+.userName {
+	background-image: url("$xwiki.getSkinFile("icons/rights-manager/user.png")");
+   background-repeat: no-repeat;
+   background-position: 2% 50%;
+   padding-left: 25px;
+}
+
+.groupName {
+	background-image: url("$xwiki.getSkinFile("icons/rights-manager/group.png")");
+   background-repeat: no-repeat;
+   background-position: 2% 50%;
+   padding-left: 25px;
+}
+
+.del {
+	text-align: center;
+}
+
+.icon-del {
+	margin-left: 10px;
+   margin-right: 10px;
+	cursor: pointer;
+}
+
+
+.pg-normal {
+	color: #000;
+	font-weight: bold;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.pg-selected {
+	color: blue;
+	font-weight: bold;
+	text-decoration: underline;
+	cursor: pointer;
+}
+
+#pageNavPosition {
+	margin-top: 6px;
+   text-align: left;
+}
+
+#addNewMember {
+	margin-top: 15px;
+	margin-bottom: 10px;
+   text-align: left;
+}
+
+.sortHeader {
+   background-color: #1f66ab !important;
+   color: #fff !important;
+}
+
+#errMsg {
+	font-weight: bold;
+   color: red;
+}
+
+.btn {
+  background-image: url("$xwiki.getSkinFile("icons/rights-manager/but1.png")");
+  background-repeat: no-repeat;
+  height: 24px;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  cursor: pointer;
+  text-align: center;
+  width: 130px;
+}
+
+.btnTxt {
+	font-weight: bold;
+	color: #FFF;
+	font-size: 12px;
+}

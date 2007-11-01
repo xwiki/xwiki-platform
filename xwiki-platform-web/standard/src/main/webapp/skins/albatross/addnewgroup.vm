@@ -1,0 +1,9 @@
+<div>
+<span>Create new group </span>
+<form method="post">
+<div>
+<input type="text" name="newgroup" value="" />
+<input type="submit" value="Create Group" onclick="new Ajax.Request('$xwiki.getURL("XWiki.__groupname__", "save", "template=XWiki.XWikiGroupTemplate")'.replace('__groupname__', this.form.newgroup.value), {asynchronous: false}); window.lb.lbSaveForm();" />
+</div>
+</form>
+</div>

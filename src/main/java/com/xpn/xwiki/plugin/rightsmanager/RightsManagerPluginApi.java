@@ -226,16 +226,6 @@ public class RightsManagerPluginApi extends PluginApi
             RIGHTS_UI_VALUE_STABLE);
     }
 
-    /**
-     * Modify the user interface to use for rights management.
-     * 
-     * @param ui "stable" or "new".
-     */
-    public void setDefaultUi(String ui)
-    {
-        this.context.getWiki().getConfig().setProperty(RIGHTS_UI_PROPERTY, ui);
-    }
-
     // Groups management
 
     /**

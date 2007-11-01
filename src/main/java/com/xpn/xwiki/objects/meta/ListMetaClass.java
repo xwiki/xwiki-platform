@@ -46,6 +46,12 @@ public class ListMetaClass extends PropertyMetaClass {
         multi_class.setDisplayType("yesno");
         multi_class.setUnmodifiable(true);
         safeput("multiSelect", multi_class);
+        
+        StringClass separators_class = new StringClass(this);
+        separators_class.setName("separators");
+        separators_class.setPrettyName("Separators");
+        separators_class.setSize(5);
+        safeput("separators", separators_class);
 
         BooleanClass relational_class = new BooleanClass(this);
         relational_class.setName("relationalStorage");

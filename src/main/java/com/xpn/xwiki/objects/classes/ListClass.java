@@ -72,9 +72,12 @@ public abstract class ListClass extends PropertyClass
         this(null);
     }
 
-    public String getSeparators()
-    {
-        return null;
+    public String getSeparators() {
+        return getStringValue("separators");
+    }
+
+    public void setSeparators(String separators) {
+        setStringValue("separators", separators);
     }
 
     public String getDisplayType()

@@ -11,10 +11,10 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1187873943000</creationDate>
-<date>1191862182000</date>
-<contentUpdateDate>1191862182000</contentUpdateDate>
-<version>1.2</version>
+<creationDate>1187881143000</creationDate>
+<date>1194016301000</date>
+<contentUpdateDate>1194016301000</contentUpdateDate>
+<version>1.17</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -53,16 +53,20 @@
 <tags/>
 </property>
 </object>
-<content>## you can modify this page to customize the presentation of your object
-
-1 Document $doc.name
+<content>1 Wiki "$doc.name.substring(11).toLowerCase()"
 
 #set($class = $doc.getObject("XWiki.XWikiServerClass").xWikiClass)
 
-&lt;dl&gt;
-  #foreach($prop in $class.properties)
-    &lt;dt&gt; ${prop.prettyName} &lt;/dt&gt;
-    &lt;dd&gt;$doc.display($prop.getName())&lt;/dd&gt;
-  #end
-&lt;/dl&gt;
+#set($objList = $doc.getObjects("XWiki.XWikiServerClass"))
+
+#foreach($obj in $objList)
+  1.1 $doc.display("server", "view", $obj):
+
+  &lt;dl&gt;
+    #foreach($prop in $class.properties)
+      &lt;dt&gt; ${prop.prettyName} &lt;/dt&gt;
+      &lt;dd&gt;$doc.display($prop.getName(), $obj)&lt;/dd&gt;
+    #end
+  &lt;/dl&gt;
+#end
 </content></xwikidoc>

@@ -11,10 +11,10 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1186671807000</creationDate>
-<date>1193157236000</date>
-<contentUpdateDate>1193157236000</contentUpdateDate>
-<version>1.2</version>
+<creationDate>1186679007000</creationDate>
+<date>1192548512000</date>
+<contentUpdateDate>1192719385000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -112,7 +112,7 @@ wikimanager.successdeletewiki=Wiki \"{0}\" deleted.
 wikimanager.errordeletewiki=Wiki \"{0}\" delete failed with error code \"{1}\".
 wikimanager.successsetvisibility=Wiki \"{0}\" visibility changed to \"{1}\".
 wikimanager.errorsetvisibility=Wiki \"{0}' visibility changing failed with error code \"{1}\".
-wikimanager.successcreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: {1}.
+wikimanager.successcreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: http://{1}.
 wikimanager.errorcreatewiki=Wiki \"{0}\" creation failed with error code \"{1}\".
 wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=This wiki \"{0}\" already exist. Please choose another name.
 wikimanager.listwikiempty=There are no open wikis.

@@ -4,7 +4,7 @@ $response.setContentType("application/x-json")
 #set( $off = $offset - 1 )
 #set( $limit = $xwiki.parseInt( $request.get( "limit" ) ) )
 
-#set( $rm = $xwiki.rightsmanager )
+#set( $rm = $xwiki.rightsmanager.usersApi )
 
 #### get all the request parameters which are filters
 #set( $params = $request.getParameterMap() )
@@ -44,14 +44,14 @@ $response.setContentType("application/x-json")
 #foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
 #if( $value == "local" )
   #set( $users = $rm.getAllMatchedLocalUsers( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.usersApi.countAllMatchedLocalUsers( $filterMap ) )
+  #set( $countUsers = $rm.countAllMatchedLocalUsers( $filterMap ) )
 #elseif( $value == "global" )
   #set( $users = $rm.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.usersApi.countAllMatchedGlobalUsers( $filterMap ) )
+  #set( $countUsers = $rm.countAllMatchedGlobalUsers( $filterMap ) )
 #else  
   ## get both local and global users
   #set( $users = $rm.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.usersApi.countAllMatchedUsers( $filterMap ) )
+  #set( $countUsers = $rm.countAllMatchedUsers( $filterMap ) )
 #end
 
 #set( $wikiname = $request.get("wiki") )

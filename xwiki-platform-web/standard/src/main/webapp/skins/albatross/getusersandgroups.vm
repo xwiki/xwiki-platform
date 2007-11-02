@@ -54,27 +54,27 @@ $response.setContentType("application/x-json")
 #foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
 #if( $value == "local" )
   #if($uorg == "users")
-    #set( $users = $rm.getAllMatchedLocalUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $users = $rm.usersApi.getAllMatchedLocalUsers( $filterMap, $limit, $off, $orderList ) )
     #set( $countUsers = $rm.usersApi.countAllMatchedLocalUsers( $filterMap ) )
   #else
-    #set( $users = $rm.getAllMatchedLocalGroups( $filterMap, $limit, $off, $orderList ) )
+    #set( $users = $rm.groupsApi.getAllMatchedLocalGroups( $filterMap, $limit, $off, $orderList ) )
     #set( $countUsers = $rm.groupsApi.countAllMatchedLocalGroups( $filterMap ) )
   #end
 #elseif( $value == "global" )
   #if($uorg == "users")
-    #set( $users = $rm.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $users = $rm.usersApi.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
     #set( $countUsers = $rm.usersApi.countAllMatchedGlobalUsers( $filterMap ) )
   #else
-    #set( $users = $rm.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
-    #set( $countUsers = $rm.groupsApi.countAllMatchedGlobalGroups( $filterMap ) )
+    #set( $users = $rm.usersApi.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.usersApi.countAllMatchedGlobalGroups( $filterMap ) )
   #end
 #else  
   ## get both local and global users
   #if($uorg == "users")
-    #set( $users = $rm.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $users = $rm.usersApi.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
     #set( $countUsers = $rm.usersApi.countAllMatchedUsers( $filterMap ) )
   #else
-    #set( $users = $rm.getAllMatchedGroups( $filterMap, $limit, $off, $orderList ) )
+    #set( $users = $rm.groupsApi.getAllMatchedGroups( $filterMap, $limit, $off, $orderList ) )
     #set( $countUsers = $rm.groupsApi.countAllMatchedGroups( $filterMap ) )
   #end
 #end

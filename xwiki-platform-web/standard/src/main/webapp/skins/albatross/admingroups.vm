@@ -5,15 +5,14 @@
   #set($interface = $xwiki.rightsmanager.defaultUi)
 #end
 <div id="xwikieditcontent">
-#set($url = "?xpage=getgroups")
-## switch between the new and the old interface
-<select name="switchInterface" onchange="if(this.options[this.selectedIndex].value=='new') { location='?editor=groups&amp;space=XWiki&amp;interface=new';  } else if(this.options[this.selectedIndex].value=='stable') { location='?editor=groups&amp;space=XWiki&amp;interface=stable';  } ">
-<option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
-<option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
-<option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
-</select>
-#if($interface == "new")
-<div id="wrapper" style="display: none;">
+ #set($url = "?xpage=getgroups")
+ ## switch between the new and the old interface
+ <select name="switchInterface" onchange="if(this.value=='new') { location='?editor=groups&amp;space=XWiki&amp;interface=new';  } else if(this.value=='stable') { location='?editor=groups&amp;space=XWiki&amp;interface=stable';  } ">
+  <option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
+  <option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
+  <option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
+ </select>
+#if($interface == "new") ## new interface
 <div id="ajax-loader">Loading...<br />
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
@@ -23,7 +22,7 @@
       <table border="0" cellpadding="2" cellspacing="0" width="100%" class="display">
       <thead class="theader">
           <tr>
-                  <td class="hgroupname">Groupname</td>
+              <td class="hgroupname">Groupname</td>
               <td class="groupmembers">Members</td>
               <td class="hgroupmanage" id="hgroupmanage">Filter<img src="$xwiki.getSkinFile('icons/rights-manager/filter.png')" alt="Filters" title="Filters" /></td>
           </tr>
@@ -48,10 +47,9 @@
     </td>
     <td id="buff"></td>
 </tr>
-<tr><td colspan="2"><div id="add-new-user" class="btn"><span class="btnTxt">Add New Group</span></div></td></tr>
+<tr><td colspan="2"><div id="add-new-user" class="btn">$msg.get("rightsmanager.addnewgroup")</div></td></tr>
 </table>
 <script type="text/javascript">
-        $('wrapper').style.display = "block";
         var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "groupstable", displayGroups, true); 
         Event.observe($('hgroupmanage'), 'click', showHideFilters(ta));
         ##//Event.observe( $('add-new-user'), 'click', ta.createAddHandler(ta));
@@ -60,12 +58,11 @@
         #set($redirecturl = $doc.getURL())
         Event.observe($('add-new-user'), "click", makeAddHandler("$url", "$saveurl", "$redirecturl"));
 </script>
-</div>
-#else
+#else ## stable interface
 <div class="layoutsubsection">
 <div style="overflow:auto">
 $xwiki.parseMessage("editgroupsredirect")
 </div>
 </div>
 #end
-</div>
+</div> ## xwikieditcontent

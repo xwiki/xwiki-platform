@@ -1,9 +1,11 @@
-<div>
+<div id="addnewgroup">
 <span>Create new group </span>
 <form method="post">
 <div>
 <input type="text" name="newgroup" value="" />
 <input type="submit" value="Create Group" onclick="new Ajax.Request('$xwiki.getURL("XWiki.__groupname__", "save", "template=XWiki.XWikiGroupTemplate")'.replace('__groupname__', this.form.newgroup.value), {asynchronous: false}); window.lb.lbSaveForm();" />
+<br />
+<span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
 </div>
 </form>
 </div>

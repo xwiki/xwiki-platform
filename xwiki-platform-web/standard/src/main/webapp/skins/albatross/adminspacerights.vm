@@ -5,13 +5,13 @@
   #set($interface = $xwiki.rightsmanager.defaultUi)
 #end
 <div id="xwikieditcontent">
-## switch between the new and the old interface
-<select name="switchInterface" onchange="if(this.options[this.selectedIndex].value=='new') { location='?editor=spacerights&amp;space=${doc.space}&amp;interface=new';  } else if(this.options[this.selectedIndex].value=='stable') { location='?editor=spacerights&amp;space=${doc.space}&amp;interface=stable';  } ">
-<option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
-<option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
-<option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
-</select>
-#if($interface == "new")
+ ## switch between the new and the old interface
+ <select name="switchInterface" onchange="if(this.value=='new') { location='?editor=spacerights&amp;space=${doc.space}&amp;interface=new';  } else if(this.value=='stable') { location='?editor=spacerights&amp;space=${doc.space}&amp;interface=stable';  } ">
+  <option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
+  <option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
+  <option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
+ </select>
+#if($interface == "new") ## new interface
 #if($doc.fullName == "XWiki.XWikiPreferences")
 #if($request.editor == "globalrights")  
 #set($clsname = "XWiki.XWikiGlobalRights")
@@ -21,16 +21,17 @@
 #else #set($clsname = "XWiki.XWikiRights") #end
 #end
 #set($url = "?xpage=getusersandgroups")
-<div id="wrapper" style="display: none;">
 <div id="ajax-loader">Loading...<br />
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
 <div class="spaceName">
 <span class="editSpaceName">$msg.get("editrightsforspace"): <strong><em>$space</em></strong></span>
-<select name="space" style="width: 130px;" onchange="location='?editor=spacerights&amp;global=1&amp;interface=${interface}&amp;space='+this.value;">
+<select name="space" style="width: 130px;" onchange="location='?editor=spaceright&amp;global=1&amp;space='+this.value+'&amp;interface=${interface}';">
 	<option value="" label="">---</option>
-	#foreach($spaceitem in $xwiki.spaces)
-	<option value="$spaceitem" label="$spaceitem">$spaceitem</option>
+	#foreach($spaceitem in $xwiki.spaces) ## display only the spaces where has admin rights
+	#if($xwiki.hasAccessLevel("admin", $context.user, "${spaceitem}.WebPreferences"))
+	  <option value="$spaceitem" label="$spaceitem">$spaceitem</option>
+	#end
 	#end
 </select>
 </div>
@@ -50,12 +51,12 @@
               <td class="rights">View</td>
               <td class="rights">Comment</td>
               <td class="rights">Edit</td>
-			  <td class="rights">Delete</td>
+	      <td class="rights">Delete</td>
               ## does not have register rights at space level <td class="rights">Register</td>
               <td class="rights">Admin</td>
               ## if global rights and main wiki show programming right column
               #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-              #if($hasPrgr)<td class="programmingr">Program</td> #end
+              #if($hasPrgr)<td class="rights">Program</td> #end
               <td class="huorgmanage" id="huorgmanage">Manage<img src="$xwiki.getSkinFile('icons/rights-manager/filter.png')" alt="Filters" title="Filters" /></td>
           </tr>
           <tr id="table-filters">
@@ -87,13 +88,11 @@
     <td id="buff"></td>
 </tr>
 </table>
-</div>
 <script type="text/javascript">
-	$('wrapper').style.display = "block";
 	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstable", displayUsersAndGroups, true); 
 	Event.observe($('huorgmanage'), 'click', showHideFilters(ta));
 </script>
-#else
+#else ## stable interface
 #set ($classname = "XWiki.XWikiGlobalRights")
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")

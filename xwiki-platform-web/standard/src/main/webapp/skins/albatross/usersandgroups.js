@@ -1038,7 +1038,7 @@ function deleteUserOrGroup(i, table, docname)
   return function()
   {
     var url = "?xpage=deleteuorg&docname=" + docname;
-    if(confirm('$msg.get("confirmdeleteuserorgroup")')) {
+    if(confirm('$msg.get("rightsmanager.confirmdeleteuserorgroup")')) {
       new Ajax.Request(url, {
         method: 'get',
         onSuccess: function(transport) {
@@ -1055,7 +1055,7 @@ function deleteMember(i, table, docname, docurl)
   return function()
   {
     var url = docurl + "?xpage=deletegroupmember&fullname=" + docname;
-    if(confirm('$msg.get("confirmdeleteuserorgroup")')) {
+    if(confirm('$msg.get("rightsmanager.confirmdeletemember")')) {
       new Ajax.Request(url, {
         method: 'get',
         onSuccess: function(transport) {

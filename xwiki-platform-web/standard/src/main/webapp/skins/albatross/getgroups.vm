@@ -4,7 +4,7 @@ $response.setContentType("application/x-json")
 #set( $off = $offset - 1 )
 #set( $limit = $xwiki.parseInt( $request.get( "limit" ) ) )
 
-#set( $rm = $xwiki.rightsmanager )
+#set( $rm = $xwiki.rightsmanager.groupsApi )
 
 #### get all the request parameters which are filters
 #set( $params = $request.getParameterMap() )
@@ -43,14 +43,14 @@ $response.setContentType("application/x-json")
 #foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
 #if( $value == "local" )
   #set( $users = $rm.getAllMatchedLocalGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.groupsApi.countAllMatchedLocalGroups( $filterMap ) )
+  #set( $countUsers = $rm.countAllMatchedLocalGroups( $filterMap ) )
 #elseif( $value == "global" )
   #set( $users = $rm.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.groupsApi.countAllMatchedGlobalGroups( $filterMap ) )
+  #set( $countUsers = $rm.countAllMatchedGlobalGroups( $filterMap ) )
 #else
   ## get both local and global users
   #set( $users = $rm.getAllMatchedGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.groupsApi.countAllMatchedGroups( $filterMap ) )
+  #set( $countUsers = $rm.countAllMatchedGroups( $filterMap ) )
 #end
 
 #set( $wikiname = $request.get("wiki") )
@@ -69,7 +69,7 @@ $response.setContentType("application/x-json")
     "members"       : "$xwiki.getDocument($user.fullName).getObjects("XWiki.XWikiGroups").size()", 
     "userurl"       : "$xwiki.getURL($user.fullName)",
     "usersaveurl"   : "$user.getURL('save')",
-    "userinlineurl" : "$user.getURL("inline", "xpage=plain")",
+    "userinlineurl" : "$user.getURL("inline", "xpage=editgroup")",
     "docurl"        : "$xwiki.getURL("XWiki.XWikiGroups", "admin", "editor=groups&space=XWiki")"
   }
 #end

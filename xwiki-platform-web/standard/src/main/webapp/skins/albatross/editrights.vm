@@ -5,7 +5,7 @@
   #set($interface = $xwiki.rightsmanager.defaultUi)
 #end
 <div id="xwikieditcontent">## switch between the new and the old interface
-<select name="switchInterface" onchange="if(this.options[this.selectedIndex].value=='new') { location='?editor=rights&amp;interface=new';  } else if(this.options[this.selectedIndex].value=='stable') { location='?editor=rights&amp;interface=stable';  } ">
+<select name="switchInterface" onchange="if(this.value=='new') { location='?editor=rights&amp;interface=new';  } else if(this.value=='stable') { location='?editor=rights&amp;interface=stable';  } ">
 <option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
 <option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
 <option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
@@ -25,7 +25,6 @@
 #end
 #end
 #set($url = "?xpage=getusersandgroups")
-<div id="wrapper" style="display: none;">
 <div id="ajax-loader">Loading...<br />
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
@@ -48,7 +47,7 @@
 			  <td class="rights">Delete</td>
               ## if global rights and main wiki show programming right column
               #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-              #if($hasPrgr)<td class="programmingr">Program</td> #end
+              #if($hasPrgr)<td class="rights">Program</td> #end
               <td class="huorgmanage" id="huorgmanage">Manage<img src="$xwiki.getSkinFile('icons/rights-manager/filter.png')" alt="Filters" title="Filters" /></td>
           </tr>
           <tr id="table-filters">
@@ -80,9 +79,7 @@
     <td id="buff"></td>
 </tr>
 </table>
-</div>
 <script type="text/javascript">
-	$('wrapper').style.display = "block";
 	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstable", displayUsersAndGroups, true); 
 	Event.observe($('huorgmanage'), 'click', showHideFilters(ta));
 </script>

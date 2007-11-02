@@ -11,10 +11,10 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1186669668000</creationDate>
-<date>1192542148000</date>
-<contentUpdateDate>1192542148000</contentUpdateDate>
-<version>1.14</version>
+<creationDate>1186676868000</creationDate>
+<date>1194019499000</date>
+<contentUpdateDate>1194019499000</contentUpdateDate>
+<version>1.12</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -60,6 +60,7 @@
 #set($confirm = $request.getParameter("confirm"))
 
 #set($wikiname = $request.getParameter("wikiname"))
+#set($serverid = $xwiki.parseInt($request.getParameter("serverid")))
 #set($wikivisibility = $request.getParameter("wikivisibility"))
 
 #############################################################################
@@ -96,20 +97,20 @@
       &lt;/tr&gt;
     #foreach($serverdoc in $list)
       &lt;tr&gt;
-        &lt;td&gt;[$serverdoc.wikiName&gt;$serverdoc.homePageUrl]&lt;/td&gt;
+        &lt;td&gt;[$serverdoc.wikiName ($serverdoc.server)&gt;$serverdoc.homePageUrl]&lt;/td&gt;
         &lt;td&gt;[$serverdoc.owner]&lt;/td&gt;
         &lt;td&gt;$xwiki.formatDate($serverdoc.creationDate,"dd/MM/yyyy")&lt;/td&gt;
         &lt;td&gt;$serverdoc.state&lt;/td&gt;
         &lt;td&gt;$serverdoc.visibility&lt;/td&gt;
         &lt;td&gt;
           #if($serverdoc.visibility == "public")
-            [$msg.get("wikimanager.action.setvisibility.private")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;wikivisibility=private] | 
+            [$msg.get("wikimanager.action.setvisibility.private")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;serverid=$serverdoc.objectId&amp;wikivisibility=private] | 
           #elseif($serverdoc.visibility == "private")
-            [$msg.get("wikimanager.action.setvisibility.template")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;wikivisibility=template] | 
+            [$msg.get("wikimanager.action.setvisibility.template")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;serverid=$serverdoc.objectId&amp;wikivisibility=template] | 
           #elseif($serverdoc.visibility == "template")
-            [$msg.get("wikimanager.action.setvisibility.public")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;wikivisibility=public] | 
+            [$msg.get("wikimanager.action.setvisibility.public")&gt;?action=setvisibility&amp;wikiname=$serverdoc.WikiName&amp;serverid=$serverdoc.objectId&amp;wikivisibility=public] | 
           #end
-          [$msg.get("delete")&gt;?action=delete&amp;wikiname=$serverdoc.WikiName] |
+          [$msg.get("delete")&gt;?action=delete&amp;wikiname=$serverdoc.WikiName&amp;serverid=$serverdoc.objectId] |
           &lt;a href="$serverdoc.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;
         &lt;/td&gt;
       &lt;/tr&gt;

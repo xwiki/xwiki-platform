@@ -11,10 +11,10 @@
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
-<creationDate>1190977921000</creationDate>
-<date>1192542160000</date>
-<contentUpdateDate>1192542160000</contentUpdateDate>
-<version>1.6</version>
+<creationDate>1190985121000</creationDate>
+<date>1194018866000</date>
+<contentUpdateDate>1194018866000</contentUpdateDate>
+<version>1.4</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -54,7 +54,7 @@
 </property>
 </object>
 <content>#if($action == "setvisibility")
-  #set($result = $WikiManager.setWikiVisibility($wikiname, $wikivisibility))
+  #set($result = $WikiManager.setWikiVisibility($wikiname, $serverid, $wikivisibility))
   #if ($result == $Exception.ERROR_NOERROR)
     #info($msg.get("wikimanager.successsetvisibility", [$wikiname, $wikivisibility]))
   #elseif ($result == $Exception.ERROR_XWIKI_ACCESS_DENIED)

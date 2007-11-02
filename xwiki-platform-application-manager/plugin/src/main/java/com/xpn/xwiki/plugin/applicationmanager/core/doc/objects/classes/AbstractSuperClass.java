@@ -26,12 +26,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -577,11 +579,11 @@ public abstract class AbstractSuperClass implements SuperClass
      * 
      * @see SuperClass#getClassDocument(com.xpn.xwiki.XWikiContext)
      */
-    public XWikiDocument getClassDocument(XWikiContext context) throws XWikiException
+    public Document getClassDocument(XWikiContext context) throws XWikiException
     {
         check(context);
 
-        return context.getWiki().getDocument(getClassFullName(), context);
+        return context.getWiki().getDocument(getClassFullName(), context).newDocument(context);
     }
 
     /**
@@ -589,11 +591,12 @@ public abstract class AbstractSuperClass implements SuperClass
      * 
      * @see SuperClass#getClassSheetDocument(com.xpn.xwiki.XWikiContext)
      */
-    public XWikiDocument getClassSheetDocument(XWikiContext context) throws XWikiException
+    public Document getClassSheetDocument(XWikiContext context) throws XWikiException
     {
         check(context);
 
-        return context.getWiki().getDocument(getClassSheetFullName(), context);
+        return context.getWiki().getDocument(getClassSheetFullName(), context).newDocument(
+            context);
     }
 
     /**
@@ -601,11 +604,12 @@ public abstract class AbstractSuperClass implements SuperClass
      * 
      * @see SuperClass#getClassTemplateDocument(com.xpn.xwiki.XWikiContext)
      */
-    public XWikiDocument getClassTemplateDocument(XWikiContext context) throws XWikiException
+    public Document getClassTemplateDocument(XWikiContext context) throws XWikiException
     {
         check(context);
 
-        return context.getWiki().getDocument(getClassTemplateFullName(), context);
+        return context.getWiki().getDocument(getClassTemplateFullName(), context).newDocument(
+            context);
     }
 
     /**
@@ -614,6 +618,16 @@ public abstract class AbstractSuperClass implements SuperClass
      * @see SuperClass#isInstance(com.xpn.xwiki.doc.XWikiDocument)
      */
     public boolean isInstance(XWikiDocument doc)
+    {
+        return doc.getObject(getClassFullName()) != null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SuperClass#isInstance(com.xpn.xwiki.doc.XWikiDocument)
+     */
+    public boolean isInstance(Document doc)
     {
         return doc.getObject(getClassFullName()) != null;
     }
@@ -656,41 +670,21 @@ public abstract class AbstractSuperClass implements SuperClass
 
     /**
      * {@inheritDoc}
-     * 
-     * @see SuperClass#getItemDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
+     *
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#getSuperDocument(java.lang.String, int, boolean, com.xpn.xwiki.XWikiContext)
      */
-    public XWikiDocument getItemDocument(String itemName, XWikiContext context)
-        throws XWikiException
-    {
-        return context.getWiki().getDocument(getItemDocumentDefaultFullName(itemName, context),
-            context);
-    }
-
-    /**
-     * Find all XWikiDocument containing object of this XWiki class.
-     * 
-     * @param context the XWiki context.
-     * @return a list of XWikiDocument containing object of this XWiki class.
-     * @throws XWikiException error when searching for document in database.
-     * @see #getClassFullName()
-     */
-    public List searchItemDocuments(XWikiContext context) throws XWikiException
-    {
-        return searchItemDocumentsByFields(null, context);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByField(java.lang.String,
-     *      java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
-     */
-    public List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
+    public SuperDocument getSuperDocument(String itemName, int objectId, boolean validate,
         XWikiContext context) throws XWikiException
     {
-        String[][] fieldDescriptors = new String[][] {{fieldName, fieldType, fieldValue}};
+        XWikiDocument doc =
+            context.getWiki().getDocument(getItemDocumentDefaultFullName(itemName, context),
+                context);
 
-        return searchItemDocumentsByFields(fieldDescriptors, context);
+        if (doc.isNew() || !isInstance(doc)) {
+            throw new SuperDocumentDoesNotExistException(itemName + " object does not exist");
+        }
+
+        return newSuperDocument(doc, objectId, context);
     }
 
     /**
@@ -710,7 +704,7 @@ public abstract class AbstractSuperClass implements SuperClass
             new StringBuffer(" where doc.fullName=obj.name and obj.className="
                 + HQL_PARAMETER_STRING);
         parameterValues.add(getClassFullName());
-        
+
         where.append(" and obj.name<>" + HQL_PARAMETER_STRING);
         parameterValues.add(getClassTemplateFullName());
 
@@ -746,12 +740,46 @@ public abstract class AbstractSuperClass implements SuperClass
     }
 
     /**
-     * {@inheritDoc}
+     * Find all XWikiDocument containing object of this XWiki class.
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#searchItemDocumentsByFields(
-     *      java.lang.String[][], com.xpn.xwiki.XWikiContext)
+     * @param context the XWiki context.
+     * @return the list of found {@link SuperDocument}.
+     * @throws XWikiException error when searching for document in database.
+     * @see #getClassFullName()
      */
-    public List searchItemDocumentsByFields(String[][] fieldDescriptors, XWikiContext context)
+    public List searchSuperDocuments(XWikiContext context) throws XWikiException
+    {
+        return searchSuperDocumentsByFields(null, context);
+    }
+
+    /**
+     * Search in instances of this document class.
+     * 
+     * @param fieldName the name of field.
+     * @param fieldValue the value of field.
+     * @param fieldType the type of field.
+     * @param context the XWiki context.
+     * @return the list of found {@link SuperDocument}.
+     * @throws XWikiException error when searching for documents from in database.
+     */
+    public List searchSuperDocumentsByField(String fieldName, String fieldValue,
+        String fieldType, XWikiContext context) throws XWikiException
+    {
+        String[][] fieldDescriptors = new String[][] {{fieldName, fieldType, fieldValue}};
+
+        return searchSuperDocumentsByFields(fieldDescriptors, context);
+    }
+
+    /**
+     * Search in instances of this document class.
+     * 
+     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
+     *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
+     * @param context the XWiki context.
+     * @return the list of found {@link SuperDocument}.
+     * @throws XWikiException error when searching for documents from in database.
+     */
+    public List searchSuperDocumentsByFields(String[][] fieldDescriptors, XWikiContext context)
         throws XWikiException
     {
         check(context);
@@ -759,30 +787,33 @@ public abstract class AbstractSuperClass implements SuperClass
         List parameterValues = new ArrayList();
         String where = createWhereClause(fieldDescriptors, parameterValues);
 
-        return context.getWiki().getStore().searchDocuments(where, parameterValues, context);
+        return newSuperDocumentList(context.getWiki().getStore().searchDocuments(where,
+            parameterValues, context), context);
     }
 
     /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.XWikiContext)
+     *      int, com.xpn.xwiki.XWikiContext)
      */
-    public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
+    public SuperDocument newSuperDocument(XWikiDocument doc, int objId, XWikiContext context)
         throws XWikiException
     {
-        return new DefaultSuperDocument(this, doc, context);
+        return new DefaultSuperDocument(this, doc, objId, context);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see SuperClass#newSuperDocument(java.lang.String, com.xpn.xwiki.XWikiContext)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#newSuperDocument(java.lang.String,
+     *      int, com.xpn.xwiki.XWikiContext)
      */
-    public SuperDocument newSuperDocument(String docFullName, XWikiContext context)
+    public SuperDocument newSuperDocument(String docFullName, int objId, XWikiContext context)
         throws XWikiException
     {
-        return newSuperDocument(context.getWiki().getDocument(docFullName, context), context);
+        return newSuperDocument(context.getWiki().getDocument(docFullName, context), objId,
+            context);
     }
 
     /**
@@ -792,6 +823,27 @@ public abstract class AbstractSuperClass implements SuperClass
      */
     public SuperDocument newSuperDocument(XWikiContext context) throws XWikiException
     {
-        return newSuperDocument(new XWikiDocument(), context);
+        return newSuperDocument(new XWikiDocument(), 0, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#newSuperDocumentList(java.util.List,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public List newSuperDocumentList(List documents, XWikiContext context) throws XWikiException
+    {
+        List list = new ArrayList(documents.size());
+        for (Iterator it = documents.iterator(); it.hasNext();) {
+            XWikiDocument doc = (XWikiDocument) it.next();
+            List objects = doc.getObjects(getClassFullName());
+
+            for (int i = 0; i < objects.size(); ++i) {
+                list.add(newSuperDocument(doc, i, context));
+            }
+        }
+
+        return list;
     }
 }

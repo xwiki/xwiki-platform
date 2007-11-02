@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -186,7 +187,7 @@ public interface SuperClass
      * @return the document containing the class for this context.
      * @throws XWikiException error when getting class document from the database.
      */
-    XWikiDocument getClassDocument(XWikiContext context) throws XWikiException;
+    Document getClassDocument(XWikiContext context) throws XWikiException;
 
     /**
      * @return the default content to add in a new class sheet document.
@@ -200,7 +201,7 @@ public interface SuperClass
      * @return the document containing the class sheet for this context.
      * @throws XWikiException error when getting class sheet document from the database.
      */
-    XWikiDocument getClassSheetDocument(XWikiContext context) throws XWikiException;
+    Document getClassSheetDocument(XWikiContext context) throws XWikiException;
 
     /**
      * @return the default content to add in a new class template document.
@@ -214,7 +215,7 @@ public interface SuperClass
      * @return the class template document for this context.
      * @throws XWikiException error when getting class template document from the database.
      */
-    XWikiDocument getClassTemplateDocument(XWikiContext context) throws XWikiException;
+    Document getClassTemplateDocument(XWikiContext context) throws XWikiException;
 
     /**
      * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he
@@ -224,6 +225,15 @@ public interface SuperClass
      * @return true if <code>doc</code> support this class, false otherwise.
      */
     boolean isInstance(XWikiDocument doc);
+
+    /**
+     * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he
+     * contains class object).
+     * 
+     * @param doc the XWikidocument to test.
+     * @return true if <code>doc</code> support this class, false otherwise.
+     */
+    boolean isInstance(Document doc);
 
     /**
      * Get document name from item name <code>item</code>. Usually a Document name is
@@ -263,13 +273,17 @@ public interface SuperClass
      * Get document by full name from item name <code>itemName</code>.
      * 
      * @param itemName the full name of the item.
+     * @param objectId the id of the XWiki object included in the document to manage.
+     * @param validate indicate if it return new {@link SuperDocument} or throw exception if wiki
+     *            descriptor does not exist.
      * @param context the XWiki context.
-     * @return the full name of the document.
+     * @return the document.
      * @throws XWikiException error when getting document from the database.
      * @see #getItemDefaultName(String)
      * @see #getItemDocumentDefaultFullName(String, XWikiContext)
      */
-    XWikiDocument getItemDocument(String itemName, XWikiContext context) throws XWikiException;
+    SuperDocument getSuperDocument(String itemName, int objectId, boolean validate,
+        XWikiContext context) throws XWikiException;
 
     /**
      * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface}
@@ -284,40 +298,17 @@ public interface SuperClass
     String createWhereClause(String[][] fieldDescriptors, List parameterValues);
 
     /**
-     * Search in instances of this document class.
-     * 
-     * @param fieldName the name of field.
-     * @param fieldValue the value of field.
-     * @param fieldType the type of field.
-     * @param context the XWiki context.
-     * @return the list of found XWikiDocuments.
-     * @throws XWikiException error when searching for documents from in database.
-     */
-    List searchItemDocumentsByField(String fieldName, String fieldValue, String fieldType,
-        XWikiContext context) throws XWikiException;
-
-    /**
-     * Search in instances of this document class.
-     * 
-     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
-     *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
-     * @param context the XWiki context.
-     * @return the list of found XWikiDocuments.
-     * @throws XWikiException error when searching for documents from in database.
-     */
-    List searchItemDocumentsByFields(String[][] fieldDescriptors, XWikiContext context)
-        throws XWikiException;
-
-    /**
      * Create new super document containing object of class {@link #getClassFullName()}. If
      * document already exist it is returned with new object if it does not contains any.
      * 
      * @param doc the XWiki document to manage.
+     * @param objId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @return a new SuperDocument instance.
      * @throws XWikiException error when calling SuperDocument implementation constructor.
      */
-    SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    SuperDocument newSuperDocument(XWikiDocument doc, int objId, XWikiContext context)
+        throws XWikiException;
 
     /**
      * Create new super document containing object of class {@link #getClassFullName()}. If
@@ -334,11 +325,23 @@ public interface SuperClass
      * document already exist it is returned with new object if it does not contains any.
      * 
      * @param docFullName the full name of document to manage.
+     * @param objId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @return a new SuperDocument instance.
      * @throws XWikiException error when calling SuperDocument implementation constructor.
      * @see #getClassFullName()
      */
-    SuperDocument newSuperDocument(String docFullName, XWikiContext context)
+    SuperDocument newSuperDocument(String docFullName, int objId, XWikiContext context)
         throws XWikiException;
+
+    /**
+     * Create new super document containing object of class {@link #getClassFullName()} for each
+     * {@link XWikiDocument} in the list and return it.
+     * 
+     * @param documents the list of {@link XWikiDocument}.
+     * @param context the XWiki context.
+     * @return the list of {@link SuperDocument}.
+     * @throws XWikiException error when calling SuperDocument implementation constructor.
+     */
+    List newSuperDocumentList(List documents, XWikiContext context) throws XWikiException;
 }

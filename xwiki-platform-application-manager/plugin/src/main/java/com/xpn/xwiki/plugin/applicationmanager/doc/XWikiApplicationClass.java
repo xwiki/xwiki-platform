@@ -24,12 +24,15 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerException;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -297,14 +300,18 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * @throws XWikiException error when searching for application descriptor document.
      * @see #getApplication(String, XWikiContext, boolean)
      */
-    private XWikiDocument getApplicationDocument(String appName, XWikiContext context,
+    protected XWikiDocument getApplicationDocument(String appName, XWikiContext context,
         boolean validate) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
+        String[][] fieldDescriptors =
+            new String[][] {{FIELD_APPNAME, StringProperty.class.getSimpleName(), appName}};
+        List parameterValues = new ArrayList();
+        String where = createWhereClause(fieldDescriptors, parameterValues);
+
         List listApp =
-            searchItemDocumentsByField(FIELD_APPNAME, appName, StringProperty.class
-                .getSimpleName(), context);
+            context.getWiki().getStore().searchDocuments(where, parameterValues, context);
 
         if (listApp.size() == 0) {
             if (validate) {
@@ -332,23 +339,40 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * @throws XWikiException error when searching for application descriptor document.
      * @see #getApplicationDocument(String, XWikiContext, boolean)
      */
-    public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
+    public XWikiApplication getApplication(String appName, boolean validate, XWikiContext context)
         throws XWikiException
     {
-        return (XWikiApplication) newSuperDocument(getApplicationDocument(appName, context,
-            validate), context);
+        XWikiDocument doc = getApplicationDocument(appName, context, validate);
+
+        int objectId = 0;
+        for (Iterator it = doc.getObjects(getClassFullName()).iterator(); it.hasNext();) {
+            BaseObject obj = (BaseObject) it.next();
+
+            if (obj.getStringValue(FIELD_APPNAME).equalsIgnoreCase(appName)) {
+                break;
+            }
+            
+            ++objectId;
+        }
+
+        if (objectId == doc.getObjects(getClassFullName()).size()) {
+            objectId = 0;
+        }
+
+        return (XWikiApplication) newSuperDocument(doc, objectId, context);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * Override abstract method using {@link XWikiApplication} as {@link XWikiApplication}.
+     * Override abstract method using {@link XWikiApplication} as {@link SuperDocument}.
      * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument,
-     *      com.xpn.xwiki.XWikiContext)
+     *      int, com.xpn.xwiki.XWikiContext)
      */
-    public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
+    public SuperDocument newSuperDocument(XWikiDocument doc, int objId, XWikiContext context)
+        throws XWikiException
     {
-        return (SuperDocument) doc.newDocument(XWikiApplication.class.getName(), context);
+        return new XWikiApplication(doc, objId, context);
     }
 }

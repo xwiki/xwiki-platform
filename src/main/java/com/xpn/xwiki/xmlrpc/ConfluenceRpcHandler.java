@@ -263,6 +263,17 @@ public class ConfluenceRpcHandler extends BaseRpcHandler implements ConfluenceRp
         // Verify authentication token
         checkToken(token, context);
 
+        // TODO: This check shouldn't need to be done here as the right solution is to
+        // move the full XMLRPC implementation to use XWiki's public API instead.
+        if (xwiki.getRightService().hasAccessLevel("view", context.getUser(),
+            pageId, context) == false)
+        {
+            Object[] args = {pageId, context.getUser()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Access to document {0} has been denied to user {1}", null, args);
+        }
+        
         XWikiDocument doc = xwiki.getDocument(pageId, context);
         Page page = new Page(doc, context);
         return page.getParameters();

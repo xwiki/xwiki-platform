@@ -40,7 +40,7 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
         "wikimanager.plugin.comment.createwikitemplate";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to make action that require virtaul
+     * Used as {@link WikiManagerException} message when trying to make action that require virtual
      * mode in a wiki not in virtual mode.
      */
     public static final String ERROR_XWIKINOTVIRTUAL = "wikimanager.plugin.error.xwikinotvirtual";

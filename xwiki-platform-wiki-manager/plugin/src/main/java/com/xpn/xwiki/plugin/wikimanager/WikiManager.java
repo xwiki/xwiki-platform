@@ -38,7 +38,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -594,7 +593,7 @@ final class WikiManager
 
         XWiki xwiki = context.getWiki();
 
-        SuperClass wikiClass = userWikiSuperDoc.getSuperClass();
+        SuperClass wikiClass = XWikiServerClass.getInstance(context);
 
         XWikiServer wikiSuperDocToSave;
 
@@ -617,7 +616,10 @@ final class WikiManager
                 }
             }
 
-            wikiSuperDocToSave = (XWikiServer) wikiClass.newSuperDocument(docToSave, context);
+            int objtId = docToSave.createNewObject(wikiClass.getClassFullName(), context);
+
+            wikiSuperDocToSave =
+                (XWikiServer) wikiClass.newSuperDocument(docToSave, objtId, context);
 
             // clear entry in virtual wiki cache
             if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {
@@ -759,6 +761,7 @@ final class WikiManager
      * Only delete the wiki descriptor the corresponding database always exist after delete.
      * 
      * @param wikiNameToDelete the name of the wiki to delete.
+     * @param objectId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @throws XWikiException error when:
      *             <ul>
@@ -766,9 +769,10 @@ final class WikiManager
      *             <li>or deleteing wiki.</li>
      *             </ul>
      */
-    public void deleteWiki(String wikiNameToDelete, XWikiContext context) throws XWikiException
+    public void deleteWiki(String wikiNameToDelete, int objectId, XWikiContext context)
+        throws XWikiException
     {
-        XWikiServer doc = getWiki(wikiNameToDelete, context, true);
+        XWikiServer doc = getWiki(wikiNameToDelete, objectId, true, context);
 
         doc.delete();
     }
@@ -777,36 +781,22 @@ final class WikiManager
      * Get the wiki descriptor document.
      * 
      * @param wikiName the name of the wiki.
-     * @param context the XWiki context.
+     * @param objectId the id of the XWiki object included in the document to manage.
      * @param validate when wiki descriptor document does not exist :
      *            <ul>
      *            <li> if true, throw an exception with code
      *            {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
      *            <li> if false, return new document unsaved
      *            </ul>
+     * @param context the XWiki context.
      * @return a wiki descriptor document.
      * @throws XWikiException error when getting wiki descriptor document.
      */
-    public XWikiServer getWiki(String wikiName, XWikiContext context, boolean validate)
-        throws XWikiException
+    public XWikiServer getWiki(String wikiName, int objectId, boolean validate,
+        XWikiContext context) throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).getWikiServer(wikiName, context, validate);
-    }
-
-    /**
-     * Get all wiki descriptors documents.
-     * 
-     * @param context the XWiki context.
-     * @return a list of XWikiDocuments.
-     * @throws XWikiException error when:
-     *             <ul>
-     *             <li>getting {@link XWikiServerClass} unique instance.</li>
-     *             <li>or when searching for documents.</li>
-     *             </ul>
-     */
-    public List getWikiDocumentList(XWikiContext context) throws XWikiException
-    {
-        return XWikiServerClass.getInstance(context).searchItemDocuments(context);
+        return XWikiServerClass.getInstance(context).getWikiServer(wikiName, objectId, validate,
+            context);
     }
 
     /**
@@ -822,29 +812,21 @@ final class WikiManager
      */
     public List getWikiList(XWikiContext context) throws XWikiException
     {
-        List documentList = getWikiDocumentList(context);
-
-        List wikiList = new ArrayList(documentList.size());
-
-        for (Iterator it = documentList.iterator(); it.hasNext();) {
-            wikiList.add(XWikiServerClass.getInstance(context).newSuperDocument(
-                (XWikiDocument) it.next(), context));
-        }
-
-        return wikiList;
+        return XWikiServerClass.getInstance(context).searchSuperDocuments(context);
     }
 
     /**
      * Indicate of wiki descriptor document exist.
      * 
      * @param wikiName the name of the wiki.
+     * @param objectId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @return true if wiki descriptor exist, false if not.
      */
-    public boolean isWikiExist(String wikiName, XWikiContext context)
+    public boolean isWikiExist(String wikiName, int objectId, XWikiContext context)
     {
         try {
-            return getWiki(wikiName, context, true) != null;
+            return getWiki(wikiName, objectId, true, context) != null;
         } catch (XWikiException e) {
             return false;
         }
@@ -860,6 +842,7 @@ final class WikiManager
      * "template".
      * 
      * @param wikiName the name of the template wiki.
+     * @param objectId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @param validate when wiki descriptor document does not exist :
      *            <ul>
@@ -875,33 +858,11 @@ final class WikiManager
      *             "template".</li>
      *             </ul>
      */
-    public XWikiServer getWikiTemplate(String wikiName, XWikiContext context, boolean validate)
-        throws XWikiException
+    public XWikiServer getWikiTemplate(String wikiName, int objectId, XWikiContext context,
+        boolean validate) throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).getWikiTemplateServer(wikiName, context,
-            validate);
-    }
-
-    /**
-     * Get all the templates wikis descriptors documents.
-     * <p>
-     * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to
-     * "template".
-     * 
-     * @param context the XWiki context.
-     * @return a list of XWikiDocuments.
-     * @throws XWikiException eeor when:
-     *             <ul>
-     *             <li>getting {@link XWikiServerClass} unique instance.</li>
-     *             <li>or when searching for all wikis descriptors with "visibility" field equals
-     *             to "template".</li>
-     *             </ul>
-     */
-    public List getWikiTemplateDocumentList(XWikiContext context) throws XWikiException
-    {
-        return XWikiServerClass.getInstance(context).searchItemDocumentsByField(
-            XWikiServerClass.FIELD_VISIBILITY, XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE,
-            "StringProperty", context);
+        return XWikiServerClass.getInstance(context).getWikiTemplateServer(wikiName, objectId,
+            validate, context);
     }
 
     /**
@@ -921,16 +882,9 @@ final class WikiManager
      */
     public List getWikiTemplateList(XWikiContext context) throws XWikiException
     {
-        List documentList = getWikiTemplateDocumentList(context);
-
-        List wikiList = new ArrayList(documentList.size());
-
-        for (Iterator it = documentList.iterator(); it.hasNext();) {
-            wikiList.add(XWikiServerClass.getInstance(context).newSuperDocument(
-                (XWikiDocument) it.next(), context));
-        }
-
-        return wikiList;
+        return XWikiServerClass.getInstance(context).searchSuperDocumentsByField(
+            XWikiServerClass.FIELD_VISIBILITY, XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE,
+            "StringProperty", context);
     }
 
     /**

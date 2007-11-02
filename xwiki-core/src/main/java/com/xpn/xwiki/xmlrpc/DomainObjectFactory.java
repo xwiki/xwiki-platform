@@ -83,6 +83,11 @@ public class DomainObjectFactory
         if (!pageId.contains(PAGE_VERSION_SEPARATOR)) {
             // Current version of document
             if (xwiki.exists(pageId, context)) {
+
+                // TODO: This check shouldn't need to be done here as the right solution is to
+                // move the full XMLRPC implementation to use XWiki's public API instead.
+                checkRights(pageId, context);
+
                 return xwiki.getDocument(pageId, context);
             } else {
                 throw exception("The page '" + pageId + "' does not exist.");
@@ -92,11 +97,32 @@ public class DomainObjectFactory
             String fullName = pageId.substring(0, i);
             String version = pageId.substring(i + 1);
             if (xwiki.exists(fullName, context)) {
+
+                // TODO: This check shouldn't need to be done here as the right solution is to
+                // move the full XMLRPC implementation to use XWiki's public API instead.
+                checkRights(fullName, context);
+
                 XWikiDocument currentDoc = xwiki.getDocument(fullName, context);
                 return xwiki.getDocument(currentDoc, version, context);
             } else {
                 throw exception("The page '" + fullName + "' does not exist.");
             }
+        }
+    }
+
+    /**
+     * TODO: Remove this method when we move the XMLRPC to use the XWiki public API.
+     */
+    private void checkRights(String pageId, XWikiContext context) throws XWikiException
+    {
+        XWiki xwiki = context.getWiki();
+        if (xwiki.getRightService().hasAccessLevel("view", context.getUser(),
+            pageId, context) == false)
+        {
+            Object[] args = {pageId, context.getUser()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Access to document {0} has been denied to user {1}", null, args);
         }
     }
 

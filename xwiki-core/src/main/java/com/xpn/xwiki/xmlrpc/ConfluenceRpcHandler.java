@@ -264,7 +264,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
      * Create a new space.
      * 
      * @param token the authentication token retrieved when calling the login method
-     * @param spaceProperties Map containing all informations, we need to create a new space. We
+     * @param spaceMap Map containing all informations, we need to create a new space. We
      *            need the following keys: - key "name": the name of the space - key "key": the
      *            space key - key "description": the space description
      * @return created Space as xml-rpc representation

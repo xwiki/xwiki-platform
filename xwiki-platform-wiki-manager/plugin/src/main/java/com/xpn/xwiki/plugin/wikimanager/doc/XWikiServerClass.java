@@ -25,6 +25,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocumentDoesNotExistException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 
@@ -272,95 +273,63 @@ public class XWikiServerClass extends AbstractSuperClass
     }
 
     /**
-     * Get wiki descriptor {@link XWikiDocument}.
-     * 
-     * @param wikiName the name of the wiki.
-     * @param context the XWiki context.
-     * @param validate indicate if it return new {@link XWikiDocument} or throw exception if wiki
-     *            descriptor does not exist.
-     * @return the {@link XWikiDocument} representing wiki descriptor.
-     * @throws XWikiException error when searching for wiki descriptor document.
-     */
-    private XWikiDocument getWikiServerDocument(String wikiName, XWikiContext context,
-        boolean validate) throws XWikiException
-    {
-        XWikiDocument doc = getItemDocument(wikiName, context);
-
-        if (validate && doc.isNew()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                wikiName + " wiki descriptor document does not exist");
-        }
-
-        return doc;
-    }
-
-    /**
-     * Get wiki descriptor {@link XWikiDocument} with "visibility" field to "template".
-     * 
-     * @param wikiName the name of the wiki.
-     * @param context the XWiki context.
-     * @param validate indicate if it return new {@link XWikiDocument} or throw exception if wiki
-     *            descriptor does not exist.
-     * @return the {@link XWikiDocument} representing wiki descriptor.
-     * @throws XWikiException error when searching for wiki descriptor document.
-     */
-    private XWikiDocument getWikiTemplateServerDocument(String wikiName, XWikiContext context,
-        boolean validate) throws XWikiException
-    {
-        XWikiDocument doc = getItemDocument(wikiName, context);
-
-        if (validate) {
-            if (doc.isNew()
-                || !doc.getStringValue(FIELD_VISIBILITY).equals(FIELDL_VISIBILITY_TEMPLATE)) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                    wikiName + " wiki template descriptor document does not exist");
-            }
-        }
-
-        return doc;
-    }
-
-    /**
      * Get wiki descriptor {@link XWikiServer}.
      * 
      * @param wikiName the name of the wiki.
-     * @param context the XWiki context.
+     * @param objectId the id of the XWiki object included in the document to manage.
      * @param validate indicate if it return new {@link XWikiServer} or throw exception if wiki
      *            descriptor does not exist.
+     * @param context the XWiki context.
      * @return the {@link XWikiServer} representing wiki descriptor.
      * @throws XWikiException error when searching for wiki descriptor document.
      */
-    public XWikiServer getWikiServer(String wikiName, XWikiContext context, boolean validate)
-        throws XWikiException
+    public XWikiServer getWikiServer(String wikiName, int objectId, boolean validate,
+        XWikiContext context) throws XWikiException
     {
-        return (XWikiServer) newSuperDocument(getWikiServerDocument(wikiName, context, validate),
-            context);
+        try {
+            return (XWikiServer) getSuperDocument(wikiName, objectId, validate, context);
+        } catch (SuperDocumentDoesNotExistException e) {
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
+                wikiName + " wiki descriptor document does not exist",
+                e);
+        }
     }
 
     /**
      * Get wiki template descriptor {@link XWikiServer}.
      * 
      * @param wikiName the name of the wiki.
+     * @param objectId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @param validate indicate if it return new {@link XWikiServer} or throw exception if wiki
      *            descriptor does not exist.
      * @return the {@link XWikiServer} representing wiki descriptor.
      * @throws XWikiException error when searching for wiki descriptor document.
      */
-    public XWikiServer getWikiTemplateServer(String wikiName, XWikiContext context,
-        boolean validate) throws XWikiException
+    public XWikiServer getWikiTemplateServer(String wikiName, int objectId, boolean validate,
+        XWikiContext context) throws XWikiException
     {
-        return (XWikiServer) newSuperDocument(getWikiTemplateServerDocument(wikiName, context,
-            validate), context);
+        XWikiServer wiki = getWikiServer(wikiName, objectId, validate, context);
+
+        if (validate && !wiki.getVisibility().equals(FIELDL_VISIBILITY_TEMPLATE)) {
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
+                wikiName + " wiki template descriptor document does not exist");
+        }
+
+        return wiki;
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     * <p>
+     * Override abstract method using XWikiApplication as {@link SuperDocument}.
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument,
+     *      int, com.xpn.xwiki.XWikiContext)
      */
-    public SuperDocument newSuperDocument(XWikiDocument doc, XWikiContext context)
+    public SuperDocument newSuperDocument(XWikiDocument doc, int objId, XWikiContext context)
+        throws XWikiException
     {
-        return (SuperDocument) doc.newDocument(XWikiServer.class.getName(), context);
+        return new XWikiServer(doc, objId, context);
     }
 }

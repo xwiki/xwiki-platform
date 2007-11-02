@@ -71,9 +71,19 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     private static final String CLASS_SUFFIX_XWIKIUSERS = "XWikiUsers";
 
     /**
-     * Name of the "XWiki.XWikiGroups" class without the space name.
+     * Name of the "XWiki.XWikiGroups" class.
      */
-    private static final String CLASS_XWIKIGROUPS = "XWiki.XWikiGroups";
+    private static final String CLASS_XWIKIGROUPS = "XWiki" + CLASS_SUFFIX_XWIKIGROUPS;
+
+    /**
+     * Name of the "XWiki.XWikiGroupSheet" class sheet.
+     */
+    private static final String CLASSSHEET_XWIKIGROUPS = "XWiki.XWikiGroupSheet";
+
+    /**
+     * Name of the "XWiki.XWikiUserSheet" class sheet.
+     */
+    private static final String CLASSSHEET_XWIKIUSERS = "XWiki.XWikiUserSheet";
 
     /**
      * Name of the field of class XWiki.XWikiGroups where group's members names are inserted.
@@ -315,6 +325,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         }
     }
 
+    /**
+     * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
+     */
     public List listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
         List list = new ArrayList();
@@ -359,6 +372,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         return null;
     }
 
+    /**
+     * @deprecated Use
+     *             {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
+     */
     public List listAllGroups(XWikiContext context) throws XWikiException
     {
         if (context.getWiki().getHibernateStore() != null) {
@@ -424,7 +441,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
      * Create a "where clause" to use with {@link XWikiStoreInterface} searchDocuments and
      * searchDocumentsNames methods.
      * 
-     * @param documentClass a filter to search only document containing this XWiki class.
+     * @param user if true search for users, otherwise search for groups.
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
@@ -441,14 +458,18 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
      * @param parameterValues the list of values to fill for use with HQL named request.
      * @return the formated HQL named request.
      */
-    protected String createWhereClause(String documentClass, Object[][] matchFields,
-        Object[][] order, List parameterValues)
+    protected String createWhereClause(boolean user, Object[][] matchFields, Object[][] order,
+        List parameterValues)
     {
+        String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
+        String classsheet = user ? CLASSSHEET_XWIKIUSERS : CLASSSHEET_XWIKIGROUPS;
+
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
         StringBuffer where =
-            new StringBuffer(" where doc.fullName=obj.name and obj.className='XWiki."
-                + documentClass + "'");
+            new StringBuffer(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
+        parameterValues.add(classsheet);
+        parameterValues.add("XWiki." + documentClass);
 
         Map fieldMap = new HashMap();
         int fieldIndex = 0;
@@ -559,11 +580,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         boolean withdetails, int nb, int start, Object[][] order, XWikiContext context)
         throws XWikiException
     {
-        String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
-
         if (context.getWiki().getHibernateStore() != null) {
             List parameterValues = new ArrayList();
-            String where = createWhereClause(documentClass, matchFields, order, parameterValues);
+            String where = createWhereClause(user, matchFields, order, parameterValues);
 
             if (withdetails)
                 return context.getWiki().getStore().searchDocuments(where, nb, start,
@@ -613,10 +632,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     protected int countAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
         XWikiContext context) throws XWikiException
     {
-        String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
-
         List parameterValues = new ArrayList();
-        String where = createWhereClause(documentClass, matchFields, null, parameterValues);
+        String where = createWhereClause(user, matchFields, null, parameterValues);
 
         String sql = "select count(distinct doc) from XWikiDocument doc" + where;
 

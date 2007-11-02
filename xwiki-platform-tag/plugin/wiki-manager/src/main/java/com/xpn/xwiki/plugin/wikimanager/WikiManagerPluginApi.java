@@ -202,6 +202,27 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public int deleteWiki(String wikiName) throws XWikiException
     {
+        return deleteWiki(wikiName, 0);
+    }
+
+    /**
+     * Delete wiki descriptor document from database.
+     * 
+     * @param wikiName the name of the wiki to delete.
+     * @param objectId the id of the XWiki object included in the document to manage.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
+     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
+     *         not exists.</li>
+     *         </ul>
+     * @throws XWikiException critical error in xwiki engine.
+     */
+    public int deleteWiki(String wikiName, int objectId) throws XWikiException
+    {
         if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
         }
@@ -209,7 +230,7 @@ public class WikiManagerPluginApi extends PluginApi
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            WikiManager.getInstance().deleteWiki(wikiName, this.context);
+            WikiManager.getInstance().deleteWiki(wikiName, objectId, this.context);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
@@ -240,10 +261,32 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public XWikiServer getWikiDocument(String wikiName) throws XWikiException
     {
+        return getWikiDocument(wikiName, 0);
+    }
+
+    /**
+     * Get wiki descriptor document corresponding to provided wiki name.
+     * 
+     * @param wikiName the name of the wiki.
+     * @param objectId the id of the XWiki object included in the document to manage.
+     * @return null if there is an error and add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
+     *         not exists.</li>
+     *         </ul>
+     * @throws XWikiException critical error in xwiki engine.
+     */
+    public XWikiServer getWikiDocument(String wikiName, int objectId) throws XWikiException
+    {
         XWikiServer doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWiki(wikiName, this.context, true);
+            doc = WikiManager.getInstance().getWiki(wikiName, objectId, true, this.context);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
 
@@ -296,7 +339,20 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public boolean isWikiExist(String wikiName)
     {
-        return WikiManager.getInstance().isWikiExist(wikiName, this.context);
+        return isWikiExist(wikiName, 0);
+    }
+
+    /**
+     * Check if a Server of the given name exists in the master Wiki by checking if the
+     * "XWiki.XWikiServer{serverName}" document is new.
+     * 
+     * @param wikiName the name of the server to be checked
+     * @param objectId the id of the XWiki object included in the document to manage.
+     * @return true if server exists, false otherwise
+     */
+    public boolean isWikiExist(String wikiName, int objectId)
+    {
+        return WikiManager.getInstance().isWikiExist(wikiName, objectId, this.context);
     }
 
     /**
@@ -318,10 +374,35 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public int setWikiVisibility(String wikiName, String visibility) throws XWikiException
     {
+        return setWikiVisibility(wikiName, 0, visibility);
+    }
+
+    /**
+     * Change the {@link XWikiServerClass} "visibility" field of a wiki descriptor document.
+     * 
+     * @param wikiName the name of the wiki descriptor.
+     * @param objectId the id of the XWiki object included in the document to manage.
+     * @param visibility the new value of "visibility" field. Can be "public", "private" or
+     *            "template".
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
+     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
+     *         not exists.</li>
+     *         </ul>
+     * @throws XWikiException critical error in xwiki engine.
+     */
+    public int setWikiVisibility(String wikiName, int objectId, String visibility)
+        throws XWikiException
+    {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            XWikiServer wikiDoc = WikiManager.getInstance().getWiki(wikiName, this.context, true);
+            XWikiServer wikiDoc =
+                WikiManager.getInstance().getWiki(wikiName, objectId, true, this.context);
             wikiDoc.setVisibility(visibility);
             wikiDoc.save();
         } catch (WikiManagerException e) {
@@ -426,10 +507,35 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public XWikiServer getWikiTemplateDocument(String wikiName) throws XWikiException
     {
+        return getWikiTemplateDocument(wikiName, 0);
+    }
+
+    /**
+     * Get wiki descriptor document corresponding to provided wiki name with
+     * {@link XWikiServerClass} "visibility" field set to "template".
+     * 
+     * @param wikiName the name of the wiki template.
+     * @param objectId the id of the XWiki object included in the document to manage.
+     * @return null if there is an error and add error code in context
+     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
+     *         {@link #CONTEXT_LASTEXCEPTION} field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
+     *         not exists.</li>
+     *         </ul>
+     * @throws XWikiException critical error in xwiki engine.
+     */
+    public XWikiServer getWikiTemplateDocument(String wikiName, int objectId)
+        throws XWikiException
+    {
         XWikiServer doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWikiTemplate(wikiName, this.context, true);
+            doc =
+                WikiManager.getInstance().getWikiTemplate(wikiName, objectId, this.context, true);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
 

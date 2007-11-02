@@ -22,7 +22,8 @@ package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Object;
 
 /**
  * SuperDocument interface.
@@ -69,7 +70,17 @@ public interface SuperDocument
     boolean isNew();
 
     /**
-     * @return the XWiki document.
+     * @return the document.
      */
-    XWikiDocument getDocument();
+    Document getDocumentApi();
+    
+    /**
+     * @return the managed XWiki object.
+     */
+    Object getObjectApi();
+    
+    /**
+     * @return the id of the managed XWiki object;
+     */
+    int getObjectId();
 }

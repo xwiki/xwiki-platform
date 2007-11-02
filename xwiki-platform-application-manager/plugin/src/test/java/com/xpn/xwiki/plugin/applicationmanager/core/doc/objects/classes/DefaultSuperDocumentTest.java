@@ -186,7 +186,7 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
 
         SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
         DefaultSuperDocument sdoc =
-            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
+            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, 0, context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -208,7 +208,7 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
 
         SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
         DefaultSuperDocument sdoc =
-            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, context);
+            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, 0, context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());

@@ -51,6 +51,7 @@ public class XWikiApplication extends DefaultSuperDocument
      * Create new XWikiApplication managing provided XWikiDocument.
      * 
      * @param xdoc the encapsulated XWikiDocument
+     * @param objectId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context
      * @throws XWikiException error when:
      *             <ul>
@@ -58,11 +59,12 @@ public class XWikiApplication extends DefaultSuperDocument
      *             <li>or when calling {@link #reload(XWikiContext)}</li>
      *             </ul>
      * @see DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
-     *      XWikiDocument, XWikiContext)
+     *      XWikiDocument, int, XWikiContext)
      */
-    public XWikiApplication(XWikiDocument xdoc, XWikiContext context) throws XWikiException
+    public XWikiApplication(XWikiDocument xdoc, int objectId, XWikiContext context)
+        throws XWikiException
     {
-        super(XWikiApplicationClass.getInstance(context), xdoc, context);
+        super(XWikiApplicationClass.getInstance(context), xdoc, objectId, context);
     }
 
     // ///
@@ -291,7 +293,7 @@ public class XWikiApplication extends DefaultSuperDocument
         for (Iterator it = applications.iterator(); it.hasNext();) {
             XWikiApplication app =
                 ((XWikiApplicationClass) sclass)
-                    .getApplication((String) it.next(), context, true);
+                    .getApplication((String) it.next(), true, context);
             applicationSet.add(app);
 
             if (recurse) {

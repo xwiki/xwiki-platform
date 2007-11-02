@@ -21,7 +21,6 @@
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -124,7 +123,7 @@ final class ApplicationManager
 
             if (!doc.isNew()) {
                 return (XWikiApplication) XWikiApplicationClass.getInstance(context)
-                    .newSuperDocument(doc, context);
+                    .newSuperDocument(doc, 0, context);
             }
         }
 
@@ -135,35 +134,12 @@ final class ApplicationManager
      * Search for all document containing a object of class XWikiApplicationClass.
      * 
      * @param context the XWiki context.
-     * @return a list of {@link XWikiDocument}.
-     * @throws XWikiException error when calling for
-     *             {@link XWikiApplicationClass#searchItemDocuments(XWikiContext)}
-     */
-    public List getApplicationDocumentList(XWikiContext context) throws XWikiException
-    {
-        return XWikiApplicationClass.getInstance(context).searchItemDocuments(context);
-    }
-
-    /**
-     * Search for all document containing a object of class XWikiApplicationClass.
-     * 
-     * @param context the XWiki context.
      * @return a list if {@link XWikiApplication}.
-     * @throws XWikiException error when calling for
-     *             {@link XWikiApplicationClass#searchItemDocuments(XWikiContext)}
+     * @throws XWikiException error when searching documents.
      */
     public List getApplicationList(XWikiContext context) throws XWikiException
     {
-        List documentList = getApplicationDocumentList(context);
-
-        List applicationList = new ArrayList(documentList.size());
-
-        for (Iterator it = documentList.iterator(); it.hasNext();) {
-            applicationList.add(XWikiApplicationClass.getInstance(context).newSuperDocument(
-                (XWikiDocument) it.next(), context));
-        }
-
-        return applicationList;
+        return XWikiApplicationClass.getInstance(context).searchSuperDocuments(context);
     }
 
     /**
@@ -207,7 +183,7 @@ final class ApplicationManager
 
         XWikiApplication appSuperDocToSave =
             (XWikiApplication) XWikiApplicationClass.getInstance(context).newSuperDocument(
-                docToSave, context);
+                docToSave, 0, context);
 
         appSuperDocToSave.mergeBaseObject(userAppSuperDoc);
 
@@ -244,8 +220,8 @@ final class ApplicationManager
     public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
         throws XWikiException
     {
-        return XWikiApplicationClass.getInstance(context).getApplication(appName, context,
-            validate);
+        return XWikiApplicationClass.getInstance(context).getApplication(appName, validate,
+            context);
     }
 
     /**
@@ -485,7 +461,7 @@ final class ApplicationManager
 
             if (XWikiApplicationClass.getInstance(context).isInstance(doc)) {
                 reloadApplication((XWikiApplication) XWikiApplicationClass.getInstance(context)
-                    .newSuperDocument(doc, context), comment, context);
+                    .newSuperDocument(doc, 0, context), comment, context);
             }
         }
     }

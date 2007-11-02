@@ -34,6 +34,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
@@ -428,7 +429,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     private void ptestGetClassDocument(SuperClass sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassFullName(), context);
-        XWikiDocument docFromClass = sclass.getClassDocument(context);
+        Document docFromClass = sclass.getClassDocument(context);
 
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
@@ -455,7 +456,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     private void ptestGetClassSheetDocument(SuperClass sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassSheetFullName(), context);
-        XWikiDocument docFromClass = sclass.getClassSheetDocument(context);
+        Document docFromClass = sclass.getClassSheetDocument(context);
 
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
@@ -482,7 +483,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     private void ptestGetClassTemplateDocument(SuperClass sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassTemplateFullName(), context);
-        XWikiDocument docFromClass = sclass.getClassTemplateDocument(context);
+        Document docFromClass = sclass.getClassTemplateDocument(context);
 
         assertFalse(docFromClass.isNew());
         assertEquals(doc.getFullName(), docFromClass.getFullName());
@@ -551,14 +552,14 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     public void testIsInstanceNoDispatch() throws XWikiException
     {
         assertTrue(NoDispatchSuperClass.getInstance(context).isInstance(
-            NoDispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument()));
+            NoDispatchSuperClass.getInstance(context).newSuperDocument(context).getDocumentApi()));
         assertFalse(NoDispatchSuperClass.getInstance(context).isInstance(new XWikiDocument()));
     }
 
     public void testIsInstanceDispatch() throws XWikiException
     {
         assertTrue(DispatchSuperClass.getInstance(context).isInstance(
-            DispatchSuperClass.getInstance(context).newSuperDocument(context).getDocument()));
+            DispatchSuperClass.getInstance(context).newSuperDocument(context).getDocumentApi()));
         assertFalse(DispatchSuperClass.getInstance(context).isInstance(new XWikiDocument()));
     }
 }

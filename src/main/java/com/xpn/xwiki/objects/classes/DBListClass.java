@@ -87,7 +87,7 @@ public class DBListClass extends ListClass
 
     public List getDBList(XWikiContext context)
     {
-        List list = getCachedDBList();
+        List list = getCachedDBList(context);
         if (list==null) {
 
             XWiki xwiki = context.getWiki();
@@ -108,7 +108,7 @@ public class DBListClass extends ListClass
                     list = new ArrayList();
                 }
             }
-            setCachedDBList(list);
+            setCachedDBList(list, context);
         }
         return list;
     }
@@ -234,16 +234,20 @@ public class DBListClass extends ListClass
         setStringValue("valueField", valueField);
     }
 
-    public List getCachedDBList() {
-        if (isCache())
+    public List getCachedDBList(XWikiContext context) {
+        if (isCache()) {
             return cachedDBList;
-        else
-            return null;
+        } else {
+            return (List) context.get(context.getDatabase() + ":" + getFieldFullName());
+        }
     }
 
-    public void setCachedDBList(List cachedDBList) {
-        if (isCache())
+    public void setCachedDBList(List cachedDBList, XWikiContext context) {
+        if (isCache()) {
             this.cachedDBList = cachedDBList;
+        } else {
+            context.put(context.getDatabase() + ":" + getFieldFullName(), cachedDBList);
+        }
     }
 
     public void flushCache() {

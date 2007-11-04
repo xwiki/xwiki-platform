@@ -24,7 +24,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 
 public class XWikiAsyncCallback implements AsyncCallback {
-    private XWikiGWTApp app;
+    public XWikiGWTApp app;
 
     public XWikiAsyncCallback(XWikiGWTApp app){
         this.app = app;

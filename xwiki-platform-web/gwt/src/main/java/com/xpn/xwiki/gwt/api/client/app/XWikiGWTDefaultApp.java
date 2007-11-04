@@ -36,7 +36,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     protected Translator translator;
     protected LoadingDialog loadingDialog;
     protected XWikiServiceAsync serviceInstance;
-
+    protected String name;
 
     public XWikiGWTDefaultApp() {
         loadingDialog = new com.xpn.xwiki.gwt.api.client.app.LoadingDialog(this);
@@ -47,7 +47,11 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     }
 
     public String getName() {
-        return "";
+        return (name==null) ? "app" : name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -186,6 +190,10 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
         getLoadingDialog().finishLoading();
     }
 
+    public boolean isTranslatorLoaded() {
+        return (translator!=null);
+    }
+
     /**
      * Check if translator is loaded. This needs to be called.
      *
@@ -267,6 +275,14 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
         return (getUserAgent().indexOf("MSIE")!=-1);
     }
 
+    public static boolean isGecki() {
+        return (getUserAgent().indexOf("Gecko")!=-1);
+    }
+
+    public static boolean isSafari() {
+        return (getUserAgent().indexOf("Safari")!=-1);
+    }
+    
     public static int getAbsoluteTop(Widget widget) {
         if (isMSIE())
             return widget.getAbsoluteTop();

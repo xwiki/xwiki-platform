@@ -36,7 +36,7 @@ public class Dialog extends ModalDialog {
     public static int BUTTON_NEXT = 4;
 
     protected XWikiGWTApp app;
-    private AsyncCallback nextCallback;
+    protected AsyncCallback nextCallback;
 
     private String name;
     private String dialogTranslationName;
@@ -99,11 +99,11 @@ public class Dialog extends ModalDialog {
         return app.getCSSPrefix() + "-" + cssPrefix + "-" + module + "-" + name;
     }
 
-    protected Object getCurrentResult() {
+    public Object getCurrentResult() {
         return currentResult;
     }
 
-    protected void setCurrentResult(Object result) {
+    public void setCurrentResult(Object result) {
         currentResult = result;
     }
 

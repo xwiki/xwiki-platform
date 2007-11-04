@@ -110,4 +110,6 @@ public interface XWikiGWTApp {
 
     public void showError(String code, String text);
 
+    public boolean isTranslatorLoaded();
+
 }

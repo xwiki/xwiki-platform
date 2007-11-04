@@ -1,12 +1,14 @@
 package com.xpn.xwiki.gwt.api.client.dialog;
 
-import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
+import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 
 /**
- * See the NOTICE file distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright 2006,XpertNet SARL,and individual contributors as indicated
+ * by the contributors.txt.
  * <p/>
  * This is free software;you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -26,15 +28,17 @@ import com.google.gwt.user.client.ui.FlowPanel;
  * @author ldubost
  */
 
-public class MessageDialog extends Dialog {
+public class CustomDialog extends Dialog {
     protected HTML messagePanel;
+    protected Panel addPanel;
+
     /**
      * Choice dialog
      * @param app  XWiki GWT App object to access translations and css prefix names
      * @param name dialog name
      * @param buttonModes button modes Dialog.BUTTON_CANCEL|Dialog.BUTTON_NEXT for Cancel / Next
      */
-    public MessageDialog(XWikiGWTApp app, String name, int buttonModes) {
+    public CustomDialog(XWikiGWTApp app, String name, Panel panel, int buttonModes) {
         super(app, name, buttonModes);
 
         FlowPanel main = new FlowPanel();
@@ -43,18 +47,31 @@ public class MessageDialog extends Dialog {
         messagePanel = new HTML(app.getTranslation(getDialogTranslationName() + ".invitation"));
         messagePanel.addStyleName(getCSSName("invitation"));
         main.add(messagePanel);
+
+        addPanel = new SimplePanel();
+        main.add(addPanel);
+        if (panel!=null) {
+            addPanel.add(panel);
+        }
+
         main.add(getActionsPanel());
         add(main);
     }
 
     protected void endDialog() {
-        setCurrentResult(null);
+        setCurrentResult("");
         super.endDialog();
     }
 
     public void setMessage(String text, String[] args) {
         String message = app.getTranslation(text, args);
         messagePanel.setHTML(message);
+    }
+
+    public void setPanel(Panel panel) {
+        addPanel.clear();
+        if (panel!=null)
+         addPanel.add(panel);
     }
 
 }

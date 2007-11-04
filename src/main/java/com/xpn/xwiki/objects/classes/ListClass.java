@@ -392,7 +392,7 @@ public abstract class ListClass extends PropertyClass
         if (rawvalue instanceof Object[]) {
             return ((Object[]) rawvalue)[0].toString();
         }
-        return rawvalue.toString();
+        return (rawvalue==null) ? "" : rawvalue.toString();
     }
 
     public void displayHidden(StringBuffer buffer, String name, String prefix,

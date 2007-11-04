@@ -94,28 +94,6 @@ public class SecHibernateQuery extends HibernateQuery {
 			isAllow = false;
 	}
 
-    public String getNativeQuery() {
-        if (translator==null)
-            translator = new XWikiHibernateQueryTranslator(getQueryTree());
-
-        _allowdocs.clear();
-        String docname = translator.getLastNameClass(qn_xwiki_document);
-        if (docname==null) {
-            QName lclass = translator.getLastQNClass();
-            if (qn_xwiki_object.equals(lclass)) {
-                final String objname = translator.getLastNameClass(lclass);
-                docname = translator.newXWikiObj(qn_xwiki_document);
-                _where.appendWithSep(docname).append(".fullName=").append(objname).append(".name");
-            } else if (qn_xwiki_attachment.equals(lclass)) {
-                final String attname = translator.getLastNameClass(lclass);
-                docname = translator.newXWikiObj(qn_xwiki_document);
-                _where.appendWithSep(docname).append(".id=").append(attname).append(".docId");
-            } else
-                throw new TranslateException("Class not exist");
-        }
-        _select = new SepStringBuffer(docname+".id,"+docname+".fullName", null);
-        return super.getNativeQuery();        
-    }
 
     public List list() throws XWikiException {
 		if (translator==null)
@@ -128,7 +106,25 @@ public class SecHibernateQuery extends HibernateQuery {
 		
 		final SepStringBuffer _real_select = _select;		
 		try {
-			security = false;
+            _allowdocs.clear();
+            _hqlparams.clear();
+            String docname = translator.getLastNameClass(qn_xwiki_document);
+            if (docname == null) {
+                QName lclass = translator.getLastQNClass();
+                if (qn_xwiki_object.equals(lclass)) {
+                    final String objname = translator.getLastNameClass(lclass);
+                    docname = translator.newXWikiObj(qn_xwiki_document);
+                    _where.appendWithSep(docname).append(".fullName=").append(objname).append(".name");
+                } else if (qn_xwiki_attachment.equals(lclass)) {
+                    final String attname = translator.getLastNameClass(lclass);
+                    docname = translator.newXWikiObj(qn_xwiki_document);
+                    _where.appendWithSep(docname).append(".id=").append(attname).append(".docId");
+                } else
+                    throw new TranslateException("Class not exist");
+            }
+            _select = new SepStringBuffer(docname + ".id," + docname + ".fullName", null);
+
+            security = false;
 			int fr = _firstResult; _firstResult = -1;
 			int fs = _fetchSize; _fetchSize = -1;
 			final List doclst = super.list();

@@ -76,6 +76,9 @@ public class Translator {
         String oStr = getTranslation(key);
         String oStr2;
 
+        if (args==null)
+            return oStr;
+        
         for (int i = 0; i<args.length; i++){
             if (GWT.isScript()) {
                 oStr2 = oStr.replaceAll("\\{"+i+"\\}", args[i]);

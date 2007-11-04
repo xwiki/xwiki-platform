@@ -41,7 +41,7 @@ public class MessageDialog extends Dialog {
         main.addStyleName(getCSSName("main"));
 
         messagePanel = new HTML(app.getTranslation(getDialogTranslationName() + ".invitation"));
-        messagePanel.addStyleName(getCssPrefix() + "-invitation");
+        messagePanel.addStyleName(getCSSName("invitation"));
         main.add(messagePanel);
         main.add(getActionsPanel());
         add(main);

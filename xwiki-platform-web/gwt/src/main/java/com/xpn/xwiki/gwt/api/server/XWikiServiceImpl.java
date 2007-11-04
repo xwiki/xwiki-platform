@@ -58,7 +58,8 @@ import java.util.Map;
 import java.util.Properties;
 
 
-public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
+public class
+        XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
     private static final Log log = LogFactory.getLog(XWiki.class);
 
     XWikiEngineContext engine;
@@ -313,7 +314,15 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
             context = getXWikiContext();
             if (context.getWiki().getRightService().hasAccessLevel("edit", context.getUser(), docname, context)==true) {
                 XWikiDocument doc = context.getWiki().getDocument(docname, context);
-                doc.setStringValue(className, propertyname, value);
+                BaseObject bobject = doc.getObject(className);
+                if (bobject == null) {
+                   bobject = new BaseObject();
+                   doc.addObject(className, bobject);
+                }
+                bobject.setName(doc.getFullName());
+                bobject.setClassName(className);
+                bobject.set(propertyname, value, context);
+                doc.setContentDirty(true);
                 context.getWiki().saveDocument(doc, context.getMessageTool().get("core.comment.updateProperty"), context);
                 return true;
             } else

@@ -110,10 +110,22 @@ public interface XWikiService extends RemoteService {
     public static class App {
         private static XWikiServiceAsync ourInstance = null;
 
+        /**
+         * Native method in JavaScript to access gwt:property
+         */
+        public static native String getProperty(String name) /*-{
+             return $wnd.__gwt_getMetaProperty(name);
+             }-*/;
+
         public static synchronized XWikiServiceAsync getInstance() {
             if (ourInstance == null) {
                 ourInstance = (XWikiServiceAsync) GWT.create(XWikiService.class);
-                ((ServiceDefTarget) ourInstance).setServiceEntryPoint(GWT.getModuleBaseURL() + "/XWikiService");
+
+                String serviceurl = getProperty("serviceurl");
+                if ((serviceurl == null) || (serviceurl.equals("")))
+                    serviceurl = GWT.getModuleBaseURL() + "/XWikiService";
+
+                ((ServiceDefTarget) ourInstance).setServiceEntryPoint(serviceurl);
             }
             return ourInstance;
         }

@@ -3686,7 +3686,9 @@ public class XWikiDocument
 
     public void resetArchive(XWikiContext context) throws XWikiException
     {
-        getVersioningStore(context).resetRCSArchive(this, true, context);
+        boolean hasVersioning = context.getWiki().hasVersioning(getFullName(), context);
+        if (hasVersioning)
+            getVersioningStore(context).resetRCSArchive(this, true, context);
     }
 
     // This functions adds an object from an new object creation form
@@ -4317,5 +4319,9 @@ public class XWikiDocument
          return "";
         int prev = last - 1;
         return "1." + prev;
+    }
+    
+    public String toString() {
+        return getFullName();
     }
 }

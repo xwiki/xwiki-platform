@@ -497,12 +497,12 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
                     }
 
                     where.append(" and lower(" + fieldPrefix + ".value) like ?");
-                    parameterValues.add(value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
 
                     fieldMap.put(fieldName, fieldPrefix);
                 } else {
                     where.append(" and lower(doc." + fieldName + ") like ?");
-                    parameterValues.add(value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
                 }
             }
         }

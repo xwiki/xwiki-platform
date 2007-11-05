@@ -3,7 +3,6 @@
 <h3 id="xwikimenutitle" class="hidden">$msg.get("menu")</h3>
 <div class="rightmenu"><a id="tmDoc" href='http://www.xwiki.org/xwiki/bin/view/Main/Documentation' onclick="openURL('http://www.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;"><strong>$msg.get("core.menu.documentation")</strong></a></div>
 <div class="leftmenu">
-
 ##
 ## Edit mode
 ##
@@ -27,7 +26,6 @@
 ##if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("core.menu.create.panel"))#end
 ##xwikitopmenuentryend()
 ##end
-
 ##
 ## Edit menu
 ##
@@ -49,7 +47,6 @@
 #xwikitopmenuentry($doc.getURL($editaction, $languageparams) $msg.get("core.menu.edit") "tmEdit")
 #end
 #end
-
 ##
 ## Show menu
 ##
@@ -63,7 +60,6 @@
 #end
 #xwikitopmenuentryend()
 #end ## isNew
-
 ##
 ## Print menu
 ##
@@ -74,15 +70,15 @@
 #submenuitem($doc.getURL("export", "format=pdf&amp;$docvariant") $msg.get("core.menu.export.pdf"))
 #submenuitem($doc.getURL("export", "format=rtf&amp;$docvariant") $msg.get("core.menu.export.rtf"))
 #xwikitopmenuentryend()
-
 ##
 ## Actions menu
 ##
+#if((!$doc.isNew()) && $xwiki.checkAccess($doc.fullName, "delete"))
 #xwikitopmenuentrystart("" $msg.get("core.menu.actions") "tmFile")
 #submenuitem($doc.getURL("delete", $languageparams) $msg.get("core.menu.delete"))
 #submenuitem($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("core.menu.rename"))
 #xwikitopmenuentryend()
-
+#end
 ##
 ## Watch menu
 ##

@@ -76,14 +76,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     private static final String CLASS_XWIKIGROUPS = "XWiki" + CLASS_SUFFIX_XWIKIGROUPS;
 
     /**
-     * Name of the "XWiki.XWikiGroupSheet" class sheet.
+     * Name of the "XWiki.XWikiGroupTemplate" class sheet.
      */
-    private static final String CLASSSHEET_XWIKIGROUPS = "XWiki.XWikiGroupSheet";
+    private static final String CLASSTEMPLATE_XWIKIGROUPS = "XWiki.XWikiGroupTemplate";
 
     /**
-     * Name of the "XWiki.XWikiUserSheet" class sheet.
+     * Name of the "XWiki.XWikiUserTemplate" class sheet.
      */
-    private static final String CLASSSHEET_XWIKIUSERS = "XWiki.XWikiUserSheet";
+    private static final String CLASSTEMPLATE_XWIKIUSERS = "XWiki.XWikiUserTemplate";
 
     /**
      * Name of the field of class XWiki.XWikiGroups where group's members names are inserted.
@@ -462,13 +462,13 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         List parameterValues)
     {
         String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
-        String classsheet = user ? CLASSSHEET_XWIKIUSERS : CLASSSHEET_XWIKIGROUPS;
+        String classtemplate = user ? CLASSTEMPLATE_XWIKIUSERS : CLASSTEMPLATE_XWIKIGROUPS;
 
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
         StringBuffer where =
             new StringBuffer(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
-        parameterValues.add(classsheet);
+        parameterValues.add(classtemplate);
         parameterValues.add("XWiki." + documentClass);
 
         Map fieldMap = new HashMap();

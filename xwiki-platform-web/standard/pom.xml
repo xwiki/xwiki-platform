@@ -165,14 +165,6 @@
           </plugin>
         </plugins>
       </build>
-      <pluginRepositories>
-        <!-- We need this repository defined in order to download the buildnumber plugin -->
-        <pluginRepository>
-          <id>tlc</id>
-          <name>TLC Repository</name>
-          <url>http://commons.ucalgary.ca/pub/m2</url>
-        </pluginRepository>
-      </pluginRepositories>
     </profile>
   </profiles>
 </project>

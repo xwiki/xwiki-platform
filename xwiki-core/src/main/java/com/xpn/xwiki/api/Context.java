@@ -65,6 +65,14 @@ public class Context extends Api
     {
         return getXWikiContext().getDatabase();
     }
+    
+    /**
+     * @return the name of the main wiki.
+     */
+    public String getMainWikiName()
+    {
+        return getXWikiContext().getMainXWiki();
+    }
 
     /**
      * @return the original database

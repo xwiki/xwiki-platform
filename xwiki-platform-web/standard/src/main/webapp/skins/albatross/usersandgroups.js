@@ -19,7 +19,7 @@ ASSTable.prototype = {
     this.getUrl = url;
     this.lastoffset = 1;
 
-        //show initial rows
+    //show initial rows
     this.showRows( 1, limit );
   },
 
@@ -49,7 +49,7 @@ ASSTable.prototype = {
         $('ajax-loader').style.display = "none";
         var res = eval( '(' + transport.responseText + ')');
         if(res.totalrows <= res.returnedrows)
-        pivot.scroller.domNode.style.display = "none";
+          pivot.scroller.domNode.style.display = "none";
         else
           pivot.scroller.domNode.style.display = "block";
         pivot.updateFetchedRows( res );
@@ -62,8 +62,8 @@ ASSTable.prototype = {
   {
     this.json = json;
     this.totalRows = json.totalrows;
-    for( var i = json.offset; i < json.offset+json.returnedrows; i++)
-    this.fetchedRows[i] = json.rows[i-json.offset];
+    for( var i = json.offset; i < json.offset + json.returnedrows; i++)
+       this.fetchedRows[i] = json.rows[i-json.offset];
   },
     
   clearDisplay: function()
@@ -76,11 +76,11 @@ ASSTable.prototype = {
   },
     
   displayRows: function( offset, limit ) { 
-
-    var f = offset + limit;
+  	
+    var f = offset + limit - 1;
     if(f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0 ) ? offset : 0;
-    $('showLimits').innerHTML = "Displaying rows from " + off + " to " + f + " out of " + this.totalRows;
+    $('showLimits').innerHTML = "Displaying rows from <strong>" + off + "</strong> to <strong>" + f + "</strong> out of <strong>" + this.totalRows + "</strong>";
 
     this.clearDisplay();
 
@@ -92,7 +92,8 @@ ASSTable.prototype = {
 
     var raport = this.totalRows / limit;
     var outheight = this.domNode.parentNode.offsetHeight; 
-    var inheight = Math.round(outheight * raport);
+    // the header?
+    var inheight = Math.round(outheight * raport) + 10;
       
     this.scroller.domNode.style.height = outheight + "px";
     this.scroller.domNode.firstChild.style.height = inheight + "px";
@@ -103,7 +104,7 @@ ASSTable.prototype = {
     this.lastoffset = offset;
     var buff  = 'request to display rows '+offset+' to '+(offset+limit)+' <br />\n';
 
-        //if no rows fetched get all we need
+    //if no rows fetched get all we need
     if( this.totalRows == -1 )
     {
       this.getRows( offset, limit, offset, limit );
@@ -111,24 +112,25 @@ ASSTable.prototype = {
       return buff;
     }
             
-        //make a range of required rows
+    //make a range of required rows
     var min = -1;
     var max = -1;
 
-    for( var i = offset; i < (offset+limit); i++ )
-    if( this.fetchedRows[i] == undefined )
-    {
-      if(min == -1)  min = i;
-      max = i;
-    }
+    for( var i = offset; i < (offset + limit); i++ )
+      if( this.fetchedRows[i] == undefined )
+      {
+        if(min == -1)  min = i;
+        max = i;
+      }
         
-        //if we don't need any new row
+    //if we don't need any new row
     if(min == -1)
     {
       buff += 'no need to get new rows <br />\n';
       this.displayRows( offset, limit );
     }
-        //we need get new rows
+    
+    //we need get new rows
     else
     {
       buff += 'we need to get rows '+min+' to '+(max+1)+' <br />\n';
@@ -160,7 +162,7 @@ ASSTable.prototype = {
   { 
     this.deleteAndShiftRows(indx);
 
-                //compute new refresh offset
+    //compute new refresh offset
     var newoffset = this.lastoffset;
     if(indx > this.totalRows - this.limit - 1)
     newoffset -= 1;
@@ -169,7 +171,7 @@ ASSTable.prototype = {
     this.totalRows -= 1;
     this.showRows(newoffset, this.limit);
     this.scroller.refreshScrollbar();
-  },
+  } /* ,
 
   compareStrings: function( s1, s2 )
   {
@@ -178,12 +180,12 @@ ASSTable.prototype = {
     s2 = s2.toLowerCase();
     var l1 = s1.length;
     var l2 = s2.length;
-    var lower = (l1<l2)?l1:l2;
+    var lower = (l1 < l2) ? l1 : l2;
 
-    for(i=0;i<lower;i++){
-      if(s1.charAt(i)==s2.charAt(i))
+    for(i = 0; i < lower; i++){
+      if(s1.charAt(i) == s2.charAt(i))
       continue;
-      else if(s1.charAt(i)<s2.charAt(i))
+      else if(s1.charAt(i) < s2.charAt(i))
       return -1;
       else
         return 1;
@@ -193,17 +195,17 @@ ASSTable.prototype = {
 
   searchAddPosition: function( start, end, fullname )
   {
-    if(start>=end)
-    return start;
+    if(start >= end)
+      return start;
 
-    var pos = Math.floor((start+end)/2);
+    var pos = Math.floor((start + end) / 2);
     var comp = this.compareStrings(fullname,this.fetchedRows[pos].username);
     if( comp == 0 )
-    return pos+1;
-    else if(comp==-1)
-    return this.searchAddPosition(start,pos-1,fullname);
+     return pos + 1;
+    else if(comp == -1)
+     return this.searchAddPosition(start, pos-1, fullname);
     else
-      return this.searchAddPosition(pos+1,end,fullname);
+      return this.searchAddPosition(pos+1, end, fullname);
   },
 
   getMax: function()
@@ -211,7 +213,7 @@ ASSTable.prototype = {
     var max = 0;
     for(i in this.fetchedRows){
       var ii = parseInt(i);
-      if(ii>max)
+      if(ii > max)
       max = ii;
     }
     return max;
@@ -219,35 +221,35 @@ ASSTable.prototype = {
 
   shiftRight: function( poz, max )
   {
-    if(max==null)
+    if(max == null)
     max = this.getMax();
-    for(i=max; i>=poz; i-=1)
+    for(i = max; i >= poz; i -= 1)
     this.fetchedRows[i+1] = this.fetchedRows[i];
   },
 
   addRow: function( fullname )
   {
-    var max = this.getMax();
-    /*
-     * for now, the lightbox does a refresh but it is possible to add without refreshing
+     var max = this.getMax();
     var pos = this.searchAddPosition(0, max, fullname);
     this.shiftRight(pos, max);
-    this.fetchedRows[pos] = eval( jsonul userului introdus );
+    this.fetchedRows[pos] = eval( json );
     var rest = 0;
-    var s = pos - round(this.limit / 2);
-    if(s < 1 ) { s = 1; rest = this.limit / 2 - pos; }
-    var e = pos + this.limit / 2 + rest;
-    if(e > this.totalRows) e = this.totalRows;
-    this.showRows(s, e);
-    */
+    var start = pos - Math.round(this.limit / 2);
+    if(start < 1 ) { 
+    	start = 1; 
+    	rest = Math.round(this.limit / 2) - pos; 
+    }
+    var end = pos + Math.round(this.limit / 2) + rest;
+    if(end > this.totalRows) end = this.totalRows;
+    this.showRows(start, end); 
   },
 
   createAddHandler: function(pivot)
   {
     return function(){
-      pivot.addRow("ca");
+      //
     }
-  }
+  } */
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -285,16 +287,15 @@ ASSScroller.prototype = {
     var p = y / h;
 
     if(this.table.totalRows == -1)
-    var rtg = 1;
+      var rtg = 1;
     else
-      var rtg = Math.round(this.table.totalRows*p); 
-            
-            
+      var rtg = Math.round(this.table.totalRows * p); 
+                       
     if( (rtg + this.table.limit) > this.table.totalRows )
-    rtg = this.table.totalRows - this.table.limit + 1;
-            
+      rtg = this.table.totalRows - this.table.limit + 1;
+    
     if( rtg < 1 ) rtg = 1;
-            
+  
     return rtg;
   },
     
@@ -669,13 +670,13 @@ MRevertButton.prototype = Object.extend(new MButton(), {
     {
       this.ready = true;
       this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/revert.png")';
-                //icon-manage-enabled
+      //icon-manage-enabled
     }
     else
     {
       this.ready = false;
       this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/revertg.png")';
-                //icon-manage-disabled
+      //icon-manage-disabled
     }
   }
 });
@@ -741,15 +742,12 @@ function displayUsers( row, i, table)
   var userurl = row.userurl;
   var usersaveurl = row.usersaveurl;
   var userinlineurl = row.userinlineurl;
-  var fullname = row.fullname;
-  var wikiname = table.json.wikiname;
+  var wikiname = row.wikiname;
   var docurl = row.docurl;
                 
   var tr = document.createElement('tr'); 
-  if(i % 2 == 0)
-  tr.className = "even";
-  else
-    tr.className = "odd";
+  if(i % 2 == 0)  tr.className = "even";
+  else tr.className = "odd";
         
   var username = document.createElement('td');
   if(wikiname == "local")
@@ -758,30 +756,26 @@ function displayUsers( row, i, table)
     a.href = userurl;
     a.appendChild( document.createTextNode( row.username ) );
     username.appendChild( a );
-    username.className = "localusername";
   }
   else
-  {
     username.appendChild( document.createTextNode( row.username ) );
-    username.className = "globalusername";
-  }
+  
   tr.appendChild(username);
             
   var firstname = document.createElement('td');
   firstname.appendChild(document.createTextNode(row.firstname) );
-  firstname.className = "firstname";
   tr.appendChild(firstname);
           
   var lastname = document.createElement('td');
   lastname.appendChild(document.createTextNode(row.lastname) );
-  lastname.className = "lastname";
   tr.appendChild(lastname);
             
   var manage = document.createElement('td');
   manage.className = "manage";
+  
   if(wikiname == "local")
   {
-                //edit user
+    //edit user
     var edit = document.createElement('img');
     edit.src = '$xwiki.getSkinFile("icons/rights-manager/edit.png")';
     edit.title = '$msg.get("edit")';
@@ -789,11 +783,11 @@ function displayUsers( row, i, table)
     edit.className = 'icon-manage';
     manage.appendChild(edit);
 
-      //delete group
+    //delete group
     var del = document.createElement('img');
     del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
     del.title = '$msg.get("delete")';
-    Event.observe(del, 'click', deleteUserOrGroup(i, table, fullname));
+    Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname));
     del.className = 'icon-manage';
     manage.appendChild(del);
   }
@@ -807,9 +801,9 @@ function displayGroups( row, i, table)
   var userurl = row.userurl;
   var userinlineurl = row.userinlineurl;
   var usersaveurl = row.usersaveurl;
-  var fullname = row.fullname;
-  var wikiname = table.json.wikiname;
-  var docurl = row.docurl;            
+  var wikiname = row.wikiname;
+  var docurl = row.docurl;     
+         
   var tr = document.createElement('tr'); 
   
   if(i % 2 == 0) tr.className = "even";
@@ -822,36 +816,32 @@ function displayGroups( row, i, table)
     a.href = userurl;
     a.appendChild( document.createTextNode( row.username ) );
     username.appendChild( a );
-    username.className = "localgroupname";
   }
   else
-  {
     username.appendChild( document.createTextNode( row.username ) );
-    username.className = "globalgroupname";
-  }
+
   tr.appendChild(username);
   
   var members = document.createElement('td');
   if(wikiname == "local")
-  members.appendChild(document.createTextNode(row.members));
+   members.appendChild(document.createTextNode(row.members));
   else
     members.appendChild(document.createTextNode("-"));
-  members.className = "groupmembers";
   tr.appendChild(members);
                         
   var manage = document.createElement('td');
-  manage.className = "groupmanage";
-
+  manage.className = "manage";
+  
   if(wikiname == "local")
   {
-                //delete group
+    //delete group
     var del = document.createElement('img');
     del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
     del.title = '$msg.get("delete")';
-    Event.observe(del, 'click', deleteUserOrGroup(i, table, fullname));
+    Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname));
     del.className = 'icon-manage';
 
-                //edit user
+    //edit user
     var edit = document.createElement('img');
     edit.src = '$xwiki.getSkinFile("icons/rights-manager/edit.png")';
     edit.title = '$msg.get("edit")';
@@ -875,11 +865,16 @@ function displayMembers( row, i, table )
   else tr.className = "odd";
         
   var membername = document.createElement("td");
-  membername.className = "membername";
-  var a = document.createElement("a");
-  a.href = row.memberurl;
-  a.appendChild(document.createTextNode(row.fullname));
-  membername.appendChild(a);
+  
+  if(row.wikiname == "local")
+  {
+      var a = document.createElement("a");
+      a.href = row.memberurl;
+      a.appendChild(document.createTextNode(row.fullname));
+      membername.appendChild(a);
+  }
+  else
+     membername.appendChild(document.createTextNode(row.fullname));
         
   var membermanage = document.createElement("td");
   membermanage.className = "manage";
@@ -911,21 +906,16 @@ function displayUsersAndGroups( row, i, table )
   else tr.className = "odd";
   
   var username = document.createElement('td');
-  if(table.json.wikiname == "local")
+  if(row.wikiname == "local")
   {
     var a = document.createElement('a');
     a.href = userurl;
     a.appendChild( document.createTextNode( row.username ) );
     username.appendChild( a );
-    if(uorg == "users") username.className = "localusername";
-    else username.className = "globalusername";
   }
   else
-  {
     username.appendChild( document.createTextNode( row.username ) );
-    if(uorg == "users") username.className = "globalusername";
-    else className = "localusername";
-  }
+  
   tr.appendChild(username);
 
   var view = document.createElement('td');
@@ -1001,7 +991,7 @@ function displayUsersAndGroups( row, i, table )
   }
         
   var manage = document.createElement('td');
-  manage.className = "uorgmanage";
+  manage.className = "manage";
         
   var spansave = document.createElement('span');
   var spanrevert = document.createElement('span');
@@ -1070,29 +1060,10 @@ function makeAddHandler(url, saveurl, redirecturl)
 {
   return function()
   {
-    addNewUser(url, saveurl, redirecturl); 
+    window.lb = new Lightbox(url, saveurl, redirecturl);
   }
 }
 
-function addNewUser(url, saveurl, redirecturl)
-{
-  window.lb = new Lightbox(url, saveurl, redirecturl);
-}
-
-// function to show/hide filters
-function showHideFilters(table)
-{
-  return function()
-  {
-    if($('table-filters').style.display == "none")
-    {
-      if(navigator.userAgent.toLowerCase().indexOf("msie") >= 0) $('table-filters').style.display = "block";
-      else $('table-filters').style.display = "table-row";
-    }
-    else $('table-filters').style.display = "none";
-    ta.scroller.refreshScrollbar();
-  }
-}
 
 //utility function
 function trim(str)

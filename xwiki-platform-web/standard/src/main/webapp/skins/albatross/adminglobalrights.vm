@@ -1,17 +1,12 @@
 #set($formname = "update")
 #set($saveaction = "save")
-#set($interface = $request.get("interface"))
-#if(!$interface)
-  #set($interface = $xwiki.rightsmanager.defaultUi)
-#end
+
+## set the new interface from xwiki.cfg
+#set($interface = $xwiki.rightsmanager.defaultUi)
+
 <div id="xwikieditcontent">
- ## switch between the new and the old interface
- <select name="switchInterface" onchange="if(this.value=='new') { location='?editor=globalrights&amp;space=${doc.space}&amp;interface=new';  } else if(this.value=='stable') { location='?editor=globalrights&amp;space=${doc.space}&amp;interface=stable';  } ">
-  <option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
-  <option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
-  <option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
- </select>
-#if($interface == "new") ## new interface
+########## display the new interface
+#if($interface == "new")
 #if($doc.fullName == "XWiki.XWikiPreferences")
 #if($request.editor == "globalrights")   
 #set($clsname = "XWiki.XWikiGlobalRights")
@@ -24,54 +19,55 @@
 #else
 #set($clsname = "XWiki.XWikiRights")  
 #end #end
+## url to take the users and groups to display in the ajax-based table
 #set($url = "?xpage=getusersandgroups")
 <div id="ajax-loader">Loading...<br />
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
-<table cellpadding="0" cellspacing="5" id="usersandgroupstable">
+<table id="usersandgroupstable">
 <tr>
-    <td colspan="2">
+    <td colspan="2" style="padding-top: 10px; padding-bottom: 10px;">
       <select name="uorg" style="width: 130px;">
         <option value="groups" selected="selected">Groups</option>
         <option value="users">Users</option>
       </select>&nbsp;<span id="showLimits"></span>
     </td>
 </tr>
-<tr><td valign="top" style="width:100%">
-      <table border="0" cellpadding="2" cellspacing="0" width="100%" class="display">
+<tr><td style="width:100%">
+      <table class="display">
        <thead class="theader">
-          <tr><td class="huorgname">Group or User</td>
-              <td class="rights">View</td>
-              <td class="rights">Comment</td>
-              <td class="rights">Edit</td>
-	      <td class="rights">Delete</td>
-              <td class="rights">Register</td>
-              <td class="rights">Admin</td>
+          <tr><td>Group or User</td>
+              <td>View</td>
+              <td>Comment</td>
+              <td>Edit</td>
+	      <td>Delete</td>
+              <td>Register</td>
+              <td>Admin</td>
               ## if global rights and main wiki show programming right column
               #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-              #if($hasPrgr)<td class="rights">Program</td> #end
-              <td class="huorgmanage" id="huorgmanage">Manage<img src="$xwiki.getSkinFile('icons/rights-manager/filter.png')" alt="Filters" title="Filters" /></td>
+              #if($hasPrgr)<td>Program</td> #end
+              <td>Manage</td>
           </tr>
           <tr id="table-filters">
-              <td class="fuorgname">
-                <input name="name" type="text" />
+              <td>
+                <input name="name" type="text" class="filter"/>
                 <input name="progr" type="hidden" value="#if($hasPrgr) true #else false #end" />
                 <input name="admin" type="hidden" value="true" />
                 <input name="reg" type="hidden" value="true" />
-                <input type="hidden" name="clsname" value="$clsname" />
+                <input name="clsname" type="hidden" value="$clsname" />
               </td>
-              <td class="uorgwikiname">
-                #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
-                #if(!$mainwk)
-                <select name="wiki">
+              <td colspan="5"></td>#if($hasPrgr)<td></td>#end<td></td>
+              <td>
+              #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
+                #if(!$mainwk) ## display the combobox only in a local wiki
+                <select name="wiki" class="filter">
                   <option value="local" selected="selected">Local</option>
                   <option value="global">Global</option>
                   <option value="both">Both</option>
                 </select>
                 #else <input type="hidden" value="local" name="wiki" /> #end
-              </td>
-              <td colspan="5"></td>#if($hasPrgr)<td></td>#end<td></td>
-          </tr>
+                </td>
+              </tr>
        </thead>
        <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
       </table></td>
@@ -83,9 +79,10 @@
 </table>
 <script type="text/javascript">
    var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstable", displayUsersAndGroups, true); 
-   Event.observe($('huorgmanage'), 'click', showHideFilters(ta));
 </script>
-#else ## stable interface
+
+######## display the stable interface
+#else 
 #set ($classname = "XWiki.XWikiGlobalRights")
 #set( $class = $xwiki.getDocument($classname).xWikiClass)
 #set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")

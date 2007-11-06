@@ -65,8 +65,8 @@ $response.setContentType("application/x-json")
     #set( $users = $rm.usersApi.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
     #set( $countUsers = $rm.usersApi.countAllMatchedGlobalUsers( $filterMap ) )
   #else
-    #set( $users = $rm.usersApi.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
-    #set( $countUsers = $rm.usersApi.countAllMatchedGlobalGroups( $filterMap ) )
+    #set( $users = $rm.groupsApi.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.groupsApi.countAllMatchedGlobalGroups( $filterMap ) )
   #end
 #else  
   ## get both local and global users
@@ -79,7 +79,6 @@ $response.setContentType("application/x-json")
   #end
 #end
 
-#set( $wikiname = $request.get("wiki") )
 #set( $clsname = $request.get("clsname") )
 
 ### json starts
@@ -90,11 +89,12 @@ $response.setContentType("application/x-json")
 "admin"    : $a,
 "progr"    : $p,
 "reg"      : $r,
-"wikiname" : "$wikiname",
 "clsname"  : "$clsname",
 "uorg"     : "$uorg",
 "rows": [
 #foreach( $user in $users )
+   #set($wikiname = $user.getWiki())
+   #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
    #set($allows = "")
    #set($denys = "")
    #if( $velocityCount > 1 ) , #end
@@ -112,7 +112,7 @@ $response.setContentType("application/x-json")
   #end
    {"username"   : "$user.name", 
     "fullname"   : "$user.fullName",
-    "wikiname"   : "$user.getWiki()", 
+    "wikiname"   : "$wikiname", 
     "userurl"    : "$xwiki.getURL($user.fullName)",
     "allows"     : "$!allows",
     "denys"      : "$!denys"

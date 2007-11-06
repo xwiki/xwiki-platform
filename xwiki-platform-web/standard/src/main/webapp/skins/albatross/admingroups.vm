@@ -1,37 +1,33 @@
 #set($formname = "update")
 #set($saveaction = "save")
-#set($interface = $request.get("interface"))
-#if(!$interface)
-  #set($interface = $xwiki.rightsmanager.defaultUi)
-#end
+
+## set the interface to use from xwiki.cfg
+#set($interface = $xwiki.rightsmanager.defaultUi)
+
 <div id="xwikieditcontent">
- #set($url = "?xpage=getgroups")
- ## switch between the new and the old interface
- <select name="switchInterface" onchange="if(this.value=='new') { location='?editor=groups&amp;space=XWiki&amp;interface=new';  } else if(this.value=='stable') { location='?editor=groups&amp;space=XWiki&amp;interface=stable';  } ">
-  <option value="choose" #if($interface == "") selected="selected" #end>Switch interface</option>
-  <option value="new" #if($interface == "new") selected="selected" #end>New Interface</option>
-  <option value="stable" #if($interface == "stable") selected="selected" #end>Stable Interface</option>
- </select>
-#if($interface == "new") ## new interface
+
+############### display the new interface
+#if($interface == "new")
+## url to get the groups for displaying them in the ajax-based table
+#set($url = "?xpage=getgroups")
 <div id="ajax-loader">Loading...<br />
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
-<table cellpadding="0" cellspacing="5" id="groupstable">
+<table id="groupstable">
 <tr><td colspan="2" id="showLimits"></td></tr>
-<tr><td valign="top" style="width:800px">
-      <table border="0" cellpadding="2" cellspacing="0" width="100%" class="display">
-      <thead class="theader">
+<tr><td style="width: 100%;">
+      <table class="display">
+       <thead class="theader">
           <tr>
-              <td class="hgroupname">Groupname</td>
-              <td class="groupmembers">Members</td>
-              <td class="hgroupmanage" id="hgroupmanage">Filter<img src="$xwiki.getSkinFile('icons/rights-manager/filter.png')" alt="Filters" title="Filters" /></td>
+              <td>Group Name</td><td>Members</td><td>Manage</td>
           </tr>
           <tr id="table-filters">
-              <td class="fgroupname" colspan="2"><input name="name" type="text" /></td>
-              <td class="gmanage">
+              <td><input name="name" type="text" class="filter"/></td>
+              <td></td>
+              <td>
                 #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
-                #if(!$mainwk)
-                <select name="wiki">
+                #if(!$mainwk) ## display the combobox only in a local wiki
+                <select name="wiki" class="filter">
                   <option value="local" selected="selected">Local</option>
                   <option value="global">Global</option>
                   <option value="both">Both</option>
@@ -47,18 +43,23 @@
     </td>
     <td id="buff"></td>
 </tr>
-<tr><td colspan="2"><div id="add-new-user" class="btn">$msg.get("rightsmanager.addnewgroup")</div></td></tr>
+<tr><td colspan="2">
+<br />
+<a href="#" id="addNewGroup">$msg.get("rightsmanager.addnewgroup")</a>
+</td></tr>
 </table>
+
+#set($addnewurl = $xwiki.getURL("XWiki.XWikiGroups", "view", "xpage=addnewgroup"))
+#set($saveurl = $xwiki.getURL("XWiki.XWikiGroups", "view"))
+#set($redirecturl = $doc.getURL("admin", "editor=groupd&amp;space=XWiki"))
+        
 <script type="text/javascript">
         var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "groupstable", displayGroups, true); 
-        Event.observe($('hgroupmanage'), 'click', showHideFilters(ta));
-        ##//Event.observe( $('add-new-user'), 'click', ta.createAddHandler(ta));
-        #set($url = $xwiki.getURL("XWiki.XWikiGroups", "view", "xpage=addnewgroup"))
-        #set($saveurl = $xwiki.getURL("XWiki.XWikiGroups", "view"))
-        #set($redirecturl = $doc.getURL())
-        Event.observe($('add-new-user'), "click", makeAddHandler("$url", "$saveurl", "$redirecturl"));
+        Event.observe($('addNewGroup'), "click", makeAddHandler("$addnewurl", "$saveurl", "$redirecturl"));
 </script>
-#else ## stable interface
+
+############ display the stable interface
+#else 
 <div class="layoutsubsection">
 <div style="overflow:auto">
 $xwiki.parseMessage("editgroupsredirect")

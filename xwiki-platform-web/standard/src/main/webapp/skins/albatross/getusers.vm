@@ -54,18 +54,19 @@ $response.setContentType("application/x-json")
   #set( $countUsers = $rm.countAllMatchedUsers( $filterMap ) )
 #end
 
-#set( $wikiname = $request.get("wiki") )
 ### json starts
 { 
 "totalrows": $countUsers,
 "returnedrows": #if($countUsers < $limit) $countUsers #else $limit #end,
 "offset": $offset,
-"wikiname" : "$wikiname",
 "rows": [
 #foreach( $user in $users )
+   #set($wikiname = $user.getWiki())
+   #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
    #if( $velocityCount > 1 ) , #end
    {"username"      : "$user.name", 
     "fullname"      : "$user.fullName",
+    "wikiname"      : "$wikiname",
     "firstname"     : "$user.getObject('XWiki.XWikiUsers').get('first_name')", 
     "lastname"      : "$user.getObject('XWiki.XWikiUsers').get('last_name')",
     "userurl"       : "$xwiki.getURL($user.fullName)",

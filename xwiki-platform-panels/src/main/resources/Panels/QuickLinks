@@ -142,7 +142,6 @@
 * [Blog&gt;Blog.WebHome]
 * [Calendar&gt;Main.EventCalendar]
 * [Photo Albums&gt;Photos.WebHome]
-* [Presentations&gt;Presentations.WebHome]
 * [Sandbox&gt;Sandbox.WebHome]
 * [Tags&gt;Main.Tags]
 #if ($xwiki.hasAdminRights())

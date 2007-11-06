@@ -708,6 +708,8 @@ public abstract class AbstractSuperClass implements SuperClass
         where.append(" and obj.name<>" + HQL_PARAMETER_STRING);
         parameterValues.add(getClassTemplateFullName());
 
+        String andSymbol = " and ";
+        
         if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {
                 String fieldName = fieldDescriptors[i][0];
@@ -718,8 +720,6 @@ public abstract class AbstractSuperClass implements SuperClass
                     String fieldPrefix = "field" + i;
 
                     from.append(", " + type + " as " + fieldPrefix);
-
-                    String andSymbol = " and ";
 
                     where.append(andSymbol + "obj.id=" + fieldPrefix + ".id.id");
 

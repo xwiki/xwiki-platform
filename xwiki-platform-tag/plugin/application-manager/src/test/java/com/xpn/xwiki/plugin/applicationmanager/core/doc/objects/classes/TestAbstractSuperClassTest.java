@@ -20,6 +20,7 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -238,7 +239,53 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
      * Pretty name of field <code>stringlist</code>.
      */
     public static final String FIELDPN_stringlist = "String List";
+    
+    /**
+     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with no parameters.
+     */
+    public static final String WHERECLAUSE_null = ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>?";
+    
+    public static final String[] WHERECLAUSE_doc0 = {"df0", null, "dv0"};
+    public static final String[] WHERECLAUSE_doc1 = {"df1", null, "dv1"};
+    public static final String[] WHERECLAUSE_obj0 = {"of0", "String", "ov0"};
+    public static final String[] WHERECLAUSE_obj1 = {"of1", "Int", "ov1"};
+    
+    /**
+     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with doc filter.
+     */
+    public static final String WHERECLAUSE_doc = ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=?";
+    public static final String[][] WHERECLAUSE_PARAM_doc = {WHERECLAUSE_doc0}; 
 
+    /**
+     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with more than one docs filters.
+     */
+    public static final String WHERECLAUSE_doc_multi = ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and lower(doc.df1)=?";
+    public static final String[][] WHERECLAUSE_PARAM_doc_multi = {WHERECLAUSE_doc0, WHERECLAUSE_doc1};
+    
+    /**
+     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with object filter.
+     */
+    public static final String WHERECLAUSE_obj = ", BaseObject as obj, String as field0 where doc.fullName=obj.name and obj.className=? and obj.name<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=?";
+    public static final String[][] WHERECLAUSE_PARAM_obj = {WHERECLAUSE_obj0};
+    
+    /**
+     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with more than one objects filters.
+     */
+    public static final String WHERECLAUSE_obj_multi = ", BaseObject as obj, String as field0, Int as field1 where doc.fullName=obj.name and obj.className=? and obj.name<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
+    public static final String[][] WHERECLAUSE_PARAM_obj_multi = {WHERECLAUSE_obj0, WHERECLAUSE_obj1};
+    
+    /**
+     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with object and doc filter.
+     */
+    public static final String WHERECLAUSE_objdoc = ", BaseObject as obj, String as field1 where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
+    public static final String[][] WHERECLAUSE_PARAM_objdoc = {WHERECLAUSE_doc0, WHERECLAUSE_obj0};
+    
+    /**
+     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with more than one objects and docs filters.
+     */
+    public static final String WHERECLAUSE_objdoc_multi = ", BaseObject as obj, String as field2, Int as field3 where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and lower(doc.df1)=? and obj.id=field2.id.id and field2.name=? and lower(field2.value)=? and obj.id=field3.id.id and field3.name=? and lower(field3.value)=?";
+    public static final String[][] WHERECLAUSE_PARAM_objdoc_multi = {WHERECLAUSE_doc0, WHERECLAUSE_doc1, WHERECLAUSE_obj0, WHERECLAUSE_obj1};
+    
     static abstract public class TestSuperClass extends AbstractSuperClass
     {
         /**
@@ -561,5 +608,78 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         assertTrue(DispatchSuperClass.getInstance(context).isInstance(
             DispatchSuperClass.getInstance(context).newSuperDocument(context).getDocumentApi()));
         assertFalse(DispatchSuperClass.getInstance(context).isInstance(new XWikiDocument()));
+    }
+    
+    public void testCreateWhereClause_null() throws XWikiException
+    {
+        List list = new ArrayList();
+        
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(null, list);
+        
+        assertEquals(WHERECLAUSE_null, where);
+    }
+    
+    public void testCreateWhereClause_nothing() throws XWikiException
+    {
+        List list = new ArrayList();
+        String[][] fieldDescriptors = new String[][]{};
+        
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(fieldDescriptors, list);
+        
+        assertEquals(WHERECLAUSE_null, where);
+    }
+    
+    public void testCreateWhereClause_doc() throws XWikiException
+    {
+        List list = new ArrayList();
+        
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc, list);
+        
+        assertEquals(WHERECLAUSE_doc, where);
+    }
+    
+    public void testCreateWhereClause_doc_multi() throws XWikiException
+    {
+        List list = new ArrayList();
+        
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc_multi, list);
+        
+        assertEquals(WHERECLAUSE_doc_multi, where);
+    }
+    
+    public void testCreateWhereClause_obj() throws XWikiException
+    {
+        List list = new ArrayList();
+
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj, list);
+        
+        assertEquals(WHERECLAUSE_obj, where);
+    }
+    
+    public void testCreateWhereClause_obj_multi() throws XWikiException
+    {
+        List list = new ArrayList();
+
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj_multi, list);
+        
+        assertEquals(WHERECLAUSE_obj_multi, where);
+    }
+    
+    public void testCreateWhereClause_objdoc() throws XWikiException
+    {
+        List list = new ArrayList();
+
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc, list);
+        
+        assertEquals(WHERECLAUSE_objdoc, where);
+    }
+    
+    public void testCreateWhereClause_objdoc_multi() throws XWikiException
+    {
+        List list = new ArrayList();
+
+        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc_multi, list);
+        
+        assertEquals(WHERECLAUSE_objdoc_multi, where);
     }
 }

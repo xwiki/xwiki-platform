@@ -53,7 +53,13 @@
           </resourceBundles>
           <properties>
             <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>
-            <xwikiCfgAdditionalProperties># xwiki.rights.defaultui=stable</xwikiCfgAdditionalProperties>
+            <!-- Note: The formatting below is intentional and done so that the generated file looks line -->
+            <xwikiCfgAdditionalProperties>
+# Decide what UI interface to use for Rights Management.
+# Possible values are: "new", "stable".
+# Uncomment to use the new Ajax UI (experimental at this stage).
+# xwiki.rights.defaultui=new
+            </xwikiCfgAdditionalProperties>
           </properties>
         </configuration>
       </plugin>

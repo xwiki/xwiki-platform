@@ -53,6 +53,7 @@
           </resourceBundles>
           <properties>
             <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>
+            <xwikiCfgAdditionalProperties># xwiki.rights.defaultui=stable</xwikiCfgAdditionalProperties>
           </properties>
         </configuration>
       </plugin>

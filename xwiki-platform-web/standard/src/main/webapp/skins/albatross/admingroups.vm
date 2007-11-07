@@ -43,8 +43,7 @@
     </td>
     <td id="buff"></td>
 </tr>
-<tr><td colspan="2">
-<br />
+<tr><td colspan="2" id="tdAddNewUserOrGroup">
 <a href="#" id="addNewGroup">$msg.get("rightsmanager.addnewgroup")</a>
 </td></tr>
 </table>

@@ -102,3 +102,28 @@ div.inscrollbar {
 	margin-left: 13px;
 	margin-top: 5px;
 }
+
+#tdAddNewUserOrGroup {
+	padding-top: 10px;
+}
+
+
+#tdAddNewUserOrGroup a {
+        color: #fff;
+        font-weight: bold;
+        font-size: 12px;
+        text-decoration: none;
+	background-image: url("$xwiki.getSkinFile('icons/rights-manager/but1.png')");
+	background-repeat: no-repeat !important;
+        display: block;
+        text-align: center;
+        padding-top: 3px;
+        width: 130px;
+        height: 24px;
+}
+
+#errMsg {
+        color: #DD7700;
+        font-size: 12px;
+        font-weight: bold;
+}

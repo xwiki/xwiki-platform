@@ -1,8 +1,7 @@
 <div class = "lbcontent">
-#if(!$xwiki.hasAccessLevel("view","XWiki.Registration")||$xwiki.getDocument("XWiki.Registration").isNew())
   <h1>$msg.get("Registration")</h1>
 #if(!$reg||$reg<0 )
-    <p>$msg.get("registerwelcome")</p>
+  <p>$msg.get("registerwelcome")</p>
 #end
 #if($reg && $reg<=0)
 #if($reg==-2)
@@ -60,8 +59,5 @@
         <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
       </div>
     </form>
-#end
-#else
-  $xwiki.getDocument("XWiki.Registration").getTranslatedDocument().getRenderedContent()
 #end
 </div>

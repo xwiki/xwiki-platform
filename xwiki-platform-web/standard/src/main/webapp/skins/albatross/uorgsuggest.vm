@@ -16,9 +16,9 @@ $response.setContentType("text/xml")
 
 #if($uorg == "user")
    #if($wiki == "local")
-	  #set($allUsers = $xwiki.rightsmanager.getAllMatchedLocalUsersNames($filterMap))
+	  #set($allUsers = $xwiki.rightsmanager.usersApi.getAllMatchedLocalUsersNames($filterMap))
 	#else
-		#set($allUsers = $xwiki.rightsmanager.getAllMatchedGlobalUsersNames($filterMap))
+		#set($allUsers = $xwiki.rightsmanager.usersApi.getAllMatchedGlobalUsersNames($filterMap))
 	#end
 	#if($allUsers.size() > 0)
 		#foreach($user in $allUsers)
@@ -27,9 +27,9 @@ $response.setContentType("text/xml")
 	#end
 	#else ## groups
 	   #if($wiki == "local")
-			#set($allUsers = $xwiki.rightsmanager.getAllMatchedLocalGroupsNames($filterMap))
+			#set($allUsers = $xwiki.rightsmanager.groupsApi.getAllMatchedLocalGroupsNames($filterMap))
 		#else
-		   #set($allUsers = $xwiki.rightsmanager.getAllMatchedGlobalGroupsNames($filterMap))
+		   #set($allUsers = $xwiki.rightsmanager.groupsApi.getAllMatchedGlobalGroupsNames($filterMap))
 		#end
 		#if($allUsers.size() > 0)
 		#foreach($user in $allUsers)

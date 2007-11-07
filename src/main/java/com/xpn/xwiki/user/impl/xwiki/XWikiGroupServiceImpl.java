@@ -73,7 +73,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     /**
      * Name of the "XWiki.XWikiGroups" class.
      */
-    private static final String CLASS_XWIKIGROUPS = "XWiki" + CLASS_SUFFIX_XWIKIGROUPS;
+    private static final String CLASS_XWIKIGROUPS = "XWiki." + CLASS_SUFFIX_XWIKIGROUPS;
 
     /**
      * Name of the "XWiki.XWikiGroupTemplate" class sheet.
@@ -269,7 +269,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
                     String member = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
 
                     if (isMemberEquals(member, memberWiki, memberSpace, memberName, context)) {
-                        groupDocument.removeObject(bobj);
+                        needUpdate = groupDocument.removeObject(bobj);
                     }
                 }
             }

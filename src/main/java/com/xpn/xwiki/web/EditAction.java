@@ -86,7 +86,7 @@ public class EditAction extends XWikiAction {
             String defaultLanguage = peform.getDefaultLanguage();
             if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
                 doc.setDefaultLanguage(defaultLanguage);
-            if (doc.getDefaultLanguage().equals(""))
+            if (doc.isNew()&&doc.getDefaultLanguage().equals(""))
                 doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
 
             String language = context.getWiki().getLanguagePreference(context);

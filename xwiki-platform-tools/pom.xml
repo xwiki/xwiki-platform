@@ -27,18 +27,18 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>6</version>
+    <version>7-SNAPSHOT</version>
     <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <artifactId>xwiki-tools</artifactId>
   <name>XWiki Platform - Tools - Parent POM</name>
-  <version>5</version>
+  <version>6-SNAPSHOT</version>
   <packaging>pom</packaging>
   <description>XWiki Tools</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-5</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-5</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-5</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</url>
   </scm>
   <modules>
     <module>build-tools</module>

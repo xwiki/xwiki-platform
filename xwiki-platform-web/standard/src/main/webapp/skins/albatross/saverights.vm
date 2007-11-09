@@ -1,46 +1,128 @@
 #set($fullname = $request.get("fullname"))
 #set($uorg = $request.get("uorg"))
-#set($allows = "$!request.get('allows')")
-#set($denys = "$!request.get('denys')")
+#set($right = $request.get("right")) ## right name: edit, view, comment...
+#set($action = $request.get("action"))  ## can be allow, deny or clear(delete) that right
 #set($clsname = $request.get("clsname"))
-## found the user or group
+## found allow or deny for the user or group
 #set($founda = false)
 #set($foundd = false)
 
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
-  #set($pers = $obj.getProperty($uorg).getValue())
-  ## TO DO: regular expression
-  #if($pers.matches("${fullname},?"))
-    #if($obj.getProperty('allow').getValue() == 1)
-        #set($founda = true) ## found allows -> set the new levels 
-        #if($allows != "") $obj.set('levels', $allows)
-	#else $doc.removeObject($obj) #end
-    #else
-        #set($foundd = true)## found denys -> set the new levels
-        #if($denys != "") $obj.set('levels', $denys)
-	#else $doc.removeObject($obj) #end
-    #end
-  #elseif($pers.matches("^(.*,)?${fullname}(,.*)?$"))
+  #set($pers = "$!obj.getProperty($uorg).getValue()")
+
+  #if($pers != "" && $pers.matches("${fullname},?")) ## found the rule containing that person
+      #set($levels = "$obj.getProperty('levels').getValue()") ## get the levels
+      
+      #if($obj.getProperty('allow').getValue() == 1) ## found allow rule
+          ### if action = allow, add the right it it does not exist; 
+          ### if action = deny, delete the right from allow rule, if exists
+          ## if action = clear, remove the right from allow levels
+          #set($founda = true)  
+
+          #if($action == "allow")
+          
+            #if($levels.indexOf($right) == -1) ## the right is not in the allow list, add it
+              #set($right = "," + $right)
+              #set($levels = $levels + $right)
+              
+              person: $pers rule: allow action: allow levels: $levels
+              
+              $obj.set('levels', $levels) ## set the new levels
+            #end
+            
+          #else  ## deny or clean action
+          
+            #set($i = $levels.indexOf($right))
+            
+            #if($i > -1) ## the right was found in the allow levels, remove it
+              #if($i == 0)
+                #set($levels = $levels.replaceAll("${right}(,|$)", ""))
+              #else
+                #set($levels = $levels.replaceAll(",${right}", ""))
+              #end
+            #end  
+            
+            person: $pers rule: allow action: deny/clean levels: $levels
+            
+            #if($levels != "")
+                $obj.set('levels', $levels) ## set the new levels
+            #else ## no other righs in the levels, remove the rule completely
+                $doc.removeObject($obj)
+            #end
+
+          #end
+          
+      #else ## found deny rule
+      
+          #set($foundd = true) 
+          
+          ### if action = allow, delete the right from the deny levels, if exists; 
+          ### if action = deny, add the right to deny levels, if not exists
+          ## if action = clear, remove the right from deny levels
+          
+          #if($action == "deny")
+          
+            #if($levels.indexOf($right) == -1) ## the right is not in the allow list, add it
+              #set($right = "," + $right)
+              #set($levels = $levels + $right)
+              
+              pers: $pers rule: deny action:deny levels: $levels
+              
+              $obj.set('levels', $levels) ## set the new levels
+            #end
+            
+           #else  ## allow or clean action
+           
+              #set($i = $levels.indexOf($right))
+              #if($i > -1) ## the right was found in the allow levels, remove it
+                 #if($i == 0)
+                  #set($levels = $levels.replaceAll("${right}(,|$)", ""))
+                #else
+                  #set($levels = $levels.replaceAll(",${right}", ""))
+                #end
+              #end  
+          
+               pers: $pers rule: deny action: allow/clean levels: $levels
+               
+              #if($levels != "")
+                $obj.set('levels', $levels) ## set the new levels
+              #else ## no other righs in the levels, remove the rule completely
+                $doc.removeObject($obj)
+              #end
+              
+           #end
+          
+      #end ## end get property
+      
+  #elseif($pers.matches("^(.*,)?${fullname}(,.*)?$")) ## could not find the first pattern
+  
     #set($pers = $pers.replaceAll("^${fullname}(,|$)", ""))
     #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
     $obj.set($uorg, $pers)
+    
   #end
-#end
+#end ## end foreach
 
-#if(($founda == false) && ($allows != ""))
+#if(($founda == false) && ($action == "allow"))
 ## could not find the rule -> create one
 #set($obj = $doc.newObject($clsname))
 ## set the new rules
 $obj.set($uorg, $fullname)
-$obj.set('levels', $allows)
+$obj.set('levels', $right)
+
+pers: $pers rule: allow action: allow levels: $right
+
 $obj.set('allow', '1')
 #end
-#if(($foundd == false) && ($denys != ""))
+#if(($foundd == false) && ($action == "deny"))
 ## could not find the rule -> create one
 #set($obj = $doc.newObject($clsname))
 ## set the new rules
 $obj.set($uorg, $fullname)
-$obj.set('levels', $denys)
+$obj.set('levels', $right)
+
+pers: $pers rule: deny action: deny levels: $right
+
 $obj.set('allow', '0')
 #end
 #set($discard = $doc.save())

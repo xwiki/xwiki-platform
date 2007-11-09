@@ -9,7 +9,7 @@ ASSTable.prototype = {
     this.domNode = $( domNode );
     this.scroller = new ASSScroller( this, scrollNode );
     if(hasFilters)
-    this.filter = new ASSFilter( this, filterNode );
+      this.filter = new ASSFilter( this, filterNode );
     this.hasFilters = hasFilters;
     this.filters = "";
     this.getHandler = getHandler;
@@ -414,18 +414,17 @@ MSCheckbox = Class.create();
 
 MSCheckbox.prototype = {
 
-  initialize: function( domNode, childId,  defaultState )
+  initialize: function( domNode, right, saveUrl, defaultState )
   {
     this.domNode = $(domNode);
-    this.childId = childId;
+    this.right = right;
+    this.saveUrl = saveUrl;
     this.defaultState = defaultState;
     this.state = defaultState;
     this.states = [0,1,2]; // 0 = none; 1 = allow, 2 == deny
     this.nrstates = this.states.length;
     this.images = ["$xwiki.getSkinFile("icons/rights-manager/none.png")","$xwiki.getSkinFile("icons/rights-manager/allow.png")","$xwiki.getSkinFile("icons/rights-manager/deny1.png")"];
     this.labels = ['','',''];
-        // buttons with actions upon checkboxes
-    this.buttons = new Array();
 
     this.draw(this.state);
     this.attachEvents();
@@ -433,16 +432,16 @@ MSCheckbox.prototype = {
 
   draw: function(state)
   {
-                //remove image
+                  //remove image
     if(this.domNode.childNodes.length > 0) 
-    this.domNode.removeChild( this.domNode.firstChild );
+      this.domNode.removeChild( this.domNode.firstChild );
                 //remove label
     if(this.domNode.childNodes.length > 0)
-    this.domNode.removeChild( this.domNode.lastChild );
+      this.domNode.removeChild( this.domNode.lastChild );
                 //add new image
     var img = document.createElement('img');
     img.src = this.images[ state ];
-    img.id = this.childId;
+    
     this.domNode.appendChild( img );
                 //add label
     if( this.labels[ state ] != '')
@@ -468,272 +467,37 @@ MSCheckbox.prototype = {
   {
     return function()
     {
-      pivot.next();
-      for(var i = 0; i < pivot.buttons.length; i++)
-      pivot.buttons[i].notifyChange();
+      //put $msg.get() messages!!!!!
+      
+      var nxtst = (pivot.state + 1) % pivot.nrstates;
+      if(pivot.right == "admin" && nxtst == 2)
+       confirm("You are about to deny the admin right for this user. Continue?");
+      else if(pivot.right == "admin" && nxtst == 0)
+        confirm("You are about to clear the admin right for this user. Continue?");
+      pivot.next(); // go to next state
+      
+      //compute the complete url
+      var action = "";
+      if(pivot.state == 0)       action = "clear";
+      else if(pivot.state == 1)  action = "allow";
+      else                       action = "deny";
+
+      var url = pivot.saveUrl + "&action=" + action + "&right=" + pivot.right;
+      
+      new Ajax.Request(url, 
+      { 
+        method: 'get',
+        onSuccess: function() {}
+      }); 
     }
-  },
-
-  equalize: function()
-  {
-    this.defaultState = this.state;
-    this.notifyButtons();
-  },
-
-  notifyButtons : function()
-  {
-    for(var i = 0; i < this.buttons.length; i++)
-    this.buttons[i].notifyChange();
   },
 
   attachEvents: function()
   {
     Event.observe( this.domNode, 'click', this.createClickHandler(this));
-  },
-  
-  attachButton : function(b)
-  {
-    this.buttons.push(b);
   }
 }
 
-////////////////////////////////////////////////////////////////////////
-/* class that represents an 'action' button    */
-MButton = Class.create();
-
-MButton.prototype = {
-  initialize : function() {
-    //
-  },
-
-  init: function(domNode, type, table, indx, checkboxes)
-  {
-    this.domNode = $(domNode);
-    this.type = type;
-    this.table = table;
-    this.indx = indx;
-    this.checkboxes = checkboxes;
-
-    this.draw(); 
-    this.attachCheckboxes();
-    this.attachHandler();
-  },
-    
-  attachHandler : function()
-  {
-    Event.observe(this.domNode.firstChild, 'click', this.createHandler(this));
-  },
-
-  attachCheckboxes : function()
-  {
-    for(var i = 0; i < this.checkboxes.length; i++) 
-    this.checkboxes[i].attachButton(this); 
-  },
-
-  checkEqual : function()
-  {
-    for(var i = 0; i < this.checkboxes.length; i++)
-    if(this.checkboxes[i].state != this.checkboxes[i].defaultState)
-    return false;
-    return true;
-  },
-
-  checkClear : function()
-  {
-    for(var i = 0; i < this.checkboxes.length; i++)
-    if(this.checkboxes[i].state != 0)
-    return false;
-    return true;
-  }
-}
-
-
-MSaveButton = Class.create();
-
-MSaveButton.prototype = Object.extend(new MButton(), {
-
-  initialize : function(domNode, table, indx, checkboxes)
-  {
-    this.ready = false;
-    this.init(domNode, 'save', table, indx, checkboxes);
-  },
-
-  draw : function()
-  {
-    var img = document.createElement('img');
-    img.src = '$xwiki.getSkinFile("icons/rights-manager/saveg.png")';
-    img.alt = "";
-    img.className = "icon-manage";
-    this.domNode.appendChild(img);
-  },
-    
-  createHandler : function(pivot)
-  {
-    return function()
-    {  
-      if(pivot.ready)
-      {
-        var allows = "";
-        var denys = "";
-        var j = 0, k = 0;
-        for(var i = 0; i < pivot.checkboxes.length; i++)
-        {
-          if(pivot.checkboxes[i].state == 1)
-          {
-            if(j > 0)  allows += ",";
-            allows += pivot.checkboxes[i].childId.substring(0, pivot.checkboxes[i].childId.indexOf('_'));
-            j++; 
-          }
-      
-          else if(pivot.checkboxes[i].state == 2)
-          {
-            if(k > 0) denys += ",";
-            denys += pivot.checkboxes[i].childId.substring(0, pivot.checkboxes[i].childId.indexOf('_'));
-            k++;
-          }      
-        }
-
-        var url = "?xpage=saverights";
-        url += "&fullname=" + pivot.table.fetchedRows[pivot.indx].fullname + "&clsname=" + pivot.table.json.clsname + "&uorg=" + pivot.table.json.uorg + "&allows=" + allows + "&denys=" + denys;
-
-        new Ajax.Request(url,
-        {
-          method: 'get',
-          onSuccess: function()
-          {
-            pivot.table.fetchedRows[pivot.indx].allows = allows;
-            pivot.table.fetchedRows[pivot.indx].denys = denys;
-            for(var i = 0; i < pivot.checkboxes.length; i++)
-            pivot.checkboxes[i].equalize();
-          }
-        }); 
-      }
-    }
-  },
-
-  notifyChange : function()
-  {
-    if(! this.checkEqual())
-    {
-      this.ready = true;
-      this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/save.png")';
-                //icon-manage-enabled
-    }
-    else
-    {
-      this.ready = false;
-      this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/saveg.png")';
-                //icon-manage-disabled
-    }
-  }
-});
-
-
-MRevertButton = Class.create();
-
-MRevertButton.prototype = Object.extend(new MButton(), {
-
-  initialize : function(domNode, table, indx, checkboxes)
-  {
-    this.ready = false;
-    this.init(domNode, 'revert', table, indx, checkboxes);
-  },
-
-  draw : function()
-  {
-    var img = document.createElement('img');
-    img.src = '$xwiki.getSkinFile("icons/rights-manager/revertg.png")';
-    img.alt = "";
-    img.className = "icon-manage";
-    this.domNode.appendChild(img);
-  },
-    
-  createHandler : function(pivot)
-  {
-    return function()
-    {  
-      if(pivot.ready)
-      {
-        for(var i = 0; i < pivot.checkboxes.length; i++)
-        {
-          pivot.checkboxes[i].state = pivot.checkboxes[i].defaultState;
-          pivot.checkboxes[i].draw(pivot.checkboxes[i].state);
-          pivot.checkboxes[i].notifyButtons();
-        }
-      }
-    }
-  },
-
-  notifyChange : function()
-  {
-    if(! this.checkEqual())
-    {
-      this.ready = true;
-      this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/revert.png")';
-      //icon-manage-enabled
-    }
-    else
-    {
-      this.ready = false;
-      this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/revertg.png")';
-      //icon-manage-disabled
-    }
-  }
-});
-
-
-MClearButton = Class.create();
-
-MClearButton.prototype = Object.extend(new MButton(), {
-
-  initialize : function(domNode, table, indx, checkboxes)
-  {
-    this.ready = true;
-    this.init(domNode, 'clear', table, indx, checkboxes);
-    this.notifyChange(); // verify if all checkboxes are clear to disable the clear button
-  },
-
-  draw : function()
-  {
-    var img = document.createElement('img');
-    img.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
-    img.alt = "";
-    img.className = "icon-manage";
-    this.domNode.appendChild(img);
-  },
-    
-  createHandler : function(pivot)
-  {
-    return function()
-    {  
-      if(pivot.ready)
-      {
-        for(var i = 0; i < pivot.checkboxes.length; i++)
-        {
-          pivot.checkboxes[i].state = 0;
-          pivot.checkboxes[i].draw(pivot.checkboxes[i].state);
-        }
-        pivot.checkboxes[pivot.checkboxes.length - 1].notifyButtons();
-      }
-    }
-  },
-
-  notifyChange : function()
-  {
-    if(this.checkClear())
-    {
-      this.ready = false;
-      this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/clearg.png")';
-                //icon-manage-disabled
-    }
-    else
-    {
-      this.ready = true;
-      this.domNode.firstChild.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
-                //icon-manage-disabled
-    }
-  }
-});
 
 
 /** user list element creator **/
@@ -899,6 +663,8 @@ function displayUsersAndGroups( row, i, table )
   var uorg = table.json.uorg;
   var allows = row.allows;
   var denys = row.denys;
+  var saveUrl = "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
+  
   var objs = new Array(); //array with checkboxes objects
   var tr = document.createElement('tr');
  
@@ -923,36 +689,32 @@ function displayUsersAndGroups( row, i, table )
   var r = 0;
   if(allows.indexOf("view") >= 0) r = 1;
   else if(denys.indexOf("view") >= 0) r = 2;
-  var chbx1 = new MSCheckbox(view, "view_"+i, r);
+  var chbx1 = new MSCheckbox(view, "view", saveUrl, r);
   tr.appendChild(view);
-  objs.push(chbx1);
         
   var comment = document.createElement('td');
   comment.className = "rights";
   r = 0;
   if(allows.indexOf("comment") >= 0) r = 1;
   else if(denys.indexOf("comment") >= 0) r = 2;
-  var chbx2 = new MSCheckbox(comment, "comment_"+i, r);
+  var chbx2 = new MSCheckbox(comment, "comment", saveUrl, r);
   tr.appendChild(comment);
-  objs.push(chbx2);
         
   var edit = document.createElement('td');
   edit.className = "rights";
   r = 0;
   if(allows.indexOf("edit") >= 0) r = 1;
   else if(denys.indexOf("edit") >= 0) r = 2;
-  var chbx3 = new MSCheckbox(edit, "edit_"+i, r);
+  var chbx3 = new MSCheckbox(edit, "edit", saveUrl, r);
   tr.appendChild(edit);
-  objs.push(chbx3);
         
   var del = document.createElement('td');
   del.className = "rights";
   r = 0;
   if(allows.indexOf("delete") >= 0)  r = 1;
   else if(denys.indexOf("delete") >= 0) r = 2;
-  var chbx4 = new MSCheckbox(del, "delete_"+i, r);
+  var chbx4 = new MSCheckbox(del, "delete", saveUrl, r);
   tr.appendChild(del);
-  objs.push(chbx4);
         
   if(table.json.reg == true)
   {
@@ -961,9 +723,8 @@ function displayUsersAndGroups( row, i, table )
     r = 0;
     if(allows.indexOf("register") >= 0)  r = 1;
     else if(denys.indexOf("register") >= 0) r = 2;
-    var chbx5 = new MSCheckbox(register, "register_"+i, r);
+    var chbx5 = new MSCheckbox(register, "register", saveUrl, r);
     tr.appendChild(register);
-    objs.push(chbx5);
   }
         
   if(table.json.admin == true)
@@ -973,9 +734,8 @@ function displayUsersAndGroups( row, i, table )
     r = 0;
     if(allows.indexOf("admin") >= 0) r = 1;
     else if(denys.indexOf("admin") >= 0) r = 2;
-    var chbx6 = new MSCheckbox(admin, "admin_"+i, r);
+    var chbx6 = new MSCheckbox(admin, "admin", saveUrl, r);
     tr.appendChild(admin);
-    objs.push(chbx6);
   }
         
   if(table.json.progr == true)
@@ -985,28 +745,9 @@ function displayUsersAndGroups( row, i, table )
     r = 0;
     if(allows.indexOf("programming") >= 0) r = 1;
     else if(denys.indexOf("programming") >= 0) r = 2;
-    var chbx7 = new MSCheckbox(progr, "programming_"+i, r);
+    var chbx7 = new MSCheckbox(progr, "programming", saveUrl, r);
     tr.appendChild(progr);
-    objs.push(chbx7);
   }
-        
-  var manage = document.createElement('td');
-  manage.className = "manage";
-        
-  var spansave = document.createElement('span');
-  var spanrevert = document.createElement('span');
-  var spanclear = document.createElement('span');
-
-  manage.appendChild(spansave);
-  manage.appendChild(spanrevert);
-  manage.appendChild(spanclear);
-
-   //save rights
-  var save = new MSaveButton(spansave, table, i, objs);
-  var revert = new MRevertButton(spanrevert, table, i, objs);
-  var clear = new MClearButton(spanclear, table, i, objs);
-                
-  tr.appendChild(manage);
         
   return tr;
 }

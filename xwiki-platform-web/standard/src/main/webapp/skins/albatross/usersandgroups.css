@@ -84,6 +84,23 @@ div.inscrollbar {
 	left: 8px;
 }
 
+#specialusersandgroups {
+   border-collapse: collapse;
+   border: 1px solid #d4dee8;
+   width: 100%;
+}
+
+#specialusersandgroups td {
+    border: 1px solid #d4dee8;
+}
+
+.suorg {
+  color: #1f66ab;
+  font-weight: bold;
+  font-size: 13px;
+  padding-left: 10px;
+}
+
 #display1 td {
 	padding-left: 11px;
 }
@@ -126,4 +143,11 @@ div.inscrollbar {
         color: #DD7700;
         font-size: 12px;
         font-weight: bold;
+}
+
+#XWikiGuestSpecial {
+        background-color: #ACBFD2;
+        font-size: 12px;
+        font-weight: bold;
+        color: #000;
 }

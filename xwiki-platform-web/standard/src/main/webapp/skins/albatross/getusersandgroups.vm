@@ -97,25 +97,24 @@ $response.setContentType("application/x-json")
    #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
    #set($allows = "")
    #set($denys = "")
-   #if( $velocityCount > 1 ) , #end
+   #if( $velocityCount > 1 ) , #end 
    ## get the rights for that user or group
-   #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
-    #set($pers = $obj.getProperty($uorg).getValue())
-    #set($fullnamecomma = $user.fullName + ",")
-    #if($pers.matches("^(.*,)?${user.fullName}(,.*)?$"))
-      #if($obj.getProperty('allow').getValue() == 1)
-        #set($allows = $obj.getProperty('levels').getValue())
-      #else
-        #set($denys = $obj.getProperty('levels').getValue())
+   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
+      #set($pers = "$!obj.getProperty($uorg).getValue()")
+      #if(($pers != "") && ($pers.matches("^(.*,)?${user.fullName}(,.*)?$")) )  
+        #if($obj.getProperty('allow').getValue() == 1)
+          #set($allows = "$!obj.getProperty('levels').getValue()")
+        #else
+          #set($denys = "$!obj.getProperty('levels').getValue()")
+        #end
       #end
-    #end
-  #end
+   #end ## second foreach
    {"username"   : "$user.name", 
     "fullname"   : "$user.fullName",
     "wikiname"   : "$wikiname", 
     "userurl"    : "$xwiki.getURL($user.fullName)",
-    "allows"     : "$!allows",
-    "denys"      : "$!denys"
+    "allows"     : "$allows",
+    "denys"      : "$denys"
   }
 #end
 ]}

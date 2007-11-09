@@ -16,7 +16,7 @@
 <table id="groupstable">
 <tr><td colspan="2" id="showLimits"></td></tr>
 <tr><td style="width: 100%;">
-      <table class="display">
+      <table class="display" cellpadding="3">
        <thead class="theader">
           <tr>
               <td>Group Name</td><td>Members</td><td>Manage</td>

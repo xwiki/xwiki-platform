@@ -68,17 +68,17 @@
 <table id="usersandgroupstable">
 
 <tr>
-<td colspan="2" style="width:100%">
+<td style="width:100%">
 <table id="specialusersandgroups">
 <tr class="theader">
-    <td>$msg.get("rightsmanager.specialusers")</td>
-    <td>$msg.get("rightsmanager.view")</td>
-    <td>$msg.get("rightsmanager.comment")</td>
-    <td>$msg.get("rightsmanager.edit")</td>
-    <td>$msg.get("rightsmanager.delete")</td>
+    <td class="usersorgroupsnames">$msg.get("rightsmanager.specialusers")</td>
+    <td class="rights">$msg.get("rightsmanager.view")</td>
+    <td class="rights">$msg.get("rightsmanager.comment")</td>
+    <td class="rights">$msg.get("rightsmanager.edit")</td>
+    <td class="rights">$msg.get("rightsmanager.delete")</td>
     ## if global rights and main wiki show programming right column
     #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-    #if($hasPrgr)<td>$msg.get("rightsmanager.program")</td> #end
+    #if($hasPrgr)<td class="rights">$msg.get("rightsmanager.program")</td> #end
 </tr>
 <tr id="XWikiGuestSpecial">
       <td class="suorg">$msg.get("rightsmanager.unregisteredusers")</td>
@@ -102,11 +102,11 @@
 <tr><td style="width:100%">
       <table class="display">
        <thead class="theader">
-          <tr><td>$msg.get("rightsmanager.groupsorusers")</td>
-              <td>$msg.get("rightsmanager.view")</td>
-              <td>$msg.get("rightsmanager.comment")</td>
-              <td>$msg.get("rightsmanager.edit")</td>
-	      <td>$msg.get("rightsmanager.delete")</td>
+          <tr><td class="usersorgroupsnames">$msg.get("rightsmanager.groupsorusers")</td>
+              <td class="rights">$msg.get("rightsmanager.view")</td>
+              <td class="rights">$msg.get("rightsmanager.comment")</td>
+              <td class="rights">$msg.get("rightsmanager.edit")</td>
+	      <td class="rights">$msg.get("rightsmanager.delete")</td>
               ## if global rights and main wiki show programming right column
               #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
               #if($hasPrgr)<td>$msg.get("rightsmanager.program")</td> #end

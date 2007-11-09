@@ -18,7 +18,7 @@
 <table id="userstable">
 <tr><td colspan="2" id="showLimits"></td></tr>
 <tr>
- <td style="width:100%;"><table class="display">
+ <td style="width:100%;"><table class="display" cellpadding="3">
         <thead class="theader">
            <tr><td>User Name</td><td>First Name</td><td>Last Name</td><td>Manage</td></tr>
            <tr id="table-filters">

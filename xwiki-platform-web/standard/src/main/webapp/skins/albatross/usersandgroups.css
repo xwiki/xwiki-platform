@@ -40,6 +40,10 @@ div.inscrollbar {
    padding-right: 10px;
 }
 
+.icon-manageg {
+   padding-right: 10px;
+}
+
 #ajax-loader {
    margin: 0px;
    padding: 0px;
@@ -77,11 +81,11 @@ div.inscrollbar {
 }
 
 #userstable, #groupstable, #usersandgroupstable, #memberstable {
-	width: 100%;
-	position: relative;
-	padding: 0px;
-	margin: 0px;
-	left: 8px;
+    width: 100%;
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    left: 8px;
 }
 
 #specialusersandgroups {
@@ -92,13 +96,6 @@ div.inscrollbar {
 
 #specialusersandgroups td {
     border: 1px solid #d4dee8;
-}
-
-.suorg {
-  color: #1f66ab;
-  font-weight: bold;
-  font-size: 13px;
-  padding-left: 10px;
 }
 
 #display1 td {
@@ -113,7 +110,9 @@ div.inscrollbar {
 .rights {
 	text-align: center;
 	padding-left: 0px !important;
+	padding-top: 4px;
 }
+
 
 .spaceName {
 	margin-left: 13px;
@@ -146,8 +145,17 @@ div.inscrollbar {
 }
 
 #XWikiGuestSpecial {
-        background-color: #ACBFD2;
-        font-size: 12px;
-        font-weight: bold;
+        background-color: #fff;
         color: #000;
+}
+
+.usersorgroupsnames {
+    width: 30%;
+    padding-top: 4px;
+}
+
+.suorg {
+  width: 30%;
+  padding-left: 10px;
+  padding-top: 4px;
 }

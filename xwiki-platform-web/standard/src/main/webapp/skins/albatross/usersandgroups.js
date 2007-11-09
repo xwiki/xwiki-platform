@@ -441,7 +441,6 @@ MSCheckbox.prototype = {
                 //add new image
     var img = document.createElement('img');
     img.src = this.images[ state ];
-    
     this.domNode.appendChild( img );
                 //add label
     if( this.labels[ state ] != '')
@@ -549,12 +548,22 @@ function displayUsers( row, i, table)
 
     //delete group
     var del = document.createElement('img');
-    del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
-    del.title = '$msg.get("delete")';
-    Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname));
-    del.className = 'icon-manage';
-    manage.appendChild(del);
+    
+    if(row.grayed == "true")
+    {
+      del.src = '$xwiki.getSkinFile("icons/rights-manager/clearg.png")';
+      del.className = 'icon-manageg';
+    }
+    else
+    {
+      del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
+      Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname));
+      del.className = 'icon-manage';
+     }
+     del.title = '$msg.get("delete")';
+     manage.appendChild(del);
   }
+  
   tr.appendChild(manage);
   return tr;
 }
@@ -643,10 +652,19 @@ function displayMembers( row, i, table )
   var membermanage = document.createElement("td");
   membermanage.className = "manage";
   var del = document.createElement('img');
-  del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
+  
+   if(row.grayed == "true")
+   {
+      del.src = '$xwiki.getSkinFile("icons/rights-manager/clearg.png")';
+      del.className = 'icon-manageg';
+  }
+  else
+  {
+    del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
+    Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
+    del.className = 'icon-manage';
+  }
   del.title = '$msg.get("delete")';
-  Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
-  del.className = 'icon-manage';
   membermanage.appendChild(del);
 
   tr.appendChild(membername);
@@ -682,6 +700,7 @@ function displayUsersAndGroups( row, i, table )
   else
     username.appendChild( document.createTextNode( row.username ) );
   
+  username.className = "usersorgroupsnames";
   tr.appendChild(username);
 
   var view = document.createElement('td');

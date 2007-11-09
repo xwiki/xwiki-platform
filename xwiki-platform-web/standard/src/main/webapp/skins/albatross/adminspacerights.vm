@@ -71,19 +71,18 @@
 </div>
 <table id="usersandgroupstable">
 <tr>
-<td colspan="2" style="width:100%">
+<td style="width:100%">
 <table id="specialusersandgroups">
 <tr class="theader">
-    <td>$msg.get("rightsmanager.specialusers")</td>
-    <td>$msg.get("rightsmanager.view")</td>
-    <td>$msg.get("rightsmanager.comment")</td>
-    <td>$msg.get("rightsmanager.edit")</td>
-    <td>$msg.get("rightsmanager.delete")</td>
-    <td>$msg.get("rightsmanager.register")</td>
-    <td>$msg.get("rightsmanager.admin")</td>
+    <td class="usersorgroupsnames">$msg.get("rightsmanager.specialusers")</td>
+    <td class="rights">$msg.get("rightsmanager.view")</td>
+    <td class="rights">$msg.get("rightsmanager.comment")</td>
+    <td class="rights">$msg.get("rightsmanager.edit")</td>
+    <td class="rights">$msg.get("rightsmanager.delete")</td>
+    <td class="rights">$msg.get("rightsmanager.admin")</td>
     ## if global rights and main wiki show programming right column
     #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-    #if($hasPrgr)<td>$msg.get("rightsmanager.program")</td> #end
+    #if($hasPrgr)<td class="rights">$msg.get("rightsmanager.program")</td> #end
 </tr>
 <tr id="XWikiGuestSpecial">
       <td class="suorg">$msg.get("rightsmanager.unregisteredusers")</td>
@@ -91,7 +90,6 @@
       <td class="rights" id="tdcomment"></td>
       <td class="rights" id="tdedit"></td>
       <td class="rights" id="tddelete"></td>
-      <td class="rights" id="tdregister"></td>
       <td class="rights" id="tdadmin"></td>
       #if($hasPrgr)<td class="rights" id="tdprogr"></td> #end
 </tr>
@@ -106,22 +104,22 @@
         </select>&nbsp;<span id="showLimits"></span>
     </td>
 </tr>
-<tr><td valign="top" style="width:100%">
-      <table border="0" cellpadding="2" cellspacing="0" width="100%" class="display">
+<tr><td style="width:100%">
+      <table class="display">
        <thead class="theader">
-          <tr><td>$msg.get("rightsmanager.groupsorusers")</td>
-              <td>$msg.get("rightsmanager.view")</td>
-              <td>$msg.get("rightsmanager.comment")</td>
-              <td>$msg.get("rightsmanager.edit")</td>
-	      <td>$msg.get("rightsmanager.delete")</td>
+          <tr><td class="usersorgroupsnames">$msg.get("rightsmanager.groupsorusers")</td>
+              <td class="rights">$msg.get("rightsmanager.view")</td>
+              <td class="rights">$msg.get("rightsmanager.comment")</td>
+              <td class="rights">$msg.get("rightsmanager.edit")</td>
+	      <td class="rights">$msg.get("rightsmanager.delete")</td>
               ## does not have register rights at space level <td class="rights">Register</td>
-              <td>$msg.get("rightsmanager.admin")</td>
+              <td class="rights">$msg.get("rightsmanager.admin")</td>
               ## if global rights and main wiki show programming right column
               #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-              #if($hasPrgr)<td>$msg.get("rightsmanager.program")</td> #end
+              #if($hasPrgr)<td class="rights">$msg.get("rightsmanager.program")</td> #end
           </tr>
           <tr id="table-filters">
-              <td class="fuorgname">
+              <td>
                 <input name="name" type="text" class="filter" />
 	        <input name="progr" type="hidden" value="#if($hasPrgr) true #else false #end" />
                 <input name="admin" type="hidden" value="true" />
@@ -155,7 +153,6 @@
         var chbx2 = new MSCheckbox(document.getElementById('tdcomment'), "comment", "${saveUrl}", "${r2}"); 
         var chbx3 = new MSCheckbox(document.getElementById('tdedit'), "edit", "$saveUrl", "${r3}"); 
         var chbx4 = new MSCheckbox(document.getElementById('tddelete'), "delete", "${saveUrl}", "${r4}"); 
-        var chbx5 = new MSCheckbox(document.getElementById('tdregister'), "register", "${saveUrl}", "${r5}"); 
         var chbx6 = new MSCheckbox(document.getElementById('tdadmin'), "admin", "${saveUrl}", "${r6}"); 
         if(document.getElementById('tdprogr')) var chbx7 = new MSCheckbox(document.getElementById('tdprogr'), "programming", "${saveUrl}", "${r7}"); 
 </script>

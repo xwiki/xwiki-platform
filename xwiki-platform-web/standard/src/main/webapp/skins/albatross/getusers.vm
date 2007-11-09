@@ -61,6 +61,11 @@ $response.setContentType("application/x-json")
 "offset": $offset,
 "rows": [
 #foreach( $user in $users )
+   #if($context.user == $user.fullName)
+    #set($grayed = true)
+   #else
+    #set($grayed = false)
+  #end
    #set($wikiname = $user.getWiki())
    #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
    #if( $velocityCount > 1 ) , #end
@@ -72,7 +77,8 @@ $response.setContentType("application/x-json")
     "userurl"       : "$xwiki.getURL($user.fullName)",
     "usersaveurl"   : "$user.getURL("save")",
     "userinlineurl" : "$user.getURL("inline", "xpage=edituser")",
-    "docurl"        : "$xwiki.getURL("XWiki.XWikiUsers", "admin", "editor=users&space=XWiki")"
+    "docurl"        : "$xwiki.getURL("XWiki.XWikiUsers", "admin", "editor=users&space=XWiki")",
+    "grayed"        : "$grayed"
   }
 #end
 ]}

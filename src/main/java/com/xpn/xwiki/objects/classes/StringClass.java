@@ -34,6 +34,9 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiException;
+
 public class StringClass extends PropertyClass
 {
 
@@ -62,7 +65,17 @@ public class StringClass extends PropertyClass
     {
         setIntValue("size", size);
     }
+    
+    public boolean isPicker()
+    {
+        return (getIntValue("picker") == 1);
+    }
 
+    public void setPicker(boolean picker)
+    {
+        setIntValue("picker", picker ? 1 : 0);
+    }
+    
     public BaseProperty fromString(String value)
     {
         BaseProperty property = newProperty();
@@ -90,6 +103,26 @@ public class StringClass extends PropertyClass
         input.setName(prefix + name);
         input.setID(prefix + name);
         input.setSize(getSize());
+        
+        if(isPicker()) {
+        	input.addAttribute("autocomplete", "off");
+        	String path = "";
+        	try {
+           	 	XWiki xwiki = context.getWiki();
+           	 	path = xwiki.getURL("Main.WebHome", "view", context);
+        	} catch(XWikiException e) {
+        		e.printStackTrace();
+        	  }
+        	
+        	String classname = this.getObject().getName();
+       	 	String fieldname = this.getName();
+       	 	String secondCol = "-", firstCol = "-";
+       	 	
+       	 	String script = "\""+path+"?xpage=suggest&amp;classname="+classname+"&amp;fieldname="+fieldname+"&amp;firCol="+firstCol+"&amp;secCol="+secondCol+"&amp;\"";
+    	 	String varname = "\"input\"";
+    	 	input.setOnFocus("new ajaxSuggest(this, {script:"+script+", varname:"+varname+"} )");
+        }
+        
         buffer.append(input.toString());
     }
 

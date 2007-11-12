@@ -662,20 +662,8 @@ final class WikiManager
         // Create database/schema
         try {
             xwiki.getStore().createWiki(targetWiki, context);
-        } catch (XWikiException e) {
-            if (LOG.isErrorEnabled()) {
-                if (e.getCode() == 10010) {
-                    LOG.error(msg.get(WikiManagerMessageTool.LOG_DATABASEALREADYEXISTS,
-                        targetWiki));
-                } else if (e.getCode() == 10011) {
-                    LOG.error(msg.get(WikiManagerMessageTool.LOG_DATABASECREATION, targetWiki));
-                } else {
-                    LOG.error(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION,
-                        targetWiki), e);
-                }
-            }
         } catch (Exception e) {
-            LOG.error(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki),
+            LOG.warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki),
                 e);
         }
 
@@ -906,7 +894,6 @@ final class WikiManager
         wikiSuperDocument.setVisibility(XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE);
 
         // Create empty wiki
-        WikiManager.getInstance().createNewWikiFromPackage(wikiSuperDocument, packageName, false,
-            comment, context);
+        createNewWikiFromPackage(wikiSuperDocument, packageName, false, comment, context);
     }
 }

@@ -1,0 +1,123 @@
+$response.setContentType("application/x-json")
+#set( $offset = $xwiki.parseInt( $request.get( "offset" ) ) )
+## offset starts from 0 in velocity and 1 in javascript
+#set( $off = $offset - 1 )
+#set( $limit = $xwiki.parseInt( $request.get( "limit" ) ) )
+
+#set( $rm = $xwiki.rightsmanager )
+
+#### get all the request parameters which are filters
+#set( $params = $request.getParameterMap() )
+#set( $keys = $params.keySet() )
+#set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reg", "admin", "progr", "uorg", "clsname", "space"] )
+#set( $docProps = ["fullName", "name"] )
+#set( $filterMap = $xwiki.hashMap )
+#set( $orderList = $xwiki.arrayList )
+
+#foreach( $key in $keys )
+  #if(! $defaultKeys.contains( $key ) )
+     ## build the filters map
+     #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
+     #if( $docProps.contains( $key )) 
+        #set( $arr = $xwiki.arrayList )
+        #set( $discard = $arr.add( null ) ) ## this may be variable...
+        #set( $discard = $arr.add( "$value" ) )
+        #set( $discard = $filterMap.put("$key", $arr))
+        #set( $discard = $orderList.add( "$key" ))
+     #else
+        #set( $arr = $xwiki.arrayList )
+        #set( $discard = $arr.add( "StringProperty" ) ) ## this may be variable...
+        #set( $discard = $arr.add( "$value" ) )
+        #set( $discard = $filterMap.put("$key", $arr))
+		#set( $arr2 = $xwiki.arrayList )
+        #set( $discard = $arr2.add( "$key" ) )
+        #set( $discard = $arr2.add( "StringProperty" ) )
+        #set( $discard = $orderList.add( $arr2 ))
+     #end 
+  #elseif( $key == "uorg" )
+     #foreach( $i in $params.get( $key ) ) #set( $uorg = $i ) #end
+  #elseif( $key == "admin" )
+     #foreach( $i in $params.get( $key ) ) #set( $a = $i ) #end
+  #elseif( $key == "progr" )
+     #foreach( $i in $params.get( $key ) ) #set( $p = $i ) #end
+  #elseif( $key == "reg" )
+     #foreach( $i in $params.get( $key ) ) #set( $r = $i ) #end
+  #elseif( $key == "clsname" )
+     #foreach( $i in $params.get( $key ) ) #set( $clsname = $i ) #end
+  #end
+#end
+
+#if($orderList.size() == 0)
+#set($disc = $orderList.add("name")) ## initially fiter by "name" !!!
+#end
+
+#foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
+#if( $value == "local" )
+  #if($uorg == "users")
+    #set( $users = $rm.usersApi.getAllMatchedLocalUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.usersApi.countAllMatchedLocalUsers( $filterMap ) )
+  #else
+    #set( $users = $rm.groupsApi.getAllMatchedLocalGroups( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.groupsApi.countAllMatchedLocalGroups( $filterMap ) )
+  #end
+#elseif( $value == "global" )
+  #if($uorg == "users")
+    #set( $users = $rm.usersApi.getAllMatchedGlobalUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.usersApi.countAllMatchedGlobalUsers( $filterMap ) )
+  #else
+    #set( $users = $rm.groupsApi.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.groupsApi.countAllMatchedGlobalGroups( $filterMap ) )
+  #end
+#else  
+  ## get both local and global users
+  #if($uorg == "users")
+    #set( $users = $rm.usersApi.getAllMatchedUsers( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.usersApi.countAllMatchedUsers( $filterMap ) )
+  #else
+    #set( $users = $rm.groupsApi.getAllMatchedGroups( $filterMap, $limit, $off, $orderList ) )
+    #set( $countUsers = $rm.groupsApi.countAllMatchedGroups( $filterMap ) )
+  #end
+#end
+
+#set( $clsname = $request.get("clsname") )
+
+### json starts
+{ 
+"totalrows": $countUsers,
+"returnedrows": #if($countUsers < $limit) $countUsers #else $limit #end,
+"offset"   : $offset,
+"admin"    : $a,
+"progr"    : $p,
+"reg"      : $r,
+"clsname"  : "$clsname",
+"uorg"     : "$uorg",
+"rows": [
+#foreach( $user in $users )
+   #set($wikiname = $user.getWiki())
+   #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+   #set($allows = "")
+   #set($denys = "")
+   #if( $velocityCount > 1 ) , #end 
+   ## get the rights for that user or group
+   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
+      #set($pers = "$!obj.getProperty($uorg).getValue()")
+      #if(($pers != "") && ($pers.matches("^(.*,)?${user.fullName}(,.*)?$")) )  
+        #if($obj.getProperty('allow').getValue() == 1)
+          #set($allows = "$!obj.getProperty('levels').getValue()")
+        #else
+          #set($denys = "$!obj.getProperty('levels').getValue()")
+        #end
+      #end
+   #end ## second foreach
+   {"username"   : "$user.name", 
+    "fullname"   : "$user.fullName",
+    "wikiname"   : "$wikiname", 
+    "userurl"    : "$xwiki.getURL($user.fullName)",
+    "allows"     : "$allows",
+    "denys"      : "$denys"
+  }
+#end
+]}
+
+### end of json
+

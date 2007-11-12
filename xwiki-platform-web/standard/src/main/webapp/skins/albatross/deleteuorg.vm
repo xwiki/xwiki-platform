@@ -1,0 +1,3 @@
+#set($docname = $request.get("docname"))
+#set($d = $xwiki.getDocument($docname))
+$d.delete()

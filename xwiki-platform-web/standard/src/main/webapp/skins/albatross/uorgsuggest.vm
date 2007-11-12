@@ -1,0 +1,40 @@
+$response.setContentType("text/xml")
+<?xml version="1.0" encoding="UTF-8"?>
+<results>
+#set($input = $request.get("input").toLowerCase())
+#set($indx = $input.indexOf("."))
+#set($next = $indx + 1)
+#if($indx > 0) #set($input = $input.substring($next)) #end #### only if use name
+#set($uorg = $request.get("uorg"))
+#set($wiki = $request.get("wiki"))
+
+#set( $filterMap = $xwiki.hashMap )
+#set( $arr = $xwiki.arrayList )
+#set( $discard = $arr.add( null ) ) 
+#set( $discard = $arr.add( "$input" ) )
+#set( $discard = $filterMap.put("name", $arr))
+
+#if($uorg == "user")
+   #if($wiki == "local")
+	  #set($allUsers = $xwiki.rightsmanager.usersApi.getAllMatchedLocalUsersNames($filterMap))
+	#else
+		#set($allUsers = $xwiki.rightsmanager.usersApi.getAllMatchedGlobalUsersNames($filterMap))
+	#end
+	#if($allUsers.size() > 0)
+		#foreach($user in $allUsers)
+			<rs id="" info="">$user</rs>
+		#end
+	#end
+	#else ## groups
+	   #if($wiki == "local")
+			#set($allUsers = $xwiki.rightsmanager.groupsApi.getAllMatchedLocalGroupsNames($filterMap))
+		#else
+		   #set($allUsers = $xwiki.rightsmanager.groupsApi.getAllMatchedGlobalGroupsNames($filterMap))
+		#end
+		#if($allUsers.size() > 0)
+		#foreach($user in $allUsers)
+			<rs id="" info="">$user</rs>
+		#end
+	#end
+#end
+</results>

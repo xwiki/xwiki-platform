@@ -58,6 +58,12 @@
           </resourceBundles>
           <properties>
             <xwikiDbConnectionUrl>none</xwikiDbConnectionUrl>
+            <xwikiCfgAdditionalProperties>
+# Decide what UI interface to use for Rights Management.
+# Possible values are: "new", "stable".
+# Uncomment to use the new old UI.
+# xwiki.rights.defaultui=stable
+            </xwikiCfgAdditionalProperties>
           </properties>
         </configuration>
       </plugin>

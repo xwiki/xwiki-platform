@@ -26,6 +26,10 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+
 public class StaticListMetaClass extends ListMetaClass {
 
 
@@ -39,6 +43,13 @@ public class StaticListMetaClass extends ListMetaClass {
         values_class.setPrettyName("Values");
         values_class.setSize(40);
         safeput("values", values_class);
+        
+        BooleanClass picker_class = new BooleanClass(this);
+        picker_class.setName("picker");
+        picker_class.setPrettyName("Use Suggest");
+        picker_class.setDisplayType("yesno");
+        picker_class.setUnmodifiable(true);
+        safeput("picker", picker_class);
     }
 
     public BaseCollection newObject(XWikiContext context) {

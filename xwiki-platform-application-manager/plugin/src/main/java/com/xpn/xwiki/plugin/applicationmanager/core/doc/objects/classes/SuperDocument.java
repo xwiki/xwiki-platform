@@ -52,13 +52,6 @@ public interface SuperDocument
     void reload(XWikiContext context) throws XWikiException;
 
     /**
-     * Merge two documents BaseObject.
-     * 
-     * @param sdoc the document to merge.
-     */
-    void mergeBaseObject(SuperDocument sdoc);
-
-    /**
      * @return the class manager for this document.
      */
     SuperClass getSuperClass();

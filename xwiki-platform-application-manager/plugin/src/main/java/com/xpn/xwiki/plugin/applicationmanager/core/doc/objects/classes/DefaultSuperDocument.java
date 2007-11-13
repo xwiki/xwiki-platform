@@ -116,11 +116,12 @@ public class DefaultSuperDocument extends Document implements SuperDocument
 
             BaseObject object = getDoc().newObject(this.sclass.getClassFullName(), context);
 
-            Document docTemplate = this.sclass.getClassTemplateDocument(context);
-            Object templateObject = docTemplate.getObject(this.sclass.getClassFullName());
+            XWikiDocument docTemplate =
+                context.getWiki().getDocument(this.sclass.getClassTemplateFullName(), context);
+            BaseObject templateObject = docTemplate.getObject(this.sclass.getClassFullName());
 
             if (templateObject != null) {
-                object.merge(templateObject.getXWikiObject());
+                object.merge(templateObject);
             }
 
             if (super.isNew()) {
@@ -131,26 +132,27 @@ public class DefaultSuperDocument extends Document implements SuperDocument
             this.isNew = true;
         }
     }
-    
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument#getDocumentApi()
      */
     public Document getDocumentApi()
     {
         return this;
     }
-    
+
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument#getObjectId()
      */
-    public int getObjectId() {
+    public int getObjectId()
+    {
         return this.objectId;
     }
-    
+
     /**
      * {@inheritDoc}
      * 
@@ -183,17 +185,17 @@ public class DefaultSuperDocument extends Document implements SuperDocument
     }
 
     /**
-     * {@inheritDoc}
+     * Merge two documents BaseObject.
      * 
-     * @see SuperDocument#mergeBaseObject(SuperDocument)
+     * @param sdoc the document to merge.
      */
-    public void mergeBaseObject(SuperDocument sdoc)
+    public void mergeObject(DefaultSuperDocument sdoc)
     {
         if (getSuperClass() != sdoc.getSuperClass()) {
             return;
         }
 
-        getBaseObject(true).merge(sdoc.getObjectApi().getXWikiObject());
+        getBaseObject(true).merge(sdoc.getBaseObject(false));
     }
 
     /**
@@ -240,8 +242,7 @@ public class DefaultSuperDocument extends Document implements SuperDocument
             doc.removeObject(getBaseObject(false));
             save();
         }
-        
-        
+
         this.isNew = true;
     }
 

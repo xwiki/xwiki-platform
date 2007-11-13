@@ -7,7 +7,7 @@ div.scrollbar {
     padding:0px;
     width: 25px;
     left: -10px;
-    _left: -5px;
+    /* _left: -5px; css hack for ie! */
     position: relative;
 }
 

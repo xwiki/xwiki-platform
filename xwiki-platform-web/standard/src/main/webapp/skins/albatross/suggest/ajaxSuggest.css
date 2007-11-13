@@ -79,7 +79,6 @@ div.ajaxsuggest ul li a
 	display: block;
 	text-decoration: none;
 	background-color: transparent;
-	text-shadow: #000 0px 0px 5px;
 	position: relative;
 	padding: 0;
 	width: 100%;
@@ -130,7 +129,6 @@ div.ajaxsuggest ul li.as_highlight a span
 div.ajaxsuggest ul li a .tl,
 div.ajaxsuggest ul li a .tr
 {
-	background-image: transparent;
 	background-repeat: no-repeat;
 	width: 6px;
 	height: 6px;

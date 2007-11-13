@@ -185,7 +185,7 @@ final class ApplicationManager
             (XWikiApplication) XWikiApplicationClass.getInstance(context).newSuperDocument(
                 docToSave, 0, context);
 
-        appSuperDocToSave.mergeBaseObject(userAppSuperDoc);
+        appSuperDocToSave.mergeObject(userAppSuperDoc);
 
         appSuperDocToSave.save(comment);
 

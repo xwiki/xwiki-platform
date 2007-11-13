@@ -626,7 +626,7 @@ final class WikiManager
                 xwiki.getVirtualWikiMap().flushEntry(userWikiSuperDoc.getServer());
             }
 
-            wikiSuperDocToSave.mergeBaseObject(userWikiSuperDoc);
+            wikiSuperDocToSave.mergeObject(userWikiSuperDoc);
         } else {
             wikiSuperDocToSave = userWikiSuperDoc;
         }

@@ -111,6 +111,7 @@
 
   #if(!$allwikinamelist)
     #set($allwikinamelist = [$context.mainWiki])
+
     #foreach($wikidoc in $wikilist)
       #set($added = $allwikinamelist.add($wikidoc.wikiName))
     #end

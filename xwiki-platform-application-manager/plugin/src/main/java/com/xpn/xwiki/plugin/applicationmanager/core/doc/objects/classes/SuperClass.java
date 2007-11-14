@@ -335,7 +335,19 @@ public interface SuperClass
         throws XWikiException;
 
     /**
-     * Create new super document containing object of class {@link #getClassFullName()} for each
+     * Create new super documents for each object of class {@link #getClassFullName()} for provided
+     * {@link XWikiDocument} and return it.
+     * 
+     * @param documents the list of {@link XWikiDocument}.
+     * @param context the XWiki context.
+     * @return the list of {@link SuperDocument}.
+     * @throws XWikiException error when calling SuperDocument implementation constructor.
+     */
+    List newSuperDocumentList(XWikiDocument documents, XWikiContext context)
+        throws XWikiException;
+
+    /**
+     * Create new super document for each object of class {@link #getClassFullName()} of each
      * {@link XWikiDocument} in the list and return it.
      * 
      * @param documents the list of {@link XWikiDocument}.

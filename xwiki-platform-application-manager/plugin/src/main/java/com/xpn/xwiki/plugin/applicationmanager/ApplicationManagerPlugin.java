@@ -21,9 +21,11 @@
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,7 +48,12 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
      * The logging tool.
      */
     protected static final Log LOG = LogFactory.getLog(ApplicationManagerPlugin.class);
-    
+
+    /**
+     * Notification rule on document create or modify.
+     */
+    private DocChangeRule docChangeRule;
+
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -60,6 +67,45 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     {
         super(name, className, context);
         init(context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
+     */
+    public void init(XWikiContext context)
+    {
+        if (docChangeRule == null) {
+            docChangeRule = new DocChangeRule(ApplicationManager.getInstance());
+        }
+
+        context.getWiki().getNotificationManager().addGeneralRule(docChangeRule);
+
+        String database = context.getDatabase();
+        try {
+            // FIXME : XWiki Platform 1.1.2 bug fixed in 1.1.3 (see
+            // http://jira.xwiki.org/jira/browse/XWIKI-1853)
+            context.getWiki().setDatabase(context.getMainXWiki());
+
+            context.setDatabase(context.getMainXWiki());
+            ApplicationManager.getInstance().updateAllApplicationTranslation(
+                "Referesh applications translations informations", context);
+        } catch (XWikiException e) {
+            LOG.error("Error when updating all applications translations informations", e);
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#flushCache(com.xpn.xwiki.XWikiContext)
+     */
+    public void flushCache(XWikiContext context)
+    {
+        context.getWiki().getNotificationManager().removeGeneralRule(docChangeRule);
     }
 
     /**
@@ -81,15 +127,5 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ApplicationManagerPluginApi((ApplicationManagerPlugin) plugin, context);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
-     */
-    public void init(XWikiContext context)
-    {
-        super.init(context);
     }
 }

@@ -21,6 +21,7 @@
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
@@ -47,7 +50,7 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
  * 
  * @version $Id: $
  */
-final class ApplicationManager
+final class ApplicationManager implements XWikiDocChangeNotificationInterface
 {
     /**
      * The logging tool.
@@ -100,6 +103,34 @@ final class ApplicationManager
         }
 
         return instance;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
+        int event, XWikiContext context)
+    {
+        try {
+            if (newdoc != null
+                && newdoc.getObjectNumbers(XWikiApplicationClass.getInstance(context)
+                    .getClassFullName()) > 0) {
+
+                List appList =
+                    XWikiApplicationClass.getInstance(context).newSuperDocumentList(newdoc,
+                        context);
+                updateApplicationsTranslation(appList,
+                    "Auto update translations informations from applications in "
+                        + newdoc.getFullName(), context);
+            }
+        } catch (XWikiException e) {
+            LOG.error("Error when updating translations informations from applications in "
+                + newdoc.getFullName(), e);
+        }
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -274,6 +305,7 @@ final class ApplicationManager
      * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of all
      * applications in the context's wiki.
      * 
+     * @param applications the applications for which to update translations informations.
      * @param comment a comment used when saving XWiki.
      * @param context the XWiki context.
      * @throws XWikiException error when :
@@ -283,8 +315,8 @@ final class ApplicationManager
      *             <li>or saving wiki preferences document.</li>
      *             </ul>
      */
-    public void updateAllApplicationTranslation(String comment, XWikiContext context)
-        throws XWikiException
+    public void updateApplicationsTranslation(Collection applications, String comment,
+        XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -298,9 +330,7 @@ final class ApplicationManager
 
         boolean updateprefs = false;
 
-        List applist = getApplicationList(context);
-
-        for (Iterator it = applist.iterator(); it.hasNext();) {
+        for (Iterator it = applications.iterator(); it.hasNext();) {
             XWikiApplication app = (XWikiApplication) it.next();
 
             updateprefs |= updateApplicationTranslation(translationPrefs, app);
@@ -311,6 +341,25 @@ final class ApplicationManager
                 translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
             xwiki.saveDocument(prefsDoc, comment, context);
         }
+    }
+
+    /**
+     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of all
+     * applications in the context's wiki.
+     * 
+     * @param comment a comment used when saving XWiki.
+     * @param context the XWiki context.
+     * @throws XWikiException error when :
+     *             <ul>
+     *             <li>getting wiki preferences document.</li>
+     *             <li>or searching for all applications in the wiki.</li>
+     *             <li>or saving wiki preferences document.</li>
+     *             </ul>
+     */
+    public void updateAllApplicationTranslation(String comment, XWikiContext context)
+        throws XWikiException
+    {
+        updateApplicationsTranslation(getApplicationList(context), comment, context);
     }
 
     /**

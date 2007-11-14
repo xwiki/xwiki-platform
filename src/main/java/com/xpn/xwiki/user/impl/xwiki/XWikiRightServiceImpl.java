@@ -643,7 +643,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         try {
             // The master user and programming rights are checked in the main wiki
-            context.setDatabase(context.getWiki().getDatabase());
+            context.setDatabase(context.getMainXWiki());
             XWikiDocument xwikimasterdoc = context.getWiki().getDocument("XWiki.XWikiPreferences", context);
 // Verify XWiki Master super user
             try {

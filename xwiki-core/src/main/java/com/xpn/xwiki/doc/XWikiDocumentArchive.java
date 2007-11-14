@@ -194,6 +194,8 @@ public class XWikiDocumentArchive
                     Version ver = nodeInfo.getVersion();
                     String xml = archive.getRevisionAsString(ver);
                     XWikiDocument doc = new XWikiDocument();
+                    // Some time in the past there was a bug in XWiki where version were starting at 1.2. When this
+                    // happens the returned xml has a value of "\n". Thus we simply skip it.
                     if (xml.length()>1) {
                         doc.fromXML(xml);
                         // set this fields from old document

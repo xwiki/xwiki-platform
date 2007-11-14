@@ -272,7 +272,74 @@ public class XWikiApplication extends DefaultSuperDocument
         return getAppName() + "-" + getAppVersion();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        return getAppName() != null ? getAppName().hashCode() : "".hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.api.Document#equals(java.lang.Object)
+     */
+    public boolean equals(Object object)
+    {
+        boolean equals = false;
+
+        if (object instanceof XWikiApplication) {
+            equals =
+                getAppName() == null ? ((XWikiApplication) object).getAppName() == null
+                    : getAppName().equalsIgnoreCase(((XWikiApplication) object).getAppName());
+        } else if (object instanceof String) {
+            equals =
+                getAppName() == null ? object == null : getAppName().equalsIgnoreCase(
+                    (String) object);
+        }
+
+        return equals;
+    }
+
     // ///
+
+    /**
+     * Add all applications on which current application depend.
+     * 
+     * @param rootApplication the root application containing recursively all in
+     *            <code>applicationList</code>.
+     * @param applicationList the applications.
+     * @param recurse if true it add recursively all applications dependencies, if false return only
+     *            direct dependencies.
+     * @param context the XWiki context.
+     * @throws XWikiException error when getting application descriptor document from the database.
+     * @see #getApplications()
+     */
+    protected void addXWikiApplicationSet(XWikiApplication rootApplication,
+        Collection applicationList, boolean recurse, XWikiContext context) throws XWikiException
+    {
+        List applications = getApplications();
+        for (Iterator it = applications.iterator(); it.hasNext();) {
+            String appname = (String) it.next();
+
+            // Breaks infinite loop if application contains itself in its dependencies at any level.
+            if ((rootApplication == null || !rootApplication.equals(appname))
+                && !applicationList.contains(appname)) {
+                XWikiApplication app =
+                    ((XWikiApplicationClass) sclass).getApplication(appname, true, context);
+                applicationList.add(app);
+
+                if (recurse) {
+                    app
+                        .addXWikiApplicationSet(rootApplication, applicationList, recurse,
+                            context);
+                }
+            }
+        }
+    }
 
     /**
      * Get set of XWikiApplication containing all applications on which current application depend.
@@ -289,18 +356,7 @@ public class XWikiApplication extends DefaultSuperDocument
     {
         Set applicationSet = new HashSet();
 
-        List applications = getApplications();
-        for (Iterator it = applications.iterator(); it.hasNext();) {
-            XWikiApplication app =
-                ((XWikiApplicationClass) sclass)
-                    .getApplication((String) it.next(), true, context);
-            applicationSet.add(app);
-
-            if (recurse) {
-                applicationSet.addAll(app.getXWikiApplicationSet(recurse, context));
-            }
-
-        }
+        addXWikiApplicationSet(this, applicationSet, recurse, context);
 
         return applicationSet;
     }

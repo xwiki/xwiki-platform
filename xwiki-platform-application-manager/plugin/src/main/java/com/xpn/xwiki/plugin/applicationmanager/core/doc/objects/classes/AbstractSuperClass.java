@@ -670,8 +670,9 @@ public abstract class AbstractSuperClass implements SuperClass
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#getSuperDocument(java.lang.String, int, boolean, com.xpn.xwiki.XWikiContext)
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#getSuperDocument(java.lang.String,
+     *      int, boolean, com.xpn.xwiki.XWikiContext)
      */
     public SuperDocument getSuperDocument(String itemName, int objectId, boolean validate,
         XWikiContext context) throws XWikiException
@@ -709,7 +710,7 @@ public abstract class AbstractSuperClass implements SuperClass
         parameterValues.add(getClassTemplateFullName());
 
         String andSymbol = " and ";
-        
+
         if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {
                 String fieldName = fieldDescriptors[i][0];
@@ -824,6 +825,21 @@ public abstract class AbstractSuperClass implements SuperClass
     public SuperDocument newSuperDocument(XWikiContext context) throws XWikiException
     {
         return newSuperDocument(new XWikiDocument(), 0, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass#newSuperDocumentList(com.xpn.xwiki.doc.XWikiDocument,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public List newSuperDocumentList(XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        List documents = new ArrayList(1);
+        documents.add(document);
+        
+        return newSuperDocumentList(documents, context);
     }
 
     /**

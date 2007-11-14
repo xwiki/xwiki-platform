@@ -185,6 +185,7 @@ public class XWikiDocumentArchive
             XWikiRCSArchive archive = new XWikiRCSArchive(text);
             resetArchive();
             Collection nodes = archive.getNodes(getId());
+            boolean addNodeInfo = true;
             for (Iterator it = nodes.iterator(); it.hasNext();) {
                 XWikiRCSNodeInfo    nodeInfo    = (XWikiRCSNodeInfo) it.next();
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
@@ -193,13 +194,15 @@ public class XWikiDocumentArchive
                     Version ver = nodeInfo.getVersion();
                     String xml = archive.getRevisionAsString(ver);
                     XWikiDocument doc = new XWikiDocument();
-                    doc.fromXML(xml);
-                    // set this fields from old document
-                    nodeInfo.setAuthor(doc.getAuthor());
-                    nodeInfo.setComment(doc.getComment());
-                    nodeInfo.setDate(doc.getDate());
+                    if (xml.length()>1) {
+                        doc.fromXML(xml);
+                        // set this fields from old document
+                        nodeInfo.setAuthor(doc.getAuthor());
+                        nodeInfo.setComment(doc.getComment());
+                        nodeInfo.setDate(doc.getDate());
+                    }
                 }
-                
+
                 updateNode(nodeInfo);
                 updatedNodeInfos.add(nodeInfo);
                 updatedNodeContents.add(nodeContent);

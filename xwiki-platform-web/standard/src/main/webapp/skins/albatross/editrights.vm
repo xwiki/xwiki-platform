@@ -148,7 +148,7 @@
         var chbx4 = new MSCheckbox(document.getElementById('tddelete'), "delete", "${saveUrl}", "${r4}"); 
         ##//var chbx5 = new MSCheckbox(document.getElementById('tdregister'), "register", "${saveUrl}", "${r5}"); 
         ##//var chbx6 = new MSCheckbox(document.getElementById('tdadmin'), "admin", "${saveUrl}", "${r6}"); 
-        if(document.getElementById('tdprogr')) var chbx7 = new MSCheckbox(document.getElementById('tdprogr'), "programming", "${saveUrl}", "${r7}"); 
+        if(document.getElementById('tdprogr')) var chbx7 = new MSCheckbox(document.getElementById('tdprogr'), "programming", "$saveUrl", "$r7"); 
 </script>
 
 ############ display the old interface

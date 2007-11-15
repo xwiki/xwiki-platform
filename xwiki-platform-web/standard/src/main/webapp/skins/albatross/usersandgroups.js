@@ -48,6 +48,7 @@ ASSTable.prototype = {
       onSuccess: function( transport ) {
         $('ajax-loader').style.display = "none";
         var res = eval( '(' + transport.responseText + ')');
+        
         if(res.totalrows <= res.returnedrows)
           pivot.scroller.domNode.style.display = "none";
         else
@@ -76,7 +77,7 @@ ASSTable.prototype = {
   },
     
   displayRows: function( offset, limit ) { 
-  	
+  		
     var f = offset + limit - 1;
     if(f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0 ) ? offset : 0;
@@ -90,13 +91,14 @@ ASSTable.prototype = {
       this.domNode.appendChild( elem );
     }
 
-    var raport = this.totalRows / limit;
-    var outheight = this.domNode.parentNode.offsetHeight; 
-    // the header?
-    var inheight = Math.round(outheight * raport) + 10;
-      
-    this.scroller.domNode.style.height = outheight + "px";
-    this.scroller.domNode.firstChild.style.height = inheight + "px";
+    	var raport = this.totalRows / limit;
+    	var outheight = this.domNode.parentNode.offsetHeight; 
+    	// the header?
+    	var inheight = Math.round(outheight * raport)+10;
+    	this.scroller.domNode.style.height = outheight + "px";
+    	this.scroller.domNode.firstChild.style.height = inheight + "px";
+    	this.scroller.domNode.style.display = "block";
+
   },
 
   showRows: function( offset, limit )
@@ -133,7 +135,7 @@ ASSTable.prototype = {
     //we need get new rows
     else
     {
-      buff += 'we need to get rows '+min+' to '+(max+1)+' <br />\n';
+      buff += 'we need to get rows '+min+' to '+ (max+1) +' <br />\n';
       this.getRows( min, max - min + 1, offset, limit );
     }
     return buff;        
@@ -165,9 +167,9 @@ ASSTable.prototype = {
     //compute new refresh offset
     var newoffset = this.lastoffset;
     if(indx > this.totalRows - this.limit - 1)
-    newoffset -= 1;
+    	newoffset -= 1;
     if(newoffset <= 0)
-    newoffset = 1;
+    	newoffset = 1;
     this.totalRows -= 1;
     this.showRows(newoffset, this.limit);
     this.scroller.refreshScrollbar();
@@ -330,6 +332,7 @@ ASSScroller.prototype = {
   { 
     var raport = this.table.totalRows / this.table.limit;
     var outheight = this.table.domNode.parentNode.offsetHeight; 
+    //
     var inheight = Math.round(outheight * raport);
       
     this.domNode.style.height = outheight + "px";
@@ -398,8 +401,7 @@ ASSFilter.prototype = {
     
   refreshContent : function()
   {
-    this.table.filters = this.getFilters();
-        
+    this.table.filters = this.getFilters();  
     this.table.totalRows = -1;
     this.table.fetchedRows = new Array();
     this.table.showRows(1, this.table.limit);
@@ -432,17 +434,17 @@ MSCheckbox.prototype = {
 
   draw: function(state)
   {
-                  //remove image
+    //remove image
     if(this.domNode.childNodes.length > 0) 
       this.domNode.removeChild( this.domNode.firstChild );
-                //remove label
+    //remove label
     if(this.domNode.childNodes.length > 0)
       this.domNode.removeChild( this.domNode.lastChild );
-                //add new image
+    //add new image
     var img = document.createElement('img');
     img.src = this.images[ state ];
     this.domNode.appendChild( img );
-                //add label
+    //add label
     if( this.labels[ state ] != '')
     {
       var la = document.createElement('span');

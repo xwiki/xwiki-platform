@@ -8,8 +8,19 @@
   background: #EEF3F6 none repeat scroll 0% 50%;
   height: 1px;
   border-width: 0 1px;
+  margin: 0;
+  padding: 0;
+  zoom: 1;
+  line-height: 1px;
   }
+.rounded, .rounded .top, .rounded .bottom {
+  height: 16px ;
+}
 
+	
+.roundedlight, .roundedlight .top, .roundedlight .bottom {
+  height: 5px ;
+}
 .roundedlight .b1, .roundedlight .b1b { background: #A9B6C3 none repeat scroll 0% 50%; margin: 0 5px; border-width: 0; }
 .roundedlight .b2, .roundedlight .b2b { border-width: 0 2px; margin: 0 3px; }
 .roundedlight .b3, .roundedlight .b3b { margin: 0pt 2px; }
@@ -31,10 +42,11 @@
   background-color: #000;
   height: 100%;
   left: 0;
-  position: fixed;
+  position:absolute;
   top: 0;
   width: 100%;
   z-index: 100000;
+  filter: alpha(opacity=70);
   opacity: 0.7;
   overflow: auto;
 }
@@ -44,7 +56,7 @@
 }
 
 #lb button{
-    cursor: pointer;
+    cursor: hand;
 }
 
 #lb-align {
@@ -74,7 +86,9 @@
   text-align: center;
 }
 
-
+#lb ul li {
+    _zoom:1;
+}
 #lb-top {}
 #lb-bottom {}
 .lb-squarred {
@@ -94,26 +108,27 @@
   margin-top: 0;
   padding-top: 0;
 }
+<!-- IE sucks -->
 
-
-*+html #lb-top .roundedlight, * html #lb-top .roundedlight {
-  margin-top: -1em;
-}
-
-* html #lb-bottom .roundedlight {
-  margin-top: -1em;
-}
-
-*+html #lb-top .rounded, * html #lb-top .rounded {
-  margin-top: -1em;
+#lb-top .roundedlight {
+  _margin-bottom: -0.15em;
+  _margin-top: -0.9em;
 }
 
 
-/* *+html #lb-bottom .rounded, */
-* html #lb-bottom .rounded {
-  margin-top: 0em; /* avant -1em*/
+#lb-bottom .roundedlight {
+  margin-top: -0.75em;
 }
 
+#lb-top .rounded {
+  margin-bottom: 0em;/* avant 0.1  pour IE7 ?*/
+  margin-top: 0em; /* avant 0.3  pour IE7 ?*/
+}
+
+
+#lb-bottom .rounded {
+  margin-top: -0.2em;
+}
 
 *+html #lb-top .rounded .b1, * html #lb-top .rounded .b1, *+html
 #lb-top .roundedlight .b1, * html #lb-top .roundedlight .b1 {
@@ -137,11 +152,12 @@
 }
 
 .lbClose {
-	position: absolute;
+	position: relative;
 	top: 20px;
 	right: 20px;
 	width: 30px;
 	cursor: pointer;
+	z-index: 100007;
 	background-image: url("$xwiki.getSkinFile("icons/rights-manager/btnClose.png")");
 	background-repeat: no-repeat;
 }

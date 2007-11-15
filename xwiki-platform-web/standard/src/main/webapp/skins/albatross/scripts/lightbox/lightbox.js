@@ -4,7 +4,7 @@ Lightbox.prototype =  {
 	initialize: function(formUrl, saveUrl, redirectUrl) {
   		this.formUrl = formUrl;
   		this.saveUrl = saveUrl;
-                this.redirectUrl = redirectUrl;
+      this.redirectUrl = redirectUrl;
   		this.formData = "";
   		this.loadedForms = new Object();
   		this.lbinit();
@@ -151,41 +151,31 @@ Lightbox.prototype =  {
     		return str;
 	},
 
-        roundedlightbottom:  function(bgcolor, bordercolor) {
+    roundedlightbottom:  function(bgcolor, bordercolor) {
 		var str = '<div class="roundedlight"><b class="top">' + 
-              		'<b class="b4b" style="background:' + bordercolor + ';"></b>' +
-              		'<b class="b3b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b3b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b1b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b></b> </div>';
+              '<b class="b4b" style="background:' + bordercolor + ';"></b>' +
+              '<b class="b3b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b3b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b1b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b></b> </div>';
     		return str;
-	},
-
-
-	roundedlightbottom: function(bgcolor) {
-		return this.roundedlightbottom(bgcolor, "");
-	},
-
-
-	roundedlightbottom: function(bgcolor, bordercolor) {
-		return this.roundedlightbottom(bgcolor, bordercolor);
 	},
 
 	roundedbottom: function(bgcolor, bordercolor) {
 		var str = '<div class="rounded">' +
-              		'<b class="bottom">' +
-              		'<b class="b12b" style="background:' + bordercolor +';"></b>' +
-              		'<b class="b11b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b10b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b9b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b8b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b7b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b6b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b5b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b4b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b3b" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b2b" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'<b class="b1b" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-              		'</b></div>';
+              '<b class="bottom">' +
+              '<b class="b12b" style="background:' + bordercolor +';"></b>' +
+              '<b class="b11b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b10b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b9b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b8b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b7b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b6b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b5b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b4b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b3b" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b2b" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '<b class="b1b" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+              '</b></div>';
     		return str;
 	},
 
@@ -195,7 +185,7 @@ Lightbox.prototype =  {
 	          	'<b class="b2" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
 	          	'<b class="b3" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
 	          	'<b class="b4" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b></b> </div>';
-    		return str;
+    return str;
 	},
 
 	roundedtop: function(bgcolor, bordercolor) {
@@ -205,15 +195,15 @@ Lightbox.prototype =  {
               		'<b class="b2" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
               		'<b class="b3" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
               		'<b class="b4" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-					'<b class="b5" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-					'<b class="b6" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+									'<b class="b5" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+									'<b class="b6" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
               		'<b class="b7" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
               		'<b class="b8" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-					'<b class="b9" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-					'<b class="b10" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-					'<b class="b11" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-					'<b class="b12" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
-					'</b></div>';
+									'<b class="b9" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+									'<b class="b10" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+									'<b class="b11" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+									'<b class="b12" style="background:'+ bgcolor + '; border-color:' + bordercolor + ';"></b>' +
+									'</b></div>';
     		return str;
 	},
 

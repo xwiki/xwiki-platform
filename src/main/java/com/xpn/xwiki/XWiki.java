@@ -657,7 +657,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Run migrations
         if ("1".equals(Param("xwiki.store.migration", "0"))) {
             if (LOG.isInfoEnabled())
-                LOG.info("Running migrations");
+                LOG.info("Running storage migrations");
             AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager)
                 createClassFromConfig( "xwiki.store.migration.manager.class",
                     "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);

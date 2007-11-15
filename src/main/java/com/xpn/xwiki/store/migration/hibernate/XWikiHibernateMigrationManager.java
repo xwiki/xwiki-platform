@@ -83,7 +83,6 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         List result = new ArrayList();
         // TODO: how to register migrations?
         // 1st way:
-        result.add(new R4326SampleMigrator());
         result.add(new R4340XWIKI883Migrator());
         result.add(new R4359XWIKI1459Migrator());
         // 2nd way - via classloader

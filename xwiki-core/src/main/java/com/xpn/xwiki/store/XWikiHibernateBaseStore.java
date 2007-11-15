@@ -292,8 +292,6 @@ public class XWikiHibernateBaseStore {
 
         DatabaseProduct databaseProduct = getDatabaseProductName(context);
 
-        wikiName = wikiName.toLowerCase();
-
         if (databaseProduct == DatabaseProduct.DERBY) {
             return wikiName.equalsIgnoreCase(context.getMainXWiki()) ? "APP" : wikiName
                 .replace('-', '_');

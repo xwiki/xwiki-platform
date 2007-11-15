@@ -30,6 +30,16 @@ import com.xpn.xwiki.XWikiException;
 public interface XWikiMigratorInterface
 {
     /**
+     * @return the migrator name. For example "R4340XWIKI883". 
+     */
+    String getName();
+
+    /**
+     * @return a description of what the migrator does
+     */
+    String getDescription();
+
+    /**
      * @return data version which need migration. 
      * before you commit stuff which needs migration,
      *  you need write migrator with version = current svn revision number. 

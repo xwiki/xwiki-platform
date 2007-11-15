@@ -79,7 +79,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     {
         XWikiDBVersion curversion = getDBVersion(context);
         if (LOG.isInfoEnabled()) {
-            LOG.info("current data version = " + curversion.toString());
+            LOG.info("Current storage version = [" + curversion.toString() + "]");
         }
         try {
             Collection neededMigrations = getNeededMigrations(context);
@@ -99,12 +99,11 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     {
         XWikiDBVersion curversion = getDBVersion(context);
         SortedMap neededMigrations = new TreeMap();
-        String[] forcedMigrations = context.getWiki().getConfig()
-            .getPropertyAsList("xwiki.store.migration.force");
+        String[] forcedMigrations = context.getWiki().getConfig().getPropertyAsList("xwiki.store.migration.force");
         if (forcedMigrations.length > 0) {
             for (int i = 0; i < forcedMigrations.length; i++) {
-                XWikiMigratorInterface migrator = (XWikiMigratorInterface)
-                    Class.forName(forcedMigrations[i]).newInstance();
+                XWikiMigratorInterface migrator =
+                    (XWikiMigratorInterface) Class.forName(forcedMigrations[i]).newInstance();
                 neededMigrations.put(migrator.getVersion(), migrator); 
             }
         } else {
@@ -112,10 +111,10 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                 .getPropertyAsList("xwiki.store.migration.ignored")));
             List allMigrations = getAllMigrations(context);
             for (Iterator it = allMigrations.iterator(); it.hasNext();) {
-                XWikiMigratorInterface migrator = (XWikiMigratorInterface) 
-                    it.next();
+                XWikiMigratorInterface migrator = (XWikiMigratorInterface) it.next();
                 if (ignoredMigrations.contains(migrator.getClass().getName())
-                    || ignoredMigrations.contains(migrator.getVersion().toString())) {
+                    || ignoredMigrations.contains(migrator.getVersion().toString()))
+                {
                     continue;
                 }
                 if (migrator.getVersion().compareTo(curversion) >= 0) {
@@ -123,7 +122,17 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                 }
             }
         }
-        return neededMigrations.values(); 
+
+        Collection neededMigrationsAsCollection = neededMigrations.values();
+        if (LOG.isInfoEnabled()) {
+            LOG.info("List of migrations that will be executed:");
+            for (Iterator it = neededMigrationsAsCollection.iterator(); it.hasNext();) {
+                XWikiMigratorInterface migrator = (XWikiMigratorInterface) it.next();
+                LOG.info("  " + migrator.getName() + " - " + migrator.getDescription());
+            }
+        }
+
+        return neededMigrationsAsCollection; 
     }
     /**
      * @param migrations - run this migrations in order of collection
@@ -137,8 +146,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
         for (Iterator it = migrations.iterator(); it.hasNext();) {
             XWikiMigratorInterface migrator = (XWikiMigratorInterface) it.next();
             if (LOG.isInfoEnabled()) {
-                LOG.info("running migrator '" + migrator.getClass().getName()
-                    + "' with version " + migrator.getVersion());
+                LOG.info("Running migration [" + migrator.getName() + "] with version [" + migrator.getVersion() + "]");
             }
             migrate(migrator, context);
             if (migrator.getVersion().compareTo(curversion) > 0) {
@@ -158,7 +166,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     }
     /**
      * @param context used everywhere
-     * @return List of all {@link AbstractXWikiMigrator} for this manager
+     * @return List of all {@link XWikiMigratorInterface} for this manager
      * @throws XWikiException if any error
      */
     protected abstract List getAllMigrations(XWikiContext context) throws XWikiException;

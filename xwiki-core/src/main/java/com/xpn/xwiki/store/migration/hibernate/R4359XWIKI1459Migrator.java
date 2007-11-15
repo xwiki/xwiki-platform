@@ -6,6 +6,8 @@ import java.sql.Statement;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -19,6 +21,27 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
 {
+    /** logger. */
+    private static final Log LOG = LogFactory.getLog(R4359XWIKI1459Migrator.class);
+
+    /**
+     * {@inheritDoc}
+     * @see AbstractXWikiHibernateMigrator#getName()
+     */
+    public String getName()
+    {
+        return "R4359XWIKI1459";
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see com.xpn.xwiki.store.migration.hibernate.AbstractXWikiHibernateMigrator#getDescription()
+     */
+    public String getDescription()
+    {
+        return "See http://jira.xwiki.org/jira/browse/XWIKI-1459";
+    }
+
     /** {@inheritDoc} */
     public XWikiDBVersion getVersion()
     {
@@ -35,13 +58,16 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     Statement stmt = session.connection().createStatement();
                     ResultSet rs;
                     try {
-                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE from xwikidoc");
+                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc");
                     } catch (SQLException e) {
                         // most likely there is no XWD_ARCHIVE column, so migration is not needed
                         // is there easier way to find what column is not exist?
                         return null;
                     }
                     while (rs.next()) {
+                        if (LOG.isInfoEnabled()) {
+                            LOG.info("Updating document [" + rs.getString(3) + "]...");
+                        }
                         long docId = Long.parseLong(rs.getString(1));
                         String sArchive = rs.getString(2);
                         if (sArchive==null)
@@ -53,7 +79,7 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     stmt.close();
                 } catch (SQLException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, 
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, "XWIKI-1459 migration failed", e);
+                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
                 }
                 return Boolean.TRUE;
             }

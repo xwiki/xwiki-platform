@@ -58,10 +58,21 @@ public class XWikiMigrationManagerTest extends TestCase
         }
         private XWikiMigratorInterface createMigrator(final int ver) {
             return new XWikiMigratorInterface() {
+                public String getName()
+                {
+                    return "Test";
+                }
+
+                public String getDescription()
+                {
+                    return "Test";
+                }
+
                 public XWikiDBVersion getVersion()
                 {
                     return new XWikiDBVersion(ver);
                 }
+
                 public void migrate(XWikiMigrationManagerInterface manager, XWikiContext context)
                     throws XWikiException
                 {
@@ -108,6 +119,16 @@ public class XWikiMigrationManagerTest extends TestCase
     }
     
     public static class TestForceMigratior implements XWikiMigratorInterface {
+        public String getName()
+        {
+            return "Test";
+        }
+
+        public String getDescription()
+        {
+            return "Test";
+        }
+
         public XWikiDBVersion getVersion()
         {
             return new XWikiDBVersion(567);

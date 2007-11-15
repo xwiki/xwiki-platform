@@ -20,6 +20,24 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 public class R4340XWIKI883Migrator extends AbstractXWikiHibernateMigrator
 {
+    /**
+     * {@inheritDoc}
+     * @see AbstractXWikiHibernateMigrator#getName()
+     */
+    public String getName()
+    {
+        return "R4340XWIKI883";
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see com.xpn.xwiki.store.migration.hibernate.AbstractXWikiHibernateMigrator#getDescription()
+     */
+    public String getDescription()
+    {
+        return "See http://jira.xwiki.org/jira/browse/XWIKI-883";
+    }
+
     /** {@inheritDoc} */
     public XWikiDBVersion getVersion()
     {

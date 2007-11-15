@@ -30,6 +30,7 @@ import com.xpn.xwiki.api.Object;
  * 
  * @version $Id: $
  * @see SuperClass
+ * @future XA2 : rename to DocumentObject.
  */
 public interface SuperDocument
 {

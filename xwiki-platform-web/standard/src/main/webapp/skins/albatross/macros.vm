@@ -44,8 +44,12 @@
 ###
 #macro(displaypanel $name)
   #set ($pobj = "")
+  ## Since Velocity does not do any assignment if the RHS is null we need to reset the paneldoc
+  ## as otherwise the previously set panel will be displayed. getDocument() returns null if the
+  ## user doesn't have the right to view a document.
+  #set ($paneldoc = "")
   #set ($paneldoc = $xwiki.getDocument($name))
-  #if ($paneldoc && $paneldoc.fullName==$name)
+  #if ($paneldoc != "")
     #set ($pobj = $paneldoc.getObject("Panels.PanelClass"))
     #if (!$pobj)
       ## discarded

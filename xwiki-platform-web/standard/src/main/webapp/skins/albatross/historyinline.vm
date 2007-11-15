@@ -64,9 +64,11 @@
         #end
         #if($xwiki.hasMinorEdit())
           #if(!$request.getParameter("showminor"))
-            <div class="buttonwrapper"><a href="$tdoc.getURL("view","viewer=history&amp;showminor=1&amp;$docvariant")">$msg.get("core.minoredit.show")</a></div>
+            <div class="buttonwrapper"><input class="button" type="submit" name="viewminorversions" value="$msg.get("core.minoredit.show")"
+              onclick="document.forms.${formname}.action='$tdoc.getURL("view","viewer=history&amp;showminor=1&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #else
-            <div class="buttonwrapper"><a href="$tdoc.getURL("view","viewer=history&amp;$docvariant")">$msg.get("core.minoredit.hide")</a></div>
+            <div class="buttonwrapper"><input class="button" type="submit" name="hideminorversions" value="$msg.get("core.minoredit.hide")"
+              onclick="document.forms.${formname}.action='$tdoc.getURL("view","viewer=history&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #end
         #end
       </div>

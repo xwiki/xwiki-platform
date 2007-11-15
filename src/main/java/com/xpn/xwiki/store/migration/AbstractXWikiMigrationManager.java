@@ -151,6 +151,9 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
             migrate(migrator, context);
             if (migrator.getVersion().compareTo(curversion) > 0) {
                 setDBVersion(migrator.getVersion().increment(), context);
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("New storage version is now [" + getDBVersion(context) + "]");
+                }
             }
         }
     }

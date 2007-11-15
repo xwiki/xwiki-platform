@@ -37,9 +37,10 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * </ul>
  * 
  * @version $Id: $
- * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. When that issue is applied in XWiki Core
+ * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1576. When that issue is applied in XWiki Core
  *       and when this plugin moves to the version of XWiki Core where it was applied then remove
  *       this class.
+ * @future XA2 : rename to ClassManager.
  */
 public interface SuperClass
 {
@@ -281,6 +282,7 @@ public interface SuperClass
      * @throws XWikiException error when getting document from the database.
      * @see #getItemDefaultName(String)
      * @see #getItemDocumentDefaultFullName(String, XWikiContext)
+     * @future XA2 : rename to getDocumentObject.
      */
     SuperDocument getSuperDocument(String itemName, int objectId, boolean validate,
         XWikiContext context) throws XWikiException;
@@ -306,6 +308,7 @@ public interface SuperClass
      * @param context the XWiki context.
      * @return a new SuperDocument instance.
      * @throws XWikiException error when calling SuperDocument implementation constructor.
+     * @future XA2 : rename to newDocumentObject.
      */
     SuperDocument newSuperDocument(XWikiDocument doc, int objId, XWikiContext context)
         throws XWikiException;
@@ -317,6 +320,7 @@ public interface SuperClass
      * @param context the XWiki context.
      * @return a new SuperDocument instance.
      * @throws XWikiException error when calling SuperDocument implementation constructor.
+     * @future XA2 : rename to newDocumentObject.
      */
     SuperDocument newSuperDocument(XWikiContext context) throws XWikiException;
 
@@ -330,6 +334,7 @@ public interface SuperClass
      * @return a new SuperDocument instance.
      * @throws XWikiException error when calling SuperDocument implementation constructor.
      * @see #getClassFullName()
+     * @future XA2 : rename to newDocumentObject.
      */
     SuperDocument newSuperDocument(String docFullName, int objId, XWikiContext context)
         throws XWikiException;
@@ -342,6 +347,7 @@ public interface SuperClass
      * @param context the XWiki context.
      * @return the list of {@link SuperDocument}.
      * @throws XWikiException error when calling SuperDocument implementation constructor.
+     * @future XA2 : rename to newDocumentObjectList.
      */
     List newSuperDocumentList(XWikiDocument documents, XWikiContext context)
         throws XWikiException;
@@ -354,6 +360,7 @@ public interface SuperClass
      * @param context the XWiki context.
      * @return the list of {@link SuperDocument}.
      * @throws XWikiException error when calling SuperDocument implementation constructor.
+     * @future XA2 : rename to newDocumentObjectList.
      */
     List newSuperDocumentList(List documents, XWikiContext context) throws XWikiException;
 }

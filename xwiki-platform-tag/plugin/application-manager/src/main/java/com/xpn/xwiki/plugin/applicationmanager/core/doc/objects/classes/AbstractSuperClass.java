@@ -52,6 +52,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. When that issue is applied in XWiki Core
  *       and when this plugin moves to the version of XWiki Core where it was applied then remove
  *       this class.
+ * @future XA2 : rename to AbstractClassManager.
  */
 public abstract class AbstractSuperClass implements SuperClass
 {

@@ -33,6 +33,8 @@ import java.util.TreeSet;
 
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -49,6 +51,9 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  */
 public class XWikiDocumentArchive
 {
+    /** logger. */
+    private static final Log LOG = LogFactory.getLog(XWikiDocumentArchive.class);
+
     /** =docId. */
     private long id;
     /** SortedMap from Version to XWikiRCSNodeInfo. */
@@ -189,19 +194,28 @@ public class XWikiDocumentArchive
             for (Iterator it = nodes.iterator(); it.hasNext();) {
                 XWikiRCSNodeInfo    nodeInfo    = (XWikiRCSNodeInfo) it.next();
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
-                // if archive is old. (there is no author, comment, date fields in archive nodes)
+
+                // If the archive node is old there is no author, comment and date fields so we set them using the
+                // ones from a XWikiDocment object that we construct using the archive content.
                 if (nodeInfo.getAuthor() == null || nodeInfo.getAuthor().indexOf('.') < 0) {
                     Version ver = nodeInfo.getVersion();
                     String xml = archive.getRevisionAsString(ver);
-                    XWikiDocument doc = new XWikiDocument();
-                    // Some time in the past there was a bug in XWiki where version were starting at 1.2. When this
-                    // happens the returned xml has a value of "\n". Thus we simply skip it.
-                    if (xml.length()>1) {
+
+                    try {
+                        XWikiDocument doc = new XWikiDocument();
                         doc.fromXML(xml);
                         // set this fields from old document
                         nodeInfo.setAuthor(doc.getAuthor());
                         nodeInfo.setComment(doc.getComment());
                         nodeInfo.setDate(doc.getDate());
+                    } catch (Exception e) {
+                        // Two potential known errors:
+                        // 1) Revision 1.1 doesn't exist. Some time in the past there was a bug in XWiki where version
+                        //    were starting at 1.2. When this happens the returned xml has a value of "\n".
+                        // 2) A Class property with an invalid XML name was created.
+                        //    See http://jira.xwiki.org/jira/browse/XWIKI-1855
+                        LOG.warn("Error in revision [" + ver.toString() + "]: [" + e.getMessage()
+                            + "]. Ignoring non-fatal error.");
                     }
                 }
 

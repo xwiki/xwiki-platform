@@ -78,9 +78,6 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     public void startMigrations(XWikiContext context) throws XWikiException
     {
         XWikiDBVersion curversion = getDBVersion(context);
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Current storage version = [" + curversion.toString() + "]");
-        }
         try {
             Collection neededMigrations = getNeededMigrations(context);
             startMigrations(neededMigrations, context);
@@ -125,10 +122,15 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
 
         Collection neededMigrationsAsCollection = neededMigrations.values();
         if (LOG.isInfoEnabled()) {
-            LOG.info("List of migrations that will be executed:");
-            for (Iterator it = neededMigrationsAsCollection.iterator(); it.hasNext();) {
-                XWikiMigratorInterface migrator = (XWikiMigratorInterface) it.next();
-                LOG.info("  " + migrator.getName() + " - " + migrator.getDescription());
+            if (!neededMigrations.isEmpty()) {
+                LOG.info("Current storage version = [" + curversion.toString() + "]");
+                LOG.info("List of migrations that will be executed:");
+                for (Iterator it = neededMigrationsAsCollection.iterator(); it.hasNext();) {
+                    XWikiMigratorInterface migrator = (XWikiMigratorInterface) it.next();
+                    LOG.info("  " + migrator.getName() + " - " + migrator.getDescription());
+                }
+            } else {
+                LOG.info("No storage migration required since current version is [" + curversion.toString() + "]");
             }
         }
 

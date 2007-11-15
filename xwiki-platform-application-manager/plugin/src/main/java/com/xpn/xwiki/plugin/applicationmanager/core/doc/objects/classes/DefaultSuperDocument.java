@@ -38,6 +38,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id: $
  * @see SuperDocument
  * @see SuperClass
+ * @future XA2 : rename to DefaultDocumentObject.
  */
 public class DefaultSuperDocument extends Document implements SuperDocument
 {

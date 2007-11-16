@@ -28,7 +28,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>3-SNAPSHOT</version>
+    <version>2</version>
   </parent>
   <artifactId>xwiki-plugin-application-manager</artifactId>
   <name>XWiki Platform - Plugins - Application Manager</name>
@@ -36,6 +36,10 @@
   <description>
     XWiki Platform - Plugins - Application Manager
   </description>
+  <properties>
+    <platform.tools.version>1.7</platform.tools.version>
+    <platform.core.version>1.1.2</platform.core.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
@@ -43,7 +47,7 @@
       <!-- Currently this Application Manager plugin is used by XEM which is based on XWiki Core
         version 1.1.x, hence this dependency on 1.1.X and not on 1.2.x. If this becomes a
         problem we can branch this plugin. -->
-      <version>1.1-SNAPSHOT</version>
+      <version>${platform.core.version}</version>
     </dependency>
     <dependency>
       <groupId>jmock</groupId>
@@ -69,7 +73,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.6</version>
+            <version>${platform.tools.version}</version>
           </dependency>
         </dependencies>
       </plugin>

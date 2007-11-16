@@ -30,7 +30,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
  * Plugin for manipulating dates from velocity scripts inside xwiki documents. It is based on the
- * JodaTime framework ({@link http://joda-time.sourceforge.net/}), a quality replacement for the
+ * <a href="http://joda-time.sourceforge.net/">JodaTime framework</a>, a quality replacement for the
  * Java date and time classes.
  * 
  * @see JodaTimePluginApi

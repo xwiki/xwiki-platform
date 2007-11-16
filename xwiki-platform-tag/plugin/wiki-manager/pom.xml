@@ -22,8 +22,7 @@
  *
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>xwiki-plugins</artifactId>
@@ -32,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-wiki-manager</artifactId>
   <name>XWiki Platform - Plugins - Wiki Manager</name>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0-milestone-2</version>
   <description>XWiki Platform - Plugins - Wiki Manager</description>
   <properties>
     <platform.tools.version>1.7</platform.tools.version>
@@ -76,4 +75,10 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.0-milestone-2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.0-milestone-2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.0-milestone-2</url>
+  </scm>
 </project>

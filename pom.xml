@@ -503,7 +503,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
             <artifactId>xwiki-build-verifications</artifactId>
-            <version>1.7-SNAPSHOT</version>
+            <version>${platform.tools.version}</version>
           </dependency>
         </dependencies>
         <configuration>

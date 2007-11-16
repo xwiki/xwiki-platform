@@ -48,6 +48,10 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <properties>
+    <!-- Versions of XWiki dependencies used in Platform/Web modules -->
+    <platform.tools.version>1.7-SNAPSHOT</platform.tools.version>
+  </properties>
   <modules>
     <module>xwiki-core</module>
     <module>xwiki-component</module>

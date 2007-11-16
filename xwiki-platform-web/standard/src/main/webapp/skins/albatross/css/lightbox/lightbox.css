@@ -28,14 +28,15 @@
 .rounded .b12, .rounded .b12b { height: 3px; margin: 0 1px; }
 
 #lb-bg {
-  background-color: #000;
+  background-image: url("$xwiki.getSkinFile("icons/rights-manager/back.png")");
+  background-repeat: repeat;
   height: 100%;
-  left: 0;
-  position: fixed;
-  top: 0;
   width: 100%;
+  position: fixed;
+  left: 0;
+  top: 0;
   z-index: 100000;
-  opacity: 0.7;
+  /* opacity: 0.7; css3 property */
   overflow: auto;
 }
 
@@ -136,10 +137,16 @@
   text-align: left;
 }
 
-.lbClose {
-	position: absolute;
-	top: 20px;
-	right: 20px;
+#close-wrap {
+	position: relative;
+	top: 30px;
+	text-align: right;
+	cursor: default;
+}
+
+#lb-close {
+	margin-left: auto;
+	margin-right: 10px;
 	width: 30px;
 	cursor: pointer;
 	background-image: url("$xwiki.getSkinFile("icons/rights-manager/btnClose.png")");

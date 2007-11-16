@@ -136,7 +136,9 @@ Lightbox.prototype =  {
               		'<div id="lb-align" class="hidden">' + 
               		'<div id="lb">' +
               		'<div id="lb-top"><span id="lb-close">' +
-              		'<div class="lbClose" onclick="window.lb.lbHide(); window.lb.lbClearData(); return false;" title="Cancel and close">&nbsp;</div>' +
+              		'<div id="close-wrap">' + 
+              		'<div id="lb-close" onclick="window.lb.lbHide(); window.lb.lbClearData(); return false;" title="Cancel and close">&nbsp;</div>' +
+              		'</div>' + 
               		'</span>';
               
     		if(lbtype == "lightrounded") str += this.roundedlighttop(lbbgcolor, lbbordercolor);

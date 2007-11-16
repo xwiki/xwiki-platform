@@ -46,8 +46,8 @@
   top: 0;
   width: 100%;
   z-index: 100000;
-  filter: alpha(opacity=70);
-  opacity: 0.7;
+  /* filter: alpha(opacity=70);
+  opacity: 0.7; */
   overflow: auto;
 }
 
@@ -151,13 +151,18 @@
   text-align: left;
 }
 
-.lbClose {
+#close-wrap {
 	position: relative;
-	top: 20px;
-	right: 20px;
+	top: 30px;
+	text-align: right;
+	cursor: default;
+}
+
+#lb-close {
+	margin-left: auto;
+	margin-right: 10px;
 	width: 30px;
 	cursor: pointer;
-	z-index: 100007;
 	background-image: url("$xwiki.getSkinFile("icons/rights-manager/btnClose.png")");
 	background-repeat: no-repeat;
 }

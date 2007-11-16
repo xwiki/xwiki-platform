@@ -178,7 +178,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         scontext.setUser(cUser);
         scontext.setLanguage(cLang);
         scontext.setDatabase(cDb);
+        scontext.setMainXWiki(context.getMainXWiki());
         scontext.setVirtual(context.isVirtual());
+        scontext.put("msg", context.getMessageTool());
 
         com.xpn.xwiki.web.XWikiURLFactory xurf = context.getURLFactory();
         if (xurf == null) {

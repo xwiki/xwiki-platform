@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.plugin.PluginApi;
 import org.apache.velocity.VelocityContext;
 

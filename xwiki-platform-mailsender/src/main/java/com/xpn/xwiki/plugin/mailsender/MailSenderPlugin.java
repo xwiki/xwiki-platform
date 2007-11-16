@@ -440,6 +440,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
             vcontext = new VelocityContext();
         }
 
+        vcontext.put("msg", context.getMessageTool());
         vcontext.put("from.name", fromAddr);
         vcontext.put("from.address", fromAddr);
         vcontext.put("to.name", toAddr);

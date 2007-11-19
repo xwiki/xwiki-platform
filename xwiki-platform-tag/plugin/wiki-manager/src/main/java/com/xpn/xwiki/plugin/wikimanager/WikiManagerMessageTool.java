@@ -133,16 +133,27 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String LOG_WIKIDELETION = "wikimanager.plugin.log.wikideletion";
 
     /**
+     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki alias.
+     */
+    public static final String LOG_WIKIGET = "wikimanager.plugin.log.wikiget";
+    
+    /**
      * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki
      * descriptor document.
      */
-    public static final String LOG_WIKIGET = "wikimanager.plugin.log.wikiget";
+    public static final String LOG_WIKIALIASGET = "wikimanager.plugin.log.wikialiasget";
 
     /**
      * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis
      * descriptors documents.
      */
     public static final String LOG_WIKIGETALL = "wikimanager.plugin.log.wikigetall";
+
+    /**
+     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis
+     * aliases.
+     */
+    public static final String LOG_WIKIALIASGETALL = "wikimanager.plugin.log.wikialiasgetall";
 
     /**
      * Used as {@link org.apache.commons.logging.Log} log message when modification of the

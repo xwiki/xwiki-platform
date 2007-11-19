@@ -23,6 +23,7 @@ package com.xpn.xwiki.plugin.wikimanager;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.PluginApi;
+import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.web.XWikiMessageTool;
@@ -244,6 +245,72 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
+     * Get {@link Wiki} with provided name.
+     * 
+     * @param wikiName the name of the wiki.
+     * @return the {@link Wiki} object.
+     * @throws XWikiException error when getting document from wiki name.
+     */
+    public Wiki getWikiFromName(String wikiName) throws XWikiException
+    {
+        Wiki doc = null;
+
+        try {
+            doc = WikiManager.getInstance().getWikiFromName(wikiName, context);
+        } catch (WikiManagerException e) {
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
+
+            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+        }
+
+        return doc;
+    }
+    
+    /**
+     * @return the list of all {@link Wiki}.
+     * @throws XWikiException error when getting wiki documents descriptors.
+     */
+    public List getAllWikis() throws XWikiException
+    {
+        List wikiList = Collections.EMPTY_LIST;
+
+        try {
+            wikiList = WikiManager.getInstance().getAllWikis(context);
+        } catch (WikiManagerException e) {
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
+
+            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+        }
+
+        return wikiList;
+    }
+
+    /**
+     * Get {@link Wiki} described by document with provided full name.
+     * 
+     * @param documentFullName the full name of the wiki document descriptor.
+     * @return the {@link Wiki} object.
+     * @throws XWikiException error when getting document.
+     */
+    public Wiki getWikiFromDocumentName(String documentFullName) throws XWikiException
+    {
+        Wiki doc = null;
+
+        try {
+            doc = WikiManager.getInstance().getWikiFromDocumentName(documentFullName, context);
+        } catch (WikiManagerException e) {
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
+
+            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+        }
+
+        return doc;
+    }
+
+    /**
      * Get wiki descriptor document corresponding to provided wiki name.
      * 
      * @param wikiName the name of the wiki.
@@ -286,9 +353,9 @@ public class WikiManagerPluginApi extends PluginApi
         XWikiServer doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWiki(wikiName, objectId, true, this.context);
+            doc = WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGET, wikiName), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -308,9 +375,9 @@ public class WikiManagerPluginApi extends PluginApi
         List listDocument = Collections.EMPTY_LIST;
 
         try {
-            listDocument = WikiManager.getInstance().getWikiList(this.context);
+            listDocument = WikiManager.getInstance().getWikiAliasList(this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGETALL), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -352,7 +419,7 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public boolean isWikiExist(String wikiName, int objectId)
     {
-        return WikiManager.getInstance().isWikiExist(wikiName, objectId, this.context);
+        return WikiManager.getInstance().isWikiAliasExist(wikiName, objectId, this.context);
     }
 
     /**
@@ -402,7 +469,7 @@ public class WikiManagerPluginApi extends PluginApi
 
         try {
             XWikiServer wikiDoc =
-                WikiManager.getInstance().getWiki(wikiName, objectId, true, this.context);
+                WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
             wikiDoc.setVisibility(visibility);
             wikiDoc.save();
         } catch (WikiManagerException e) {
@@ -535,7 +602,8 @@ public class WikiManagerPluginApi extends PluginApi
 
         try {
             doc =
-                WikiManager.getInstance().getWikiTemplate(wikiName, objectId, this.context, true);
+                WikiManager.getInstance().getWikiTemplateAlias(wikiName, objectId, this.context,
+                    true);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
 
@@ -555,7 +623,7 @@ public class WikiManagerPluginApi extends PluginApi
         List listDocument = new ArrayList();
 
         try {
-            return WikiManager.getInstance().getWikiTemplateList(this.context);
+            return WikiManager.getInstance().getWikiTemplateAliasList(this.context);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
 

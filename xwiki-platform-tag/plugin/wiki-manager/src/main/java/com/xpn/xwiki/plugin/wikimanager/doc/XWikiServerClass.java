@@ -183,6 +183,11 @@ public class XWikiServerClass extends AbstractSuperClass
      */
     public static final String FIELDPN_HOMEPAGE = "Home page";
 
+    /**
+     * The full name of the default parent of a newly created document.
+     */
+    public static final String DEFAULT_PAGE_PARENT = "WikiManager.WebHome";
+
     // ///
 
     /**
@@ -264,8 +269,8 @@ public class XWikiServerClass extends AbstractSuperClass
     {
         boolean needsUpdate = false;
 
-        if ("WikiManager.WebHome".equals(doc.getParent())) {
-            doc.setParent(getClassSpacePrefix() + "Manager.WebHome");
+        if (!DEFAULT_PAGE_PARENT.equals(doc.getParent())) {
+            doc.setParent(DEFAULT_PAGE_PARENT);
             needsUpdate = true;
         }
 

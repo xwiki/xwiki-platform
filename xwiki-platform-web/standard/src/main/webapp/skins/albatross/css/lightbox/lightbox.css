@@ -8,7 +8,7 @@
   background: #EEF3F6 none repeat scroll 0% 50%;
   height: 1px;
   border-width: 0 1px;
-  }
+ }
 
 .roundedlight .b1, .roundedlight .b1b { background: #A9B6C3 none repeat scroll 0% 50%; margin: 0 5px; border-width: 0; }
 .roundedlight .b2, .roundedlight .b2b { border-width: 0 2px; margin: 0 3px; }
@@ -136,6 +136,7 @@
   overflow: hidden;
   text-align: left;
 }
+
 
 #close-wrap {
 	position: relative;

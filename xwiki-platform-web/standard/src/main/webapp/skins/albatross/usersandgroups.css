@@ -79,7 +79,7 @@ div.inscrollbar {
 	padding-left: 10px;
 }
 
-#userstable, #groupstable, #usersandgroupstable, #memberstable {
+#userstable, #groupstable, #usersandgroupstableg, #usersandgroupstables, #usersandgroupstabled, #memberstable {
     width: 100%;
     position: relative;
     padding: 0px;
@@ -97,10 +97,6 @@ div.inscrollbar {
     border: 1px solid #d4dee8;
 }
 
-#display1 td {
-	padding-left: 11px;
-}
-
 .manage {
 	text-align: center;
 	width: 15%;
@@ -108,23 +104,33 @@ div.inscrollbar {
 
 .hmanage {
 	width: 15%;
-	padding-left: 10px;	
+	padding-left: 10px;
 }
+
 
 .rights {
 	text-align: center;
 	padding-left: 0px !important;
 	padding-top: 4px;
+	width: 9%;
 }
 
+#usersandgroupstables .rights {
+      width: 12% !important;
+}
+
+#usersandgroupstabled .rights {
+      width: 15% !important;
+}
 
 .spaceName {
 	margin-left: 13px;
 	margin-top: 5px;
+        margin-bottom: 5px;
 }
 
 #tdAddNewUserOrGroup {
-	padding-top: 10px;
+	padding-top: 11px;
 }
 
 
@@ -153,13 +159,7 @@ div.inscrollbar {
         color: #000;
 }
 
-.usersorgroupsnames {
-    width: 30%;
-    padding-top: 4px;
-}
-
 .suorg {
-  width: 30%;
   padding-left: 10px;
   padding-top: 4px;
 }

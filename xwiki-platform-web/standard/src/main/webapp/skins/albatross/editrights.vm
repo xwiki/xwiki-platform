@@ -7,16 +7,16 @@
 ########## display the new interface
 #if($interface == "new")
 #if($doc.fullName == "XWiki.XWikiPreferences")
-  #if($request.editor == "globalrights")   
+  #if($request.editor == "globalrights")
     #set($clsname = "XWiki.XWikiGlobalRights")
-  #else                                    
+  #else
     #set($clsname = "XWiki.XWikiRights")
   #end
-#elseif($doc.name == "WebPreferences")  
+#elseif($doc.name == "WebPreferences")
   #if($request.editor == "spacerights")
     #set($clsname = "XWiki.XWikiGlobalRights")
   #else
-    #set($clsname = "XWiki.XWikiRights")  
+    #set($clsname = "XWiki.XWikiRights")
   #end
 #else
    #set($clsname = "XWiki.XWikiRights")
@@ -25,47 +25,41 @@
 ### url to get the users and groups to display in the ajax-based table
 #set($url = "?xpage=getusersandgroups")
 
-#set($saveUrl = $doc.getURL("view", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
+#set($saveUrl = $doc.getURL("view", "xpage=saverights&amp;clsname=${clsname}&amp;fullname=XWiki.XWikiGuest&amp;uorg=users"))
 
 ## get the rights for XWikiGuest
-#set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0) #set($r5 = 0) #set($r6 = 0) #set($r7 = 0)
-  
+#set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0)
+
 #set($guest = "XWiki.XWikiGuest")
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
   #set($pers = "$!obj.getProperty('users').getValue()")
-  
+
   #if($pers != "" && $pers.matches("^(.*,)?${guest}(,.*)?$"))
      #if($obj.getProperty('allow').getValue() == 1)
         #set($allows = "$!obj.getProperty('levels').getValue()")
       #else
         #set($denys = "$!obj.getProperty('levels').getValue()")
       #end
-      
+
       #if($allows && $allows.indexOf("view") > -1) #set($r1 = 1) #end
       #if($allows && $allows.indexOf("comment") > -1) #set($r2 = 1) #end
       #if($allows && $allows.indexOf("edit") > -1) #set($r3 = 1) #end
       #if($allows && $allows.indexOf("delete") > -1) #set($r4 = 1) #end
-      #if($allows && $allows.indexOf("register") > -1) #set($r5 = 1) #end
-      #if($allows && $allows.indexOf("admin") > -1) #set($r6 = 1) #end
-      #if($allows && $allows.indexOf("programming") > -1) #set($r7 = 1) #end
 
       #if($denys && $denys.indexOf("view") > -1) #set($r1 = 2) #end
       #if($denys && $denys.indexOf("comment") > -1) #set($r2 = 2) #end
       #if($denys && $denys.indexOf("edit") > -1) #set($r3 = 2) #end
       #if($denys && $denys.indexOf("delete") > -1) #set($r4 = 2) #end
-      #if($denys && $denys.indexOf("register") > -1) #set($r5 = 2) #end
-      #if($denys && $denys.indexOf("admin") > -1) #set($r6 = 2) #end
-      #if($denys && $denys.indexOf("programming") > -1) #set($r7 = 2) #end
-      
-      #if($denys && $denys == "") #set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0) #set($r5 = 0) #set($r6 = 0) #set($r7 = 0) #end
-      #if($allows && $allows == "") #set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0) #set($r5 = 0) #set($r6 = 0) #set($r7 = 0) #end
+
+      #if($denys && $denys == "") #set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0)  #end
+      #if($allows && $allows == "") #set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0) #end
   #end
 #end
 
 <div id="ajax-loader">Loading...<br />
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
-<table id="usersandgroupstable">
+<table id="usersandgroupstabled">
 
 <tr>
 <td style="width:100%">
@@ -76,9 +70,6 @@
     <td class="rights">$msg.get("rightsmanager.comment")</td>
     <td class="rights">$msg.get("rightsmanager.edit")</td>
     <td class="rights">$msg.get("rightsmanager.delete")</td>
-    ## if global rights and main wiki show programming right column
-    #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-    #if($hasPrgr)<td class="rights">$msg.get("rightsmanager.program")</td> #end
 </tr>
 <tr id="XWikiGuestSpecial">
       <td class="suorg">$msg.get("rightsmanager.unregisteredusers")</td>
@@ -86,30 +77,25 @@
       <td class="rights" id="tdcomment"></td>
       <td class="rights" id="tdedit"></td>
       <td class="rights" id="tddelete"></td>
-      #if($hasPrgr)<td class="rights" id="tdprogr"></td> #end
 </tr>
 </table>
 </td>
 </tr>
 <tr>
     <td colspan="2" style="padding-top: 10px; padding-bottom: 10px;">
-      <select name="uorg" style="width: 130px;">
-        <option value="groups" selected="selected">$msg.get("Groups")</option>
-        <option value="users">$msg.get("Users")</option>
-        </select>&nbsp;<span id="showLimits"></span>
+      <span id="showLimits"></span>
     </td>
 </tr>
 <tr><td style="width:100%">
       <table class="display">
        <thead class="theader">
-          <tr><td class="usersorgroupsnames">$msg.get("rightsmanager.groupsorusers")</td>
+          <tr><td class="usersorgroupsnames">
+          <input type="radio" name="uorg" value="groups" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
+      	  <input type="radio" name="uorg" value="users"/>$msg.get("Users")</td>
               <td class="rights">$msg.get("rightsmanager.view")</td>
               <td class="rights">$msg.get("rightsmanager.comment")</td>
               <td class="rights">$msg.get("rightsmanager.edit")</td>
-	      <td class="rights">$msg.get("rightsmanager.delete")</td>
-              ## if global rights and main wiki show programming right column
-              #set($hasPrgr = ($doc.fullName=='XWiki.XWikiPreferences' && $context.database=='xwiki'))
-              #if($hasPrgr)<td>$msg.get("rightsmanager.program")</td> #end
+	          <td class="rights">$msg.get("rightsmanager.delete")</td>
           </tr>
           <tr id="table-filters">
               <td>
@@ -141,14 +127,13 @@
 </tr>
 </table>
 <script type="text/javascript">
-	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstable", displayUsersAndGroups, true); 
-	var chbx1 = new MSCheckbox(document.getElementById('tdview'), "view", "${saveUrl}", "${r1}"); 
-	var chbx2 = new MSCheckbox(document.getElementById('tdcomment'), "comment", "${saveUrl}", "${r2}"); 
-        var chbx3 = new MSCheckbox(document.getElementById('tdedit'), "edit", "$saveUrl", "${r3}"); 
-        var chbx4 = new MSCheckbox(document.getElementById('tddelete'), "delete", "${saveUrl}", "${r4}"); 
-        ##//var chbx5 = new MSCheckbox(document.getElementById('tdregister'), "register", "${saveUrl}", "${r5}"); 
-        ##//var chbx6 = new MSCheckbox(document.getElementById('tdadmin'), "admin", "${saveUrl}", "${r6}"); 
-        if(document.getElementById('tdprogr')) var chbx7 = new MSCheckbox(document.getElementById('tdprogr'), "programming", "$saveUrl", "$r7"); 
+	var saveUrl = "$saveUrl";
+   	saveUrl.replace(/&amp;/g, "&");
+	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstabled", displayUsersAndGroups, true);
+	var chbx1 = new MSCheckbox(document.getElementById('tdview'), "view", saveUrl, "${r1}");
+	var chbx2 = new MSCheckbox(document.getElementById('tdcomment'), "comment", saveUrl, "${r2}");
+        var chbx3 = new MSCheckbox(document.getElementById('tdedit'), "edit", saveUrl, "${r3}");
+        var chbx4 = new MSCheckbox(document.getElementById('tddelete'), "delete", saveUrl, "${r4}");
 </script>
 
 ############ display the old interface

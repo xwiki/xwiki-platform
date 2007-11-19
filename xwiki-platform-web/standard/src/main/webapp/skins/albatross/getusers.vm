@@ -29,7 +29,7 @@ $response.setContentType("application/x-json")
         #set( $discard = $arr.add( "StringProperty" ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
         #set( $discard = $filterMap.put("$key", $arr ))
-		#set( $arr2 = $xwiki.arrayList )
+	#set( $arr2 = $xwiki.arrayList )
         #set( $discard = $arr2.add( "$key" ) )
         #set( $discard = $arr2.add( "StringProperty" ) )
         #set( $discard = $orderList.add( $arr2 ))

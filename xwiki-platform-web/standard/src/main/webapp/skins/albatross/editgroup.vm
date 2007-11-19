@@ -26,11 +26,11 @@
  <div id="addNewMember">
      <table cellpadding="5" cellspacing="5">
      <tr>
-       <td><strong>Add a new user </strong></td>
+       <td><strong>Add a new user</strong></td>
        <td>
          <select name="wiki" onchange="changeWiki(this);">
-            <option value="local" selected="selected">Local</option>
-            <option value="global">Global</option>
+            <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
+            <option value="global">$msg.get("rightsmanager.global")</option>
          </select>
        </td>
        <td>

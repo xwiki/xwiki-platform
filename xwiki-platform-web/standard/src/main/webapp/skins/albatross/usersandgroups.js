@@ -30,8 +30,8 @@ ASSTable.prototype = {
     if( this.hasFilters )
     {
       this.filters = this.filter.getFilters();
-      if(this.filters != "" && this.filters != undefined) 
-      url += this.filters;	
+      if(this.filters != "" && this.filters != undefined)
+      url += this.filters;
     }
 
     var pivot = this;
@@ -48,7 +48,7 @@ ASSTable.prototype = {
       onSuccess: function( transport ) {
         $('ajax-loader').style.display = "none";
         var res = eval( '(' + transport.responseText + ')');
-        
+
         if(res.totalrows <= res.returnedrows)
           pivot.scroller.domNode.style.display = "none";
         else
@@ -58,7 +58,7 @@ ASSTable.prototype = {
       }
     });
   },
-    
+
   updateFetchedRows: function( json )
   {
     this.json = json;
@@ -66,7 +66,7 @@ ASSTable.prototype = {
     for( var i = json.offset; i < json.offset + json.returnedrows; i++)
        this.fetchedRows[i] = json.rows[i-json.offset];
   },
-    
+
   clearDisplay: function()
   {
     var object = this.domNode;
@@ -75,9 +75,9 @@ ASSTable.prototype = {
       object.removeChild(object.firstChild);
     }
   },
-    
-  displayRows: function( offset, limit ) { 
-  		
+
+  displayRows: function( offset, limit ) {
+
     var f = offset + limit - 1;
     if(f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0 ) ? offset : 0;
@@ -86,19 +86,25 @@ ASSTable.prototype = {
     this.clearDisplay();
 
     for( var i = offset; i < (offset + limit); i++)
-    {           
+    {
       var elem = this.getHandler( this.fetchedRows[i], i, this );
       this.domNode.appendChild( elem );
     }
 
+    if(this.totalRows < this.limit)
+    {
+    	this.scroller.domNode.style.display = "none";
+    }
+      else
+		{
+			this.scroller.domNode.style.display = "block";
     	var raport = this.totalRows / limit;
-    	var outheight = this.domNode.parentNode.offsetHeight; 
+    	var outheight = this.domNode.parentNode.offsetHeight;
     	// the header?
-    	var inheight = Math.round(outheight * raport)+10;
+    	var inheight = Math.round(outheight * raport) + 10;
     	this.scroller.domNode.style.height = outheight + "px";
     	this.scroller.domNode.firstChild.style.height = inheight + "px";
-    	this.scroller.domNode.style.display = "block";
-
+		}
   },
 
   showRows: function( offset, limit )
@@ -113,7 +119,7 @@ ASSTable.prototype = {
       buff += 'table is empty so we get all rows';
       return buff;
     }
-            
+
     //make a range of required rows
     var min = -1;
     var max = -1;
@@ -124,28 +130,28 @@ ASSTable.prototype = {
         if(min == -1)  min = i;
         max = i;
       }
-        
+
     //if we don't need any new row
     if(min == -1)
     {
       buff += 'no need to get new rows <br />\n';
       this.displayRows( offset, limit );
     }
-    
+
     //we need get new rows
     else
     {
       buff += 'we need to get rows '+min+' to '+ (max+1) +' <br />\n';
       this.getRows( min, max - min + 1, offset, limit );
     }
-    return buff;        
+    return buff;
   },
 
   deleteAndShiftRows: function(indx)
   {
     for(i in this.fetchedRows)
     {
-      if(i >= indx) 
+      if(i >= indx)
       this.fetchedRows[i] = this.fetchedRows[''+(parseInt(i)+1)];
     }
   },
@@ -157,11 +163,11 @@ ASSTable.prototype = {
     if( this.fetchedRows[i] != undefined )
     buf += i+' ';
     return buf;
-  }, 
+  },
 
 
   deleteRow: function( indx )
-  { 
+  {
     this.deleteAndShiftRows(indx);
 
     //compute new refresh offset
@@ -173,85 +179,7 @@ ASSTable.prototype = {
     this.totalRows -= 1;
     this.showRows(newoffset, this.limit);
     this.scroller.refreshScrollbar();
-  } /* ,
-
-  compareStrings: function( s1, s2 )
-  {
-
-    s1 = s1.toLowerCase();
-    s2 = s2.toLowerCase();
-    var l1 = s1.length;
-    var l2 = s2.length;
-    var lower = (l1 < l2) ? l1 : l2;
-
-    for(i = 0; i < lower; i++){
-      if(s1.charAt(i) == s2.charAt(i))
-      continue;
-      else if(s1.charAt(i) < s2.charAt(i))
-      return -1;
-      else
-        return 1;
-    }
-    return 0;
-  },
-
-  searchAddPosition: function( start, end, fullname )
-  {
-    if(start >= end)
-      return start;
-
-    var pos = Math.floor((start + end) / 2);
-    var comp = this.compareStrings(fullname,this.fetchedRows[pos].username);
-    if( comp == 0 )
-     return pos + 1;
-    else if(comp == -1)
-     return this.searchAddPosition(start, pos-1, fullname);
-    else
-      return this.searchAddPosition(pos+1, end, fullname);
-  },
-
-  getMax: function()
-  {
-    var max = 0;
-    for(i in this.fetchedRows){
-      var ii = parseInt(i);
-      if(ii > max)
-      max = ii;
-    }
-    return max;
-  },
-
-  shiftRight: function( poz, max )
-  {
-    if(max == null)
-    max = this.getMax();
-    for(i = max; i >= poz; i -= 1)
-    this.fetchedRows[i+1] = this.fetchedRows[i];
-  },
-
-  addRow: function( fullname )
-  {
-     var max = this.getMax();
-    var pos = this.searchAddPosition(0, max, fullname);
-    this.shiftRight(pos, max);
-    this.fetchedRows[pos] = eval( json );
-    var rest = 0;
-    var start = pos - Math.round(this.limit / 2);
-    if(start < 1 ) { 
-    	start = 1; 
-    	rest = Math.round(this.limit / 2) - pos; 
-    }
-    var end = pos + Math.round(this.limit / 2) + rest;
-    if(end > this.totalRows) end = this.totalRows;
-    this.showRows(start, end); 
-  },
-
-  createAddHandler: function(pivot)
-  {
-    return function(){
-      //
-    }
-  } */
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -262,18 +190,18 @@ ASSScroller.prototype = {
 
   initialize: function( table, domNode )
   {
-    this.table = table; 
+    this.table = table;
     this.domNode = $(domNode);
     this.advanceRTG = 1;
-    this.timer = null; 
+    this.timer = null;
     this.linkEvent();
   },
-    
+
   linkEvent: function()
   {
     Event.observe( this.domNode, 'scroll', this.makeScrollHandler( this ) );
   },
-    
+
   makeScrollHandler: function( pivot )
   {
     return function()
@@ -281,7 +209,7 @@ ASSScroller.prototype = {
       pivot.onscroll();
     }
   },
-    
+
   computeScroll: function( )
   {
     var h = $('scrollbar1').scrollHeight - 100;
@@ -291,22 +219,22 @@ ASSScroller.prototype = {
     if(this.table.totalRows == -1)
       var rtg = 1;
     else
-      var rtg = Math.round(this.table.totalRows * p); 
-                       
+      var rtg = Math.round(this.table.totalRows * p);
+
     if( (rtg + this.table.limit) > this.table.totalRows )
       rtg = this.table.totalRows - this.table.limit + 1;
-    
+
     if( rtg < 1 ) rtg = 1;
-  
+
     return rtg;
   },
-    
+
   applyscroll: function( )
   {
     this.table.showRows( this.advanceRTG, this.table.limit );
     this.timer = null;
   },
-    
+
     //closure
   makeTimeoutHandler: function( pivot )
   {
@@ -315,11 +243,11 @@ ASSScroller.prototype = {
       pivot.applyscroll();
     }
   },
-    
+
   onscroll: function()
   {
-    this.advanceRTG = this.computeScroll(); 
-                
+    this.advanceRTG = this.computeScroll();
+
     if( this.timer == null )
     this.timer = setTimeout( this.makeTimeoutHandler( this ), 800 );
     else
@@ -329,16 +257,16 @@ ASSScroller.prototype = {
   },
 
   refreshScrollbar: function( )
-  { 
+  {
     var raport = this.table.totalRows / this.table.limit;
-    var outheight = this.table.domNode.parentNode.offsetHeight; 
+    var outheight = this.table.domNode.parentNode.offsetHeight;
     //
     var inheight = Math.round(outheight * raport);
-      
+
     this.domNode.style.height = outheight + "px";
     this.domNode.firstChild.style.height = inheight + "px";
   }
-    
+
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -352,10 +280,10 @@ ASSFilter.prototype = {
     this.table = table;
     this.filterNode = $(filterNode);
     this.filters = new Object();
-        
+
     this.linkEvents();
   },
-    
+
   makeRefreshHandler: function( pivot )
   {
     return function()
@@ -363,27 +291,38 @@ ASSFilter.prototype = {
       pivot.refreshContent();
     }
   },
-    
+
   linkEvents : function()
   {
     var inputs = this.filterNode.getElementsByTagName('input');
     var selects = this.filterNode.getElementsByTagName('select');
-        
+
     for(var i = 0; i < inputs.length; i++)
-    Event.observe(inputs[i], 'keyup', this.makeRefreshHandler(this));
-            
+    {
+    	if(inputs[i].type == "radio")
+    		Event.observe(inputs[i], 'click', this.makeRefreshHandler(this));
+    	else
+    		Event.observe(inputs[i], 'keyup', this.makeRefreshHandler(this));
+    }
+
     for(var i = 0; i < selects.length; i++)
-    Event.observe(selects[i], 'change', this.makeRefreshHandler(this));
+    	Event.observe(selects[i], 'change', this.makeRefreshHandler(this));
   },
-    
-    
+
+
   getFilters : function()
   {
     var inputs = this.filterNode.getElementsByTagName('input');
-    for(var i = 0; i < inputs.length; i++) 
+    for(var i = 0; i < inputs.length; i++)
     {
       var key = inputs[i].name;
-      this.filters[key] = trim(inputs[i].value);
+      if(inputs[i].type == "radio")
+      {
+      	if(inputs[i].checked == 1)
+      		this.filters[key] = trim(inputs[i].value);
+      }
+      else
+        this.filters[key] = trim(inputs[i].value);
     }
 
     var selects = this.filterNode.getElementsByTagName('select');
@@ -391,22 +330,22 @@ ASSFilter.prototype = {
     {
       this.filters[selects[i].name] = trim(selects[i].options[selects[i].selectedIndex].value);
     }
-      
+
     var filterString = "";
     for(key in this.filters)
     if(key != "extend" && this.filters[key] != "") filterString += '&' + key + '=' + this.filters[key];
-                
+
     return filterString;
   },
-    
+
   refreshContent : function()
   {
-    this.table.filters = this.getFilters();  
+    this.table.filters = this.getFilters();
     this.table.totalRows = -1;
     this.table.fetchedRows = new Array();
     this.table.showRows(1, this.table.limit);
   }
-    
+
 }
 
 /* the class that deals with the filtering in a table */
@@ -435,7 +374,7 @@ MSCheckbox.prototype = {
   draw: function(state)
   {
     //remove image
-    if(this.domNode.childNodes.length > 0) 
+    if(this.domNode.childNodes.length > 0)
       this.domNode.removeChild( this.domNode.firstChild );
     //remove label
     if(this.domNode.childNodes.length > 0)
@@ -469,14 +408,14 @@ MSCheckbox.prototype = {
     return function()
     {
       //put $msg.get() messages!!!!!
-      
+
       var nxtst = (pivot.state + 1) % pivot.nrstates;
       if(pivot.right == "admin" && nxtst == 2)
        confirm("You are about to deny the admin right for this user. Continue?");
       else if(pivot.right == "admin" && nxtst == 0)
         confirm("You are about to clear the admin right for this user. Continue?");
       pivot.next(); // go to next state
-      
+
       //compute the complete url
       var action = "";
       if(pivot.state == 0)       action = "clear";
@@ -484,12 +423,12 @@ MSCheckbox.prototype = {
       else                       action = "deny";
 
       var url = pivot.saveUrl + "&action=" + action + "&right=" + pivot.right;
-      
-      new Ajax.Request(url, 
-      { 
+
+      new Ajax.Request(url,
+      {
         method: 'get',
         onSuccess: function() {}
-      }); 
+      });
     }
   },
 
@@ -509,11 +448,11 @@ function displayUsers( row, i, table)
   var userinlineurl = row.userinlineurl;
   var wikiname = row.wikiname;
   var docurl = row.docurl;
-                
-  var tr = document.createElement('tr'); 
+
+  var tr = document.createElement('tr');
   if(i % 2 == 0)  tr.className = "even";
   else tr.className = "odd";
-        
+
   var username = document.createElement('td');
   if(wikiname == "local")
   {
@@ -524,20 +463,20 @@ function displayUsers( row, i, table)
   }
   else
     username.appendChild( document.createTextNode( row.username ) );
-  
+
   tr.appendChild(username);
-            
+
   var firstname = document.createElement('td');
   firstname.appendChild(document.createTextNode(row.firstname) );
   tr.appendChild(firstname);
-          
+
   var lastname = document.createElement('td');
   lastname.appendChild(document.createTextNode(row.lastname) );
   tr.appendChild(lastname);
-            
+
   var manage = document.createElement('td');
   manage.className = "manage";
-  
+
   if(wikiname == "local")
   {
     //edit user
@@ -550,7 +489,7 @@ function displayUsers( row, i, table)
 
     //delete group
     var del = document.createElement('img');
-    
+
     if(row.grayed == "true")
     {
       del.src = '$xwiki.getSkinFile("icons/rights-manager/clearg.png")';
@@ -565,7 +504,7 @@ function displayUsers( row, i, table)
      del.title = '$msg.get("delete")';
      manage.appendChild(del);
   }
-  
+
   tr.appendChild(manage);
   return tr;
 }
@@ -577,13 +516,13 @@ function displayGroups( row, i, table)
   var userinlineurl = row.userinlineurl;
   var usersaveurl = row.usersaveurl;
   var wikiname = row.wikiname;
-  var docurl = row.docurl;     
-         
-  var tr = document.createElement('tr'); 
-  
+  var docurl = row.docurl;
+
+  var tr = document.createElement('tr');
+
   if(i % 2 == 0) tr.className = "even";
   else tr.className = "odd";
-        
+
   var username = document.createElement('td');
   if(wikiname == "local")
   {
@@ -596,17 +535,17 @@ function displayGroups( row, i, table)
     username.appendChild( document.createTextNode( row.username ) );
 
   tr.appendChild(username);
-  
+
   var members = document.createElement('td');
   if(wikiname == "local")
    members.appendChild(document.createTextNode(row.members));
   else
     members.appendChild(document.createTextNode("-"));
   tr.appendChild(members);
-                        
+
   var manage = document.createElement('td');
   manage.className = "manage";
-  
+
   if(wikiname == "local")
   {
     //delete group
@@ -628,7 +567,7 @@ function displayGroups( row, i, table)
   }
 
   tr.appendChild(manage);
-     
+
   return tr;
 }
 
@@ -638,9 +577,9 @@ function displayMembers( row, i, table )
   var tr = document.createElement('tr');
   if(i % 2 == 0) tr.className = "even";
   else tr.className = "odd";
-        
+
   var membername = document.createElement("td");
-  
+
   if(row.wikiname == "local")
   {
       var a = document.createElement("a");
@@ -650,11 +589,11 @@ function displayMembers( row, i, table )
   }
   else
      membername.appendChild(document.createTextNode(row.fullname));
-        
+
   var membermanage = document.createElement("td");
   membermanage.className = "manage";
   var del = document.createElement('img');
-  
+
    if(row.grayed == "true")
    {
       del.src = '$xwiki.getSkinFile("icons/rights-manager/clearg.png")';
@@ -671,26 +610,26 @@ function displayMembers( row, i, table )
 
   tr.appendChild(membername);
   tr.appendChild(membermanage);
-  
+
   return tr;
 }
 
 
 /** user and groups list element creator **/
 function displayUsersAndGroups( row, i, table )
-{ 
+{
   var userurl = row.userurl;
   var uorg = table.json.uorg;
   var allows = row.allows;
   var denys = row.denys;
   var saveUrl = "?xpage=saverights&clsname=" + table.json.clsname + "&fullname=" + row.fullname + "&uorg=" + uorg;
-  
+
   var objs = new Array(); //array with checkboxes objects
   var tr = document.createElement('tr');
- 
+
   if(i % 2 == 0) tr.className = "even";
   else tr.className = "odd";
-  
+
   var username = document.createElement('td');
   if(row.wikiname == "local")
   {
@@ -701,7 +640,7 @@ function displayUsersAndGroups( row, i, table )
   }
   else
     username.appendChild( document.createTextNode( row.username ) );
-  
+
   username.className = "usersorgroupsnames";
   tr.appendChild(username);
 
@@ -712,7 +651,7 @@ function displayUsersAndGroups( row, i, table )
   else if(denys.indexOf("view") >= 0) r = 2;
   var chbx1 = new MSCheckbox(view, "view", saveUrl, r);
   tr.appendChild(view);
-        
+
   var comment = document.createElement('td');
   comment.className = "rights";
   r = 0;
@@ -720,7 +659,7 @@ function displayUsersAndGroups( row, i, table )
   else if(denys.indexOf("comment") >= 0) r = 2;
   var chbx2 = new MSCheckbox(comment, "comment", saveUrl, r);
   tr.appendChild(comment);
-        
+
   var edit = document.createElement('td');
   edit.className = "rights";
   r = 0;
@@ -728,7 +667,7 @@ function displayUsersAndGroups( row, i, table )
   else if(denys.indexOf("edit") >= 0) r = 2;
   var chbx3 = new MSCheckbox(edit, "edit", saveUrl, r);
   tr.appendChild(edit);
-        
+
   var del = document.createElement('td');
   del.className = "rights";
   r = 0;
@@ -736,7 +675,7 @@ function displayUsersAndGroups( row, i, table )
   else if(denys.indexOf("delete") >= 0) r = 2;
   var chbx4 = new MSCheckbox(del, "delete", saveUrl, r);
   tr.appendChild(del);
-        
+
   if(table.json.reg == true)
   {
     var register = document.createElement('td');
@@ -747,7 +686,7 @@ function displayUsersAndGroups( row, i, table )
     var chbx5 = new MSCheckbox(register, "register", saveUrl, r);
     tr.appendChild(register);
   }
-        
+
   if(table.json.admin == true)
   {
     var admin = document.createElement('td');
@@ -758,7 +697,7 @@ function displayUsersAndGroups( row, i, table )
     var chbx6 = new MSCheckbox(admin, "admin", saveUrl, r);
     tr.appendChild(admin);
   }
-        
+
   if(table.json.progr == true)
   {
     var progr = document.createElement('td');
@@ -769,13 +708,13 @@ function displayUsersAndGroups( row, i, table )
     var chbx7 = new MSCheckbox(progr, "programming", saveUrl, r);
     tr.appendChild(progr);
   }
-        
+
   return tr;
 }
 
 ////////////////////////////////////////////////////////////////
 
-function editUserOrGroup(userinlineurl, usersaveurl, userredirecturl) 
+function editUserOrGroup(userinlineurl, usersaveurl, userredirecturl)
 {
   return function()
   {

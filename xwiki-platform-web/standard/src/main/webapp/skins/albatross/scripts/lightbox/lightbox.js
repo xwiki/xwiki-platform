@@ -135,11 +135,14 @@ Lightbox.prototype =  {
     		var str = '<div id="lb-bg" class="hidden"></div>' + 
               		'<div id="lb-align" class="hidden">' + 
               		'<div id="lb">' +
-              		'<div id="lb-top"><span id="lb-close">' +
+              		'<div id="lb-top">' + 
               		'<div id="close-wrap">' + 
               		'<div id="lb-close" onclick="window.lb.lbHide(); window.lb.lbClearData(); return false;" title="Cancel and close">&nbsp;</div>' +
-              		'</div>' + 
-              		'</span>';
+              		'</div>';
+              		'<div id="lb-top">' +
+              		'<div id="close-wrap">' + 
+              		'<div id="lb-close" onclick="window.lb.lbHide(); window.lb.lbClearData(); return false;" title="Cancel and close">&nbsp;</div>' +
+              		'</div>';
               
     		if(lbtype == "lightrounded") str += this.roundedlighttop(lbbgcolor, lbbordercolor);
     		else if(lbtype == "rounded") str += this.roundedtop(lbbgcolor, lbbordercolor);
@@ -164,7 +167,7 @@ Lightbox.prototype =  {
 
 	roundedbottom: function(bgcolor, bordercolor) {
 		var str = '<div class="rounded">' +
-              '<b class="bottom">' +
+              '<b class="bottom" style="padding:0px; margin:0px;">' +
               '<b class="b12b" style="background:' + bordercolor +';"></b>' +
               '<b class="b11b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +
               '<b class="b10b" style="background:' + bgcolor + '; border-color:' + bordercolor + ';"></b>' +

@@ -29,6 +29,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperCla
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
+import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
@@ -38,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -204,6 +206,76 @@ final class WikiManager
 
     // ////////////////////////////////////////////////////////////////////////////
     // Wikis management
+
+    /**
+     * Get {@link Wiki} described by provided document.
+     * 
+     * @param document the wiki document descriptor.
+     * @param context the XWiki context.
+     * @return the {@link Wiki} object.
+     * @throws XWikiException error when creating {@link Wiki} object.
+     */
+    public Wiki getWikiFromDocument(XWikiDocument document, XWikiContext context)
+        throws XWikiException
+    {
+        return new Wiki(document, context);
+    }
+
+    /**
+     * Get {@link Wiki} with provided name.
+     * 
+     * @param wikiName the name of the wiki.
+     * @param context the XWiki context.
+     * @return the {@link Wiki} object.
+     * @throws XWikiException error when getting document from wiki name.
+     */
+    public Wiki getWikiFromName(String wikiName, XWikiContext context) throws XWikiException
+    {
+        return getWikiFromDocumentName(XWikiServerClass.getInstance(context)
+            .getItemDocumentDefaultFullName(wikiName, context), context);
+    }
+
+    /**
+     * Get all {@link Wiki}.
+     * 
+     * @param context the XWiki context.
+     * @return the list of all {@link Wiki}.
+     * @throws XWikiException error when getting wikis documents descriptors.
+     */
+    public List getAllWikis(XWikiContext context) throws XWikiException
+    {
+        List wikiList = new ArrayList();
+
+        List parameterValues = new ArrayList();
+
+        String wheresql =
+            XWikiServerClass.getInstance(context).createWhereClause(null, parameterValues);
+        List documents =
+            context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
+
+        for (Iterator it = documents.iterator(); it.hasNext();) {
+            XWikiDocument document = (XWikiDocument) it.next();
+
+            wikiList.add(new Wiki(document, context));
+        }
+
+        return wikiList;
+    }
+
+    /**
+     * Get {@link Wiki} described by document with provided full name.
+     * 
+     * @param documentFullName the full name of the wiki document descriptor.
+     * @param context the XWiki context.
+     * @return the {@link Wiki} object.
+     * @throws XWikiException error when getting document.
+     */
+    public Wiki getWikiFromDocumentName(String documentFullName, XWikiContext context)
+        throws XWikiException
+    {
+        return getWikiFromDocument(context.getWiki().getDocument(documentFullName, context),
+            context);
+    }
 
     /**
      * Get the documents for which copied document content will be replace by an
@@ -660,8 +732,9 @@ final class WikiManager
         try {
             xwiki.getStore().createWiki(targetWiki, context);
         } catch (Exception e) {
-            LOG.warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki),
-                e);
+            LOG
+                .warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki),
+                    e);
         }
 
         // Init database/schema
@@ -757,7 +830,7 @@ final class WikiManager
     public void deleteWiki(String wikiNameToDelete, int objectId, XWikiContext context)
         throws XWikiException
     {
-        XWikiServer doc = getWiki(wikiNameToDelete, objectId, true, context);
+        XWikiServer doc = getWikiAlias(wikiNameToDelete, objectId, true, context);
 
         doc.delete();
     }
@@ -777,10 +850,10 @@ final class WikiManager
      * @return a wiki descriptor document.
      * @throws XWikiException error when getting wiki descriptor document.
      */
-    public XWikiServer getWiki(String wikiName, int objectId, boolean validate,
+    public XWikiServer getWikiAlias(String wikiName, int objectId, boolean validate,
         XWikiContext context) throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).getWikiServer(wikiName, objectId, validate,
+        return XWikiServerClass.getInstance(context).getWikiAlias(wikiName, objectId, validate,
             context);
     }
 
@@ -795,7 +868,7 @@ final class WikiManager
      *             <li>or getting {@link XWikiServerClass} unique instance.</li>
      *             </ul>
      */
-    public List getWikiList(XWikiContext context) throws XWikiException
+    public List getWikiAliasList(XWikiContext context) throws XWikiException
     {
         return XWikiServerClass.getInstance(context).searchSuperDocuments(context);
     }
@@ -808,10 +881,10 @@ final class WikiManager
      * @param context the XWiki context.
      * @return true if wiki descriptor exist, false if not.
      */
-    public boolean isWikiExist(String wikiName, int objectId, XWikiContext context)
+    public boolean isWikiAliasExist(String wikiName, int objectId, XWikiContext context)
     {
         try {
-            return getWiki(wikiName, objectId, true, context) != null;
+            return getWikiAlias(wikiName, objectId, true, context) != null;
         } catch (XWikiException e) {
             return false;
         }
@@ -843,10 +916,10 @@ final class WikiManager
      *             "template".</li>
      *             </ul>
      */
-    public XWikiServer getWikiTemplate(String wikiName, int objectId, XWikiContext context,
+    public XWikiServer getWikiTemplateAlias(String wikiName, int objectId, XWikiContext context,
         boolean validate) throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).getWikiTemplateServer(wikiName, objectId,
+        return XWikiServerClass.getInstance(context).getWikiTemplateAlias(wikiName, objectId,
             validate, context);
     }
 
@@ -865,7 +938,7 @@ final class WikiManager
      *             to "template".</li>
      *             </ul>
      */
-    public List getWikiTemplateList(XWikiContext context) throws XWikiException
+    public List getWikiTemplateAliasList(XWikiContext context) throws XWikiException
     {
         return XWikiServerClass.getInstance(context).searchSuperDocumentsByField(
             XWikiServerClass.FIELD_VISIBILITY, XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE,

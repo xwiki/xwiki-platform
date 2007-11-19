@@ -43,9 +43,9 @@ public class XWikiServer extends DefaultSuperDocument
     /**
      * Create new XWikiServer managing provided XWikiDocument.
      * 
-     * @param xdoc the encapsulated XWikiDocument
+     * @param xdoc the encapsulated XWikiDocument.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @param context the XWiki context
+     * @param context the XWiki context.
      * @throws XWikiException error when:
      *             <ul>
      *             <li>getting XWikiServerClass instance.</li>

@@ -288,7 +288,7 @@ public class XWikiServerClass extends AbstractSuperClass
      * @return the {@link XWikiServer} representing wiki descriptor.
      * @throws XWikiException error when searching for wiki descriptor document.
      */
-    public XWikiServer getWikiServer(String wikiName, int objectId, boolean validate,
+    public XWikiServer getWikiAlias(String wikiName, int objectId, boolean validate,
         XWikiContext context) throws XWikiException
     {
         try {
@@ -311,10 +311,10 @@ public class XWikiServerClass extends AbstractSuperClass
      * @return the {@link XWikiServer} representing wiki descriptor.
      * @throws XWikiException error when searching for wiki descriptor document.
      */
-    public XWikiServer getWikiTemplateServer(String wikiName, int objectId, boolean validate,
+    public XWikiServer getWikiTemplateAlias(String wikiName, int objectId, boolean validate,
         XWikiContext context) throws XWikiException
     {
-        XWikiServer wiki = getWikiServer(wikiName, objectId, validate, context);
+        XWikiServer wiki = getWikiAlias(wikiName, objectId, validate, context);
 
         if (validate && !wiki.getVisibility().equals(FIELDL_VISIBILITY_TEMPLATE)) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,

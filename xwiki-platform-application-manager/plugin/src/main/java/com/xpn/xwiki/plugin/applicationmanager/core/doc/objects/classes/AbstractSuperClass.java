@@ -839,7 +839,7 @@ public abstract class AbstractSuperClass implements SuperClass
     {
         List documents = new ArrayList(1);
         documents.add(document);
-        
+
         return newSuperDocumentList(documents, context);
     }
 
@@ -856,8 +856,11 @@ public abstract class AbstractSuperClass implements SuperClass
             XWikiDocument doc = (XWikiDocument) it.next();
             List objects = doc.getObjects(getClassFullName());
 
-            for (int i = 0; i < objects.size(); ++i) {
-                list.add(newSuperDocument(doc, i, context));
+            int i = 0;
+            for (Iterator itObject = objects.iterator(); itObject.hasNext(); ++i) {
+                if (itObject.next() != null) {
+                    list.add(newSuperDocument(doc, i, context));
+                }
             }
         }
 

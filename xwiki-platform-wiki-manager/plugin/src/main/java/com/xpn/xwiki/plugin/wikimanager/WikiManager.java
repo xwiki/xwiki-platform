@@ -616,10 +616,7 @@ final class WikiManager
                 }
             }
 
-            int objtId = docToSave.createNewObject(wikiClass.getClassFullName(), context);
-
-            wikiSuperDocToSave =
-                (XWikiServer) wikiClass.newSuperDocument(docToSave, objtId, context);
+            wikiSuperDocToSave = (XWikiServer) wikiClass.newSuperDocument(docToSave, 0, context);
 
             // clear entry in virtual wiki cache
             if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {

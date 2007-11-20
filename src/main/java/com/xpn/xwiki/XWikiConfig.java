@@ -29,41 +29,48 @@ import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
 
-public class XWikiConfig extends Properties {
-
-    public XWikiConfig() {
-        // Default constructor so that properties can be added after constructing the instance 
+public class XWikiConfig extends Properties
+{
+    public XWikiConfig()
+    {
+        // Default constructor so that properties can be added after constructing the instance
         // by using XWikiConfig.put().
     }
-    
-    public XWikiConfig(String path) throws XWikiException {
-       try {
-           FileInputStream fis = new FileInputStream(path);
-           loadConfig(fis, path);
-       }
-       catch (FileNotFoundException e) {
-           Object[] args = { path };
-           throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
-               XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
-               "Configuration file {0} not found", e, args);
-           }
+
+    public XWikiConfig(String path) throws XWikiException
+    {
+        try {
+            FileInputStream fis = new FileInputStream(path);
+            loadConfig(fis, path);
+        } catch (FileNotFoundException e) {
+            Object[] args = {path};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
+                XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
+                "Configuration file {0} not found",
+                e,
+                args);
+        }
     }
 
-    public XWikiConfig(InputStream is) throws XWikiException {
-       loadConfig(is, "");
+    public XWikiConfig(InputStream is) throws XWikiException
+    {
+        loadConfig(is, "");
     }
 
-    public void loadConfig(InputStream is, String path) throws XWikiException {
+    public void loadConfig(InputStream is, String path) throws XWikiException
+    {
         try {
             load(is);
-        }
-        catch (IOException e) {
-            Object[] args = { path };
+        } catch (IOException e) {
+            Object[] args = {path};
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
                 XWikiException.ERROR_XWIKI_CONFIG_FORMATERROR,
-                "Error reading configuration file", e, args);
+                "Error reading configuration file",
+                e,
+                args);
         }
     }
+
     /**
      * @return array of string splited from property.
      * @param param - name of property

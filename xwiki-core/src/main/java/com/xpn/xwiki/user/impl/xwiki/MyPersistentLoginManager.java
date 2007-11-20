@@ -21,10 +21,12 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +42,7 @@ import org.securityfilter.filter.SecurityRequestWrapper;
  * parameter.
  * 
  * The cookies used are:
- * <dl>>
+ * <dl>
  * <dt>username</dt>
  * <dd>The logged in username</dd>
  * <dt>password</dt>
@@ -182,7 +184,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
         if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
             String validationHash =
-                getValidationHash(protectedUsername, protectedPassword, request.getRemoteAddr());
+                getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
                 Cookie validationCookie = new Cookie(COOKIE_VALIDATION, validationHash);
@@ -418,5 +420,148 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private static boolean isTrue(String text)
     {
         return "true".equals(text) || "1".equals(text) || "yes".equals(text);
+    }
+
+    /**
+     * Given an array of Cookies, a name, and a default value, this method tries to find the value
+     * of the cookie with the given name. If there is no cookie matching the name in the array, then
+     * the default value is returned instead.
+     */
+    private static String getCookieValue(Cookie[] cookies, String cookieName, String defaultValue)
+    {
+        if (cookies != null) {
+            for (int i = 0; i < cookies.length; i++) {
+                Cookie cookie = cookies[i];
+                if (cookieName.equals(cookie.getName())) {
+                    return (cookie.getValue());
+                }
+            }
+        }
+        return (defaultValue);
+    }
+
+    /**
+     * Get remembered username
+     * 
+     * @param request the servlet request
+     * @param response the servlet response
+     * @return the username value or null if not found or a problem with security of cookie
+     */
+    public String getRememberedUsername(HttpServletRequest request, HttpServletResponse response)
+        throws IOException, ServletException
+    {
+        String username = getCookieValue(request.getCookies(), COOKIE_USERNAME, "false");
+        String password = getCookieValue(request.getCookies(), COOKIE_PASSWORD, "false");
+
+        String validationHash = getCookieValue(request.getCookies(), COOKIE_VALIDATION, "false");
+        if (!username.equals("false")) {
+            if (!validationHash.equals("false")) {
+                // check hash
+                String calculatedHash =
+                    getValidationHash(username, password, getClientIP(request));
+                if (validationHash.equals(calculatedHash)) {
+                    if (protection.equals(PROTECTION_ALL)
+                        || protection.equals(PROTECTION_ENCRYPTION)) {
+                        username = decryptText(username);
+                    }
+                    return username;
+                } else {
+                    System.out.println("!remember-me cookie validation hash mismatch! ");
+                    System.out.println("!remember-me cookie has been tampered with! ");
+                    System.out.println("!remember-me cookie is being deleted! ");
+                    removeCookie(request, response, COOKIE_USERNAME);
+                    removeCookie(request, response, COOKIE_PASSWORD);
+                    removeCookie(request, response, COOKIE_REMEMBERME);
+                    removeCookie(request, response, COOKIE_VALIDATION);
+                    return null;
+                }
+            } else {
+                if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
+                    username = decryptText(username);
+                }
+                return username;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Get remembered password
+     * 
+     * @param request the servlet request
+     * @param response the servlet response
+     * @return the password value or null if not found or a problem with security of cookie
+     */
+    public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
+        throws IOException, ServletException
+    {
+        String username = getCookieValue(request.getCookies(), COOKIE_USERNAME, "false");
+        String password = getCookieValue(request.getCookies(), COOKIE_PASSWORD, "false");
+
+        String validationHash = getCookieValue(request.getCookies(), COOKIE_VALIDATION, "false");
+        if (!password.equals("false")) {
+            if (!validationHash.equals("false")) {
+                String calculatedHash =
+                    getValidationHash(username, password, getClientIP(request));
+                if (validationHash.equals(calculatedHash)) {
+                    if (protection.equals(PROTECTION_ALL)
+                        || protection.equals(PROTECTION_ENCRYPTION)) {
+                        password = decryptText(password);
+                    }
+                    return password;
+                } else {
+                    System.out.println("!remember-me cookie validation hash mismatch! ");
+                    System.out.println("!remember-me cookie has been tampered with! ");
+                    System.out.println("!remember-me cookie is being deleted! ");
+                    removeCookie(request, response, COOKIE_USERNAME);
+                    removeCookie(request, response, COOKIE_PASSWORD);
+                    removeCookie(request, response, COOKIE_REMEMBERME);
+                    removeCookie(request, response, COOKIE_VALIDATION);
+                    return null;
+                }
+            } else {
+                if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
+                    password = decryptText(password);
+                }
+                return password;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Decrypt a string.
+     * 
+     * @param encryptedText
+     * @return encryptedText, decrypted
+     */
+    private String decryptText(String encryptedText)
+    {
+        sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
+        try {
+            byte decodedEncryptedText[] = decoder.decodeBuffer(encryptedText);
+            Cipher c1 = Cipher.getInstance(cipherParameters);
+            c1.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] decryptedText = c1.doFinal(decodedEncryptedText);
+            String decryptedTextString = new String(decryptedText);
+            return decryptedTextString;
+        } catch (Exception e) {
+            System.out.println("Error: " + e);
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    protected String getClientIP(HttpServletRequest request)
+    {
+        String remoteIP = request.getHeader("X-Forwarded-For");
+        if (remoteIP == null || "".equals(remoteIP)) {
+            remoteIP = request.getRemoteAddr();
+        } else if (remoteIP.indexOf(',') != -1) {
+            remoteIP = remoteIP.substring(0, remoteIP.indexOf(','));
+        }
+        return remoteIP;
     }
 }

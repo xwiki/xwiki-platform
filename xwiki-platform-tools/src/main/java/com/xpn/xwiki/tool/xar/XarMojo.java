@@ -21,45 +21,45 @@ package com.xpn.xwiki.tool.xar;
 
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
-import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.archiver.ArchiveFileFilter;
-import org.codehaus.plexus.archiver.manager.NoSuchArchiverException;
+import org.codehaus.plexus.archiver.ArchiveEntry;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
-import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
-import org.codehaus.plexus.logging.console.ConsoleLogger;
-import org.codehaus.plexus.logging.Logger;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.FileWriter;
-import java.io.InputStream;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 /**
  * Gather all resources in a XAR file (which is actually a ZIP file). Also generates a XAR
  * descriptor if none is provided.
- *
- * <p>Note that the generated descriptor currently doesn't handle
- * translations.</p>
- *
+ * <p>
+ * Note that the generated descriptor currently doesn't handle translations.
+ * </p>
+ * 
  * @version $Id: $
  * @goal xar
  * @phase package
  * @requiresDependencyResolution runtime
  */
-public class XarMojo extends AbstractMojo
+public class XarMojo extends AbstractXarMojo
 {
     /**
+     * To look up Archiver/UnArchiver implementations.
+     * 
+     * @parameter expression="${component.org.codehaus.plexus.archiver.manager.ArchiverManager}"
+     * @required
+     */
+    protected ArchiverManager archiverManager;
+
+    /**
      * The maven project.
-     *
+     * 
      * @parameter expression="${project}"
      * @required
      * @readonly
@@ -67,15 +67,9 @@ public class XarMojo extends AbstractMojo
     private MavenProject project;
 
     /**
-     * To look up Archiver/UnArchiver implementations
-     *
-     * @parameter expression="${component.org.codehaus.plexus.archiver.manager.ArchiverManager}"
-     * @required
-     */
-    protected ArchiverManager archiverManager;
-    
-    /**
-     * @see org.apache.maven.plugin.Mojo#execute()
+     * {@inheritDoc}
+     * 
+     * @see org.apache.maven.plugin.AbstractMojo#execute()
      */
     public void execute() throws MojoExecutionException, MojoFailureException
     {
@@ -86,21 +80,21 @@ public class XarMojo extends AbstractMojo
 
         try {
             performArchive();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new MojoExecutionException("Error while creating XAR file", e);
         }
     }
 
     /**
      * Create the XAR by zipping the resource files.
-     *
+     * 
      * @throws Exception if the zipping failed for some reason
      */
     private void performArchive() throws Exception
     {
-        File xarFile = new File(this.project.getBuild().getDirectory(),
-            this.project.getArtifactId() + ".xar");
+        File xarFile =
+            new File(this.project.getBuild().getDirectory(), this.project.getArtifactId()
+                + ".xar");
 
         // The source dir points to the target/classes directory where the Maven resources plugin
         // has copied the XAR files during the process-resources phase.
@@ -118,10 +112,10 @@ public class XarMojo extends AbstractMojo
         archiver.addDirectory(sourceDir);
 
         // If no package.xml can be found at the top level of the current project, generate one
-        if (archiver.getFiles().get("package.xml") == null) {
-            File generatedPackageFile = new File(sourceDir, "package.xml");
-            generatePackageXml(generatedPackageFile, archiver.getFiles().keySet());
-            archiver.addFile(generatedPackageFile, "package.xml");
+        if (archiver.getFiles().get(PACKAGE_XML) == null) {
+            File generatedPackageFile = new File(sourceDir, PACKAGE_XML);
+            generatePackageXml(generatedPackageFile, archiver.getFiles().values());
+            archiver.addFile(generatedPackageFile, PACKAGE_XML);
         }
 
         archiver.createArchive();
@@ -129,9 +123,17 @@ public class XarMojo extends AbstractMojo
         this.project.getArtifact().setFile(xarFile);
     }
 
-    private void generatePackageXml(File packageFile, Set files) throws IOException
+    /**
+     * Create and add package configuration file to the package.
+     * 
+     * @param packageFile the package when to add configuration file.
+     * @param files the files in the package.
+     * @throws IOException error when writing the configuration file.
+     */
+    private void generatePackageXml(File packageFile, Collection files) throws IOException
     {
-        this.getLog().info("Generating package.xml descriptor at [" + packageFile.getPath() + "]"); 
+        this.getLog()
+            .info("Generating package.xml descriptor at [" + packageFile.getPath() + "]");
 
         FileWriter fw = new FileWriter(packageFile);
         fw.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
@@ -148,15 +150,13 @@ public class XarMojo extends AbstractMojo
 
         // First element before the "/" is the space name, rest is the document name. Warn if there
         // are more than 1 "/".
-        for (Iterator it = files.iterator(); it.hasNext();)
-        {
-            String fileName = (String) it.next();
-            StringTokenizer st = new StringTokenizer(fileName, "/");
-            if (st.countTokens() != 2) {
-                this.getLog().warn("Invalid file location [" + fileName + "], skipping it.");
-            } else {
-                fw.write("    <file defaultAction=\"0\" language=\"\">" + st.nextToken() + "."
-                    + st.nextToken() + "</file>\n");
+        for (Iterator it = files.iterator(); it.hasNext();) {
+            ArchiveEntry entry = (ArchiveEntry) it.next();
+
+            String fullName = getFullNameFromXML(entry.getFile());
+
+            if (fullName != null) {
+                fw.write(" <file defaultAction=\"0\" language=\"\">" + fullName + "</file>\n");
             }
         }
 
@@ -165,6 +165,32 @@ public class XarMojo extends AbstractMojo
         fw.close();
     }
 
+    /**
+     * Get wiki document full name found in xml.
+     * 
+     * @param file the file to parse.
+     * @return the full name of the document.
+     */
+    private String getFullNameFromXML(File file)
+    {
+        String fullname = null;
+
+        try {
+            XWikiDocument doc = new XWikiDocument();
+            doc.fromXML(file);
+            fullname = doc.getFullName();
+        } catch (Exception e) {
+            this.getLog().warn("Failed to parse " + file.getAbsolutePath(), e);
+        }
+
+        return fullname;
+    }
+
+    /**
+     * Unpack xar dependencies before pack then into it.
+     * 
+     * @throws MojoExecutionException error when unpack dependencies.
+     */
     private void unpackDependentXars() throws MojoExecutionException
     {
         Set artifacts = this.project.getArtifacts();
@@ -181,9 +207,8 @@ public class XarMojo extends AbstractMojo
     }
 
     /**
-     * Unpacks A XAR artifacts into the build output directory, along with the project's
-     * XAR files.
-     *
+     * Unpacks A XAR artifacts into the build output directory, along with the project's XAR files.
+     * 
      * @param artifact the XAR artifact to unpack.
      * @throws MojoExecutionException in case of unpack error
      */
@@ -196,46 +221,6 @@ public class XarMojo extends AbstractMojo
         }
 
         File file = artifact.getFile();
-        try {
-            unpack(file, outputLocation);
-        } catch (NoSuchArchiverException e) {
-            this.getLog().info("Skip unpacking dependency file with unknown extension ["
-                + file.getPath() + "]"); 
-        }
-    }
-
-    /**
-     * Unpacks the XAR file (exclude the package.xml file if it exists)
-     *
-     * @param file File to be unpacked.
-     * @param location Location where to put the unpacked files.
-     */
-    private void unpack(File file, File location)
-        throws MojoExecutionException, NoSuchArchiverException
-    {
-        try {
-            ZipUnArchiver unArchiver = new ZipUnArchiver();
-            unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, "XarMojo"));
-            unArchiver.setSourceFile(file);
-            unArchiver.setDestDirectory(location);
-
-            // Ensure that we don't overwrite XML document files present in this project since
-            // we want those to be used and not the ones in the dependent XAR.
-            unArchiver.setOverwrite(false);
-
-            // Do not unpack any package.xml file in dependant XARs. We'll generate a complete one
-            // automatically.
-            List filters = new ArrayList();
-            filters.add(new ArchiveFileFilter() {
-                public boolean include(InputStream dataStream, String entryName ) {
-                    return (!entryName.equals("package.xml"));
-                }});
-
-            unArchiver.setArchiveFilters(filters);
-            unArchiver.extract();
-        } catch (Exception e) {
-            throw new MojoExecutionException("Error unpacking file [" + file + "] to [" + location
-                + "]", e);
-        }
+        unpack(file, outputLocation, "XarMojo", false);
     }
 }

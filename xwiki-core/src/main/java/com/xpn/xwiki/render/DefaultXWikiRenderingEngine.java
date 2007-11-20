@@ -324,13 +324,24 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
     private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
         XWikiContext context)
     {
-        return ((context == null) ? "xwiki" : context.getDatabase()) + "-"
-            + ((contentdoc == null) ? "" : contentdoc.getDatabase() + ":"
-                + contentdoc.getFullName()) + "-"
-            + ((includingdoc == null) ? "" : includingdoc.getDatabase() + ":"
-                + includingdoc.getFullName()) + "-"
-            + ((context == null || context.getRequest() == null) ? "" : context.getRequest()
-                .getQueryString()) + "-" + text.hashCode();
+        String qs =
+            ((context == null || context.getRequest() == null) ? "" : context.getRequest()
+                .getQueryString());
+        if (qs != null) {
+            qs = qs.replaceAll("refresh=1&?", "");
+            qs = qs.replaceAll("&?refresh=1", "");
+        }
+        String db = ((context == null) ? "xwiki" : context.getDatabase());
+        String cdoc =
+            ((contentdoc == null) ? "" : contentdoc.getDatabase() + ":"
+                + contentdoc.getFullName() + ":" + contentdoc.getRealLanguage());
+        String idoc =
+            ((includingdoc == null) ? "" : includingdoc.getDatabase() + ":"
+                + includingdoc.getFullName() + ":" + includingdoc.getRealLanguage());
+        String action = ((context == null) ? "view" : context.getAction());
+        String lang = ((context == null) ? "" : context.getLanguage());
+        return db + "-" + cdoc + "-" + idoc + "-" + qs + "-" + action + "-" + lang + "-"
+            + text.hashCode();
     }
 
     public void flushCache()

@@ -23,7 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.filters.StringInputStream;
 import org.suigeneris.jrcs.diff.PatchFailedException;
 import org.suigeneris.jrcs.rcs.Archive;
@@ -38,6 +41,7 @@ import org.suigeneris.jrcs.util.ToString;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
@@ -47,6 +51,9 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
  */
 public class XWikiRCSArchive extends Archive
 {
+	/** logger. */
+    private static final Log LOG = LogFactory.getLog(XWikiRCSArchive.class);
+    
     /**
      * Used to serialize {@link XWikiDocumentArchive}.
      * @param nodeInfos - collection of {@link XWikiRCSNodeInfo} in any order
@@ -98,10 +105,12 @@ public class XWikiRCSArchive extends Archive
      */
     private static class XWikiJRCSNode extends TrunkNode
     {
-        /** bug if author=="". */
+        /** bug if author=="". see http://www.suigeneris.org/issues/browse/JRCS-24 */
         public static String sauthorIfEmpty = "_";
-        /** mark that node contains not patch. */
+        /** mark that node contains full text, not diff. */
         public static String sfullVersion = "full";
+        /** mark that node contains diff. */
+        public static String sdiffVersion = "diff";
         /** 
          * @param vernum - version of node
          * @param next - next node (with smaller version) in history
@@ -155,29 +164,78 @@ public class XWikiRCSArchive extends Archive
         }
         /** @param isdiff - true if node stores a diff, false - if full version */
         public void setDiff(boolean isdiff) {            
-            setState(isdiff ? "diff" : sfullVersion);
+            setState(isdiff ? sdiffVersion : sfullVersion);
+        }
+        /** @return is this revision has old format. (xwiki-core<1.2, without author,comment,state fields)*/
+        public boolean hasOldFormat() {
+            return !sfullVersion.equals(getState()) && !sdiffVersion.equals(getState());
         }
         /** @return text of modification.
          *  @see Node#getText() */
         public String getTextString() {
             return mergedText()[0].toString();
         }
+        /** {@inheritDoc}
+         * @throws PatchFailedException 
+         * @throws InvalidFileFormatException */
+        public void patch(List original, boolean annotate) throws InvalidFileFormatException, PatchFailedException {
+            if (isDiff()) {
+                super.patch(original, annotate);
+            } else {
+                // there is full version, so simply copy. @see TrunkNode#patch0(..)
+                // impossible because org.suigeneris.jrcs.rcs.impl.Line is final with default constructor.
+                throw new IllegalArgumentException();
+                /*original.clear();
+        		Object[] lines = getText();
+        		for (int it = 0; it < lines.length; it++) {
+                    original.add(new Line(this, lines[it]));
+                }*/
+            }
+        }
     }
     
     /**
      * @return Collection of pairs [{@link XWikiRCSNodeInfo},  {@link XWikiRCSNodeContent}]
      * @param docId - docId which will be wrote in {@link XWikiRCSNodeId#setDocId(long)}
+     * @throws PatchFailedException 
+     * @throws InvalidFileFormatException 
+     * @throws NodeNotFoundException 
      */
-    public Collection getNodes(long docId) {
+    public Collection getNodes(long docId) throws NodeNotFoundException, InvalidFileFormatException, PatchFailedException {
         Collection result = new ArrayList(nodes.values().size());
         for (Iterator it = nodes.values().iterator(); it.hasNext();) {
             XWikiJRCSNode node = new XWikiJRCSNode((Node) it.next());
             XWikiRCSNodeInfo nodeInfo = new XWikiRCSNodeInfo();
             nodeInfo.setId(new XWikiRCSNodeId(docId, node.getVersion()));
-            nodeInfo.setAuthor(node.getAuthor1());
-            nodeInfo.setComment(node.getLog());
-            nodeInfo.setDate(node.getDate());
             nodeInfo.setDiff(node.isDiff());
+            
+            if (!node.hasOldFormat()) {
+            	nodeInfo.setAuthor(node.getAuthor1());
+                nodeInfo.setComment(node.getLog());
+                nodeInfo.setDate(node.getDate());
+            } else {
+            	// If the archive node is old so there is no author, comment and date fields so we set them using the
+                // ones from a XWikiDocment object that we construct using the archive content.
+            	String xml = getRevisionAsString(node.getVersion());
+
+            	try {
+                    XWikiDocument doc = new XWikiDocument();
+                    doc.fromXML(xml);
+                    // set this fields from old document
+                    nodeInfo.setAuthor(doc.getAuthor());
+                    nodeInfo.setComment(doc.getComment());
+                    nodeInfo.setDate(doc.getDate());
+                } catch (Exception e) {
+                    // Two potential known errors:
+                    // 1) Revision 1.1 doesn't exist. Some time in the past there was a bug in XWiki where version
+                    //    were starting at 1.2. When this happens the returned xml has a value of "\n".
+                    // 2) A Class property with an invalid XML name was created.
+                    //    See http://jira.xwiki.org/jira/browse/XWIKI-1855
+                    LOG.warn("Error in revision [" + node.getVersion().toString() + "]: [" + e.getMessage()
+                        + "]. Ignoring non-fatal error.");
+                }
+            }
+
             XWikiRCSNodeContent content = new XWikiRCSNodeContent(nodeInfo.getId());
             content.setPatch(new XWikiPatch(node.getTextString(), node.isDiff()));
             nodeInfo.setContent(content);

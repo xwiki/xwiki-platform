@@ -195,30 +195,6 @@ public class XWikiDocumentArchive
                 XWikiRCSNodeInfo    nodeInfo    = (XWikiRCSNodeInfo) it.next();
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
 
-                // If the archive node is old there is no author, comment and date fields so we set them using the
-                // ones from a XWikiDocment object that we construct using the archive content.
-                if (nodeInfo.getAuthor() == null || nodeInfo.getAuthor().indexOf('.') < 0) {
-                    Version ver = nodeInfo.getVersion();
-                    String xml = archive.getRevisionAsString(ver);
-
-                    try {
-                        XWikiDocument doc = new XWikiDocument();
-                        doc.fromXML(xml);
-                        // set this fields from old document
-                        nodeInfo.setAuthor(doc.getAuthor());
-                        nodeInfo.setComment(doc.getComment());
-                        nodeInfo.setDate(doc.getDate());
-                    } catch (Exception e) {
-                        // Two potential known errors:
-                        // 1) Revision 1.1 doesn't exist. Some time in the past there was a bug in XWiki where version
-                        //    were starting at 1.2. When this happens the returned xml has a value of "\n".
-                        // 2) A Class property with an invalid XML name was created.
-                        //    See http://jira.xwiki.org/jira/browse/XWIKI-1855
-                        LOG.warn("Error in revision [" + ver.toString() + "]: [" + e.getMessage()
-                            + "]. Ignoring non-fatal error.");
-                    }
-                }
-
                 updateNode(nodeInfo);
                 updatedNodeInfos.add(nodeInfo);
                 updatedNodeContents.add(nodeContent);

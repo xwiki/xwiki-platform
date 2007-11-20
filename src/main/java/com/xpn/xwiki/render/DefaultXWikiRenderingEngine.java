@@ -340,6 +340,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                 + includingdoc.getFullName() + ":" + includingdoc.getRealLanguage());
         String action = ((context == null) ? "view" : context.getAction());
         String lang = ((context == null) ? "" : context.getLanguage());
+        lang += ((contentdoc == null) ? "" : ":" + contentdoc.getRealLanguage());
         return db + "-" + cdoc + "-" + idoc + "-" + qs + "-" + action + "-" + lang + "-"
             + text.hashCode();
     }

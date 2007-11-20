@@ -334,10 +334,12 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         String db = ((context == null) ? "xwiki" : context.getDatabase());
         String cdoc =
             ((contentdoc == null) ? "" : contentdoc.getDatabase() + ":"
-                + contentdoc.getFullName() + ":" + contentdoc.getRealLanguage());
+                + contentdoc.getFullName() + ":" + contentdoc.getRealLanguage() + ":"
+                + contentdoc.getVersion());
         String idoc =
             ((includingdoc == null) ? "" : includingdoc.getDatabase() + ":"
-                + includingdoc.getFullName() + ":" + includingdoc.getRealLanguage());
+                + includingdoc.getFullName() + ":" + includingdoc.getRealLanguage() + ":"
+                + includingdoc.getVersion());
         String action = ((context == null) ? "view" : context.getAction());
         String lang = ((context == null) ? "" : context.getLanguage());
         lang += ((contentdoc == null) ? "" : ":" + contentdoc.getRealLanguage());

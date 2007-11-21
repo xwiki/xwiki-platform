@@ -147,6 +147,6 @@ public class UnXarMojo extends AbstractXarMojo
 
         getLog().debug("Source XAR = " + HOOK_OPEN + artifact.getFile() + HOOK_CLOSE);
 
-        unpack(artifact.getFile(), this.outputDirectory, "XarMojo", false);
+        unpack(artifact.getFile(), this.outputDirectory, "XarMojo", true);
     }
 }

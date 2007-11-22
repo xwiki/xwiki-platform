@@ -485,6 +485,11 @@
       <artifactId>xwiki-core-component</artifactId>
       <version>${version}</version>
     </dependency>
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>1.4</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>

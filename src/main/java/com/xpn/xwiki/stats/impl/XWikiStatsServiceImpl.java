@@ -27,6 +27,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
+import com.xpn.xwiki.stats.impl.DocumentStats;
+import com.xpn.xwiki.stats.impl.StatsUtil;
+import com.xpn.xwiki.stats.impl.VisitStats;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.jcr.XWikiJcrStore;
@@ -43,6 +46,7 @@ import org.apache.portals.graffito.jcr.query.Filter;
 import org.apache.portals.graffito.jcr.query.QueryManager;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.joda.time.DateTime;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
@@ -566,6 +570,328 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     return cookie;
    }
 
+    /**
+     * {@inheritDoc}
+     */
+    public Map getActionStatistics(String action, Scope scope, Period period, Duration step,
+        XWikiContext context)
+    {
+        DateTime stepStart = new DateTime(period.getStart());
+        DateTime periodEnd = new DateTime(period.getEnd());
+        org.joda.time.Period stepDuration =
+            new org.joda.time.Period(step.getYears(), step.getMonths(), step.getWeeks(), step
+                .getDays(), 0, 0, 0, 0);
+        Map activity = new HashMap();
+        while (stepStart.compareTo(periodEnd) < 0) {
+            DateTime stepEnd = stepStart.plus(stepDuration);
+            if (stepEnd.compareTo(periodEnd) > 0) {
+                stepEnd = periodEnd;
+            }
+            List stats =
+                this.getDocumentStatistics(action, scope, new Period(stepStart.getMillis(),
+                    stepEnd.getMillis()), IntervalFactory.FIRST, context);
+            int actionCount = 0;
+            if (stats.size() > 0) {
+                actionCount = ((DocumentStats) stats.get(0)).getPageViews();
+            }
+            activity.put(stepStart, new Integer(actionCount));
+            stepStart = stepEnd;
+        }
+        return activity;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List getDocumentStatistics(String action, Scope scope, Period period,
+        Interval interval, XWikiContext context)
+    {
+        String nameFilter = "name like :name";
+        boolean hasNameParam = true;
+        if (scope.getType() == Scope.SPACE_SCOPE && "".equals(scope.getName())) {
+            nameFilter = "name not like '%.%' and name <> ''";
+            hasNameParam = false;
+        }
+        String sortOrder = "desc";
+        if (interval.getSize() < 0) {
+            sortOrder = "asc";
+        }
+        XWikiHibernateStore store = null;
+        try {
+            store = context.getWiki().getHibernateStore();
+            store.beginTransaction(context);
+            Session session = store.getSession(context);
+            Query query =
+                session
+                    .createQuery("select name, sum(pageViews) from DocumentStats where action=:action and "
+                        + nameFilter
+                        + " and :startDate <= period and period <= :endDate group by name order by sum(pageViews) "
+                        + sortOrder);
+            query.setString("action", action);
+            if (hasNameParam) {
+                query.setString("name", scope.getPattern());
+            }
+            query.setInteger("startDate", period.getStartCode());
+            query.setInteger("endDate", period.getEndCode());
+
+            List results =
+                getDocumentStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                    .getAbsoluteStart(), context), action);
+            if (interval.getSize() < 0) {
+                Collections.reverse(results);
+            }
+            return results;
+        } catch (XWikiException e) {
+            return Collections.EMPTY_LIST;
+        } finally {
+            try {
+                store.endTransaction(context, false);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * Converts the rows retrieved from the database to a list of DocumentStats instances
+     * 
+     * @param resultSet the result of a database query for document statistics
+     * @param action the action for which the statistics were retrieved
+     * @return a list of {@link com.xpn.xwiki.stats.impl.DocumentStats} objects
+     * @see #getDocumentStatistics(String, Scope, Period, Interval, XWikiContext)
+     */
+    private List getDocumentStatistics(List resultSet, String action)
+    {
+        Date now = Calendar.getInstance().getTime();
+        List stats = new ArrayList(resultSet.size());
+        Iterator it = resultSet.iterator();
+        while (it.hasNext()) {
+            Object[] result = (Object[]) it.next();
+            // We can't represent a custom period (e.g. year, week or some time interval) in the
+            // database and thus we use a default one, which sould be ignored
+            DocumentStats docStats =
+                new DocumentStats((String) result[0], action, now, StatsUtil.PERIOD_DAY);
+            docStats.setPageViews(((Integer) result[1]).intValue());
+            stats.add(docStats);
+        }
+        return stats;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List getBackLinkStatistics(String domain, Scope scope, Period period,
+        Interval interval, XWikiContext context)
+    {
+        if (domain == null || domain.trim().length() == 0) {
+            domain = "%";
+        }
+        String nameFilter = "name like :name";
+        boolean hasNameParam = true;
+        if (scope.getType() == Scope.SPACE_SCOPE && "".equals(scope.getName())) {
+            nameFilter = "name not like '%.%' and name <> ''";
+            hasNameParam = false;
+        }
+        String sortOrder = "desc";
+        if (interval.getSize() < 0) {
+            sortOrder = "asc";
+        }
+        XWikiHibernateStore store = null;
+        try {
+            store = context.getWiki().getHibernateStore();
+            store.beginTransaction(context);
+            Session session = store.getSession(context);
+            Query query =
+                session
+                    .createQuery("select name, sum(pageViews) from RefererStats where "
+                        + nameFilter
+                        + " and referer like :referer and :startDate <= period and period <= :endDate group by name order by sum(pageViews) "
+                        + sortOrder);
+            if (hasNameParam) {
+                query.setString("name", scope.getPattern());
+            }
+            query.setString("referer", domain);
+            query.setInteger("startDate", period.getStartCode());
+            query.setInteger("endDate", period.getEndCode());
+
+            List results =
+                getDocumentStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                    .getAbsoluteStart(), context), "refer");
+            if (interval.getSize() < 0) {
+                Collections.reverse(results);
+            }
+            return results;
+        } catch (XWikiException e) {
+            return Collections.EMPTY_LIST;
+        } finally {
+            try {
+                store.endTransaction(context, false);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List getRefererStatistics(String domain, Scope scope, Period period,
+        Interval interval, XWikiContext context)
+    {
+        if (domain == null || domain.trim().length() == 0) {
+            domain = "%";
+        }
+        String nameFilter = "name like :name";
+        boolean hasNameParam = true;
+        if (scope.getType() == Scope.SPACE_SCOPE && "".equals(scope.getName())) {
+            nameFilter = "name not like '%.%' and name <> ''";
+            hasNameParam = false;
+        }
+        String sortOrder = "desc";
+        if (interval.getSize() < 0) {
+            sortOrder = "asc";
+        }
+        XWikiHibernateStore store = null;
+        try {
+            store = context.getWiki().getHibernateStore();
+            store.beginTransaction(context);
+            Session session = store.getSession(context);
+            Query query =
+                session
+                    .createQuery("select referer, sum(pageViews) from RefererStats where "
+                        + nameFilter
+                        + " and referer like :referer and :startDate <= period and period <= :endDate group by referer order by sum(pageViews) "
+                        + sortOrder);
+            if (hasNameParam) {
+                query.setString("name", scope.getPattern());
+            }
+            query.setString("referer", domain);
+            query.setInteger("startDate", period.getStartCode());
+            query.setInteger("endDate", period.getEndCode());
+
+            List results =
+                getRefererStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                    .getAbsoluteStart(), context));
+            if (interval.getSize() < 0) {
+                Collections.reverse(results);
+            }
+            return results;
+        } catch (XWikiException e) {
+            return Collections.EMPTY_LIST;
+        } finally {
+            try {
+                store.endTransaction(context, false);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * Converts the rows retrieved from the database to a list of
+     * {@link com.xpn.xwiki.stats.impl.RefererStats} instances
+     * 
+     * @param resultSet The result of a database query for referer statistics
+     * @return A list of {@link com.xpn.xwiki.stats.impl.RefererStats} objects
+     * @see #getRefererStatistics(String, Scope, Period, Interval, XWikiContext)
+     */
+    private List getRefererStatistics(List resultSet)
+    {
+        Date now = Calendar.getInstance().getTime();
+        List stats = new ArrayList(resultSet.size());
+        Iterator it = resultSet.iterator();
+        while (it.hasNext()) {
+            Object[] result = (Object[]) it.next();
+            // We can't represent a custom period (e.g. year, week or some time interval) in the
+            // database and thus we use a default one, which sould be ignored
+            RefererStats refStats =
+                new RefererStats("", (String) result[0], now, StatsUtil.PERIOD_DAY);
+            refStats.setPageViews(((Integer) result[1]).intValue());
+            stats.add(refStats);
+        }
+        return stats;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List getVisitStatistics(String action, Period period, Interval interval,
+        XWikiContext context)
+    {
+        String sortOrder = "desc";
+        if (interval.getSize() < 0) {
+            sortOrder = "asc";
+        }
+        String orderByClause =
+            "order by sum(pageSaves) " + sortOrder + ", sum(pageViews) " + sortOrder
+                + ", sum(downloads) " + sortOrder;
+        if (action.equals("save")) {
+            orderByClause = "order by sum(pageSaves) " + sortOrder;
+        } else if (action.equals("view")) {
+            orderByClause = "order by sum(pageViews) " + sortOrder;
+        } else if (action.equals("download")) {
+            orderByClause = "order by sum(downloads) " + sortOrder;
+        }
+        XWikiHibernateStore store = null;
+        try {
+            store = context.getWiki().getHibernateStore();
+            store.beginTransaction(context);
+            Session session = store.getSession(context);
+            Query query =
+                session
+                    .createQuery("select name, uniqueID, cookie, IP, userAgent, sum(pageSaves), sum(pageViews), sum(downloads) from VisitStats where :startDate <= startDate and endDate < :endDate group by name "
+                        + orderByClause);
+            query.setDate("startDate", new Date(period.getStart()));
+            query.setDate("endDate", new Date(period.getEnd()));
+
+            List results =
+                getVisitStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                    .getAbsoluteStart(), context), new DateTime(period.getStart()),
+                    new DateTime(period.getEnd()));
+            if (interval.getSize() < 0) {
+                Collections.reverse(results);
+            }
+            return results;
+        } catch (XWikiException e) {
+            return Collections.EMPTY_LIST;
+        } finally {
+            try {
+                store.endTransaction(context, false);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    /**
+     * Converts the rows retrieved from the database to a list of VisitStats instances
+     * 
+     * @param resultSet the result of a database query for visitor statistics
+     * @param startDate the start date used in the query
+     * @param endDate the end date used in the query
+     * @return a list of {@link com.xpn.xwiki.stats.impl.VisitStats} objects
+     * @see #getVisitStatistics(Period, Interval, XWikiContext)
+     */
+    private List getVisitStatistics(List resultSet, DateTime startDate, DateTime endDate)
+    {
+        List stats = new ArrayList(resultSet.size());
+        Iterator it = resultSet.iterator();
+        while (it.hasNext()) {
+            Object[] result = (Object[]) it.next();
+            String name = (String) result[0];
+            String uniqueID = (String) result[1];
+            String cookie = (String) result[2];
+            String ip = (String) result[3];
+            String userAgent = (String) result[4];
+            int pageSaves = ((Integer) result[5]).intValue();
+            int pageViews = ((Integer) result[6]).intValue();
+            int downloads = ((Integer) result[7]).intValue();
+            VisitStats vs =
+                new VisitStats(name, uniqueID, cookie, ip, userAgent, new Date(startDate
+                    .getMillis()), StatsUtil.PERIOD_DAY);
+            vs.setStartDate(new Date(startDate.getMillis()));
+            vs.setEndDate(new Date(endDate.getMillis()));
+            vs.setPageSaves(pageSaves);
+            vs.setPageViews(pageViews);
+            vs.setDownloads(downloads);
+            stats.add(vs);
+        }
+        return stats;
+    }
 }
-
-

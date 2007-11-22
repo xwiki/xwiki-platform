@@ -50,6 +50,11 @@ public class XWiki extends Api
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
 
     private com.xpn.xwiki.XWiki xwiki;
+    
+    /**
+     * @see #getStatsService()
+     */
+    private StatsService statsService;
 
     /**
      * XWiki API Constructor
@@ -61,6 +66,7 @@ public class XWiki extends Api
     {
         super(context);
         this.xwiki = xwiki;
+        this.statsService = new StatsService(context);
     }
 
     /**
@@ -1821,6 +1827,7 @@ public class XWiki extends Api
      * @param action action for which to retrieve statistics (view/save/download)
      * @return A DocumentStats object with number of actions performed, unique visitors, number of
      *         visits
+     * @deprecated use {@link #getStatsService()} instead
      */
     public DocumentStats getCurrentMonthXWikiStats(String action)
     {
@@ -2099,6 +2106,7 @@ public class XWiki extends Api
      * @param action ("view" or "edit")
      * @param size how many recent actions to retrieve
      * @return a ArrayList of document names
+     * @deprecated use {@link #getStatsService()} instead
      */
     public java.util.Collection getRecentActions(String action, int size)
     {
@@ -2932,5 +2940,15 @@ public class XWiki extends Api
     public String add(String a, String b) {
         long c = Long.parseLong(a) + Long.parseLong(b);
         return "" + c;
+    }
+    
+    /**
+     * Access statistics api
+     * 
+     * @return a StatsService instance that can be used to retrieve different xwiki statistics
+     */
+    public StatsService getStatsService()
+    {
+        return this.statsService;
     }
 }

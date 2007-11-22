@@ -63,11 +63,7 @@ public class XWikiStats extends BaseCollection {
     }
 
     public int hashCode() {
-        String str = getName()+getClassName();
-        int nb = getNumber();
-        if (nb>0)
-            str += "_" + nb;
-        return str.hashCode();
+        return (getName() + getClassName() + "_" + getNumber()).hashCode();
     }
 
     public void setId(int id) {

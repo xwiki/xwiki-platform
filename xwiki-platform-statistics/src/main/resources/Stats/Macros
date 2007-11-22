@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Stats</web>
+<name>Macros</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>Stats.WebHome</parent>
+<customClass></customClass>
+<title>Statistics Macros</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>true</minorEdit>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Stats.Macros</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>&lt;style type="text/css"&gt;
+table.stats{
+width:100%;
+}
+table.stats th{
+font-weight:normal;
+color:#333333;
+border-bottom:1px solid #DDDDDD;
+border-top:1px solid #DDDDDD;
+padding-bottom:2px;
+}
+table.stats td{
+color:#888888;
+}
+table.stats th.numeric, table.stats td.numeric{
+text-align:right;
+padding-right:6px;
+width:70px;
+}
+&lt;/style&gt;
+#macro(printPageStats $stats)
+&lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class="numeric"&gt;Hits&lt;/th&gt;
+&lt;th&gt;Page&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+#foreach($item in $stats)
+#set($docStats = $xwiki.getDocument($item.name))
+#if ($docStats)
+#set($title = $docStats.displayTitle)
+&lt;tr&gt;
+&lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
+&lt;td&gt;[$docStats.name&amp;gt;${docStats.web}.$docStats.name.replaceAll("@","%40")]#if ($title != $docStats.name) - &lt;em&gt;$title&lt;/em&gt;#end
+&lt;/td&gt;
+&lt;/tr&gt;
+#end
+#end
+&lt;/tbody&gt;
+&lt;/table&gt;
+#end
+#macro(printSpaceStats $stats)
+&lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class="numeric"&gt;Hits&lt;/th&gt;
+&lt;th&gt;Space&lt;/th&gt;
+&lt;/tr&gt;&lt;/thead&gt;
+&lt;tbody&gt;
+#foreach($item in $stats)
+&lt;tr&gt;
+&lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
+&lt;td&gt;[$item.name&amp;gt;${item.name}.WebHome]&lt;/td&gt;
+&lt;/tr&gt;
+#end
+&lt;/tbody&gt;
+&lt;/table&gt;
+#end
+#macro(printContributorStats $stats)
+&lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class="numeric"&gt;Changes&lt;/th&gt;
+&lt;th&gt;User&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+#foreach($item in $stats)
+#set($userName = $xwiki.getUserName($item.name))
+#if($userName)
+&lt;tr&gt;
+&lt;td class="numeric"&gt;$item.pageSaves&lt;/td&gt;
+&lt;td&gt;$userName&lt;/td&gt;
+&lt;/tr&gt;
+#end
+#end
+&lt;/tbody&gt;
+&lt;/table&gt;
+#end
+#macro(printRefererStats $stats)
+&lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th class="numeric"&gt;Sources&lt;/th&gt;
+&lt;th&gt;Referrer&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+#foreach($item in $stats)
+&lt;tr&gt;
+&lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
+&lt;td&gt;&lt;a href="$item.referer" title="$item.URL.host"&gt;$item.URL.host&lt;/td&gt;
+&lt;/tr&gt;
+#end
+&lt;/tbody&gt;
+&lt;/table&gt;
+#end</content>
+</xwikidoc>

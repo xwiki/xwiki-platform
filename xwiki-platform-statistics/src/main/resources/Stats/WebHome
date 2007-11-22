@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Stats</web>
+<name>WebHome</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<customClass></customClass>
+<title>Statistics Home</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>true</minorEdit>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Stats.WebHome</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>1 Statistics
+
+#if($xwiki.statsService.enabled)
+#set($chartWidth = 380)
+#displayPanelLayout(2 ["Stats.MostViewedPages", "Stats.MostActiveContributors", "Stats.CurrentMonthActivity", "Stats.MostReferredPages"])
+#info("For more statistics see [Document Statistics&gt;Stats.Document], [Visit Statistics&gt;Stats.Visit], [Activity Statistics&gt;Stats.Activity] and [Referrer Statistics&gt;Stats.Referrer].")
+#else
+#warning("
+The statistics module is disabled by default for improved performances. It can be globally activated by setting the value of *&lt;tt&gt;xwiki.stats&lt;/tt&gt;* to *&lt;tt&gt;1&lt;/tt&gt;* in the *&lt;tt&gt;xwiki.cfg&lt;/tt&gt;* configuration file. For more details, see [xwiki.org&gt;http://www.xwiki.org].
+
+Activating the statistics module makes the following information available to you:
+
+* Most edited pages
+* Most active users
+* Current month activity
+* Most referred pages
+* and much more!
+")
+#end</content>
+</xwikidoc>

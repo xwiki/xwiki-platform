@@ -21,6 +21,8 @@
 
 package com.xpn.xwiki.stats.impl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Date;
 
 public class RefererStats extends XWikiStats {
@@ -44,5 +46,14 @@ public class RefererStats extends XWikiStats {
 
     public void setReferer(String referer) {
         setStringValue("referer", referer);
+    }
+    
+    public URL getURL()
+    {
+        try {
+            return new URL(getReferer());
+        } catch (MalformedURLException e) {
+            return null;
+        }
     }
 }

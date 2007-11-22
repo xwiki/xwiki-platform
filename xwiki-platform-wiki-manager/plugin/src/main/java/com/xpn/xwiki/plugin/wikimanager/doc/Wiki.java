@@ -13,6 +13,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * This class manage wiki document descriptor.
  * 
  * @version $Id: $
+ * @future XA2 : create a Wiki interface to implement here and rename.
  */
 public class Wiki extends Document
 {

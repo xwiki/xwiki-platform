@@ -148,6 +148,14 @@ public interface XWikiClient
      * rendered as if it were the body of the page (useful for a 'preview page' function). If it's
      * not provided, then the existing content of the page is used instead (ie useful for 'view
      * page' function).
+     *
+     * @param spaceKey unused. We have to have since it's in the Confluence XMLRPC API but it doesn't seem to be used.
+     * @param pageId the id of page to get rendered HTML. A getPage() call should be done to get the pageId. The
+     *        pageId can be in any format since this API will support any server side system implementing it.
+     * @param content if this is set, it will replace the original content for rendering
+     * @return the string representing the rendered content of the page as HTML
+     * @throws XWikiClientException in case of error
+     * @throws XWikiClientRemoteException in case of error
      */
     String renderContent(String spaceKey, String pageId, String content)
         throws XWikiClientException, XWikiClientRemoteException;

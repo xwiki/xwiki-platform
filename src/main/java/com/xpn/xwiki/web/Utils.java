@@ -230,7 +230,9 @@ public class Utils
         String dbname = "xwiki";
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
-        // Push the URL into the Log4j NDC context
+
+        // Push the URL into the Log4j MDC context so that we can display it in the generated logs using the
+        // %X{url} syntax.
         MDC.put("url", url);
 
         context.setEngineContext(engine_context);

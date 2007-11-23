@@ -80,6 +80,13 @@ public class DomainObjectFactory
         throws XWikiException
     {
         XWiki xwiki = context.getWiki();
+
+        // First verify that the pageId is valid. It must be of the form Space.Page.
+        if (pageId.indexOf('.') == -1) {
+            throw exception("The page format for [" + pageId
+                + "] is invalid. A page id must be of the form Space.Page");
+        }
+
         if (!pageId.contains(PAGE_VERSION_SEPARATOR)) {
             // Current version of document
             if (xwiki.exists(pageId, context)) {
@@ -90,7 +97,7 @@ public class DomainObjectFactory
 
                 return xwiki.getDocument(pageId, context);
             } else {
-                throw exception("The page '" + pageId + "' does not exist.");
+                throw exception("The page [" + pageId + "] does not exist.");
             }
         } else {
             int i = pageId.indexOf(PAGE_VERSION_SEPARATOR);
@@ -105,7 +112,7 @@ public class DomainObjectFactory
                 XWikiDocument currentDoc = xwiki.getDocument(fullName, context);
                 return xwiki.getDocument(currentDoc, version, context);
             } else {
-                throw exception("The page '" + fullName + "' does not exist.");
+                throw exception("The page [" + fullName + "] does not exist.");
             }
         }
     }

@@ -665,10 +665,11 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
      * is used instead (ie useful for 'view page' function).
      * 
      * @param token the authentication token retrieved when calling the login method
-     * @param spaceKey in which space is our page
-     * @param pageId id of page to get rendered HTML
+     * @param spaceKey unused. We have to have since it's in the Confluence XMLRPC API but it doesn't seem to be used.
+     * @param pageId the id of page to get rendered HTML. A getPage() call should be done to get the pageId. The
+     *        pageId can be in any format since this API will support any server side system implementing it.
      * @param content if this is set, it will replace the original content for rendering
-     * @return string representing rendered content of page as HTML
+     * @return the string representing the rendered content of the page as HTML
      * @throws XWikiException in case of error
      */
     public String renderContent(String token, String spaceKey, String pageId, String content)

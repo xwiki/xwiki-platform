@@ -8,7 +8,7 @@
 <div class="changes-info-title">$msg.get("changes.from") $msg.get("changes.version") $request.rev1</div>
 <div class="changes-info-content">
 #if($origdoc)
-$msg.get("changes.editedby") $xwiki.renderText($xwiki.getLocalUserName($newdoc.author),$doc)
+$msg.get("changes.editedby") $xwiki.renderText($xwiki.getLocalUserName($origdoc.author),$doc)
 <br />
 $msg.get("changes.on") $xwiki.formatDate($origdoc.date)
 #end

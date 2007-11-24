@@ -118,7 +118,7 @@ public class ImageMacro extends BaseLocaleMacro {
             alt = title = img;
         }
 
-        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getContext();
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getXWikiContext();
 
         // Get the target document
         XWikiDocument doc = null;

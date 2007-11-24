@@ -43,7 +43,7 @@ public class GraphVizMacro  extends BaseLocaleMacro {
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();
 
-        XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getContext();
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getXWikiContext();
         XWiki xwiki = xcontext.getWiki();
 
         GraphVizPlugin plugin = (GraphVizPlugin) xwiki.getPlugin("graphviz", xcontext);

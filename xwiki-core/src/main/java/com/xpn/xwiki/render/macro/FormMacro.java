@@ -42,7 +42,7 @@ public class FormMacro  extends BaseLocaleMacro {
 
     RenderContext context = params.getContext();
     RenderEngine engine = context.getRenderEngine();
-    XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getContext();
+    XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getXWikiContext();
     XWikiDocument doc = xcontext.getDoc();
 
     String className = params.get("text", 0);

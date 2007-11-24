@@ -37,11 +37,22 @@ import java.util.Locale;
 
 public class XWikiRadeoxRenderer  implements XWikiRenderer {
     private boolean removePre = true;
+    private XWikiRadeoxRenderEngine radeoxEngine;
 
-    public XWikiRadeoxRenderer() {
+    public XWikiRadeoxRenderer()
+    {
+        // This is needed so that our local config is used
+        InitialRenderContext ircontext = new BaseInitialRenderContext();
+        Locale locale = new Locale("xwiki", "xwiki");
+        ircontext.set(RenderContext.INPUT_LOCALE, locale);
+        ircontext.set(RenderContext.OUTPUT_LOCALE, locale);
+        ircontext.setParameters(new HashMap());
+
+        this.radeoxEngine = new XWikiRadeoxRenderEngine(ircontext);
     }
 
     public XWikiRadeoxRenderer(boolean removePre) {
+        this();
         setRemovePre(removePre);
     }
 
@@ -58,16 +69,10 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
             rcontext.set("xcontext", context);
         }
         if (rcontext.getRenderEngine()==null) {
-            // This is needed so that our local config is used
-            InitialRenderContext ircontext = new BaseInitialRenderContext();
-            Locale locale = new Locale("xwiki", "xwiki");
-            ircontext.set(RenderContext.INPUT_LOCALE, locale);
-            ircontext.set(RenderContext.OUTPUT_LOCALE, locale);
-            ircontext.setParameters(new HashMap());
+            this.radeoxEngine.setXWikiContext(context);
 
-            XWikiRadeoxRenderEngine radeoxengine = new XWikiRadeoxRenderEngine(ircontext, context);
-            rcontext.setRenderEngine(radeoxengine);
-
+            // Note: Are there any case where we would want to clone the radeox context?
+            rcontext.setRenderEngine(this.radeoxEngine);
         }
         String result = rcontext.getRenderEngine().render(content, rcontext);
         return preTagSubst.insertNonWikiText(result);

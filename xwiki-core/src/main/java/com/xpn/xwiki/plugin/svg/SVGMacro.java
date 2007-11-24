@@ -44,7 +44,7 @@ public class SVGMacro  extends BaseLocaleMacro {
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();
 
-        XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getContext();
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getXWikiContext();
         XWiki xwiki = xcontext.getWiki();
 
         SVGPlugin plugin = (SVGPlugin) xwiki.getPlugin("svg", xcontext);

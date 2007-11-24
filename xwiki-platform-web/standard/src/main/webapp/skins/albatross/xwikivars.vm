@@ -9,12 +9,20 @@
 #set($spaceviewurl = $spaceDoc.getURL("view"))
 #set($viewurl = $doc.getURL("view"))
 #set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
+## =====================================================================================
+## Advanced users are:
+## - super admin
+## - user documents who have their usertype property set to "Advanced"
+## - guest users who have admin rights (i.e. when the wiki is empty with no rights set)
+## =====================================================================================
 #if($context.user == "XWiki.superadmin")
-#set($isAdvancedUser = true)
+  #set($isAdvancedUser = true)
+#elseif($isguest && $hasadmin)
+  #set($isAdvancedUser = true)
 #elseif(!$objuser.getProperty("usertype").value)
-#set($isAdvancedUser = false)
+  #set($isAdvancedUser = false)
 #else
-#set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"))
+  #set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"))
 #end
 #set($parent ="<a href='$doc.getParentURL()'>${xwiki.getDocument($doc.parent).displayTitle}</a>")
 #if($tdoc)

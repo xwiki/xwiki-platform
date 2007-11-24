@@ -73,6 +73,7 @@ width:70px;
 &lt;tr&gt;
 &lt;th class="numeric"&gt;Hits&lt;/th&gt;
 &lt;th&gt;Page&lt;/th&gt;
+&lt;th&gt;Space&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
@@ -82,8 +83,8 @@ width:70px;
 #set($title = $docStats.displayTitle)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;[$docStats.name&amp;gt;${docStats.web}.$docStats.name.replaceAll("@","%40")]#if ($title != $docStats.name) - &lt;em&gt;$title&lt;/em&gt;#end
-&lt;/td&gt;
+&lt;td&gt;[$docStats.name&amp;gt;${docStats.web}.$docStats.name.replaceAll("@","%40")]#if ($title != $docStats.name) - &lt;em&gt;$title&lt;/em&gt;#end&lt;/td&gt;
+&lt;td&gt;[$docStats.web&amp;gt;${docStats.web}.WebHome]&lt;/td&gt;
 &lt;/tr&gt;
 #end
 #end

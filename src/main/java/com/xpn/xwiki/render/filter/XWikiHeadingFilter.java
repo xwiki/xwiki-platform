@@ -84,7 +84,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 
         RenderContext rcontext = context.getRenderContext();
         XWikiContext xcontext =
-            ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getContext();
+            ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getXWikiContext();
         XWikiDocument doc = xcontext.getDoc();
 
         log.debug("Processing '" + text + "'");

@@ -44,7 +44,7 @@ public class StyleMacro extends BaseLocaleMacro {
             throws IllegalArgumentException, IOException {
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();
-        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getContext();
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getXWikiContext();
 
         String text = params.getContent();
         String type = params.get("type");

@@ -100,7 +100,7 @@ public class AttachMacro extends BaseLocaleMacro {
         }
         text = Encoder.escape(text);
 
-        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getContext();
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getXWikiContext();
 
         // Get the target document
         XWikiDocument doc = null;

@@ -18,8 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
-
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
@@ -46,48 +44,48 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+/**
+ * Before this class can be used you need to call setXWikiContext().
+ */
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine {
     private static Log log = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
-    private XWikiContext context;
+    private XWikiContext xwikiContext;
     protected FilterPipe fp;
 
-    public XWikiRadeoxRenderEngine(XWikiContext context) {
-        // super();
-        this.setContext(context);
-    }
-
-    public XWikiRadeoxRenderEngine(InitialRenderContext ircontext, XWikiContext context) {
+    public XWikiRadeoxRenderEngine(InitialRenderContext ircontext) {
         super(ircontext);
-        this.setContext(context);
+        init();
     }
 
-    public XWikiContext getContext() {
-        return context;
+    public XWikiContext getXWikiContext() {
+        return this.xwikiContext;
     }
 
-    public void setContext(XWikiContext context) {
-        this.context = context;
+    public void setXWikiContext(XWikiContext context) {
+        this.xwikiContext = context;
     }
 
-    // Overidding to load our own Filter list.
-    protected void init() {
-        if (null == fp) {
-            fp = new FilterPipe(initialContext);
+    /**
+     * We override this method from {@link BaseRenderEngine} in order to provide our own initialization of Filters.
+     * In this manner we can load our filter definition from the
+     * META-INF/services/com.xpn.xwiki.render.filter.XWikiFilter file.
+     */
+    protected void init()
+    {
+        fp = new FilterPipe(initialContext);
 
-            Iterator iterator = Service.providers(XWikiFilter.class);
-            while (iterator.hasNext()) {
-                try {
-                    Filter filter = (Filter) iterator.next();
-                    fp.addFilter(filter);
-                    log.debug("Loaded filter: " + filter.getClass().getName());
-                } catch (Exception e) {
-                    log.warn("BaseRenderEngine: unable to load filter", e);
-                }
+        Iterator iterator = Service.providers(XWikiFilter.class);
+        while (iterator.hasNext()) {
+            try {
+                Filter filter = (Filter) iterator.next();
+                fp.addFilter(filter);
+                log.debug("Radeox filter [" + filter.getClass().getName() + "] loaded");
+            } catch (Exception e) {
+                log.error("Failed to load Radeox filter", e);
             }
-
-            fp.init();
-            //Logger.debug("FilterPipe = "+fp.toString());
         }
+
+        fp.init();
     }
 
     /**
@@ -100,7 +98,6 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
      * @return result Output with rendered content
      */
     public String render(String content, RenderContext context) {
-      init();
       FilterContext filterContext = new BaseFilterContext();
       filterContext.setRenderContext(context);
       return fp.filter(content, filterContext);
@@ -117,16 +114,16 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
      * @see org.radeox.api.engine.WikiRenderEngine#exists(String)
      */
     public boolean exists(String name) {
-        String database = context.getDatabase();
+        String database = getXWikiContext().getDatabase();
         try {
             int colonIndex = name.indexOf(":");
             if (colonIndex!=-1) {
                 String db = name.substring(0,colonIndex);
                 name = name.substring(colonIndex + 1);
-                context.setDatabase(db);
+                getXWikiContext().setDatabase(db);
             }
 
-            XWikiDocument currentdoc = context.getDoc();
+            XWikiDocument currentdoc = getXWikiContext().getDoc();
 
             int qsIndex = name.indexOf("?");
             if (qsIndex!=-1) {
@@ -139,7 +136,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             XWikiDocument doc = new XWikiDocument(
                     (currentdoc!=null) ? currentdoc.getSpace() : "Main",
                     newname);
-            boolean exists = context.getWiki().exists(doc.getFullName(), context);
+            boolean exists = getXWikiContext().getWiki().exists(doc.getFullName(), getXWikiContext());
 
             // If the document exists with the spaces and accents converted then we use this one
             if (exists)
@@ -149,13 +146,13 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
             doc = new XWikiDocument(
                     (currentdoc!=null) ? currentdoc.getSpace() : "Main",
                      name);
-            return context.getWiki().exists(doc.getFullName(), context);
+            return getXWikiContext().getWiki().exists(doc.getFullName(), getXWikiContext());
         }
         catch (Exception e) {
             e.printStackTrace();
             return false;
         } finally {
-            context.setDatabase(database);
+            getXWikiContext().setDatabase(database);
         }
 
     }
@@ -181,8 +178,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         if (name.length() == 0 && anchor != null) {
             appendInternalLink(buffer, view, anchor); 
         } else {
-            String database = context.getDatabase();
-            XWikiContext context = getContext();
+            String database = getXWikiContext().getDatabase();
+            XWikiContext context = getXWikiContext();
     
             try {
                 String db = null;
@@ -276,14 +273,14 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("<span class=\"wikilink\"><a href=\"#");
         buffer.append(anchor);
         buffer.append("\">");
-        if (view.length() == 0) view = Utils.decode(anchor, context);
+        if (view.length() == 0) view = Utils.decode(anchor, getXWikiContext());
         buffer.append(cleanText(view));
         buffer.append("</a></span>");
     }
 
     public void appendCreateLink(StringBuffer buffer, String name, String view) {
-        String database = context.getDatabase();
-        XWikiContext context = getContext();
+        String database = getXWikiContext().getDatabase();
+        XWikiContext context = getXWikiContext();
 
         try {
             String db = null;

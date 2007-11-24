@@ -46,6 +46,8 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         Locale locale = new Locale("xwiki", "xwiki");
         ircontext.set(RenderContext.INPUT_LOCALE, locale);
         ircontext.set(RenderContext.OUTPUT_LOCALE, locale);
+        ircontext.set(RenderContext.LANGUAGE_LOCALE, locale);
+
         ircontext.setParameters(new HashMap());
 
         this.radeoxEngine = new XWikiRadeoxRenderEngine(ircontext);

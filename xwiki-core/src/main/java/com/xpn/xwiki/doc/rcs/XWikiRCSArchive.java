@@ -20,11 +20,14 @@
 package com.xpn.xwiki.doc.rcs;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.codec.DecoderException;
+import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.tools.ant.filters.StringInputStream;
@@ -126,7 +129,7 @@ public class XWikiRCSArchive extends Archive
         {
             this(other.version, null);
             this.setDate(other.getDate());
-            this.setAuthor(other.getAuthor());
+            this.author = other.getAuthor(); // setAuthor is encoding
             this.setState(other.getState());
             this.setLog(other.getLog());
             this.setLocker(other.getLocker());
@@ -137,24 +140,42 @@ public class XWikiRCSArchive extends Archive
         public void setDate(Date date) {
             this.date = date;
         }
+        /** bitset of chars allowed in author field */ 
+        static BitSet safeAuthorChars = new BitSet();
+        static {
+            safeAuthorChars.set('-');
+            for (char c='A', c1='a'; c<='Z'; c++, c1++) {
+                safeAuthorChars.set(c);
+                safeAuthorChars.set(c1);
+            }
+        }
         /** @param user - user of modification */
         public void setAuthor(String user) {
             // empty author is error in jrcs
             if (user == null || "".equals(user)) {
                 super.setAuthor(sauthorIfEmpty);
-            } else {
-                super.setAuthor(user);
+            } else {                
+                byte[] enc = URLCodec.encodeUrl(safeAuthorChars, user.getBytes());
+                String senc = new String(enc).replace('%', '_');
+                super.setAuthor(senc);
             }
         }
         /** @return user of modification
-         *  can't override getAuthor, so getAuthor1 
+         *  can't override getAuthor, so getAuthor1
          *  @see Node#getAuthor() */
         public String getAuthor1() {
             String result = super.getAuthor();
             if (sauthorIfEmpty.equals(result)) {
                 return "";
             } else {
-                return result;
+                result = result.replace('_', '%');
+                try {
+                    byte[] dec = URLCodec.decodeUrl(result.getBytes());
+                    String sdec = new String(dec);
+                    return sdec;
+                } catch (DecoderException e) {
+                    throw new Error(e);
+                }
             }
         }
         /** @return is this node store diff or full version */

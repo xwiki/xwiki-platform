@@ -46,10 +46,10 @@ public class DeleteAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         boolean redirected = false;
 
-        if (doc.isNew()) {
-            // delete from recycle bin
-            if (xwiki.hasRecycleBin(context)) {
-                String sindex = request.getParameter("id");
+        // If the document doesn't exist then delete it form the recycle bin.
+        if (doc.isNew() && xwiki.hasRecycleBin(context)) {
+            String sindex = request.getParameter("id");
+            if (sindex != null) {
                 long index = Long.parseLong(sindex);
                 XWikiDeletedDocument dd = xwiki.getRecycleBinStore()
                     .getDeletedDocument(doc, index, context, true);
@@ -57,9 +57,14 @@ public class DeleteAction extends XWikiAction
                 if (!ddapi.canDelete()) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, 
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        "You can't delete from recycle bin before certain time will passed");
+                        "You can't delete from recycle bin before some time has passed");
                 }
                 xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
+                sendRedirect(response, doc.getURL("view", context));
+                redirected = true;
+            } else {
+                // No index parameter passed, redirect the user to the view template so that he gets the document
+                // don't exist dialog box.
                 sendRedirect(response, doc.getURL("view", context));
                 redirected = true;
             }

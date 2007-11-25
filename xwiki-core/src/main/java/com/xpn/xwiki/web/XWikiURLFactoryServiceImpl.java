@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.XWiki;
@@ -33,15 +32,16 @@ import java.util.Map;
 
 public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
 {
-    private static final Log log = LogFactory.getLog(XWikiURLFactoryService.class);
+    private static final Log LOG = LogFactory.getLog(XWikiURLFactoryService.class);
 
-    private Map              factoryMap;
+    private Map factoryMap;
 
-    public XWikiURLFactoryServiceImpl()
+    public XWikiURLFactoryServiceImpl(XWiki xwiki)
     {
+        init(xwiki);
     }
 
-    public void init(XWiki xwiki)
+    private void init(XWiki xwiki)
     {
         factoryMap = new HashMap();
         register(xwiki, XWikiContext.MODE_XMLRPC, XWikiXmlRpcURLFactory.class, "xwiki.urlfactory.xmlrpcclass");
@@ -61,13 +61,13 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         {
             try
             {
-                log.debug("Using custom url factory: " + urlFactoryClassName);
+                LOG.debug("Using custom url factory: " + urlFactoryClassName);
                 Class urlFactoryClass = Class.forName(urlFactoryClassName);
                 factoryMap.put(factoryMode, urlFactoryClass);
             }
             catch (Exception e)
             {
-                log.error("Faiiled to load custom url factory class: " + urlFactoryClassName);
+                LOG.error("Faiiled to load custom url factory class: " + urlFactoryClassName);
             }
         }
     }
@@ -83,7 +83,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         }
         catch (Exception e)
         {
-            log.error("Failed to get construct url factory", e);
+            LOG.error("Failed to get construct url factory", e);
         }
         return urlf;
     }

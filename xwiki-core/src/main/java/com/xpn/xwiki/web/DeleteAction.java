@@ -51,15 +51,18 @@ public class DeleteAction extends XWikiAction
             String sindex = request.getParameter("id");
             if (sindex != null) {
                 long index = Long.parseLong(sindex);
-                XWikiDeletedDocument dd = xwiki.getRecycleBinStore()
-                    .getDeletedDocument(doc, index, context, true);
-                DeletedDocument ddapi = new DeletedDocument(dd, context);
-                if (!ddapi.canDelete()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS, 
-                        XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                        "You can't delete from recycle bin before some time has passed");
+                XWikiDeletedDocument dd = xwiki.getRecycleBinStore().getDeletedDocument(doc, index, context, true);
+                // If the document hasn't been previously delete (ie it's not in the deleted document store) then
+                // don't try to delete it and instead redirect to the view page.
+                if (dd != null) {
+                    DeletedDocument ddapi = new DeletedDocument(dd, context);
+                    if (!ddapi.canDelete()) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                            XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                            "You can't delete from recycle bin before some time has passed");
+                    }
+                    xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
                 }
-                xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
                 sendRedirect(response, doc.getURL("view", context));
                 redirected = true;
             } else {

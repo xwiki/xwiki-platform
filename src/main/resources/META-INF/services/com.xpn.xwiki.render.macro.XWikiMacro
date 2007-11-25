@@ -13,11 +13,9 @@ org.radeox.macro.ApiMacro
 org.radeox.macro.XrefMacro
 org.radeox.macro.AsinMacro
 org.radeox.macro.FilePathMacro
-org.radeox.macro.HelloWorldMacro
 org.radeox.macro.IsbnMacro
 com.xpn.xwiki.render.macro.LinkMacro
 org.radeox.macro.MailToMacro
-org.radeox.macro.MacroListMacro
 org.radeox.macro.QuoteMacro
 org.radeox.macro.RfcMacro
 com.xpn.xwiki.render.macro.TableMacro

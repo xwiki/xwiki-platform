@@ -20,13 +20,13 @@
  */
 package com.xpn.xwiki.doc;
 
-import java.util.Date;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.AbstractSimpleClass;
+
+import java.util.Date;
 /**
- * Archive of deleted document, stored in {@link XWikiRecycleBinStoreInterface}
+ * Archive of deleted document, stored in {@link com.xpn.xwiki.store.XWikiRecycleBinStoreInterface}
  * Immutable, because we don't need modify deleted document.
  * @version $Id: $
  * @since 1.2M1

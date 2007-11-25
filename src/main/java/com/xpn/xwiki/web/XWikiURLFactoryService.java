@@ -21,11 +21,9 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 
 public interface XWikiURLFactoryService
 {
-    public void init(XWiki context);
     public XWikiURLFactory createURLFactory(int mode, XWikiContext context);
 }

@@ -202,10 +202,9 @@ $xwiki.getUserName("xwiki:${username}")
   #set ($numbered = false)
  #else
   #set ($numbered = $boolean.valueOf($numbered))
-  #set ($context.context.tocNumbered = $numbered)
  #end
  #set ($tocData = ${tdoc.getTOC($init, $max, $numbered)})
- #set ($context.context.tocData = $tocData)
+ #set ($context.tocData = $tocData)
  #set ($lastLevel = $init - 1)
  #set ($depth = 0)
  #set ($openeditem = true)

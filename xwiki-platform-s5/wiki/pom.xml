@@ -26,16 +26,12 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
-    <artifactId>xwiki-applications</artifactId>
-    <version>8-SNAPSHOT</version>
+    <artifactId>xwiki-application-s5</artifactId>
+    <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-application-s5</artifactId>
-  <name>XWiki Platform - Applications - S5</name>
+  <artifactId>xwiki-application-s5-wiki</artifactId>
+  <name>XWiki Platform - Applications - S5 - Wiki</name>
   <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
+  <packaging>xar</packaging>
   <description>Application to create slides with S5</description>
-  <modules>
-    <module>wiki</module>
-    <!--module>web</module-->
-  </modules>
 </project>

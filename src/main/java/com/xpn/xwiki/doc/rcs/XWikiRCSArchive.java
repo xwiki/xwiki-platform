@@ -263,9 +263,10 @@ public class XWikiRCSArchive extends Archive
             result.add(nodeInfo);
             result.add(content);
         }
-        // ensure latest version is full
+        // Ensure that the latest revision is set set to have the full content and not a diff.
         if (result.size() > 0) {
-            ((XWikiRCSNodeInfo) result.iterator().next()).setDiff(false);
+            ((XWikiRCSNodeInfo) ((ArrayList) result).get(0)).setDiff(false);
+            ((XWikiRCSNodeContent) ((ArrayList) result).get(1)).getPatch().setDiff(false);
         }
         return result;
     }

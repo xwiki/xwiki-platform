@@ -65,7 +65,6 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
     public RightsManagerPlugin(String name, String className, XWikiContext context)
     {
         super(PLUGIN_NAME, className, context);
-        init(context);
     }
 
     /**

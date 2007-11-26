@@ -79,12 +79,14 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         });
     }
     /** {@inheritDoc} */
-    protected List getAllMigrations(XWikiContext context) {
+    protected List getAllMigrations(XWikiContext context) throws XWikiException
+    {
         List result = new ArrayList();
         // TODO: how to register migrations?
         // 1st way:
         result.add(new R4340XWIKI883Migrator());
         result.add(new R4359XWIKI1459Migrator());
+        result.add(new R6079XWIKI1878Migrator(getDBVersion(context).getVersion()));
         // 2nd way - via classloader
         
         return result;

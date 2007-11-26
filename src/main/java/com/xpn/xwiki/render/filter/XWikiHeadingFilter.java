@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.filter.CacheFilter;
@@ -85,6 +86,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         RenderContext rcontext = context.getRenderContext();
         XWikiContext xcontext =
             ((XWikiRadeoxRenderEngine) rcontext.getRenderEngine()).getXWikiContext();
+        VelocityContext vcontext = (VelocityContext)xcontext.get("vcontext");
         XWikiDocument doc = xcontext.getDoc();
 
         log.debug("Processing '" + text + "'");
@@ -104,10 +106,18 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         log.debug("Generated heading id '" + id + "'");
 
         // add numbering if the flag is set
+
         if (xcontext.containsKey(TOC_NUMBERED)
             && ((Boolean) xcontext.get(TOC_NUMBERED)).booleanValue()) {
+            // This is the old place where the data was placed, but this requires programming
+            // rights. Instead, we now use vcontext.
             if (xcontext.containsKey(TOC_DATA)) {
                 Map tocEntry = (Map) ((Map) xcontext.get(TOC_DATA)).get(id);
+                if (tocEntry != null) {
+                    numbering = (String) tocEntry.get(TOCGenerator.TOC_DATA_NUMBERING) + " ";
+                }
+            } else if (vcontext != null && vcontext.containsKey(TOC_DATA)) {
+                Map tocEntry = (Map) ((Map) vcontext.get(TOC_DATA)).get(id);
                 if (tocEntry != null) {
                     numbering = (String) tocEntry.get(TOCGenerator.TOC_DATA_NUMBERING) + " ";
                 }

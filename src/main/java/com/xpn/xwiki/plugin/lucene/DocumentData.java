@@ -33,6 +33,7 @@ public class DocumentData extends IndexData
     public DocumentData(final XWikiDocument doc, final XWikiContext context)
     {
         super(doc, context);
+        
         setAuthor(doc.getAuthor());
         setCreator(doc.getCreator());
         setModificationDate(doc.getDate());

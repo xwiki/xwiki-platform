@@ -66,7 +66,6 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
     public ApplicationManagerPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
-        init(context);
     }
 
     /**

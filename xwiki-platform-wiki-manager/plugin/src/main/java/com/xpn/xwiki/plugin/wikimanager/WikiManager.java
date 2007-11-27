@@ -790,18 +790,18 @@ final class WikiManager
         // Get packager plugin
         PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi("package", context));
 
-        // Import package
-        try {
-            importer.Import(packFile.getContent(context));
-        } catch (IOException e) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg.get(
-                WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
-        }
-
         String database = context.getDatabase();
 
         try {
             context.setDatabase(targetWiki);
+
+            // Import package
+            try {
+                importer.Import(packFile.getContent(context));
+            } catch (IOException e) {
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg
+                    .get(WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
+            }
 
             // Install imported documents
             if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {

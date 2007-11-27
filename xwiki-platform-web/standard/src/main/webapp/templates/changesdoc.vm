@@ -256,7 +256,6 @@ $objdiff.getNewValue().toString()
 #if((!$objdiff.getClassName().equals("XWiki.ArticleClass"))&&(!$objdiff.getClassName().equals("XWiki.TagClass"))&&(!$objdiff.getClassName().equals("XWiki.XWikiComments")))
 #set($hasobjectchanges = 1)
 #set($propname = $objdiff.getPropName())
-#if($propname!="content")
 <tr>
 <td>$propname $msg.get("changes.ofclass") $objdiff.getClassName()</td>
 <td>
@@ -268,7 +267,6 @@ $value
 $value
 </td>
 </tr>
-#end
 #end
 #end
 #end

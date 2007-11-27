@@ -51,6 +51,7 @@ public class UndeleteAction extends XWikiAction
             XWikiDocument newdoc = xwiki.getRecycleBinStore().restoreFromRecycleBin(
                 doc, index, context, true);
             xwiki.saveDocument(newdoc, "restored from recycle bin", context);
+            xwiki.getRecycleBinStore().deleteFromRecycleBin(doc, index, context, true);
             // save attachments
             List attachlist = newdoc.getAttachmentList();
             if (attachlist.size() > 0) {

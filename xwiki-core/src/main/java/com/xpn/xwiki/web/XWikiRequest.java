@@ -21,15 +21,16 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.util.Util;
-
 import javax.portlet.ActionRequest;
 import javax.portlet.RenderRequest;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
-public interface XWikiRequest extends HttpServletRequest, RenderRequest, ActionRequest {
+public interface XWikiRequest extends HttpServletRequest, RenderRequest, ActionRequest
+{
     public String get(String name);
+
     public HttpServletRequest getHttpServletRequest();
+
     public Cookie getCookie(String cookieName);
 }

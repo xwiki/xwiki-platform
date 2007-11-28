@@ -21,22 +21,27 @@
 
 package com.xpn.xwiki.web;
 
-import org.apache.commons.lang.StringUtils;
+import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
-public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor {
-    protected String processPath(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse) throws IOException {
+import org.apache.commons.lang.StringUtils;
+
+public class XWikiRequestProcessor extends org.apache.struts.action.RequestProcessor
+{
+    protected String processPath(HttpServletRequest httpServletRequest,
+        HttpServletResponse httpServletResponse) throws IOException
+    {
         String result = super.processPath(httpServletRequest, httpServletResponse);
-        if (StringUtils.countMatches(result, "/")<=2) {
-            if (result.startsWith("/xmlrpc/"))
+        if (StringUtils.countMatches(result, "/") <= 2) {
+            if (result.startsWith("/xmlrpc/")) {
                 return "/xmlrpc/";
-            else
+            } else {
                 return "/view/";
+            }
+        } else {
+            return result.substring(0, result.indexOf("/", 1) + 1);
         }
-        else
-          return result.substring(0,result.indexOf("/",1)+1);
     }
 }

@@ -124,18 +124,18 @@ public class SetCharacterEncodingFilter implements Filter {
      * @param filterConfig The filter configuration object
      */
     public void init(FilterConfig filterConfig) throws ServletException {
-
-	this.filterConfig = filterConfig;
+        this.filterConfig = filterConfig;
         this.encoding = filterConfig.getInitParameter("encoding");
         String value = filterConfig.getInitParameter("ignore");
-        if (value == null)
+        if (value == null) {
             this.ignore = true;
-        else if (value.equalsIgnoreCase("true"))
+        } else if (value.equalsIgnoreCase("true")) {
             this.ignore = true;
-        else if (value.equalsIgnoreCase("yes"))
+        } else if (value.equalsIgnoreCase("yes")) {
             this.ignore = true;
-        else
+        } else {
             this.ignore = false;
+        }
 
     }
 

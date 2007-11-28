@@ -3981,7 +3981,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                                     + request.getServletPath().length());
                 }
 
-                // Fix error in some containers, which don't hide the jsessionid paramter from the URL
+                // Fix error in some containers, which don't hide the jsessionid parameter from the URL
                 if (path.indexOf(";jsessionid=") != -1) {
                     path = path.substring(0, path.indexOf(";jsessionid="));
                 }

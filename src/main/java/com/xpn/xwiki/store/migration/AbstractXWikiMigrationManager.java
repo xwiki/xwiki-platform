@@ -108,22 +108,6 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
      */
     protected void setContextForDatabase(String databaseName, XWikiContext context) throws XWikiException
     {
-        // Get the document describing the virtual wiki
-        String serverwikipage = context.getWiki().getServerWikiPage(databaseName);
-        XWikiDocument doc = context.getWiki().getDocument(serverwikipage, context);
-        if (doc.isNew()) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI,
-                XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                "The wiki [" + databaseName + "] does not exist");
-        }
-
-        // Set the wiki owner
-        String wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
-        if (wikiOwner.indexOf(":") == -1)
-            wikiOwner = context.getWiki().getDatabase() + ":" + wikiOwner;
-        context.setWikiOwner(wikiOwner);
-
-        context.setWikiServer(doc);
         context.setVirtual(true);
         context.setDatabase(databaseName);
         context.setOriginalDatabase(databaseName);

@@ -19,20 +19,14 @@
  */
 package com.xpn.xwiki.store.migration;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
+import java.util.*;
 
 /**
  * Template for {@link XWikiMigrationManagerInterface}.
@@ -72,20 +66,101 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
      */
     protected abstract void setDBVersion(XWikiDBVersion version, XWikiContext context)
         throws XWikiException;
+
     /**
      * {@inheritDoc}
      */
     public void startMigrations(XWikiContext context) throws XWikiException
+    {
+        // Save context values so that we can restore them as they were before the migration.
+        String currentWikiOwner = context.getWikiOwner();
+        XWikiDocument currentWikiServer = context.getWikiServer();
+        boolean currentIsVirtual = context.isVirtual();
+        String currentDatabase = context.getDatabase();
+        String currentOriginalDatabase = context.getOriginalDatabase();
+
+        try {
+            for (Iterator it = getDatabasesToMigrate(context).iterator(); it.hasNext();) {
+                String database = (String) it.next();
+                LOG.info("Starting migration for database [" + database + "]...");
+
+                // Set up the context so that it points to the virtual wiki corresponding to the database.
+
+                // Get the document describing the virtual wiki
+                String serverwikipage = context.getWiki().getServerWikiPage(database);
+                XWikiDocument doc = context.getWiki().getDocument(serverwikipage, context);
+                if (doc.isNew()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI,
+                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                        "The wiki [" + database + "] does not exist");
+                }
+
+                // Set the wiki owner
+                String wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
+                if (wikiOwner.indexOf(":") == -1)
+                    wikiOwner = context.getWiki().getDatabase() + ":" + wikiOwner;
+                context.setWikiOwner(wikiOwner);
+
+                context.setWikiServer(doc);
+                context.setVirtual(true);
+                context.setDatabase(database);
+                context.setOriginalDatabase(database);
+
+                startMigrationsForDatabase(context);
+            }
+        } finally {
+            context.setWikiOwner(currentWikiOwner);
+            context.setWikiServer(currentWikiServer);
+            context.setVirtual(currentIsVirtual);
+            context.setDatabase(currentDatabase);
+            context.setOriginalDatabase(currentOriginalDatabase);
+        }
+    }
+
+    /**
+     * @return the names of all databases to migrate. This is controlled through the "xwiki.store.migration.databases"
+     *         configuration property in xwiki.cfg. A value of "all" will add all databases. Note that the main database
+     *         is automatically added even if not specified.
+     */
+    private Set getDatabasesToMigrate(XWikiContext context) throws XWikiException
+    {
+        Set databasesToMigrate = new ListOrderedSet();
+
+        // Always migrate the main database. We also want this to be the first database migrated so it has to be the
+        // first returned in the list.
+        databasesToMigrate.add(context.getMainXWiki());
+
+        // Add the databases listed by the user (if any). If there's a single database named and if it's "all" or "ALL"
+        // then automatically add all the registered databases.
+        if (context.getWiki().isVirtual()) {
+            String[] databases = context.getWiki().getConfig().getPropertyAsList("xwiki.store.migration.databases");
+            if ((databases.length == 1) && databases[0].equalsIgnoreCase("all")) {
+                databasesToMigrate.addAll(context.getWiki().getVirtualWikisDatabaseNames(context));
+            } else {
+                for (int i = 0; i < databases.length; i++) {
+                    databasesToMigrate.add(databases[i]);
+                }
+            }
+        }
+        
+        return databasesToMigrate;
+    }
+
+    /**
+     * It is assumed that before calling this method the XWiki context has been set with the database to migrate.
+     */
+    private void startMigrationsForDatabase(XWikiContext context) throws XWikiException
     {
         XWikiDBVersion curversion = getDBVersion(context);
         try {
             Collection neededMigrations = getNeededMigrations(context);
             startMigrations(neededMigrations, context);
         } catch (Exception e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, 
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_MIGRATION, "Migration failed", e);
         }
     }
+
     /**
      * @return collection of {@link XWikiMigratorInterface} in ascending order,
      *   which need be executed.

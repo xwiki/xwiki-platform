@@ -385,9 +385,34 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    /**
+     * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a
+     *         full list of all virtual wikis database names use {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
+     */
     public List getVirtualWikiList()
     {
         return virtualWikiList;
+    }
+
+    /**
+     * @return the full list of all database names of all defined virtual wikis. The database names are computed from
+     *         the names of documents having a XWiki.XWikiServerClass object attached to them by removing the
+     *         "XWiki.XWikiServer" prefix and making it lower case. For example a page named
+     *         "XWiki.XWikiServerMyDatabase" would return "mydatabase" as the database name.
+     */
+    public List getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
+    {
+        List databaseNames = new ArrayList();
+        String hql = ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
+            + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id ";
+        List list = getStore().searchDocumentsNames(hql, context);
+        for (Iterator it = list.iterator(); it.hasNext();) {
+            String docname = (String) it.next();
+            if (docname.startsWith("XWiki.XWikiServer")) {
+                databaseNames.add(docname.substring("XWiki.XWikiServer".length()).toLowerCase());
+            }
+        }
+        return databaseNames;
     }
 
     public XWikiCache getVirtualWikiMap()
@@ -458,6 +483,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 context.setVirtual(true);
                 context.setDatabase(appname);
                 context.setOriginalDatabase(appname);
+
                 try {
                     // Let's make sure the virtaul wikis are upgraded to the latest database version
                     xwiki.updateDatabase(appname, false, context);
@@ -465,6 +491,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     // Just to report it
                     e.printStackTrace();
                 }
+
+/*
+                // Run migrations
+                if ("1".equals(xwiki.Param("xwiki.store.migration", "0"))) {
+                    if (LOG.isInfoEnabled())
+                        LOG.info("Running storage migrations");
+                    AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager)
+                        xwiki.createClassFromConfig( "xwiki.store.migration.manager.class",
+                            "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
+                    manager.startMigrations(context);
+                    if ("1".equals(xwiki.Param("xwiki.store.migration.exitAfterEnd", "0"))) {
+                        if (LOG.isErrorEnabled())
+                            LOG.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
+                        System.exit(0);
+                    }
+                }
+  */
             }
         }
         return xwiki;

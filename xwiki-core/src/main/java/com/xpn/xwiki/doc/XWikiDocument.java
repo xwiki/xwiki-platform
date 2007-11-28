@@ -841,7 +841,7 @@ public class XWikiDocument
 
     public void loadArchive(XWikiContext context) throws XWikiException
     {
-        if (archive == null) {
+        if (archive == null || archive.get() == null) {
             XWikiDocumentArchive arch =
                 getVersioningStore(context).getXWikiDocumentArchive(this, context);
             // We are using a SoftReference which will allow the archive to be

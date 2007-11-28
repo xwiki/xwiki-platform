@@ -74,8 +74,6 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
     {
         if (context.getWiki().isVirtual()) {
             // Save context values so that we can restore them as they were before the migration.
-            String currentWikiOwner = context.getWikiOwner();
-            XWikiDocument currentWikiServer = context.getWikiServer();
             boolean currentIsVirtual = context.isVirtual();
             String currentDatabase = context.getDatabase();
             String currentOriginalDatabase = context.getOriginalDatabase();
@@ -85,12 +83,12 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                     String database = (String) it.next();
                     LOG.info("Starting migration for database [" + database + "]...");
                     // Set up the context so that it points to the virtual wiki corresponding to the database.
-                    setContextForDatabase(database, context);
+                    context.setVirtual(true);
+                    context.setDatabase(database);
+                    context.setOriginalDatabase(database);
                     startMigrationsForDatabase(context);
                 }
             } finally {
-                context.setWikiOwner(currentWikiOwner);
-                context.setWikiServer(currentWikiServer);
                 context.setVirtual(currentIsVirtual);
                 context.setDatabase(currentDatabase);
                 context.setOriginalDatabase(currentOriginalDatabase);
@@ -100,19 +98,6 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
             startMigrationsForDatabase(context);
         }
     }
-
-    /**
-     * Sets the XWiki Context so that it points to the passed databasse name
-     *
-     * @param databaseName the name of the database to point to. Example: "xwiki"
-     */
-    protected void setContextForDatabase(String databaseName, XWikiContext context) throws XWikiException
-    {
-        context.setVirtual(true);
-        context.setDatabase(databaseName);
-        context.setOriginalDatabase(databaseName);
-    }
-
 
     /**
      * @return the names of all databases to migrate. This is controlled through the "xwiki.store.migration.databases"

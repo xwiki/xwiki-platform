@@ -46,7 +46,7 @@ public class DeleteAction extends XWikiAction
         XWikiDocument doc = context.getDoc();
         boolean redirected = false;
 
-        // If the document doesn't exist then delete it form the recycle bin.
+        // If the document doesn't exist then delete it from the recycle bin.
         if (doc.isNew() && xwiki.hasRecycleBin(context)) {
             String sindex = request.getParameter("id");
             if (sindex != null) {

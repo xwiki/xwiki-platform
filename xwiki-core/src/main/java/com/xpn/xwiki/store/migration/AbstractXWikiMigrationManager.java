@@ -72,50 +72,63 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
      */
     public void startMigrations(XWikiContext context) throws XWikiException
     {
-        // Save context values so that we can restore them as they were before the migration.
-        String currentWikiOwner = context.getWikiOwner();
-        XWikiDocument currentWikiServer = context.getWikiServer();
-        boolean currentIsVirtual = context.isVirtual();
-        String currentDatabase = context.getDatabase();
-        String currentOriginalDatabase = context.getOriginalDatabase();
+        if (context.getWiki().isVirtual()) {
+            // Save context values so that we can restore them as they were before the migration.
+            String currentWikiOwner = context.getWikiOwner();
+            XWikiDocument currentWikiServer = context.getWikiServer();
+            boolean currentIsVirtual = context.isVirtual();
+            String currentDatabase = context.getDatabase();
+            String currentOriginalDatabase = context.getOriginalDatabase();
 
-        try {
-            for (Iterator it = getDatabasesToMigrate(context).iterator(); it.hasNext();) {
-                String database = (String) it.next();
-                LOG.info("Starting migration for database [" + database + "]...");
-
-                // Set up the context so that it points to the virtual wiki corresponding to the database.
-
-                // Get the document describing the virtual wiki
-                String serverwikipage = context.getWiki().getServerWikiPage(database);
-                XWikiDocument doc = context.getWiki().getDocument(serverwikipage, context);
-                if (doc.isNew()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI,
-                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki [" + database + "] does not exist");
+            try {
+                for (Iterator it = getDatabasesToMigrate(context).iterator(); it.hasNext();) {
+                    String database = (String) it.next();
+                    LOG.info("Starting migration for database [" + database + "]...");
+                    // Set up the context so that it points to the virtual wiki corresponding to the database.
+                    setContextForDatabase(database, context);
+                    startMigrationsForDatabase(context);
                 }
-
-                // Set the wiki owner
-                String wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
-                if (wikiOwner.indexOf(":") == -1)
-                    wikiOwner = context.getWiki().getDatabase() + ":" + wikiOwner;
-                context.setWikiOwner(wikiOwner);
-
-                context.setWikiServer(doc);
-                context.setVirtual(true);
-                context.setDatabase(database);
-                context.setOriginalDatabase(database);
-
-                startMigrationsForDatabase(context);
+            } finally {
+                context.setWikiOwner(currentWikiOwner);
+                context.setWikiServer(currentWikiServer);
+                context.setVirtual(currentIsVirtual);
+                context.setDatabase(currentDatabase);
+                context.setOriginalDatabase(currentOriginalDatabase);
             }
-        } finally {
-            context.setWikiOwner(currentWikiOwner);
-            context.setWikiServer(currentWikiServer);
-            context.setVirtual(currentIsVirtual);
-            context.setDatabase(currentDatabase);
-            context.setOriginalDatabase(currentOriginalDatabase);
+        } else {
+            // Just migrate the main wiki
+            startMigrationsForDatabase(context);
         }
     }
+
+    /**
+     * Sets the XWiki Context so that it points to the passed databasse name
+     *
+     * @param databaseName the name of the database to point to. Example: "xwiki"
+     */
+    protected void setContextForDatabase(String databaseName, XWikiContext context) throws XWikiException
+    {
+        // Get the document describing the virtual wiki
+        String serverwikipage = context.getWiki().getServerWikiPage(databaseName);
+        XWikiDocument doc = context.getWiki().getDocument(serverwikipage, context);
+        if (doc.isNew()) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI,
+                XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                "The wiki [" + databaseName + "] does not exist");
+        }
+
+        // Set the wiki owner
+        String wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
+        if (wikiOwner.indexOf(":") == -1)
+            wikiOwner = context.getWiki().getDatabase() + ":" + wikiOwner;
+        context.setWikiOwner(wikiOwner);
+
+        context.setWikiServer(doc);
+        context.setVirtual(true);
+        context.setDatabase(databaseName);
+        context.setOriginalDatabase(databaseName);
+    }
+
 
     /**
      * @return the names of all databases to migrate. This is controlled through the "xwiki.store.migration.databases"
@@ -142,7 +155,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                 }
             }
         }
-        
+
         return databasesToMigrate;
     }
 

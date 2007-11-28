@@ -12,14 +12,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1190985121000</creationDate>
-<date>1194019884000</date>
-<contentUpdateDate>1195305639000</contentUpdateDate>
-<version>1.1</version>
+<date>1196258170000</date>
+<contentUpdateDate>1196258170000</contentUpdateDate>
+<version>2.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -53,7 +54,7 @@
 <tags/>
 </property>
 </object>
-<content>#if($action == "setvisibility")
+<content>#if($action &amp;&amp; $action == "setvisibility")
   #set($result = $WikiManager.setWikiVisibility($wikiname, $serverid, $wikivisibility))
   #if ($result == $Exception.ERROR_NOERROR)
     #info($msg.get("wikimanager.successsetvisibility", [$wikiname, $wikivisibility]))

@@ -374,6 +374,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         this.context = new XWikiContext();
         this.context.setWiki(xwiki);
         this.context.setDatabase(xwiki.getDatabase());
+        this.context.setMainXWiki(xwiki.getDatabase());
         this.plugin = plugin;
         // take the first configured index dir as the one for writing
         // String[] indexDirs =

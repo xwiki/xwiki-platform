@@ -172,7 +172,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                             addToIndex(data, doc, context);
                             nb++;
                         } catch (Exception e) {
-                            LOG.error("error indexing document" + id, e);
+                            LOG.error("error indexing document " + id, e);
                             e.printStackTrace();
                         }
                     }

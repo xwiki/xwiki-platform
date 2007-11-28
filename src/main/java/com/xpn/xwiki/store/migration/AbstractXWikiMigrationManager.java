@@ -86,7 +86,11 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                     context.setVirtual(true);
                     context.setDatabase(database);
                     context.setOriginalDatabase(database);
-                    startMigrationsForDatabase(context);
+                    try {
+                        startMigrationsForDatabase(context);
+                    } catch (XWikiException e) {
+                        LOG.info("Failed to migrate database [" + database + "]...", e);
+                    }
                 }
             } finally {
                 context.setVirtual(currentIsVirtual);

@@ -404,7 +404,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         List databaseNames = new ArrayList();
         String hql = ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-            + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id ";
+            + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
+            + "and prop.id.id = obj.id ";
         List list = getStore().searchDocumentsNames(hql, context);
         for (Iterator it = list.iterator(); it.hasNext();) {
             String docname = (String) it.next();

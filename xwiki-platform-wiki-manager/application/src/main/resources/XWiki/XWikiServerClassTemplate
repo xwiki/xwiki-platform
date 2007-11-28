@@ -13,13 +13,14 @@
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881143000</creationDate>
 <date>1195470259000</date>
-<contentUpdateDate>1195470259000</contentUpdateDate>
-<version>1.2</version>
+<contentUpdateDate>1196173411000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>XWiki.TagClass</name>

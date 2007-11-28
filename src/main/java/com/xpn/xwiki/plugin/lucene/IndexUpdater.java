@@ -368,13 +368,11 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      * @param config
      */
-    public synchronized void init(Properties config, LucenePlugin plugin, XWiki wiki)
+    public synchronized void init(Properties config, LucenePlugin plugin, XWikiContext context)
     {
-        this.xwiki = wiki;
-        this.context = new XWikiContext();
-        this.context.setWiki(xwiki);
-        this.context.setDatabase(xwiki.getDatabase());
-        this.context.setMainXWiki(xwiki.getDatabase());
+        this.xwiki = context.getWiki();
+        this.context = (XWikiContext)context.clone();
+        this.context.setDatabase(this.context.getMainXWiki());
         this.plugin = plugin;
         // take the first configured index dir as the one for writing
         // String[] indexDirs =

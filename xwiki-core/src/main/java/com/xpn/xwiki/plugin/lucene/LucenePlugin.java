@@ -377,7 +377,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         }
         indexUpdater = new IndexUpdater();
         indexUpdater.setAnalyzer(analyzer);
-        indexUpdater.init(config, this, context.getWiki());
+        indexUpdater.init(config, this, context);
         indexUpdaterThread = new Thread(indexUpdater);
         indexUpdaterThread.start();
         indexRebuilder = new IndexRebuilder(indexUpdater, context);

@@ -39,7 +39,7 @@ public class XWikiServer extends DefaultSuperDocument
      * Comma string.
      */
     private static final String COMMA = ",";
-    
+
     /**
      * Create new XWikiServer managing provided XWikiDocument.
      * 
@@ -51,9 +51,11 @@ public class XWikiServer extends DefaultSuperDocument
      *             <li>getting XWikiServerClass instance.</li>
      *             <li>or when calling {@link #reload(XWikiContext)}</li>
      *             </ul>
-     * @see DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass, XWikiDocument, int, XWikiContext)
+     * @see DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
+     *      XWikiDocument, int, XWikiContext)
      */
-    public XWikiServer(XWikiDocument xdoc, int objectId, XWikiContext context) throws XWikiException
+    public XWikiServer(XWikiDocument xdoc, int objectId, XWikiContext context)
+        throws XWikiException
     {
         super(XWikiServerClass.getInstance(context), xdoc, objectId, context);
     }
@@ -78,11 +80,30 @@ public class XWikiServer extends DefaultSuperDocument
     }
 
     /**
+     * @return the pretty name of the wiki.
+     * @see #setWikiPrettyName(String)
+     */
+    public String getWikiPrettyName()
+    {
+        return getStringValue(XWikiServerClass.FIELD_WIKIPRETTYNAME);
+    }
+
+    /**
+     * Modify the pretty name of the application.
+     * 
+     * @param wikiPrettyName the new name of the wiki.
+     */
+    public void setWikiPrettyName(String wikiPrettyName)
+    {
+        setStringValue(XWikiServerClass.FIELD_WIKIPRETTYNAME, wikiPrettyName);
+    }
+
+    /**
      * @return the name of the owner of the wiki.
      */
     public String getOwner()
     {
-        return getStringValue(XWikiServerClass.FIELD_OWNER);
+        return getLargeStringValue(XWikiServerClass.FIELD_OWNER);
     }
 
     /**
@@ -92,7 +113,7 @@ public class XWikiServer extends DefaultSuperDocument
      */
     public void setOwner(String owner)
     {
-        setStringValue(XWikiServerClass.FIELD_OWNER, owner);
+        setLargeStringValue(XWikiServerClass.FIELD_OWNER, owner);
     }
 
     /**

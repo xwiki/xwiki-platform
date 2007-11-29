@@ -45,6 +45,16 @@ public class XWikiServerClass extends AbstractSuperClass
     public static final String DEFAULT_FIELDS = "|";
 
     /**
+     * Name of field <code>prettyname</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final String FIELD_WIKIPRETTYNAME = "wikiprettyname";
+
+    /**
+     * Pretty name of field <code>prettyname</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final String FIELDPN_WIKIPRETTYNAME = "Wiki pretty name";
+
+    /**
      * Name of field <code>owner</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELD_OWNER = "owner";
@@ -246,6 +256,7 @@ public class XWikiServerClass extends AbstractSuperClass
 
         baseClass.setName(getClassFullName());
 
+        needsUpdate |= baseClass.addTextField(FIELD_WIKIPRETTYNAME, FIELDPN_WIKIPRETTYNAME, 30);
         needsUpdate |= baseClass.addUsersField(FIELD_OWNER, FIELDPN_OWNER, false);
         needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
         needsUpdate |= baseClass.addTextField(FIELD_SERVER, FIELDPN_SERVER, 30);

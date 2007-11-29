@@ -2,7 +2,7 @@
 <div id="actionmenu" class="layoutsubsection">
 <div class="centered">
 <div class="editinfo">
-$msg.get("editing"): $doc.name
+$msg.get("editing"): <a href="$doc.getURL()">$doc.name</a>
 </div>
 </div>
 </div>

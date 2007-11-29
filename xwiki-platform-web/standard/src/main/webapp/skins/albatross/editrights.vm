@@ -25,7 +25,7 @@
 ### url to get the users and groups to display in the ajax-based table
 #set($url = "?xpage=getusersandgroups")
 
-#set($saveUrl = $doc.getURL("view", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
+#set($saveUrl = $doc.getURL("edit", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
 
 ## get the rights for XWikiGuest
 #set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0)

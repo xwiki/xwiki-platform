@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1192218584000</creationDate>
-<date>1196334097000</date>
-<contentUpdateDate>1196334097000</contentUpdateDate>
-<version>3.1</version>
+<date>1196346255000</date>
+<contentUpdateDate>1196346255000</contentUpdateDate>
+<version>16.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -56,17 +56,17 @@
 </object>
 <content>#set($AppManager = $xwiki.applicationmanager)
 #set($Exception = $AppManager.DefaultException)
-
+##
 #set($appdocument = $AppManager.createApplicationDocument())
 #set($appdocumentobject = $appdocument.updateObjectFromRequest("XAppClasses.XWikiApplicationClass"))
-
+##
 #set($action = $request.getParameter("action"))
-
+##
 #############################################################################
-
+##
 1 $msg.get("xapp.createapplication")
-
-#if ($action)
+##
+#if($action)
   #if($action == "create")
     #set($result = $AppManager.createApplication($appdocument, true))
     #if ($result == $Exception.ERROR_NOERROR)
@@ -84,29 +84,27 @@
     #end
   #end
 #end
-
-&lt;style&gt;
-  .xem_userlisttable td {}
-&lt;/style&gt;
-
-&lt;form method="get"&gt;
-  &lt;input type="hidden" name="action" value="create" /&gt;
-
-  &lt;table width="100%"&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("xapp.appname")&lt;/td&gt;
-      &lt;td&gt;$appdocument.display("appname", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("xapp.description")&lt;/td&gt;
-      &lt;td&gt;$appdocument.display("description", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("version")&lt;/td&gt;
-      &lt;td&gt;$appdocument.display("appversion", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/table&gt;
-
-  &lt;input type="submit" value="$msg.get("create")" /&gt;
+##
+&lt;form method="get" action=""&gt;
+  &lt;fieldset&gt;
+    &lt;input type="hidden" name="action" value="create" /&gt;
+    &lt;table width="100%"&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("xapp.appname")&lt;/td&gt;
+        &lt;td&gt;$appdocument.display("appname", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("xapp.description")&lt;/td&gt;
+        &lt;td&gt;$appdocument.display("description", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("version")&lt;/td&gt;
+        &lt;td&gt;$appdocument.display("appversion", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/fieldset&gt;
+  &lt;fieldset&gt;
+    &lt;input type="submit" value="$msg.get("create")" /&gt;
+  &lt;/fieldset&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1196334164000</date>
-<contentUpdateDate>1196334164000</contentUpdateDate>
-<version>5.1</version>
+<date>1196346273000</date>
+<contentUpdateDate>1196346273000</contentUpdateDate>
+<version>13.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -56,14 +56,14 @@
 </object>
 <content>#set($wikimanager = $xwiki.wikimanager)
 #set($Exception = $wikimanager.DefaultException)
-
+##
 #set($domainname = "localdomain.com")
-
+##
 #set($wikidocument = $wikimanager.createWikiDocument())
 #set($wikidocumentobject = $wikidocument.updateObjectFromRequest("XWiki.XWikiServerClass"))
-
+##
 #set($action = $request.getParameter("action"))
-
+##
 #set($wikiname = $request.getParameter("wikiname"))
 #set($wikitemplate = $request.getParameter("wikitemplate"))
 #set($wikipackage = $request.getParameter("wikipackage"))
@@ -73,14 +73,14 @@
 #if ($wikidocument.server == "" &amp;&amp; $wikiname &amp;&amp; $wikiname != "")
   $wikidocument.set("server", "${wikiname}.${domainname}")
 #end
-
+##
 #############################################################################
-
+##
 1 $msg.get("wikimanager.createwiki")
-
+##
 #if ($action &amp;&amp; $action == "create")
   #set($result = $wikimanager.createNewWiki($wikiname, $wikitemplate, $wikipackage, $wikidocument, true))
-
+##
   #if ($result == $Exception.ERROR_NOERROR)
     #info($msg.get("wikimanager.successcreatewiki", [$wikiname, $wikidocument.getHomePageUrl()]))
   #else
@@ -91,64 +91,63 @@
     #end
   #end
 #end
-
-&lt;style&gt;
-  .xem_userlisttable td {}
-&lt;/style&gt;
-
-&lt;form method="get"&gt;
-  &lt;input type="hidden" name="action" value="create" /&gt;
-
-  &lt;table width="100%"&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikiname")&lt;/td&gt;
-      &lt;td&gt;&lt;input size="30" id="wikiname" name="wikiname" type="text" /&gt;&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikidesc")&lt;/td&gt;
-      &lt;td&gt;$wikidocument.display("description", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikidomain")&lt;/td&gt;
-      &lt;td&gt;$wikidocument.display("server", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikiadmin")&lt;/td&gt;
-      &lt;td&gt;$wikidocument.display("owner", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikivisibility")&lt;/td&gt;
-      &lt;td&gt;$wikidocument.display("visibility", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikistate")&lt;/td&gt;
-      &lt;td&gt;$wikidocument.display("state", "edit")&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikitemplate")&lt;/td&gt;
-      &lt;td&gt;
-        &lt;select name="wikitemplate" id="wikitemplate"&gt;
-          &lt;option value=""&gt;&lt;/option&gt;
-          #set($listtemplate=$wikimanager.getWikiTemplateList())
-          #foreach ($template in $listtemplate)
-            &lt;option value="$template.wikiName"&gt;$template.wikiName&lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/td&gt;
-    &lt;tr&gt;
-      &lt;td&gt;$msg.get("wikimanager.wikipackage")&lt;/td&gt;
-      &lt;td&gt;
-        &lt;select name="wikipackage" id="wikipackage"&gt;
-          &lt;option value=""&gt;&lt;/option&gt;
-          #set($listpackage=$doc.getAttachmentList())
-          #foreach ($package in $listpackage)
-            &lt;option value="$package.getFilename()"&gt;$package.getFilename()&lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/table&gt;
-
-  &lt;input type="submit" value="create" /&gt;
+##
+&lt;form method="get" action="#"&gt;
+  &lt;fieldset&gt;
+    &lt;input type="hidden" name="action" value="create" /&gt;
+    &lt;table width="100%"&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikiname")&lt;/td&gt;
+        &lt;td&gt;&lt;input size="30" id="wikiname" name="wikiname" type="text" /&gt;&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikidesc")&lt;/td&gt;
+        &lt;td&gt;$wikidocument.display("description", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikidomain")&lt;/td&gt;
+        &lt;td&gt;$wikidocument.display("server", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikiadmin")&lt;/td&gt;
+        &lt;td&gt;$wikidocument.display("owner", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikivisibility")&lt;/td&gt;
+        &lt;td&gt;$wikidocument.display("visibility", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikistate")&lt;/td&gt;
+        &lt;td&gt;$wikidocument.display("state", "edit")&lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikitemplate")&lt;/td&gt;
+        &lt;td&gt;
+          &lt;select name="wikitemplate" id="wikitemplate"&gt;
+            &lt;option value=""&gt;&lt;/option&gt;
+            #set($listtemplate=$wikimanager.getWikiTemplateList())
+            #foreach ($template in $listtemplate)
+              &lt;option value="$template.wikiName"&gt;$template.wikiName&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;$msg.get("wikimanager.wikipackage")&lt;/td&gt;
+        &lt;td&gt;
+          &lt;select name="wikipackage" id="wikipackage"&gt;
+            &lt;option value=""&gt;&lt;/option&gt;
+            #set($listpackage=$doc.getAttachmentList())
+            #foreach ($package in $listpackage)
+              &lt;option value="$package.getFilename()"&gt;$package.getFilename()&lt;/option&gt;
+            #end
+          &lt;/select&gt;
+        &lt;/td&gt;
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/fieldset&gt;
+  &lt;fieldset&gt;
+    &lt;input type="submit" value="create" /&gt;
+  &lt;/fieldset&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

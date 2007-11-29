@@ -86,7 +86,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * The default maximum size for uploaded documents. This limit can be changed using the
      * <tt>upload_maxsize</tt> XWiki preference.
      */
-    private static final long UPLOAD_DEFAULT_MAXSIZE = 10000000L;
+    private static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
 
     /**
      * The default maximum size for in-memory stored uploaded documents. If a file is larger than

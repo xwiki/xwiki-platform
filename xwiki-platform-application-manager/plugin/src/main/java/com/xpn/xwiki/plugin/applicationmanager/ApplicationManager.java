@@ -116,9 +116,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
         int event, XWikiContext context)
     {
         try {
-            if (newdoc != null
-                && newdoc.getObjectNumbers(XWikiApplicationClass.getInstance(context)
-                    .getClassFullName()) > 0) {
+            if (newdoc != null && XWikiApplicationClass.getInstance(context).isInstance(newdoc)) {
 
                 List appList =
                     XWikiApplicationClass.getInstance(context).newSuperDocumentList(newdoc,
@@ -323,23 +321,25 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
         XWikiDocument prefsDoc = xwiki.getDocument(XWIKIPREFERENCES, context);
         BaseObject prefsObject = prefsDoc.getObject(XWIKIPREFERENCES);
 
-        String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
-        List translationPrefs =
-            ListClass.getListFromString(documentBundles, XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP,
-                true);
+        if (prefsObject != null) {
+            String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
+            List translationPrefs =
+                ListClass.getListFromString(documentBundles,
+                    XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP, true);
 
-        boolean updateprefs = false;
+            boolean updateprefs = false;
 
-        for (Iterator it = applications.iterator(); it.hasNext();) {
-            XWikiApplication app = (XWikiApplication) it.next();
+            for (Iterator it = applications.iterator(); it.hasNext();) {
+                XWikiApplication app = (XWikiApplication) it.next();
 
-            updateprefs |= updateApplicationTranslation(translationPrefs, app);
-        }
+                updateprefs |= updateApplicationTranslation(translationPrefs, app);
+            }
 
-        if (updateprefs) {
-            prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
-                translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
-            xwiki.saveDocument(prefsDoc, comment, context);
+            if (updateprefs) {
+                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
+                    translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
+                xwiki.saveDocument(prefsDoc, comment, context);
+            }
         }
     }
 
@@ -383,17 +383,19 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
         XWikiDocument prefsDoc = xwiki.getDocument(XWIKIPREFERENCES, context);
         BaseObject prefsObject = prefsDoc.getObject(XWIKIPREFERENCES);
 
-        String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
-        List translationPrefs =
-            ListClass.getListFromString(documentBundles, XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP,
-                true);
+        if (prefsObject != null) {
+            String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
+            List translationPrefs =
+                ListClass.getListFromString(documentBundles,
+                    XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP, true);
 
-        boolean updateprefs = updateApplicationTranslation(translationPrefs, app);
+            boolean updateprefs = updateApplicationTranslation(translationPrefs, app);
 
-        if (updateprefs) {
-            prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
-                translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
-            xwiki.saveDocument(prefsDoc, comment, context);
+            if (updateprefs) {
+                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
+                    translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
+                xwiki.saveDocument(prefsDoc, comment, context);
+            }
         }
     }
 

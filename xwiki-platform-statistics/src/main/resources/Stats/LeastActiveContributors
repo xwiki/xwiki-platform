@@ -7,13 +7,20 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Stats.Visit</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1195803878000</creationDate>
+<date>1196154715000</date>
+<contentUpdateDate>1196154715000</contentUpdateDate>
+<version>1.1</version>
 <title>Least Active Contributors</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -91,10 +98,18 @@
 </property>
 <property>
 <content>#panelheader('Least Active Contributors')
+#if($xwiki.statsService.enabled)
 #set($period=$xwiki.statsService.periodFactory.ALL_TIME)
 #set($interval=$xwiki.statsService.intervalFactory.createTailInterval(5))
 #set($stats=$xwiki.statsService.getVisitStatistics('save',$period,$interval))
+#if($stats.size() &gt; 0)
 #printContributorStats($stats)
+#else
+#printNoStatisticsData()
+#end
+#else
+#printStatisticsDisabled()
+#end
 #panelfooter()
 #includeMacros("Stats.Macros")</content>
 </property>

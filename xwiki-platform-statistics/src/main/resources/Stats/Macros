@@ -7,13 +7,20 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Stats.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1195803878000</creationDate>
+<date>1196173438000</date>
+<contentUpdateDate>1196173438000</contentUpdateDate>
+<version>1.1</version>
 <title>Statistics Macros</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -47,27 +54,7 @@
 <tags/>
 </property>
 </object>
-<content>&lt;style type="text/css"&gt;
-table.stats{
-width:100%;
-}
-table.stats th{
-font-weight:normal;
-color:#333333;
-border-bottom:1px solid #DDDDDD;
-border-top:1px solid #DDDDDD;
-padding-bottom:2px;
-}
-table.stats td{
-color:#888888;
-}
-table.stats th.numeric, table.stats td.numeric{
-text-align:right;
-padding-right:6px;
-width:70px;
-}
-&lt;/style&gt;
-#macro(printPageStats $stats)
+<content>#macro(printPageStats $stats)
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -146,5 +133,11 @@ width:70px;
 #end
 &lt;/tbody&gt;
 &lt;/table&gt;
+#end
+#macro(printNoStatisticsData)
+#info('No statistics recorded')
+#end
+#macro(printStatisticsDisabled)
+#warning('The statistics module is disabled by default for improved performances. For more details, see [statistics home page&gt;Stats.WebHome].')
 #end</content>
 </xwikidoc>

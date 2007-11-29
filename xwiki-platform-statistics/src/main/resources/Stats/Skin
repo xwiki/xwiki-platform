@@ -1,0 +1,429 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>Stats</web>
+<name>Skin</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent>Stats.WebHome</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1196172313000</creationDate>
+<date>1196172847000</date>
+<contentUpdateDate>1196172847000</contentUpdateDate>
+<version>1.1</version>
+<title>Statistics Skin</title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>Stats.Skin</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<object>
+<class>
+<name>XWiki.XWikiSkins</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<baseskin>
+<customDisplay></customDisplay>
+<name>baseskin</name>
+<number>10</number>
+<prettyName>Base Skin</prettyName>
+<size>30</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</baseskin>
+<comments2.vm>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>comments2.vm</name>
+<number>8</number>
+<prettyName>Comments</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</comments2.vm>
+<edit.vm>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>edit.vm</name>
+<number>9</number>
+<prettyName>Edit</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</edit.vm>
+<footer.vm>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>footer.vm</name>
+<number>4</number>
+<prettyName>Footer</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</footer.vm>
+<header.vm>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>header.vm</name>
+<number>3</number>
+<prettyName>Header</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</header.vm>
+<logo>
+<customDisplay></customDisplay>
+<name>logo</name>
+<number>11</number>
+<prettyName>Logo</prettyName>
+<size>30</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</logo>
+<name>
+<customDisplay></customDisplay>
+<name>name</name>
+<number>1</number>
+<prettyName>Name</prettyName>
+<size>30</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</name>
+<pagemenu.vm>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>pagemenu.vm</name>
+<number>7</number>
+<prettyName>Page Menu</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</pagemenu.vm>
+<style.css>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>style.css</name>
+<number>2</number>
+<prettyName>Style</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</style.css>
+<view.vm>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>view.vm</name>
+<number>5</number>
+<prettyName>View</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</view.vm>
+<viewheader.vm>
+<customDisplay></customDisplay>
+<editor>---</editor>
+<name>viewheader.vm</name>
+<number>6</number>
+<prettyName>View Header</prettyName>
+<rows>15</rows>
+<size>80</size>
+<tooltip></tooltip>
+<unmodifiable>0</unmodifiable>
+<validationMessage></validationMessage>
+<validationRegExp></validationRegExp>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</viewheader.vm>
+</class>
+<name>Stats.Skin</name>
+<number>0</number>
+<className>XWiki.XWikiSkins</className>
+<property>
+<baseskin>albatross</baseskin>
+</property>
+<property>
+<comments2.vm></comments2.vm>
+</property>
+<property>
+<edit.vm></edit.vm>
+</property>
+<property>
+<footer.vm></footer.vm>
+</property>
+<property>
+<header.vm></header.vm>
+</property>
+<property>
+<logo></logo>
+</property>
+<property>
+<name>skin</name>
+</property>
+<property>
+<pagemenu.vm></pagemenu.vm>
+</property>
+<property>
+<style.css>@import "elements.css";
+@import "classes.css";
+@import "xwiki.css";
+@import "wiki.css";
+@import "page.css";
+@import "rss.css";
+@import "screenlayout.css";
+@import "microformats.css";
+@import "presentation.css";
+@import "colorsblack.css";
+@import "fullscreenEdit.css";
+@import "css/table/table.css";
+@import "usersandgroups.css";
+@import "suggest/ajaxSuggest.css";
+
+.rightmenu a {
+	margin-right: 2px;
+	font-size: 100%;
+}
+
+.expanded .xwikipaneltitle {
+	background-color: #fff;
+	color: #384554;
+}
+
+.xwikipaneltitle:hover {
+	cursor: pointer;
+}
+
+.collapsed .wikipaneltitle {
+	border-top: 1px solid #fff;
+}
+
+.xwikipaneltitle {
+	padding: 0px 10px;
+	margin: 0px;
+	font-size: 1em;
+	background: url("icons/black-less.png") no-repeat right center;
+	border: 4px solid #384554;
+	border-width: 0px;
+	cursor: pointer;
+}
+
+.panel .accordionTabTitleBar h6 {
+	border-top: 1px solid #999;
+}
+
+#xwikinav {
+	border-bottom: 1px solid #999;
+}
+
+#contentcolumn {
+	width: 100% !important;
+	overflow: hidden;
+}
+
+li.inline {
+	display: inline;
+	padding-left: 3px;
+	padding-right: 7px;
+}
+
+li.tags {
+	color: rgb(102, 102, 255);
+	cursor: pointer;
+}
+
+li.selected {
+	background-color: #008;
+	color: #fff;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+#xwikieditcontent .accordionTabTitleBar h6 {
+	width: 100%;
+}
+
+div.panellayoutcontainer-1col .panellayoutcol {
+	width: 100%;
+}
+
+div.panellayoutcontainer-2col .panellayoutcol {
+	width: 50%;
+}
+
+div.panellayoutcontainer-3col .panellayoutcol {
+	width: 33%;
+}
+
+div.panellayoutcontainer-4col .panellayoutcol {
+	width: 25%;
+}
+
+div.panellayoutcontainer-5col .panellayoutcol {
+	width: 20%;
+}
+
+div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutcontainer-3col,div.panellayoutcontainer-4col,div.panellayoutcontainer-5col
+	{
+	overflow: auto;
+	clear: left;
+	height: 1%;
+}
+
+.panellayoutcol {
+	overflow: auto;
+	float: left;
+	height: 1%;
+}
+
+.panellayoutcol .panel {
+	width: 90%;
+	margin: 0 0 20px 5%;
+	border: 1px solid #ddd;
+}
+
+#xwikicontent .panel ul {
+	margin: 0 5px;
+	padding: 0;
+	list-style-position: inside;
+}
+
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents {
+	background-color: transparent;
+}
+
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents a {
+	color: #000;
+}
+
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents a:hover {
+	color: #06F;
+}
+
+#xwikicontent .panellayoutcol .expanded .xwikipaneltitle {
+	background-color: #789;
+	color: #fff;
+	border-bottom: 1px solid #ddd;
+	background-image:
+		url("icons/black-less-cont.png")
+		;
+}
+
+#xwikicontent .panellayoutcol .collapsed .xwikipaneltitle {
+	background-color: #CDE;
+	color: #fff;
+	background-image:
+		url("icons/black-more-cont.png")
+		;
+}
+
+#xwikicontent .panellayoutcol .expanded h5.xwikipaneltitle:hover,#xwikicontent .panellayoutcol .collapsed h5.xwikipaneltitle:hover
+	{
+	color: #fff;
+}
+
+/* CSS Rules for the Statistics Application */
+table.stats{
+	width:100%;
+}
+table.stats th{
+	font-weight:normal;
+	color:#333333;
+	border-bottom:1px solid #DDDDDD;
+	border-top:1px solid #DDDDDD;
+	padding-bottom:2px;
+}
+table.stats td{
+	color:#888888;
+}
+table.stats th.numeric, table.stats td.numeric{
+	text-align:right;
+	padding-right:6px;
+	width:70px;
+}</style.css>
+</property>
+<property>
+<view.vm></view.vm>
+</property>
+<property>
+<viewheader.vm></viewheader.vm>
+</property>
+</object>
+<content>
+</content></xwikidoc>

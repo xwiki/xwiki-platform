@@ -7,13 +7,20 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Stats.Activity</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1195803878000</creationDate>
+<date>1196159331000</date>
+<contentUpdateDate>1196159331000</contentUpdateDate>
+<version>1.1</version>
 <title>Activity Data</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -47,7 +54,8 @@
 <tags/>
 </property>
 </object>
-<content>1 Current week activity
+<content>#if($xwiki.statsService.enabled)
+1 Current week activity
 
 #set($scope = $xwiki.statsService.scopeFactory.ALL)
 #set($period = $xwiki.statsService.periodFactory.currentWeek)
@@ -57,8 +65,12 @@
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM.dd'))
 {table}
 | Views | Edits
+#if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 $dtf.print($item.key) | $item.value | $myedits.get($item.key)
+#end
+#else
+1900.01.01 | 0 | 0
 #end
 {table}
 
@@ -71,8 +83,12 @@ $dtf.print($item.key) | $item.value | $myedits.get($item.key)
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM.dd'))
 {table}
 | Views | Edits
+#if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 $dtf.print($item.key) | $item.value | $myedits.get($item.key)
+#end
+#else
+1900.01.01 | 0 | 0
 #end
 {table}
 
@@ -85,8 +101,12 @@ $dtf.print($item.key) | $item.value | $myedits.get($item.key)
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM'))
 {table}
 | Views | Edits
+#if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 $dtf.print($item.key) | $item.value | $myedits.get($item.key)
+#end
+#else
+1900.01 | 0 | 0
 #end
 {table}
 
@@ -99,8 +119,16 @@ $dtf.print($item.key) | $item.value | $myedits.get($item.key)
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy'))
 {table}
 | Views | Edits
+#if($myviews.size() &gt; 0)
 #foreach($item in $myviews.entrySet())
 $dtf.print($item.key) | $item.value | $myedits.get($item.key)
 #end
-{table}</content>
+#else
+1900 | 0 | 0
+#end
+{table}
+#else
+#printStatisticsDisabled()
+#end
+#includeMacros("Stats.Macros")</content>
 </xwikidoc>

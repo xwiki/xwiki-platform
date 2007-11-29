@@ -7,13 +7,20 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Stats.Document</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1195803878000</creationDate>
+<date>1195810293000</date>
+<contentUpdateDate>1195810293000</contentUpdateDate>
+<version>1.1</version>
 <title>Most Viewed Spaces</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -91,11 +98,19 @@
 </property>
 <property>
 <content>#panelheader('Most Viewed Spaces')
+#if($xwiki.statsService.enabled)
 #set($scope=$xwiki.statsService.scopeFactory.ALL_SPACES)
 #set($period=$xwiki.statsService.periodFactory.ALL_TIME)
 #set($interval=$xwiki.statsService.intervalFactory.createHeadInterval(5))
 #set($stats=$xwiki.statsService.getDocumentStatistics("view",$scope,$period,$interval))
+#if($stats.size() &gt; 0)
 #printSpaceStats($stats)
+#else
+#printNoStatisticsData()
+#end
+#else
+#printStatisticsDisabled()
+#end
 #panelfooter()
 #includeMacros("Stats.Macros")</content>
 </property>

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676868000</creationDate>
-<date>1195484631000</date>
-<contentUpdateDate>1196173412000</contentUpdateDate>
-<version>1.1</version>
+<date>1196335087000</date>
+<contentUpdateDate>1196335087000</contentUpdateDate>
+<version>2.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -128,13 +128,13 @@
             &lt;td&gt;$wikiAlias.visibility&lt;/td&gt;
             &lt;td&gt;
               #if($wikiAlias.visibility == "public")
-                [$msg.get("wikimanager.action.setvisibility.private")&gt;?action=setvisibility&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId&amp;wikivisibility=private] | 
+                &lt;a href="$doc.getURL("view", "action=setvisibility&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId&amp;wikivisibility=private")"&gt;$msg.get("wikimanager.action.setvisibility.private")&lt;/a&gt; | 
               #elseif($wikiAlias.visibility == "private")
-                [$msg.get("wikimanager.action.setvisibility.template")&gt;?action=setvisibility&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId&amp;wikivisibility=template] | 
+                &lt;a href="$doc.getURL("view", "action=setvisibility&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId&amp;wikivisibility=template")"&gt;$msg.get("wikimanager.action.setvisibility.template")&lt;/a&gt; | 
               #elseif($wikiAlias.visibility == "template")
-                [$msg.get("wikimanager.action.setvisibility.public")&gt;?action=setvisibility&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId&amp;wikivisibility=public] | 
+                &lt;a href="$doc.getURL("view", "action=setvisibility&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId&amp;wikivisibility=public")"&gt;$msg.get("wikimanager.action.setvisibility.public")&lt;/a&gt; | 
               #end
-              [$msg.get("delete")&gt;?action=delete&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId]
+              &lt;a href="$doc.getURL("view", "action=delete&amp;wikiname=$wikiAlias.WikiName&amp;serverid=$wikiAlias.objectId")"&gt;$msg.get("delete")&lt;/a&gt;
             &lt;/td&gt;
           &lt;/tr&gt;
         #end

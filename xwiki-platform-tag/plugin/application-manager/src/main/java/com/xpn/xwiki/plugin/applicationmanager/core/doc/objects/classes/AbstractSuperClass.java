@@ -365,11 +365,11 @@ public abstract class AbstractSuperClass implements SuperClass
     {
         synchronized (databasesInitedMap) {
             if (!this.databasesInitedMap.contains(context.getDatabase())) {
+                this.databasesInitedMap.add(context.getDatabase());
+                
                 checkClassDocument(context);
                 checkClassSheetDocument(context);
                 checkClassTemplateDocument(context);
-
-                this.databasesInitedMap.add(context.getDatabase());
             }
         }
     }
@@ -620,7 +620,7 @@ public abstract class AbstractSuperClass implements SuperClass
      */
     public boolean isInstance(XWikiDocument doc)
     {
-        return doc.getObject(getClassFullName()) != null;
+        return doc.getObjectNumbers(getClassFullName()) > 0;
     }
 
     /**
@@ -630,7 +630,7 @@ public abstract class AbstractSuperClass implements SuperClass
      */
     public boolean isInstance(Document doc)
     {
-        return doc.getObject(getClassFullName()) != null;
+        return doc.getObjectNumbers(getClassFullName()) > 0;
     }
 
     /**

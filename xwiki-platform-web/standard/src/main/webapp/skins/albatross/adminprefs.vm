@@ -66,7 +66,7 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 #set($obj = $doc.getObject($classname, 0))
 #if(!$obj)
 #set($redirect = $xwiki.getRequestURL())
-$response.sendRedirect($doc.getURL("objectadd", "classname=XWiki.XWikiPreferences&xredirect=$xwiki.getFormEncoded($redirect)"))
+$response.sendRedirect($doc.getURL("objectadd", "classname=XWiki.XWikiPreferences&XWiki.XWikiPreferences_upload_maxsize=33554432&xredirect=$xwiki.getFormEncoded($redirect)"))
 #end
 <div class="hidden">
 <input type="hidden" name="xcontinue" value="$doc.getURL("admin", "editor=prefs")"/>

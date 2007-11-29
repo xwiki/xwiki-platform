@@ -27,43 +27,78 @@ import org.joda.time.format.DateTimeFormatter;
 
 /**
  * Immutable period for retrieving statistics. A period of time is uniquely identified by its
- * bounds, and not by its span.
+ * bounds, and not by its span. Two periods of time with the same span are different if they don't
+ * start at the same time.
  */
 public class Period
 {
+    /**
+     * Formatter associated with periods that have less than a month
+     */
     private static final DateTimeFormatter DAY_PERIOD_FORMATTER =
         DateTimeFormat.forPattern("yyyyMMdd");
 
+    /**
+     * Formatter associated with periods that have at least one month
+     */
     private static final DateTimeFormatter MONTH_PERIOD_FORMATTER =
         DateTimeFormat.forPattern("yyyyMM");
 
     private Interval interval;
 
+    /**
+     * Creates a new time Period from the specified start time to the specified end time. Both ends
+     * of the period are given as time stamps (the number of milliseconds from 1970-01-01T00:00:00Z)
+     * 
+     * @param start The period start as the number of milliseconds from 1970-01-01T00:00:00Z
+     * @param end The period end as the number of milliseconds from 1970-01-01T00:00:00Z
+     */
     public Period(long start, long end)
     {
         interval = new Interval(start, end);
     }
 
+    /**
+     * @return The period start as the number of milliseconds from 1970-01-01T00:00:00Z
+     */
     public long getStart()
     {
         return interval.getStartMillis();
     }
 
+    /**
+     * @return The period end as the number of milliseconds from 1970-01-01T00:00:00Z
+     */
     public long getEnd()
     {
         return interval.getEndMillis();
     }
 
+    /**
+     * @return The start of the period formatted with the associated formatter. Usually this is how
+     *         the start of the period is stored in the database.
+     * @see #getFormatter()
+     */
     public int getStartCode()
     {
         return Integer.parseInt(getFormatter().print(interval.getStart()));
     }
 
+    /**
+     * @return The end of the period formatted with the associated formatter. Usually this is how
+     *         the end of the period is stored in the database.
+     * @see #getFormatter()
+     */
     public int getEndCode()
     {
         return Integer.parseInt(getFormatter().print(interval.getEnd()));
     }
 
+    /**
+     * @return The formatter associated with this Period instance
+     * @see #DAY_PERIOD_FORMATTER
+     * @see #MONTH_PERIOD_FORMATTER
+     */
     private DateTimeFormatter getFormatter()
     {
         if (interval.toPeriod().getMonths() >= 1) {

@@ -7,13 +7,20 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>1</translation>
 <parent>Stats.Document</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1195803878000</creationDate>
+<date>1195812434000</date>
+<contentUpdateDate>1195812434000</contentUpdateDate>
+<version>1.1</version>
 <title>Most Viewed Pages</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -91,11 +98,19 @@
 </property>
 <property>
 <content>#panelheader("Most Viewed Pages")
+#if($xwiki.statsService.enabled)
 #set($scope=$xwiki.statsService.scopeFactory.ALL_PAGES)
 #set($period=$xwiki.statsService.periodFactory.ALL_TIME)
 #set($interval=$xwiki.statsService.intervalFactory.createHeadInterval(5))
 #set($stats=$xwiki.statsService.getDocumentStatistics("view",$scope,$period,$interval))
+#if($stats.size() &gt; 0)
 #printPageStats($stats)
+#else
+#printNoStatisticsData()
+#end
+#else
+#printStatisticsDisabled()
+#end
 #panelfooter()
 #includeMacros("Stats.Macros")</content>
 </property>

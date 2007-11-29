@@ -7,13 +7,20 @@
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
 <parent>Stats.Activity</parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
 <customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1195803878000</creationDate>
+<date>1196159090000</date>
+<contentUpdateDate>1196159090000</contentUpdateDate>
+<version>1.1</version>
 <title>Current Month Activity</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
-<minorEdit>true</minorEdit>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -91,6 +98,7 @@
 </property>
 <property>
 <content>#panelheader('Current Month Activity')
+#if($xwiki.statsService.enabled)
 #if(not $chartWidth)
 #set($chartWidth=250)
 #end
@@ -103,7 +111,11 @@
 #set($monthEnd=$xwiki.jodatime.getDateTime($currentMonth.end))
 #set($dtf=$xwiki.jodatime.getDateTimeFormatterForPattern($pattern))
 &lt;div style="text-align:center;"&gt;{chart:type=time|source=type:table;doc:Stats.ActivityData;table_number:1;ignore_alpha:true|date_format=type:custom;pattern:$pattern|height=$chartHeight|width=$chartWidth|domain_axis_date_format_override=type:custom;pattern:dd|domain_axis_lower_date=value:$dtf.print($monthStart);type:custom;pattern:$pattern|domain_axis_upper_date=value:$dtf.print($monthEnd);type:custom;pattern:$pattern|domain_axis_date_tick_unit=unit:day;count:3|domain_axis_tick_mark_position:ende}&lt;/div&gt;
-#panelfooter()</content>
+#else
+#printStatisticsDisabled()
+#end
+#panelfooter()
+#includeMacros("Stats.Macros")</content>
 </property>
 <property>
 <description>Displays the activity during the current month</description>

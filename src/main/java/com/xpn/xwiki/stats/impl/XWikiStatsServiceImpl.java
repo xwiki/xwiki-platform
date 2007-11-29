@@ -572,6 +572,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
     /**
      * {@inheritDoc}
+     * 
+     * @see XWikiStatsService#getActionStatistics(String, Scope, Period, Duration, XWikiContext)
      */
     public Map getActionStatistics(String action, Scope scope, Period period, Duration step,
         XWikiContext context)
@@ -602,6 +604,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
     /**
      * {@inheritDoc}
+     * 
+     * @see XWikiStatsService#getDocumentStatistics(String, Scope, Period, Interval, XWikiContext)
      */
     public List getDocumentStatistics(String action, Scope scope, Period period,
         Interval interval, XWikiContext context)
@@ -678,6 +682,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
     /**
      * {@inheritDoc}
+     * 
+     * @see XWikiStatsService#getBackLinkStatistics(String, Scope, Period, Interval, XWikiContext)
      */
     public List getBackLinkStatistics(String domain, Scope scope, Period period,
         Interval interval, XWikiContext context)
@@ -732,6 +738,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
     /**
      * {@inheritDoc}
+     * 
+     * @see XWikiStatsService#getRefererStatistics(String, Scope, Period, Interval, XWikiContext)
      */
     public List getRefererStatistics(String domain, Scope scope, Period period,
         Interval interval, XWikiContext context)
@@ -811,6 +819,8 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
     /**
      * {@inheritDoc}
+     * 
+     * @see XWikiStatsService#getVisitStatistics(String, Period, Interval, XWikiContext)
      */
     public List getVisitStatistics(String action, Period period, Interval interval,
         XWikiContext context)
@@ -836,7 +846,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             Session session = store.getSession(context);
             Query query =
                 session
-                    .createQuery("select name, uniqueID, cookie, IP, userAgent, sum(pageSaves), sum(pageViews), sum(downloads) from VisitStats where :startDate <= startDate and endDate < :endDate group by name "
+                    .createQuery("select name, sum(pageSaves), sum(pageViews), sum(downloads) from VisitStats where :startDate <= startDate and endDate < :endDate group by name "
                         + orderByClause);
             query.setDate("startDate", new Date(period.getStart()));
             query.setDate("endDate", new Date(period.getEnd()));
@@ -875,13 +885,13 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
         while (it.hasNext()) {
             Object[] result = (Object[]) it.next();
             String name = (String) result[0];
-            String uniqueID = (String) result[1];
-            String cookie = (String) result[2];
-            String ip = (String) result[3];
-            String userAgent = (String) result[4];
-            int pageSaves = ((Integer) result[5]).intValue();
-            int pageViews = ((Integer) result[6]).intValue();
-            int downloads = ((Integer) result[7]).intValue();
+            String uniqueID = "";
+            String cookie = "";
+            String ip = "";
+            String userAgent = "";
+            int pageSaves = ((Integer) result[1]).intValue();
+            int pageViews = ((Integer) result[2]).intValue();
+            int downloads = ((Integer) result[3]).intValue();
             VisitStats vs =
                 new VisitStats(name, uniqueID, cookie, ip, userAgent, new Date(startDate
                     .getMillis()), StatsUtil.PERIOD_DAY);

@@ -26,45 +26,94 @@ package com.xpn.xwiki.stats.impl;
  */
 public class DurationFactory
 {
+    /**
+     * A duration of exactly one day
+     */
     public static final Duration DAY = createDuration(0, 0, 0, 1);
 
+    /**
+     * A duration of exactly one week
+     */
     public static final Duration WEEK = createDuration(0, 0, 1, 0);
 
+    /**
+     * A duration of exactly one month
+     */
     public static final Duration MONTH = createDuration(0, 1, 0, 0);
 
+    /**
+     * A duration of exactly one year
+     */
     public static final Duration YEAR = createDuration(1, 0, 0, 0);
 
+    /**
+     * This factory is implemented as a singleton. This is its only instance.
+     */
     private static final DurationFactory instance = new DurationFactory();
 
     private DurationFactory()
     {
     }
 
+    /**
+     * @return The only instance of this singleton factory
+     */
     public static DurationFactory getInstance()
     {
         return instance;
     }
 
+    /**
+     * @see Duration#Duration(int, int, int, int)
+     */
     public static Duration createDuration(int years, int months, int weeks, int days)
     {
         return new Duration(years, months, weeks, days);
     }
 
+    /**
+     * Creates a new Duration instance having just the specified number of days. All the other
+     * fields are 0.
+     * 
+     * @param days The number of days
+     * @return A new Duration instance
+     */
     public static Duration createDays(int days)
     {
         return createDuration(0, 0, 0, days);
     }
 
+    /**
+     * Creates a new Duration instance having just the specified number of weeks. All the other
+     * fields are 0.
+     * 
+     * @param weeks The number of weeks
+     * @return A new Duration instance
+     */
     public static Duration createWeeks(int weeks)
     {
         return createDuration(0, 0, weeks, 0);
     }
 
+    /**
+     * Creates a new Duration instance having just the specified number of months. All the other
+     * fields are 0.
+     * 
+     * @param months The number of months
+     * @return A new Duration instance
+     */
     public static Duration createMonths(int months)
     {
         return createDuration(0, months, 0, 0);
     }
 
+    /**
+     * Creates a new Duration instance having just the specified number of years. All the other
+     * fields are 0.
+     * 
+     * @param years The number of years
+     * @return A new Duration instance
+     */
     public static Duration createYears(int years)
     {
         return createDuration(years, 0, 0, 0);

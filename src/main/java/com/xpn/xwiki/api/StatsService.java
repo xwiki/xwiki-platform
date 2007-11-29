@@ -38,7 +38,7 @@ import com.xpn.xwiki.stats.impl.Scope;
 import com.xpn.xwiki.stats.impl.ScopeFactory;
 
 /**
- * Statistics api. The statistics module need to be activated (xwiki.stats=1 in xwiki.cfg)
+ * Statistics api. The Statistics module needs to be activated (xwiki.stats=1 in xwiki.cfg)
  */
 public class StatsService extends Api
 {
@@ -48,7 +48,12 @@ public class StatsService extends Api
     }
 
     /**
-     * @return true if the statistics application is activated in the xwiki.cfg
+     * The Statistics module is disabled by default for improved performances. It can be globally
+     * activated by setting the value of <b><code>xwiki.stats</b></code> to <b><code>1</b></code>
+     * in the <b><code>xwiki.cfg</b></code> configuration file. Use this method to test if at
+     * some point the Statistics module is enabled or disabled.
+     * 
+     * @return true if the Statistics module is enabled
      */
     public boolean isEnabled()
     {
@@ -56,7 +61,8 @@ public class StatsService extends Api
     }
 
     /**
-     * @return A helper factory for creating Scope objects in velocity.
+     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Scope} objects in
+     *         velocity.
      */
     public ScopeFactory getScopeFactory()
     {
@@ -64,7 +70,8 @@ public class StatsService extends Api
     }
 
     /**
-     * @return A helper factory for creating a Period objects in velocity.
+     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Period} objects in
+     *         velocity.
      */
     public PeriodFactory getPeriodFactory()
     {
@@ -72,7 +79,8 @@ public class StatsService extends Api
     }
 
     /**
-     * @return A helper factory for creating a Period objects in velocity.
+     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Duration} objects in
+     *         velocity.
      */
     public DurationFactory getDurationFactory()
     {
@@ -80,7 +88,8 @@ public class StatsService extends Api
     }
 
     /**
-     * @return A helper factory for creating Interval objects in velocity.
+     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Interval} objects in
+     *         velocity.
      */
     public IntervalFactory getIntervalFactory()
     {
@@ -90,7 +99,9 @@ public class StatsService extends Api
     /**
      * Retrieves document statistics.
      * 
-     * @param action Can be one of: "view", "save", "download"
+     * @param action The action the results should be ordered by. It can be one of: "view", "save"
+     *            or "download". If the action is "view" then the documents are ordered by the
+     *            number of times they have been viewed so far.
      * @param scope The set of documents for which to retrieve statistics
      * @param period The period of time
      * @param interval The sub-interval to return from the entire result set. Use this parameter for
@@ -108,7 +119,9 @@ public class StatsService extends Api
     /**
      * Retrieves visit statistics
      * 
-     * @param action The action the results should be ordered by
+     * @param action The action the results should be ordered by. It can be one of: "view", "save"
+     *            or "download". If the action is "view" then the visitors are ordered by the number
+     *            of pages they have viewed so far.
      * @param period The period of time
      * @param interval The sub-interval to return from the entire result set. Use this parameter for
      *            pagination
@@ -163,7 +176,7 @@ public class StatsService extends Api
      * Shows how the statistics for the specified action have evolved over the specified period of
      * time.
      * 
-     * @param action
+     * @param action The action for which to retrieve statistics
      * @param scope The set of documents to consider
      * @param period The period of time
      * @param step The step used for sampling the period

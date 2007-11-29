@@ -26,36 +26,68 @@ package com.xpn.xwiki.stats.impl;
  */
 public class IntervalFactory
 {
+    /**
+     * The interval that matches the entire list it is applied to.
+     */
     public static final Interval ALL = createInterval(0, 0);
 
+    /**
+     * The interval that matches just the first element of the list it is applied to.
+     */
     public static final Interval FIRST = createInterval(0, 1);
 
+    /**
+     * The interval that matches just the last element of the list it is applied to.
+     */
     public static final Interval LAST = createInterval(0, -1);
 
+    /**
+     * This factory is implemented as a singleton. This is its only instance.
+     */
     private static final IntervalFactory instance = new IntervalFactory();
 
     private IntervalFactory()
     {
     }
 
+    /**
+     * @return The only instance of this singleton factory
+     */
     public static IntervalFactory getInstance()
     {
         return instance;
     }
 
+    /**
+     * @see Interval#Interval(int, int)
+     */
     public static Interval createInterval(int start, int size)
     {
         return new Interval(start, size);
     }
 
+    /**
+     * Creates a new Interval starting from 0 and having the specified size. It matches the first
+     * <code>size</code> elements of the list it is applied to.
+     * 
+     * @param size The size of the interval
+     * @return A new Interval instance
+     */
     public static Interval createHeadInterval(int size)
     {
-        return createInterval(0, size);
+        return createInterval(0, Math.abs(size));
     }
 
+    /**
+     * Creates a new Interval starting from the end of the list it is applied to and having the
+     * specified size. It matches the last <code>size</code> elements of the list.
+     * 
+     * @param size The size of the interval
+     * @return A new Interval instance
+     */
     public static Interval createTailInterval(int size)
     {
-        return createInterval(0, -size);
+        return createInterval(0, -Math.abs(size));
     }
 
     /**

@@ -41,22 +41,34 @@ public class PeriodFactory
      */
     private static final DateTime MAX_DATE = new DateTime(9999, 12, 31, 23, 59, 59, 999);
 
+    /**
+     * The period of time between {@link #MIN_DATE} and {@link #MAX_DATE}
+     */
     public static final Period ALL_TIME =
         createPeriod(MIN_DATE.getMillis(), MAX_DATE.getMillis());
 
     private static final DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyyMMdd");
 
+    /**
+     * This factory is implemented as a singleton. This is its only instance.
+     */
     private static final PeriodFactory instance = new PeriodFactory();
 
     private PeriodFactory()
     {
     }
 
+    /**
+     * @return The only instance of this singleton factory
+     */
     public static PeriodFactory getInstance()
     {
         return instance;
     }
 
+    /**
+     * @see Period#Period(long, long)
+     */
     public static Period createPeriod(long start, long end)
     {
         return new Period(start, end);
@@ -76,6 +88,13 @@ public class PeriodFactory
         return createPeriod(formatter.parseMillis(start), formatter.parseMillis(end));
     }
 
+    /**
+     * Creates a new Period instance that matches exactly the day that includes the specified time
+     * stamp.
+     * 
+     * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
+     * @return A new Period instance
+     */
     public static Period createDayPeriod(long timestamp)
     {
         MutableDateTime mdt = new MutableDateTime(timestamp);
@@ -83,8 +102,10 @@ public class PeriodFactory
     }
 
     /**
-     * @param date The string representation of a date uniquely identifying a day. Use the "yyyyMMdd"
-     *            format.
+     * Creates a new Period instance that matches exactly the day that includes the specified date.
+     * 
+     * @param date The string representation of a date uniquely identifying a day. Use the
+     *            "yyyyMMdd" format.
      * @return The corresponding Period object
      * @see java.text.SimpleDateFormat
      */
@@ -93,11 +114,21 @@ public class PeriodFactory
         return createDayPeriod(formatter.parseMillis(date));
     }
 
+    /**
+     * @return The period of time matching the current day
+     */
     public static Period getCurrentDay()
     {
         return createDayPeriod(new DateTime().getMillis());
     }
 
+    /**
+     * Creates a new Period instance that matches exactly the week that includes the specified time
+     * stamp.
+     * 
+     * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
+     * @return A new Period instance
+     */
     public static Period createWeekPeriod(long timestamp)
     {
         MutableDateTime mdt = new MutableDateTime(timestamp);
@@ -105,6 +136,8 @@ public class PeriodFactory
     }
 
     /**
+     * Creates a new Period instance that matches exactly the week that includes the specified date.
+     * 
      * @param date The string representation of a date uniquely identifying a week. Use the
      *            "yyyyMMdd" format.
      * @return The corresponding Period object
@@ -115,11 +148,21 @@ public class PeriodFactory
         return createWeekPeriod(formatter.parseMillis(date));
     }
 
+    /**
+     * @return The period of time matching the current week
+     */
     public static Period getCurrentWeek()
     {
         return createWeekPeriod(new DateTime().getMillis());
     }
 
+    /**
+     * Creates a new Period instance that matches exactly the month that includes the specified time
+     * stamp.
+     * 
+     * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
+     * @return A new Period instance
+     */
     public static Period createMonthPeriod(long timestamp)
     {
         MutableDateTime mdt = new MutableDateTime(timestamp);
@@ -127,6 +170,9 @@ public class PeriodFactory
     }
 
     /**
+     * Creates a new Period instance that matches exactly the month that includes the specified
+     * date.
+     * 
      * @param date The string representation of a date uniquely identifying a month. Use the
      *            "yyyyMMdd" format.
      * @return The corresponding Period object
@@ -137,11 +183,21 @@ public class PeriodFactory
         return createMonthPeriod(formatter.parseMillis(date));
     }
 
+    /**
+     * @return The period of time matching the current month
+     */
     public static Period getCurrentMonth()
     {
         return createMonthPeriod(new DateTime().getMillis());
     }
 
+    /**
+     * Creates a new Period instance that matches exactly the year that includes the specified time
+     * stamp.
+     * 
+     * @param timestamp The milliseconds from 1970-01-01T00:00:00Z
+     * @return A new Period instance
+     */
     public static Period createYearPeriod(long timestamp)
     {
         MutableDateTime mdt = new MutableDateTime(timestamp);
@@ -149,6 +205,8 @@ public class PeriodFactory
     }
 
     /**
+     * Creates a new Period instance that matches exactly the year that includes the specified date.
+     * 
      * @param date The string representation of a date uniquely identifying a year. Use the
      *            "yyyyMMdd" format.
      * @return The corresponding Period object
@@ -159,6 +217,9 @@ public class PeriodFactory
         return createYearPeriod(formatter.parseMillis(date));
     }
 
+    /**
+     * @return The period of time matching the current year
+     */
     public static Period getCurrentYear()
     {
         return createYearPeriod(new DateTime().getMillis());

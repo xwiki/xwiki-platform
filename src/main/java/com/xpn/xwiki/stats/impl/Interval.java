@@ -26,31 +26,57 @@ package com.xpn.xwiki.stats.impl;
  */
 public class Interval
 {
+    /**
+     * The start of the interval. It can be both positive and negative. A negative start is usually
+     * associated with an interval which is relative to the end of the list it is applied to.
+     */
     private int start;
 
+    /**
+     * The size of the interval. It can be both positive and negative. A negative size is usually
+     * associated with an interval which is relative to the end of the list it is applied to.
+     */
     private int size;
 
+    /**
+     * Creates a new interval having the specified start and size.
+     * 
+     * @param start The start of the interval
+     * @param size The size of the interval
+     */
     public Interval(int start, int size)
     {
         this.start = start;
         this.size = size;
     }
 
+    /**
+     * @see #start
+     */
     public int getStart()
     {
         return start;
     }
 
+    /**
+     * @return The absolute value (nonnegative) of this interval's start
+     */
     public int getAbsoluteStart()
     {
         return Math.abs(start);
     }
 
+    /**
+     * @see #size
+     */
     public int getSize()
     {
         return size;
     }
 
+    /**
+     * @return The absolute value (nonnegative) of this interval's size
+     */
     public int getAbsoluteSize()
     {
         return Math.abs(size);

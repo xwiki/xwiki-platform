@@ -26,8 +26,6 @@ import junit.framework.TestCase;
 
 /**
  * Unit tests for the {@link StatsUtil} class.
- * 
- * @version $Id: $
  */
 public class StatsUtilTest extends TestCase
 {

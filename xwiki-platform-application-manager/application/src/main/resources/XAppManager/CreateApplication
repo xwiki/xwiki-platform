@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1192218584000</creationDate>
-<date>1196270683000</date>
-<contentUpdateDate>1196270683000</contentUpdateDate>
-<version>2.1</version>
+<date>1196334097000</date>
+<contentUpdateDate>1196334097000</contentUpdateDate>
+<version>3.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -89,27 +89,24 @@
   .xem_userlisttable td {}
 &lt;/style&gt;
 
-&lt;form method="get" name="createapplication"&gt;
-  &lt;input type="hidden" name="action" value="create"&gt;&lt;/input&gt;
+&lt;form method="get"&gt;
+  &lt;input type="hidden" name="action" value="create" /&gt;
 
   &lt;table width="100%"&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("xapp.appname")&lt;/td&gt;
       &lt;td&gt;$appdocument.display("appname", "edit")&lt;/td&gt;
-      &lt;td id="appnameerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("xapp.description")&lt;/td&gt;
       &lt;td&gt;$appdocument.display("description", "edit")&lt;/td&gt;
-      &lt;td id="appdescerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("version")&lt;/td&gt;
       &lt;td&gt;$appdocument.display("appversion", "edit")&lt;/td&gt;
-      &lt;td id="appversionerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/table&gt;
 
-  &lt;input type="submit" value="$msg.get("create")"&gt;&lt;/input&gt;
+  &lt;input type="submit" value="$msg.get("create")" /&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

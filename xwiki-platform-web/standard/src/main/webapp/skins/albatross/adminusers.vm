@@ -49,6 +49,7 @@
  </table>
 
  <script type="text/javascript">
+//<![CDATA[
      var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "userstable", displayUsers, true); 
      #if(!$xwiki.hasAccessLevel("view","XWiki.Registration")||$xwiki.getDocument("XWiki.Registration").isNew())
        #set($registerurl = $doc.getURL("view", "xpage=registeruser"))
@@ -59,6 +60,7 @@
        ## go to custom registration page
        $('addNewUser').href = "$xwiki.getURL('XWiki.Registration')";
      #end
+//]
  </script>
  
 ########### display the stable interface

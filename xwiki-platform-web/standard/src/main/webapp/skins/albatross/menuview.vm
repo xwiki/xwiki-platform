@@ -84,6 +84,7 @@
 ##
 #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew())
 <script type="text/javascript">
+//<![CDATA[
 function reloadActionMenu()
 {
   var id = 'menuview';
@@ -107,6 +108,7 @@ function watchlist(action)
       onComplete: reloadActionMenu()
     });
 }
+//]]>
 </script>
 #set ($isWatchedDoc = $xwiki.watchlist.isWatchedDocument())
 #set ($isWatchedSpace = $xwiki.watchlist.isWatchedSpace())

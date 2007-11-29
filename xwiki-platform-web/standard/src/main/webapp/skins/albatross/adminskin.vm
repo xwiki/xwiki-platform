@@ -23,10 +23,10 @@
 <tr><td class="label"><label for="${class.name}_${obj.number}_${prop.name}">$prop.prettyName:</label></td>
 <td>$doc.displayEdit($prop, "${class.name}_${obj.number}_" , $obj)
 <script type="text/javascript">
-//<!--
+//<![CDATA[
 //document.write("<a href=\"#\" onclick=\"openColorPicker(); return false\">$msg.get("colorpicker")<"+"/a>");
 document.write("<span class=\"chwColorPickerInvoker\" title=\"$msg.get("chwinvokecolorpickertitle")\" onclick=\"window.colorPicker.show(document.getElementById('${class.name}_${obj.number}_${prop.name}'));\">$msg.get("chwinvokecolorpicker")<"+"/span>");
-//-->
+//]]>
 </script>
 </td>
 </tr>

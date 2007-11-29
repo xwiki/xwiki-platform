@@ -26,6 +26,7 @@ $xwiki.getTextArea($tdoc.content)
 <div class="bottombuttons">#template("editactions.vm")</div>
 ## </form>
 <script type="text/javascript">
+//<![CDATA[
     if ( browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
         wikiEditor.init({
             language: "en",
@@ -45,6 +46,7 @@ $xwiki.getTextArea($tdoc.content)
    } else {
             alert("$msg.get('browsernoncompatible')");
 	  }
+//]]>
 </script>
 ## fullscreen editing
 <script type="text/javascript">

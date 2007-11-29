@@ -21,7 +21,7 @@
 #end #end
 ## url to take the users and groups to display in the ajax-based table
 #set($url = "?xpage=getusersandgroups")
-#set($saveUrl = $doc.getURL("view", "xpage=saverights&amp;clsname=${clsname}&amp;fullname=XWiki.XWikiGuest&amp;uorg=users"))
+#set($saveUrl = $doc.getURL("view", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
 
 ## get the rights for XWikiGuest
 #set($r1 = 0) #set($r2 = 0) #set($r3 = 0) #set($r4 = 0) #set($r5 = 0) #set($r6 = 0) #set($r7 = 0)
@@ -142,6 +142,7 @@
 </tr>
 </table>
 <script type="text/javascript">
+//<![CDATA[
    var saveUrl = "$saveUrl";
    saveUrl.replace(/&amp;/g, "&");
    var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstableg", displayUsersAndGroups, true);
@@ -152,6 +153,7 @@
    var chbx5 = new MSCheckbox(document.getElementById('tdregister'), "register", saveUrl, "${r5}");
    var chbx6 = new MSCheckbox(document.getElementById('tdadmin'), "admin", saveUrl, "${r6}");
    if(document.getElementById('tdprogr')) var chbx7 = new MSCheckbox(document.getElementById('tdprogr'), "programming", saveUrl, "${r7}");
+//]]>
 </script>
 
 ######## display the stable interface

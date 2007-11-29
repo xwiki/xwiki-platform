@@ -127,6 +127,7 @@
 </tr>
 </table>
 <script type="text/javascript">
+//<![CDATA[
 	var saveUrl = "$saveUrl";
    	saveUrl.replace(/&amp;/g, "&");
 	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstabled", displayUsersAndGroups, true);
@@ -134,6 +135,7 @@
 	var chbx2 = new MSCheckbox(document.getElementById('tdcomment'), "comment", saveUrl, "${r2}");
         var chbx3 = new MSCheckbox(document.getElementById('tdedit'), "edit", saveUrl, "${r3}");
         var chbx4 = new MSCheckbox(document.getElementById('tddelete'), "delete", saveUrl, "${r4}");
+//]]>
 </script>
 
 ############ display the old interface

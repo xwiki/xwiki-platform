@@ -138,6 +138,7 @@
 </tr>
 </table>
 <script type="text/javascript">
+//<![CDATA[
    	var saveUrl = "$saveUrl";
    	saveUrl.replace(/&amp;/g, "&");
 	var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstables", displayUsersAndGroups, true);
@@ -146,6 +147,7 @@
         var chbx3 = new MSCheckbox(document.getElementById('tdedit'), "edit", saveUrl, "${r3}");
         var chbx4 = new MSCheckbox(document.getElementById('tddelete'), "delete", saveUrl, "${r4}");
         var chbx6 = new MSCheckbox(document.getElementById('tdadmin'), "admin", saveUrl, "${r6}");
+//]]>
 </script>
 
 ######### display the stable interface

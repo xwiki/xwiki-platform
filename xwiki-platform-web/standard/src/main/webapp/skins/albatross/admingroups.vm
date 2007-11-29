@@ -53,8 +53,10 @@
 #set($redirecturl = $doc.getURL("admin", "editor=groupd&amp;space=XWiki"))
         
 <script type="text/javascript">
+//<![CDATA[
         var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "groupstable", displayGroups, true); 
         Event.observe($('addNewGroup'), "click", makeAddHandler("$addnewurl", "$saveurl", "$redirecturl"));
+//]]>
 </script>
 
 ############ display the stable interface

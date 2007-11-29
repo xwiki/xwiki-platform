@@ -64,6 +64,7 @@
 
 #set($url = $doc.getURL("view", "xpage=getgroupmembers"))
 <script type="text/javascript">
+//<![CDATA[
   tabl = new ASSTable("$url", 15, "display1", "scrollbar1", "memberstable", displayMembers, true);
    
   //create new ajax suggest
@@ -117,6 +118,7 @@
         // clear errors messages
         $('errMsg').innerHTML = "";
  }
+//]]>
 </script>
 #else
 $xwiki.renderText($xwiki.getDocument("XWiki.XWikiGroupSheet").getContent(), $doc)

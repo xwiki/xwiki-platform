@@ -3,6 +3,7 @@
 <script type="text/javascript" src="${request.contextPath}/tiny_mce/tiny_mce.js"></script>
 <script type="text/javascript" src="${request.contextPath}/wiki_editor/wiki_editor.js"></script>
 <script type="text/javascript">
+//<![CDATA[
 	wikiEditor.init({
 		elements : "$editors",
 	    language: "en",
@@ -17,5 +18,6 @@
         wiki_macro_path : '${request.contextPath}/bin/view/$doc.web/$doc.name',
         wiki_plugins: 'core, attachments, macros'
 	});
+//]]>
 </script>
 #end

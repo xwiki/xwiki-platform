@@ -118,6 +118,4 @@ $response.setContentType("application/x-json")
   }
 #end
 ]}
-
 ### end of json
-

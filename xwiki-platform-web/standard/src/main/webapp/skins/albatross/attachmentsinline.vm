@@ -77,12 +77,12 @@ ${Msz}Mb
     </div> ## attachmentscontent
 #if($inline && ($inline == true))
 <script type="text/javascript">
-//<!--
+//<![CDATA[
 #if($hasedit || $hasadmin)
 document.getElementById("attachform").className = "collapsed";
 #end
 document.getElementById("attachments").className = "hidden";
-//-->
+//]]>
 </script>
 #end
 ## #end

@@ -410,11 +410,21 @@ MSCheckbox.prototype = {
       //put $msg.get() messages!!!!!
 
       var nxtst = (pivot.state + 1) % pivot.nrstates;
-      if(pivot.right == "admin" && nxtst == 2)
-       confirm("You are about to deny the admin right for this user. Continue?");
-      else if(pivot.right == "admin" && nxtst == 0)
-        confirm("You are about to clear the admin right for this user. Continue?");
-      pivot.next(); // go to next state
+      if(pivot.right == "admin" && nxtst == 2) {
+        if(confirm("You are about to deny the admin right for this user. Continue?")) {
+          pivot.next(); // go to next state
+        } else {
+          return;
+        }
+      } else if(pivot.right == "admin" && nxtst == 0) {
+        if(confirm("You are about to clear the admin right for this user. Continue?")) {
+          pivot.next(); // go to next state
+        } else {
+          return;
+        }
+      } else {
+        pivot.next(); // go to next state
+      }
 
       //compute the complete url
       var action = "";

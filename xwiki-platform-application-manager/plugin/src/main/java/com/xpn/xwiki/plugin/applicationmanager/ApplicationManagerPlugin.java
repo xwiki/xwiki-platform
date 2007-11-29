@@ -83,11 +83,6 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
 
         String database = context.getDatabase();
         try {
-            // FIXME : XWiki Platform 1.1.2 bug fixed in 1.1.3 (see
-            // http://jira.xwiki.org/jira/browse/XWIKI-1853). Remove it when ApplicationManager
-            // depends on 1.1.3 version.
-            context.getWiki().setDatabase(context.getMainXWiki());
-
             context.setDatabase(context.getMainXWiki());
             ApplicationManager.getInstance().updateAllApplicationTranslation(
                 "Referesh applications translations informations", context);

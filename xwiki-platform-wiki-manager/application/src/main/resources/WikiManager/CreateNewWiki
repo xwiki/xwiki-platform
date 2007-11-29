@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1196270699000</date>
-<contentUpdateDate>1196270699000</contentUpdateDate>
-<version>4.1</version>
+<date>1196334164000</date>
+<contentUpdateDate>1196334164000</contentUpdateDate>
+<version>5.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -96,39 +96,33 @@
   .xem_userlisttable td {}
 &lt;/style&gt;
 
-&lt;form method="get" name="createwiki"&gt;
-  &lt;input type="hidden" name="action" value="create"&gt;&lt;/input&gt;
+&lt;form method="get"&gt;
+  &lt;input type="hidden" name="action" value="create" /&gt;
 
   &lt;table width="100%"&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("wikimanager.wikiname")&lt;/td&gt;
-      &lt;td&gt;&lt;input size="30" id="wikiname" name="wikiname" type="text"&gt;&lt;/input&gt;&lt;/td&gt;
-      &lt;td id="wikinameerrormsg" width="40%"&gt;&lt;/td&gt;
+      &lt;td&gt;&lt;input size="30" id="wikiname" name="wikiname" type="text" /&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("wikimanager.wikidesc")&lt;/td&gt;
       &lt;td&gt;$wikidocument.display("description", "edit")&lt;/td&gt;
-      &lt;td id="wikidescerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("wikimanager.wikidomain")&lt;/td&gt;
       &lt;td&gt;$wikidocument.display("server", "edit")&lt;/td&gt;
-      &lt;td id="wikidomainerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("wikimanager.wikiadmin")&lt;/td&gt;
       &lt;td&gt;$wikidocument.display("owner", "edit")&lt;/td&gt;
-      &lt;td id="wikiadminerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("wikimanager.wikivisibility")&lt;/td&gt;
       &lt;td&gt;$wikidocument.display("visibility", "edit")&lt;/td&gt;
-      &lt;td id="wikivisibilityerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("wikimanager.wikistate")&lt;/td&gt;
       &lt;td&gt;$wikidocument.display("state", "edit")&lt;/td&gt;
-      &lt;td id="wikistateerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;$msg.get("wikimanager.wikitemplate")&lt;/td&gt;
@@ -152,10 +146,9 @@
           #end
         &lt;/select&gt;
       &lt;/td&gt;
-      &lt;td id="wikitemplateerrormsg" width="40%"&gt;&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/table&gt;
 
-  &lt;input type="submit" value="create"&gt;&lt;/input&gt;
+  &lt;input type="submit" value="create" /&gt;
 &lt;/form&gt;</content>
 </xwikidoc>

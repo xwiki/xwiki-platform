@@ -463,7 +463,7 @@ function displayUsers( row, i, table)
   }
   else
     username.appendChild( document.createTextNode( row.username ) );
-
+  username.className="username";
   tr.appendChild(username);
 
   var firstname = document.createElement('td');
@@ -533,7 +533,7 @@ function displayGroups( row, i, table)
   }
   else
     username.appendChild( document.createTextNode( row.username ) );
-
+  username.className="username";
   tr.appendChild(username);
 
   var members = document.createElement('td');
@@ -589,7 +589,7 @@ function displayMembers( row, i, table )
   }
   else
      membername.appendChild(document.createTextNode(row.fullname));
-
+  membername.className="username";
   var membermanage = document.createElement("td");
   membermanage.className = "manage";
   var del = document.createElement('img');
@@ -641,7 +641,7 @@ function displayUsersAndGroups( row, i, table )
   else
     username.appendChild( document.createTextNode( row.username ) );
 
-  username.className = "usersorgroupsnames";
+  username.className = "username";
   tr.appendChild(username);
 
   var view = document.createElement('td');

@@ -45,15 +45,9 @@ public class RefererStats extends XWikiStats {
     }
 
     public void setReferer(String referer) {
-        if (referer == null) {
-            setStringValue("referer", "");
-        } else if (referer.length() > 8192) {
-            setStringValue("referer", referer.substring(0, 8192));
-        } else {
-            setStringValue("referer", referer);
-        }
+        setStringValue("referer", referer);
     }
-
+    
     public URL getURL()
     {
         try {

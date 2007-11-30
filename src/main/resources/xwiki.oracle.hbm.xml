@@ -579,7 +579,7 @@
         </property>
 
         <property name="referer" type="string">
-            <column name="XWR_REFERER" not-null="true" length="255"/>
+            <column name="XWR_REFERER" not-null="true" length="8192"/>
         </property>
 
         <property name="pageViews" type="integer">
@@ -613,11 +613,11 @@
         </property>
 
         <property name="userAgent" type="string">
-            <column name="XWV_USER_AGENT" not-null="true" length="255"/>
+            <column name="XWV_USER_AGENT" not-null="true" length="8192"/>
         </property>
 
         <property name="cookie" type="string">
-            <column name="XWV_COOKIE" not-null="true" length="255"/>
+            <column name="XWV_COOKIE" not-null="true" length="8192"/>
         </property>
 
         <property name="uniqueID" type="string">

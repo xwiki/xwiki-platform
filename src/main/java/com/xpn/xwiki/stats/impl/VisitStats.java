@@ -119,13 +119,7 @@ public class VisitStats extends XWikiStats {
     }
 
     public void setIP(String ip) {
-        if (ip == null) {
-            setStringValue("ip", "unknown");
-        } else if (ip.length() > 255) {
-            setStringValue("ip", ip.substring(0, 255));
-        } else {
-            setStringValue("ip", ip);
-        }
+        setStringValue("ip", ip);
     }
 
     public String getUserAgent() {

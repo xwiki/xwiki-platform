@@ -532,7 +532,9 @@ public class XWiki extends Api
                         result.add(obj);
                     } else if (obj instanceof String) {
                         Document doc = getDocument(obj.toString());
-                        result.add(doc);
+                        if(doc != null) {
+                            result.add(doc);
+                        }
                     }
                 } catch (XWikiException ex) {
                 }

@@ -44,17 +44,20 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-/**
- * Before this class can be used you need to call setXWikiContext().
- */
 public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRenderEngine, ImageRenderEngine {
-    private static Log log = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
+    private static final Log LOG = LogFactory.getLog(XWikiRadeoxRenderEngine.class);
     private XWikiContext xwikiContext;
     protected FilterPipe fp;
 
-    public XWikiRadeoxRenderEngine(InitialRenderContext ircontext) {
+    public XWikiRadeoxRenderEngine(XWikiContext xwikiContext) {
+        // super();
+        this.setXWikiContext(xwikiContext);
+    }
+
+    public XWikiRadeoxRenderEngine(InitialRenderContext ircontext, FilterPipe filterPipe, XWikiContext xwikiContext) {
         super(ircontext);
-        init();
+        this.setXWikiContext(xwikiContext);
+        this.fp = filterPipe;
     }
 
     public XWikiContext getXWikiContext() {
@@ -66,26 +69,12 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     }
 
     /**
-     * We override this method from {@link BaseRenderEngine} in order to provide our own initialization of Filters.
-     * In this manner we can load our filter definition from the
-     * META-INF/services/com.xpn.xwiki.render.filter.XWikiFilter file.
+     * @see com.xpn.xwiki.render.XWikiRadeoxRenderer#initFilterPipe
      */
     protected void init()
     {
-        fp = new FilterPipe(initialContext);
-
-        Iterator iterator = Service.providers(XWikiFilter.class);
-        while (iterator.hasNext()) {
-            try {
-                Filter filter = (Filter) iterator.next();
-                fp.addFilter(filter);
-                log.debug("Radeox filter [" + filter.getClass().getName() + "] loaded");
-            } catch (Exception e) {
-                log.error("Failed to load Radeox filter", e);
-            }
-        }
-
-        fp.init();
+        // Do nothing and thus ensure that the filter Pipe is not initialized here. We are intializing it in
+        // XWikiRadeoxRenderer so that it's initialized only once in XWiki's lifetime.
     }
 
     /**
@@ -100,7 +89,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
     public String render(String content, RenderContext context) {
       FilterContext filterContext = new BaseFilterContext();
       filterContext.setRenderContext(context);
-      return fp.filter(content, filterContext);
+      return this.fp.filter(content, filterContext);
     }
 
     public String noaccents(String name) {
@@ -259,8 +248,8 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
                     links.add(docname);
                 }
         } catch (Exception e) {
-            if (log.isErrorEnabled()) {
-                log.error("Error adding link to context", e);
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Error adding link to context", e);
             }
         }
     }

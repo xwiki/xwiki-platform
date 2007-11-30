@@ -23,23 +23,41 @@
 package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.render.filter.XWikiFilter;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseInitialRenderContext;
 import org.radeox.engine.context.BaseRenderContext;
+import org.radeox.filter.FilterPipe;
+import org.radeox.filter.Filter;
+import org.radeox.util.Service;
 
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Iterator;
 
 
 public class XWikiRadeoxRenderer  implements XWikiRenderer {
+    private static final Log LOG = LogFactory.getLog(XWikiRadeoxRenderer.class);
     private boolean removePre = true;
-    private XWikiRadeoxRenderEngine radeoxEngine;
+    private InitialRenderContext initialRenderContext;
+    private FilterPipe filterPipe;
 
-    public XWikiRadeoxRenderer()
+    public XWikiRadeoxRenderer() {
+        initRadeoxEngine();
+    }
+
+    public XWikiRadeoxRenderer(boolean removePre) {
+        this();
+        setRemovePre(removePre);
+    }
+
+    private void initRadeoxEngine()
     {
         // This is needed so that our local config is used
         InitialRenderContext ircontext = new BaseInitialRenderContext();
@@ -47,15 +65,35 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         ircontext.set(RenderContext.INPUT_LOCALE, locale);
         ircontext.set(RenderContext.OUTPUT_LOCALE, locale);
         ircontext.set(RenderContext.LANGUAGE_LOCALE, locale);
-
         ircontext.setParameters(new HashMap());
 
-        this.radeoxEngine = new XWikiRadeoxRenderEngine(ircontext);
+        this.initialRenderContext = ircontext;
+        this.filterPipe = initFilterPipe(ircontext);
     }
 
-    public XWikiRadeoxRenderer(boolean removePre) {
-        this();
-        setRemovePre(removePre);
+    /**
+     * We override this method from {@link org.radeox.engine.BaseRenderEngine} in order to provide our own initialization of Filters.
+     * In this manner we can load our filter definition from the
+     * META-INF/services/com.xpn.xwiki.render.filter.XWikiFilter file.
+     */
+    private FilterPipe initFilterPipe(InitialRenderContext initialRenderContext)
+    {
+        FilterPipe fp = new FilterPipe(initialRenderContext);
+
+        Iterator iterator = Service.providers(XWikiFilter.class);
+        while (iterator.hasNext()) {
+            try {
+                Filter filter = (Filter) iterator.next();
+                fp.addFilter(filter);
+                LOG.debug("Radeox filter [" + filter.getClass().getName() + "] loaded");
+            } catch (Exception e) {
+                LOG.error("Failed to load Radeox filter", e);
+            }
+        }
+
+        fp.init();
+
+        return fp;
     }
 
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context) {
@@ -71,10 +109,11 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
             rcontext.set("xcontext", context);
         }
         if (rcontext.getRenderEngine()==null) {
-            this.radeoxEngine.setXWikiContext(context);
 
-            // Note: Are there any case where we would want to clone the radeox context?
-            rcontext.setRenderEngine(this.radeoxEngine);
+            XWikiRadeoxRenderEngine radeoxengine =
+                new XWikiRadeoxRenderEngine(this.initialRenderContext, this.filterPipe, context);
+            rcontext.setRenderEngine(radeoxengine);
+
         }
         String result = rcontext.getRenderEngine().render(content, rcontext);
         return preTagSubst.insertNonWikiText(result);

@@ -18,25 +18,27 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.pdf.impl;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URL;
 
-public class PdfURLFactory extends XWikiServletURLFactory {
-
-    public PdfURLFactory() {
+public class PdfURLFactory extends XWikiServletURLFactory
+{
+    public PdfURLFactory()
+    {
     }
 
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring, String xwikidb, XWikiContext context) {
+    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+        String xwikidb, XWikiContext context)
+    {
         try {
             File tempdir = (File) context.get("pdfexportdir");
             File file = new File(tempdir, web + "." + name + "." + filename);
@@ -57,7 +59,9 @@ public class PdfURLFactory extends XWikiServletURLFactory {
         }
     }
 
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb, XWikiContext context) {
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String xwikidb,
+        XWikiContext context)
+    {
         try {
             File tempdir = (File) context.get("pdfexportdir");
             File file = new File(tempdir, web + "." + name + "." + filename);
@@ -78,10 +82,11 @@ public class PdfURLFactory extends XWikiServletURLFactory {
         }
     }
 
-
-    public String getURL(URL url, XWikiContext context) {
-        if (url==null)
+    public String getURL(URL url, XWikiContext context)
+    {
+        if (url == null) {
             return "";
+        }
         return Util.escapeURL(url.toString());
     }
 }

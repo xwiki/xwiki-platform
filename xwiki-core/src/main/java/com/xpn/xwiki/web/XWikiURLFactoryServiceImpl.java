@@ -61,13 +61,13 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         {
             try
             {
-                LOG.debug("Using custom url factory: " + urlFactoryClassName);
+                LOG.debug("Using custom url factory ["+ urlFactoryClassName + "]");
                 Class urlFactoryClass = Class.forName(urlFactoryClassName);
                 factoryMap.put(factoryMode, urlFactoryClass);
             }
             catch (Exception e)
             {
-                LOG.error("Faiiled to load custom url factory class: " + urlFactoryClassName);
+                LOG.error("Failed to load custom url factory class [" + urlFactoryClassName + "]");
             }
         }
     }
@@ -83,7 +83,7 @@ public class XWikiURLFactoryServiceImpl implements XWikiURLFactoryService
         }
         catch (Exception e)
         {
-            LOG.error("Failed to get construct url factory", e);
+            LOG.error("Failed to create url factory", e);
         }
         return urlf;
     }

@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>8</version>
   </parent>
   <artifactId>xwiki-application-statistics</artifactId>
   <name>XWiki Platform - Applications - Statistics</name>
@@ -38,14 +38,14 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.applications</groupId>
       <artifactId>xwiki-application-panels</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>[1.2-rc-1,)</version>
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>[1.2-rc-1,)</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

@@ -83,6 +83,7 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
     // -- user management could be a part of the test setup
 
     // Q: Where are access rights checked ? Ensure they are !
+    // Vincent discovered that they are not checked ... was it fixed?
 
     // TODO Use the log for more than login, logout and errors
 

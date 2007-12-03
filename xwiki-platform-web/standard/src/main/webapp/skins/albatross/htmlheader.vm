@@ -31,7 +31,7 @@
   </head>
 
   #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
-    <body onunload="return false; cancelEdit()"
+    <body onunload="cancelEdit();"
           onload="prepareCancelEdit(); createColorPicker();" id="body" class="${context.action}body">
   #else
     <body id="body" class="${context.action}body">

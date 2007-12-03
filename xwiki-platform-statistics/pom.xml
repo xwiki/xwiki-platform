@@ -38,14 +38,14 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.applications</groupId>
       <artifactId>xwiki-application-panels</artifactId>
-      <version>[1.2-rc-1,)</version>
+      <version>1.2-SNAPSHOT</version>
       <type>xar</type>
       <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>[1.2-rc-1,)</version>
+      <version>1.2-SNAPSHOT</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

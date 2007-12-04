@@ -217,12 +217,12 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    private void addFileName(StringBuffer newpath, String filename, XWikiContext context)
+    protected void addFileName(StringBuffer newpath, String filename, XWikiContext context)
     {
         addFileName(newpath, filename, true, context);
     }
 
-    private void addFileName(StringBuffer newpath, String filename, boolean encode,
+    protected void addFileName(StringBuffer newpath, String filename, boolean encode,
         XWikiContext context)
     {
         newpath.append("/");

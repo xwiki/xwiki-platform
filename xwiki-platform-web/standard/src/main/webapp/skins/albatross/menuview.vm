@@ -69,6 +69,7 @@
 #submenuseparator()
 #submenuitem($doc.getURL("export", "format=pdf&amp;$docvariant") $msg.get("core.menu.export.pdf"))
 #submenuitem($doc.getURL("export", "format=rtf&amp;$docvariant") $msg.get("core.menu.export.rtf"))
+#submenuitem($doc.getURL("export", "format=html&amp;$docvariant") $msg.get("core.menu.export.html"))
 #xwikitopmenuentryend()
 ##
 ## Actions menu

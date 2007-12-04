@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881143000</creationDate>
-<date>1196265105000</date>
-<contentUpdateDate>1196356924000</contentUpdateDate>
-<version>1.1</version>
+<date>1196783639000</date>
+<contentUpdateDate>1196783639000</contentUpdateDate>
+<version>2.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -107,7 +107,13 @@
     #end
 
     #foreach($wikiAlias in $wikiAliasList)
-      1.1.1 $wikiAlias.server
+      #if($context.action == "view")
+        1.1.1 $wikiAlias.server
+      #else
+        &lt;fieldset&gt;
+        &lt;legend&gt;$wikiAlias.server&lt;/legend&gt;
+      #end
+
       #if($context.action == "view")
         &lt;form method="get" action="$doc.getURL("view")"&gt;
           &lt;input type="hidden" name="action" value="delete"/&gt;
@@ -123,6 +129,10 @@
           &lt;dd&gt;$doc.display($prop.getName(), $wikiAlias.objectApi)&lt;/dd&gt;
         #end
       &lt;/dl&gt;
+
+      #if($context.action != "view")
+        &lt;/fieldset&gt;
+      #end
     #end
   #end
 #end</content>

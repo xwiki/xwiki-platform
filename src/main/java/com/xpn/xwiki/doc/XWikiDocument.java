@@ -177,7 +177,17 @@ public class XWikiDocument
     public static final int HAS_CLASS = 4;
 
     private int elements = HAS_OBJECTS | HAS_ATTACHMENTS;
-
+    
+    /**
+     * Separator string between database name and space name.
+     */
+    public static final String DB_SPACE_SEP = ":";
+    
+    /**
+     * Separator string between space name and page name.
+     */
+    public static final String SPACE_NAME_SEP = ".";
+    
     // Meta Data
     private BaseClass xWikiClass;
 

@@ -22,18 +22,25 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.export.html.HtmlPackager;
 import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 import com.xpn.xwiki.plugin.packaging.PackageAPI;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
- * Exports in XAR, PDF or RTF formats
+ * Exports in XAR, PDF, RTF or HTML formats.
+ * 
+ * @version $Id: $
  */
 public class ExportAction extends XWikiAction
 {
     /**
      * {@inheritDoc}
+     * 
      * @see XWikiAction#render(XWikiContext)
      */
     public String render(XWikiContext context) throws XWikiException
@@ -46,23 +53,64 @@ public class ExportAction extends XWikiAction
 
             if ((format == null) || (format.equals("xar"))) {
                 defaultPage = exportXAR(context);
+            } else if (format.equals("html")) {
+                defaultPage = exportHTML(context);
             } else {
                 defaultPage = exportPDFOrRTF(format, context);
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_EXPORT,
-                "Exception while exporting", e);
+                "Exception while exporting",
+                e);
         }
 
         return defaultPage;
     }
 
-    private String exportPDFOrRTF(String format, XWikiContext context)
-        throws XWikiException, IOException
+    private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
-        XWikiURLFactory urlf = context.getWiki().getURLFactoryService()
-            .createURLFactory(XWikiContext.MODE_PDF, context);
+        XWikiRequest request = context.getRequest();
+
+        String description = request.get("description");
+        String name = request.get("name");
+        String[] pages = request.getParameterValues("pages");
+
+        List pageList;
+        if (pages == null || pages.length == 0) {
+            pageList = new ArrayList();
+            pageList.add(context.getDoc().getFullName());
+
+            if (name == null || name.trim().length() == 0) {
+                name = context.getDoc().getFullName();
+            }
+        } else {
+            pageList = Arrays.asList(pages);
+        }
+
+        HtmlPackager packager = new HtmlPackager();
+
+        if (name != null && name.trim().length() > 0) {
+            packager.setName(name);
+        }
+
+        if (description != null) {
+            packager.setDescription(description);
+        }
+        
+        packager.addPages(pageList);
+        
+        packager.export(context);
+        
+        return null;
+    }
+
+    private String exportPDFOrRTF(String format, XWikiContext context) throws XWikiException,
+        IOException
+    {
+        XWikiURLFactory urlf =
+            context.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_PDF,
+                context);
         context.setURLFactory(urlf);
         PdfExportImpl pdfexport = new PdfExportImpl();
         XWikiDocument doc = context.getDoc();
@@ -76,9 +124,10 @@ public class ExportAction extends XWikiAction
         }
 
         context.getResponse().setContentType("application/" + format);
-        context.getResponse().addHeader("Content-disposition", "inline; filename=" +
-            Utils.encode(doc.getSpace(), context) + "_" +
-            Utils.encode(doc.getName(), context) + "." + format);
+        context.getResponse().addHeader(
+            "Content-disposition",
+            "inline; filename=" + Utils.encode(doc.getSpace(), context) + "_"
+                + Utils.encode(doc.getName(), context) + "." + format);
         pdfexport.export(doc, context.getResponse().getOutputStream(), type, context);
 
         return null;
@@ -107,8 +156,7 @@ public class ExportAction extends XWikiAction
             return "export";
         }
 
-        PackageAPI export =
-            ((PackageAPI) context.getWiki().getPluginApi("package", context));
+        PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi("package", context));
         if ("true".equals(history)) {
             export.setWithVersions(true);
         } else {

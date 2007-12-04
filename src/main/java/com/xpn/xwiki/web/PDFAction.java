@@ -27,6 +27,10 @@ import com.xpn.xwiki.pdf.impl.PdfExportImpl;
 
 import java.io.IOException;
 
+/**
+ *
+ * @deprecated Use {@link ExportAction}.
+ */
 public class PDFAction extends XWikiAction {
 	public String render(XWikiContext context) throws XWikiException {
         XWikiURLFactory urlf = context.getWiki().getURLFactoryService().createURLFactory(XWikiContext.MODE_PDF, context);

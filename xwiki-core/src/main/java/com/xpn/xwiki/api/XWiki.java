@@ -451,7 +451,7 @@ public class XWiki extends Api
     public List searchDocuments(String wheresql, boolean distinctbylanguage)
         throws XWikiException
     {
-        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, getXWikiContext()));
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, getXWikiContext()));
     }
 
     /**
@@ -467,7 +467,7 @@ public class XWiki extends Api
     public List searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start)
         throws XWikiException
     {
-        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, nb, start, getXWikiContext()));
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, nb, start, getXWikiContext()));
     }
 
     /**

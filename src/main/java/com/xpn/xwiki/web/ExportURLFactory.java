@@ -170,16 +170,18 @@ public class ExportURLFactory extends XWikiServletURLFactory
     public URL createURL(String web, String name, String action, String querystring,
         String anchor, String xwikidb, XWikiContext context)
     {
+        String wikiname =
+            xwikidb == null ? context.getDatabase().toLowerCase() : xwikidb.toLowerCase();
+
         try {
-            if (this.exportedPages.contains((xwikidb == null ? context.getDatabase()
-                .toLowerCase() : xwikidb.toLowerCase())
-                + XWikiDocument.DB_SPACE_SEP + web + XWikiDocument.SPACE_NAME_SEP)
-                && !"view".equals(action) && context.getLinksAction() == null) {
-                StringBuffer newpath = new StringBuffer(servletPath);
+            if (this.exportedPages.contains(wikiname + XWikiDocument.DB_SPACE_SEP + web
+                + XWikiDocument.SPACE_NAME_SEP + name)
+                && "view".equals(action) && context.getLinksAction() == null) {
+                StringBuffer newpath = new StringBuffer();
 
                 newpath.append("file://");
 
-                newpath.append(xwikidb.toLowerCase());
+                newpath.append(wikiname);
                 newpath.append(".");
                 newpath.append(web);
                 newpath.append(".");

@@ -3014,7 +3014,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         BaseObject newrightsobject = (BaseObject) rclass.newObject(context);
         newrightsobject.setClassName(rclass.getName());
         newrightsobject.setName(fullwikiname);
-        newrightsobject.setStringValue("groups", "XWiki.XWikiAdminGroup");
+        newrightsobject.setLargeStringValue("groups", "XWiki.XWikiAdminGroup");
         newrightsobject.setStringValue("levels", userRights);
         newrightsobject.setIntValue("allow", 1);
         doc.addObject(rclass.getName(), newrightsobject);
@@ -3022,7 +3022,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         BaseObject newuserrightsobject = (BaseObject) rclass.newObject(context);
         newuserrightsobject.setClassName(rclass.getName());
         newuserrightsobject.setName(fullwikiname);
-        newuserrightsobject.setStringValue("users", fullwikiname);
+        newuserrightsobject.setLargeStringValue("users", fullwikiname);
         newuserrightsobject.setStringValue("levels", userRights);
         newuserrightsobject.setIntValue("allow", 1);
         doc.addObject(rclass.getName(), newuserrightsobject);

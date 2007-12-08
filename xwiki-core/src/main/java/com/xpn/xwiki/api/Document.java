@@ -1173,19 +1173,19 @@ public class Document extends Api
                 return new ArrayList();
             }
             if (origdoc == null) {
-                return doc.getObjectDiff(
+                return doc.getAttachmentDiff(
                     new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
                     getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getObjectDiff(origdoc.doc,
+                return doc.getAttachmentDiff(origdoc.doc,
                     new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
             }
 
             return doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
             java.lang.Object[] args =
-                {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
+                {(origdoc != null) ? origdoc.getFullName() : null), (origdoc != null) ? origdoc.getVersion() : null, (newdoc != null) ? newdoc.getVersion() : null};
             List list = new ArrayList();
             XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
                 XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,

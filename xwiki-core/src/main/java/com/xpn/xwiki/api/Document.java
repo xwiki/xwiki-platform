@@ -1185,7 +1185,7 @@ public class Document extends Api
             return doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
             java.lang.Object[] args =
-                {(origdoc != null) ? origdoc.getFullName() : null), (origdoc != null) ? origdoc.getVersion() : null, (newdoc != null) ? newdoc.getVersion() : null};
+                {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null, (newdoc != null) ? newdoc.getVersion() : null};
             List list = new ArrayList();
             XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
                 XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,

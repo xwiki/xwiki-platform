@@ -110,23 +110,21 @@
           </tr>
           <tr id="table-filters">
               <td>
-                <input name="name" type="text" class="filter" />
+                <input name="name" type="text" style="width:65%"/>
+				#if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
+                #if(!$mainwk) ## display the combobox only in a local wiki
+                <select name="wiki" style="margin-left:10px;">
+                  <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
+                  <option value="global">$msg.get("rightsmanager.global")</option>
+                  <option value="both">$msg.get("rightsmanager.both")</option>
+                </select>
+                #else <input type="hidden" value="local" name="wiki" /> #end
 	            <input name="progr" type="hidden" value="#if($hasPrgr) true #else false #end" />
                 <input name="admin" type="hidden" value="true" />
                 <input name="reg" type="hidden" value="false" />
                 <input name="clsname" type="hidden" value="$clsname" />
               </td>
-              <td colspan="4"></td>
-              <td>
-                #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
-                #if(!$mainwk) ## display the combobox only for local wiki
-                <select name="wiki" class="filter">
-                  <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
-                  <option value="global">$msg.get("rightsmanager.global")</option>
-                  <option value="both">$msg.get("rightsmanager.both")</option>
-		        </select>
-		        #else <input type="hidden" value="local" name="wiki" /> #end
-              </td>
+              <td colspan="5"></td>
           </tr>
        </thead>
        <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>

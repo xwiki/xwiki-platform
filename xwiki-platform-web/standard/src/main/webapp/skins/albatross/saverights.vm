@@ -25,7 +25,7 @@
               #set($right = "," + $right)
               #set($levels = $levels + $right)
               
-              person: $pers rule: allow action: allow levels: $levels
+              1. person: $pers rule: allow action: allow levels: $levels
               
               $obj.set('levels', $levels) ## set the new levels
             #end
@@ -42,7 +42,7 @@
               #end
             #end  
             
-            person: $pers rule: allow action: deny/clean levels: $levels
+            2. person: $pers rule: allow action: deny/clean levels: $levels
             
             #if($levels != "")
                 $obj.set('levels', $levels) ## set the new levels
@@ -66,7 +66,7 @@
               #set($right = "," + $right)
               #set($levels = $levels + $right)
               
-              pers: $pers rule: deny action:deny levels: $levels
+              3. person: $pers rule: deny action:deny levels: $levels
               
               $obj.set('levels', $levels) ## set the new levels
             #end
@@ -82,7 +82,7 @@
                 #end
               #end  
           
-               pers: $pers rule: deny action: allow/clean levels: $levels
+               4. person: $pers rule: deny action: allow/clean levels: $levels
                
               #if($levels != "")
                 $obj.set('levels', $levels) ## set the new levels
@@ -99,6 +99,8 @@
     #set($pers = $pers.replaceAll("^${fullname}(,|$)", ""))
     #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
     $obj.set($uorg, $pers)
+	
+	5. person: $pers
     
   #end
 #end ## end foreach
@@ -110,7 +112,10 @@
 $obj.set($uorg, $fullname)
 $obj.set('levels', $right)
 
-pers: $pers rule: allow action: allow levels: $right
+
+$obj.get($uorg)
+
+6. person: $fullname rule: allow action: allow levels: $right
 
 $obj.set('allow', '1')
 #end
@@ -121,7 +126,7 @@ $obj.set('allow', '1')
 $obj.set($uorg, $fullname)
 $obj.set('levels', $right)
 
-pers: $pers rule: deny action: deny levels: $right
+7. person: $fullname rule: deny action: deny levels: $right
 
 $obj.set('allow', '0')
 #end

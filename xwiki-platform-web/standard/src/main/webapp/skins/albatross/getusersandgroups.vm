@@ -95,13 +95,18 @@ $response.setContentType("application/x-json")
 #foreach( $user in $users )
    #set($wikiname = $user.getWiki())
    #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+   #if($wikiname == "xwiki")
+	#set($username = $user.getPrefixedFullName())
+   #else
+	#set($username = $user.fullName)
+   #end
    #set($allows = "")
    #set($denys = "")
    #if( $velocityCount > 1 ) , #end 
    ## get the rights for that user or group
    #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
       #set($pers = "$!obj.getProperty($uorg).getValue()")
-      #if(($pers != "") && ($pers.matches("^(.*,)?${user.fullName}(,.*)?$")) )  
+      #if(($pers != "") && ($pers.matches("^(.*,)?${username}(,.*)?$")) )  
         #if($obj.getProperty('allow').getValue() == 1)
           #set($allows = "$!obj.getProperty('levels').getValue()")
         #else
@@ -110,7 +115,7 @@ $response.setContentType("application/x-json")
       #end
    #end ## second foreach
    {"username"   : "$user.name", 
-    "fullname"   : "$user.fullName",
+    "fullname"   : #if($wikiname=="xwiki") "$user.getPrefixedFullName()" #else "$user.fullName" #end,
     "wikiname"   : "$wikiname", 
     "userurl"    : "$xwiki.getURL($user.fullName)",
     "allows"     : "$allows",

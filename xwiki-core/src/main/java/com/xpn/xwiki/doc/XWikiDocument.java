@@ -2253,10 +2253,10 @@ public class XWikiDocument
             el = new DOMElement("versions");
             try {
                 el.addText(getDocumentArchive(context).getArchive( context ));
+                docel.add(el);
             } catch (XWikiException e) {
-                return null;
+                log.error("Document [" + this.getFullName() + "] has malformed history");
             }
-            docel.add(el);
         }
 
         return doc;

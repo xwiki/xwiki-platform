@@ -3673,6 +3673,7 @@ TinyMCE_Control.prototype = {
 		htm = tinyMCE.regexpReplace(htm, "&#59;", ";", "gi");
 		htm = tinyMCE.regexpReplace(htm, "&#34;", "&quot;", "gi");
 		htm = tinyMCE.regexpReplace(htm, "&#94;", "^", "gi");
+		htm = tinyMCE.regexpReplace(htm, "&#45;", "-", "gi");
 
 		if (this.formElement)
 			this.formElement.value = htm;

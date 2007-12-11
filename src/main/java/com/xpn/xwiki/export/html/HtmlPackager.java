@@ -176,6 +176,40 @@ public class HtmlPackager
         // Finish zip file
         zos.finish();
         zos.flush();
+
+        // Delete temporary directory
+        deleteDirectory(tempdir);
+    }
+
+    /**
+     * Delete a directory and all with all it's content.
+     * 
+     * @param directory the directory to delete.
+     */
+    private static void deleteDirectory(File directory)
+    {
+        if (!directory.isDirectory()) {
+            return;
+        }
+
+        File[] files = directory.listFiles();
+
+        if (files == null) {
+            return;
+        }
+
+        for (int i = 0; i < files.length; ++i) {
+            File file = files[i];
+
+            if (file.isDirectory()) {
+                deleteDirectory(file);
+                continue;
+            }
+
+            file.delete();
+        }
+
+        directory.delete();
     }
 
     /**

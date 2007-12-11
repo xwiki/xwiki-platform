@@ -1,9 +1,9 @@
 ### Show list of deleted documents
 #set($dds=$xwiki.getDeletedDocuments($tdoc.getFullName(), $tdoc.getLanguage()))
-#if($dds)
-<center>
+#if($dds && ($dds.size() > 0))
+<div class="centered">
 <p>$msg.get("core.recyclebin.showlistmsg")</p>
-<table>
+<table class="centered">
  <thead>
   <tr>
    <th>$msg.get("core.recyclebin.deleter")</td>
@@ -29,5 +29,5 @@
  #end
  </tbody>
 </table>
-</center>
+</div>
 #end

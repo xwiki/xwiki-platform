@@ -130,6 +130,46 @@ public class XWikiApplication extends DefaultSuperDocument
     }
 
     /**
+     * @return the authors of the application.
+     * @see #setAppAuthors(String)
+     */
+    public String getAppAuthors()
+    {
+        return getStringValue(XWikiApplicationClass.FIELD_APPAUTHORS);
+    }
+
+    /**
+     * Modify the authors of the application.
+     * 
+     * @param appauthors the authors of the application.
+     * @see #getAppAuthors()
+     */
+    public void setAppAuthors(String appauthors)
+    {
+        setStringValue(XWikiApplicationClass.FIELD_APPAUTHORS, appauthors);
+    }
+
+    /**
+     * @return the license of the application.
+     * @see #setLicense(String)
+     */
+    public String getLicense()
+    {
+        return getStringValue(XWikiApplicationClass.FIELD_LICENSE);
+    }
+
+    /**
+     * Modify the version of the application.
+     * 
+     * @param license the license of the application.
+     * @see #getAppVersion()
+     */
+    public void setLicense(String license)
+    {
+        setStringValue(XWikiApplicationClass.FIELD_LICENSE, license);
+    }
+
+    /**
      * @return the list of plugins on which application depends.
      * @see #setDependencies(List)
      */

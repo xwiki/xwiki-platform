@@ -62,6 +62,10 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public void init(XWikiContext context)
     {
         URL url = context.getURL();
+        if (url == null) {
+            // Cannot initialize, probably running tests...
+            return;
+        }
         String path = url.getPath();
         String servletpath = context.getRequest().getServletPath();
 
@@ -85,7 +89,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             } else if (context.getRequest().getServletPath().startsWith("/testbin")) {
                 actionPath = "testbin/";
             } else {
-                actionPath = context.getWiki().Param("xwiki.defaultactionpath", "xwiki/");
+                actionPath = context.getWiki().Param("xwiki.defaultactionpath", "bin/");
             }
         }
 

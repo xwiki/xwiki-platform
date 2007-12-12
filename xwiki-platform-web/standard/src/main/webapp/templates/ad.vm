@@ -1,3 +1,8 @@
+###
+### Ads
+###
+### Google ads - not used for the moment
+###
 #if($xwiki.getAdType().equals("google"))
 #set($googleclientid = $xwiki.getAdClientId())
 <script type="text/javascript"><!--

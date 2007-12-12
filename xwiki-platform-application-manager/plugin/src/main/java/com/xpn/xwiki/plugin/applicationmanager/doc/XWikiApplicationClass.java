@@ -78,7 +78,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_DESCRIPTION = "Description";
-
+    
     /**
      * Name of field <code>version</code> for the XWiki class XAppClasses.XWikiApplicationClass.
      * The version of the application.
@@ -91,6 +91,30 @@ public class XWikiApplicationClass extends AbstractSuperClass
      */
     public static final String FIELDPN_APPVERSION = "Application Version";
 
+    /**
+     * Name of field <code>appauthors</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The description of the application.
+     */
+    public static final String FIELD_APPAUTHORS = "appauthors";
+
+    /**
+     * Pretty name of field <code>appauthors</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_APPAUTHORS = "Authors";
+    
+    /**
+     * Name of field <code>license</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The description of the application.
+     */
+    public static final String FIELD_LICENSE = "license";
+
+    /**
+     * Pretty name of field <code>license</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_LICENSE = "License";
+    
     /**
      * Name of field <code>dependencies</code> for the XWiki class
      * XAppClasses.XWikiApplicationClass. The list of plugins on which application depends.
@@ -238,6 +262,10 @@ public class XWikiApplicationClass extends AbstractSuperClass
         needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
         needsUpdate |= baseClass.addTextField(FIELD_APPVERSION, FIELDPN_APPVERSION, 30);
 
+        needsUpdate |= baseClass.addTextField(FIELD_APPAUTHORS, FIELDPN_APPAUTHORS, 30);
+        
+        needsUpdate |= baseClass.addTextField(FIELD_LICENSE, FIELDPN_LICENSE, 30);
+        
         needsUpdate |=
             baseClass.addStaticListField(FIELD_DEPENDENCIES, FIELDPN_DEPENDENCIES, 80, true, "",
                 DEFAULT_FIELDDT, DEFAULT_FIELDS);

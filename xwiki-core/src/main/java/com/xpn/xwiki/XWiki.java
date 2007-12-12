@@ -233,13 +233,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         try {
             xwikicfg = getConfigPath();
-            synchronized (XWiki.class) {
-                xwiki = (XWiki) econtext.getAttribute(xwikiname);
-                if (xwiki == null) {
-                    InputStream xwikicfgis =
-                        XWiki.readXWikiConfiguration(xwikicfg, econtext, context);
-                    xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
-                    econtext.setAttribute(xwikiname, xwiki);
+            xwiki = (XWiki) econtext.getAttribute(xwikiname);
+            if (xwiki == null) {
+                synchronized (XWiki.class) {
+                    if (xwiki == null) {
+                        InputStream xwikicfgis =
+                            XWiki.readXWikiConfiguration(xwikicfg, econtext, context);
+                        xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
+                        econtext.setAttribute(xwikiname, xwiki);
+                    }
                 }
             }
             context.setWiki(xwiki);

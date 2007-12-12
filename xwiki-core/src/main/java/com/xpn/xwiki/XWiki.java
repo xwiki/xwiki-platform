@@ -215,7 +215,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public static XWiki getMainXWiki(XWikiContext context) throws XWikiException
     {
-        String xwikicfg = null;
         String xwikiname = "xwiki";
         XWiki xwiki = null;
         XWikiEngineContext econtext = context.getEngineContext();
@@ -232,13 +231,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         context.setMainXWiki(xwikiname);
 
         try {
-            xwikicfg = getConfigPath();
             xwiki = (XWiki) econtext.getAttribute(xwikiname);
             if (xwiki == null) {
                 synchronized (XWiki.class) {
                     if (xwiki == null) {
                         InputStream xwikicfgis =
-                            XWiki.readXWikiConfiguration(xwikicfg, econtext, context);
+                            XWiki.readXWikiConfiguration(getConfigPath(), econtext, context);
                         xwiki = new XWiki(xwikicfgis, context, context.getEngineContext());
                         econtext.setAttribute(xwikiname, xwiki);
                     }

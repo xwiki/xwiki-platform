@@ -82,50 +82,81 @@ public class XWikiPatch
         this.isDiff = isDiff;
     }
     /**
-     * Create full patch for document.
-     * @param doc - document to patch
-     * @param context - used for serialization document to xml
-     * @return self
+     * Store the XML export of the document as the history patch; this will be a history milestone.
+     * @param version Document version to store in the history patch.
+     * @param context Needed for serializing documents to xml.
+     * @return Self, with the patch content set to the XML export of the document version.
      * @throws XWikiException if any error
      */
-    public XWikiPatch setFullVersion(XWikiDocument doc, XWikiContext context) throws XWikiException
+    public XWikiPatch setFullVersion(XWikiDocument version, XWikiContext context)
+    throws XWikiException
+    {
+        return setFullVersion(version.toXML(context));
+    }
+    /**
+     * Store the XML export of the document as the history patch; this will be a history milestone.
+     * @param versionXml Document version to store in the history patch, in the XML export format.
+     * @return Self, with the patch content set to the XML export of the document version.
+     * @throws XWikiException if any error occurs
+     */
+    public XWikiPatch setFullVersion(String versionXml) throws XWikiException
     {
         setDiff(false);
-        setContent(doc.toXML(context));
+        setContent(versionXml);
         return this;
     }
     /**
-     * Create difference patch for document curdoc, using origdoc as previous version.
-     * @param curDoc  - current document
-     * @param origDoc - original document
-     * @param context - used for serialization documents to xml
-     * @return self
-     * @throws XWikiException if any error
+     * Create history patch between originalVersion and newVersion as difference on the XML export
+     * of the two versions. The patch is created between newVersion and originalVersion.
+     * @param newVersion Current version of the document.
+     * @param originalVersion Original version of the document document.
+     * @param context Needed for serializing documents to xml.
+     * @return Self, with the patch content set to the generated diff between the two version.
+     * @throws XWikiException if any error occurs
      */
-    public XWikiPatch setDiffVersion(XWikiDocument curDoc, XWikiDocument origDoc,
+    public XWikiPatch setDiffVersion(XWikiDocument newVersion, XWikiDocument originalVersion,
         XWikiContext context) throws XWikiException
     {
-        return setDiffVersion(curDoc, origDoc.toXML(context), context);
+        return setDiffVersion(newVersion.toXML(context), originalVersion.toXML(context),
+            newVersion.getFullName());
     }
     /**
-     * Create difference patch for document curdoc, using origdoc as previous version.
-     * @param curDoc     - current document
-     * @param origDocXml - xml of original document
-     * @param context    - used for serialization document to xml
-     * @return self
-     * @throws XWikiException if any error
+     * Create history patch between originalVersion and newVersion as difference on the XML export
+     * of the two versions. The patch is created between newVersion and originalVersion.
+     * @param newVersion Current version of the document.
+     * @param originalVersionXml Original version of the document document, in the XML export
+     * format.
+     * @param context Needed for serializing documents to xml.
+     * @return Self, with the patch content set to the generated diff between the two version.
+     * @throws XWikiException if any error occurs
      */
-    public XWikiPatch setDiffVersion(XWikiDocument curDoc, String origDocXml,
+    public XWikiPatch setDiffVersion(XWikiDocument newVersion, String originalVersionXml,
         XWikiContext context) throws XWikiException
+    {
+        return setDiffVersion(newVersion.toXML(context), originalVersionXml,
+            newVersion.getFullName());
+    }
+    /**
+     * Create history patch between originalVersion and newVersion as difference on the XML export
+     * of the two versions. The patch is created between newVersion and originalVersion.
+     * @param newVersionXml Current version of the document, in the XML export format.
+     * @param originalVersionXml Original version of the document document, in the XML export
+     * format.
+     * @param docName Needed for the exception report.
+     * @return Self, with the patch content set to the generated diff between the two version.
+     * @throws XWikiException if any error occurs
+     */
+    public XWikiPatch setDiffVersion(String newVersionXml, String originalVersionXml,
+        String docName) throws XWikiException
     {
         setDiff(true);
         try {
-            setContent(XWikiPatchUtils.getDiff(curDoc.toXML(context), origDocXml));
+            setContent(XWikiPatchUtils.getDiff(newVersionXml, originalVersionXml));
         } catch (Exception e) {
-            Object[] args = {curDoc.getFullName()};
+            Object[] args = {docName};
             throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF, 
                 XWikiException.ERROR_XWIKI_DIFF_XML_ERROR, 
-                "Failed to create diff for doc {}", e, args);
+                "Failed to create diff for doc {0}", e, args);
         }
         return this;
     }

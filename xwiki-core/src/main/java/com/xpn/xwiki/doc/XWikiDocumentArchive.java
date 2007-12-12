@@ -31,10 +31,10 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.suigeneris.jrcs.rcs.Version;
-import org.suigeneris.jrcs.util.ToString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.suigeneris.jrcs.rcs.Version;
+import org.suigeneris.jrcs.util.ToString;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -43,6 +43,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSArchive;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
+import com.xpn.xwiki.plugin.packaging.PackagePlugin;
 
 /**
  * Contains document history.
@@ -190,7 +191,6 @@ public class XWikiDocumentArchive
             XWikiRCSArchive archive = new XWikiRCSArchive(text);
             resetArchive();
             Collection nodes = archive.getNodes(getId());
-            boolean addNodeInfo = true;
             for (Iterator it = nodes.iterator(); it.hasNext();) {
                 XWikiRCSNodeInfo    nodeInfo    = (XWikiRCSNodeInfo) it.next();
                 XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
@@ -257,24 +257,29 @@ public class XWikiDocumentArchive
             return;
         }
         if (vfrom1 == null) {
-            // store full version in vto1
-            XWikiDocument docto1 = loadDocument(vto1, context);
+            // Deleting the most recent version.
+            // TODO: update the document to the new "most recent" version.
+            // Store full version in vto1
+            String xmlto1 = getVersionXml(vto1, context);
             XWikiRCSNodeInfo nito1 = getNode(vto1);
             XWikiRCSNodeContent ncto1 = nito1.getContent(context);
-            ncto1.getPatch().setFullVersion(docto1, context);
+            ncto1.getPatch().setFullVersion(xmlto1);
             nito1.setContent(ncto1);
             updateNode(nito1);
             getUpdatedNodeContents().add(ncto1);
         } else if (vto1 != null) {
-            XWikiDocument docfrom1    = loadDocument(vfrom1, context);
-            XWikiDocument docto1      = loadDocument(vto1, context);
+            // We're not deleting from the first version, so we must make a new diff jumping over
+            // the deleted versions.
+            String xmlfrom1 = getVersionXml(vfrom1, context);
+            String xmlto1 = getVersionXml(vto1, context);
             XWikiRCSNodeInfo nito1    = getNode(vto1);
             XWikiRCSNodeContent ncto1 = nito1.getContent(context);
-            ncto1.getPatch().setDiffVersion(docfrom1, docto1, context);
+            ncto1.getPatch().setDiffVersion(xmlfrom1, xmlto1, "");
             nito1.setContent(ncto1);
             updateNode(nito1);
             getUpdatedNodeContents().add(ncto1);
-        } // if (vto1==null) => nothing to do, except delete
+        }
+        // if (vto1==null) => nothing to do, except delete
         for (Iterator it = getNodes(vfrom0, vto0).iterator(); it.hasNext();) {
             XWikiRCSNodeInfo ni = (XWikiRCSNodeInfo) it.next();
             fullVersions.remove(ni.getId().getVersion());
@@ -295,20 +300,11 @@ public class XWikiDocumentArchive
         if (nodeInfo == null) {
             return null;            
         }
-        try {    
-            Version nearestFullVersion = getNearestFullVersion(version);
-            
-            List lstContent = loadRCSNodeContents(nearestFullVersion, version, context);
-            List origText = new ArrayList();
-            for (Iterator it = lstContent.iterator(); it.hasNext();) {
-                XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
-                nodeContent.getPatch().patch(origText);
-            }
-            
-            String content = ToString.arrayToString(origText.toArray());
+        try {
+            String content = getVersionXml(version, context);
             XWikiDocument doc = new XWikiDocument();
             doc.fromXML(content);
-            
+
             doc.setRCSVersion(version);
             doc.setComment(nodeInfo.getComment());
             doc.setDate(nodeInfo.getDate());
@@ -324,6 +320,19 @@ public class XWikiDocumentArchive
                 XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
                     "Exception while reading document version {1}", e, args);
         }
+    }
+    public String getVersionXml(Version version, XWikiContext context) throws XWikiException
+    {
+        Version nearestFullVersion = getNearestFullVersion(version);
+
+        List lstContent = loadRCSNodeContents(nearestFullVersion, version, context);
+        List origText = new ArrayList();
+        for (Iterator it = lstContent.iterator(); it.hasNext();) {
+            XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
+            nodeContent.getPatch().patch(origText);
+        }
+
+        return ToString.arrayToString(origText.toArray());
     }
     /**
      * @return {@link XWikiRCSNodeInfo} by version. null if none.

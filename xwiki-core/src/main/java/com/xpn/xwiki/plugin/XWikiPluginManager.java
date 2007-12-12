@@ -98,6 +98,10 @@ public class XWikiPluginManager
 
     public void addPlugins(String[] classNames, XWikiContext context)
     {
+        if (context.getURLFactory() == null) {
+            context.setURLFactory(context.getWiki().getURLFactoryService().createURLFactory(
+                context.getMode(), context));
+        }
         initInterface();
         for (int i = 0; i < classNames.length; i++) {
             addPlugin(classNames[i], classNames[i], context);

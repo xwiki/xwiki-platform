@@ -26,7 +26,7 @@
          2) Uncomment the properties below for your specific DB
     -->
 
-    ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "non". I would
+    ## Only use a default configuration if the $xwikiDbConnectionUrl field equal to "none". I would
     ## have preferred to use an empty value but I couldn't make that work with Maven. 
     #if ($xwikiDbConnectionUrl != "none")
     <property name="connection.url">$xwikiDbConnectionUrl</property>
@@ -47,7 +47,8 @@
     <!-- MySQL configuration.
          Uncomment if you want to use MySQL and comment out other database configurations.
          Note that the database will be created automatically if it doesn't already exist.
-    <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false</property>
+    <!-- We need to set the sql_mode to a less strict value, see XWIKI-1945 -->
+    <property name="connection.url">jdbc:mysql://localhost/xwiki?useServerPrepStmts=false&amp;sessionVariables=sql_mode=''</property>
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">com.mysql.jdbc.Driver</property>

@@ -101,8 +101,14 @@ var baseurl = tinyMCE.getParam("wiki_attach_path");
       if (form.filename.value==fname)
        return true;
 
-      if (form.filename.value=="")
-       form.filename.value = fname;
+      if (form.filename.value=="") {
+          form.filename.value = fname;
+      } else {
+          if(form.filename.value.lastIndexOf('.') < 0){
+              var extension = fname.substr(fname.lastIndexOf('.'), fname.length - fname.lastIndexOf('.'));
+              form.filename.value += extension; 
+          }
+      }
       return true;
     }
 

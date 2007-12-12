@@ -24,6 +24,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
@@ -83,6 +84,10 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
 
         String database = context.getDatabase();
         try {
+            XWikiURLFactory urlf =
+                context.getWiki().getURLFactoryService().createURLFactory(context.getMode(),
+                    context);
+            context.setURLFactory(urlf);
             context.setDatabase(context.getMainXWiki());
             ApplicationManager.getInstance().updateAllApplicationTranslation(
                 "Referesh applications translations informations", context);

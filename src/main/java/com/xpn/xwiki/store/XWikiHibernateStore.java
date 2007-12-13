@@ -273,13 +273,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            // Verify if the document already exists
-            Query query = session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
-            query.setLong("id", doc.getId());
-            if (query.uniqueResult()==null)
-                session.save(doc);
-            else
-                session.update(doc);
+            session.saveOrUpdate(doc);
 
             // Remove properties planned for removal
             if (doc.getObjectsToRemove().size()>0) {

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1196761095000</date>
-<contentUpdateDate>1196761095000</contentUpdateDate>
-<version>2.1</version>
+<date>1197474749000</date>
+<contentUpdateDate>1197474749000</contentUpdateDate>
+<version>4.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -86,6 +86,11 @@ wikimanager.listwikistate=State
 wikimanager.listwikivisibility=Visibility
 wikimanager.legend.wiki=Wiki
 wikimanager.legend.validate=Validate
+wikimanager.legend.members=Members
+wikimanager.legend.sources=Create new wiki from
+wikimanager.readers=Readers
+wikimanager.writers=Writers
+wikimanager.admins=Administrators
 ##
 # WIDGETS
 ##

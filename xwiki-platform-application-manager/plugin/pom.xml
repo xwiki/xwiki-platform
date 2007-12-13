@@ -43,9 +43,6 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <!-- Currently this Application Manager plugin is used by XEM which is based on XWiki Core
-        version 1.1.x, hence this dependency on 1.1.X and not on 1.2.x. If this becomes a
-        problem we can branch this plugin. -->
       <version>${platform.core.version}</version>
     </dependency>
     <dependency>

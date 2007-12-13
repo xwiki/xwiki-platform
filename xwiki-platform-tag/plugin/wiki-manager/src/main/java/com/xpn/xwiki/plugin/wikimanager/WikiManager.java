@@ -739,7 +739,7 @@ final class WikiManager
 
         // Init database/schema
         try {
-            xwiki.updateDatabase(targetWiki, true, false, context);
+            xwiki.updateDatabase(targetWiki, true, context);
         } catch (Exception e) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_UPDATEDATABASE, msg.get(
                 WikiManagerMessageTool.ERROR_UPDATEDATABASE, targetWiki), e);

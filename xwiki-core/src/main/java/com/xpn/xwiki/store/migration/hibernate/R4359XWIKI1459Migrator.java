@@ -23,14 +23,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
@@ -92,19 +94,26 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                         // is there easier way to find what column is not exist?
                         return null;
                     }
+                    Transaction originalTransaction = ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).getTransaction(context);
+                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(null, context);
+                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(null, context);
+
                     while (rs.next()) {
                         if (logger.isInfoEnabled()) {
                             logger.info("Updating document [" + rs.getString(3) + "]...");
                         }
                         long docId = Long.parseLong(rs.getString(1));
                         String sArchive = rs.getString(2);
-                        if (sArchive==null)
+                        if (sArchive==null) {
                             continue;
+                        }
                         XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
                         docArchive.setArchive(sArchive);
-                        context.getWiki().getVersioningStore().saveXWikiDocArchive(docArchive, false, context);
+                        context.getWiki().getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
                     }
                     stmt.close();
+                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(session, context);
+                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(originalTransaction, context);
                 } catch (SQLException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);

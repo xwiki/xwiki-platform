@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store.migration.hibernate;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -88,7 +89,7 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     Statement stmt = session.connection().createStatement();
                     ResultSet rs;
                     try {
-                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc");
+                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc where XWD_ARCHIVE is not null order by XWD_VERSION");
                     } catch (SQLException e) {
                         // most likely there is no XWD_ARCHIVE column, so migration is not needed
                         // is there easier way to find what column is not exist?
@@ -97,6 +98,7 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     Transaction originalTransaction = ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).getTransaction(context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(null, context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(null, context);
+                    PreparedStatement deleleteStatement = session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=null where XWD_ID=?");
 
                     while (rs.next()) {
                         if (logger.isInfoEnabled()) {
@@ -104,13 +106,13 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                         }
                         long docId = Long.parseLong(rs.getString(1));
                         String sArchive = rs.getString(2);
-                        if (sArchive==null) {
-                            continue;
-                        }
                         XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
                         docArchive.setArchive(sArchive);
                         context.getWiki().getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
+                        deleleteStatement.setLong(1, docId);
+                        deleleteStatement.executeUpdate();
                     }
+                    deleleteStatement.close();
                     stmt.close();
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(session, context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(originalTransaction, context);

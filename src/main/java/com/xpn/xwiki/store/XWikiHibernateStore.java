@@ -273,7 +273,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 }
             }
 
-            session.saveOrUpdate(doc);
+            // Verify if the document already exists
+            Query query = session.createQuery("select xwikidoc.id from XWikiDocument as xwikidoc where xwikidoc.id = :id");
+            query.setLong("id", doc.getId());
+            if (query.uniqueResult()==null)
+                session.save(doc);
+            else
+                session.update(doc);
+            // TODO: this is slower!! How can it be improved?
+//            session.saveOrUpdate(doc);
 
             // Remove properties planned for removal
             if (doc.getObjectsToRemove().size()>0) {
@@ -1479,6 +1487,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // need to delete existing links before saving the page's one
+            // TODO: is there any faster way to do this?
             deleteLinks(doc.getId(), context, bTransaction);
 
             // necessary to blank links from doc

@@ -14,30 +14,33 @@
   margin-top: 5px;
   font-size: 2.6em;
   line-height: 1.1em;
-  margin: 30px 0 30px 0;
+  margin: .15em 0 30px 0;
+  padding-top: .85em;
   border-bottom: 0px solid;
 }
-
 .heading-1-1 {
-   	margin: 20px 0 15px 0;
-  	border-bottom: 1px solid;
-	font-weight:bold;
-	font-style: normal;
-	font-size: 2.2em;
-	line-height: 1.1em;
+  margin: 0px 0 15px 0;
+  padding-top: 1em;
+  border-bottom: 1px solid;
+  font-weight:bold;
+  font-style: normal;
+  font-size: 2.2em;
+  line-height: 1.1em;
 }
 
 .heading-1-1-1 {
   font-weight: normal;
-    font-size: 2em;
-	line-height: 1.1em;
-	margin: 20px 0 15px 0;
+  font-size: 2em;
+  line-height: 1.1em;
+  margin: -0.5em 0 15px 0;
+  padding-top: 1.1em;
 }
 
 .heading-1-1-1-1 {
   font-weight:normal;
   color: #404040;
-  margin: 20px 0 0 0;
+  margin: -1em 0 0 0;
+  padding-top: 1.6em;
   left: 0px;
   font-size: 1.4em;
   line-height: 1.1em;
@@ -46,8 +49,9 @@
   font-weight:normal;
   color: #404040;
   font-style: normal;
-  margin: 0px;
+  margin: -1.8em 0px 0px 0.5em;
   left: 0px;
+  padding-top: 1.85em;
   font-size: 1.2em;
   line-height: 1.1em;
 }

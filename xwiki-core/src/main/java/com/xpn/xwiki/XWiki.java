@@ -395,24 +395,37 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * @return the full list of all database names of all defined virtual wikis. The database names are computed from
-     *         the names of documents having a XWiki.XWikiServerClass object attached to them by removing the
-     *         "XWiki.XWikiServer" prefix and making it lower case. For example a page named
-     *         "XWiki.XWikiServerMyDatabase" would return "mydatabase" as the database name.
+     * @return the full list of all database names of all defined virtual wikis. The database names
+     *         are computed from the names of documents having a XWiki.XWikiServerClass object
+     *         attached to them by removing the "XWiki.XWikiServer" prefix and making it lower case.
+     *         For example a page named "XWiki.XWikiServerMyDatabase" would return "mydatabase" as
+     *         the database name.
      */
     public List getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
         List databaseNames = new ArrayList();
-        String hql = ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-            + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
-            + "and prop.id.id = obj.id ";
-        List list = getStore().searchDocumentsNames(hql, context);
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            String docname = (String) it.next();
-            if (docname.startsWith("XWiki.XWikiServer")) {
-                databaseNames.add(docname.substring("XWiki.XWikiServer".length()).toLowerCase());
+
+        String database = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
+
+            String hql =
+                ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
+                    + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
+                    + "and prop.id.id = obj.id ";
+            List list = getStore().searchDocumentsNames(hql, context);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                String docname = (String) it.next();
+                if (docname.startsWith("XWiki.XWikiServer")) {
+                    databaseNames.add(docname.substring("XWiki.XWikiServer".length())
+                        .toLowerCase());
+                }
             }
+        } finally {
+            context.setDatabase(database);
         }
+
         return databaseNames;
     }
 

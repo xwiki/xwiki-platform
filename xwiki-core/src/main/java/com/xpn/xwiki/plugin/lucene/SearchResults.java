@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.lucene;
 
 import com.xpn.xwiki.api.XWiki;
-import org.apache.log4j.Logger;
 import org.apache.lucene.search.Hits;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

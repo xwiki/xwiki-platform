@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.lucene;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import org.apache.log4j.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

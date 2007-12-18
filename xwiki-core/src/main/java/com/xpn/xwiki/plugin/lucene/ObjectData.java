@@ -27,7 +27,6 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListItem;
 import com.xpn.xwiki.objects.classes.StaticListClass;
-import org.apache.log4j.Logger;
 import org.apache.lucene.document.Field;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

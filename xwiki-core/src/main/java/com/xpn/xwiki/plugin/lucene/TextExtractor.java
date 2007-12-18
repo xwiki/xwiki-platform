@@ -26,7 +26,6 @@ import com.xpn.xwiki.plugin.lucene.textextraction.MimetypeTextExtractor;
 import com.xpn.xwiki.plugin.lucene.textextraction.PDFTextExtractor;
 import com.xpn.xwiki.plugin.lucene.textextraction.PlainTextExtractor;
 import com.xpn.xwiki.plugin.lucene.textextraction.XmlTextExtractor;
-import org.apache.log4j.Logger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -236,6 +236,21 @@ final class WikiManager
     }
 
     /**
+     * Get {@link Wiki} described by document with provided full name.
+     * 
+     * @param documentFullName the full name of the wiki document descriptor.
+     * @param context the XWiki context.
+     * @return the {@link Wiki} object.
+     * @throws XWikiException error when getting document.
+     */
+    public Wiki getWikiFromDocumentName(String documentFullName, XWikiContext context)
+        throws XWikiException
+    {
+        return getWikiFromDocument(context.getWiki().getDocument(documentFullName, context),
+            context);
+    }
+
+    /**
      * Get all {@link Wiki}.
      * 
      * @param context the XWiki context.
@@ -263,33 +278,19 @@ final class WikiManager
     }
 
     /**
-     * Get {@link Wiki} described by document with provided full name.
-     * 
-     * @param documentFullName the full name of the wiki document descriptor.
-     * @param context the XWiki context.
-     * @return the {@link Wiki} object.
-     * @throws XWikiException error when getting document.
-     */
-    public Wiki getWikiFromDocumentName(String documentFullName, XWikiContext context)
-        throws XWikiException
-    {
-        return getWikiFromDocument(context.getWiki().getDocument(documentFullName, context),
-            context);
-    }
-
-    /**
      * Get the documents for which copied document content will be replace by an
-     * #includeInContext(SourceDocument) macro call.
+     * #includeInContext(SourceDocument) or #includeTopic(SourceDocument) macro call.
      * 
      * @param wiki the name of the wiki where to find the list of documents.
      * @param context the XWiki context.
-     * @return the list of documents to include.
+     * @return a pair of list of documents names to include and list of documents names to link.
      * @throws XWikiException error when getting Applications descriptors where searched documents
      *             are listed.
      */
-    private Collection getDocsNameToInclude(String wiki, XWikiContext context)
-        throws XWikiException
+    private Collection[] getDocsNames(String wiki, XWikiContext context) throws XWikiException
     {
+        Collection[] docsNames = new Collection[2];
+
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
             (ApplicationManagerPluginApi) context.getWiki().getPluginApi(
@@ -300,11 +301,9 @@ final class WikiManager
         }
 
         // //////////////////////////////////
-        // Get documents to include
+        // Get documents to include or link
 
         String database = context.getDatabase();
-
-        Collection docsToInclude = null;
 
         try {
             context.setDatabase(wiki);
@@ -312,63 +311,18 @@ final class WikiManager
             XWikiApplication rootApp = appmanager.getRootApplication();
 
             if (rootApp != null) {
-                docsToInclude = rootApp.getDocsNameToInclude(true);
+                docsNames[0] = rootApp.getDocsNameToInclude(true);
+                docsNames[1] = rootApp.getDocsNameToLink(true);
             } else {
-                docsToInclude =
-                    XWikiApplication
-                        .getDocsNameToInclude(appmanager.getApplicationDocumentList());
+                Collection applications = appmanager.getApplicationDocumentList();
+                docsNames[0] = XWikiApplication.getDocsNameToInclude(applications);
+                docsNames[1] = XWikiApplication.getDocsNameToLink(applications);
             }
         } finally {
             context.setDatabase(database);
         }
 
-        return docsToInclude;
-    }
-
-    /**
-     * Get the documents for which copied document content will be replace by an
-     * #includeTopic(SourceDocument) macro call.
-     * 
-     * @param wiki the name of the wiki where to find the list of documents.
-     * @param context the XWiki context.
-     * @return the list of documents to include.
-     * @throws XWikiException error when getting Applications descriptors where searched documents
-     *             are listed.
-     */
-    private Collection getDocsNameToLink(String wiki, XWikiContext context) throws XWikiException
-    {
-        // Get applications manger
-        ApplicationManagerPluginApi appmanager =
-            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(
-                ApplicationManagerPlugin.PLUGIN_NAME, context);
-
-        if (appmanager == null) {
-            return null;
-        }
-
-        // //////////////////////////////////
-        // Get documents to link
-
-        String database = context.getDatabase();
-
-        Collection docsToLink = null;
-
-        try {
-            context.setDatabase(wiki);
-
-            XWikiApplication rootApp = appmanager.getRootApplication();
-
-            if (rootApp != null) {
-                docsToLink = rootApp.getDocsNameToLink(true);
-            } else {
-                docsToLink =
-                    XWikiApplication.getDocsNameToLink(appmanager.getApplicationDocumentList());
-            }
-        } finally {
-            context.setDatabase(database);
-        }
-
-        return docsToLink;
+        return docsNames;
     }
 
     /**
@@ -403,8 +357,10 @@ final class WikiManager
         try {
             context.setDatabase(targetWiki);
 
+            Collection[] docsNames = getDocsNames(sourceWiki, context);
+            
             // Replace documents contents to include
-            Collection docsNameToInclude = getDocsNameToInclude(sourceWiki, context);
+            Collection docsNameToInclude = docsNames[0];
             for (Iterator it = docsNameToInclude.iterator(); it.hasNext();) {
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
@@ -414,7 +370,7 @@ final class WikiManager
             }
 
             // Replace documents contents to link
-            Collection docsNameToLink = getDocsNameToLink(sourceWiki, context);
+            Collection docsNameToLink = docsNames[1];
             for (Iterator it = docsNameToLink.iterator(); it.hasNext();) {
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);

@@ -27,12 +27,11 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
- * Migration for XWIKI1878: Fix xwikircs table isdiff data not matching RCS state of some revisions (when the state
- * says "full" the isdiff column in the database should be false).
- *
- * Note: This migrator should only be executed if the R4359XWIKI1459 one has already been executed (i.e. if the
- * database is in version < 4360). This is because this current migrator is because of a bug in R4359XWIKI1459 which
- * has now been fixed.  
+ * Migration for XWIKI1878: Fix xwikircs table isdiff data not matching RCS state of some revisions
+ * (when the state says "full" the isdiff column in the database should be false). Note: This
+ * migrator should only be executed if the R4359XWIKI1459 one has already been executed in a
+ * previous migration (i.e. if the database is in version >= 4360). This is because this current
+ * migrator is because of a bug in R4359XWIKI1459 which has now been fixed.
  * 
  * @version $Id: $
  */
@@ -41,15 +40,16 @@ public class R6079XWIKI1878Migrator extends R4359XWIKI1459Migrator
     /** logger. */
     private static final Log LOG = LogFactory.getLog(R6079XWIKI1878Migrator.class);
 
-    private int previousVersion;
+    private int startupVersion;
 
     public R6079XWIKI1878Migrator(int currentVersionBeforeMigratorsExecute)
     {
-        this.previousVersion = currentVersionBeforeMigratorsExecute;
+        this.startupVersion = currentVersionBeforeMigratorsExecute;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.store.migration.hibernate.AbstractXWikiHibernateMigrator#getName()
      */
     public String getName()
@@ -59,6 +59,7 @@ public class R6079XWIKI1878Migrator extends R4359XWIKI1459Migrator
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractXWikiHibernateMigrator#getDescription()
      */
     public String getDescription()
@@ -73,9 +74,10 @@ public class R6079XWIKI1878Migrator extends R4359XWIKI1459Migrator
     }
 
     /** {@inheritDoc} */
-    public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context) throws XWikiException
+    public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context)
+        throws XWikiException
     {
-        if (this.previousVersion >= 4360) {
+        if (this.startupVersion >= 4360) {
             super.migrate(manager, context, LOG);
         }
     }

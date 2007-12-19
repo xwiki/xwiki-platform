@@ -41,7 +41,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
     private Set neededSkins = new HashSet();
 
     /**
-     * ExportURLFactory conxtructor.
+     * ExportURLFactory constructor.
      */
     public ExportURLFactory()
     {
@@ -200,7 +200,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             e.printStackTrace();
         }
 
-        return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
+        return super.createExternalURL(web, name, action, querystring, anchor, xwikidb, context);
     }
 
     /**

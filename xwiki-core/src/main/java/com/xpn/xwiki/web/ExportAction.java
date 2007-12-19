@@ -28,8 +28,10 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Exports in XAR, PDF, RTF or HTML formats.
@@ -68,6 +70,14 @@ public class ExportAction extends XWikiAction
         return defaultPage;
     }
 
+    /**
+     * Create ZIP archive containing wiki pages rendered in HTML, attached files and used skins.
+     * 
+     * @param context the XWiki context.
+     * @return always return null.
+     * @throws XWikiException error when exporting HTML ZIP package.
+     * @throws IOException error when exporting HTML ZIP package.
+     */
     private String exportHTML(XWikiContext context) throws XWikiException, IOException
     {
         XWikiRequest request = context.getRequest();
@@ -76,16 +86,68 @@ public class ExportAction extends XWikiAction
         String name = request.get("name");
         String[] pages = request.getParameterValues("pages");
 
-        List pageList;
+        List pageList = new ArrayList();;
         if (pages == null || pages.length == 0) {
-            pageList = new ArrayList();
             pageList.add(context.getDoc().getFullName());
 
             if (name == null || name.trim().length() == 0) {
                 name = context.getDoc().getFullName();
             }
         } else {
-            pageList = Arrays.asList(pages);
+            Map wikiQueries = new HashMap();
+            for (int i = 0; i < pages.length; ++i) {
+                String pattern = pages[i];
+                
+                String wikiName;
+                if (pattern.contains(":")) {
+                    int index = pattern.indexOf(':');
+                    wikiName = pattern.substring(0, index);
+                    pattern = pattern.substring(index + 1);
+                } else {
+                    wikiName = context.getDatabase();
+                }
+                
+                StringBuffer where;
+                List params;
+                
+                if (!wikiQueries.containsKey(wikiName)) {
+                    Object[] query = new Object[2];
+                    query[0] = where = new StringBuffer("where ");
+                    query[1] = params = new ArrayList();
+                    wikiQueries.put(wikiName, query);
+                } else {
+                    Object[] query = (Object[])wikiQueries.get(wikiName);
+                    where = (StringBuffer)query[0];
+                    params = (List)query[1];
+                }
+                
+                if (i > 0) {
+                    where.append(" or ");
+                }
+                
+                where.append("doc.fullName like ?");
+                params.add(pattern);
+            }
+            
+            String database = context.getDatabase();
+            try {
+                for (Iterator it = wikiQueries.entrySet().iterator(); it.hasNext();) {
+                    Map.Entry entry = (Map.Entry)it.next();
+                    String wikiName = (String)entry.getKey();
+                    Object[] query = (Object[])entry.getValue();
+                    String where = ((StringBuffer)query[0]).toString();
+                    List params = (List)query[1];
+                    
+                    context.setDatabase(wikiName);
+                    pageList.addAll(context.getWiki().getStore().searchDocumentsNames(where, params, context));
+                }
+            } finally {
+                context.setDatabase(database);
+            }
+        }
+        
+        if (pageList.size() == 0) {
+            return null;
         }
 
         HtmlPackager packager = new HtmlPackager();

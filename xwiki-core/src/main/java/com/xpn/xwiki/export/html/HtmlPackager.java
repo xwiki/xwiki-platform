@@ -11,10 +11,13 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.web.ExportURLFactory;
 
 /**
@@ -117,8 +120,6 @@ public class HtmlPackager
         tempdir.mkdirs();
         File attachmentDir = new File(tempdir, "attachment");
         attachmentDir.mkdirs();
-        urlf.init(this.pages, tempdir, context);
-        context.setURLFactory(urlf);
 
         // ////////////////////////////////////////////
         // Configure response
@@ -135,31 +136,63 @@ public class HtmlPackager
 
         ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
 
-        XWikiContext renderContext = (XWikiContext) context.clone();
+        VelocityContext vcontext = (VelocityContext)context.get("vcontext");
+        
+        Document currentDocument = (Document)vcontext.get("cdoc");
+        Document currentCDocument = (Document)vcontext.get("cdoc");
+        Document currentTDocument = (Document)vcontext.get("tdoc");
+        
+        try {
+            XWikiContext renderContext = (XWikiContext) context.clone();
 
-        for (Iterator it = this.pages.iterator(); it.hasNext();) {
-            String pageName = (String) it.next();
+            vcontext = XWikiVelocityRenderer.prepareContext(renderContext);
 
-            XWikiDocument doc = context.getWiki().getDocument(pageName, context);
+            urlf.init(this.pages, tempdir, renderContext);
+            renderContext.setURLFactory(urlf);
 
-            String zipname =
-                doc.getDatabase() + "." + doc.getSpace() + "." + doc.getName() + ".html";
-            String language = doc.getLanguage();
-            if ((language != null) && (!language.equals(""))) {
-                zipname += "." + language;
+            renderContext.put("action", "view");
+
+            for (Iterator it = this.pages.iterator(); it.hasNext();) {
+                String pageName = (String) it.next();
+
+                XWikiDocument doc = renderContext.getWiki().getDocument(pageName, renderContext);
+
+                String zipname = doc.getDatabase() + "." + doc.getSpace() + "." + doc.getName();
+                String language = doc.getLanguage();
+                if ((language != null) && (!language.equals(""))) {
+                    zipname += "." + language;
+                }
+
+                zipname += ".html";
+
+                ZipEntry zipentry = new ZipEntry(zipname);
+                zos.putNextEntry(zipentry);
+
+                renderContext.setDatabase(doc.getDatabase());
+                renderContext.setDoc(doc);
+                vcontext.put("doc", doc.newDocument(renderContext));
+                vcontext.put("cdoc", vcontext.get("doc"));
+
+                XWikiDocument tdoc = doc.getTranslatedDocument(renderContext);
+                renderContext.put("tdoc", tdoc);
+                vcontext.put("tdoc", tdoc.newDocument(renderContext));
+
+                String content = renderContext.getWiki().parseTemplate("view.vm", renderContext);
+
+                zos.write(content.getBytes(renderContext.getWiki().getEncoding()));
+                zos.closeEntry();
             }
-            ZipEntry zipentry = new ZipEntry(zipname);
-            zos.putNextEntry(zipentry);
-
-            renderContext.setDoc(doc);
-            String content = context.getWiki().parseTemplate("view.vm", renderContext);
-
-            zos.write(content.getBytes(context.getWiki().getEncoding()));
-            zos.closeEntry();
+        } finally {
+            // Clean velocity context
+            vcontext = XWikiVelocityRenderer.prepareContext(context);
+            
+            vcontext.put("doc", currentDocument);
+            vcontext.put("cdoc", currentCDocument);
+            vcontext.put("tdoc", currentTDocument);
         }
 
         // ////////////////////////////////////////////
-        // Add needed skins to zip file
+        // Add required skins to zip file
         // ////////////////////////////////////////////
         for (Iterator it = urlf.getNeededSkins().iterator(); it.hasNext();) {
             String skinName = (String) it.next();

@@ -9,7 +9,7 @@ $response.setContentType("application/x-json")
 #### get all the request parameters which are filters
 #set( $params = $request.getParameterMap() )
 #set( $keys = $params.keySet() )
-#set( $defaultKeys = ["xpage", "offset", "limit", "wiki"] )
+#set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo"] )
 #set( $docProps = ["fullName", "name"] )
 #set( $filterMap = $xwiki.hashMap )
 #set( $orderList = $xwiki.arrayList )
@@ -59,6 +59,7 @@ $response.setContentType("application/x-json")
 "totalrows": $countUsers,
 "returnedrows": #if($countUsers < $limit) $countUsers #else $limit #end,
 "offset": $offset,
+"reqNo": $request.reqNo,
 "rows": [
 #foreach( $user in $users )
    #if($context.user == $user.fullName)

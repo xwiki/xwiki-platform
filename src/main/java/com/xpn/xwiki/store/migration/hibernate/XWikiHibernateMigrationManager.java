@@ -88,6 +88,7 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         result.add(new R4359XWIKI1459Migrator());
         result.add(new R6079XWIKI1878Migrator(getDBVersion(context).getVersion()));
         result.add(new R6405XWIKI1933Migrator(getDBVersion(context).getVersion()));
+        result.add(new R6430XWIKI1954Migrator(getDBVersion(context).getVersion()));
         // 2nd way - via classloader
         
         return result;

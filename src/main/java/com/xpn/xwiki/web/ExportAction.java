@@ -139,7 +139,11 @@ public class ExportAction extends XWikiAction
                     List params = (List)query[1];
                     
                     context.setDatabase(wikiName);
-                    pageList.addAll(context.getWiki().getStore().searchDocumentsNames(where, params, context));
+                    List docsNames = context.getWiki().getStore().searchDocumentsNames(where, params, context);
+                    for (Iterator itDocName = docsNames.iterator(); itDocName.hasNext();) {
+                        String docName = (String)itDocName.next();
+                        pageList.add(wikiName + XWikiDocument.DB_SPACE_SEP + docName);
+                    }
                 }
             } finally {
                 context.setDatabase(database);

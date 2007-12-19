@@ -63,13 +63,12 @@ public class Wiki extends Document
         Collection objects =
             doc.getObjects(XWikiServerClass.getInstance(context).getClassFullName());
 
-        int id = 0;
-        for (Iterator it = objects.iterator(); it.hasNext(); ++id) {
+        for (Iterator it = objects.iterator(); it.hasNext();) {
             BaseObject bobect = (BaseObject) it.next();
 
             if (bobect != null
                 && bobect.getStringValue(XWikiServerClass.FIELD_SERVER).equals(domain)) {
-                return getWikiAlias(id);
+                return getWikiAlias(bobect.getNumber());
             }
         }
 

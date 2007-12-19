@@ -66,8 +66,9 @@ ASSTable.prototype = {
 
     if (this.hasFilters) {
       this.filters = this.filter.getFilters();
-      if(this.filters != "" && this.filters != undefined)
-      url += this.filters;
+      if (this.filters != "" && this.filters != undefined) {
+        url += this.filters;
+      }
     }
 
     var self = this;
@@ -347,7 +348,9 @@ ASSScroller.prototype = {
 
     this.domNode.style.height = outheight + "px";
     this.domNode.firstChild.style.height = inheight + "px";
-    this.domNode.scrollTop = scrollTop;
+    if (this.domNode.scrollTop != scrollTop) {
+      this.domNode.scrollTop = scrollTop;
+    }
     this.domNode.style.display = "block";
   }
 }
@@ -452,10 +455,14 @@ MSCheckbox.prototype = {
     * @todo Send the state number, or a generic map {state => sendValue}
     * @todo Configuration: automatic save, or just change the value.
     * @todo "Busy" icon when saving.
+    * @todo Changing the value should change the cache, not invalidate it.
+    * @todo The new state should be taken from the response, not just increment it.
     * @todo Make this a valid ARIA checkbox: http://www.w3.org/TR/aria-role/#checkbox
     */
-  initialize: function(domNode, right, saveUrl, defaultState)
+  initialize: function(domNode, right, saveUrl, defaultState, table, idx)
   {
+    this.table = table;
+    this.idx = idx;
     this.domNode = $(domNode);
     this.right = right;
     this.saveUrl = saveUrl;
@@ -494,6 +501,11 @@ MSCheckbox.prototype = {
   next: function()
   {
     this.state = (this.state + 1) % this.nrstates;
+    if (this.table != undefined) {
+      // TODO: Just update the cache, don't invalidate the row, once the rights are as stored as an
+      // array, and not as a string.
+      delete this.table.fetchedRows[this.idx];
+    }
     this.draw(this.state);
   },
 
@@ -721,7 +733,7 @@ function displayMembers(row, i, table)
   * Used in adminglobalrights.vm, adminspacerights.vm, editrights.vm.
   * @todo allows and denys should be arrays, not strings.
   */
-function displayUsersAndGroups(row, i, table)
+function displayUsersAndGroups(row, i, table, idx)
 {
   var userurl = row.userurl;
   var uorg = table.json.uorg;
@@ -758,7 +770,7 @@ function displayUsersAndGroups(row, i, table)
     } else if (denys.indexOf(right) >= 0) {
       r = 2;
     }
-    var chbx = new MSCheckbox(td, right, saveUrl, r);
+    var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);
     tr.appendChild(td);
   });
 

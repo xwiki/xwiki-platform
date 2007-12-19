@@ -1,5 +1,0 @@
-#template("xwiki.vm")
-#template("s5bheader.vm")
-$cdoc.getRenderedContent()
-</body>
-</html>

@@ -137,7 +137,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
         XWikiContext context)
     {
         if (!"skins".equals(web)) {
-            return createSkinURL(filename, web, name, xwikidb, context);
+            return super.createSkinURL(filename, web, name, xwikidb, context);
         }
 
         try {
@@ -200,7 +200,7 @@ public class ExportURLFactory extends XWikiServletURLFactory
             e.printStackTrace();
         }
 
-        return super.createExternalURL(web, name, action, querystring, anchor, xwikidb, context);
+        return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
     }
 
     /**

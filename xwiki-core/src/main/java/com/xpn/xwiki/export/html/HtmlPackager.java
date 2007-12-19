@@ -21,12 +21,43 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.web.ExportURLFactory;
 
 /**
- * Create a zip package containing a range of HTML pages with skin and attachment dependencies.
+ * Create a ZIP package containing a range of HTML pages with skin and attachment dependencies.
  * 
  * @version $Id: $
+ * @since XWiki Platform 1.3M1
  */
 public class HtmlPackager
 {
+    /**
+     * A point.
+     */
+    private static final String POINT = ".";
+
+    /**
+     * Name of the context property containing the document.
+     */
+    private static final String CONTEXT_TDOC = "tdoc";
+
+    /**
+     * Name of the Velocity context property containing the document.
+     */
+    private static final String VCONTEXT_DOC = "doc";
+
+    /**
+     * Name of the Velocity context property containing the document.
+     */
+    private static final String VCONTEXT_CDOC = "cdoc";
+
+    /**
+     * Name of the Velocity context property containing the document.
+     */
+    private static final String VCONTEXT_TDOC = CONTEXT_TDOC;
+
+    /**
+     * The separator in an internal zip path.
+     */
+    private static final String ZIPPATH_SEPARATOR = "/";
+
     /**
      * The name of the package for which packager append ".zip".
      */
@@ -101,6 +132,93 @@ public class HtmlPackager
     }
 
     /**
+     * Add rendered document to ZIP stream.
+     * 
+     * @param pageName the name (used with
+     *            {@link com.xpn.xwiki.XWiki.XWiki#getDocument(String, XWikiContext)}) of the page
+     *            to render.
+     * @param zos the ZIP output stream.
+     * @param context the XWiki context.
+     * @param vcontext the Velocity context.
+     * @throws XWikiException error when rendering document.
+     * @throws IOException error when rendering document.
+     */
+    private void renderDocument(String pageName, ZipOutputStream zos, XWikiContext context,
+        VelocityContext vcontext) throws XWikiException, IOException
+    {
+        XWikiDocument doc = context.getWiki().getDocument(pageName, context);
+
+        String zipname = doc.getDatabase() + POINT + doc.getSpace() + POINT + doc.getName();
+        String language = doc.getLanguage();
+        if (language != null && language.length() != 0) {
+            zipname += POINT + language;
+        }
+
+        zipname += ".html";
+
+        ZipEntry zipentry = new ZipEntry(zipname);
+        zos.putNextEntry(zipentry);
+
+        context.setDatabase(doc.getDatabase());
+        context.setDoc(doc);
+        vcontext.put(VCONTEXT_DOC, doc.newDocument(context));
+        vcontext.put(VCONTEXT_CDOC, vcontext.get(VCONTEXT_DOC));
+
+        XWikiDocument tdoc = doc.getTranslatedDocument(context);
+        context.put(CONTEXT_TDOC, tdoc);
+        vcontext.put(VCONTEXT_TDOC, tdoc.newDocument(context));
+
+        String content = context.getWiki().parseTemplate("view.vm", context);
+
+        zos.write(content.getBytes(context.getWiki().getEncoding()));
+        zos.closeEntry();
+    }
+
+    /**
+     * Init provided {@link ExportURLFactory} and add rendered documents to ZIP stream.
+     * 
+     * @param zos the ZIP output stream.
+     * @param tempdir the directory where to copy attached files.
+     * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory.XWikiURLFactory} used to render the
+     *            documents.
+     * @param context the XWiki context.
+     * @throws XWikiException error when render documents.
+     * @throws IOException error when render documents.
+     */
+    private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf,
+        XWikiContext context) throws XWikiException, IOException
+    {
+        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+
+        Document currentDocument = (Document) vcontext.get(VCONTEXT_DOC);
+        Document currentCDocument = (Document) vcontext.get(VCONTEXT_CDOC);
+        Document currentTDocument = (Document) vcontext.get(VCONTEXT_TDOC);
+
+        try {
+            XWikiContext renderContext = (XWikiContext) context.clone();
+            renderContext.put("action", "view");
+
+            vcontext = XWikiVelocityRenderer.prepareContext(renderContext);
+
+            urlf.init(this.pages, tempdir, renderContext);
+            renderContext.setURLFactory(urlf);
+
+            for (Iterator it = this.pages.iterator(); it.hasNext();) {
+                String pageName = (String) it.next();
+
+                renderDocument(pageName, zos, renderContext, vcontext);
+            }
+        } finally {
+            // Clean velocity context
+            vcontext = XWikiVelocityRenderer.prepareContext(context);
+
+            vcontext.put(VCONTEXT_DOC, currentDocument);
+            vcontext.put(VCONTEXT_CDOC, currentCDocument);
+            vcontext.put(VCONTEXT_TDOC, currentTDocument);
+        }
+    }
+
+    /**
      * Apply export and create the ZIP package.
      * 
      * @param context the XWiki context used to render pages.
@@ -109,11 +227,13 @@ public class HtmlPackager
      */
     public void export(XWikiContext context) throws IOException, XWikiException
     {
-        // ////////////////////////////////////////////
-        // Create custom URL factory
-        // ////////////////////////////////////////////
+        context.getResponse().setContentType("application/zip");
+        context.getResponse().addHeader("Content-disposition",
+            "attachment; filename=" + context.getWiki().getURLEncoded(name) + ".zip");
+        context.setFinished(true);
 
-        ExportURLFactory urlf = new ExportURLFactory();
+        ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
+
         File dir =
             (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
@@ -121,92 +241,24 @@ public class HtmlPackager
         File attachmentDir = new File(tempdir, "attachment");
         attachmentDir.mkdirs();
 
-        // ////////////////////////////////////////////
-        // Configure response
-        // ////////////////////////////////////////////
+        // Create custom URL factory
+        ExportURLFactory urlf = new ExportURLFactory();
 
-        context.getResponse().setContentType("application/zip");
-        context.getResponse().addHeader("Content-disposition",
-            "attachment; filename=" + context.getWiki().getURLEncoded(name) + ".zip");
-        context.setFinished(true);
-
-        // ////////////////////////////////////////////
         // Render pages to export
-        // ////////////////////////////////////////////
+        renderDocuments(zos, tempdir, urlf, context);
 
-        ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
-
-        VelocityContext vcontext = (VelocityContext)context.get("vcontext");
-        
-        Document currentDocument = (Document)vcontext.get("cdoc");
-        Document currentCDocument = (Document)vcontext.get("cdoc");
-        Document currentTDocument = (Document)vcontext.get("tdoc");
-        
-        try {
-            XWikiContext renderContext = (XWikiContext) context.clone();
-
-            vcontext = XWikiVelocityRenderer.prepareContext(renderContext);
-
-            urlf.init(this.pages, tempdir, renderContext);
-            renderContext.setURLFactory(urlf);
-
-            renderContext.put("action", "view");
-
-            for (Iterator it = this.pages.iterator(); it.hasNext();) {
-                String pageName = (String) it.next();
-
-                XWikiDocument doc = renderContext.getWiki().getDocument(pageName, renderContext);
-
-                String zipname = doc.getDatabase() + "." + doc.getSpace() + "." + doc.getName();
-                String language = doc.getLanguage();
-                if ((language != null) && (!language.equals(""))) {
-                    zipname += "." + language;
-                }
-
-                zipname += ".html";
-
-                ZipEntry zipentry = new ZipEntry(zipname);
-                zos.putNextEntry(zipentry);
-
-                renderContext.setDatabase(doc.getDatabase());
-                renderContext.setDoc(doc);
-                vcontext.put("doc", doc.newDocument(renderContext));
-                vcontext.put("cdoc", vcontext.get("doc"));
-
-                XWikiDocument tdoc = doc.getTranslatedDocument(renderContext);
-                renderContext.put("tdoc", tdoc);
-                vcontext.put("tdoc", tdoc.newDocument(renderContext));
-
-                String content = renderContext.getWiki().parseTemplate("view.vm", renderContext);
-
-                zos.write(content.getBytes(renderContext.getWiki().getEncoding()));
-                zos.closeEntry();
-            }
-        } finally {
-            // Clean velocity context
-            vcontext = XWikiVelocityRenderer.prepareContext(context);
-            
-            vcontext.put("doc", currentDocument);
-            vcontext.put("cdoc", currentCDocument);
-            vcontext.put("tdoc", currentTDocument);
-        }
-
-        // ////////////////////////////////////////////
-        // Add required skins to zip file
-        // ////////////////////////////////////////////
+        // Add required skins to ZIP file
         for (Iterator it = urlf.getNeededSkins().iterator(); it.hasNext();) {
             String skinName = (String) it.next();
             addSkinToZip(skinName, zos, context);
         }
 
-        // ////////////////////////////////////////////
-        // Add resources files to zip file
-        // ////////////////////////////////////////////
+        // Add resources files to ZIP file
         addDirToZip(tempdir, zos, "");
 
         zos.setComment(description);
 
-        // Finish zip file
+        // Finish ZIP file
         zos.finish();
         zos.flush();
 
@@ -258,7 +310,7 @@ public class HtmlPackager
     {
         File file =
             new File(context.getWiki().getEngineContext().getRealPath("/skins/" + skinName));
-        addDirToZip(file, out, "skins/" + skinName + "/");
+        addDirToZip(file, out, "skins" + ZIPPATH_SEPARATOR + skinName + ZIPPATH_SEPARATOR);
     }
 
     /**
@@ -287,7 +339,7 @@ public class HtmlPackager
         for (int i = 0; i < files.length; ++i) {
             File file = files[i];
             if (file.isDirectory()) {
-                addDirToZip(file, out, basePath + file.getName() + "/");
+                addDirToZip(file, out, basePath + file.getName() + ZIPPATH_SEPARATOR);
                 continue;
             }
 

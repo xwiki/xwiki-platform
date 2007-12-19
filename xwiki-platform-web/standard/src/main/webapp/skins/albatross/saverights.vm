@@ -21,7 +21,7 @@
           #set($levels = $levels + "," + $right)
 
 1. person: $pers; rule: allow; action: allow; levels: $levels
-          $obj.set('levels', $levels) ## set the new levels
+          $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
         #end
       #else ## deny or clean action
         #set($i = $levels.indexOf($right))
@@ -35,7 +35,7 @@
 
 2. person: $pers; rule: allow; action: deny/clean; levels: $levels
         #if($levels != "")
-          $obj.set('levels', $levels) ## set the new levels
+          $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
         #else ## no other righs in the levels, remove the rule completely
           #set($discard = $doc.removeObject($obj))
         #end
@@ -51,8 +51,6 @@
 
 3. person: $pers; rule: deny; action:deny; levels: $levels
           $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
-
-$doc.toXML()
         #end
       #else ## allow or clean action
         #set($i = $levels.indexOf($right))
@@ -66,7 +64,7 @@ $doc.toXML()
 
 4. person: $pers; rule: deny; action: allow/clean; levels: $levels
         #if($levels != "")
-          $obj.set('levels', $levels) ## set the new levels
+          $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
         #else ## no other righs in the levels, remove the rule completely
           #set($discard = $doc.removeObject($obj))
         #end
@@ -75,7 +73,7 @@ $doc.toXML()
   #elseif($pers.matches("^(.*,)?${fullname}(,.*)?$")) ## The person is in a multiple selection rule, remove it from there.
     #set($pers = $pers.replaceAll("^${fullname}(,|$)", ""))
     #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
-    $obj.set($uorg, $pers)
+    $doc.getObject($clsname, $obj.number).set($uorg, $pers)
 
 5. person: $pers
   #end

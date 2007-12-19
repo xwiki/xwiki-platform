@@ -476,10 +476,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
 
         // Manage object match strings
         if (matchFields != null) {
-            for (; fieldIndex < matchFields.length; ++fieldIndex) {
-                String fieldName = (String) matchFields[fieldIndex][0];
-                String type = (String) matchFields[fieldIndex][1];
-                String value = (String) matchFields[fieldIndex][2];
+            for (int i = 0; i < matchFields.length; ++i) {
+                String fieldName = (String) matchFields[i][0];
+                String type = (String) matchFields[i][1];
+                String value = (String) matchFields[i][2];
 
                 if (type != null) {
                     String fieldPrefix;

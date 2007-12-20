@@ -39,6 +39,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -58,21 +59,6 @@ final class WikiManager
      * Key to use with {@link XWikiContext#get(Object)}.
      */
     public static final String MESSAGETOOL_CONTEXT_KEY = "wikimanagermessagetool";
-
-    /**
-     * Quote string.
-     */
-    public static final String QUOTE = "\"";
-
-    /**
-     * Open bracket.
-     */
-    public static final String OPEN_BRACKET = "(";
-
-    /**
-     * Close bracket.
-     */
-    public static final String CLOSE_BRACKET = ")";
 
     /**
      * The logging tool.
@@ -358,15 +344,15 @@ final class WikiManager
             context.setDatabase(targetWiki);
 
             Collection[] docsNames = getDocsNames(sourceWiki, context);
-            
+
             // Replace documents contents to include
             Collection docsNameToInclude = docsNames[0];
             for (Iterator it = docsNameToInclude.iterator(); it.hasNext();) {
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                targetDoc.setContent("#includeInContext" + OPEN_BRACKET + QUOTE + sourceWiki
-                    + SuperDocument.WIKI_SPACE_SEPARATOR + docFullName + QUOTE + CLOSE_BRACKET);
+                targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")",
+                    new Object[] {sourceWiki, SuperDocument.WIKI_SPACE_SEPARATOR, docFullName}));
             }
 
             // Replace documents contents to link
@@ -375,8 +361,8 @@ final class WikiManager
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                targetDoc.setContent("#includeTopic" + OPEN_BRACKET + QUOTE + sourceWiki
-                    + SuperDocument.WIKI_SPACE_SEPARATOR + docFullName + QUOTE + CLOSE_BRACKET);
+                targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")",
+                    new Object[] {sourceWiki, SuperDocument.WIKI_SPACE_SEPARATOR, docFullName}));
             }
         } finally {
             context.setDatabase(database);

@@ -20,6 +20,7 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
+import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -68,11 +69,6 @@ public class RightsManagerPluginApi extends PluginApi
      * user interface.
      */
     public static final String RIGHTS_UI_VALUE_NEW = "new";
-
-    /**
-     * Quote symbol.
-     */
-    public static final String QUOTE = "\"";
 
     /**
      * The logging toolkit.
@@ -244,8 +240,8 @@ public class RightsManagerPluginApi extends PluginApi
                 RightsManager.getInstance()
                     .getAllGroupsNamesForMember(member, 0, 0, this.context);
         } catch (RightsManagerException e) {
-            logError("Try to get all groups containing user " + QUOTE + member + QUOTE
-                + ") users from local wiki", e);
+            logError(MessageFormat.format("Try to get all groups containing user [{0}]",
+                new Object[] {member}), e);
         }
 
         return userList;
@@ -282,7 +278,8 @@ public class RightsManagerPluginApi extends PluginApi
                 RightsManager.getInstance().getAllMembersNamesForGroup(group, nb, start,
                     this.context);
         } catch (RightsManagerException e) {
-            logError("Try to get all user group " + QUOTE + group + QUOTE + ") contains", e);
+            logError(MessageFormat.format("Try to get all user group [{0}] contains",
+                new Object[] {group}), e);
         }
 
         return userList;

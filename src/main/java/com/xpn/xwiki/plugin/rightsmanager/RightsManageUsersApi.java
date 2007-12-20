@@ -20,6 +20,7 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -54,11 +55,6 @@ public class RightsManageUsersApi extends Api
      */
     public static final String CONTEXT_LASTEXCEPTION =
         RightsManagerPluginApi.CONTEXT_LASTEXCEPTION;
-
-    /**
-     * Quote symbol.
-     */
-    public static final String QUOTE = RightsManagerPluginApi.QUOTE;
 
     /**
      * The logging toolkit.
@@ -157,7 +153,8 @@ public class RightsManageUsersApi extends Api
                 RightsManager.getInstance().countAllWikiUsersOrGroups(true, wikiName,
                     RightsManagerPluginApi.createMatchingTable(matchFields), this.context);
         } catch (RightsManagerException e) {
-            logError("Try to count all users in wiki " + QUOTE + wikiName + QUOTE, e);
+            logError(MessageFormat.format("Try to count all users in wiki [{0}]",
+                new Object[] {wikiName}), e);
         }
 
         return count;

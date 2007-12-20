@@ -20,6 +20,8 @@
 
 package com.xpn.xwiki.plugin.rightsmanager;
 
+import java.text.MessageFormat;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -46,12 +48,7 @@ public class RightsManageRightsApi extends Api
      * Field name of the last api exception inserted in context.
      */
     public static final String CONTEXT_LASTEXCEPTION = RightsManagerPluginApi.CONTEXT_LASTEXCEPTION;
-    
-    /**
-     * Quote symbol.
-     */
-    public static final String QUOTE = RightsManagerPluginApi.QUOTE;
-    
+       
     /**
      * The logging toolkit.
      */
@@ -102,7 +99,8 @@ public class RightsManageRightsApi extends Api
                 parent = xdoc.newDocument(context);
             }
         } catch (RightsManagerException e) {
-            logError("Try to get parent rights preference for " + QUOTE + spaceOrPage + QUOTE, e);
+            logError(MessageFormat.format("Try to get parent rights preference for [{0}]",
+                new Object[] {spaceOrPage}), e);
         }
 
         return parent;

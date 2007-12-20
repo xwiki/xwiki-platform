@@ -546,7 +546,7 @@ MSCheckbox.prototype = {
           self.next();
         },
         onFailure: function() {
-          alert("$msg.get('xwiki.core.rightsManagement.ajaxFailure')");
+          alert("$msg.get('platform.core.rightsManagement.ajaxFailure')");
         },
         onComplete: function() {
           delete self.req;

@@ -61,7 +61,7 @@
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get('ui.ajaxTable.loading')" title="" />
 </div>
 #if($editor == "spacerights")
-<div class="spaceName">$msg.get("core.rightsManagement.editRightsForSpace", [$space])&nbsp;&nbsp;
+<div class="spaceName">$msg.get("platform.core.rightsManagement.editRightsForSpace", [$space])&nbsp;&nbsp;
 <select name="space" style="width: 130px;" class="filter" onchange="location='?editor=spacerights&amp;global=1&amp;space='+this.value;">
   <option value="" label="">---</option>
   #foreach($spaceitem in $xwiki.spaces)

@@ -10,50 +10,50 @@
 
 #############################################################################
 
-#if($appname &amp;&amp; $appname.length() &gt; 0)
+#if($appname && $appname.length() > 0)
 
   #set($app = $Appmanager.getApplicationDocument($doc.getValue("appname", $object)))
 
   1 Application \"$app.appName\"
 
-  &lt;dl&gt;
+  <dl>
     #foreach($prop in $class.properties)
-      &lt;dt&gt; ${prop.prettyName} &lt;/dt&gt;
-      #if($context.action == "view" &amp;&amp; $prop.name == "documents")
-        &lt;dd&gt;
+      <dt> ${prop.prettyName} </dt>
+      #if($context.action == "view" && $prop.name == "documents")
+        <dd>
           #foreach($docfullname in $app.getDocumentsNames(false, false))
-            [$docfullname&gt;$docfullname]
+            [$docfullname>$docfullname]
           #end
-        &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "docstoinclude")
-        &lt;dd&gt;
+        </dd>
+      #elseif($context.action == "view" && $prop.name == "docstoinclude")
+        <dd>
           #foreach($docfullname in $app.getDocsNameToInclude(false))
-            [$docfullname&gt;$docfullname]
+            [$docfullname>$docfullname]
           #end
-        &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "docstolink")
-        &lt;dd&gt;
+        </dd>
+      #elseif($context.action == "view" && $prop.name == "docstolink")
+        <dd>
           #foreach($docfullname in $app.getDocsNameToLink(false))
-            [$docfullname&gt;$docfullname]
+            [$docfullname>$docfullname]
           #end
-        &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "translationdocs")
-        &lt;dd&gt;
+        </dd>
+      #elseif($context.action == "view" && $prop.name == "translationdocs")
+        <dd>
           #foreach($docfullname in $app.getTranslationDocs())
-            [$docfullname&gt;$docfullname]
+            [$docfullname>$docfullname]
           #end
-        &lt;/dd&gt;
-      #elseif($context.action == "view" &amp;&amp; $prop.name == "applications")
-        &lt;dd&gt;
+        </dd>
+      #elseif($context.action == "view" && $prop.name == "applications")
+        <dd>
           #foreach($appname in $app.getApplications())
-            [$appname&gt;$Appmanager.getApplicationDocument($appname).fullName]
+            [$appname>$Appmanager.getApplicationDocument($appname).fullName]
           #end
-        &lt;/dd&gt;
+        </dd>
       #else
-        &lt;dd&gt;$doc.display($prop.getName())&lt;/dd&gt;
+        <dd>$doc.display($prop.getName())</dd>
       #end
     #end
-  &lt;/dl&gt;
+  </dl>
 #else
   1 Document \"$doc.name\"
 #end

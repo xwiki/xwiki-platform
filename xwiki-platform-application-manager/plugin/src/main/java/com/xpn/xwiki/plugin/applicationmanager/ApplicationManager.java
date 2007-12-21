@@ -53,6 +53,11 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
 final class ApplicationManager implements XWikiDocChangeNotificationInterface
 {
     /**
+     * Key to use with {@link XWikiContext#get(Object)}.
+     */
+    public static final String MESSAGETOOL_CONTEXT_KEY = "applicationmanagermessagetool";
+    
+    /**
      * The logging tool.
      */
     protected static final Log LOG = LogFactory.getLog(ApplicationManager.class);

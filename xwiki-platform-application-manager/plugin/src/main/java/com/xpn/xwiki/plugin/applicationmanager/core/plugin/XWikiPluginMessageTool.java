@@ -2,10 +2,13 @@ package com.xpn.xwiki.plugin.applicationmanager.core.plugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.Arrays;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+
 import com.xpn.xwiki.web.XWikiMessageTool;
 
 /**
@@ -16,14 +19,15 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 public class XWikiPluginMessageTool extends XWikiMessageTool
 {
     /**
-     * @param bundle the default Resource Bundle to fall back to if no document bundle is found when
-     *            trying to get a key
+     * @param locale the locale.
+     * @param plugin the plugin.
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
      *            primitives for loading documents
      */
-    public XWikiPluginMessageTool(ResourceBundle bundle, XWikiContext context)
+    public XWikiPluginMessageTool(Locale locale, XWikiPluginInterface plugin, XWikiContext context)
     {
-        super(bundle, context);
+        this(ResourceBundle.getBundle(plugin.getName() + "/ApplicationResources", locale == null
+            ? Locale.ENGLISH : locale), context);
     }
 
     /**
@@ -32,7 +36,18 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
      */
     public XWikiPluginMessageTool(ResourceBundle bundle)
     {
-        super(bundle, null);
+        this(bundle, null);
+    }
+
+    /**
+     * @param bundle the default Resource Bundle to fall back to if no document bundle is found when
+     *            trying to get a key
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
+     *            primitives for loading documents
+     */
+    public XWikiPluginMessageTool(ResourceBundle bundle, XWikiContext context)
+    {
+        super(bundle, context);
     }
 
     /**
@@ -46,7 +61,7 @@ public class XWikiPluginMessageTool extends XWikiMessageTool
     protected String getTranslation(String key)
     {
         String translation = key;
-        
+
         if (context != null) {
             translation = this.context.getMessageTool().get(key);
         }

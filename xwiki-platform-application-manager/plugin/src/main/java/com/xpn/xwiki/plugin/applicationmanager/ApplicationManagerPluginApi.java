@@ -25,7 +25,6 @@ import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
@@ -94,9 +93,8 @@ public class ApplicationManagerPluginApi extends PluginApi
 
         // Message Tool
         Locale locale = (Locale) context.get("locale");
-        ResourceBundle bundle =
-            ResourceBundle.getBundle(getPlugin().getName() + "/ApplicationResources", locale);
-        this.messageTool = new XWikiPluginMessageTool(bundle, context);
+        this.messageTool = new XWikiPluginMessageTool(locale, plugin, context);
+        context.put(ApplicationManager.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
     }
 
     /**

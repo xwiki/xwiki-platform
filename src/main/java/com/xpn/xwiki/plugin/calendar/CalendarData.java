@@ -271,7 +271,7 @@ public class CalendarData {
                 result.append("<a href=\"" + url + "\">");
             }
             result.append(title);
-            if(title != null && !title.equals("")) {
+            if(url != null && !url.equals("")) {
                 result.append("</a>");
             }
             result.append("</div>");

@@ -1,4 +1,3 @@
-
 #set($macros = $xwiki.getMacroList())
 #set($macros = $macros.split('\n'))
 <form id="macroform" name="macroform" onsubmit="insertMacro(); return false;" action="">

@@ -21,5 +21,3 @@ $response.setStatus(404)
 </div>
 #template("basefooter.vm")
 #template("footer.vm")
-
-

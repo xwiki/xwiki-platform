@@ -23,17 +23,14 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
-import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-
-public class StaticListMetaClass extends ListMetaClass {
-
-
-    public StaticListMetaClass() {
+public class StaticListMetaClass extends ListMetaClass
+{
+    public StaticListMetaClass()
+    {
         super();
         setPrettyName("Static List Class");
         setName(StaticListClass.class.getName());
@@ -43,7 +40,7 @@ public class StaticListMetaClass extends ListMetaClass {
         values_class.setPrettyName("Values");
         values_class.setSize(40);
         safeput("values", values_class);
-        
+
         BooleanClass picker_class = new BooleanClass(this);
         picker_class.setName("picker");
         picker_class.setPrettyName("Use Suggest");
@@ -52,7 +49,8 @@ public class StaticListMetaClass extends ListMetaClass {
         safeput("picker", picker_class);
     }
 
-    public BaseCollection newObject(XWikiContext context) {
+    public BaseCollection newObject(XWikiContext context)
+    {
         return new StaticListClass();
     }
 }

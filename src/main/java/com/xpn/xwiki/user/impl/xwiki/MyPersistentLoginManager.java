@@ -21,12 +21,10 @@
 
 package com.xpn.xwiki.user.impl.xwiki;
 
-import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.Cipher;
-import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,6 +68,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Log4J logger object to log messages in this class.
      */
     private static final Log LOG = LogFactory.getLog(MyPersistentLoginManager.class);
+
+    /**
+     * Default value to use when getting the authentication cookie values.
+     */
+    private static final String DEFAULT_VALUE = "false";
 
     /**
      * The domain generalization for which the cookies are active. Configured by the
@@ -426,6 +429,13 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * Given an array of Cookies, a name, and a default value, this method tries to find the value
      * of the cookie with the given name. If there is no cookie matching the name in the array, then
      * the default value is returned instead.
+     * 
+     * @param cookies The list of cookies to search.
+     * @param cookieName The name of the cookie whose value should be returned.
+     * @param defaultValue The default value that should be returned when no cookie with the given
+     *            name was found.
+     * @return The value of the cookie with the given name, or defaultValue if no such cookie was
+     *         found.
      */
     private static String getCookieValue(Cookie[] cookies, String cookieName, String defaultValue)
     {
@@ -441,119 +451,110 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     }
 
     /**
-     * Get remembered username
+     * Checks if the cookies are valid.
      * 
-     * @param request the servlet request
-     * @param response the servlet response
-     * @return the username value or null if not found or a problem with security of cookie
+     * @param request The servlet request.
+     * @param response The servlet response.
+     * @return True if the validation cookie holds a valid value or is not present, false otherwise.
+     * @todo Don't ignore it when set to "false", check the validation method.
+     */
+    private boolean checkValidation(HttpServletRequest request, HttpServletResponse response)
+    {
+        if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
+            String username =
+                getCookieValue(request.getCookies(), COOKIE_USERNAME, DEFAULT_VALUE);
+            String password =
+                getCookieValue(request.getCookies(), COOKIE_PASSWORD, DEFAULT_VALUE);
+            String cookieHash =
+                getCookieValue(request.getCookies(), COOKIE_VALIDATION, DEFAULT_VALUE);
+            String calculatedHash = getValidationHash(username, password, getClientIP(request));
+            if (cookieHash.equals(calculatedHash)) {
+                return true;
+            } else {
+                LOG
+                    .warn("Login cookie validation hash mismatch! Cookies have been tampered with");
+                LOG.info("Login cookie is being deleted!");
+                forgetLogin(request, response);
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the username stored (in a cookie) in the request. Also checks the validity of the cookie.
+     * 
+     * @param request The servlet request.
+     * @param response The servlet response.
+     * @return The username value, or <tt>null</tt> if not found or the cookie isn't valid.
+     * @todo Also use the URL, in case cookies are disabled [XWIKI-1071].
      */
     public String getRememberedUsername(HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException
     {
-        String username = getCookieValue(request.getCookies(), COOKIE_USERNAME, "false");
-        String password = getCookieValue(request.getCookies(), COOKIE_PASSWORD, "false");
+        String username = getCookieValue(request.getCookies(), COOKIE_USERNAME, DEFAULT_VALUE);
 
-        String validationHash = getCookieValue(request.getCookies(), COOKIE_VALIDATION, "false");
-        if (!username.equals("false")) {
-            if (!validationHash.equals("false")) {
-                // check hash
-                String calculatedHash =
-                    getValidationHash(username, password, getClientIP(request));
-                if (validationHash.equals(calculatedHash)) {
-                    if (protection.equals(PROTECTION_ALL)
-                        || protection.equals(PROTECTION_ENCRYPTION)) {
-                        username = decryptText(username);
-                    }
-                    return username;
-                } else {
-                    System.out.println("!remember-me cookie validation hash mismatch! ");
-                    System.out.println("!remember-me cookie has been tampered with! ");
-                    System.out.println("!remember-me cookie is being deleted! ");
-                    removeCookie(request, response, COOKIE_USERNAME);
-                    removeCookie(request, response, COOKIE_PASSWORD);
-                    removeCookie(request, response, COOKIE_REMEMBERME);
-                    removeCookie(request, response, COOKIE_VALIDATION);
-                    return null;
-                }
-            } else {
+        if (!username.equals(DEFAULT_VALUE)) {
+            if (checkValidation(request, response)) {
                 if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
                     username = decryptText(username);
                 }
                 return username;
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
-     * Get remembered password
+     * Get the password stored (in a cookie) in the request. Also checks the validity of the cookie.
      * 
-     * @param request the servlet request
-     * @param response the servlet response
-     * @return the password value or null if not found or a problem with security of cookie
+     * @param request The servlet request.
+     * @param response The servlet response.
+     * @return The password value, or <tt>null</tt> if not found or the cookie isn't valid.
+     * @todo Also use the URL, in case cookies are disabled [XWIKI-1071].
      */
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
-        throws IOException, ServletException
     {
-        String username = getCookieValue(request.getCookies(), COOKIE_USERNAME, "false");
-        String password = getCookieValue(request.getCookies(), COOKIE_PASSWORD, "false");
-
-        String validationHash = getCookieValue(request.getCookies(), COOKIE_VALIDATION, "false");
-        if (!password.equals("false")) {
-            if (!validationHash.equals("false")) {
-                String calculatedHash =
-                    getValidationHash(username, password, getClientIP(request));
-                if (validationHash.equals(calculatedHash)) {
-                    if (protection.equals(PROTECTION_ALL)
-                        || protection.equals(PROTECTION_ENCRYPTION)) {
-                        password = decryptText(password);
-                    }
-                    return password;
-                } else {
-                    System.out.println("!remember-me cookie validation hash mismatch! ");
-                    System.out.println("!remember-me cookie has been tampered with! ");
-                    System.out.println("!remember-me cookie is being deleted! ");
-                    removeCookie(request, response, COOKIE_USERNAME);
-                    removeCookie(request, response, COOKIE_PASSWORD);
-                    removeCookie(request, response, COOKIE_REMEMBERME);
-                    removeCookie(request, response, COOKIE_VALIDATION);
-                    return null;
-                }
-            } else {
+        String password = getCookieValue(request.getCookies(), COOKIE_PASSWORD, DEFAULT_VALUE);
+        if (!password.equals(DEFAULT_VALUE)) {
+            if (checkValidation(request, response)) {
                 if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
                     password = decryptText(password);
                 }
                 return password;
             }
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
      * Decrypt a string.
      * 
-     * @param encryptedText
+     * @param encryptedText The encrypted value.
      * @return encryptedText, decrypted
      */
     private String decryptText(String encryptedText)
     {
         sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
         try {
-            byte decodedEncryptedText[] = decoder.decodeBuffer(encryptedText);
+            byte[] decodedEncryptedText = decoder.decodeBuffer(encryptedText);
             Cipher c1 = Cipher.getInstance(cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);
             String decryptedTextString = new String(decryptedText);
             return decryptedTextString;
         } catch (Exception e) {
-            System.out.println("Error: " + e);
-            e.printStackTrace();
+            LOG.error(e);
             return null;
         }
     }
 
+    /**
+     * Returns the original client IP. Needed because request.getRemoteAddr returns the address of
+     * the last requesting host, which can be either the real client, or a proxy. The original
+     * method prevents logging in when using a cluster of reverse proxies in front of XWiki.
+     * 
+     * @param request The servlet request.
+     * @return The IP of the actual client.
+     */
     protected String getClientIP(HttpServletRequest request)
     {
         String remoteIP = request.getHeader("X-Forwarded-For");

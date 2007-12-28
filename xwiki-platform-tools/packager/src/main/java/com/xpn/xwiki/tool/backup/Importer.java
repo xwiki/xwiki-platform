@@ -102,7 +102,9 @@ public class Importer extends AbstractPackager
 
             // check that is HSQLDB
             Dialect dialect = Dialect.getDialect(hibernateStore.getConfiguration().getProperties());
-            if (!(dialect instanceof HSQLDialect)) return;
+            if (!(dialect instanceof HSQLDialect)) {
+                return;
+            }
 
             boolean bTransaction = true;
             try {
@@ -123,6 +125,7 @@ public class Importer extends AbstractPackager
                         hibernateStore.endTransaction(context, false, false);
                     }
                 } catch (Exception e) {
+                    // Ignore
                 }
             }
         }

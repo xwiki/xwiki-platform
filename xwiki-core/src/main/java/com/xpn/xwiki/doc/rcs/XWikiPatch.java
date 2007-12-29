@@ -89,7 +89,7 @@ public class XWikiPatch
      * @throws XWikiException if any error
      */
     public XWikiPatch setFullVersion(XWikiDocument version, XWikiContext context)
-    throws XWikiException
+        throws XWikiException
     {
         return setFullVersion(version.toXML(context));
     }

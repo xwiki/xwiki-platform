@@ -38,7 +38,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-url</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
   </dependencies>
   <modules>

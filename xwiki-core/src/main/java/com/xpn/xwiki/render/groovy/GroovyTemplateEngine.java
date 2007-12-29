@@ -42,6 +42,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.DefaultGroovyStaticMethods;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.codehaus.groovy.runtime.metaclass.MetaClassRegistryImpl;
 
 import java.beans.Introspector;
 import java.io.BufferedReader;
@@ -331,9 +332,9 @@ public class GroovyTemplateEngine extends TemplateEngine
     public static void flushCache()
     {
         // Clear up groovy registry
-        MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
+        MetaClassRegistry mcr = MetaClassRegistryImpl.getInstance(0);
         clearMetaClassRegistry(mcr);
-        mcr = MetaClassRegistry.getIntance(1);
+        mcr = MetaClassRegistryImpl.getInstance(1);
         clearMetaClassRegistry(mcr);
         mcr = InvokerHelper.getInstance().getMetaRegistry();
         clearMetaClassRegistry(mcr);
@@ -343,9 +344,9 @@ public class GroovyTemplateEngine extends TemplateEngine
     public static void removeClass(Class clazz)
     {
         // Clear up groovy registry
-        MetaClassRegistry mcr = MetaClassRegistry.getIntance(0);
+        MetaClassRegistry mcr = MetaClassRegistryImpl.getInstance(0);
         mcr.removeMetaClass(clazz);
-        mcr = MetaClassRegistry.getIntance(1);
+        mcr = MetaClassRegistryImpl.getInstance(1);
         mcr.removeMetaClass(clazz);
         mcr = InvokerHelper.getInstance().getMetaRegistry();
         mcr.removeMetaClass(clazz);

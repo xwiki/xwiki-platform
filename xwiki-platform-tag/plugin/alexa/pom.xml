@@ -52,6 +52,7 @@
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>1.2-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>

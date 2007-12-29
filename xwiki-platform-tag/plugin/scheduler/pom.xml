@@ -30,7 +30,7 @@
     <version>3</version>
   </parent>
   <artifactId>xwiki-plugin-scheduler</artifactId>
-  <version>1.1.2</version>
+  <version>1.2-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Scheduler</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Scheduler</description>
@@ -54,10 +54,4 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.1.2</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.1.2</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-scheduler-1.1.2</url>
-  </scm>
 </project>

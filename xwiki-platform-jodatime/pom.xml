@@ -27,17 +27,17 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>4-SNAPSHOT</version>
+    <version>3</version>
   </parent>
   <artifactId>xwiki-plugin-jodatime</artifactId>
   <name>XWiki Platform - Plugins - Joda Time</name>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.0.2</version>
   <description>XWiki Platform - Plugins - Joda Time</description>
   <dependencies>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2-rc-2</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -46,4 +46,10 @@
       <version>1.4</version>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-jodatime-1.0.2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-jodatime-1.0.2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-jodatime-1.0.2</url>
+  </scm>
 </project>

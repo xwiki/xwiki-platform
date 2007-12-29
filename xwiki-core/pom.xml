@@ -368,8 +368,8 @@
     </dependency>
     <dependency>
       <groupId>groovy</groupId>
-      <artifactId>groovy-all-1.0-jsr</artifactId>
-      <version>06</version>
+      <artifactId>groovy-all</artifactId>
+      <version>1.1-rc-1</version>
     </dependency>
     <dependency>
       <groupId>picocontainer</groupId>
@@ -483,7 +483,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
@@ -524,15 +524,12 @@
               **/content/**/*.java,
               **/XWikiMessageTool.java,
               **/XWikiListFilter.java,
-              **/MyPersistentLoginManager.java,
-              **/XWikiDocumentArchive.java,
               **/doc/rcs/*.java,
               **/api/RevisionInfo.java,
               **/web/DeleteVersions*.java,
 	          **/migration/**.java,
 	          **/*RecycleBin*.java,
 	          **/*DeletedDocument.java,
-	          **/DeleteAction.java,
 	          **/UndeleteAction.java,
               **/rightsmanager/**/*.java
           </includes>
@@ -541,7 +538,8 @@
 	            <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
               **/XWikiPatchUtils.java,
 	          **/XWikiRCSArchive.java,
-              **/XWikiHibernateRecycleBinStore.java
+              **/XWikiHibernateRecycleBinStore.java,
+	          **/migration/AbstractXWikiMigrationManager.java
           </excludes>
         </configuration>
       </plugin>

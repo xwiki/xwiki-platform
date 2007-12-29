@@ -43,6 +43,7 @@
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>${platform.core.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
@@ -53,6 +54,13 @@
       <groupId>jmock</groupId>
       <artifactId>jmock-cglib</artifactId>
       <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed at test time. Some versions of Maven don't inherit provided dependencies. -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

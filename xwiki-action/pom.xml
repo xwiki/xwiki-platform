@@ -38,17 +38,17 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-container-api</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-url</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
   </dependencies>
 </project>

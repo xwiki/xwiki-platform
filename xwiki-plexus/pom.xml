@@ -38,22 +38,22 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-container-api</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-container-servlet</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-action</artifactId>
-      <version>${version}</version>
+      <version>${pom.version}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

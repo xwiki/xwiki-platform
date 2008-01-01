@@ -87,8 +87,7 @@ public class R6430XWIKI1954Migrator extends AbstractXWikiHibernateMigrator
                         stmt.executeUpdate("update xwikidoc set XWD_ARCHIVE=null");
                         stmt.close();
                     } catch (SQLException e) {
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
+                        // Maybe the columnd doesn't exist.
                     }
                     return Boolean.TRUE;
                 }

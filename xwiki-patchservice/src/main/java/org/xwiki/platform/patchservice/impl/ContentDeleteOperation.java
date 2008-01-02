@@ -20,7 +20,7 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
     private String removedContent;
 
     static {
-        OperationFactoryImpl.getInstance().registerTypeProvider(Operation.TYPE_CONTENT_DELETE,
+        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CONTENT_DELETE,
             ContentDeleteOperation.class);
     }
 

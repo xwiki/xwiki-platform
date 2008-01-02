@@ -31,9 +31,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
     private Map propertyConfig;
 
     static {
-        OperationFactoryImpl.getInstance().registerTypeProvider(
+        OperationFactoryImpl.registerTypeProvider(
             Operation.TYPE_CLASS_PROPERTY_ADD, ClassPropertySetOperation.class);
-        OperationFactoryImpl.getInstance().registerTypeProvider(
+        OperationFactoryImpl.registerTypeProvider(
             Operation.TYPE_CLASS_PROPERTY_CHANGE, ClassPropertySetOperation.class);
     }
 
@@ -140,7 +140,6 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         int i =
             new HashCodeBuilder(11, 13).append(this.propertyType).append(this.propertyConfig)
                 .toHashCode();
-        System.out.print(" asd > " + i);
         return i;
     }
 

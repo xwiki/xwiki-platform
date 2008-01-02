@@ -19,7 +19,7 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
     private String addedContent;
 
     static {
-        OperationFactoryImpl.getInstance().registerTypeProvider(Operation.TYPE_CONTENT_INSERT,
+        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CONTENT_INSERT,
             ContentInsertOperation.class);
     }
     

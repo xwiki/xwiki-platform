@@ -14,22 +14,18 @@ import org.xwiki.platform.patchservice.api.RWOperation;
 
 import com.xpn.xwiki.XWikiException;
 
-public class OperationFactoryImpl implements OperationFactory
+public final class OperationFactoryImpl implements OperationFactory
 {
     private static final Log LOG = LogFactory.getLog(OperationFactoryImpl.class);
 
-    private static OperationFactoryImpl theInstance = new OperationFactoryImpl();
+    private static Map typeMap = new HashMap();
 
-    private static boolean initialized;
-
-    public Map typeMap = new HashMap();
-
-    private OperationFactoryImpl()
+    private static class SingletonHolder
     {
-        // Private constructor so that it cannot be instantiated.
+        private static OperationFactoryImpl theInstance = new OperationFactoryImpl();
     }
 
-    private static void init()
+    private OperationFactoryImpl()
     {
         for (Iterator it = Service.providers(RWOperation.class); it.hasNext();) {
             Operation op = (Operation) it.next();
@@ -40,15 +36,7 @@ public class OperationFactoryImpl implements OperationFactory
 
     public static OperationFactoryImpl getInstance()
     {
-        if (!initialized) {
-            synchronized (OperationFactoryImpl.class) {
-                if (!initialized) {
-                    initialized = true;
-                    init();
-                }
-            }
-        }
-        return theInstance;
+        return SingletonHolder.theInstance;
     }
 
     public RWOperation newOperation(String type) throws XWikiException
@@ -82,15 +70,15 @@ public class OperationFactoryImpl implements OperationFactory
         return op;
     }
 
-    public void registerTypeProvider(String type, Class provider)
+    public static void registerTypeProvider(String type, Class provider)
     {
-        this.typeMap.put(type, provider);
+        typeMap.put(type, provider);
     }
 
-    public void registerTypeProvider(String[] types, Class provider)
+    public static void registerTypeProvider(String[] types, Class provider)
     {
         for (int i = 0; i < types.length; ++i) {
-            this.registerTypeProvider(types[i], provider);
+            registerTypeProvider(types[i], provider);
         }
     }
 }

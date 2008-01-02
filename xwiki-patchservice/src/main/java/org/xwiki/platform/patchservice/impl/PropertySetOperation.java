@@ -22,7 +22,7 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
     private String propertyValue;
 
     static {
-        OperationFactoryImpl.getInstance().registerTypeProvider(Operation.TYPE_PROPERTY_SET,
+        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_PROPERTY_SET,
             PropertySetOperation.class);
     }
 

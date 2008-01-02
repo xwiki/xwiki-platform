@@ -96,7 +96,6 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
 
     public String toString()
     {
-        return Operation.TYPE_PROPERTY_SET + ": [" + this.propertyName + "] to ["
-            + this.propertyValue + "]";
+        return this.getType() + ": [" + this.propertyName + "] to [" + this.propertyValue + "]";
     }
 }

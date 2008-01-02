@@ -146,7 +146,6 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
 
     public String toString()
     {
-        return Operation.TYPE_CLASS_PROPERTY_ADD + ": [" + this.propertyType + "] = "
-            + this.propertyConfig;
+        return this.getType() + ": [" + this.propertyType + "] = " + this.propertyConfig;
     }
 }

@@ -88,7 +88,6 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
 
     public String toString()
     {
-        return Operation.TYPE_CONTENT_INSERT + ": [" + this.addedContent + "] at "
-            + this.position;
+        return this.getType() + ": [" + this.addedContent + "] at " + this.position;
     }
 }

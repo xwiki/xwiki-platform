@@ -103,7 +103,7 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
 
     public String toString()
     {
-        return Operation.TYPE_CONTENT_DELETE + ": [" + this.removedContent + "] at "
+        return this.getType() + ": [" + this.removedContent + "] at "
             + this.position;
     }
 }

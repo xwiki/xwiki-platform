@@ -5,6 +5,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.Operation;
+import org.xwiki.platform.patchservice.api.Position;
 import org.xwiki.platform.patchservice.api.RWOperation;
 
 import com.xpn.xwiki.XWikiException;
@@ -12,9 +13,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class ContentInsertOperation extends AbstractOperationImpl implements RWOperation
 {
-    public static final String POSITION_ATTRIBUTE_NAME = "position";
-
-    private int position = -1;
+    private Position position = null;
 
     private String addedContent;
 
@@ -30,20 +29,19 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
 
     public void apply(XWikiDocument doc) throws XWikiException
     {
-        try {
-            String content = doc.getContent();
-            content =
-                content.substring(0, position) + this.addedContent + content.substring(position);
-            doc.setContent(content);
-        } catch (StringIndexOutOfBoundsException ex) {
+        String content = doc.getContent();
+        if (!position.checkPosition(content)) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
                 XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Patch cannot be applied",
-                ex);
+                "Patch cannot be applied: invalid position " + position);
         }
+        content =
+            position.getTextBeforePosition(content) + this.addedContent
+                + position.getTextAfterPosition(content);
+        doc.setContent(content);
     }
 
-    public boolean insert(String text, int position)
+    public boolean insert(String text, Position position)
     {
         this.addedContent = text;
         this.position = position;
@@ -52,20 +50,20 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
 
     public void fromXml(Element e) throws XWikiException
     {
-        Element textNode = (Element) e.getFirstChild();
-        this.position = Integer.parseInt(textNode.getAttribute(POSITION_ATTRIBUTE_NAME));
+        Element textNode = (Element) e.getElementsByTagName(TEXT_NODE_NAME).item(0);
         this.addedContent = StringEscapeUtils.unescapeXml(textNode.getTextContent());
+        this.position = new PositionImpl();
+        position.fromXml((Element) e.getElementsByTagName(PositionImpl.NODE_NAME).item(0));
     }
 
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
-        xmlNode.setAttribute(AbstractOperationImpl.TYPE_ATTRIBUTE_NAME,
-            Operation.TYPE_CONTENT_INSERT);
+        xmlNode.setAttribute(AbstractOperationImpl.TYPE_ATTRIBUTE_NAME, this.getType());
         Element textNode = doc.createElement(TEXT_NODE_NAME);
-        textNode.setAttribute(POSITION_ATTRIBUTE_NAME, this.position + "");
         textNode.appendChild(doc.createTextNode(StringEscapeUtils.escapeXml(this.addedContent)));
         xmlNode.appendChild(textNode);
+        xmlNode.appendChild(position.toXml(doc));
         return xmlNode;
     }
 
@@ -73,7 +71,7 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
     {
         try {
             ContentInsertOperation otherOperation = (ContentInsertOperation) other;
-            return (otherOperation.position == this.position)
+            return otherOperation.position.equals(this.position)
                 && otherOperation.addedContent.equals(this.addedContent);
         } catch (Exception e) {
             return false;

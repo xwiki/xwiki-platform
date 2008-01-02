@@ -10,6 +10,7 @@ import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.Operation;
 import org.xwiki.platform.patchservice.api.RWOperation;
 import org.xwiki.platform.patchservice.impl.OperationFactoryImpl;
+import org.xwiki.platform.patchservice.impl.PositionImpl;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -35,7 +36,7 @@ public class ContentOperationsTest extends TestCase
         doc.setContent("this is the content");
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
-        operation.insert("new ", 12);
+        operation.insert("new ", new PositionImpl(0, 12));
         operation.apply(doc);
         assertEquals("this is the new content", doc.getContent());
     }
@@ -44,7 +45,7 @@ public class ContentOperationsTest extends TestCase
     {
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
-        operation.insert("added <con\"ten>t", 10);
+        operation.insert("added <con\"ten>t", new PositionImpl(0, 10));
         Element e = operation.toXml(domDoc);
         Operation loadedOperation = OperationFactoryImpl.getInstance().loadOperation(e);
         assertEquals(loadedOperation, operation);
@@ -55,7 +56,7 @@ public class ContentOperationsTest extends TestCase
         doc.setContent("this is the short content");
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
-        operation.insert("something", 42);
+        operation.insert("something", new PositionImpl(0, 42));
         try {
             operation.apply(doc);
             assertFalse(true);
@@ -69,7 +70,7 @@ public class ContentOperationsTest extends TestCase
         doc.setContent("this is the old content");
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
-        operation.delete("old ", 12);
+        operation.delete("old ", new PositionImpl(0, 12));
         operation.apply(doc);
         assertEquals("this is the content", doc.getContent());
     }
@@ -78,7 +79,7 @@ public class ContentOperationsTest extends TestCase
     {
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
-        operation.delete("something", 10);
+        operation.delete("something", new PositionImpl(0, 10));
         Element e = operation.toXml(domDoc);
         Operation loadedOperation = OperationFactoryImpl.getInstance().loadOperation(e);
         assertEquals(operation, loadedOperation);
@@ -89,14 +90,14 @@ public class ContentOperationsTest extends TestCase
         doc.setContent("this is the short content");
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
-        operation.delete("something", 42);
+        operation.delete("something", new PositionImpl(0, 42));
         try {
             operation.apply(doc);
             assertFalse(true);
         } catch (XWikiException ex) {
             // This is expected
         }
-        operation.delete("this", 2);
+        operation.delete("this", new PositionImpl(0, 2));
         try {
             operation.apply(doc);
             assertFalse(true);
@@ -110,20 +111,20 @@ public class ContentOperationsTest extends TestCase
         doc.setContent("this is the old content");
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
-        operation.delete("old", 12);
+        operation.delete("old", new PositionImpl(0, 12));
         operation.apply(doc);
         operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
-        operation.insert("new", 12);
+        operation.insert("new", new PositionImpl(0, 12));
         operation.apply(doc);
         assertEquals("this is the new content", doc.getContent());
         operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
-        operation.insert("restored", 15);
+        operation.insert("restored", new PositionImpl(0, 15));
         operation.apply(doc);
         operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
-        operation.delete("new", 12);
+        operation.delete("new", new PositionImpl(0, 12));
         operation.apply(doc);
         assertEquals("this is the restored content", doc.getContent());
     }

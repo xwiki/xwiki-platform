@@ -6,6 +6,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.Operation;
+import org.xwiki.platform.patchservice.api.Position;
 import org.xwiki.platform.patchservice.api.RWOperation;
 
 import com.xpn.xwiki.XWikiException;
@@ -13,9 +14,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class ContentDeleteOperation extends AbstractOperationImpl implements RWOperation
 {
-    public static final String POSITION_ATTRIBUTE_NAME = "position";
-
-    private int position = -1;
+    private Position position = null;
 
     private String removedContent;
 
@@ -36,18 +35,19 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
     {
         try {
             String content = doc.getContent();
-            if (content.indexOf(this.removedContent, this.position) != this.position) {
+            if (!position.checkPosition(content)
+                || !position.getTextAfterPosition(content).startsWith(this.removedContent)) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
                     XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Patch does not fit. Expected ["
-                        + StringUtils.abbreviate(this.removedContent, 20)
-                        + "], but found ["
-                        + StringUtils.abbreviate(StringUtils.mid(content, this.position,
-                            this.removedContent.length()), 20) + "]");
+                        + StringUtils.abbreviate(this.removedContent, 20) + "], but found ["
+                        + StringUtils.abbreviate(position.getTextAfterPosition(content), 20)
+                        + "]");
             }
             content =
-                content.substring(0, position)
-                    + content.substring(position + this.removedContent.length());
+                position.getTextBeforePosition(content)
+                    + position.getTextAfterPosition(content).substring(
+                        this.removedContent.length());
             doc.setContent(content);
         } catch (StringIndexOutOfBoundsException ex) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
@@ -57,7 +57,7 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
         }
     }
 
-    public boolean delete(String text, int position)
+    public boolean delete(String text, Position position)
     {
         this.removedContent = text;
         this.position = position;
@@ -66,9 +66,10 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
 
     public void fromXml(Element e) throws XWikiException
     {
-        Element textNode = (Element) e.getFirstChild();
-        this.position = Integer.parseInt(textNode.getAttribute(POSITION_ATTRIBUTE_NAME));
+        Element textNode = (Element) e.getElementsByTagName(TEXT_NODE_NAME).item(0);
         this.removedContent = StringEscapeUtils.unescapeXml(textNode.getTextContent());
+        this.position = new PositionImpl();
+        position.fromXml((Element) e.getElementsByTagName(PositionImpl.NODE_NAME).item(0));
     }
 
     public Element toXml(Document doc) throws XWikiException
@@ -77,10 +78,10 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
         xmlNode.setAttribute(AbstractOperationImpl.TYPE_ATTRIBUTE_NAME,
             Operation.TYPE_CONTENT_DELETE);
         Element textNode = doc.createElement(TEXT_NODE_NAME);
-        textNode.setAttribute(POSITION_ATTRIBUTE_NAME, this.position + "");
         textNode
             .appendChild(doc.createTextNode(StringEscapeUtils.escapeXml(this.removedContent)));
         xmlNode.appendChild(textNode);
+        xmlNode.appendChild(position.toXml(doc));
         return xmlNode;
     }
 
@@ -88,7 +89,7 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
     {
         try {
             ContentDeleteOperation otherOperation = (ContentDeleteOperation) other;
-            return (otherOperation.position == this.position)
+            return otherOperation.position.equals(this.position)
                 && otherOperation.removedContent.equals(this.removedContent);
         } catch (Exception e) {
             return false;
@@ -103,7 +104,6 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
 
     public String toString()
     {
-        return this.getType() + ": [" + this.removedContent + "] at "
-            + this.position;
+        return this.getType() + ": [" + this.removedContent + "] at " + this.position;
     }
 }

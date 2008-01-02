@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xwiki.platform.patchservice.api.Position;
 import org.xwiki.platform.patchservice.api.RWOperation;
 
 import com.xpn.xwiki.XWikiException;
@@ -34,7 +35,7 @@ public abstract class AbstractOperationImpl implements RWOperation
         return false;
     }
 
-    public boolean delete(String text, int position)
+    public boolean delete(String text, Position position)
     {
         return false;
     }
@@ -44,7 +45,7 @@ public abstract class AbstractOperationImpl implements RWOperation
         return false;
     }
 
-    public boolean deleteFromProperty(String property, String text, int position)
+    public boolean deleteFromProperty(String property, String text, Position position)
     {
         return false;
     }
@@ -59,12 +60,12 @@ public abstract class AbstractOperationImpl implements RWOperation
         return false;
     }
 
-    public boolean insert(String text, int position)
+    public boolean insert(String text, Position position)
     {
         return false;
     }
 
-    public boolean insertInProperty(String property, String text, int position)
+    public boolean insertInProperty(String property, String text, Position position)
     {
         return false;
     }

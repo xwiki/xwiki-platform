@@ -17,9 +17,9 @@ public interface RWOperation extends Operation
      * @param position The position where the text is inserted.
      * @return True if the action was successfully stored in the object, false otherwise.
      */
-    boolean insert(String text, int position);
+    boolean insert(String text, Position position);
 
-    boolean delete(String text, int position);
+    boolean delete(String text, Position position);
 
     /* Operations affeting the document metadata (name, author, language etc. */
     boolean setProperty(String property, String value);
@@ -38,9 +38,9 @@ public interface RWOperation extends Operation
 
     boolean setObjectProperty(String objectClass, String index, String propertyName, String value);
 
-    boolean insertInProperty(String property, String text, int position);
+    boolean insertInProperty(String property, String text, Position position);
 
-    boolean deleteFromProperty(String property, String text, int position);
+    boolean deleteFromProperty(String property, String text, Position position);
 
     /* Operations affeting the attachments */
     boolean setAttachment(InputStream is);

@@ -26,7 +26,7 @@ public class ClassPropertyOperationsTest extends TestCase
     Document domDoc;
 
     XWikiDocument doc;
-    
+
     BaseClass bclass;
 
     protected void setUp()
@@ -96,7 +96,8 @@ public class ClassPropertyOperationsTest extends TestCase
         ((PropertyClass) bclass.get("prop1")).setPrettyName("new Property 1");
         RWOperation operation = getOperation((PropertyClass) bclass.get("prop1"), false);
         operation.apply(doc);
-        assertEquals("new Property 1", ((PropertyClass) doc.getxWikiClass().get("prop1")).getPrettyName());
+        assertEquals("new Property 1", ((PropertyClass) doc.getxWikiClass().get("prop1"))
+            .getPrettyName());
     }
 
     public void testXmlRoundtripPropertySetOperation() throws XWikiException
@@ -108,7 +109,79 @@ public class ClassPropertyOperationsTest extends TestCase
         assertEquals(loadedOperation, operation);
     }
 
-    private RWOperation getOperation(PropertyClass property, boolean create) throws XWikiException
+    public void testApplyPropertyDeleteOperation() throws XWikiException
+    {
+        testApplyPropertyAddOperation();
+        RWOperation operation =
+            OperationFactoryImpl.getInstance().newOperation(
+                RWOperation.TYPE_CLASS_PROPERTY_DELETE);
+        operation.deleteType("prop1");
+        operation.apply(doc);
+        assertEquals(1, doc.getxWikiClass().getProperties().length);
+        assertNull(doc.getxWikiClass().get("prop1"));
+        assertNotNull(doc.getxWikiClass().get("prop2"));
+    }
+
+    public void testApplyInvalidPropertyDeleteOperation() throws XWikiException
+    {
+        RWOperation operation =
+            OperationFactoryImpl.getInstance().newOperation(
+                RWOperation.TYPE_CLASS_PROPERTY_DELETE);
+        operation.deleteType("prop3");
+        try {
+            operation.apply(doc);
+            assertTrue(false);
+        } catch (XWikiException ex) {
+            assertTrue(true);
+        }
+        assertNull(doc.getxWikiClass().get("prop3"));
+    }
+
+    public void testXmlRoundtripPropertyDeleteOperation() throws XWikiException
+    {
+        RWOperation operation =
+            OperationFactoryImpl.getInstance().newOperation(
+                RWOperation.TYPE_CLASS_PROPERTY_DELETE);
+        operation.deleteType("prop1");
+        Element e = operation.toXml(domDoc);
+        Operation loadedOperation = OperationFactoryImpl.getInstance().loadOperation(e);
+        assertEquals(loadedOperation, operation);
+    }
+
+    public void testConsecutiveClassOperations() throws XWikiException
+    {
+        bclass.addTextField("prop1", "Property 1", 30);
+        RWOperation operation = getOperation((PropertyClass) bclass.get("prop1"), true);
+        operation.apply(doc);
+        assertEquals(1, doc.getxWikiClass().getProperties().length);
+        assertNotNull(doc.getxWikiClass().getField("prop1"));
+        assertEquals("prop1", doc.getxWikiClass().get("prop1").getName());
+
+        ((PropertyClass) bclass.get("prop1")).setPrettyName("new Property 1");
+        operation = getOperation((PropertyClass) bclass.get("prop1"), false);
+        operation.apply(doc);
+        assertEquals("new Property 1", ((PropertyClass) doc.getxWikiClass().get("prop1"))
+            .getPrettyName());
+        assertEquals(1, doc.getxWikiClass().getProperties().length);
+
+        bclass.addBooleanField("prop2", "Property 2", "yesno");
+        operation = getOperation((PropertyClass) bclass.get("prop2"), true);
+        operation.apply(doc);
+        assertEquals(2, doc.getxWikiClass().getProperties().length);
+
+        operation =
+            OperationFactoryImpl.getInstance().newOperation(
+                RWOperation.TYPE_CLASS_PROPERTY_DELETE);
+        operation.deleteType("prop1");
+        assertEquals(2, doc.getxWikiClass().getProperties().length);
+        operation.apply(doc);
+        assertEquals(1, doc.getxWikiClass().getProperties().length);
+        assertNotNull(doc.getxWikiClass().getField("prop2"));
+        assertNull(doc.getxWikiClass().getField("prop1"));
+    }
+
+    private RWOperation getOperation(PropertyClass property, boolean create)
+        throws XWikiException
     {
         String type = property.getClass().getCanonicalName();
         Map config = new HashMap();
@@ -117,7 +190,9 @@ public class ClassPropertyOperationsTest extends TestCase
             config.put(pr.getName(), pr.getValue());
         }
         RWOperation operation =
-            OperationFactoryImpl.getInstance().newOperation(create ? RWOperation.TYPE_CLASS_PROPERTY_ADD : RWOperation.TYPE_CLASS_PROPERTY_CHANGE);
+            OperationFactoryImpl.getInstance().newOperation(
+                create ? RWOperation.TYPE_CLASS_PROPERTY_ADD
+                    : RWOperation.TYPE_CLASS_PROPERTY_CHANGE);
         if (create) {
             operation.createType(type, config);
         } else {

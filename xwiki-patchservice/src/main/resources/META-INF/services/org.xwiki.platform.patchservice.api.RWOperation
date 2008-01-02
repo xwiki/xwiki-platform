@@ -2,3 +2,4 @@ org.xwiki.platform.patchservice.impl.ContentInsertOperation
 org.xwiki.platform.patchservice.impl.ContentDeleteOperation
 org.xwiki.platform.patchservice.impl.PropertySetOperation
 org.xwiki.platform.patchservice.impl.ClassPropertySetOperation
+org.xwiki.platform.patchservice.impl.ClassPropertyDeleteOperation

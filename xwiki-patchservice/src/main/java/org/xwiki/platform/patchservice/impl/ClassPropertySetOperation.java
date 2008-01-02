@@ -119,7 +119,8 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
     {
         try {
             ClassPropertySetOperation otherOperation = (ClassPropertySetOperation) other;
-            return (otherOperation.propertyType == this.propertyType)
+            return otherOperation.propertyType.equals(this.propertyType)
+                && (this.getType().equals(otherOperation.getType()))
                 && (this.propertyConfig.values().containsAll(otherOperation.propertyConfig
                     .values()))
                 && (otherOperation.propertyConfig.values().containsAll(this.propertyConfig

@@ -1,11 +1,6 @@
 package org.xwiki.platform.patchservice.api;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.xpn.xwiki.XWikiException;
-
-public interface Position
+public interface Position extends XmlSerializable
 {
     /**
      * Checks if the position is still valid for the given text.
@@ -34,24 +29,4 @@ public interface Position
      *         valid.
      */
     String getTextAfterPosition(String text);
-
-    /**
-     * Serialize this position as a DOM Element that can be inserted in the given DOM Document.
-     * 
-     * @param doc A DOM Document used for generating a compatible Element. The document is not
-     *            changed, as the constructed Element is just returned, not inserted in the
-     *            document.
-     * @return The operation exported as a DOM Element.
-     * @throws XWikiException If the Operation is not well defined.
-     */
-    Element toXml(Document doc) throws XWikiException;
-
-    /**
-     * Load the operation from an XML.
-     * 
-     * @param e A DOM Element defining the Operation.
-     * @throws XWikiException If the provided element is not a valid (or compatible) exported
-     *             Operation.
-     */
-    void fromXml(Element e) throws XWikiException;
 }

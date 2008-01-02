@@ -2,13 +2,12 @@ package org.xwiki.platform.patchservice.api;
 
 import java.util.List;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public interface Patch
+public interface Patch extends XmlSerializable
 {
     String getSpecVersion();
 
@@ -32,10 +31,6 @@ public interface Patch
     //
     // boolean checkSignature();
     Element toXml() throws XWikiException;
-
-    Element toXml(Document doc) throws XWikiException;
-
-    void fromXml(Element e) throws XWikiException;
 
     /**
      * Apply this patch on a document.

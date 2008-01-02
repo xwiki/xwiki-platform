@@ -1,8 +1,5 @@
 package org.xwiki.platform.patchservice.api;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -32,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @see RWOperation
  * @version $Id: $
  */
-public interface Operation
+public interface Operation extends XmlSerializable
 {
     /* Operation type flags */
     /**
@@ -118,26 +115,6 @@ public interface Operation
     String getType();
 
     /* Actions */
-    /**
-     * Serialize this operation as a DOM Element that can be inserted in the given DOM Document.
-     * 
-     * @param doc A DOM Document used for generating a compatible Element. The document is not
-     *            changed, as the constructed Element is just returned, not inserted in the
-     *            document.
-     * @return The operation exported as a DOM Element.
-     * @throws XWikiException If the Operation is not well defined.
-     */
-    Element toXml(Document doc) throws XWikiException;
-
-    /**
-     * Load the operation from an XML.
-     * 
-     * @param e A DOM Element defining the Operation.
-     * @throws XWikiException If the provided element is not a valid (or compatible) exported
-     *             Operation.
-     */
-    void fromXml(Element e) throws XWikiException;
-
     /**
      * Apply this operation on a document.
      * 

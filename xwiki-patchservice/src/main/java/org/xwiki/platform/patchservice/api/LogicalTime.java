@@ -1,13 +1,12 @@
 package org.xwiki.platform.patchservice.api;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
-import com.xpn.xwiki.XWikiException;
-
-public interface LogicalTime extends Comparable
+/**
+ * A logical time represents a kind of timestamp that can be used in a p2p environment, where a
+ * simple host time isn't enough for event ordering. The actual implementation is hidden, as all we
+ * need to do is compare two logical timestamps.
+ * 
+ * @version $Id: $
+ */
+public interface LogicalTime extends Comparable, XmlSerializable
 {
-    Element toXml(Document doc) throws XWikiException;
-
-    void fromXml(Element e) throws XWikiException;
 }

@@ -2,20 +2,14 @@ package org.xwiki.platform.patchservice.api;
 
 import java.util.List;
 
-import org.w3c.dom.Element;
-
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public interface PatchSet
+public interface PatchSet extends XmlSerializable
 {
     List getVersionRange();
 
     List getPatches();
-
-    Element toXml() throws XWikiException;
-
-    void fromXml(Element e) throws XWikiException;
 
     /**
      * Apply this patch set on a document.

@@ -31,10 +31,10 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
     private Map propertyConfig;
 
     static {
-        OperationFactoryImpl.registerTypeProvider(
-            Operation.TYPE_CLASS_PROPERTY_ADD, ClassPropertySetOperation.class);
-        OperationFactoryImpl.registerTypeProvider(
-            Operation.TYPE_CLASS_PROPERTY_CHANGE, ClassPropertySetOperation.class);
+        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CLASS_PROPERTY_ADD,
+            ClassPropertySetOperation.class);
+        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CLASS_PROPERTY_CHANGE,
+            ClassPropertySetOperation.class);
     }
 
     public ClassPropertySetOperation()

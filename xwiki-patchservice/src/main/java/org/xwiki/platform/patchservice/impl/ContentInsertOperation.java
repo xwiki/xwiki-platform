@@ -22,7 +22,7 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
         OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CONTENT_INSERT,
             ContentInsertOperation.class);
     }
-    
+
     public ContentInsertOperation()
     {
         this.setType(Operation.TYPE_CONTENT_INSERT);
@@ -88,6 +88,7 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
 
     public String toString()
     {
-        return Operation.TYPE_CONTENT_INSERT + ": [" + this.addedContent + "] at " + this.position;
+        return Operation.TYPE_CONTENT_INSERT + ": [" + this.addedContent + "] at "
+            + this.position;
     }
 }

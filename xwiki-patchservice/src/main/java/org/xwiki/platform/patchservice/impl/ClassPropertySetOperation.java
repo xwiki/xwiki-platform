@@ -63,6 +63,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean createType(String propertyType, Map properties)
     {
         this.propertyType = propertyType;
@@ -75,6 +78,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean modifyType(String propertyType, Map properties)
     {
         this.propertyType = propertyType;
@@ -83,6 +89,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         this.setType(e.getAttribute(TYPE_ATTRIBUTE_NAME));
@@ -97,6 +106,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
@@ -115,6 +127,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         return xmlNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean equals(Object other)
     {
         try {
@@ -134,6 +149,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode()
     {
         // return new HashCodeBuilder(11, 13).append(this.propertyType).append(this.propertyConfig)
@@ -144,6 +162,9 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         return i;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         return this.getType() + ": [" + this.propertyType + "] = " + this.propertyConfig;

@@ -7,6 +7,7 @@ import com.xpn.xwiki.web.XWikiAction;
 public class PatchServiceAction extends XWikiAction
 {
     /**
+     * {@inheritDoc}
      * @todo Write me!
      */
     public boolean action(XWikiContext context) throws XWikiException

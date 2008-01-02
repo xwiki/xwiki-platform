@@ -19,17 +19,26 @@ public class LogicalTimeImpl implements LogicalTime
         fromXml(e);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(NODE_NAME);
         return xmlNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int compareTo(Object other)
     {
         if (!(other instanceof LogicalTimeImpl))

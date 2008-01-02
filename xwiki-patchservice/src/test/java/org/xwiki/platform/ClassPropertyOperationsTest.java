@@ -47,7 +47,7 @@ public class ClassPropertyOperationsTest extends TestCase
         bclass.addTextField("prop1", "Property 1", 30);
         bclass.addBooleanField("prop2", "Property 2", "yesno");
         for (Iterator it = bclass.getFieldList().iterator(); it.hasNext();) {
-            RWOperation operation = getOperation((PropertyClass) it.next());
+            RWOperation operation = getOperation((PropertyClass) it.next(), true);
             operation.apply(doc);
         }
         assertEquals(2, doc.getxWikiClass().getProperties().length);
@@ -60,7 +60,7 @@ public class ClassPropertyOperationsTest extends TestCase
     public void testApplyTwicePropertyAddOperation() throws XWikiException
     {
         bclass.addTextField("prop1", "Property 1", 30);
-        RWOperation operation = getOperation((PropertyClass) bclass.getProperties()[0]);
+        RWOperation operation = getOperation((PropertyClass) bclass.getProperties()[0], true);
         operation.apply(doc);
         operation.apply(doc);
         assertEquals(1, doc.getxWikiClass().getProperties().length);
@@ -84,13 +84,31 @@ public class ClassPropertyOperationsTest extends TestCase
     public void testXmlRoundtripPropertyAddOperation() throws XWikiException
     {
         bclass.addTextField("prop1", "Property 1", 30);
-        RWOperation operation = getOperation((PropertyClass) bclass.getProperties()[0]);
+        RWOperation operation = getOperation((PropertyClass) bclass.getProperties()[0], true);
         Element e = operation.toXml(domDoc);
         Operation loadedOperation = OperationFactoryImpl.getInstance().loadOperation(e);
         assertEquals(loadedOperation, operation);
     }
 
-    private RWOperation getOperation(PropertyClass property) throws XWikiException
+    public void testApplyPropertySetOperation() throws XWikiException
+    {
+        testApplyPropertyAddOperation();
+        ((PropertyClass) bclass.get("prop1")).setPrettyName("new Property 1");
+        RWOperation operation = getOperation((PropertyClass) bclass.get("prop1"), false);
+        operation.apply(doc);
+        assertEquals("new Property 1", ((PropertyClass) doc.getxWikiClass().get("prop1")).getPrettyName());
+    }
+
+    public void testXmlRoundtripPropertySetOperation() throws XWikiException
+    {
+        bclass.addTextField("prop1", "Property 1", 30);
+        RWOperation operation = getOperation((PropertyClass) bclass.getProperties()[0], true);
+        Element e = operation.toXml(domDoc);
+        Operation loadedOperation = OperationFactoryImpl.getInstance().loadOperation(e);
+        assertEquals(loadedOperation, operation);
+    }
+
+    private RWOperation getOperation(PropertyClass property, boolean create) throws XWikiException
     {
         String type = property.getClass().getCanonicalName();
         Map config = new HashMap();
@@ -99,8 +117,12 @@ public class ClassPropertyOperationsTest extends TestCase
             config.put(pr.getName(), pr.getValue());
         }
         RWOperation operation =
-            OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CLASS_PROPERTY_ADD);
-        operation.createType(type, config);
+            OperationFactoryImpl.getInstance().newOperation(create ? RWOperation.TYPE_CLASS_PROPERTY_ADD : RWOperation.TYPE_CLASS_PROPERTY_CHANGE);
+        if (create) {
+            operation.createType(type, config);
+        } else {
+            operation.modifyType(type, config);
+        }
         return operation;
     }
 }

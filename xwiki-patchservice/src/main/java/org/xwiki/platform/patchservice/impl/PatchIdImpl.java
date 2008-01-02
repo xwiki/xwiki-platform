@@ -32,26 +32,41 @@ public class PatchIdImpl implements RWPatchId
 
     private LogicalTime logicalTime;
 
+    /**
+     * {@inheritDoc}
+     */
     public void setDocumentId(String documentId)
     {
         this.documentId = documentId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setHostId(String hostId)
     {
         this.hostId = hostId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setLogicalTime(LogicalTime logicalTime)
     {
         this.logicalTime = logicalTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setTime(Date time)
     {
         this.time = time;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         try {
@@ -70,26 +85,41 @@ public class PatchIdImpl implements RWPatchId
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getDocumentId()
     {
         return this.documentId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getHostId()
     {
         return this.hostId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public LogicalTime getLogicalTime()
     {
         return this.logicalTime;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Date getTime()
     {
         return this.time;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(NODE_NAME);

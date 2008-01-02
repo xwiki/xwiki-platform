@@ -14,7 +14,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class ContentDeleteOperation extends AbstractOperationImpl implements RWOperation
 {
-    private Position position = null;
+    private Position position;
 
     private String removedContent;
 
@@ -57,6 +57,9 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean delete(String text, Position position)
     {
         this.removedContent = text;
@@ -64,6 +67,9 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         Element textNode = (Element) e.getElementsByTagName(TEXT_NODE_NAME).item(0);
@@ -72,6 +78,9 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
         position.fromXml((Element) e.getElementsByTagName(PositionImpl.NODE_NAME).item(0));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
@@ -85,6 +94,9 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
         return xmlNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean equals(Object other)
     {
         try {
@@ -96,12 +108,18 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode()
     {
         return new HashCodeBuilder(5, 7).append(this.position).append(this.removedContent)
             .toHashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         return this.getType() + ": [" + this.removedContent + "] at " + this.position;

@@ -13,7 +13,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public class ContentInsertOperation extends AbstractOperationImpl implements RWOperation
 {
-    private Position position = null;
+    private Position position;
 
     private String addedContent;
 
@@ -27,6 +27,9 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
         this.setType(Operation.TYPE_CONTENT_INSERT);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void apply(XWikiDocument doc) throws XWikiException
     {
         String content = doc.getContent();
@@ -41,6 +44,9 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
         doc.setContent(content);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean insert(String text, Position position)
     {
         this.addedContent = text;
@@ -48,6 +54,9 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         Element textNode = (Element) e.getElementsByTagName(TEXT_NODE_NAME).item(0);
@@ -56,6 +65,9 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
         position.fromXml((Element) e.getElementsByTagName(PositionImpl.NODE_NAME).item(0));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
@@ -67,6 +79,9 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
         return xmlNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean equals(Object other)
     {
         try {
@@ -78,12 +93,18 @@ public class ContentInsertOperation extends AbstractOperationImpl implements RWO
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode()
     {
         return new HashCodeBuilder(3, 5).append(this.position).append(this.addedContent)
             .toHashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         return this.getType() + ": [" + this.addedContent + "] at " + this.position;

@@ -1,12 +1,13 @@
 package org.xwiki.platform.patchservice.api;
 
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Map;
 
 /**
  * A read-write operation, or one that can be defined using method calls. The 
+ *  
  * @see Operation
+ * @version $Id: $
  */
 public interface RWOperation extends Operation
 {
@@ -48,7 +49,5 @@ public interface RWOperation extends Operation
     boolean deleteAttachment(String name);
 
     /* Operation metadata */
-    void setTime(Date time);
-
     void setType(String type);
 }

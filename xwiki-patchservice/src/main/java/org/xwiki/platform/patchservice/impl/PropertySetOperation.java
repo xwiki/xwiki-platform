@@ -47,6 +47,9 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean setProperty(String property, String value)
     {
         this.propertyName = property;
@@ -54,6 +57,9 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         Element textNode = (Element) e.getFirstChild();
@@ -63,6 +69,9 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
             StringEscapeUtils.unescapeXml(textNode.getAttribute(VALUE_ATTRIBUTE_NAME));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
@@ -77,6 +86,9 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
         return xmlNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean equals(Object other)
     {
         try {
@@ -88,12 +100,18 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode()
     {
         return new HashCodeBuilder(7, 11).append(this.propertyName).append(this.propertyValue)
             .toHashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         return this.getType() + ": [" + this.propertyName + "] to [" + this.propertyValue + "]";

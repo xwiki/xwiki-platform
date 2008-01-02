@@ -24,9 +24,9 @@ public class PositionImpl implements Position
 
     public static final String AFTER_ATTRIBUTE_NAME = "after";
 
-    private String before = null;
+    private String before;
 
-    private String after = null;
+    private String after;
 
     private int row = -1;
 
@@ -62,6 +62,9 @@ public class PositionImpl implements Position
         this.after = after;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean checkPosition(String text)
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, '\n');
@@ -74,6 +77,9 @@ public class PositionImpl implements Position
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getTextBeforePosition(String text)
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, '\n');
@@ -81,6 +87,9 @@ public class PositionImpl implements Position
             + StringUtils.substring(rows[row], 0, column);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String getTextAfterPosition(String text)
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, '\n');
@@ -90,6 +99,9 @@ public class PositionImpl implements Position
         return (span <= 0) ? textAfter : textAfter.substring(span);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         this.row = Integer.parseInt(e.getAttribute(ROW_ATTRIBUTE_NAME));
@@ -102,6 +114,9 @@ public class PositionImpl implements Position
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(NODE_NAME);
@@ -116,6 +131,9 @@ public class PositionImpl implements Position
         return xmlNode;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public boolean equals(Object other)
     {
         try {
@@ -131,6 +149,9 @@ public class PositionImpl implements Position
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public int hashCode()
     {
         return new HashCodeBuilder(5, 47).append(this.row).append(this.column).append(
@@ -138,6 +159,9 @@ public class PositionImpl implements Position
             .toHashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public String toString()
     {
         return "@" + this.row + "," + this.column + ": << [" + this.before + "] >> ["

@@ -9,27 +9,70 @@ import com.xpn.xwiki.XWikiException;
 public class OriginatorImpl implements RWOriginator
 {
     public static final String NODE_NAME = "originator";
+
     public static final String AUTHOR_ATTRIBUTE_NAME = "author";
+
     public static final String HOST_ATTRIBUTE_NAME = "host";
+
     public static final String WIKI_ATTRIBUTE_NAME = "wiki";
+
     private String author;
+
     private String hostId;
+
     private String wikiId;
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getAuthor()
+    {
+        return this.author;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void setAuthor(String author)
     {
         this.author = author;
     }
 
-    public void setHostId(String hostId)
+    /**
+     * {@inheritDoc}
+     */
+    public String getWikiId()
     {
-        this.hostId = hostId;
+        return this.wikiId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setWikiId(String wikiId)
     {
         this.wikiId = wikiId;
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    public String getHostId()
+    {
+        return this.hostId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setHostId(String hostId)
+    {
+        this.hostId = hostId;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void fromXml(Element e) throws XWikiException
     {
         this.author = e.getAttribute(AUTHOR_ATTRIBUTE_NAME);
@@ -37,21 +80,9 @@ public class OriginatorImpl implements RWOriginator
         this.wikiId = e.getAttribute(WIKI_ATTRIBUTE_NAME);
     }
 
-    public String getAuthor()
-    {
-        return this.author;
-    }
-
-    public String getHostId()
-    {
-        return this.hostId;
-    }
-
-    public String getWikiId()
-    {
-        return this.wikiId;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(NODE_NAME);

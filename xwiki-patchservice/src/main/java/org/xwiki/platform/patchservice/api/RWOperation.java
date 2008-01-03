@@ -4,8 +4,8 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * A read-write operation, or one that can be defined using method calls. The 
- *  
+ * A read-write operation, or one that can be defined using method calls. The
+ * 
  * @see Operation
  * @version $Id: $
  */
@@ -14,6 +14,7 @@ public interface RWOperation extends Operation
     /* Operations affeting the content of the document */
     /**
      * Record a text insert operation in the document content.
+     * 
      * @param text The text being inserted.
      * @param position The position where the text is inserted.
      * @return True if the action was successfully stored in the object, false otherwise.
@@ -26,22 +27,24 @@ public interface RWOperation extends Operation
     boolean setProperty(String property, String value);
 
     /* Operations affeting the XObjectDefinition stored in a document */
-    boolean createType(String propertyType, Map properties);
+    boolean createType(String className, String propertyName, String propertyType, Map properties);
 
-    boolean modifyType(String propertyName, Map properties);
+    boolean modifyType(String className, String propertyName, Map properties);
 
-    boolean deleteType(String propertyName);
+    boolean deleteType(String className, String propertyName);
 
     /* Operations affeting the document's objects */
     boolean addObject(String objectClass);
 
     boolean deleteObject(String objectClass, int index);
 
-    boolean setObjectProperty(String objectClass, String index, String propertyName, String value);
+    boolean setObjectProperty(String objectClass, int index, String propertyName, String value);
 
-    boolean insertInProperty(String property, String text, Position position);
+    boolean insertInProperty(String objectClass, int index, String property, String text,
+        Position position);
 
-    boolean deleteFromProperty(String property, String text, Position position);
+    boolean deleteFromProperty(String objectClass, int index, String property, String text,
+        Position position);
 
     /* Operations affeting the attachments */
     boolean setAttachment(InputStream is);

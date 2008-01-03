@@ -1,7 +1,6 @@
 package org.xwiki.platform.patchservice.impl;
 
 import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.w3c.dom.Document;
@@ -23,6 +22,8 @@ public class PositionImpl implements Position
     public static final String BEFORE_ATTRIBUTE_NAME = "before";
 
     public static final String AFTER_ATTRIBUTE_NAME = "after";
+    
+    private static final String SEPARATOR = "\n";
 
     private String before;
 
@@ -36,6 +37,7 @@ public class PositionImpl implements Position
 
     public PositionImpl()
     {
+        this(0, 0, -1, null, null);
     }
 
     public PositionImpl(int row, int column)
@@ -67,14 +69,13 @@ public class PositionImpl implements Position
      */
     public boolean checkPosition(String text)
     {
-        String[] rows = StringUtils.splitPreserveAllTokens(text, '\n');
-        if (rows.length > row && rows[row].length() > column) {
-            if ((StringUtils.isEmpty(before) || getTextBeforePosition(text).endsWith(before))
-                && (StringUtils.isEmpty(after) || getTextAfterPosition(text).startsWith(after))) {
-                return true;
-            }
+        String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
+        if (rows != null && rows.length > row && rows[row].length() >= column) {
+            return (StringUtils.isEmpty(before) || getTextBeforePosition(text).endsWith(before))
+                && (StringUtils.isEmpty(after) || getTextAfterPosition(text).startsWith(after));
         }
-        return false;
+        return row == 0 && column == 0 && StringUtils.isEmpty(before)
+            && StringUtils.isEmpty(after);
     }
 
     /**
@@ -82,9 +83,12 @@ public class PositionImpl implements Position
      */
     public String getTextBeforePosition(String text)
     {
-        String[] rows = StringUtils.splitPreserveAllTokens(text, '\n');
-        return StringUtils.join(ArrayUtils.subarray(rows, 0, row), '\n')
-            + StringUtils.substring(rows[row], 0, column);
+        String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
+        if (ArrayUtils.getLength(rows) <= row) {
+            return StringUtils.defaultString(StringUtils.join(rows, SEPARATOR));
+        }
+        return StringUtils.join(ArrayUtils.subarray(rows, 0, row), SEPARATOR)
+            + ((row > 0) ? SEPARATOR : "") + StringUtils.substring(rows[row], 0, column);
     }
 
     /**
@@ -92,11 +96,14 @@ public class PositionImpl implements Position
      */
     public String getTextAfterPosition(String text)
     {
-        String[] rows = StringUtils.splitPreserveAllTokens(text, '\n');
+        String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
+        if (ArrayUtils.getLength(rows) <= row) {
+            return "";
+        }
         String textAfter =
-            StringUtils.substring(rows[row], column)
-                + StringUtils.join(ArrayUtils.subarray(rows, row + 1, rows.length), '\n');
-        return (span <= 0) ? textAfter : textAfter.substring(span);
+            StringUtils.substring(rows[row], column) + ((row + 1 < rows.length) ? SEPARATOR : "")
+                + StringUtils.join(ArrayUtils.subarray(rows, row + 1, rows.length), SEPARATOR);
+        return (span <= 0) ? textAfter : StringUtils.substring(textAfter, span);
     }
 
     /**
@@ -107,10 +114,13 @@ public class PositionImpl implements Position
         this.row = Integer.parseInt(e.getAttribute(ROW_ATTRIBUTE_NAME));
         this.column = Integer.parseInt(e.getAttribute(COLUMN_ATTRIBUTE_NAME));
         if (e.hasAttribute(BEFORE_ATTRIBUTE_NAME)) {
-            this.before = StringEscapeUtils.unescapeXml(e.getAttribute(BEFORE_ATTRIBUTE_NAME));
+            this.before = e.getAttribute(BEFORE_ATTRIBUTE_NAME);
         }
         if (e.hasAttribute(AFTER_ATTRIBUTE_NAME)) {
-            this.after = StringEscapeUtils.unescapeXml(e.getAttribute(AFTER_ATTRIBUTE_NAME));
+            this.after = e.getAttribute(AFTER_ATTRIBUTE_NAME);
+        }
+        if (e.hasAttribute(SPAN_ATTRIBUTE_NAME)) {
+            this.span = Integer.parseInt(e.getAttribute(SPAN_ATTRIBUTE_NAME));
         }
     }
 
@@ -123,10 +133,13 @@ public class PositionImpl implements Position
         xmlNode.setAttribute(ROW_ATTRIBUTE_NAME, row + "");
         xmlNode.setAttribute(COLUMN_ATTRIBUTE_NAME, column + "");
         if (!StringUtils.isEmpty(before)) {
-            xmlNode.setAttribute(BEFORE_ATTRIBUTE_NAME, StringEscapeUtils.escapeXml(before));
+            xmlNode.setAttribute(BEFORE_ATTRIBUTE_NAME, before);
         }
         if (!StringUtils.isEmpty(after)) {
-            xmlNode.setAttribute(AFTER_ATTRIBUTE_NAME, StringEscapeUtils.escapeXml(after));
+            xmlNode.setAttribute(AFTER_ATTRIBUTE_NAME, after);
+        }
+        if (span >= 0) {
+            xmlNode.setAttribute(SPAN_ATTRIBUTE_NAME, span + "");
         }
         return xmlNode;
     }
@@ -137,13 +150,13 @@ public class PositionImpl implements Position
     public boolean equals(Object other)
     {
         try {
-            PositionImpl otherPosition = (PositionImpl) other;
-            return (otherPosition.row == this.row)
-                && otherPosition.column == this.column
-                && StringUtils.defaultString(otherPosition.before).equals(
+            PositionImpl that = (PositionImpl) other;
+            return (that.row == this.row)
+                && that.column == this.column
+                && StringUtils.defaultString(that.before).equals(
                     StringUtils.defaultString(before))
-                && StringUtils.defaultString(otherPosition.after).equals(
-                    StringUtils.defaultString(after));
+                && StringUtils.defaultString(that.after).equals(StringUtils.defaultString(after))
+                && (that.span == this.span);
         } catch (Exception e) {
             return false;
         }

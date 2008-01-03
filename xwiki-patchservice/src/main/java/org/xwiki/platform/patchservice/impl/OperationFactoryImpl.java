@@ -64,7 +64,7 @@ public final class OperationFactoryImpl implements OperationFactory
 
     public Operation loadOperation(Element e) throws XWikiException
     {
-        String type = e.getAttribute(AbstractOperationImpl.TYPE_ATTRIBUTE_NAME);
+        String type = e.getAttribute(AbstractOperationImpl.OPERATION_TYPE_ATTRIBUTE_NAME);
         Operation op = newOperation(type);
         op.fromXml(e);
         return op;

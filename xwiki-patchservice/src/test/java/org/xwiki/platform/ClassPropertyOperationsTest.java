@@ -15,6 +15,7 @@ import org.xwiki.platform.patchservice.api.Operation;
 import org.xwiki.platform.patchservice.api.RWOperation;
 import org.xwiki.platform.patchservice.impl.OperationFactoryImpl;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -29,6 +30,8 @@ public class ClassPropertyOperationsTest extends TestCase
 
     BaseClass bclass;
 
+    XWikiContext context;
+
     protected void setUp()
     {
         try {
@@ -37,6 +40,7 @@ public class ClassPropertyOperationsTest extends TestCase
             doc.setFullName("XWiki.XWikiTestClass");
             bclass = new BaseClass();
             bclass.setName("XWiki.XWikiTestClass");
+            context = new XWikiContext();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -48,7 +52,7 @@ public class ClassPropertyOperationsTest extends TestCase
         bclass.addBooleanField("prop2", "Property 2", "yesno");
         for (Iterator it = bclass.getFieldList().iterator(); it.hasNext();) {
             RWOperation operation = getOperation((PropertyClass) it.next(), true);
-            operation.apply(doc);
+            operation.apply(doc, context);
         }
         assertEquals(2, doc.getxWikiClass().getProperties().length);
         assertNotNull(doc.getxWikiClass().getField("prop1"));
@@ -61,8 +65,8 @@ public class ClassPropertyOperationsTest extends TestCase
     {
         bclass.addTextField("prop1", "Property 1", 30);
         RWOperation operation = getOperation((PropertyClass) bclass.getProperties()[0], true);
-        operation.apply(doc);
-        operation.apply(doc);
+        operation.apply(doc, context);
+        operation.apply(doc, context);
         assertEquals(1, doc.getxWikiClass().getProperties().length);
         assertEquals("prop1", doc.getxWikiClass().get("prop1").getName());
     }
@@ -71,9 +75,9 @@ public class ClassPropertyOperationsTest extends TestCase
     {
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CLASS_PROPERTY_ADD);
-        operation.createType("invalid", new HashMap());
+        operation.createType(doc.getFullName(), "invalid", "invalid", new HashMap());
         try {
-            operation.apply(doc);
+            operation.apply(doc, context);
             assertTrue(false);
         } catch (XWikiException ex) {
             assertTrue(true);
@@ -95,7 +99,7 @@ public class ClassPropertyOperationsTest extends TestCase
         testApplyPropertyAddOperation();
         ((PropertyClass) bclass.get("prop1")).setPrettyName("new Property 1");
         RWOperation operation = getOperation((PropertyClass) bclass.get("prop1"), false);
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals("new Property 1", ((PropertyClass) doc.getxWikiClass().get("prop1"))
             .getPrettyName());
     }
@@ -115,8 +119,8 @@ public class ClassPropertyOperationsTest extends TestCase
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(
                 RWOperation.TYPE_CLASS_PROPERTY_DELETE);
-        operation.deleteType("prop1");
-        operation.apply(doc);
+        operation.deleteType(doc.getFullName(), "prop1");
+        operation.apply(doc, context);
         assertEquals(1, doc.getxWikiClass().getProperties().length);
         assertNull(doc.getxWikiClass().get("prop1"));
         assertNotNull(doc.getxWikiClass().get("prop2"));
@@ -127,9 +131,9 @@ public class ClassPropertyOperationsTest extends TestCase
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(
                 RWOperation.TYPE_CLASS_PROPERTY_DELETE);
-        operation.deleteType("prop3");
+        operation.deleteType(doc.getFullName(), "prop3");
         try {
-            operation.apply(doc);
+            operation.apply(doc, context);
             assertTrue(false);
         } catch (XWikiException ex) {
             assertTrue(true);
@@ -142,7 +146,7 @@ public class ClassPropertyOperationsTest extends TestCase
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(
                 RWOperation.TYPE_CLASS_PROPERTY_DELETE);
-        operation.deleteType("prop1");
+        operation.deleteType(doc.getFullName(), "prop1");
         Element e = operation.toXml(domDoc);
         Operation loadedOperation = OperationFactoryImpl.getInstance().loadOperation(e);
         assertEquals(loadedOperation, operation);
@@ -152,29 +156,29 @@ public class ClassPropertyOperationsTest extends TestCase
     {
         bclass.addTextField("prop1", "Property 1", 30);
         RWOperation operation = getOperation((PropertyClass) bclass.get("prop1"), true);
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals(1, doc.getxWikiClass().getProperties().length);
         assertNotNull(doc.getxWikiClass().getField("prop1"));
         assertEquals("prop1", doc.getxWikiClass().get("prop1").getName());
 
         ((PropertyClass) bclass.get("prop1")).setPrettyName("new Property 1");
         operation = getOperation((PropertyClass) bclass.get("prop1"), false);
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals("new Property 1", ((PropertyClass) doc.getxWikiClass().get("prop1"))
             .getPrettyName());
         assertEquals(1, doc.getxWikiClass().getProperties().length);
 
         bclass.addBooleanField("prop2", "Property 2", "yesno");
         operation = getOperation((PropertyClass) bclass.get("prop2"), true);
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals(2, doc.getxWikiClass().getProperties().length);
 
         operation =
             OperationFactoryImpl.getInstance().newOperation(
                 RWOperation.TYPE_CLASS_PROPERTY_DELETE);
-        operation.deleteType("prop1");
+        operation.deleteType(doc.getFullName(), "prop1");
         assertEquals(2, doc.getxWikiClass().getProperties().length);
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals(1, doc.getxWikiClass().getProperties().length);
         assertNotNull(doc.getxWikiClass().getField("prop2"));
         assertNull(doc.getxWikiClass().getField("prop1"));
@@ -194,9 +198,9 @@ public class ClassPropertyOperationsTest extends TestCase
                 create ? RWOperation.TYPE_CLASS_PROPERTY_ADD
                     : RWOperation.TYPE_CLASS_PROPERTY_CHANGE);
         if (create) {
-            operation.createType(type, config);
+            operation.createType(doc.getFullName(), property.getName(), type, config);
         } else {
-            operation.modifyType(type, config);
+            operation.modifyType(doc.getFullName(), property.getName(), config);
         }
         return operation;
     }

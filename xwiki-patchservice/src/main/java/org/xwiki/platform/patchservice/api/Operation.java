@@ -1,5 +1,6 @@
 package org.xwiki.platform.patchservice.api;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -50,17 +51,17 @@ public interface Operation extends XmlSerializable
     /**
      * Operation affecting the contained Class: Add a new property definition.
      */
-    String TYPE_CLASS_PROPERTY_ADD = "class-prop-add";
+    String TYPE_CLASS_PROPERTY_ADD = "class-property-add";
 
     /**
      * Operation affecting the contained Class: Change a property definition.
      */
-    String TYPE_CLASS_PROPERTY_CHANGE = "class-prop-change";
+    String TYPE_CLASS_PROPERTY_CHANGE = "class-property-change";
 
     /**
      * Operation affecting the contained Class: Delete a property definition.
      */
-    String TYPE_CLASS_PROPERTY_DELETE = "class-prop-delete";
+    String TYPE_CLASS_PROPERTY_DELETE = "class-property-delete";
 
     /**
      * Operation affecting an attached object: Add a new object.
@@ -70,24 +71,24 @@ public interface Operation extends XmlSerializable
     /**
      * Operation affecting an attached object: Delete an existing object.
      */
-    String TYPE_DBJECT_DELETE = "object-delete";
+    String TYPE_OBJECT_DELETE = "object-delete";
 
     /**
      * Operation affecting an attached object: Change the value for an object property.
      */
-    String TYPE_OBJECT_PROPERTY_SET = "object-prop-set";
+    String TYPE_OBJECT_PROPERTY_SET = "object-property-set";
 
     /**
      * Operation affecting an attached object: Insert some text at a certain position inside a
      * multiline object property.
      */
-    String TYPE_OBJECT_PROPERTY_INSERT_AT = "object-prop-textinsert";
+    String TYPE_OBJECT_PROPERTY_INSERT_AT = "object-property-textinsert";
 
     /**
      * Operation affecting an attached object: Delete some text from a certain position from inside
      * a multiline object property.
      */
-    String TYPE_OBJECT_PROPERTY_DELETE_AT = "object-prop-textdelete";
+    String TYPE_OBJECT_PROPERTY_DELETE_AT = "object-property-textdelete";
 
     /**
      * Operation affecting the document attachments: Add a new attachment.
@@ -123,5 +124,5 @@ public interface Operation extends XmlSerializable
      *             well defined, or is not compatible with the document version (a conflict was
      *             detected).
      */
-    void apply(XWikiDocument doc) throws XWikiException;
+    void apply(XWikiDocument doc, XWikiContext context) throws XWikiException;
 }

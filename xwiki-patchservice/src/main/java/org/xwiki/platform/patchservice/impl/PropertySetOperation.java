@@ -1,6 +1,5 @@
 package org.xwiki.platform.patchservice.impl;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.w3c.dom.Document;
@@ -8,15 +7,12 @@ import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.Operation;
 import org.xwiki.platform.patchservice.api.RWOperation;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 public class PropertySetOperation extends AbstractOperationImpl implements RWOperation
 {
-    public static final String NAME_ATTRIBUTE_NAME = "name";
-
-    public static final String VALUE_ATTRIBUTE_NAME = "value";
-
     private String propertyName;
 
     private String propertyValue;
@@ -34,7 +30,7 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
     /**
      * {@inheritDoc}
      */
-    public void apply(XWikiDocument doc) throws XWikiException
+    public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         try {
             doc.getClass().getMethod("set" + StringUtils.capitalize(propertyName),
@@ -62,11 +58,8 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
      */
     public void fromXml(Element e) throws XWikiException
     {
-        Element textNode = (Element) e.getFirstChild();
-        this.propertyName =
-            StringEscapeUtils.unescapeXml(textNode.getAttribute(NAME_ATTRIBUTE_NAME));
-        this.propertyValue =
-            StringEscapeUtils.unescapeXml(textNode.getAttribute(VALUE_ATTRIBUTE_NAME));
+        this.propertyName = getPropertyName(e);
+        this.propertyValue = getTextValue(e);
     }
 
     /**
@@ -74,15 +67,9 @@ public class PropertySetOperation extends AbstractOperationImpl implements RWOpe
      */
     public Element toXml(Document doc) throws XWikiException
     {
-        Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
-        xmlNode.setAttribute(AbstractOperationImpl.TYPE_ATTRIBUTE_NAME,
-            Operation.TYPE_PROPERTY_SET);
-        Element propertyNode = doc.createElement(PROPERTY_NODE_NAME);
-        propertyNode.setAttribute(NAME_ATTRIBUTE_NAME, StringEscapeUtils
-            .escapeXml(this.propertyName));
-        propertyNode.setAttribute(VALUE_ATTRIBUTE_NAME, StringEscapeUtils
-            .escapeXml(this.propertyValue));
-        xmlNode.appendChild(propertyNode);
+        Element xmlNode = createOperationNode(doc);
+        xmlNode.appendChild(createPropertyNode(propertyName, doc));
+        xmlNode.appendChild(createTextNode(propertyValue, doc));
         return xmlNode;
     }
 

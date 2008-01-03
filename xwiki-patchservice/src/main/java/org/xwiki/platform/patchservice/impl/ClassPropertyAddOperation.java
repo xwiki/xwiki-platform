@@ -16,23 +16,27 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
-public class ClassPropertySetOperation extends AbstractOperationImpl implements RWOperation
+public class ClassPropertyAddOperation extends AbstractOperationImpl implements RWOperation
 {
     private String propertyName;
+
+    private String propertyType;
 
     private Map propertyConfig;
 
     private String className;
 
     static {
-        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CLASS_PROPERTY_CHANGE,
-            ClassPropertySetOperation.class);
+        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CLASS_PROPERTY_ADD,
+            ClassPropertyAddOperation.class);
     }
 
-    public ClassPropertySetOperation()
+    public ClassPropertyAddOperation()
     {
-        this.setType(Operation.TYPE_CLASS_PROPERTY_CHANGE);
+        this.setType(Operation.TYPE_CLASS_PROPERTY_ADD);
     }
 
     /**
@@ -41,24 +45,30 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
     public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = doc.getxWikiClass();
-        PropertyClass pclass = (PropertyClass) bclass.get(propertyName);
-        if (pclass != null) {
+        MetaClass mclass = MetaClass.getMetaClass();
+        PropertyMetaClass pmclass = (PropertyMetaClass) mclass.get(this.propertyType);
+        if (pmclass != null) {
+            PropertyClass pclass = (PropertyClass) pmclass.newObject(null);
+            pclass.setObject(bclass);
             pclass.getxWikiClass(null).fromMap(propertyConfig, pclass);
+            pclass.setName(propertyName);
             bclass.put(pclass.getName(), pclass);
         } else {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
                 XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Invalid propert name : " + this.propertyName);
+                "Invalid property type : " + this.propertyType);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean modifyType(String className, String propertyName, Map properties)
+    public boolean createType(String className, String propertyName, String propertyType,
+        Map properties)
     {
         this.className = className;
         this.propertyName = propertyName;
+        this.propertyType = propertyType;
         this.propertyConfig = new HashMap();
         for (Iterator it = properties.keySet().iterator(); it.hasNext();) {
             String prop = (String) it.next();
@@ -72,10 +82,10 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
      */
     public void fromXml(Element e) throws XWikiException
     {
-        this.setType(getOperationType(e));
         this.className = getClassName(e);
+        this.propertyName = getPropertyName(e);
+        this.propertyType = getPropertyType(e);
         Element propertyNode = getPropertyNode(getClassNode(e));
-        this.propertyName = propertyNode.getAttribute(PROPERTY_NAME_ATTRIBUTE_NAME);
         this.propertyConfig = new HashMap();
         NodeList properties = propertyNode.getElementsByTagName(PROPERTY_NODE_NAME);
         for (int i = 0; i < properties.getLength(); ++i) {
@@ -93,7 +103,7 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
     {
         Element xmlNode = createOperationNode(doc);
         Element classNode = createClassNode(className, doc);
-        Element typeNode = createPropertyNode(propertyName, doc);
+        Element typeNode = createClassPropertyNode(propertyName, propertyType, doc);
         for (Iterator it = propertyConfig.keySet().iterator(); it.hasNext();) {
             String propName = (String) it.next();
             typeNode.appendChild(createPropertyNode(propName, propertyConfig.get(propName)
@@ -110,17 +120,14 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
     public boolean equals(Object other)
     {
         try {
-            ClassPropertySetOperation otherOperation = (ClassPropertySetOperation) other;
-            return otherOperation.propertyName.equals(this.propertyName)
-                && (this.getType().equals(otherOperation.getType()))
-                && (this.propertyConfig.values().containsAll(otherOperation.propertyConfig
-                    .values()))
-                && (otherOperation.propertyConfig.values().containsAll(this.propertyConfig
-                    .values()))
-                && (this.propertyConfig.keySet().containsAll(otherOperation.propertyConfig
-                    .keySet()))
-                && (otherOperation.propertyConfig.keySet().containsAll(this.propertyConfig
-                    .keySet()));
+            ClassPropertyAddOperation that = (ClassPropertyAddOperation) other;
+            return (this.getType().equals(that.getType()))
+                && this.propertyType.equals(that.propertyType)
+                && this.propertyName.equals(that.propertyName)
+                && (this.propertyConfig.values().containsAll(that.propertyConfig.values()))
+                && (that.propertyConfig.values().containsAll(this.propertyConfig.values()))
+                && (this.propertyConfig.keySet().containsAll(that.propertyConfig.keySet()))
+                && (that.propertyConfig.keySet().containsAll(this.propertyConfig.keySet()));
         } catch (Exception e) {
             return false;
         }
@@ -134,8 +141,8 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
         // return new HashCodeBuilder(11, 13).append(this.propertyType).append(this.propertyConfig)
         // .toHashCode();
         int i =
-            new HashCodeBuilder(11, 13).append(this.propertyName).append(this.propertyConfig)
-                .toHashCode();
+            new HashCodeBuilder(11, 13).append(this.propertyName).append(this.propertyType)
+                .append(this.propertyConfig).toHashCode();
         return i;
     }
 
@@ -144,6 +151,7 @@ public class ClassPropertySetOperation extends AbstractOperationImpl implements 
      */
     public String toString()
     {
-        return this.getType() + ": [" + this.propertyName + "] = " + this.propertyConfig;
+        return this.getType() + ": [" + this.propertyName + ":" + this.propertyType + "] = "
+            + this.propertyConfig;
     }
 }

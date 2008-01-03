@@ -12,6 +12,7 @@ import org.xwiki.platform.patchservice.api.RWOperation;
 import org.xwiki.platform.patchservice.impl.OperationFactoryImpl;
 import org.xwiki.platform.patchservice.impl.PositionImpl;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -21,11 +22,14 @@ public class ContentOperationsTest extends TestCase
 
     XWikiDocument doc;
 
+    XWikiContext context;
+
     protected void setUp()
     {
         try {
             domDoc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             doc = new XWikiDocument();
+            context = new XWikiContext();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
@@ -37,7 +41,7 @@ public class ContentOperationsTest extends TestCase
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
         operation.insert("new ", new PositionImpl(0, 12));
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals("this is the new content", doc.getContent());
     }
 
@@ -58,10 +62,10 @@ public class ContentOperationsTest extends TestCase
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
         operation.insert("something", new PositionImpl(0, 42));
         try {
-            operation.apply(doc);
+            operation.apply(doc, context);
             assertFalse(true);
         } catch (XWikiException ex) {
-            // This is expected
+            assertTrue(true);
         }
     }
 
@@ -71,7 +75,7 @@ public class ContentOperationsTest extends TestCase
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
         operation.delete("old ", new PositionImpl(0, 12));
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals("this is the content", doc.getContent());
     }
 
@@ -92,14 +96,14 @@ public class ContentOperationsTest extends TestCase
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
         operation.delete("something", new PositionImpl(0, 42));
         try {
-            operation.apply(doc);
+            operation.apply(doc, context);
             assertFalse(true);
         } catch (XWikiException ex) {
             // This is expected
         }
         operation.delete("this", new PositionImpl(0, 2));
         try {
-            operation.apply(doc);
+            operation.apply(doc, context);
             assertFalse(true);
         } catch (XWikiException ex) {
             // This is expected
@@ -112,20 +116,20 @@ public class ContentOperationsTest extends TestCase
         RWOperation operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
         operation.delete("old", new PositionImpl(0, 12));
-        operation.apply(doc);
+        operation.apply(doc, context);
         operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
         operation.insert("new", new PositionImpl(0, 12));
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals("this is the new content", doc.getContent());
         operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_INSERT);
         operation.insert("restored", new PositionImpl(0, 15));
-        operation.apply(doc);
+        operation.apply(doc, context);
         operation =
             OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_CONTENT_DELETE);
         operation.delete("new", new PositionImpl(0, 12));
-        operation.apply(doc);
+        operation.apply(doc, context);
         assertEquals("this is the restored content", doc.getContent());
     }
 }

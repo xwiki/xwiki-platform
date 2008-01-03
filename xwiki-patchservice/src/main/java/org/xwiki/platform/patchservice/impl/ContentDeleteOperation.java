@@ -1,6 +1,5 @@
 package org.xwiki.platform.patchservice.impl;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.w3c.dom.Document;
@@ -9,6 +8,7 @@ import org.xwiki.platform.patchservice.api.Operation;
 import org.xwiki.platform.patchservice.api.Position;
 import org.xwiki.platform.patchservice.api.RWOperation;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -31,7 +31,7 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
     /**
      * {@inheritDoc}
      */
-    public void apply(XWikiDocument doc) throws XWikiException
+    public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         try {
             String content = doc.getContent();
@@ -72,10 +72,8 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
      */
     public void fromXml(Element e) throws XWikiException
     {
-        Element textNode = (Element) e.getElementsByTagName(TEXT_NODE_NAME).item(0);
-        this.removedContent = StringEscapeUtils.unescapeXml(textNode.getTextContent());
-        this.position = new PositionImpl();
-        position.fromXml((Element) e.getElementsByTagName(PositionImpl.NODE_NAME).item(0));
+        this.removedContent = getTextValue(e);
+        this.position = loadPositionNode(e);
     }
 
     /**
@@ -83,13 +81,8 @@ public class ContentDeleteOperation extends AbstractOperationImpl implements RWO
      */
     public Element toXml(Document doc) throws XWikiException
     {
-        Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
-        xmlNode.setAttribute(AbstractOperationImpl.TYPE_ATTRIBUTE_NAME,
-            Operation.TYPE_CONTENT_DELETE);
-        Element textNode = doc.createElement(TEXT_NODE_NAME);
-        textNode
-            .appendChild(doc.createTextNode(StringEscapeUtils.escapeXml(this.removedContent)));
-        xmlNode.appendChild(textNode);
+        Element xmlNode = createOperationNode(doc);
+        xmlNode.appendChild(createTextNode(removedContent, doc));
         xmlNode.appendChild(position.toXml(doc));
         return xmlNode;
     }

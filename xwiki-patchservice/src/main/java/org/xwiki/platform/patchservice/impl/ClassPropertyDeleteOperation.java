@@ -6,6 +6,7 @@ import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.Operation;
 import org.xwiki.platform.patchservice.api.RWOperation;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -13,9 +14,9 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class ClassPropertyDeleteOperation extends AbstractOperationImpl implements RWOperation
 {
-    public static final String PROPERTY_NAME_ATTRIBUTE_NAME = "name";
-
     private String propertyName;
+
+    private String className;
 
     static {
         OperationFactoryImpl.registerTypeProvider(Operation.TYPE_CLASS_PROPERTY_DELETE,
@@ -30,10 +31,7 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
     /**
      * {@inheritDoc}
      */
-    /**
-     * {@inheritDoc}
-     */
-    public void apply(XWikiDocument doc) throws XWikiException
+    public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = doc.getxWikiClass();
         PropertyClass prop = (PropertyClass) bclass.get(propertyName);
@@ -49,8 +47,9 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
     /**
      * {@inheritDoc}
      */
-    public boolean deleteType(String propertyName)
+    public boolean deleteType(String className, String propertyName)
     {
+        this.className = className;
         this.propertyName = propertyName;
         return true;
     }
@@ -60,7 +59,8 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
      */
     public void fromXml(Element e) throws XWikiException
     {
-        this.propertyName = e.getAttribute(PROPERTY_NAME_ATTRIBUTE_NAME);
+        this.className = getClassName(e);
+        this.propertyName = getPropertyName(getClassNode(e));
     }
 
     /**
@@ -68,9 +68,10 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
      */
     public Element toXml(Document doc) throws XWikiException
     {
-        Element xmlNode = doc.createElement(AbstractOperationImpl.NODE_NAME);
-        xmlNode.setAttribute(AbstractOperationImpl.TYPE_ATTRIBUTE_NAME, this.getType());
-        xmlNode.setAttribute(PROPERTY_NAME_ATTRIBUTE_NAME, propertyName);
+        Element xmlNode = createOperationNode(doc);
+        Element classNode = createClassNode(className, doc);
+        classNode.appendChild(createPropertyNode(propertyName, doc));
+        xmlNode.appendChild(classNode);
         return xmlNode;
     }
 
@@ -80,8 +81,9 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
     public boolean equals(Object other)
     {
         try {
-            ClassPropertyDeleteOperation otherOperation = (ClassPropertyDeleteOperation) other;
-            return otherOperation.propertyName.equals(this.propertyName);
+            ClassPropertyDeleteOperation that = (ClassPropertyDeleteOperation) other;
+            return this.className.equals(that.className)
+                && this.propertyName.equals(that.propertyName);
         } catch (Exception e) {
             return false;
         }

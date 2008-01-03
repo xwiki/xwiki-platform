@@ -21,19 +21,21 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
-public class AdminAction extends XWikiAction {
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
+
+public class AdminAction extends XWikiAction
+{
     private static final Log log = LogFactory.getLog(AdminAction.class);
 
-	public String render(XWikiContext context) throws XWikiException {
+    public String render(XWikiContext context) throws XWikiException
+    {
         XWikiRequest request = context.getRequest();
         String content = request.getParameter("content");
         XWikiDocument doc = context.getDoc();
@@ -44,29 +46,37 @@ public class AdminAction extends XWikiAction {
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
             EditForm peform = (EditForm) form;
             String parent = peform.getParent();
-            if (parent!=null)
+            if (parent != null) {
                 doc.setParent(parent);
+            }
             String creator = peform.getCreator();
-            if (creator!=null)
+            if (creator != null) {
                 doc.setCreator(creator);
+            }
             String defaultTemplate = peform.getDefaultTemplate();
-            if (defaultTemplate!=null)
+            if (defaultTemplate != null) {
                 doc.setDefaultTemplate(defaultTemplate);
+            }
             String defaultLanguage = peform.getDefaultLanguage();
-            if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
+            if ((defaultLanguage != null) && !defaultLanguage.equals("")) {
                 doc.setDefaultLanguage(defaultLanguage);
-            if (doc.getDefaultLanguage().equals(""))
+            }
+            if (doc.getDefaultLanguage().equals("")) {
                 doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
+            }
 
             String language = context.getWiki().getLanguagePreference(context);
             String languagefromrequest = context.getRequest().getParameter("language");
-            String languagetoedit = ((languagefromrequest==null)||(languagefromrequest.equals(""))) ?
-                    language : languagefromrequest;
+            String languagetoedit =
+                ((languagefromrequest == null) || (languagefromrequest.equals(""))) ? language
+                    : languagefromrequest;
 
-            if ((languagetoedit==null)||(languagetoedit.equals("default")))
+            if ((languagetoedit == null) || (languagetoedit.equals("default"))) {
                 languagetoedit = "";
-            if (doc.isNew()||(doc.getDefaultLanguage().equals(languagetoedit)))
+            }
+            if (doc.isNew() || (doc.getDefaultLanguage().equals(languagetoedit))) {
                 languagetoedit = "";
+            }
 
             if (languagetoedit.equals("")) {
                 // In this case the created document is going to be the default document
@@ -80,7 +90,7 @@ public class AdminAction extends XWikiAction {
             } else {
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
-                if ((tdoc==doc)) {
+                if ((tdoc == doc)) {
                     tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
@@ -92,14 +102,14 @@ public class AdminAction extends XWikiAction {
             }
 
             XWikiDocument tdoc2 = (XWikiDocument) tdoc.clone();
-            if (content != null && !content.equals(""))
+            if (content != null && !content.equals("")) {
                 tdoc2.setContent(content);
+            }
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", tdoc2.newDocument(context));
-            try{
-            	tdoc2.readFromTemplate(peform, context);
-            }
-            catch (XWikiException e) {
+            try {
+                tdoc2.readFromTemplate(peform, context);
+            } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY) {
                     context.put("exception", e);
                     return "docalreadyexists";
@@ -109,8 +119,10 @@ public class AdminAction extends XWikiAction {
             /* Setup a lock */
             try {
                 XWikiLock lock = tdoc.getLock(context);
-                if ((lock == null) || (lock.getUserName().equals(context.getUser())) || (peform.isLockForce()))
-                    tdoc.setLock(context.getUser(),context);
+                if ((lock == null) || (lock.getUserName().equals(context.getUser()))
+                    || (peform.isLockForce())) {
+                    tdoc.setLock(context.getUser(), context);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 // Lock should never make XWiki fail
@@ -120,5 +132,5 @@ public class AdminAction extends XWikiAction {
         }
 
         return "admin";
-	}
+    }
 }

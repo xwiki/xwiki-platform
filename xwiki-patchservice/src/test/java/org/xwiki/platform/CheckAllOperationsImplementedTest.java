@@ -1,5 +1,6 @@
 package org.xwiki.platform;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -46,8 +47,8 @@ public class CheckAllOperationsImplementedTest extends TestCase
             RWOperation.TYPE_OBJECT_PROPERTY_INSERT_AT));
         assertNotNull(OperationFactoryImpl.getInstance().newOperation(
             RWOperation.TYPE_OBJECT_PROPERTY_DELETE_AT));
-        // assertNotNull(OperationFactoryImpl.getInstance().newOperation(
-        // RWOperation.TYPE_ATTACHMENT_ADD));
+        assertNotNull(OperationFactoryImpl.getInstance().newOperation(
+            RWOperation.TYPE_ATTACHMENT_ADD));
         // assertNotNull(OperationFactoryImpl.getInstance().newOperation(
         // RWOperation.TYPE_ATTACHMENT_SET));
         // assertNotNull(OperationFactoryImpl.getInstance().newOperation(
@@ -118,6 +119,20 @@ public class CheckAllOperationsImplementedTest extends TestCase
                 RWOperation.TYPE_OBJECT_PROPERTY_INSERT_AT);
         operation.insertInProperty("XWiki.Class", 0, "property", "inserted text",
             new PositionImpl(2, 0));
+        root.appendChild(operation.toXml(doc));
+        root.appendChild(doc.createTextNode("\n"));
+
+        operation =
+            OperationFactoryImpl.getInstance().newOperation(
+                RWOperation.TYPE_OBJECT_PROPERTY_DELETE_AT);
+        operation.deleteFromProperty("XWiki.Class", 0, "property", "deleted text",
+            new PositionImpl(2, 0));
+        root.appendChild(operation.toXml(doc));
+        root.appendChild(doc.createTextNode("\n"));
+
+        operation =
+            OperationFactoryImpl.getInstance().newOperation(RWOperation.TYPE_ATTACHMENT_ADD);
+        operation.addAttachment(new ByteArrayInputStream("hello".getBytes()), "file", "XWiki.Me");
         root.appendChild(operation.toXml(doc));
         root.appendChild(doc.createTextNode("\n"));
 

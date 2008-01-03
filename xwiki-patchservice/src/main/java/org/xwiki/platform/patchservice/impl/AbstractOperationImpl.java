@@ -1,8 +1,11 @@
 package org.xwiki.platform.patchservice.impl;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
+import org.apache.commons.codec.binary.Base64;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.Position;
@@ -38,12 +41,32 @@ public abstract class AbstractOperationImpl implements RWOperation
 
     public static final String ATTACHMENT_NODE_NAME = "attachment";
 
+    public static final String ATTACHMENT_FILANAME_ATTRIBUTE_NAME = CLASS_NAME_ATTRIBUTE_NAME;
+
+    public static final String ATTACHMENT_AUTHOR_ATTRIBUTE_NAME = "author";
+
     private String type;
 
     /**
      * {@inheritDoc}
      */
-    public boolean addObject(String objectClass)
+    public boolean insert(String text, Position position)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean delete(String text, Position position)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean setProperty(String property, String value)
     {
         return false;
     }
@@ -60,32 +83,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean delete(String text, Position position)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean deleteAttachment(String name)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean deleteFromProperty(String objectClass, int index, String property,
-        String text, Position position)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean deleteObject(String objectClass, int index)
+    public boolean modifyType(String className, String propertyName, Map properties)
     {
         return false;
     }
@@ -101,7 +99,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean insert(String text, Position position)
+    public boolean addObject(String objectClass)
     {
         return false;
     }
@@ -109,24 +107,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean insertInProperty(String objectClass, int index, String property, String text,
-        Position position)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean modifyType(String className, String propertyName, Map properties)
-    {
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public boolean setAttachment(InputStream is)
+    public boolean deleteObject(String objectClass, int index)
     {
         return false;
     }
@@ -143,7 +124,41 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean setProperty(String property, String value)
+    public boolean insertInProperty(String objectClass, int index, String property, String text,
+        Position position)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean deleteFromProperty(String objectClass, int index, String property,
+        String text, Position position)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean addAttachment(InputStream is, String filename, String author)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean setAttachment(InputStream is, String filename, String author)
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public boolean deleteAttachment(String name)
     {
         return false;
     }
@@ -287,6 +302,51 @@ public abstract class AbstractOperationImpl implements RWOperation
     public String getClassName(Element e)
     {
         return getClassNode(e).getAttribute(CLASS_NAME_ATTRIBUTE_NAME);
+    }
+
+    public Element createAttachmentNode(String filename, Document doc)
+    {
+        return createAttachmentNode(null, filename, null, doc);
+    }
+
+    public Element createAttachmentNode(byte[] content, String filename, String author,
+        Document doc)
+    {
+        Element xmlNode = doc.createElement(ATTACHMENT_NODE_NAME);
+        xmlNode.setAttribute(ATTACHMENT_FILANAME_ATTRIBUTE_NAME, filename);
+        if (author != null) {
+            xmlNode.setAttribute(ATTACHMENT_AUTHOR_ATTRIBUTE_NAME, author);
+        }
+        if (content != null) {
+            xmlNode.setTextContent(new String(Base64.encodeBase64(content)));
+        }
+        return xmlNode;
+    }
+
+    public Element getAttachmentNode(Element e)
+    {
+        return (Element) e.getElementsByTagName(ATTACHMENT_NODE_NAME).item(0);
+    }
+
+    public byte[] getAttachmentContent(Element e)
+    {
+        try {
+            return Base64.decodeBase64(getAttachmentNode(e).getTextContent().getBytes(
+                "ISO-8859-1"));
+        } catch (UnsupportedEncodingException e1) {
+        } catch (DOMException e1) {
+        }
+        return new byte[0];
+    }
+
+    public String getAttachmentFilename(Element e)
+    {
+        return getAttachmentNode(e).getAttribute(ATTACHMENT_FILANAME_ATTRIBUTE_NAME);
+    }
+
+    public String getAttachmentAuthor(Element e)
+    {
+        return getAttachmentNode(e).getAttribute(ATTACHMENT_AUTHOR_ATTRIBUTE_NAME);
     }
 
     public Position loadPositionNode(Element e) throws XWikiException

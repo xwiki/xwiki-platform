@@ -47,7 +47,9 @@ public interface RWOperation extends Operation
         Position position);
 
     /* Operations affeting the attachments */
-    boolean setAttachment(InputStream is);
+    boolean addAttachment(InputStream is, String filename, String author);
+    
+    boolean setAttachment(InputStream is, String filename, String author);
 
     boolean deleteAttachment(String name);
 

@@ -9,3 +9,5 @@ org.xwiki.platform.patchservice.impl.ObjectDeleteOperation
 org.xwiki.platform.patchservice.impl.ObjectPropertySetOperation
 org.xwiki.platform.patchservice.impl.ObjectPropertyInsertAtOperation
 org.xwiki.platform.patchservice.impl.ObjectPropertyDeleteAtOperation
+org.xwiki.platform.patchservice.impl.AttachmentAddOperation
+org.xwiki.platform.patchservice.impl.AttachmentDeleteOperation

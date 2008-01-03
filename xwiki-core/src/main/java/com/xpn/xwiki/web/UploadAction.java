@@ -27,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -113,10 +112,12 @@ public class UploadAction extends XWikiAction
         ArrayList params = new ArrayList();
         params.add(filename);
         params.add(olddoc.getAttachmentRevisionURL(filename, nextRev, context));
-        if (attachment.isImage(context))
+        if (attachment.isImage(context)) {
             comment = context.getMessageTool().get("core.comment.uploadImageComment", params);
-        else
-            comment = context.getMessageTool().get("core.comment.uploadAttachmentComment", params);
+        } else {
+            comment =
+                context.getMessageTool().get("core.comment.uploadAttachmentComment", params);
+        }
         olddoc.setComment(comment);
 
         // Save the content and the archive
@@ -142,8 +143,9 @@ public class UploadAction extends XWikiAction
         }
         // forward to attach page
         String redirect = fileupload.getFileItemAsString("xredirect", context);
-        if ((redirect == null) || (redirect.equals("")))
+        if ((redirect == null) || (redirect.equals(""))) {
             redirect = context.getDoc().getURL("attach", true, context);
+        }
         sendRedirect(response, redirect);
         return false;
     }
@@ -153,7 +155,8 @@ public class UploadAction extends XWikiAction
         boolean ajax = ((Boolean) context.get("ajax")).booleanValue();
         if (ajax) {
             try {
-                context.getResponse().getOutputStream().println("error: " + context.getMessageTool().get((String)context.get("message")));
+                context.getResponse().getOutputStream().println(
+                    "error: " + context.getMessageTool().get((String) context.get("message")));
             } catch (IOException ex) {
                 log.error("Unhandled exception writing output:", ex);
             }

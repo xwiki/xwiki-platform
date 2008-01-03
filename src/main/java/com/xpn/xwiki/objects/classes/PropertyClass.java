@@ -330,6 +330,24 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return getLargeStringValue("tooltip");
     }
 
+    /**
+     * Gets international tooltip
+     * @param context
+     * @return
+     */
+    public String getTooltip(XWikiContext context)
+    {
+        String tooltipName = getFieldFullName() + "_tooltip";
+        String tooltip = context.getWiki().getMessage(tooltipName, context);
+        if (tooltipName.equals(tooltip)) {
+            tooltipName = getLargeStringValue("tooltip");
+            if ((tooltipName!=null)&&(!tooltipName.trim().equals(""))) {
+                tooltip = context.getWiki().getMessage(tooltipName, context);
+            }
+        }
+        return tooltip;           
+    }
+
     public void setTooltip(String tooltip)
     {
         setLargeStringValue("tooltip", tooltip);

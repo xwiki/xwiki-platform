@@ -152,8 +152,9 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      */
     public void endRendering(XWikiContext context)
     {
-        // we used to call cleanFileList here but we should not anymore as endRendering is called to many times
-        // and empties the file upload list. This is handled by XWikiAction and XWikiPortlet which clean up lists in a finally block
+        // we used to call cleanFileList here but we should not anymore as endRendering is called to
+        // many times and empties the file upload list. This is handled by XWikiAction and
+        // XWikiPortlet which clean up lists in a finally block
     }
 
     /**
@@ -216,7 +217,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
         LOG.debug("Loading uploaded files");
         // If we already have a file list then loadFileList was already called
         // Continuing would empty the list.. We need to stop.
-        if (context.get(FILE_LIST_KEY)!=null) {
+        if (context.get(FILE_LIST_KEY) != null) {
             LOG.debug("Called loadFileList twice");
             return;
         }

@@ -467,6 +467,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 if ("0".equals(xwiki.Param("xwiki.virtual.autowww"))) {
                     appname = servername;
                 } else {
+                    // As a convenience, allow sites starting with www, localhost or using an
+                    // IP address not to have to create a XWikiServerXwiki page since we consider
+                    // in that case that they're pointing to the main wiki.
                     if ((servername.equals("www"))
                         || (host.equals("localhost") || (context.getUtil().match(
                             "m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host)))) {

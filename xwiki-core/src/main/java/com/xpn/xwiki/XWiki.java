@@ -272,18 +272,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         // First try loading from a file.
         File f = new File(configurationLocation);
-        if (f.exists()) {
-            try {
+        try {
+            if (f.exists()) {
                 xwikicfgis = new FileInputStream(f);
-            } catch (Exception e) {
-                // Error loading the file. Most likely, the Security Manager prevented it.
-                // We'll try loading it as a resource below.
-                LOG.debug("Failed to load the file [" + configurationLocation + "] using direct "
-                    + "file access. The error was [" + e.getMessage() + "]. Trying to load it "
-                    + "as a resource using the Servlet Context...");
             }
+        } catch (Exception e) {
+            // Error loading the file. Most likely, the Security Manager prevented it.
+            // We'll try loading it as a resource below.
+            LOG.debug("Failed to load the file [" + configurationLocation + "] using direct "
+                + "file access. The error was [" + e.getMessage() + "]. Trying to load it "
+                + "as a resource using the Servlet Context...");
         }
-
         // Second, try loading it as a resource using the Servlet Context
         if (xwikicfgis == null) {
             xwikicfgis = econtext.getResourceAsStream(configurationLocation);
@@ -874,16 +873,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public boolean resourceExists(String name)
     {
-        InputStream ris = null;
         if (getEngineContext() != null) {
             try {
-                if (getResourceAsStream(name) != null)
+                if (getResourceAsStream(name) != null) {
                     return true;
+                }
             } catch (IOException e) {
             }
         }
-        File file = new File(name);
-        return file.exists();
+        try {
+            File file = new File(name);
+            return file.exists();
+        } catch (Exception e) {
+            // Could be running under -security, which prevents calling file.exists().
+        }
+        return false;
     }
 
     public XWikiConfig getConfig()
@@ -5453,8 +5457,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         String pageName = clearName(name, context);
         if (exists(space + "." + pageName, context)) {
             int i = 0;
-            while (exists(space + "." + pageName + "_" + i, context))
+            while (exists(space + "." + pageName + "_" + i, context)) {
                 i++;
+            }
             return pageName + "_" + i;
         }
         return pageName;

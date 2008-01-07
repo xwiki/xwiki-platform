@@ -28,12 +28,18 @@ ASSTable.prototype = {
     * @todo Default values for limit, getHandler.
     * @todo Make this a valid ARIA grid: http://www.w3.org/TR/aria-role/#structural
     */
-  initialize: function(url, limit, domNode, scrollNode, filterNode, getHandler, hasFilters)
+  initialize: function(url, limit, domNode, scrollNode, filterNode, getHandler, hasFilters, action)
   {
     this.domNode = $(domNode);
     this.scroller = new ASSScroller(this, scrollNode);
     if (hasFilters) {
       this.filter = new ASSFilter(this, filterNode);
+    }
+    if(action) {
+      this.action = action;
+    }
+    else {
+      this.action = "view";
     }
     this.hasFilters = hasFilters;
     this.filters = "";
@@ -233,7 +239,12 @@ ASSTable.prototype = {
       newoffset = 1;
     }
     this.totalRows -= 1;
-    this.showRows(newoffset, this.limit);
+    if(this.totalRows < this.limit) {
+      this.showRows(newoffset, this.totalRows);
+    }
+    else {
+      this.showRows(newoffset, this.limit);
+    }
     this.scroller.refreshScrollbar();
   }
 }
@@ -712,23 +723,28 @@ function displayMembers(row, i, table)
     membername.appendChild(document.createTextNode(row.fullname));
   }
   membername.className="username";
-  var membermanage = document.createElement("td");
-  membermanage.className = "manage";
-  var del = document.createElement('img');
-
-  if (row.grayed == "true") {
-    del.src = '$xwiki.getSkinFile("icons/rights-manager/clearg.png")';
-    del.className = 'icon-manageg';
-  } else {
-    del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
-    Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
-    del.className = 'icon-manage';
-  }
-  del.title = '$msg.get("delete")';
-  membermanage.appendChild(del);
-
   tr.appendChild(membername);
-  tr.appendChild(membermanage);
+  
+  /* do not allow to delete users from a group when not in inline mode */
+  if(table.action == "inline")
+  {
+    var membermanage = document.createElement("td");
+    membermanage.className = "manage";
+  
+    var del = document.createElement('img');
+
+    if (row.grayed == "true") {
+       del.src = '$xwiki.getSkinFile("icons/rights-manager/clearg.png")';
+       del.className = 'icon-manageg';
+    } else {
+       del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
+       Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
+       del.className = 'icon-manage';
+    }
+    del.title = '$msg.get("delete")';
+    membermanage.appendChild(del);
+    tr.appendChild(membermanage);
+  }
 
   return tr;
 }
@@ -767,16 +783,19 @@ function displayUsersAndGroups(row, i, table, idx)
   username.className = "username";
   tr.appendChild(username);
   activeRights.each(function(right) {
-    var td = document.createElement('td');
-    td.className = "rights";
-    var r = 0;
-    if (allows.indexOf(right) >= 0) {
-      r = 1;
-    } else if (denys.indexOf(right) >= 0) {
-      r = 2;
+    if(right)
+    {
+        var td = document.createElement('td');
+        td.className = "rights";
+        var r = 0;
+        if (allows.indexOf(right) >= 0) {
+           r = 1;
+        } else if (denys.indexOf(right) >= 0) {
+           r = 2;
+        }
+        var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);
+        tr.appendChild(td);
     }
-    var chbx = new MSCheckbox(td, right, saveUrl, r, table, i);
-    tr.appendChild(td);
   });
 
   return tr;

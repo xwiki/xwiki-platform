@@ -79,12 +79,17 @@ div.inscrollbar {
 	padding-left: 10px;
 }
 
-#userstable, #groupstable, #usersandgroupstable, #memberstable {
+#userstable, #groupstable, #usersandgroupstable {
     width: 100%;
     position: relative;
     padding: 0px;
     margin: 0px;
     left: 8px;
+}
+
+#memberstable {
+    width: 500px;
+    margin-bottom: 5px;
 }
 
 #specialusersandgroups {
@@ -166,4 +171,12 @@ div.inscrollbar {
 
 .username {
   padding-left:10px;
+}
+
+#addNewMember {
+   margin-top: 5px;
+}
+
+.addlabel {
+   font-weight: bold;
 }

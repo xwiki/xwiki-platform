@@ -181,8 +181,14 @@ public class SkinAction extends XWikiAction
         XWiki xwiki = context.getWiki();
         XWikiResponse response = context.getResponse();
         try {
-            response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
             String path = "/skins/" + skin + "/" + filename;
+            byte[] data;
+            try {
+                data = context.getWiki().getResourceContentAsBytes(path);
+            } catch (Exception ex) {
+                return false;
+            }
+            response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
             // Choose the right content type
             String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
             if (mimetype != null)
@@ -191,7 +197,6 @@ public class SkinAction extends XWikiAction
                 response.setContentType("application/octet-stream");
 
             // Sending the content of the file
-            byte[] data = context.getWiki().getResourceContentAsBytes(path);
             if (data == null || data.length == 0)
                 return false;
 

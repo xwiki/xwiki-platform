@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
@@ -856,10 +857,10 @@ public abstract class AbstractSuperClass implements SuperClass
             XWikiDocument doc = (XWikiDocument) it.next();
             List objects = doc.getObjects(getClassFullName());
 
-            int i = 0;
-            for (Iterator itObject = objects.iterator(); itObject.hasNext(); ++i) {
-                if (itObject.next() != null) {
-                    list.add(newSuperDocument(doc, i, context));
+            for (Iterator itObject = objects.iterator(); itObject.hasNext();) {
+                BaseObject bobject = (BaseObject) itObject.next();
+                if (bobject != null) {
+                    list.add(newSuperDocument(doc, bobject.getNumber(), context));
                 }
             }
         }

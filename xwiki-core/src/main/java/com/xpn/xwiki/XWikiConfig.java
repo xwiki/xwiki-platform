@@ -54,7 +54,9 @@ public class XWikiConfig extends Properties
 
     public XWikiConfig(InputStream is) throws XWikiException
     {
-        loadConfig(is, "");
+        if (is != null) {
+            loadConfig(is, "");
+        }
     }
 
     public void loadConfig(InputStream is, String path) throws XWikiException

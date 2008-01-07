@@ -62,17 +62,25 @@ public class XWikiHibernateBaseStore
      */
     public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context)
     {
-        String path = xwiki.Param("xwiki.store.hibernate.path", "hibernate.cfg.xml");
-        if ((path != null) && ((new File(path).exists() || context.getEngineContext() == null))) {
-            setPath(path);
-        } else {
+        String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
+        log.debug("Hibernate configuration file: [" + path + "]");
+        try {
+            if ((path != null) && ((new File(path).exists() || context.getEngineContext() == null))) {
+                setPath(path);
+                return;
+            }
+        } catch (Exception ex) {
+            // Probably running under -security, which prevents calling File.exists()
+            log.info("Failed setting the Hibernate configuration path using a path string");
+        }
+        try {
+            setHibUrl(context.getEngineContext().getResource(path));
+        } catch (Exception ex) {
+            log.info("Failed setting the Hibernate configuration path using getResource");
             try {
-                setHibUrl(context.getEngineContext().getResource(path));
-            } catch (Exception e) {
-                try {
-                    setHibUrl(XWiki.class.getClassLoader().getResource(path));
-                } catch (Exception e2) {
-                }
+                setHibUrl(XWiki.class.getClassLoader().getResource(path));
+            } catch (Exception ex2) {
+                log.error("Failed setting the Hibernate configuration file with any method, storage cannot be configured", ex2);
             }
         }
     }

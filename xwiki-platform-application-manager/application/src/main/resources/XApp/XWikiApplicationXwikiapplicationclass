@@ -217,6 +217,9 @@
 <number>0</number>
 <className>XAppClasses.XWikiApplicationClass</className>
 <property>
+<appauthors></appauthors>
+</property>
+<property>
 <applications/>
 </property>
 <property>
@@ -241,10 +244,13 @@
 </property>
 <property>
 <documents>
-<value>XAppClasses.XWikiApplicationClass</value>
-<value>XAppSheets.XWikiApplicationClassSheet</value>
-<value>XAppTemplates.XWikiApplicationClassTemplate</value>
+<value>[XAppClasses.%]</value>
+<value>[XAppSheets.%]</value>
+<value>[XAppTemplates.%]</value>
 </documents>
+</property>
+<property>
+<license></license>
 </property>
 <property>
 <translationdocs/>

@@ -29,6 +29,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.authenticator.persistent.DefaultPersistentLoginManager;
@@ -331,7 +332,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     public String encryptText(String clearText)
     {
-        sun.misc.BASE64Encoder encoder = new sun.misc.BASE64Encoder();
         try {
             Cipher c1 = Cipher.getInstance(cipherParameters);
             if (secretKey != null) {
@@ -339,7 +339,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 byte[] clearTextBytes;
                 clearTextBytes = clearText.getBytes();
                 byte[] encryptedText = c1.doFinal(clearTextBytes);
-                String encryptedEncodedText = encoder.encode(encryptedText);
+                String encryptedEncodedText = new String(Base64.encodeBase64(encryptedText));
                 return encryptedEncodedText;
             }
             if (LOG.isErrorEnabled()) {
@@ -533,9 +533,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private String decryptText(String encryptedText)
     {
-        sun.misc.BASE64Decoder decoder = new sun.misc.BASE64Decoder();
         try {
-            byte[] decodedEncryptedText = decoder.decodeBuffer(encryptedText);
+            byte[] decodedEncryptedText = Base64.decodeBase64(encryptedText.getBytes("ISO-8859-1"));
             Cipher c1 = Cipher.getInstance(cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);

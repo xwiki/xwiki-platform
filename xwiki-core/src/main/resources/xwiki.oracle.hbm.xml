@@ -100,12 +100,12 @@
         <property name="comment" type="string">
             <column name="XWD_COMMENT" length="1023" />
         </property>
-        
+
         <property name="minorEdit1" type="boolean">
             <column name="XWD_MINOREDIT" not-null="true" />
         </property>
     </class>
-    
+
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">
         <composite-id name="id" class="com.xpn.xwiki.doc.rcs.XWikiRCSNodeId">
             <key-property name="docId"    column="XWR_DOCID" type="long" />
@@ -114,9 +114,9 @@
         </composite-id>
         <property name="date"    type="timestamp" column="XWR_DATE"    not-null="true" />
         <property name="comment" type="text">
-            <column name="XWR_COMMENT" sql-type="clob" not-null="true" />
+            <column name="XWR_COMMENT" sql-type="clob" />
         </property>
-        <property name="author"  type="string" column="XWR_AUTHOR"  not-null="true" />
+        <property name="author"  type="string" column="XWR_AUTHOR" />
         <property name="diff"    type="boolean"   column="XWR_ISDIFF"  not-null="false" update="false" insert="false" />
     </class>
 

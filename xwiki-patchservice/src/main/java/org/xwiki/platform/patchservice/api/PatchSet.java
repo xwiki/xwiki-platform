@@ -2,20 +2,33 @@ package org.xwiki.platform.patchservice.api;
 
 import java.util.List;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
+/**
+ * A <tt>PatchSet</tt> groups several patches together, for easier transfer between hosts. A
+ * patchset must contain patches affecting only one document.
+ * 
+ * @see RWPatchSet
+ * @version $Id: $
+ * @since XWikiPlatform 1.3
+ */
 public interface PatchSet extends XmlSerializable
 {
-    List getVersionRange();
-
+    /**
+     * Get the list of patches included in this set.
+     * 
+     * @return The list of patches.
+     */
     List getPatches();
 
     /**
      * Apply this patch set on a document.
      * 
      * @param doc The document being patched.
-     * @return The document with all the patches in this patch set applied.
+     * @param context The XWiki context, needed for some document operations.
+     * @throws XWikiException If the patchset cannot be applied on the document.
      */
-    void apply(XWikiDocument doc) throws XWikiException;
+    void apply(XWikiDocument doc, XWikiContext context) throws XWikiException;
 }

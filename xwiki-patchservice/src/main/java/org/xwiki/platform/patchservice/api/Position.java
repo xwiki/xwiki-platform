@@ -1,5 +1,11 @@
 package org.xwiki.platform.patchservice.api;
 
+/**
+ * A <tt>Position</tt> identifies a place inside a text field, where some changes occured.
+ * 
+ * @version $Id: $
+ * @since XWikiPlatform 1.3
+ */
 public interface Position extends XmlSerializable
 {
     /**
@@ -13,7 +19,9 @@ public interface Position extends XmlSerializable
     boolean checkPosition(String text);
 
     /**
-     * Returns the text between the start of the text and this Position.
+     * Returns the text between the start of the text and this Position. Does not throw exceptions
+     * if the position is not valid anymore, but gets the text between the start of the text and the
+     * position that best estimates the original position.
      * 
      * @param text The text where this position is supposed to be defined.
      * @return The portion of text before this position, or <tt>null</tt> if the position is not
@@ -22,7 +30,9 @@ public interface Position extends XmlSerializable
     String getTextBeforePosition(String text);
 
     /**
-     * Returns the text between this Position and the end of the text.
+     * Returns the text between this Position and the end of the text. Does not throw exceptions if
+     * the position is not valid anymore, but gets the text between the position that best estimates
+     * the original position, and the end of the text.
      * 
      * @param text The text where this position is supposed to be defined.
      * @return The portion of text after this position, or <tt>null</tt> if the position is not

@@ -2,24 +2,65 @@ package org.xwiki.platform.patchservice.impl;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.xwiki.platform.patchservice.api.Originator;
 import org.xwiki.platform.patchservice.api.RWOriginator;
+import org.xwiki.platform.patchservice.api.XmlSerializable;
 
 import com.xpn.xwiki.XWikiException;
 
-public class OriginatorImpl implements RWOriginator
+/**
+ * Default implementation for {@link RWOriginator}.
+ * 
+ * @see org.xwiki.platform.patchservice.api.RWOriginator
+ * @see org.xwiki.platform.patchservice.api.Originator
+ * @version $Id: $
+ * @since XWikiPlatform 1.3
+ */
+public class OriginatorImpl implements Originator, RWOriginator, XmlSerializable
 {
+    /** The name of the XML element corresponding to originator objects. */
     public static final String NODE_NAME = "originator";
 
+    /**
+     * The name of the XML attribute holding the author wiki name.
+     * 
+     * @see Originator#getAuthor()
+     */
     public static final String AUTHOR_ATTRIBUTE_NAME = "author";
 
+    /**
+     * The name of the XML attribute holding the host identifier.
+     * 
+     * @see Originator#getHostId()
+     */
     public static final String HOST_ATTRIBUTE_NAME = "host";
 
+    /**
+     * The name of the XML attribute holding the wiki name.
+     * 
+     * @see Originator#getWikiId()
+     */
     public static final String WIKI_ATTRIBUTE_NAME = "wiki";
 
+    /**
+     * The patch author.
+     * 
+     * @see Originator#getAuthor()
+     */
     private String author;
 
+    /**
+     * The host identifier.
+     * 
+     * @see Originator#getHostId()
+     */
     private String hostId;
 
+    /**
+     * The wiki name.
+     * 
+     * @see Originator#getWikiId()
+     */
     private String wikiId;
 
     /**

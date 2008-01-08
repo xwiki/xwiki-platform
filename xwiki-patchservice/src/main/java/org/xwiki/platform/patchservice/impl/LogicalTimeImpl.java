@@ -6,8 +6,16 @@ import org.xwiki.platform.patchservice.api.LogicalTime;
 
 import com.xpn.xwiki.XWikiException;
 
+/**
+ * Default implementation for {@link LogicalTime}.
+ * 
+ * @see org.xwiki.platform.patchservice.api.LogicalTime
+ * @version $Id: $
+ * @since XWikiPlatform 1.3
+ */
 public class LogicalTimeImpl implements LogicalTime
 {
+    /** The name of the XML element corresponding to logical time objects. */
     public static final String NODE_NAME = "logicalTime";
 
     public LogicalTimeImpl()
@@ -41,8 +49,7 @@ public class LogicalTimeImpl implements LogicalTime
      */
     public int compareTo(Object other)
     {
-        if (!(other instanceof LogicalTimeImpl))
-        {
+        if (!(other instanceof LogicalTimeImpl)) {
             return -1;
         }
         return 0;

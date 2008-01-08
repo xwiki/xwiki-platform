@@ -7,29 +7,76 @@ import org.apache.commons.lang.time.DateUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.LogicalTime;
+import org.xwiki.platform.patchservice.api.PatchId;
 import org.xwiki.platform.patchservice.api.RWPatchId;
+import org.xwiki.platform.patchservice.api.XmlSerializable;
 
 import com.xpn.xwiki.XWikiException;
 
-public class PatchIdImpl implements RWPatchId
+/**
+ * Default implementation for {@link RWPatchId}.
+ * 
+ * @see org.xwiki.platform.patchservice.api.RWPatchId
+ * @see org.xwiki.platform.patchservice.api.PatchId
+ * @version $Id: $
+ * @since XWikiPlatform 1.3
+ */
+public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable
 {
+    /** The name of the XML element corresponding to patch IDs. */
     public static final String NODE_NAME = "id";
 
+    /**
+     * The name of the XML attribute holding the document ID.
+     * 
+     * @see PatchId#getDocumentId()
+     */
     public static final String DOCID_ATTRIBUTE_NAME = "doc";
 
+    /**
+     * The name of the XML attribute holding the host ID.
+     * 
+     * @see PatchId#getHostId()
+     */
     public static final String HOSTID_ATTRIBUTE_NAME = "host";
 
+    /**
+     * The name of the XML attribute holding the patch creation time.
+     * 
+     * @see PatchId#getTime()
+     */
     public static final String TIME_ATTRIBUTE_NAME = "time";
 
+    /** Date format used in the XML export. A vector is needed by apache-commons. */
     public static final String[] FORMATS =
         new String[] {DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.getPattern()};
 
+    /**
+     * The document ID.
+     * 
+     * @see PatchId#getDocumentId()
+     */
     private String documentId;
 
+    /**
+     * The host ID.
+     * 
+     * @see PatchId#getHostId()
+     */
     private String hostId;
 
+    /**
+     * The patch creation time on the originating server.
+     * 
+     * @see PatchId#getTime()
+     */
     private Date time;
 
+    /**
+     * The patch creation logical time.
+     * 
+     * @see PatchId#getLogicalTime()
+     */
     private LogicalTime logicalTime;
 
     /**

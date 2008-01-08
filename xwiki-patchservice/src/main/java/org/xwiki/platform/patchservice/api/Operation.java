@@ -5,21 +5,23 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
+ * <p>
  * An <tt>Operation</tt> is the basic unit of change affecting a document. Currently there are 5
  * types of possible changes:
  * <ul>
  * <li>changes affecting the document content;</li>
  * <li>changes affecting the document properties (author, date, language...);</li>
  * <li>changes affecting the Class properties (or property definitions);</li>
- * <li>changes affecting the object properties;</li>
+ * <li>changes affecting the Object properties;</li>
  * <li>changes affecting the attachments.</li>
  * </ul>
+ * </p>
  * <p>
- * Editing and saving a new version of a document is equivalent to applying several operations. For
- * example, between two consecutive document versions there can be several content operations
- * (delete a continuous portion of text, insert new text at a certain position, insert new text at
- * another position) and several document properties operations (change the author, change the
- * modification date).
+ * Editing and saving a new version of a document is equivalent to applying several operations,
+ * grouped in a {@link Patch}. For example, between two consecutive document versions there can be
+ * several content operations (delete a continuous portion of text, insert new text at a certain
+ * position, insert new text at another position) and several document properties operations (change
+ * the author, change the modification date).
  * </p>
  * <p>
  * This interface describes a read-only operation, one that can only be applied on a document.
@@ -120,6 +122,7 @@ public interface Operation extends XmlSerializable
      * Apply this operation on a document.
      * 
      * @param doc The document being patched.
+     * @param context The XWiki context, needed for some document manipulations.
      * @throws XWikiException If the patch cannot be applied, either because the operation is not
      *             well defined, or is not compatible with the document version (a conflict was
      *             detected).

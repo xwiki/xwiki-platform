@@ -6,23 +6,39 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.Position;
+import org.xwiki.platform.patchservice.api.XmlSerializable;
 
 import com.xpn.xwiki.XWikiException;
 
-public class PositionImpl implements Position
+/**
+ * Default implementation for {@link Position}. It uses a [row, column] position mark, with an
+ * optional context (text before and after the position).
+ * 
+ * @see org.xwiki.platform.patchservice.api.Position
+ * @version $Id: $
+ * @since XWikiPlatform 1.3
+ */
+public class PositionImpl implements Position, XmlSerializable
 {
+    /** The name of the XML element corresponding to position objects. */
     public static final String NODE_NAME = "position";
 
+    /** The name of the XML attribute holding the row number. */
     public static final String ROW_ATTRIBUTE_NAME = "row";
 
+    /** The name of the XML attribute holding the column number. */
     public static final String COLUMN_ATTRIBUTE_NAME = "column";
 
+    /** The name of the XML attribute holding the position's length. Currently not used. */
     public static final String SPAN_ATTRIBUTE_NAME = "span";
 
+    /** The name of the XML attribute holding the context before the position. */
     public static final String BEFORE_ATTRIBUTE_NAME = "before";
 
+    /** The name of the XML attribute holding the context after the position. */
     public static final String AFTER_ATTRIBUTE_NAME = "after";
-    
+
+    /** The newline character used. */
     private static final String SEPARATOR = "\n";
 
     private String before;

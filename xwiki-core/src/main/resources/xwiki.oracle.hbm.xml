@@ -114,9 +114,9 @@
         </composite-id>
         <property name="date"    type="timestamp" column="XWR_DATE"    not-null="true" />
         <property name="comment" type="text">
-            <column name="XWR_COMMENT" sql-type="clob" not-null="true" />
+            <column name="XWR_COMMENT" sql-type="clob" />
         </property>
-        <property name="author"  type="string" column="XWR_AUTHOR"  not-null="true" />
+        <property name="author"  type="string" column="XWR_AUTHOR" />
         <property name="diff"    type="boolean"   column="XWR_ISDIFF"  not-null="false" update="false" insert="false" />
     </class>
 

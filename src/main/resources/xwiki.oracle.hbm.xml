@@ -613,11 +613,11 @@
         </property>
 
         <property name="userAgent" type="string">
-            <column name="XWV_USER_AGENT" not-null="true" length="8192"/>
+            <column name="XWV_USER_AGENT" sql-type="clob" not-null="true" length="8192"/>
         </property>
 
         <property name="cookie" type="string">
-            <column name="XWV_COOKIE" not-null="true" length="8192"/>
+            <column name="XWV_COOKIE" sql-type="clob" not-null="true" length="8192"/>
         </property>
 
         <property name="uniqueID" type="string">

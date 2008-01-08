@@ -106,7 +106,10 @@ public class XWikiRCSNodeInfo implements Comparable
      */
     public String getAuthor()
     {
-        return author;
+        // For Oracle and other databases, an empty string is equivalent to a NULL and thus
+        // we had to remove the NOT-NULL condition on this field. Hence we need to test if it's
+        // null here and return an empty string so that all code calling this will not be impacted.
+        return author != null ? author : "";
     }
     /**
      * @param updateAuthor - author of modification.
@@ -120,7 +123,10 @@ public class XWikiRCSNodeInfo implements Comparable
      */
     public String getComment()
     {
-        return comment;
+        // For Oracle and other databases, an empty string is equivalent to a NULL and thus
+        // we had to remove the NOT-NULL condition on this field. Hence we need to test if it's
+        // null here and return an empty string so that all code calling this will not be impacted.
+        return comment != null ? comment : "";
     }
     /**
      * @param comment - modification's comment.

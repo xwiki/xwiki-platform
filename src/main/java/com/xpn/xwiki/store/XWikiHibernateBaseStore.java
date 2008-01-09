@@ -284,7 +284,7 @@ public class XWikiHibernateBaseStore
         try {
             String fullName =
                 ((context != null) && (context.getWiki() != null) && (context.getWiki().isMySQL()))
-                    ? "concat('xwd_web','.','xwd_name)" : "xwd_fullname";
+                    ? "concat(xwd_web,'.',xwd_name)" : "xwd_fullname";
             String[] schemaSQL = getSchemaUpdateScript(getConfiguration(), context);
             String[] addSQL =
                 {

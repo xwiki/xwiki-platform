@@ -19,49 +19,44 @@
  */
 package com.xpn.xwiki;
 
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.User;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
-import com.xpn.xwiki.cache.impl.OSCacheService;
-import com.xpn.xwiki.cache.impl.XWikiCacheListener;
-import com.xpn.xwiki.doc.*;
-import com.xpn.xwiki.notify.*;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.*;
-import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.XWikiPluginManager;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
-import com.xpn.xwiki.plugin.query.XWikiCriteria;
-import com.xpn.xwiki.plugin.query.XWikiQuery;
-import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
-import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
-import com.xpn.xwiki.stats.api.XWikiStatsService;
-import com.xpn.xwiki.stats.impl.SearchEngineRule;
-import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
-import com.xpn.xwiki.store.*;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
-import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
-import com.xpn.xwiki.user.api.XWikiAuthService;
-import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
-import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
-import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
-import com.xpn.xwiki.util.MenuSubstitution;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.*;
-import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.DateFormatSymbols;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.Vector;
+import java.util.zip.ZipOutputStream;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
@@ -82,23 +77,79 @@ import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.DateFormatSymbols;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.zip.ZipOutputStream;
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.User;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
+import com.xpn.xwiki.cache.impl.OSCacheService;
+import com.xpn.xwiki.cache.impl.XWikiCacheListener;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiAttachmentArchive;
+import com.xpn.xwiki.doc.XWikiDeletedDocument;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.notify.DocObjectChangedRule;
+import com.xpn.xwiki.notify.PropertyChangedRule;
+import com.xpn.xwiki.notify.XWikiActionRule;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
+import com.xpn.xwiki.notify.XWikiPageNotification;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.GroupsClass;
+import com.xpn.xwiki.objects.classes.LevelsClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.UsersClass;
+import com.xpn.xwiki.objects.meta.MetaClass;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.query.QueryPlugin;
+import com.xpn.xwiki.plugin.query.XWikiCriteria;
+import com.xpn.xwiki.plugin.query.XWikiQuery;
+import com.xpn.xwiki.render.DefaultXWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiRenderingEngine;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
+import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
+import com.xpn.xwiki.stats.api.XWikiStatsService;
+import com.xpn.xwiki.stats.impl.SearchEngineRule;
+import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
+import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
+import com.xpn.xwiki.store.XWikiCacheStore;
+import com.xpn.xwiki.store.XWikiCacheStoreInterface;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
+import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
+import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
+import com.xpn.xwiki.user.api.XWikiAuthService;
+import com.xpn.xwiki.user.api.XWikiGroupService;
+import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.user.impl.LDAP.LDAPAuthServiceImpl;
+import com.xpn.xwiki.user.impl.exo.ExoAuthServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiGroupServiceImpl;
+import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
+import com.xpn.xwiki.util.MenuSubstitution;
+import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiEngineContext;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.web.XWikiURLFactoryService;
+import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
+import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
 public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface
 {
@@ -111,6 +162,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     private XWikiAttachmentStoreInterface attachmentStore;
 
     private XWikiVersioningStoreInterface versioningStore;
+
     /** store for deleted documents */
     private XWikiRecycleBinStoreInterface recycleBinStore;
 
@@ -255,13 +307,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * First try to find the configuration file pointed by the passed location as a file. If it
-     * does not exist or if the file cannot be read (for example if the security manager
-     * doesn't allow it), then try to load the file as a resource using the Servlet Context and
-     * failing that from teh classpath.
-     *
+     * First try to find the configuration file pointed by the passed location as a file. If it does
+     * not exist or if the file cannot be read (for example if the security manager doesn't allow
+     * it), then try to load the file as a resource using the Servlet Context and failing that from
+     * teh classpath.
+     * 
      * @param configurationLocation the location where the XWiki configuration file is located
-     *        (either an absolute or relative file path or a resource location)
+     *            (either an absolute or relative file path or a resource location)
      * @return the stream containing the configuration data or null if not found
      * @todo this code should be moved to a Configuration class proper
      */
@@ -296,8 +348,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             // the debug mode and even for that we need to find some better way of doing it so
             // that we don't have hardcoded code only for development debugging purposes.
             if (context.getMode() == XWikiContext.MODE_GWT
-                || context.getMode() == XWikiContext.MODE_GWT_DEBUG)
-            {
+                || context.getMode() == XWikiContext.MODE_GWT_DEBUG) {
                 xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki-gwt.cfg");
             } else {
                 xwikicfgis = XWiki.class.getClassLoader().getResourceAsStream("xwiki.cfg");
@@ -385,8 +436,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a
-     *         full list of all virtual wikis database names use {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
+     * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user
+     *         request). To get a full list of all virtual wikis database names use
+     *         {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
      */
     public List getVirtualWikiList()
     {
@@ -508,22 +560,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     e.printStackTrace();
                 }
 
-/*
-                // Run migrations
-                if ("1".equals(xwiki.Param("xwiki.store.migration", "0"))) {
-                    if (LOG.isInfoEnabled())
-                        LOG.info("Running storage migrations");
-                    AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager)
-                        xwiki.createClassFromConfig( "xwiki.store.migration.manager.class",
-                            "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
-                    manager.startMigrations(context);
-                    if ("1".equals(xwiki.Param("xwiki.store.migration.exitAfterEnd", "0"))) {
-                        if (LOG.isErrorEnabled())
-                            LOG.error("Exiting because xwiki.store.migration.exitAfterEnd is set");
-                        System.exit(0);
-                    }
-                }
-  */
+                /*
+                 * // Run migrations if ("1".equals(xwiki.Param("xwiki.store.migration", "0"))) { if
+                 * (LOG.isInfoEnabled()) LOG.info("Running storage migrations");
+                 * AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager)
+                 * xwiki.createClassFromConfig( "xwiki.store.migration.manager.class",
+                 * "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager",
+                 * context); manager.startMigrations(context); if
+                 * ("1".equals(xwiki.Param("xwiki.store.migration.exitAfterEnd", "0"))) { if
+                 * (LOG.isErrorEnabled()) LOG.error("Exiting because
+                 * xwiki.store.migration.exitAfterEnd is set"); System.exit(0); } }
+                 */
             }
         }
         return xwiki;
@@ -598,7 +645,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         String wikiOwner = context.getWikiOwner();
 
-        if (isVirtual()&&(!servername.equals(context.getMainXWiki()))) {
+        if (isVirtual() && (!servername.equals(context.getMainXWiki()))) {
             String serverwikipage = getServerWikiPage(servername);
 
             String currentdatabase = context.getDatabase();
@@ -673,6 +720,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         initXWiki(new XWikiConfig(is), context, engine_context, true);
     }
+
     /**
      * Initialize all xwiki subsystems.
      */
@@ -687,8 +735,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         // Prepare the store
         setConfig(config);
-        XWikiStoreInterface basestore = (XWikiStoreInterface) createClassFromConfig(
-            "xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore", context);
+        XWikiStoreInterface basestore =
+            (XWikiStoreInterface) createClassFromConfig("xwiki.store.class",
+                "com.xpn.xwiki.store.XWikiHibernateStore", context);
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache) {
@@ -698,17 +747,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             setStore(basestore);
 
         setAttachmentStore((XWikiAttachmentStoreInterface) createClassFromConfig(
-            "xwiki.store.attachment.class",
-            "com.xpn.xwiki.store.XWikiHibernateAttachmentStore", context));
+            "xwiki.store.attachment.class", "com.xpn.xwiki.store.XWikiHibernateAttachmentStore",
+            context));
 
         if (hasVersioning(null, context)) {
-            setVersioningStore( (XWikiVersioningStoreInterface) createClassFromConfig(
+            setVersioningStore((XWikiVersioningStoreInterface) createClassFromConfig(
                 "xwiki.store.versioning.class",
                 "com.xpn.xwiki.store.XWikiHibernateVersioningStore", context));
         }
 
         if (hasRecycleBin(context)) {
-            setRecycleBinStore( (XWikiRecycleBinStoreInterface) createClassFromConfig(
+            setRecycleBinStore((XWikiRecycleBinStoreInterface) createClassFromConfig(
                 "xwiki.store.recyclebin.class",
                 "com.xpn.xwiki.store.XWikiHibernateRecycleBinStore", context));
         }
@@ -717,9 +766,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if ("1".equals(Param("xwiki.store.migration", "0"))) {
             if (LOG.isInfoEnabled())
                 LOG.info("Running storage migrations");
-            AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager)
-                createClassFromConfig( "xwiki.store.migration.manager.class",
-                    "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager", context);
+            AbstractXWikiMigrationManager manager =
+                (AbstractXWikiMigrationManager) createClassFromConfig(
+                    "xwiki.store.migration.manager.class",
+                    "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager",
+                    context);
             manager.startMigrations(context);
             if ("1".equals(Param("xwiki.store.migration.exitAfterEnd", "0"))) {
                 if (LOG.isErrorEnabled())
@@ -773,17 +824,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         try {
             Class[] classes = new Class[] {XWikiContext.class};
             Object[] args = new Object[] {context};
-            Object result = Class.forName(storeclass).getConstructor(classes)
-                .newInstance(args);
+            Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
         } catch (Exception e) {
             Throwable ecause = e;
             if (e instanceof InvocationTargetException)
-                ecause = ((InvocationTargetException)e).getTargetException();
+                ecause = ((InvocationTargetException) e).getTargetException();
             Object[] args = {param, storeclass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load class {1} from param {0}", ecause, args);
+                "Cannot load class {1} from param {0}",
+                ecause,
+                args);
         }
     }
 
@@ -804,6 +856,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * {@inheritDoc}
+     * 
      * @see XWikiInterface#getVersion()
      */
     public String getVersion()
@@ -998,8 +1051,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         saveDocument(doc, comment, false, context);
     }
 
-    public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit, XWikiContext context)
-        throws XWikiException
+    public void saveDocument(XWikiDocument doc, String comment, boolean isMinorEdit,
+        XWikiContext context) throws XWikiException
     {
         String server = null, database = null;
         try {
@@ -1137,7 +1190,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * @see com.xpn.xwiki.api.XWiki#getDeletedDocuments(String, String)
      */
-    public XWikiDeletedDocument[] getDeletedDocuments(String fullname, String lang, XWikiContext context) throws XWikiException
+    public XWikiDeletedDocument[] getDeletedDocuments(String fullname, String lang,
+        XWikiContext context) throws XWikiException
     {
         if (hasRecycleBin(context)) {
             XWikiDocument doc = new XWikiDocument();
@@ -1150,9 +1204,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /**
-     * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, String)  
+     * @see com.xpn.xwiki.api.XWiki#getDeletedDocument(String, String, String)
      */
-    public XWikiDeletedDocument getDeletedDocument(String fullname, String lang, int index, XWikiContext context) throws XWikiException
+    public XWikiDeletedDocument getDeletedDocument(String fullname, String lang, int index,
+        XWikiContext context) throws XWikiException
     {
         if (hasRecycleBin(context)) {
             XWikiDocument doc = new XWikiDocument();
@@ -1420,7 +1475,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * Designed to include dynamic content, such as Servlets or JSPs, inside Velocity templates;
      * works by creating a RequestDispatcher, buffering the output, then returning it as a string.
-     *
+     * 
      * @author LBlaze
      */
     public String invokeServletAndReturnAsString(String url, XWikiContext xwikiContext)
@@ -1514,7 +1569,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
                 // Read XWikiAttachment
                 XWikiAttachment attachment = null;
-                List list = doc.getAttachmentList();
+                doc.getAttachmentList();
                 String shortname = filename.substring(0, filename.indexOf("."));
                 attachment = doc.getAttachment(shortname);
 
@@ -1790,7 +1845,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * try to get it from a cookie. If no language cookie exists then use the user default language
      * and barring that use the browser's "Accept-Language" header sent in HTTP request. If none is
      * defined use the default language.
-     *
+     * 
      * @return the language to use
      */
     public String getLanguagePreference(XWikiContext context)
@@ -2357,7 +2412,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the
      * required configuration properties to make XWiki work properly. If some properties are missing
      * they are created and saved in the database.
-     *
+     * 
      * @param context the XWiki Context
      * @return the XWiki Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2384,7 +2439,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("default_language", "Default Language", 5);
         needsUpdate |= bclass.addBooleanField("authenticate_edit", "Authenticated Edit", "yesno");
         needsUpdate |= bclass.addBooleanField("authenticate_view", "Authenticated View", "yesno");
-        needsUpdate |= bclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
+        needsUpdate |=
+            bclass.addBooleanField("auth_active_check", "Authentication Active Check", "yesno");
 
         needsUpdate |= bclass.addTextField("skin", "Skin", 30);
         // This one should not be in the prefs
@@ -2406,12 +2462,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextAreaField("menu", "Menu", 60, 8);
         needsUpdate |= bclass.addTextAreaField("meta", "HTTP Meta Info", 60, 8);
 
-        needsUpdate |= bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
+        needsUpdate |=
+            bclass.addBooleanField("use_email_verification", "Use eMail Verification", "yesno");
         needsUpdate |= bclass.addTextField("smtp_server", "SMTP Server", 30);
         needsUpdate |= bclass.addTextField("admin_email", "Admin eMail", 30);
-        needsUpdate |= bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72, 10);
-        needsUpdate |= bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content", 72, 10);
-        needsUpdate |= bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72, 10);
+        needsUpdate |=
+            bclass.addTextAreaField("validation_email_content", "Validation eMail Content", 72,
+                10);
+        needsUpdate |=
+            bclass.addTextAreaField("confirmation_email_content", "Confirmation eMail Content",
+                72, 10);
+        needsUpdate |=
+            bclass.addTextAreaField("invitation_email_content", "Invitation eMail Content", 72,
+                10);
 
         needsUpdate |= bclass.addTextField("macros_languages", "Macros Languages", 60);
         needsUpdate |= bclass.addTextField("macros_velocity", "Macros for Velocity", 60);
@@ -2419,18 +2482,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         needsUpdate |= bclass.addTextField("macros_wiki", "Macros for the Wiki Parser", 60);
         needsUpdate |= bclass.addTextAreaField("macros_mapping", "Macros Mapping", 60, 15);
 
-        needsUpdate |= bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
+        needsUpdate |=
+            bclass.addStaticListField("registration_anonymous", "Anonymous", "---|Image|Text");
+        needsUpdate |=
+            bclass.addStaticListField("registration_registered", "Registered", "---|Image|Text");
         needsUpdate |= bclass.addStaticListField("edit_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
-        needsUpdate |= bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
+        needsUpdate |=
+            bclass.addStaticListField("edit_registered", "Registered", "---|Image|Text");
+        needsUpdate |=
+            bclass.addStaticListField("comment_anonymous", "Anonymous", "---|Image|Text");
+        needsUpdate |=
+            bclass.addStaticListField("comment_registered", "Registered", "---|Image|Text");
 
         needsUpdate |= bclass.addTextField("notification_pages", "Notification Pages", 60);
 
-        needsUpdate |= bclass.addBooleanField("renderXWikiVelocityRenderer", "Render velocity code", "yesno");
-        needsUpdate |= bclass.addBooleanField("renderXWikiGroovyRenderer", "Render Groovy code", "yesno");
-        needsUpdate |= bclass.addBooleanField("renderXWikiRadeoxRenderer", "Render Wiki syntax", "yesno");
+        needsUpdate |=
+            bclass
+                .addBooleanField("renderXWikiVelocityRenderer", "Render velocity code", "yesno");
+        needsUpdate |=
+            bclass.addBooleanField("renderXWikiGroovyRenderer", "Render Groovy code", "yesno");
+        needsUpdate |=
+            bclass.addBooleanField("renderXWikiRadeoxRenderer", "Render Wiki syntax", "yesno");
 
         needsUpdate |= bclass.addNumberField("upload_maxsize", "Maximum Upload Size", 5, "long");
 
@@ -2443,12 +2515,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // New fields for the XWiki 1.0 skin
         needsUpdate |= bclass.addTextField("leftPanels", "Panels displayed on the left", 60);
         needsUpdate |= bclass.addTextField("rightPanels", "Panels displayed on the right", 60);
-        needsUpdate |= bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
-        needsUpdate |= bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
-        needsUpdate |= bclass.addStaticListField("pageWidth", "Preferred page width", "default|640|800|1024|1280|1600");
+        needsUpdate |=
+            bclass.addBooleanField("showLeftPanels", "Display the left panel column", "yesno");
+        needsUpdate |=
+            bclass.addBooleanField("showRightPanels", "Display the right panel column", "yesno");
+        needsUpdate |=
+            bclass.addStaticListField("pageWidth", "Preferred page width",
+                "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("languages", "Supported languages", 30);
         needsUpdate |= bclass.addTextField("convertmail", "convert email type", 1);
-        needsUpdate |= bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
+        needsUpdate |=
+            bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
 
         if (((BooleanClass) bclass.get("showLeftPanels")).getDisplayType().equals("checkbox")) {
             ((BooleanClass) bclass.get("showLeftPanels")).setDisplayType("yesno");
@@ -2762,7 +2839,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     /**
      * Method allows to create an empty user with no password (he won't be able to login) This
      * method is usefull for authentication like LDAP or App Server trusted
-     *
+     * 
      * @param xwikiname
      * @param userRights
      * @param context
@@ -3081,7 +3158,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
      * Prepares the localized resources, according to the selected language. From any point in the
      * code (java, velocity or groovy) the "msg" parameter holds an instance of the localized
      * resource bundle, and the "locale" parameter holds the current locale settings.
-     *
+     * 
      * @param context The request context.
      */
     public void prepareResources(XWikiContext context)
@@ -3262,13 +3339,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         deleteDocument(doc, true, context);
     }
 
-    public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
+    public void deleteDocument(XWikiDocument doc, boolean totrash, XWikiContext context)
+        throws XWikiException
     {
         getNotificationManager().preverify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),
             XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
         if (hasRecycleBin(context) && totrash) {
-            getRecycleBinStore().saveToRecycleBin(
-                doc, context.getUser(), new Date(), context, true);
+            getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context,
+                true);
         }
         getStore().deleteXWikiDoc(doc, context);
         getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
@@ -3364,8 +3442,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return copyDocument(docname, targetdocname, null, null, null, true, context);
     }
 
-    public boolean copyDocument(String docname, String targetdocname, boolean reset, XWikiContext context)
-        throws XWikiException
+    public boolean copyDocument(String docname, String targetdocname, boolean reset,
+        XWikiContext context) throws XWikiException
     {
         return copyDocument(docname, targetdocname, null, null, null, reset, context);
     }
@@ -3394,14 +3472,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         String targetWiki, String wikilanguage, boolean reset, boolean force, XWikiContext context)
         throws XWikiException
     {
-        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset, force,
-            false, context);
+        return copyDocument(docname, targetdocname, sourceWiki, targetWiki, wikilanguage, reset,
+            force, false, context);
     }
 
     public boolean copyDocument(String docname, String targetdocname, String sourceWiki,
-        String targetWiki, String wikilanguage, boolean reset, boolean force, boolean resetCreationData,
-        XWikiContext context)
-        throws XWikiException
+        String targetWiki, String wikilanguage, boolean reset, boolean force,
+        boolean resetCreationData, XWikiContext context) throws XWikiException
     {
         String db = context.getDatabase();
         if (sourceWiki == null)
@@ -3806,7 +3883,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     String server = serverobject.getStringValue("server");
                     if (server != null) {
                         int mode = serverobject.getIntValue("secure");
-                        int port = (context.getURL().getPort() == -1) ? 80 : context.getURL().getPort();
+                        int port =
+                            (context.getURL().getPort() == -1) ? 80 : context.getURL().getPort();
                         if (mode == 1) {
                             if (port != 443) {
                                 serverurl = "https://" + server + ":" + port + "/";
@@ -4002,7 +4080,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                                     + request.getServletPath().length());
                 }
 
-                // Fix error in some containers, which don't hide the jsessionid parameter from the URL
+                // Fix error in some containers, which don't hide the jsessionid parameter from the
+                // URL
                 if (path.indexOf(";jsessionid=") != -1) {
                     path = path.substring(0, path.indexOf(";jsessionid="));
                 }
@@ -4312,21 +4391,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                     if (urlFactoryServiceClass != null) {
                         try {
                             if (LOG.isDebugEnabled())
-                                LOG.debug("Using custom URLFactory Service Class [" + urlFactoryServiceClass + "]");
-                            factoryService = (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
-                                .getConstructor(new Class[] {XWiki.class}).newInstance(new Object[] {this});
+                                LOG.debug("Using custom URLFactory Service Class ["
+                                    + urlFactoryServiceClass + "]");
+                            factoryService =
+                                (XWikiURLFactoryService) Class.forName(urlFactoryServiceClass)
+                                    .getConstructor(new Class[] {XWiki.class}).newInstance(
+                                        new Object[] {this});
                         } catch (Exception e) {
                             factoryService = null;
-                            LOG.warn("Failed to initialize URLFactory Service [" + urlFactoryServiceClass + "]", e);
+                            LOG.warn("Failed to initialize URLFactory Service ["
+                                + urlFactoryServiceClass + "]", e);
                         }
                     }
                     if (factoryService == null) {
                         if (LOG.isDebugEnabled())
-                            LOG.debug("Using default URLFactory Service Class [" + urlFactoryServiceClass + "]");
+                            LOG.debug("Using default URLFactory Service Class ["
+                                + urlFactoryServiceClass + "]");
                         factoryService = new XWikiURLFactoryServiceImpl(this);
                     }
 
-                    // Set the urlFactoryService object in one assignment to prevent threading issues when checking for
+                    // Set the urlFactoryService object in one assignment to prevent threading
+                    // issues when checking for
                     // null above.
                     urlFactoryService = factoryService;
                 }
@@ -4346,7 +4431,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
-     *
+     * 
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4378,7 +4463,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Privileged API to access an eXo Platform Portal service from the Wiki Engine
-     *
+     * 
      * @param className eXo classname to retrieve the service from
      * @return A object representing the service
      * @throws XWikiException if the service cannot be loaded
@@ -4598,7 +4683,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
             try {
                 sdf.setTimeZone(TimeZone.getTimeZone(getUserTimeZone(context)));
-            } catch (Exception e) {}
+            } catch (Exception e) {
+            }
             return sdf.format(date);
         } catch (Exception e) {
             e.printStackTrace();
@@ -4614,22 +4700,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     /*
-      Allow to read user setting providing the user timezone
-      All dates will be expressed with this timezone
+     * Allow to read user setting providing the user timezone All dates will be expressed with this
+     * timezone
      */
-    public String getUserTimeZone(XWikiContext context) {
+    public String getUserTimeZone(XWikiContext context)
+    {
         String tz = getUserPreference("timezone", context);
-        if ((tz==null)||(tz.equals("")))
-        {
+        if ((tz == null) || (tz.equals(""))) {
             String defaultTz = TimeZone.getDefault().getID();
             return Param("xwiki.timezone", defaultTz);
-        }
-        else
-        {
+        } else {
             return tz;
         }
     }
-
 
     public boolean exists(String fullname, XWikiContext context)
     {
@@ -4775,21 +4858,21 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         String proxyHost = System.getProperty("http.proxyHost");
         String proxyPort = System.getProperty("http.proxyPort");
-        if ((proxyHost!=null)&&(!proxyHost.equals(""))) {
+        if ((proxyHost != null) && (!proxyHost.equals(""))) {
             int port = 3128;
-            if ((proxyPort!=null)&&(!proxyPort.equals(""))) {
+            if ((proxyPort != null) && (!proxyPort.equals(""))) {
                 port = Integer.parseInt(proxyPort);
             }
             client.getHostConfiguration().setProxy(proxyHost, port);
         }
 
         String proxyUser = System.getProperty("http.proxyUser");
-        if ((proxyUser!=null)&&(!proxyUser.equals(""))) {
+        if ((proxyUser != null) && (!proxyUser.equals(""))) {
             String proxyPassword = System.getProperty("http.proxyPassword");
             Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
             client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
         }
-       return client;
+        return client;
     }
 
     public String getURLContent(String surl, XWikiContext context) throws IOException
@@ -4844,7 +4927,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             get.setDoAuthentication(true);
 
             // execute the GET
-            int status = client.executeMethod(get);
+            client.executeMethod(get);
 
             // print the status and response
             return get.getResponseBodyAsString();
@@ -4870,7 +4953,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
         try {
             // execute the GET
-            int status = client.executeMethod(get);
+            client.executeMethod(get);
 
             // print the status and response
             return get.getResponseBody();
@@ -4911,7 +4994,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             get.setDoAuthentication(true);
 
             // execute the GET
-            int status = client.executeMethod(get);
+            client.executeMethod(get);
 
             // print the status and response
             return get.getResponseBody();
@@ -4938,7 +5021,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
             docs =
                 this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{
-                    "doc.web", spaceName}}, context);
+                "doc.web", spaceName}}, context);
         } else if (getNotCacheStore() instanceof XWikiJcrStore) {
             docs = ((XWikiJcrStore) getNotCacheStore()).getSpaceDocsName(spaceName, context);
         }
@@ -4991,7 +5074,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * accessor for the isReadOnly instance var.
-     *
+     * 
      * @see #isReadOnly
      */
     public boolean isReadOnly()
@@ -5009,7 +5092,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         deleteAllDocuments(doc, true, context);
     }
 
-    public void deleteAllDocuments(XWikiDocument doc, boolean totrash, XWikiContext context) throws XWikiException
+    public void deleteAllDocuments(XWikiDocument doc, boolean totrash, XWikiContext context)
+        throws XWikiException
     {
         // Delete all documents
         List list = doc.getTranslationList(context);
@@ -5177,6 +5261,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     {
         return "1".equals(Param("xwiki.recyclebin", "1"));
     }
+
     /**
      * @deprecated use {@link XWikiDocument#rename(String, XWikiContext)} instead
      */
@@ -5224,21 +5309,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public Object parseGroovyFromString(String script, XWikiContext context)
-            throws XWikiException
+        throws XWikiException
     {
         if (getRenderingEngine().getRenderer("groovy") == null)
             return null;
         else
             return ((XWikiGroovyRenderer) getRenderingEngine().getRenderer("groovy"))
-                    .parseGroovyFromString(script, context);
+                .parseGroovyFromString(script, context);
     }
 
     public Object parseGroovyFromString(String script, String jarWikiPage, XWikiContext context)
-            throws XWikiException
+        throws XWikiException
     {
         if (getRenderingEngine().getRenderer("groovy") == null)
             return null;
-
 
         XWikiPageClassLoader pcl = new XWikiPageClassLoader(jarWikiPage, context);
         Object prevParentClassLoader = context.get("parentclassloader");
@@ -5246,7 +5330,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
             context.put("parentclassloader", pcl);
             return parseGroovyFromString(script, context);
         } finally {
-            if (prevParentClassLoader==null)
+            if (prevParentClassLoader == null)
                 context.remove("parentclassloader");
             else
                 context.put("parentclassloader", prevParentClassLoader);
@@ -5254,17 +5338,17 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     }
 
     public Object parseGroovyFromPage(String fullname, XWikiContext context)
-            throws XWikiException
+        throws XWikiException
     {
         return parseGroovyFromString(context.getWiki().getDocument(fullname, context)
-                .getContent(), context);
+            .getContent(), context);
     }
 
     public Object parseGroovyFromPage(String fullName, String jarWikiPage, XWikiContext context)
-            throws XWikiException
+        throws XWikiException
     {
         return parseGroovyFromString(context.getWiki().getDocument(fullName, context)
-                .getContent(), context);
+            .getContent(), context);
     }
 
     public String getMacroList(XWikiContext context)
@@ -5697,7 +5781,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Get the XWiki temporary filesystem directory (deleted on exit)
-     *
+     * 
      * @param context
      * @return temporary directory
      * @since 1.1 Milestone 4
@@ -5705,50 +5789,41 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public File getTempDirectory(XWikiContext context)
     {
         // if tempDir has already been set, return it
-        if (tempDir != null)
-        {
+        if (tempDir != null) {
             return tempDir;
         }
 
         // xwiki.cfg
         String dirPath = context.getWiki().Param("xwiki.temp.dir");
-        if (dirPath != null)
-        {
-            try
-            {
+        if (dirPath != null) {
+            try {
                 tempDir = new File(dirPath.replaceAll("\\s+$", ""));
-                if (tempDir.isDirectory() && tempDir.canWrite())
-                {
+                if (tempDir.isDirectory() && tempDir.canWrite()) {
                     tempDir.deleteOnExit();
                     return tempDir;
                 }
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 tempDir = null;
-                LOG.warn("xwiki.temp.dir set in xwiki.cfg : " + dirPath + " does not exist or is not writable", e);
+                LOG.warn("xwiki.temp.dir set in xwiki.cfg : " + dirPath
+                    + " does not exist or is not writable", e);
             }
         }
 
         Object jsct = context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
 
         // javax.servlet.context.tempdir (File)
-        if (jsct!=null && (jsct instanceof File))
-        {
-            workDir=(File)jsct;
-            if (workDir.isDirectory() && workDir.canWrite())
-            {
+        if (jsct != null && (jsct instanceof File)) {
+            workDir = (File) jsct;
+            if (workDir.isDirectory() && workDir.canWrite()) {
                 return workDir;
             }
         }
 
         // javax.servlet.context.tempdir (String)
-        if (jsct!=null && (jsct instanceof String))
-        {
-            workDir=new File((String)jsct);
+        if (jsct != null && (jsct instanceof String)) {
+            workDir = new File((String) jsct);
 
-            if (workDir.isDirectory() && workDir.canWrite())
-            {
+            if (workDir.isDirectory() && workDir.canWrite()) {
                 return workDir;
             }
         }
@@ -5756,12 +5831,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         // Let's make a tempdir in java.io.tmpdir
         workDir = new File(System.getProperty("java.io.tmpdir"), "xwikiTemp");
 
-        if (workDir.exists())
-        {
+        if (workDir.exists()) {
             workDir.deleteOnExit();
-        }
-        else
-        {
+        } else {
             workDir.mkdir();
             workDir.deleteOnExit();
         }
@@ -5771,7 +5843,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Get a new directory in the xwiki work directory
-     *
+     * 
      * @param subdir desired directory name
      * @param context
      * @return work subdirectory
@@ -5780,8 +5852,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
     public File getWorkSubdirectory(String subdir, XWikiContext context)
     {
         File fdir = new File(this.getWorkDirectory(context).getAbsolutePath(), subdir);
-        if (!fdir.exists())
-        {
+        if (!fdir.exists()) {
             fdir.mkdir();
         }
         return fdir;
@@ -5789,50 +5860,43 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     /**
      * Get the XWiki work directory
-     *
+     * 
      * @param context
      * @return work directory
      * @since 1.1 Milestone 4
      */
     public File getWorkDirectory(XWikiContext context)
     {
-        String  dirPath;
+        String dirPath;
 
         // if workDir has already been set, return it
-        if (workDir != null)
-        {
+        if (workDir != null) {
             return workDir;
         }
 
         // xwiki.cfg
         dirPath = context.getWiki().Param("xwiki.work.dir");
-        if (dirPath != null)
-        {
-            try
-            {
+        if (dirPath != null) {
+            try {
                 workDir = new File(dirPath.replaceAll("\\s+$", ""));
-                if (workDir.exists())
-                {
-                    if (workDir.isDirectory() && workDir.canWrite())
-                    {
+                if (workDir.exists()) {
+                    if (workDir.isDirectory() && workDir.canWrite()) {
                         return workDir;
                     }
-                }
-                else
-                {
+                } else {
                     workDir.mkdir();
                     return workDir;
                 }
-            }
-            catch(Exception e)
-            {
+            } catch (Exception e) {
                 workDir = null;
-                LOG.warn("xwiki.work.dir set in xwiki.cfg : " + dirPath + " does not exist or is not writable", e);
+                LOG.warn("xwiki.work.dir set in xwiki.cfg : " + dirPath
+                    + " does not exist or is not writable", e);
             }
         }
 
         /*
-         * TODO : it would be nice to create a subdirectory xwiki in APPServer/work or WEBAPP/WEB-INF/work
+         * TODO : it would be nice to create a subdirectory xwiki in APPServer/work or
+         * WEBAPP/WEB-INF/work
          */
 
         // No choices left, retreiving the temp directory
@@ -5841,68 +5905,89 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return workDir;
     }
 
-    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context) throws XWikiException {
+    public XWikiDocument rollback(final XWikiDocument tdoc, String rev, XWikiContext context)
+        throws XWikiException
+    {
         // let's clone rolledbackDoc since we might modify it
         XWikiDocument rolledbackDoc = (XWikiDocument) getDocument(tdoc, rev, context).clone();
 
-        if ("1".equals(context.getWiki().Param("xwiki.store.rollbackattachmentwithdocuments", "1"))) {
+        if ("1".equals(context.getWiki()
+            .Param("xwiki.store.rollbackattachmentwithdocuments", "1"))) {
             // XWIKI-851 We need to check the attachments..
-            // If attachment exist in both versions (current and older), rollback the attachment to the one in the older document
-            // If attachment does not exist anymore we can't do anything, we have to delete the reference in the older document
-            // If attachment does not exist in the older, readd it and roll it back to the first version uploaded
-            // Delete attachment that do not exist anymore but existed in the version to which we rollback
+            // If attachment exist in both versions (current and older), rollback the attachment to
+            // the one in the older document
+            // If attachment does not exist anymore we can't do anything, we have to delete the
+            // reference in the older document
+            // If attachment does not exist in the older, readd it and roll it back to the first
+            // version uploaded
+            // Delete attachment that do not exist anymore but existed in the version to which we
+            // rollback
             List rolledbackAttachList = rolledbackDoc.getAttachmentList();
             List toDelete = new ArrayList();
-            for (int i=0;i<rolledbackAttachList.size();i++) {
+            for (int i = 0; i < rolledbackAttachList.size(); i++) {
                 XWikiAttachment attach = (XWikiAttachment) rolledbackAttachList.get(i);
                 String fileName = attach.getFilename();
-                if (tdoc.getAttachment(fileName)==null) {
+                if (tdoc.getAttachment(fileName) == null) {
                     // we need to remove that attachment because it does not exist in the never one
-                    // TODO: if we have a storage system which keeps track of deleted attachments then we can recover it..
+                    // TODO: if we have a storage system which keeps track of deleted attachments
+                    // then we can recover it..
                     toDelete.add(attach);
                 }
             }
-            for (int i=0;i<toDelete.size();i++) {
-                XWikiAttachment newAttach = (XWikiAttachment)toDelete.get(i);
+            for (int i = 0; i < toDelete.size(); i++) {
+                XWikiAttachment newAttach = (XWikiAttachment) toDelete.get(i);
                 rolledbackAttachList.remove(newAttach);
             }
 
-            // Let's look now for attachment that are in both or present in the most recent doc but not in the rolledback doc
-            // if the attachment is in both we want to rollback to the version existing at the time (if it exist)
-            // if the attachment is not present in the rollbacked do we don't want to explicitely loose a reference
+            // Let's look now for attachment that are in both or present in the most recent doc but
+            // not in the rolledback doc
+            // if the attachment is in both we want to rollback to the version existing at the time
+            // (if it exist)
+            // if the attachment is not present in the rollbacked do we don't want to explicitely
+            // loose a reference
             // to that doc, since we'll never be able to resolve it
-            // so we want to keep this attachment and roll it back to the first ever uploaded attachment
+            // so we want to keep this attachment and roll it back to the first ever uploaded
+            // attachment
             List currentAttachList = tdoc.getAttachmentList();
             Map toRollbackMap = new HashMap();
-            for (int i=0;i<currentAttachList.size();i++) {
+            for (int i = 0; i < currentAttachList.size(); i++) {
                 XWikiAttachment attach = (XWikiAttachment) currentAttachList.get(i);
                 String fileName = attach.getFilename();
                 XWikiAttachment rolledbackAttach = rolledbackDoc.getAttachment(fileName);
                 XWikiAttachment correctAttach = null;
-                if (rolledbackAttach!=null) {
-                    // if the attachment exist in both let's look for the revision existing at the time
+                if (rolledbackAttach != null) {
+                    // if the attachment exist in both let's look for the revision existing at the
+                    // time
                     try {
-                        correctAttach = rolledbackAttach.getAttachmentRevision(rolledbackAttach.getVersion(), context);
-                    } catch(Exception e) {}
+                        correctAttach =
+                            rolledbackAttach.getAttachmentRevision(rolledbackAttach.getVersion(),
+                                context);
+                    } catch (Exception e) {
+                    }
                 }
 
-                // if we had an attachment but correctAttach returned null, then we might be in an even more complex
-                // case where the attachment was uploaded, delete, uploaded and we don't have the same number of versions
+                // if we had an attachment but correctAttach returned null, then we might be in an
+                // even more complex
+                // case where the attachment was uploaded, delete, uploaded and we don't have the
+                // same number of versions
                 // in this case we want to still keep the latest attachment we have in the store.
-                if (correctAttach==null) {
+                if (correctAttach == null) {
                     // let's re-add the attachment and roll it back to the first ever version
                     rolledbackAttach = (XWikiAttachment) attach.clone();
-                    XWikiAttachment firstAttach = rolledbackAttach.getAttachmentRevision("1.1", context);
+                    XWikiAttachment firstAttach =
+                        rolledbackAttach.getAttachmentRevision("1.1", context);
                     firstAttach.setVersion(attach.getVersion());
-                    XWikiAttachmentArchive firstArchive = (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
+                    XWikiAttachmentArchive firstArchive =
+                        (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
                     firstArchive.setAttachment(firstAttach);
                     firstAttach.setAttachment_archive(firstArchive);
                     rolledbackAttachList.add(firstAttach);
                     toRollbackMap.put(rolledbackAttach.getFilename(), firstAttach);
-                }  else {
+                } else {
                     // we need to update the version
                     correctAttach.setVersion(attach.getVersion());
-                    XWikiAttachmentArchive correctArchive = (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
+                    XWikiAttachmentArchive correctArchive =
+                        (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
                     correctArchive.setAttachment(correctAttach);
                     correctAttach.setAttachment_archive(correctArchive);
                     toRollbackMap.put(rolledbackAttach.getFilename(), correctAttach);
@@ -5919,14 +6004,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 String fileName = (String) fileNamesIt.next();
                 XWikiAttachment newAttach = (XWikiAttachment) toRollbackMap.get(fileName);
                 try {
-                    context.getWiki().getAttachmentStore()
-                            .saveAttachmentContent(newAttach, false, context, true);
+                    context.getWiki().getAttachmentStore().saveAttachmentContent(newAttach,
+                        false, context, true);
                     attachmentTreated++;
                 } catch (XWikiException e) {
-                    LOG.error("Error rolling back attachment " + fileName + " in document rollback for document " + tdoc.getFullName());
-                    // If we have already treated an attachment it's better to continue and leave only one attachment in bad state
+                    LOG.error("Error rolling back attachment " + fileName
+                        + " in document rollback for document " + tdoc.getFullName());
+                    // If we have already treated an attachment it's better to continue and leave
+                    // only one attachment in bad state
                     // this is better then leaving the whole document in bad state...
-                    if (attachmentTreated==0)
+                    if (attachmentTreated == 0)
                         throw e;
                 }
             }
@@ -5941,7 +6028,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         List params = new ArrayList();
         params.add(rev);
 
-        saveDocument(rolledbackDoc, context.getMessageTool().get("core.comment.rollback", params), context);
+        saveDocument(rolledbackDoc,
+            context.getMessageTool().get("core.comment.rollback", params), context);
         return rolledbackDoc;
     }
 }

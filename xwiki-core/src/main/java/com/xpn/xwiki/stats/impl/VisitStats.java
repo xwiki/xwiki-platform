@@ -23,6 +23,8 @@ package com.xpn.xwiki.stats.impl;
 
 import java.util.Date;
 
+import org.apache.commons.lang.StringUtils;
+
 public class VisitStats extends XWikiStats {
     protected VisitStats oldObject = null;
 
@@ -111,7 +113,7 @@ public class VisitStats extends XWikiStats {
     }
 
     public void setCookie(String cookie) {
-        setStringValue("cookie", cookie);
+        setStringValue("cookie", StringUtils.defaultString(cookie));
     }
 
     public String getIP() {
@@ -127,7 +129,7 @@ public class VisitStats extends XWikiStats {
     }
 
     public void setUserAgent(String userAgent) {
-        setStringValue("userAgent", userAgent);
+        setStringValue("userAgent", StringUtils.defaultString(userAgent));
     }
 
     public String getUser() {

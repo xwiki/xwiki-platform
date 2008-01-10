@@ -397,8 +397,11 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
 
         if (vobject==null) {
             // we need to create the session
-            if (ip==null) ip = request.getRemoteAddr();
-            if (ua==null) ua = request.getHeader("User-Agent");
+            if (ip == null) ip = request.getRemoteAddr();
+            if (ua == null) ua = request.getHeader("User-Agent");
+            if (ua == null) {
+                ua = "";
+            }
             String uniqueID;
 
             if (newcookie) {

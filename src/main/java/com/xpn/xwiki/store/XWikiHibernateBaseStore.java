@@ -80,7 +80,7 @@ public class XWikiHibernateBaseStore
             try {
                 setHibUrl(XWiki.class.getClassLoader().getResource(path));
             } catch (Exception ex2) {
-                log.error("Failed setting the Hibernate configuration file with any method, storage cannot be configured");
+                log.error("Failed setting the Hibernate configuration file with any method, storage cannot be configured", ex2);
             }
         }
     }

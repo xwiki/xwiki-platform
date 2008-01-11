@@ -59,6 +59,14 @@
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-servlet</artifactId>
       <version>1.0-beta-9</version>
+      <exclusions>
+        <!-- We need to explicitely exclude JUnit since Plexus Servlet has an invalid transitive
+             dependency on JUnit with a compile scope dependency -->
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

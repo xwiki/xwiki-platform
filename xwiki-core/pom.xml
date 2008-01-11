@@ -385,7 +385,7 @@
     <dependency>
       <groupId>picocontainer</groupId>
       <artifactId>picocontainer</artifactId>
-      <version>1.1</version>
+      <version>1.2</version>
     </dependency>
     <!-- This Axis dependency is not used directly and shouldn't be declared. However it's used
          by the Google API used in the Google Plugin API. It should be declared in that project's
@@ -454,6 +454,15 @@
       <groupId>org.apache.xmlrpc</groupId>
       <artifactId>xmlrpc-common</artifactId>
       <version>3.0</version>
+      <exclusions>
+        <!-- We need to explicitely exclude JUnit since WS Common 1.0.1 used by XMLRPC Commons is
+             having an invalid compile time dependency on it.
+             See JIRA issue: http://jira.codehaus.org/browse/MEV-567 -->
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-codec</groupId>

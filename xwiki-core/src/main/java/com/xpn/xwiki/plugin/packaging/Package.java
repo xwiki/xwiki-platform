@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -140,9 +139,9 @@ public class Package
     }
 
     /**
-     * If true, the package will preserve the original author
-     * during import, rather than updating the author to the current (importing) user.
-     *
+     * If true, the package will preserve the original author during import, rather than updating
+     * the author to the current (importing) user.
+     * 
      * @see #isWithVersions()
      * @see #isVersionPreserved()
      */
@@ -157,9 +156,9 @@ public class Package
     }
 
     /**
-     * If true, the package will preserve the current document version
-     * during import, regardless of whether or not the document history is included.
-     *
+     * If true, the package will preserve the current document version during import, regardless of
+     * whether or not the document history is included.
+     * 
      * @see #isWithVersions()
      * @see #isBackupPack()
      */
@@ -189,15 +188,15 @@ public class Package
     }
 
     /**
-     * If set to true, Package will include the change history for the document
-     * when exporting the package. This implies that the old version is preserved.
-     *
+     * If set to true, Package will include the change history for the document when exporting the
+     * package. This implies that the old version is preserved.
+     * 
      * @see #isVersionPreserved(boolean)
      */
     public void setWithVersions(boolean withVersions)
     {
         this.withVersions = withVersions;
-        if ( withVersions ) {
+        if (withVersions) {
             this.preserveVersion = true;
         }
     }
@@ -575,7 +574,7 @@ public class Package
                     doc.getDoc().setAuthor(context.getUser());
                 }
 
-                if ((!preserveVersion)&&(!withVersions)) {
+                if ((!preserveVersion) && (!withVersions)) {
                     doc.getDoc().setVersion("1.1");
                 }
 
@@ -590,12 +589,13 @@ public class Package
 
                 if (withVersions) {
                     // we need to force the saving the document archive.
-                    if (doc.getDoc().getDocumentArchive()!=null)
-                        context.getWiki().getVersioningStore().saveXWikiDocArchive(doc.getDoc().getDocumentArchive(context), true, context);
+                    if (doc.getDoc().getDocumentArchive() != null)
+                        context.getWiki().getVersioningStore().saveXWikiDocArchive(
+                            doc.getDoc().getDocumentArchive(context), true, context);
                 }
                 // if there is no archive in xml and content&metaData Dirty is not set
-                //  then archive was not saved
-                //  so we need save it via resetArchive
+                // then archive was not saved
+                // so we need save it via resetArchive
                 if ((doc.getDoc().getDocumentArchive() == null)
                     || (doc.getDoc().getDocumentArchive().getNodes() == null) || (!withVersions)) {
                     doc.getDoc().resetArchive(context);
@@ -690,14 +690,35 @@ public class Package
         return new ByteArrayInputStream(baos.toByteArray());
     }
 
+    /**
+     * Create a {@link XWikiDocument} from xml stream.
+     * 
+     * @param is the xml stream.
+     * @return the {@link XWikiDocument}.
+     * @throws XWikiException error when creating the {@link XWikiDocument}.
+     */
     private XWikiDocument readFromXML(InputStream is) throws XWikiException
     {
         XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
-        if (withVersions)
-            doc.fromXML(is, true);
-        else {
-            doc.fromXML(is);
-        }
+
+        doc.fromXML(is, withVersions);
+
+        return doc;
+    }
+
+    /**
+     * Create a {@link XWikiDocument} from xml {@link Document}.
+     * 
+     * @param domDoc the xml {@link Document}.
+     * @return the {@link XWikiDocument}.
+     * @throws XWikiException error when creating the {@link XWikiDocument}.
+     */
+    private XWikiDocument readFromXML(Document domDoc) throws XWikiException
+    {
+        XWikiDocument doc = new com.xpn.xwiki.doc.XWikiDocument();
+
+        doc.fromXML(domDoc, withVersions);
+
         return doc;
     }
 
@@ -851,8 +872,7 @@ public class Package
             if (!context.getWiki().getRightService().hasAdminRights(context)) {
                 xml =
                     context.getUtil().substitute(
-                        "s/<password>.*?<\\/password>/<password>********<\\/password>/goi",
-                        xml);
+                        "s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml);
             }
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(xml.getBytes(context.getWiki().getEncoding()));
@@ -946,69 +966,99 @@ public class Package
         }
     }
 
+    /**
+     * Load document files from provided directory and sub-directories into packager.
+     * 
+     * @param dir the directory from where to load documents.
+     * @param context the XWiki context.
+     * @param description the package descriptor.
+     * @return the number of loaded documents.
+     * @throws IOException error when loading documents.
+     * @throws XWikiException error when loading documents.
+     */
+    public int readFromDir(File dir, XWikiContext context, Document description)
+        throws IOException, XWikiException
+    {
+        File[] files = dir.listFiles();
+
+        SAXReader reader = new SAXReader();
+
+        int count = 0;
+        for (int i = 0; i < files.length; ++i) {
+            File file = files[i];
+
+            if (file.isDirectory()) {
+                count += readFromDir(file, context, description);
+            } else {
+                boolean validWikiDoc = false;
+                Document domdoc = null;
+
+                try {
+                    domdoc = reader.read(new FileInputStream(file));
+                    validWikiDoc = XWikiDocument.isXMLWikiDocument(domdoc);
+                } catch (DocumentException e1) {
+                }
+
+                if (validWikiDoc) {
+                    XWikiDocument doc = readFromXML(domdoc);
+
+                    try {
+                        filter(doc, context);
+
+                        if (documentExistInPackageFile(doc.getFullName(), doc.getLanguage(),
+                            description)) {
+                            add(doc, context);
+
+                            ++count;
+                        } else {
+                            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                                "document " + doc.getFullName()
+                                    + " does not exist in package definition");
+                        }
+                    } catch (ExcludeDocumentException e) {
+                        log.info("Skip the document '" + doc.getFullName() + "'");
+                    }
+                } else if (!file.getName().equals(DefaultPackageFileName)) {
+                    log.info(file.getAbsolutePath() + " is not a valid wiki document");
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /**
+     * Load document files from provided directory and sub-directories into packager.
+     * 
+     * @param dir the directory from where to load documents.
+     * @param context the XWiki context.
+     * @return 
+     * @throws IOException error when loading documents.
+     * @throws XWikiException error when loading documents.
+     */
     public String readFromDir(File dir, XWikiContext context) throws IOException, XWikiException
     {
-        Document description = null;
-        setBackupPack(true);
+        if (!dir.isDirectory()) {
+            throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN, dir
+                .getAbsolutePath()
+                + " is not a directory");
+        }
+
         int count = 0;
         try {
             File infofile = new File(dir, DefaultPackageFileName);
-            description = fromXml(new FileInputStream(infofile));
-            if (description == null) {
-                throw new PackageException(PackageException.ERROR_PACKAGE_NODESCRIPTION,
-                    "Cannot read package description file");
-            }
+            Document description = fromXml(new FileInputStream(infofile));
 
-            Element docFiles = description.getRootElement();
-            Element infosFiles = docFiles.element("files");
+            count = readFromDir(dir, context, description);
 
-            List ListFile = infosFiles.elements("file");
-            if (log.isInfoEnabled()) {
-                log.info("Package declares " + ListFile.size() + " documents");
-            }
-            for (int i = 0; i < ListFile.size(); i++) {
-                Element el = (Element) ListFile.get(i);
-                String defaultAction = el.attributeValue("defaultAction");
-                String language = el.attributeValue("language");
-                if (language == null) {
-                    language = "";
-                }
-                String docName = el.getStringValue();
-                XWikiDocument doc = new XWikiDocument();
-                doc.setFullName(docName, context);
-                doc.setLanguage(language);
-
-                if (log.isDebugEnabled()) {
-                    log
-                        .debug("Package adding document " + docName + " with language "
-                            + language);
-                }
-
-                File space = new File(dir, doc.getSpace());
-                String filename = doc.getName();
-                if ((doc.getLanguage() != null) && (!doc.getLanguage().equals(""))) {
-                    filename += "." + doc.getLanguage();
-                }
-                File docfile = new File(space, filename);
-                doc = readFromXML(new FileInputStream(docfile));
-                if (doc == null) {
-                    if (log.isErrorEnabled()) {
-                        log.info("Package readFrom XML read null doc for " + docName
-                            + " language " + language);
-                    }
-                }
-                DocumentInfo di = new DocumentInfo(doc);
-                di.setAction(Integer.parseInt(defaultAction));
-                files.add(di);
-                count++;
-            }
+            updateFileInfos(description);
         } catch (DocumentException e) {
             throw new PackageException(PackageException.ERROR_PACKAGE_UNKNOWN,
                 "Error when reading the XML");
         }
-        if (log.isInfoEnabled()) {
-            log.info("Package read " + count + " documents");
-        }
+
+        log.info("Package read " + count + " documents");
+
         return "";
     }
 }

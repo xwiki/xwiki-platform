@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -38,9 +38,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * specifics methods, getters and setters for this type of object and fields.
  * 
  * @version $Id: $
- * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument
  */
-public class XWikiApplication extends DefaultSuperDocument
+public class XWikiApplication extends DefaultXObjectDocument
 {
     /**
      * Pattern to match that indicate if a document name contains SQL "like" matching string.
@@ -58,7 +57,7 @@ public class XWikiApplication extends DefaultSuperDocument
      *             <li>getting XWikiApplicationClass instance.</li>
      *             <li>or when calling {@link #reload(XWikiContext)}</li>
      *             </ul>
-     * @see DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
+     * @see DefaultXObjectDocument#DefaultXObjectDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
      *      XWikiDocument, int, XWikiContext)
      */
     public XWikiApplication(XWikiDocument xdoc, int objectId, XWikiContext context)

@@ -1,14 +1,12 @@
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
-import com.xpn.xwiki.XWikiException;
-
 /**
  * Exception when try get {@link SuperDocument} that does not exist.
  * 
  * @version $Id: $
- * @future XA2 : rename to tDocumentObjectDoesNotExistException.
+ * @deprecated Use {@link XObjectDocumentDoesNotExistException}
  */
-public class SuperDocumentDoesNotExistException extends XWikiException
+public class SuperDocumentDoesNotExistException extends XObjectDocumentDoesNotExistException
 {
     /**
      * Create new instance of {@link SuperDocumentDoesNotExistException}.
@@ -17,6 +15,6 @@ public class SuperDocumentDoesNotExistException extends XWikiException
      */
     public SuperDocumentDoesNotExistException(String message)
     {
-        super(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, message);
+        super(message);
     }
 }

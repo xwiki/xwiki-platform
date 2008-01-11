@@ -28,22 +28,22 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerException;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 /**
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass}
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager}
  * implementation for XAppClasses.XWikiApplicationClass class.
  * 
  * @version $Id: $
- * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
- * @see AbstractSuperClass
+ * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
+ * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager
  */
-public class XWikiApplicationClass extends AbstractSuperClass
+public class XWikiApplicationClass extends AbstractXClassManager
 {
     /**
      * Default list display type of XAppClasses.XWikiApplicationClass fields.
@@ -78,7 +78,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_DESCRIPTION = "Description";
-    
+
     /**
      * Name of field <code>version</code> for the XWiki class XAppClasses.XWikiApplicationClass.
      * The version of the application.
@@ -102,10 +102,10 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_APPAUTHORS = "Authors";
-    
+
     /**
-     * Name of field <code>license</code> for the XWiki class
-     * XAppClasses.XWikiApplicationClass. The description of the application.
+     * Name of field <code>license</code> for the XWiki class XAppClasses.XWikiApplicationClass.
+     * The description of the application.
      */
     public static final String FIELD_LICENSE = "license";
 
@@ -114,7 +114,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
      * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_LICENSE = "License";
-    
+
     /**
      * Name of field <code>dependencies</code> for the XWiki class
      * XAppClasses.XWikiApplicationClass. The list of plugins on which application depends.
@@ -219,7 +219,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
     private static XWikiApplicationClass instance;
 
     /**
-     * Construct the overload of AbstractSuperClass with spaceprefix={@link #CLASS_SPACE_PREFIX}
+     * Construct the overload of AbstractXClassManager with spaceprefix={@link #CLASS_SPACE_PREFIX}
      * and prefix={@link #CLASS_PREFIX}.
      */
     protected XWikiApplicationClass()
@@ -252,7 +252,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
      */
     protected boolean updateBaseClass(BaseClass baseClass)
     {
@@ -263,9 +263,9 @@ public class XWikiApplicationClass extends AbstractSuperClass
         needsUpdate |= baseClass.addTextField(FIELD_APPVERSION, FIELDPN_APPVERSION, 30);
 
         needsUpdate |= baseClass.addTextField(FIELD_APPAUTHORS, FIELDPN_APPAUTHORS, 30);
-        
+
         needsUpdate |= baseClass.addTextField(FIELD_LICENSE, FIELDPN_LICENSE, 30);
-        
+
         needsUpdate |=
             baseClass.addStaticListField(FIELD_DEPENDENCIES, FIELDPN_DEPENDENCIES, 80, true, "",
                 DEFAULT_FIELDDT, DEFAULT_FIELDS);
@@ -296,7 +296,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
      */
     protected boolean updateClassTemplateDocument(XWikiDocument doc)
     {
@@ -379,7 +379,7 @@ public class XWikiApplicationClass extends AbstractSuperClass
             if (obj.getStringValue(FIELD_APPNAME).equalsIgnoreCase(appName)) {
                 break;
             }
-            
+
             ++objectId;
         }
 
@@ -387,18 +387,18 @@ public class XWikiApplicationClass extends AbstractSuperClass
             objectId = 0;
         }
 
-        return (XWikiApplication) newSuperDocument(doc, objectId, context);
+        return (XWikiApplication) newXObjectDocument(doc, objectId, context);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * Override abstract method using {@link XWikiApplication} as {@link SuperDocument}.
+     * Override abstract method using {@link XWikiApplication} as {@link XObjectDocument}.
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument,
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
      *      int, com.xpn.xwiki.XWikiContext)
      */
-    public SuperDocument newSuperDocument(XWikiDocument doc, int objId, XWikiContext context)
+    public XObjectDocument newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
         throws XWikiException
     {
         return new XWikiApplication(doc, objId, context);

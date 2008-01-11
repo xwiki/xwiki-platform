@@ -2439,6 +2439,38 @@ public class XWikiDocument
         // Note: We don't set the original document as it's already been set in the constructor
         // when this object was instantiated.
     }
+    
+    /**
+     * Check if provided xml stream contains wiki document.
+     * 
+     * @param is the xml stream to read.
+     * @return true if provided stream contains wiki document.
+     */
+    public static boolean isXMLWikiDocument(InputStream is)
+    {
+        boolean validWikiDoc = false;
+
+        try {
+            SAXReader reader = new SAXReader();
+            Document domdoc = reader.read(is);
+
+            validWikiDoc = isXMLWikiDocument(domdoc);
+        } catch (DocumentException e1) {
+        }
+
+        return validWikiDoc;
+    }
+
+    /**
+     * Check if provided xml document is a wiki document.
+     * 
+     * @param is the xml document.
+     * @return true if provided xml document is a wiki document.
+     */
+    public static boolean isXMLWikiDocument(Document domdoc)
+    {
+        return domdoc.getRootElement().getName().equals("xwikidoc");
+    }
 
     public void setAttachmentList(List list)
     {

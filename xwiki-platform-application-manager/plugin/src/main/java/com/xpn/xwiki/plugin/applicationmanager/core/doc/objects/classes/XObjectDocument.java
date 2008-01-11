@@ -30,6 +30,7 @@ import com.xpn.xwiki.api.Object;
  * 
  * @version $Id: $
  * @see XClassManager
+ * @since Application Manager 1.0RC1
  */
 public interface XObjectDocument
 {

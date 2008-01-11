@@ -6,7 +6,7 @@ import com.xpn.xwiki.XWikiException;
  * Exception when try get {@link SuperDocument} that does not exist.
  * 
  * @version $Id: $
- * @future XA2 : rename to tDocumentObjectDoesNotExistException.
+ * @since Application Manager 1.0RC1
  */
 public class XObjectDocumentDoesNotExistException extends XWikiException
 {

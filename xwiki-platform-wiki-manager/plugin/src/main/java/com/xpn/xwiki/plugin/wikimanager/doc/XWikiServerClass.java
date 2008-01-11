@@ -23,21 +23,20 @@ package com.xpn.xwiki.plugin.wikimanager.doc;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocumentDoesNotExistException;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocumentDoesNotExistException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 
 /**
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass}
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager}
  * implementation for XWiki.XWikiServerClass class.
  * 
  * @version $Id: $
- * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass
- * @see AbstractSuperClass
+ * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
  */
-public class XWikiServerClass extends AbstractSuperClass
+public class XWikiServerClass extends AbstractXClassManager
 {
     /**
      * Default list separators of XWiki.XWikiServerClass fields.
@@ -248,7 +247,7 @@ public class XWikiServerClass extends AbstractSuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.util.AbstractSuperClass#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
+     * @see com.xpn.xwiki.util.AbstractXClassManager#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
      */
     protected boolean updateBaseClass(BaseClass baseClass)
     {
@@ -274,7 +273,7 @@ public class XWikiServerClass extends AbstractSuperClass
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
      */
     protected boolean updateClassTemplateDocument(XWikiDocument doc)
     {
@@ -303,8 +302,8 @@ public class XWikiServerClass extends AbstractSuperClass
         XWikiContext context) throws XWikiException
     {
         try {
-            return (XWikiServer) getSuperDocument(wikiName, objectId, validate, context);
-        } catch (SuperDocumentDoesNotExistException e) {
+            return (XWikiServer) getXObjectDocument(wikiName, objectId, validate, context);
+        } catch (XObjectDocumentDoesNotExistException e) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
                 wikiName + " wiki descriptor document does not exist",
                 e);
@@ -338,12 +337,12 @@ public class XWikiServerClass extends AbstractSuperClass
     /**
      * {@inheritDoc}
      * <p>
-     * Override abstract method using XWikiApplication as {@link SuperDocument}.
+     * Override abstract method using XWikiApplication as {@link XObjectDocument}.
      * 
-     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass#newSuperDocument(com.xpn.xwiki.doc.XWikiDocument,
+     * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
      *      int, com.xpn.xwiki.XWikiContext)
      */
-    public SuperDocument newSuperDocument(XWikiDocument doc, int objId, XWikiContext context)
+    public XObjectDocument newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
         throws XWikiException
     {
         return new XWikiServer(doc, objId, context);

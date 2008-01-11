@@ -209,6 +209,11 @@ public class PdfExportImpl implements PdfExport
 
     public void export(XWikiDocument doc, OutputStream out, int type, XWikiContext context) throws XWikiException
     {
+        // Note: The passed document is not used currently since we're calling pdf.vm and that
+        // velocity template uses the XWiki Context to get the current doc or its translations.
+        // This could be improved by setting a specific context using the passed document but we
+        // would also need to get the translations and set them too.
+
         File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         tidy.setOutputEncoding(context.getWiki().getEncoding());

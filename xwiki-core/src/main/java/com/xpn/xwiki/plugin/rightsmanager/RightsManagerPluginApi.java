@@ -114,7 +114,7 @@ public class RightsManagerPluginApi extends PluginApi
     }
 
     /**
-     * @return the API for managing rights and inheritance.
+     * @return the API for managing users.
      */
     public RightsManageUsersApi getUsersApi()
     {
@@ -122,7 +122,7 @@ public class RightsManagerPluginApi extends PluginApi
     }
 
     /**
-     * @return the API for managing rights and inheritance.
+     * @return the API for managing groups.
      */
     public RightsManageGroupsApi getGroupsApi()
     {

@@ -995,7 +995,7 @@ public class Package
 
                 try {
                     domdoc = reader.read(new FileInputStream(file));
-                    validWikiDoc = XWikiDocument.isXMLWikiDocument(domdoc);
+                    validWikiDoc = XWikiDocument.containsXMLWikiDocument(domdoc);
                 } catch (DocumentException e1) {
                 }
 

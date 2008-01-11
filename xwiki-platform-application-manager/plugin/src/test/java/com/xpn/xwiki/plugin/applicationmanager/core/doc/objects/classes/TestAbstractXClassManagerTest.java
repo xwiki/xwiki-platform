@@ -48,11 +48,11 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
  * Unit tests for
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractSuperClass}.
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager}.
  * 
  * @version $Id: $
  */
-public class TestAbstractSuperClassTest extends MockObjectTestCase
+public class TestAbstractXClassManagerTest extends MockObjectTestCase
 {
     private XWikiContext context;
 
@@ -165,32 +165,32 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
     private static final String CLASS_NAME =
         CLASS_PREFIX
-            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASS_SUFFIX;
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager.XWIKI_CLASS_SUFFIX;
 
     private static final String CLASSSHEET_NAME =
         CLASS_PREFIX
-            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSSHEET_SUFFIX;
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager.XWIKI_CLASSSHEET_SUFFIX;
 
     private static final String CLASSTEMPLATE_NAME =
         CLASS_PREFIX
-            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSTEMPLATE_SUFFIX;
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager.XWIKI_CLASSTEMPLATE_SUFFIX;
 
     private static final String DISPATCH_CLASS_SPACE =
         CLASS_SPACE_PREFIX
-            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASS_SPACE_SUFFIX;
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager.XWIKI_CLASS_SPACE_SUFFIX;
 
     private static final String DISPATCH_CLASS_FULLNAME = DISPATCH_CLASS_SPACE + "." + CLASS_NAME;
 
     private static final String DISPATCH_CLASSSHEET_SPACE =
         CLASS_SPACE_PREFIX
-            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSSHEET_SPACE_SUFFIX;
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager.XWIKI_CLASSSHEET_SPACE_SUFFIX;
 
     private static final String DISPATCH_CLASSSHEET_FULLNAME =
         DISPATCH_CLASSSHEET_SPACE + "." + CLASSSHEET_NAME;
 
     private static final String DISPATCH_CLASSTEMPLATE_SPACE =
         CLASS_SPACE_PREFIX
-            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass.XWIKI_CLASSTEMPLATE_SPACE_SUFFIX;
+            + com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager.XWIKI_CLASSTEMPLATE_SPACE_SUFFIX;
 
     private static final String DISPATCH_CLASSTEMPLATE_FULLNAME =
         DISPATCH_CLASSTEMPLATE_SPACE + "." + CLASSTEMPLATE_NAME;
@@ -241,7 +241,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     public static final String FIELDPN_stringlist = "String List";
     
     /**
-     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with no parameters.
+     * Result of {@link AbstractXClassManager#createWhereClause(String[][], List)} with no parameters.
      */
     public static final String WHERECLAUSE_null = ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>?";
     
@@ -251,47 +251,47 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     public static final String[] WHERECLAUSE_obj1 = {"of1", "Int", "ov1"};
     
     /**
-     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with doc filter.
+     * Result of {@link AbstractXClassManager#createWhereClause(String[][], List)} with doc filter.
      */
     public static final String WHERECLAUSE_doc = ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=?";
     public static final String[][] WHERECLAUSE_PARAM_doc = {WHERECLAUSE_doc0}; 
 
     /**
-     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with more than one docs filters.
+     * Result of {@link AbstractXClassManager#createWhereClause(String[][], List)} with more than one docs filters.
      */
     public static final String WHERECLAUSE_doc_multi = ", BaseObject as obj where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and lower(doc.df1)=?";
     public static final String[][] WHERECLAUSE_PARAM_doc_multi = {WHERECLAUSE_doc0, WHERECLAUSE_doc1};
     
     /**
-     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with object filter.
+     * Result of {@link AbstractXClassManager#createWhereClause(String[][], List)} with object filter.
      */
     public static final String WHERECLAUSE_obj = ", BaseObject as obj, String as field0 where doc.fullName=obj.name and obj.className=? and obj.name<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=?";
     public static final String[][] WHERECLAUSE_PARAM_obj = {WHERECLAUSE_obj0};
     
     /**
-     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with more than one objects filters.
+     * Result of {@link AbstractXClassManager#createWhereClause(String[][], List)} with more than one objects filters.
      */
     public static final String WHERECLAUSE_obj_multi = ", BaseObject as obj, String as field0, Int as field1 where doc.fullName=obj.name and obj.className=? and obj.name<>? and obj.id=field0.id.id and field0.name=? and lower(field0.value)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
     public static final String[][] WHERECLAUSE_PARAM_obj_multi = {WHERECLAUSE_obj0, WHERECLAUSE_obj1};
     
     /**
-     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with object and doc filter.
+     * Result of {@link AbstractXClassManager#createWhereClause(String[][], List)} with object and doc filter.
      */
     public static final String WHERECLAUSE_objdoc = ", BaseObject as obj, String as field1 where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and obj.id=field1.id.id and field1.name=? and lower(field1.value)=?";
     public static final String[][] WHERECLAUSE_PARAM_objdoc = {WHERECLAUSE_doc0, WHERECLAUSE_obj0};
     
     /**
-     * Result of {@link AbstractSuperClass#createWhereClause(String[][], List)} with more than one objects and docs filters.
+     * Result of {@link AbstractXClassManager#createWhereClause(String[][], List)} with more than one objects and docs filters.
      */
     public static final String WHERECLAUSE_objdoc_multi = ", BaseObject as obj, String as field2, Int as field3 where doc.fullName=obj.name and obj.className=? and obj.name<>? and lower(doc.df0)=? and lower(doc.df1)=? and obj.id=field2.id.id and field2.name=? and lower(field2.value)=? and obj.id=field3.id.id and field3.name=? and lower(field3.value)=?";
     public static final String[][] WHERECLAUSE_PARAM_objdoc_multi = {WHERECLAUSE_doc0, WHERECLAUSE_doc1, WHERECLAUSE_obj0, WHERECLAUSE_obj1};
     
-    static abstract public class TestSuperClass extends AbstractSuperClass
+    static abstract public class TestXClassManager extends AbstractXClassManager
     {
         /**
          * Default constructor for XWikiApplicationClass.
          */
-        protected TestSuperClass(String spaceprefix, String prefix, boolean dispatch)
+        protected TestXClassManager(String spaceprefix, String prefix, boolean dispatch)
         {
             super(spaceprefix, prefix, dispatch);
         }
@@ -307,12 +307,12 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         }
     }
 
-    static public class DispatchSuperClass extends TestSuperClass
+    static public class DispatchXClassManager extends TestXClassManager
     {
         /**
          * Unique instance of XWikiApplicationClass;
          */
-        private static DispatchSuperClass instance = null;
+        private static DispatchXClassManager instance = null;
 
         /**
          * Return unique instance of XWikiApplicationClass and update documents for this context.
@@ -321,10 +321,10 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
          * @return XWikiApplicationClass Instance of XWikiApplicationClass.
          * @throws XWikiException
          */
-        public static DispatchSuperClass getInstance(XWikiContext context) throws XWikiException
+        public static DispatchXClassManager getInstance(XWikiContext context) throws XWikiException
         {
             // if (instance == null)
-            instance = new DispatchSuperClass();
+            instance = new DispatchXClassManager();
 
             instance.check(context);
 
@@ -334,18 +334,18 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         /**
          * Default constructor for XWikiApplicationClass.
          */
-        private DispatchSuperClass()
+        private DispatchXClassManager()
         {
             super(CLASS_SPACE_PREFIX, CLASS_PREFIX, true);
         }
     }
 
-    static public class NoDispatchSuperClass extends TestSuperClass
+    static public class NoDispatchXClassManager extends TestXClassManager
     {
         /**
          * Unique instance of XWikiApplicationClass;
          */
-        private static NoDispatchSuperClass instance = null;
+        private static NoDispatchXClassManager instance = null;
 
         /**
          * Return unique instance of XWikiApplicationClass and update documents for this context.
@@ -354,11 +354,11 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
          * @return XWikiApplicationClass Instance of XWikiApplicationClass.
          * @throws XWikiException
          */
-        public static NoDispatchSuperClass getInstance(XWikiContext context)
+        public static NoDispatchXClassManager getInstance(XWikiContext context)
             throws XWikiException
         {
             // if (instance == null)
-            instance = new NoDispatchSuperClass();
+            instance = new NoDispatchXClassManager();
 
             instance.check(context);
 
@@ -368,19 +368,19 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         /**
          * Default constructor for XWikiApplicationClass.
          */
-        private NoDispatchSuperClass()
+        private NoDispatchXClassManager()
         {
             super(CLASS_SPACE_PREFIX, CLASS_PREFIX, false);
         }
     }
 
-    public void testInitSuperClassDispatch() throws XWikiException
+    public void testInitXClassManagerDispatch() throws XWikiException
     {
         documents.clear();
 
         // ///
 
-        SuperClass sclass = DispatchSuperClass.getInstance(context);
+        XClassManager sclass = DispatchXClassManager.getInstance(context);
 
         assertEquals(CLASS_SPACE_PREFIX, sclass.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, sclass.getClassPrefix());
@@ -397,13 +397,13 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         assertEquals(DISPATCH_CLASSTEMPLATE_FULLNAME, sclass.getClassTemplateFullName());
     }
 
-    public void testInitSuperClassNoDispatch() throws XWikiException
+    public void testInitXClassManagerNoDispatch() throws XWikiException
     {
         documents.clear();
 
         // ///
 
-        SuperClass sclass = NoDispatchSuperClass.getInstance(context);
+        XClassManager sclass = NoDispatchXClassManager.getInstance(context);
 
         assertEquals(CLASS_SPACE_PREFIX, sclass.getClassSpacePrefix());
         assertEquals(CLASS_PREFIX, sclass.getClassPrefix());
@@ -420,7 +420,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         assertEquals(NODISPATCH_CLASSTEMPLATE_FULLNAME, sclass.getClassTemplateFullName());
     }
 
-    private void ptestCkeck(SuperClass sclass) throws XWikiException
+    private void ptestCkeck(XClassManager sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassFullName(), context);
 
@@ -461,7 +461,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestCkeck(NoDispatchSuperClass.getInstance(context));
+        ptestCkeck(NoDispatchXClassManager.getInstance(context));
     }
 
     public void testCkeckNoDispatch() throws XWikiException
@@ -470,10 +470,10 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestCkeck(NoDispatchSuperClass.getInstance(context));
+        ptestCkeck(NoDispatchXClassManager.getInstance(context));
     }
 
-    private void ptestGetClassDocument(SuperClass sclass) throws XWikiException
+    private void ptestGetClassDocument(XClassManager sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassFullName(), context);
         Document docFromClass = sclass.getClassDocument(context);
@@ -488,7 +488,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassDocument(DispatchSuperClass.getInstance(context));
+        ptestGetClassDocument(DispatchXClassManager.getInstance(context));
     }
 
     public void testGetClassDocumentNoDispatch() throws XWikiException
@@ -497,10 +497,10 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassDocument(NoDispatchSuperClass.getInstance(context));
+        ptestGetClassDocument(NoDispatchXClassManager.getInstance(context));
     }
 
-    private void ptestGetClassSheetDocument(SuperClass sclass) throws XWikiException
+    private void ptestGetClassSheetDocument(XClassManager sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassSheetFullName(), context);
         Document docFromClass = sclass.getClassSheetDocument(context);
@@ -515,7 +515,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassSheetDocument(DispatchSuperClass.getInstance(context));
+        ptestGetClassSheetDocument(DispatchXClassManager.getInstance(context));
     }
 
     public void testGetClassSheetDocumentNoDispatch() throws XWikiException
@@ -524,10 +524,10 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassSheetDocument(NoDispatchSuperClass.getInstance(context));
+        ptestGetClassSheetDocument(NoDispatchXClassManager.getInstance(context));
     }
 
-    private void ptestGetClassTemplateDocument(SuperClass sclass) throws XWikiException
+    private void ptestGetClassTemplateDocument(XClassManager sclass) throws XWikiException
     {
         XWikiDocument doc = xwiki.getDocument(sclass.getClassTemplateFullName(), context);
         Document docFromClass = sclass.getClassTemplateDocument(context);
@@ -542,7 +542,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassTemplateDocument(DispatchSuperClass.getInstance(context));
+        ptestGetClassTemplateDocument(DispatchXClassManager.getInstance(context));
     }
 
     public void testGetClassTemplateDocumentNoDispatch() throws XWikiException
@@ -551,70 +551,70 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
 
         // ///
 
-        ptestGetClassTemplateDocument(NoDispatchSuperClass.getInstance(context));
+        ptestGetClassTemplateDocument(NoDispatchXClassManager.getInstance(context));
     }
 
     public void testGetItemDefaultNameDisptach() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEM_NAME, DispatchSuperClass.getInstance(context)
+        assertEquals(DEFAULT_ITEM_NAME, DispatchXClassManager.getInstance(context)
             .getItemDefaultName(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME));
     }
 
     public void testGetItemDefaultNameNoDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEM_NAME, NoDispatchSuperClass.getInstance(context)
+        assertEquals(DEFAULT_ITEM_NAME, NoDispatchXClassManager.getInstance(context)
             .getItemDefaultName(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME));
     }
 
     public void testGetItemDocumentDefaultNameDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context)
             .getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context)
             .getItemDocumentDefaultName(DEFAULT_ITEM_NAME + " ", context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context)
             .getItemDocumentDefaultName(DEFAULT_ITEM_NAME + "\t", context));
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchSuperClass.getInstance(context)
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, DispatchXClassManager.getInstance(context)
             .getItemDocumentDefaultName(DEFAULT_ITEM_NAME + ".", context));
     }
 
     public void testGetItemDocumentDefaultNameNoDispatch() throws XWikiException
     {
-        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchSuperClass.getInstance(context)
+        assertEquals(DEFAULT_ITEMDOCUMENT_NAME, NoDispatchXClassManager.getInstance(context)
             .getItemDocumentDefaultName(DEFAULT_ITEM_NAME, context));
     }
 
     public void testGetItemDocumentDefaultFullNameDispatch() throws XWikiException
     {
-        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchSuperClass.getInstance(
+        assertEquals(DISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, DispatchXClassManager.getInstance(
             context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
     }
 
     public void testGetItemDocumentDefaultFullNameNoDispatch() throws XWikiException
     {
-        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchSuperClass.getInstance(
+        assertEquals(NODISPATCH_DEFAULT_ITEMDOCUMENT_FULLNAME, NoDispatchXClassManager.getInstance(
             context).getItemDocumentDefaultFullName(DEFAULT_ITEM_NAME, context));
     }
 
     public void testIsInstanceNoDispatch() throws XWikiException
     {
-        assertTrue(NoDispatchSuperClass.getInstance(context).isInstance(
-            NoDispatchSuperClass.getInstance(context).newSuperDocument(context).getDocumentApi()));
-        assertFalse(NoDispatchSuperClass.getInstance(context).isInstance(new XWikiDocument()));
+        assertTrue(NoDispatchXClassManager.getInstance(context).isInstance(
+            NoDispatchXClassManager.getInstance(context).newXObjectDocument(context).getDocumentApi()));
+        assertFalse(NoDispatchXClassManager.getInstance(context).isInstance(new XWikiDocument()));
     }
 
     public void testIsInstanceDispatch() throws XWikiException
     {
-        assertTrue(DispatchSuperClass.getInstance(context).isInstance(
-            DispatchSuperClass.getInstance(context).newSuperDocument(context).getDocumentApi()));
-        assertFalse(DispatchSuperClass.getInstance(context).isInstance(new XWikiDocument()));
+        assertTrue(DispatchXClassManager.getInstance(context).isInstance(
+            DispatchXClassManager.getInstance(context).newXObjectDocument(context).getDocumentApi()));
+        assertFalse(DispatchXClassManager.getInstance(context).isInstance(new XWikiDocument()));
     }
     
     public void testCreateWhereClause_null() throws XWikiException
     {
         List list = new ArrayList();
         
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(null, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(null, list);
         
         assertEquals(WHERECLAUSE_null, where);
     }
@@ -624,7 +624,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
         List list = new ArrayList();
         String[][] fieldDescriptors = new String[][]{};
         
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(fieldDescriptors, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(fieldDescriptors, list);
         
         assertEquals(WHERECLAUSE_null, where);
     }
@@ -633,7 +633,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         List list = new ArrayList();
         
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc, list);
         
         assertEquals(WHERECLAUSE_doc, where);
     }
@@ -642,7 +642,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         List list = new ArrayList();
         
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc_multi, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_doc_multi, list);
         
         assertEquals(WHERECLAUSE_doc_multi, where);
     }
@@ -651,7 +651,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         List list = new ArrayList();
 
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj, list);
         
         assertEquals(WHERECLAUSE_obj, where);
     }
@@ -660,7 +660,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         List list = new ArrayList();
 
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj_multi, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_obj_multi, list);
         
         assertEquals(WHERECLAUSE_obj_multi, where);
     }
@@ -669,7 +669,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         List list = new ArrayList();
 
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc, list);
         
         assertEquals(WHERECLAUSE_objdoc, where);
     }
@@ -678,7 +678,7 @@ public class TestAbstractSuperClassTest extends MockObjectTestCase
     {
         List list = new ArrayList();
 
-        String where = DispatchSuperClass.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc_multi, list);
+        String where = DispatchXClassManager.getInstance(context).createWhereClause(WHERECLAUSE_PARAM_objdoc_multi, list);
         
         assertEquals(WHERECLAUSE_objdoc_multi, where);
     }

@@ -124,7 +124,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
             if (newdoc != null && XWikiApplicationClass.getInstance(context).isInstance(newdoc)) {
 
                 List appList =
-                    XWikiApplicationClass.getInstance(context).newSuperDocumentList(newdoc,
+                    XWikiApplicationClass.getInstance(context).newXObjectDocumentList(newdoc,
                         context);
                 updateApplicationsTranslation(appList,
                     "Auto update translations informations from applications in "
@@ -157,7 +157,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
 
             if (!doc.isNew()) {
                 return (XWikiApplication) XWikiApplicationClass.getInstance(context)
-                    .newSuperDocument(doc, 0, context);
+                    .newXObjectDocument(doc, 0, context);
             }
         }
 
@@ -173,13 +173,13 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      */
     public List getApplicationList(XWikiContext context) throws XWikiException
     {
-        return XWikiApplicationClass.getInstance(context).searchSuperDocuments(context);
+        return XWikiApplicationClass.getInstance(context).searchXObjectDocuments(context);
     }
 
     /**
      * Create a new application descriptor base on provided application descriptor.
      * 
-     * @param userAppSuperDoc appSuperDocument the user application descriptor from which new
+     * @param userAppSuperDoc appXObjectDocument the user application descriptor from which new
      *            descriptor will be created.
      * @param failOnExist if true fail if the application descriptor to create already exists.
      * @param comment a comment used when saving application descriptor document.
@@ -216,7 +216,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
         }
 
         XWikiApplication appSuperDocToSave =
-            (XWikiApplication) XWikiApplicationClass.getInstance(context).newSuperDocument(
+            (XWikiApplication) XWikiApplicationClass.getInstance(context).newXObjectDocument(
                 docToSave, 0, context);
 
         appSuperDocToSave.mergeObject(userAppSuperDoc);
@@ -517,7 +517,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
 
             if (XWikiApplicationClass.getInstance(context).isInstance(doc)) {
                 reloadApplication((XWikiApplication) XWikiApplicationClass.getInstance(context)
-                    .newSuperDocument(doc, 0, context), comment, context);
+                    .newXObjectDocument(doc, 0, context), comment, context);
             }
         }
     }

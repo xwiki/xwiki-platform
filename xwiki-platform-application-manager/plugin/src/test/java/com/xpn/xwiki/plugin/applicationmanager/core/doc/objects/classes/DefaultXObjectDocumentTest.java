@@ -43,11 +43,11 @@ import java.util.Map;
 
 /**
  * Unit tests for
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument}.
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument}.
  * 
  * @version $Id: $
  */
-public class DefaultSuperDocumentTest extends MockObjectTestCase
+public class DefaultXObjectDocumentTest extends MockObjectTestCase
 {
     private XWikiContext context;
 
@@ -160,14 +160,14 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
 
     private final String DEFAULT_DOCFULLNAME = DEFAULT_SPACE + "." + DEFAULT_DOCNAME;
 
-    public void testInitSuperDocumentEmpty() throws XWikiException
+    public void testInitXObjectDocumentEmpty() throws XWikiException
     {
         documents.clear();
 
         // ///
 
-        SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
-        DefaultSuperDocument sdoc = (DefaultSuperDocument) sclass.newSuperDocument(context);
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
+        DefaultXObjectDocument sdoc = (DefaultXObjectDocument) sclass.newXObjectDocument(context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -175,18 +175,18 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         com.xpn.xwiki.api.Object obj = sdoc.getObject(sclass.getClassFullName());
 
         assertNotNull(obj);
-        assertEquals(sdoc.getSuperClass(), sclass);
+        assertEquals(sdoc.getXClassManager(), sclass);
     }
 
-    public void testInitSuperDocumentDocName() throws XWikiException
+    public void testInitXObjectDocumentDocName() throws XWikiException
     {
         documents.clear();
 
         // ///
 
-        SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
-        DefaultSuperDocument sdoc =
-            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, 0, context);
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
+        DefaultXObjectDocument sdoc =
+            (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -194,10 +194,10 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         com.xpn.xwiki.api.Object obj = sdoc.getObject(sclass.getClassFullName());
 
         assertNotNull(obj);
-        assertEquals(sdoc.getSuperClass(), sclass);
+        assertEquals(sdoc.getXClassManager(), sclass);
     }
 
-    public void testInitSuperDocumentDocNameExists() throws XWikiException
+    public void testInitXObjectDocumentDocNameExists() throws XWikiException
     {
         documents.clear();
 
@@ -206,9 +206,9 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         XWikiDocument doc = xwiki.getDocument(DEFAULT_DOCFULLNAME, context);
         xwiki.saveDocument(doc, context);
 
-        SuperClass sclass = TestAbstractSuperClassTest.DispatchSuperClass.getInstance(context);
-        DefaultSuperDocument sdoc =
-            (DefaultSuperDocument) sclass.newSuperDocument(DEFAULT_DOCFULLNAME, 0, context);
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
+        DefaultXObjectDocument sdoc =
+            (DefaultXObjectDocument) sclass.newXObjectDocument(DEFAULT_DOCFULLNAME, 0, context);
 
         assertNotNull(sdoc);
         assertTrue(sdoc.isNew());
@@ -216,6 +216,6 @@ public class DefaultSuperDocumentTest extends MockObjectTestCase
         com.xpn.xwiki.api.Object obj = sdoc.getObject(sclass.getClassFullName());
 
         assertNotNull(obj);
-        assertEquals(sdoc.getSuperClass(), sclass);
+        assertEquals(sdoc.getXClassManager(), sclass);
     }
 }

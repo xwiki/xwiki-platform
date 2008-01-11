@@ -232,6 +232,15 @@
       <artifactId>swizzle-confluence</artifactId>
       <version>1.1-20070908</version>
       <classifier>xwiki</classifier>
+      <exclusions>
+        <!-- We need to explicitely exclude JUnit since swizzle confluence depends transitively
+             on Apache WS Common which wrongly defines a compile dependency on JUnit.
+             See JIRA issue: http://jira.codehaus.org/browse/MEV-567 -->
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Standard dependencies found in the central repository -->
@@ -279,7 +288,7 @@
     <dependency>
       <groupId>commons-httpclient</groupId>
       <artifactId>commons-httpclient</artifactId>
-      <version>3.0.1</version>
+      <version>3.1</version>
     </dependency>
     <dependency>
       <groupId>ecs</groupId>
@@ -290,6 +299,15 @@
       <groupId>xmlrpc</groupId>
       <artifactId>xmlrpc-server</artifactId>
       <version>3.0</version>
+      <exclusions>
+        <!-- We need to explicitely exclude JUnit since xmlrpc Server depends transitively
+             on Apache WS Common which wrongly defines a compile dependency on JUnit.
+             See JIRA issue: http://jira.codehaus.org/browse/MEV-567 -->
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>securityfilter</groupId>
@@ -352,7 +370,7 @@
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j</artifactId>
-      <version>0.9.19</version>
+      <version>0.9.20</version>
     </dependency>
     <dependency>
       <groupId>javax.mail</groupId>

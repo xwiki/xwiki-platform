@@ -25,8 +25,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
@@ -352,7 +352,7 @@ final class WikiManager
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
                 targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")",
-                    new Object[] {sourceWiki, SuperDocument.WIKI_SPACE_SEPARATOR, docFullName}));
+                    new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, docFullName}));
             }
 
             // Replace documents contents to link
@@ -362,7 +362,7 @@ final class WikiManager
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
                 targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")",
-                    new Object[] {sourceWiki, SuperDocument.WIKI_SPACE_SEPARATOR, docFullName}));
+                    new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, docFullName}));
             }
         } finally {
             context.setDatabase(database);
@@ -607,7 +607,7 @@ final class WikiManager
 
         XWiki xwiki = context.getWiki();
 
-        SuperClass wikiClass = XWikiServerClass.getInstance(context);
+        XClassManager wikiClass = XWikiServerClass.getInstance(context);
 
         XWikiServer wikiSuperDocToSave;
 
@@ -630,7 +630,7 @@ final class WikiManager
                 }
             }
 
-            wikiSuperDocToSave = (XWikiServer) wikiClass.newSuperDocument(docToSave, 0, context);
+            wikiSuperDocToSave = (XWikiServer) wikiClass.newXObjectDocument(docToSave, 0, context);
 
             // clear entry in virtual wiki cache
             if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {
@@ -812,7 +812,7 @@ final class WikiManager
      */
     public List getWikiAliasList(XWikiContext context) throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).searchSuperDocuments(context);
+        return XWikiServerClass.getInstance(context).searchXObjectDocuments(context);
     }
 
     /**
@@ -882,7 +882,7 @@ final class WikiManager
      */
     public List getWikiTemplateAliasList(XWikiContext context) throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).searchSuperDocumentsByField(
+        return XWikiServerClass.getInstance(context).searchXObjectDocumentsByField(
             XWikiServerClass.FIELD_VISIBILITY, XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE,
             "StringProperty", context);
     }
@@ -893,19 +893,19 @@ final class WikiManager
      * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to
      * "template".
      * 
-     * @param wikiSuperDocument a wiki descriptor document from which the new template wiki
+     * @param wikiXObjectDocument a wiki descriptor document from which the new template wiki
      *            descriptor document will be created.
      * @param packageName the name of the attached XAR file to import in the new template wiki.
      * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @throws XWikiException error when creating new wiki from XAR package.
      */
-    public void createWikiTemplate(XWikiServer wikiSuperDocument, String packageName,
+    public void createWikiTemplate(XWikiServer wikiXObjectDocument, String packageName,
         String comment, XWikiContext context) throws XWikiException
     {
-        wikiSuperDocument.setVisibility(XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE);
+        wikiXObjectDocument.setVisibility(XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE);
 
         // Create empty wiki
-        createNewWikiFromPackage(wikiSuperDocument, packageName, false, comment, context);
+        createNewWikiFromPackage(wikiXObjectDocument, packageName, false, comment, context);
     }
 }

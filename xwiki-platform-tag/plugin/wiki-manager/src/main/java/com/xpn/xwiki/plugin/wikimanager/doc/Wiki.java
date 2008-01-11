@@ -44,7 +44,7 @@ public class Wiki extends Document
      */
     public Collection getWikiAliasList() throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).newSuperDocumentList(doc, context);
+        return XWikiServerClass.getInstance(context).newXObjectDocumentList(doc, context);
     }
 
     /**
@@ -84,7 +84,7 @@ public class Wiki extends Document
      */
     public XWikiServer getWikiAlias(int id) throws XWikiException
     {
-        return (XWikiServer) XWikiServerClass.getInstance(context).newSuperDocument(doc, id,
+        return (XWikiServer) XWikiServerClass.getInstance(context).newXObjectDocument(doc, id,
             context);
     }
 }

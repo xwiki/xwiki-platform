@@ -24,7 +24,7 @@ import java.net.URL;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultSuperDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @version $Id: $
  */
-public class XWikiServer extends DefaultSuperDocument
+public class XWikiServer extends DefaultXObjectDocument
 {
     /**
      * Comma string.
@@ -51,8 +51,6 @@ public class XWikiServer extends DefaultSuperDocument
      *             <li>getting XWikiServerClass instance.</li>
      *             <li>or when calling {@link #reload(XWikiContext)}</li>
      *             </ul>
-     * @see DefaultSuperDocument#DefaultSuperDocument(com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.SuperClass,
-     *      XWikiDocument, int, XWikiContext)
      */
     public XWikiServer(XWikiDocument xdoc, int objectId, XWikiContext context)
         throws XWikiException

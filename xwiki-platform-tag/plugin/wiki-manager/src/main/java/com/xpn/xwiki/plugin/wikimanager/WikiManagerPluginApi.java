@@ -116,7 +116,7 @@ public class WikiManagerPluginApi extends PluginApi
      * @param wikiname the name of the new wiki.
      * @param templateWiki the name of the wiki from where to copy document to the new wiki.
      * @param pkgName the name of the attached XAR file to import in the new wiki.
-     * @param wikiSuperDocument a wiki descriptor document from which the new wiki descriptor
+     * @param wikiXObjectDocument a wiki descriptor document from which the new wiki descriptor
      *            document will be created.
      * @param failOnExist if true throw exception when wiki already exist. If false overwrite
      *            existing wiki.
@@ -145,7 +145,7 @@ public class WikiManagerPluginApi extends PluginApi
      * @throws XWikiException critical error in xwiki engine.
      */
     public int createNewWiki(String wikiname, String templateWiki, String pkgName,
-        XWikiServer wikiSuperDocument, boolean failOnExist) throws XWikiException
+        XWikiServer wikiXObjectDocument, boolean failOnExist) throws XWikiException
     {
         if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
@@ -153,7 +153,7 @@ public class WikiManagerPluginApi extends PluginApi
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
-        wikiSuperDocument.setWikiName(wikiname);
+        wikiXObjectDocument.setWikiName(wikiname);
 
         String realTemplateWikiName =
             templateWiki == null || templateWiki.trim().length() == 0 ? null : templateWiki;
@@ -171,10 +171,10 @@ public class WikiManagerPluginApi extends PluginApi
                 comment = WikiManagerMessageTool.COMMENT_CREATEEMPTYWIKI;
             }
 
-            WikiManager.getInstance().createNewWiki(wikiSuperDocument, failOnExist,
+            WikiManager.getInstance().createNewWiki(wikiXObjectDocument, failOnExist,
                 realTemplateWikiName, realPkgName, comment, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiSuperDocument
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument
                 .toString()), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
@@ -394,7 +394,7 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public XWikiServer createWikiDocument() throws XWikiException
     {
-        return (XWikiServer) XWikiServerClass.getInstance(context).newSuperDocument(context);
+        return (XWikiServer) XWikiServerClass.getInstance(context).newXObjectDocument(context);
     }
 
     /**
@@ -526,24 +526,24 @@ public class WikiManagerPluginApi extends PluginApi
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
-        XWikiServer wikiSuperDocument =
-            (XWikiServer) XWikiServerClass.getInstance(context).newSuperDocument(context);
-        wikiSuperDocument.setWikiName(templateName);
-        wikiSuperDocument.setDescription(templateDescription);
+        XWikiServer wikiXObjectDocument =
+            (XWikiServer) XWikiServerClass.getInstance(context).newXObjectDocument(context);
+        wikiXObjectDocument.setWikiName(templateName);
+        wikiXObjectDocument.setDescription(templateDescription);
 
-        wikiSuperDocument.setServer(templateName + ".template.local");
+        wikiXObjectDocument.setServer(templateName + ".template.local");
 
-        wikiSuperDocument.setState(XWikiServerClass.FIELDL_STATE_ACTIVE);
-        wikiSuperDocument.setOwner(this.context.getUser());
+        wikiXObjectDocument.setState(XWikiServerClass.FIELDL_STATE_ACTIVE);
+        wikiXObjectDocument.setOwner(this.context.getUser());
 
         try {
             WikiManager.getInstance().createWikiTemplate(
-                wikiSuperDocument,
+                wikiXObjectDocument,
                 packageName,
                 this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE,
                     new String[] {templateName, packageName}), this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiSuperDocument
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument
                 .toString()), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));

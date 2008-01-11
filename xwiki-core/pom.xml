@@ -209,13 +209,6 @@
       <scope>runtime</scope>
     </dependency>
 
-    <!-- We need to create a JIRA issue on the Maven project to upload this artifact -->
-    <dependency>
-      <groupId>fop</groupId>
-      <artifactId>fop</artifactId>
-      <version>0.93</version>
-    </dependency>
-
     <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
          http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
          allow a release (this is for reproducibility). Thus we've had to upload JTidy into
@@ -489,6 +482,11 @@
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <version>1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>fop</artifactId>
+      <version>0.93</version>
     </dependency>
   </dependencies>
   <build>

@@ -124,14 +124,14 @@ public class ApplicationManagerPluginApi extends PluginApi
      */
     public XWikiApplication createApplicationDocument() throws XWikiException
     {
-        return (XWikiApplication) XWikiApplicationClass.getInstance(context).newSuperDocument(
+        return (XWikiApplication) XWikiApplicationClass.getInstance(context).newXObjectDocument(
             context);
     }
 
     /**
      * Create a new application descriptor base on provided application descriptor.
      * 
-     * @param appSuperDocument the user application descriptor from which new descriptor will be
+     * @param appXObjectDocument the user application descriptor from which new descriptor will be
      *            created.
      * @param failOnExist if true fail if the application descriptor to create already exists.
      * @return error code . If there is error, it add error code in context
@@ -148,7 +148,7 @@ public class ApplicationManagerPluginApi extends PluginApi
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
      */
-    public int createApplication(XWikiApplication appSuperDocument, boolean failOnExist)
+    public int createApplication(XWikiApplication appXObjectDocument, boolean failOnExist)
         throws XWikiException
     {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
@@ -157,13 +157,13 @@ public class ApplicationManagerPluginApi extends PluginApi
 
         try {
             ApplicationManager.getInstance().createApplication(
-                appSuperDocument,
+                appXObjectDocument,
                 failOnExist,
                 this.messageTool.get("applicationmanager.plugin.createapplication.comment",
-                    appSuperDocument.toString()), context);
+                    appXObjectDocument.toString()), context);
         } catch (ApplicationManagerException e) {
             LOG.error(MessageFormat.format("Try to create application [{0}]",
-                new Object[] {appSuperDocument}), e);
+                new Object[] {appXObjectDocument}), e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));

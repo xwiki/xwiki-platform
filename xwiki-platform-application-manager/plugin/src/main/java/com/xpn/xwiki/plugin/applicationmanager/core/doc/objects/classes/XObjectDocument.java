@@ -29,11 +29,9 @@ import com.xpn.xwiki.api.Object;
  * SuperDocument interface.
  * 
  * @version $Id: $
- * @see SuperClass
- * @future XA2 : rename to DocumentObject.
- * @deprecated Use {@link XObjectDocument}
+ * @see XClassManager
  */
-public interface SuperDocument extends XObjectDocument
+public interface XObjectDocument
 {
     /**
      * The separator between space name and document name in document full name.
@@ -56,7 +54,7 @@ public interface SuperDocument extends XObjectDocument
     /**
      * @return the class manager for this document.
      */
-    SuperClass getSuperClass();
+    XClassManager getXClassManager();
 
     /**
      * @return true if this is a new document of this class (this document can exist but does not

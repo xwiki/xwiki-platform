@@ -50,10 +50,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * 
  * @version $Id: $
  * @see XClassManager
- * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. When that issue is applied in XWiki Core
- *       and when this plugin moves to the version of XWiki Core where it was applied then remove
- *       this class.
- * @future XA2 : rename to AbstractClassManager.
+ * @since Application Manager 1.0RC1
  */
 public abstract class AbstractXClassManager implements XClassManager
 {

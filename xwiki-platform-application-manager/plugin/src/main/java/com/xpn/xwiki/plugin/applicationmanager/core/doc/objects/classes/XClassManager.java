@@ -37,10 +37,7 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * </ul>
  * 
  * @version $Id: $
- * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1576. When that issue is applied in XWiki Core
- *       and when this plugin moves to the version of XWiki Core where it was applied then remove
- *       this class.
- * @future XA2 : rename to ClassManager.
+ * @since Application Manager 1.0RC1
  */
 public interface XClassManager
 {

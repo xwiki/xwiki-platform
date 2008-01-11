@@ -38,7 +38,7 @@ import com.xpn.xwiki.objects.BaseObject;
  * @version $Id: $
  * @see XObjectDocument
  * @see XClassManager
- * @future XA2 : rename to DefaultDocumentObject.
+ * @since Application Manager 1.0RC1
  */
 public class DefaultXObjectDocument extends Document implements XObjectDocument
 {

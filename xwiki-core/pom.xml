@@ -318,8 +318,7 @@
       <groupId>portlet-api</groupId>
       <artifactId>portlet-api</artifactId>
       <version>1.0</version>
-      <!-- TODO: Should the scope be "provided"?
-      <scope>provided</scope-->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>struts</groupId>

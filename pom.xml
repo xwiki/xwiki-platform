@@ -318,7 +318,9 @@
       <groupId>portlet-api</groupId>
       <artifactId>portlet-api</artifactId>
       <version>1.0</version>
-      <scope>provided</scope>
+      <!-- TODO: Ideally the scope should be "provided". However before we can do this we'll need
+           to fully remove all references to the Portlet API in XWiki Core so that using it in
+           a Servlet environment will not fail with a ClassNotFoundException -->
     </dependency>
     <dependency>
       <groupId>struts</groupId>

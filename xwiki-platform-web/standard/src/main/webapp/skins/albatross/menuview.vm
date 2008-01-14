@@ -69,6 +69,8 @@
 #submenuseparator()
 #submenuitem($doc.getURL("export", "format=pdf&amp;$docvariant") $msg.get("core.menu.export.pdf"))
 #submenuitem($doc.getURL("export", "format=rtf&amp;$docvariant") $msg.get("core.menu.export.rtf"))
+#submenuitem($doc.getURL("export", "format=html&amp;$docvariant") $msg.get("core.menu.export.html"))
+#submenuitem($doc.getURL("export", "format=xar&amp;name=$doc.fullName&amp;pages=$doc.fullName&amp;$docvariant") $msg.get("core.menu.export.xar"))
 #xwikitopmenuentryend()
 ##
 ## Actions menu
@@ -82,6 +84,8 @@
 ##
 ## Watch menu
 ##
+## FIXME (JIRA : http://jira.xwiki.org/jira/browse/XPWATCHLIST-4)
+#if ($xwiki.isVirtual())
 #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew())
 <script type="text/javascript">
 //<![CDATA[
@@ -131,6 +135,7 @@ function watchlist(action)
 #submenuseparator()
 #submenuitem($docuser.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
 #xwikitopmenuentryend()
+#end
 #end
 </div>
 </div>

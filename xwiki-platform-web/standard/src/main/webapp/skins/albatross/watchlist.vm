@@ -112,7 +112,7 @@
         <table id="searchTable" class="grid sortable doOddEven">
         <tr class="">
             <th>$msg.get("watchlist.space")</th>
-            <th style="width:180px">$msg.get("watchlist.actions")</th>
+            <th style="width:180px" class="unsortable noFilter">$msg.get("watchlist.actions")</th>
         </tr>
         #set ($wlist = $xwiki.watchlist.getWatchedSpaces())
         #foreach($item in $wlist)

@@ -170,7 +170,7 @@ public class LucenePluginApi extends Api
         return null;
     }
 
-    /*
+    /**
      * @return the number of documents in the queue
      */
     public long getQueueSize()

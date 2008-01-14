@@ -90,12 +90,12 @@ public class SchedulerPluginApi extends Api
     public JobState getJobStatus(BaseObject object)
         throws SchedulerException, SchedulerPluginException
     {
-        return plugin.getJobStatus(object);
+        return plugin.getJobStatus(object, context);
     }
 
     public JobState getJobStatus(Object object) throws SchedulerException, SchedulerPluginException
     {
-        return plugin.getJobStatus(retrieveBaseObject(object));
+        return plugin.getJobStatus(retrieveBaseObject(object), context);
     }
 
     /**
@@ -301,7 +301,7 @@ public class SchedulerPluginApi extends Api
     public Date getNextFireTime(BaseObject object)
     {
         try {
-            return plugin.getNextFireTime(object);
+            return plugin.getNextFireTime(object, context);
         }
         catch (SchedulerPluginException e) {
             context.put("error", e.getMessage());

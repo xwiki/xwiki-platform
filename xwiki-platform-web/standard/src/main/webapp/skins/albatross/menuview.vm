@@ -84,6 +84,8 @@
 ##
 ## Watch menu
 ##
+## FIXME (JIRA : http://jira.xwiki.org/jira/browse/XPWATCHLIST-4)
+#if ($xwiki.isVirtual())
 #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew())
 <script type="text/javascript">
 //<![CDATA[
@@ -133,6 +135,7 @@ function watchlist(action)
 #submenuseparator()
 #submenuitem($docuser.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
 #xwikitopmenuentryend()
+#end
 #end
 </div>
 </div>

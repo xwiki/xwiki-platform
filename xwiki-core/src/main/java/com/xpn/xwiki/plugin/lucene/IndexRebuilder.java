@@ -53,8 +53,10 @@ public class IndexRebuilder
         this.indexUpdater = indexUpdater;
 
         if (indexUpdater.needInitialBuild) {
-            LOG.info("Initializing Lucene search index, " + this.rebuildIndex(context)
-                + " documents found");
+            if (LOG.isInfoEnabled()) {
+                LOG.info("Initializing Lucene search index, " + this.rebuildIndex(context)
+                    + " documents found");
+            }
         }
     }
 
@@ -108,7 +110,9 @@ public class IndexRebuilder
      */
     protected int indexWiki(String wikiName, XWikiContext context)
     {
-        LOG.info("reading content of wiki " + wikiName);
+        if (LOG.isInfoEnabled()) {
+            LOG.info("reading content of wiki " + wikiName);
+        }
 
         int retval = 0;
 
@@ -145,9 +149,10 @@ public class IndexRebuilder
                     retval += this.indexUpdater.addAttachmentsOfDocument(document, context);
                     retval += addObjectsOfDocument(document, context);
                 } else {
-                    LOG
-                        .info("XWiki delivered null for document name " + wikiName + ":"
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("XWiki delivered null for document name " + wikiName + ":"
                             + docName);
+                    }
                 }
             }
         } finally {
@@ -191,7 +196,8 @@ public class IndexRebuilder
         for (Iterator iter = translations.iterator(); iter.hasNext();) {
             String lang = (String) iter.next();
             try {
-                this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext), wikiContext);
+                this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext),
+                    wikiContext);
                 retval++;
             } catch (XWikiException e1) {
                 LOG.error("error getting translated document for document "

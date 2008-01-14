@@ -97,9 +97,13 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
         while (!this.exit) {
             if (this.queue.isEmpty()) {
-                LOG.debug("IndexUpdater: queue empty, nothing to do");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("IndexUpdater: queue empty, nothing to do");
+                }
             } else {
-                LOG.debug("IndexUpdater: documents in queue, start indexing");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("IndexUpdater: documents in queue, start indexing");
+                }
 
                 Map toIndex = new HashMap();
                 List toDelete = new ArrayList();
@@ -112,12 +116,18 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                         if (oldDocs != null) {
                             for (int i = 0; i < oldDocs.size(); i++) {
                                 Object id = oldDocs.get(i);
-                                LOG.debug("Adding " + id + " to remove list");
+
+                                if (LOG.isDebugEnabled()) {
+                                    LOG.debug("Adding " + id + " to remove list");
+                                }
+
                                 if (!toDelete.contains(id)) {
                                     toDelete.add(id);
                                 } else {
-                                    LOG.debug("Found " + id
-                                        + " already in list while adding it to remove list");
+                                    if (LOG.isDebugEnabled()) {
+                                        LOG.debug("Found " + id
+                                            + " already in list while adding it to remove list");
+                                    }
                                 }
                             }
                         }
@@ -125,8 +135,10 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                         String id = data.getId();
                         LOG.debug("Adding " + id + " to index list");
                         if (toIndex.containsKey(id)) {
-                            LOG.debug("Found " + id
-                                + " already in list while adding it to index list");
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Found " + id
+                                    + " already in list while adding it to index list");
+                            }
                             toIndex.remove(id);
                         }
                         toIndex.put(id, data);
@@ -140,9 +152,13 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 // Let's delete
                 try {
                     openSearcher();
-                    LOG.info("deleting " + toDelete.size() + " docs from lucene index");
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("deleting " + toDelete.size() + " docs from lucene index");
+                    }
                     int nb = deleteOldDocs(toDelete);
-                    LOG.info("deleted " + nb + " docs from lucene index");
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("deleted " + nb + " docs from lucene index");
+                    }
                 } catch (Exception e) {
                     LOG.error("error deleting previous documents", e);
                 } finally {
@@ -151,7 +167,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
                 // Let's index
                 try {
-                    LOG.info("indexing " + toIndex.size() + " docs to lucene index");
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("indexing " + toIndex.size() + " docs to lucene index");
+                    }
 
                     XWikiContext context = (XWikiContext) this.context.clone();
                     context.getWiki().getStore().cleanUp(context);
@@ -164,24 +182,24 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                         String id = (String) entry.getKey();
                         IndexData data = (IndexData) entry.getValue();
 
-                        System.out.println("###################### " + id);
-                        
                         try {
                             XWikiDocument doc =
                                 this.xwiki.getDocument(data.getFullName(), context);
-                            
+
                             if (data.getLanguage() != null && !data.getLanguage().equals("")) {
                                 doc = doc.getTranslatedDocument(data.getLanguage(), context);
                             }
-                            
+
                             addToIndex(data, doc, context);
                             ++nb;
                         } catch (Exception e) {
                             LOG.error("error indexing document " + id, e);
                         }
                     }
-                    
-                    LOG.info("indexed " + nb + " docs to lucene index");
+
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("indexed " + nb + " docs to lucene index");
+                    }
                 } catch (Exception e) {
                     LOG.error("error indexing documents", e);
                 } finally {
@@ -242,7 +260,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
         for (Iterator iter = oldDocs.iterator(); iter.hasNext();) {
             Integer id = (Integer) iter.next();
-            LOG.debug("delete doc " + id);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("delete doc " + id);
+            }
 
             try {
                 this.reader.deleteDocument(id.intValue());
@@ -286,7 +306,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
             // writer = new IndexWriter (indexDir, analyzer, create);
             writer.setUseCompoundFile(true);
 
-            LOG.debug("successfully opened index writer : " + indexDir);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("successfully opened index writer : " + indexDir);
+            }
         } catch (IOException e) {
             LOG.error("IOException when opening Lucene Index for writing at " + indexDir, e);
         }
@@ -313,13 +335,17 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
         this.writer = null;
 
-        LOG.debug("closed writer.");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("closed writer.");
+        }
     }
 
     private void addToIndex(IndexData data, XWikiDocument doc, XWikiContext context)
         throws IOException
     {
-        LOG.debug("addToIndex: " + data);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("addToIndex: " + data);
+        }
 
         org.apache.lucene.document.Document luceneDoc = new org.apache.lucene.document.Document();
         data.addDataToLuceneDocument(luceneDoc, doc, context);
@@ -386,10 +412,14 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
     public void cleanIndex()
     {
-        LOG.info("trying to clear index for rebuilding");
+        if (LOG.isInfoEnabled()) {
+            LOG.info("trying to clear index for rebuilding");
+        }
 
         while (writer != null) {
-            LOG.debug("waiting for existing index writer to close");
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("waiting for existing index writer to close");
+            }
 
             try {
                 Thread.sleep(1000);
@@ -457,8 +487,10 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     public void notify(XWikiNotificationRule rule, XWikiDocument newDoc, XWikiDocument oldDoc,
         int event, XWikiContext context)
     {
-        LOG.debug("notify from XWikiDocChangeNotificationInterface, event=" + event + ", newDoc="
-            + newDoc + " oldDoc=" + oldDoc);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("notify from XWikiDocChangeNotificationInterface, event=" + event
+                + ", newDoc=" + newDoc + " oldDoc=" + oldDoc);
+        }
 
         try {
             add(newDoc, context);
@@ -477,7 +509,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         XWikiContext context)
     {
         if ("upload".equals(action)) {
-            LOG.debug("upload action notification for doc " + doc.getName());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("upload action notification for doc " + doc.getName());
+            }
 
             try {
                 // Retrieve the latest version (with the file just attached)

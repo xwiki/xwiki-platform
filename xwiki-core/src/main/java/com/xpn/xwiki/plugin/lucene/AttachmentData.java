@@ -34,7 +34,7 @@ import java.util.Map;
  * Holds all data but the content of an attachment to be indexed. The content is retrieved at
  * indexing time, which should save us some memory especially when rebuilding an index for a big
  * wiki.
- *
+ * 
  * @version $Id: $
  */
 public class AttachmentData extends IndexData
@@ -69,22 +69,22 @@ public class AttachmentData extends IndexData
         final XWikiContext context)
     {
         super(attachment.getDoc(), context);
+        
         setModificationDate(attachment.getDate());
         setAuthor(attachment.getAuthor());
         setSize(attachment.getFilesize());
         setFilename(attachment.getFilename());
     }
 
-    /**
-     * @see IndexData#addDataToLuceneDocument
-     */
-    public void addDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
+    public void addDataToLuceneDocument(Document luceneDoc, XWikiDocument doc,
+        XWikiContext context)
     {
         super.addDataToLuceneDocument(luceneDoc, doc, context);
         if (filename != null) {
-            luceneDoc
-                .add(new Field(IndexFields.FILENAME, filename, Field.Store.YES,
-                    Field.Index.TOKENIZED));
+            luceneDoc.add(new Field(IndexFields.FILENAME,
+                filename,
+                Field.Store.YES,
+                Field.Index.TOKENIZED));
         }
     }
 
@@ -122,14 +122,14 @@ public class AttachmentData extends IndexData
 
     /**
      * overridden to append the filename
-     *
+     * 
      * @see IndexData#getId()
      */
     public String getId()
     {
         return new StringBuffer(super.getId()).append(".file.").append(filename).toString();
     }
-    
+
     /**
      * @return a string containing the result of {@link IndexData#getFullText} plus the full text
      *         content of this attachment, as far as it could be extracted.
@@ -142,34 +142,32 @@ public class AttachmentData extends IndexData
         if (contentText != null) {
             retval.append(" ").append(contentText).toString();
         }
+
         return retval.toString();
     }
 
-    /**
-     * @param doc
-     * @param context
-     * @return
-     */
     private String getContentAsText(XWikiDocument doc, XWikiContext context)
     {
         String contentText = null;
+
         try {
             XWikiAttachment att = doc.getAttachment(filename);
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("have attachment for filename " + filename + ": " + att);
-            }
+
+            LOG.debug("have attachment for filename " + filename + ": " + att);
+
             byte[] content = att.getContent(context);
             if (filename != null) {
                 String[] nameParts = filename.split("\\.");
                 if (nameParts.length > 1) {
-                    contentText = TextExtractor.getText(content, (String) MIMETYPES
-                        .get(nameParts[nameParts.length - 1].toLowerCase()));
+                    contentText =
+                        TextExtractor.getText(content, (String) MIMETYPES
+                            .get(nameParts[nameParts.length - 1].toLowerCase()));
                 }
             }
         } catch (Exception e) {
             LOG.error("error getting content of attachment", e);
-            e.printStackTrace();
         }
+
         return contentText;
     }
 }

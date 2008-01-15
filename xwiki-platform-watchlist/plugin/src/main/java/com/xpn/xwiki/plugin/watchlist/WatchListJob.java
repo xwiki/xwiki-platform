@@ -239,8 +239,6 @@ public class WatchListJob implements Job
      */
     protected List retrieveUpdatedDocuments() throws XWikiException
     {
-        // String updatedDocumentRequest = "where year(doc.date) = year(current_date()) and ";
-        String updatedDocumentRequest = "where ";
         DateTime dt = new DateTime();
 
         switch (interval) {
@@ -261,7 +259,7 @@ public class WatchListJob implements Job
                 dt = dt.minus(Months.ONE);
                 break;
         }
-        updatedDocumentRequest += "doc.date > " +
+        String updatedDocumentRequest = "where doc.date > " +
             xwiki.formatDate(dt.toDate(), "yyyy-MM-dd HH:mm:ss.SSS") + "' order by doc.date desc";
         return xwiki.searchDocuments(updatedDocumentRequest);
     }

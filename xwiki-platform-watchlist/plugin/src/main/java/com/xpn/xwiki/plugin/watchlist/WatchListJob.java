@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.watchlist;
 
 import com.xpn.xwiki.XWikiException;
@@ -26,8 +25,14 @@ import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
-import org.hibernate.engine.Collections;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
+import org.joda.time.Hours;
+import org.joda.time.Months;
+import org.joda.time.Weeks;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -49,11 +54,19 @@ import java.util.List;
  */
 public class WatchListJob implements Job
 {
+    private static final Log LOG = LogFactory.getLog(WatchListPlugin.class);
+
     protected com.xpn.xwiki.api.XWiki xwiki = null;
+
     protected BaseObject xjob = null;
+
     protected com.xpn.xwiki.api.Context xcontext = null;
+
     protected WatchListPluginApi notificationPlugin = null;
+
     protected int interval = 0;
+
+    protected String logprefix;
 
     /**
      * Sets objects required by the Job : XWiki, XWikiContext, WatchListPlugin, etc
@@ -65,21 +78,21 @@ public class WatchListJob implements Job
         JobDataMap data = context.getJobDetail().getJobDataMap();
         xwiki = (com.xpn.xwiki.api.XWiki) data.get("xwiki");
         xcontext = (com.xpn.xwiki.api.Context) data.get("context");
-        notificationPlugin = (WatchListPluginApi)xwiki.getPlugin(WatchListPlugin.ID);
+        notificationPlugin = (WatchListPluginApi) xwiki.getPlugin(WatchListPlugin.ID);
         xjob = (BaseObject) data.get("xjob");
         interval = Integer.parseInt(xjob.getLargeStringValue("script"));
+        logprefix = "WatchList job " + xcontext.getDatabase() + ":" + xjob.getName() + " ";
     }
 
     /**
      * Method called from the scheduler
      *
      * @param context Context of the request
-     * @throws JobExecutionException
      */
     public void execute(JobExecutionContext context) throws JobExecutionException
     {
         // Set required objects
-        init(context);        
+        init(context);
 
         try {
             // Retreive notification subscribers
@@ -87,11 +100,12 @@ public class WatchListJob implements Job
             if (subscribers != null && subscribers.size() > 0) {
                 // Retreive updated documents
                 List updatedDocuments = retrieveUpdatedDocuments();
+                LOG.info(logprefix + "updatedDocumentsNumber : [" + updatedDocuments.size() + "]");
                 Iterator it = subscribers.iterator();
                 while (it.hasNext()) {
                     try {
                         // Retreive WatchList Object for each subscribers
-                        Document subscriber = xwiki.getDocument((String) it.next());                        
+                        Document subscriber = xwiki.getDocument((String) it.next());
                         Object userObj = subscriber.getObject("XWiki.XWikiUsers");
                         Object notificationCriteria =
                             subscriber.getObject(WatchListPlugin.WATCHLIST_CLASS);
@@ -104,10 +118,20 @@ public class WatchListJob implements Job
                                 .getFullName());
 
                         // If there are matching documents, sends the notification
-                        if (matchingDocuments.size() > 0)
-                            sendNotificationMessage(subscriber, matchingDocuments);
+                        if (matchingDocuments.size() > 0) {
+                            LOG.info(logprefix + "matchingDocumentsForUser " +
+                                subscriber.getFullName() + ": [" + matchingDocuments.size() + "]");
+                            try {
+                                sendNotificationMessage(subscriber, matchingDocuments);
+                            } catch (Exception e) {
+                                LOG.error(logprefix + "exception while sending email to " +
+                                    subscriber.display("email", "view") + " with " +
+                                    matchingDocuments.size() + " matching documents");
+                                e.printStackTrace();
+                            }
+                        }
                     } catch (XWikiException e) {
-                        // We're in a job, don't throw it
+                        e.printStackTrace();
                     }
                 }
             }
@@ -123,18 +147,18 @@ public class WatchListJob implements Job
      * @param notificationCriteria the BaseObject representing the user notification criteria
      * @param subscriber the user to be notified
      * @return a filtered list of documents to be sent to the user
-     * @throws XWikiException
      */
     private List filter(List updatedDocuments,
         Object notificationCriteria, String subscriber) throws XWikiException
-    {        
-        String spaceCriterion = (String)notificationCriteria.display("spaces", "view");
-        String documentCriterion = (String)notificationCriteria.display("documents", "view");
-        String query = (String)notificationCriteria.display("query", "view");
+    {
+        String spaceCriterion = (String) notificationCriteria.display("spaces", "view");
+        String documentCriterion = (String) notificationCriteria.display("documents", "view");
+        String query = (String) notificationCriteria.display("query", "view");
 
         List watchedDocuments = new ArrayList();
         if (spaceCriterion.length() == 0 && documentCriterion.length() == 0
-            && query.length() == 0) {
+            && query.length() == 0)
+        {
             /* Iterator docIt = updatedDocuments.iterator();
             while (docIt.hasNext()) {
                 watchedDocuments.add(docIt.next());
@@ -146,8 +170,9 @@ public class WatchListJob implements Job
         String[] watchedSpaces = spaceCriterion.split(",");
 
         String[] docArray = documentCriterion.split(",");
-        for (int i = 0; i < docArray.length; i++)
+        for (int i = 0; i < docArray.length; i++) {
             watchedDocuments.add(docArray[i]);
+        }
 
         if (query.length() > 0) {
             List queryDocuments = xwiki.searchDocuments(query);
@@ -156,13 +181,14 @@ public class WatchListJob implements Job
 
         Iterator updatedDocumentsIt = updatedDocuments.iterator();
         while (updatedDocumentsIt.hasNext()) {
-            String updatedDocument = (String)updatedDocumentsIt.next();
+            String updatedDocument = (String) updatedDocumentsIt.next();
             String updatedDocumentSpace = xwiki.getDocument(updatedDocument).getSpace();
             boolean documentAdded = false;
 
             for (int i = 0; i < watchedSpaces.length; i++) {
                 if (updatedDocumentSpace.equals(watchedSpaces[i])
-                    && xwiki.hasAccessLevel("view", subscriber, updatedDocument)) {
+                    && xwiki.hasAccessLevel("view", subscriber, updatedDocument))
+                {
                     filteredDocumentList.add(updatedDocument);
                     documentAdded = true;
                     break;
@@ -174,15 +200,15 @@ public class WatchListJob implements Job
             if (!documentAdded) {
                 Iterator watchedDocumentIt = watchedDocuments.iterator();
                 while (watchedDocumentIt.hasNext()) {
-                    String watchedDocumentName = (String)watchedDocumentIt.next();
+                    String watchedDocumentName = (String) watchedDocumentIt.next();
                     if (updatedDocument.equals(watchedDocumentName)
-                        && xwiki.hasAccessLevel("view", subscriber, updatedDocument)) {
+                        && xwiki.hasAccessLevel("view", subscriber, updatedDocument))
+                    {
                         filteredDocumentList.add(updatedDocument);
                         break;
                     }
                 }
             }
-
         }
 
         return filteredDocumentList;
@@ -190,18 +216,19 @@ public class WatchListJob implements Job
 
     /**
      * Retrieves all the XWiki.XWikiUsers who have requested to be notified by changes, i.e. who
-     * have an Object of class WATCHLIST_CLASS attached AND who have choosen the current interval (ex:hourly).
+     * have an Object of class WATCHLIST_CLASS attached AND who have choosen the current interval
+     * (ex:hourly).
      *
      * @return a collection of document names pointing to the XWikiUsers wishing to get notified.
-     * @throws XWikiException
      */
     protected List retrieveNotificationSubscribers() throws XWikiException
     {
         List userDocs =
             xwiki.searchDocuments(
                 ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName and obj.className='"
-                    + WatchListPlugin.WATCHLIST_CLASS + "' and prop.id.id=obj.id and prop.name='interval' " +
-                        "and prop.value='" + interval + "'");
+                    + WatchListPlugin.WATCHLIST_CLASS +
+                    "' and prop.id.id=obj.id and prop.name='interval' " +
+                    "and prop.value='" + interval + "'");
         return userDocs;
     }
 
@@ -209,48 +236,48 @@ public class WatchListJob implements Job
      * Retrieves the list of documents that have been updated or created in the interval.
      *
      * @return a list of updated or created documents in the interval
-     * @throws XWikiException
      */
     protected List retrieveUpdatedDocuments() throws XWikiException
     {
-        String updatedDocumentRequest = "where year(doc.date) = year(current_date()) and ";
+        // String updatedDocumentRequest = "where year(doc.date) = year(current_date()) and ";
+        String updatedDocumentRequest = "where ";
+        DateTime dt = new DateTime();
+
         switch (interval) {
             case WatchListPlugin.WATCHLIST_INTERVAL_HOUR:
                 // hourly
-                updatedDocumentRequest += "month(doc.date) = month(current_date()) and day(doc.date) = day(current_date()) and hour(doc.date) > (hour(current_time()) - 1)";
+                dt = dt.minus(Hours.ONE);
                 break;
             case WatchListPlugin.WATCHLIST_INTERVAL_DAY:
                 // daily
-                updatedDocumentRequest += "month(doc.date) = month(current_date()) and day(doc.date) > (day(current_date()) - 1)";
+                dt = dt.minus(Days.ONE);
                 break;
-            case WatchListPlugin.WATCHLIST_INTERVAL_WEEK :
+            case WatchListPlugin.WATCHLIST_INTERVAL_WEEK:
                 // weekly
-                updatedDocumentRequest += "month(doc.date) = month(current_date()) and day(doc.date) > (day(current_date()) - 7)";
+                dt = dt.minus(Weeks.ONE);
                 break;
             case WatchListPlugin.WATCHLIST_INTERVAL_MONTH:
                 // monthly
-                updatedDocumentRequest += "month(doc.date) > (month(current_date()) - 1)";
+                dt = dt.minus(Months.ONE);
                 break;
         }
-        updatedDocumentRequest += " order by doc.date desc";
+        updatedDocumentRequest += "doc.date > " +
+            xwiki.formatDate(dt.toDate(), "yyyy-MM-dd HH:mm:ss.SSS") + "' order by doc.date desc";
         return xwiki.searchDocuments(updatedDocumentRequest);
     }
-
-    // TODO : 
 
     /**
      * Sends the email notifying the subscriber that the updatedDocuments have been changed.
      *
      * @param subscriber person to notify
      * @param updatedDocuments list of updated documents
-     * @throws XWikiException
      */
     protected void sendNotificationMessage(Document subscriber,
         List updatedDocuments) throws XWikiException
     {
         // Get user email
         Object userObj = subscriber.getObject("XWiki.XWikiUsers");
-        String emailAddr = (String)userObj.display("email", "view");
+        String emailAddr = (String) userObj.display("email", "view");
         if (emailAddr == null || emailAddr.length() == 0 || emailAddr.indexOf("@") < 0) {
             // Invalid email
             return;
@@ -275,7 +302,7 @@ public class WatchListJob implements Job
         }
 
         // Get wiki administrator email (default : mailer@xwiki.localdomain.com)
-        String sender = xwiki.getXWikiPreference("admin_email", "mailer@xwiki.localdomain.com");                    
+        String sender = xwiki.getXWikiPreference("admin_email", "mailer@xwiki.localdomain.com");
 
         // Send message from template
         int sendResult =

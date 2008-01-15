@@ -53,9 +53,9 @@ public class IndexRebuilder
         this.indexUpdater = indexUpdater;
 
         if (indexUpdater.needInitialBuild) {
+            int retval = this.rebuildIndex(context);
             if (LOG.isInfoEnabled()) {
-                LOG.info("Initializing Lucene search index, " + this.rebuildIndex(context)
-                    + " documents found");
+                LOG.info("Initializing Lucene search index, " + retval + " documents found");
             }
         }
     }

@@ -259,9 +259,10 @@ public class WatchListJob implements Job
                 dt = dt.minus(Months.ONE);
                 break;
         }
-        String updatedDocumentRequest = "where doc.date > '" +
-            xwiki.formatDate(dt.toDate(), "yyyy-MM-dd HH:mm:ss.SSS") + "' order by doc.date desc";
-        return xwiki.searchDocuments(updatedDocumentRequest);
+        List values = new ArrayList();
+        values.add(dt.toDate());
+        String updatedDocumentRequest = "where doc.date > ? order by doc.date desc";
+        return xwiki.searchDocuments(updatedDocumentRequest, 0, 0, values);
     }
 
     /**

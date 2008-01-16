@@ -32,8 +32,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
 
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
 import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -68,17 +66,24 @@ public class DBListClass extends ListClass
         List list2 = new ArrayList();
         for (int i = 0; i < list.size(); i++) {
             Object result = list.get(i);
-            if (result instanceof String) {
-                list2.add(new ListItem((String) result));
-            } else {
-                Object[] res = (Object[]) result;
-                if (res.length == 1) {
-                    list2.add(new ListItem(res[0].toString()));
-                } else if (res.length == 2) {
-                    list2.add(new ListItem(res[0].toString(), res[1].toString()));
+
+            // Oracle databases treat NULL and empty strings similarly. Thus the list passed
+            // as parameter can have some elements being NULL (for XWiki string properties which
+            // were empty strings). This means we need to check for NULL and ignore NULL entries
+            // from the list.
+            if (result != null) {
+                if (result instanceof String) {
+                    list2.add(new ListItem((String) result));
                 } else {
-                    list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2]
-                        .toString()));
+                    Object[] res = (Object[]) result;
+                    if (res.length == 1) {
+                        list2.add(new ListItem(res[0].toString()));
+                    } else if (res.length == 2) {
+                        list2.add(new ListItem(res[0].toString(), res[1].toString()));
+                    } else {
+                        list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2]
+                            .toString()));
+                    }
                 }
             }
         }

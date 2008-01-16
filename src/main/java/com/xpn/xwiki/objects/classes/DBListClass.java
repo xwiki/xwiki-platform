@@ -32,8 +32,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.plugin.query.QueryPlugin;
 
-import java.text.CharacterIterator;
-import java.text.StringCharacterIterator;
 import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.xhtml.input;
@@ -68,17 +66,24 @@ public class DBListClass extends ListClass
         List list2 = new ArrayList();
         for (int i = 0; i < list.size(); i++) {
             Object result = list.get(i);
-            if (result instanceof String) {
-                list2.add(new ListItem((String) result));
-            } else {
-                Object[] res = (Object[]) result;
-                if (res.length == 1) {
-                    list2.add(new ListItem(res[0].toString()));
-                } else if (res.length == 2) {
-                    list2.add(new ListItem(res[0].toString(), res[1].toString()));
+
+            // Oracle databases treat NULL and empty strings similarly. Thus the list passed
+            // as parameter can have some elements being NULL (for XWiki string properties which
+            // were empty strings). This means we need to check for NULL and ignore NULL entries
+            // from the list.
+            if (result != null) {
+                if (result instanceof String) {
+                    list2.add(new ListItem((String) result));
                 } else {
-                    list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2]
-                        .toString()));
+                    Object[] res = (Object[]) result;
+                    if (res.length == 1) {
+                        list2.add(new ListItem(res[0].toString()));
+                    } else if (res.length == 2) {
+                        list2.add(new ListItem(res[0].toString(), res[1].toString()));
+                    } else {
+                        list2.add(new ListItem(res[0].toString(), res[1].toString(), res[2]
+                            .toString()));
+                    }
                 }
             }
         }
@@ -253,38 +258,38 @@ public class DBListClass extends ListClass
     public void flushCache() {
         this.cachedDBList = null;
     }
-    
+
     // return first or second col from user query
     public String returnCol(String hibquery, boolean first) {
        	String firstCol = "-", secondCol = "-";
-        	
+
     	int fromIndx = hibquery.indexOf("from");
-    		 
+
     	if(fromIndx > 0) {
     		 String firstPart = hibquery.substring(0, fromIndx);
     		 firstPart.replaceAll("\\s+", " ");
     		 int comIndx = hibquery.indexOf(",");
-    		 
+
     		 //there are more than one columns to select- take the second one (the value)
     		 if(comIndx > 0 && comIndx < fromIndx) {
-    
+
     			 StringTokenizer st = new StringTokenizer(firstPart, " ,()", true);
     			 ArrayList words = new ArrayList();
-    			 
-    			 while(st.hasMoreTokens()) 
+
+    			 while(st.hasMoreTokens())
     				 words.add(st.nextToken().toLowerCase());
-    			 
+
     			 int comma = words.indexOf(",") - 1;
     			 while(words.get(comma).toString().compareTo(" ") == 0) {
     				 comma--;
     			 }
     			 firstCol = words.get(comma).toString().trim();
-    			 
+
     			 comma = words.indexOf(",") + 1;
     			 while(words.get(comma).toString().compareTo(" ") == 0) {
     				  comma++;
     			 }
-    			 				 
+
               	 if(words.get(comma).toString().compareTo("(") == 0) {
               		 int i = comma+1;
               		 while(words.get(i).toString().compareTo(")") != 0) {
@@ -314,17 +319,17 @@ public class DBListClass extends ListClass
     	if(first == true) return firstCol;
     	else return secondCol;
     }
-    
+
     //the result of the second query, to retrieve the value
     public String getValue(String val, String sql, XWikiContext context) {
     	String firstCol = returnCol(sql, true);
     	String secondCol = returnCol(sql, false);
-    	
+
     	String newsql = sql.substring(0, sql.indexOf(firstCol));
     	newsql += secondCol + " ";
     	newsql += sql.substring(sql.indexOf("from"));
     	newsql += "and " + firstCol + "='" + val + "'";
-    	
+
     	Object[] list = null;
     	XWiki xwiki = context.getWiki();
     	String res = "";
@@ -333,27 +338,27 @@ public class DBListClass extends ListClass
     			if(list.length > 0) res = list[0].toString();
     		}catch(Exception e) {
     			e.printStackTrace();
-    		}  
+    		}
     	return res;
     }
-    
-    
+
+
     //override the method from parent ListClass
     public void displayEdit(StringBuffer buffer, String name, String prefix,
             BaseCollection object, XWikiContext context)
         {
-            //input display  	
+            //input display
             if (getDisplayType().equals("input")) {
             	input input = new input();
                 input.setType("text");
                 input.setSize(getSize());
                 boolean changeInputName = false;
                 boolean setInpVal = true;
-                
+
                 BaseProperty prop = (BaseProperty) object.safeget(name);
                 String val = "";
                 if (prop != null)  val = prop.toFormString();
-                
+
                 if(isPicker()) {
                 	input.addAttribute("autocomplete", "off");
                 	String path = "";
@@ -367,37 +372,37 @@ public class DBListClass extends ListClass
                	 	String fieldname = this.getName();
                	 	String hibquery = this.getSql();
                	 	String secondCol = "-", firstCol = "-";
-               	 	
+
                	 	if(hibquery != null && !hibquery.equals("")) {
                	 		firstCol = returnCol(hibquery, true);
                	 		secondCol = returnCol(hibquery, false);
-               	 		       	 		
+
                	 		if(secondCol.compareTo("-") != 0) {
-               	 			changeInputName = true;                    		 
+               	 			changeInputName = true;
                	 			input hidden = new input();
                	 			hidden.setID(prefix + name);
                	 			hidden.setName(prefix + name);
                	 			hidden.setType("hidden");
                	 			if(val != null && !val.equals("")) hidden.setValue(val);
                	 			buffer.append(hidden.toString());
-               	 			
+
                	 			input.setValue(getValue(val, hibquery, context));
                	 			setInpVal = false;
                	 		}
                	 	}
-               	 	
-               	 	String script = "\""+path+"?xpage=suggest&amp;classname="+classname+"&amp;fieldname="+fieldname+"&amp;firCol="+firstCol+"&amp;secCol="+secondCol+"&amp;\"";            	 	
+
+               	 	String script = "\""+path+"?xpage=suggest&amp;classname="+classname+"&amp;fieldname="+fieldname+"&amp;firCol="+firstCol+"&amp;secCol="+secondCol+"&amp;\"";
                	 	String varname = "\"input\"";
                	    String seps = "\""+this.getSeparators()+"\"";
                	    if(isMultiSelect())
                	    	input.setOnFocus("new ajaxSuggest(this, {script:"+script+", varname:"+varname+", seps:"+seps+"} )");
                	    else
                	    	input.setOnFocus("new ajaxSuggest(this, {script:"+script+", varname:"+varname+"} )");
-         	 	  
-               	 
-               	 	
+
+
+
                 }
-               	 	
+
                	if(changeInputName == true) {
                	 		input.setName(prefix + name + "_suggest");
                	 		input.setID(prefix + name + "_suggest");
@@ -407,21 +412,21 @@ public class DBListClass extends ListClass
                	 		input.setID(prefix + name);
                	 	 }
                	if(setInpVal == true) input.setValue(val);
-               
+
                 buffer.append(input.toString());
-                                
+
             } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
                 displayRadioEdit(buffer, name, prefix, object, context);
             } else {
                 displaySelectEdit(buffer, name, prefix, object, context);
             }
-    
+
             if (!getDisplayType().equals("input")) {
                 org.apache.ecs.xhtml.input hidden = new input(input.hidden, prefix + name, "");
                 buffer.append(hidden);
             }
         }
-    
+
     public void displayView(StringBuffer buffer, String name, String prefix,
             BaseCollection object, XWikiContext context)
         {
@@ -430,7 +435,7 @@ public class DBListClass extends ListClass
     			String val = "";
     			if(prop != null) val = prop.toFormString();
     			Map map = getMap(context);
-     
+
     			String  secondCol = returnCol(getSql(), false);
     			if(secondCol.compareTo("-") != 0) {
     				String res = getValue(val, getSql(), context);

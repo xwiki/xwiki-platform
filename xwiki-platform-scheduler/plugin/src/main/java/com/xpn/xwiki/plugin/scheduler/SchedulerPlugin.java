@@ -40,8 +40,14 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
@@ -199,8 +205,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             }
         }
 
-        //lets now build the stub context
-        XWikiContext scontext = new XWikiContext();
+        //lets now build the stub context        
+        XWikiContext scontext = (XWikiContext)context.clone();
         scontext.setWiki(context.getWiki());
 
         // We are sure the context request is a real servlet request
@@ -216,6 +222,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         scontext.setDatabase(cDb);
         scontext.setMainXWiki(context.getMainXWiki());
         scontext.setVirtual(context.isVirtual());
+        if (scontext.getURL() == null) {
+            try {
+                scontext.setURL(new URL("http://www.mystuburl.com/"));
+            } catch (Exception e) {
+                // the URL is well formed, I promise
+            }
+        }
 
         com.xpn.xwiki.web.XWikiURLFactory xurf = context.getURLFactory();
         if (xurf == null) {

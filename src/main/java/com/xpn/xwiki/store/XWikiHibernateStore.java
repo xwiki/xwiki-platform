@@ -1641,6 +1641,39 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
          return ("1".equals(context.getWiki().Param(param + ".read", "1")));
     }
 
+    /**
+     * Add values into named query.
+     * 
+     * @param parameterId the parameter id to increment.
+     * @param query the query to fill.
+     * @param parameterValues the values to add to query.
+     * @return the id of the next parameter to add.
+     */
+    private int injectParameterListToQuery(int parameterId, Query query, Collection parameterValues)
+    {
+        int index = parameterId;
+        
+        if (parameterValues != null) {
+            for (Iterator valueIt = parameterValues.iterator(); valueIt.hasNext(); ++index) {
+                injectParameterToQuery(index, query, valueIt.next());
+            }
+        }
+
+        return index;
+    }
+    
+    /**
+     * Add value into named query.
+     * 
+     * @param parameterId the parameter id to increment.
+     * @param query the query to fill.
+     * @param parameterValue the values to add to query.
+     */
+    private void injectParameterToQuery(int parameterId, Query query, Object parameterValue)
+    {
+        query.setParameter(parameterId, parameterValue);
+    }
+    
     public List searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -1716,12 +1749,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             // Add values for provided HQL request containing "?" characters where to insert real
             // values.
-            int parameterId = 0;
-            if (parameterValues != null) {
-                for (Iterator values = parameterValues.iterator(); values.hasNext();) {
-                    query.setString(parameterId++, values.next().toString());
-                }
-            }
+            int parameterId = injectParameterListToQuery(0, query, parameterValues);
 
             if (whereParams != null) {
                 for (int i = 0; i < whereParams.length; i++)
@@ -1857,14 +1885,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
             Query query = session.createQuery(sql);
 
-            if (parameterValues != null)
-            {
-                int i = 0;
-                for (Iterator values = parameterValues.iterator(); values.hasNext();) {
-                    query.setString(i, (String) values.next());
-                    i++;
-                }
-            }
+            injectParameterListToQuery(0, query, parameterValues);
 
             if (start!=0)
                 query.setFirstResult(start);
@@ -1942,13 +1963,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             Query query = session.createQuery(sql);
 
-            if (parameterValues != null) {
-                int i = 0;
-                for (Iterator values = parameterValues.iterator(); values.hasNext();) {
-                    query.setString(i, values.next().toString());
-                    i++;
-                }
-            }
+            injectParameterListToQuery(0, query, parameterValues);
 
             if (start != 0)
                 query.setFirstResult(start);

@@ -99,7 +99,7 @@
     <property name="connection.username">xwiki</property>
     <property name="connection.password">xwiki</property>
     <property name="connection.driver_class">oracle.jdbc.driver.OracleDriver</property>
-    <property name="dialect">org.hibernate.dialect.OracleDialect</property>
+    <property name="dialect">org.hibernate.dialect.Oracle10gDialect</property>
     <property name="connection.provider_class">com.xpn.xwiki.store.DBCPConnectionProvider</property>
     <property name="connection.pool_size">2</property>
     <property name="statement_cache.size">2</property>

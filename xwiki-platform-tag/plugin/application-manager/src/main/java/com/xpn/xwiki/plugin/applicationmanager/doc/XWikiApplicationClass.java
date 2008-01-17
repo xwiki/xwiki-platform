@@ -341,7 +341,7 @@ public class XWikiApplicationClass extends AbstractXClassManager
         List listApp =
             context.getWiki().getStore().searchDocuments(where, parameterValues, context);
 
-        if (listApp.size() == 0) {
+        if (listApp.isEmpty()) {
             if (validate) {
                 throw new ApplicationManagerException(
                     ApplicationManagerException.ERROR_AM_DOESNOTEXIST,

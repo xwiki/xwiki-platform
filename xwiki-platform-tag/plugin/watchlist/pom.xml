@@ -7,7 +7,7 @@
   </parent>
   <artifactId>xwiki-plugin-watchlist</artifactId>
   <name>XWiki Platform - Plugins - WatchList Manager</name>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - WatchList Manager</description>
   <dependencies>
     <dependency>
@@ -32,10 +32,4 @@
       <version>1.4</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.1</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.1</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-watchlist-1.1</url>
-  </scm>
 </project>

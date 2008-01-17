@@ -38,8 +38,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-scheduler</artifactId>
-      <!-- We want to release the Scheduler plugin and application together. Hence they should have the same version -->
-      <version>${pom.version}</version>
+      <version>1.2</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

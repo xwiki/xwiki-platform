@@ -329,7 +329,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
                 "<tr style=\"background-color:${color};\">\n" +
                 "<td><a href=\"${udoc.getExternalURL()}\">$udoc.getDisplayTitle()</a></td>\n" +
                 "<td>$udoc.web</td>\n" +
-                "<td>$xwiki.getLocalUserName($udoc.author, true)</td>\n" +
+                "<td>$xwiki.getLocalUserName($udoc.author, false)</td>\n" +
                 "<td>$udoc.getComment()</td>\n" +
                 "<td>$xwiki.formatDate($udoc.date)</td>\n" +
                 "</tr>\n" +

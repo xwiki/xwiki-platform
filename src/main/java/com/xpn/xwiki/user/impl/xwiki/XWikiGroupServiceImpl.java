@@ -642,7 +642,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         if (list == null || list.size() == 0)
             return 0;
 
-        return ((Integer) list.get(0)).intValue();
+        return ((Number) list.get(0)).intValue();
     }
 
     /**

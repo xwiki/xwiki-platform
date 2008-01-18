@@ -306,6 +306,6 @@ public class WatchListJob implements Job
         // Send message from template
         int sendResult =
             emailService.sendMessageFromTemplate(sender, emailAddr, null,
-                null, language, WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE, vcontext);
+                null, language, xcontext.getMainWikiName() + ":" + WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE, vcontext);
     }
 }

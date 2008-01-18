@@ -457,7 +457,7 @@ public class XWikiApplication extends DefaultXObjectDocument
 
             String appFilter = app.createHqlFilter(type, values, false, includeAppDesc);
 
-            if (!appFilter.isEmpty()) {
+            if (!appFilter.equals("")) {
                 filter.append("(");
                 filter.append(appFilter);
                 filter.append(")");
@@ -491,7 +491,7 @@ public class XWikiApplication extends DefaultXObjectDocument
 
         List patterns = getListValue(type);
 
-        if (!patterns.isEmpty()) {
+        if (!patterns.equals("")) {
             // Filter with applications documents
             if (!type.equals(XWikiApplicationClass.FIELD_DOCUMENTS)) {
                 filter.append(createHqlFilter(getDocuments(), values, false));
@@ -500,7 +500,7 @@ public class XWikiApplication extends DefaultXObjectDocument
             // Filter with provided applications documents type
             String typeFilter = createHqlFilter(getListValue(type), values, includeAppDesc);
 
-            if (!typeFilter.isEmpty()) {
+            if (!typeFilter.equals("")) {
                 if (filter.length() > 0) {
                     filter.append(HQL_AND);
                 }
@@ -516,7 +516,7 @@ public class XWikiApplication extends DefaultXObjectDocument
             String dependenciesFilter =
                 createApplicationsHqlFilter(applications, type, values, includeAppDesc);
 
-            if (!dependenciesFilter.isEmpty()) {
+            if (!dependenciesFilter.equals("")) {
                 if (filter.length() > 0) {
                     filter.append(HQL_OR);
                 }
@@ -598,7 +598,7 @@ public class XWikiApplication extends DefaultXObjectDocument
 
         String where = createHqlFilter(type, values, recurse, includeAppDesc);
 
-        return where.isEmpty() ? Collections.EMPTY_SET : new HashSet(context.getWiki().getStore()
+        return where.equals("") ? Collections.EMPTY_SET : new HashSet(context.getWiki().getStore()
             .searchDocumentsNames(HQL_WHERE + " " + where, values, context));
     }
 
@@ -623,7 +623,7 @@ public class XWikiApplication extends DefaultXObjectDocument
         boolean includeAppDesc) throws XWikiException
     {
         Set set = Collections.EMPTY_SET;
-        if (!applications.isEmpty()) {
+        if (!applications.equals("")) {
             List values = new ArrayList();
 
             String where =
@@ -631,7 +631,7 @@ public class XWikiApplication extends DefaultXObjectDocument
 
             XWikiApplication app = (XWikiApplication) applications.iterator().next();
 
-            if (where.isEmpty()) {
+            if (where.equals("")) {
                 set = Collections.EMPTY_SET;
             } else {
                 set =

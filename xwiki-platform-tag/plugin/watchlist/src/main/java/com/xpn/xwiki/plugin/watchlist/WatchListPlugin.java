@@ -47,7 +47,7 @@ import java.util.List;
  */
 public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {
-    public static String WATCHLIST_EMAIL_TEMPLATE = "XWiki.WatchListMessage";
+    public static String WATCHLIST_EMAIL_TEMPLATE = "xwiki:XWiki.WatchListMessage";
 
     public static String WATCHLIST_EMAIL_JOB_COMMON_NAME = "Scheduler.WatchListJob";
 

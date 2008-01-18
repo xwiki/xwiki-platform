@@ -20,7 +20,9 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.doc;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -45,6 +47,31 @@ public class XWikiApplication extends DefaultXObjectDocument
      * Pattern to match that indicate if a document name contains SQL "like" matching string.
      */
     private static final Pattern EXT_DOCNAME_PATTERN = Pattern.compile("^\\[(.*)\\]$");
+
+    /**
+     * HQL where key word.
+     */
+    private static final String HQL_WHERE = "where";
+
+    /**
+     * HQL or key word.
+     */
+    private static final String HQL_OR = " or ";
+
+    /**
+     * HQL and key word.
+     */
+    private static final String HQL_AND = " and ";
+
+    /**
+     * Filter to add in a named HQL query for a specific document.
+     */
+    private static final String HQL_FILTER_DOC_EQUALS = "doc.fullName = ?";
+
+    /**
+     * Filter to add in a named HQL query to filter documents with a pattern.
+     */
+    private static final String HQL_FILTER_DOC_PATTERN = "doc.fullName like ?";
 
     /**
      * Create new XWikiApplication managing provided XWikiDocument.
@@ -401,101 +428,145 @@ public class XWikiApplication extends DefaultXObjectDocument
     }
 
     /**
-     * Insert in <code>docsNames</code> all documents names <code>docsNamesToResolve</code>
-     * contains.
-     * <p>
-     * For each of these documents names, if are between "[" and "]", are considered as SQL matching
-     * string to use with "like".
+     * Create a HQL where clause containing applications documents filter for provided documents
+     * type.
      * 
-     * @param docsNames the collection to complete with resolved documents names.
-     * @param docsNamesToResolve the documents names to resolve.
-     * @param context the XWiki context.
-     * @throws XWikiException error when resolving SQL matching.
-     * @see #EXT_DOCNAME_PATTERN
-     * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocumentsNames(String, XWikiContext)
+     * @param applications the applications from which to get filters.
+     * @param type the XWikiApplicationClass field where to find documents names list :
+     *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
+     * @param values the HQL values list filled for the named query.
+     * @param includeAppDesc if true application descriptor document names are included in the
+     *            generated filter.
+     * @return a HQL where clause containing applications documents filter for provided documents
+     *         type.
+     * @throws XWikiException error when creating HQL filter.
      */
-    private static void resolveDocumentsNames(Collection docsNames,
-        Collection docsNamesToResolve, XWikiContext context) throws XWikiException
+    private static String createApplicationsHqlFilter(Collection applications, String type,
+        Collection values, boolean includeAppDesc) throws XWikiException
     {
-        Matcher matcher;
+        StringBuffer filter = new StringBuffer();
 
-        StringBuffer where = new StringBuffer();
-        for (Iterator it = docsNamesToResolve.iterator(); it.hasNext();) {
-            String docName = (String) it.next();
+        for (Iterator it = applications.iterator(); it.hasNext();) {
+            if (filter.length() > 0) {
+                filter.append(HQL_OR);
+            }
 
-            matcher = EXT_DOCNAME_PATTERN.matcher(docName);
-            if (matcher.matches()) {
-                if (where.length() > 0) {
-                    where.append(" or ");
-                }
-                where.append("doc.fullName like '").append(matcher.group(1)).append("'");
-            } else {
-                docsNames.add(docName);
+            XWikiApplication app = (XWikiApplication) it.next();
+
+            String appFilter = app.createHqlFilter(type, values, false, includeAppDesc);
+
+            if (!appFilter.isEmpty()) {
+                filter.append("(");
+                filter.append(appFilter);
+                filter.append(")");
             }
         }
 
-        if (where.length() > 0) {
-            docsNames.addAll(context.getWiki().getStore().searchDocumentsNames("where " + where,
-                context));
-        }
+        return filter.toString();
     }
 
     /**
-     * Insert in <code>docsNames</code> all documents names of type <code>type</code>
-     * application contains.
-     * <p>
-     * For each of these documents names, if are between "[" and "]", are considered as SQL matching
-     * string to use with "like".
+     * Create a HQL where clause containing application documents filter for provided documents
+     * type.
      * 
-     * @param docsNames the collection to complete with resolved documents names.
      * @param type the XWikiApplicationClass field where to find documents names list :
      *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
      *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
      *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
-     * @param includeAppDesc if true application descriptor document names is add to
-     *            <code>docsNames</code>.
-     * @throws XWikiException error when resolving SQL matching.
-     * @see XWikiApplicationClass#FIELD_DOCUMENTS
-     * @see XWikiApplicationClass#FIELD_DOCSTOINCLUDE
-     * @see XWikiApplicationClass#FIELD_DOCSTOLINK
-     * @see #resolveDocumentsNames(Collection, Collection, XWikiContext)
+     * @param values the HQL values list filled for the named query.
+     * @param recurse indicate if dependencies applications filters are included in the generated
+     *            filter.
+     * @param includeAppDesc if true application descriptor document names are included in the
+     *            generated filter.
+     * @return a HQL where clause containing application documents filter for provided documents
+     *         type.
+     * @throws XWikiException error when creating HQL filter.
      */
-    private void resolveDocumentsNames(Collection docsNames, String type, boolean includeAppDesc)
-        throws XWikiException
+    private String createHqlFilter(String type, Collection values, boolean recurse,
+        boolean includeAppDesc) throws XWikiException
     {
+        StringBuffer filter = new StringBuffer();
+
+        List patterns = getListValue(type);
+
+        if (!patterns.isEmpty()) {
+            // Filter with applications documents
+            if (!type.equals(XWikiApplicationClass.FIELD_DOCUMENTS)) {
+                filter.append(createHqlFilter(getDocuments(), values, false));
+            }
+
+            // Filter with provided applications documents type
+            String typeFilter = createHqlFilter(getListValue(type), values, includeAppDesc);
+
+            if (!typeFilter.isEmpty()) {
+                if (filter.length() > 0) {
+                    filter.append(HQL_AND);
+                }
+
+                filter.append(typeFilter);
+            }
+        }
+
+        // Add dependencies applications hql filters for provided type
+        if (recurse) {
+            Collection applications = getXWikiApplicationSet(true, context);
+
+            String dependenciesFilter =
+                createApplicationsHqlFilter(applications, type, values, includeAppDesc);
+
+            if (!dependenciesFilter.isEmpty()) {
+                if (filter.length() > 0) {
+                    filter.append(HQL_OR);
+                }
+                filter.append(dependenciesFilter);
+            }
+        }
+
+        return filter.toString();
+    }
+
+    /**
+     * Convert provided filter list in one hql where clause.
+     * 
+     * @param docsNamesToResolve the application filters.
+     * @param values the HQL values list filled for the named query.
+     * @param includeAppDesc if true application descriptor document names are included in the
+     *            generated filter.
+     * @return a HQL where clause containing application documents filter for provided documents
+     *         type.
+     */
+    private String createHqlFilter(Collection docsNamesToResolve, Collection values,
+        boolean includeAppDesc)
+    {
+        StringBuffer filter = new StringBuffer();
+
         if (includeAppDesc) {
-            docsNames.add(getFullName());
+            filter.append(HQL_FILTER_DOC_EQUALS);
+            values.add(this.getFullName());
         }
 
-        resolveDocumentsNames(docsNames, getListValue(type), context);
-    }
+        for (Iterator it = docsNamesToResolve.iterator(); it.hasNext();) {
+            if (filter.length() > 0) {
+                filter.append(HQL_OR);
+            }
 
-    /**
-     * Insert in <code>docsNames</code> all documents names of type
-     * <code>type</code> <code>applications</code> XWikiApplication list contains.
-     * <p>
-     * For each of these documents names, if are between "[" and "]", are considered as SQL matching
-     * string to use with "like".
-     * 
-     * @param docsNames the collection to complete with resolved documents names.
-     * @param applications the applications containing documents names to resolve and add to
-     *            <code>docsNames</code>.
-     * @param type the XWikiApplicationClass field where to find documents names list :
-     *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
-     *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
-     *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
-     * @param includeAppDesc if true application descriptor document names is add to
-     *            <code>docsNames</code>.
-     * @throws XWikiException error when resolving SQL matching.
-     */
-    private static void resolveApplicationsDocsNames(Collection docsNames,
-        Collection applications, String type, boolean includeAppDesc) throws XWikiException
-    {
-        for (Iterator it = applications.iterator(); it.hasNext();) {
-            XWikiApplication app = (XWikiApplication) it.next();
+            String docName = (String) it.next();
 
-            app.resolveDocumentsNames(docsNames, type, includeAppDesc);
+            Matcher matcher = EXT_DOCNAME_PATTERN.matcher(docName);
+            if (matcher.matches()) {
+                // Add a pattern
+                filter.append(HQL_FILTER_DOC_PATTERN);
+                values.add(matcher.group(1));
+            } else {
+                // Add a document name
+                filter.append(HQL_FILTER_DOC_EQUALS);
+                values.add(docName);
+            }
         }
+
+        return filter.toString();
     }
 
     /**
@@ -504,14 +575,14 @@ public class XWikiApplication extends DefaultXObjectDocument
      * For each of these documents names, if are between "[" and "]", are considered as SQL matching
      * string to use with "like".
      * 
-     * @param type the XWikiApplicationClass field where to find documents names list :
+     * @param type type the XWikiApplicationClass field where to find documents names list :
      *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
      *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
      *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
      * @param recurse if true it follow recursively all applications dependencies, if false parse
      *            only direct dependencies.
-     * @param includeAppDesc if true application descriptor document names is add to
-     *            <code>docsNames</code>.
+     * @param includeAppDesc if true application descriptor document names is added to the returned
+     *            set.
      * @return all documents names of type <code>type</code> application contains.
      * @throws XWikiException error when:
      *             <ul>
@@ -520,19 +591,56 @@ public class XWikiApplication extends DefaultXObjectDocument
      *             database.</li>
      *             </ul>
      */
-    private Set getDocsNameSet(String type, boolean recurse, boolean includeAppDesc)
+    private Set getDocsNamesByType(String type, boolean recurse, boolean includeAppDesc)
         throws XWikiException
     {
-        Set documents = new HashSet();
+        List values = new ArrayList();
 
-        resolveDocumentsNames(documents, type, includeAppDesc);
+        String where = createHqlFilter(type, values, recurse, includeAppDesc);
 
-        if (recurse) {
-            resolveApplicationsDocsNames(documents, getXWikiApplicationSet(true, context), type,
-                includeAppDesc);
+        return where.isEmpty() ? Collections.EMPTY_SET : new HashSet(context.getWiki().getStore()
+            .searchDocumentsNames(HQL_WHERE + " " + where, values, context));
+    }
+
+    /**
+     * Get and resolve all documents names of type <code>type</code> provided applications
+     * contains.
+     * <p>
+     * For each of these documents names, if are between "[" and "]", are considered as SQL matching
+     * string to use with "like".
+     * 
+     * @param applications the applications from which to get documents names.
+     * @param type type the XWikiApplicationClass field where to find documents names list :
+     *            {@link XWikiApplicationClass#FIELD_DOCUMENTS},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOINCLUDE},
+     *            {@link XWikiApplicationClass#FIELD_DOCSTOLINK}.
+     * @param includeAppDesc if true application descriptor document names is added to the returned
+     *            set.
+     * @return all documents names of type <code>type</code> provided applications contains.
+     * @throws XWikiException error when resolving SQL matching.
+     */
+    private static Set getApplicationsDocsNamesByType(Collection applications, String type,
+        boolean includeAppDesc) throws XWikiException
+    {
+        Set set = Collections.EMPTY_SET;
+        if (!applications.isEmpty()) {
+            List values = new ArrayList();
+
+            String where =
+                createApplicationsHqlFilter(applications, type, values, includeAppDesc);
+
+            XWikiApplication app = (XWikiApplication) applications.iterator().next();
+
+            if (where.isEmpty()) {
+                set = Collections.EMPTY_SET;
+            } else {
+                set =
+                    new HashSet(app.context.getWiki().getStore().searchDocumentsNames(
+                        HQL_WHERE + " " + where, values, app.context));
+            }
         }
 
-        return documents;
+        return set;
     }
 
     /**
@@ -543,7 +651,7 @@ public class XWikiApplication extends DefaultXObjectDocument
      * 
      * @param recurse if true it follow recursively all applications dependencies, if false parse
      *            only direct dependencies.
-     * @param includeAppDesc if true application descriptor document names is add to
+     * @param includeAppDesc if true application descriptor document names is added to
      *            <code>docsNames</code>.
      * @return all documents names application contains.
      * @throws XWikiException error when:
@@ -557,7 +665,7 @@ public class XWikiApplication extends DefaultXObjectDocument
      */
     public Set getDocumentsNames(boolean recurse, boolean includeAppDesc) throws XWikiException
     {
-        return getDocsNameSet(XWikiApplicationClass.FIELD_DOCUMENTS, recurse, includeAppDesc);
+        return getDocsNamesByType(XWikiApplicationClass.FIELD_DOCUMENTS, recurse, includeAppDesc);
     }
 
     /**
@@ -580,7 +688,7 @@ public class XWikiApplication extends DefaultXObjectDocument
      */
     public Set getDocsNameToInclude(boolean recurse) throws XWikiException
     {
-        return getDocsNameSet(XWikiApplicationClass.FIELD_DOCSTOINCLUDE, recurse, false);
+        return getDocsNamesByType(XWikiApplicationClass.FIELD_DOCSTOINCLUDE, recurse, false);
     }
 
     /**
@@ -604,12 +712,8 @@ public class XWikiApplication extends DefaultXObjectDocument
      */
     public static Set getDocsNameToInclude(Collection applications) throws XWikiException
     {
-        Set docsToInclude = new HashSet();
-
-        resolveApplicationsDocsNames(docsToInclude, applications,
+        return getApplicationsDocsNamesByType(applications,
             XWikiApplicationClass.FIELD_DOCSTOINCLUDE, false);
-
-        return docsToInclude;
     }
 
     /**
@@ -632,7 +736,7 @@ public class XWikiApplication extends DefaultXObjectDocument
      */
     public Set getDocsNameToLink(boolean recurse) throws XWikiException
     {
-        return getDocsNameSet(XWikiApplicationClass.FIELD_DOCSTOLINK, recurse, false);
+        return getDocsNamesByType(XWikiApplicationClass.FIELD_DOCSTOLINK, recurse, false);
     }
 
     /**
@@ -656,11 +760,7 @@ public class XWikiApplication extends DefaultXObjectDocument
      */
     public static Set getDocsNameToLink(Collection applications) throws XWikiException
     {
-        Set docsToLink = new HashSet();
-
-        resolveApplicationsDocsNames(docsToLink, applications,
+        return getApplicationsDocsNamesByType(applications,
             XWikiApplicationClass.FIELD_DOCSTOLINK, false);
-
-        return docsToLink;
     }
 }

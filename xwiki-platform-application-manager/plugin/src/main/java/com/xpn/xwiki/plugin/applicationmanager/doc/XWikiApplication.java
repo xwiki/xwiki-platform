@@ -74,6 +74,16 @@ public class XWikiApplication extends DefaultXObjectDocument
     private static final String HQL_FILTER_DOC_PATTERN = "doc.fullName like ?";
 
     /**
+     * Open HQL group.
+     */
+    private static final String HQL_GROUP_OPEN = "(";
+
+    /**
+     * Clause HQL group.
+     */
+    private static final String HQL_GROUP_CLOSE = ")";
+
+    /**
      * Create new XWikiApplication managing provided XWikiDocument.
      * 
      * @param xdoc the encapsulated XWikiDocument
@@ -113,6 +123,26 @@ public class XWikiApplication extends DefaultXObjectDocument
     public void setAppName(String appname)
     {
         setStringValue(XWikiApplicationClass.FIELD_APPNAME, appname);
+    }
+
+    /**
+     * @return the pretty name of the application
+     * @see #setAppPrettyName(String)
+     */
+    public String getAppPrettyName()
+    {
+        return getStringValue(XWikiApplicationClass.FIELD_APPPRETTYNAME);
+    }
+
+    /**
+     * Modify the pratty name of the application.
+     * 
+     * @param appprettyname the new pretty name of the application.
+     * @see #getAppPrettyName()
+     */
+    public void setAppPrettyName(String appprettyname)
+    {
+        setStringValue(XWikiApplicationClass.FIELD_APPPRETTYNAME, appprettyname);
     }
 
     /**
@@ -465,9 +495,9 @@ public class XWikiApplication extends DefaultXObjectDocument
             String appFilter = app.createHqlFilter(type, values, false, includeAppDesc);
 
             if (!appFilter.equals("")) {
-                filter.append("(");
+                filter.append(HQL_GROUP_OPEN);
                 filter.append(appFilter);
-                filter.append(")");
+                filter.append(HQL_GROUP_CLOSE);
             }
         }
 
@@ -501,7 +531,9 @@ public class XWikiApplication extends DefaultXObjectDocument
         if (!patterns.isEmpty()) {
             // Filter with applications documents
             if (!type.equals(XWikiApplicationClass.FIELD_DOCUMENTS)) {
+                filter.append(HQL_GROUP_OPEN);
                 filter.append(createHqlFilter(getDocuments(), values, false));
+                filter.append(HQL_GROUP_CLOSE);
             }
 
             // Filter with provided applications documents type
@@ -512,7 +544,9 @@ public class XWikiApplication extends DefaultXObjectDocument
                     filter.append(HQL_AND);
                 }
 
+                filter.append(HQL_GROUP_OPEN);
                 filter.append(typeFilter);
+                filter.append(HQL_GROUP_CLOSE);
             }
         }
 
@@ -605,8 +639,8 @@ public class XWikiApplication extends DefaultXObjectDocument
 
         String where = createHqlFilter(type, values, recurse, includeAppDesc);
 
-        return where.equals("") ? Collections.EMPTY_SET : new HashSet(context.getWiki().getStore()
-            .searchDocumentsNames(HQL_WHERE + " " + where, values, context));
+        return where.equals("") ? Collections.EMPTY_SET : new HashSet(context.getWiki()
+            .getStore().searchDocumentsNames(HQL_WHERE + " " + where, values, context));
     }
 
     /**

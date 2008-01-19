@@ -498,7 +498,7 @@ public class XWikiApplication extends DefaultXObjectDocument
 
         List patterns = getListValue(type);
 
-        if (!patterns.equals("")) {
+        if (!patterns.isEmpty()) {
             // Filter with applications documents
             if (!type.equals(XWikiApplicationClass.FIELD_DOCUMENTS)) {
                 filter.append(createHqlFilter(getDocuments(), values, false));
@@ -630,7 +630,7 @@ public class XWikiApplication extends DefaultXObjectDocument
         boolean includeAppDesc) throws XWikiException
     {
         Set set = Collections.EMPTY_SET;
-        if (!applications.equals("")) {
+        if (applications.size() > 0) {
             List values = new ArrayList();
 
             String where =

@@ -22,6 +22,7 @@ package com.xpn.xwiki.plugin.wikimanager;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
+import com.xpn.xwiki.plugin.globalsearch.GlobalSearchPluginApi;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
 import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
@@ -52,7 +53,7 @@ public class WikiManagerPluginApi extends PluginApi
     public static final String CONTEXT_LASTERRORCODE = "lasterrorcode";
 
     /**
-     * Field name of the last api exception inserted in context.
+     * Field name of the last API exception inserted in context.
      */
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
 
@@ -65,12 +66,17 @@ public class WikiManagerPluginApi extends PluginApi
      * The default WikiManager managed exception.
      */
     private XWikiExceptionApi defaultException;
+    
+    /**
+     * API tool to be able to make and merge multi wikis search queries.
+     */
+    private GlobalSearchPluginApi searchApi;
 
     /**
      * The plugin internationalization service.
      */
     private XWikiPluginMessageTool messageTool;
-
+   
     /**
      * Create an instance of the Wiki Manager plugin user api.
      * 
@@ -86,9 +92,10 @@ public class WikiManagerPluginApi extends PluginApi
 
         // Message Tool
         Locale locale = (Locale) context.get("locale");
-        this.messageTool = new WikiManagerMessageTool(locale, context);
-
+        this.messageTool = new WikiManagerMessageTool(locale, plugin, context);
         context.put(WikiManager.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
+        
+        searchApi = plugin.getGlobalSearchApiPlugin(context);
     }
 
     /**
@@ -105,6 +112,14 @@ public class WikiManagerPluginApi extends PluginApi
     public XWikiMessageTool getMessageTool()
     {
         return this.messageTool;
+    }
+    
+    /**
+     * @return the GlobalSearch plugin api.
+     */
+    public GlobalSearchPluginApi getSearchApi()
+    {
+        return this.searchApi;
     }
 
     // ////////////////////////////////////////////////////////////////////////////

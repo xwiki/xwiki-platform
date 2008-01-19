@@ -1,7 +1,6 @@
 package com.xpn.xwiki.plugin.wikimanager;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
@@ -10,7 +9,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  * Wiki Manager plugin translation messages manager.
  * <p>
  * The main use of this class is construct {@link XWikiPluginMessageTool} with the correct
- * {@link ResourceBundle} and to list all the message keys used internally in the plugin.
+ * {@link java.util.ResourceBundle} and to list all the message keys used internally in the plugin.
  * 
  * @version $Id: $
  */
@@ -189,12 +188,12 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
      * "/ApplicationResources".
      * 
      * @param locale the {@link Locale} used to load the {@link ResourceBundle}.
+     * @param plugin the plugin.
      * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
      *            primitives for loading documents
      */
-    WikiManagerMessageTool(Locale locale, XWikiContext context)
+    WikiManagerMessageTool(Locale locale, WikiManagerPlugin plugin, XWikiContext context)
     {
-        super(ResourceBundle.getBundle(WikiManagerPlugin.PLUGIN_NAME + "/ApplicationResources",
-            locale == null ? Locale.ENGLISH : locale), context);
+        super(locale, plugin, context);
     }
 }

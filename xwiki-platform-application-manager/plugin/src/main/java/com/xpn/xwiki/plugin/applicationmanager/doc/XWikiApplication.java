@@ -235,7 +235,10 @@ public class XWikiApplication extends DefaultXObjectDocument
     }
 
     /**
-     * @return the list of documents application contains.
+     * @return the list of documents application contains. This method return the content of the
+     *         field "documents", if you want the real list of documents names with resolved
+     *         patterns and recursive tools you should use
+     *         {@link #getDocumentsNames(boolean, boolean)}.
      * @see #setDocuments(List)
      */
     public List getDocuments()
@@ -256,7 +259,9 @@ public class XWikiApplication extends DefaultXObjectDocument
 
     /**
      * @return the list of document application contains that will be included in place of copy from
-     *         wiki template.
+     *         wiki template. This method return the content of the field "docstoinclude", if you
+     *         want the real list of documents names with resolved patterns and recursive tools you
+     *         should use {@link #getDocsNameToInclude(boolean)}.
      * @see #setDocsToInclude(List)
      */
     public List getDocsToInclude()
@@ -279,7 +284,9 @@ public class XWikiApplication extends DefaultXObjectDocument
 
     /**
      * @return the list of document application contains that will be linked in place of copy from a
-     *         wiki template.
+     *         wiki template. This method return the content of the field "docstolink", if you want
+     *         the real list of documents names with resolved patterns and recursive tools you
+     *         should use {@link #getDocsNameToLink(boolean)}.
      * @see #setDocsToLink(List)
      */
     public List getDocsToLink()

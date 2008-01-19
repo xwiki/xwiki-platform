@@ -1,16 +1,16 @@
 #set($WikiManager = $xwiki.wikimanager)
 #set($Exception = $WikiManager.DefaultException)
-
+##
 #set($action = $request.getParameter("action"))
 #set($domain = $request.getParameter("domain"))
-
+##
 #############################################################################
-
+##
 #if($doc.fullName == "XWiki.XWikiServerClassSheet" || $doc.fullName == "XWiki.XWikiServerClassTemplate")
   1 Document "$doc.name"
 #else
   #set($wiki = $WikiManager.getWikiFromDocumentName($doc.fullName))
-
+  ##
   #if($action && ($action == "create") && $domain && ($domain.trim().length() > 0))
     #set($alias = $wiki.getWikiAlias($domain))
     #if(!$alias)
@@ -19,7 +19,7 @@
       $wiki.save()
     #end
   #end
-
+  ##
   #if($action && ($action == "delete") && $domain && ($domain.trim().length() > 0))
     #set($alias = $wiki.getWikiAlias($domain))
     #if($alias)
@@ -27,55 +27,53 @@
       $wiki.save()
     #end
   #end
-
+  ##
   #############################################################################
-
+  ##
   #set($wikiAliasList = $wiki.wikiAliasList)
-
+  ##
   #if($wikiAliasList.size() > 0)
     1 Wiki "$wiki.wikiName"
-
+    ##
     #if($context.action == "view")
       1.1 Create new alias
-  
+      ##
       <form method="get" action="$doc.getURL("inline")">
-        <input type="hidden" name="action" value="create"/>
-        Create new alias: <input type="text" name="domain" class="wikialiasinput"/>
-        <input type="submit" class="button" value="$msg.get("create")"/>
+        <fieldset>
+          <legend>Create new alias</legend>
+          <input type="hidden" name="action" value="create"/>
+            Wiki domain name: <input type="text" name="domain" class="wikialiasinput"/>
+          <input type="submit" class="button" value="$msg.get("create")"/>
+          </fieldset>
       </form>
     #end
-
-
+    ##
     #if($context.action == "view")
       1.1 View aliases
     #end
-
+    ##
     #foreach($wikiAlias in $wikiAliasList)
       #if($context.action == "view")
-        1.1.1 $wikiAlias.server
-      #else
-        <fieldset>
-        <legend>$wikiAlias.server</legend>
-      #end
-
-      #if($context.action == "view")
         <form method="get" action="$doc.getURL("view")">
-          <input type="hidden" name="action" value="delete"/>
-          <input type="hidden" name="domain" value="$wikiAlias.server"/>
-          <input type="submit" class="button" value="$msg.get("delete")"/>
-        </form>
       #end
+          <fieldset>
+            <legend>#if((!$wikiAlias.wikiPrettyName) || ($wikiAlias.wikiPrettyName != "")) $wikiAlias.wikiPrettyName #else $wikiAlias.server #end</legend>
 
-      <dl>
-        #set($class = $wikiAlias.objectApi.xWikiClass)
-        #foreach($prop in $class.properties)
-          <dt>${prop.prettyName}:</dt>
-          <dd>$doc.display($prop.getName(), $wikiAlias.objectApi)</dd>
-        #end
-      </dl>
-
-      #if($context.action != "view")
-        </fieldset>
+            <dl>
+              #set($class = $wikiAlias.objectApi.xWikiClass)
+              #foreach($prop in $class.properties)
+                <dt>${prop.prettyName}:</dt>
+                <dd>$doc.display($prop.getName(), $wikiAlias.objectApi)</dd>
+              #end
+            </dl>
+      #if($context.action == "view")
+            <input type="hidden" name="action" value="delete"/>
+            <input type="hidden" name="domain" value="$wikiAlias.server"/>
+            <input type="submit" class="button" value="$msg.get("delete")"/>
+      #end
+          </fieldset>
+      #if($context.action == "view")
+        </form>
       #end
     #end
   #end

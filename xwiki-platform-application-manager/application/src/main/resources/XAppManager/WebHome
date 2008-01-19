@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1192218584000</creationDate>
-<date>1197471094000</date>
-<contentUpdateDate>1199724181000</contentUpdateDate>
-<version>1.1</version>
+<date>1200778515000</date>
+<contentUpdateDate>1200778515000</contentUpdateDate>
+<version>5.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -93,7 +93,7 @@ $msg.get("xapp.totalnumberofapp") : $listApp.size()
   {table}
     $msg.get("xapp.appname") | $msg.get("version") | $msg.get("xapp.description") | $msg.get("more")
     #foreach($app in $listApp)
-      [$app.appname&gt;$app.getFullName()] | $app.appversion | $app.description | &lt;a href="$doc.getURL("view", "action=delete&amp;amp;appname=$app.appname")"&gt;$msg.get("delete")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=export&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.exportrecurse")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=reload&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.reloadapp")&lt;/a&gt; &lt;a href="$app.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;
+      [#if($app.appprettyname &amp;&amp; $app.appprettyname.trim() != "")$app.appprettyname ($app.appname)#else$app.appname#end&gt;$app.getFullName()] | $app.appversion | $app.description | &lt;a href="$doc.getURL("view", "action=delete&amp;amp;appname=$app.appname")"&gt;$msg.get("delete")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=export&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.exportrecurse")&lt;/a&gt; &lt;a href="$doc.getURL("view", "action=reload&amp;amp;appname=$app.appname")"&gt;$msg.get("xapp.action.reloadapp")&lt;/a&gt; &lt;a href="$app.getURL("inline")"&gt;$msg.get("edit")&lt;/a&gt;
     #end
   {table}
 #end

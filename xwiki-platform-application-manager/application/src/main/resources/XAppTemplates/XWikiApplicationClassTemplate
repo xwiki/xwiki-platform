@@ -72,6 +72,14 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </appname>
+<appprettyname>
+<name>appprettyname</name>
+<number>12</number>
+<prettyName>Application Pretty Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</appprettyname>
 <appversion>
 <customDisplay></customDisplay>
 <name>appversion</name>

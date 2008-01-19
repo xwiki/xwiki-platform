@@ -10,11 +10,11 @@
 <creator></creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
-<contentAuthor></contentAuthor>
+<contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1192211384000</creationDate>
-<date>1192211384000</date>
-<contentUpdateDate>1199724180000</contentUpdateDate>
-<version>1.1</version>
+<date>1200779336000</date>
+<contentUpdateDate>1200779336000</contentUpdateDate>
+<version>7.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -72,6 +72,14 @@
 <validationRegExp></validationRegExp>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </appname>
+<appprettyname>
+<name>appprettyname</name>
+<number>12</number>
+<prettyName>Application Pretty Name</prettyName>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</appprettyname>
 <appversion>
 <customDisplay></customDisplay>
 <name>appversion</name>
@@ -217,13 +225,16 @@
 <number>0</number>
 <className>XAppClasses.XWikiApplicationClass</className>
 <property>
-<appauthors></appauthors>
+<appauthors>XWiki development team</appauthors>
 </property>
 <property>
 <applications/>
 </property>
 <property>
 <appname>XWikiApplicationClass</appname>
+</property>
+<property>
+<appprettyname>XWikiApplication class</appprettyname>
 </property>
 <property>
 <appversion>1.0</appversion>
@@ -234,10 +245,12 @@
 </dependencies>
 </property>
 <property>
-<description></description>
+<description>XWikiApplication class, template and sheet.</description>
 </property>
 <property>
-<docstoinclude/>
+<docstoinclude>
+<value>[%]</value>
+</docstoinclude>
 </property>
 <property>
 <docstolink/>
@@ -250,7 +263,7 @@
 </documents>
 </property>
 <property>
-<license></license>
+<license>LGPL</license>
 </property>
 <property>
 <translationdocs/>

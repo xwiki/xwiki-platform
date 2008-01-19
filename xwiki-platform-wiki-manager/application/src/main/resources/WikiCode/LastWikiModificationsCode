@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1191514175000</creationDate>
-<date>1196265534000</date>
-<contentUpdateDate>1199724180000</contentUpdateDate>
-<version>1.1</version>
+<date>1200765508000</date>
+<contentUpdateDate>1200765508000</contentUpdateDate>
+<version>44.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -54,34 +54,63 @@
 <tags/>
 </property>
 </object>
-<content>#includeMacros("WikiCode.Macros")
-
+<content>#set($WikiManager = $xwiki.wikimanager)
+#set($Globalsearch = $WikiManager.searchApi)
+##
+#includeMacros("WikiCode.Macros")
+##
 #############################################################################
-
+##
 #if(!$nb)
   #set($nb = 30)
 #end
-
+##
 #if(!$wikinamelist)
-  #if(!$wikiname)
-    #set($wikinamelist = [$context.Database])
+  #if($wikilist)
+    #set($wikinamelist = [])
+    #foreach($wikidoc in $wikilist)
+      #set($added = $wikinamelist.add($wikidoc.wikiName))
+    #end
   #else
-    #set($wikinamelist = [$wikiname])
+    #if(!$allwikilist)
+      #set($allwikilist = $WikiManager.getAllWikis())
+    #end
+    ##
+    #if(!$allwikinamelist)
+      #set($allwikinamelist = [])
+      #foreach($wikidoc in $allwikilist)
+        #set($added = $allwikinamelist.add($wikidoc.wikiName))
+      #end
+      ##
+      #if(!$allwikinamelist.contains($context.mainWikiName))
+        #set($added = $allwikinamelist.add($context.mainWikiName))
+      #end
+    #end
+    ##
+    #set($wikinamelist = $allwikinamelist)
   #end
 #end
-
-#set($documentlist = [])
-#foreach($wikiname in $wikinamelist)
-  #addlastwikimodifications($documentlist $wikiname $usermodifications $usermodificationswiki $nb)
+##
+#set($sql = "where 1=1")
+#if($usermodifications)
+  #if($context.database != $usermodificationswiki)
+    #set($sql = "${sql} and doc.author='${usermodificationswiki}:${usermodifications}'")
+  #else
+    #set($sql = "${sql} and doc.author='${usermodifications}'")
+  #end
 #end
-
-#if($documentlist.size() &gt; $nb)
-  #set($documentlist = $documentlist.subList(0, $nb))
-#end
-
+#set($sql = "${sql} order by doc.date desc")
+##
+#set($query = $Globalsearch.newQuery())
+$query.setHql("where 1=1 and doc.author='XWiki.Admin' order by doc.date desc")
+$query.setWikiNameList($wikinamelist)
+$query.setMax($nb)
+##
+#set($documentlist = $Globalsearch.searchDocuments($query, false))
+##
 #############################################################################
-
+##
 #foreach ($item in $documentlist)
-  #displaymodification($item.name $item.prefixedFullName $item.date $formatDate $item.author true)
+  #displaymodification("$item.wiki - $item.displayTitle in $item.space" $item.prefixedFullName $item.date $formatDate $item.author true)
 #end</content>
 </xwikidoc>

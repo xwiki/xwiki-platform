@@ -87,4 +87,18 @@ public class Wiki extends Document
         return (XWikiServer) XWikiServerClass.getInstance(context).newXObjectDocument(doc, id,
             context);
     }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        try {
+            return getWikiName();
+        } catch (XWikiException e) {
+            return super.toString();
+        }
+    }
 }

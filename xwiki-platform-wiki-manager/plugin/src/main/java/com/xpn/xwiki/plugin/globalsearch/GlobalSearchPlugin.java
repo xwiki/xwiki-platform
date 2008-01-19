@@ -18,70 +18,46 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.plugin.wikimanager;
+package com.xpn.xwiki.plugin.globalsearch;
 
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.globalsearch.GlobalSearchPlugin;
-import com.xpn.xwiki.plugin.globalsearch.GlobalSearchPluginApi;
 import com.xpn.xwiki.XWikiContext;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Entry point of the Wiki Manager plugin.
+ * Entry point of the Global Search plugin.
  * 
  * @version $Id: $
  */
-public class WikiManagerPlugin extends XWikiDefaultPlugin
+public class GlobalSearchPlugin extends XWikiDefaultPlugin
 {
     /**
-     * Identifier of Wiki Manager plugin.
+     * Identifier of Global Search plugin.
      */
-    public static final String PLUGIN_NAME = "wikimanager";
+    public static final String PLUGIN_NAME = "globalsearch";
 
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
      * The logging tool.
      */
-    protected static final Log LOG = LogFactory.getLog(WikiManagerPlugin.class);
+    protected static final Log LOG = LogFactory.getLog(GlobalSearchPlugin.class);
 
     // ////////////////////////////////////////////////////////////////////////////
 
     /**
-     * Tool to be able to make and merge multi wikis search queries.
-     */
-    private XWikiPluginInterface searchPlugin;
-
-    /**
-     * Construct the entry point of the Wiki Manager plugin.
+     * Construct the entry point of the Global Search plugin.
      * 
      * @param name the identifier of the plugin.
      * @param className the class name of the entry point of the plugin.
      * @param context the XWiki context.
      */
-    public WikiManagerPlugin(String name, String className, XWikiContext context)
+    public GlobalSearchPlugin(String name, String className, XWikiContext context)
     {
         super(PLUGIN_NAME, className, context);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
-     */
-    public void init(XWikiContext context)
-    {
-        super.init(context);
-
-        searchPlugin = context.getWiki().getPlugin(GlobalSearchPlugin.PLUGIN_NAME, context);
-        if (searchPlugin == null) {
-            searchPlugin =
-                new GlobalSearchPlugin(GlobalSearchPlugin.PLUGIN_NAME, GlobalSearchPlugin.class
-                    .getName(), context);
-        }
     }
 
     /**
@@ -92,15 +68,6 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
      */
     public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
-        return new WikiManagerPluginApi((WikiManagerPlugin) plugin, context);
-    }
-
-    /**
-     * @param context the XWiki context.
-     * @return the global search plugin api.
-     */
-    public GlobalSearchPluginApi getGlobalSearchApiPlugin(XWikiContext context)
-    {
-        return (GlobalSearchPluginApi) searchPlugin.getPluginApi(searchPlugin, context);
+        return new GlobalSearchPluginApi((GlobalSearchPlugin) plugin, context);
     }
 }

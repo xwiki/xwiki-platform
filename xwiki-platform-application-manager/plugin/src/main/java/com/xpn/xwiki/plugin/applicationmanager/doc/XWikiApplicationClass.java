@@ -57,7 +57,7 @@ public class XWikiApplicationClass extends AbstractXClassManager
 
     /**
      * Name of field <code>appname</code> for the XWiki class XAppClasses.XWikiApplicationClass.
-     * The name of the application.
+     * The unique name of the application.
      */
     public static final String FIELD_APPNAME = "appname";
 
@@ -66,6 +66,18 @@ public class XWikiApplicationClass extends AbstractXClassManager
      * XAppClasses.XWikiApplicationClass.
      */
     public static final String FIELDPN_APPNAME = "Application Name";
+
+    /**
+     * Name of field <code>appprettyname</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass. The displayed name of the application.
+     */
+    public static final String FIELD_APPPRETTYNAME = "appprettyname";
+
+    /**
+     * Pretty name of field <code>appprettyname</code> for the XWiki class
+     * XAppClasses.XWikiApplicationClass.
+     */
+    public static final String FIELDPN_APPPRETTYNAME = "Application Pretty Name";
 
     /**
      * Name of field <code>description</code> for the XWiki class
@@ -258,7 +270,8 @@ public class XWikiApplicationClass extends AbstractXClassManager
     {
         boolean needsUpdate = super.updateBaseClass(baseClass);
 
-        needsUpdate |= baseClass.addTextField(FIELD_APPNAME, FIELDPN_APPNAME, 30);
+        needsUpdate |= baseClass.addTextField(FIELD_APPNAME, FIELDPN_APPNAME, 80);
+        needsUpdate |= baseClass.addTextField(FIELD_APPPRETTYNAME, FIELDPN_APPPRETTYNAME, 30);
         needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
         needsUpdate |= baseClass.addTextField(FIELD_APPVERSION, FIELDPN_APPVERSION, 30);
 

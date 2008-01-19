@@ -1,21 +1,23 @@
 #set($Appmanager = $xwiki.applicationmanager)
 #set($Exception = $Appmanager.DefaultException)
-
+##
 #set($object = $doc.getObject("XAppClasses.XWikiApplicationClass"))
-
+##
 #if($object)
   #set($class = $object.xWikiClass)
   #set($appname = $doc.getValue("appname", $object))
 #end
-
+##
 #############################################################################
-
+##
 #if($appname && $appname.length() > 0)
-
+  ##
   #set($app = $Appmanager.getApplicationDocument($doc.getValue("appname", $object)))
-
-  1 Application \"$app.appName\"
-
+  ##
+  #if($context.action == "view")
+    1 Application \"#if($app.appprettyname && $app.appprettyname.trim() != "")$app.appprettyname#else$app.appname#end\"
+  #end
+  ##
   <dl>
     #foreach($prop in $class.properties)
       <dt> ${prop.prettyName} </dt>

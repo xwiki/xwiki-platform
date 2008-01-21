@@ -518,6 +518,19 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 			throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Cannot create new xwiki workspace: "+wikiName, e);
 		}
 	}
+	
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#deleteWiki(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException
+    {
+        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+            XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
+            "XWikiJcrStore.deleteWiki not implemented");
+    }
 
 	public boolean exists(final XWikiDocument doc, XWikiContext context) throws XWikiException {
 		try {

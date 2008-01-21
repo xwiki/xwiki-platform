@@ -393,6 +393,16 @@ public interface XWikiStoreInterface {
 
     public void cleanUp(XWikiContext context);
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException;
+    
+    /**
+     * Delete a wiki database.
+     * 
+     * @param wikiName the name of the wiki.
+     * @param context the XWiki context.
+     * @throws XWikiException error when deleting wiki database.
+     */
+    public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException;
+   
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException;
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException;

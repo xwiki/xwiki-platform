@@ -3194,6 +3194,7 @@ public class XWikiDocument
         throws XWikiException, DifferentiationFailedException
     {
         Version version = getRCSVersion();
+        // TODO This is not right with the new version numbering.
         String prev = "1." + (version.last() - 1);
         XWikiDocument prevdoc = context.getWiki().getDocument(this, prev, context);
 
@@ -3354,7 +3355,7 @@ public class XWikiDocument
             return difflist;
         }
 
-        List dlist = origclass.getDiff(newclass, context);
+        List dlist = newclass.getDiff(origclass, context);
         if (dlist.size() > 0) {
             difflist.add(dlist);
         }

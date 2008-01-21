@@ -132,7 +132,9 @@ final class GlobalSearch
     }
 
     /**
-     * Execute query in all provided wikis and return list containing alla results.
+     * Execute query in all provided wikis and return list containing all results. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming"
+     * since it issues one request per provided wiki.
      * 
      * @param query the query parameters.
      * @param context the XWiki context.
@@ -427,7 +429,9 @@ final class GlobalSearch
 
     /**
      * Search wiki pages in all provided wikis and return list containing found
-     * {@link XWikiDocument}.
+     * {@link XWikiDocument}. Compared to XWiki Platform search, searchDocuments and
+     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
+     * provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is
@@ -455,7 +459,9 @@ final class GlobalSearch
 
     /**
      * Search wiki pages in all provided wikis and return list containing found
-     * {@link XWikiDocument}.
+     * {@link XWikiDocument}. Compared to XWiki Platform search, searchDocuments and
+     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
+     * provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is
@@ -506,7 +512,9 @@ final class GlobalSearch
 
     /**
      * Search wiki pages in all provided wikis and return list containing found
-     * {@link XWikiDocument}.
+     * {@link XWikiDocument}. Compared to XWiki Platform search, searchDocuments and
+     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
+     * provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is

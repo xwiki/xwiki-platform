@@ -78,7 +78,9 @@ public class GlobalSearchPluginApi extends PluginApi
     }
 
     /**
-     * Execute query in all provided wikis and return list containing all results.
+     * Execute query in all provided wikis and return list containing all results. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming"
+     * since it issues one request per provided wiki.
      * 
      * @param query the query parameters. The hql has some constraints:
      *            <ul>
@@ -110,7 +112,9 @@ public class GlobalSearchPluginApi extends PluginApi
 
     /**
      * Search wiki pages in all provided wikis and return list containing found
-     * {@link com.xpn.xwiki.api.Document}.
+     * {@link com.xpn.xwiki.api.Document}. Compared to XWiki Platform search, searchDocuments and
+     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
+     * provided wiki.
      * 
      * @param query the query parameters. The hql has some constraints:
      *            <ul>
@@ -147,7 +151,9 @@ public class GlobalSearchPluginApi extends PluginApi
 
     /**
      * Search wiki pages in all provided wikis and return list containing found
-     * {@link com.xpn.xwiki.api.Document}.
+     * {@link com.xpn.xwiki.api.Document}. Compared to XWiki Platform search, searchDocuments and
+     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
+     * provided wiki.
      * 
      * @param query the query parameters. The hql has some constraints:
      *            <ul>

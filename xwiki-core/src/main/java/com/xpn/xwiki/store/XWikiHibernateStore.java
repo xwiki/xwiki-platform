@@ -180,6 +180,60 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#deleteWiki(java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException
+    {
+        boolean bTransaction = true;
+        String database = context.getDatabase();
+        Statement stmt = null;
+        try {
+            bTransaction = beginTransaction(context);
+            Session session = getSession(context);
+            Connection connection = session.connection();
+            stmt = connection.createStatement();
+
+            String schema = getSchemaFromWikiName(wikiName, context);
+
+            DatabaseProduct databaseProduct = getDatabaseProductName(context);
+            if (DatabaseProduct.ORACLE == databaseProduct) {
+                stmt.execute("DROP SCHEMA " + schema);
+            } else if (DatabaseProduct.DERBY == databaseProduct) {
+                stmt.execute("DROP SCHEMA " + schema);
+            } else if (DatabaseProduct.HSQLDB == databaseProduct) {
+                stmt.execute("DROP SCHEMA " + schema);
+            } else {
+                stmt.execute("create database " + schema);
+            }
+
+            stmt.execute("DROP DATABASE " + schema);
+
+            endTransaction(context, true);
+        } catch (Exception e) {
+            Object[] args = {wikiName};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETE_DATABASE,
+                "Exception while delete wiki database {0}",
+                e,
+                args);
+        } finally {
+            context.setDatabase(database);
+            try {
+                if (stmt != null)
+                    stmt.close();
+            } catch (Exception e) {
+            }
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {
+            }
+        }
+    }
+    
+    /**
      * Verifies if a wiki document exists
      * @param doc
      * @param context

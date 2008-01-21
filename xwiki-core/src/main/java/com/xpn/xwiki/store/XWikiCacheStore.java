@@ -465,6 +465,18 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
             store.createWiki(wikiName, context);
         }
     }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#deleteWiki(java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException
+    {
+        synchronized (wikiName) {
+            store.deleteWiki(wikiName, context);
+        }
+    }
 
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException {
         String key = getKey(doc,context);

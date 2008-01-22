@@ -27,16 +27,16 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>3</version>
+    <version>4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-wiki-manager</artifactId>
   <name>XWiki Platform - Plugins - Wiki Manager</name>
   <version>1.0-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Wiki Manager</description>
   <properties>
-    <platform.tools.version>1.7</platform.tools.version>
-    <platform.core.version>1.2</platform.core.version>
-    <platform.plugin.applicationmanager.version>1.0-rc-1</platform.plugin.applicationmanager.version>
+    <platform.tools.version>1.8-SNAPSHOT</platform.tools.version>
+    <platform.core.version>1.2-SNAPSHOT</platform.core.version>
+    <platform.plugin.applicationmanager.version>1.0-SNAPSHOT</platform.plugin.applicationmanager.version>
   </properties>
   <dependencies>
     <dependency>

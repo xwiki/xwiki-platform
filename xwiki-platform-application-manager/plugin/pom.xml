@@ -34,8 +34,8 @@
   <version>1.0-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Application Manager</description>
   <properties>
-    <platform.tools.version>1.8-SNAPSHOT</platform.tools.version>
-    <platform.core.version>1.2-SNAPSHOT</platform.core.version>
+    <platform.tools.version>1.7</platform.tools.version>
+    <platform.core.version>1.2</platform.core.version>
   </properties>
   <dependencies>
     <dependency>

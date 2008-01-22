@@ -5425,7 +5425,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
     public String clearName(String name, XWikiContext context)
     {
-        return clearName(name, true, false, context);
+        return clearName(name, true, true, context);
     }
 
     public String clearName(String name, boolean stripDots, boolean ascii, XWikiContext context)

@@ -82,6 +82,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.ObjectDiff;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -3299,22 +3300,44 @@ public class XWikiDocument
         return getObjectDiff(this, revdoc, context);
     }
 
-    public List getObjectDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context)
+    /**
+     * Return the object differences between two document versions. There is no hard requirement on
+     * the order of the two versions, but the results are semantically correct only if the two
+     * versions are given in the right order.
+     * 
+     * @param oldDoc The old ('before') version of the document.
+     * @param newDoc The new ('after') version of the document.
+     * @param context The {@link com.xpn.xwiki.XWikiContext context}.
+     * @return The object differences. The returned list's elements are other lists, one for each
+     *         changed object. The inner lists contain {@link ObjectDiff} elements, one object for
+     *         each changed property of the object.
+     * @throws XWikiException If there's an error computing the differences.
+     */
+    public List getObjectDiff(XWikiDocument oldDoc, XWikiDocument newDoc, XWikiContext context)
         throws XWikiException
     {
         ArrayList difflist = new ArrayList();
-        for (Iterator itobjs = origdoc.getxWikiObjects().values().iterator(); itobjs.hasNext();) {
-            Vector objects = (Vector) itobjs.next();
-            for (Iterator itobjs2 = objects.iterator(); itobjs2.hasNext();) {
-                BaseObject origobj = (BaseObject) itobjs2.next();
-                if (origobj!=null) {
-                    BaseObject newobj = newdoc.getObject(origobj.getClassName(), origobj.getNumber());
-
+        // Since objects could have been deleted or added, we iterate on both the old and the new
+        // object collections.
+        // First, iterate over the old objects.
+        for (Iterator originalObjectClassesIterator =
+            oldDoc.getxWikiObjects().values().iterator(); originalObjectClassesIterator.hasNext();) {
+            Vector objects = (Vector) originalObjectClassesIterator.next();
+            for (Iterator originalObjectsIterator = objects.iterator(); originalObjectsIterator
+                .hasNext();) {
+                BaseObject originalObj = (BaseObject) originalObjectsIterator.next();
+                // This happens when objects are deleted, and the document is still in the cache
+                // storage.
+                if (originalObj != null) {
+                    BaseObject newObj =
+                        newDoc.getObject(originalObj.getClassName(), originalObj.getNumber());
                     List dlist;
-                    if (newobj == null) {
-                        dlist = origobj.getDiff(new BaseObject(), context);
+                    if (newObj == null) {
+                        // The object was deleted.
+                        dlist = originalObj.getDiff(new BaseObject(), context);
                     } else {
-                        dlist = origobj.getDiff(newobj, context);
+                        // The object exists in both versions, but might have been changed.
+                        dlist = originalObj.getDiff(newObj, context);
                     }
                     if (dlist.size() > 0) {
                         difflist.add(dlist);
@@ -3322,18 +3345,23 @@ public class XWikiDocument
                 }
             }
         }
-        for (Iterator itobjs = newdoc.getxWikiObjects().values().iterator(); itobjs.hasNext();) {
-            Vector objects = (Vector) itobjs.next();
-            for (Iterator itobjs2 = objects.iterator(); itobjs2.hasNext();) {
-                BaseObject newobj = (BaseObject) itobjs2.next();
-                if (newobj!=null) {
-                    BaseObject origobj = origdoc.getObject(newobj.getClassName(), newobj.getNumber());
-
-                    if (origobj == null) {
-                        origobj = new BaseObject();
-                        origobj.setClassName(newobj.getClassName());
-                        origobj.setNumber(newobj.getNumber());
-                        List dlist = origobj.getDiff(newobj, context);
+        // Second, iterate over the objects which are only in the new version.
+        for (Iterator newObjectClassesIterator = newDoc.getxWikiObjects().values().iterator(); newObjectClassesIterator
+            .hasNext();) {
+            Vector objects = (Vector) newObjectClassesIterator.next();
+            for (Iterator newObjectsIterator = objects.iterator(); newObjectsIterator.hasNext();) {
+                BaseObject newObj = (BaseObject) newObjectsIterator.next();
+                // This happens when objects are deleted, and the document is still in the cache
+                // storage.
+                if (newObj != null) {
+                    BaseObject originalObj =
+                        oldDoc.getObject(newObj.getClassName(), newObj.getNumber());
+                    if (originalObj == null) {
+                        // Only consider added objects, the other case was treated above.
+                        originalObj = new BaseObject();
+                        originalObj.setClassName(newObj.getClassName());
+                        originalObj.setNumber(newObj.getNumber());
+                        List dlist = originalObj.getDiff(newObj, context);
                         if (dlist.size() > 0) {
                             difflist.add(dlist);
                         }

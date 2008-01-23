@@ -335,9 +335,6 @@ public class XWikiDocumentArchive
 
             doc.setRCSVersion(version);
             doc.setComment(nodeInfo.getComment());
-            doc.setDate(nodeInfo.getDate());
-            doc.setCreationDate(nodeInfo.getDate());
-            doc.setContentUpdateDate(nodeInfo.getDate());
             doc.setAuthor(nodeInfo.getAuthor());
             doc.setMinorEdit(nodeInfo.isMinorEdit());
             doc.setMostRecent(version.equals(getLatestVersion()));

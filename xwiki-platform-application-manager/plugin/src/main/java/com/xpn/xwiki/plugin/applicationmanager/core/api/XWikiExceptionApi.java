@@ -72,7 +72,7 @@ public class XWikiExceptionApi extends Api
      */
     public String toString()
     {
-        return this.exception.toString();
+        return this.exception.getMessage();
     }
 
     // ///////////////////////////////////////////////////////////:

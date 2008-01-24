@@ -61,6 +61,30 @@
           </properties>
         </configuration>
       </plugin>
+      <!-- Unpack the Albatross Skin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <artifactId>xwiki-skin-albatross</artifactId>
+                  <version>${platform.skin.albatross.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/skin</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
@@ -78,6 +102,12 @@
               <directory>${basedir}/src/main/webInfResources</directory>
               <targetPath>WEB-INF</targetPath>
               <filtering>true</filtering>
+            </resource>
+            <!-- Add the Albatross skin -->
+            <resource>
+              <directory>${project.build.directory}/skin</directory>
+              <targetPath>skins</targetPath>
+              <filtering>false</filtering>
             </resource>
           </webResources>
         </configuration>

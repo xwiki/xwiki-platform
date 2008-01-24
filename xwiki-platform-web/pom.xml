@@ -42,6 +42,7 @@
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tools.version>1.7</platform.tools.version>
     <platform.core.version>1.3-SNAPSHOT</platform.core.version>
+    <platform.skin.albatross.version>1.0-SNAPSHOT</platform.skin.albatross.version>
   </properties>
   <profiles>
     <profile>

@@ -1,0 +1,172 @@
+@import "elements.css";
+
+@import "classes.css";
+
+/* @import "chwSkin.css";*/
+@import "xwiki.css";
+
+@import "wiki.css";
+
+@import "page.css";
+
+@import "rss.css";
+
+@import "screenlayout.css";
+
+@import "microformats.css";
+
+@import "presentation.css";
+
+@import "colorsblack.css";
+
+/*@import "ie.css";   masque temporairement : modif spécifique IE à réintéger*/
+@import "fullscreenEdit.css";
+
+/* Styles for custom hand written <table> tables */
+@import "css/table/table.css";
+
+@import "usersandgroups.css";
+
+@import "suggest/ajaxSuggest.css";
+
+.rightmenu a {
+	margin-right: 2px;
+	font-size: 100%;
+}
+
+.expanded .xwikipaneltitle {
+	background-color: #fff;
+	color: #384554;
+}
+
+.xwikipaneltitle:hover {
+	cursor: pointer;
+}
+
+.collapsed .wikipaneltitle {
+	border-top: 1px solid #fff;
+}
+
+.xwikipaneltitle {
+	padding: 0px 10px;
+	margin: 0px;
+	font-size: 1em;
+	background: url("icons/black-less.png") no-repeat right center;
+	border: 4px solid #384554;
+	border-width: 0px;
+	cursor: pointer;
+}
+
+.panel .accordionTabTitleBar h6 {
+	border-top: 1px solid #999;
+}
+
+#xwikinav {
+	border-bottom: 1px solid #999;
+}
+
+#contentcolumn {
+	width: 100% !important;
+	overflow: hidden;
+}
+
+li.inline {
+	display: inline;
+	padding-left: 3px;
+	padding-right: 7px;
+}
+
+li.tags {
+	color: rgb(102, 102, 255);
+	cursor: pointer;
+}
+
+li.selected {
+	background-color: #008;
+	color: #fff;
+	text-decoration: none;
+	cursor: pointer;
+}
+
+#xwikieditcontent .accordionTabTitleBar h6 {
+	width: 100%;
+}
+
+div.panellayoutcontainer-1col .panellayoutcol {
+	width: 100%;
+}
+
+div.panellayoutcontainer-2col .panellayoutcol {
+	width: 50%;
+}
+
+div.panellayoutcontainer-3col .panellayoutcol {
+	width: 33%;
+}
+
+div.panellayoutcontainer-4col .panellayoutcol {
+	width: 25%;
+}
+
+div.panellayoutcontainer-5col .panellayoutcol {
+	width: 20%;
+}
+
+div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutcontainer-3col,div.panellayoutcontainer-4col,div.panellayoutcontainer-5col
+	{
+	overflow: auto;
+	clear: left;
+	height: 1%;
+}
+
+.panellayoutcol {
+	overflow: auto;
+	float: left;
+	height: 1%;
+}
+
+.panellayoutcol .panel {
+	width: 90%;
+	margin: 0 0 20px 5%;
+	border: 1px solid #ddd;
+}
+
+#xwikicontent .panel ul {
+	margin: 0 5px;
+	padding: 0;
+	list-style-position: inside;
+}
+
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents {
+	background-color: transparent;
+}
+
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents a {
+	color: #000;
+}
+
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents a:hover {
+	color: #06F;
+}
+
+#xwikicontent .panellayoutcol .expanded .xwikipaneltitle {
+	background-color: #789;
+	color: #fff;
+	border-bottom: 1px solid #ddd;
+	background-image:
+		url("icons/black-less-cont.png")
+		;
+}
+
+#xwikicontent .panellayoutcol .collapsed .xwikipaneltitle {
+	background-color: #CDE;
+	color: #fff;
+	background-image:
+		url("icons/black-more-cont.png")
+		;
+}
+
+#xwikicontent .panellayoutcol .expanded h5.xwikipaneltitle:hover,#xwikicontent .panellayoutcol .collapsed h5.xwikipaneltitle:hover
+	{
+	color: #fff;
+}

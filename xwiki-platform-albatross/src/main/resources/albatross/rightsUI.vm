@@ -1,0 +1,183 @@
+#set($formname = "update")
+#set($saveaction = "save")
+##
+## set the new interface from xwiki.cfg
+#set($interface = $xwiki.rightsmanager.defaultUi)
+##
+<div id="xwikieditcontent">
+########## display the new interface
+#if($interface == "new")
+#set($rightsLevels = {"view":0, "comment":1, "edit":2, "delete": 3, "admin": 4, "register": 5, "programming": 6})
+#set($levelsRights = $xwiki.hashMap)
+#foreach($r in $rightsLevels.keySet())#set($discard = $levelsRights.put($rightsLevels.get($r), $r))#end
+#set($maxlevel = $rightsLevels.get("delete")) ## Default: view, comment, edit, delete
+#if($doc.fullName == "XWiki.XWikiPreferences")
+  #if($request.editor == "globalrights")
+    #set($clsname = "XWiki.XWikiGlobalRights")
+    #if($context.database=='xwiki')
+      #set($maxlevel = $rightsLevels.get("programming")) ## base + admin, register, programming
+    #else
+      #set($maxlevel = $rightsLevels.get("register")) ## base + admin, register
+    #end
+  #else
+    #set($clsname = "XWiki.XWikiRights")
+  #end
+#elseif($doc.name == "WebPreferences")
+  #if($request.editor == "spacerights")
+    #set($clsname = "XWiki.XWikiGlobalRights")
+    #set($maxlevel = $rightsLevels.get("admin")) ## base + admin
+  #else
+    #set($clsname = "XWiki.XWikiRights")
+  #end
+#else
+  #set($clsname = "XWiki.XWikiRights")
+#end
+
+## url to take the users and groups to display in the ajax-based table
+#set($url = "?xpage=getusersandgroups")
+#set($saveUrl = $doc.getURL("edit", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
+
+## get the rights for XWikiGuest
+#set($r = $xwiki.arrayList)
+#foreach($i in [0..$maxlevel])#set($discard = $r.add(0))#end
+#set($guest = "XWiki.XWikiGuest")
+#foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights
+  #set($pers = "$!obj.getProperty('users').getValue()")
+  #if($pers.matches("^(.*,)?${guest}(,.*)?$"))
+    #if($obj.getProperty('allow').getValue() == 1)
+      #set($rightValue = 1)
+    #else
+      #set($rightValue = 2)
+    #end
+    #set($specifiedRights = $!obj.getProperty('levels').getValue().split(','))
+    #foreach($right in $specifiedRights)
+      #if($maxlevel >= $rightsLevels.get($right))
+        #set($discard = $r.set($rightsLevels.get($right), $rightValue))
+      #end
+    #end
+  #end
+#end
+<div id="ajax-loader">$msg.get("ui.ajaxTable.loading")<br />
+  <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get('ui.ajaxTable.loading')" title="" />
+</div>
+#if($editor == "spacerights")
+<div class="spaceName">$msg.get("platform.core.rightsManagement.editRightsForSpace", [$space])&nbsp;&nbsp;
+<select name="space" style="width: 130px;" class="filter" onchange="location='?editor=spacerights&amp;global=1&amp;space='+this.value;">
+  <option value="" label="">---</option>
+  #foreach($spaceitem in $xwiki.spaces)
+  ## display only the spaces where has admin rights
+  #if($xwiki.hasAccessLevel("admin", $context.user, "${spaceitem}.WebPreferences"))
+    <option value="$spaceitem" label="$spaceitem" #if($doc.space == $spaceitem)selected="selected"#end>$spaceitem</option>
+  #end
+  #end
+</select>
+</div>
+#end ## editor = spacerights
+<table id="usersandgroupstable" class="$editor">
+<tr>
+<td style="width:100%" colspan="2">
+<table id="specialusersandgroups">
+  <thead class="theader"><tr>
+    <td class="usersorgroupsnames">$msg.get("rightsmanager.specialusers")</td>
+    #foreach($i in [0..$maxlevel])
+    <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
+    #end
+  </tr></thead>
+  <tbody><tr id="XWikiGuestSpecial">
+    <td class="suorg">$msg.get("rightsmanager.unregisteredusers")</td>
+    #foreach($i in [0..$maxlevel])
+    <td class="rights" id="td${levelsRights.get($i)}"></td>
+    #end
+  </tr></tbody>
+</table>
+</td>
+</tr>
+<tr>
+    <td colspan="2" style="padding-top:10px;">
+      <span id="showLimits"></span>
+    </td>
+</tr>
+<tr><td style="width:100%">
+      <table class="display">
+       <thead class="theader">
+          <tr><td class="usersorgroupsnames">
+          <input type="radio" name="uorg" value="groups" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
+            <input type="radio" name="uorg" value="users"/>$msg.get("Users")
+            </td>
+          #foreach($i in [0..$maxlevel])
+            <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
+          #end
+          </tr>
+          <tr id="table-filters">
+              <td>
+                <input name="name" type="text" style="width:65%"/>
+                #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
+                #if(!$mainwk) ## display the combobox only in a local wiki
+                <select name="wiki" style="margin-left:10px;">
+                  <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
+                  <option value="global">$msg.get("rightsmanager.global")</option>
+                  <option value="both">$msg.get("rightsmanager.both")</option>
+                </select>
+                #else<input type="hidden" name="wiki" value="local"/>#end
+                </td><td>
+                <input type="hidden" name="clsname" value="$clsname" />
+              </td>
+              <td colspan="$maxlevel"></td>
+              </tr>
+       </thead>
+       <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
+      </table></td>
+    <td valign="top">
+      <div id="scrollbar1" class="scrollbar"><div class="inscrollbar">&nbsp;</div></div>
+    </td>
+    <td id="buff"></td>
+</tr>
+</table>
+<script type="text/javascript">
+//<![CDATA[
+var activeRights = [#foreach($i in [0..$maxlevel])"$levelsRights.get($i)",#end];
+var saveUrl = "$saveUrl";
+saveUrl.replace(/&amp;/g, "&");
+var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "usersandgroupstable", displayUsersAndGroups, true);
+#foreach($i in [0..$maxlevel])
+var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", saveUrl, "${r.get($i)}");
+#end
+//]]>
+</script>
+######## display the stable interface
+#else
+#set ($classname = "XWiki.XWikiGlobalRights")
+#set( $class = $xwiki.getDocument($classname).xWikiClass)
+#set( $redirect = "$xwiki.getRequestURL()&amp;editor=rights")
+<form id="update" method="post" action="$doc.getURL("save")" onsubmit="cancelCancelEdit()">
+<div style="overflow:auto">
+<div>
+<div class="hidden">
+<input type="hidden" name="xcontinue" value="$doc.getURL($context.action, "editor=globalrights&amp;global=1")"/>
+<input type="hidden" name="xredirect" value="$xwiki.getURL("${doc.space}.WebHome")"/>
+</div>
+#set ($first = 1)
+#set($nb = $doc.getObjectNumbers("${class.name}"))
+<input type="hidden" name="${class.name}_nb" value="$nb" />
+<table id="xwikirightstable">
+ <tr>
+#*<th>$msg.get("Right")</th>*#<th>$msg.get("Users")</th><th>$msg.get("Groups")</th><th>$msg.get("Level")</th><th>$msg.get("Allow-Deny")</th><th>$msg.get("Remove")</th>
+ </tr>
+#foreach ($obj in $doc.getObjects($class.name))
+#set($class = $obj.xWikiClass)
+    <tr>
+##      <td align="center">$!{obj.number}</td>
+        <td>$!doc.displayEdit($class.users,"${class.name}_${obj.number}_",$obj)</td>
+        <td>$!doc.displayEdit($class.groups,"${class.name}_${obj.number}_",$obj)</td>
+        <td>$!doc.displayEdit($class.levels,"${class.name}_${obj.number}_",$obj)</td>
+        <td>$!doc.displayEdit($class.allow,"${class.name}_${obj.number}_",$obj)</td>
+        <td class="xwikibuttonlink"><a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${xwiki.getURLEncoded($redirect)}")" onclick="return confirm('$msg.get("confirmobjectremove")')">$msg.get("Remove")</a></td>
+    </tr>
+#end
+  </table>
+</div> ## noname
+</div> ## overflow
+<div class="bottombuttons">#template("adminactions.vm")</div>
+</form>
+#end
+</div>

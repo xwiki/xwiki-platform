@@ -1,0 +1,143 @@
+#if($context.getMode()==0)## Visible only in a page
+<div id="actionmenu" class="layoutsubsection">
+<h3 id="xwikimenutitle" class="hidden">$msg.get("menu")</h3>
+<div class="rightmenu"><a id="tmDoc" href='http://www.xwiki.org/xwiki/bin/view/Main/Documentation' onclick="openURL('http://www.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;"><strong>$msg.get("core.menu.documentation")</strong></a></div>
+<div class="leftmenu">
+##
+## Edit mode
+##
+#if($hasedit && !$isReadOnly)
+## Check inline editing option
+#if($doc.content.indexOf("includeForm(")!=-1)
+#set($editaction = "inline")
+#else
+#set($editaction = "edit")
+#end
+##
+## Create menu
+##
+##if($hasedit)
+### #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("core.menu.create") "tmCreate")
+##xwikitopmenuentrystart($xwiki.getURL("XWiki.CreateSubpage", "view", "parent=${doc.fullName}") $msg.get("core.menu.create") "tmCreate")
+##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "parent=${doc.fullName}") $msg.get("core.menu.create.page"))
+##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "tocreate=space") $msg.get("core.menu.create.space"))
+##submenuitem($xwiki.getURL("Blog.CreateBlogPost", "view") $msg.get("core.menu.create.blogpost"))
+##if($xwiki.hasAccessLevel("edit", "Main.EventCalendar"))#submenuitem($xwiki.getURL("Main.EventCalendar", "view") $msg.get("core.menu.create.event"))#end
+##if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("core.menu.create.panel"))#end
+##xwikitopmenuentryend()
+##end
+##
+## Edit menu
+##
+#if($isAdvancedUser)
+#xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("core.menu.edit") "tmEdit")
+<a style="display:none;" href="$doc.getURL($editaction, $languageparams)" accesskey="e">edit</a>
+#submenuitem($doc.getURL("edit", "${languageparams}&amp;editor=wiki") $msg.get("core.menu.edit.wiki"))
+#submenuitem($doc.getURL("edit", "$languageparams&amp;editor=wysiwyg") $msg.get("core.menu.edit.visual"))
+#submenuitem($doc.getURL("inline", "$languageparams") $msg.get("core.menu.edit.form"))
+#submenuseparator()
+#submenuitem($doc.getURL("edit", "editor=rights") $msg.get("core.menu.rights"))
+#submenuseparator()
+#submenuitem($doc.getURL("edit", "editor=object") $msg.get("core.menu.edit.object"))
+#if($hasadmin)
+#submenuitem($doc.getURL("edit", "editor=class") $msg.get("core.menu.edit.class"))
+#end
+#xwikitopmenuentryend()
+#else ## !isAdvanced
+#xwikitopmenuentry($doc.getURL($editaction, $languageparams) $msg.get("core.menu.edit") "tmEdit")
+#end
+#end
+##
+## Show menu
+##
+#if(!$doc.isNew())
+#xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("core.menu.view")  "tmShow")
+#submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("core.menu.view.comments"))
+#submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("core.menu.view.attachments"))
+#submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("core.menu.view.history"))
+#if($isAdvancedUser)
+#submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("core.menu.view.code"))
+#end
+#xwikitopmenuentryend()
+#end ## isNew
+##
+## Print menu
+##
+#xwikitopmenuentrystart("javascript:window.print()" $msg.get("core.menu.print") "tmPrint")
+#submenuitem("javascript:window.print()" $msg.get("core.menu.print"))
+#submenuitem($doc.getURL("view", "xpage=print&amp;$docvariant") $msg.get("core.menu.preview"))
+#submenuseparator()
+#submenuitem($doc.getURL("export", "format=pdf&amp;$docvariant") $msg.get("core.menu.export.pdf"))
+#submenuitem($doc.getURL("export", "format=rtf&amp;$docvariant") $msg.get("core.menu.export.rtf"))
+#submenuitem($doc.getURL("export", "format=html&amp;$docvariant") $msg.get("core.menu.export.html"))
+#submenuitem($doc.getURL("export", "format=xar&amp;name=$doc.fullName&amp;pages=$doc.fullName&amp;$docvariant") $msg.get("core.menu.export.xar"))
+#xwikitopmenuentryend()
+##
+## Actions menu
+##
+#if((!$doc.isNew()) && $xwiki.checkAccess($doc.fullName, "delete"))
+#xwikitopmenuentrystart("" $msg.get("core.menu.actions") "tmFile")
+#submenuitem($doc.getURL("delete", $languageparams) $msg.get("core.menu.delete"))
+#submenuitem($doc.getURL("view", "xpage=rename&amp;step=1") $msg.get("core.menu.rename"))
+#xwikitopmenuentryend()
+#end
+##
+## Watch menu
+##
+## We're disabling the Watchlist menu for now since the Watchlist doesn't work yet in multiwiki
+## mode. Remove when http://jira.xwiki.org/jira/browse/XPWATCHLIST-4 is fixed.
+#if (!$xwiki.isVirtual())
+  #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew())
+<script type="text/javascript">
+//<![CDATA[
+function reloadActionMenu()
+{
+  var id = 'menuview';
+  var surl = '$doc.getURL("view", "xpage=xpart&vm=menuview.vm")';
+  var myAjax = new Ajax.Updater(
+    id,
+    surl,
+    {
+      method: 'get',
+      evalScripts: true,
+      onComplete: function() {}
+    });
+}
+function watchlist(action)
+{
+  var surl = '$doc.getURL("view", "xpage=watch&do=")' + action;
+  var myAjax = new Ajax.Request(
+    surl,
+    {
+      method: 'get',
+      onComplete: reloadActionMenu()
+    });
+}
+//]]>
+</script>
+    #set ($isWatchedDoc = $xwiki.watchlist.isWatchedDocument())
+    #set ($isWatchedSpace = $xwiki.watchlist.isWatchedSpace())
+    #if ($isWatchedDoc || $isWatchedSpace)
+      #xwikitopmenuentrystart("javascript:watchlist('removedocument')" $msg.get("core.menu.watch") "tmWatched")
+    #else
+      #xwikitopmenuentrystart("javascript:watchlist('adddocument')" $msg.get("core.menu.watch") "tmWatch")
+    #end
+    #if (!$isWatchedDoc)
+      #submenuitem("javascript:watchlist('adddocument')" $msg.get("core.menu.watchlist.add.page"))
+    #else
+      #submenuitem("javascript:watchlist('removedocument')" $msg.get("core.menu.watchlist.remove.page"))
+    #end
+    #submenuseparator()
+    #if (!$isWatchedSpace)
+      #submenuitem("javascript:watchlist('addspace')" $msg.get("core.menu.watchlist.add.space"))
+    #else
+      #submenuitem("javascript:watchlist('removespace')" $msg.get("core.menu.watchlist.remove.space"))
+    #end
+    #submenuseparator()
+    #submenuitem($docuser.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
+    #xwikitopmenuentryend()
+  #end
+#end
+</div>
+</div>
+#end

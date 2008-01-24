@@ -1,0 +1,6 @@
+###
+### Attachments page in the "view" mode
+###
+###
+<h2>$xwiki.parseMessage("viewattachmentstitle")</h2>
+#template("attachmentsinline.vm")

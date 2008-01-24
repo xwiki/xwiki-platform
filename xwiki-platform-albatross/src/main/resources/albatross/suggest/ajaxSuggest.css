@@ -1,0 +1,168 @@
+body
+{
+	position: relative;
+}
+
+
+div.ajaxsuggest
+{
+	position: absolute;
+	background-image: url(suggest_img/as_pointer.gif);
+	background-position: top;
+	background-repeat: no-repeat;
+	padding: 10px 0 0 0;
+z-index: 100013;
+}
+
+div.ajaxsuggest div.as_header,
+div.ajaxsuggest div.as_footer
+{
+	position: relative;
+	height: 6px;
+	padding: 0 6px;
+	background-image: url(suggest_img/ul_corner_tr.gif);
+	background-position: top right;
+	background-repeat: no-repeat;
+	overflow: hidden;
+}
+div.ajaxsuggest div.as_footer
+{
+	background-image: url(suggest_img/ul_corner_br.gif);
+}
+
+div.ajaxsuggest div.as_header div.as_corner,
+div.ajaxsuggest div.as_footer div.as_corner
+{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 6px;
+	width: 6px;
+	background-image: url(suggest_img/ul_corner_tl.gif);
+	background-position: top left;
+	background-repeat: no-repeat;
+}
+div.ajaxsuggest div.as_footer div.as_corner
+{
+	background-image: url(suggest_img/ul_corner_bl.gif);
+}
+div.ajaxsuggest div.as_header div.as_bar,
+div.ajaxsuggest div.as_footer div.as_bar
+{
+	height: 6px;
+	overflow: hidden;
+	background-color: #333;
+}
+
+
+div.ajaxsuggest ul
+{
+	list-style: none;
+	margin: 0 0 -4px 0;
+	padding: 0;
+	overflow: hidden;
+	background-color: #333;
+}
+
+div.ajaxsuggest ul li
+{
+	color: #ccc;
+	padding: 0;
+	margin: 0 4px 4px;
+	text-align: left;
+}
+
+div.ajaxsuggest ul li a
+{
+	color: #ccc;
+	display: block;
+	text-decoration: none;
+	background-color: transparent;
+	position: relative;
+	padding: 0;
+	width: 100%;
+}
+div.ajaxsuggest ul li a:hover
+{
+	background-color: #444;
+}
+div.ajaxsuggest ul li.as_highlight a:hover
+{
+	background-color: #1B5CCD;
+}
+
+div.ajaxsuggest ul li a span
+{
+	display: block;
+	padding: 3px 6px;
+	font-weight: bold;
+}
+
+div.ajaxsuggest ul li a span small
+{
+	font-weight: normal;
+	color: #fff;
+}
+
+div.ajaxsuggest ul li.as_highlight a span small
+{
+	color: #ccc;
+}
+
+div.ajaxsuggest ul li.as_highlight a
+{
+	color: #fff;
+	background-color: #1B5CCD;
+	background-image: url(suggest_img/hl_corner_br.gif);
+	background-position: bottom right;
+	background-repeat: no-repeat;
+}
+
+div.ajaxsuggest ul li.as_highlight a span
+{
+	background-image: url(suggest_img/hl_corner_bl.gif);
+	background-position: bottom left;
+	background-repeat: no-repeat;
+}
+
+div.ajaxsuggest ul li a .tl,
+div.ajaxsuggest ul li a .tr
+{
+	background-repeat: no-repeat;
+	width: 6px;
+	height: 6px;
+	position: absolute;
+	top: 0;
+	padding: 0;
+	margin: 0;
+}
+div.ajaxsuggest ul li a .tr
+{
+	right: 0;
+}
+
+div.ajaxsuggest ul li.as_highlight a .tl
+{
+	left: 0;
+	background-image: url(suggest_img/hl_corner_tl.gif);
+	background-position: bottom left;
+}
+
+div.ajaxsuggest ul li.as_highlight a .tr
+{
+	right: 0;
+	background-image: url(suggest_img/hl_corner_tr.gif);
+	background-position: bottom right;
+}
+
+div.ajaxsuggest ul em
+{
+	font-style: normal;
+	color: #6EADE7;
+}
+
+div.ajaxsuggest ul li.as_warning
+{
+	font-weight: bold;
+	text-align: center;
+}

@@ -1,0 +1,58 @@
+        <div id="chwTypeWizard" class="chwInactivePage">
+          <div id="chwChartTypeDiv" class="chwHidden">
+            <fieldset id="chwChartTypeFieldset" class="chwLargeFieldset">
+              <legend id="chwChartsTypeLegend" class="chwLargeLegend" onclick="window.wizard.flipAdvanced('ChartsType');" title="$msg.get("chwdcharttypetitle")">$msg.get("chwcharttypelegend") &lt;&lt;</legend>
+              <div id="chwChartsTypeDiv" class="chwVisible">
+                <label for="chwChartTypeInput" accesskey="t">$msg.get("chwcharttypelabel")</label>
+                <select id="chwChartTypeInput" size="2" name="type" onchange="window.wizard.changeChartType(this.value);">
+                  <option selected="selected" value="Bar">Bar</option>
+                  <option value="Pie">Pie</option>
+<!--                  <option value="Line">Line</option>
+                  <option value="Area">Area</option>
+                  <option value="Time">Time</option>-->
+                </select>
+                <div id="chwBarSubtypes">
+                  <label for="chwBarSubtypeInput">$msg.get("chwchartsubtypelabel")</label>
+                  <select id="chwBarSubtypeInput" size="1" name="renderer" onchange="window.wizard.changeChartSubtype(this.value);">
+                    <option selected="selected" value="bar">Simple Bar</option>
+                    <option value="bar_3d">3D Bar</option>
+                    <option value="waterfall_bar">Waterfall</option>
+                    <option value="interval_bar">Interval</option>
+                    <option value="layered_bar">Layered</option>
+                    <option value="stacked_bar">Stacked</option>
+                    <option value="stacked_bar_3d">3D Stacked</option>
+                    <option value="level">Level</option>
+                    <option value="grouped_stacked_bar">Grouped Stacked</option>
+                  </select>
+                </div>
+                <div id="chwPieSubtypes" class="chwHidden">
+                  <label for="chwPieSubtypeInput">$msg.get("chwchartsubtypelabel")</label>
+                  <select id="chwPieSubtypeInput" size="1" name="renderer" onchange="window.wizard.changeChartSubtype(this.value);">
+                    <option selected="selected" value="pie">Simple Pie</option>
+                    <option value="pie_3d">3D Pie</option>
+                    <option value="ring">Ring</option>
+<!-- does not exist                    <option value="ring_3d">3D Ring</option> -->
+                  </select>
+                </div>
+                <div id="chwLineSubtypes" class="chwHidden">
+                  <label for="chwLineSubtypeInput">$msg.get("chwchartsubtypelabel")</label>
+                  <select id="chwLineSubtypeInput" size="1" name="renderer" onchange="window.wizard.changeChartSubtype(this.value);">
+                    <option selected="selected" value="line">Simple Line</option>
+                  </select>
+                </div>
+                <div id="chwAreaSubtypes" class="chwHidden">
+                  <label for="chwAreaSubtypeInput">$msg.get("chwchartsubtypelabel")</label>
+                  <select id="chwAreaSubtypeInput" size="1" name="renderer" onchange="window.wizard.changeChartSubtype(this.value);">
+                    <option selected="selected" value="area">Simple Area</option>
+                  </select>
+                </div>
+                <div id="chwTimeSubtypes" class="chwHidden">
+                  <label for="chwTimeSubtypeInput">$msg.get("chwchartsubtypelabel")</label>
+                  <select id="chwTimeSubtypeInput" size="1" name="renderer" onchange="window.wizard.changeChartSubtype(this.value);">
+                    <option selected="selected" value="xy_line_and_shape">Simple Timeline</option>
+                  </select>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+        </div>

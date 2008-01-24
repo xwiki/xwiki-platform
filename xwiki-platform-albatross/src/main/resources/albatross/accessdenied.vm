@@ -1,0 +1,16 @@
+###
+### Access denied message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#if ($xwiki.isReadOnly())
+#xwikimessageboxstart($msg.get("error") $msg.get("readonly"))
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("notallowed"))
+#end
+$!exception
+#xwikimessageboxend()
+<div class="clearfloats"></div>
+</div>
+#template("endpage.vm")

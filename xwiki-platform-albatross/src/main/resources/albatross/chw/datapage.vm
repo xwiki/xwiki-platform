@@ -1,0 +1,65 @@
+#set($definedDS = "")
+#foreach($docName in $xwiki.searchDocuments(""))
+ #set($document = $xwiki.getDocument($docName))
+ #set($hasSources = "false")
+ #set($objects = $document.getxWikiObjects())
+ #foreach($className in $objects.keySet())
+  #if($className.endsWith("DataSource") && $className.startsWith("XWiki."))
+   #set($objectSet = $objects.get($className))
+   #if($objectSet.size() != 0)
+    #foreach($i in [1 .. $objectSet.size()])
+     #set($j = $i - 1)
+     #set($object = $objectSet.get($j))
+     #set($value = "type:object;")
+     #set($value = $value.concat("doc:").concat($docName).concat(";"))
+     #set($value = $value.concat("class:").concat($className.substring(6)).concat(";"))
+     #set($value = $value.concat("object_number:").concat("$j"))
+     #if($object.get("datasource_name").trim() == "")
+                   #set($definedDS = $definedDS.concat("<option value='$value'>$className.substring(6) #$j from $docName</option>"))
+     #else
+                   #set($definedDS = $definedDS.concat("<option value='$value'>").concat($object.get("datasource_name")).concat("</option>"))
+     #end
+    #end
+   #end
+  #end
+ #end
+#end
+        <div id="chwDataWizard" class="chwInactivePage">
+          <fieldset id="chwDataWizardFieldset" class="chwLargeFieldset">
+            <legend id="chwDataOptionsLegend" class="chwLargeLegend" onclick="window.wizard.flipAdvanced('DataOptions');" title="$msg.get("chwdatasourcetitle")">$msg.get("chwdatasourcelegend") &lt;&lt;</legend>
+            <div id="chwDataOptionsDiv" class="chwVisible">
+              <fieldset class="chwSmallFieldset">
+                <legend class="chwSmallLegend"><input type="radio" id="chwDataDefineLegend" checked="checked" name="sourcetype" onclick="if(this.checked){window.wizard.changeSourceType('Define');}" onchange="if(this.checked){window.wizard.changeSourceType('Define');}"/><label for="chwDataDefineLegend" class="chwAction">$msg.get("chwdatadefinelegend")</label></legend>
+                <div id="chwDataDefineDiv">
+                  <label for="chwDataCreateTypeInput">$msg.get("chwdatadefinetypelable")</input>
+                  <select id="chwDataDefineTypeInput" title="$msg.get("chwdatadefinetypetitle")" onchange="window.wizard.defineTypeChanged()">
+                    <option value="table" title="$msg.get("chwdatatypetabletitle")" selected="selected">$msg.get("chwdatatypetable")</option>
+                  </select>
+                  <div id="chwDataTypeTableDiv" class="chwInline">
+                    <span class="chwDatSourceWizardInvoker" title="$msg.get("chwinvoketablewizardtitle")" onclick="window.open('$doc.getURL("chartwizard", "xpage=chw/tdwwizard")', 'chwDatasourceWizard', 'location=0,scrollbars=0,menubar=0,toolbar=0,statusbar=0,directories=0,height=470,width=700');">$msg.get("chwinvoketablewizard")</span>
+                    <input id="chwDataSourceInput" type="hidden" name="source"/>
+                  </div>
+                  <span class="chwHidden" id="chwDefineHasDatasource">$msg.get("chwsourcedefined")</span>
+                </div>
+              </fieldset>
+              <fieldset class="chwSmallFieldset">
+                <legend class="chwSmallLegend"><input type="radio" id="chwDataReuseLegend" name="sourcetype" onclick="if(this.checked){window.wizard.changeSourceType('Reuse');}" onchange="if(this.checked){window.wizard.changeSourceType('Reuse');}" #if($definedDS == "") disabled="disabled" #end/><label for="chwDataReuseLegend" class="chwAction">$msg.get("chwdatareuselegend")</label></legend>
+                <div id="chwDataReuseDiv" class="chwHidden">
+                  <select id="chwDataReuseDocInput" name="source" class="chwLimited">
+                    $definedDS
+                  </select>
+                </div>
+              </fieldset>
+              <fieldset class="chwSmallFieldset">
+                <legend class="chwSmallLegend" id="chwDataOrientationLegend" title="$msg.get("chwdataorientationtitle")" class="chwExpander" onclick="window.wizard.flipAdvanced('DataOrientation'); return false;">$msg.get("chwdataorientationlegend") &lt;&lt;</legend>
+                <div id="chwDataOrientationDiv" class="chwVisible">
+                  <label for="chwDataOrientationInput">$msg.get("chwdataorientationlabel")</label>
+                  <select id="chwDataOrientationInput" name="series">
+                    <option value="rows" #if($chartDefaults.get("series") == "rows") selected="selected" #end>$msg.get("chwdataorientationrows")</option>
+                    <option value="columns" #if($chartDefaults.get("series") == "columns") selected="selected" #end>$msg.get("chwdataorientationcolumns")</option>
+                  </select>
+                </div>
+              </fieldset>
+            </div>
+          </fieldset>
+        </div>

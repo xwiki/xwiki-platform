@@ -1,0 +1,10 @@
+#set ($do=$request.do)
+#if ($do == "adddocument")
+  $xwiki.watchlist.addDocument($doc.fullName)
+#elseif ($do == "removedocument")
+  $xwiki.watchlist.removeDocument($doc.fullName)
+#elseif ($do == "addspace")
+    $xwiki.watchlist.addSpace($doc.web)
+#elseif ($do == "removespace")
+    $xwiki.watchlist.removeSpace($doc.web)
+#end

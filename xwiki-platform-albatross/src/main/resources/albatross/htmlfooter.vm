@@ -1,0 +1,6 @@
+#if($context.getMode()==0)
+</div>## xwikimaincontainerinner
+</div>## xwikimaincontainer
+</body>
+</html>
+#end

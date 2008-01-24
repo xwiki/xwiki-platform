@@ -1,0 +1,30 @@
+###
+### Main "view" template
+###
+### General wrapper for view actions
+###
+#if ($request.getParameter("raw").equals("1"))
+#template("code.vm")
+#else
+#template("startpage.vm")
+#if((!$viewer) || ($viewer == ""))
+#set($viewer = $request.getParameter("viewer"))
+#end
+#if((!$viewer) || ($viewer == ""))
+#set($viewer = "view")
+#end
+#if($viewer == "view")
+<div class="minwidthb"></div>
+<div class="main layoutsubsection">
+#template("contentview.vm")
+#template("docextra.vm")
+<div class="clearfloats"></div>
+#else
+<div class="main layoutsubsection">
+#template("${viewer}.vm")
+<div class="clearfloats">
+</div>
+#end
+</div>## main
+#template("endpage.vm")
+#end

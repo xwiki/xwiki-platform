@@ -1,0 +1,383 @@
+#doctitle {
+	font-size: 2.8em;
+	line-height: 1.1em;
+	margin: 0 0 30px 0;
+}
+.heading-1, .heading-1-1,
+.heading-1-1-1, .heading-1-1-1-1 {
+  color: #000;
+  background-color: inherit;
+  padding: 0;
+}
+
+.heading-1 {
+  margin-top: 5px;
+  font-size: 2.6em;
+  line-height: 1.1em;
+  margin: .15em 0 30px 0;
+  padding-top: .85em;
+  border-bottom: 0px solid;
+}
+.heading-1-1 {
+  margin: 0px 0 15px 0;
+  padding-top: 1em;
+  border-bottom: 1px solid;
+  font-weight:bold;
+  font-style: normal;
+  font-size: 2.2em;
+  line-height: 1.1em;
+}
+
+.heading-1-1-1 {
+  font-weight: normal;
+  font-size: 2em;
+  line-height: 1.1em;
+  margin: -0.5em 0 15px 0;
+  padding-top: 1.1em;
+}
+
+.heading-1-1-1-1 {
+  font-weight:normal;
+  color: #404040;
+  margin: -1em 0 0 0;
+  padding-top: 1.6em;
+  left: 0px;
+  font-size: 1.4em;
+  line-height: 1.1em;
+}
+.heading-1-1-1-1-1 {
+  font-weight:normal;
+  color: #404040;
+  font-style: normal;
+  margin: -1.8em 0px 0px 0.5em;
+  left: 0px;
+  padding-top: 1.85em;
+  font-size: 1.2em;
+  line-height: 1.1em;
+}
+
+.heading-1, .heading-1-1, .heading-1-1-1, .heading-1-1-1-1, .heading-1-1-1-1-1, .heading-1-1-1-1-1-1{
+  clear: both;
+}
+
+.quote {
+  font-style: italic;
+  color: inherit;
+  background-color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+}
+
+.code {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  padding: 5px 5px 5px 5px;
+  color: inherit;
+  background-color: #eeeeee;
+  border: 1px dotted #003366;
+  font-family: courier, courier new, monospace;
+  font-size: 12px;
+  line-height: 100%;
+  white-space: pre;
+  width: 70%;
+  overflow: auto;
+}
+
+.java-keyword {
+  font-weight: bold;
+  color: #0000aa;
+  background-color: inherit;
+}
+
+.java-object {
+  color: #000088;
+  background-color: inherit;
+}
+
+.java-quote {
+  color: #00aa00;
+  background-color: inherit;
+}
+
+.xml-keyword {
+  font-weight: bold;
+}
+
+.xml-tag {
+  color: #0000aa;
+  background-color: inherit;
+}
+
+/* special formatting of a wiki table */
+.wiki-table {
+  margin: 20px auto;
+  empty-cells: show;
+  width: 80%;
+  font-size:100%;
+  text-align:left;
+  border: 20px solid #E5F0FE !important;
+  background-color: #E5F0FE;
+}
+
+.wiki-table td {
+  padding: 8px;
+  text-align:left;
+}
+
+.wiki-table th {
+  border-width: 0px;
+  border-style: inset;
+  text-align: left;
+  font-weight: 100;
+  font-size: 160%;
+  padding: 8px;
+  background-color: #E5F0FE;
+}
+
+.wiki-table .table-head td{
+  font-weight: 100 !important;
+  font-size: 160% !important;
+
+}
+
+.wiki-table .table-odd {
+  background-color: #fff;
+}
+
+.wiki-table .table-even {
+}
+
+.list {
+}
+
+.list-title {
+  font-weight: bold;
+}
+
+.list ul {
+  margin-top: 0px;
+  margin-bottom: 0px;
+  margin-left: 0px;
+  padding-left: 0px;
+  list-style-type: none;
+}
+
+/* wiki lists */
+
+ul.minus { list-style-type: square; }
+ul.star { list-style-type: circle; }
+ol.roman { list-style-type: lower-roman; }
+ol.ROMAN { list-style-type: upper-roman; }
+ol.alpha { list-style-type: lower-alpha; }
+ol.ALPHA { list-style-type: upper-alpha; }
+ol.greek { list-style-type: lower-greek; }
+ol.GREEK { list-style-type: lower-greek; }
+/* Disabled until they become valid CSS (in 3.0)
+ol.hiragana { list-style-type: hiragana; }
+ol.HIRAGANA { list-style-type: hiragana-iroha; }
+ol.katakana { list-style-type: katakana; }
+ol.KATAKANA { list-style-type: katakana-iroha; }
+ol.HEBREW { list-style-type: hebrew; }
+*/
+.wikicreatelink {
+  text-decoration: none;
+}
+
+.wikicreatelinktext {
+  text-decoration: underline;
+  color: black;
+}
+
+.wikicreatelinkqm {
+  text-decoration: none;
+  font-size: 90%;
+  color: white;
+  border: 0px solid black;
+  background: #008;
+  padding: 3px;
+  padding-top: 0px;
+  padding-bottom: 0px;
+  margin: 0px;
+  margin-left: 3px;
+}
+.wiki-calendar-table *{
+  text-align: center;
+  border-collapse: collapse;
+  border-spacing: 0px;
+}
+.wiki-calendar-table div{
+  font-size: 90%;
+  margin: 2px 0px;
+}
+* html .wiki-calendar-table div{
+  font-size: 80%;
+}
+.wiki-calendar-table {
+  border: 4px solid #C0D4E7;
+  font-size: 100%;
+  margin: auto;
+}
+.wiki-calendar-table td {
+  vertical-align: top;
+}
+.wiki-calendar-table th {
+  background-color: #FFF;
+}
+.wiki-calendar-table td, .wiki-calendar-table th {
+  text-align: center;
+  border: 1px #C0D4E7 solid;
+  height: 60px;
+  width: 90px;
+  padding-top: 0px !important;
+}
+.wiki-calendar-daynotinmonth{
+ color: #BBBBBB;
+ background-color: #E5E5E5;
+}
+.wiki-calendar-today{
+  background-color: #C0D4E7;
+}
+.wiki-calendar-today-notinmonth{
+ background-color: #D9E0E7;
+ color: #BBBBBB;
+}
+.wiki-calendar-daynamerow {
+  background-color: #C0D4E7 !important;
+}
+.wiki-calendar-daynamerow th{
+  background-color: #C0D4E7 !important;
+  color: #fff;
+  font-weight: 900;
+  height: 1.8em;
+}
+.wiki-calendar-daytitle {
+  background-color: #E8EEF7;
+  font-size: 75% !important;
+  padding: 0px 5px;
+  margin: 0px !important;
+}
+.wiki-calendar-daynotinmonth .wiki-calendar-daytitle {
+  background-color: transparent !important;
+}
+.wiki-calendar-today-notinmonth .wiki-calendar-daytitle {
+  background-color: transparent !important;
+}
+.wiki-calendar-today .wiki-calendar-daytitle {
+  background-color: transparent !important;
+}
+
+.wiki-calendar-today-notinmonth a, .wiki-calendar-daynotinmonth a{
+  color: #BBB !important;
+}
+.wiki-calendar-monthyearrow {
+  font-size: 140%;
+  font-weight: 100;
+  font-variant: small-caps;
+  color: #C0D4E7;
+  border: none !important;
+  width: auto !important;
+}
+.wiki-calendar-month-nav{
+  border: none !important;
+}
+.wiki-calendar-month-nav a{
+  font-size: 140%;
+  font-weight: bold;
+  color: #C0D4E7 !important;
+  text-decoration: none;
+}
+.wiki-calendar-month-nav a:hover{
+  text-decoration: none !important;
+  color: #38c !important;
+}
+#body .prev-month{
+  text-align: left;
+  padding-left: 8px;
+}
+#body .next-month{
+  text-align: right;
+  padding-right: 8px;
+}
+
+.underline{
+  text-decoration: underline;
+}
+
+.workshop {
+  background-color: #FED;
+}
+.event .username {
+  font-size: 80%;
+}
+
+.article_title {
+ font-size: 120%;
+ border-bottom: 1px;
+}
+
+.article_content {
+ padding: 10px;
+}
+
+.article_date {
+ font-size: 120%;
+ border-bottom: 1px solid;
+}
+
+.article_footer {
+ border-top: 1px dotted;
+ font-size: 75%;
+ font-weight: bold;
+ color: gray;
+}
+
+## Footnotes
+sup.footnoteRef a{
+  font-weight: bold;
+  text-decoration: none;
+}
+sup.footnoteRef:target a{
+  background-color: #E5F0FE;
+  color: #C82;
+}
+div.footnotes{
+  font-size: 70%;
+  margin: 10px 0px;
+  border: 1px solid #ddd;
+}
+.footnotes ol{
+  padding-left: 1em;
+}
+.footnotes li{
+  padding: 0px 4px;
+  margin: 0px;
+}
+.footnotes li:target{
+  background-color: #E5F0FE;
+}
+a.footnoteBackRef{
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.pagedNavigation {
+  text-align: center;
+  padding: 8px 0px;
+  margin: auto;
+}
+.pagedNavigation span{
+  padding: 0px 8px;
+}
+.pagedNavigation .pagedLink{
+  background-color: #E5F0FE;
+}
+.pagedNavigation .inactive{
+  color: #CCC;
+}
+.pagedNavigation .pagedLink a{
+  text-decoration: none;
+  color: #2E5A87 !important;
+}
+.pagedNavigation .pagedLink a:hover{
+  color: #D70 !important;
+}

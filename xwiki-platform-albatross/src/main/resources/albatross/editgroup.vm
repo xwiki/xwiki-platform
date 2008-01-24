@@ -1,0 +1,125 @@
+##check to see if the XWiki.XWkiGroupSheet exists
+#if($xwiki.getDocument("XWiki.XWikiGroupSheet").isNew())
+<div id="groupwrap">
+<div id="ajax-loader">Loading...<br />
+  <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
+</div>
+<table id="memberstable">
+<tr><td colspan="2" id="showLimits"></td></tr>
+<tr><td>
+      <table class="display">
+       <thead class="theader">
+          <tr>
+        <td class="membername">Member</td>
+              <td id="hgroupmanage">Manage</td>
+          </tr>
+       </thead>
+       <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
+      </table></td>
+    <td valign="top">
+      <div id="scrollbar1" class="scrollbar"><div class="inscrollbar">&nbsp;</div></div>
+    </td>
+    <td id="buff"></td>
+</tr>
+</table>
+#if($context.action == "inline")
+ <div id="addNewMember">
+     <table cellpadding="5" cellspacing="5">
+     <tr>
+       <td><strong>Add a new user</strong></td>
+       <td>
+         <select name="wiki" onchange="changeWiki(this);">
+            <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
+            <option value="global">$msg.get("rightsmanager.global")</option>
+         </select>
+       </td>
+       <td>
+          <input id="userSuggest" type="text" size="30" name="newMember" autocomplete="off" onfocus="createSuggest(this, 'user');"/>
+       </td>
+       <td>
+          <input type="button" id="addNewUser" class="button" value="$msg.get('add')" onclick="addNewMember('user', $('userSuggest').value);"/>
+       </td>
+    </tr>
+    <tr>
+       <td><strong>Add a new group </strong></td>
+       <td>
+         <select name="wiki" onchange="changeWiki(this);">
+         <option value="local" selected="selected">Local</option>
+         <option value="global">Global</option>
+         </select>
+       </td>
+       <td>
+           <input id="groupSuggest" type="text" size="30" name="newMember" autocomplete="off" onfocus="createSuggest(this, 'group');"/>
+       </td>
+       <td>
+           <input type="button" id="addNewGroup" class="button" value="$msg.get('add')" onclick="addNewMember('group', $('groupSuggest').value);"/>
+  </td>
+    </tr>
+    <tr><td colspan="3" id="errMsg"></td></tr>
+</table>
+<span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
+</div>
+#end
+</div>
+
+#set($url = $doc.getURL("view", "xpage=getgroupmembers"))
+<script type="text/javascript">
+//<![CDATA[
+  tabl = new ASSTable("$url", 15, "display1", "scrollbar1", "memberstable", displayMembers, true);
+   
+  //create new ajax suggest
+   suggesturl = "$doc.getURL()" + "?xpage=uorgsuggest" + "&" + "classname=XWiki.XWikiUsers" + "&" + "wiki=local";
+   
+  //create a new suggest depending on the wiki, user or group and matching string params
+  createSuggest = function(input, uorg)
+  {
+     if(suggesturl.indexOf("&" + "uorg=") > 0) suggesturl = suggesturl.substring(0, suggesturl.indexOf("&" + "uorg="));
+     if(uorg == "user") 
+            suggesturl += "&" + "uorg=user" + "&";
+     else 
+            suggesturl += "&" + "uorg=group" + "&";
+        
+     //clear the errors
+        $('errMsg').innerHTML = "";
+     return new ajaxSuggest(input, { script: suggesturl, varname:'input' } );
+  }
+  
+  addNewMember = function(uorg, name)
+  {
+     //url = adduorg
+     if(name) 
+     {
+             var url = "$doc.getURL("view")" + "?xpage=adduorg" + "&" + "uorg=" + uorg + "&" + "name=" + name;
+             new Ajax.Request(url, 
+             {
+               method: 'get',
+                       onSuccess: function(transport) {
+                         $('userSuggest').value = "";
+                         $('groupSuggest').value = "";
+                                    
+                         var nr = parseInt(transport.responseText);  
+                         if(nr == 0) $('errMsg').innerHTML = "$msg.get("duplicateuser")";
+                         else {
+                             var end = window.tabl.totalRows + nr;       
+                             var start = end - window.tabl.limit;
+                             if(start < 1)  start = 1;
+                             window.tabl.showRows(start, end); 
+                         }                   
+                       }
+             });
+     }
+ }  
+ 
+ changeWiki = function(obj)
+ {
+     if(suggesturl.indexOf("&" + "wiki=") >= 0)
+            suggesturl = suggesturl.substring(0, suggesturl.indexOf("&" + "wiki="));
+     suggesturl += "&" + "wiki=" + trim(obj.options[obj.selectedIndex].value);
+        // clear errors messages
+        $('errMsg').innerHTML = "";
+ }
+//]]>
+</script>
+#else
+$xwiki.renderText($xwiki.getDocument("XWiki.XWikiGroupSheet").getContent(), $doc)
+#end

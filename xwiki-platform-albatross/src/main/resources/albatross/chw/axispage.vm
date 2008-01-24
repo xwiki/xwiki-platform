@@ -1,0 +1,47 @@
+        <div id="chwAxesWizard" class="chwInactivePage">
+          <div id="chwXAxisTitleDiv" class="chwHidden">
+            <fieldset>
+              <legend>Category Axis</legend>
+              <input id="chwXAxisTitleEnabled" name="axis_domain_visible" type="checkbox" onchange="window.wizard.flipEnabled('XAxisTitle');" checked="checked" value="true"/>
+              <label for="chwXAxisTitleEnabled">Show category axis label</label><br/>
+              <label for="chwXAxisTitleInput">Label:</label>
+              <input type="text" id="chwXAxisTitleInput" name="axis_domain_label"/>
+              <div id="chwXAxisTitleAdvancedDiv" class="chwHidden">
+                <label for="chwXAxisTitlePositionInput">Position:</label>
+                <select id="chwXAxisTitlePositionInput" name="axis_domain_position">
+                  <option selected="selected" value="top">Top</otpion>
+                  <option value="left">Left</otpion>
+                  <option value="bottom">Bottom</otpion>
+                  <option value="right">Right</otpion>
+                </select>
+                <br/>
+                <label for="chwXAxisTitleHorizontalAlignmentInput">Horizontal Alignment:</label>
+                <select id="chwXAxisTitleHorizontalAlignmentInput" name="title_horizontal_alignment">
+                  <option value="left">Left</otpion>
+                  <option selected="selected" value="center">Center</otpion>
+                  <option value="right">Right</otpion>
+                </select>
+                <br/>
+                <label for="chwXAxisTitleVerticalAlignmentInput">Vertical Alignment:</label>
+                <select id="chwXAxisTitleVerticalAlignmentInput" name="title_vertical_alignment">
+                  <option value="top">Top</otpion>
+                  <option selected="selected" value="center">Center</otpion>
+                  <option value="bottom">Bottom</otpion>
+                </select>
+                <label for="chwXAxisTitle"/>
+              </div>
+            </fieldset>
+          </div>
+          <div id="chwYAxisTitleDiv" class="chwHidden">
+            <label for="chwYAxisTitleInput">Y-axis name:</label>
+            <input type="text" id="axis_range_label"/>
+          </div>
+          <div id="chwXAxisDiv" class="chwHidden">
+            <input type="checkbox" id="chwXAxisInput"/>
+            <label for="chwXAxisInput">Show X-axis</label>
+          </div>
+          <div id="chwYAxisDiv" class="chwHidden">
+            <input type="checkbox" id="chwYAxisInput"/>
+            <label for="chwYAxisInput">Show Y-axis</label>
+          </div>
+        </div>

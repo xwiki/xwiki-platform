@@ -66,7 +66,7 @@ public class WikiManagerPluginApi extends PluginApi
      * The default WikiManager managed exception.
      */
     private XWikiExceptionApi defaultException;
-    
+
     /**
      * API tool to be able to make and merge multi wikis search queries.
      */
@@ -76,7 +76,7 @@ public class WikiManagerPluginApi extends PluginApi
      * The plugin internationalization service.
      */
     private XWikiPluginMessageTool messageTool;
-   
+
     /**
      * Create an instance of the Wiki Manager plugin user api.
      * 
@@ -94,7 +94,7 @@ public class WikiManagerPluginApi extends PluginApi
         Locale locale = (Locale) context.get("locale");
         this.messageTool = new WikiManagerMessageTool(locale, plugin, context);
         context.put(WikiManager.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
-        
+
         searchApi = plugin.getGlobalSearchApiPlugin(context);
     }
 
@@ -113,7 +113,7 @@ public class WikiManagerPluginApi extends PluginApi
     {
         return this.messageTool;
     }
-    
+
     /**
      * @return the GlobalSearch plugin api.
      */
@@ -168,29 +168,26 @@ public class WikiManagerPluginApi extends PluginApi
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
-        wikiXObjectDocument.setWikiName(wikiname);
-
-        String realTemplateWikiName =
-            templateWiki == null || templateWiki.trim().length() == 0 ? null : templateWiki;
-
-        String realPkgName = pkgName == null || pkgName.trim().length() == 0 ? null : pkgName;
-
         try {
-            String comment;
-
-            if (realTemplateWikiName != null) {
-                comment = WikiManagerMessageTool.COMMENT_CREATEWIKIFROMTEMPLATE;
-            } else if (realPkgName != null) {
-                comment = WikiManagerMessageTool.COMMENT_CREATEWIKIFROMPACKAGE;
-            } else {
-                comment = WikiManagerMessageTool.COMMENT_CREATEEMPTYWIKI;
+            if (wikiname == null || wikiname.trim().equals("")) {
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN,
+                    messageTool.get(WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, wikiname));
             }
+
+            wikiXObjectDocument.setWikiName(wikiname);
+
+            String realTemplateWikiName =
+                templateWiki == null || templateWiki.trim().length() == 0 ? null : templateWiki;
+
+            String realPkgName = pkgName == null || pkgName.trim().length() == 0 ? null : pkgName;
+
+            String comment = WikiManagerMessageTool.COMMENT_CREATEEMPTYWIKI;
 
             WikiManager.getInstance().createNewWiki(wikiXObjectDocument, failOnExist,
                 realTemplateWikiName, realPkgName, comment, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument
-                .toString()), e);
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION,
+                wikiXObjectDocument.toString()), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -281,7 +278,7 @@ public class WikiManagerPluginApi extends PluginApi
 
         return doc;
     }
-    
+
     /**
      * @return the list of all {@link Wiki}.
      * @throws XWikiException error when getting wiki documents descriptors.
@@ -558,8 +555,8 @@ public class WikiManagerPluginApi extends PluginApi
                 this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE,
                     new String[] {templateName, packageName}), this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument
-                .toString()), e);
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION,
+                wikiXObjectDocument.toString()), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));

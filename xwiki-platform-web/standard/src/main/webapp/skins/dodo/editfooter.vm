@@ -1,7 +1,0 @@
-<div class="xwiki${xwikimode}b" id="xwikinav_footer">
-<div class="xwikiactions">
-#set($editactions = "bottom")
-#template("editactions.vm")
-</div>
-</div>
-#template("footer.vm")

@@ -1,2 +1,0 @@
-#set($message=$msg.get("changescanceled"))
-#template("view.vm")

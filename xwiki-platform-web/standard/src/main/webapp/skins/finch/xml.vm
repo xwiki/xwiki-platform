@@ -1,1 +1,0 @@
-$response.setContentType("text/xml")$cdoc.getXMLContent()

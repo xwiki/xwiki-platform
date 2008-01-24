@@ -1613,7 +1613,7 @@ public class Document extends Api
      */
     protected void deleteDocument() throws XWikiException
     {
-        getXWikiContext().getWiki().deleteDocument(getDocument(), getXWikiContext());
+        getXWikiContext().getWiki().deleteDocument(this.doc, getXWikiContext());
         cloned = false;
     }
 

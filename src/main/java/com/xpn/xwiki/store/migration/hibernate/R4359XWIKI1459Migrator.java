@@ -98,7 +98,7 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     Transaction originalTransaction = ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).getTransaction(context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(null, context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(null, context);
-                    PreparedStatement deleleteStatement = session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=null where XWD_ID=?");
+                    PreparedStatement deleteStatement = session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=null where XWD_ID=?");
 
                     while (rs.next()) {
                         if (logger.isInfoEnabled()) {
@@ -109,10 +109,10 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                         XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
                         docArchive.setArchive(sArchive);
                         context.getWiki().getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
-                        deleleteStatement.setLong(1, docId);
-                        deleleteStatement.executeUpdate();
+                        deleteStatement.setLong(1, docId);
+                        deleteStatement.executeUpdate();
                     }
-                    deleleteStatement.close();
+                    deleteStatement.close();
                     stmt.close();
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(session, context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(originalTransaction, context);

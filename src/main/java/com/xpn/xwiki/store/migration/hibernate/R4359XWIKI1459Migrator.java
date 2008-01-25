@@ -106,9 +106,16 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                         }
                         long docId = Long.parseLong(rs.getString(1));
                         String sArchive = rs.getString(2);
-                        XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
-                        docArchive.setArchive(sArchive);
-                        context.getWiki().getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
+
+                        // In some weird cases it can happen that the XWD_ARCHIVE field is empty (that shouldn't happen but we've seen it happening).
+                        // In this case just ignore the archive...
+                        if (sArchive.trim().length() != 0) {
+                            XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
+                            docArchive.setArchive(sArchive);
+                            context.getWiki().getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
+                        } else {
+                            LOG.warn("Empty revision found for document [" + rs.getString(3) + "]. Ignoring non-fatal error.");
+                        }
                         deleteStatement.setLong(1, docId);
                         deleteStatement.executeUpdate();
                     }

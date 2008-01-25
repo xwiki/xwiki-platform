@@ -55,7 +55,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      * Milliseconds of sleep between checks for changed documents
      */
-    private int indexingInterval = 300000;
+    private int indexingInterval = 3000;
 
     private boolean exit = false;
 
@@ -76,6 +76,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     private XWikiContext context;
 
     private XWiki xwiki;
+
+    private long activesIndexedDocs = 0;
 
     static List fields = new ArrayList();
 
@@ -107,6 +109,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
                 Map toIndex = new HashMap();
                 List toDelete = new ArrayList();
+                activesIndexedDocs = 0;
 
                 try {
                     openSearcher();
@@ -141,6 +144,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                             }
                             toIndex.remove(id);
                         }
+                        ++activesIndexedDocs;
                         toIndex.put(id, data);
                     }
                 } catch (Exception e) {
@@ -192,6 +196,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
                             addToIndex(data, doc, context);
                             ++nb;
+                            --activesIndexedDocs;
                         } catch (Exception e) {
                             LOG.error("error indexing document " + id, e);
                         }
@@ -200,6 +205,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                     if (LOG.isInfoEnabled()) {
                         LOG.info("indexed " + nb + " docs to lucene index");
                     }
+
+                    writer.flush();
                 } catch (Exception e) {
                     LOG.error("error indexing documents", e);
                 } finally {
@@ -210,7 +217,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 plugin.openSearchers();
             }
             try {
-                Thread.sleep(this.indexingInterval);
+                Thread.sleep(indexingInterval);
             } catch (InterruptedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -301,7 +308,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
         try {
             // fix for windows by Daniel Cortes:
-            FSDirectory f = FSDirectory.getDirectory(indexDir, false);
+            FSDirectory f = FSDirectory.getDirectory(indexDir);
             writer = new IndexWriter(f, analyzer, create);
             // writer = new IndexWriter (indexDir, analyzer, create);
             writer.setUseCompoundFile(true);
@@ -352,8 +359,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         Field fld = null;
 
         // collecting all the fields for using up in search
-        for (Enumeration e = luceneDoc.fields(); e.hasMoreElements();) {
-            fld = (Field) e.nextElement();
+        for (Iterator it = luceneDoc.getFields().iterator(); it.hasNext();) {
+            fld = (Field) it.next();
             if (!fields.contains(fld.name())) {
                 fields.add(fld.name());
             }
@@ -533,8 +540,30 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         }
     }
 
+    /**
+     * @return the number of documents in the queue.
+     */
     public long getQueueSize()
     {
         return this.queue.getSize();
+    }
+
+    /**
+     * @return the number of documents Lucene index writer.
+     */
+    public long getLuceneDocCount()
+    {
+        if (writer != null)
+            return writer.docCount();
+
+        return -1;
+    }
+
+    /**
+     * @return the number of documents in the second queue gave to Lucene.
+     */
+    public long getActiveQueueSize()
+    {
+        return this.activesIndexedDocs;
     }
 }

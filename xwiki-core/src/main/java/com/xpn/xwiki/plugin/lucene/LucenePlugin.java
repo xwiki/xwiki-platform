@@ -199,6 +199,8 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     public SearchResults getSearchResults(String query, String sortField,
         String virtualWikiNames, String languages, XWikiContext context) throws Exception
     {
+        openSearchers();
+        
         return search(query, sortField, virtualWikiNames, languages, this.searchers, context);
     }
 
@@ -247,7 +249,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
             LOG.debug("query " + q + " returned " + hitcount + " hits");
         }
         
-        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
+        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context), context);
     }
 
     /**
@@ -274,7 +276,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         if (LOG.isDebugEnabled())
             LOG.debug("query " + q + " returned " + hitcount + " hits");
         
-        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
+        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context), context);
     }
 
     /**
@@ -498,5 +500,21 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     public void queueAttachment(XWikiDocument doc, XWikiContext context)
     {
         indexUpdater.addAttachmentsOfDocument(doc, context);
+    }
+
+    /**
+     * @return the number of documents Lucene index writer.
+     */
+    public long getLuceneDocCount()
+    {
+        return indexUpdater.getLuceneDocCount();
+    }
+
+    /**
+     * @return the number of documents in the second queue gave to Lucene.
+     */
+    public long getActiveQueueSize()
+    {
+        return indexUpdater.getActiveQueueSize();
     }
 }

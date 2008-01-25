@@ -78,7 +78,7 @@ public class LucenePluginApi extends Api
         if (wiki.hasAdminRights()) {
             nbDocuments = getPlugin().rebuildIndex(context.getContext());
         }
-        
+
         return nbDocuments;
     }
 
@@ -102,7 +102,7 @@ public class LucenePluginApi extends Api
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
-        
+
         return null;
     }
 
@@ -166,16 +166,32 @@ public class LucenePluginApi extends Api
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
     /**
-     * @return the number of documents in the queue
+     * @return the number of documents in the queue.
      */
     public long getQueueSize()
     {
         return plugin.getQueueSize();
+    }
+
+    /**
+     * @return the number of documents in the second queue gave to Lucene.
+     */
+    public long getActiveQueueSize()
+    {
+        return plugin.getActiveQueueSize();
+    }
+
+    /**
+     * @return the number of documents Lucene index writer.
+     */
+    public long getLuceneDocCount()
+    {
+        return plugin.getLuceneDocCount();
     }
 
     /**
@@ -212,7 +228,7 @@ public class LucenePluginApi extends Api
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
-        
+
         return null;
     }
 
@@ -258,7 +274,7 @@ public class LucenePluginApi extends Api
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
-        
+
         return null;
     }
 
@@ -280,7 +296,7 @@ public class LucenePluginApi extends Api
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
-        
+
         return null;
     }
 
@@ -342,7 +358,7 @@ public class LucenePluginApi extends Api
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 
@@ -404,7 +420,7 @@ public class LucenePluginApi extends Api
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         return null;
     }
 

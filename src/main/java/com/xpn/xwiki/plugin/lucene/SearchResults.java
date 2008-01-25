@@ -19,6 +19,8 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.XWiki;
 import org.apache.lucene.search.Hits;
 import org.apache.commons.logging.Log;
@@ -28,13 +30,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Container for the results of a search. <p> This class handles paging through search results and
- * enforces the xwiki rights management by only returning search results the user executing the
- * search is allowed to view. </p>
- *
+ * Container for the results of a search.
+ * <p>
+ * This class handles paging through search results and enforces the xwiki rights management by only
+ * returning search results the user executing the search is allowed to view.
+ * </p>
+ * 
  * @version $Id: $
  */
-public class SearchResults
+public class SearchResults extends Api
 {
     private final XWiki xwiki;
 
@@ -48,8 +52,10 @@ public class SearchResults
      * @param hits Lucene search results
      * @param xwiki xwiki instance for access rights checking
      */
-    public SearchResults(Hits hits, XWiki xwiki)
+    public SearchResults(Hits hits, XWiki xwiki, XWikiContext context)
     {
+        super(context);
+
         this.hits = hits;
         this.xwiki = xwiki;
     }
@@ -59,23 +65,32 @@ public class SearchResults
         if (relevantResults == null) {
             relevantResults = new ArrayList();
             final int hitcount = hits.length();
-            for (int i = 0; i < hitcount; i++) {
-                SearchResult result = null;
-                try {
-                    result = new SearchResult(hits.doc(i), hits.score(i), xwiki);
-                    String pageName = null;
-                    if (result.isWikiContent()) {
-                        pageName = result.getWeb() + "." + result.getName();
+
+            String database = this.context.getDatabase();
+            try {
+                for (int i = 0; i < hitcount; i++) {
+                    SearchResult result = null;
+                    try {
+                        result = new SearchResult(hits.doc(i), hits.score(i), xwiki);
+
+                        this.context.setDatabase(result.getWiki());
+
+                        String pageName = null;
+                        if (result.isWikiContent()) {
+                            pageName =
+                                result.getWiki() + ":" + result.getWeb() + "." + result.getName();
+                        }
+                        if (result != null && result.isWikiContent()
+                            && xwiki.checkAccess(pageName, "view") && xwiki.exists(pageName)) {
+                            relevantResults.add(result);
+                        }
+                    } catch (Exception e) {
+                        LOG.error("error getting search result", e);
+                        e.printStackTrace();
                     }
-                    if (result != null && result.isWikiContent() &&
-                        xwiki.checkAccess(pageName, "view") && xwiki.exists(pageName))
-                    {
-                        relevantResults.add(result);
-                    }
-                } catch (Exception e) {
-                    LOG.error("error getting search result", e);
-                    e.printStackTrace();
                 }
+            } finally {
+                this.context.setDatabase(database);
             }
         }
         return relevantResults;
@@ -147,11 +162,11 @@ public class SearchResults
     /**
      * Returns a list of search results. According to beginIndex and endIndex, only a subset of the
      * results is returned. To get the first ten results, one would use beginIndex=1 and items=10.
-     *
+     * 
      * @param beginIndex 1-based index of first result to return.
      * @param items number of items to return
-     * @return List of SearchResult instances starting at <code>beginIndex</code> and containing up
-     *         to <code>items</code> elements.
+     * @return List of SearchResult instances starting at <code>beginIndex</code> and containing
+     *         up to <code>items</code> elements.
      */
     public List getResults(int beginIndex, int items)
     {
@@ -162,33 +177,43 @@ public class SearchResults
         if (relResults == null) {
             relResults = new ArrayList();
             final int hitcount = hits.length();
-            for (int i = 0; i < hitcount; i++) {
-                SearchResult result = null;
-                try {
-                    result = new SearchResult(hits.doc(i), hits.score(i), xwiki);
-                    String pageName = null;
-                    if (result.isWikiContent()) {
-                        pageName = result.getWeb() + "." + result.getName();
-                    }
-                    if (result != null && result.isWikiContent() && xwiki.exists(pageName) &&
-                            xwiki.checkAccess(pageName, "view"))
-                    {
-                        if (resultcount>=listStartIndex) {
-                            relResults.add(result);
+
+            String database = this.context.getDatabase();
+            try {
+                for (int i = 0; i < hitcount; i++) {
+                    SearchResult result = null;
+                    try {
+                        result = new SearchResult(hits.doc(i), hits.score(i), xwiki);
+
+                        this.context.setDatabase(result.getWiki());
+
+                        String pageName = null;
+                        if (result.isWikiContent()) {
+                            pageName =
+                                result.getWiki() + ":" + result.getWeb() + "." + result.getName();
                         }
-                        resultcount++;
-                        if (resultcount==listEndIndex)
-                            return relResults;
+                        if (result != null && result.isWikiContent() && xwiki.exists(pageName)
+                            && xwiki.checkAccess(pageName, "view")) {
+                            if (resultcount >= listStartIndex) {
+                                relResults.add(result);
+                            }
+                            resultcount++;
+                            if (resultcount == listEndIndex)
+                                return relResults;
+                        }
+                    } catch (Exception e) {
+                        LOG.error("error getting search result", e);
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    LOG.error("error getting search result", e);
-                    e.printStackTrace();
                 }
+            } finally {
+                this.context.setDatabase(database);
             }
+
             return relResults;
         } else {
             return getRelevantResults().subList(listStartIndex,
-                    listEndIndex < resultcount ? listEndIndex : resultcount);
+                listEndIndex < resultcount ? listEndIndex : resultcount);
         }
     }
 

@@ -152,12 +152,11 @@ public class XWikiDocumentArchiveTest extends MockObjectTestCase
         new XWikiDocumentArchive(123456789L).setArchive(archive.getArchive(context));
     }
     
-    public void testUpdateLoad() throws XWikiException {
+    public void testUpdateLoad() throws XWikiException
+    {
         XWikiDocument doc = new XWikiDocument("Test", "Test");
         doc.setContent("content 1.1");
         
-        XWikiContext context = new XWikiContext();
-
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         assertEquals(0, archive.getNodes().size());
         
@@ -204,9 +203,8 @@ public class XWikiDocumentArchiveTest extends MockObjectTestCase
         assertEquals(new Version(3,3), archive.getLatestVersion());
     }
     
-    public void testRemoveVersions() throws XWikiException {
-        XWikiContext context = new XWikiContext();
-        
+    public void testRemoveVersions() throws XWikiException
+    {
         XWikiDocument doc = new XWikiDocument("Test", "Test");
         XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
         doc.setDocumentArchive(archive);
@@ -241,5 +239,37 @@ public class XWikiDocumentArchiveTest extends MockObjectTestCase
         assertEquals(doc11.getDate(), actual.getDate());
         assertEquals(doc11.getAuthor(), actual.getAuthor());
         assertEquals(doc11.getComment(), actual.getComment());
+    }
+
+    /**
+     * Verify issue "When loading a revision of a document the creation date is incorrectly set as the last
+     * modification date".
+     * @see <a href="http://jira.xwiki.org/jira/browse/XWIKI-2029">XWIKI-2029</a>
+     */
+    public void testVerifyCreationDateWhenLoadingDocumentFromArchive() throws Exception
+    {
+        XWikiDocument doc = new XWikiDocument("Test", "Test");
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        doc.setContent("content 1.1");
+        doc.setAuthor(author);
+        doc.setComment("initial, 1.1");
+        doc.setDate(new Date());
+        archive.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), null, context);
+
+        Date creationDate = doc.getCreationDate();
+
+        // Wait for 2 seconds and make a change. We'll then load the last revision and verify it has a correct
+        // creation date.
+        Thread.sleep(1000L);
+
+        doc.setContent("content 2.1\nqwe @ ");
+        archive.updateArchive(doc, author, new Date(), "2.1", new Version(2,1), context);
+
+        XWikiDocument latest = archive.loadDocument(new Version(2,1), context);
+
+        assertEquals(creationDate, latest.getCreationDate());
     }
 }

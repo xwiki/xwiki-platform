@@ -222,10 +222,10 @@ public class XWikiDocumentArchive
                 updatedNodeContents.add(nodeContent);
             }
         } catch (Exception e) {
+            Object[] args = {text, getId()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
                 XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
-                "Exception while constructing document archive",
-                e);
+                "Exception while constructing archive for JRCS string [{0}] for document [{1}]", e, args);
         }
     }
 
@@ -340,10 +340,10 @@ public class XWikiDocumentArchive
             doc.setMostRecent(version.equals(getLatestVersion()));
             return doc;
         } catch (Exception e) {
-            Object[] args = {version.toString()};
+            Object[] args = {version.toString(), getId()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
-                "Exception while reading document version {0}", e, args);
+                "Exception while reading version [{0}] for document id [{1,number}]", e, args);
         }
     }
 

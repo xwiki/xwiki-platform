@@ -343,9 +343,7 @@ public class XWikiDocumentArchive
             Object[] args = {version.toString()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_RCS_READING_REVISIONS,
-                "Exception while reading document version {1}",
-                e,
-                args);
+                "Exception while reading document version {0}", e, args);
         }
     }
 

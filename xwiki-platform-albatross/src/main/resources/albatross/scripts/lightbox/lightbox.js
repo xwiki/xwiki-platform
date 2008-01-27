@@ -115,7 +115,7 @@ Lightbox.prototype =  {
 
 
 	getWaiting: function() {
-  		return '<div style="padding: 30px;"><img src="$xwiki.getSkinFile(\'icons/ajax-loader.gif\')"/></div>';
+  		return '<div style="padding: 30px;"><img src="$xwiki.getSkinFile('icons/ajax-loader.gif')"/></div>';
 	},
 
 

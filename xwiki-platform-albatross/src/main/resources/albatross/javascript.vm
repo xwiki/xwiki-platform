@@ -9,7 +9,7 @@
 <script type="text/javascript" src="$xwiki.getSkinFile("fullscreenEdit.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("usersandgroups.js", true)"></script>
 <script type="text/javascript" src="$xwiki.getSkinFile("suggest/ajaxSuggest.js")"></script>
-<script type="text/javascript" src="$xwiki.getSkinFile("scripts/lightbox/lightbox.js")"></script>
+<script type="text/javascript" src="$xwiki.getSkinFile("scripts/lightbox/lightbox.js", true)"></script>
 
 #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
 <script type="text/javascript">

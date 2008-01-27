@@ -210,11 +210,7 @@ public class XWikiDocumentArchiveTest extends MockObjectTestCase
         doc.setDocumentArchive(archive);
         String author = "XWiki.some author";
         
-        doc.setContent("content 1.1");
-        doc.setAuthor(author);
-        doc.setComment("initial, 1.1");
-        doc.setDate(new Date());
-        archive.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), null, context);
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
         XWikiDocument doc11 = (XWikiDocument) doc.clone();
         
         doc.setContent("content 2.1\nqwe @ ");
@@ -253,11 +249,7 @@ public class XWikiDocumentArchiveTest extends MockObjectTestCase
         doc.setDocumentArchive(archive);
         String author = "XWiki.some author";
 
-        doc.setContent("content 1.1");
-        doc.setAuthor(author);
-        doc.setComment("initial, 1.1");
-        doc.setDate(new Date());
-        archive.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), null, context);
+        addRevisionToHistory(archive, doc, "content 1.1", author, "initial 1.1");
 
         Date creationDate = doc.getCreationDate();
 
@@ -271,5 +263,61 @@ public class XWikiDocumentArchiveTest extends MockObjectTestCase
         XWikiDocument latest = archive.loadDocument(new Version(2,1), context);
 
         assertEquals(creationDate, latest.getCreationDate());
+    }
+
+    public void testVerifyDiffAndFullRevisionAlgorithm() throws Exception
+    {
+        XWikiDocument doc = new XWikiDocument("Test", "Test");
+        XWikiDocumentArchive archive = new XWikiDocumentArchive(doc.getId());
+        doc.setDocumentArchive(archive);
+        String author = "XWiki.some author";
+
+        // The first revision is always a full revision (not a diff)
+        addRevisionToHistory(archive, doc, "content 1.1", author, "1.1");
+        assertFalse(archive.getNode(new Version(1, 1)).isDiff());
+
+        // When a new revision is added the new revision is always the full revision but the previous one is
+        // modified to be a diff.
+        addRevisionToHistory(archive, doc, "content 2.1", author, "2.1");
+        assertTrue(archive.getNode(new Version(1, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(2, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 3.1", author, "3.1");
+        assertTrue(archive.getNode(new Version(1, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(2, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(3, 1)).isDiff());
+
+        addRevisionToHistory(archive, doc, "content 4.1", author, "4.1");
+        assertTrue(archive.getNode(new Version(1, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(2, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(3, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(4, 1)).isDiff());
+
+        // Every 5th revision we save the full content and not a diff
+        addRevisionToHistory(archive, doc, "content 5.1", author, "5.1");
+        assertTrue(archive.getNode(new Version(1, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(2, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(3, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(4, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(5, 1)).isDiff());
+
+        // Verify that the 5th revision is kept as a full content revision when the 6th is added
+        addRevisionToHistory(archive, doc, "content 6.1", author, "6.1");
+        assertTrue(archive.getNode(new Version(1, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(2, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(3, 1)).isDiff());
+        assertTrue(archive.getNode(new Version(4, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(5, 1)).isDiff());
+        assertFalse(archive.getNode(new Version(6, 1)).isDiff());
+    }
+
+    private void addRevisionToHistory(XWikiDocumentArchive archive, XWikiDocument document, String content,
+        String author, String comment) throws XWikiException
+    {
+        document.setContent(content);
+        document.setAuthor(author);
+        document.setComment(comment);
+        document.setDate(new Date());
+        archive.updateArchive(document, document.getAuthor(), document.getDate(), document.getComment(), null, context);
     }
 }

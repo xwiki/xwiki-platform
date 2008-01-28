@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881143000</creationDate>
-<date>1199789429000</date>
-<contentUpdateDate>1199789429000</contentUpdateDate>
-<version>7.1</version>
+<date>1201519693000</date>
+<contentUpdateDate>1201519693000</contentUpdateDate>
+<version>8.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -118,8 +118,10 @@
             &lt;dl&gt;
               #set($class = $wikiAlias.objectApi.xWikiClass)
               #foreach($prop in $class.properties)
-                &lt;dt&gt;${prop.prettyName}:&lt;/dt&gt;
-                &lt;dd&gt;$doc.display($prop.getName(), $wikiAlias.objectApi)&lt;/dd&gt;
+                #if($prop.name != "state")
+                  &lt;dt&gt;${prop.prettyName}:&lt;/dt&gt;
+                  &lt;dd&gt;$doc.display($prop.getName(), $wikiAlias.objectApi)&lt;/dd&gt;
+                #end
               #end
             &lt;/dl&gt;
       #if($context.action == "view")

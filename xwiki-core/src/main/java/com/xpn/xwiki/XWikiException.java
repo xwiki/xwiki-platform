@@ -315,9 +315,9 @@ public class XWikiException extends Exception {
         buffer.append(getCode());
         buffer.append(" in ");
         buffer.append(getModuleName());
-        buffer.append(": ");
 
         if (message != null) {
+            buffer.append(": ");
             if (args == null)
                 buffer.append(message);
             else {

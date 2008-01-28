@@ -20,23 +20,51 @@
  */
 package com.xpn.xwiki.api;
 
+import java.text.MessageFormat;
+import java.util.Collection;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
-import java.util.Collection;
-
+/**
+ * Scriptable API for easy handling of users. For the moment this API is very limited, containing
+ * only one method. In the future it should be extended to provide useful methods for working with
+ * users.
+ * 
+ * @version $Id: $
+ * @since Platform-1.0
+ */
 public class User extends Api
 {
+    /** Logging helper object. */
+    protected static final Log LOG = LogFactory.getLog(User.class);
+
+    /** The wrapped XWikiUser object. */
     private XWikiUser user;
 
+    /**
+     * Constructs a wrapper for the given protected XWikiUser object.
+     * 
+     * @param user The XWikiUser object that should be wrapper.
+     * @param context The current {@link XWikiContext context}.
+     */
     public User(XWikiUser user, XWikiContext context)
     {
         super(context);
         this.user = user;
     }
 
+    /**
+     * Expose the wrapped XWikiUser object. Requires programming rights.
+     * 
+     * @return The wrapped XWikiUser object, or <tt>null</tt> if the user does not have
+     *         programming rights.
+     */
     public XWikiUser getUser()
     {
         if (hasProgrammingRights()) {
@@ -45,10 +73,43 @@ public class User extends Api
         return null;
     }
 
-    public boolean isUserInGroup(String groupName) throws XWikiException
+    /**
+     * Check if the user belongs to a group or not.
+     * 
+     * @param groupName The group to check.
+     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if
+     *         an exception occurs.
+     */
+    public boolean isUserInGroup(String groupName)
     {
-        XWikiGroupService groupService = getXWikiContext().getWiki().getGroupService(getXWikiContext());
-        Collection groups = groupService.listGroupsForUser(user.getUser(), getXWikiContext());
-        return groups.contains(groupName);
+        try {
+            if (user != null && StringUtils.isEmpty(user.getUser())) {
+                XWikiGroupService groupService =
+                    getXWikiContext().getWiki().getGroupService(getXWikiContext());
+                Collection groups =
+                    groupService.getAllGroupsNamesForMember(user.getUser(), 0, 0,
+                        getXWikiContext());
+                return groups.contains(groupName);
+            }
+        } catch (Exception ex) {
+            LOG.warn(new MessageFormat("Unhandled exception checking if user {0}"
+                + " belongs to group {1}").format(new String[] {user.getUser(), groupName}), ex);
+        }
+        return false;
+    }
+
+    /**
+     * <p>
+     * See if the user is global (i.e. registered in the main wiki) or local to a virtual wiki.
+     * </p>
+     * <p>
+     * This method is not public, as the underlying implementation is not fully functional
+     * </p>
+     * 
+     * @return <tt>true</tt> if the user is global, false otherwise or if an exception occurs.
+     */
+    protected boolean isMain()
+    {
+        return user.isMain();
     }
 }

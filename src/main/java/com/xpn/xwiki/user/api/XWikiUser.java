@@ -21,6 +21,13 @@
 
 package com.xpn.xwiki.user.api;
 
+import java.util.Collection;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+
 public class XWikiUser
 {
     private String user;
@@ -46,6 +53,26 @@ public class XWikiUser
     public void setUser(String user)
     {
         this.user = user;
+    }
+
+    /**
+     * Check if the user belongs to a group or not.
+     * 
+     * @param groupName The group to check.
+     * @param context The current {@link XWikiContext context}.
+     * @return <tt>true</tt> if the user does belong to the specified group, false otherwise or if
+     *         an exception occurs.
+     *
+     * @throws XWikiException If an error occurs when checking the groups.
+     */
+    public boolean isUserInGroup(String groupName, XWikiContext context) throws XWikiException
+    {
+        if (!StringUtils.isEmpty(getUser())) {
+            XWikiGroupService groupService = context.getWiki().getGroupService(context);
+            Collection groups = groupService.getAllGroupsNamesForMember(getUser(), 0, 0, context);
+            return groups.contains(groupName);
+        }
+        return false;
     }
 
     public boolean isMain()

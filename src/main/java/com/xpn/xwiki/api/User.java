@@ -21,14 +21,11 @@
 package com.xpn.xwiki.api;
 
 import java.text.MessageFormat;
-import java.util.Collection;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
@@ -83,14 +80,7 @@ public class User extends Api
     public boolean isUserInGroup(String groupName)
     {
         try {
-            if (user != null && StringUtils.isEmpty(user.getUser())) {
-                XWikiGroupService groupService =
-                    getXWikiContext().getWiki().getGroupService(getXWikiContext());
-                Collection groups =
-                    groupService.getAllGroupsNamesForMember(user.getUser(), 0, 0,
-                        getXWikiContext());
-                return groups.contains(groupName);
-            }
+            return user.isUserInGroup(groupName, getXWikiContext());
         } catch (Exception ex) {
             LOG.warn(new MessageFormat("Unhandled exception checking if user {0}"
                 + " belongs to group {1}").format(new String[] {user.getUser(), groupName}), ex);

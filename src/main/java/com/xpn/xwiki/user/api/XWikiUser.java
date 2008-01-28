@@ -19,36 +19,42 @@
  *
  */
 
-
 package com.xpn.xwiki.user.api;
 
-public class XWikiUser {
+public class XWikiUser
+{
     private String user;
+
     private boolean main;
 
-    public XWikiUser(String user) {
+    public XWikiUser(String user)
+    {
         this(user, false);
     }
 
-    public XWikiUser(String user, boolean main) {
+    public XWikiUser(String user, boolean main)
+    {
         setUser(user);
         setMain(main);
     }
 
-    public String getUser() {
+    public String getUser()
+    {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(String user)
+    {
         this.user = user;
     }
 
-    public boolean isMain() {
+    public boolean isMain()
+    {
         return main;
     }
 
-    public void setMain(boolean main) {
+    public void setMain(boolean main)
+    {
         this.main = main;
     }
-
 }

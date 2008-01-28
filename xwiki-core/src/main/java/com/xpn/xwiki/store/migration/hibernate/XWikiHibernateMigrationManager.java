@@ -42,8 +42,9 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
 {
     /** logger */
     protected static final Log LOG = LogFactory.getLog(XWikiHibernateMigrationManager.class);
+
     /** {@inheritDoc} */
-    public XWikiHibernateMigrationManager(XWikiContext context)
+    public XWikiHibernateMigrationManager(XWikiContext context) throws XWikiException
     {
         super(context);
     }
@@ -86,9 +87,9 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         // 1st way:
         result.add(new R4340XWIKI883Migrator());
         result.add(new R4359XWIKI1459Migrator());
-        result.add(new R6079XWIKI1878Migrator(getDBVersion(context).getVersion()));
-        result.add(new R6405XWIKI1933Migrator(getDBVersion(context).getVersion()));
-        result.add(new R6430XWIKI1954Migrator(getDBVersion(context).getVersion()));
+        result.add(new R6079XWIKI1878Migrator());
+        result.add(new R6405XWIKI1933Migrator());
+        result.add(new R6430XWIKI1954Migrator());
         // 2nd way - via classloader
         
         return result;

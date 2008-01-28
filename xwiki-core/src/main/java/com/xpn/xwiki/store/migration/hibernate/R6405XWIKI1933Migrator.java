@@ -35,13 +35,6 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 public class R6405XWIKI1933Migrator extends R4340XWIKI883Migrator
 {
-    private int startupVersion;
-
-    public R6405XWIKI1933Migrator(int currentVersionBeforeMigratorsExecute)
-    {
-        this.startupVersion = currentVersionBeforeMigratorsExecute;
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -68,12 +61,19 @@ public class R6405XWIKI1933Migrator extends R4340XWIKI883Migrator
         return new XWikiDBVersion(6405);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractXWikiHibernateMigrator#shouldExecute(com.xpn.xwiki.store.migration.XWikiDBVersion)
+     */
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        return (startupVersion.getVersion() >= 4340);
+    }
+
     /** {@inheritDoc} */
     public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context)
         throws XWikiException
     {
-        if (this.startupVersion >= 4340) {
-            super.migrate(manager, context);
-        }
+        super.migrate(manager, context);
     }
 }

@@ -130,17 +130,5 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                 return Boolean.TRUE;
             }
         })==null) return;
-        // drop old column
-        // I think it is not needed. this column do not harm, but may be useful. User can delete it by self in any time.
-        /*manager.getStore(context).executeWrite(context, true, new HibernateCallBack() {
-            public Object doInHibernate(Session session) throws Exception
-            {
-                Connection connection = session.connection();
-                Statement stmt = connection.createStatement();
-                stmt.executeUpdate("ALTER TABLE xwikidoc DROP COLUMN XWD_ARCHIVE");
-                connection.commit();
-                return null;
-            }
-        });*/
     }
 }

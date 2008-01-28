@@ -681,10 +681,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         // TODO: improve using real request
         List groupNameList = new ArrayList(listGroupsForUser(member, context));
 
-        if (start <= 0 & (nb <= 0 || nb >= groupNameList.size()))
-            return groupNameList;
-
-        if (nb == 0 && start == 0)
+        if (start <= 0 && (nb <= 0 || nb >= groupNameList.size()))
             return groupNameList;
 
         if (start + nb > groupNameList.size())

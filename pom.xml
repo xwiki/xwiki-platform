@@ -539,7 +539,8 @@
         </dependencies>
         <configuration>
           <includes>
-              **/Api.java,
+              **/api/Api.java,
+              **/api/User.java,
               **/xmlrpc/ConfluenceRpcInterface,
               **/xmlrpc/Attachment.java,
               **/xmlrpc/SpaceSummary.java,

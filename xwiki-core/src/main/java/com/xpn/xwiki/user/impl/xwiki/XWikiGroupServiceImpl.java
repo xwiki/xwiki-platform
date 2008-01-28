@@ -679,6 +679,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         XWikiContext context) throws XWikiException
     {
         // TODO: improve using real request
+        // TODO: Use a cache mechanism.
         List groupNameList = new ArrayList(listGroupsForUser(member, context));
 
         if (start <= 0 && (nb <= 0 || nb >= groupNameList.size()))

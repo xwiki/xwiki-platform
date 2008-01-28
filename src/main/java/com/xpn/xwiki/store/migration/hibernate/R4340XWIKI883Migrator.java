@@ -33,6 +33,7 @@ import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
+
 /**
  * Migration for XWIKI-883: global access preferences cannot be updated
  * @version $Id: $
@@ -62,6 +63,7 @@ public class R4340XWIKI883Migrator extends AbstractXWikiHibernateMigrator
     {
         return new XWikiDBVersion(4340);
     }
+
     /** {@inheritDoc} */
     public void migrate(XWikiHibernateMigrationManager manager, XWikiContext context)
         throws XWikiException

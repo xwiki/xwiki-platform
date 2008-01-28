@@ -41,13 +41,6 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  */
 public class R6430XWIKI1954Migrator extends AbstractXWikiHibernateMigrator
 {
-    private int startupVersion;
-
-    public R6430XWIKI1954Migrator(int currentVersionBeforeMigratorsExecute)
-    {
-        this.startupVersion = currentVersionBeforeMigratorsExecute;
-    }
-
     /**
      * {@inheritDoc}
      * 
@@ -74,24 +67,31 @@ public class R6430XWIKI1954Migrator extends AbstractXWikiHibernateMigrator
         return new XWikiDBVersion(6430);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractXWikiHibernateMigrator#shouldExecute(com.xpn.xwiki.store.migration.XWikiDBVersion)
+     */
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        return (startupVersion.getVersion() >= 4359);
+    }
+
     /** {@inheritDoc} */
     public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context)
         throws XWikiException
     {
-        if (this.startupVersion >= 4359) {
-            manager.getStore(context).executeWrite(context, true, new HibernateCallback() {
-                public Object doInHibernate(Session session) throws HibernateException, XWikiException
-                {
-                    try {
-                        Statement stmt = session.connection().createStatement();
-                        stmt.executeUpdate("update xwikidoc set XWD_ARCHIVE=null");
-                        stmt.close();
-                    } catch (SQLException e) {
-                        // Maybe the column doesn't exist.
-                    }
-                    return Boolean.TRUE;
+        manager.getStore(context).executeWrite(context, true, new HibernateCallback() {
+            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+            {
+                try {
+                    Statement stmt = session.connection().createStatement();
+                    stmt.executeUpdate("update xwikidoc set XWD_ARCHIVE=null");
+                    stmt.close();
+                } catch (SQLException e) {
+                    // Maybe the column doesn't exist.
                 }
-            });
-        }
+                return Boolean.TRUE;
+            }
+        });
     }
 }

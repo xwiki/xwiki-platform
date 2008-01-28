@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676868000</creationDate>
-<date>1199960205000</date>
-<contentUpdateDate>1199960205000</contentUpdateDate>
-<version>15.1</version>
+<date>1201519541000</date>
+<contentUpdateDate>1201519541000</contentUpdateDate>
+<version>16.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -100,7 +100,7 @@
         &lt;th&gt;$msg.get("wikimanager.listwikiname")&lt;/th&gt;
         &lt;th&gt;$msg.get("wikimanager.listwikiadmin")&lt;/th&gt;
         &lt;th&gt;$msg.get("wikimanager.listwikicreation")&lt;/th&gt;
-        &lt;th&gt;$msg.get("wikimanager.listwikistate")&lt;/th&gt;
+##        &lt;th&gt;$msg.get("wikimanager.listwikistate")&lt;/th&gt;
         &lt;th&gt;$msg.get("wikimanager.listwikivisibility")&lt;/th&gt;
         &lt;th class="unsortable noFilter"&gt;$msg.get("more")&lt;/th&gt;
       &lt;/tr&gt;
@@ -110,7 +110,7 @@
         &lt;td&gt;$wiki.wikiName #if($wikiAliasList.size() == 1) ($!wikiAliasList.get(0).wikiPrettyName [$wikiAliasList.get(0).server&gt;$wikiAliasList.get(0).homePageUrl]) #end&lt;/td&gt;
         &lt;td&gt;#if($wikiAliasList.size()==1) #printLink($wikiAliasList.get(0).owner) #end&lt;/td&gt;
         &lt;td&gt;$xwiki.formatDate($wiki.creationDate,"dd/MM/yyyy")&lt;/td&gt;
-        &lt;td&gt;#if($wikiAliasList.size()==1) $wikiAliasList.get(0).state #end&lt;/td&gt;
+##        &lt;td&gt;#if($wikiAliasList.size()==1) $wikiAliasList.get(0).state #end&lt;/td&gt;
         &lt;td&gt;#if($wikiAliasList.size()==1) $wikiAliasList.get(0).visibility #end&lt;/td&gt;
         &lt;td&gt;
           #if($wikiAliasList.size()==1)
@@ -130,7 +130,7 @@
             &lt;td&gt;- $!wikiAliasList.get(0).wikiPrettyName [$wikiAlias.server&gt;$wikiAlias.homePageUrl]&lt;/td&gt;
             &lt;td&gt;#printLink($wikiAlias.owner)&lt;/td&gt;
             &lt;td&gt;&lt;/td&gt;
-            &lt;td&gt;$wikiAlias.state&lt;/td&gt;
+##            &lt;td&gt;$wikiAlias.state&lt;/td&gt;
             &lt;td&gt;$wikiAlias.visibility&lt;/td&gt;
             &lt;td&gt;
               #if($wikiAlias.visibility == "public")

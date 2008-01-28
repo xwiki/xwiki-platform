@@ -611,9 +611,10 @@ $fn
 #set($footnote_group_id = 1)
 #end
 #set($discard = $page_footnotes.add($text))
+#set($processedText = $text.replaceAll('[*~<>_-]', ''))
 #set($footnote_id = $page_footnotes.size())
 <sup class="footnoteRef" id="footnoteref_${footnote_group_id}_${footnote_id}">
- <a href="#footnote_${footnote_group_id}_${footnote_id}" title="$msg.get("core.footnotes.gotofootnote", [${footnote_id}]): $text">\[$footnote_id\]</a>
+ <a href="#footnote_${footnote_group_id}_${footnote_id}" title="$msg.get("core.footnotes.gotofootnote", [${footnote_id}]): {pre}$processedText{/pre}">\[$footnote_id\]</a>
 </sup>
 #end
 ##

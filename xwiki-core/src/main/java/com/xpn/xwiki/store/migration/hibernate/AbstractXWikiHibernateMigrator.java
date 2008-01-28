@@ -23,6 +23,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.migration.XWikiMigrationManagerInterface;
 import com.xpn.xwiki.store.migration.XWikiMigratorInterface;
+import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Template for migrators of hibernate store
@@ -37,7 +38,17 @@ public abstract class AbstractXWikiHibernateMigrator implements XWikiMigratorInt
     {
         migrate((XWikiHibernateMigrationManager)manager, context);
     }
-    /** @see AbstractXWikiHibernateMigrator#migrate(AXWikiMigrationManager, XWikiContext) */
+
+    /**
+     * {@inheritDoc}
+     * @see com.xpn.xwiki.store.migration.XWikiMigratorInterface#shouldExecute(XWikiDBVersion)
+     */
+    public boolean shouldExecute(XWikiDBVersion startupVersion)
+    {
+        return true;
+    }
+
+    /** @see XWikiMigratorInterface#migrate(XWikiMigrationManagerInterface,XWikiContext)  */
     public abstract void migrate(XWikiHibernateMigrationManager manager, XWikiContext context)
         throws XWikiException;
 }

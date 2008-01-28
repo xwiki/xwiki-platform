@@ -69,20 +69,13 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
     {
         return new XWikiDBVersion(4359);
     }
-    /** {@inheritDoc} */
-    public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context) throws XWikiException
-    {
-        migrate(manager, context, LOG);
-    }
 
-    /**
-     * The reason for the logger is to let the R6079XWIKI1878Migrator reuse the same code.
-     */
-    protected void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context, final Log logger)
+    /** {@inheritDoc} */
+    public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context)
         throws XWikiException
     {
         // migrate data
-        if (manager.getStore(context).executeWrite(context, true, new HibernateCallback() {
+        manager.getStore(context).executeWrite(context, true, new HibernateCallback() {
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {
@@ -101,8 +94,8 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     PreparedStatement deleteStatement = session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=null where XWD_ID=?");
 
                     while (rs.next()) {
-                        if (logger.isInfoEnabled()) {
-                            logger.info("Updating document [" + rs.getString(3) + "]...");
+                        if (LOG.isInfoEnabled()) {
+                            LOG.info("Updating document [" + rs.getString(3) + "]...");
                         }
                         long docId = Long.parseLong(rs.getString(1));
                         String sArchive = rs.getString(2);
@@ -129,6 +122,6 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                 }
                 return Boolean.TRUE;
             }
-        })==null) return;
+        });
     }
 }

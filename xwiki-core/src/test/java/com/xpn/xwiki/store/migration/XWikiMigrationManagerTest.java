@@ -52,7 +52,7 @@ public class XWikiMigrationManagerTest extends TestCase
     }
     /** mocked migration manager */
     private static class TestMigrationManager extends AbstractXWikiMigrationManager {
-        public TestMigrationManager(XWikiContext context)
+        public TestMigrationManager(XWikiContext context) throws Exception
         {
             super(context);
         }
@@ -71,6 +71,11 @@ public class XWikiMigrationManagerTest extends TestCase
                 public XWikiDBVersion getVersion()
                 {
                     return new XWikiDBVersion(ver);
+                }
+
+                public boolean shouldExecute(XWikiDBVersion startupVersion)
+                {
+                    return true;
                 }
 
                 public void migrate(XWikiMigrationManagerInterface manager, XWikiContext context)
@@ -112,13 +117,15 @@ public class XWikiMigrationManagerTest extends TestCase
         TestMigrationManager mm = new TestMigrationManager(context);
         Collection neededMigration = mm.getNeededMigrations(context);
         assertEquals(2, neededMigration.size());
-        XWikiMigratorInterface[] actual = new XWikiMigratorInterface[2];
+        AbstractXWikiMigrationManager.XWikiMigration[] actual =
+            new AbstractXWikiMigrationManager.XWikiMigration[2];
         neededMigration.toArray(actual);
-        assertEquals(234, actual[0].getVersion().getVersion());
-        assertEquals(456, actual[1].getVersion().getVersion());
+        assertEquals(234, actual[0].migrator.getVersion().getVersion());
+        assertEquals(456, actual[1].migrator.getVersion().getVersion());
     }
     
-    public static class TestForceMigratior implements XWikiMigratorInterface {
+    public static class TestForceMigratior implements XWikiMigratorInterface
+    {
         public String getName()
         {
             return "Test";
@@ -133,10 +140,19 @@ public class XWikiMigrationManagerTest extends TestCase
         {
             return new XWikiDBVersion(567);
         }
+
+
+        public boolean shouldExecute(XWikiDBVersion startupVersion)
+        {
+            return true;
+        }
+
         public void migrate(XWikiMigrationManagerInterface manager, XWikiContext context)
             throws XWikiException
-        { }
+        {
+        }
     }
+
     /** test "xwiki.store.migration.force" parameter */
     public void testMigrationForce() throws Exception {
         XWikiConfig config = context.getWiki().getConfig();
@@ -145,6 +161,7 @@ public class XWikiMigrationManagerTest extends TestCase
         TestMigrationManager mm = new TestMigrationManager(context);
         Collection neededMigration = mm.getNeededMigrations(context);
         assertEquals(1, neededMigration.size());
-        assertEquals(567, ((XWikiMigratorInterface)neededMigration.toArray()[0]).getVersion().getVersion());
+        assertEquals(567, ((AbstractXWikiMigrationManager.XWikiMigration)neededMigration.toArray()[0])
+            .migrator.getVersion().getVersion());
     }
 }

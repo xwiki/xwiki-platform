@@ -41,7 +41,7 @@
   <properties>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tools.version>1.7</platform.tools.version>
-    <platform.core.version>1.2-SNAPSHOT</platform.core.version>
+    <platform.core.version>1.2.1</platform.core.version>
   </properties>
   <profiles>
     <profile>

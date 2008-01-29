@@ -24,17 +24,18 @@ import org.apache.commons.logging.LogFactory;
 import org.hibernate.Session;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.Query;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
+import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
+import com.xpn.xwiki.doc.rcs.XWikiPatch;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.PreparedStatement;
+import java.util.Iterator;
 
 /**
  * Migration for XWIKI1878: Fix xwikircs table isdiff data not matching RCS state of some revisions (when the state
@@ -93,34 +94,34 @@ public class R6079XWIKI1878Migrator extends AbstractXWikiHibernateMigrator
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {
-                    Statement stmt = session.connection().createStatement();
-                    ResultSet rs;
-                    try {
-                        rs = stmt.executeQuery("select xwikircs.XWR_DOCID, xwikircs.XWR_VERSION1, xwikircs.XWR_VERSION2, xwikidoc.XWD_FULLNAME from xwikircs, xwikidoc where xwikidoc.XWD_ID = xwikircs.XWR_DOCID and XWR_ISDIFF = b'1' and XWR_PATCH like '<?xml%'");
-                    } catch (SQLException e) {
-                        // Means the xwikircs table doesn't exist which isn't normal.
-                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                            XWikiException.ERROR_XWIKI_STORE_MIGRATION, "Failed to get RCS data", e);
-                    }
+                    Query query = session.createQuery("select rcs.id, rcs.patch, doc.fullName "
+                        + "from XWikiDocument as doc, XWikiRCSNodeContent as rcs where "
+                        + "doc.id = rcs.id.docId and rcs.patch.diff = true and rcs.patch.content like '<?xml%'");
+                    Iterator it = query.list().iterator();
+
                     Transaction originalTransaction = ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).getTransaction(context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(null, context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(null, context);
-                    PreparedStatement updateStatement = session.connection().prepareStatement("update xwikircs set XWR_ISDIFF = b'0' where XWR_DOCID=? and XWR_VERSION1=? and XWR_VERSION2=?");
 
-                    while (rs.next()) {
+                    while (it.hasNext()) {
+                        Object[] result = (Object[]) it.next();
                         if (LOG.isInfoEnabled()) {
-                            LOG.info("Fixing document [" + rs.getString(4) + "]...");
+                            LOG.info("Fixing document [" + result[2] + "]...");
                         }
-                        updateStatement.setLong(1, rs.getLong(1));
-                        updateStatement.setInt(2, rs.getInt(2));
-                        updateStatement.setInt(3, rs.getInt(3));
-                        updateStatement.executeUpdate();
+
+                        // Reconstruct a XWikiRCSNodeContent object with isDiff set to false and update it.
+                        XWikiRCSNodeId nodeId = (XWikiRCSNodeId) result[0];
+                        XWikiRCSNodeContent fixedNodeContent = new XWikiRCSNodeContent(nodeId);
+                        XWikiPatch patch = (XWikiPatch) result[1];
+                        patch.setDiff(false);
+                        fixedNodeContent.setPatch(patch);
+
+                        session.update(fixedNodeContent);
                     }
-                    updateStatement.close();
-                    stmt.close();
+
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(session, context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(originalTransaction, context);
-                } catch (SQLException e) {
+                } catch (Exception e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
                 }

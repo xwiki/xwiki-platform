@@ -224,7 +224,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                     continue;
                 }
                 if (migrator.getVersion().compareTo(curversion) >= 0) {
-                    XWikiMigration migration = new XWikiMigration(migrator, true);
+                    XWikiMigration migration = new XWikiMigration(migrator, false);
                     neededMigrations.put(migrator.getVersion(), migration);
                 }
             }
@@ -237,8 +237,10 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                 LOG.info("List of migrations that will be executed:");
                 for (Iterator it = neededMigrationsAsCollection.iterator(); it.hasNext();) {
                     XWikiMigration migration = (XWikiMigration) it.next();
-                    LOG.info("  " + migration.migrator.getName() + " - " + migration.migrator.getDescription()
-                        + (migration.isForced ? " (forced)" : ""));
+                    if (migration.isForced || migration.migrator.shouldExecute(this.startupVersion)) {
+                        LOG.info("  " + migration.migrator.getName() + " - " + migration.migrator.getDescription()
+                            + (migration.isForced ? " (forced)" : ""));
+                    }
                 }
             } else {
                 LOG.info("No storage migration required since current version is ["
@@ -273,13 +275,18 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
         XWikiDBVersion curversion = getDBVersion(context);
         for (Iterator it = migrations.iterator(); it.hasNext();) {
             XWikiMigration migration = (XWikiMigration) it.next();
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Running migration [" + migration.migrator.getName() + "] with version ["
-                    + migration.migrator.getVersion() + "]");
-            }
 
             if (migration.isForced || migration.migrator.shouldExecute(this.startupVersion)) {
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Running migration [" + migration.migrator.getName() + "] with version ["
+                        + migration.migrator.getVersion() + "]");
+                }
                 migration.migrator.migrate(this, context);
+            } else {
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Skipping uneeded migration [" + migration.migrator.getName() + "] with version ["
+                        + migration.migrator.getVersion() + "]");
+                }
             }
 
             if (migration.migrator.getVersion().compareTo(curversion) > 0) {
@@ -288,6 +295,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                     LOG.info("New storage version is now [" + getDBVersion(context) + "]");
                 }
             }
+
         }
     }
 

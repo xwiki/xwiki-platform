@@ -284,7 +284,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                 migration.migrator.migrate(this, context);
             } else {
                 if (LOG.isInfoEnabled()) {
-                    LOG.info("Skipping uneeded migration [" + migration.migrator.getName() + "] with version ["
+                    LOG.info("Skipping unneeded migration [" + migration.migrator.getName() + "] with version ["
                         + migration.migrator.getVersion() + "]");
                 }
             }

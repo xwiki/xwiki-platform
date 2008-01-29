@@ -28,7 +28,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
-import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
+import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 /**
  * Unit tests for {@link XWikiDocument}.
@@ -54,9 +54,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
         
-        this.mockXWikiVersioningStore =
-            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class,
-            XWikiContext.class}, new Object[] {this.mockXWiki.proxy(), this.context});
+        this.mockXWikiVersioningStore = mock(XWikiVersioningStoreInterface.class);
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
             returnValue(null));
 

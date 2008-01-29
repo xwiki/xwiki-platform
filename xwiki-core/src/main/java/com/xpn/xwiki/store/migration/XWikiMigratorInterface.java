@@ -52,11 +52,13 @@ public interface XWikiMigratorInterface
      * @param context used everywhere
      * @throws XWikiException if any error
      */
-    void migrate(XWikiMigrationManagerInterface manager, XWikiContext context) throws XWikiException;
+    void migrate(XWikiMigrationManagerInterface manager, XWikiContext context)
+        throws XWikiException;
 
     /**
-     * @param startupVersion the database version when the migration process starts (before any migrator is applied).
-     *        This is useful for migrator which need to run only when the database is in a certain version.
+     * @param startupVersion the database version when the migration process starts (before any
+     *        migrator is applied). This is useful for migrator which need to run only when the
+     *        database is in a certain version.
      * @return true if the migration should be executed or false otherwise
      */
     boolean shouldExecute(XWikiDBVersion startupVersion);

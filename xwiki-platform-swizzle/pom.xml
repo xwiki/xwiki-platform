@@ -28,7 +28,7 @@
     <version>3</version>
   </parent>
   <artifactId>xwiki-plugin-swizzle</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Swizzle</name>
   <packaging>jar</packaging>
   <description>Plugin for using Codehaus Swizzle (http://swizzle.codehaus.org/)</description>
@@ -45,10 +45,4 @@
       <classifier>xwiki</classifier>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-swizzle-1.0</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-swizzle-1.0</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-swizzle-1.0</url>
-  </scm>
 </project>

@@ -20,14 +20,16 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
+import java.util.Iterator;
 import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.PropertyInterface;
 
 /**
  * Default implementation of XObjectDocument. This class manage an XWiki document containing
@@ -159,7 +161,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
      * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument#getObjectApi()
      */
-    public Object getObjectApi()
+    public com.xpn.xwiki.api.Object getObjectApi()
     {
         BaseObject obj = getBaseObject(false);
 
@@ -186,7 +188,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     }
 
     /**
-     * Merge two documents BaseObject.
+     * Overwrite current BaseObject fields with provided one. Only provided non null fields are
+     * copied.
      * 
      * @param sdoc the document to merge.
      */
@@ -196,7 +199,17 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
             return;
         }
 
-        getBaseObject(true).merge(sdoc.getBaseObject(false));
+        BaseObject obj1 = getBaseObject(true);
+        BaseObject obj2 = sdoc.getBaseObject(false);
+
+        for (Iterator it = obj1.getPropertyList().iterator(); it.hasNext();) {
+            String fieldName = (String) it.next();
+            Object fieldValue2 = obj2.safeget(fieldName);
+
+            if (fieldValue2 != null) {
+                obj1.safeput(fieldName, (PropertyInterface) ((BaseElement) fieldValue2).clone());
+            }
+        }
     }
 
     /**

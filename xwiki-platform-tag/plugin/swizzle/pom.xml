@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>3</version>
+    <version>4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-swizzle</artifactId>
   <version>1.1-SNAPSHOT</version>
@@ -36,7 +36,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.2.1</version>
+      <version>1.2-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.swizzle</groupId>

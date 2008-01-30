@@ -58,6 +58,7 @@
         <module>wiki-manager</module>
         <module>mailsender</module>
         <module>watchlist</module>
+        <module>swizzle</module>
       </modules>
     </profile>
     <profile>

@@ -2495,11 +2495,11 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to retrieve an object instanciated from groovy code in a String Groovy
-     * scripts compilation is cached
+     * Privileged API to retrieve an object instantiated from groovy code in a String.
+     * Note that Groovy scripts compilation is cached.
      * 
-     * @param script script containing a Groovy class definition (public class MyClass { ... })
-     * @return An object instanciating this class
+     * @param script the Groovy class definition string (public class MyClass { ... })
+     * @return An object instantiating this class
      * @throws XWikiException
      */
     public Object parseGroovyFromString(String script) throws XWikiException
@@ -2510,16 +2510,17 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to retrieve an object instanciated from groovy code in a String Groovy
-     * scripts compilation is cached
+     * Privileged API to retrieve an object instantiated from groovy code in a String,
+     * using a classloader including all JAR files located in the passed page as attachments.
+     * Note that Groovy scripts compilation is cached
      * 
-     * @param fullname // script containing a Groovy class definition (public class MyClass { ... })
-     * @return An object instanciating this class
+     * @param script the Groovy class definition string (public class MyClass { ... })
+     * @return An object instantiating this class
      * @throws XWikiException
      */
-    public Object parseGroovyFromPage(String fullname, String jarWikiPage) throws XWikiException
+    public Object parseGroovyFromPage(String script, String jarWikiPage) throws XWikiException
     {
-        XWikiDocument doc = xwiki.getDocument(fullname, getXWikiContext());
+        XWikiDocument doc = xwiki.getDocument(script, getXWikiContext());
         if (xwiki.getRightService().hasProgrammingRights(doc, getXWikiContext()))
             return xwiki.parseGroovyFromString(doc.getContent(), jarWikiPage, getXWikiContext());
         return "groovy_missingrights";

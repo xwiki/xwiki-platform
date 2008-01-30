@@ -5313,6 +5313,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         return pref.toLowerCase();
     }
 
+    /**
+     * Privileged API to retrieve an object instantiated from groovy code in a String.
+     * Note that Groovy scripts compilation is cached.
+     *
+     * @param script the Groovy class definition string (public class MyClass { ... })
+     * @return An object instantiating this class
+     * @throws XWikiException
+     */
     public Object parseGroovyFromString(String script, XWikiContext context)
         throws XWikiException
     {
@@ -5323,6 +5331,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
                 .parseGroovyFromString(script, context);
     }
 
+    /**
+     * Privileged API to retrieve an object instantiated from groovy code in a String,
+     * using a classloader including all JAR files located in the passed page as attachments.
+     * Note that Groovy scripts compilation is cached
+     *
+     * @param script the Groovy class definition string (public class MyClass { ... })
+     * @return An object instantiating this class
+     * @throws XWikiException
+     */
     public Object parseGroovyFromString(String script, String jarWikiPage, XWikiContext context)
         throws XWikiException
     {

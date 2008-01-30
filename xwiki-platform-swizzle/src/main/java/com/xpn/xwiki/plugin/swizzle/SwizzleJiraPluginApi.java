@@ -31,6 +31,18 @@ import java.net.MalformedURLException;
 /**
  * Allows getting Swizzle Objects (http://swizzle.codehaus.org/) so that it's easy to use from a
  * Velocity page in a XWiki page.
+ * <p>Example:</p>
+ * <code><pre>
+ * #set ($jira = $xwiki.swizzle.getJira("http://jira.xwiki.org/jira/rpc/xmlrpc"))
+ * $jira.login("username", "password")
+ *
+ * {table}
+ * ID | Key | Project Name | Project Lead | Project URL
+ * #foreach ($project in $jira.getProjects())
+ *   $project.getId() | $project.getKey() | $project.getName() | $project.getLead() | $project.getProjectUrl()
+ * #end
+ * {table}
+ * </pre></code>
  *
  * @version $Id: $
  */

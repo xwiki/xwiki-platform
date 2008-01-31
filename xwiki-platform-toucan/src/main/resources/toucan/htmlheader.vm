@@ -1,0 +1,56 @@
+### In non-Servlet mode (in Portlet mode for example) we don't display the <HTML>, <HEAD> and <BODY>
+### elements.
+#if($context.getMode()==0)
+<?xml version="1.0" encoding="$xwiki.encoding" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="$context.language" xml:lang="$context.language">
+  <head>
+
+    <title>
+    #if(!$title)
+      #set( $title = $!xwiki.getWebPreference("title"))
+      #if ( $title != "")
+        $xwiki.parseContent($title)
+      #else
+        XWiki - $!doc.web - $!doc.displayTitle
+      #end
+    #else
+      $title
+    #end
+    </title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=$xwiki.encoding" />
+    <meta http-equiv="imagetoolbar" content="no"/>
+    $xwiki.parseContent($!xwiki.getWebPreference("meta"))
+
+    #template("stylesheets.vm")
+    #template("analytics.vm")
+    #template("javascript.vm")
+<!--[if lt IE 7]>
+    <link href="$xwiki.getSkinFile("ie.css")" rel="stylesheet" type="text/css"  />
+<![endif]-->
+  </head>
+
+  #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
+    <body onunload="return false; cancelEdit()"
+          onload="prepareCancelEdit(); createColorPicker();" id="body" class="$context.database ${context.action}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
+  #else
+    <body id="body" class="$context.database ${context.action}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
+  #end
+
+#else
+
+  #template("stylesheets2.vm")
+  #template("javascript.vm")
+
+  <!-- This is a hack for Exo which needs this for the XWiki portlet to fit in the Portlet window
+       properly. In the future Exo should modifies its behavior so that this is not necessary and
+       this will need to be removed -->
+  <div class="UIApplication" style="overflow: auto">
+
+#end
+
+<!-- These elements will be closed in the footer vm file -->
+<div id="xwikimaincontainer" class="$context.database">
+<div id="xwikimaincontainerinner" class="$context.database">

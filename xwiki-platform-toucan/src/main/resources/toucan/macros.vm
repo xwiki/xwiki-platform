@@ -1,0 +1,280 @@
+###
+###    Panel header
+###
+### Generate the starting html code for a panel
+###
+### @param title The panel caption title
+###
+#macro(panelheader $title)
+#set($cookieName = "${context.user}_${panel}")
+#set($expanded = "expanded")
+#set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
+<div class="panel $expanded">
+<h5 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h5>
+<div class="xwikipanelcontents">
+#end
+#macro(panelhiddenheader $title)
+<div class="panel expanded">
+<h5 class="xwikipaneltitle hidden" onclick="togglePanelVisibility(this.parentNode);">$title</h5>
+<div class="xwikipanelcontents">
+#end
+#macro(largepanelheader $title)
+#set($cookieName = "${context.user}_${panel}")
+#set($expanded = "expanded")
+#set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
+<div class="large panel $expanded">
+<h5 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h5>
+<div class="xwikipanelcontents">
+#end
+
+###
+###    Panel footer
+###
+### Generate the ending html code for a panel
+###
+#macro(panelfooter)
+</div>
+</div>
+#end
+
+###
+###    Display Panel
+###
+### Extract and display the panel code from the panel object
+###
+#macro(displaypanel $name)
+  #set ($pobj = "")
+  ## Since Velocity does not do any assignment if the RHS is null we need to reset the paneldoc
+  ## as otherwise the previously set panel will be displayed. getDocument() returns null if the
+  ## user doesn't have the right to view a document.
+  #set ($paneldoc = "")
+  #set ($paneldoc = $xwiki.getDocument($name))
+  #if ($paneldoc != "")
+    #set ($pobj = $paneldoc.getObject("Panels.PanelClass"))
+    #if (!$pobj)
+      ## discarded
+    #else
+      $!doc.display("content", "view", $pobj)
+    #end
+  #end
+#end
+
+#macro(displayPropName $prop)
+#if($msg.get("$class.getName()_$prop.name") == "$class.getName()_$prop.name")
+$prop.prettyName#else
+$msg.get($prop.name)#end
+#end
+
+###
+###    Display Panel content
+###
+###
+#macro(displaypanelcontent $doc $obj)
+$doc.display("content", $obj)
+#end
+
+###
+###    Toplevel Menu entry with subitems
+###
+### Generate a menu entry and start the subitem section
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(xwikitopmenuentrystart $actionurl $linktext $id)
+<div class="topmenuentry" onmouseover="showsubmenu(this);" onmouseout="hidesubmenu(this);" id="$id">
+<a class="tme" #if ($actionurl != "") href="$actionurl" #else style="cursor:default;" #end><strong>$linktext</strong></a><span class="hidden menucolon">: </span><span class="submenu hidden">
+#end
+
+###
+###    Toplevel Menu entry without subitems
+###
+### Generate a menu entry withut subitems
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(xwikitopmenuentry $actionurl $linktext $id)
+<div class="topmenuentry" id="$id"><a href="$actionurl"><strong>$linktext</strong></a></div>
+#end
+
+###
+###    Menu subitem entry
+###
+### Generate a submenu entry
+###
+### @param actionurl The URL this entry points to
+### @param linktext The menu item text
+###
+#macro(submenuitem $actionurl $linktext)
+<span class="submenuitem"><a href="$actionurl">$linktext</a></span>
+#end
+
+###
+###    Menu disabled subitem entry
+###
+### Generate a disabled submenu entry
+###
+### @param text The menu item text
+###
+#macro(submenuitemdisabled $text)
+<span class="submenuitem disable">$text</span>
+#end
+
+
+###
+###    Menu submenu separator
+###
+#macro(submenuseparator)
+<span class="submenuseparator">&nbsp;</span>
+#end
+
+###
+###    Toplevel Menu entry end
+###
+### End the subitem section
+###
+#macro(xwikitopmenuentryend)
+</span></div>
+#end
+
+###
+###    Message box
+###
+#macro(xwikimessageboxstart $title $message)
+    <div class="centered">
+    <div class="xwikimessage">
+      <h3>$title</h3>
+      <p class="xwikimessage">$message</p>
+#end
+#macro(xwikimessageboxend)
+    </div>
+    </div>
+#end
+
+#macro(xwikimessagebox $title $message $urlyes $urlno $msgyes $msgno)
+#xwikimessageboxstart($title $message)
+      <div class="buttons"><a href="$urlyes"><input type="button" class="button" value="$msgyes" onclick="location='$urlyes'; return false;"/></a><a href="$urlno"><input type="button" class="button" value="$msgno" onclick="location='$urlno'; return false;"/></a></div>
+#xwikimessageboxend()
+#end
+
+#macro(xwikimessageboxfield $fielddoc $fieldname $fieldtext $html)
+<div class="xmblabel">$fieldtext</div>
+<div class="xmbfield">
+#if($fieldname!="")
+$fielddoc.display($fieldname, "edit")
+#end
+#if($html!="")
+$html
+#end
+</div>
+#end
+
+#macro(xwikimessageboxsubmit $submittext)
+<div class="xmbbutton">
+<input type="submit" value="$submittext" />
+</div>
+#end
+
+
+###
+###    message
+###
+
+#macro(warning $text)
+<div class="warningmessage"><span class="messagetype">$msg.get("warning"): </span>$text</div>
+#end
+
+#macro(error $text)
+<div class="errormessage"><span class="messagetype">$msg.get("error"): </span>$text</div>
+#end
+
+#macro(info $text)
+<div class="infomessage">$text</div>
+#end
+
+#macro(message $text)
+<div class="plainmessage">$text</div>
+#end
+
+#macro (floatingbox $text)
+<div class="floatinginfobox"><div class='floatingboxinner'>$text</div></div>
+#end
+
+#macro (startfloatingbox)
+<div class="floatinginfobox">
+	<div class='floatingboxinner'>
+#end
+
+#macro (endfloatingbox)
+</div></div>
+#end
+
+###
+###    CSS properties
+###
+#macro(csscolorproperty $csspropname $fieldname)
+#set($objcolor = $colors.get($fieldname))
+#if($objcolor && $objcolor != "")
+  $csspropname: $objcolor;
+#end
+#end
+##
+##
+##
+#macro(csscolorpropertyimportant $csspropname $fieldname)
+#set($objcolor = $colors.get($fieldname))
+#if($objcolor && $objcolor != "")
+  $csspropname: $objcolor !important;
+#end
+#end
+
+#macro(displayPropName $prop)
+#if($msg.get("$class.getName()_$prop.name") == "$class.getName()_$prop.name")
+$prop.prettyName#else
+$msg.get($prop.name)#end
+#end
+
+###
+###    Display Panel content
+###
+###
+#macro(displaypanelcontent $doc $obj)
+$doc.display("content", $obj)
+#end
+
+###
+###    Display in page panels layout
+###
+###
+#macro(displayPanelLayout $nbcolumns $panelNameList)
+  <div class="panellayoutcontainer-${nbcolumns}col">
+    #set($lastColumnId = ($nbcolumns - 1))
+    #foreach($colId in [0..$lastColumnId])
+      <div class="panellayoutcol">
+        #foreach($panelName in $panelNameList)
+          #if($panelName && ($panelName != "") && (((($velocityCount - 1) + $nbcolumns) % $nbcolumns) == $colId))
+            #displaypanel($panelName)
+          #end
+        #end
+      </div>
+    #end
+  </div>
+#end
+###
+###
+###
+###    XWIKI.ORG MACROS
+###
+###
+###
+#macro(roundedboxstart $title $color $width $float )
+    <div class="roundedbox" style="background-color:rgb($color); width:$width; float:$float;">
+    <div class="roundedheader">
+      <h3>$title</h3>
+	</div><div class="roundedbody">
+#end
+#macro(roundedboxend)
+    </div>
+    </div>
+#end

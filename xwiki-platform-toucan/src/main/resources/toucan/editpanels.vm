@@ -1,0 +1,28 @@
+#if($editor == "wiki" || $editor == "wysiwyg")
+#set($editorPanels = "Panels.EditModes,Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
+#elseif($editor == "object")
+#set($editorPanels = "Panels.EditModes,Panels.ObjectEditorWelcome,Panels.AddObject")
+#elseif($editor == "class")
+#set($editorPanels = "Panels.EditModes,Panels.ClassEditorWelcome,Panels.AddClassProperty")
+#elseif($editor == "rights")
+#set($editorPanels = "Panels.EditModes,Panels.RightsEditorWelcome,Panels.RightsHelp,Panels.RightsTips")
+#elseif($editor == "history")
+#set($editorPanels = "Panels.EditModes,Panels.RightsEditorWelcome,Panels.RightsHelp,Panels.RightsTips")
+#end
+#set($editorPanels = $editorPanels.split(","))
+<div id="editPanels" class="panels editor">
+#foreach($panel in $editorPanels)
+#displaypanel($panel)
+#end
+</div>
+#if($editor == "wysiwyg")
+<script type="text/javascript">
+  if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
+    var panels = document.getElementById("editPanels");
+    if(document.getElementById("xwikisyntaxhelppanel"))
+        panels.removeChild(document.getElementById("xwikisyntaxhelppanel"));
+    if (document.getElementById("simpleedittoolbar"))
+        document.getElementById("simpleedittoolbar").style.display = "none";
+  }
+</script>
+#end

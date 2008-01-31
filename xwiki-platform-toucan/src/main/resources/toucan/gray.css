@@ -1,0 +1,10 @@
+body#body{background-image: url( images/color/gray/H4x4-GRAY.png ); }
+body#body #xwikimaincontainer{  background-image :url( images/color/gray/bg-GRAY.png ) ;  }
+#xwikimaincontainerinner {  background-image: url( images/color/gray/bg-GRAY.png );}
+body#body.hideright  #xwikimaincontainerinner {  background-image: url( images/color/gray/bg-GRAY3.png );}
+body#body.adminbody#body  #xwikimaincontainerinner {  background-image: url( images/color/gray/bg-GRAY3.png );}
+body#body.hidelefthideright  #xwikimaincontainerinner {  background-image: url( images/color/gray/bg-GRAY3.png );}
+#globallinks{  background-image: url( images/color/gray/bgx-GRAY.png );}
+#rightPanels{  background-image: url( images/color/gray/bgx-GRAY.png );}
+#editPanels.panels{  background-image: url( images/color/gray/bgx-GRAY.png );}
+

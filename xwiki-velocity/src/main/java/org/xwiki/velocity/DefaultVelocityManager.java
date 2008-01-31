@@ -44,7 +44,11 @@ public class DefaultVelocityManager extends AbstractLogEnabled
     private RuntimeServices runtimeServices;
 
     private Container container;
-    
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.component.phase.Initializable#initialize()
+     */
     public void initialize() throws InitializationException
     {
         this.engine = new VelocityEngine();

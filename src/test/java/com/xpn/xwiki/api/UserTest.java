@@ -17,8 +17,11 @@ public class UserTest extends MockObjectTestCase
      */
     public void testIsUserInGroupDoesNotThrowNPE()
     {
+        User u = new User(null, null);
+        assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
+
         XWikiUser xu = new XWikiUser(null);
-        User u = new User(xu, null);
+        u = new User(xu, null);
         assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
 
         XWikiContext c = new XWikiContext();

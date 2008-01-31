@@ -84,4 +84,9 @@ public class XWikiUser
     {
         this.main = main;
     }
+    
+    public String toString()
+    {
+        return getUser();
+    }
 }

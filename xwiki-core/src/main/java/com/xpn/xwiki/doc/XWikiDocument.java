@@ -1991,7 +1991,7 @@ public class XWikiDocument
             return false;
         }
         
-        if (isMinorEdit() == doc.isMinorEdit()) {
+        if (isMinorEdit() != doc.isMinorEdit()) {
             return false;
         }
 

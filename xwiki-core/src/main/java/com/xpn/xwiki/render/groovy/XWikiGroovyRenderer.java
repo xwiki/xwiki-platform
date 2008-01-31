@@ -199,7 +199,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             return content;
         }
 
-        if (!context.getWiki().getRightService().hasProgrammingRights(contentdoc, context)) {
+        if (!context.getWiki().getRightService().hasProgrammingRights(contextdoc, context)) {
             return content;
         }
 

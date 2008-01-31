@@ -83,7 +83,7 @@ public class User extends Api
             return user.isUserInGroup(groupName, getXWikiContext());
         } catch (Exception ex) {
             LOG.warn(new MessageFormat("Unhandled exception checking if user {0}"
-                + " belongs to group {1}").format(new String[] {user.getUser(), groupName}), ex);
+                + " belongs to group {1}").format(new java.lang.Object[] {user, groupName}), ex);
         }
         return false;
     }

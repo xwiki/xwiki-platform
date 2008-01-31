@@ -22,11 +22,14 @@ package org.xwiki.plexus;
 
 import org.codehaus.plexus.servlet.PlexusServletContextListener;
 import org.codehaus.plexus.servlet.PlexusServletUtils;
+import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
+import org.codehaus.plexus.PlexusContainer;
 import org.xwiki.action.ActionException;
 import org.xwiki.action.ActionManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainer;
 import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.plexus.manager.PlexusComponentManager;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
@@ -40,22 +43,37 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         super.contextInitialized(servletContextEvent);
 
         // Initializes XWiki's Container with the Servlet Context
-        ServletContainer containerManager = null;
+        ServletContainer container = null;
         try {
-            containerManager = (ServletContainer) PlexusServletUtils.lookup(
+            container = (ServletContainer) PlexusServletUtils.lookup(
                 servletContextEvent.getServletContext(), Container.ROLE, "servlet");
-            containerManager.initialize(servletContextEvent.getServletContext());
+            container.initialize(servletContextEvent.getServletContext());
         } catch (ServletException se) {
             throw new RuntimeException("Failed to lookup component role [" + Container.ROLE
                 + "] for hint [servlet]", se);
         } catch (ServletContainerException sce) {
             ActionManager manager = lookupActionManager(servletContextEvent.getServletContext());
             try {
-                manager.handleRequest(containerManager, "error", sce);
+                manager.handleRequest(container, "error", sce);
             } catch (ActionException ae) {
                 throw new RuntimeException("Failed to call the error Action", ae);
             }
         }
+
+        // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
+        // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
+        // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
+        // Class that need to lookup then just need to get it from the XWikiContext instance.
+        // This is of course not necessary for XWiki components since they just need to implement
+        // the Composable interface to get access to the Component Manager or better they simply
+        // need to define the Components they require as field members and configure the Plexus
+        // deployment descriptors (components.xml) so that they are automatically injected.
+        PlexusContainer plexusContainer =
+            PlexusServletUtils.getPlexusContainer(servletContextEvent.getServletContext());
+        org.xwiki.component.manager.ComponentManager xwikiManager = new PlexusComponentManager(
+            new PlexusContainerLocator(plexusContainer));
+        servletContextEvent.getServletContext().setAttribute(
+            org.xwiki.component.manager.ComponentManager.class.getName(), xwikiManager);
     }
 
     private ActionManager lookupActionManager(ServletContext servletContext)

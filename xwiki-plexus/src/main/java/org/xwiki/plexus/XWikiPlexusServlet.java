@@ -41,14 +41,14 @@ public class XWikiPlexusServlet extends PlexusServlet
 
         // Initializes XWiki's Container with the Servlet request/response/session so that
         // components needing them can depend on the Container Manager component to get them.
-        ServletContainer containerManager =
+        ServletContainer container =
             (ServletContainer) lookup(Container.ROLE, "servlet");
         try {
-            containerManager.initialize(httpServletRequest, httpServletResponse);
+            container.initialize(httpServletRequest, httpServletResponse);
         } catch (ServletContainerException e) {
             try {
                 // Call the error Action to handle the exception
-                manager.handleRequest(containerManager, "error", e);
+                manager.handleRequest(container, "error", e);
                 return;
             } catch (ActionException ae) {
                 throw new ServletException("Failed to call the error Action", ae);
@@ -57,12 +57,12 @@ public class XWikiPlexusServlet extends PlexusServlet
 
         // Call the Action Manager to handle the request
         try {
-            manager.handleRequest(containerManager);
+            manager.handleRequest(container);
         } catch (ActionException e) {
             // We haven't been able to handle the exception in ActionManager so generate a
             // container exception.
             throw new ServletException("Failed to handle request ["
-                + containerManager.getRequest() + "]", e);
+                + container.getRequest() + "]", e);
         }
     }
 }

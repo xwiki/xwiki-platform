@@ -31,6 +31,8 @@ import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentLookupException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -250,6 +252,19 @@ public class Utils
             mode = XWikiContext.MODE_PORTLET;
         }
         context.setMode(mode);
+
+        // This is a temporary bridge so that non XWiki component classes can lookup XWiki
+        // components. A ComponentManager instance has been set up in the Servlet Context and
+        // we now populate the XWiki Context with it so that code can then use it to look up
+        // components.
+        // This is of course not necessary for XWiki components since they just need to implement
+        // the Composable interface to get access to the Component Manager or better they simply
+        // need to define the Components they require as field members and configure the Plexus
+        // deployment descriptors (components.xml) so that they are automatically injected.
+        ComponentManager componentManager =
+            (ComponentManager) engine_context.getAttribute(ComponentManager.class.getName());
+        context.put(ComponentManager.class.getName(), componentManager);
+
         return context;
     }
 
@@ -470,4 +485,28 @@ public class Utils
         }
         return fileupload;
     }
+
+    /**
+     * Lookup a XWiki component by role and hint.
+     *
+     * @param role the component's identity (usually the component's interface name as a String)
+     * @param hint a value to differentiate different component implementations for the same role
+     * @param context the XWiki Context where the Component Manager is stored
+     * @return the component's Object
+     */
+    public static Object getComponent(String role, String hint, XWikiContext context)
+    {
+        ComponentManager componentManager =
+            (ComponentManager) context.get(ComponentManager.class.getName());
+        Object component = null;
+        if (componentManager != null) {
+            try {
+                component = componentManager.lookup(role, hint);
+            } catch (ComponentLookupException e) {
+                throw new RuntimeException("Failed to load component [" + role + "]", e);
+            }
+        }
+        return component;
+    }
+
 }

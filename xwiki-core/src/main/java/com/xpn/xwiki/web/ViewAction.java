@@ -63,7 +63,6 @@ public class ViewAction extends XWikiAction
                 e.printStackTrace();
             }
             shouldRender = false;
-            return false;
         }
 
         return shouldRender;

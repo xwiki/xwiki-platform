@@ -132,6 +132,9 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         // what the user can access.
         vcontext.put("context", new Context(context));
 
+        // Put the Util API in the Velocity context.
+        vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
+
         // Save the Velocity Context in the XWiki context so that users can access the objects
         // we've put in it (xwiki, request, response, etc).
         context.put("vcontext", vcontext);

@@ -20,12 +20,9 @@
 
 package com.xpn.xwiki.api;
 
-import com.sun.image.codec.jpeg.JPEGCodec;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.user.api.XWikiUser;
-import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -33,7 +30,6 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.apache.commons.logging.Log;
@@ -41,13 +37,19 @@ import org.apache.commons.logging.LogFactory;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.Object;
 import java.util.*;
 
 public class XWiki extends Api
 {
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
+
+    /**
+     * Utility methods have been moved in version 1.3 Milestone 2 to the {@link Util} class.
+     * However to preserve backward compatibility we have deprecated them in this class and
+     * not removed them yet. All calls are funnelled through this class variable.
+     */
+    private Util util;
 
     private com.xpn.xwiki.XWiki xwiki;
     
@@ -67,6 +69,7 @@ public class XWiki extends Api
         super(context);
         this.xwiki = xwiki;
         this.statsService = new StatsService(context);
+        this.util = new Util(xwiki, context);
     }
 
     /**
@@ -271,18 +274,22 @@ public class XWiki extends Api
      * API to protect Text from Wiki transformation
      * @param text
      * @return escaped text
+     * @deprecated replaced by Util#escapeText
      */
-    public String escapeText(String text) {
-        return Util.escapeText(text);
+    public String escapeText(String text)
+    {
+        return this.util.escapeText(text);
     }
 
     /**
      * API to protect URLs from Wiki transformation
      * @param url
      * @return encoded URL
+     * @deprecated replaced by Util#escapeURL
      */
-    public String escapeURL(String url) {
-        return Util.escapeURL(url);
+    public String escapeURL(String url)
+    {
+        return this.util.escapeURL(url);
     }
 
     /**
@@ -1516,69 +1523,69 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a java object with the current date
-     * 
      * @return the current date
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate()}
      */
     public Date getCurrentDate()
     {
-        return xwiki.getCurrentDate();
+        return this.util.getDate();
     }
 
     /**
-     * API to retrieve a java object with the current date
-     * 
      * @return the current date
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate()}
      */
     public Date getDate()
     {
-        return xwiki.getCurrentDate();
+        return this.util.getDate();
     }
 
     /**
-     * API to retrieve the time delta in milliseconds between the current date and the time passed
-     * as parameter.
-     * 
-     * @param time
-     * @return delta of the time in milliseconds
+     * @param time the time in milliseconds
+     * @return the time delta in milliseconds between the current date and the time passed
+     *         as parameter
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getTimeDelta(long)}
      */
     public int getTimeDelta(long time)
     {
-        return xwiki.getTimeDelta(time);
+        return this.util.getTimeDelta(time);
     }
 
     /**
-     * API to convert a date from a time in milliseconds since 01/01/1970 to a Java Date Object
-     * 
      * @param time time in milliseconds since 1970, 00:00:00 GMT
-     * @return Date object
+     * @return Date a date from a time in milliseconds since 01/01/1970 as a
+     *         Java {@link Date} Object
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate(long)}
      */
     public Date getDate(long time)
     {
-        return xwiki.getDate(time);
+        return this.util.getDate(time);
     }
 
     /**
-     * API to split a text to an array of texts, according to a separator
-     * 
-     * @param str original text
-     * @param sep separator characters. The separator is one or more of the separator characters
-     * @return An array of the splitted text
+     * Split a text to an array of texts, according to a separator.
+     *
+     * @param text the original text
+     * @param sep the separator characters. The separator is one or more of the
+     *        separator characters
+     * @return An array containing the split text
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#split(String, String)}
      */
-    public String[] split(String str, String sep)
+    public String[] split(String text, String sep)
     {
-        return xwiki.split(str, sep);
+        return this.util.split(text, sep);
     }
 
     /**
-     * API to retrieve an exception stack trace in a String
-     * 
-     * @param e Exception to retrieve the stack trace from
-     * @return Text showing the exception stack trace
+     * Get a stack trace as a String
+     *
+     * @param e the exception to convert to a String
+     * @return the exception stack trace as a String
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#printStrackTrace(Throwable)}
      */
     public String printStrackTrace(Throwable e)
     {
-        return xwiki.printStrackTrace(e);
+        return this.util.printStrackTrace(e);
     }
 
     /**
@@ -1593,25 +1600,27 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve a NULL object This is usefull in Velocity where there is no real null object
-     * for comparaisons
-     * 
-     * @return A null Object
+     * Get a Null object. This is useful in Velocity where there is no real null object
+     * for comparaisons.
+     *
+     * @return a Null Object
+     * @deprecated replaced by {@link Util#getNull()}
      */
     public Object getNull()
     {
-        return null;
+        return this.util.getNull();
     }
 
     /**
-     * API to retrieve a New Line character This is usefull in Velocity where there is no real new
-     * line character for inclusion in texts
-     * 
-     * @return A new line character
+     * Get a New Line character. This is useful in Velocity where there is no real new
+     * line character for inclusion in texts.
+     *
+     * @return a new line character
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getNewline()}
      */
     public String getNl()
     {
-        return "\n";
+        return this.util.getNewline();
     }
 
     /**
@@ -1746,79 +1755,92 @@ public class XWiki extends Api
     }
 
     /**
-     * API to retrieve an List object This is usefull is velocity where you cannot create objects
-     * 
-     * @return a java.util.ArrayList object casted to List
+     * Creates an Array List. This is useful from Velocity since you cannot
+     * create Object from Velocity with our secure uberspector.
+     *
+     * @return a {@link ArrayList} object
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getArrayList()} 
      */
     public List getArrayList()
     {
-        return new ArrayList();
+        return this.util.getArrayList();
     }
 
     /**
-     * API to retrieve an Map object This is usefull is velocity where you cannot create objects
-     * 
-     * @return a java.util.HashMap object casted to Map
+     * Creates a Hash Map. This is useful from Velocity since you cannot
+     * create Object from Velocity with our secure uberspector.
+     *
+     * @return a {@link HashMap} object
+     * @deprecated replaced by {@link Util#getHashMap()} ()}
      */
     public Map getHashMap()
     {
-        return new HashMap();
-    }
-
-    public Map getTreeMap()
-    {
-        return new TreeMap();
+        return this.util.getHashMap();
     }
 
     /**
-     * API to sort a list over standard comparator. Elements need to be mutally comparable and
-     * implement the Comparable interface
-     * 
-     * @param list List to sort
-     * @return the sorted list (in the same oject)
-     * @see Collections void sort(List list)
+     * Creates a Tree Map. This is useful from Velocity since you cannot
+     * create Object from Velocity with our secure uberspector.
+     *
+     * @return a {@link TreeMap} object
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getTreeMap()} ()} 
+     */
+    public Map getTreeMap()
+    {
+        return this.util.getTreeMap();
+    }
+
+    /**
+     * Sort a list using a standard comparator. Elements need to be mutally comparable and
+     * implement the Comparable interface.
+     *
+     * @param list the list to sort
+     * @return the sorted list (as the same oject reference)
+     * @see {@link java.util.Collections#sort(java.util.List)}
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#sort(java.util.List)}
      */
     public List sort(List list)
     {
-        Collections.sort(list);
-        return list;
-    }
-
-    public Number toNumber(Object o)
-    {
-        try {
-            return new Long(o.toString());
-        } catch (Exception e) {
-            return null;
-        }
+        return this.util.sort(list);
     }
 
     /**
-     * API to generate a random string
+     * Convert an Object to a number and return null if the object is not a Number.
      *
-     * @param size Desired size of the string
-     * @return the generated string
+     * @param object the object to convert
+     * @return the object as a {@link Number}
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#toNumber(Object)} 
+     */
+    public Number toNumber(Object object)
+    {
+        return this.util.toNumber(object);
+    }
+
+    /**
+     * Generate a random string.
+     *
+     * @param size the desired size of the string
+     * @return the randomly generated string
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#generateRandomString(int)}
      */
     public String generateRandomString(int size)
     {
-        return xwiki.generateRandomString(size);
+        return this.util.generateRandomString(size);
     }
 
     /**
-     * API to Outpout an BufferedImage object into the response outputstream Once this function has
-     * been called, not further action is possible Users should set $context.setFinished(true) to
-     * avoid template output The image is outpout as image/jpeg
-     * 
-     * @param image BufferedImage to output
-     * @throws IOException exception if the output fails
+     * Output a BufferedImage object into the response outputstream.
+     * Once this method has been called, not further action is possible.
+     * Users should set $context.setFinished(true) to
+     * avoid template output The image is outpout as image/jpeg.
+     *
+     * @param image the BufferedImage to output
+     * @throws java.io.IOException if the output fails
+     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#outputImage(java.awt.image.BufferedImage)}
      */
     public void outputImage(BufferedImage image) throws IOException
     {
-        JPEGImageEncoder encoder;
-        OutputStream ostream = getXWikiContext().getResponse().getOutputStream();
-        encoder = JPEGCodec.createJPEGEncoder(ostream);
-        encoder.encode(image);
-        ostream.flush();
+        this.util.outputImage(image);
     }
 
     /**
@@ -2139,74 +2161,53 @@ public class XWiki extends Api
     }
 
     /**
-     * Retrieves a int from a String
-     * 
-     * @param str String to convert to int
-     * @return the int or zero in case of exception
+     * @param str the String to convert to an integer
+     * @return the parsed integer or zero in case of exception
+     * @deprecated replaced by {@link Util#parseInt(String)}
      */
     public int parseInt(String str)
     {
-        try {
-            return Integer.parseInt(str);
-        } catch (Exception e) {
-            return 0;
-        }
+        return this.util.parseInt(str);
     }
 
     /**
-     * Retrieves a int from a String
-     * 
-     * @param str String to convert to int
-     * @return the int or zero in case of exception
+     * @param str the String to convert to an Integer Object
+     * @return the parsed integer or zero in case of exception
+     * @deprecated replaced by {@link Util#parseInteger(String)}
      */
     public Integer parseInteger(String str)
     {
-        return new Integer(parseInt(str));
+        return this.util.parseInteger(str);
     }
 
     /**
-     * Retrieves a long from a String
-     * 
-     * @param str String to convert to long
-     * @return the long or zero in case of exception
+     * @param str the String to convert to a long
+     * @return the parsed long or zero in case of exception
+     * @deprecated replaced by {@link Util#parseLong(String)}
      */
     public long parseLong(String str)
     {
-        try {
-            return Long.parseLong(str);
-        } catch (Exception e) {
-            return 0;
-        }
+        return this.util.parseLong(str);
     }
 
     /**
-     * Retrieves a float from a String
-     * 
-     * @param str String to convert to float
-     * @return the float or zero in case of exception
+     * @param str the String to convert to a float
+     * @return the parsed float or zero in case of exception
+     * @deprecated replaced by {@link Util#parseFloat(String)}
      */
     public float parseFloat(String str)
     {
-        try {
-            return Float.parseFloat(str);
-        } catch (Exception e) {
-            return 0;
-        }
+        return this.util.parseFloat(str);
     }
 
     /**
-     * Retrieves a double from a String
-     * 
-     * @param str String to convert to double
-     * @return the double or zero in case of exception
+     * @param str the String to convert to a double
+     * @return the parsed double or zero in case of exception
+     * @deprecated replaced by {@link Util#parseDouble(String)}
      */
     public double parseDouble(String str)
     {
-        try {
-            return Double.parseDouble(str);
-        } catch (Exception e) {
-            return 0;
-        }
+        return this.util.parseDouble(str);
     }
 
     /**
@@ -2318,14 +2319,16 @@ public class XWiki extends Api
     }
 
     /**
-     * Filters text to be include in = or like clause in SQL
-     * 
-     * @param text text to filter
+     * Escape text so that it can be used in a like clause or in a test for equality clause.
+     * For example it escapes single quote characters.
+     *
+     * @param text the text to escape
      * @return filtered text
+     * @deprecated replaced by {@link Util#escapeSQL(String)}
      */
     public String sqlfilter(String text)
     {
-        return Utils.SQLFilter(text);
+        return this.util.escapeSQL(text);
     }
 
     /**
@@ -2788,14 +2791,16 @@ public class XWiki extends Api
     }
 
     /**
-     * Cleans up the page name to make it valid
-     * 
-     * @param name
-     * @return A valid page name
+     * Cleans up the passed text by removing all accents and special characters to make it
+     * a valid page name.
+     *
+     * @param name the page name to normalize
+     * @return the valid page name
+     * @deprecated replaced by {@link Util#clearName(String)}
      */
     public String clearName(String name)
     {
-        return xwiki.clearName(name, getXWikiContext());
+        return this.util.clearName(name);
     }
 
     /**
@@ -2841,11 +2846,16 @@ public class XWiki extends Api
         return xwiki.addMandatory(getXWikiContext());
     }
 
-    /*
-     * Clear accents
+    /**
+     * Replace all accents by their alpha equivalent.
+     *
+     * @param text the text to parse
+     * @return a string with accents replaced with their alpha equivalent
+     * @deprecated replaced by {@link Util#clearAccents(String)} 
      */
-    public String clearAccents(String text) {
-        return Util.noaccents(text);
+    public String clearAccents(String text)
+    {
+        return this.util.clearAccents(text);
     }
 
     /**
@@ -2915,34 +2925,42 @@ public class XWiki extends Api
     }
 
     /**
-     * Add a and b because velocity operations are not always working
-     * @param a
-     * @param b
-     * @return a+b
+     * Add a and b because Velocity operations are not always working.
+     *
+     * @param a an integer to add
+     * @param b an integer to add
+     * @return the sum of a and b
+     * @deprecated replaced by {@link Util#add(int, int)}
      */
-    public int add(int a, int b) {
-        return a+b;
+    public int add(int a, int b)
+    {
+        return this.util.add(a, b); 
     }
 
     /**
-     * Add a and b because velocity operations are not working with longs
-     * @param a
-     * @param b
-     * @return a+b
+     * Add a and b because Velocity operations are not working with longs.
+     *
+     * @param a a long to add
+     * @param b a long to add
+     * @return the sum of a and b
+     * @deprecated replaced by {@link Util#add(long, long)}
      */
-    public long add(long a, long b) {
-        return a+b;
+    public long add(long a, long b)
+    {
+        return this.util.add(a, b);
     }
 
     /**
-     * Add a and b because velocity operations are not working with longs
-     * @param a
-     * @param b
-     * @return a+b
+     * Add a and b where a and b are non decimal numbers specified as Strings.
+     *
+     * @param a a string representing a non decimal number
+     * @param b a string representing a non decimal number
+     * @return the sum of a and b as a String
+     * @deprecated replaced by {@link Util#add(String, String)}
      */
-    public String add(String a, String b) {
-        long c = Long.parseLong(a) + Long.parseLong(b);
-        return "" + c;
+    public String add(String a, String b)
+    {
+        return this.util.add(a,  b);
     }
     
     /**

@@ -1,17 +1,4 @@
-/* @override http://192.168.1.13:8080/xwiki/bin/skin/XWiki/NewOrgSkin/style.css */
-
-/* @override http://www.xwiki.org/xwiki/bin/skin/XWiki/NewOrgSkin/style.css */
-
-/* @import "elements.css"; */
-/*@import "classes.css"; */
-/* @import "xwiki.css";*/
-/* @import "wiki.css";*/
-/* @import "page.css";*/
-/* @import "rss.css";*/
-/* @import "screenlayout.css";*/
 @import "microformats.css";
-/* @import "presentation.css";*/
-/* @import "colorsblack.css";*/
 @import "fullscreenEdit.css";
 @import "css/table/table.css";
 @import "usersandgroups.css";
@@ -551,7 +538,7 @@ body{
   padding: 0;
   margin: 0 ;
   min-width: 970px;
-  background-image: url( images/color/gray/H4x4-GRAY.png );
+  background-image: url( images/colors/gray/H4x4-GRAY.png );
   background-color: #fff;
 }
 body.mceContentBody {
@@ -570,7 +557,7 @@ body.hideright #xwikimaincontainer {
   border: none;
   overflow-y: hidden;
   background-color: #fff;
-  background-image :url( images/color/gray/bg-GRAY3.png ) ;
+  background-image :url( images/colors/gray/bg-GRAY3.png ) ;
   background-position: 0 0;
   background-repeat: repeat-y;
   border-bottom: 1px solid #ccc;
@@ -579,7 +566,7 @@ body.adminbody #xwikimaincontainer,
 body.hidelefthideright #xwikimaincontainer,
 body.hideleft #xwikimaincontainer,
 body.editbody #xwikimaincontainer
- {  background-image :url( images/color/gray/bg-GRAY.png ) ;}
+ {  background-image :url( images/colors/gray/bg-GRAY.png ) ;}
 
 
 
@@ -592,7 +579,7 @@ body.editbody #xwikimaincontainer
   border: none;
   text-align: left;
   clear: both;
-  background-image: url( images/color/gray/bg-GRAY.png );
+  background-image: url( images/colors/gray/bg-GRAY.png );
   background-position: top right;
   background-repeat: repeat-y;
   background-color:transparent;
@@ -604,7 +591,7 @@ body.editbody #xwikimaincontainerinner {
 }
 body.hideright #xwikimaincontainerinner {
   margin:  0 0 0 220px;
-  background-image: url( images/color/gray/bg-GRAY3.png );
+  background-image: url( images/colors/gray/bg-GRAY3.png );
 }
 
 
@@ -612,7 +599,7 @@ body.hideright #xwikimaincontainerinner {
 body.adminbody #xwikimaincontainerinner,
 body.hidelefthideright #xwikimaincontainerinner {
   margin:  0 0 0 30px;
-  background-image: url( images/color/gray/bg-GRAY3.png );
+  background-image: url( images/colors/gray/bg-GRAY3.png );
 }
 
 
@@ -624,7 +611,7 @@ body.hidelefthideright #xwikimaincontainerinner {
   width: 220px;
   margin-left: -220px;
   height:  100px;
-  background-image: url( images/color/gray/bgx-GRAY.png );
+  background-image: url( images/colors/gray/bgx-GRAY.png );
   background-position: top left;
 }
 
@@ -712,7 +699,7 @@ margin-left: -220px;
 height: auto !important;
 height: 400px;
 min-height: 400px; 
-background-image: url( images/color/gray/bgx-GRAY.png );
+background-image: url( images/colors/gray/bgx-GRAY.png );
 background-position:left -100px;
 background-repeat: no-repeat;
 padding-bottom: 100px;
@@ -735,7 +722,7 @@ padding-top: 25px;
 height: auto !important;
 height: 400px;
 min-height: 400px; 
-background-image: url( images/color/gray/bgx-GRAY.png );
+background-image: url( images/colors/gray/bgx-GRAY.png );
 background-position:left -100px;
 background-repeat: no-repeat;
 }

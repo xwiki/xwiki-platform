@@ -269,20 +269,3 @@ $doc.display("content", $obj)
     #end
   </div>
 #end
-###
-###
-###
-###    XWIKI.ORG MACROS
-###
-###
-###
-#macro(roundedboxstart $title $color $width $float )
-    <div class="roundedbox" style="background-color:rgb($color); width:$width; float:$float;">
-    <div class="roundedheader">
-      <h3>$title</h3>
-	</div><div class="roundedbody">
-#end
-#macro(roundedboxend)
-    </div>
-    </div>
-#end

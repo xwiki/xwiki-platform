@@ -73,10 +73,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             (context.getWiki() == null) ? "" : context.getWiki().Param("xwiki.servletpath", "");
         if (servletPath.equals("")) {
             try {
-                servletPath =
-                    ((XWikiServletContext) context.getEngineContext()).getServletContext()
-                        .getServletContextName()
-                        + "/";
+                servletPath = context.getRequest().getContextPath().substring(1) + "/";
             } catch (Exception e) {
                 servletPath = path.substring(0, path.indexOf('/', 1) + 1);
             }

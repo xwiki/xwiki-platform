@@ -24,6 +24,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.api.Util;
 import com.xpn.xwiki.cache.api.XWikiCache;
 import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.impl.XWikiCachedObject;
@@ -80,6 +81,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             gcontext.put("request", context.getRequest());
             gcontext.put("response", context.getResponse());
             gcontext.put("context", new Context(context));
+            gcontext.put("util", new Util(context.getWiki(), context));
 
             // Put the Groovy Context in the context
             // so that includes can use it..

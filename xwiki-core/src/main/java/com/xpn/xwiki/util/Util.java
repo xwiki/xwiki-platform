@@ -51,7 +51,6 @@ import org.apache.oro.text.regex.MatchResult;
 import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcherInput;
 import org.apache.oro.text.regex.Perl5Matcher;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
@@ -697,4 +696,28 @@ public class Util {
         }
         return url;
     }
+
+    /**
+     * Removes all non alpha numerical characters from the passed text. First tries to convert
+     * accented chars to their alpha numeric representation.
+     *
+     * @param text the text to convert
+     * @return the alpha numeric equivalent
+     */
+    public static String convertToAlphaNumeric(String text)
+    {
+        // Start by removing accents
+        String textNoAccents = Util.noaccents(text);
+
+        // Now remove all non alphanumeric chars
+        StringBuffer result = new StringBuffer(textNoAccents.length());
+        char[] testChars = textNoAccents.toCharArray();
+        for (int i = 0; i < testChars.length; i++) {
+            if (Character.isLetterOrDigit(testChars[i])) {
+                result.append(testChars[i]);
+            }
+        }
+        return result.toString();
+    }
+
 }

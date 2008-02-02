@@ -11,7 +11,11 @@
 #set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-<div class="panel $expanded $util.convertToAlphaNumeric($paneldoc.name)">
+#set ($specialClassAttribute = "")
+#if ($paneldoc != "")
+  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
+#end
+<div class="panel $expanded $specialClassAttribute">
 <h5 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h5>
 <div class="xwikipanelcontents">
 #end
@@ -19,7 +23,11 @@
 #macro(panelhiddenheader $title)
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-<div class="panel expanded $util.convertToAlphaNumeric($paneldoc.name)">
+#set ($specialClassAttribute = "")
+#if ($paneldoc != "")
+  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
+#end
+<div class="panel expanded $specialClassAttribute">
 <h5 class="xwikipaneltitle hidden" onclick="togglePanelVisibility(this.parentNode);">$title</h5>
 <div class="xwikipanelcontents">
 #end
@@ -30,7 +38,11 @@
 #set($expanded = $xwiki.getUserPreferenceFromCookie($cookieName))
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
-<div class="large panel $expanded $util.convertToAlphaNumeric($paneldoc.name)">
+#set ($specialClassAttribute = "")
+#if ($paneldoc != "")
+  #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
+#end
+<div class="large panel $expanded $specialClassAttribute">
 <h5 class="xwikipaneltitle" onclick="if(eltHasClass(this.parentNode, 'expanded')) createCookie('$cookieName','collapsed', ''); else eraseCookie('$cookieName'); togglePanelVisibility(this.parentNode);">$title</h5>
 <div class="xwikipanelcontents">
 #end

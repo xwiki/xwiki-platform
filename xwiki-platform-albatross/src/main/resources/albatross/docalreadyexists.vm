@@ -2,6 +2,7 @@
 ### Document already exists message
 ###
 ###
+$response.setStatus(409)
 #template("startpage.vm")
 <div class="main layoutsubsection">
 #if($xwiki.exists("XWiki.DocumentAlreadyExist"))

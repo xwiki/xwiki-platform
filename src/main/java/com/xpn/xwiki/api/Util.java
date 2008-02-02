@@ -19,27 +19,25 @@
  */
 package com.xpn.xwiki.api;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
-import com.sun.image.codec.jpeg.JPEGImageEncoder;
-import com.sun.image.codec.jpeg.JPEGCodec;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.TreeMap;
-import java.util.Collections;
-import java.util.Date;
-import java.lang.*;
-import java.lang.Object;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Utility APIs, available from Velocity/Groovy scripting.
- *
+ * 
  * @version $Id: $
  */
 public class Util extends Api
@@ -48,6 +46,7 @@ public class Util extends Api
 
     /**
      * {@inheritDoc}
+     * 
      * @see Api#Api(com.xpn.xwiki.XWikiContext)
      */
     public Util(com.xpn.xwiki.XWiki xwiki, XWikiContext context)
@@ -58,7 +57,7 @@ public class Util extends Api
 
     /**
      * Protect Text from Wiki transformation.
-     *
+     * 
      * @param text the text to escape
      * @return the escaped text
      * @since 1.3 Milestone 2
@@ -70,7 +69,7 @@ public class Util extends Api
 
     /**
      * Protect URLs from Wiki transformation.
-     *
+     * 
      * @param url the url to escape
      * @return the encoded URL
      * @since 1.3 Milestone 2
@@ -81,9 +80,9 @@ public class Util extends Api
     }
 
     /**
-     * Creates an Array List. This is useful from Velocity since you cannot
-     * create Object from Velocity with our secure uberspector.
-     *
+     * Creates an Array List. This is useful from Velocity since you cannot create Object from
+     * Velocity with our secure uberspector.
+     * 
      * @return a {@link ArrayList} object
      * @since 1.3 Milestone 2
      */
@@ -93,9 +92,9 @@ public class Util extends Api
     }
 
     /**
-     * Creates a Hash Map. This is useful from Velocity since you cannot
-     * create Object from Velocity with our secure uberspector.
-     *
+     * Creates a Hash Map. This is useful from Velocity since you cannot create Object from Velocity
+     * with our secure uberspector.
+     * 
      * @return a {@link HashMap} object
      * @since 1.3 Milestone 2
      */
@@ -105,9 +104,9 @@ public class Util extends Api
     }
 
     /**
-     * Creates a Tree Map. This is useful from Velocity since you cannot
-     * create Object from Velocity with our secure uberspector.
-     *
+     * Creates a Tree Map. This is useful from Velocity since you cannot create Object from Velocity
+     * with our secure uberspector.
+     * 
      * @return a {@link TreeMap} object
      * @since 1.3 Milestone 2
      */
@@ -127,8 +126,8 @@ public class Util extends Api
 
     /**
      * @param time time in milliseconds since 1970, 00:00:00 GMT
-     * @return Date a date from a time in milliseconds since 01/01/1970 as a
-     *         Java {@link Date} Object
+     * @return Date a date from a time in milliseconds since 01/01/1970 as a Java {@link Date}
+     *         Object
      * @since 1.3 Milestone 2
      */
     public Date getDate(long time)
@@ -138,8 +137,8 @@ public class Util extends Api
 
     /**
      * @param time the time in milliseconds
-     * @return the time delta in milliseconds between the current date and the time passed
-     *         as parameter
+     * @return the time delta in milliseconds between the current date and the time passed as
+     *         parameter
      * @since 1.3 Milestone 2
      */
     public int getTimeDelta(long time)
@@ -149,10 +148,9 @@ public class Util extends Api
 
     /**
      * Split a text to an array of texts, according to a separator.
-     *
+     * 
      * @param text the original text
-     * @param sep the separator characters. The separator is one or more of the
-     *        separator characters
+     * @param sep the separator characters. The separator is one or more of the separator characters
      * @return An array containing the split text
      * @since 1.3 Milestone 2
      */
@@ -163,7 +161,7 @@ public class Util extends Api
 
     /**
      * Get a stack trace as a String
-     *
+     * 
      * @param e the exception to convert to a String
      * @return the exception stack trace as a String
      * @since 1.3 Milestone 2
@@ -172,14 +170,14 @@ public class Util extends Api
     {
         return this.xwiki.printStrackTrace(e);
     }
-    
+
     /**
-     * Sort a list using a standard comparator. Elements need to be mutally comparable and
-     * implement the Comparable interface.
-     *
+     * Sort a list using a standard comparator. Elements need to be mutally comparable and implement
+     * the Comparable interface.
+     * 
      * @param list the list to sort
      * @return the sorted list (as the same oject reference)
-     * @see {@link java.util.Collections#sort(java.util.List)} 
+     * @see {@link java.util.Collections#sort(java.util.List)}
      * @since 1.3 Milestone 2
      */
     public List sort(List list)
@@ -190,7 +188,7 @@ public class Util extends Api
 
     /**
      * Convert an Object to a number and return null if the object is not a Number.
-     *
+     * 
      * @param object the object to convert
      * @return the object as a {@link Number}
      * @since 1.3 Milestone 2
@@ -206,7 +204,7 @@ public class Util extends Api
 
     /**
      * Generate a random string.
-     *
+     * 
      * @param size the desired size of the string
      * @return the randomly generated string
      * @since 1.3 Milestone 2
@@ -217,11 +215,10 @@ public class Util extends Api
     }
 
     /**
-     * Output a BufferedImage object into the response outputstream.
-     * Once this method has been called, not further action is possible.
-     * Users should set $context.setFinished(true) to
-     * avoid template output The image is outpout as image/jpeg.
-     *
+     * Output a BufferedImage object into the response outputstream. Once this method has been
+     * called, not further action is possible. Users should set $context.setFinished(true) to avoid
+     * template output The image is outpout as image/jpeg.
+     * 
      * @param image the BufferedImage to output
      * @throws java.io.IOException if the output fails
      * @since 1.3 Milestone 2
@@ -236,9 +233,9 @@ public class Util extends Api
     }
 
     /**
-     * Get a Null object. This is useful in Velocity where there is no real null object
-     * for comparaisons.
-     *
+     * Get a Null object. This is useful in Velocity where there is no real null object for
+     * comparaisons.
+     * 
      * @return a Null Object
      * @since 1.3 Milestone 2
      */
@@ -248,9 +245,9 @@ public class Util extends Api
     }
 
     /**
-     * Get a New Line character. This is useful in Velocity where there is no real new
-     * line character for inclusion in texts.
-     *
+     * Get a New Line character. This is useful in Velocity where there is no real new line
+     * character for inclusion in texts.
+     * 
      * @return a new line character
      * @since 1.3 Milestone 2
      */
@@ -326,9 +323,9 @@ public class Util extends Api
     }
 
     /**
-     * Escape text so that it can be used in a like clause or in a test for equality clause.
-     * For example it escapes single quote characters.
-     *
+     * Escape text so that it can be used in a like clause or in a test for equality clause. For
+     * example it escapes single quote characters.
+     * 
      * @param text the text to escape
      * @return filtered text
      * @since 1.3 Milestone 2
@@ -340,7 +337,7 @@ public class Util extends Api
 
     /**
      * Replace all accents by their alpha equivalent.
-     *
+     * 
      * @param text the text to parse
      * @return a string with accents replaced with their alpha equivalent
      * @since 1.3 Milestone 2
@@ -352,7 +349,7 @@ public class Util extends Api
 
     /**
      * Add a and b because Velocity operations are not always working.
-     *
+     * 
      * @param a an integer to add
      * @param b an integer to add
      * @return the sum of a and b
@@ -365,7 +362,7 @@ public class Util extends Api
 
     /**
      * Add a and b because Velocity operations are not working with longs.
-     *
+     * 
      * @param a a long to add
      * @param b a long to add
      * @return the sum of a and b
@@ -378,7 +375,7 @@ public class Util extends Api
 
     /**
      * Add a and b where a and b are non decimal numbers specified as Strings.
-     *
+     * 
      * @param a a string representing a non decimal number
      * @param b a string representing a non decimal number
      * @return the sum of a and b as a String
@@ -391,9 +388,9 @@ public class Util extends Api
     }
 
     /**
-     * Cleans up the passed text by removing all accents and special characters to make it
-     * a valid page name.
-     *
+     * Cleans up the passed text by removing all accents and special characters to make it a valid
+     * page name.
+     * 
      * @param name the page name to normalize
      * @return the valid page name
      * @since 1.3 Milestone 2
@@ -406,7 +403,7 @@ public class Util extends Api
     /**
      * Removes all non alpha numerical characters from the passed text. First tries to convert
      * accented chars to their alpha numeric representation.
-     *
+     * 
      * @param text the text to convert
      * @return the alpha numeric equivalent
      * @since 1.3 Milestone 2

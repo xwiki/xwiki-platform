@@ -12,7 +12,7 @@
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
 #set ($specialClassAttribute = "")
-#if ($paneldoc != "")
+#if ($paneldoc && $paneldoc != "")
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
 <div class="panel $expanded $specialClassAttribute">
@@ -24,7 +24,7 @@
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
 #set ($specialClassAttribute = "")
-#if ($paneldoc != "")
+#if ($paneldoc && $paneldoc != "")
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
 <div class="panel expanded $specialClassAttribute">
@@ -39,7 +39,7 @@
 ## Note: We pass the Panel name as an HTML class attribute so that it's possible to style
 ## the Panels selectively using CSS.
 #set ($specialClassAttribute = "")
-#if ($paneldoc != "")
+#if ($paneldoc && $paneldoc != "")
   #set ($specialClassAttribute = $util.convertToAlphaNumeric($paneldoc.name))
 #end
 <div class="large panel $expanded $specialClassAttribute">

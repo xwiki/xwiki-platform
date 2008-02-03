@@ -2912,6 +2912,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         sendMessage(sender, email, content, context);
     }
 
+    /**
+     * @deprecated replaced by the
+     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *   Plugin</a>
+     */
     public void sendMessage(String sender, String[] recipient, String message,
         XWikiContext context) throws XWikiException
     {
@@ -2986,6 +2991,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
         }
     }
 
+    /**
+     * @deprecated replaced by the
+     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *   Plugin</a>
+     */
     public void sendMessage(String sender, String recipient, String message, XWikiContext context)
         throws XWikiException
     {

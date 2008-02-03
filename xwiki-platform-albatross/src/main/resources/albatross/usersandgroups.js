@@ -630,7 +630,7 @@ function displayUsers(row, i, table)
       del.className = 'icon-manageg';
     } else {
       del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
-      Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname));
+      Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "user"));
       del.className = 'icon-manage';
     }
     del.title = '$msg.get("delete")';
@@ -686,7 +686,7 @@ function displayGroups(row, i, table)
     var del = document.createElement('img');
     del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
     del.title = '$msg.get("delete")';
-    Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname));
+    Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "group"));
     del.className = 'icon-manage';
 
     //edit user
@@ -812,17 +812,29 @@ function editUserOrGroup(userinlineurl, usersaveurl, userredirecturl)
 
 
 //function to delete a user with ajax
-function deleteUserOrGroup(i, table, docname)
+function deleteUserOrGroup(i, table, docname, uorg)
 {
   return function() {
     var url = "?xpage=deleteuorg&docname=" + docname;
-    if (confirm('$msg.get("rightsmanager.confirmdeleteuserorgroup")')) {
-      new Ajax.Request(url, {
-        method: 'get',
-        onSuccess: function(transport) {
-          table.deleteRow(i);
-        }
-      });
+    if(uorg == "user") {
+      if (confirm('$msg.get("rightsmanager.confirmdeleteuser")'.replace('__name__', docname))) {
+        new Ajax.Request(url, {
+            method: 'get',
+            onSuccess: function(transport) {
+              table.deleteRow(i);
+            }
+        });
+      }
+    }
+    else {
+      if (confirm('$msg.get("rightsmanager.confirmdeletegroup")'.replace('__name__', docname))) {
+        new Ajax.Request(url, {
+            method: 'get',
+            onSuccess: function(transport) {
+              table.deleteRow(i);
+            }
+        });
+      }
     }
   }
 }

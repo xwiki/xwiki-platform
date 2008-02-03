@@ -1,9 +1,9 @@
 <div id="addnewgroup">
-<span style="padding-left:13px;">Create new group </span>
-<form method="post">
+<span style="padding-left:13px;">$msg.get("rightsmanager.createnewgroup")</span>
+<form method="post" onsubmit="return false;">
 <div>
-<span style="padding-left:13px;"><input type="text" name="newgroup" value="" /></span>
-<span class="buttonwrapper"><input class="button" type="submit" value="Create Group" onclick="new Ajax.Request('$xwiki.getURL("XWiki.__groupname__", "save", "template=XWiki.XWikiGroupTemplate")'.replace('__groupname__', this.form.newgroup.value), {asynchronous: false}); window.lb.lbSaveForm();" /></span>
+<span style="padding-left:13px;"><input type="text" name="newgroup" value="" id="newgroupi" /></span>
+<span class="buttonwrapper"><input class="button" type="submit" value="$msg.get("rightsmanager.creategroup")" onclick="new Ajax.Request('$xwiki.getURL("XWiki.__groupname__", "save", "template=XWiki.XWikiGroupTemplate")'.replace('__groupname__', this.form.newgroup.value), { onFailure: function(transport) { alert('$msg.get("rightsmanager.groupexist")'.replace('__name__', $('newgroupi').value)); }, onSuccess: function(transport) { window.lb.lbSaveForm(); } });" /></span>
 <br />
 <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick=" window.lb.lbHide(); window.lb.lbClearData(); return false;"/></span>
 </div>

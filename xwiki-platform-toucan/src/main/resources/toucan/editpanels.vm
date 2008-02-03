@@ -17,6 +17,7 @@
 </div>
 #if($editor == "wysiwyg")
 <script type="text/javascript">
+//<![CDATA[
   if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {
     var panels = document.getElementById("editPanels");
     if(document.getElementById("xwikisyntaxhelppanel"))
@@ -24,5 +25,6 @@
     if (document.getElementById("simpleedittoolbar"))
         document.getElementById("simpleedittoolbar").style.display = "none";
   }
+//]]>
 </script>
 #end

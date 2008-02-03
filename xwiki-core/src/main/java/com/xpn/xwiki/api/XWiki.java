@@ -1222,6 +1222,9 @@ public class XWiki extends Api
      * @param recipient email of the recipient of the message
      * @param message Message to send
      * @throws XWikiException if the mail was not send successfully
+     * @deprecated replaced by the
+     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *   Plugin</a>
      */
     public void sendMessage(String sender, String recipient, String message)
         throws XWikiException
@@ -1237,6 +1240,9 @@ public class XWiki extends Api
      * @param recipient emails of the recipients of the message
      * @param message Message to send
      * @throws XWikiException if the mail was not send successfully
+     * @deprecated replaced by the
+     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *   Plugin</a>
      */
     public void sendMessage(String sender, String[] recipient, String message)
         throws XWikiException

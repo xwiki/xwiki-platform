@@ -50,7 +50,7 @@
 
 #set($addnewurl = $xwiki.getURL("XWiki.XWikiGroups", "view", "xpage=addnewgroup"))
 #set($saveurl = $xwiki.getURL("XWiki.XWikiGroups", "view"))
-#set($redirecturl = $doc.getURL("admin", "editor=groupd&amp;space=XWiki"))
+#set($redirecturl = $doc.getURL("admin", "editor=groups&space=XWiki"))
         
 <script type="text/javascript">
 //<![CDATA[

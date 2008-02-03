@@ -1216,7 +1216,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to send a message to an email address
+     * Privileged API to send a message to an email address
      * 
      * @param sender email of the sender of the message
      * @param recipient email of the recipient of the message
@@ -1231,7 +1231,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to send a message to an email address
+     * Privileged API to send a message to an email address
      * 
      * @param sender email of the sender of the message
      * @param recipient emails of the recipients of the message
@@ -1246,7 +1246,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to copy a document to another document in the same wiki
+     * Privileged API to copy a document to another document in the same wiki
      * 
      * @param docname source document
      * @param targetdocname target document
@@ -1259,7 +1259,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to copy a translation of a document to another document in the same wiki
+     * Privileged API to copy a translation of a document to another document in the same wiki
      * 
      * @param docname source document
      * @param targetdocname target document
@@ -1274,7 +1274,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to copy a translation of a document to another document of the same name in
+     * Privileged API to copy a translation of a document to another document of the same name in
      * another wiki
      * 
      * @param docname source document
@@ -1292,7 +1292,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to copy a translation of a document to another document of the same name in
+     * Privileged API to copy a translation of a document to another document of the same name in
      * another wiki additionally resetting the version
      * 
      * @param docname source document
@@ -1311,7 +1311,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to copy a translation of a document to another document of the same name in
+     * Privileged API to copy a translation of a document to another document of the same name in
      * another wiki additionally resetting the version and overwriting the previous document
      * 
      * @param docname source document
@@ -1335,7 +1335,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to copy a space to another wiki, optionally deleting all document of the
+     * Privileged API to copy a space to another wiki, optionally deleting all document of the
      * target space
      * 
      * @param web source Space
@@ -2355,7 +2355,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to set/unset the readonly status of the Wiki After setting this to true no
+     * Privileged API to set/unset the readonly status of the Wiki After setting this to true no
      * writing to the database will be performed All Edit buttons will be removed and save actions
      * disabled This is used for maintenance purposes
      * 
@@ -2530,7 +2530,7 @@ public class XWiki extends Api
     }
 
     /**
-     * Priviledged API to retrieve an object instanciated from groovy code in a String Groovy
+     * Privileged API to retrieve an object instanciated from groovy code in a String Groovy
      * scripts compilation is cached
      *
      * @param fullname // script containing a Groovy class definition (public class MyClass { ... })

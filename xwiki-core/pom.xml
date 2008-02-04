@@ -516,9 +516,32 @@
       <artifactId>fop</artifactId>
       <version>0.93</version>
     </dependency>
+    <!-- Needed for backward compatibility Aspects -->
+    <dependency>
+      <groupId>aspectj</groupId>
+      <artifactId>aspectjrt</artifactId>
+      <version>1.5.2a</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
+      <!-- Apply Backward compatibility Aspects using the strategy described at
+           http://blogs.sonatype.com/john/2007/11/09/1194630418546.html -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>aspectj-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>backward-compatibility-aspects</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <aspectDirectory>src/main/aspect/compatibility</aspectDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
@@ -554,19 +577,19 @@
               **/doc/rcs/*.java,
               **/api/RevisionInfo.java,
               **/web/DeleteVersions*.java,
-	          **/migration/**.java,
-	          **/*RecycleBin*.java,
-	          **/*DeletedDocument.java,
-	          **/UndeleteAction.java,
+	            **/migration/**.java,
+	            **/*RecycleBin*.java,
+	            **/*DeletedDocument.java,
+	            **/UndeleteAction.java,
               **/rightsmanager/**/*.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,
 	            <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
               **/XWikiPatchUtils.java,
-	          **/XWikiRCSArchive.java,
+	            **/XWikiRCSArchive.java,
               **/XWikiHibernateRecycleBinStore.java,
-	          **/migration/AbstractXWikiMigrationManager.java
+	            **/migration/AbstractXWikiMigrationManager.java
           </excludes>
         </configuration>
       </plugin>
@@ -581,13 +604,6 @@
            everything you'll need to control what is logged by tuning the Log4J configuration file
            to log only what you want. -->
       <id>debug</id>
-      <dependencies>
-        <dependency>
-          <groupId>aspectj</groupId>
-          <artifactId>aspectjrt</artifactId>
-          <version>1.5.2a</version>
-        </dependency>
-      </dependencies>
       <build>
         <plugins>
           <plugin>
@@ -595,9 +611,15 @@
             <artifactId>aspectj-maven-plugin</artifactId>
             <executions>
               <execution>
+                <id>debug</id>
                 <goals>
                   <goal>compile</goal>
                 </goals>
+                <configuration>
+                  <configuration>
+                    <aspectDirectory>src/main/aspect/debug</aspectDirectory>
+                  </configuration>
+                </configuration>
               </execution>
             </executions>
           </plugin>

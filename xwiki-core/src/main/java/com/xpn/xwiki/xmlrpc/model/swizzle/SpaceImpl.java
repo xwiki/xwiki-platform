@@ -71,7 +71,7 @@ public class SpaceImpl implements Space
     }
 
     /**
-     * @see com.xpn.xwiki.xmlrpc.model.Space#getHomepage()
+     * @see com.xpn.xwiki.xmlrpc.model.Space#getHomePage() 
      */
     public String getHomePage()
     {
@@ -119,7 +119,7 @@ public class SpaceImpl implements Space
     }
 
     /**
-     * @see com.xpn.xwiki.xmlrpc.model.Space#setHomepage(java.lang.String)
+     * @see com.xpn.xwiki.xmlrpc.model.Space#setHomePage(String) 
      */
     public void setHomePage(String homepage)
     {
@@ -159,7 +159,7 @@ public class SpaceImpl implements Space
     }
     
     /**
-     * @see com.xpn.xwiki.xmlrpc.model.MapObject#toMap(java.lang.String)
+     * @see com.xpn.xwiki.xmlrpc.model.MapObject#toMap() 
      */
     public Map toMap()
     {

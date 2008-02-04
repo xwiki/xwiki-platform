@@ -28,14 +28,12 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.meta.MetaClass;
-import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import org.suigeneris.jrcs.diff.delta.Chunk;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.lang.Object;
 import java.util.*;
@@ -43,13 +41,6 @@ import java.util.*;
 public class XWiki extends Api
 {
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
-
-    /**
-     * Utility methods have been moved in version 1.3 Milestone 2 to the {@link Util} class.
-     * However to preserve backward compatibility we have deprecated them in this class and
-     * not removed them yet. All calls are funnelled through this class variable.
-     */
-    private Util util;
 
     private com.xpn.xwiki.XWiki xwiki;
     
@@ -69,7 +60,6 @@ public class XWiki extends Api
         super(context);
         this.xwiki = xwiki;
         this.statsService = new StatsService(context);
-        this.util = new Util(xwiki, context);
     }
 
     /**
@@ -268,28 +258,6 @@ public class XWiki extends Api
     public String getXMLEncoded(String content)
     {
         return com.xpn.xwiki.XWiki.getXMLEncoded(content);
-    }
-
-    /**
-     * API to protect Text from Wiki transformation
-     * @param text
-     * @return escaped text
-     * @deprecated replaced by Util#escapeText
-     */
-    public String escapeText(String text)
-    {
-        return this.util.escapeText(text);
-    }
-
-    /**
-     * API to protect URLs from Wiki transformation
-     * @param url
-     * @return encoded URL
-     * @deprecated replaced by Util#escapeURL
-     */
-    public String escapeURL(String url)
-    {
-        return this.util.escapeURL(url);
     }
 
     /**
@@ -962,14 +930,6 @@ public class XWiki extends Api
     }
 
     /**
-     * @deprecated use {@link #getLanguagePreference()} instead
-     */
-    public String getDocLanguagePreference()
-    {
-        return xwiki.getDocLanguagePreference(getXWikiContext());
-    }
-
-    /**
      * API to access the interface language preference for the request Order of evaluation is:
      * Language of the wiki in mono-lingual mode language request paramater language in context
      * language user preference language in cookie language accepted by the navigator
@@ -1213,42 +1173,6 @@ public class XWiki extends Api
         if (hasProgrammingRights())
             xwiki.sendConfirmationEmail(xwikiname, password, email, "", contentfield,
                 getXWikiContext());
-    }
-
-    /**
-     * Privileged API to send a message to an email address
-     * 
-     * @param sender email of the sender of the message
-     * @param recipient email of the recipient of the message
-     * @param message Message to send
-     * @throws XWikiException if the mail was not send successfully
-     * @deprecated replaced by the
-     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *   Plugin</a>
-     */
-    public void sendMessage(String sender, String recipient, String message)
-        throws XWikiException
-    {
-        if (hasProgrammingRights())
-            xwiki.sendMessage(sender, recipient, message, getXWikiContext());
-    }
-
-    /**
-     * Privileged API to send a message to an email address
-     * 
-     * @param sender email of the sender of the message
-     * @param recipient emails of the recipients of the message
-     * @param message Message to send
-     * @throws XWikiException if the mail was not send successfully
-     * @deprecated replaced by the
-     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *   Plugin</a>
-     */
-    public void sendMessage(String sender, String[] recipient, String message)
-        throws XWikiException
-    {
-        if (hasProgrammingRights())
-            xwiki.sendMessage(sender, recipient, message, getXWikiContext());
     }
 
     /**
@@ -1529,72 +1453,6 @@ public class XWiki extends Api
     }
 
     /**
-     * @return the current date
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate()}
-     */
-    public Date getCurrentDate()
-    {
-        return this.util.getDate();
-    }
-
-    /**
-     * @return the current date
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate()}
-     */
-    public Date getDate()
-    {
-        return this.util.getDate();
-    }
-
-    /**
-     * @param time the time in milliseconds
-     * @return the time delta in milliseconds between the current date and the time passed
-     *         as parameter
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getTimeDelta(long)}
-     */
-    public int getTimeDelta(long time)
-    {
-        return this.util.getTimeDelta(time);
-    }
-
-    /**
-     * @param time time in milliseconds since 1970, 00:00:00 GMT
-     * @return Date a date from a time in milliseconds since 01/01/1970 as a
-     *         Java {@link Date} Object
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate(long)}
-     */
-    public Date getDate(long time)
-    {
-        return this.util.getDate(time);
-    }
-
-    /**
-     * Split a text to an array of texts, according to a separator.
-     *
-     * @param text the original text
-     * @param sep the separator characters. The separator is one or more of the
-     *        separator characters
-     * @return An array containing the split text
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#split(String, String)}
-     */
-    public String[] split(String text, String sep)
-    {
-        return this.util.split(text, sep);
-    }
-
-    /**
-     * Get a stack trace as a String
-     *
-     * @param e the exception to convert to a String
-     * @return the exception stack trace as a String
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#printStrackTrace(Throwable)}
-     */
-    public String printStrackTrace(Throwable e)
-    {
-        return this.util.printStrackTrace(e);
-    }
-
-    /**
      * API to retrieve the current encoding of the wiki engine The encoding is stored in xwiki.cfg
      * Default encoding is ISO-8891-1
      * 
@@ -1603,30 +1461,6 @@ public class XWiki extends Api
     public String getEncoding()
     {
         return xwiki.getEncoding();
-    }
-
-    /**
-     * Get a Null object. This is useful in Velocity where there is no real null object
-     * for comparaisons.
-     *
-     * @return a Null Object
-     * @deprecated replaced by {@link Util#getNull()}
-     */
-    public Object getNull()
-    {
-        return this.util.getNull();
-    }
-
-    /**
-     * Get a New Line character. This is useful in Velocity where there is no real new
-     * line character for inclusion in texts.
-     *
-     * @return a new line character
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getNewline()}
-     */
-    public String getNl()
-    {
-        return this.util.getNewline();
     }
 
     /**
@@ -1703,15 +1537,6 @@ public class XWiki extends Api
     }
 
     /**
-     * @see #getExoService(String)
-     * @deprecated use {@link #getExoService(String)} instead
-     */
-    public java.lang.Object getService(String className) throws XWikiException
-    {
-        return getExoService(className);
-    }
-
-    /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
      *
      * @param className eXo classname to retrieve the service from
@@ -1732,15 +1557,6 @@ public class XWiki extends Api
     }
 
     /**
-     * @see #getExoPortalService(String)
-     * @deprecated use {@link #getExoPortalService(String)} instead
-     */
-    public java.lang.Object getPortalService(String className) throws XWikiException
-    {
-        return getExoPortalService(className);
-    }
-
-    /**
      * Privileged API to access an eXo Platform Portal service from the Wiki Engine
      * 
      * @param className eXo classname to retrieve the service from
@@ -1758,95 +1574,6 @@ public class XWiki extends Api
         }
 
         return portalService;
-    }
-
-    /**
-     * Creates an Array List. This is useful from Velocity since you cannot
-     * create Object from Velocity with our secure uberspector.
-     *
-     * @return a {@link ArrayList} object
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getArrayList()} 
-     */
-    public List getArrayList()
-    {
-        return this.util.getArrayList();
-    }
-
-    /**
-     * Creates a Hash Map. This is useful from Velocity since you cannot
-     * create Object from Velocity with our secure uberspector.
-     *
-     * @return a {@link HashMap} object
-     * @deprecated replaced by {@link Util#getHashMap()} ()}
-     */
-    public Map getHashMap()
-    {
-        return this.util.getHashMap();
-    }
-
-    /**
-     * Creates a Tree Map. This is useful from Velocity since you cannot
-     * create Object from Velocity with our secure uberspector.
-     *
-     * @return a {@link TreeMap} object
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getTreeMap()} ()} 
-     */
-    public Map getTreeMap()
-    {
-        return this.util.getTreeMap();
-    }
-
-    /**
-     * Sort a list using a standard comparator. Elements need to be mutally comparable and
-     * implement the Comparable interface.
-     *
-     * @param list the list to sort
-     * @return the sorted list (as the same oject reference)
-     * @see {@link java.util.Collections#sort(java.util.List)}
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#sort(java.util.List)}
-     */
-    public List sort(List list)
-    {
-        return this.util.sort(list);
-    }
-
-    /**
-     * Convert an Object to a number and return null if the object is not a Number.
-     *
-     * @param object the object to convert
-     * @return the object as a {@link Number}
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#toNumber(Object)} 
-     */
-    public Number toNumber(Object object)
-    {
-        return this.util.toNumber(object);
-    }
-
-    /**
-     * Generate a random string.
-     *
-     * @param size the desired size of the string
-     * @return the randomly generated string
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#generateRandomString(int)}
-     */
-    public String generateRandomString(int size)
-    {
-        return this.util.generateRandomString(size);
-    }
-
-    /**
-     * Output a BufferedImage object into the response outputstream.
-     * Once this method has been called, not further action is possible.
-     * Users should set $context.setFinished(true) to
-     * avoid template output The image is outpout as image/jpeg.
-     *
-     * @param image the BufferedImage to output
-     * @throws java.io.IOException if the output fails
-     * @deprecated replaced by {@link com.xpn.xwiki.api.Util#outputImage(java.awt.image.BufferedImage)}
-     */
-    public void outputImage(BufferedImage image) throws IOException
-    {
-        this.util.outputImage(image);
     }
 
     /**
@@ -2131,22 +1858,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Returns the recently visited pages for a specific action
-     * 
-     * @param action ("view" or "edit")
-     * @param size how many recent actions to retrieve
-     * @return a ArrayList of document names
-     * @deprecated use {@link #getStatsService()} instead
-     */
-    public java.util.Collection getRecentActions(String action, int size)
-    {
-        XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
-        if (stats == null)
-            return Collections.EMPTY_LIST;
-        return stats.getRecentActions(action, size, getXWikiContext());
-    }
-
-    /**
      * Returns the Advertisement system from the preferences
      * 
      * @return "google" or "none"
@@ -2164,56 +1875,6 @@ public class XWiki extends Api
     public String getAdClientId()
     {
         return xwiki.getAdClientId(getXWikiContext());
-    }
-
-    /**
-     * @param str the String to convert to an integer
-     * @return the parsed integer or zero in case of exception
-     * @deprecated replaced by {@link Util#parseInt(String)}
-     */
-    public int parseInt(String str)
-    {
-        return this.util.parseInt(str);
-    }
-
-    /**
-     * @param str the String to convert to an Integer Object
-     * @return the parsed integer or zero in case of exception
-     * @deprecated replaced by {@link Util#parseInteger(String)}
-     */
-    public Integer parseInteger(String str)
-    {
-        return this.util.parseInteger(str);
-    }
-
-    /**
-     * @param str the String to convert to a long
-     * @return the parsed long or zero in case of exception
-     * @deprecated replaced by {@link Util#parseLong(String)}
-     */
-    public long parseLong(String str)
-    {
-        return this.util.parseLong(str);
-    }
-
-    /**
-     * @param str the String to convert to a float
-     * @return the parsed float or zero in case of exception
-     * @deprecated replaced by {@link Util#parseFloat(String)}
-     */
-    public float parseFloat(String str)
-    {
-        return this.util.parseFloat(str);
-    }
-
-    /**
-     * @param str the String to convert to a double
-     * @return the parsed double or zero in case of exception
-     * @deprecated replaced by {@link Util#parseDouble(String)}
-     */
-    public double parseDouble(String str)
-    {
-        return this.util.parseDouble(str);
     }
 
     /**
@@ -2322,19 +1983,6 @@ public class XWiki extends Api
         } catch (Exception e) {
             return null;
         }
-    }
-
-    /**
-     * Escape text so that it can be used in a like clause or in a test for equality clause.
-     * For example it escapes single quote characters.
-     *
-     * @param text the text to escape
-     * @return filtered text
-     * @deprecated replaced by {@link Util#escapeSQL(String)}
-     */
-    public String sqlfilter(String text)
-    {
-        return this.util.escapeSQL(text);
     }
 
     /**
@@ -2797,19 +2445,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Cleans up the passed text by removing all accents and special characters to make it
-     * a valid page name.
-     *
-     * @param name the page name to normalize
-     * @return the valid page name
-     * @deprecated replaced by {@link Util#clearName(String)}
-     */
-    public String clearName(String name)
-    {
-        return this.util.clearName(name);
-    }
-
-    /**
      * Inserts a tooltip using toolTip.js
      * 
      * @param html HTML viewed
@@ -2850,18 +2485,6 @@ public class XWiki extends Api
     public String addMandatory()
     {
         return xwiki.addMandatory(getXWikiContext());
-    }
-
-    /**
-     * Replace all accents by their alpha equivalent.
-     *
-     * @param text the text to parse
-     * @return a string with accents replaced with their alpha equivalent
-     * @deprecated replaced by {@link Util#clearAccents(String)} 
-     */
-    public String clearAccents(String text)
-    {
-        return this.util.clearAccents(text);
     }
 
     /**
@@ -2930,45 +2553,6 @@ public class XWiki extends Api
         return context.getWiki().getAuthService().checkAuth(username, password, rememberme, context);
     }
 
-    /**
-     * Add a and b because Velocity operations are not always working.
-     *
-     * @param a an integer to add
-     * @param b an integer to add
-     * @return the sum of a and b
-     * @deprecated replaced by {@link Util#add(int, int)}
-     */
-    public int add(int a, int b)
-    {
-        return this.util.add(a, b); 
-    }
-
-    /**
-     * Add a and b because Velocity operations are not working with longs.
-     *
-     * @param a a long to add
-     * @param b a long to add
-     * @return the sum of a and b
-     * @deprecated replaced by {@link Util#add(long, long)}
-     */
-    public long add(long a, long b)
-    {
-        return this.util.add(a, b);
-    }
-
-    /**
-     * Add a and b where a and b are non decimal numbers specified as Strings.
-     *
-     * @param a a string representing a non decimal number
-     * @param b a string representing a non decimal number
-     * @return the sum of a and b as a String
-     * @deprecated replaced by {@link Util#add(String, String)}
-     */
-    public String add(String a, String b)
-    {
-        return this.util.add(a,  b);
-    }
-    
     /**
      * Access statistics api
      * 

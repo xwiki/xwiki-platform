@@ -119,6 +119,13 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                     context.setDatabase(database);
                     context.setOriginalDatabase(database);
                     try {
+                        // Force the schema update since it's not been executed yet for sub wikis
+                        // databases.
+                        // TODO: In the future intead of doing this, move all the database schema
+                        // update + migrations into XWiki's init (see http://jira.xwiki.org/jira/browse/XWIKI-2075).
+                        context.getWiki().getHibernateStore().updateSchema(context, false);
+
+                        // Run the migrations on the current database
                         startMigrationsForDatabase(context);
                     } catch (XWikiException e) {
                         LOG.info(new Formatter().format("Failed to migrate database [%s]...",

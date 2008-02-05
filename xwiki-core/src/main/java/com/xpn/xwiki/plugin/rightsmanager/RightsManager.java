@@ -210,7 +210,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
             cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
                 userOrGroupName, user, context);
         } else {
-            List wikiList = context.getWiki().getVirtualWikiList();
+            List wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
 
             String database = context.getDatabase();
             try {

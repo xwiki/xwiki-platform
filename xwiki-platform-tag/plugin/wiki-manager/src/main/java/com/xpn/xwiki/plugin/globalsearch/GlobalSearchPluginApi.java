@@ -62,7 +62,7 @@ public class GlobalSearchPluginApi extends PluginApi
         // Message Tool
         Locale locale = (Locale) context.get("locale");
         this.messageTool = new GlobalSearchMessageTool(locale, plugin, context);
-        context.put(GlobalSearch.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
+        context.put(GlobalSearchMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
 
         this.search = new GlobalSearch(messageTool);
     }

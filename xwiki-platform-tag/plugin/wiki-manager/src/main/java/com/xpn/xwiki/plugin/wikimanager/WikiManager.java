@@ -56,21 +56,11 @@ import org.apache.commons.logging.LogFactory;
 final class WikiManager
 {
     /**
-     * Key to use with {@link XWikiContext#get(Object)}.
-     */
-    public static final String MESSAGETOOL_CONTEXT_KEY = "wikimanagermessagetool";
-
-    /**
      * The logging tool.
      */
     protected static final Log LOG = LogFactory.getLog(WikiManager.class);
 
     // ////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * Default bundle manager where to find translated messages.
-     */
-    private static final XWikiPluginMessageTool DEFAULTMESSAGETOOL = new WikiManagerMessageTool();
 
     /**
      * Unique instance of WikiManager.
@@ -106,10 +96,7 @@ final class WikiManager
      */
     public XWikiPluginMessageTool getMessageTool(XWikiContext context)
     {
-        XWikiPluginMessageTool messagetool =
-            (XWikiPluginMessageTool) context.get(MESSAGETOOL_CONTEXT_KEY);
-
-        return messagetool != null ? messagetool : DEFAULTMESSAGETOOL;
+        return WikiManagerMessageTool.getDefault(context);
     }
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -351,8 +338,10 @@ final class WikiManager
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")",
-                    new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, docFullName}));
+                targetDoc
+                    .setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")",
+                        new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR,
+                            docFullName}));
             }
 
             // Replace documents contents to link
@@ -361,8 +350,10 @@ final class WikiManager
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")",
-                    new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, docFullName}));
+                targetDoc
+                    .setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")",
+                        new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR,
+                            docFullName}));
             }
         } finally {
             context.setDatabase(database);
@@ -630,7 +621,8 @@ final class WikiManager
                 }
             }
 
-            wikiSuperDocToSave = (XWikiServer) wikiClass.newXObjectDocument(docToSave, 0, context);
+            wikiSuperDocToSave =
+                (XWikiServer) wikiClass.newXObjectDocument(docToSave, 0, context);
 
             // clear entry in virtual wiki cache
             if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {
@@ -757,8 +749,27 @@ final class WikiManager
 
     /**
      * Delete an existing wiki.
-     * <p>
-     * Only delete the wiki descriptor the corresponding database always exist after delete.
+     * 
+     * @param wikiNameToDelete the name of the wiki to delete.
+     * @param deleteDatabase if true wiki's database is also removed.
+     * @param context the XWiki context.
+     * @throws XWikiException error when:
+     *             <ul>
+     *             <li>getting wiki descriptor document.</li>
+     *             <li>or deleteing wiki.</li>
+     *             </ul>
+     * @since 1.1
+     */
+    public void deleteWiki(String wikiNameToDelete, boolean deleteDatabase, XWikiContext context)
+        throws XWikiException
+    {
+        Wiki wiki = getWikiFromName(wikiNameToDelete, context);
+
+        wiki.delete(deleteDatabase);
+    }
+
+    /**
+     * Delete an existing wiki alias. If it's the last alias it delete the wiki.
      * 
      * @param wikiNameToDelete the name of the wiki to delete.
      * @param objectId the id of the XWiki object included in the document to manage.
@@ -768,13 +779,19 @@ final class WikiManager
      *             <li>getting wiki descriptor document.</li>
      *             <li>or deleteing wiki.</li>
      *             </ul>
+     * @since 1.1
      */
-    public void deleteWiki(String wikiNameToDelete, int objectId, XWikiContext context)
+    public void deleteWikiAlias(String wikiNameToDelete, int objectId, XWikiContext context)
         throws XWikiException
     {
-        XWikiServer doc = getWikiAlias(wikiNameToDelete, objectId, true, context);
+        Wiki wiki = getWikiFromName(wikiNameToDelete, context);
+        XWikiServer alias = wiki.getWikiAlias(objectId);
 
-        doc.delete();
+        if (wiki.countWikiAliases() == 1) {
+            wiki.delete(true);
+        } else {
+            alias.delete();
+        }
     }
 
     /**

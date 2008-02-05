@@ -28,6 +28,7 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectD
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocumentDoesNotExistException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
+import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 
 /**
  * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager}
@@ -288,7 +289,7 @@ public class XWikiServerClass extends AbstractXClassManager
     }
 
     /**
-     * Get wiki descriptor {@link XWikiServer}.
+     * Get wiki alias {@link XWikiServer}.
      * 
      * @param wikiName the name of the wiki.
      * @param objectId the id of the XWiki object included in the document to manage.
@@ -305,13 +306,14 @@ public class XWikiServerClass extends AbstractXClassManager
             return (XWikiServer) getXObjectDocument(wikiName, objectId, validate, context);
         } catch (XObjectDocumentDoesNotExistException e) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                wikiName + " wiki descriptor document does not exist",
+                WikiManagerMessageTool.getDefault(context).get(
+                    WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS, wikiName),
                 e);
         }
     }
 
     /**
-     * Get wiki template descriptor {@link XWikiServer}.
+     * Get wiki template alias {@link XWikiServer}.
      * 
      * @param wikiName the name of the wiki.
      * @param objectId the id of the XWiki object included in the document to manage.
@@ -328,7 +330,8 @@ public class XWikiServerClass extends AbstractXClassManager
 
         if (validate && !wiki.getVisibility().equals(FIELDL_VISIBILITY_TEMPLATE)) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                wikiName + " wiki template descriptor document does not exist");
+                WikiManagerMessageTool.getDefault(context).get(
+                    WikiManagerMessageTool.ERROR_WIKITEMPLATEALIASDOESNOTEXISTS, wikiName));
         }
 
         return wiki;

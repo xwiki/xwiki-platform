@@ -205,10 +205,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + schema);
             } else {
-                stmt.execute("create database " + schema);
+                stmt.execute("DROP DATABASE " + schema);
             }
-
-            stmt.execute("DROP DATABASE " + schema);
 
             endTransaction(context, true);
         } catch (Exception e) {

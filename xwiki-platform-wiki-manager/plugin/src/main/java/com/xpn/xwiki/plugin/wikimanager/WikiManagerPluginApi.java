@@ -93,7 +93,7 @@ public class WikiManagerPluginApi extends PluginApi
         // Message Tool
         Locale locale = (Locale) context.get("locale");
         this.messageTool = new WikiManagerMessageTool(locale, plugin, context);
-        context.put(WikiManager.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
+        context.put(WikiManagerMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
 
         searchApi = plugin.getGlobalSearchApiPlugin(context);
     }
@@ -199,7 +199,49 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
-     * Delete wiki descriptor document from database.
+     * Delete wiki descriptor document and wiki's database.
+     * 
+     * @param wikiName the name of the wiki to delete.
+     * @param deleteDatabase if true wiki's database is also removed.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
+     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
+     *         not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
+     *         delete wiki.</li>
+     *         </ul>
+     * @throws XWikiException critical error in xwiki engine.
+     * @since 1.1
+     */
+    public int deleteWiki(String wikiName, boolean deleteDatabase) throws XWikiException
+    {
+        int returncode = XWikiExceptionApi.ERROR_NOERROR;
+
+        try {
+            if (!hasAdminRights()) {
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    messageTool.get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
+            }
+
+            WikiManager.getInstance().deleteWiki(wikiName, deleteDatabase, this.context);
+        } catch (WikiManagerException e) {
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
+
+            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+
+            returncode = e.getCode();
+        }
+
+        return returncode;
+    }
+
+    /**
+     * Delete wiki descriptor document and wiki's database.
      * 
      * @param wikiName the name of the wiki to delete.
      * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
@@ -210,12 +252,14 @@ public class WikiManagerPluginApi extends PluginApi
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
      *         not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
+     *         delete wiki.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
     public int deleteWiki(String wikiName) throws XWikiException
     {
-        return deleteWiki(wikiName, 0);
+        return deleteWiki(wikiName, true);
     }
 
     /**
@@ -231,19 +275,47 @@ public class WikiManagerPluginApi extends PluginApi
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
      *         not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
+     *         delete wiki.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
+     * @deprecated Use {@link #deleteWikiAlias(String, int)} since 1.1.
      */
     public int deleteWiki(String wikiName, int objectId) throws XWikiException
     {
-        if (!hasAdminRights()) {
-            return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
-        }
+        return deleteWikiAlias(wikiName, objectId);
+    }
 
+    /**
+     * Delete wiki descriptor alias document from database.
+     * 
+     * @param wikiName the name of the wiki to delete.
+     * @param objectId the id of the XWiki object included in the document to manage.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
+     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
+     *         not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
+     *         delete wiki.</li>
+     *         </ul>
+     * @throws XWikiException critical error in xwiki engine.
+     * @since 1.1
+     */
+    public int deleteWikiAlias(String wikiName, int objectId) throws XWikiException
+    {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            WikiManager.getInstance().deleteWiki(wikiName, objectId, this.context);
+            if (!hasAdminRights()) {
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                    messageTool.get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
+            }
+
+            WikiManager.getInstance().deleteWikiAlias(wikiName, objectId, this.context);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 

@@ -49,7 +49,7 @@ public class WikiManagerException extends PluginException
     public static final int ERROR_WM_WIKIALREADYEXISTS = 50033;
 
     /**
-     * Error when trying to use a provide wiki descriptor that does not exist.
+     * Error when trying to use a provided wiki descriptor that does not exist.
      */
     public static final int ERROR_WM_WIKIDOESNOTEXISTS = 50034;
 
@@ -84,6 +84,13 @@ public class WikiManagerException extends PluginException
      * {@link com.xpn.xwiki.doc.XWikiDocument}.
      */
     public static final int ERROR_WM_PACKAGEINSTALL = 50040;
+
+    /**
+     * Error when trying to get a provided wiki alias that does not exist.
+     * 
+     * @since 1.1
+     */
+    public static final int ERROR_WM_WIKIALIASDOESNOTEXISTS = 50041;
 
     // //////
 

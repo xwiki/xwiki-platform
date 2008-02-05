@@ -29,7 +29,7 @@
     <artifactId>xwiki-watch-build-tools</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-watch-build-doc-plugin</artifactId>
+  <artifactId>xwiki-build-xmldoc-update-plugin</artifactId>
   <name>XWiki Products - Watch - Tools - Doc Plugin</name>
   <packaging>maven-plugin</packaging>
   <description>A Maven plugin to load XWiki documents from XML and perform file attachment or setting object properties, before writting the document back to XML</description>

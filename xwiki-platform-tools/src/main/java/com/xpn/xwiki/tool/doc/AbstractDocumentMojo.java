@@ -48,6 +48,22 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
     private MavenProject project;
 
     /**
+     * The document to perform the update on
+     * 
+     * @parameter expression="${basedir}/src/main/resources/XWiki/XWikiPreferences"
+     * @required
+     */
+    protected File sourceDocument;
+    
+    /**
+     * The target directory to write the document back to
+     * 
+     * @parameter expression="${project.build.outputDirectory}"
+     * @required
+     */
+    protected File outputDirectory;    
+    
+    /**
      * Loads a XWikiDocument from a XML file
      * 
      * @param file the xml file to load
@@ -92,22 +108,20 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
     }
 
     /**
-     * Obtain the output file for a Wiki document
+     * Return the space directory as a File for a given document in a given
+     * directory, creating the directories on the fly if the do not exists
      * 
-     * @param document the document to get the output file of
-     * @return the File for that document in the build output directory
+     * @param document the document to get space for
+     * @param directory the directory in which the space will be written
+     * @return the space as a File
      * @throws MojoExecutionException
      */
-    protected File getOutputFileForDocument(File document) throws MojoExecutionException
+    protected File getSpaceDirectory(File directory, File document) throws MojoExecutionException
     {
-        File targetDir = new File(this.project.getBuild().getOutputDirectory());
-        if (!targetDir.exists()) {
-            targetDir.mkdirs();
-        }
-        File spaceDir = new File(targetDir, document.getParentFile().getName());
+        File spaceDir = new File(directory, document.getParentFile().getName());
         if (!spaceDir.exists()) {
             spaceDir.mkdirs();
         }
-        return new File(targetDir, spaceDir.getName() + "/" + document.getName());
+        return spaceDir;
     }
 }

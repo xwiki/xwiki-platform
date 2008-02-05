@@ -23,7 +23,6 @@ import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -37,64 +36,59 @@ import com.xpn.xwiki.objects.BaseObject;
  */
 public class SetPropertyMojo extends AbstractDocumentMojo
 {
-    
-    /**
-     * The document holding the object
-     * 
-     * @parameter expression="${basedir}/target/classes/XWiki/XWikiPreferences"
-     */
-    private File document;
-    
+
     /**
      * The class name of the object to write the property value to
      * 
      * @parameter expression="XWiki.XWikiPreferences"
+     * @required
      */
     private String className;
-    
+
     /**
      * The object id to write the property value to
      * 
      * @parameter expression="0"
+     * @required
      */
     private int objectId;
-    
+
     /**
      * The property name
      * 
      * @parameter
      * @required
      */
-    private String propName;
-    
+    private String propertyName;
+
     /**
      * The property value to write
      * 
      * @parameter
      * @required
      */
-    private String propValue;
-    
+    private String value;
+
     /**
      * Append the value to the existing one
      * 
      * @parameter expression="false"
      */
-    private boolean append;    
-    
-    
+    private boolean append;
+
     public void execute() throws MojoExecutionException, MojoFailureException
     {
-        XWikiDocument doc = loadFromXML(document);
+        XWikiDocument doc = loadFromXML(sourceDocument);
         BaseObject bo = doc.getObject(className, objectId);
-        if(append){
-            propValue += bo.getStringValue(propName);
-        }   
-        bo.setStringValue(propName, propValue);
-        
-        File outputFile = getOutputFileForDocument(document);
-        
+        if (append) {
+            value += bo.getStringValue(propertyName);
+        }
+
+        bo.setStringValue(propertyName, value);
+
+        File outputFile =
+            new File(getSpaceDirectory(outputDirectory, sourceDocument), sourceDocument.getName());
+
         writeToXML(doc, outputFile);
     }
-
 }

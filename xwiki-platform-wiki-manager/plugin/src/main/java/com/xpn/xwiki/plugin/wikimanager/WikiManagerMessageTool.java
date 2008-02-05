@@ -1,6 +1,7 @@
 package com.xpn.xwiki.plugin.wikimanager;
 
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
@@ -15,6 +16,13 @@ import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageToo
  */
 public class WikiManagerMessageTool extends XWikiPluginMessageTool
 {
+    /**
+     * Key to use with {@link XWikiContext#get(Object)}.
+     * 
+     * @since 1.1
+     */
+    public static final String MESSAGETOOL_CONTEXT_KEY = "wikimanagermessagetool";
+
     /**
      * Used as comment when creating a new empty wiki.
      */
@@ -94,6 +102,33 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_PACKAGEINSTALL = "wikimanager.plugin.error.packageinstall";
 
     /**
+     * Used as {@link WikiManagerException} message when trying to delete wiki with not
+     * administrator user.
+     * 
+     * @since 1.1
+     */
+    public static final String ERROR_RIGHTTODELETEWIKI =
+        "wikimanager.plugin.error.righttodeletewiki";
+
+    /**
+     * Used as {@link WikiManagerException} message when trying to delete wiki with not
+     * administrator user.
+     * 
+     * @since 1.1
+     */
+    public static final String ERROR_WIKIALIASDOESNOTEXISTS =
+        "wikimanager.plugin.error.wikialiasdoesnotexists";
+
+    /**
+     * Used as {@link WikiManagerException} message when trying to delete wiki with not
+     * administrator user.
+     * 
+     * @since 1.1
+     */
+    public static final String ERROR_WIKITEMPLATEALIASDOESNOTEXISTS =
+        "wikimanager.plugin.error.wikitemplatealiasdoesnotexists";
+
+    /**
      * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new wiki
      * with a wiki descriptor that already exist.
      */
@@ -135,7 +170,7 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
      * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki alias.
      */
     public static final String LOG_WIKIGET = "wikimanager.plugin.log.wikiget";
-    
+
     /**
      * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki
      * descriptor document.
@@ -174,12 +209,19 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
         "wikimanager.plugin.log.wikitemplategetall";
 
     /**
+     * Default bundle manager where to find translated messages.
+     * 
+     * @since 1.1
+     */
+    private static final WikiManagerMessageTool DEFAULTMESSAGETOOL = new WikiManagerMessageTool();
+
+    /**
      * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system
      * {@link Locale}.
      */
-    WikiManagerMessageTool()
+    private WikiManagerMessageTool()
     {
-        super(null, null);
+        super(ResourceBundle.getBundle(WikiManagerPlugin.PLUGIN_NAME + "/ApplicationResources"));
     }
 
     /**
@@ -195,5 +237,20 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     WikiManagerMessageTool(Locale locale, WikiManagerPlugin plugin, XWikiContext context)
     {
         super(locale, plugin, context);
+    }
+
+    /**
+     * Get Wiki Manager message tool registered in XWiki context. If not return default.
+     * 
+     * @param context the XWiki context from which to get message tool.
+     * @return the default Wiki Manager message tool.
+     * @since 1.1
+     */
+    public static WikiManagerMessageTool getDefault(XWikiContext context)
+    {
+        Object messagetool = context.get(MESSAGETOOL_CONTEXT_KEY);
+
+        return messagetool != null && messagetool instanceof WikiManagerMessageTool
+            ? (WikiManagerMessageTool) messagetool : DEFAULTMESSAGETOOL;
     }
 }

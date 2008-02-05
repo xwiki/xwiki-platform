@@ -25,11 +25,6 @@ import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchResult;
 final class GlobalSearch
 {
     /**
-     * Key to use with {@link XWikiContext#get(Object)}.
-     */
-    public static final String MESSAGETOOL_CONTEXT_KEY = "globalsearchmessagetool";
-
-    /**
      * The logging tool.
      */
     protected static final Log LOG = LogFactory.getLog(GlobalSearch.class);

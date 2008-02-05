@@ -82,7 +82,13 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     Statement stmt = session.connection().createStatement();
                     ResultSet rs;
                     try {
-                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc where XWD_ARCHIVE is not null order by XWD_VERSION");
+                        // We place an empty character in archives for documents that have already been migrated so
+                        // that we can re-execute this migrator and not start over.
+                        // Note that we cannot use NULL since in old databases (prior to 1.1) the XWD_ARCHIVE column
+                        // had a not null constraint and since this column has disappeared in 1.2 and after, the
+                        // hibernate update script will not have modified the nullability of it...
+                        // (see http://jira.xwiki.org/jira/browse/XWIKI-2074).
+                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION");
                     } catch (SQLException e) {
                         // most likely there is no XWD_ARCHIVE column, so migration is not needed
                         // is there easier way to find what column is not exist?
@@ -91,7 +97,7 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                     Transaction originalTransaction = ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).getTransaction(context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(null, context);
                     ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(null, context);
-                    PreparedStatement deleteStatement = session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=null where XWD_ID=?");
+                    PreparedStatement deleteStatement = session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
                     while (rs.next()) {
                         if (LOG.isInfoEnabled()) {

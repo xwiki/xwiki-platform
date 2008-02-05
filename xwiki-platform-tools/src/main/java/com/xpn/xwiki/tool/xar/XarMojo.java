@@ -109,7 +109,7 @@ public class XarMojo extends AbstractXarMojo
         // existing files since we want this projet's files to be used if they override a file
         // present in a XAR dependency.
         unpackDependentXars();
-        archiver.addDirectory(sourceDir);
+        archiver.addDirectory(sourceDir, getIncludes(), getExcludes());
 
         // If no package.xml can be found at the top level of the current project, generate one
         if (archiver.getFiles().get(PACKAGE_XML) == null) {

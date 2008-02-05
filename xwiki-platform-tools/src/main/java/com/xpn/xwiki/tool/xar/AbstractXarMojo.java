@@ -1,14 +1,12 @@
 package com.xpn.xwiki.tool.xar;
 
 import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.codehaus.plexus.archiver.ArchiveFileFilter;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
+import org.codehaus.plexus.components.io.fileselectors.FileSelector;
+import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 
@@ -35,6 +33,54 @@ abstract class AbstractXarMojo extends AbstractMojo
     protected static final String PACKAGE_XML = "package.xml";
 
     /**
+     * List of files to include. Specified as fileset patterns.
+     *
+     * @parameter
+     */
+    protected String[] includes;
+ 
+    /**
+     * List of files to exclude. Specified as fileset patterns.
+     *
+     * @parameter
+     */
+    protected String[] excludes;
+    
+	/**
+	 * Default excludes
+	 */
+    private static final String[] DEFAULT_EXCLUDES = null;
+
+	/**
+	 * Default includes
+	 */
+    private static final String[] DEFAULT_INCLUDES = new String[] { "**/**" };
+    
+    /**
+     * @return the includes
+     */
+    protected String[] getIncludes()
+    {
+        if ( includes != null && includes.length > 0 )
+        {
+            return includes;
+        }
+        return DEFAULT_INCLUDES;
+    }
+
+    /**
+     * @return the excludes
+     */
+    protected String[] getExcludes()
+    {
+        if ( excludes != null && excludes.length > 0 )
+        {
+            return excludes;
+        }
+        return DEFAULT_EXCLUDES; 
+    }
+    
+    /**
      * Unpacks the XAR file (exclude the package.xml file if it exists).
      * 
      * @param file the file to be unpacked.
@@ -51,7 +97,13 @@ abstract class AbstractXarMojo extends AbstractMojo
             unArchiver.enableLogging(new ConsoleLogger(Logger.LEVEL_ERROR, logName));
             unArchiver.setSourceFile(file);
             unArchiver.setDestDirectory(location);
-
+            
+            FileSelector[] selectors;
+            
+            IncludeExcludeFileSelector fs = new IncludeExcludeFileSelector();
+            fs.setIncludes(getIncludes());
+            fs.setExcludes(getExcludes());
+                        
             // Ensure that we don't overwrite XML document files present in this project since
             // we want those to be used and not the ones in the dependent XAR.
             unArchiver.setOverwrite(overwrite);
@@ -59,17 +111,16 @@ abstract class AbstractXarMojo extends AbstractMojo
             if (!overwrite) {
                 // Do not unpack any package.xml file in dependant XARs. We'll generate a complete
                 // one automatically.
-                List filters = new ArrayList();
-                filters.add(new ArchiveFileFilter()
-                {
-                    public boolean include(InputStream dataStream, String entryName)
-                    {
-                        return (!entryName.equals(PACKAGE_XML));
-                    }
-                });
-                unArchiver.setArchiveFilters(filters);
+                IncludeExcludeFileSelector fs2 = new IncludeExcludeFileSelector();
+                fs2.setExcludes(new String[]{PACKAGE_XML});
+                selectors = new FileSelector[]{fs, fs2};
+            }
+            else {
+                selectors = new FileSelector[]{fs};
             }
 
+            unArchiver.setFileSelectors(selectors);
+            
             unArchiver.extract();
         } catch (Exception e) {
             throw new MojoExecutionException("Error unpacking file " + HOOK_OPEN + file

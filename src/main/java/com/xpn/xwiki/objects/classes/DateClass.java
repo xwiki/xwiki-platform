@@ -31,6 +31,8 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import org.apache.ecs.xhtml.input;
 import org.apache.ecs.xhtml.link;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.dom4j.Element;
 
 import java.text.ParseException;
@@ -39,9 +41,12 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 
-public class DateClass  extends PropertyClass {
+public class DateClass  extends PropertyClass
+{
+    private static final Log LOG = LogFactory.getLog(DateClass.class);
 
-    public DateClass(PropertyMetaClass wclass) {
+    public DateClass(PropertyMetaClass wclass)
+    {
         super("date", "Date", wclass);
         setSize(20);
         setDateFormat("dd/MM/yyyy HH:mm:ss");
@@ -125,16 +130,23 @@ public class DateClass  extends PropertyClass {
             return property;
         }
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S");
             property.setValue(sdf.parse(value));
         } catch (ParseException e) {
+            SimpleDateFormat sdf2 = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
             try {
-                e.printStackTrace();
-                SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
-                property.setValue(sdf.parse(value));
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Failed to parse date [" + value + "] using format ["
+                        + sdf.toString() + "]. Trying again with format ["
+                        + sdf2.toString() + "]");
+                }
+                property.setValue(sdf2.parse(value));
             } catch (ParseException e2) {
-                e2.printStackTrace();
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Failed to parse date [" + value + "] using format ["
+                        + sdf2.toString() + "]. Defaulting to the current date.");
+                }
                 property.setValue(new Date());
             }
         }

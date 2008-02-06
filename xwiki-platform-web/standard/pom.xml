@@ -80,6 +80,13 @@
                   <type>zip</type>
                   <outputDirectory>${project.build.directory}/skin</outputDirectory>
                 </artifactItem>
+                <artifactItem>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <artifactId>xwiki-skin-toucan</artifactId>
+                  <version>${platform.skin.toucan.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/skin</outputDirectory>
+                </artifactItem>
               </artifactItems>
             </configuration>
           </execution>

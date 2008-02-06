@@ -1,3 +1,5 @@
+/* @override http://192.168.1.11:8080/xwiki/bin/skin/skins/toucan/style.css */
+
 @import "microformats.css";
 @import "fullscreenEdit.css";
 @import "css/table/table.css";
@@ -86,6 +88,7 @@ tt {font-family: monospace;}
 em {font-style: italic;}
 strong, .strong {font-weight: bold;}
 /* @end */
+
 /* @group XWIKI */
 #doctitle {
 	font-size: 2.8em;
@@ -123,7 +126,7 @@ body#mceSpanFonts .heading-1-1-1, body#mceSpanFonts .heading-1-1-1-1 {
 h1 {
   margin-top: 5px;
   font-size: 2.6em;
-  font-weight: normalmal;
+  font-weight: normal;
   letter-spacing: -1px;
   line-height: 1.1em;
 }
@@ -161,23 +164,36 @@ h1 {
   line-height: 1.1em;
 }
 
-.edit_section{
+
+span.edit_section{
   position: relative;
-  float: right;
+  display: block;
+  background: #ccc;
+  margin-top: -20px !important;
   visibility: hidden;
   overflow: hidden;
   height: 24px;
-  width: 24px;
   line-height: 24px;
-  margin-top:-20px;
+  margin-bottom: -1em;
+  border: 1px solid red;
 }
 .edit_section a{
-  position: relative;
-  padding: 20px 0 0 20px;
+  position: absolute;
+  top: 0px;
+  right:  0px;
+    margin: 0;
+  margin-right: -52px;
+  padding-left: 50px;
+  line-height: 24px;
   visibility: visible;
-  background: transparent url("icons/black-edit.png") left bottom no-repeat;
-
+  background: transparent url("images/black-edit.png") left top no-repeat;
+overflow: hidden;
+border: 0px solid blue;
 }
+
+
+
+
 .quote {
   font-style: italic;
   color: inherit;
@@ -264,6 +280,7 @@ table {
  font:bold 1.2em/2em Arial,Helvetica,sans-serif;
  color:#66a3d3
  }	
+ table.xwikilogintable th {background-color: transparent;}
 .main tfoot th {
  text-align:center;
  background:#f4f9fe;
@@ -291,6 +308,7 @@ table {
 		line-height : 1.4em;
 		margin-top: 1em;
 		margin-bottom:1em; 
+		list-style-position: inside;
 		}
 .main ol ol, .main ul ul {
 		margin-top: 0em;
@@ -562,6 +580,8 @@ body.hideright #xwikimaincontainer {
   background-repeat: repeat-y;
   border-bottom: 1px solid #ccc;
   }
+body.eportbody #xwikimaincontainer,
+body.importbody #xwikimaincontainer,
 body.adminbody #xwikimaincontainer,
 body.hidelefthideright #xwikimaincontainer,
 body.hideleft #xwikimaincontainer,
@@ -594,8 +614,8 @@ body.hideright #xwikimaincontainerinner {
   background-image: url( images/colors/gray/bg-GRAY3.png );
 }
 
-
-
+body.importbody #xwikimaincontainerinner,
+body.exportbody #xwikimaincontainerinner,
 body.adminbody #xwikimaincontainerinner,
 body.hidelefthideright #xwikimaincontainerinner {
   margin:  0 0 0 30px;
@@ -620,14 +640,20 @@ body.editbody #globallinks {
   width: 220px;
   margin-left: -220px;
 }
+body.exportbody #companylogo,
+body.importbody #companylogo,
 body.adminbody #companylogo{
 	margin-right: 30px;
 	padding-right: 220px;
 }
+body.exportbody #globallinks,
+body.importbody #globallinks,
 body.adminbody #globallinks{
 	margin-left: -250px;
 	background-image: none;
 }
+body.exportbody #globallinks a,
+body.importbody #globallinks a,
 body.adminbody #globallinks a{
 	color: #888;
 	font-size: 0.9em;
@@ -641,6 +667,8 @@ body.editbody #companylogo{}
 #headerspace {margin-right: 220px;}
 body.editbody #headerspace {}
 body.hideleft #headerspace {margin-right: 220px;}
+body.exportbody #headerspace,
+body.importbody #headerspace,
 body.adminbody #headerspace {margin-right:30px;}
 
 
@@ -674,6 +702,7 @@ body.adminbody #headerspace {margin-right:30px;}
 #xwikicontent {
 	 overflow: auto;
 	 padding: 0;
+	 position: relative;
 	 } 
 
 
@@ -711,7 +740,12 @@ float: left;
 width:  200px;
 margin-left: -100%;
   }
+body.exportbody #editPanels.panels,
+body.importbody #editPanels.panels,
 body.adminbody #editPanels.panels {	display: none;}
+
+
+
 #editPanels.panels{ 
   position: relative;
 float: left; 
@@ -788,6 +822,7 @@ text-decoration: none;
   float: left;
   width: 100%;
 }
+#companylogo {width: 740px;}/*IE*/
 #companylogo{
 padding: 0;
 background-color: #FFF;
@@ -805,12 +840,12 @@ height: 100px;
 #companylogo a:hover {
 	border: none;
 }
+
 #companylogo a img {
 	height: 100px;
 	width: 300px;
 }
-
-
+ #companylogo a img {position: relative; float: left;}/*IE*/
 
 
 
@@ -844,9 +879,13 @@ background-color:#fff;
 margin-right: 220px;
 border-top: 1px solid #000;
 }
+#headerspace {height: 24px; overflow:hidden;}/*ie*/
+
 #headerspace a{line-height: 25px;}
+body#body.exportbody #footerglobal,
+body#body.importbody #footerglobal,
 body#body.adminbody #footerglobal{
-	margin-right: 0px;
+	margin-right: 30px;
 }
 #footerglobal {
   clear:both;
@@ -879,7 +918,7 @@ Content
   border: none;
   text-align: right;
   font-size: 0.9em;
-  margin-top: 1em 0;
+  margin: 1em 0;
   padding: 5px 10px;
   background-color: #F9F9F9;
   color: #888;
@@ -1208,12 +1247,16 @@ ul.xwikitabbar{
 	border-bottom: none;
 	overflow:auto;
 }
+#xwikieditor ul.xwikitabbar{
+	overflow: hidden;
+	}
 #xwikicontent ul.xwikitabbar{
 	overflow: hidden;
 	margin: 0px;
 	border-bottom: 2px solid #555;
 	}
 .xwikitabbar li{
+	position:  relative;
   display: inline;
   padding: 5px 0px;
   list-style-type: none;
@@ -1225,7 +1268,7 @@ ul.xwikitabbar{
   display: block;
   float: left;
   width: 106px;
-  background: transparent url( images/tab.png ) top left no-repeat;
+  background: transparent url(images/tab.png ) top left no-repeat;
   border: none;
 }
 .xwikitabbar li#xwikiorphansview{
@@ -1259,7 +1302,9 @@ html > body .xwikitabbar li{
   background-position:top right;
   border: none;
 }
-
+#xwikichangespace {
+	padding:10px 5px;
+}
 /* @end */
 /*
 --
@@ -1277,39 +1322,27 @@ Panels
 
 
 
-#download .xwikipanelcontents a {
-	display: block;
-	width: 190px;
-	height: 50px;
-	background-image: url( images/downloadxwiki.png );
-}
-#download .xwikipanelcontents a span {display: none;}
-#globalsearch form div {
+
+
+#rightPanels .Search #globalsearch {
   text-align: center;
   margin: 0px ;
-  padding:18px 15px 0;
-	line-height: 1em;
+  padding:15px 15px 0;
+line-height: 12px;
   background-color: transparent;
   height:50px;
   background-image: url( images/search-bg.png );
   background-repeat: no-repeat;
+  margin:0 ;
 }
-#download .xwikipanelcontents,
-#globalsearch .xwikipanelcontents {
+.Search .xwikipanelcontents,
+.Search .xwikipaneltitle {
 background-image:none;
 padding:0px;
 }
-#globalsearch div.expanded{
+#globalsearch{
 	margin: 0px 0px 0px 10px;
 }
-
-
-
-
-
-
-
-
 
 .xwikipanelcontents form{margin: 0;padding: 0px;}
 #rightPanels #globalsearch input{
@@ -1327,7 +1360,7 @@ padding:0px;
   width: auto;
 }
 #leftPanels ,
-#rightPanels{padding:  0 0 100px 0;}
+#rightPanels{padding:  0 0 100px 0; height:  1%;}
 .panels{}
 html > body .panels{
   margin-top: 0px;
@@ -1532,7 +1565,11 @@ span.panelitem{  display: block;}
 
 .placeholder{width: 200px;}
 html > body #dragbox {width: 198px !important;}
-#xwikinavcontainer{ margin : -6px 0;}
+#xwikinavcontainer{ 
+margin : 0 0 0; 
+border: 1px solid #999;
+border-width: 0 0 1px 0;
+}
 
 span.pitemseparator{
   display: none;
@@ -1595,6 +1632,23 @@ font:bold 1em/1.1em sans-serif;
 color: #FFF;
 background-color: #8799b3;
 }
+#xwikinav .accordionTabTitleBar h6{
+	background-color: #fff;
+	color: #333;
+	border: 1px solid #999;
+	margin-top: 0px;
+	border-width: 1px 0 0 0;
+}
+
+#xwikinavcontainer #xwikinav .tbexpanded h6 {
+	border-width: 1px 0;
+}
+
+
+
+
+
+
 #xwikieditcontent .accordionTabTitleBar h6{
 margin: 0px;
 padding:4px 21px;
@@ -1829,8 +1883,10 @@ div.pagelayoutoptions td{
   margin: 60px 240px 20px 20px;
   border: 1px solid #ddd;
 }
+body.importbody .alleditcontent,
+body.exportbody .alleditcontent,
 body.adminbody .alleditcontent{
-  margin: 20px 50px 20px 20px;
+  margin: 30px 50px 20px 20px;
 }
 .alleditcontent label {
 	display: block;
@@ -2098,7 +2154,46 @@ background:transparent url( images/buttons3.png ) repeat-x scroll right 25%;
 border-color: #94ad12;
 color: #333;
 }
+
+
+body.importbody .alleditcontent .padded h3,
+body.exportbody .alleditcontent .padded h3{
+	font-size: 1.4em;
+	margin: 1em 0;
+	border-bottom:  1px solid #ccc;
+}
+body.importbody #editcolumn .alleditcontent .padded fieldset,
+body.exportbody #editcolumn .alleditcontent .padded fieldser{
+background-color: #eaeaf3;
+border: 5px solid #eaeaf3;
+border-width:25px 5px 5px;
+}
+body.importbody #editcolumn .alleditcontent .padded label,
+body.exportbody #editcolumn .alleditcontent .padded label{
+text-align: left;
+margin: 0;
+}
+
+
+
+
+
+
+
 /* @end */
+
+
+
+
+
+
+
+
+
+
+
+
+
 table#searchTableUnique {width: 99.8%;}
 table#searchTableUnique td span.wikilink {
 	display:block;
@@ -2187,19 +2282,19 @@ span.messagetype{
   display: none;
 }
 
-div.floatingboxinner, fieldset.floatingboxinner{
-  background-color: #FAFAFD;
-  padding: 10px;
-}
+
 div.floatinginfobox, fieldset.floatinginfobox {
- width:auto;
+ 	width:auto;
   float: right;
   border-left: 20px solid #FFF;
   border-bottom: 40px solid #FFF;
-	background-color:#E4E4E5;
-	padding: 1px;
-	  margin: 0  0  0.5em 0 ;
+background-color: #f1f1fc;
+	padding: 10px;
+	margin: 1em  0  0.5em 0 ;
 }
+div.floatingboxinner, fieldset.floatingboxinner{
+}
+
 div.floatinginfobox .strong, fieldset.floatinginfobox .strong {
 	display: block;
 	text-align: center;
@@ -2217,6 +2312,8 @@ div.floatinginfobox ul, fieldset.floatinginfobox ul {
 	list-style-image:url( images/bullet-1.png );
 	list-style-position:outside;
 	}
+
+
 	/*
 	---------------------------------------
 	Images
@@ -2275,18 +2372,19 @@ table.mceEditor textarea{ width :100%; height: 100%;}
 #treeview table td{ text-align: left; padding: 0px;}
 
 .roundedbox {
-	margin: 0 auto;
-	background: url( images/rounded.png ) no-repeat bottom right;
-	font-size: 100%;
+	margin: 0em;
+	border: 1em solid #fff;
+	border-width: 0 1em;
+	background:transparent url(images/rounded.png ) no-repeat bottom right;
 }
 .roundedheader {
-	background: url( images/rounded.png ) no-repeat top right;
+	background:transparent url(images/rounded.png ) no-repeat top right;
 	margin: 0;
 	padding: 0;
 	text-align: left;
 }
 .roundedheader h3 {
-	background: url( images/rounded.png ) no-repeat top left;
+	background:transparent url(images/rounded.png ) no-repeat top left;
 	margin: 0;
 	padding: 10px 10px 5px;
 	color: white; 
@@ -2295,26 +2393,14 @@ table.mceEditor textarea{ width :100%; height: 100%;}
 	line-height: 1em;
 }
 .roundedbody {
-	background: url( images/rounded.png ) no-repeat bottom left;
+	width: auto;
+	background:transparent url(images/rounded.png ) no-repeat bottom left;
 	margin: 0;
 	padding: 5px 30px 31px;
 }
 
 
-
-
-
-.
-
-
-
-
-
-
-
-
 #changescontent {}
-
 #changescontent table{
 width:  100%;
 margin: 0;}
@@ -2360,7 +2446,7 @@ span.diffaddword {
 }
 div#changes-info{
 	background-color: #919dac;
-	background-image: url( images/DIFF-header.png );
+	background-image: url(images/DIFF-header.png );
 	background-position:50% -35px ;
 	background-repeat: no-repeat;
 }
@@ -2368,7 +2454,7 @@ div#changes-info{
 #changes-title {
 	margin-top: 2em;
 	background-color: #6b747f;
-		background-image: url( images/rounded.png ) !important;
+		background-image: url(images/rounded.png ) !important;
 	background-image: url( images/rounded.gif ) ;
 }
 #changes-title h1{
@@ -2376,8 +2462,8 @@ div#changes-info{
 	font-size: 1.4em;
 	letter-spacing: 1px;
 	text-align: center;
-		background-image: url( images/rounded.png ) !important;
-	background-image: url( images/rounded.gif ) ;
+		background-image: url(images/rounded.png ) !important;
+	background-image: url(images/rounded.gif ) ;
 	background-position: top right;
 	color:  #fff;
 	border-bottom: 4px solid #fff;
@@ -2420,4 +2506,48 @@ div.changes-info-title {
 	text-align: center;
 	padding: 1em 0;
 	color:  #FFF;
+}
+/*IE 6 ONLY*/
+/*  IE 6 */
+* html  * {zoom:1; }
+* html a {position:relative; z-index:1;}
+* html #rightPanels, #editPanels { margin-top: -27px;}
+* html #globalsearch{margin-bottom: 1em}
+
+* html h5.xwikipaneltitle,
+* html .collapsed h5.xwikipaneltitle,
+* html .xwikipanelcontents {background-image: url(images/panel-v.gif);}
+* html #rightPanels .Search #globalsearch {background-image:url(images/search-bg.gif);}
+
+
+* html #xwikihelpsyntax {background-image: url(images/panel-e.gif);}
+* html #editPanels .expanded h5.xwikipaneltitle {background-image: url(images/panel-e.gif);}
+* html #editPanels .xwikipanelcontents {background-image: url(images/panel-e.gif);}
+* html #editPanels .editmodes .xwikipanelcontents ul li.active {background-image: url();}
+* html #editPanels .editmodes h5, #editPanels .editmodes  .xwikipanelcontents {background-image: url(images/panel-m.gif);}
+* html #xwikicontent{overflow-y: hidden;}
+
+* html #headerglobal .minwithd {display: none;}
+* html .minwidth,* html  .minwidthb,* html  .minwidthc{}
+* html #contentcolumn .minwidthb{ display:block; width:740px; margin-right:220px;}
+* html #headerspace .minwidth{ display:block; width:710px;}/* 740 - 30 padding */
+* html .minwidthc{}
+
+* html body  #show-dialog-btn {
+right:1px;
+top:1px;
+}
+* html ul.xwikitabbar{margin: 0;}
+* html .roundedbox ,
+* html .roundedheader ,
+* html .roundedheader h3 ,
+* html .roundedbody {	background-image: url(images/rounded.gif) ;}
+
+* html div.floatinginfobox,
+* html fieldset.floatinginfobo,
+* html div.floatingboxinner,
+* html fieldset.floatingboxinner,
+* html div.floatingboxinner *,
+* html fieldset.floatingboxinner *{
+  zoom: normal;
 }

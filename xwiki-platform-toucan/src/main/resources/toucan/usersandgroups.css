@@ -1,0 +1,184 @@
+/* USERS SCROLLING SYSTEM */
+
+div.scrollbar {
+    overflow: auto;
+    height: 250px;
+    margin:0px;
+    padding:0px;
+    width: 25px;
+    left: -10px;
+    position: relative;
+}
+
+div.inscrollbar {
+    width:1px;
+    margin:0px;
+    padding:0px;
+    height:3000px;
+}
+
+.display {
+    border-collapse: collapse;
+    border: 1px solid #e8e8e8;
+    width: 100%;
+}
+
+.display td {
+    border: 1px solid #e8e8e8;
+    padding: 3px;
+}
+
+
+#showLimits {
+   font-size: 12px;
+   padding-top: 5px;
+   padding-bottom: 5px;
+}
+
+.icon-manage {
+   cursor: pointer;
+   padding-right: 10px;
+}
+
+.icon-manageg {
+   padding-right: 10px;
+}
+
+#ajax-loader {
+   margin: 0px;
+   padding: 0px;
+   position: absolute;
+   top: 50%;
+   left: 35%;
+   z-index: 1000000000;
+   display: none;
+   width: 220px;
+   background-color: #fff;
+   border: 1px solid #999;
+   font-size: 11px;
+   padding: 8px;
+   text-indent: 5px;
+}
+
+
+.theader {
+   background-color: #ccc;
+   color: #FFF;
+   font-weight: bold;
+   font-size: 1em;
+}
+
+#table-filters {
+    background-color: #efefef;
+}
+
+.filter {
+	width: 70%;
+}
+
+.theader td {
+	padding: 3px 0 3px 10px;
+}
+
+#userstable, #groupstable, #usersandgroupstable {
+    width: auto;
+    position: relative;
+    border: 5px solid #fff;
+    margin: 0px;
+    left: 0px;
+}
+
+#memberstable {
+    width: 500px;
+    margin-bottom: 5px;
+}
+
+#specialusersandgroups {
+   border-collapse: collapse;
+   border: 1px solid #7c7c7c;
+   width: 100%;
+}
+
+#specialusersandgroups td {
+    border: 1px solid #7c7c7c;
+}
+
+.manage {
+	text-align: center;
+	width: 15%;
+}
+
+.hmanage {
+	width: 15%;
+	padding-left: 10px;
+}
+
+
+.rights {
+	text-align: center;
+	padding-left: 0px !important;
+	padding-top: 4px;
+	width: 9%;
+}
+
+#usersandgroupstable.spacerights .rights {
+      width: 12% !important;
+}
+
+#usersandgroupstable.rights .rights {
+      width: 15% !important;
+}
+
+.spaceName {
+	padding: 10px 5px;
+}
+
+#tdAddNewUserOrGroup {
+	padding-top: 11px;
+}
+
+
+#tdAddNewUserOrGroup a {
+display: inline-block;
+display:inline;
+font-size: 12px;
+padding: 3px 10px;
+	line-height: 24px;
+	font-weight: bold;
+margin:0px !important;
+min-height:24px !important;
+background:transparent url( images/buttons3.png ) repeat-x scroll right top;
+border: 1px solid #8f908e;
+color: #FFF;
+white-space: nowrap;
+        background:transparent url( images/buttons3.png ) repeat-x scroll left 25%;
+border-color: #94ad12;        
+}
+
+#errMsg {
+        color: #DD7700;
+        font-size: 12px;
+        font-weight: bold;
+}
+
+#XWikiGuestSpecial {
+        background-color: #fff;
+        color: #000;
+}
+
+.suorg {
+  padding-left: 10px;
+  padding-top: 4px;
+}
+
+.username {
+  padding-left:10px;
+}
+
+#addNewMember {
+   margin-top: 5px;
+}
+
+.addlabel {
+   font-weight: bold;
+}

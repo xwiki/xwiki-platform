@@ -420,6 +420,12 @@ public interface SpaceManager extends XWikiPluginInterface
         throws SpaceManagerException;
 
     /**
+     * Returns the list of roles the specified user has as a member of the specified space
+     */
+    public Collection getRoles(String spaceName, String userName, XWikiContext context)
+        throws SpaceManagerException;
+
+    /**
      * @param spaceName
      * @param user
      * @param context

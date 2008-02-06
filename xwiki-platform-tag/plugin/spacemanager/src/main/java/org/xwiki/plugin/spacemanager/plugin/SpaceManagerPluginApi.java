@@ -21,11 +21,13 @@ package org.xwiki.plugin.spacemanager.plugin;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.PluginApi;
+
 import org.xwiki.plugin.spacemanager.api.Space;
 import org.xwiki.plugin.spacemanager.api.SpaceManager;
 import org.xwiki.plugin.spacemanager.api.SpaceManagerException;
 import org.xwiki.plugin.spacemanager.api.SpaceUserProfile;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Collection;
 
@@ -457,14 +459,44 @@ public class SpaceManagerPluginApi extends PluginApi
      * @param role
      * @return
      */
-    // public List getUsersForRole(Space space, String role) throws SpaceManagerException;
+    public Collection getUsersForRole(String spaceName, String role)
+    {
+        context.remove("SpaceManagerException");
+        try {
+            return getSpaceManager().getUsersForRole(spaceName, role, context);
+        } catch (SpaceManagerException e) {
+            context.put("SpaceManagerException", e);
+            return Collections.EMPTY_LIST;
+        }
+    }
 
     /**
-     *
-     * @param space
-     * @return
+     * @return the list of roles available for the given space
      */
-    // public List getRoles(Space space) throws SpaceManagerException;
+    public Collection getRoles(String spaceName)
+    {
+        context.remove("SpaceManagerException");
+        try {
+            return getSpaceManager().getRoles(spaceName, context);
+        } catch (SpaceManagerException e) {
+            context.put("SpaceManagerException", e);
+            return Collections.EMPTY_LIST;
+        }
+    }
+
+    /**
+     * @return the list of roles the specified user has as a member of the specified space
+     */
+    public Collection getRoles(String spaceName, String memberName)
+    {
+        context.remove("SpaceManagerException");
+        try {
+            return getSpaceManager().getRoles(spaceName, memberName, context);
+        } catch (SpaceManagerException e) {
+            context.put("SpaceManagerException", e);
+            return Collections.EMPTY_LIST;
+        }
+    }
 
     /**
      * Gets a user profile object

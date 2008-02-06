@@ -1055,8 +1055,8 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         throws SpaceManagerException
     {
         try {
-            return getGroupService(context).getAllMembersNamesForGroup(
-                getRoleGroupName(spaceName, role), 0, 0, context);
+            return sortUserNames(getGroupService(context).getAllMembersNamesForGroup(
+                getRoleGroupName(spaceName, role), 0, 0, context), context);
         } catch (XWikiException e) {
             throw new SpaceManagerException(e);
         }
@@ -1248,8 +1248,10 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
 
     /**
      * {@inheritDoc}
+     * 
+     * @see SpaceManager#getMembers(String, XWikiContext)
      */
-    public Collection getMembers(String spaceName, final XWikiContext context)
+    public Collection getMembers(String spaceName, XWikiContext context)
         throws SpaceManagerException
     {
         try {
@@ -1364,6 +1366,26 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     {
         notImplemented();
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see SpaceManager#getRoles(String, String, XWikiContext)
+     */
+    public Collection getRoles(String spaceName, String memberName, XWikiContext context)
+        throws SpaceManagerException
+    {
+        try {
+            Collection memberRoles =
+                context.getWiki().getGroupService(context).getAllGroupsNamesForMember(memberName,
+                    0, 0, context);
+            Collection spaceRoles = getRoles(spaceName, context);
+            memberRoles.retainAll(spaceRoles);
+            return memberRoles;
+        } catch (XWikiException e) {
+            throw new SpaceManagerException(e);
+        }
     }
 
     /**

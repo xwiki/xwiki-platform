@@ -63,12 +63,17 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
+import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderer;
@@ -371,6 +376,48 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bclass.setName(doc.getFullName());
                 if ((bclass.getFieldList().size()>0)&&(useClassesTable(true, context)))
                     saveXWikiClass(bclass, context, false);
+                // update objects of the class
+                for (Iterator itf=bclass.getFieldList().iterator(); itf.hasNext(); ) {
+                    PropertyClass prop = (PropertyClass) itf.next();
+                    // migrate values of list properties
+                    if (prop instanceof StaticListClass || prop instanceof DBListClass) {
+                        ListClass lc = (ListClass) prop;
+                        String[] classes = {DBStringListProperty.class.getName(), StringListProperty.class.getName(), StringProperty.class.getName()}; // @see ListClass#newProperty()
+                        for (int i=0; i<classes.length; i++) {
+                            String oldclass = classes[i];
+                            if (!oldclass.equals(lc.newProperty().getClass().getName())) {
+                                Query q = session.createQuery("select p from "+oldclass+" as p, BaseObject as o" +
+                                    " where o.className=?" +
+                                    "  and p.id=o.id and p.name=?")
+                                    .setString(0, bclass.getName())
+                                    .setString(1, lc.getName());
+                                for (Iterator it = q.list().iterator(); it.hasNext(); ) {
+                                    BaseProperty lp = (BaseProperty) it.next();
+                                    BaseProperty lp1 = lc.newProperty();
+                                    lp1.setId(lp.getId());
+                                    lp1.setName(lp.getName());
+                                    if (lc.isMultiSelect()) {
+                                        List tmp;
+                                        if (lp.getValue() instanceof List) {
+                                            tmp = (List) lp.getValue();
+                                        } else {
+                                            tmp = new ArrayList(1);
+                                            tmp.add(lp.getValue());
+                                        }
+                                        lp1.setValue(tmp);
+                                    } else {
+                                        Object tmp = lp.getValue();
+                                        if (tmp instanceof List)
+                                            tmp = ((List)tmp).get(0);
+                                        lp1.setValue(tmp);
+                                    }
+                                    session.delete(lp);
+                                    session.save(lp1);
+                                }
+                            }
+                        }
+                    }
+                }
             } else {
                 // TODO: Remove existing class
             }

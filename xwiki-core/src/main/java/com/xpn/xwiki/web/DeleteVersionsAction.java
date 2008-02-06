@@ -75,6 +75,12 @@ public class DeleteVersionsAction extends XWikiAction
             archive.removeVersions(v1, v2, context);
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
             tdoc.setDocumentArchive(archive);
+            // if we delete latest version then rollback to latest undeleted version 
+            if (archive.getLatestVersion()!=null && !tdoc.getRCSVersion().equals(archive.getLatestVersion())) {
+                XWikiDocument newdoc = archive.loadDocument(archive.getLatestVersion(), context);
+                context.getWiki().getStore().saveXWikiDoc(newdoc, context);
+                context.setDoc(newdoc);
+            }
         }
         sendRedirect(context);
         return false;

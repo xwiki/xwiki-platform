@@ -35,7 +35,6 @@
   <packaging>pom</packaging>
   <description>XWiki Platform - Tools - Build - Parent POM</description>
   <modules>
-    <module>build-verifications</module>
     <module>build-xar-plugin</module>
     <module>build-xar-handlers</module>
     <module>build-xmldoc-update-plugin</module>

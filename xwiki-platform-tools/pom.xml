@@ -42,6 +42,7 @@
   </scm>
   <modules>
     <module>build-tools</module>
+    <module>xwiki-verification-resources</module>
     <module>xwiki-shared-tests</module>
     <module>xwiki-packager-plugin</module>
     <module>xwiki-configuration-resources</module>

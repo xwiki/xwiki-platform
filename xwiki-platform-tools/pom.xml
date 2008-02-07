@@ -29,7 +29,7 @@
     <artifactId>xwiki-build-tools</artifactId>
     <version>1.8-SNAPSHOT</version>
   </parent>
-  <artifactId>xwiki-shared-test</artifactId>
+  <artifactId>xwiki-shared-tests</artifactId>
   <name>XWiki Platform - Tools - Build - Shared Test</name>
   <packaging>jar</packaging>
   <description>Test framework classes shared between functional test modules</description>

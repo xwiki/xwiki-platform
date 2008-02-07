@@ -34,7 +34,7 @@
       </plugin>
       <plugin>
         <groupId>com.xpn.xwiki.platform</groupId>
-        <artifactId>xwiki-packager</artifactId>
+        <artifactId>xwiki-packager-plugin</artifactId>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>
         </configuration>

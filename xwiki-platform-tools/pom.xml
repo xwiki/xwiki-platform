@@ -61,7 +61,7 @@
         <dependencies>
           <dependency>
             <groupId>com.xpn.xwiki.platform</groupId>
-            <artifactId>xwiki-build-verifications</artifactId>
+            <artifactId>xwiki-verification-resources</artifactId>
             <version>${pom.version}</version>
           </dependency>
         </dependencies>

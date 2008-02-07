@@ -85,7 +85,9 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
     }
 
     /**
-     * Write a XWiki document to a XML file
+     * Write a XWiki document to a XML file, without rendering and without versions.
+     * Note also that objects will be empty if their class definition is not in the document
+     * itself.
      * 
      * @param doc the document to write XML for
      * @param file the file to write the document to
@@ -95,8 +97,10 @@ public abstract class AbstractDocumentMojo extends AbstractMojo
     {
         try {
             FileWriter fw = new FileWriter(file);
-            // write to XML the document, its object and attachments 
-            // but without rendering and without versions
+            // write to XML the document and attachments 
+            // but without rendering and without versions.
+            // Objects will be written only if their class could be loaded,
+            // i.e if defined in the document itself.
             // A null context does the trick if the document
             // has been properly loaded.
             fw.write(doc.toXML(true, false, true, false, null));

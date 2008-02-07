@@ -20,7 +20,6 @@
 package org.xwiki.plugin.activitystream.api;
 
 import java.util.List;
-import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -31,39 +30,46 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public interface ActivityStream
 {
-
     /**
      * Creates the classes used by the activity stream when necessary
      */
     void initClasses(XWikiContext context) throws XWikiException;
 
-
     /**
-     * Adding and activity event
-     * The Id does not need to be filled as it will be created
-     * Date and Wiki are optional
+     * Adding and activity event. The Id does not need to be filled as it will be created. Date and
+     * Wiki are optional
+     * 
      * @param event
      * @param context
      * @throws ActivityStreamException
      */
-    void addActivityEvent(ActivityEvent event, XWikiContext context) throws ActivityStreamException;
+    void addActivityEvent(ActivityEvent event, XWikiContext context)
+        throws ActivityStreamException;
 
-    void addActivityEvent(String type, String title, XWikiContext context) throws ActivityStreamException;
+    void addActivityEvent(String type, String title, XWikiContext context)
+        throws ActivityStreamException;
 
-    void addDocumentActivityEvent(XWikiDocument doc, String type, String title, XWikiContext context) throws ActivityStreamException;
+    void addDocumentActivityEvent(XWikiDocument doc, String type, String title,
+        XWikiContext context) throws ActivityStreamException;
 
-    List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context) throws ActivityStreamException;
+    List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)
+        throws ActivityStreamException;
 
-    List getEvents(boolean filter, int nb, int start, XWikiContext context) throws ActivityStreamException;
+    List getEvents(boolean filter, int nb, int start, XWikiContext context)
+        throws ActivityStreamException;
 
-    List getEventsForSpace(String space, boolean filter, int nb, int start, XWikiContext context) throws ActivityStreamException;
+    List getEventsForSpace(String space, boolean filter, int nb, int start, XWikiContext context)
+        throws ActivityStreamException;
 
-    List getEventsForUser(String user, boolean filter, int nb, int start, XWikiContext context) throws ActivityStreamException;
+    List getEventsForUser(String user, boolean filter, int nb, int start, XWikiContext context)
+        throws ActivityStreamException;
 
-    List getEvents(String streamName, boolean filter, int nb, int start, XWikiContext context) throws ActivityStreamException;
+    List getEvents(String streamName, boolean filter, int nb, int start, XWikiContext context)
+        throws ActivityStreamException;
 
-    List getEventsForSpace(String streamName, String space, boolean filter, int nb, int start, XWikiContext context) throws ActivityStreamException;
+    List getEventsForSpace(String streamName, String space, boolean filter, int nb, int start,
+        XWikiContext context) throws ActivityStreamException;
 
-    List getEventsForUser(String streamName, String user, boolean filter, int nb, int start, XWikiContext context) throws ActivityStreamException;
-
+    List getEventsForUser(String streamName, String user, boolean filter, int nb, int start,
+        XWikiContext context) throws ActivityStreamException;
 }

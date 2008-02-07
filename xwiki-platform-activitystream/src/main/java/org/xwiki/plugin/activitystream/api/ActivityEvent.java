@@ -19,9 +19,9 @@
  */
 package org.xwiki.plugin.activitystream.api;
 
-import com.xpn.xwiki.XWikiContext;
-
 import java.util.Date;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * An Activity Event represents a event done by a user in a certain context.
@@ -39,7 +39,6 @@ public interface ActivityEvent
      */
     void setEventId(String id);
 
-
     /**
      * @return The request ID
      */
@@ -50,7 +49,6 @@ public interface ActivityEvent
      * @see #getRequestId()
      */
     void setRequestId(String id);
-
 
     /**
      * @return The priority of the event
@@ -74,18 +72,16 @@ public interface ActivityEvent
      */
     void setType(String type);
 
+    /**
+     * @return The application name
+     */
+    String getApplication();
 
     /**
-      * @return The application name
-      */
-     String getApplication();
-
-     /**
-      * @param application The application Name
-      * @see #getApplication()
-      */
-     void setApplication(String application);
-
+     * @param application The application Name
+     * @see #getApplication()
+     */
+    void setApplication(String application);
 
     /**
      * @return The stream name
@@ -98,7 +94,6 @@ public interface ActivityEvent
      */
     void setStream(String stream);
 
-
     /**
      * @return The stream name
      */
@@ -109,7 +104,6 @@ public interface ActivityEvent
      * @see #getDate()
      */
     void setDate(Date date);
-
 
     /**
      * @return The wiki name of the user creating the event
@@ -144,7 +138,6 @@ public interface ActivityEvent
      */
     void setSpace(String space);
 
-
     /**
      * @return The page of the event
      */
@@ -155,7 +148,6 @@ public interface ActivityEvent
      * @see #getPage()
      */
     void setPage(String page);
-
 
     /**
      * @return The target url
@@ -190,7 +182,6 @@ public interface ActivityEvent
      */
     void setBody(String body);
 
-
     /**
      * @return The first param of the event
      */
@@ -201,7 +192,6 @@ public interface ActivityEvent
      * @see #getParam1()
      */
     void setParam1(String param1);
-
 
     /**
      * @return The second param of the event
@@ -247,9 +237,9 @@ public interface ActivityEvent
      */
     void setParam5(String param5);
 
-
     /**
      * Retrieves the event in displayable format
+     * 
      * @param context
      * @return
      */
@@ -257,6 +247,7 @@ public interface ActivityEvent
 
     /**
      * Retrieves the event body in displayable format
+     * 
      * @param context
      * @return
      */
@@ -264,6 +255,7 @@ public interface ActivityEvent
 
     /**
      * Retrieves the event date in displayable format
+     * 
      * @param context
      * @return
      */
@@ -271,9 +263,9 @@ public interface ActivityEvent
 
     /**
      * Retrieves the event user in displayable format
+     * 
      * @param context
      * @return
      */
     String getDisplayUser(XWikiContext context);
-
 }

@@ -19,8 +19,8 @@
  */
 package org.xwiki.plugin.activitystream.plugin;
 
-import org.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
 import org.xwiki.plugin.activitystream.api.ActivityStream;
+import org.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
@@ -28,37 +28,29 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
- * Plug-in for for managing invitations and membership requests
+ * Plug-in for for managing streams of activity events
  * 
- * @see org.xwiki.plugin.invitationmanager.api.InvitationManager
+ * @see ActivityStream
  */
 public class ActivityStreamPlugin extends XWikiDefaultPlugin
 {
     /**
      * We should user inversion of control instead
      */
-    private ActivityStream invitationManager = new ActivityStreamImpl();
+    private ActivityStream activityStream = new ActivityStreamImpl();
 
     /**
-     * {@inheritDoc}
-     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public ActivityStreamPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
-
-        // move this to ActivityStreamImpl in the near future
-        String mailNotificationCfg =
-            context.getWiki().Param("xwiki.activitystream.mailnotification", "1").trim();
-        boolean mailNotification = "1".equals(mailNotificationCfg);
-        // ((ActivityStreamImpl) invitationManager).setMailNotification(mailNotification);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
+     * @see XWikiDefaultPlugin#getName()
      */
     public String getName()
     {
@@ -68,36 +60,53 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi
+     * @see XWikiDefaultPlugin#getPluginApi
      */
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ActivityStreamPluginApi((ActivityStreamPlugin) plugin, context);
     }
 
+    /**
+     * @return The {@link ActivityStream} component used in behind by this plug-in instance
+     */
     public ActivityStream getActivityStream()
     {
-        return invitationManager;
+        return activityStream;
     }
 
-    public void setActivityStream(ActivityStream invitationManager)
+    /**
+     * @param activityStream The {@link ActivityStream} component to be used
+     */
+    public void setActivityStream(ActivityStream activityStream)
     {
-        this.invitationManager = invitationManager;
+        this.activityStream = activityStream;
     }
 
-
-    public void init(XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiDefaultPlugin#init(XWikiContext)
+     */
+    public void init(XWikiContext context)
+    {
         super.init(context);
         try {
-            invitationManager.initClasses(context);
+            activityStream.initClasses(context);
         } catch (Exception e) {
         }
     }
 
-    public void virtualInit(XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiDefaultPlugin#virtualInit(XWikiContext)
+     */
+    public void virtualInit(XWikiContext context)
+    {
         super.virtualInit(context);
         try {
-            invitationManager.initClasses(context);
+            activityStream.initClasses(context);
         } catch (Exception e) {
         }
     }

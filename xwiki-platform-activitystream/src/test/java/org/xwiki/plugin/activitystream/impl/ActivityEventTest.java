@@ -17,32 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.plugin.activitystream.plugin;
+package org.xwiki.plugin.activitystream.impl;
 
-import org.xwiki.plugin.activitystream.api.ActivityStream;
-
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.plugin.PluginApi;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import org.xwiki.plugin.activitystream.api.ActivityEvent;
 
 /**
- * API for {@link ActivityStreamPlugin}
+ * Unit tests for classes implementing {@link ActivityEvent} interface.
  */
-public class ActivityStreamPluginApi extends PluginApi
+public abstract class ActivityEventTest // extends MockObjectTestCase
 {
-    /**
-     * @see PluginApi#PluginApi(XWikiPluginInterface, XWikiContext)
-     */
-    public ActivityStreamPluginApi(ActivityStreamPlugin plugin, XWikiContext context)
-    {
-        super(plugin, context);
-    }
-
-    /**
-     * @return The {@link ActivityStream} component to use inside the API
-     */
-    protected ActivityStream getActivityStream()
-    {
-        return ((ActivityStreamPlugin) getPlugin()).getActivityStream();
-    }
 }

@@ -19,202 +19,259 @@
  */
 package org.xwiki.plugin.activitystream.impl;
 
-
-import com.xpn.xwiki.XWikiContext;
-import org.xwiki.plugin.activitystream.api.ActivityEvent;
-
 import java.util.Date;
 
-/**
- */
-public class ActivityEventImpl implements ActivityEvent {
+import org.xwiki.plugin.activitystream.api.ActivityEvent;
+
+import com.xpn.xwiki.XWikiContext;
+
+public class ActivityEventImpl implements ActivityEvent
+{
     protected String eventId;
+
     protected String requestId;
+
     protected int priority = 0;
+
     protected Date date;
+
     protected String stream;
+
     protected String application;
+
     protected String type;
+
     protected String user;
+
     protected String wiki;
+
     protected String space;
+
     protected String page;
+
     protected String url;
+
     protected String title;
+
     protected String body = "";
+
     protected String param1 = "";
+
     protected String param2 = "";
+
     protected String param3 = "";
+
     protected String param4 = "";
+
     protected String param5 = "";
 
-
-
-    public String getDisplayTitle(XWikiContext context) {
+    public String getDisplayTitle(XWikiContext context)
+    {
         return context.getWiki().parseMessage(title, context);
     }
 
-    public String getDisplayBody(XWikiContext context) {
-        return context.getWiki().parseMessage(body, context);               
+    public String getDisplayBody(XWikiContext context)
+    {
+        return context.getWiki().parseMessage(body, context);
     }
 
-    public String getDisplayDate(XWikiContext context) {
+    public String getDisplayDate(XWikiContext context)
+    {
         return context.getWiki().formatDate(date, null, context);
     }
 
-    public String getDisplayUser(XWikiContext context) {
+    public String getDisplayUser(XWikiContext context)
+    {
         return context.getWiki().getLocalUserName(user, context);
     }
 
-    public String getEventId() {
+    public String getEventId()
+    {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(String eventId)
+    {
         this.eventId = eventId;
     }
 
-    public String getRequestId() {
+    public String getRequestId()
+    {
         return requestId;
     }
 
-    public void setRequestId(String requestId) {
+    public void setRequestId(String requestId)
+    {
         this.requestId = requestId;
     }
 
-    public int getPriority() {
+    public int getPriority()
+    {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(int priority)
+    {
         this.priority = priority;
     }
 
-    public String getApplication() {
+    public String getApplication()
+    {
         return application;
     }
 
-    public void setStream(String stream) {
+    public void setStream(String stream)
+    {
         this.stream = stream;
     }
 
-    public String getParam1() {
+    public String getParam1()
+    {
         return param1;
     }
 
-    public void setParam1(String param1) {
+    public void setParam1(String param1)
+    {
         this.param1 = param1;
     }
 
-    public String getParam2() {
+    public String getParam2()
+    {
         return param2;
     }
 
-    public void setParam2(String param2) {
+    public void setParam2(String param2)
+    {
         this.param2 = param2;
     }
 
-    public String getParam3() {
+    public String getParam3()
+    {
         return param3;
     }
 
-    public void setParam3(String param3) {
+    public void setParam3(String param3)
+    {
         this.param3 = param3;
     }
 
-    public String getParam4() {
+    public String getParam4()
+    {
         return param4;
     }
 
-    public void setParam4(String param4) {
+    public void setParam4(String param4)
+    {
         this.param4 = param4;
     }
 
-    public String getParam5() {
+    public String getParam5()
+    {
         return param5;
     }
 
-    public void setParam5(String param5) {
+    public void setParam5(String param5)
+    {
         this.param5 = param5;
     }
 
-    public String getWiki() {
+    public String getWiki()
+    {
         return wiki;
     }
 
-    public void setWiki(String wiki) {
+    public void setWiki(String wiki)
+    {
         this.wiki = wiki;
     }
 
-    public String getType() {
+    public String getType()
+    {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(String type)
+    {
         this.type = type;
     }
 
-    public String getUser() {
+    public String getUser()
+    {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(String user)
+    {
         this.user = user;
     }
 
-    public String getSpace() {
+    public String getSpace()
+    {
         return space;
     }
 
-    public void setSpace(String space) {
+    public void setSpace(String space)
+    {
         this.space = space;
     }
 
-    public String getPage() {
+    public String getPage()
+    {
         return page;
     }
 
-    public void setPage(String page) {
+    public void setPage(String page)
+    {
         this.page = page;
     }
 
-    public String getUrl() {
+    public String getUrl()
+    {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(String url)
+    {
         this.url = url;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public String getBody() {
+    public String getBody()
+    {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(String body)
+    {
         this.body = body;
     }
 
-    public Date getDate() {
+    public Date getDate()
+    {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Date date)
+    {
         this.date = date;
     }
 
-    public String getStream() {
+    public String getStream()
+    {
         return stream;
     }
 
-    public void setApplication(String application) {
+    public void setApplication(String application)
+    {
         this.application = application;
     }
 }

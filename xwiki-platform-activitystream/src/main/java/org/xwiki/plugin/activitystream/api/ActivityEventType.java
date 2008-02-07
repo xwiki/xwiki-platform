@@ -21,10 +21,9 @@ package org.xwiki.plugin.activitystream.api;
 
 /**
  * The type of request. This list is extensible.
- * 
  */
-public interface ActivityEventType {
-
+public interface ActivityEventType
+{
     String OTHER = "other";
 
     String CREATE = "create";
@@ -54,5 +53,4 @@ public interface ActivityEventType {
     String CHANGE_RIGHTS = "changerights";
 
     String NEW_MEMBER = "newmember";
-
 }

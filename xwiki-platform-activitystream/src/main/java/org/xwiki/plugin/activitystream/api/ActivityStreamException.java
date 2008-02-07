@@ -1,8 +1,4 @@
-package org.xwiki.plugin.activitystream.api;
-
-import com.xpn.xwiki.XWikiException;
-
-/**
+/*
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  * <p/>
@@ -21,39 +17,47 @@ import com.xpn.xwiki.XWikiException;
  * Software Foundation,Inc.,51 Franklin St,Fifth Floor,Boston,MA
  * 02110-1301 USA,or see the FSF site:http://www.fsf.org.
  */
+package org.xwiki.plugin.activitystream.api;
 
-public class ActivityStreamException extends XWikiException {
-    public static final int MODULE_PLUGIN_ActivityStream = 101;
+import com.xpn.xwiki.XWikiException;
 
-    public static final int ERROR_INVITATION_INVITEE_MISSING = 101001;
-    public static final int ERROR_INVITATION_INVITEE_EMAIL_INVALID = 101002;
-    public static final int ERROR_INVITATION_ALREADY_EXISTS = 101003;
-    public static final int ERROR_INVITATION_ALREADY_MEMBER = 101004;
-    public static final int ERROR_INVITATION_SENDER_EMAIL_INVALID = 101005;
-    public static final int ERROR_INVITATION_TARGET_EMAIL_INVALID = 101006;
-    public static final int ERROR_INVITATION_SENDING_EMAIL_FAILED = 101007;
-    public static final int ERROR_INVITATION_MANAGER_REQUIRES_MAILSENDER_PLUGIN = 101008;
-    
-    public static final int ERROR_INVITATION_DATA_INVALID = 101009;
-    public static final int ERROR_INVITATION_CANNOT_FIND_EMAIL_ADDRESS = 101010;
+public class ActivityStreamException extends XWikiException
+{
+    public static final int MODULE_PLUGIN_ACTIVITY_STREAM = 102;
 
-    public ActivityStreamException(){
-	}
+    /**
+     * @see XWikiException#XWikiException()
+     */
+    public ActivityStreamException()
+    {
+    }
 
-    public ActivityStreamException(int module, int code, String message){
+    /**
+     * @see XWikiException#XWikiException(int, int, String)
+     */
+    public ActivityStreamException(int module, int code, String message)
+    {
         super(module, code, message);
     }
 
-    public ActivityStreamException(int module, int code, String message, Exception e){
+    /**
+     * @see XWikiException#XWikiException(int, int, String, Throwable)
+     */
+    public ActivityStreamException(int module, int code, String message, Exception e)
+    {
         super(module, code, message, e);
     }
 
-    public ActivityStreamException( XWikiException e ){
+    /**
+     * @see Exception#Exception(Throwable)
+     */
+    public ActivityStreamException(XWikiException e)
+    {
         super();
         setModule(e.getModule());
         setCode(e.getCode());
         setException(e.getException());
         setArgs(e.getArgs());
         setMessage(e.getMessage());
-	}
+    }
 }

@@ -39,6 +39,5 @@
     <module>build-xar-plugin</module>
     <module>build-xar-handlers</module>
     <module>build-xmldoc-update-plugin</module>
-    <module>shared-test</module>
   </modules>
 </project>

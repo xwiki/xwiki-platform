@@ -89,7 +89,7 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         result.add(new R4359XWIKI1459Migrator());
         result.add(new R6079XWIKI1878Migrator());
         result.add(new R6405XWIKI1933Migrator());
-        result.add(new R6430XWIKI1954Migrator());
+        result.add(new R7350XWIKI2079Migrator());
         // 2nd way - via classloader
         
         return result;

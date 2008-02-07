@@ -44,6 +44,7 @@
     <module>build-tools</module>
     <module>xwiki-verification-resources</module>
     <module>xwiki-shared-tests</module>
+    <module>xwiki-xmldoc-update-plugin</module>
     <module>xwiki-packager-plugin</module>
     <module>xwiki-configuration-resources</module>
     <module>xwiki-jetty-resources</module>

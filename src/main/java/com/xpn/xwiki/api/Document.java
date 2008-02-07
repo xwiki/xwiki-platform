@@ -1828,4 +1828,14 @@ public class Document extends Api
     public boolean isMostRecent() {
         return doc.isMostRecent();
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
+        return doc.toString();
+    }
 }

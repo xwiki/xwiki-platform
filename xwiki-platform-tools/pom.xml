@@ -42,7 +42,7 @@
   </scm>
   <modules>
     <module>build-tools</module>
-    <module>packager</module>
+    <module>xwiki-packager-plugin</module>
     <module>xwiki-configuration-resources</module>
     <module>xwiki-jetty-resources</module>
   </modules>

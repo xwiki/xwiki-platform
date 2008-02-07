@@ -1,1 +1,0 @@
-clean com.xpn.xwiki.platform:xwiki-packager:import com.xpn.xwiki.platform:xwiki-packager:export

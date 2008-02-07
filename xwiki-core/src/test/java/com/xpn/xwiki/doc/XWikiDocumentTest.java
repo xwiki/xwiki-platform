@@ -141,4 +141,10 @@ public class XWikiDocumentTest extends MockObjectTestCase
         
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
     }
+
+    public void testToStringReturnsFullName()
+    {
+        assertEquals("Space.Page", document.toString());
+        assertEquals("Main.WebHome", new XWikiDocument().toString());
+    }
 }

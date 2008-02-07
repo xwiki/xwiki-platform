@@ -1,16 +1,23 @@
+## This template is necessary so that different skins can use different edit Panels.
+## Thus each skin is allowed to override the editpanelsvars.vm file.
+#template("editpanelsvars.vm")
 #if($editor == "wiki" || $editor == "wysiwyg")
-#set($editorPanels = "Panels.DocumentInformation,Panels.EditTranslations,Panels.SyntaxHelp")
+  #set($editorPanels = $editorPanelsWiki)
+#elseif($editor == "wysiwyg")
+  #set($editorPanels = $editorPanelsWysiwyg)
 #elseif($editor == "object")
-#set($editorPanels = "Panels.ObjectEditorWelcome,Panels.AddObject")
+  #set($editorPanels = $editorPanelsObjects)
 #elseif($editor == "class")
-#set($editorPanels = "Panels.ClassEditorWelcome,Panels.AddClassProperty")
+  #set($editorPanels = $editorPanelsClass)
 #elseif($editor == "rights")
-#set($editorPanels = "Panels.RightsEditorWelcome,Panels.RightsHelp,Panels.RightsTips")
+  #set($editorPanels = $editorPanelsRights)
+#elseif($editor == "history")
+  #set($editorPanels = $editorPanelsHistory)
 #end
 #set($editorPanels = $editorPanels.split(","))
 <div id="editPanels" class="panels editor">
 #foreach($panel in $editorPanels)
-#displaypanel($panel)
+  #displaypanel($panel)
 #end
 </div>
 #if($editor == "wysiwyg")

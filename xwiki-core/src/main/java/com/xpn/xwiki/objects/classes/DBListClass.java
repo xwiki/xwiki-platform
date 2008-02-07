@@ -34,6 +34,8 @@ import com.xpn.xwiki.plugin.query.QueryPlugin;
 
 import java.util.StringTokenizer;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.xhtml.input;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
@@ -44,6 +46,8 @@ import com.xpn.xwiki.XWikiException;
 
 public class DBListClass extends ListClass
 {
+    private static final Log LOG = LogFactory.getLog(DBListClass.class);
+
     private List cachedDBList;
 
     public DBListClass(String name, String prettyname, PropertyMetaClass wclass)
@@ -146,14 +150,15 @@ public class DBListClass extends ListClass
         }
         return map;
     }
-
+    
     public String getQuery(XWikiContext context)
     {
         String sql = getSql();
         try {
             sql = context.getDoc().getRenderedContent(sql, context);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to render SQL script [" + sql + "]. Internal error ["
+                + e.getMessage() + "]. Continuing with non-rendered script.");
         }
         if ((sql == null) || (sql.trim().equals(""))) {
             String classname = getClassname();
@@ -163,33 +168,39 @@ public class DBListClass extends ListClass
                 valueField = idField;
             }
             if (context.getWiki().getHibernateStore() != null) {
-                String select = "select ";
-                String tables = " from XWikiDocument as doc, BaseObject as obj";
-                String where =
-                    " where doc.fullName=obj.name and obj.className='" + classname + "'";
+                StringBuffer select = new StringBuffer("select "); 
+                StringBuffer tables =
+                    new StringBuffer(" from XWikiDocument as doc, BaseObject as obj");
+                StringBuffer where =
+                    new StringBuffer(" where doc.fullName=obj.name and obj.className='");
+                where.append(classname).append("'");
+                
                 if (idField.startsWith("doc.") || idField.startsWith("obj.")) {
-                    select += idField + ",";
+                    select.append(idField);
                 } else {
-                    select += "idprop.value,";
-                    tables += ", StringProperty as idprop";
-                    where += " and obj.id=idprop.id.id and idprop.id.name='" + idField + "'";
+                    select.append("idprop.value");
+                    tables.append(", StringProperty as idprop");
+                    where.append(" and obj.id=idprop.id.id and idprop.id.name='")
+                    	.append(idField)
+                    	.append("'");
                 }
+                
                 if (valueField.startsWith("doc.") || valueField.startsWith("obj.")) {
-                    select += valueField + ",";
+                	select.append(", ").append(valueField);
                 }
                 else {
                     if (idField.equals(valueField)) {
-                        select += "idprop.value,";
+                    	select.append(", idprop.value");
                     } else {
-                        select += "valueprop.value,";
-                        tables += ", StringProperty as valueprop";
-                        where +=
-                            " and obj.id=valueprop.id.id and valueprop.id.name='" + valueField
-                                + "'";
+                    	select.append(", valueprop.value");
+                    	tables.append(", StringProperty as valueprop");
+                        where.append(" and obj.id=valueprop.id.id and valueprop.id.name='")
+                        	.append(valueField)
+                        	.append("'");
                     }
                 }
                 // Let's create the sql
-                sql = select + tables + where;
+                sql = select.append(tables).append(where).toString();
             } else {
                 // TODO: query plugin impl.
                 // We need to generate the right query for the query plugin

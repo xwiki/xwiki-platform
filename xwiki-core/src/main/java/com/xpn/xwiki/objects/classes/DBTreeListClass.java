@@ -29,6 +29,8 @@ import java.util.Iterator;
 import org.apache.ecs.xhtml.option;
 import org.apache.ecs.xhtml.select;
 import org.apache.velocity.VelocityContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -37,7 +39,9 @@ import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
-public class DBTreeListClass extends DBListClass {
+public class DBTreeListClass extends DBListClass
+{
+    private static final Log LOG = LogFactory.getLog(DBTreeListClass.class);
 
     public DBTreeListClass(PropertyMetaClass wclass) {
         super("dbtreelist", "DB Tree List", wclass);
@@ -277,55 +281,69 @@ public class DBTreeListClass extends DBListClass {
     public String getQuery(XWikiContext context) {
         String sql = getSql();
         try {
-          sql = context.getDoc().getRenderedContent(sql, context);
+            sql = context.getDoc().getRenderedContent(sql, context);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.warn("Failed to render SQL script [" + sql + "]. Internal error ["
+                + e.getMessage() + "]. Continuing with non-rendered script.");
         }
-        if ((sql==null)||(sql.trim().equals(""))) {
+        if ((sql == null) || (sql.trim().equals(""))) {
             String classname = getClassname();
             String idField = getIdField();
             String valueField = getValueField();
-            String parentField = getParentField();
-            if ((valueField==null)||(valueField.trim().equals("")))
-             valueField =  idField;
-            if (context.getWiki().getHibernateStore()!=null) {
-             String select = "select ";
-             String tables = " from XWikiDocument as doc, BaseObject as obj";
-             String where = " where doc.fullName=obj.name and obj.className='" + classname + "'";
-                if (idField.startsWith("doc.")||idField.startsWith("obj."))
-                    select += idField + ",";
-                else {
-                    select += "idprop.value,";
-                    tables += ", StringProperty as idprop";
-                    where += " and obj.id=idprop.id.id and idprop.id.name='" + idField + "'";
+            if ((valueField == null) || (valueField.trim().equals(""))) {
+                valueField = idField;
+            }
+            if (context.getWiki().getHibernateStore() != null) {
+                StringBuffer select = new StringBuffer("select "); 
+                StringBuffer tables = new StringBuffer(" from XWikiDocument as doc, BaseObject as obj");
+                StringBuffer where = new StringBuffer(" where doc.fullName=obj.name and obj.className='");
+                where.append(classname).append("'");
+                
+                if (idField.startsWith("doc.") || idField.startsWith("obj.")) {
+                    select.append(idField);
+                } else {
+                    select.append("idprop.value");
+                    tables.append(", StringProperty as idprop");
+                    where.append(" and obj.id=idprop.id.id and idprop.id.name='")
+                    	.append(idField)
+                    	.append("'");
                 }
-                if (valueField.startsWith("doc.")||valueField.startsWith("obj."))
-                    select += valueField + ",";
+                
+                if (valueField.startsWith("doc.") || valueField.startsWith("obj.")) {
+                	select.append(", ").append(valueField);
+                }
                 else {
                     if (idField.equals(valueField)) {
-                        select += "idprop.value,";
+                    	select.append(", idprop.value");
                     } else {
-                        select += "valueprop.value,";
-                        tables += ", StringProperty as valueprop";
-                        where += " and obj.id=valueprop.id.id and valueprop.id.name='" + valueField + "'";
+                    	select.append(", valueprop.value");
+                    	tables.append(", StringProperty as valueprop");
+                        where.append(" and obj.id=valueprop.id.id and valueprop.id.name='")
+                        	.append(valueField)
+                        	.append("'");
                     }
                 }
-
+                
+                // DBTreeList specific part
+                String parentField = getParentField();
                 if (parentField.startsWith("doc.")||parentField.startsWith("obj."))
-                    select += parentField + ",";
+                    select.append(", ").append(parentField);
                 else {
                     if (idField.equals(parentField)) {
-                        select += "idprop.value,";
+                        select.append(", idprop.value");
                     } else if (valueField.equals(parentField)) {
-                        select += "valueprop.value,";
+                        select.append(", valueprop.value");
                     } else {
-                        select += "parentprop.value,";
-                        tables += ", StringProperty as parentprop";
-                        where += " and obj.id=parentprop.id.id and parentprop.id.name='" + parentField + "'";
+                        select.append(", parentprop.value");
+                        tables.append(", StringProperty as parentprop");
+                        where.append(" and obj.id=parentprop.id.id and parentprop.id.name='")
+                        	.append(parentField)
+                        	.append("'");
                     }
                 }
+                
                 // Let's create the sql
-                sql = select +  tables + where;
+                sql = select.append(tables).append(where).toString();
             } else {
                 // TODO: query plugin impl.
                 // We need to generate the right query for the query plugin

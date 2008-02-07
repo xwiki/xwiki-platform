@@ -1,4 +1,4 @@
-package org.xwiki.plugin.spacemanager.api;
+package com.xpn.xwiki.plugin.spacemanager.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.classes.BaseClass;

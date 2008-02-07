@@ -1,20 +1,20 @@
-package org.xwiki.plugin.spacemanager.impl;
+package com.xpn.xwiki.plugin.spacemanager.impl;
 
-import org.xwiki.plugin.spacemanager.api.SpaceUserProfile;
-import org.xwiki.plugin.spacemanager.api.SpaceManagerException;
-import org.xwiki.plugin.spacemanager.api.SpaceManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.plugin.spacemanager.api.SpaceManager;
+import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerException;
+import com.xpn.xwiki.plugin.spacemanager.api.SpaceUserProfile;
 import com.xpn.xwiki.api.Document;
 
 /**
  * Created by IntelliJ IDEA.
  * User: ludovic
- * Date: 13 dŽc. 2007
+ * Date: 13 dï¿½c. 2007
  * Time: 14:37:24
  * To change this template use File | Settings | File Templates.
  */

@@ -1,12 +1,12 @@
-package org.xwiki.plugin.spacemanager.plugin;
+package com.xpn.xwiki.plugin.spacemanager.plugin;
 
 import java.util.List;
 
-import org.xwiki.plugin.spacemanager.api.Space;
-import org.xwiki.plugin.spacemanager.api.SpaceManagerException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.spacemanager.api.Space;
+import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerException;
 
 /**
  * Created by IntelliJ IDEA.

@@ -1,4 +1,4 @@
-package org.xwiki.plugin.spacemanager.api;
+package com.xpn.xwiki.plugin.spacemanager.api;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
@@ -11,7 +11,7 @@ import java.util.Iterator;
 /**
  * Created by IntelliJ IDEA.
  * User: ludovic
- * Date: 11 dŽc. 2007
+ * Date: 11 dï¿½c. 2007
  * Time: 15:39:05
  * To change this template use File | Settings | File Templates.
  */

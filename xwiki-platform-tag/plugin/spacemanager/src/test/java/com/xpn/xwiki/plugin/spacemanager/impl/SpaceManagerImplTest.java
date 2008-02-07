@@ -1,18 +1,20 @@
-package org.xwiki.plugin.spacemanager.impl;
+package com.xpn.xwiki.plugin.spacemanager.impl;
 
 import java.util.*;
 
 import org.jmock.Mock;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.Invocation;
-import org.xwiki.plugin.spacemanager.api.Space;
-import org.xwiki.plugin.spacemanager.api.SpaceManagerException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.spacemanager.api.Space;
+import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerException;
+import com.xpn.xwiki.plugin.spacemanager.impl.SpaceImpl;
+import com.xpn.xwiki.plugin.spacemanager.impl.SpaceManagerImpl;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiHibernateStore;

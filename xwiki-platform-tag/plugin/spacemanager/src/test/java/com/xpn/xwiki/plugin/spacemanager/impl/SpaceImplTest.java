@@ -1,4 +1,4 @@
-package org.xwiki.plugin.spacemanager.impl;
+package com.xpn.xwiki.plugin.spacemanager.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,6 +14,8 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.spacemanager.impl.SpaceImpl;
+import com.xpn.xwiki.plugin.spacemanager.impl.SpaceManagerImpl;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;

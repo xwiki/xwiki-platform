@@ -1,4 +1,4 @@
-package org.xwiki.plugin.spacemanager.impl;
+package com.xpn.xwiki.plugin.spacemanager.impl;
 
 public class SpaceManagerExtensionImplTest {
 

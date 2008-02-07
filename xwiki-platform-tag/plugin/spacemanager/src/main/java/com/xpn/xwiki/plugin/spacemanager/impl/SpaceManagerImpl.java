@@ -17,7 +17,7 @@
  * Software Foundation,Inc.,51 Franklin St,Fifth Floor,Boston,MA
  * 02110-1301 USA,or see the FSF site:http://www.fsf.org.
  */
-package org.xwiki.plugin.spacemanager.impl;
+package com.xpn.xwiki.plugin.spacemanager.impl;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -31,11 +31,11 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.mailsender.Mail;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
+import com.xpn.xwiki.plugin.spacemanager.api.*;
+import com.xpn.xwiki.plugin.spacemanager.plugin.SpaceManagerPluginApi;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
 import org.apache.velocity.VelocityContext;
-import org.xwiki.plugin.spacemanager.api.*;
-import org.xwiki.plugin.spacemanager.plugin.SpaceManagerPluginApi;
 import org.apache.commons.lang.ArrayUtils;
 
 import java.lang.reflect.Constructor;

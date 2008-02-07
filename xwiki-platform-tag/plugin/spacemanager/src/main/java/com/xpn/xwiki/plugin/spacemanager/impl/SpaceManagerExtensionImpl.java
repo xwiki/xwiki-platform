@@ -1,10 +1,10 @@
-package org.xwiki.plugin.spacemanager.impl;
+package com.xpn.xwiki.plugin.spacemanager.impl;
 
-import org.xwiki.plugin.spacemanager.api.*;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.spacemanager.api.*;
 
 /**
  * Implementation of a specific SpaceManagerExtension

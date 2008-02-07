@@ -66,14 +66,18 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
 /**
- * Plugin that brings mailing capbilities to XWiki Recipients : to, cc, bcc Text messages HTML
- * messages with attachments Text + HTML messages from XWiki pages templates Send a collection of
- * mails in one call
+ * Plugin that brings powerful mailing capabilities.
  *
+ * @see MailSender
  * @version $Id: $
  */
-public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+public final class MailSenderPlugin extends XWikiDefaultPlugin
 {
+    /**
+     * Log object to log messages in this class.
+     */
+    private static final Log LOG = LogFactory.getLog(MailSenderPlugin.class);
+
     public static int ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND = -2;
 
     public static int ERROR = -1;
@@ -83,8 +87,6 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
     public static final String ID = "mailsender";
 
     protected static final String URL_SEPARATOR = "/";
-
-    private static Log log = LogFactory.getLog(MailSenderPlugin.class);    
 
     /**
      * {@inheritDoc}
@@ -134,14 +136,6 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new MailSenderPluginApi((MailSenderPlugin) plugin, context);
-    }
-
-    /**
-     * @return log Log interface
-     */
-    protected Log getLogger()
-    {
-        return log;
     }
 
     /**
@@ -278,7 +272,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
         InternetAddress[] bcc = toInternetAddresses(mail.getBcc());
 
         if ((to == null) && (cc == null) && (bcc == null)) {
-            log.info("No recipient -> skipping this email");
+            LOG.info("No recipient -> skipping this email");
             return null;
         }
 
@@ -420,7 +414,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
         properties.put("mail.host", "localhost");
         properties.put("mail.smtp.host", smtp);
         properties.put("mail.debug", "false");
-        log.debug("smtp: " + smtp);
+        LOG.debug("smtp: " + smtp);
         return properties;
     }
 
@@ -516,7 +510,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
                 }
 
                 Mail mail = (Mail) emailIt.next();
-                log.info("Sending email: " + mail.toFullString());
+                LOG.info("Sending email: " + mail.toFullString());
 
                 try {
 
@@ -534,15 +528,15 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
                                 transport.close();
                             }
                         } catch (MessagingException ex) {
-                            log.error("MessagingException has occured.", ex);
+                            LOG.error("MessagingException has occured.", ex);
                         }
                         transport = null;
                         session = null;
                     }
                 } catch (SendFailedException ex) {
                     sendFailedCount++;
-                    log.error("SendFailedException has occured.", ex);
-                    log.error("Detailed email information" + mail.toFullString());
+                    LOG.error("SendFailedException has occured.", ex);
+                    LOG.error("Detailed email information" + mail.toFullString());
                     if (emailCount == 1) {
                         throw ex;
                     }
@@ -550,15 +544,15 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
                         throw ex;
                     }
                 } catch (MessagingException mex) {
-                    log.error("MessagingException has occured.", mex);
-                    log.error("Detailed email information" + mail.toFullString());
+                    LOG.error("MessagingException has occured.", mex);
+                    LOG.error("Detailed email information" + mail.toFullString());
                     if (emailCount == 1) {
                         throw mex;
                     }
                 } catch (XWikiException e) {
-                    log.error("XWikiException has occured.", e);
+                    LOG.error("XWikiException has occured.", e);
                 } catch (IOException e) {
-                    log.error("IOException has occured.", e);
+                    LOG.error("IOException has occured.", e);
                 }
             }
         } finally {
@@ -567,10 +561,10 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
                     transport.close();
                 }
             } catch (MessagingException ex) {
-                log.error("MessagingException has occured.", ex);
+                LOG.error("MessagingException has occured.", ex);
             }
 
-            log.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
+            LOG.info("sendEmails: Email count = " + emailCount + " sent count = " + count);
         }
         return true;
     }
@@ -603,7 +597,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
             obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", "en");
         }
         if (obj == null) {
-            log.error("No mail object found in the document " + templateDocFullName);
+            LOG.error("No mail object found in the document " + templateDocFullName);
             return ERROR_TEMPLATE_EMAIL_OBJECT_NOT_FOUND;
         }
         String subjectContent = obj.getStringValue("subject");
@@ -634,7 +628,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin implements XWikiP
             sendMail(mail, context);
             return 0;
         } catch (Exception e) {
-            log.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: "
+            LOG.error("sendEmailFromTemplate: " + templateDocFullName + " vcontext: "
                 + updatedVelocityContext, e);
             return ERROR;
         }

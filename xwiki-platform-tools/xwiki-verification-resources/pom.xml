@@ -31,7 +31,13 @@
   </parent>
   <artifactId>xwiki-verification-resources</artifactId>
   <name>XWiki Platform - Tools - Shared Verification Resources</name>
-  <version>1.8-SNAPSHOT</version>
+  <version>1.8</version>
   <packaging>jar</packaging>
   <description>XWiki Platform - Tools - Shared Verification Resources (Checkstyle files, etc)</description>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-verification-resources-1.8</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-verification-resources-1.8</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-verification-resources-1.8</url>
+  </scm>
 </project>

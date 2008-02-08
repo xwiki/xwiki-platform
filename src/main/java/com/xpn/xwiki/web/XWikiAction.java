@@ -46,19 +46,35 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
 /**
  * <p>
- * A simple action that handles the display and editing of an wiki page..
+ * Root class for most XWiki actions. It provides a common framework that allows actions to execute
+ * just the specific action code, handling the extra activities, such as preparing the context and
+ * retrieving the document corresponding to the URL.
  * </p>
- * <p/>
  * <p>
- * The action support an <i>action</i> URL. The action in the URL controls what this action class
- * does. The following values are supported:
+ * It defines two methods, {@link #action(XWikiContext)} and {@link #render(XWikiContext)}, that
+ * should be overridden by specific actions. {@link #action(XWikiContext)} should contain the
+ * processing part of the action. {@link #render(XWikiContext)} should return the name of a template
+ * that should be rendered, or manually write to the {@link XWikiResponse response} stream.
+ * </p>
+ * <p>
+ * Serving a request goes through the following phases:
  * </p>
  * <ul>
- * <li>view - view the Wiki Document
- * <li>edit - edit the Wiki Document
- * <li>preview - preview the Wiki Document
- * <li>save - save the Wiki Document
+ * <li>Wrapping the request and response object in XWiki specific wrappers</li>
+ * <li>Prepare the request {@link XWikiContext XWiki-specific context}</li>
+ * <li>Initialize/retrieve the XWiki object corresponding to the requested wiki</li>
+ * <li>Handle file uploads</li>
+ * <li>Prepare the velocity context</li>
+ * <li>Prepare the document objects corresponding to the requested URL</li>
+ * <li>Send action pre-notifications to listeners</li>
+ * <li>Run the overridden {@link #action(XWikiContext)}</li>
+ * <li>If {@link #action(XWikiContext)} returns true, run the overridden
+ * {@link #render(XWikiContext)}</li>
+ * <li>If {@link #render(XWikiContext)} returned a string (template name), render the template with
+ * that name</li>
+ * <li>Send action post-notifications to listeners</li>
  * </ul>
+ * <p>During this process, also handle specific errors, like when a document does not exist, or the user does not have the right to perform the current action.</p>
  */
 public abstract class XWikiAction extends Action
 {

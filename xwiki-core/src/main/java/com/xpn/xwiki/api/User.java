@@ -22,6 +22,8 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiUser;
 
@@ -50,5 +52,25 @@ public class User extends Api
         XWikiGroupService groupService = getXWikiContext().getWiki().getGroupService(getXWikiContext());
         Collection groups = groupService.listGroupsForUser(user.getUser(), getXWikiContext());
         return groups.contains(groupName);
+    }
+
+    /**
+     * API to retrieve the e-mail address of this user. This e-mail address is taken from the user
+     * profile. If the user hasn't changed his profile, then this is the e-mail address he filled in
+     * the registration form.
+     * 
+     * @return The e-mail address from the user profile, or <tt>null</tt> if there is an error
+     *         retrieving the email.
+     */
+    public String getEmail()
+    {
+        XWikiDocument userDoc;
+        try {
+            userDoc = getXWikiContext().getWiki().getDocument(user.getUser(), getXWikiContext());
+            BaseObject obj = userDoc.getObject("XWiki.XWikiUsers");
+            return obj.getStringValue("email");
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

@@ -97,9 +97,7 @@
 <category>Navigation</category>
 </property>
 <property>
-<content>&lt;div class="panel editmodes"&gt;
-&lt;h5&gt;$msg.get("chooseeditor")&lt;/h5&gt;
-&lt;div class="xwikipanelcontents"&gt;
+<content>#largepanelheader($msg.get("chooseeditor"))
 ###
 ### Edit mode tabs
 ###

@@ -1,2 +1,0 @@
-#template("xwikivars.vm")
-$cdoc.getContent()

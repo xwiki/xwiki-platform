@@ -61,6 +61,44 @@
           </properties>
         </configuration>
       </plugin>
+      <!-- Unpack the Skins we want to package -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>prepare-package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <artifactId>xwiki-skin-dodo</artifactId>
+                  <version>${platform.skin.dodo.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/skins</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <artifactId>xwiki-skin-finch</artifactId>
+                  <version>${platform.skin.finch.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/skins</outputDirectory>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.xpn.xwiki.platform.skins</groupId>
+                  <artifactId>xwiki-skin-albatross</artifactId>
+                  <version>${platform.skin.albatross.version}</version>
+                  <type>zip</type>
+                  <outputDirectory>${project.build.directory}/skins</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
@@ -78,6 +116,12 @@
               <directory>${basedir}/src/main/webInfResources</directory>
               <targetPath>WEB-INF</targetPath>
               <filtering>true</filtering>
+            </resource>
+            <!-- Add the skins -->
+            <resource>
+              <directory>${project.build.directory}/skins</directory>
+              <targetPath>skins</targetPath>
+              <filtering>false</filtering>
             </resource>
           </webResources>
         </configuration>

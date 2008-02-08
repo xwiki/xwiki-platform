@@ -1,2 +1,0 @@
-#template("xwiki.vm")
-$cdoc.getRenderedContent()

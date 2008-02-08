@@ -1,4 +1,0 @@
-#if($request.editor=="prefs")
-$response.sendRedirect($doc.getURL("edit", "xpage=editprefs"))
-#end
-Hello

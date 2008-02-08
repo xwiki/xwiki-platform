@@ -1,5 +1,0 @@
-#if($context.getMode()==0)
-</div>
-</body>
-</html>
-#end

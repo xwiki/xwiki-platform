@@ -74,7 +74,10 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
  * that name</li>
  * <li>Send action post-notifications to listeners</li>
  * </ul>
- * <p>During this process, also handle specific errors, like when a document does not exist, or the user does not have the right to perform the current action.</p>
+ * <p>
+ * During this process, also handle specific errors, like when a document does not exist, or the
+ * user does not have the right to perform the current action.
+ * </p>
  */
 public abstract class XWikiAction extends Action
 {

@@ -25,18 +25,25 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.Session;
 import org.xwiki.plugin.activitystream.api.ActivityEvent;
 import org.xwiki.plugin.activitystream.api.ActivityEventPriority;
+import org.xwiki.plugin.activitystream.api.ActivityEventType;
 import org.xwiki.plugin.activitystream.api.ActivityStream;
 import org.xwiki.plugin.activitystream.api.ActivityStreamException;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.DocChangeRule;
+import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
+import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 
-public class ActivityStreamImpl implements ActivityStream
+public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotificationInterface
 {
     public void initClasses(XWikiContext context) throws XWikiException
     {
+        // listen to notifications
+        context.getWiki().getNotificationManager().addGeneralRule(
+            new DocChangeRule(this, true, true));
     }
 
     protected void prepareEvent(ActivityEvent event, XWikiContext context)
@@ -185,5 +192,32 @@ public class ActivityStreamImpl implements ActivityStream
     protected ActivityEvent newActivityEvent()
     {
         return new ActivityEventImpl();
+    }
+
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
+        int event, XWikiContext context)
+    {
+        try {
+            switch (event) {
+                case /* EVENT_CHANGE */0:
+                    addActivityEvent(ActivityEventType.UPDATE, null, context);
+                    break;
+                case /* EVENT_NEW */1:
+                    addActivityEvent(ActivityEventType.CREATE, null, context);
+                    break;
+                case /* EVENT_DELETE */2:
+                    addActivityEvent(ActivityEventType.DELETE, null, context);
+                    break;
+                case /* EVENT_UPDATE_CONTENT */3:
+                    addActivityEvent(ActivityEventType.UPDATE, null, context);
+                    break;
+                case /* EVENT_UPDATE_OBJECT */4:
+                    break;
+                case /* EVENT_UPDATE_CLASS */5:
+                    break;
+            }
+        } catch (ActivityStreamException e) {
+            // ignore
+        }
     }
 }

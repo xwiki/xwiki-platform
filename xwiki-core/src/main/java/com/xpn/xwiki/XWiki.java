@@ -510,7 +510,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterfac
 
                 XWikiURLFactory urlf = context.getURLFactory();
                 if ((urlf != null) && (urlf instanceof XWikiServletURLFactory)
-                    && ("".equals(((XWikiServletURLFactory) urlf).getServletPath())))
+                    && ("".equals(((XWikiServletURLFactory) urlf).getContextPath())))
                     appname = context.getMainXWiki();
                 else
                     appname = uri.substring(1, uri.indexOf("/", 2));

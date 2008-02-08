@@ -97,9 +97,27 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
+    /**
+     * Returns the part of the URL identifying the web application. In a normal install, that is
+     * <tt>xwiki/</tt>.
+     * 
+     * @return The configured context path.
+     */
     public String getContextPath()
     {
         return contextPath;
+    }
+
+    /**
+     * Returns the part of the URL identifying the servlet inside the web application, which is the
+     * Struts mapping name. In a normal install, that is <tt>bin/</tt>. Other usual values are
+     * <tt>xwiki/</tt> and <tt>testbin/</tt>.
+     * 
+     * @return The servlet path corresponding to the current request.
+     */
+    public String getServletPath()
+    {
+        return servletPath;
     }
 
     private URL getServerURL(XWikiContext context) throws MalformedURLException

@@ -46,8 +46,8 @@
   top: 0;
   width: 100%;
   z-index: 100000;
-  /* filter: alpha(opacity=70);
-  opacity: 0.7; */
+  filter: alpha(opacity=70);
+  opacity: 0.7;
   overflow: auto;
 }
 
@@ -108,11 +108,11 @@
   margin-top: 0;
   padding-top: 0;
 }
-<!-- IE sucks -->
+
 
 #lb-top .roundedlight {
-  _margin-bottom: -0.15em;
-  _margin-top: -0.9em;
+  margin-bottom: -0.15em;
+  margin-top: -0.9em;
 }
 
 
@@ -121,8 +121,8 @@
 }
 
 #lb-top .rounded {
-  margin-bottom: 0em;/* avant 0.1  pour IE7 ?*/
-  margin-top: 0em; /* avant 0.3  pour IE7 ?*/
+  margin-bottom: 0em;
+  margin-top: 0em;
 }
 
 
@@ -132,13 +132,13 @@
 
 *+html #lb-top .rounded .b1, * html #lb-top .rounded .b1, *+html
 #lb-top .roundedlight .b1, * html #lb-top .roundedlight .b1 {
-  margin-bottom: -0.15em;
+  margin-bottom: -1em;
 }
 
 *+html #lb-bottom .rounded .b12b, * html #lb-bottom .rounded .b12b,
 *+html #lb-bottom .roundedlight .b4b, * html #lb-bottom .roundedlight
 .b4b {
-  margin-bottom: -0.1em;
+  margin-bottom: -1em;
 }
 
 
@@ -163,6 +163,6 @@
 	margin-right: 10px;
 	width: 30px;
 	cursor: pointer;
-	background-image: url("$xwiki.getSkinFile("icons/rights-manager/btnClose.png")");
+	background-image: url($xwiki.getSkinFile("icons/rights-manager/btnClose.png"));
 	background-repeat: no-repeat;
 }

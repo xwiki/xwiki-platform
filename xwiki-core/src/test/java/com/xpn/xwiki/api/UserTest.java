@@ -1,8 +1,16 @@
 package com.xpn.xwiki.api;
 
+import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
@@ -12,6 +20,27 @@ import com.xpn.xwiki.user.api.XWikiUser;
  */
 public class UserTest extends MockObjectTestCase
 {
+    private Mock mockXWiki;
+
+    private XWikiContext context;
+
+    protected void setUp() throws XWikiException
+    {
+        this.context = new XWikiContext();
+        this.mockXWiki =
+            mock(com.xpn.xwiki.XWiki.class, new java.lang.Class[] {
+            com.xpn.xwiki.XWikiConfig.class, XWikiContext.class}, new java.lang.Object[] {
+            new XWikiConfig(), context});
+        context.setWiki((XWiki) mockXWiki.proxy());
+        XWikiDocument doc = new XWikiDocument("XWiki", "Admin");
+        BaseClass userClass = new BaseClass();
+        userClass.addTextField("email", "email address", 20);
+        mockXWiki.stubs().method("getClass").will(returnValue(userClass));
+        BaseObject userObj = doc.newObject("XWiki.XWikiUsers", context);
+        userObj.setStringValue("email", "admin@mail.com");
+        mockXWiki.stubs().method("getDocument").will(returnValue(doc));
+    }
+
     /**
      * Checks that XWIKI-2040 remains fixed.
      */
@@ -27,5 +56,15 @@ public class UserTest extends MockObjectTestCase
         XWikiContext c = new XWikiContext();
         u = new User(xu, c);
         assertFalse(u.isUserInGroup("XWiki.InexistentGroupName"));
+    }
+
+    public void testGetEmail()
+    {
+        User u = new User(null, null);
+        assertNull(u.getEmail());
+
+        XWikiUser xu = new XWikiUser("XWiki.Admin");
+        u = new User(xu, context);
+        assertEquals("admin@mail.com", u.getEmail());
     }
 }

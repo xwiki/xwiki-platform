@@ -80,7 +80,6 @@ div.inscrollbar {
 }
 
 #userstable, #groupstable, #usersandgroupstable {
-    width: 100%;
     position: relative;
     padding: 0px;
     margin: 0px;
@@ -140,28 +139,28 @@ div.inscrollbar {
 
 
 #tdAddNewUserOrGroup a {
-        color: #fff;
-        font-weight: bold;
-        font-size: 12px;
-        text-decoration: none;
-	background-image: url("$xwiki.getSkinFile('icons/rights-manager/but1.png')");
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+  text-decoration: none;
+	background-image: url($xwiki.getSkinFile('icons/rights-manager/but1.png'));
 	background-repeat: no-repeat !important;
-        display: block;
-        text-align: center;
-        padding-top: 3px;
-        width: 130px;
-        height: 24px;
+  display: block;
+  text-align: center;
+  padding-top: 3px;
+  width: 130px;
+  height: 24px;
 }
 
 #errMsg {
-        color: #DD7700;
-        font-size: 12px;
-        font-weight: bold;
+   color: #DD7700;
+   font-size: 12px;
+   font-weight: bold;
 }
 
 #XWikiGuestSpecial {
-        background-color: #fff;
-        color: #000;
+   background-color: #fff;
+   color: #000;
 }
 
 .suorg {

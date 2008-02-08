@@ -192,8 +192,8 @@
                the version.properties file so that the property is replaced by its value. -->
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
-            <artifactId>maven-buildnumber-plugin</artifactId>
-            <version>0.9.5</version>
+            <artifactId>buildnumber-maven-plugin</artifactId>
+            <version>1.0-beta-1</version>
             <executions>
               <execution>
                 <phase>validate</phase>

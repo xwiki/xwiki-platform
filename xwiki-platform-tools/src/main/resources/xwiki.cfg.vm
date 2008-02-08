@@ -38,7 +38,7 @@ xwiki.stats=0
 xwiki.stats.default=1
 xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl
 
-xwiki.encoding=ISO-8859-1
+xwiki.encoding=$xwikiCfgEncoding
 
 xwiki.backlinks=1
 
@@ -110,8 +110,8 @@ xwiki.section.edit=1
 
 ## Skin configuration
 
-xwiki.defaultskin=albatross
-xwiki.defaultbaseskin=albatross
+xwiki.defaultskin=$xwikiCfgDefaultSkin
+xwiki.defaultbaseskin=$xwikiCfgDefaultBaseSkin
 
 ## XWiki temporary directory
 # xwiki.temp.dir=/tmp/xwiki

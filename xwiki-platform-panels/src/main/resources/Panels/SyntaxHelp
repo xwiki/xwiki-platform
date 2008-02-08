@@ -106,9 +106,9 @@
 <category>Information</category>
 </property>
 <property>
-<content>&lt;div class="panel"&gt;
-&lt;div id="xwikihelpsyntax"&gt;$msg.get("helponsyntax") &lt;a href="http://platform.xwiki.org/xwiki/bin/view/Main/XWikiSyntax?xpage=plain" onclick="openHelp(); return false;"&gt;&lt;span class="nobr"&gt;$msg.get("xwikisyntax")&lt;/span&gt;&lt;/a&gt;&lt;/div&gt;
-&lt;/div&gt;</content>
+<content>#largepanelheader("XWiki Syntax Help")
+$msg.get("helponsyntax") &lt;a href="http://platform.xwiki.org/xwiki/bin/view/Main/XWikiSyntax?xpage=plain" onclick="openHelp(); return false;"&gt;&lt;span class="nobr"&gt;$msg.get("xwikisyntax")&lt;/span&gt;&lt;/a&gt;
+#panelfooter()</content>
 </property>
 <property>
 <description>Displays information on the XWiki syntax.</description>

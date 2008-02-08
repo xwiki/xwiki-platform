@@ -37,9 +37,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     protected URL serverURL;
 
-    protected String servletPath;
+    protected String contextPath;
 
-    protected String actionPath;
+    protected String servletPath;
 
     public XWikiServletURLFactory()
     {
@@ -49,8 +49,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public XWikiServletURLFactory(URL serverURL, String servletPath, String actionPath)
     {
         this.serverURL = serverURL;
-        this.servletPath = servletPath;
-        this.actionPath = actionPath;
+        this.contextPath = servletPath;
+        this.servletPath = actionPath;
     }
 
     // Used by tests
@@ -69,24 +69,24 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         String path = url.getPath();
         String servletpath = context.getRequest().getServletPath();
 
-        servletPath =
+        contextPath =
             (context.getWiki() == null) ? "" : context.getWiki().Param("xwiki.servletpath", "");
-        if (servletPath.equals("")) {
+        if (contextPath.equals("")) {
             try {
-                servletPath = context.getRequest().getContextPath().substring(1) + "/";
+                contextPath = context.getRequest().getContextPath().substring(1) + "/";
             } catch (Exception e) {
-                servletPath = path.substring(0, path.indexOf('/', 1) + 1);
+                contextPath = path.substring(0, path.indexOf('/', 1) + 1);
             }
         }
 
-        actionPath = context.getWiki().Param("xwiki.actionpath", "");
-        if (actionPath.equals("")) {
+        servletPath = context.getWiki().Param("xwiki.actionpath", "");
+        if (servletPath.equals("")) {
             if (servletpath.startsWith("/bin")) {
-                actionPath = "bin/";
+                servletPath = "bin/";
             } else if (context.getRequest().getServletPath().startsWith("/testbin")) {
-                actionPath = "testbin/";
+                servletPath = "testbin/";
             } else {
-                actionPath = context.getWiki().Param("xwiki.defaultactionpath", "bin/");
+                servletPath = context.getWiki().Param("xwiki.defaultactionpath", "bin/");
             }
         }
 
@@ -97,9 +97,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    public String getServletPath()
+    public String getContextPath()
     {
-        return servletPath;
+        return contextPath;
     }
 
     private URL getServerURL(XWikiContext context) throws MalformedURLException
@@ -161,8 +161,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 querystring = querystring + "&" + context.getLinksQueryString();
         }
 
-        StringBuffer newpath = new StringBuffer(servletPath);
-        newpath.append(actionPath);
+        StringBuffer newpath = new StringBuffer(contextPath);
+        newpath.append(servletPath);
 
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
@@ -246,7 +246,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     public URL createSkinURL(String filename, String skin, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(servletPath);
+        StringBuffer newpath = new StringBuffer(contextPath);
         newpath.append("skins/");
         newpath.append(skin);
         addFileName(newpath, filename, false, context);
@@ -261,8 +261,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createSkinURL(String filename, String web, String name, String xwikidb,
         XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(servletPath);
-        newpath.append(actionPath);
+        StringBuffer newpath = new StringBuffer(contextPath);
+        newpath.append(servletPath);
         addAction(newpath, "skin", context);
         addSpace(newpath, web, "skin", context);
         addName(newpath, name, "skin", context);
@@ -277,7 +277,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     public URL createTemplateURL(String filename, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(servletPath);
+        StringBuffer newpath = new StringBuffer(contextPath);
         newpath.append("templates");
         addFileName(newpath, filename, false, context);
         try {
@@ -291,8 +291,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createAttachmentURL(String filename, String web, String name, String action,
         String querystring, String xwikidb, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(servletPath);
-        newpath.append(actionPath);
+        StringBuffer newpath = new StringBuffer(contextPath);
+        newpath.append(servletPath);
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);
@@ -347,8 +347,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         String revision, String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
-        StringBuffer newpath = new StringBuffer(servletPath);
-        newpath.append(actionPath);
+        StringBuffer newpath = new StringBuffer(contextPath);
+        newpath.append(servletPath);
         addAction(newpath, action, context);
         addSpace(newpath, web, action, context);
         addName(newpath, name, action, context);

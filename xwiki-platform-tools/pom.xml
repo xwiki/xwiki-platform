@@ -25,30 +25,30 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.xpn.xwiki.platform.tools</groupId>
-    <artifactId>xwiki-tools</artifactId>
-    <version>7-SNAPSHOT</version>
+    <groupId>com.xpn.xwiki.platform</groupId>
+    <artifactId>xwiki</artifactId>
+    <version>10</version>
+    <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
-  <artifactId>xwiki-license-resources</artifactId>
-  <name>XWiki Platform - Tools - XWiki License Resources</name>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <description>
-    XWiki License file (License + Notice file containing copyrights).
-  </description>
-  <build>
-    <plugins>
-     <plugin>
-       <groupId>org.apache.maven.plugins</groupId>
-       <artifactId>maven-remote-resources-plugin</artifactId>
-       <executions>
-         <execution>
-           <goals>
-             <goal>bundle</goal>
-           </goals>
-         </execution>
-       </executions>
-     </plugin>
-    </plugins>
-  </build>
+  <groupId>com.xpn.xwiki.platform.tools</groupId>
+  <artifactId>xwiki-tools</artifactId>
+  <name>XWiki Platform - Tools - Parent POM</name>
+  <version>6</version>
+  <packaging>pom</packaging>
+  <description>XWiki Tools</description>
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-6</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-6</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-6</url>
+  </scm>
+  <modules>
+    <module>xwiki-verification-resources</module>
+    <module>xwiki-shared-tests</module>
+    <module>xwiki-xar-plugin</module>
+    <module>xwiki-xar-handlers</module>
+    <module>xwiki-xmldoc-update-plugin</module>
+    <module>xwiki-packager-plugin</module>
+    <module>xwiki-configuration-resources</module>
+    <module>xwiki-jetty-resources</module>
+  </modules>
 </project>

@@ -21,12 +21,13 @@
 
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -35,14 +36,13 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.xml.sax.SAXException;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.monitor.api.MonitorPlugin;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.SocketException;
 
 /**
  * <p>
@@ -62,6 +62,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
  */
 public abstract class XWikiAction extends Action
 {
+    private static final Log LOG = LogFactory.getLog(XWikiAction.class);
 
     // --------------------------------------------------------- Public Methods
 
@@ -102,12 +103,22 @@ public abstract class XWikiAction extends Action
                     String redirect = context.getWiki().Param("xwiki.virtual.redirect");
                     response.sendRedirect(redirect);
                     return null;
-                } else
+                } else {
                     throw e;
+                }
             }
 
-            // Parses multipart so that parms in multipart are available for all actions
+            // Start monitoring timer
+            monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
+            if (monitor != null) {
+                monitor.startRequest("", mapping.getName(), context.getURL());
+                monitor.startTimer("multipart");
+            }
+            // Parses multipart so that params in multipart are available for all actions
             fileupload = Utils.handleMultipart(req, context);
+            if (monitor != null) {
+                monitor.endTimer("multipart");
+            }
 
             XWikiURLFactory urlf =
                 xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
@@ -121,12 +132,9 @@ public abstract class XWikiAction extends Action
 
             // Any error before this will be treated using a redirection to an error page
 
-            // Start monitoring timer
-            monitor = (MonitorPlugin) xwiki.getPlugin("monitor", context);
-            if (monitor != null)
-                monitor.startRequest("", mapping.getName(), context.getURL());
-            if (monitor != null)
+            if (monitor != null) {
                 monitor.startTimer("request");
+            }
 
             VelocityContext vcontext = null;
             // Prepare velocity context
@@ -137,15 +145,23 @@ public abstract class XWikiAction extends Action
                 if (xwiki.prepareDocuments(request, context, vcontext) == false)
                     return null;
 
+                if (monitor != null) {
+                    monitor.setWikiPage(context.getDoc().getFullName());
+                }
+
                 // Let's handle the notification and make sure it never fails
+                if (monitor != null) {
+                    monitor.startTimer("prenotify");
+                }
                 try {
                     xwiki.getNotificationManager().preverify(context.getDoc(), mapping.getName(),
                         context);
                 } catch (Throwable e) {
-                    e.printStackTrace();
+                    LOG.error("Exception while pre-notifying", e);
                 }
-                if (monitor != null)
-                    monitor.setWikiPage(context.getDoc().getFullName());
+                if (monitor != null) {
+                    monitor.endTimer("prenotify");
+                }
 
                 String renderResult = null;
                 XWikiDocument doc = context.getDoc();
@@ -165,6 +181,14 @@ public abstract class XWikiAction extends Action
                 }
                 return null;
             } catch (Throwable e) {
+                if (e instanceof IOException) {
+                    e =
+                        new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                            XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+                            "Exception while sending response",
+                            e);
+                }
+
                 if (!(e instanceof XWikiException)) {
                     e =
                         new XWikiException(XWikiException.MODULE_XWIKI_APP,
@@ -175,7 +199,12 @@ public abstract class XWikiAction extends Action
 
                 try {
                     XWikiException xex = (XWikiException) e;
-                    if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
+                    if (xex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
+                        // Connection aborted, simply ignore this.
+                        LOG.error("Connection aborted");
+                        // We don't write any other message, as the connection is broken, anyway.
+                        return null;
+                    } else if (xex.getCode() == XWikiException.ERROR_XWIKI_ACCESS_DENIED) {
                         Utils.parseTemplate(context.getWiki().Param("xwiki.access_exception",
                             "accessdenied"), context);
                         return null;
@@ -190,31 +219,34 @@ public abstract class XWikiAction extends Action
                         return null;
                     }
                     vcontext.put("exp", e);
-                    Log log = LogFactory.getLog(XWikiAction.class);
-                    if (log.isWarnEnabled()) {
-                        log.warn("Uncaught exception: " + e.getMessage(), e);
+                    if (LOG.isWarnEnabled()) {
+                        LOG.warn("Uncaught exception: " + e.getMessage(), e);
                     }
                     Utils.parseTemplate(Utils.getPage(request, "exception"), context);
                     return null;
+                } catch (XWikiException ex) {
+                    if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
+                        LOG.error("Connection aborted");
+                    }
                 } catch (Exception e2) {
                     // I hope this never happens
-                    e.printStackTrace();
-                    e2.printStackTrace();
-                    return null;
+                    LOG.error("Uncaught exceptions (inner): ", e);
+                    LOG.error("Uncaught exceptions (outer): ", e2);
                 }
+                return null;
             } finally {
-
                 // Let's make sure we have flushed content and closed
                 try {
                     response.getWriter().flush();
                 } catch (Throwable e) {
+                    // This might happen if the connection was closed, for example.
+                    // If we can't flush, then there's nothing more we can send to the client.
                 }
 
-                if (monitor != null)
+                if (monitor != null) {
                     monitor.endTimer("request");
-
-                if (monitor != null)
                     monitor.startTimer("notify");
+                }
 
                 // Let's handle the notification and make sure it never fails
                 try {
@@ -224,8 +256,9 @@ public abstract class XWikiAction extends Action
                     e.printStackTrace();
                 }
 
-                if (monitor != null)
+                if (monitor != null) {
                     monitor.endTimer("notify");
+                }
 
                 // Make sure we cleanup database connections
                 // There could be cases where we have some

@@ -100,13 +100,12 @@ public class DBListClass extends ListClass
     {
         List list = getCachedDBList(context);
         if (list == null || getIntValue("cache") != 1) {
-
             XWiki xwiki = context.getWiki();
             String query = getQuery(context);
 
-            if (query == null)
+            if (query == null) {
                 list = new ArrayList();
-            else {
+            } else {
                 try {
                     if ((xwiki.getHibernateStore() != null) && (!query.startsWith("/"))) {
                         list = makeList(xwiki.search(query, context));
@@ -413,29 +412,33 @@ public class DBListClass extends ListClass
                         i++;
                     }
                     secondCol += ")";
-                } else
+                } else {
                     secondCol = words.get(comma).toString().trim();
+                }
             }
             // has only one column
             else {
                 int i = fromIndx - 1;
-                while (firstPart.charAt(i) == ' ')
-                    i--;
+                while (firstPart.charAt(i) == ' ') {
+                    --i;
+                }
                 String col = " ";
                 while (firstPart.charAt(i) != ' ') {
                     col += firstPart.charAt(i);
-                    i--;
+                    --i;
                 }
                 String reverse = " ";
-                for (i = (col.length() - 1); i >= 0; i--)
+                for (i = (col.length() - 1); i >= 0; --i) {
                     reverse += col.charAt(i);
+                }
                 firstCol = reverse.trim();
             }
         }
-        if (first == true)
+        if (first == true) {
             return firstCol;
-        else
+        } else {
             return secondCol;
+        }
     }
 
     // the result of the second query, to retrieve the value
@@ -454,8 +457,9 @@ public class DBListClass extends ListClass
         String res = "";
         try {
             list = xwiki.search(newsql, context).toArray();
-            if (list.length > 0)
+            if (list.length > 0) {
                 res = list[0].toString();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -518,13 +522,13 @@ public class DBListClass extends ListClass
                         + "&amp;\"";
                 String varname = "\"input\"";
                 String seps = "\"" + this.getSeparators() + "\"";
-                if (isMultiSelect())
+                if (isMultiSelect()) {
                     input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:"
                         + varname + ", seps:" + seps + "} )");
-                else
+                } else {
                     input.setOnFocus("new ajaxSuggest(this, {script:" + script + ", varname:"
                         + varname + "} )");
-
+                }
             }
 
             if (changeInputName == true) {
@@ -534,11 +538,11 @@ public class DBListClass extends ListClass
                 input.setName(prefix + name);
                 input.setID(prefix + name);
             }
-            if (setInpVal == true)
+            if (setInpVal == true) {
                 input.setValue(val);
+            }
 
             buffer.append(input.toString());
-
         } else if (getDisplayType().equals("radio") || getDisplayType().equals("checkbox")) {
             displayRadioEdit(buffer, name, prefix, object, context);
         } else {
@@ -557,16 +561,18 @@ public class DBListClass extends ListClass
         if (isPicker() && getSql().compareTo("") != 0) {
             BaseProperty prop = (BaseProperty) object.safeget(name);
             String val = "";
-            if (prop != null)
+            if (prop != null) {
                 val = prop.toFormString();
+            }
             Map map = getMap(context);
 
             String secondCol = returnCol(getSql(), false);
             if (secondCol.compareTo("-") != 0) {
                 String res = getValue(val, getSql(), context);
                 buffer.append(getDisplayValue(res, name, map, context));
-            } else
+            } else {
                 buffer.append(getDisplayValue(val, name, map, context));
+            }
         } else {
             List selectlist;
             String separator = getSeparator();
@@ -584,5 +590,4 @@ public class DBListClass extends ListClass
             }
         }
     }
-
 }

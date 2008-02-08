@@ -26,6 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**
@@ -101,5 +103,25 @@ public class User extends Api
     protected boolean isMain()
     {
         return user.isMain();
+    }
+
+    /**
+     * API to retrieve the e-mail address of this user. This e-mail address is taken from the user
+     * profile. If the user hasn't changed his profile, then this is the e-mail address he filled in
+     * the registration form.
+     * 
+     * @return The e-mail address from the user profile, or <tt>null</tt> if there is an error
+     *         retrieving the email.
+     */
+    public String getEmail()
+    {
+        XWikiDocument userDoc;
+        try {
+            userDoc = getXWikiContext().getWiki().getDocument(user.getUser(), getXWikiContext());
+            BaseObject obj = userDoc.getObject("XWiki.XWikiUsers");
+            return obj.getStringValue("email");
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

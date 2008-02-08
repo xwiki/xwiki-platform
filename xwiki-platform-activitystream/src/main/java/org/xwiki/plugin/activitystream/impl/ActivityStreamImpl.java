@@ -199,21 +199,23 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         try {
             switch (event) {
-                case /* EVENT_CHANGE */0:
+                case XWikiDocChangeNotificationInterface.EVENT_CHANGE:
                     addActivityEvent(ActivityEventType.UPDATE, null, context);
                     break;
-                case /* EVENT_NEW */1:
+                case XWikiDocChangeNotificationInterface.EVENT_NEW:
                     addActivityEvent(ActivityEventType.CREATE, null, context);
                     break;
-                case /* EVENT_DELETE */2:
+                case XWikiDocChangeNotificationInterface.EVENT_DELETE:
                     addActivityEvent(ActivityEventType.DELETE, null, context);
                     break;
-                case /* EVENT_UPDATE_CONTENT */3:
+                case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CONTENT:
                     addActivityEvent(ActivityEventType.UPDATE, null, context);
                     break;
-                case /* EVENT_UPDATE_OBJECT */4:
+                case XWikiDocChangeNotificationInterface.EVENT_UPDATE_OBJECT:
+                    // TODO
                     break;
-                case /* EVENT_UPDATE_CLASS */5:
+                case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CLASS:
+                    // TODO
                     break;
             }
         } catch (ActivityStreamException e) {

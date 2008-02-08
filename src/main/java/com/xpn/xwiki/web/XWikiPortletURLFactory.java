@@ -41,8 +41,8 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
         } catch (Exception e) {
         }
 
-        servletPath = "xwiki/";
-        actionPath = "bin/";
+        contextPath = "xwiki/";
+        servletPath = "bin/";
     }
 
     public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb, XWikiContext context) {

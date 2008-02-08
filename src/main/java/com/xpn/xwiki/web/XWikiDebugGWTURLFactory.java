@@ -11,9 +11,9 @@ public class XWikiDebugGWTURLFactory  extends XWikiServletURLFactory{
     public void init(XWikiContext context) {
         URL url = context.getURL();
 
-        servletPath = "/xwiki/";
+        contextPath = "/xwiki/";
 
-        actionPath = "bin/";
+        servletPath = "bin/";
 
         try {
             serverURL = new URL(url.getProtocol(), url.getHost(), 1025, "/");

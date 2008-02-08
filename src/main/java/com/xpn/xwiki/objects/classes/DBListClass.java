@@ -45,7 +45,7 @@ import com.xpn.xwiki.plugin.query.QueryPlugin;
 
 public class DBListClass extends ListClass
 {
-    private static final String DEFAULT_QUERY =
+    protected static final String DEFAULT_QUERY =
         "select doc.name from XWikiDocument doc where 1 = 0";
 
     private static final Log LOG = LogFactory.getLog(DBListClass.class);

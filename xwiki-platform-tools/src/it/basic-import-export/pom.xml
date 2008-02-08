@@ -25,7 +25,7 @@
         </executions>
         <configuration>
           <resourceBundles>
-            <resourceBundle>com.xpn.xwiki.platform:xwiki-configuration-resources:1.6</resourceBundle>
+            <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:1.7</resourceBundle>
           </resourceBundles>
           <properties>
             <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>
@@ -33,7 +33,7 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>com.xpn.xwiki.platform</groupId>
+        <groupId>com.xpn.xwiki.platform.tools</groupId>
         <artifactId>xwiki-packager-plugin</artifactId>
         <configuration>
           <hibernateConfig>${project.build.directory}/maven-shared-archive-resources/hibernate.cfg.xml</hibernateConfig>

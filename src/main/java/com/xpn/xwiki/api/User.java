@@ -112,6 +112,9 @@ public class User extends Api
      * 
      * @return The e-mail address from the user profile, or <tt>null</tt> if there is an error
      *         retrieving the email.
+     * @since 1.1.3
+     * @since 1.2.2
+     * @since 1.3M2
      */
     public String getEmail()
     {
@@ -121,6 +124,9 @@ public class User extends Api
             BaseObject obj = userDoc.getObject("XWiki.XWikiUsers");
             return obj.getStringValue("email");
         } catch (Exception e) {
+            // APIs should never throw errors, as velocity cannot catch them, and scripts should be
+            // as robust as possible. Instead, the code using this should know that null means there
+            // was an error, if it really needs to report these exceptions.
             return null;
         }
     }

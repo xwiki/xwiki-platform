@@ -10,7 +10,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.user.api.XWikiUser;
 
 /**

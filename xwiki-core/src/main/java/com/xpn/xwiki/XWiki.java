@@ -151,7 +151,7 @@ import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
 
-public class XWiki implements XWikiDocChangeNotificationInterface, XWikiInterface
+public class XWiki implements XWikiDocChangeNotificationInterface
 {
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
 

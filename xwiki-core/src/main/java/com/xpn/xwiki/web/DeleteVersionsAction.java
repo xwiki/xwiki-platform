@@ -28,6 +28,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
  * Struts action for delete document versions.
+ * 
  * @version $Id: $
  */
 public class DeleteVersionsAction extends XWikiAction
@@ -39,7 +40,7 @@ public class DeleteVersionsAction extends XWikiAction
     {
         XWikiDocument doc = context.getDoc();
         DeleteVersionsForm form = (DeleteVersionsForm) context.getForm();
-        
+
         boolean confirm = form.isConfirmed();
         Version v1;
         Version v2;
@@ -53,7 +54,7 @@ public class DeleteVersionsAction extends XWikiAction
         }
         String language = form.getLanguage();
         XWikiDocument tdoc;
-        
+
         if (!confirm) {
             return true;
         }
@@ -69,14 +70,15 @@ public class DeleteVersionsAction extends XWikiAction
             }
             tdoc.setTranslation(1);
         }
-        
+
         if (v1 != null && v2 != null) {
             XWikiDocumentArchive archive = tdoc.getDocumentArchive(context);
             archive.removeVersions(v1, v2, context);
             context.getWiki().getVersioningStore().saveXWikiDocArchive(archive, true, context);
             tdoc.setDocumentArchive(archive);
-            // if we delete latest version then rollback to latest undeleted version 
-            if (archive.getLatestVersion()!=null && !tdoc.getRCSVersion().equals(archive.getLatestVersion())) {
+            // if we delete latest version then rollback to latest undeleted version
+            if (archive.getLatestVersion() != null
+                && !tdoc.getRCSVersion().equals(archive.getLatestVersion())) {
                 XWikiDocument newdoc = archive.loadDocument(archive.getLatestVersion(), context);
                 context.getWiki().getStore().saveXWikiDoc(newdoc, context);
                 context.setDoc(newdoc);
@@ -85,16 +87,20 @@ public class DeleteVersionsAction extends XWikiAction
         sendRedirect(context);
         return false;
     }
+
     /**
      * redirect back to view history.
+     * 
      * @param context used in redirecting
      * @throws XWikiException if any error
      */
-    private void sendRedirect(XWikiContext context) throws XWikiException {
+    private void sendRedirect(XWikiContext context) throws XWikiException
+    {
         // forward to view
         String redirect = Utils.getRedirect("view", "viewer=history", context);
         sendRedirect(context.getResponse(), redirect);
     }
+
     /**
      * {@inheritDoc}
      */

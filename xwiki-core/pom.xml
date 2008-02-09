@@ -577,6 +577,7 @@
               **/doc/rcs/*.java,
               **/api/RevisionInfo.java,
               **/web/DeleteVersions*.java,
+              **/web/SkinAction.java,
 	            **/migration/**.java,
 	            **/*RecycleBin*.java,
 	            **/*DeletedDocument.java,

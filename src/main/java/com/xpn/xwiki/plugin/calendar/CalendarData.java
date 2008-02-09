@@ -284,7 +284,8 @@ public class CalendarData {
         vcontext.put("date", tddate);
         List events = getCalendarData(tddate);
         vcontext.put("events", events);
-        return XWikiVelocityRenderer.evaluate(velocityScript, "", vcontext, context);
+        return XWikiVelocityRenderer.evaluate(velocityScript, "<calendar displaying code>",
+            vcontext, context);
     }
 
     public void addCalendarData(CalendarEvent event) {

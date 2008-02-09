@@ -19,14 +19,13 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
-
-import java.io.IOException;
 
 public class DownloadAction extends XWikiAction
 {
@@ -63,7 +62,9 @@ public class DownloadAction extends XWikiAction
             Object[] args = {filename};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                "Attachment {0} not found", null, args);
+                "Attachment {0} not found",
+                null,
+                args);
         }
 
         XWikiPluginManager plugins = context.getWiki().getPluginManager();
@@ -82,7 +83,7 @@ public class DownloadAction extends XWikiAction
         // Save dialog box (exe, zip, xar, etc).
         String dispType = "inline";
         if ("1".equals(request.getParameter("force-download"))) {
-        	dispType = "attachment";
+            dispType = "attachment";
         }
         response.addHeader("Content-disposition", dispType + "; filename=\"" + ofilename + "\"");
 
@@ -92,12 +93,13 @@ public class DownloadAction extends XWikiAction
         byte[] data;
         try {
             data = attachment.getContent(context);
-        }
-        catch (XWikiException e) {
+        } catch (XWikiException e) {
             Object[] args = {filename};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_ATTACHMENT_NOT_FOUND,
-                "Attachment content {0} not found", null, args);
+                "Attachment content {0} not found",
+                null,
+                args);
         }
 
         response.setContentLength(data.length);
@@ -106,7 +108,8 @@ public class DownloadAction extends XWikiAction
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                "Exception while sending response", e);
+                "Exception while sending response",
+                e);
         }
         return null;
     }

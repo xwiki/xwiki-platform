@@ -1423,26 +1423,38 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String parseTemplate(String template, String skin, XWikiContext context)
     {
         try {
-            String path = "/skins/" + skin + "/" + template;
-            String content = getResourceContent(path);
-            return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context
-                .get("vcontext"), context);
-        } catch (Exception e) {
-        }
-
-        try {
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
+                // Try parsing the object property
                 BaseObject object = doc.getObject("XWiki.XWikiSkins", 0);
                 if (object != null) {
                     String content = object.getStringValue(template);
-                    if ((content != null) && (!content.equals(""))) {
+                    if (!StringUtils.isBlank(content)) {
                         // Let's use this template
                         return XWikiVelocityRenderer.evaluate(content, skin + "#" + template,
                             (VelocityContext) context.get("vcontext"), context);
                     }
                 }
+                // Try parsing a document attachment
+                XWikiAttachment attachment = doc.getAttachment(template);
+                if (attachment != null) {
+                    String content = new String(attachment.getContent(context));
+                    if (!StringUtils.isBlank(content)) {
+                        // Let's use this template
+                        return XWikiVelocityRenderer.evaluate(content, skin + "+" + template,
+                            (VelocityContext) context.get("vcontext"), context);
+                    }
+                }
             }
+        } catch (Exception e) {
+        }
+
+        // Try parsing a file located in the directory with the same name.
+        try {
+            String path = "/skins/" + skin + "/" + template;
+            String content = getResourceContent(path);
+            return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context
+                .get("vcontext"), context);
         } catch (Exception e) {
         }
 

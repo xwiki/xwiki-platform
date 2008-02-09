@@ -1413,8 +1413,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         try {
             String content = getResourceContent("/templates/" + template);
-            return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext) context
-                .get("vcontext"), context);
+            return XWikiVelocityRenderer.evaluate(content, "/templates/" + template,
+                (VelocityContext) context.get("vcontext"), context);
         } catch (Exception e) {
             return "";
         }
@@ -1425,7 +1425,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             String path = "/skins/" + skin + "/" + template;
             String content = getResourceContent(path);
-            return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext) context
+            return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context
                 .get("vcontext"), context);
         } catch (Exception e) {
         }
@@ -1438,7 +1438,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String content = object.getStringValue(template);
                     if ((content != null) && (!content.equals(""))) {
                         // Let's use this template
-                        return XWikiVelocityRenderer.evaluate(content, "",
+                        return XWikiVelocityRenderer.evaluate(content, skin + "#" + template,
                             (VelocityContext) context.get("vcontext"), context);
                     }
                 }
@@ -4619,7 +4619,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String propname = (String) it.next();
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
-                text = XWikiVelocityRenderer.evaluate(format, "", vcontext, context);
+                text = XWikiVelocityRenderer.evaluate(format, "<username formatting code in " +
+                    context.getDoc().getFullName() + ">", vcontext, context);
             }
 
             if (link == false)

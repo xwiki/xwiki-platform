@@ -29,7 +29,9 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -96,8 +98,7 @@ public class XWikiTest extends MockObjectTestCase
             XWikiContext.class}, new Object[] {this.xwiki, this.context});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
             returnValue(null));
-        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(
-            returnValue(null));
+        this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
@@ -141,5 +142,64 @@ public class XWikiTest extends MockObjectTestCase
         XWikiDocument copy = this.xwiki.getDocument(copyName, context);
 
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
+    }
+
+    public void testParseTemplateConsidersObjectField() throws XWikiException
+    {
+        XWikiDocument skinClass = new XWikiDocument("XWiki", "XWikiSkins");
+        skinClass.getxWikiClass().addTextAreaField("template.vm", "template", 80, 20);
+        xwiki.saveDocument(skinClass, context);
+        XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
+        BaseObject obj = skin.newObject("XWiki.XWikiSkins", context);
+        obj.setLargeStringValue("template.vm", "parsing a field");
+        xwiki.saveDocument(skin, context);
+        context.put("skin", "XWiki.Skin");
+        assertEquals("XWiki.Skin", xwiki.getSkin(context));
+        assertFalse(xwiki.getDocument("XWiki.Skin", context).isNew());
+        assertEquals(skin, xwiki.getDocument("XWiki.Skin", context));
+        assertEquals("parsing a field", xwiki.parseTemplate("template.vm", context));
+    }
+
+    /**
+     * See XWIKI-2096
+     */
+    public void testParseTemplateConsidersAttachment() throws XWikiException
+    {
+        XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
+        XWikiAttachment attachment = new XWikiAttachment();
+        skin.getAttachmentList().add(attachment);
+        attachment.setContent("parsing an attachment".getBytes());
+        attachment.setFilename("template.vm");
+        attachment.setDoc(skin);
+        xwiki.saveDocument(skin, context);
+        context.put("skin", "XWiki.Skin");
+        assertEquals("XWiki.Skin", xwiki.getSkin(context));
+        assertFalse(xwiki.getDocument("XWiki.Skin", context).isNew());
+        assertEquals(skin, xwiki.getDocument("XWiki.Skin", context));
+        assertEquals("parsing an attachment", xwiki.parseTemplate("template.vm", context));
+    }
+
+    /**
+     * See XWIKI-2098
+     */
+    public void testParseTemplateConsidersObjectFieldBeforeAttachment() throws XWikiException
+    {
+        XWikiDocument skinClass = new XWikiDocument("XWiki", "XWikiSkins");
+        skinClass.getxWikiClass().addTextAreaField("template.vm", "template", 80, 20);
+        xwiki.saveDocument(skinClass, context);
+        XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
+        BaseObject obj = skin.newObject("XWiki.XWikiSkins", context);
+        obj.setLargeStringValue("template.vm", "parsing a field");
+        XWikiAttachment attachment = new XWikiAttachment();
+        skin.getAttachmentList().add(attachment);
+        attachment.setContent("parsing an attachment".getBytes());
+        attachment.setFilename("template.vm");
+        attachment.setDoc(skin);
+        xwiki.saveDocument(skin, context);
+        context.put("skin", "XWiki.Skin");
+        assertEquals("XWiki.Skin", xwiki.getSkin(context));
+        assertFalse(xwiki.getDocument("XWiki.Skin", context).isNew());
+        assertEquals(skin, xwiki.getDocument("XWiki.Skin", context));
+        assertEquals("parsing a field", xwiki.parseTemplate("template.vm", context));
     }
 }

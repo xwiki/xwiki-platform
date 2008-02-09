@@ -71,7 +71,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform.tools</groupId>
             <artifactId>xwiki-verification-resources</artifactId>
-            <version>1.8-SNAPSHOT</version>
+            <version>1.9-SNAPSHOT</version>
           </dependency>
         </dependencies>
       </plugin>

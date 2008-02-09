@@ -44,13 +44,20 @@ import com.xpn.xwiki.objects.BaseObject;
  * <p>
  * This action indicates that the results should be publicly cacheable for 30 days.
  * </p>
+ * 
  * @version $Id: $
  * @since 1.0
  */
 public class SkinAction extends XWikiAction
 {
     /** Logging helper. */
-    private static final Log log = LogFactory.getLog(SkinAction.class);
+    private static final Log LOG = LogFactory.getLog(SkinAction.class);
+
+    /** Path delimiter. */
+    private static final String DELIMITER = "/";
+
+    /** The directory where the skins are placed in the webapp. */
+    private static final String SKINS_DIRECTORY = "skins";
 
     /**
      * {@inheritDoc}
@@ -67,14 +74,14 @@ public class SkinAction extends XWikiAction
         XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
         String path = request.getPathInfo();
-        log.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
+        LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
             + " ; defaultbaseskin: " + defaultbaseskin);
-        int idx = path.lastIndexOf("/");
+        int idx = path.lastIndexOf(DELIMITER);
         boolean found = false;
         while (idx > 0) {
             try {
                 String filename = Utils.decode(path.substring(idx + 1), context);
-                log.debug("Trying '" + filename + "'");
+                LOG.debug("Trying '" + filename + "'");
 
                 if (renderSkin(filename, doc, context)) {
                     found = true;
@@ -97,10 +104,14 @@ public class SkinAction extends XWikiAction
                     }
                 }
             } catch (XWikiException ex) {
-                // TODO: ignored for the moment, this must be rethinked
-                log.debug(new Integer(idx), ex);
+                if (ex.getCode() == XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION) {
+                    // This means that the response couldn't be sent, although the file was
+                    // successfully found. Signal this further, and stop trying to render.
+                    throw ex;
+                }
+                LOG.debug(new Integer(idx), ex);
             }
-            idx = path.lastIndexOf("/", idx - 1);
+            idx = path.lastIndexOf(DELIMITER, idx - 1);
         }
         if (!found) {
             context.getResponse().setStatus(404);
@@ -124,30 +135,29 @@ public class SkinAction extends XWikiAction
      * @param doc The skin {@link XWikiDocument document}.
      * @param context The current {@link XWikiContext request context}.
      * @return <tt>true</tt> if the attachment was found and the content was successfully sent.
-     * @throws IOException If the response cannot be sent.
      * @throws XWikiException If the attachment cannot be loaded.
      */
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
-        log.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
+        LOG.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
             + "' document");
         try {
             if (doc.isNew()) {
-                log.debug(doc.getName() + " is not a document");
-                if ("skins".equals(doc.getSpace())) {
-                    log.debug("Trying on the filesystem");
+                LOG.debug(doc.getName() + " is not a document");
+                if (SKINS_DIRECTORY.equals(doc.getSpace())) {
+                    LOG.debug("Trying on the filesystem");
                 }
             } else {
                 return renderFileFromObjectField(filename, doc, context)
                     || renderFileFromAttachment(filename, doc, context)
-                    || ("skins".equals(doc.getSpace()) && renderSkinFromFilesystem(filename, doc
-                        .getName(), context));
+                    || (SKINS_DIRECTORY.equals(doc.getSpace()) && renderSkinFromFilesystem(
+                        filename, doc.getName(), context));
             }
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                "Exception while sending response",
+                "Exception while sending response:",
                 e);
         }
 
@@ -166,40 +176,34 @@ public class SkinAction extends XWikiAction
     private boolean renderSkinFromFilesystem(String filename, String skin, XWikiContext context)
         throws XWikiException
     {
-        log.debug("Rendering file '" + filename + "' from the '" + skin + "' skin directory");
-        XWiki xwiki = context.getWiki();
+        LOG.debug("Rendering filesystem file '" + filename + "' from the '" + skin
+            + "' skin directory");
         XWikiResponse response = context.getResponse();
+        String path = DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename;
         try {
-            String path = "/skins/" + skin + "/" + filename;
             byte[] data;
-            try {
-                data = context.getWiki().getResourceContentAsBytes(path);
-                if (data == null || data.length == 0) {
-                    return false;
+            data = context.getWiki().getResourceContentAsBytes(path);
+            if (data != null && data.length > 0) {
+                String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
+                if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
+                    data = context.getWiki().parseContent(new String(data), context).getBytes();
                 }
-            } catch (Exception ex) {
-                log.info("Skin file '" + path + "' does not exist or cannot be accessed");
-                return false;
-            }
 
-            String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
-            if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
-                data = context.getWiki().parseContent(new String(data), context).getBytes();
+                setupHeaders(response, mimetype, new Date(), data.length);
+                try {
+                    response.getOutputStream().write(data);
+                } catch (IOException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+                        "Exception while sending response",
+                        e);
+                }
+                return true;
             }
-
-            setupHeaders(response, mimetype, new Date(), data.length);
-            response.getOutputStream().write(data);
-            return true;
-        } catch (IOException e) {
-            if (skin.equals(xwiki.getDefaultBaseSkin(context))) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                    "Exception while sending response",
-                    e);
-            } else {
-                return false;
-            }
+        } catch (IOException ex) {
+            LOG.info("Skin file '" + path + "' does not exist or cannot be accessed");
         }
+        return false;
     }
 
     /**
@@ -215,7 +219,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromObjectField(String filename, XWikiDocument doc,
         XWikiContext context) throws IOException
     {
-        log.debug("... as object property");
+        LOG.debug("... as object property");
         BaseObject object = doc.getObject("XWiki.XWikiSkins");
         String content = null;
         if (object != null) {
@@ -233,7 +237,7 @@ public class SkinAction extends XWikiAction
             response.getWriter().write(content);
             return true;
         } else {
-            log.debug("Object field not found or empty");
+            LOG.debug("Object field not found or empty");
         }
         return false;
     }
@@ -251,7 +255,7 @@ public class SkinAction extends XWikiAction
     public boolean renderFileFromAttachment(String filename, XWikiDocument doc,
         XWikiContext context) throws IOException, XWikiException
     {
-        log.debug("... as attachment");
+        LOG.debug("... as attachment");
         XWikiAttachment attachment = doc.getAttachment(filename);
         if (attachment != null) {
             XWiki xwiki = context.getWiki();
@@ -265,7 +269,7 @@ public class SkinAction extends XWikiAction
             response.getOutputStream().write(data);
             return true;
         } else {
-            log.debug("Attachment not found");
+            LOG.debug("Attachment not found");
         }
         return false;
     }
@@ -278,11 +282,14 @@ public class SkinAction extends XWikiAction
      */
     public boolean isJavascriptMimeType(String mimetype)
     {
-        return ("text/javascript".equalsIgnoreCase(mimetype)
-            || "application/x-javascript".equalsIgnoreCase(mimetype)
-            || "application/javascript".equalsIgnoreCase(mimetype)
-            || "application/ecmascript".equalsIgnoreCase(mimetype) || "text/ecmascript"
-            .equalsIgnoreCase(mimetype));
+        boolean result =
+            "text/javascript".equalsIgnoreCase(mimetype)
+                || "application/x-javascript".equalsIgnoreCase(mimetype)
+                || "application/javascript".equalsIgnoreCase(mimetype);
+        result |=
+            "application/ecmascript".equalsIgnoreCase(mimetype)
+                || "text/ecmascript".equalsIgnoreCase(mimetype);
+        return result;
     }
 
     /**

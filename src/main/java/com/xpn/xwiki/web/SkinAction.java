@@ -88,7 +88,7 @@ public class SkinAction extends XWikiAction
                 log.debug("The skin document does not exist; trying on the filesystem");
             } else {
                 log.debug("... as object property");
-                BaseObject object = doc.getObject("XWiki.XWikiSkins", 0);
+                BaseObject object = doc.getObject("XWiki.XWikiSkins");
                 String content = null;
                 if (object != null) {
                     content = object.getStringValue(filename);

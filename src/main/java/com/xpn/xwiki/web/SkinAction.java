@@ -35,8 +35,14 @@ import org.apache.commons.logging.LogFactory;
 
 public class SkinAction extends XWikiAction
 {
+    /** Loggin helper */
     private static final Log log = LogFactory.getLog(SkinAction.class);
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#render(XWikiContext)
+     */
     public String render(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -50,29 +56,42 @@ public class SkinAction extends XWikiAction
         log.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
             + " ; defaultbaseskin: " + defaultbaseskin);
         int idx = path.lastIndexOf("/");
+        boolean found = false;
         while (idx > 0) {
             try {
                 String filename = Utils.decode(path.substring(idx + 1), context);
                 log.debug("Trying '" + filename + "'");
 
-                if (renderSkin(filename, doc, context))
-                    return null;
+                if (renderSkin(filename, doc, context)) {
+                    found = true;
+                    break;
+                }
 
-                if (renderSkin(filename, baseskin, context))
-                    return null;
+                if (renderSkin(filename, baseskin, context)) {
+                    found = true;
+                    break;
+                }
 
-                if (renderSkin(filename, baseskindoc, context))
-                    return null;
+                if (renderSkin(filename, baseskindoc, context)) {
+                    found = true;
+                    break;
+                }
 
-                if (renderSkin(filename, defaultbaseskin, context))
-                    return null;
+                if (renderSkin(filename, defaultbaseskin, context)) {
+                    found = true;
+                    break;
+                }
             } catch (XWikiException ex) {
                 // TODO: ignored for the moment, this must be rethinked
                 log.debug(new Integer(idx), ex);
             }
             idx = path.lastIndexOf("/", idx - 1);
         }
-        return "docdoesnotexist";
+        if (!found) {
+            context.getResponse().setStatus(404);
+            return "docdoesnotexist";
+        }
+        return null;
     }
 
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)

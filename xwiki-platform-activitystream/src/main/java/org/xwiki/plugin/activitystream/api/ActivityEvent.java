@@ -20,6 +20,7 @@
 package org.xwiki.plugin.activitystream.api;
 
 import java.util.Date;
+import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 
@@ -268,4 +269,10 @@ public interface ActivityEvent
      * @return
      */
     String getDisplayUser(XWikiContext context);
+
+    /**
+     * Set all params at once
+     * @param params
+     */
+    void setParams(List params);
 }

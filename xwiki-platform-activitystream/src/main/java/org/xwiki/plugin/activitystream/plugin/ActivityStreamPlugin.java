@@ -37,7 +37,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     /**
      * We should user inversion of control instead
      */
-    private ActivityStream activityStream = new ActivityStreamImpl();
+    private ActivityStream activityStream;
 
     /**
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
@@ -45,6 +45,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
     public ActivityStreamPlugin(String name, String className, XWikiContext context)
     {
         super(name, className, context);
+        setActivityStream(new ActivityStreamImpl());
     }
 
     /**

@@ -20,6 +20,7 @@
 package org.xwiki.plugin.activitystream.impl;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.Session;
@@ -43,28 +44,33 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     {
         // listen to notifications
         context.getWiki().getNotificationManager().addGeneralRule(
-            new DocChangeRule(this, true, true));
+                new DocChangeRule(this));
     }
 
-    protected void prepareEvent(ActivityEvent event, XWikiContext context)
+    protected void prepareEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
     {
+        if (doc==null)
+            doc = context.getDoc();
+
         if (event.getUser() == null) {
             event.setUser(context.getUser());
         }
         if (event.getStream() == null) {
-            event.setStream(context.getUser());
+            String space =  (doc==null) ? "" : doc.getSpace();
+
+            event.setStream(getStreamName(space));
         }
         if (event.getWiki() == null) {
             event.setWiki(context.getDatabase());
         }
         if (event.getSpace() == null) {
-            event.setSpace(context.getDoc().getSpace());
+            event.setSpace((doc==null) ? "" : doc.getSpace());
         }
         if (event.getPage() == null) {
-            event.setPage(context.getDoc().getFullName());
+            event.setPage((doc==null) ? "" : doc.getFullName());
         }
         if (event.getUrl() == null) {
-            event.setUrl(context.getDoc().getURL("view", context));
+            event.setUrl((doc==null) ? "" : doc.getURL("view", context));
         }
         if (event.getApplication() == null) {
             event.setApplication("xwiki");
@@ -80,44 +86,78 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         }
     }
 
+    public String getStreamName(String space) {
+        return space;
+    }
+
     protected String generateEventId(ActivityEvent event, XWikiContext context)
     {
-        return event.getStream() + "-" + event.getApplication() + "-" + event.getWiki() + ":"
-            + event.getPage() + "-" + event.getType() + "-" + event.getDate().getTime() + "-"
-            + RandomStringUtils.randomAlphanumeric(4);
+        String key = event.getStream() + "-" + event.getApplication() + "-" + event.getWiki() + ":"
+                + event.getPage() + "-" + event.getType();
+        long hash = key.hashCode();
+        if (hash<0)
+         hash = -hash;
+
+        String id =  "" + hash +  "-" + event.getDate().getTime() + "-"
+                + RandomStringUtils.randomAlphanumeric(8);
+        if (context.get("activitystream_requestid")==null) {
+            context.put("activitystream_requestid", id);
+        }
+        return id;
     }
 
     public void addActivityEvent(ActivityEvent event, XWikiContext context)
-        throws ActivityStreamException
+            throws ActivityStreamException
     {
-        prepareEvent(event, context);
+        addActivityEvent(event, null, context);
+    }
+
+    public void addActivityEvent(ActivityEvent event, XWikiDocument doc, XWikiContext context)
+            throws ActivityStreamException
+    {
+        prepareEvent(event, doc, context);
 
         // store event using hibernate
         XWikiHibernateStore hibstore = context.getWiki().getHibernateStore();
         try {
             hibstore.beginTransaction(context);
             Session session = hibstore.getSession(context);
-            session.saveOrUpdate(event);
+            session.save(event);
             hibstore.endTransaction(context, true);
         } catch (XWikiException e) {
             hibstore.endTransaction(context, false);
         }
     }
 
-    public void addActivityEvent(String type, String title, XWikiContext context)
-        throws ActivityStreamException
+    public void addActivityEvent(String streamName, String type, String title, XWikiContext context)
+            throws ActivityStreamException
+    {
+        addActivityEvent(streamName, type, title, null, context);
+    }
+
+    public void addActivityEvent(String streamName, String type, String title, List params, XWikiContext context)
+            throws ActivityStreamException
     {
         ActivityEvent event = newActivityEvent();
+        event.setStream(streamName);
         event.setType(type);
         event.setTitle(title);
         event.setBody(title);
+        event.setParams(params);
         addActivityEvent(event, context);
     }
 
-    public void addDocumentActivityEvent(XWikiDocument doc, String type, String title,
-        XWikiContext context) throws ActivityStreamException
+    public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title,
+                                         XWikiContext context) throws ActivityStreamException
+    {
+        addDocumentActivityEvent(streamName, doc, type, title, null, context);
+    }
+
+    public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title, List params,
+                                         XWikiContext context) throws ActivityStreamException
     {
         ActivityEvent event = newActivityEvent();
+        event.setStream(streamName);
         event.setPage(doc.getFullName());
         if (doc.getDatabase() != null) {
             event.setWiki(doc.getDatabase());
@@ -127,15 +167,16 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         event.setType(type);
         event.setTitle(title);
         event.setBody(title);
-        addActivityEvent(event, context);
+        event.setParams(params);
+        addActivityEvent(event, doc, context);
     }
 
     public List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)
-        throws ActivityStreamException
+            throws ActivityStreamException
     {
         String searchHql = "select act.* from ActivityEvent as act " + hql;
         String filterQuery =
-            ", ActivityEvent act2 where act.eventId=act2.eventId and act.priority=max(act2.priority)";
+                ", ActivityEvent act2 where act.eventId=act2.eventId and act.priority=max(act2.priority)";
         if (filter) {
             searchHql += filterQuery;
         }
@@ -152,41 +193,41 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     }
 
     public List getEvents(boolean filter, int nb, int start, XWikiContext context)
-        throws ActivityStreamException
+            throws ActivityStreamException
     {
         return searchEvents("", filter, nb, start, context);
     }
 
     public List getEventsForSpace(String space, boolean filter, int nb, int start,
-        XWikiContext context) throws ActivityStreamException
+                                  XWikiContext context) throws ActivityStreamException
     {
         return searchEvents("where act.space='" + space + "'", filter, nb, start, context);
     }
 
     public List getEventsForUser(String user, boolean filter, int nb, int start,
-        XWikiContext context) throws ActivityStreamException
+                                 XWikiContext context) throws ActivityStreamException
     {
         return searchEvents("where act.user='" + user + "'", filter, nb, start, context);
     }
 
     public List getEvents(String stream, boolean filter, int nb, int start, XWikiContext context)
-        throws ActivityStreamException
+            throws ActivityStreamException
     {
         return searchEvents("where act.stream='" + stream + "'", filter, nb, start, context);
     }
 
     public List getEventsForSpace(String stream, String space, boolean filter, int nb, int start,
-        XWikiContext context) throws ActivityStreamException
+                                  XWikiContext context) throws ActivityStreamException
     {
         return searchEvents("where act.space='" + space + "' and act.stream='" + stream + "'",
-            filter, nb, start, context);
+                filter, nb, start, context);
     }
 
     public List getEventsForUser(String stream, String user, boolean filter, int nb, int start,
-        XWikiContext context) throws ActivityStreamException
+                                 XWikiContext context) throws ActivityStreamException
     {
         return searchEvents("where act.user='" + user + "' and act.stream='" + stream + "'",
-            filter, nb, start, context);
+                filter, nb, start, context);
     }
 
     protected ActivityEvent newActivityEvent()
@@ -195,31 +236,46 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     }
 
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
-        int event, XWikiContext context)
+                       int event, XWikiContext context)
     {
+        ArrayList params = new ArrayList();
+        params.set(0, newdoc.getDisplayTitle(context));
+
+        String streamName = getStreamName(newdoc.getSpace());
+
+        if (streamName==null)
+         return;
+
         try {
             switch (event) {
                 case XWikiDocChangeNotificationInterface.EVENT_CHANGE:
-                    addActivityEvent(ActivityEventType.UPDATE, null, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, "as_document_has_been_updated", params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_NEW:
-                    addActivityEvent(ActivityEventType.CREATE, null, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.CREATE, "as_document_has_been_created", params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_DELETE:
-                    addActivityEvent(ActivityEventType.DELETE, null, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.DELETE, "as_document_has_been_deleted", params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CONTENT:
-                    addActivityEvent(ActivityEventType.UPDATE, null, context);
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, "as_document_has_been_updated", params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_OBJECT:
-                    // TODO
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, "as_document_has_been_updated", params, context);
                     break;
                 case XWikiDocChangeNotificationInterface.EVENT_UPDATE_CLASS:
-                    // TODO
+                    addDocumentActivityEvent(streamName, newdoc, ActivityEventType.UPDATE, "as_document_has_been_updated", params, context);
                     break;
             }
-        } catch (ActivityStreamException e) {
-            // ignore
+        } catch (Throwable e) {
+            // Error in activity stream notify should be ignored but logged in the log file
+            e.printStackTrace();
         }
     }
+
+    /*
+    public FeedEntry getFeedEntry(ActivityEvent event, XWikiContext context) {
+        return null;
+    } */
+
 }

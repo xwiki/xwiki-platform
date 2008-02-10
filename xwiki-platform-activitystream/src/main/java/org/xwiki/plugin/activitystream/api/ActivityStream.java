@@ -36,6 +36,13 @@ public interface ActivityStream
     void initClasses(XWikiContext context) throws XWikiException;
 
     /**
+     * Tranforms space name into stream name
+     * @param space
+     * @return
+     */
+    String getStreamName(String space);
+
+    /**
      * Adding and activity event. The Id does not need to be filled as it will be created. Date and
      * Wiki are optional
      * 
@@ -46,10 +53,16 @@ public interface ActivityStream
     void addActivityEvent(ActivityEvent event, XWikiContext context)
         throws ActivityStreamException;
 
-    void addActivityEvent(String type, String title, XWikiContext context)
+    void addActivityEvent(String streamName, String type, String title, XWikiContext context)
         throws ActivityStreamException;
 
-    void addDocumentActivityEvent(XWikiDocument doc, String type, String title,
+    void addActivityEvent(String streamName, String type, String title, List params, XWikiContext context)
+        throws ActivityStreamException;
+
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title,
+        XWikiContext context) throws ActivityStreamException;
+
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title, List params,
         XWikiContext context) throws ActivityStreamException;
 
     List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)

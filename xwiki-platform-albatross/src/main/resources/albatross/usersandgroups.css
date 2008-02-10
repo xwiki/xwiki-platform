@@ -79,11 +79,13 @@ div.inscrollbar {
 	padding-left: 10px;
 }
 
+
 #userstable, #groupstable, #usersandgroupstable {
+    width: 100%;
     position: relative;
+    left: 4px;
     padding: 0px;
     margin: 0px;
-    left: 8px;
 }
 
 #memberstable {
@@ -94,11 +96,11 @@ div.inscrollbar {
 #specialusersandgroups {
    border-collapse: collapse;
    border: 1px solid #d4dee8;
-   width: 100%;
+   width: 99.5%;
 }
 
 #specialusersandgroups td {
-    border: 1px solid #d4dee8;
+   border: 1px solid #d4dee8;
 }
 
 .manage {
@@ -120,17 +122,17 @@ div.inscrollbar {
 }
 
 #usersandgroupstable.spacerights .rights {
-      width: 12% !important;
+  width: 12% !important;
 }
 
 #usersandgroupstable.rights .rights {
-      width: 15% !important;
+  width: 15% !important;
 }
 
 .spaceName {
 	margin-left: 13px;
 	margin-top: 5px;
-        margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 #tdAddNewUserOrGroup {

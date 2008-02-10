@@ -1,124 +1,121 @@
 /* USERS SCROLLING SYSTEM */
 
 div.scrollbar {
-    overflow: auto;
-    height: 250px;
-    margin:0px;
-    padding:0px;
-    width: 25px;
-    left: -10px;
-    position: relative;
+  overflow: auto;
+  height: 250px;
+  margin: 0px;
+  padding: 0px;
+  width: 25px;
+  left: -10px;
+  position: relative;
 }
 
 div.inscrollbar {
-    width:1px;
-    margin:0px;
-    padding:0px;
-    height:3000px;
+  width: 1px;
+  margin: 0px;
+  padding: 0px;
+  height: 3000px;
 }
 
 .display {
-    border-collapse: collapse;
-    border: 1px solid #d4dee8;
-    width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #d4dee8;
+  width: 100%;
 }
 
 .display td {
-    border: 1px solid #d4dee8;
+  border: 1px solid #d4dee8;
 }
 
-
 #showLimits {
-   font-size: 12px;
-   padding-top: 5px;
-   padding-bottom: 5px;
+  font-size: 12px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .icon-manage {
-   cursor: pointer;
-   padding-right: 10px;
+  cursor: pointer;
+  padding-right: 10px;
 }
 
 .icon-manageg {
-   padding-right: 10px;
+  padding-right: 10px;
 }
 
 #ajax-loader {
-   margin: 0px;
-   padding: 0px;
-   position: absolute;
-   top: 50%;
-   left: 35%;
-   z-index: 1000000000;
-   display: none;
-   width: 220px;
-   background-color: #fff;
-   border: 1px solid #999;
-   font-size: 11px;
-   padding: 8px;
-   text-indent: 5px;
+  margin: 0px;
+  padding: 0px;
+  position: absolute;
+  top: 50%;
+  left: 35%;
+  z-index: 10000;
+  display: none;
+  width: 220px;
+  background-color: #fff;
+  border: 1px solid #999;
+  font-size: 11px;
+  padding: 8px;
+  text-indent: 5px;
 }
 
-
 .theader {
-   background-color: #1f66ab;
-   color: #fff;
-   font-weight: bold;
-   font-size: 12px;
+  background-color: #1f66ab;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
 }
 
 #table-filters {
-    background-color: #d4dee8;
+  background-color: #d4dee8;
 }
 
 .filter {
-	width: 70%;
+  width: 70%;
 }
 
 .theader td {
-	padding-left: 10px;
+  padding-left: 10px;
 }
 
 
 #userstable, #groupstable, #usersandgroupstable {
-    width: 100%;
-    position: relative;
-    left: 4px;
-    padding: 0px;
-    margin: 0px;
+  width: 100%;
+  position: relative;
+  left: 4px;
+  padding: 0px;
+  margin: 0px;
 }
 
 #memberstable {
-    width: 500px;
-    margin-bottom: 5px;
+  width: 500px;
+  margin-bottom: 5px;
 }
 
 #specialusersandgroups {
-   border-collapse: collapse;
-   border: 1px solid #d4dee8;
-   width: 99.5%;
+  border-collapse: collapse;
+  border: 1px solid #d4dee8;
+  width: 99.5%;
 }
 
 #specialusersandgroups td {
-   border: 1px solid #d4dee8;
+  border: 1px solid #d4dee8;
 }
 
 .manage {
-	text-align: center;
-	width: 15%;
+  text-align: center;
+  width: 15%;
 }
 
 .hmanage {
-	width: 15%;
-	padding-left: 10px;
+  width: 15%;
+  padding-left: 10px;
 }
 
-
 .rights {
-	text-align: center;
-	padding-left: 0px !important;
-	padding-top: 4px;
-	width: 9%;
+  text-align: center;
+  padding-left: 0px !important;
+  padding-top: 4px;
+  width: 9%;
 }
 
 #usersandgroupstable.spacerights .rights {
@@ -130,23 +127,22 @@ div.inscrollbar {
 }
 
 .spaceName {
-	margin-left: 13px;
-	margin-top: 5px;
+  margin-left: 13px;
+  margin-top: 5px;
   margin-bottom: 5px;
 }
 
 #tdAddNewUserOrGroup {
-	padding-top: 11px;
+  padding-top: 11px;
 }
-
 
 #tdAddNewUserOrGroup a {
   color: #fff;
   font-weight: bold;
   font-size: 12px;
   text-decoration: none;
-	background-image: url($xwiki.getSkinFile('icons/rights-manager/but1.png'));
-	background-repeat: no-repeat !important;
+  background-image: url($xwiki.getSkinFile('icons/rights-manager/but1.png'));
+  background-repeat: no-repeat !important;
   display: block;
   text-align: center;
   padding-top: 3px;
@@ -155,14 +151,14 @@ div.inscrollbar {
 }
 
 #errMsg {
-   color: #DD7700;
-   font-size: 12px;
-   font-weight: bold;
+  color: #DD7700;
+  font-size: 12px;
+  font-weight: bold;
 }
 
 #XWikiGuestSpecial {
-   background-color: #fff;
-   color: #000;
+  background-color: #fff;
+  color: #000;
 }
 
 .suorg {
@@ -171,13 +167,13 @@ div.inscrollbar {
 }
 
 .username {
-  padding-left:10px;
+  padding-left: 10px;
 }
 
 #addNewMember {
-   margin-top: 5px;
+  margin-top: 5px;
 }
 
 .addlabel {
-   font-weight: bold;
+  font-weight: bold;
 }

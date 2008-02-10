@@ -125,7 +125,7 @@ Lightbox.prototype =  {
       '<div id="lb">' +
       '<div id="lb-top">' +
       '<div id="close-wrap">' +
-      '<div id="lb-close" onclick="window.lb.lbHide(); window.lb.lbClearData(); return false;" title="Cancel and close">&nbsp;</div>' +
+      '<div id="lb-close" onclick="window.lb.lbClose();" title="Cancel and close">&nbsp;</div>' + // TODO: Refresh just the affected data, using an onClose callback
       '</div>';
 
     if(lbtype == "lightrounded") {

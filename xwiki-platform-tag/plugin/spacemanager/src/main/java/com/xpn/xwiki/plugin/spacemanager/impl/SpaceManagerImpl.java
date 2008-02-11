@@ -295,7 +295,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * @param level Access level
      * @param allow True if the right is allow, deny if not
      */
-    protected boolean addRightToGroup(String spaceName, String groupName, String level,
+    public boolean addRightToGroup(String spaceName, String groupName, String level,
         boolean allow, boolean global, XWikiContext context) throws XWikiException
     {
         final String rightsClass = global ? "XWiki.XWikiGlobalRights" : "XWiki.XWikiRights";

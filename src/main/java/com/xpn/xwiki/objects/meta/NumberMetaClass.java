@@ -31,7 +31,7 @@ public class NumberMetaClass extends PropertyMetaClass {
   public NumberMetaClass() {
     super();
     // setType("numbermetaclass");
-    setPrettyName("Number Class");
+    setPrettyName("Number");
     setName(NumberClass.class.getName());
 
     StaticListClass type_class = new StaticListClass(this);

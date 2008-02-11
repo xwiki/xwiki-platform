@@ -29,7 +29,7 @@ public class DBTreeListMetaClass extends DBListMetaClass {
 
     public DBTreeListMetaClass() {
         super();
-        setPrettyName("Database Tree List Class");
+        setPrettyName("Database Tree");
         setName(DBTreeListClass.class.getName());
 
         StringClass parentfield_class = new StringClass(this);

@@ -8,7 +8,7 @@ import com.xpn.xwiki.objects.classes.UsersClass;
 public class UsersMetaClass extends ListMetaClass {
     public UsersMetaClass() {
         super();
-        setPrettyName("Users List Class");
+        setPrettyName("List of Users");
         setName(UsersClass.class.getName());
 
         BooleanClass uselist_class = new BooleanClass(this);

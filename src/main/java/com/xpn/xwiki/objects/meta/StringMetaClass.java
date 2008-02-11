@@ -34,7 +34,7 @@ public class StringMetaClass extends PropertyMetaClass
     {
         super();
         // setType("stringmetaclass");
-        setPrettyName("String Class");
+        setPrettyName("String");
         setName(StringClass.class.getName());
 
         NumberClass size_class = new NumberClass(this);

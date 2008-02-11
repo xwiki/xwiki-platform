@@ -32,7 +32,7 @@ public class BooleanMetaClass extends PropertyMetaClass {
 
     public BooleanMetaClass() {
         super();
-        setPrettyName("Boolean Class");
+        setPrettyName("Boolean");
         setName(BooleanClass.class.getName());
 
         StaticListClass type_class = new StaticListClass(this);

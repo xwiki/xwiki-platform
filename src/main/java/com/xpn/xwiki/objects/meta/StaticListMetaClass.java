@@ -32,7 +32,7 @@ public class StaticListMetaClass extends ListMetaClass
     public StaticListMetaClass()
     {
         super();
-        setPrettyName("Static List Class");
+        setPrettyName("Static List");
         setName(StaticListClass.class.getName());
 
         StringClass values_class = new StringClass(this);

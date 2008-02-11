@@ -42,7 +42,7 @@ public class PasswordMetaClass extends StringMetaClass
     public PasswordMetaClass()
     {
         super();
-        setPrettyName("Password Class");
+        setPrettyName("Password");
         setName(PasswordClass.class.getName());
 
         StaticListClass storageType_class = new StaticListClass(this);

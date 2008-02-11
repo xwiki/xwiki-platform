@@ -210,6 +210,19 @@ public class SpaceManagerPluginApi extends PluginApi
         List spacesList = getSpaceManager().getSpaces(nb, start, context);
         return spacesList;
     }
+	
+	 /**
+     * Get the list of space objects
+     *
+     * @param nb
+     * @param start
+     * @param ordersql
+     * @return list of space objects
+     */
+    public List getSpaces(int nb, int start, String ordersql) throws SpaceManagerException {
+        List spacesList = getSpaceManager().getSpaces(nb, start, ordersql, context);
+        return spacesList;
+    }
 
     /*
     private List wrapSpaces(List spacesList) {
@@ -232,34 +245,84 @@ public class SpaceManagerPluginApi extends PluginApi
     public List getSpaceNames(int nb, int start) throws SpaceManagerException {
         return getSpaceManager().getSpaceNames(nb, start, context);
     }
-
-    /**
-     * Search for spaces using an HQL query returning Space objects
+	
+	 /**
+     * Get the list of space objects
      *
-     * @param fromsql
-     * @param wheresql
      * @param start
      * @param nb
-     * @return list of space objects
+     * @param ordersql
+     * @return list of space names
      */
+    public List getSpaceNames(int nb, int start, String ordersql) throws SpaceManagerException {
+        return getSpaceManager().getSpaceNames(nb, start, ordersql, context);
+    }
+
+    /**
+	* Performs a search for spaces. This variant returns the spaces ordered ascending by creation date
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @return A list with space objects matching the search
+	* @throws SpaceManagerException
+	*/
     public List searchSpaces(String fromsql, String wheresql, int nb, int start) throws SpaceManagerException {
         List spacesList = getSpaceManager().searchSpaces(fromsql, wheresql, nb, start, context);
         return spacesList;
 
     }
+	
+	/**
+	* Performs a search for spaces
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param ordersql The sql fragment describing the order in wich the spaces should be returned
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @return A list with space objects matching the search
+	* @throws SpaceManagerException
+	*/
+    public List searchSpaces(String fromsql, String wheresql, String ordersql, int nb, int start) throws SpaceManagerException
+    {
+		List spacesList = getSpaceManager().searchSpaces(fromsql, wheresql, ordersql, nb, start, context);
+        return spacesList;
+    }
 
-    /**
-     * Search for spaces using an HQL query returning Space Names
-     *
-     * @param fromsql
-     * @param wheresql
-     * @param start
-     * @param nb
-     * @return
-     */
+	/**
+	* Performs a search for space names. This variant returns the spaces ordered ascending by creation date
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @param context XWiki context
+	* @return A list of strings representing the names of the spaces matching the search
+	* @throws SpaceManagerException
+	*/
     public List searchSpaceNames(String fromsql, String wheresql, int nb, int start) throws SpaceManagerException {
         return getSpaceManager().searchSpaceNames(fromsql, wheresql, nb, start, context);
     }
+
+    /**
+	* Performs a search for space names
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param ordersql The sql fragment describing the order in wich the spaces should be returned
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @return A list of strings representing the names of the spaces matching the search
+	* @throws SpaceManagerException
+	*/
+    public List searchSpaceNames(String fromsql, String wheresql, String ordersql, int nb, int start) throws SpaceManagerException
+    {
+        return getSpaceManager().searchSpaceNames(fromsql, wheresql, ordersql, nb, start, context);
+    }	
+	
+	
     /**
      * Get the list of spaces for a user in a specific role
      * If role is null it will get all spaces in which the user is member

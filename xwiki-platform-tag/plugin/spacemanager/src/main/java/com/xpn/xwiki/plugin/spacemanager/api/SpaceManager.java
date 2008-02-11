@@ -155,6 +155,16 @@ public interface SpaceManager extends XWikiPluginInterface
      * @return list of space objects
      */
     public List getSpaces(int nb, int start, XWikiContext context) throws SpaceManagerException;
+	
+	/**
+     * Lists spaces in the wiki
+     * 
+     * @param nb the maximum number of spaces to retrieve
+     * @param start the offset to start retrieving spaces at
+     * @param ordersql hibernate sql describing how to order the spaceobjects
+     * @return list of space objects
+     */
+    public List getSpaces(int nb, int start, String ordersql, XWikiContext context) throws SpaceManagerException;
 
     /**
      * Get a list of space names
@@ -165,6 +175,17 @@ public interface SpaceManager extends XWikiPluginInterface
      */
     public List getSpaceNames(int nb, int start, XWikiContext context)
         throws SpaceManagerException;
+		
+	/**
+     * Get a list of space names
+     * 
+     * @param nb the maximum number of space names to retrieve
+     * @param start the offset to start retrieving the names at
+     * @param ordersql hibernate sql describing how to order the names
+     * @return list of space names
+     */
+    public List getSpaceNames(int nb, int start, String ordersql, XWikiContext context)
+        throws SpaceManagerException;
 
     /**
      * Search for spaces using an HQL query returning Space objects
@@ -172,7 +193,16 @@ public interface SpaceManager extends XWikiPluginInterface
      * @see #searchSpaceNames(String, String, int, int, XWikiContext) for parameters details.
      * @return list of space objects
      */
-    public List searchSpaces(String fromsql, String wherehql, int nb, int start,
+    public List searchSpaces(String fromsql, String wheresql, int nb, int start,
+        XWikiContext context) throws SpaceManagerException;
+		
+	/**
+     * Search for spaces using an HQL query returning Space objects
+     * 
+     * @see #searchSpaceNames(String, String, String, int, int, XWikiContext) for parameters details.
+     * @return list of space objects
+     */
+    public List searchSpaces(String fromsql, String wheresql, String ordersql, int nb, int start,
         XWikiContext context) throws SpaceManagerException;
 
     /**
@@ -188,6 +218,22 @@ public interface SpaceManager extends XWikiPluginInterface
      * @return list of space names matching the generated query
      */
     public List searchSpaceNames(String fromsql, String wheresql, int nb, int start,
+        XWikiContext context) throws SpaceManagerException;
+		
+	/**
+     * Search for spaces using an HQL query returning Space Names
+     * 
+     * @param fromsql the from clause of the hql query. Should start with a comma if not empty
+     *            (since appended to the actual search spaces from clause)
+     * @param wheresql the where clause of the hql query. Should start with " and" if not empty
+     *            (since appended to the actual search spaces where clause).
+      * @param ordersql the where clause of the hql query. Should start with " " if not empty
+     * @param nb the maximum number of spaces to retrieve
+     * @param start the offset to start retrieving the spaces at.
+     * @param context
+     * @return list of space names matching the generated query
+     */
+    public List searchSpaceNames(String fromsql, String wheresql, String ordersql, int nb, int start,
         XWikiContext context) throws SpaceManagerException;
 
     /**

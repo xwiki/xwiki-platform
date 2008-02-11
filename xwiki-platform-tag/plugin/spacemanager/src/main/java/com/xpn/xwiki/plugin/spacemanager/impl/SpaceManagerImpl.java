@@ -788,6 +788,12 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         List spaceNames = getSpaceNames(nb, start, context);
         return getSpaceObjects(spaceNames, context);
     }
+	
+	public List getSpaces(int nb, int start, String ordersql, XWikiContext context) throws SpaceManagerException
+    {
+        List spaceNames = getSpaceNames(nb, start, ordersql, context);
+        return getSpaceObjects(spaceNames, context);
+    }
 
     /**
      * Returns a list of nb space names starting at start
@@ -810,10 +816,17 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         return spaceList;
     }
 
+	public List getSpaceNames(int nb, int start, XWikiContext context)
+        throws SpaceManagerException
+    {
+        return getSpaceNames( nb, start, "", context );
+    }
+	
+	
     /**
      * {@inheritDoc}
      */
-    public List getSpaceNames(int nb, int start, XWikiContext context)
+    public List getSpaceNames(int nb, int start, String ordersql, XWikiContext context)
         throws SpaceManagerException
     {
         String type = getSpaceTypeName();
@@ -823,13 +836,13 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             sql =
                 "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, "
                     + className + " as space where doc.fullName = obj.name and obj.className='"
-                    + className + "' and obj.id = space.id and space.type='" + type + "'";
+                    + className + "' and obj.id = space.id and space.type='" + type + "'" + ordersql;
         else
             sql =
                 "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, StringProperty typeprop where doc.fullName=obj.name and obj.className = '"
                     + className
                     + "' and obj.id=typeprop.id.id and typeprop.id.name='type' and typeprop.value='"
-                    + type + "'";
+                    + type + "'" + ordersql;
 
         List spaceList = null;
         try {
@@ -841,19 +854,54 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public List searchSpaces(String fromsql, String wherehql, int nb, int start,
+	* Performs a search for spaces
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param ordersql The sql fragment describing the order in wich the spaces should be returned
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @param context XWiki context
+	* @return A list with space objects matching the search
+	* @throws SpaceManagerException
+	*/
+    public List searchSpaces(String fromsql, String wheresql, String ordersql, int nb, int start,
         XWikiContext context) throws SpaceManagerException
     {
-        List spaceNames = searchSpaceNames(fromsql, wherehql, nb, start, context);
+        List spaceNames = searchSpaceNames(fromsql, wheresql, ordersql, nb, start, context);
         return getSpaceObjects(spaceNames, context);
+    }
+	
+	/**
+	* Performs a search for spaces. This variant returns the spaces ordered ascending by creation date
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @param context XWiki context
+	* @return A list with space objects matching the search
+	* @throws SpaceManagerException
+	*/
+	public List searchSpaces(String fromsql, String wheresql, int nb, int start,
+        XWikiContext context) throws SpaceManagerException
+    {
+        return searchSpaces(fromsql, wheresql, "", nb, start, context);
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public List searchSpaceNames(String fromsql, String wheresql, int nb, int start,
+	* Performs a search for space names
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param ordersql The sql fragment describing the order in wich the spaces should be returned
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @param context XWiki context
+	* @return A list of strings representing the names of the spaces matching the search
+	* @throws SpaceManagerException
+	*/
+    public List searchSpaceNames(String fromsql, String wheresql, String ordersql, int nb, int start,
         XWikiContext context) throws SpaceManagerException
     {
         String type = getSpaceTypeName();
@@ -864,7 +912,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                 "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, "
                     + className + " as space" + fromsql
                     + " where doc.fullName = obj.name and obj.className='" + className
-                    + "' and obj.id = space.id and space.type='" + type + "'" + wheresql;
+                    + "' and obj.id = space.id and space.type='" + type + "'" + wheresql + ordersql;
         else
             sql =
                 "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, StringProperty as typeprop"
@@ -872,7 +920,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                     + " where doc.fullName=obj.name and obj.className = '"
                     + className
                     + "' and obj.id=typeprop.id.id and typeprop.id.name='type' and typeprop.value='"
-                    + type + "'" + wheresql;
+                    + type + "'" + wheresql + ordersql;
 
         List spaceList = null;
         try {
@@ -882,6 +930,23 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         }
         return spaceList;
     }
+	
+	/**
+	* Performs a search for space names. This variant returns the spaces ordered ascending by creation date
+	* 
+	* @param fromsql The sql fragment describing the source of the search
+	* @param wheresql The sql fragment describing the where clause of the search
+	* @param nb The number of spaces to return (limit)
+	* @param start Number of spaces to skip
+	* @param context XWiki context
+	* @return A list of strings representing the names of the spaces matching the search
+	* @throws SpaceManagerException
+	*/
+	public List searchSpaceNames(String fromsql, String wheresql, int nb, int start,
+        XWikiContext context) throws SpaceManagerException
+	{
+		return searchSpaceNames(fromsql,wheresql,"",nb,start,context);
+	}
 
     /**
      * {@inheritDoc}
@@ -923,6 +988,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         }
         return spaceList;
     }
+
 
     /**
      * {@inheritDoc}

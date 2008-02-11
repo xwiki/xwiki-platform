@@ -30,6 +30,7 @@ import java.util.Map;
 import javax.servlet.Servlet;
 import javax.servlet.ServletRequest;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
@@ -653,6 +654,32 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         }
         doc.setAuthor(context.getUser());
         doc.setContent(page.getContent());
+        if (page.getCreated() != null) {
+            doc.setCreationDate(page.getCreated());
+        }
+        if (!StringUtils.isBlank(page.getCreator())) {
+            doc.setCreator(page.getCreator());
+        }
+        if (!StringUtils.isBlank(page.getModifier())) {
+            doc.setAuthor(page.getModifier());
+        }
+        if (page.getModified() != null) {
+            doc.setDate(page.getModified());
+        }
+        if (!StringUtils.isBlank(page.getTitle())) {
+            doc.setTitle(page.getTitle());
+        }
+        try {
+            if (page.getVersion() > 0) {
+                long v = page.getVersion();
+                int minor = (int) (v % 16);
+                int major = (int) (v >> 16) + 1;
+                doc.setVersion(major + "." + minor);
+            }
+        } catch (Exception ex) {
+            // A NPE gets thrown here if the version was not set on the client. Probably a bug in
+            // Swizzle.
+        }
         // TODO "" was page.getComment() (removed)
         context.getWiki().saveDocument(doc, "", context);
         return convert(factory.createPage(doc, context));

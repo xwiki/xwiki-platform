@@ -7,7 +7,7 @@ import com.xpn.xwiki.objects.classes.LevelsClass;
 public class LevelsMetaClass extends ListMetaClass {
     public LevelsMetaClass() {
         super();
-        setPrettyName("Level Class");
+        setPrettyName("Access Right Levels");
         setName(LevelsClass.class.getName());
     }
 

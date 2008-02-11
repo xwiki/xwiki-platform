@@ -32,7 +32,7 @@ public class TextAreaMetaClass extends StringMetaClass {
 public TextAreaMetaClass() {
     super();
     // setType("textareametaclass");
-    setPrettyName("TextArea Class");
+    setPrettyName("TextArea");
     setName(TextAreaClass.class.getName());
 
     NumberClass rows_class = new NumberClass(this);

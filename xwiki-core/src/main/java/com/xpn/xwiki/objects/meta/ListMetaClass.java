@@ -31,7 +31,7 @@ public class ListMetaClass extends PropertyMetaClass {
 
     public ListMetaClass() {
         super();
-        setPrettyName("List Class");
+        setPrettyName("List");
         setName(ListClass.class.getName());
 
         StaticListClass type_class = new StaticListClass(this);

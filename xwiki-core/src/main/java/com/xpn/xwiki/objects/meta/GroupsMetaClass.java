@@ -8,7 +8,7 @@ import com.xpn.xwiki.objects.classes.GroupsClass;
 public class GroupsMetaClass extends ListMetaClass {
     public GroupsMetaClass() {
         super();
-        setPrettyName("Groups List Class");
+        setPrettyName("List of Groups");
         setName(GroupsClass.class.getName());
 
         BooleanClass uselist_class = new BooleanClass(this);

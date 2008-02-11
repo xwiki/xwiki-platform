@@ -33,7 +33,7 @@ public class DateMetaClass extends PropertyMetaClass {
   public DateMetaClass() {
     super();
     // setType("numbermetaclass");
-    setPrettyName("Date Class");
+    setPrettyName("Date");
     setName(DateClass.class.getName());
 
     NumberClass size_class = new NumberClass(this);

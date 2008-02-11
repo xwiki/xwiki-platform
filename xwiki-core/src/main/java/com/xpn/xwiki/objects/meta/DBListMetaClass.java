@@ -36,7 +36,7 @@ public class DBListMetaClass extends ListMetaClass {
 
     public DBListMetaClass() {
         super();
-        setPrettyName("Database List Class");
+        setPrettyName("Database List");
         setName(DBListClass.class.getName());
 
         TextAreaClass sql_class = new TextAreaClass(this);

@@ -495,6 +495,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 // Fix for XWIKI-1651
                 doc.setDate(new Date(doc.getDate().getTime()));
                 doc.setCreationDate(new Date(doc.getCreationDate().getTime()));
+                doc.setContentUpdateDate(new Date(doc.getContentUpdateDate().getTime()));
             } catch (ObjectNotFoundException e)
             { // No document
                 doc.setNew(true);

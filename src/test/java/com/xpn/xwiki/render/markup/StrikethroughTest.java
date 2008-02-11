@@ -105,6 +105,8 @@ public class StrikethroughTest extends SyntaxTestsParent
         ArrayList expects = new ArrayList();
         tests.add("-- this is a list item--");
         expects.add("...<li>this is a list item--</li>...");
+        tests.add("-- this is a list --item--");
+        expects.add("...<li>this is a list <del>item</del></li>...");
         test(tests, expects);
     }
 

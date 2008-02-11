@@ -128,6 +128,12 @@ public class UnderlineTest extends SyntaxTestsParent
         }
         tests.add(text);
         expects.add(text);
+        text = "__";
+        for (int i = 0; i < 1000; ++i) {
+            text += "abc _ ";
+        }
+        tests.add(text);
+        expects.add(text);
         long startTime = System.currentTimeMillis();
         test(tests, expects);
         // Even on very slow systems this should not take more than one second. Putting 10 seconds,

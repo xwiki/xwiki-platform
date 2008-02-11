@@ -21,6 +21,10 @@ package org.xwiki.plugin.activitystream.impl;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.io.StringWriter;
+import java.io.IOException;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.hibernate.Session;
@@ -37,6 +41,12 @@ import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.io.SyndFeedOutput;
+import com.sun.syndication.io.FeedException;
 
 public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotificationInterface
 {
@@ -281,9 +291,65 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         }
     }
 
-    /*
+
     public SyndEntry getFeedEntry(ActivityEvent event, XWikiContext context) {
-        return null;
-    } */
+        SyndEntry entry = new SyndEntryImpl();
+        String user = event.getUser();
+        String displayUser = context.getWiki().getUserName(user, null, false, context);
+        entry.setAuthor(displayUser);
+        entry.setTitle(event.getDisplayTitle(context));
+        // entry.setDescription(event.getDisplayBody(context));
+        String url;
+        try {
+            url = (new URL(context.getURL(), event.getUrl())).toString();
+        } catch (MalformedURLException e) {
+            url = event.getUrl();
+        }
+        entry.setLink(url);
+        entry.setPublishedDate(event.getDate());
+        entry.setUpdatedDate(event.getDate());
+        return entry;
+    }
+
+    public SyndFeed getFeed(List events, XWikiContext context) {
+        SyndFeed feed = new SyndFeedImpl();
+        List entries = new ArrayList();
+        for (int i=0;i<events.size();i++) {
+           ActivityEvent event = (ActivityEvent) events.get(i);
+           SyndEntry entry = getFeedEntry(event, context);
+           entries.add(entry);
+        }
+        feed.setEntries(entries);
+        return feed;
+    }
+
+    public SyndFeed getFeed(List events, String author, String title, String description, String copyright, String encoding, String url, XWikiContext context) {
+        SyndFeed feed = getFeed(events, context);
+        feed.setAuthor(author);
+        feed.setDescription(description);
+        feed.setCopyright(copyright);
+        feed.setEncoding(encoding);
+        feed.setLink(url);
+        feed.setTitle(title);
+        return feed;
+    }
+
+    public String getFeedOutput(List events, String author, String title, String description, String copyright, String encoding, String url, String type, XWikiContext context) {
+        SyndFeed feed = getFeed(events, author, title, description, copyright, encoding, url, context);
+        return getFeedOutput(feed, type);
+    }
+
+    public String getFeedOutput(SyndFeed feed, String type) {
+        feed.setFeedType(type);
+        StringWriter writer = new StringWriter();
+        SyndFeedOutput output = new SyndFeedOutput();
+        try {
+            output.output(feed,writer);
+            writer.close();
+            return writer.toString();
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
 }

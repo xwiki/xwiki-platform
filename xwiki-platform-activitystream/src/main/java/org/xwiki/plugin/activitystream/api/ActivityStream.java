@@ -24,6 +24,8 @@ import java.util.List;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
  * Manages the activity stream
@@ -91,4 +93,15 @@ public interface ActivityStream
 
     List getEventsForUser(String streamName, String user, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException;
+
+    SyndEntry getFeedEntry(ActivityEvent event, XWikiContext context);
+
+    SyndFeed getFeed(List events, XWikiContext context);
+
+    SyndFeed getFeed(List events, String author, String title, String description, String copyright, String encoding, String url, XWikiContext context);
+
+    String getFeedOutput(List events, String author, String title, String description, String copyright, String encoding, String url, String type, XWikiContext context);
+
+    String getFeedOutput(SyndFeed feed, String type);
+     
 }

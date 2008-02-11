@@ -19,13 +19,16 @@
  */
 package org.xwiki.plugin.activitystream.plugin;
 
-import org.xwiki.plugin.activitystream.api.ActivityStream;
-import org.xwiki.plugin.activitystream.api.ActivityStreamException;
+import org.xwiki.plugin.activitystream.api.*;
+import org.xwiki.plugin.activitystream.api.ActivityEvent;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
+import com.sun.syndication.feed.synd.SyndFeedImpl;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -162,4 +165,40 @@ public class ActivityStreamPluginApi extends PluginApi
         }
         return result;
     }
+
+    protected List unwrapEvents(List events) {
+            List result = new ArrayList();
+            if (events != null) {
+                for (Iterator iter = events.iterator(); iter.hasNext();) {
+                    Object obj = iter.next();
+                    org.xwiki.plugin.activitystream.plugin.ActivityEvent event = (org.xwiki.plugin.activitystream.plugin.ActivityEvent) obj;
+                    org.xwiki.plugin.activitystream.api.ActivityEvent unwrappedEvent = event.getEvent();
+                    result.add(unwrappedEvent);
+                }
+            }
+            return result;
+        }
+
+
+    public SyndEntry getFeedEntry(org.xwiki.plugin.activitystream.plugin.ActivityEvent event) {
+        return getActivityStream().getFeedEntry(event.getEvent(), context);
+    }
+
+    public SyndFeed getFeed(List events) {
+        return getActivityStream().getFeed(unwrapEvents(events), context);
+    }
+
+
+    public SyndFeed getFeed(List events, String author, String title, String description, String copyright, String encoding, String url) {
+        return getActivityStream().getFeed(unwrapEvents(events), author, title, description, copyright, encoding, url, context);
+    }
+
+    public String getFeedOutput(List events, String author, String title, String description, String copyright, String encoding, String url, String type) {
+        return getActivityStream().getFeedOutput(unwrapEvents(events), author, title, description, copyright, encoding, url, type, context);
+    }
+
+    public String getFeedOutput(SyndFeed feed, String type) {
+        return getActivityStream().getFeedOutput(feed, type);
+    }
+
 }

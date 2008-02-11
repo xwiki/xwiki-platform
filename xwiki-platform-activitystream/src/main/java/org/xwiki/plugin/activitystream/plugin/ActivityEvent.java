@@ -201,4 +201,7 @@ public class ActivityEvent extends Api {
         return event.getDisplayUser(context);
     }
 
+    protected org.xwiki.plugin.activitystream.api.ActivityEvent getEvent() {
+        return event;
+    }
 }

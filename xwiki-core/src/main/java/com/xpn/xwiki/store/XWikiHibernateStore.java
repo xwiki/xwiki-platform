@@ -485,7 +485,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             SessionFactory sfactory = injectCustomMappingsInSessionFactory(doc, context);
             bTransaction = bTransaction && beginTransaction(sfactory, false, context);
             Session session = getSession(context);
-            session.setFlushMode(FlushMode.NEVER);
+            session.setFlushMode(FlushMode.MANUAL);
 
             try {
                 session.load(doc, new Long(doc.getId()));

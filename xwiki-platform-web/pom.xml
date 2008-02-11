@@ -44,7 +44,7 @@
     <platform.core.version>1.2-SNAPSHOT</platform.core.version>
     <platform.skin.dodo.version>1.0</platform.skin.dodo.version>
     <platform.skin.finch.version>1.0</platform.skin.finch.version>
-    <platform.skin.albatross.version>1.1-SNAPSHOT</platform.skin.albatross.version>
+    <platform.skin.albatross.version>1.1</platform.skin.albatross.version>
   </properties>
   <profiles>
     <profile>

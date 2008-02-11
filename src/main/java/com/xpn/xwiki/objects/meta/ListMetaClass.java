@@ -27,9 +27,10 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 
-public class ListMetaClass extends PropertyMetaClass {
-
-    public ListMetaClass() {
+public class ListMetaClass extends PropertyMetaClass
+{
+    public ListMetaClass()
+    {
         super();
         setPrettyName("List");
         setName(ListClass.class.getName());

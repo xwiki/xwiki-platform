@@ -26,35 +26,37 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
-public class NumberMetaClass extends PropertyMetaClass {
+public class NumberMetaClass extends PropertyMetaClass
+{
+    public NumberMetaClass()
+    {
+        super();
+        // setType("numbermetaclass");
+        setPrettyName("Number");
+        setName(NumberClass.class.getName());
 
-  public NumberMetaClass() {
-    super();
-    // setType("numbermetaclass");
-    setPrettyName("Number");
-    setName(NumberClass.class.getName());
+        StaticListClass type_class = new StaticListClass(this);
+        type_class.setName("numberType");
+        type_class.setPrettyName("Number Type");
+        type_class.setValues("integer|long|float|double");
+        type_class.setRelationalStorage(false);
+        type_class.setDisplayType("select");
+        type_class.setMultiSelect(false);
+        type_class.setSize(1);
+        safeput("numberType", type_class);
 
-    StaticListClass type_class = new StaticListClass(this);
-    type_class.setName("numberType");
-    type_class.setPrettyName("Number Type");
-    type_class.setValues("integer|long|float|double");
-    type_class.setRelationalStorage(false);
-    type_class.setDisplayType("select");
-    type_class.setMultiSelect(false);
-    type_class.setSize(1);
-    safeput("numberType", type_class);
+        NumberClass size_class = new NumberClass(this);
+        size_class.setName("size");
+        size_class.setPrettyName("Size");
+        size_class.setSize(5);
+        size_class.setNumberType("integer");
 
-    NumberClass size_class = new NumberClass(this);
-    size_class.setName("size");
-    size_class.setPrettyName("Size");
-    size_class.setSize(5);
-    size_class.setNumberType("integer");
+        safeput("numberType", type_class);
+        safeput("size", size_class);
+    }
 
-    safeput("numberType", type_class);
-    safeput("size", size_class);
-  }
-
-  public BaseCollection newObject(XWikiContext context) {
+    public BaseCollection newObject(XWikiContext context)
+    {
         return new NumberClass();
-  }
+    }
 }

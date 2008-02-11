@@ -23,18 +23,15 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.classes.DBListClass;
-import com.xpn.xwiki.objects.classes.TextAreaClass;
-import com.xpn.xwiki.objects.classes.StringClass;
-
 import com.xpn.xwiki.objects.classes.BooleanClass;
-import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.DBListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
-public class DBListMetaClass extends ListMetaClass {
-
-    public DBListMetaClass() {
+public class DBListMetaClass extends ListMetaClass
+{
+    public DBListMetaClass()
+    {
         super();
         setPrettyName("Database List");
         setName(DBListClass.class.getName());
@@ -63,7 +60,7 @@ public class DBListMetaClass extends ListMetaClass {
         valuefield_class.setPrettyName("Value Field Name");
         valuefield_class.setSize(20);
         safeput("valueField", valuefield_class);
-        
+
         BooleanClass picker_class = new BooleanClass(this);
         picker_class.setName("picker");
         picker_class.setPrettyName("Use Suggest");
@@ -72,8 +69,8 @@ public class DBListMetaClass extends ListMetaClass {
         safeput("picker", picker_class);
     }
 
-    public BaseCollection newObject(XWikiContext context) {
+    public BaseCollection newObject(XWikiContext context)
+    {
         return new DBListClass();
     }
 }
-

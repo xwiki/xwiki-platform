@@ -36,7 +36,7 @@ public class PasswordMetaClass extends StringMetaClass
     public static final String HASH = "Hash";
 
     public static final String SEPARATOR = "|";
-    
+
     public static final String ALGORITHM_KEY = "algorithm";
 
     public PasswordMetaClass()
@@ -48,7 +48,7 @@ public class PasswordMetaClass extends StringMetaClass
         StaticListClass storageType_class = new StaticListClass(this);
         storageType_class.setName("storageType");
         storageType_class.setPrettyName("Storage type");
-        storageType_class.setValues(HASH + SEPARATOR + CLEAR);// + SEPARATOR + ENCRYPTED 
+        storageType_class.setValues(HASH + SEPARATOR + CLEAR);// + SEPARATOR + ENCRYPTED
         storageType_class.setRelationalStorage(false);
         storageType_class.setDisplayType("select");
         storageType_class.setMultiSelect(false);

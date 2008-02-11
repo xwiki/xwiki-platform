@@ -5,8 +5,10 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.UsersClass;
 
-public class UsersMetaClass extends ListMetaClass {
-    public UsersMetaClass() {
+public class UsersMetaClass extends ListMetaClass
+{
+    public UsersMetaClass()
+    {
         super();
         setPrettyName("List of Users");
         setName(UsersClass.class.getName());
@@ -18,7 +20,8 @@ public class UsersMetaClass extends ListMetaClass {
         safeput("usesList", uselist_class);
     }
 
-    public BaseCollection newObject(XWikiContext context) {
+    public BaseCollection newObject(XWikiContext context)
+    {
         return new UsersClass();
     }
 }

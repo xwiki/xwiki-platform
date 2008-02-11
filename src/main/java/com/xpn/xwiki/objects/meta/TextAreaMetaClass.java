@@ -27,44 +27,45 @@ import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 
-public class TextAreaMetaClass extends StringMetaClass {
+public class TextAreaMetaClass extends StringMetaClass
+{
+    public TextAreaMetaClass()
+    {
+        super();
+        // setType("textareametaclass");
+        setPrettyName("TextArea");
+        setName(TextAreaClass.class.getName());
 
-public TextAreaMetaClass() {
-    super();
-    // setType("textareametaclass");
-    setPrettyName("TextArea");
-    setName(TextAreaClass.class.getName());
+        NumberClass rows_class = new NumberClass(this);
+        rows_class.setName("rows");
+        rows_class.setPrettyName("Rows");
+        rows_class.setSize(5);
+        rows_class.setNumberType("integer");
+        safeput("rows", rows_class);
 
-    NumberClass rows_class = new NumberClass(this);
-    rows_class.setName("rows");
-    rows_class.setPrettyName("Rows");
-    rows_class.setSize(5);
-    rows_class.setNumberType("integer");
-    safeput("rows", rows_class);
+        StaticListClass editor_class = new StaticListClass(this);
+        editor_class.setName("editor");
+        editor_class.setPrettyName("Editor");
+        editor_class.setValues("---|Text|PureText|Wysiwyg");
+        editor_class.setRelationalStorage(false);
+        editor_class.setDisplayType("select");
+        editor_class.setMultiSelect(false);
+        editor_class.setSize(1);
+        safeput("editor", editor_class);
 
-    StaticListClass editor_class = new StaticListClass(this);
-    editor_class.setName("editor");
-    editor_class.setPrettyName("Editor");
-    editor_class.setValues("---|Text|PureText|Wysiwyg");
-    editor_class.setRelationalStorage(false);
-    editor_class.setDisplayType("select");
-    editor_class.setMultiSelect(false);
-    editor_class.setSize(1);
-    safeput("editor", editor_class);
+        StaticListClass contenttype_class = new StaticListClass(this);
+        contenttype_class.setName("contenttype");
+        contenttype_class.setPrettyName("Content");
+        contenttype_class.setValues("FullyRenderedText|VelocityCode|PureText");
+        contenttype_class.setRelationalStorage(false);
+        contenttype_class.setDisplayType("select");
+        contenttype_class.setMultiSelect(false);
+        contenttype_class.setSize(1);
+        safeput("contenttype", contenttype_class);
+    }
 
-     StaticListClass contenttype_class = new StaticListClass(this);
-     contenttype_class.setName("contenttype");
-     contenttype_class.setPrettyName("Content");
-     contenttype_class.setValues("FullyRenderedText|VelocityCode|PureText");
-     contenttype_class.setRelationalStorage(false);
-     contenttype_class.setDisplayType("select");
-     contenttype_class.setMultiSelect(false);
-     contenttype_class.setSize(1);
-     safeput("contenttype", contenttype_class);
-  }
-
-
-    public BaseCollection newObject(XWikiContext context) {
-          return new TextAreaClass();
+    public BaseCollection newObject(XWikiContext context)
+    {
+        return new TextAreaClass();
     }
 }

@@ -25,12 +25,13 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
-import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
+import com.xpn.xwiki.objects.classes.StringClass;
 
-public class BooleanMetaClass extends PropertyMetaClass {
-
-    public BooleanMetaClass() {
+public class BooleanMetaClass extends PropertyMetaClass
+{
+    public BooleanMetaClass()
+    {
         super();
         setPrettyName("Boolean");
         setName(BooleanClass.class.getName());
@@ -40,7 +41,7 @@ public class BooleanMetaClass extends PropertyMetaClass {
         type_class.setPrettyName("Display Form Type");
         type_class.setValues("radio|checkbox|select");
         safeput("displayFormType", type_class);
-        
+
         StringClass value_class = new StringClass(this);
         value_class.setName("displayType");
         value_class.setPrettyName("Display Type");
@@ -55,8 +56,8 @@ public class BooleanMetaClass extends PropertyMetaClass {
         safeput("defaultValue", default_value_class);
     }
 
-    public BaseCollection newObject(XWikiContext context) {
+    public BaseCollection newObject(XWikiContext context)
+    {
         return new BooleanClass();
     }
-
 }

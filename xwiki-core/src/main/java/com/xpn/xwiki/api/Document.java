@@ -1720,7 +1720,7 @@ public class Document extends Api
             i = fileName.indexOf("/");
         }
         String filename = fileName.substring(i + 1);
-        filename = getXWikiContext().getWiki().clearName(filename, false, false, getXWikiContext());
+        filename = getXWikiContext().getWiki().clearName(filename, false, true, getXWikiContext());
 
         XWikiAttachment attachment = getDoc().getAttachment(filename);
         if (attachment == null) {

@@ -150,10 +150,21 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title,
                                          XWikiContext context) throws ActivityStreamException
     {
-        addDocumentActivityEvent(streamName, doc, type, title, null, context);
+        addDocumentActivityEvent(streamName, doc, type, ActivityEventPriority.ACTION, title, null, context);
+    }
+
+    public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title,
+                                         XWikiContext context) throws ActivityStreamException {
+        addDocumentActivityEvent(streamName, doc, type, priority, title, null, context);
     }
 
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title, List params,
+                                         XWikiContext context) throws ActivityStreamException
+    {
+        addDocumentActivityEvent(streamName, doc, type, ActivityEventPriority.ACTION, title, params, context);
+    }
+
+    public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title, List params,
                                          XWikiContext context) throws ActivityStreamException
     {
         ActivityEvent event = newActivityEvent();
@@ -163,7 +174,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
             event.setWiki(doc.getDatabase());
         }
         event.setDate(doc.getDate());
-        event.setPriority(ActivityEventPriority.ACTION);
+        event.setPriority(priority);
         event.setType(type);
         event.setTitle(title);
         event.setBody(title);
@@ -174,15 +185,12 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     public List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)
             throws ActivityStreamException
     {
-        String searchHql = "select act.* from ActivityEvent as act " + hql;
-        String filterQuery =
-                ", ActivityEvent act2 where act.eventId=act2.eventId and act.priority=max(act2.priority)";
-        if (filter) {
-            searchHql += filterQuery;
-        }
+        String searchHql;
 
-        if (!hql.contains("order by")) {
-            searchHql += " order by act.date desc";
+        if (filter) {
+            searchHql = "select act from ActivityEventImpl as act, ActivityEventImpl as act2 where act.eventId=act2.eventId and " + hql + " group by act.requestId having (act.priority)=max(act2.priority) order by act.date desc";
+        } else {
+            searchHql = "select act from ActivityEventImpl as act where " + hql + " order by act.date desc";
         }
 
         try {
@@ -201,32 +209,32 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     public List getEventsForSpace(String space, boolean filter, int nb, int start,
                                   XWikiContext context) throws ActivityStreamException
     {
-        return searchEvents("where act.space='" + space + "'", filter, nb, start, context);
+        return searchEvents("act.space='" + space + "'", filter, nb, start, context);
     }
 
     public List getEventsForUser(String user, boolean filter, int nb, int start,
                                  XWikiContext context) throws ActivityStreamException
     {
-        return searchEvents("where act.user='" + user + "'", filter, nb, start, context);
+        return searchEvents("act.user='" + user + "'", filter, nb, start, context);
     }
 
     public List getEvents(String stream, boolean filter, int nb, int start, XWikiContext context)
             throws ActivityStreamException
     {
-        return searchEvents("where act.stream='" + stream + "'", filter, nb, start, context);
+        return searchEvents("act.stream='" + stream + "'", filter, nb, start, context);
     }
 
     public List getEventsForSpace(String stream, String space, boolean filter, int nb, int start,
                                   XWikiContext context) throws ActivityStreamException
     {
-        return searchEvents("where act.space='" + space + "' and act.stream='" + stream + "'",
+        return searchEvents("act.space='" + space + "' and act.stream='" + stream + "'",
                 filter, nb, start, context);
     }
 
     public List getEventsForUser(String stream, String user, boolean filter, int nb, int start,
                                  XWikiContext context) throws ActivityStreamException
     {
-        return searchEvents("where act.user='" + user + "' and act.stream='" + stream + "'",
+        return searchEvents("act.user='" + user + "' and act.stream='" + stream + "'",
                 filter, nb, start, context);
     }
 
@@ -274,7 +282,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     }
 
     /*
-    public FeedEntry getFeedEntry(ActivityEvent event, XWikiContext context) {
+    public SyndEntry getFeedEntry(ActivityEvent event, XWikiContext context) {
         return null;
     } */
 

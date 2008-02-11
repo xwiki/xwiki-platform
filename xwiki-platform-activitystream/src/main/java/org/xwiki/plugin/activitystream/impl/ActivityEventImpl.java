@@ -21,6 +21,7 @@ package org.xwiki.plugin.activitystream.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 import org.xwiki.plugin.activitystream.api.ActivityEvent;
 
@@ -68,12 +69,12 @@ public class ActivityEventImpl implements ActivityEvent
 
     public String getDisplayTitle(XWikiContext context)
     {
-        return context.getWiki().parseMessage(title, context);
+        return context.getMessageTool().get(title, getParams());
     }
 
     public String getDisplayBody(XWikiContext context)
     {
-        return context.getWiki().parseMessage(body, context);
+        return context.getMessageTool().get(body, getParams());
     }
 
     public String getDisplayDate(XWikiContext context)
@@ -104,6 +105,16 @@ public class ActivityEventImpl implements ActivityEvent
                 setParam1(params.get(4).toString());
             }
         }
+    }
+
+    public List getParams() {
+        List params = new ArrayList();
+        params.add(getParam1());
+        params.add(getParam2());
+        params.add(getParam3());
+        params.add(getParam4());
+        params.add(getParam5());
+        return params;
     }
 
     public String getEventId()

@@ -62,7 +62,13 @@ public interface ActivityStream
     void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title,
         XWikiContext context) throws ActivityStreamException;
 
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title,
+        XWikiContext context) throws ActivityStreamException;
+
     void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title, List params,
+        XWikiContext context) throws ActivityStreamException;
+
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title, List params,
         XWikiContext context) throws ActivityStreamException;
 
     List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)

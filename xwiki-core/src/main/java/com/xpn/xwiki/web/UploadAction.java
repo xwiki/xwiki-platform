@@ -86,6 +86,8 @@ public class UploadAction extends XWikiAction
         }
         filename = filename.replaceAll("\\+", " ");
 
+        filename = context.getWiki().clearName(filename, false, true, context);
+
         XWikiDocument olddoc = (XWikiDocument) doc.clone();
         // Read XWikiAttachment
         XWikiAttachment attachment = olddoc.getAttachment(filename);

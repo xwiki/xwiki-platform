@@ -1,7 +1,6 @@
 package com.xpn.xwiki.plugin.spacemanager.api;
 
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
 * A SpaceManagerExtension contains a list of methods that need to be implemented by specific SpaceManagers

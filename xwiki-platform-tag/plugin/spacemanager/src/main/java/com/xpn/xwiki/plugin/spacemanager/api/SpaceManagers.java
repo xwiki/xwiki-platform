@@ -1,12 +1,11 @@
 package com.xpn.xwiki.plugin.spacemanager.api;
 
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Iterator;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Created by IntelliJ IDEA.

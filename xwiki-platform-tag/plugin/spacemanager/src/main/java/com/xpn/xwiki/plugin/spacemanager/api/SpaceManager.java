@@ -19,12 +19,12 @@
  */
 package com.xpn.xwiki.plugin.spacemanager.api;
 
+import java.util.Collection;
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-
-import java.util.List;
-import java.util.Collection;
 
 /**
  * The interface exposed by the spacemanager plugin

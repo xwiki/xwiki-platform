@@ -142,4 +142,28 @@ public class XWikiTest extends MockObjectTestCase
 
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
     }
+
+    public void testClearNameWithoutStripDotsWithoutAscii() {
+        String name = "Oé&&{{.txt";
+        name = this.xwiki.clearName(name, false, false, context);
+        assertTrue(name.equals("Oe&&{{.txt"));
+    }
+
+    public void testClearNameWithoutStripDotsWithAscii() {
+        String name = "Oé&&{{.txt";
+        name = this.xwiki.clearName(name, false, true, context);
+        assertTrue(name.equals("Oe.txt"));
+    }
+
+    public void testClearNameWithStripDotsWithoutAscii() {
+        String name = "Oé&&{{.txt";
+        name = this.xwiki.clearName(name, true, false, context);
+        assertTrue(name.equals("Oe&&{{txt"));
+    }
+
+    public void testClearNameWithStripDotsWithAscii() {
+        String name = "Oé&&{{.txt";
+        name = this.xwiki.clearName(name, true, true, context);
+        assertTrue(name.equals("Oetxt"));
+    }
 }

@@ -5,8 +5,10 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.GroupsClass;
 
-public class GroupsMetaClass extends ListMetaClass {
-    public GroupsMetaClass() {
+public class GroupsMetaClass extends ListMetaClass
+{
+    public GroupsMetaClass()
+    {
         super();
         setPrettyName("List of Groups");
         setName(GroupsClass.class.getName());
@@ -19,7 +21,8 @@ public class GroupsMetaClass extends ListMetaClass {
 
     }
 
-    public BaseCollection newObject(XWikiContext context) {
+    public BaseCollection newObject(XWikiContext context)
+    {
         return new GroupsMetaClass();
     }
 }

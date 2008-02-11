@@ -23,13 +23,12 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.StringClass;
-import com.xpn.xwiki.objects.classes.BooleanClass;
 
 public class StringMetaClass extends PropertyMetaClass
 {
-
     public StringMetaClass()
     {
         super();
@@ -43,7 +42,7 @@ public class StringMetaClass extends PropertyMetaClass
         size_class.setSize(5);
         size_class.setNumberType("integer");
         safeput("size", size_class);
-        
+
         BooleanClass picker_class = new BooleanClass(this);
         picker_class.setName("picker");
         picker_class.setPrettyName("Use Suggest");

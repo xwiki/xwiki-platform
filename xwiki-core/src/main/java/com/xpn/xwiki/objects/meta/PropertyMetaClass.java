@@ -23,11 +23,16 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.PropertyInterface;
-import com.xpn.xwiki.objects.classes.*;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
+import com.xpn.xwiki.objects.classes.StringClass;
+import com.xpn.xwiki.objects.classes.TextAreaClass;
 
-public class PropertyMetaClass extends BaseClass implements PropertyInterface {
-
-    public PropertyMetaClass() {
+public class PropertyMetaClass extends BaseClass implements PropertyInterface
+{
+    public PropertyMetaClass()
+    {
         super();
         StringClass type_class = new StringClass(this);
         type_class.setName("classType");
@@ -88,14 +93,17 @@ public class PropertyMetaClass extends BaseClass implements PropertyInterface {
         safeput("validationMessage", validationMessage_class);
     }
 
-    public BaseCollection getObject() {
+    public BaseCollection getObject()
+    {
         return null;
     }
 
-    public void setObject(BaseCollection object) {
+    public void setObject(BaseCollection object)
+    {
     }
 
-    public String toFormString() {
+    public String toFormString()
+    {
         return null;
     }
 }

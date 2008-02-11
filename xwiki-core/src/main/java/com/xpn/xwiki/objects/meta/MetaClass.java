@@ -28,11 +28,12 @@ import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-public class MetaClass extends BaseClass {
-
+public class MetaClass extends BaseClass
+{
     private static MetaClass metaClass = new MetaClass();
 
-    public MetaClass() {
+    public MetaClass()
+    {
         NumberMetaClass numberclass = new NumberMetaClass();
         safeput(numberclass.getName(), numberclass);
         StringMetaClass stringclass = new StringMetaClass();
@@ -59,36 +60,42 @@ public class MetaClass extends BaseClass {
         safeput(levelsclass.getName(), levelsclass);
     }
 
-    public void safeput(String name, PropertyInterface property) {
+    public void safeput(String name, PropertyInterface property)
+    {
         addField("meta" + name, property);
         if (property instanceof PropertyClass) {
-         ((PropertyClass)property).setObject(this);
-         ((BaseProperty)property).setName(name);
+            ((PropertyClass) property).setObject(this);
+            ((BaseProperty) property).setName(name);
         }
     }
 
-    public PropertyInterface safeget(String name) {
+    public PropertyInterface safeget(String name)
+    {
         return super.safeget("meta" + name);
     }
 
-    public PropertyInterface get(String name) {
+    public PropertyInterface get(String name)
+    {
         return safeget(name);
     }
 
-    public void put(String name, PropertyInterface property) {
+    public void put(String name, PropertyInterface property)
+    {
         safeput(name, property);
     }
 
-    public static MetaClass getMetaClass() {
+    public static MetaClass getMetaClass()
+    {
         return metaClass;
     }
 
-    public static void setMetaClass(MetaClass metaClass) {
+    public static void setMetaClass(MetaClass metaClass)
+    {
         MetaClass.metaClass = metaClass;
     }
 
-    public BaseCollection newObject(XWikiContext context) {
+    public BaseCollection newObject(XWikiContext context)
+    {
         return new BaseClass();
     }
-
 }

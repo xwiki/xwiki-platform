@@ -141,6 +141,10 @@ public class StrikethroughTest extends SyntaxTestsParent
         }
         tests.add(text);
         expects.add(text);
+        long startTime = System.currentTimeMillis();
         test(tests, expects);
+        // Even on very slow systems this should not take more than one second. Putting 10 seconds,
+        // just to be sure we don't get false test errors.
+        assertTrue(System.currentTimeMillis() - startTime < 10000);
     }
 }

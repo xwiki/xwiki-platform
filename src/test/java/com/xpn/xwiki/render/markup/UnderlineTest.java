@@ -55,7 +55,8 @@ public class UnderlineTest extends SyntaxTestsParent
         ArrayList tests = new ArrayList();
         ArrayList expects = new ArrayList();
         tests.add("More __underlines__ on a __line__");
-        expects.add("More <em class=\"underline\">underlines</em> on a <em class=\"underline\">line</em>");
+        expects
+            .add("More <em class=\"underline\">underlines</em> on a <em class=\"underline\">line</em>");
         test(tests, expects);
     }
 
@@ -84,9 +85,11 @@ public class UnderlineTest extends SyntaxTestsParent
         ArrayList tests = new ArrayList();
         ArrayList expects = new ArrayList();
         tests.add("__Eeny__meeny__miny__moe__");
-        expects.add("<em class=\"underline\">Eeny</em>meeny<em class=\"underline\">miny</em>moe__");
+        expects
+            .add("<em class=\"underline\">Eeny</em>meeny<em class=\"underline\">miny</em>moe__");
         tests.add("__ Eeny__meeny__miny__moe__");
-        expects.add("__ Eeny<em class=\"underline\">meeny</em>miny<em class=\"underline\">moe</em>");
+        expects
+            .add("__ Eeny<em class=\"underline\">meeny</em>miny<em class=\"underline\">moe</em>");
         test(tests, expects);
     }
 
@@ -125,6 +128,10 @@ public class UnderlineTest extends SyntaxTestsParent
         }
         tests.add(text);
         expects.add(text);
+        long startTime = System.currentTimeMillis();
         test(tests, expects);
+        // Even on very slow systems this should not take more than one second. Putting 10 seconds,
+        // just to be sure we don't get false test errors.
+        assertTrue(System.currentTimeMillis() - startTime < 10000);
     }
 }

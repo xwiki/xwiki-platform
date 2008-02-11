@@ -143,27 +143,23 @@ public class XWikiTest extends MockObjectTestCase
         assertTrue(copy.getCreationDate().equals(sourceCreationDate));
     }
 
-    public void testClearNameWithoutStripDotsWithoutAscii() {
-        String name = "Oé&&{{.txt";
-        name = this.xwiki.clearName(name, false, false, context);
-        assertTrue(name.equals("Oe&&{{.txt"));
+    public void testClearNameWithoutStripDotsWithoutAscii()
+    {
+        assertEquals("ee{&.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, false, context));
     }
 
-    public void testClearNameWithoutStripDotsWithAscii() {
-        String name = "Oé&&{{.txt";
-        name = this.xwiki.clearName(name, false, true, context);
-        assertTrue(name.equals("Oe.txt"));
+    public void testClearNameWithoutStripDotsWithAscii() 
+    {
+        assertEquals("ee.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, true, context));
     }
 
-    public void testClearNameWithStripDotsWithoutAscii() {
-        String name = "Oé&&{{.txt";
-        name = this.xwiki.clearName(name, true, false, context);
-        assertTrue(name.equals("Oe&&{{txt"));
+    public void testClearNameWithStripDotsWithoutAscii()
+    {
+        assertEquals("ee{&txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, false, context));
     }
 
-    public void testClearNameWithStripDotsWithAscii() {
-        String name = "Oé&&{{.txt";
-        name = this.xwiki.clearName(name, true, true, context);
-        assertTrue(name.equals("Oetxt"));
+    public void testClearNameWithStripDotsWithAscii()           
+    {
+        assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, context));
     }
 }

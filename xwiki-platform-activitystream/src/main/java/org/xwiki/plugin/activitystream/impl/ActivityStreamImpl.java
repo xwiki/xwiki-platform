@@ -150,7 +150,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title,
                                          XWikiContext context) throws ActivityStreamException
     {
-        addDocumentActivityEvent(streamName, doc, type, ActivityEventPriority.ACTION, title, null, context);
+        addDocumentActivityEvent(streamName, doc, type, ActivityEventPriority.NOTIFICATION, title, null, context);
     }
 
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title,
@@ -161,7 +161,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title, List params,
                                          XWikiContext context) throws ActivityStreamException
     {
-        addDocumentActivityEvent(streamName, doc, type, ActivityEventPriority.ACTION, title, params, context);
+        addDocumentActivityEvent(streamName, doc, type, ActivityEventPriority.NOTIFICATION, title, params, context);
     }
 
     public void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title, List params,

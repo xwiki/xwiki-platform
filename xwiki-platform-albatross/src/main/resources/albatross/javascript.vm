@@ -29,7 +29,8 @@
                  {
                      method: 'get',
                      parameters: "",
-                     asynchronous: true
+                     asynchronous: true,
+                     discardResponse: true
                  });
         cancelCancelEditFlag = false;
      }
@@ -56,13 +57,13 @@
  }
 
  function prepareCancelEdit() {
-     cancelEditNextOnunload = document.onunload;
-     document.onunload = cancelEdit;
-     lockEdit();
+    lockEdit();
  }
  function cancelCancelEdit() {
      cancelCancelEditFlag = false;
  }
+    Event.observe(window, "unload", cancelEdit);
+    Event.observe(window, "pagehide", cancelEdit);
 // ]]>
 </script>
 #end

@@ -23,10 +23,14 @@ package org.xwiki.observation;
 import junit.framework.TestCase;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.Event;
+import org.xwiki.observation.event.filter.RegexEventFilter;
 import org.xwiki.observation.internal.DefaultObservationManager;
 
 public class ObservationManagerTest extends TestCase
 {
+    private ObservationManager manager;
+    private TestListener listener;
+
     public class TestListener implements EventListener
     {
         public boolean hasListenerBeenCalled = false;
@@ -40,14 +44,25 @@ public class ObservationManagerTest extends TestCase
         }
     }
 
-    public void testNotify()
+    protected void setUp()
     {
-        ObservationManager manager = new DefaultObservationManager();
-        TestListener listener = new TestListener();
+        this.manager = new DefaultObservationManager();
+        this.listener = new TestListener();
+    }
+
+    public void testNotifyWhenUsingDocumentSaveEvent()
+    {
         manager.addListener(new DocumentSaveEvent("SomeDocument"), listener);
 
         manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
         assertTrue("Listener has not been called", listener.hasListenerBeenCalled);
     }
 
+    public void testNotifyWhenUsingDocumentSaveEventWithFilter()
+    {
+        manager.addListener(new DocumentSaveEvent(new RegexEventFilter(".*Doc.*")), listener);
+
+        manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
+        assertTrue("Listener has not been called", listener.hasListenerBeenCalled);
+    }
 }

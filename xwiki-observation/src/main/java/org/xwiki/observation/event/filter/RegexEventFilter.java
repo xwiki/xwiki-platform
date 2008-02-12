@@ -23,7 +23,7 @@ package org.xwiki.observation.event.filter;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class RegexEventFilter
+public class RegexEventFilter implements EventFilter
 {
     private String filter;
     private Pattern pattern;

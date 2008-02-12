@@ -68,7 +68,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         if (event.getStream() == null) {
             String space =  (doc==null) ? "" : doc.getSpace();
 
-            event.setStream(getStreamName(space));
+            event.setStream(getStreamName(space, context));
         }
         if (event.getWiki() == null) {
             event.setWiki(context.getDatabase());
@@ -96,7 +96,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         }
     }
 
-    public String getStreamName(String space) {
+    public String getStreamName(String space, XWikiContext context) {
         return space;
     }
 
@@ -259,7 +259,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
         ArrayList params = new ArrayList();
         params.set(0, newdoc.getDisplayTitle(context));
 
-        String streamName = getStreamName(newdoc.getSpace());
+        String streamName = getStreamName(newdoc.getSpace(), context);
 
         if (streamName==null)
          return;

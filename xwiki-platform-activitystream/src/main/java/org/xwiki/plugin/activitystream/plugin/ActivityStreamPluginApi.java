@@ -19,20 +19,19 @@
  */
 package org.xwiki.plugin.activitystream.plugin;
 
-import org.xwiki.plugin.activitystream.api.*;
-import org.xwiki.plugin.activitystream.api.ActivityEvent;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
+import org.xwiki.plugin.activitystream.api.ActivityStream;
+import org.xwiki.plugin.activitystream.api.ActivityStreamException;
+
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
-
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * API for {@link ActivityStreamPlugin}
@@ -55,49 +54,69 @@ public class ActivityStreamPluginApi extends PluginApi
         return ((ActivityStreamPlugin) getPlugin()).getActivityStream();
     }
 
-    public void addActivityEvent(org.xwiki.plugin.activitystream.api.ActivityEvent event) throws ActivityStreamException {
-         if (hasProgrammingRights()) {
-             getActivityStream().addActivityEvent(event, context);
-         }
+    public void addActivityEvent(org.xwiki.plugin.activitystream.api.ActivityEvent event)
+        throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            getActivityStream().addActivityEvent(event, context);
+        }
     }
 
-    public void addActivityEvent(String streamName, String type, String title) throws ActivityStreamException {
+    public void addActivityEvent(String streamName, String type, String title)
+        throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
             getActivityStream().addActivityEvent(streamName, type, title, context);
         }
     }
 
-    public void addDocumentActivityEvent(String streamName, Document doc, String type, String title) throws ActivityStreamException {
+    public void addDocumentActivityEvent(String streamName, Document doc, String type,
+        String title) throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
+                title, context);
         }
     }
 
-    public void addDocumentActivityEvent(String streamName, Document doc, String type, int priority, String title) throws ActivityStreamException {
+    public void addDocumentActivityEvent(String streamName, Document doc, String type,
+        int priority, String title) throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, priority, title, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
+                priority, title, context);
         }
     }
 
-    public void addActivityEvent(String streamName, String type, String title, List params) throws ActivityStreamException {
+    public void addActivityEvent(String streamName, String type, String title, List params)
+        throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
             getActivityStream().addActivityEvent(streamName, type, title, params, context);
         }
     }
 
-    public void addDocumentActivityEvent(String streamName, Document doc, String type, String title, List params) throws ActivityStreamException {
+    public void addDocumentActivityEvent(String streamName, Document doc, String type,
+        String title, List params) throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, title, params, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
+                title, params, context);
         }
     }
 
-    public void addDocumentActivityEvent(String streamName, Document doc, String type, int priority, String title, List params) throws ActivityStreamException {
+    public void addDocumentActivityEvent(String streamName, Document doc, String type,
+        int priority, String title, List params) throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type, priority, title, params, context);
+            getActivityStream().addDocumentActivityEvent(streamName, doc.getDocument(), type,
+                priority, title, params, context);
         }
     }
 
-    public List searchEvents(String hql, boolean filter, int nb, int start) throws ActivityStreamException {
+    public List searchEvents(String hql, boolean filter, int nb, int start)
+        throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().searchEvents(hql, filter, nb, start, context));
         } else {
@@ -105,7 +124,8 @@ public class ActivityStreamPluginApi extends PluginApi
         }
     }
 
-    public List getEvents(boolean filter, int nb, int start) throws ActivityStreamException {
+    public List getEvents(boolean filter, int nb, int start) throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().getEvents(filter, nb, start, context));
         } else {
@@ -113,92 +133,128 @@ public class ActivityStreamPluginApi extends PluginApi
         }
     }
 
-    public List getEventsForSpace(String space, boolean filter, int nb, int start) throws ActivityStreamException {
+    public List getEventsForSpace(String space, boolean filter, int nb, int start)
+        throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForSpace(space, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForSpace(space, filter, nb, start,
+                context));
         } else {
             return null;
         }
     }
 
-    public List getEventsForUser(String user, boolean filter, int nb, int start) throws ActivityStreamException {
+    public List getEventsForUser(String user, boolean filter, int nb, int start)
+        throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForUser(user, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForUser(user, filter, nb, start,
+                context));
         } else {
             return null;
         }
     }
 
-    public List getEvents(String streamName, boolean filter, int nb, int start) throws ActivityStreamException {
+    public List getEvents(String streamName, boolean filter, int nb, int start)
+        throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEvents(streamName, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEvents(streamName, filter, nb, start,
+                context));
         } else {
             return null;
         }
     }
 
-    public List getEventsForSpace(String streamName, String space, boolean filter, int nb, int start) throws ActivityStreamException {
+    public List getEventsForSpace(String streamName, String space, boolean filter, int nb,
+        int start) throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForSpace(streamName, space, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForSpace(streamName, space, filter,
+                nb, start, context));
         } else {
             return null;
         }
     }
 
-    public List getEventsForUser(String streamName, String user, boolean filter, int nb, int start) throws ActivityStreamException {
+    public List getEventsForUser(String streamName, String user, boolean filter, int nb, int start)
+        throws ActivityStreamException
+    {
         if (hasProgrammingRights()) {
-            return wrapEvents(getActivityStream().getEventsForUser(streamName, user, filter, nb, start, context));
+            return wrapEvents(getActivityStream().getEventsForUser(streamName, user, filter, nb,
+                start, context));
         } else {
             return null;
         }
     }
 
-    protected List wrapEvents(List events) {
+    protected List wrapEvents(List events)
+    {
         List result = new ArrayList();
         if (events != null) {
             for (Iterator iter = events.iterator(); iter.hasNext();) {
                 Object obj = iter.next();
-                org.xwiki.plugin.activitystream.api.ActivityEvent event = (org.xwiki.plugin.activitystream.api.ActivityEvent) obj;
-                org.xwiki.plugin.activitystream.plugin.ActivityEvent wrappedEvent = new org.xwiki.plugin.activitystream.plugin.ActivityEvent(event, getXWikiContext());
+                org.xwiki.plugin.activitystream.api.ActivityEvent event =
+                    (org.xwiki.plugin.activitystream.api.ActivityEvent) obj;
+                org.xwiki.plugin.activitystream.plugin.ActivityEvent wrappedEvent =
+                    new org.xwiki.plugin.activitystream.plugin.ActivityEvent(event,
+                        getXWikiContext());
                 result.add(wrappedEvent);
             }
         }
         return result;
     }
 
-    protected List unwrapEvents(List events) {
-            List result = new ArrayList();
-            if (events != null) {
-                for (Iterator iter = events.iterator(); iter.hasNext();) {
-                    Object obj = iter.next();
-                    org.xwiki.plugin.activitystream.plugin.ActivityEvent event = (org.xwiki.plugin.activitystream.plugin.ActivityEvent) obj;
-                    org.xwiki.plugin.activitystream.api.ActivityEvent unwrappedEvent = event.getEvent();
-                    result.add(unwrappedEvent);
-                }
+    protected List unwrapEvents(List events)
+    {
+        List result = new ArrayList();
+        if (events != null) {
+            for (Iterator iter = events.iterator(); iter.hasNext();) {
+                Object obj = iter.next();
+                org.xwiki.plugin.activitystream.plugin.ActivityEvent event =
+                    (org.xwiki.plugin.activitystream.plugin.ActivityEvent) obj;
+                org.xwiki.plugin.activitystream.api.ActivityEvent unwrappedEvent =
+                    event.getEvent();
+                result.add(unwrappedEvent);
             }
-            return result;
         }
+        return result;
+    }
 
-
-    public SyndEntry getFeedEntry(org.xwiki.plugin.activitystream.plugin.ActivityEvent event) {
+    public SyndEntry getFeedEntry(org.xwiki.plugin.activitystream.plugin.ActivityEvent event)
+    {
         return getActivityStream().getFeedEntry(event.getEvent(), context);
     }
 
-    public SyndFeed getFeed(List events) {
+    public SyndFeed getFeed(List events)
+    {
         return getActivityStream().getFeed(unwrapEvents(events), context);
     }
 
-
-    public SyndFeed getFeed(List events, String author, String title, String description, String copyright, String encoding, String url) {
-        return getActivityStream().getFeed(unwrapEvents(events), author, title, description, copyright, encoding, url, context);
+    public SyndFeed getFeed(List events, String author, String title, String description,
+        String copyright, String encoding, String url)
+    {
+        return getActivityStream().getFeed(unwrapEvents(events), author, title, description,
+            copyright, encoding, url, context);
     }
 
-    public String getFeedOutput(List events, String author, String title, String description, String copyright, String encoding, String url, String type) {
-        return getActivityStream().getFeedOutput(unwrapEvents(events), author, title, description, copyright, encoding, url, type, context);
+    public String getFeedOutput(List events, String author, String title, String description,
+        String copyright, String encoding, String url, String type)
+    {
+        return getActivityStream().getFeedOutput(unwrapEvents(events), author, title,
+            description, copyright, encoding, url, type, context);
     }
 
-    public String getFeedOutput(SyndFeed feed, String type) {
+    public String getFeedOutput(SyndFeed feed, String type)
+    {
         return getActivityStream().getFeedOutput(feed, type);
     }
 
+    /**
+     * @return The name of the event stream associated with the given space
+     */
+    public String getStreamName(String spaceName)
+    {
+        return getActivityStream().getStreamName(spaceName, context);
+    }
 }

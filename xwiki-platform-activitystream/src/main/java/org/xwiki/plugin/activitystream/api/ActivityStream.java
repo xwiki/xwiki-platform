@@ -21,11 +21,11 @@ package org.xwiki.plugin.activitystream.api;
 
 import java.util.List;
 
+import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndFeed;
 
 /**
  * Manages the activity stream
@@ -39,10 +39,12 @@ public interface ActivityStream
 
     /**
      * Tranforms space name into stream name
+     * 
      * @param space
+     * @param context
      * @return
      */
-    String getStreamName(String space);
+    String getStreamName(String space, XWikiContext context);
 
     /**
      * Adding and activity event. The Id does not need to be filled as it will be created. Date and
@@ -58,20 +60,21 @@ public interface ActivityStream
     void addActivityEvent(String streamName, String type, String title, XWikiContext context)
         throws ActivityStreamException;
 
-    void addActivityEvent(String streamName, String type, String title, List params, XWikiContext context)
+    void addActivityEvent(String streamName, String type, String title, List params,
+        XWikiContext context) throws ActivityStreamException;
+
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type,
+        String title, XWikiContext context) throws ActivityStreamException;
+
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type,
+        int priority, String title, XWikiContext context) throws ActivityStreamException;
+
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type,
+        String title, List params, XWikiContext context) throws ActivityStreamException;
+
+    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type,
+        int priority, String title, List params, XWikiContext context)
         throws ActivityStreamException;
-
-    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title,
-        XWikiContext context) throws ActivityStreamException;
-
-    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title,
-        XWikiContext context) throws ActivityStreamException;
-
-    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, String title, List params,
-        XWikiContext context) throws ActivityStreamException;
-
-    void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type, int priority, String title, List params,
-        XWikiContext context) throws ActivityStreamException;
 
     List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException;
@@ -98,10 +101,12 @@ public interface ActivityStream
 
     SyndFeed getFeed(List events, XWikiContext context);
 
-    SyndFeed getFeed(List events, String author, String title, String description, String copyright, String encoding, String url, XWikiContext context);
+    SyndFeed getFeed(List events, String author, String title, String description,
+        String copyright, String encoding, String url, XWikiContext context);
 
-    String getFeedOutput(List events, String author, String title, String description, String copyright, String encoding, String url, String type, XWikiContext context);
+    String getFeedOutput(List events, String author, String title, String description,
+        String copyright, String encoding, String url, String type, XWikiContext context);
 
     String getFeedOutput(SyndFeed feed, String type);
-     
+
 }

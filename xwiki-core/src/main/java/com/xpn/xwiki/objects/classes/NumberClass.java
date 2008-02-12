@@ -38,35 +38,42 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.web.XWikiMessageTool;
 
-public class NumberClass  extends PropertyClass {
-
-    public NumberClass(PropertyMetaClass wclass) {
+public class NumberClass extends PropertyClass
+{
+    public NumberClass(PropertyMetaClass wclass)
+    {
         super("number", "Number", wclass);
         setSize(30);
         setNumberType("long");
     }
 
-    public NumberClass() {
+    public NumberClass()
+    {
         this(null);
     }
 
-    public int getSize() {
+    public int getSize()
+    {
         return getIntValue("size");
     }
 
-    public void setSize(int size) {
+    public void setSize(int size)
+    {
         setIntValue("size", size);
     }
 
-    public String getNumberType() {
+    public String getNumberType()
+    {
         return getStringValue("numberType");
     }
 
-    public void setNumberType(String ntype) {
+    public void setNumberType(String ntype)
+    {
         setStringValue("numberType", ntype);
     }
 
-    public BaseProperty newProperty() {
+    public BaseProperty newProperty()
+    {
         String ntype = getNumberType();
         BaseProperty property;
         if (ntype.equals("integer")) {
@@ -82,33 +89,41 @@ public class NumberClass  extends PropertyClass {
         return property;
     }
 
-
-    public BaseProperty fromString(String value) {
+    public BaseProperty fromString(String value)
+    {
         BaseProperty property = newProperty();
         String ntype = getNumberType();
         Number nvalue = null;
         if (ntype.equals("integer")) {
-            if ((value!=null)&&(!value.equals("")))
+            if ((value != null) && (!value.equals(""))) {
                 nvalue = new Integer(value);
+            }
         } else if (ntype.equals("float")) {
-            if ((value!=null)&&(!value.equals("")))
+            if ((value != null) && (!value.equals(""))) {
                 nvalue = new Float(value);
+            }
         } else if (ntype.equals("double")) {
-            if ((value!=null)&&(!value.equals("")))
+            if ((value != null) && (!value.equals(""))) {
                 nvalue = new Double(value);
+            }
         } else {
-            if ((value!=null)&&(!value.equals("")))
+            if ((value != null) && (!value.equals(""))) {
                 nvalue = new Long(value);
+            }
         }
         property.setValue(nvalue);
         return property;
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, String prefix,
+        BaseCollection object, XWikiContext context)
+    {
         input input = new input();
 
         BaseProperty prop = (BaseProperty) object.safeget(name);
-        if (prop!=null) input.setValue(prop.toFormString());
+        if (prop != null) {
+            input.setValue(prop.toFormString());
+        }
 
         input.setType("text");
         input.setName(prefix + name);
@@ -117,7 +132,9 @@ public class NumberClass  extends PropertyClass {
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria, XWikiContext context) {
+    public void displaySearch(StringBuffer buffer, String name, String prefix,
+        XWikiCriteria criteria, XWikiContext context)
+    {
         input input1 = new input();
         input1.setType("text");
         input1.setName(prefix + name + "_morethan");
@@ -125,60 +142,66 @@ public class NumberClass  extends PropertyClass {
         input1.setSize(getSize());
         String fieldFullName = getFieldFullName();
         Number value = (Number) criteria.getParameter(fieldFullName + "_morethan");
-        if (value!=null) {
+        if (value != null) {
             input1.setValue(value.toString());
         }
 
         input input2 = new input();
 
         input2.setType("text");
-        input2.setName(prefix + name+ "_lessthan");
+        input2.setName(prefix + name + "_lessthan");
         input2.setID(prefix + name);
         input2.setSize(getSize());
         value = (Number) criteria.getParameter(fieldFullName + "_lessthan");
-        if (value!=null) {
+        if (value != null) {
             input2.setValue(value.toString());
         }
 
         XWikiMessageTool msg = context.getMessageTool();
-        buffer.append((msg==null) ? "from" : msg.get("from"));
+        buffer.append((msg == null) ? "from" : msg.get("from"));
         buffer.append(input1.toString());
-        buffer.append((msg==null) ? "from" : msg.get("to"));
+        buffer.append((msg == null) ? "from" : msg.get("to"));
         buffer.append(input2.toString());
     }
 
-    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList) {
-        Number value = (Number)map.get(prefix);
-        if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@xp:" + getName() + "=" + value.toString());
-         return;
+    public void makeQuery(Map map, String prefix, XWikiCriteria query, List criteriaList)
+    {
+        Number value = (Number) map.get(prefix);
+        if ((value != null) && (!value.equals(""))) {
+            criteriaList.add("@xp:" + getName() + "=" + value.toString());
+            return;
         }
 
-        value = (Number)map.get(prefix + "lessthan");
-        if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@xp:" + getName() + "<=" + value.toString());
-         return;
+        value = (Number) map.get(prefix + "lessthan");
+        if ((value != null) && (!value.equals(""))) {
+            criteriaList.add("@xp:" + getName() + "<=" + value.toString());
+            return;
         }
 
-        value = (Number)map.get(prefix + "morethan");
-        if ((value!=null)&&(!value.equals(""))) {
-         criteriaList.add("@xp:" + getName() + ">=" + value.toString());
-         return;
+        value = (Number) map.get(prefix + "morethan");
+        if ((value != null) && (!value.equals(""))) {
+            criteriaList.add("@xp:" + getName() + ">=" + value.toString());
+            return;
         }
     }
 
-    public void fromSearchMap(XWikiQuery query, Map map) {
-        String data[]  = (String[])map.get("");
-        if ((data!=null)&&(data.length==1))
-            query.setParam(getObject().getName() + "_" + getName(), fromString(data[0]).getValue());
-        else {
-            data  = (String[])map.get("lessthan");
-            if ((data!=null)&&(data.length==1))
-                query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(data[0]).getValue());
-            data  = (String[])map.get("morethan");
-            if ((data!=null)&&(data.length==1))
-                query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(data[0]).getValue());
-
+    public void fromSearchMap(XWikiQuery query, Map map)
+    {
+        String data[] = (String[]) map.get("");
+        if ((data != null) && (data.length == 1)) {
+            query.setParam(getObject().getName() + "_" + getName(), fromString(data[0])
+                .getValue());
+        } else {
+            data = (String[]) map.get("lessthan");
+            if ((data != null) && (data.length == 1)) {
+                query.setParam(getObject().getName() + "_" + getName() + "_lessthan", fromString(
+                    data[0]).getValue());
+            }
+            data = (String[]) map.get("morethan");
+            if ((data != null) && (data.length == 1)) {
+                query.setParam(getObject().getName() + "_" + getName() + "_morethan", fromString(
+                    data[0]).getValue());
+            }
         }
     }
 }

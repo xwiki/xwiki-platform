@@ -202,4 +202,24 @@ public class XWikiTest extends MockObjectTestCase
         assertEquals(skin, xwiki.getDocument("XWiki.Skin", context));
         assertEquals("parsing a field", xwiki.parseTemplate("template.vm", context));
     }
+    
+    public void testClearNameWithoutStripDotsWithoutAscii()
+    {
+        assertEquals("ee{&.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, false, context));
+    }
+
+    public void testClearNameWithoutStripDotsWithAscii()
+    {
+        assertEquals("ee.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, true, context));
+    }
+
+    public void testClearNameWithStripDotsWithoutAscii()
+    {
+        assertEquals("ee{&txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, false, context));
+    }
+
+    public void testClearNameWithStripDotsWithAscii()
+    {
+        assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, context));
+    }
 }

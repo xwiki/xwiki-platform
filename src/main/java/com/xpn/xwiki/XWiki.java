@@ -5566,7 +5566,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         if (ascii) {
-            name = name.replaceAll("[^a-zA-Z0-9\\-_]", "");
+            name = name.replaceAll("[^a-zA-Z0-9\\-_\\.]", "");
         }
 
         if (name.length() > 250)

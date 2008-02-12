@@ -49,22 +49,38 @@ public class Object extends Collection
     public java.lang.Object get(String name)
     {
         String docname = getCollection().getName();
+        String wiki = getCollection().getWiki();
+
+        String database = context.getDatabase();
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
+            context.setDatabase(wiki);
+
+            XWikiDocument doc =
+                getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
             return doc.display(name, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
+        } finally {
+            context.setDatabase(database);
         }
     }
 
     public java.lang.Object display(String name, String mode)
     {
         String docname = getCollection().getName();
+        String wiki = getCollection().getWiki();
+
+        String database = context.getDatabase();
         try {
-            XWikiDocument doc = getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
+            context.setDatabase(wiki);
+
+            XWikiDocument doc =
+                getXWikiContext().getWiki().getDocument(docname, getXWikiContext());
             return doc.display(name, mode, this.getBaseObject(), getXWikiContext());
         } catch (XWikiException e) {
             return null;
+        } finally {
+            context.setDatabase(database);
         }
     }
 

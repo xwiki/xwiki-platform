@@ -19,9 +19,9 @@
  */
 package org.xwiki.plugin.activitystream.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 
 import org.xwiki.plugin.activitystream.api.ActivityEvent;
 
@@ -87,27 +87,29 @@ public class ActivityEventImpl implements ActivityEvent
         return context.getWiki().getLocalUserName(user, context);
     }
 
-    public void setParams(List params) {
-        if (params!=null) {
-            if (params.size()>0) {
+    public void setParams(List params)
+    {
+        if (params != null) {
+            if (params.size() > 0) {
                 setParam1(params.get(0).toString());
             }
-            if (params.size()>1) {
-                setParam1(params.get(1).toString());
+            if (params.size() > 1) {
+                setParam2(params.get(1).toString());
             }
-            if (params.size()>2) {
-                setParam1(params.get(2).toString());
+            if (params.size() > 2) {
+                setParam3(params.get(2).toString());
             }
-            if (params.size()>3) {
-                setParam1(params.get(3).toString());
+            if (params.size() > 3) {
+                setParam4(params.get(3).toString());
             }
-            if (params.size()>4) {
-                setParam1(params.get(4).toString());
+            if (params.size() > 4) {
+                setParam5(params.get(4).toString());
             }
         }
     }
 
-    public List getParams() {
+    public List getParams()
+    {
         List params = new ArrayList();
         params.add(getParam1());
         params.add(getParam2());

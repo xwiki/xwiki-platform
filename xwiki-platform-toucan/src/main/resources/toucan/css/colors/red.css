@@ -4,7 +4,8 @@ body#body #xwikimaincontainer{  background-image :url( ../../images/colors/red/b
 body#body.hideright  #xwikimaincontainerinner {  background-image: url( ../../images/colors/red/bg-RED3.png );}
 body#body.adminbody#body  #xwikimaincontainerinner {  background-image: url( ../../images/colors/red/bg-RED3.png );}
 body#body.hidelefthideright  #xwikimaincontainerinner {  background-image: url( ../../images/colors/red/bg-RED3.png );}
+body#body.editbody #xwikimaincontainerinner { background-image: url( ../../images/colors/red/bg-RED.png ); }
 #globallinks{  background-image: url( ../../images/colors/red/bgx-RED.png );}
 #rightPanels{  background-image: url( ../../images/colors/red/bgx-RED.png );}
 #editPanels.panels{  background-image: url( ../../images/colors/red/bgx-RED.png );}
-
+#company { background-image: url( ../../images/colors/red/bgxleft-RED.png ); }

@@ -4,7 +4,9 @@ body#body #xwikimaincontainer{  background-image :url( ../../images/colors/darkg
 body#body.hideright  #xwikimaincontainerinner {  background-image: url( ../../images/colors/darkgray/bg-DARKGRAY3.png );}
 body#body.adminbody#body  #xwikimaincontainerinner {  background-image: url( ../../images/colors/darkgray/bg-DARKGRAY3.png );}
 body#body.hidelefthideright  #xwikimaincontainerinner {  background-image: url( ../../images/colors/darkgray/bg-DARKGRAY3.png );}
+body#body.editbody #xwikimaincontainerinner { background-image: url( ../../images/colors/darkgray/bg-DARKGRAY.png ); }
 #globallinks{  background-image: url( ../../images/colors/darkgray/bgx-DARKGRAY.png );}
 #rightPanels{  background-image: url( ../../images/colors/darkgray/bgx-DARKGRAY.png );}
 #editPanels.panels{  background-image: url( ../../images/colors/darkgray/bgx-DARKGRAY.png );}
+#company { background-image: url( ../../images/colors/darkgray/bgxleft-DARKGRAY.png ); }
 

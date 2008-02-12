@@ -1,3 +1,5 @@
+/* @override http://192.168.1.11:8080/xwiki/bin/skin/skins/toucan/usersandgroups.css */
+
 /* USERS SCROLLING SYSTEM */
 
 div.scrollbar {
@@ -81,7 +83,7 @@ div.inscrollbar {
 }
 
 #userstable, #groupstable, #usersandgroupstable {
-    width: auto;
+    width: 100%;
     position: relative;
     border: 5px solid #fff;
     margin: 0px;

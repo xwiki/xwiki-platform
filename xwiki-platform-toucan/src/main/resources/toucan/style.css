@@ -54,6 +54,7 @@ ol, ul {
 caption, th, td {
 	text-align: left;
 	font-weight: normal;
+	border-width: 1px;
 }
 /* Remove possible quote marks (") from <q>, <blockquote>. */
 blockquote:before, blockquote:after,
@@ -67,8 +68,13 @@ blockquote, q {
 	clear: both;
 	height: 1px;
 	background-color: #fff;
-	margin-right: 220px;
+	margin:0 220px;
 }
+body.hideleft .clearfloat {margin: 0px 220px 0px 30px;}
+body.hideright .clearfloat {margin: 0px 30px 0px 220px;}
+body.hidelefthideright .clearfloat { margin: 0px 30px;}
+body#body.loginbody .clearfloats {display: none;}
+
 body.editbody .clearfloats {
 	margin-right: 300px;
 }
@@ -229,7 +235,7 @@ border: 0px solid blue;
   color: #0000aa;
   background-color: inherit;
 }
-table {
+table td{
 	border-collapse: separate;
 	border-spacing: 0;
 	clear: both;
@@ -264,21 +270,20 @@ table {
  color: #4e6172;
  border-color: #e5eff8;
  padding:.3em 0.5em;
+ border-width: 1px;
+ border-style: solid;
  }				
 .mceContentBody tr.table-head td,
 .main th {
- font-weight:normal;
- color: #678197;
  text-align:left;
  border-color: #e5eff8;
  padding:.3em 0.5em;
- }		
-.mceContentBody tr.table-head td,					
-.main  th {
  background:#f4f9fe;
  text-align:center;
- font:bold 1.2em/2em Arial,Helvetica,sans-serif;
- color:#66a3d3
+ font:bold 1.2em/1.4em Arial,Helvetica,sans-serif;
+ color:#66a3d3;
+  border-width: 1px;
+ border-style: solid;
  }	
  table.xwikilogintable th {background-color: transparent;}
 .main tfoot th {
@@ -593,7 +598,7 @@ body.editbody #xwikimaincontainer
 #xwikimaincontainerinner {
   text-align: left;
   height: 100%;
-  margin:  0 0 0 220px;
+  margin:  0 0 0 0;
   padding-top: 20px;
   border: none;
   border: none;
@@ -605,13 +610,13 @@ body.editbody #xwikimaincontainer
   background-color:transparent;
 }
 
-body.hideleft #xwikimaincontainerinner,
-body.editbody #xwikimaincontainerinner {
+body.hideleft #xwikimaincontainerinner{
   margin:  0 0 0 30px;
 }
+
 body.hideright #xwikimaincontainerinner {
-  margin:  0 0 0 220px;
-  background-image: url( images/colors/gray/bg-GRAY3.png );
+	padding-right: 30px;
+  background-image: url(images/colors/gray/bg-GRAY3.png );
 }
 
 body.importbody #xwikimaincontainerinner,
@@ -619,10 +624,19 @@ body.exportbody #xwikimaincontainerinner,
 body.adminbody #xwikimaincontainerinner,
 body.hidelefthideright #xwikimaincontainerinner {
   margin:  0 0 0 30px;
-  background-image: url( images/colors/gray/bg-GRAY3.png );
+  padding-right: 30px;
+  background-image: url(images/colors/gray/bg-GRAY3.png );
+}
+body#body.editbody #xwikimaincontainerinner {
+  background-image: url( images/colors/gray/bg-GRAY.png );
+  background-position: top right;
+  background-repeat: repeat-y;
+  background-color:transparent;
+  padding-right: 0;
 }
 
 
+body#body.editbody #globallinks,
 #globallinks {
   position: relative;
   float: right;
@@ -635,53 +649,78 @@ body.hidelefthideright #xwikimaincontainerinner {
   background-position: top left;
 }
 
-
 body.editbody #globallinks {
   width: 220px;
   margin-left: -220px;
 }
+
 body.exportbody #companylogo,
 body.importbody #companylogo,
 body.adminbody #companylogo{
 	margin-right: 30px;
 	padding-right: 220px;
+	margin-left: 0;
 }
+
+body.hideright #globallinks,
+body.hidelefthideright #globallinks,
 body.exportbody #globallinks,
 body.importbody #globallinks,
 body.adminbody #globallinks{
-	margin-left: -250px;
+	margin-left: -220px;
 	background-image: none;
 }
+
+body.hideright #globallinks a,
+body.hidelefthideright #globallinks a,
 body.exportbody #globallinks a,
 body.importbody #globallinks a,
 body.adminbody #globallinks a{
 	color: #888;
 	font-size: 0.9em;
 	font-weight: normal;
-	padding-right:40px;
+	padding-right:10px;
 }
-#companylogo{
-margin-right: 220px;
-}
-body.editbody #companylogo{}
-#headerspace {margin-right: 220px;}
-body.editbody #headerspace {}
-body.hideleft #headerspace {margin-right: 220px;}
-body.exportbody #headerspace,
-body.importbody #headerspace,
-body.adminbody #headerspace {margin-right:30px;}
+#companylogo{margin:0px 220px;}
+#body.hidelefthideright #companylogo {margin:  0px;}
+#body.hideleft #companylogo {margin:  0px 0px 0px 0px;}
+#body.hideright #companylogo {margin:  0px 0px 0px 220px;}
+body#body.adminbody #companylogo{margin: 0;}
+body#body.editbody #headerspace {margin: 0px 220px 0px 0px;}
+body.hideleft #headerspace {margin: 0px 220px 0px 0px;}
+
+body#body.exportbody #headerspace,
+body#body.importbody #headerspace,
+body#body.adminbody #headerspace {margin: 0px}
+
+#body.hidelefthideright #headerspace {margin:  0px;}
+#body.hideright #headerspace {margin:  0px 0px 0px 220px;}
+
+#footerglobal { margin: 0px 220px;}
+#body.hidelefthideright #footerglobal { margin: 0px ;}
+body#body.editbody #footerglobal { margin: 0px 220px 0px 0px;}
+#body.hideleft #footerglobal { margin: 0px 220px 0px 0px;}
+#body.hideright #footerglobal { margin: 0px 0px 0px 220px;}
 
 
+body#body.exportbody #footerglobal,
+body#body.importbody #footerglobal,
+body#body.adminbody #footerglobal{
+	margin-right: 0px;
+}
 
 .leftsidecolumns{
+	position:relative;
 	float: left;
 	width: 100%;
 	}
 #contentcolumn{
+	position: relative;
 	float: left;
 	width: 100%;
 }
 .main {
+	position: relative;
 	margin:  0 220px;
 	padding: 0 25px 25px 25px;
   	background-color: #fff;
@@ -689,9 +728,11 @@ body.adminbody #headerspace {margin-right:30px;}
 .contenthideleft #contentcolumn .main{
 	margin: 0 220px 0 0;
 	}
+
 .contenthideright #contentcolumn .main{
 	margin:0 0 0 220px;
 	}
+
 .contenthidelefthideright #contentcolumn .main{
 	margin:0px;
 	}
@@ -709,7 +750,7 @@ body.adminbody #headerspace {margin-right:30px;}
 html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
   display: none;
 }
-.minwidth, .minwidthb, .minwidthc{
+.minwidth, .minwidthb, .minwidthc, .minwidthd{
   display: none;
   height: 0px;
   font:normal 1px/1px sans-serif;
@@ -723,7 +764,7 @@ html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
   position: relative;
 float: right; 
 width: 220px;
-margin-top: -26px;
+margin-top: -25px;
 margin-left: -220px;
 height: auto !important;
 height: 400px;
@@ -737,7 +778,7 @@ padding-bottom: 100px;
 #leftPanels { 
 position: relative;
 float: left;
-width:  200px;
+width:  220px;
 margin-left: -100%;
   }
 body.exportbody #editPanels.panels,
@@ -754,8 +795,8 @@ margin-left: -220px;
 margin-top: -26px;
 padding-top: 25px;
 height: auto !important;
-height: 400px;
-min-height: 400px; 
+height: 600px;
+min-height: 600px; 
 background-image: url( images/colors/gray/bgx-GRAY.png );
 background-position:left -100px;
 background-repeat: no-repeat;
@@ -796,14 +837,14 @@ Global header
   height: 100px;
   z-index: 1;
 }
-#globallinks {
-}
+#globallinks {}
 #globalmenu {
   padding: 0.5em;
   text-align: right;
   font-size: 1em;
   line-height: 1.1em;
 }
+body#body.editbody #globallinks #globalmenu .glink,
 #globalmenu .glink { 
 display: block;
 background-color: transparent;
@@ -821,6 +862,9 @@ text-decoration: none;
   position: relative;
   float: left;
   width: 100%;
+  background-image: url( images/colors/gray/bgxleft-GRAY.png );
+background-position:left -2px;
+background-repeat: no-repeat;
 }
 #companylogo {width: 740px;}/*IE*/
 #companylogo{
@@ -876,17 +920,13 @@ width: auto;
 padding-left: 30px;
 color:  #ccc;
 background-color:#fff;
-margin-right: 220px;
+margin:0 220px;
 border-top: 1px solid #000;
 }
 #headerspace {height: 24px; overflow:hidden;}/*ie*/
 
 #headerspace a{line-height: 25px;}
-body#body.exportbody #footerglobal,
-body#body.importbody #footerglobal,
-body#body.adminbody #footerglobal{
-	margin-right: 30px;
-}
+
 #footerglobal {
   clear:both;
   text-align: center;
@@ -896,8 +936,7 @@ body#body.adminbody #footerglobal{
   text-transform: uppercase;
   color: #222;
   border-top: 1px dotted #CCC;
-  margin: 0px 220px 0 0;
-}
+  }
 #footerglobal a{
   color: #555;
   text-decoration: none;
@@ -925,6 +964,9 @@ Content
 }
 /* @end */
 /* @group Message Boxes */
+
+#loginForm div.centered fieldset.xwikimessage table.xwikilogintable tbody tr th,
+#loginForm div.centered fieldset.xwikimessage table.xwikilogintable tbody tr td { border: none;	}
 /*
 ---------------------------------------------
 "Message Boxes"
@@ -978,6 +1020,9 @@ fieldset.xwikimessage .buttons a {
   font-weight: bold;
   text-align: center;
 }
+
+
+
 /* @end */
 /* @group Comments, attachments, History...  */
 /*
@@ -1238,6 +1283,8 @@ Editors
 Tabs
 ---------------------------------------
 */
+#body.adminbody .alleditcontent {border-color:  #fff;}
+.alleditcontent .floatcontainer {background-color: #fff;}
 ul.xwikitabbar{
   padding: 0px 0 0 3px;
   margin: -30px 0 0 0;
@@ -1285,6 +1332,7 @@ html > body .xwikitabbar li{
   padding: 5px 3px;
   font-weight: normal;
   font-size:0.85em;
+  line-height: 1em;
   letter-spacing: -0.5px;
   text-decoration: none;
 }
@@ -1312,17 +1360,11 @@ html > body .xwikitabbar li{
 #xwikicontentedit{
   border: 1px solid;
 }
-
+/* --------------------------------------- */
+/* --------------------------------------- */
 /* @group Panels */
-/*
----------------------------------------
-Panels
----------------------------------------
-*/
-
-
-
-
+/* --------------------------------------- */
+/* --------------------------------------- */
 
 #rightPanels .Search #globalsearch {
   text-align: center;
@@ -1379,6 +1421,9 @@ html > body .panels{
   padding: 0px;
   background-color: transparent;
 }
+#leftPanels .panel,#leftPanels .fakepanel{
+  margin: 0px 0px 10px 20px;
+}
 .fakepanel{
   display: none;
   height: 320px;
@@ -1390,6 +1435,10 @@ line-height: 1.6em;
 font-weight: normal;
 padding: 0 15px 20px 15px;
 }
+div.xwikipanelcontents div.warningmessage,
+div.xwikipanelcontents table
+{margin-top: 0;}
+div.xwikipanelcontents ul.minus{margin: 0;padding: 0;}
 h5.xwikipaneltitle {
 	margin: 0;
 	font-size: 1.1em;
@@ -1496,9 +1545,10 @@ span.panelitem{  display: block;}
 	font-size: 0.8em;
 	font-weight: normal;
 	}
-#editPanels .editmodes .xwikipanelcontents {
+#editPanels .EditModes .xwikipanelcontents {
 	background-image: url( images/panel-m.png );
 	background-position: bottom right;
+	padding-bottom: 2em;
 	}
 #editPanels .xwikipanelcontents p {
 	margin: 0 0 1em 0;
@@ -1515,10 +1565,11 @@ span.panelitem{  display: block;}
 .collapsed h5.xwikipaneltitle {
 	background-position: top right;
 }
-#editPanels .editmodes .xwikipanelcontents ul{
+#editPanels .EditModes .xwikipanelcontents ul{
+	padding-top: 1em;
 	margin-left: -15px;
 }
-#editPanels .editmodes .xwikipanelcontents ul li {
+#editPanels .EditModes .xwikipanelcontents ul li {
 	display: block;
 	height: 20px;
 	font-size: 1.1em;
@@ -1528,9 +1579,9 @@ span.panelitem{  display: block;}
 	padding: 0 15px;
 	text-align:left;
 }
-#editPanels .editmodes .xwikipanelcontents ul li a {color: #555;}
-#editPanels .editmodes .xwikipanelcontents ul li a:hover {color: #000;}
-#editPanels .editmodes .xwikipanelcontents ul li.active {
+#editPanels .EditModes .xwikipanelcontents ul li a {color: #555;}
+#editPanels .EditModes .xwikipanelcontents ul li a:hover {color: #000;}
+#editPanels .EditModes .xwikipanelcontents ul li.active {
 	line-height: 30px;
 	font-size: 1.2em;
 	font-weight: bold;
@@ -1540,14 +1591,19 @@ span.panelitem{  display: block;}
 	background-position: top right;
 	text-align: left;
 }
-#editPanels .editmodes .xwikipanelcontents ul li.active a {
+#editPanels .EditModes .xwikipanelcontents ul li.active a {
 	color:  #000;
 }
-#xwikihelpsyntax {
+
+#editPanels .SyntaxHelp h5.xwikipaneltitle {
+	display: none;
+}
+
+#editPanels .SyntaxHelp div.xwikipanelcontents {
 	background-image: url( images/panel-e.png );
 	background-position: right -100px;
 	color: #333;
-	height:  30px;
+	height:  40px;
 	text-align: center;
 	line-height: 20px;
 	letter-spacing: -1px;
@@ -1577,7 +1633,7 @@ span.pitemseparator{
 .panelcontainer{
   height: 200px;
   overflow: hidden;
-  border: 1px inset #fff;
+  border: 1px solid #fff;
   padding: 3px;
 }
 .panelitemc{
@@ -1589,8 +1645,13 @@ span.pitemseparator{
 }
 .panelitemc .label, .panelitemc .xwikibuttonlink{
   text-align: center;
+	background-color: #555;
+}
+.panelitemc .xwikibuttonlink{
+  text-align: center;
 	background-color: #fff;
 }
+
 .xwikipanelcontents dl dd {margin-bottom: 2em;}
 .xwikipanelcontents dl dt {font-size: 1.3em;font-weight: bold;}
 .xwikipanelcontents dl dd table#xwikiincludeddocuments td{
@@ -1777,12 +1838,6 @@ td.label{
 html > body .xwikidatatable{
   width: 100%;
 }
-.xwikiuserblog .rssfeed {
-  width: 200px;
-  position: relative;
-  float: right;
-  border: 2px solid;
-}
 
 /* @group Page Layout */
 /*
@@ -1882,13 +1937,22 @@ div.pagelayoutoptions td{
 .alleditcontent{
   margin: 60px 240px 20px 20px;
   border: 1px solid #ddd;
+  background-color: #f0f0ee;
 }
+.alladmincontent{
+  border: 1px solid #ddd;
+}
+
+
+
+
 body.importbody .alleditcontent,
 body.exportbody .alleditcontent,
 body.adminbody .alleditcontent{
   margin: 30px 50px 20px 20px;
 }
 .alleditcontent label {
+	position: relative;
 	display: block;
 	text-align: center;
 	padding: 5px;
@@ -1896,6 +1960,12 @@ body.adminbody .alleditcontent{
 	font-size: 1em;
 	color:  #555;
 	margin: 0px 0px 1em;
+}
+
+#xwikidoctitleinput {
+	margin-top: 1em;
+	
+	width: 70%;
 }
 
 #xwikicontent .floatcontainer{
@@ -2072,16 +2142,15 @@ div#xwikiclassproperties.accordion
 .bottombuttons input.button{
 	margin-top: 1.5em;
 }
-#history  {
-	
-}
 #editcolumn {
 	width: 100%;
 }
+#history .centered{	margin: 0;}
 #history table {
 	margin: 0 0 1em 0;
 	border-top: none;
 	border-collapse: collapse;
+	width: 100%;
 }
 #history table th  {
 padding: 5px ;
@@ -2261,6 +2330,8 @@ div.errormessage, div.warningmessage, .infomessage, div.plainmessage{
   text-align: left;
 }
 
+
+
 .infomessage{
   background-image: url(icons/msginfo.png);
   color: #369;
@@ -2288,9 +2359,10 @@ div.floatinginfobox, fieldset.floatinginfobox {
   float: right;
   border-left: 20px solid #FFF;
   border-bottom: 40px solid #FFF;
-background-color: #f1f1fc;
+  border: 1px solid #E4E4E5;
+background-color:#FAFAFD;
 	padding: 10px;
-	margin: 1em  0  0.5em 0 ;
+	margin: 1em  0  1em 1em ;
 }
 div.floatingboxinner, fieldset.floatingboxinner{
 }
@@ -2304,16 +2376,25 @@ div.floatinginfobox .strong, fieldset.floatinginfobox .strong {
 	margin-bottom: 0.5em;
 }
 li.tocEntry,
-div.floatinginfobox li, fieldset.floatinginfobox li,
-div.floatinginfobox ul, fieldset.floatinginfobox ul {
-	padding: 0;
-	margin: 0 0 0 1em;
+div.floatinginfobox li,
+fieldset.floatinginfobox li,
+div.floatinginfobox ul,
+fieldset.floatinginfobox ul {
+	padding: 0 0 0 1em;
+	margin: 0 ;
 	line-height: 1.4em;
-	list-style-image:url( images/bullet-1.png );
+	list-style-type: none;
+	background-image:url( images/bullet-1.png );
+	background-repeat: no-repeat;
+	background-position: left 0.25em;
 	list-style-position:outside;
 	}
 
-
+div.floatinginfobox ul,
+fieldset.floatinginfobox ul
+{
+	background-image: none;
+}
 	/*
 	---------------------------------------
 	Images
@@ -2507,11 +2588,84 @@ div.changes-info-title {
 	padding: 1em 0;
 	color:  #FFF;
 }
-/*IE 6 ONLY*/
-/*  IE 6 */
+
+/* profil */
+.specialmenu {
+	background-color: #f2fdcb;
+	border: 1px solid #FAFAFD;
+	text-align: center;
+	margin-top: -1.3em;
+	border:  1px solid #ddd;
+	border-top: 0px solid #fff;
+	padding: 3px;
+	}
+.specialmenu img {vertical-align: middle;}
+.specialmenu ul {margin: 0;padding: 5px 0; display: inline;}
+.specialmenu ul li{list-style-type: none; list-style-image: none; display: inline;}
+.xwikiuserblog {
+	float: right;
+	width: 250px;
+}
+#lb-content .xwikiuserblog .rssfeed,
+.vcard .xwikiuserblog .rssfeed {
+  clear: both;
+  position: relative;
+  float: right;
+  width: 250px;
+  background-color: #FAFAFD;
+}
+#lb-content .xwikiuserblog .rssfeed div.rsschanneltitle,
+.vcard .xwikiuserblog .rssfeed div.rsschanneltitle{
+	padding: 5px;
+	text-align: center;
+	font-weight: bold;
+	border-bottom: 1px solid #ddd;
+}
+#lb-content .xwikiuserblog .rssfeed .rssitem,
+.vcard .xwikiuserblog .rssfeed .rssitem{
+	padding: 5px;
+}
+#lb-content h3,
+div.vcard h3{
+	clear: both;
+	padding-top: 1em;
+}
+
+#lb-content #XWiki.XWikiUsers_0_blog { width: 200px;}
+img#xwikiuseravatar.photo {
+width:200px;
+float: left;
+margin: 0 1em 1em 0;
+}
+#lb-content img#xwikiuseravatar.photo {
+width:200px;
+float: right;
+margin: 0 1em 1em 0;
+}
+#xwikiuserprofile dl{
+	font-size: 0.9em;
+}
+#xwikiuserprofile dd.given-name, #xwikiuserprofile dd.family-name {
+font-size: 1.6em;
+letter-spacing: 2px;
+}
+
+#xwikiuserprofile {	float: left;}
+#lb-content #xwikiuserprofile {
+	padding-bottom: 2em;
+}
+#lb-content #xwikiuserprofile input {width: 350px;}
+#lb-content #xwikiuserprofile label {font-size: 1.4em;}
+
+
+
+
+
+/* IE */
 * html  * {zoom:1; }
 * html a {position:relative; z-index:1;}
-* html #rightPanels, #editPanels { margin-top: -27px;}
+* html #rightPanels, #editPanels { margin-top: -27px; height: 400px;}
+
 * html #globalsearch{margin-bottom: 1em}
 
 * html h5.xwikipaneltitle,
@@ -2523,31 +2677,42 @@ div.changes-info-title {
 * html #xwikihelpsyntax {background-image: url(images/panel-e.gif);}
 * html #editPanels .expanded h5.xwikipaneltitle {background-image: url(images/panel-e.gif);}
 * html #editPanels .xwikipanelcontents {background-image: url(images/panel-e.gif);}
-* html #editPanels .editmodes .xwikipanelcontents ul li.active {background-image: url();}
-* html #editPanels .editmodes h5, #editPanels .editmodes  .xwikipanelcontents {background-image: url(images/panel-m.gif);}
+* html #editPanels .EditModes .xwikipanelcontents ul li.active {background-image: url();}
+* html #editPanels .EditModes h5,
+* html #editPanels .EditModes .xwikipanelcontents {background-image: url(images/panel-m.gif);}
 * html #xwikicontent{overflow-y: hidden;}
 
-* html #headerglobal .minwithd {display: none;}
+* html .minwidthd {display: none;}
 * html .minwidth,* html  .minwidthb,* html  .minwidthc{}
-* html #contentcolumn .minwidthb{ display:block; width:740px; margin-right:220px;}
+* html #contentcolumn .minwidthb,
+* html #contentcolumn .minwidthd{ display:block; width:740px; margin-right:220px;}
 * html #headerspace .minwidth{ display:block; width:710px;}/* 740 - 30 padding */
 * html .minwidthc{}
-
+* html .minwidthd{}
 * html body  #show-dialog-btn {
 right:1px;
 top:1px;
 }
 * html ul.xwikitabbar{margin: 0;}
+* html ul.xwikitabbar li a{line-height: 1em;}
 * html .roundedbox ,
 * html .roundedheader ,
 * html .roundedheader h3 ,
 * html .roundedbody {	background-image: url(images/rounded.gif) ;}
-
+* html #lb #lb-content img#xwikiuseravatar.photo {
+	float: left;
+	width: 50px;
+}
 * html div.floatinginfobox,
-* html fieldset.floatinginfobo,
+* html fieldset.floatinginfobox,
+* html fieldset.floatinginfobox *,
 * html div.floatingboxinner,
 * html fieldset.floatingboxinner,
 * html div.floatingboxinner *,
 * html fieldset.floatingboxinner *{
   zoom: normal;
+}
+#lb-close {		height: 15px;}
+* html #lb-content{
+	margin-top: -1px;
 }

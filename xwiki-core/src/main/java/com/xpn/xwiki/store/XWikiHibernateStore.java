@@ -563,6 +563,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                         }
                         loadXWikiCollection(object, doc, context, false, true);
                         doc.setObject(className, object.getNumber(), object);
+                        object.setWiki(context.getDatabase());
                     }
                 }
 

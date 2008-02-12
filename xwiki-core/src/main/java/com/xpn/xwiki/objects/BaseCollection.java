@@ -107,16 +107,28 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         safeput(name, property);
     }
 
-
-    public BaseClass getxWikiClass(XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.objects.ObjectInterface#getxWikiClass(com.xpn.xwiki.XWikiContext)
+     */
+    public BaseClass getxWikiClass(XWikiContext context)
+    {
         String name = getClassName();
+        String wiki = getWiki();
+
+        String database = context.getDatabase();
         try {
-            if ((context==null)||(context.getWiki()==null))
+            context.setDatabase(wiki);
+
+            if ((context == null) || (context.getWiki() == null))
                 return null;
             return context.getWiki().getClass(name, context);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            context.setDatabase(database);
         }
     }
 

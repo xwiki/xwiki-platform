@@ -27,6 +27,7 @@ import java.io.Serializable;
 public abstract class BaseElement implements ElementInterface, Serializable {
     private String name;
     private String prettyName;
+    private String wiki;
 
     public String getName() {
         return name;
@@ -43,23 +44,51 @@ public abstract class BaseElement implements ElementInterface, Serializable {
     public void setPrettyName(String name) {
         this.prettyName = name;
     }
+    
+    /**
+     * @return the name of the wiki where this element is stored. If null, the context's wiki is used.
+     */
+    public String getWiki()
+    {
+        return wiki;
+    }
+    
+    /**
+     * @param wiki the name of the wiki where this element is stored. If null, the context's wiki is used.
+     */
+    public void setWiki(String wiki)
+    {
+        this.wiki = wiki;
+    }
 
-    public boolean equals(Object el) {
-        if (el==null)
+    /**
+     * {@inheritDoc}
+     *
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object el)
+    {
+        if (el == null)
             return false;
 
-        BaseElement element = (BaseElement ) el;
+        BaseElement element = (BaseElement) el;
 
-        if (element.getName()==null) {
-            if (getName()!=null)
+        if (element.getName() == null) {
+            if (getName() != null)
                 return false;
         } else if (!element.getName().equals(getName()))
             return false;
 
-        if (element.getPrettyName()==null) {
-            if (getPrettyName()!=null)
+        if (element.getPrettyName() == null) {
+            if (getPrettyName() != null)
                 return false;
         } else if (!element.getPrettyName().equals(getPrettyName()))
+            return false;
+
+        if (element.getWiki() == null) {
+            if (getWiki() != null)
+                return false;
+        } else if (!element.getWiki().equalsIgnoreCase(getWiki()))
             return false;
 
         if (!(element.getClass().equals(this.getClass())))
@@ -68,6 +97,11 @@ public abstract class BaseElement implements ElementInterface, Serializable {
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#clone()
+     */
     public Object clone()
     {
         BaseElement element = null;
@@ -75,6 +109,7 @@ public abstract class BaseElement implements ElementInterface, Serializable {
             element = (BaseElement) getClass().newInstance();
             element.setName(getName());
             element.setPrettyName(getPrettyName());
+            element.setWiki(getWiki());
             return element;
         } catch (Exception e) {
             // This should not happen

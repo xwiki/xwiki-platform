@@ -44,6 +44,7 @@
       <artifactId>xwiki-skin-albatross</artifactId>
       <version>1.2-SNAPSHOT</version>
       <scope>runtime</scope>
+      <type>zip</type>
     </dependency>
   </dependencies>
   <build>

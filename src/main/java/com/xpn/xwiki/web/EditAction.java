@@ -20,21 +20,23 @@
  */
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.doc.XWikiLock;
-import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
-public class EditAction extends XWikiAction {
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiLock;
+import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
+
+public class EditAction extends XWikiAction
+{
     private static final Log log = LogFactory.getLog(EditAction.class);
 
-	public String render(XWikiContext context) throws XWikiException {
+    public String render(XWikiContext context) throws XWikiException
+    {
         XWikiRequest request = context.getRequest();
         String content = request.getParameter("content");
         String title = request.getParameter("title");
@@ -44,8 +46,8 @@ public class EditAction extends XWikiAction {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
 
         boolean hasTranslation = false;
-        if (doc!=context.get("tdoc"))
-                hasTranslation = true;
+        if (doc != context.get("tdoc"))
+            hasTranslation = true;
 
         // we need to clone so that nothing happens in memory
         doc = (XWikiDocument) doc.clone();
@@ -54,12 +56,14 @@ public class EditAction extends XWikiAction {
 
         // Add captcha plugin to avoid spam robots
         if (xwiki.hasCaptcha(context)) {
-            CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+            CaptchaPluginApi captchaPluginApi =
+                (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
             if (captchaPluginApi != null)
                 vcontext.put("captchaPlugin", captchaPluginApi);
             else
                 throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                        XWikiException.ERROR_XWIKI_UNKNOWN, "CaptchaPlugin not loaded");
+                    XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "CaptchaPlugin not loaded");
         }
 
         // Check for edit section
@@ -69,41 +73,45 @@ public class EditAction extends XWikiAction {
             sectionNumber = Integer.parseInt(request.getParameter("section"));
             sectionContent = doc.getContentOfSection(sectionNumber);
         }
-        vcontext.put("sectionNumber",new Integer(sectionNumber));
+        vcontext.put("sectionNumber", new Integer(sectionNumber));
 
         synchronized (doc) {
             XWikiDocument tdoc = (XWikiDocument) context.get("tdoc");
             EditForm peform = (EditForm) form;
             String parent = peform.getParent();
-            if (parent!=null)
+            if (parent != null)
                 doc.setParent(parent);
             String creator = peform.getCreator();
-            if (creator!=null)
+            if (creator != null)
                 doc.setCreator(creator);
             String defaultTemplate = peform.getDefaultTemplate();
-            if (defaultTemplate!=null)
+            if (defaultTemplate != null)
                 doc.setDefaultTemplate(defaultTemplate);
             String defaultLanguage = peform.getDefaultLanguage();
-            if ((defaultLanguage!=null)&&!defaultLanguage.equals(""))
+            if ((defaultLanguage != null) && !defaultLanguage.equals(""))
                 doc.setDefaultLanguage(defaultLanguage);
-            if (doc.isNew()&&doc.getDefaultLanguage().equals(""))
+            if (doc.isNew() && doc.getDefaultLanguage().equals(""))
                 doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
 
             String language = context.getWiki().getLanguagePreference(context);
             String languagefromrequest = context.getRequest().getParameter("language");
-            languagefromrequest = (languagefromrequest==null) ? "" : languagefromrequest;
-            String languagetoedit = languagefromrequest.equals("") ? language : languagefromrequest;
+            languagefromrequest = (languagefromrequest == null) ? "" : languagefromrequest;
+            String languagetoedit =
+                languagefromrequest.equals("") ? language : languagefromrequest;
 
             // if no specific language is set or if it is "default" then we edit the current doc
-            if ((languagetoedit==null)||(languagetoedit.equals("default")))
+            if ((languagetoedit == null) || (languagetoedit.equals("default")))
                 languagetoedit = "";
             // if the document is new then we edit it as the default
-            // if the language to edit is the one of the default document then the language is the default
-            if (doc.isNew()||(doc.getDefaultLanguage().equals(languagetoedit)))
+            // if the language to edit is the one of the default document then the language is the
+            // default
+            if (doc.isNew() || (doc.getDefaultLanguage().equals(languagetoedit)))
                 languagetoedit = "";
-            // if the doc does not exist in the language to edit and the language was not explicitely set in the URL
-            // then we edit the default doc, otherwise this can cause to create translations without wanting it.
-            if ((!hasTranslation)&&languagefromrequest.equals(""))
+            // if the doc does not exist in the language to edit and the language was not
+            // explicitely set in the URL
+            // then we edit the default doc, otherwise this can cause to create translations without
+            // wanting it.
+            if ((!hasTranslation) && languagefromrequest.equals(""))
                 languagetoedit = "";
 
             if (languagetoedit.equals("")) {
@@ -118,7 +126,7 @@ public class EditAction extends XWikiAction {
             } else {
                 // If the translated doc object is the same as the doc object
                 // this means the translated doc did not exists so we need to create it
-                if ((!hasTranslation)&&context.getWiki().isMultiLingual(context)) {
+                if ((!hasTranslation) && context.getWiki().isMultiLingual(context)) {
                     tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
                     tdoc.setLanguage(languagetoedit);
                     tdoc.setContent(doc.getContent());
@@ -134,11 +142,15 @@ public class EditAction extends XWikiAction {
                 tdoc2.setContent(content);
                 tdoc2.setTitle(title);
             }
-            if(sectionContent != null && !sectionContent.equals("")) {
-                if(content != null) tdoc2.setContent(content);
-                else tdoc2.setContent(sectionContent);
-                if(title != null) tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
-                else tdoc2.setTitle(title);
+            if (sectionContent != null && !sectionContent.equals("")) {
+                if (content != null)
+                    tdoc2.setContent(content);
+                else
+                    tdoc2.setContent(sectionContent);
+                if (title != null)
+                    tdoc2.setTitle(doc.getDocumentSection(sectionNumber).getSectionTitle());
+                else
+                    tdoc2.setTitle(title);
             }
             context.put("tdoc", tdoc2);
             vcontext.put("tdoc", tdoc2.newDocument(context));
@@ -154,8 +166,9 @@ public class EditAction extends XWikiAction {
             /* Setup a lock */
             try {
                 XWikiLock lock = tdoc.getLock(context);
-                if ((lock == null) || (lock.getUserName().equals(context.getUser())) || (peform.isLockForce()))
-                    tdoc.setLock(context.getUser(),context);
+                if ((lock == null) || (lock.getUserName().equals(context.getUser()))
+                    || (peform.isLockForce()))
+                    tdoc.setLock(context.getUser(), context);
             } catch (Exception e) {
                 e.printStackTrace();
                 // Lock should never make XWiki fail
@@ -165,5 +178,5 @@ public class EditAction extends XWikiAction {
         }
 
         return "edit";
-	}
+    }
 }

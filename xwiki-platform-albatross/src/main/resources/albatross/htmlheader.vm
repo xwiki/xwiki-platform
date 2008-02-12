@@ -26,7 +26,7 @@
     #template("javascript.vm")
   </head>
   #if(($context.action=="inline")||($context.action=="edit") || ($context.action=="admin"))
-    <body onunload="cancelEdit();"
+    <body
           onload="prepareCancelEdit(); createColorPicker();" id="body" class="$context.database ${context.action}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">
   #else
     <body id="body" class="$context.database ${context.action}body #if($showLeftPanels == "0")hideleft#end#if($showRightPanels == "0")hideright#end#if($hidecolumns && ($!hidecolumns == 1))hidelefthideright#end">

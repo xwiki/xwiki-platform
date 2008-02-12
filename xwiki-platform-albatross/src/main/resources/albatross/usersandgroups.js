@@ -147,7 +147,7 @@ ASSTable.prototype = {
 
     this.clearDisplay();
 
-    for (var i = offset; i < (offset + limit); i++) {
+    for (var i = off; i <= f; i++) {
       var elem = this.getHandler(this.fetchedRows[i], i, this);
       this.domNode.appendChild(elem);
     }

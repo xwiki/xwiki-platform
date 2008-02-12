@@ -666,15 +666,17 @@ public class ConfluenceRpcHandler extends BaseRpcHandler
         if (page.getModified() != null) {
             doc.setDate(page.getModified());
         }
-        if (!StringUtils.isBlank(page.getTitle())) {
-            doc.setTitle(page.getTitle());
-        }
         try {
             if (page.getVersion() > 0) {
                 long v = page.getVersion();
                 int minor = (int) (v % 16);
                 int major = (int) (v >> 16) + 1;
-                doc.setVersion(major + "." + minor);
+                String newVersion = major + "." + minor;
+                if (newVersion != doc.getVersion()) {
+                    doc.setVersion(newVersion);
+                    doc.setMetaDataDirty(false);
+                    doc.setContentDirty(false);
+                }
             }
         } catch (Exception ex) {
             // A NPE gets thrown here if the version was not set on the client. Probably a bug in

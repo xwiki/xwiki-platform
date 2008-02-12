@@ -22,8 +22,15 @@ package org.xwiki.observation;
 
 import org.xwiki.observation.event.Event;
 
+/**
+ * The main orchestrator for event notification. You register {@link EventListener} against this
+ * manager. It's also used to notify event listeners when an event is triggered. 
+ */
 public interface ObservationManager
 {
+    /**
+     * The component role under which the implementations of this interface can be looked up. 
+     */
     String ROLE = ObservationManager.class.getName();
 
     /**

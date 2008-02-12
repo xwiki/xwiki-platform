@@ -21,21 +21,27 @@
 
 package com.xpn.xwiki.web;
 
-
-
-public class ObjectRemoveForm extends ObjectAddForm {
+public class ObjectRemoveForm extends ObjectAddForm
+{
     private int classId;
 
-    public void readRequest() {
+    public void readRequest()
+    {
         super.readRequest();
-        setClassId(Integer.parseInt(getRequest().getParameter("classid")));
+        try {
+            setClassId(Integer.parseInt(getRequest().getParameter("classid")));
+        } catch (Exception ex) {
+            setClassId(-1);
+        }
     }
 
-    public int getClassId() {
+    public int getClassId()
+    {
         return classId;
     }
 
-    public void setClassId(int classId) {
+    public void setClassId(int classId)
+    {
         this.classId = classId;
     }
 

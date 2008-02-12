@@ -85,6 +85,10 @@ public class UploadAction extends XWikiAction
         }
         filename = filename.replaceAll("\\+", " ");
 
+        // TODO : avoid name clearing when encoding problems will be solved
+        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
+        filename = context.getWiki().clearName(filename, false, true, context);
+
         XWikiDocument olddoc = (XWikiDocument) doc.clone();
         // Read XWikiAttachment
         XWikiAttachment attachment = olddoc.getAttachment(filename);

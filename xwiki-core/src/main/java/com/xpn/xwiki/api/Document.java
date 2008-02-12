@@ -1720,7 +1720,10 @@ public class Document extends Api
             i = fileName.indexOf("/");
         }
         String filename = fileName.substring(i + 1);
-        filename = getXWikiContext().getWiki().clearName(filename, false, false, getXWikiContext());
+        
+        // TODO : avoid name clearing when encoding problems will be solved
+        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
+        filename = getXWikiContext().getWiki().clearName(filename, false, true, getXWikiContext());
 
         XWikiAttachment attachment = getDoc().getAttachment(filename);
         if (attachment == null) {

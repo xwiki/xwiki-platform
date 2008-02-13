@@ -131,7 +131,7 @@
 <category>Tools</category>
 </property>
 <property>
-<content>#if($hasedit)
+<content>#if($hasEdit || $showEmptyPanels)
 #panelheader($msg.get("Create"))
 &lt;form method="post" action="$doc.getURL("view", "xpage=create")" onsubmit="cancelCancelEdit()"&gt;
 &lt;div class="padded centered"&gt;

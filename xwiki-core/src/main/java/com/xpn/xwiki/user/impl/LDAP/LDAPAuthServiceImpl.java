@@ -41,7 +41,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 
 /**
- * @deprecated Use {@link XWikiLDAPAuthServiceImpl}.
+ * @deprecated Use {@link XWikiLDAPAuthServiceImpl} since 1.3 M2.
  */
 public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
     private static final Log log = LogFactory.getLog(LDAPAuthServiceImpl.class);

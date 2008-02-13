@@ -38,6 +38,8 @@ public abstract class IndexData
 {
     private static final Log LOG = LogFactory.getLog(IndexData.class);
 
+    private String documentTitle;
+    
     private String documentName;
 
     private String documentWeb;
@@ -61,7 +63,8 @@ public abstract class IndexData
 
     public IndexData(final XWikiDocument doc, final XWikiContext context)
     {
-        setDocumentName(doc.getName());
+     	setDocumentName(doc.getName());
+        setDocumentTitle(doc.getDisplayTitle(context));
         setDocumentWeb(doc.getSpace());
         setWiki(doc.getDatabase() == null ? context.getDatabase() : doc.getDatabase());
         setFullName(new StringBuffer(wiki).append(":").append(documentWeb).append(".")
@@ -115,6 +118,10 @@ public abstract class IndexData
         }
 
         // stored Text fields: tokenized and indexed
+        if (documentTitle != null) {
+            luceneDoc.add(new Field(IndexFields.DOCUMENT_TITLE, documentTitle, Field.Store.YES,
+                Field.Index.TOKENIZED));
+        }
         luceneDoc.add(new Field(IndexFields.DOCUMENT_NAME, documentName, Field.Store.YES,
             Field.Index.TOKENIZED));
         luceneDoc.add(new Field(IndexFields.DOCUMENT_WEB, documentWeb, Field.Store.YES,
@@ -195,6 +202,14 @@ public abstract class IndexData
     }
 
     /**
+     * @param documentTitle the document title
+     */
+    public void setDocumentTitle(String documentTitle)
+    {
+        this.documentTitle = documentTitle;
+    }
+    
+    /**
      * @param documentName The documentName to set.
      */
     public void setDocumentName(String documentName)
@@ -218,6 +233,11 @@ public abstract class IndexData
         this.modificationDate = modificationDate;
     }
 
+    public String getDocumentTitle()
+    {
+        return documentTitle;
+    }
+    
     public String getDocumentName()
     {
         return documentName;

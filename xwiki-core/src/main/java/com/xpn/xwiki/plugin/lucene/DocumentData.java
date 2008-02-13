@@ -56,6 +56,8 @@ public class DocumentData extends IndexData
     {
         StringBuffer text = new StringBuffer(super.getFullText(doc, context));
         text.append(" ");
+        text.append(super.getDocumentTitle());
+        text.append(" ");
         text.append(doc.getContent());
 
         return text.toString();

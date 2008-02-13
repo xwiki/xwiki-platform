@@ -53,6 +53,7 @@ import java.util.HashMap;
  * membership to LDAP groups.
  * 
  * @version $Id: $
+ * @since 1.3 M2
  */
 public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 {

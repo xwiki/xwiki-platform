@@ -47,6 +47,7 @@ import java.security.Security;
  * LDAP communication tool.
  * 
  * @version $Id: $
+ * @since 1.3 M2
  */
 public class XWikiLDAPConnection
 {

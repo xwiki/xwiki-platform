@@ -42,6 +42,7 @@ import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
  * LDAP communication tool.
  * 
  * @version $Id: $
+ * @since 1.3 M2
  */
 public class XWikiLDAPUtils
 {

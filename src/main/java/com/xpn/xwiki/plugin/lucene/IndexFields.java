@@ -46,6 +46,11 @@ public abstract class IndexFields
     public static final String DOCUMENT_WIKI = "wiki";
 
     /**
+     * Title of the document
+     */
+    public static final String DOCUMENT_TITLE = "title";
+    
+    /**
      * Name of the document
      */
     public static final String DOCUMENT_NAME = "name";

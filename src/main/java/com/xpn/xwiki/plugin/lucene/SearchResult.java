@@ -37,6 +37,8 @@ public class SearchResult
 
     private float score;
 
+    private String title;
+    
     private String name;
 
     private String wiki;
@@ -73,6 +75,7 @@ public class SearchResult
     {
         this.score = score;
         id = doc.get(IndexFields.DOCUMENT_ID);
+        title = doc.get(IndexFields.DOCUMENT_TITLE);
         name = doc.get(IndexFields.DOCUMENT_NAME);
         web = doc.get(IndexFields.DOCUMENT_WEB);
         wiki = doc.get(IndexFields.DOCUMENT_WIKI);
@@ -129,6 +132,14 @@ public class SearchResult
         return filename;
     }
 
+    /**
+     * @return the title of the document.
+     */
+    public String getTitle()
+    {
+        return title;
+    }    
+    
     /**
      * @return Returns the name of the document.
      */

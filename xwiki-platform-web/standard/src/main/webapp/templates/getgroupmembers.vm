@@ -1,0 +1,33 @@
+$response.setContentType("application/x-json")
+#set( $offset = $xwiki.parseInt( $request.get( "offset" ) ) )
+#set( $off = $offset - 1 )
+#set( $limit = $xwiki.parseInt( $request.get( "limit" ) ) )
+
+#set( $rm = $xwiki.rightsmanager )
+#set( $countm  = $rm.countAllMembersNamesForGroup($doc.fullName))
+#set( $members = $rm.getAllMembersNamesForGroup($doc.fullName, $limit, $off))
+
+{
+"totalrows": $countm,
+"returnedrows": #if($members.size() < $limit) $members.size() #else $limit #end,
+"offset": $offset,
+"rows": [
+#foreach( $m in $members )
+    #if($context.user == $m && $doc.fullName == "XWiki.XWikiAdminGroup")
+      #set($grayed = true)
+    #else
+      #set($grayed = false)
+    #end
+    #set($mdoc = $xwiki.getDocument($m))
+    #set($wikiname = $mdoc.getWiki())
+    #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+    #if( $velocityCount > 1 ) , #end
+   {
+    "fullname"     : "$m",
+    "wikiname"     : "$wikiname",
+    "memberurl"    : "$xwiki.getURL($m)",
+    "docurl"       : "$doc.getURL()",
+    "grayed"       : "$grayed"
+   }
+#end
+]}

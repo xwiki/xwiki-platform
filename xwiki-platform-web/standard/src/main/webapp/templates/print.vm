@@ -1,21 +1,25 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("printheader.vm")
-<div id="xwikicontent">
-$cdoc.getRenderedContent()
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#set($showLeftPanels = "0")
+#set($showRightPanels = "0")
+#set($printss = true)
+#template("htmlheader.vm")
+<div id="printheader" class="layoutsection">
+  <div id="companylogo">
+    <a href="$xwiki.getURL("Main.WebHome", "view")" title="Home">
+#set($logo = $!prefdoc.getAttachment("logo"))
+#if(!$logo)
+#set($logourl = $xwiki.getSkinFile("logo.png"))
+      <img src="$logourl" alt="XWiki logo" style="width: 215px;height: 74px;"/>
+#else
+#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+      <img src="$logourl" alt="XWiki logo"/>
+#end
+    </a>
+  </div>
 </div>
-#if ($request.comments&&($request.comments=="1"))
-#template("comments2.vm")
-#end
-#if ($request.attachments&&($request.attachments=="1"))
-<div id="xwikiattachments">
-#foreach ($attach in $doc.attachmentList)
-#if ($attach.isImage())
-<img src="$doc.getAttachmentURL("${attach.filename}", "download")" alt="${attach.filename}" />
-<br />
-#end
-#end
-</div>
-#end
-#template("basefooter.vm")
-#template("footer.vm")
+<div id="printcontainer" style="overflow: visible; border: none; padding: 10px; text-align: justify;">
+#template("contentview.vm")
+<div class="clearfloats"></div>
+</div>## printcontainer
+#template("htmlfooter.vm")

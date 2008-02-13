@@ -1,38 +1,11 @@
-<div id="xwikifooter" class="clear">
- <div id="xwikidocinfo">
- #if ($doc.parent.length() > 0)
- $parent &gt; $!headertitle
- #else
- $!headertitle
- #end
- ($tdoc.getRealLanguage())
- <br />
- #if ($tdoc)
- $msg.get("creator"): $xwiki.getLocalUserName($tdoc.creator)
- &nbsp;$msg.get("date"): $!xwiki.formatDate($tdoc.creationDate)
- <br />
- $msg.get("lastauthor"): $xwiki.getLocalUserName($tdoc.author)
- &nbsp;$msg.get("date"): $!xwiki.formatDate($tdoc.date)
- #end
- </div>
-
- <div id="xwikifooterimage">
- <a href="http://validator.w3.org/check/referer">
- <img src="$xwiki.getSkinFile("xhtml-valid.png")" alt="Valid XHTML 1.0!" /></a>
- <a href="http://jigsaw.w3.org/css-validator/validator?uri=$xwiki.requestURL">
- <img src="$xwiki.getSkinFile("css-valid.png")" alt="Valid CSS2!" /></a>
- </div>
-
- <div id="xwikifootertext">
- $!copyright
- </div>
-
- <div id="xwikifooterhelp">
- $!help
- </div>
+#if($context.getMode()==0)## Visible only in a page
+<div id="footerglobal" class="layoutsection">
+<div class="minwidth"></div>
+<hr/>
+  <div id="xwikidocinfo"><div class="minwidth"></div>#if ($tdoc)$msg.get("creator"): $xwiki.getLocalUserName($tdoc.creator) $msg.get("createdon") $!xwiki.formatDate($tdoc.creationDate)#end</div>
+  <div id="xwikilicence">$!copyright</div>
+  <div id="xwikiplatformversion">$!xwiki.version</div>
+<hr/>
 </div>
-
-#if($context.getMode()==0)
-</body>
-</html>
 #end
+### TODO: Format the footer for pdf output

@@ -1,0 +1,139 @@
+###
+### Template used by the AJAX table that displays users and groups. It returns a sublist of users
+### and/or groups, filtered according to some parameters, in the JSON format.
+###
+###
+$response.setContentType("application/x-json")
+#set($offset = $xwiki.parseInt($request.get("offset")))
+## offset starts from 0 in velocity and 1 in javascript
+#set($off = $offset - 1)
+#set($limit = $xwiki.parseInt($request.get("limit")))
+#set($rm = $xwiki.rightsmanager)
+##
+## Get all the request parameters which are filters
+#set($params = $request.getParameterMap())
+#set($keys = $params.keySet())
+## Params which are not supposed to be used for filtering
+#set($defaultKeys = ["xpage", "offset", "limit", "wiki", "uorg", "clsname", "space", "reqNo"])
+## Params that should filter the document, not object properties
+#set($docProps = ["fullName", "name"])
+## The filter being constructed. It will be passed to the rightsmanager API.
+#set($filterMap = $xwiki.hashMap)
+## 
+#set($orderList = $xwiki.arrayList)
+#foreach($key in $keys)
+  ## foreach needed because request.getParameterMap returns a list of values for each parameter
+  #foreach($i in $params.get($key)) #set($value = $i) #end
+  #if(!$defaultKeys.contains($key))
+    ## Put in the filters map
+    #if($docProps.contains($key))
+      ## Each filter is: key=>[propType, value], where propType is null for document properties
+      #set($arr = $xwiki.arrayList)
+      #set($discard = $arr.add(null)) ## null => document property
+      #set($discard = $arr.add("$value"))
+      #set($discard = $filterMap.put("$key", $arr))
+## Question: Why do we order using the filter fields?
+##      #set($discard = $orderList.add("$key"))
+    #else
+      #set($arr = $xwiki.arrayList)
+      ## This may be variable... For the moment, assume it is a StringProperty
+      #set($discard = $arr.add("StringProperty"))
+      #set($discard = $arr.add("$value"))
+      #set($discard = $filterMap.put("$key", $arr))
+##      #set($arr2 = $xwiki.arrayList)
+##      #set($discard = $arr2.add("$key"))
+##      #set($discard = $arr2.add("StringProperty"))
+##      #set($discard = $orderList.add($arr2))
+    #end
+  #elseif($key == "uorg")
+    #set($uorg = $value)
+  #elseif($key == "clsname")
+    #set($clsname = $value)
+  #end
+#end
+#if($orderList.size() == 0)
+  #set($discard = $orderList.add("name")) ## By default, order by document name
+#end
+##
+## Get the list of users/groups
+#set($wiki = $request.wiki)
+#if($wiki == "local")
+  #if($uorg == "users")
+    ## Get local users
+    #set($users = $rm.usersApi.getAllMatchedLocalUsers($filterMap, $limit, $off, $orderList))
+    #set($matchedCount = $rm.usersApi.countAllMatchedLocalUsers($filterMap))
+  #else
+    ## Get local groups
+    #set($users = $rm.groupsApi.getAllMatchedLocalGroups($filterMap, $limit, $off, $orderList))
+    #set($matchedCount = $rm.groupsApi.countAllMatchedLocalGroups($filterMap))
+  #end
+#elseif($wiki == "global")
+  #if($uorg == "users")
+    ## Get global users
+    #set($users = $rm.usersApi.getAllMatchedGlobalUsers($filterMap, $limit, $off, $orderList))
+    #set($matchedCount = $rm.usersApi.countAllMatchedGlobalUsers($filterMap))
+  #else
+    ## Get global group
+    #set($users = $rm.groupsApi.getAllMatchedGlobalGroups($filterMap, $limit, $off, $orderList))
+    #set($matchedCount = $rm.groupsApi.countAllMatchedGlobalGroups($filterMap))
+  #end
+#else
+  #if($uorg == "users")
+    ## Get both local and global users
+    #set($users = $rm.usersApi.getAllMatchedUsers($filterMap, $limit, $off, $orderList))
+    #set($matchedCount = $rm.usersApi.countAllMatchedUsers($filterMap))
+  #else
+    ## Get both local and global groups
+    #set($users = $rm.groupsApi.getAllMatchedGroups($filterMap, $limit, $off, $orderList))
+    #set($matchedCount = $rm.groupsApi.countAllMatchedGroups($filterMap))
+  #end
+#end
+### json starts
+{
+"totalrows": $matchedCount,
+"reqNo"    : $request.reqNo,
+"returnedrows": #if($matchedCount < $limit) $matchedCount #else $limit #end,
+"offset"   : $offset,
+"clsname"  : "$clsname",
+"uorg"     : "$uorg",
+"rows": [
+#foreach($user in $users)
+  #set($wikiname = $user.getWiki())
+  #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
+  #if($wikiname == "xwiki")
+    #set($username = $user.getPrefixedFullName())
+  #else
+    #set($username = $user.fullName)
+  #end
+  #set($allows = $xwiki.hashMap)
+  #set($denys = $xwiki.hashMap)
+  #if($velocityCount > 1) , #end
+  ## Get the rights for that user or group
+  #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights
+    #set($pers = "$!obj.getProperty($uorg).getValue()")
+    #if(($pers != "") && ($pers.matches("^(.*,)?${username}(,.*)?$")) )  
+      #foreach($right in $!obj.getProperty('levels').getValue().split(","))
+        #set($right = $right.trim())
+        #if($right != "")
+          #if($obj.getProperty('allow').getValue() == 1)
+            ## If the same right is specified both as allow and deny, deny is stronger.
+            #if(!$denys.containsKey($right)) #set($discard = $allows.put($right, "1")) #end
+          #else
+            #set($discard = $denys.put($right, "1"))
+            ## If the same right is specified both as allow and deny, deny is stronger.
+            #set($discard = "$!allows.remove($right)")
+          #end
+        #end
+      #end
+    #end
+  #end ## foreach rights object
+ {"username"   : "$user.name",
+  "fullname"   : #if($wikiname=="xwiki") "$user.getPrefixedFullName()" #else "$user.fullName" #end,
+  "wikiname"   : "$wikiname", 
+  "userurl"    : "$xwiki.getURL($user.fullName)",
+  "allows"     : "$allows.keySet()",
+  "denys"      : "$denys.keySet()"
+ }
+#end ## foreach user in users
+]}
+### end of json

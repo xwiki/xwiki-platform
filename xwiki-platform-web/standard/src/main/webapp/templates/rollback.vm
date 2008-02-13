@@ -1,18 +1,18 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
+#if ($request.getParameter("raw").equals("1"))
+#template("code.vm")
+#else
+#template("xwikivars.vm")
+#template("layoutvars.vm")
+#template("htmlheader.vm")
 #template("header.vm")
-#template("rollbackheader.vm")
-#if($message)
-<div id="xwikimessage">
-$message
+<div class="layoutsection">
+  <div id="contentcolumn" class="content hideleft hideright">
+#xwikimessagebox($msg.get("rollback") $msg.get('readytorollback').concat(" ").concat($request.get("rev")).concat("?") "${request.requestURL}?confirm=1&amp;${request.queryString.replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}" $doc.getURL('view') $msg.get("yes") $msg.get("no"))
+  </div>
 </div>
-#end
-<div id="xwikicontent">
-<br />
-$msg.get("readytorollback") $request.get("rev") ?
-<br />
-<br />
-<br />
-</div>
-#template("rollbackfooter.vm")
+##
+##
+##
 #template("footer.vm")
+#template("htmlfooter.vm")
+#end

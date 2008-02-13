@@ -1,17 +1,12 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("header.vm")
-#template("viewheader.vm")
-<div id="xwikicontent">
-
-    <center><h2>
-        $msg.get("thistemplatedoesnotexist")
-    </h2>
-    </center>
-    <br/><br/>
-
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
+#else
+#xwikimessageboxstart($msg.get("error") $msg.get("thistemplatedoesnotexist"))
+$!exception
+#xwikimessageboxend()
+#end
+<div class="clearfloats"></div>
 </div>
-#template("basefooter.vm")
-#template("footer.vm")
-
-
+#template("endpage.vm")

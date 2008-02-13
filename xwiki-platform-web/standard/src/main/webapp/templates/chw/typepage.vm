@@ -4,12 +4,12 @@
               <legend id="chwChartsTypeLegend" class="chwLargeLegend" onclick="window.wizard.flipAdvanced('ChartsType');" title="$msg.get("chwdcharttypetitle")">$msg.get("chwcharttypelegend") &lt;&lt;</legend>
               <div id="chwChartsTypeDiv" class="chwVisible">
                 <label for="chwChartTypeInput" accesskey="t">$msg.get("chwcharttypelabel")</label>
-                <select id="chwChartTypeInput" size="5" name="type" onchange="window.wizard.changeChartType(this.value);">
+                <select id="chwChartTypeInput" size="2" name="type" onchange="window.wizard.changeChartType(this.value);">
                   <option selected="selected" value="Bar">Bar</option>
                   <option value="Pie">Pie</option>
-                  <option value="Line">Line</option>
+<!--                  <option value="Line">Line</option>
                   <option value="Area">Area</option>
-                  <option value="Time">Time</option>
+                  <option value="Time">Time</option>-->
                 </select>
                 <div id="chwBarSubtypes">
                   <label for="chwBarSubtypeInput">$msg.get("chwchartsubtypelabel")</label>
@@ -31,7 +31,7 @@
                     <option selected="selected" value="pie">Simple Pie</option>
                     <option value="pie_3d">3D Pie</option>
                     <option value="ring">Ring</option>
-                    <option value="ring_3d">3D Ring</option>
+<!-- does not exist                    <option value="ring_3d">3D Ring</option> -->
                   </select>
                 </div>
                 <div id="chwLineSubtypes" class="chwHidden">

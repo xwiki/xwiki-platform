@@ -1,7 +1,7 @@
 <component-set>
   <components>
     <component>
-      <role>org.xwiki.observation.internal.DefaultObservationManager</role>
+      <role>org.xwiki.observation.ObservationManager</role>
       <implementation>org.xwiki.observation.internal.DefaultObservationManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>

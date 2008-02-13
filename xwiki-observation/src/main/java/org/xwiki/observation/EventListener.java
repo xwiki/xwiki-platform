@@ -34,7 +34,7 @@ public interface EventListener
      * The {@link org.xwiki.observation.ObservationManager} calls this methods when an event
      * matches the event passed when this object was registered against the Observation Manager.
      *
-     * @param event the event triggered. Can be used to differentiate differente events if your
+     * @param event the event triggered. Can be used to differentiate different events if your
      *              Object supports several events for example.
      * @param source the event source i.e. the object for which the event was triggered. For
      *               example this would be the document Object if the event is a document update

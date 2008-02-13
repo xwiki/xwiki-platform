@@ -1,0 +1,5 @@
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#template("registerinline.vm")
+</div>
+#template("endpage.vm")

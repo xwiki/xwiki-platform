@@ -2,13 +2,12 @@
 <div id="xwikibanner">
 <div id="xwikilogo">
     <a href="$xwiki.getURL("Main.WebHome", "view")">
-#set($prefdoc = $!xwiki.getDocument("XWiki.XWikiPreferences"))
-#set($logo = $!prefdoc.getAttachment("logo"))
+#set($logo = $!preferencesDoc.getAttachment("logo"))
 #if(!$logo)
 #set($logourl = $xwiki.getSkinFile("logo.gif"))
 <img src="$logourl" alt="XWiki" width="150" height="40" />
 #else
-#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+#set($logourl = $preferencesDoc.getAttachmentURL($logo.filename, "download"))
 <img src="$logourl" alt="XWiki" />
 #end
     </a>
@@ -28,9 +27,7 @@
 <a href="$regurl">$msg.get("register")</a>
 #else
 #set($logouturl = $xwiki.getURL("XWiki.XWikiLogout","logout", "xredirect=$logredir"))
-#set($docuser = $xwiki.getDocument($context.user))
-#set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
-$msg.get("hello") <a href="$docuser.getURL("view")">$docuser.display("first_name", "view", $objuser)</a><br />
+$msg.get("hello") <a href="$crtUserDoc.getURL("view")">$crtUserDoc.display("first_name", "view", $userObj)</a><br />
 <a href="$logouturl">$msg.get("logout")</a>
 #end
 #end

@@ -1,0 +1,6 @@
+###
+### Comments page in the "view" mode
+###
+###
+<h2>$xwiki.parseMessage("viewcommentstitle")</h2>
+#template("commentsinline.vm")

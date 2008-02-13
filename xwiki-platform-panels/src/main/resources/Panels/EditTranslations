@@ -99,7 +99,7 @@
 <category>Information</category>
 </property>
 <property>
-<content>#if($xwiki.isMultiLingual()==true)
+<content>#if($xwiki.isMultiLingual()==true || $showEmptyPanels)
   #largepanelheader($msg.get("panels.translation.title"))
   #if(($request.language)&amp;&amp;($request.language!="default")&amp;&amp;($doc.defaultLanguage!=$request.language))
     #set($forcetrans = $request.language)

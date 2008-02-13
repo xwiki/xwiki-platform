@@ -136,7 +136,7 @@
 </property>
 <property>
 <content>#set($blinks = $doc.getBacklinks())
-#if($blinks.size()&gt;0)
+#if($blinks.size()&gt;0 || $showEmptyPanels)
 #panelheader('Backlinks')
 #set($first = true)
 #foreach($docname in $blinks)

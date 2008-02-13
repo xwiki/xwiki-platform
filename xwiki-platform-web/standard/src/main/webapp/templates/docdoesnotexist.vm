@@ -9,7 +9,7 @@ $response.setStatus(404)
     $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
 #else
 #xwikimessageboxstart($msg.get("notice") $msg.get("thispagedoesnotexist"))
-#if($hasedit)
+#if($hasEdit)
 #set($url = $doc.getURL("edit", $editparams))
 $xwiki.parseMessage("youcanclicktoedit")
 #end

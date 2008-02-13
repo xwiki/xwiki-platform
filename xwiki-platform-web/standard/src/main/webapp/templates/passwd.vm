@@ -7,7 +7,7 @@
 <div class="main layoutsubsection">
 #if($doc.getObject("XWikiUsers", 0))
 #set($i = $context.user.indexOf(":")+1)
-#if($context.user.substring($i) == $doc.fullName || $hasadmin)
+#if($context.user.substring($i) == $doc.fullName || $hasAdmin)
   <form action="$doc.getURL("save")" method="post" onsubmit="if($('xwikipassword').value != $('xwikipassword2').value) {alert('$msg.get("passwordmissmatch")'); return false; }">
 <h2 class="heading-1">$msg.get("changepassword", [$xwiki.getUserName($doc.fullName, false)])</h2>
 <dl>

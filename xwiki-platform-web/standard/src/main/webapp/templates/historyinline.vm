@@ -14,7 +14,7 @@
 #if($xwiki.hasEditComment())
           <th>$msg.get("comment")</th>
 #end
-#if($hasedit || $hasadmin)
+#if($hasEdit || $hasAdmin)
           <th colspan="2"></th>
 #end
         </tr>
@@ -46,10 +46,10 @@
 #if($xwiki.hasEditComment())
           <td>$!{revinfo.comment}</td>
 #end
-#if($hasedit || $hasadmin)
+#if($hasEdit || $hasAdmin)
           <td class="xwikibuttonlink"><a href="$tdoc.getURL("rollback","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("readytorollback") $nextversion')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("rollback")</a></td>
 #end
-#if($hasadmin)
+#if($hasAdmin)
           <td class="xwikibuttonlink"><a href="$tdoc.getURL("deleteversions","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("core.versions.delete.confirm.single", [$nextversion])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("core.versions.delete.single")</a></td>
 #end
         </tr>
@@ -58,7 +58,7 @@
 </table>
       <div class="buttons">
         <div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>
-        #if($hasadmin)
+        #if($hasAdmin)
           <div class="buttonwrapper"><input class="button" type="submit" name="deleteversions" value="$msg.get("core.versions.delete.many")" 
             onclick="document.forms.${formname}.action='$doc.getURL("deleteversions")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
         #end

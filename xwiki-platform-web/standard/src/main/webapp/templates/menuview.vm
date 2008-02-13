@@ -6,7 +6,7 @@
 ##
 ## Edit mode
 ##
-#if($hasedit && !$isReadOnly)
+#if($hasEdit && !$isReadOnly)
 ## Check inline editing option
 #if($doc.content.indexOf("includeForm(")!=-1)
 #set($editaction = "inline")
@@ -16,14 +16,14 @@
 ##
 ## Create menu
 ##
-##if($hasedit)
+##if($hasEdit)
 ### #xwikitopmenuentrystart($doc.getURL($editaction, $languageparams) $msg.get("core.menu.create") "tmCreate")
 ##xwikitopmenuentrystart($xwiki.getURL("XWiki.CreateSubpage", "view", "parent=${doc.fullName}") $msg.get("core.menu.create") "tmCreate")
 ##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "parent=${doc.fullName}") $msg.get("core.menu.create.page"))
 ##submenuitem($xwiki.getURL("XWiki.CreatePage", "view", "tocreate=space") $msg.get("core.menu.create.space"))
 ##submenuitem($xwiki.getURL("Blog.CreateBlogPost", "view") $msg.get("core.menu.create.blogpost"))
 ##if($xwiki.hasAccessLevel("edit", "Main.EventCalendar"))#submenuitem($xwiki.getURL("Main.EventCalendar", "view") $msg.get("core.menu.create.event"))#end
-##if($hasadmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("core.menu.create.panel"))#end
+##if($hasAdmin)#submenuitem($xwiki.getURL("Panels.WebHome", "view") $msg.get("core.menu.create.panel"))#end
 ##xwikitopmenuentryend()
 ##end
 ##
@@ -39,7 +39,7 @@
 #submenuitem($doc.getURL("edit", "editor=rights") $msg.get("core.menu.rights"))
 #submenuseparator()
 #submenuitem($doc.getURL("edit", "editor=object") $msg.get("core.menu.edit.object"))
-#if($hasadmin)
+#if($hasAdmin)
 #submenuitem($doc.getURL("edit", "editor=class") $msg.get("core.menu.edit.class"))
 #end
 #xwikitopmenuentryend()

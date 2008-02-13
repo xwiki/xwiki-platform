@@ -9,7 +9,7 @@
 #if($doc.getObject("XWikiUsers", 0))
 #set($i = $context.user.indexOf(":")+1)
 #set($isMyProfile = $context.user.substring($i) == $doc.fullName)
-#if ($isMyProfile || $hasadmin)
+#if ($isMyProfile || $hasAdmin)
 #if ($request.removedocument || $request.removespace)
   #set ($el = "")
   #if ($isMyProfile)

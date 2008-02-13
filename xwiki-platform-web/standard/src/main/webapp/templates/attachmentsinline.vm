@@ -39,7 +39,7 @@ ${Msz}Mb
           <span class="mime">#mimetypeimg($attach.getMimeType().toLowerCase() $attach.getFilename().toLowerCase())</span>
           <div class="information">
           <span class="name"><a href="$doc.getAttachmentURL("${attach.filename}", "download")" title="$msg.get("downloadthisattachment")">#packName($attach.filename)</a></span>
-#if($hasedit || $hasadmin)
+#if($hasEdit || $hasAdmin)
           <span class="xwikibuttonlinks"><a class="deletelink" href="$doc.getAttachmentURL("${attach.filename}", "delattachment", "xredirect=${redirect}")" onclick="return confirm('$msg.get("confirmdelattachment")');" title="$msg.get("deletethisattachment")">$msg.get("delete")</a></span>
 #end
           <span class="version"><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></span>
@@ -54,7 +54,7 @@ ${Msz}Mb
 #else
 <div>$msg.get("noattachments")</div>
 #end
-#if($hasedit || $hasadmin)
+#if($hasEdit || $hasAdmin)
       <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
 <div>
 <input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
@@ -78,7 +78,7 @@ ${Msz}Mb
 #if($inline && ($inline == true))
 <script type="text/javascript">
 //<![CDATA[
-#if($hasedit || $hasadmin)
+#if($hasEdit || $hasAdmin)
 document.getElementById("attachform").className = "collapsed";
 #end
 document.getElementById("attachments").className = "hidden";

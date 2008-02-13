@@ -23,7 +23,7 @@
 #if($date)
  | <span class="commentdate">$xwiki.formatDate($date, "dd.MM.yyyy") $msg.get("at") $xwiki.formatDate($date, "hh:mm a")</span>
 #end
-#if($hasedit) <span class="commentdelete"><a class="commentremove" href="$doc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")"
+#if($hasEdit) <span class="commentdelete"><a class="commentremove" href="$doc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")"
     onclick="return confirm('$msg.get("confirmcommentremove")')">[$msg.get("removethiscomment")]</a></span>#end
       </div>
       <div class="commentcontent">$doc.getRenderedContent($doc.display("comment","view",$comment))      </div>

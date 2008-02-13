@@ -8,7 +8,7 @@
 <div class="minwidthb"></div>
 <div class="main layoutsubsection">
 #if($doc.getObject("XWikiUsers", 0))
-#if($context.user == $doc.fullName || $hasadmin)
+#if($context.user == $doc.fullName || $hasAdmin)
   <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }">
 <div>
 <h2 class="heading-1">$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h2>

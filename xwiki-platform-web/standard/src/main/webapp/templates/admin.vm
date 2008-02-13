@@ -65,7 +65,7 @@ $response.sendRedirect($redirecturl)
 ## Content
 ##
 #set($force = $!request.get("force"))
-#if(!$hasadmin)
+#if(!$hasAdmin)
 #xwikimessageboxstart($msg.get("error") $msg.get('notallowed'))
 #xwikimessageboxend()
 #elseif (($tdoc.getLocked()==true)&&(!$force))

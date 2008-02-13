@@ -31,7 +31,7 @@
   </div>
   <div id="globallinks">
     <div id="globalmenu">
-#if (!$isguest)
+#if (!$isGuest)
 #if ($context.user == 'XWiki.superadmin')
       $!msg.get("superadmin") #sep()
 #else
@@ -39,7 +39,7 @@
 #end
 #end
 #if ($context.action != "loginerror")
-#if ($isguest)
+#if ($isGuest)
 #set($loginurl = $xwiki.getURL("XWiki.XWikiLogin", "login", "xredirect=$xwiki.getURLEncoded($logredir)"))
       <a class="glink" href="$!loginurl" id="headerlogin">$!msg.get("login")</a>#sep()
 #else
@@ -47,11 +47,11 @@
       <a class="glink" href="$!logouturl" id="headerlogout">$!msg.get("logout")</a>#sep()
 #end
 #end
-#if($isguest && $xwiki.hasAccessLevel("register", "XWiki.XWikiPreferences"))
+#if($isGuest && $xwiki.hasAccessLevel("register", "XWiki.XWikiPreferences"))
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))
       <a class="glink" href="$!regurl" id="headerregister">$!msg.get("core.register")</a>#sep()
 #end
-#if($hasadmin)
+#if($hasAdmin)
       <a class="glink" href="$!xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$!msg.get("admin")</a> #sep()
 #end
 #if($xwiki.isMultiLingual())

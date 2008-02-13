@@ -1,0 +1,2 @@
+#set($showactions = 0)
+#includeForm("Admin.WebHome")

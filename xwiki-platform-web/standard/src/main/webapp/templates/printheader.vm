@@ -2,13 +2,12 @@
 <div id="xwikibanner">
 <div id="xwikilogo">
     <a href="$xwiki.getURL("Main.WebHome", "view")">
-#set($prefdoc = $!xwiki.getDocument("XWiki.XWikiPreferences"))
-#set($logo = $!prefdoc.getAttachment("logo"))
+#set($logo = $!preferencesDoc.getAttachment("logo"))
 #if(!$logo)
 #set($logourl = $xwiki.getSkinFile("logo.gif"))
 <img src="$logourl" alt="XWiki" width="150" height="40" />
 #else
-#set($logourl = $prefdoc.getAttachmentURL($logo.filename, "download"))
+#set($logourl = $preferencesDoc.getAttachmentURL($logo.filename, "download"))
 <img src="$logourl" alt="XWiki" />
 #end
     </a>

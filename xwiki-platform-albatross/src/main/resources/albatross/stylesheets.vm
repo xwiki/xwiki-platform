@@ -1,6 +1,6 @@
 ## The default stylesheet configuration option allows to override the default style.css CSS
 #set ( $defaultstyle = $xwiki.getWebPreference("stylesheet") )
-#if ( $defaultstyle != "" )
+#if ( $defaultstyle == "" )
   #set ( $defaultstyle = "style.css" )
 #end
 #set( $defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true) )

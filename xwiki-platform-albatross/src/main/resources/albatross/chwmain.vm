@@ -31,8 +31,8 @@ $!xwiki.getWebPreference("meta")
 #template("chw/datapage.vm")
 #template("chw/typepage.vm")
 #template("chw/titlepage.vm")
-<!-- Not ready for prime time
-#template("chw/axispage.vm")-->
+## Not ready for prime time
+## #template("chw/axispage.vm")
       </td>
     </tr>
     <tr>

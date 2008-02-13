@@ -1,12 +1,29 @@
-body#body{background-image: url( ../../images/colors/green/H4x4-GREEN.png ); }
-body#body #xwikimaincontainer{  background-image :url( ../../images/colors/green/bg-GREEN.png ) ;  }
-#xwikimaincontainerinner {  background-image: url( ../../images/colors/green/bg-GREEN.png );}
-body#body.hideright  #xwikimaincontainerinner {  background-image: url( ../../images/colors/green/bg-GREEN3.png );}
-body#body.adminbody#body  #xwikimaincontainerinner {  background-image: url( ../../images/colors/green/bg-GREEN3.png );}
-body#body.hidelefthideright  #xwikimaincontainerinner {  background-image: url( ../../images/colors/green/bg-GREEN3.png );}
-body#body.editbody #xwikimaincontainerinner { background-image: url( ../../images/colors/green/bg-GREEN.png ); }
-#globallinks{  background-image: url( ../../images/colors/green/bgx-GREEN.png );}
-#rightPanels{  background-image: url( ../../images/colors/green/bgx-GREEN.png );}
-#editPanels.panels{  background-image: url( ../../images/colors/green/bgx-GREEN.png );}
-#company { background-image: url( ../../images/colors/green/bgxleft-GREEN.png ); }
+body#body,
+#allviewpanels .accordionTabContentBox{background-image: url( ../../images/colors/green/H4x4-GREEN.png); }
 
+body#body #xwikimaincontainer,
+body.hideright #xwikimaincontainer,
+body#body.hideright  #xwikimaincontainerinner,
+body.importbody #xwikimaincontainerinner,
+body.exportbody #xwikimaincontainerinner,
+body.adminbody #xwikimaincontainerinner,
+body.hidelefthideright #xwikimaincontainerinner,
+body#body.hidelefthideright  #xwikimaincontainerinner 
+{  background-image :url( ../../images/colors/green/bg-GREEN3.png) ; }
+
+#xwikimaincontainerinner,
+body#body.editbody #xwikimaincontainerinner,
+body#body.eportbody #xwikimaincontainer,
+body#body.importbody #xwikimaincontainer,
+body#body.adminbody #xwikimaincontainer,
+body#body.hidelefthideright #xwikimaincontainer,
+body#body.hideleft #xwikimaincontainer,
+body#body.editbody #xwikimaincontainer
+ {  background-image :url(../../images/colors/green/bg-GREEN.png) ;}
+ 
+body#body.editbody #globallinks,
+#globallinks,
+#rightPanels,
+#editPanels.panels{  background-image: url( ../../images/colors/green/bgx-GREEN.png);}
+
+#company { background-image: url( ../../images/colors/green/bgxleft-GREEN.png); }

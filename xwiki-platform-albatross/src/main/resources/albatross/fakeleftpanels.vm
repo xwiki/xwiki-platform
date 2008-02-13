@@ -1,5 +1,0 @@
-#if($showLeftPanels == "1")
-<div id="leftPanels" class="panels left">
-<div class="fakepanel"></div>
-</div>
-#end

@@ -1,0 +1,71 @@
+#set($formname = "update")
+#set($saveaction = "save")
+
+## set the interface to use from xwiki.cfg
+#set($interface = $xwiki.rightsmanager.defaultUi)
+
+<div id="xwikieditcontent">
+
+############## display the new interface
+#if($interface == "new") 
+## url to get the groups for displaying them in the ajax-based table
+#set($url = "?xpage=getusers")
+
+<div id="ajax-loader">Loading...<br />
+  <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
+</div>
+
+<table id="userstable">
+<tr><td colspan="2" id="showLimits"></td></tr>
+<tr>
+ <td style="width:100%;"><table class="display" cellpadding="3">
+        <thead class="theader">
+           <tr><td>User Name</td><td>First Name</td><td>Last Name</td><td>Manage</td></tr>
+           <tr id="table-filters">
+              <td><input name="name" type="text" class="filter"/></td>
+              <td><input name="first_name" type="text" class="filter"/></td>
+              <td><input name="last_name" type="text" class="filter"/></td>
+              <td>#if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
+                #if(!$mainwk) ## display the combobox only in a local wiki
+                <select name="wiki" class="filter">
+                  <option value="local" selected="selected">Local</option>
+                  <option value="global">Global</option>
+                  <option value="both">Both</option>
+		</select>
+		#else <input name="wiki" type="hidden" value="local" /> #end
+              </td>
+           </tr>
+        </thead>
+        <tbody id="display1"><tr><td colspan="4">&nbsp;</td></tr></tbody>
+ </table></td>
+ <td valign="top">
+    <div id="scrollbar1" class="scrollbar"><div class="inscrollbar">&nbsp;</div></div>
+ </td>
+ <td id="buff"></td>
+ </tr>
+ <tr><td colspan="2" id="tdAddNewUserOrGroup">
+ <a href="#" id="addNewUser" class="addNewUserOrGroup">$msg.get("rightsmanager.addnewuser")</a>
+ </td></tr>
+ </table>
+
+ <script type="text/javascript">
+//<![CDATA[
+     var ta = new ASSTable("$url", 15, "display1", "scrollbar1", "userstable", displayUsers, true); 
+     #if(!$xwiki.hasAccessLevel("view","XWiki.Registration")||$xwiki.getDocument("XWiki.Registration").isNew())
+       #set($registerurl = $doc.getURL("view", "xpage=registeruser"))
+       #set($saveurl = $doc.getURL("register", "xpage=registeruser"))
+       #set($redirecturl = $doc.getURL("admin", "editor=users&amp;space=XWiki")) 
+       Event.observe($('addNewUser'), "click", makeAddHandler("$registerurl", "$saveurl", "$redirecturl"));
+     #else
+       ## go to custom registration page
+       $('addNewUser').href = "$xwiki.getURL('XWiki.Registration')";
+     #end
+//]
+ </script>
+ 
+########### display the stable interface
+#else 
+<p>$xwiki.parseMessage("editusersredirect")</p>
+<p>$xwiki.parseMessage("editgroupsredirect")</p>
+#end
+</div> ## end of xwikieditcontent

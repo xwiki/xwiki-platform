@@ -5,7 +5,6 @@
 #end
 #set( $defaultStyleURL = $xwiki.getSkinFile($defaultstyle, true) )
 <link href="$defaultStyleURL" rel="stylesheet" type="text/css" />
-<link href="$defaultStyleURL" rel="stylesheet" type="text/css" title="default" />
 #if ( $printss )
   <link href="$xwiki.getSkinFile("print.css")" rel="stylesheet" type="text/css"/>
 #end

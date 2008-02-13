@@ -1,5 +1,3 @@
-/* @override http://192.168.1.11:8080/xwiki/bin/skin/skins/toucan/style.css */
-
 @import "microformats.css";
 @import "fullscreenEdit.css";
 @import "css/table/table.css";
@@ -633,6 +631,7 @@ body#body.editbody #xwikimaincontainerinner {
   background-repeat: repeat-y;
   background-color:transparent;
   padding-right: 0;
+    margin:  0 0 0 30px;
 }
 
 
@@ -682,9 +681,10 @@ body.adminbody #globallinks a{
 	padding-right:10px;
 }
 #companylogo{margin:0px 220px;}
-#body.hidelefthideright #companylogo {margin:  0px;}
-#body.hideleft #companylogo {margin:  0px 0px 0px 0px;}
-#body.hideright #companylogo {margin:  0px 0px 0px 220px;}
+body.hidelefthideright #companylogo {margin:  0px;}
+body.hideleft #companylogo {margin:  0px 0px 0px 0px;}
+body.hideright #companylogo {margin:  0px 0px 0px 220px;}
+#body.editbody #companylogo {margin:  0px ;}
 body#body.adminbody #companylogo{margin: 0;}
 body#body.editbody #headerspace {margin: 0px 220px 0px 0px;}
 body.hideleft #headerspace {margin: 0px 220px 0px 0px;}
@@ -725,15 +725,25 @@ body#body.adminbody #footerglobal{
 	padding: 0 25px 25px 25px;
   	background-color: #fff;
 }
-.contenthideleft #contentcolumn .main{
+
+div#panelwizardcontainer {
+padding: -30px -250px;	
+}
+
+
+
+
+
+.hideleft #contentcolumn .main{
 	margin: 0 220px 0 0;
 	}
 
-.contenthideright #contentcolumn .main{
+.hideright #contentcolumn .main{
 	margin:0 0 0 220px;
+	
 	}
 
-.contenthidelefthideright #contentcolumn .main{
+.hidelefthideright #contentcolumn .main{
 	margin:0px;
 	}
 .content #contentcolumn .main{
@@ -1365,7 +1375,7 @@ html > body .xwikitabbar li{
 /* @group Panels */
 /* --------------------------------------- */
 /* --------------------------------------- */
-
+#leftPanels .Search #globalsearch,
 #rightPanels .Search #globalsearch {
   text-align: center;
   margin: 0px ;
@@ -1387,6 +1397,7 @@ padding:0px;
 }
 
 .xwikipanelcontents form{margin: 0;padding: 0px;}
+#leftPanels #globalsearch input,
 #rightPanels #globalsearch input{
   font-size: 0.9em;
 	width: 100px;
@@ -1394,6 +1405,7 @@ padding:0px;
   display: inline !important;
   background-color: #fff;
 }
+#leftPanels #globalsearch input.button,
 #rightPanels #globalsearch input.button{
   vertical-align: middle;
   font-size: 1em;
@@ -1930,12 +1942,12 @@ div.pagelayoutoptions td{
   position: absolute;
 }
 #panelwizardbuttons{
-  padding: 8px 5px;
+  padding: 8px 0px;
   margin: 1em 0px;
   text-align: center;
 }
 .alleditcontent{
-  margin: 60px 240px 20px 20px;
+  margin: 10px 240px 20px 20px;
   border: 1px solid #ddd;
   background-color: #f0f0ee;
 }
@@ -2134,6 +2146,7 @@ div#xwikiclassproperties.accordion
   padding:8px 10px 2px;
   border-top: 1px solid #fff;
 }
+#body #fullscreen-dlg .leftmenu2 {padding:  0px;}
 #xwikieditcontent div div.leftmenu2 a img {
 	background-color: #fff;
 	margin-left: 3px;
@@ -2167,23 +2180,29 @@ border: 1px solid #ccc;
 text-align: center;
 }
 /* panels */
+#leftPanels input[type=text],#leftPanels textarea,
 #rightPanels input[type=text],#rightPanels textarea,
 #inline input[type=text],#inline textarea{
 	background-color: #f9fcff;
 	width:100%;
 }
 .viewbody form .centered input[type=text] {width: auto;}
-
+#leftPanels.xwikipanelcontents ol,
+#leftPanels .xwikipanelcontents ul.minus,
 #rightPanels.xwikipanelcontents ol,
 #rightPanels .xwikipanelcontents ul.minus {
 margin-left:1em;
 }
+#leftPanels .xwikipanelcontents ul.star,
 #rightPanels .xwikipanelcontents ul.star {
 margin-left:0em;
+margin-bottom: 1em;
 }
+#leftPanels .xwikipanelcontents ul.star ul,
 #rightPanels .xwikipanelcontents ul.star ul{
 margin-left:2em;
 }
+#leftPanels .xwikipanelcontents ul ul,
 #rightPanels .xwikipanelcontents ul ul{
 list-style-type:none;
 margin-left:2em;
@@ -2265,8 +2284,7 @@ margin: 0;
 
 table#searchTableUnique {width: 99.8%;}
 table#searchTableUnique td span.wikilink {
-	display:block;
-	overflow:hidden;
+
 }
 table#searchTableUnique td.actions a{ 
 	 position: relative;
@@ -2605,9 +2623,11 @@ div.changes-info-title {
 .xwikiuserblog {
 	float: right;
 	width: 250px;
+	 background-color: #FAFAFD;
+	 padding: 1px;
 }
 #lb-content .xwikiuserblog .rssfeed,
-.vcard .xwikiuserblog .rssfeed {
+.xwikiuserblog .rssfeed {
   clear: both;
   position: relative;
   float: right;
@@ -2615,14 +2635,14 @@ div.changes-info-title {
   background-color: #FAFAFD;
 }
 #lb-content .xwikiuserblog .rssfeed div.rsschanneltitle,
-.vcard .xwikiuserblog .rssfeed div.rsschanneltitle{
+.xwikiuserblog .rssfeed div.rsschanneltitle{
 	padding: 5px;
 	text-align: center;
 	font-weight: bold;
 	border-bottom: 1px solid #ddd;
 }
 #lb-content .xwikiuserblog .rssfeed .rssitem,
-.vcard .xwikiuserblog .rssfeed .rssitem{
+.xwikiuserblog .rssfeed .rssitem{
 	padding: 5px;
 }
 #lb-content h3,
@@ -2630,13 +2650,18 @@ div.vcard h3{
 	clear: both;
 	padding-top: 1em;
 }
+form#inline div.clear h3{
+	clear: both;
+}
+
 
 #lb-content #XWiki.XWikiUsers_0_blog { width: 200px;}
 img#xwikiuseravatar.photo {
-width:200px;
-float: left;
+
+float: none;
 margin: 0 1em 1em 0;
 }
+
 #lb-content img#xwikiuseravatar.photo {
 width:200px;
 float: right;
@@ -2650,11 +2675,15 @@ font-size: 1.6em;
 letter-spacing: 2px;
 }
 
-#xwikiuserprofile {	float: left;}
+#xwikiuserprofile {}
+form#inline #xwikiuserprofile {}
+form#inline #xwikiuserprofile,
 #lb-content #xwikiuserprofile {
 	padding-bottom: 2em;
 }
+form#inline #xwikiuserprofile input ,
 #lb-content #xwikiuserprofile input {width: 350px;}
+form#inline #xwikiuserprofile label,
 #lb-content #xwikiuserprofile label {font-size: 1.4em;}
 
 
@@ -2671,11 +2700,12 @@ letter-spacing: 2px;
 * html h5.xwikipaneltitle,
 * html .collapsed h5.xwikipaneltitle,
 * html .xwikipanelcontents {background-image: url(images/panel-v.gif);}
+* html #leftPanels .Search #globalsearch,
 * html #rightPanels .Search #globalsearch {background-image:url(images/search-bg.gif);}
 
 
-* html #xwikihelpsyntax {background-image: url(images/panel-e.gif);}
-* html #editPanels .expanded h5.xwikipaneltitle {background-image: url(images/panel-e.gif);}
+* html #editPanels .SyntaxHelp div.xwikipanelcontents {background-image: url(images/panel-e.gif);}
+ #editPanels .expanded h5.xwikipaneltitle {background-image: url(images/panel-e.gif);}
 * html #editPanels .xwikipanelcontents {background-image: url(images/panel-e.gif);}
 * html #editPanels .EditModes .xwikipanelcontents ul li.active {background-image: url();}
 * html #editPanels .EditModes h5,

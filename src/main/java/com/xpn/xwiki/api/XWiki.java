@@ -1355,16 +1355,12 @@ public class XWiki extends Api
      */
     public boolean hasAccessLevel(String level)
     {
-        try {
-            return xwiki.getRightService().hasAccessLevel(level, getXWikiContext().getUser(),
-                getXWikiContext().getDoc().getFullName(), getXWikiContext());
-        } catch (Exception e) {
-            return false;
-        }
+        return hasAccessLevel(level, getXWikiContext().getUser(), getXWikiContext().getDoc()
+            .getFullName());
     }
 
     /**
-     * v * API to check rights on a document for a given user
+     * API to check rights on a document for a given user
      * 
      * @param level right to check (view, edit, comment, delete)
      * @param user user for which to check the right

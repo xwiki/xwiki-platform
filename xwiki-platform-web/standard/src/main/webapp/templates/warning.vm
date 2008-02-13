@@ -1,0 +1,5 @@
+###
+### Generic warning message
+###
+#set($messageType = $msg.get("xwiki.core.warningMessageType"))
+#template("message.vm")

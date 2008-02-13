@@ -1,14 +1,13 @@
-#template("fudocs.vm")
-#template("macros.vm")
-#set($isguest = $context.getUser().equals("XWiki.XWikiGuest"))
-#set($hasedit = $xwiki.hasAccessLevel("edit"))
-#set($hasadmin = $xwiki.hasAccessLevel("admin"))
+#template("frequentlyUsedDocs.vm")
+#set($isGuest = $context.getUser().equals("XWiki.XWikiGuest"))
+#set($hasEdit = $xwiki.hasAccessLevel("edit"))
+#set($hasAdmin = $xwiki.hasAccessLevel("admin"))
 #set($hasGlobalAdmin = $xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
 #set($hasSpaceAdmin = $xwiki.hasAccessLevel("admin", $context.user, "${doc.space}.WebPreferences"))
 #set($isReadOnly = $xwiki.isReadOnly())
-#set($spaceviewurl = $spaceDoc.getURL("view"))
-#set($viewurl = $doc.getURL("view"))
-#set($objuser = $docuser.getObject("XWiki.XWikiUsers",0))
+#set($spaceViewUrl = $spaceDoc.getURL("view"))
+#set($viewUrl = $doc.getURL("view"))
+#set($userObj = $!crtUserDoc.getObject("XWiki.XWikiUsers",0))
 ## =====================================================================================
 ## Advanced users are:
 ## - super admin
@@ -17,18 +16,18 @@
 ## =====================================================================================
 #if($context.user == "XWiki.superadmin")
   #set($isAdvancedUser = true)
-#elseif($isguest && $hasadmin)
+#elseif($isGuest && $hasAdmin)
   #set($isAdvancedUser = true)
-#elseif(!$objuser.getProperty("usertype").value)
+#elseif(!$userObj.getProperty("usertype").value)
   #set($isAdvancedUser = false)
 #else
-  #set($isAdvancedUser = ($objuser.getProperty("usertype").value == "Advanced"))
+  #set($isAdvancedUser = ($userObj.getProperty("usertype").value == "Advanced"))
 #end
 #set($parent ="<a href='$doc.getParentURL()'>${xwiki.getDocument($doc.parent).displayTitle}</a>")
 #if($tdoc)
-#set($headertitle = "<a href='$viewurl'>${tdoc.displayTitle}</a>")
+#set($headertitle = "<a href='$viewUrl'>${tdoc.displayTitle}</a>")
 #else
-#set($headertitle = "<a href='$viewurl'>${doc.displayTitle}</a>")
+#set($headertitle = "<a href='$viewUrl'>${doc.displayTitle}</a>")
 #end
 #set($skin=$xwiki.getSkin())
 #set($copyright=$xwiki.getWebCopyright())

@@ -1,0 +1,21 @@
+###
+### Document does not exist message
+###
+###
+$response.setStatus(404)
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#if($xwiki.exists("XWiki.DocumentDoesNotExist"))
+    $xwiki.includeForm("XWiki.DocumentDoesNotExist",false)
+#else
+#xwikimessageboxstart($msg.get("notice") $msg.get("thispagedoesnotexist"))
+#if($hasedit)
+#set($url = $doc.getURL("edit", $editparams))
+$xwiki.parseMessage("youcanclicktoedit")
+#end
+#template("recyclebinlist.vm")
+#xwikimessageboxend()
+#end
+<div class="clearfloats"></div>
+</div>
+#template("endpage.vm")

@@ -1226,10 +1226,15 @@ html > body #actionmenu{
   	font-size: 0.9em;
   	font-weight: bold;
 }
+#actionmenu div.leftmenu div:hover a,
 #actionmenu a:hover{
 	color:  #fff;
 	background-image: url( images/actionbar-bg-2.png );
 }
+#actionmenu div.leftmenu div:hover .submenu a{
+	background-image: none;
+}
+
 #actionmenu .editinfo a:hover{
 	color:  #fff;
 	background-image: url( toucan/images/ );
@@ -1250,6 +1255,10 @@ html > body #actionmenu{
   display: block;
   float: left;
 }
+#tmWatched a.tme{
+	color: #4cad1b;
+}
+
 .submenu{
   display: block;
   width: 10em;
@@ -1262,15 +1271,15 @@ html > body #actionmenu{
   background-color: transparent;
   background-image: url( images/b75.png );
 }
-.submenu.hidden{ display: none;}
+.submenu.hidden, .submenu .submenuseparator{ display: none;}
 #actionmenu .submenuitem a, #actionmenu .submenuitem a:link, #actionmenu .submenuitem a:visited, #actionmenu .submenuitem a:active  {
 display:block;
-width:10em;
+width:12em;
 font-size:0.8em;
 font-weight: bold;
 text-decoration:none; 
 height:auto; 
-padding:2px;
+padding:2px 2px 0px 2px;
 line-height:1.2em;
 border: 0;
 text-align: left;
@@ -1375,6 +1384,7 @@ html > body .xwikitabbar li{
 /* @group Panels */
 /* --------------------------------------- */
 /* --------------------------------------- */
+#panellistaccordion .Search #globalsearch,
 #leftPanels .Search #globalsearch,
 #rightPanels .Search #globalsearch {
   text-align: center;
@@ -1397,6 +1407,7 @@ padding:0px;
 }
 
 .xwikipanelcontents form{margin: 0;padding: 0px;}
+#panellistaccordion #globalsearch input,
 #leftPanels #globalsearch input,
 #rightPanels #globalsearch input{
   font-size: 0.9em;
@@ -1405,6 +1416,7 @@ padding:0px;
   display: inline !important;
   background-color: #fff;
 }
+#panellistaccordion  #globalsearch input.button,
 #leftPanels #globalsearch input.button,
 #rightPanels #globalsearch input.button{
   vertical-align: middle;
@@ -1631,7 +1643,12 @@ span.panelitem{  display: block;}
 	padding: 0;
 }
 
-.placeholder{width: 200px;}
+.placeholder{
+	width: 170px;
+	margin-left: 20px;
+		background-color: #fff;
+	opacity:  .1;
+}
 html > body #dragbox {width: 198px !important;}
 #xwikinavcontainer{ 
 margin : 0 0 0; 
@@ -1655,15 +1672,20 @@ span.pitemseparator{
     position: relative;
   float: left;
 }
-.panelitemc .label, .panelitemc .xwikibuttonlink{
+.panelitemc .label{
   text-align: center;
-	background-color: #555;
+background-color: transparent;
+padding: 2px 0;
+font-weight: bold;
 }
 .panelitemc .xwikibuttonlink{
   text-align: center;
-	background-color: #fff;
+	background-color: transparent;
+	border: 1px solid #fff;
+	border-top: 0px;
+	color: #eee;
 }
-
+.panelitemc .xwikibuttonlink a {color: #eee; padding: 0 5px;}
 .xwikipanelcontents dl dd {margin-bottom: 2em;}
 .xwikipanelcontents dl dt {font-size: 1.3em;font-weight: bold;}
 .xwikipanelcontents dl dd table#xwikiincludeddocuments td{
@@ -1705,6 +1727,7 @@ font:bold 1em/1.1em sans-serif;
 color: #FFF;
 background-color: #8799b3;
 }
+#panellistaccordion #xwikinav .accordionTabTitleBar h6,
 #xwikinav .accordionTabTitleBar h6{
 	background-color: #fff;
 	color: #333;
@@ -1716,11 +1739,6 @@ background-color: #8799b3;
 #xwikinavcontainer #xwikinav .tbexpanded h6 {
 	border-width: 1px 0;
 }
-
-
-
-
-
 
 #xwikieditcontent .accordionTabTitleBar h6{
 margin: 0px;
@@ -1736,6 +1754,14 @@ background-image: url( images/accordion.png );
 background-repeat: no-repeat;
 background-position: 0% 50%;
 }
+#panellistaccordion #xwikinav .accordionTabTitleBar h6{
+	background-image: none;
+	height: auto;
+	padding: 2px 3px;
+	font-weight: bold;
+}
+
+
 #editPanels .accordionTabContentBox{
   border: none;
   overflow: auto;
@@ -1764,6 +1790,10 @@ background-position: 0% 50%;
 	overflow: auto;
 	background-image: url( images/H4x4.png );
 }
+#panellistaccordion #xwikinav .accordionTabContentBox{
+	background-image: none;
+	overflow: hidden;
+	}
 #xwikinav ul.minus {
 margin: 0;
 padding: 0 5px;
@@ -2180,6 +2210,7 @@ border: 1px solid #ccc;
 text-align: center;
 }
 /* panels */
+#panellistaccordion input[type=text],#panellistaccordion textarea,
 #leftPanels input[type=text],#leftPanels textarea,
 #rightPanels input[type=text],#rightPanels textarea,
 #inline input[type=text],#inline textarea{

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,17 +35,17 @@ public final class XWikiLDAPConfig
     /**
      * LDAP properties names suffix in XWikiPreferences.
      */
-    public static final String PROP_LDAP_SUFFIX = "xwiki.authentication.ldap.";
+    public static final String PREF_LDAP_SUFFIX = "xwiki.authentication.ldap.";
 
     /**
      * LDAP port property name in XWikiPreferences.
      */
-    public static final String PROP_LDAP_PORT = "ldap_port";
+    public static final String PREF_LDAP_PORT = "ldap_port";
 
     /**
      * LDAP port property name in XWikiPreferences.
      */
-    public static final String PROP_LDAP_UID = "ldap_UID_attr";
+    public static final String PREF_LDAP_UID = "ldap_UID_attr";
 
     /**
      * Mapping fields separator.
@@ -88,7 +87,7 @@ public final class XWikiLDAPConfig
      */
     private XWikiLDAPConfig()
     {
-
+        
     }
 
     /**
@@ -107,17 +106,18 @@ public final class XWikiLDAPConfig
      * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name*
      * (for XWiki Preferences) will be changed to ldap.*name* for xwiki.cfg.
      * 
-     * @param name the name of the property.
+     * @param prefName the name of the property in XWikiPreferences.
+     * @param cfgName the name of the property in xwiki.cfg.
      * @param def default value.
      * @param context the XWiki context.
      * @return the value of the property.
      */
-    public String getLDAPParam(String name, String def, XWikiContext context)
+    public String getLDAPParam(String prefName, String cfgName, String def, XWikiContext context)
     {
         String param = def;
 
         try {
-            param = context.getWiki().getXWikiPreference(name, context);
+            param = context.getWiki().getXWikiPreference(prefName, context);
         } catch (Exception e) {
             // ignore
         }
@@ -125,8 +125,7 @@ public final class XWikiLDAPConfig
         if (param == null || "".equals(param)) {
             try {
                 param =
-                    context.getWiki().Param(
-                        StringUtils.replace(name, CFG_LDAP_SUFFIX, PROP_LDAP_SUFFIX));
+                    context.getWiki().Param(cfgName);
             } catch (Exception e) {
                 // ignore
             }
@@ -138,6 +137,20 @@ public final class XWikiLDAPConfig
 
         return param;
     }
+    
+    /**
+     * First try to retrieve value from XWiki Preferences and then from xwiki.cfg Syntax ldap_*name*
+     * (for XWiki Preferences) will be changed to ldap.*name* for xwiki.cfg.
+     * 
+     * @param name the name of the property in XWikiPreferences.
+     * @param def default value.
+     * @param context the XWiki context.
+     * @return the value of the property.
+     */
+    public String getLDAPParam(String name, String def, XWikiContext context)
+    {
+        return getLDAPParam(name, name.replace(PREF_LDAP_SUFFIX, CFG_LDAP_SUFFIX), def, context);
+    }
 
     /**
      * @param context the XWiki context.
@@ -145,24 +158,7 @@ public final class XWikiLDAPConfig
      */
     public boolean isLDAPEnabled(XWikiContext context)
     {
-        String param = "0";
-
-        try {
-            param = context.getWiki().getXWikiPreference("ldap", context);
-        } catch (Exception e) {
-            // ignore
-        }
-
-        if (param == null || "".equals(param)) {
-            try {
-                param =
-                    context.getWiki().Param(
-                        StringUtils.replace("xwiki.authentication.ldap", CFG_LDAP_SUFFIX,
-                            PROP_LDAP_SUFFIX));
-            } catch (Exception e) {
-                // ignore
-            }
-        }
+        String param = getLDAPParam("ldap", "xwiki.authentication.ldap", "0", context);
 
         return param != null && param.equals("1");
     }
@@ -180,7 +176,7 @@ public final class XWikiLDAPConfig
         try {
             port = context.getWiki().getXWikiPreferenceAsInt(CFG_LDAP_PORT, context);
         } catch (Exception e) {
-            port = (int) context.getWiki().ParamAsLong(PROP_LDAP_PORT, 0);
+            port = (int) context.getWiki().ParamAsLong(PREF_LDAP_PORT, 0);
         }
 
         return port;

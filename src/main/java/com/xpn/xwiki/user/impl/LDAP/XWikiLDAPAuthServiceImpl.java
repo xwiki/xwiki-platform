@@ -124,7 +124,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         XWikiLDAPConnection connector = new XWikiLDAPConnection();
         XWikiLDAPUtils ldapUtils = new XWikiLDAPUtils(connector);
 
-        ldapUtils.setUidAttributeName(config.getLDAPParam(XWikiLDAPConfig.PROP_LDAP_UID,
+        ldapUtils.setUidAttributeName(config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UID,
             LDAP_DEFAULT_UID, context));
 
         try {
@@ -196,7 +196,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // them
             if (userDN == null) {
                 String uidAttributeName =
-                    config.getLDAPParam(XWikiLDAPConfig.PROP_LDAP_UID, LDAP_DEFAULT_UID, context);
+                    config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UID, LDAP_DEFAULT_UID, context);
 
                 // search for the user in LDAP
                 String query =

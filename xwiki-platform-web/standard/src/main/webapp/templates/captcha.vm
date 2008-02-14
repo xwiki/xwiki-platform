@@ -1,8 +1,9 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("header.vm")
-#template("previewheader.vm")
-&nbsp;<div id="xwikicontent">
+###
+### CAPTCHA check page
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
 <form id="edit" method="post" action="$doc.getURL("save")">
 #if ($captchaPlugin)
   $captchaPlugin.displayCaptcha("edit","wiki_captcha")
@@ -23,6 +24,6 @@
 #template("hiddenobject.vm")
 </div>
 </form>
+<div class="clearfloats"></div>
 </div>
-#template("previewfooter.vm")
-#template("footer.vm")
+#template("endpage.vm")

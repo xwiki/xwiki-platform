@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="$xwiki.encoding" ?>
-#template("xwiki.vm")
+#template("xwikivars.vm")
 $response.setContentType("text/xml")
 $cdoc.getRenderedContent()

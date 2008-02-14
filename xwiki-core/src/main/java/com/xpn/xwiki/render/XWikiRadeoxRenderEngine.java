@@ -262,7 +262,7 @@ public class XWikiRadeoxRenderEngine extends BaseRenderEngine implements WikiRen
         buffer.append("<span class=\"wikilink\"><a href=\"#");
         buffer.append(anchor);
         buffer.append("\">");
-        if (view.length() == 0) view = Utils.decode(anchor, getXWikiContext());
+        if (view.length() == 0) view = Util.decodeURI(anchor, getXWikiContext());
         buffer.append(cleanText(view));
         buffer.append("</a></span>");
     }

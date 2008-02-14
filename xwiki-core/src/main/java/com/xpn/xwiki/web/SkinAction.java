@@ -20,19 +20,19 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-import java.util.Date;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.util.Util;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import java.io.IOException;
+import java.util.Date;
 
 /**
  * <p>
@@ -80,7 +80,7 @@ public class SkinAction extends XWikiAction
         boolean found = false;
         while (idx > 0) {
             try {
-                String filename = Utils.decode(path.substring(idx + 1), context);
+                String filename = Util.decodeURI(path.substring(idx + 1), context);
                 LOG.debug("Trying '" + filename + "'");
 
                 if (renderSkin(filename, doc, context)) {

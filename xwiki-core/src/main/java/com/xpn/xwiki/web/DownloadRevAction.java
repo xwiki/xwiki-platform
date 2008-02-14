@@ -5,6 +5,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.util.Util;
 
 import java.io.IOException;
 
@@ -15,7 +16,7 @@ public class DownloadRevAction extends XWikiAction {
         XWikiDocument doc = context.getDoc();
         String rev = request.getParameter("rev");
         String path = request.getRequestURI();
-        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
+        String filename = Util.decodeURI(path.substring(path.lastIndexOf("/")+1),context);
         XWikiAttachment attachment = null;
 
         if (request.getParameter("id")!=null) {

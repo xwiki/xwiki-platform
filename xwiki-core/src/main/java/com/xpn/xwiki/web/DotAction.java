@@ -23,6 +23,7 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.graphviz.GraphVizPlugin;
+import com.xpn.xwiki.util.Util;
 
 import java.io.IOException;
 
@@ -31,7 +32,7 @@ public class DotAction extends XWikiAction {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         String path = request.getRequestURI();
-        String filename = Utils.decode(path.substring(path.lastIndexOf("/")+1),context);
+        String filename = Util.decodeURI(path.substring(path.lastIndexOf("/")+1),context);
         try {
            ((GraphVizPlugin)context.getWiki().getPlugin("graphviz",context)).outputDotImageFromFile(filename, context);
         } catch (IOException e) {

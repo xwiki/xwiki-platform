@@ -23,6 +23,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 import java.util.ArrayList;
 
@@ -41,7 +42,7 @@ public class DeleteAttachmentAction extends XWikiAction
             // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
             // we want to use our own decoding.
             String requestUri = request.getRequestURI();
-            filename = Utils.decode(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
+            filename = Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
         }
 
         XWikiDocument newdoc = (XWikiDocument) doc.clone();

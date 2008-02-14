@@ -19,13 +19,14 @@
  */
 package com.xpn.xwiki.web;
 
-import java.io.IOException;
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.util.Util;
+
+import java.io.IOException;
 
 public class DownloadAction extends XWikiAction
 {
@@ -48,7 +49,7 @@ public class DownloadAction extends XWikiAction
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         String path = request.getRequestURI();
-        String filename = Utils.decode(getFileName(path, "download"), context);
+        String filename = Util.decodeURI(getFileName(path, "download"), context);
         XWikiAttachment attachment;
 
         if (request.getParameter("id") != null) {
@@ -74,7 +75,7 @@ public class DownloadAction extends XWikiAction
         response.setContentType(mimetype);
 
         String ofilename =
-            context.getWiki().getURLEncoded(attachment.getFilename()).replaceAll("\\+", " ");
+            Util.encodeURI(attachment.getFilename(), context).replaceAll("\\+", " ");
 
         // The inline attribute of Content-Disposition tells the browser that they should display
         // the downloaded file in the page (see http://www.ietf.org/rfc/rfc1806.txt for more

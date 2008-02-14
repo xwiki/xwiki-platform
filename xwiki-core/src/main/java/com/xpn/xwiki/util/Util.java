@@ -33,7 +33,8 @@ import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
 import java.util.*;
-
+import java.net.URLEncoder;
+import java.net.URLDecoder;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -62,6 +63,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.web.XWikiRequest;
+import com.novell.ldap.util.Base64;
 
 public class Util {
 
@@ -695,6 +697,46 @@ public class Util {
             url = url.replaceAll("\\*", "%2A");
         }
         return url;
+    }
+
+    /**
+     * API to make a text URI compliant
+     * @param text
+     * @param context
+     * @return encoded text
+     */
+    public static String encodeURI(String text, XWikiContext context)
+    {
+        try {
+            return URLEncoder.encode(text, context.getWiki().getEncoding());
+        } catch (Exception e) {
+            return text;
+        }
+    }
+
+    /**
+     * API to make readable an URI compliant text
+     * @param text
+     * @param context
+     * @return decoded text
+     */
+    public static String decodeURI(String text, XWikiContext context)
+    {
+        try {
+            // Make sure + is considered as a space
+            String result = text.replaceAll("\\+", " ");
+
+            // It seems Internet Explorer can send us back UTF-8
+            // instead of ISO-8859-1 for URLs
+            if (Base64.isValidUTF8(result.getBytes(), false)) {
+                result = new String(result.getBytes(), "UTF-8");
+            }
+
+            // Still need to decode URLs
+            return URLDecoder.decode(result, context.getWiki().getEncoding());
+        } catch (Exception e) {
+            return text;
+        }
     }
 
     /**

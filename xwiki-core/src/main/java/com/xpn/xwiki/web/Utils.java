@@ -424,7 +424,10 @@ public class Utils
         }
     }
 
-    // TODO: Duplicate of XWiki.getURLEncoded(). Keep only one
+    // TODO: Duplicate of Util.encodeURI(). Keep only one
+    /**
+     * @deprecated replaced by Util#encodeURI since 1.3M2
+     */
     public static String encode(String name, XWikiContext context)
     {
         try {
@@ -434,6 +437,10 @@ public class Utils
         }
     }
 
+    // TODO: Duplicate of Util.decodeURI(). Keep only one
+    /**
+     * @deprecated replaced by Util#decodeURI since 1.3M2
+     */
     public static String decode(String name, XWikiContext context)
     {
         try {

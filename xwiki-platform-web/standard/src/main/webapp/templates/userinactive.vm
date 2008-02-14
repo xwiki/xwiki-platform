@@ -1,23 +1,30 @@
-#template("xwiki.vm")
-#template("httpheader.vm")
-#template("header.vm")
-#template("baseheader.vm")
-<div id="xwikicontent">
-#if ($cause == "disabled")
-$msg.get("accountdisabled")
+###
+### User inactive message
+###
+###
+#template("startpage.vm")
+<div class="main layoutsubsection">
+#if($xwiki.exists("XWiki.UserInactive"))
+    $xwiki.includeForm("XWiki.UserInactive", false)
 #else
-$msg.get("accountnotactive")
-<br />
-$msg.get("accountnotactive_email")
-<br />
+#if ($cause == "disabled")
+#xwikimessageboxstart($msg.get("notice") $msg.get("accountdisabled"))
+#else
+#xwikimessageboxstart($msg.get("notice") $msg.get("accountnotactive"))
 #set($confirmdoc = $xwiki.getDocument("XWiki.RegisterNewUserConfirmation")) 
+#if(!$confirmdoc.isNew())
+$msg.get("accountnotactive_email")
 <form action="$confirmdoc.getURL("view")" method="post">
+<div>
 <input type="hidden" name="xwikiname" value="$context.user" />
 <input type="text" name="validkey" size="16" />
 <input type="submit" value="$msg.get("confirmaccount")" />
+</div>
 </form>
 #end
-
+#end
+#xwikimessageboxend()
+#end
+<div class="clearfloats"></div>
 </div>
-#template("basefooter.vm")
-#template("footer.vm")
+#template("endpage.vm")

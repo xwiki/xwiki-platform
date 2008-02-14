@@ -62,3 +62,4 @@
 #elseif($languageparams != "")
 #set($docvariant = "$languageparams")
 #end
+#template("deprecatedVars.vm")

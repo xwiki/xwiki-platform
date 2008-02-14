@@ -124,6 +124,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         XWikiLDAPConnection connector = new XWikiLDAPConnection();
         XWikiLDAPUtils ldapUtils = new XWikiLDAPUtils(connector);
 
+        ldapUtils.setUidAttributeName(config.getLDAPParam(XWikiLDAPConfig.PROP_LDAP_UID,
+            LDAP_DEFAULT_UID, context));
+
         try {
             // ////////////////////////////////////////////////////////////////////
             // 1. Check for superadmin
@@ -542,7 +545,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Adding user {0} to xwiki group {1}", new String[] {
-                userName, groupName}));
+                    userName, groupName}));
             }
 
             String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
@@ -575,7 +578,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         } catch (Exception e) {
             LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new String[] {
-            userName, groupName}), e);
+                userName, groupName}), e);
         }
     }
 

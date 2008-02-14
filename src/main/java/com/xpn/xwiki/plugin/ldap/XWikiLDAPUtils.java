@@ -24,6 +24,7 @@ package com.xpn.xwiki.plugin.ldap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,14 +78,19 @@ public class XWikiLDAPUtils
     private static final String LDAP_DEFAULT_UID = "cn";
 
     /**
+     * Contains caches for each LDAP host:port.
+     */
+    private static Map cachePool = new Hashtable();
+
+    /**
      * The LDAP connection.
      */
     private XWikiLDAPConnection connection;
 
     /**
-     * Contains caches for each ldap host:port.
+     * The LDAP attribute containing the identifier for a user.
      */
-    private Map cachePool = new HashMap();
+    private String uidAttributeName = LDAP_DEFAULT_UID;
 
     static {
         LDAP_GROUP_CLASS.add("group".toLowerCase());
@@ -109,7 +115,23 @@ public class XWikiLDAPUtils
     }
 
     /**
-     * Get the cache with the provided name for a particular ldap server.
+     * @param uidAttributeName the LDAP attribute containing the identifier for a user.
+     */
+    public void setUidAttributeName(String uidAttributeName)
+    {
+        this.uidAttributeName = uidAttributeName;
+    }
+
+    /**
+     * @return the LDAP attribute containing the identifier for a user.
+     */
+    public String getUidAttributeName()
+    {
+        return uidAttributeName;
+    }
+
+    /**
+     * Get the cache with the provided name for a particular LDAP server.
      * 
      * @param cacheName the name of the cache.
      * @param context the XWiki context.
@@ -118,18 +140,23 @@ public class XWikiLDAPUtils
      */
     public XWikiCache getCache(String cacheName, XWikiContext context) throws XWikiException
     {
-        XWikiCache cache = null;
+        XWikiCache cache;
 
         String cacheKey =
             connection.getConnection().getHost() + ":" + connection.getConnection().getPort();
 
-        Map cacheMap = (Map) cachePool.get(cacheKey);
+        Map cacheMap;
+
+        if (cachePool.containsKey(cacheKey)) {
+            cacheMap = (Map) cachePool.get(cacheKey);
+        } else {
+            cacheMap = new Hashtable();
+            cachePool.put(cacheKey, cacheMap);
+        }
 
         if (cacheMap.containsKey(cacheName)) {
             cache = (XWikiCache) cacheMap.get(cacheName);
-        }
-
-        if (cache == null) {
+        } else {
             cache = context.getWiki().getCacheService().newCache("ldap." + cacheName);
             cacheMap.put(cacheKey, cache);
         }
@@ -149,16 +176,15 @@ public class XWikiLDAPUtils
      * Execute LDAP query to get all group's members.
      * 
      * @param groupDN the group to retrieve the members of and scan for subgroups.
-     * @param uidAttributeName the attribute containing the identifier for a user.
      * @return the LDAP search result.
      */
-    private List searchGroupsMembers(String groupDN, String uidAttributeName)
+    private List searchGroupsMembers(String groupDN)
     {
         String[] attrs = new String[2 + LDAP_GROUP_MEMBER.size()];
 
         int i = 0;
         attrs[i++] = LDAP_OBJECTCLASS;
-        attrs[i++] = uidAttributeName;
+        attrs[i++] = getUidAttributeName();
         for (Iterator it = LDAP_GROUP_MEMBER.iterator(); it.hasNext();) {
             attrs[i++] = (String) it.next();
         }
@@ -211,11 +237,6 @@ public class XWikiLDAPUtils
     {
         boolean isGroup = false;
 
-        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
-
-        String uidAttributeName =
-            config.getLDAPParam(XWikiLDAPConfig.PROP_LDAP_UID, LDAP_DEFAULT_UID, context);
-
         String id = null;
 
         for (Iterator seachAttributeIt = searchAttributeList.iterator(); seachAttributeIt
@@ -230,14 +251,14 @@ public class XWikiLDAPUtils
                 if (LDAP_GROUP_CLASS.contains(objectName.toLowerCase())) {
                     isGroup = true;
                 }
-            } else if (key.equalsIgnoreCase(uidAttributeName)) {
+            } else if (key.equalsIgnoreCase(getUidAttributeName())) {
                 id = searchAttribute.value;
             }
         }
 
         if (!isGroup) {
             if (id == null) {
-                LOG.error("Could not find attribute " + uidAttributeName + " for LDAP dn "
+                LOG.error("Could not find attribute " + getUidAttributeName() + " for LDAP dn "
                     + groupDN);
             }
 
@@ -276,12 +297,7 @@ public class XWikiLDAPUtils
             return true;
         }
 
-        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
-
-        String uidAttributeName =
-            config.getLDAPParam(XWikiLDAPConfig.PROP_LDAP_UID, LDAP_DEFAULT_UID, context);
-
-        List searchAttributeList = searchGroupsMembers(groupDN, uidAttributeName);
+        List searchAttributeList = searchGroupsMembers(groupDN);
 
         if (searchAttributeList != null) {
             isGroup =
@@ -325,7 +341,9 @@ public class XWikiLDAPUtils
                 LOG.debug("Retrieving Members of the group: " + groupDN);
             }
 
-            if (getGroupMembers(groupDN, groupMembers, new ArrayList(), context)) {
+            boolean isGroup = getGroupMembers(groupDN, groupMembers, new ArrayList(), context);
+
+            if (isGroup) {
                 synchronized (cache) {
                     cache.putInCache(groupDN, groupMembers);
                 }
@@ -348,15 +366,7 @@ public class XWikiLDAPUtils
     {
         String result = null;
 
-        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
-
-        String uidAttributeName =
-            config.getLDAPParam(XWikiLDAPConfig.PROP_LDAP_UID, LDAP_DEFAULT_UID, context);
-        if (uidAttributeName == null || uidAttributeName.length() == 0) {
-            uidAttributeName = LDAP_DEFAULT_UID;
-        }
-
-        String ldapuser = uidAttributeName + "=" + userName.toLowerCase();
+        String ldapuser = getUidAttributeName() + "=" + userName.toLowerCase();
 
         for (Iterator it = groupMembers.keySet().iterator(); it.hasNext();) {
             String u = (String) it.next();

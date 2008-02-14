@@ -238,18 +238,6 @@ public class XWiki extends Api
     }
 
     /**
-     * Transform a text in a URL compatible text
-     * 
-     * @param content text to transform
-     * @return encoded result
-     */
-
-    public String getURLEncoded(String content)
-    {
-        return xwiki.getURLEncoded(content);
-    }
-
-    /**
      * Transform a text in a XML compatible text
      * 
      * @param content text to transform

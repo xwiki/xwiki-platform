@@ -33,7 +33,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -1181,8 +1180,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (name.equals(""))
             name = "WebHome";
 
-        web = Utils.decode(web, context);
-        name = Utils.decode(name, context);
+        web = Util.decodeURI(web, context);
+        name = Util.decodeURI(name, context);
         String fullname = web + "." + name;
         return fullname;
     }
@@ -1245,15 +1244,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         filter.removeAttribute("'");
         String scontent = filter.process(content);
         return scontent;
-    }
-
-    public String getURLEncoded(String content)
-    {
-        try {
-            return URLEncoder.encode(content, this.getEncoding());
-        } catch (UnsupportedEncodingException e) {
-            return content;
-        }
     }
 
     public static String getXMLEncoded(String content)

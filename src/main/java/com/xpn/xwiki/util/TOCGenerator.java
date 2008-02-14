@@ -107,7 +107,7 @@ public class TOCGenerator {
   }
 
   public static String makeHeadingID (String text, int occurence, XWikiContext context) {
-    text = "H" + context.getWiki().getURLEncoded(text);
+    text = "H" + Util.encodeURI(text, context);
     text = text.replaceAll("[^a-zA-Z0-9]", "");
         
     if (occurence > 0) {

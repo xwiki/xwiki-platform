@@ -21,10 +21,10 @@
 
 package com.xpn.xwiki.plugin.packaging;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.util.Util;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -164,7 +164,7 @@ public class PackageAPI   extends Api {
     public String export() throws IOException, XWikiException {
         getXWikiContext().getResponse().setContentType("application/zip");
         getXWikiContext().getResponse().addHeader("Content-disposition", "attachment; filename="
-            + getXWikiContext().getWiki().getURLEncoded(plugin.getName()) + ".xar");
+            + Util.encodeURI(plugin.getName(), context) + ".xar");
         getXWikiContext().setFinished(true);
         return  plugin.export(getXWikiContext().getResponse().getOutputStream(), getXWikiContext());
     }

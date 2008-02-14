@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package com.xpn.xwiki.aspect.compatibility;
+package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.api.Util;
@@ -30,7 +30,7 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 
 /**
- * Add a backwrad compatibility layer to the {@link com.xpn.xwiki.api.XWiki} class.
+ * Add a backward compatibility layer to the {@link com.xpn.xwiki.api.XWiki} class.
  *
  * @version $Id: $
  */
@@ -50,7 +50,7 @@ public privileged aspect XWikiCompatibilityAspect
 
     after(XWiki x): xwikiCreation(x)
     {
-        x.util = new Util(x.xwiki, x.context); 
+        x.util = new Util(x.xwiki, x.context);
     }
 
     /**
@@ -417,7 +417,7 @@ public privileged aspect XWikiCompatibilityAspect
      *
      * @param text the text to parse
      * @return a string with accents replaced with their alpha equivalent
-     * @deprecated replaced by {@link Util#clearAccents(String)} since 1.3M2 
+     * @deprecated replaced by {@link Util#clearAccents(String)} since 1.3M2
      */
     public String XWiki.clearAccents(String text)
     {

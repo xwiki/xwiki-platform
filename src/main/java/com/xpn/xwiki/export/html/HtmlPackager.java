@@ -15,6 +15,7 @@ import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
@@ -229,7 +230,7 @@ public class HtmlPackager
     {
         context.getResponse().setContentType("application/zip");
         context.getResponse().addHeader("Content-disposition",
-            "attachment; filename=" + context.getWiki().getURLEncoded(name) + ".zip");
+            "attachment; filename=" + Util.encodeURI(name, context) + ".zip");
         context.setFinished(true);
 
         ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());

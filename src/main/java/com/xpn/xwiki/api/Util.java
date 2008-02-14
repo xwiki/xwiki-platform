@@ -80,6 +80,29 @@ public class Util extends Api
     }
 
     /**
+     * Make a text URI compliant
+     * @param text the non encoded text
+     * @return encoded text
+     * @since 1.3 Milestone 2
+     */
+    public String encodeURI(String text)
+    {
+        return com.xpn.xwiki.util.Util.encodeURI(text, context);
+    }
+
+    /**
+     * Make an URI compliant text readable
+     * @param text the encoded text
+     * @return decoded text
+     * @since 1.3 Milestone 2
+     */
+    public String decodeURI(String text)
+    {
+        return com.xpn.xwiki.util.Util.decodeURI(text, context);
+    }
+    
+
+    /**
      * Creates an Array List. This is useful from Velocity since you cannot create Object from
      * Velocity with our secure uberspector.
      * 

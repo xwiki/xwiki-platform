@@ -26,6 +26,7 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 import org.apache.velocity.VelocityContext;
 
 public class ViewAttachRevAction extends XWikiAction {
@@ -38,7 +39,7 @@ public class ViewAttachRevAction extends XWikiAction {
         if (context.getMode() == XWikiContext.MODE_PORTLET)
             filename = request.getParameter("filename");
         else
-            filename = Utils.decode(path.substring(path.lastIndexOf("/") + 1), context);
+            filename = Util.decodeURI(path.substring(path.lastIndexOf("/") + 1), context);
 
         XWikiAttachment attachment = null;
         if (request.getParameter("id") != null) {

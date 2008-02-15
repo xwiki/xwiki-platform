@@ -16,7 +16,7 @@
 </div>
 
 <table id="userstable">
-<tr><td colspan="2" id="showLimits"></td></tr>
+<tr><td colspan="3" id="showLimits"></td></tr>
 <tr>
  <td style="width:100%;"><table class="display" cellpadding="3">
         <thead class="theader">
@@ -43,7 +43,7 @@
  </td>
  <td id="buff"></td>
  </tr>
- <tr><td colspan="2" id="tdAddNewUserOrGroup">
+ <tr><td colspan="3" id="tdAddNewUserOrGroup">
  <a href="#" id="addNewUser" class="addNewUserOrGroup">$msg.get("rightsmanager.addnewuser")</a>
  </td></tr>
  </table>

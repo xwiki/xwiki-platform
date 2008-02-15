@@ -14,7 +14,7 @@
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
 <table id="groupstable">
-<tr><td colspan="2" id="showLimits"></td></tr>
+<tr><td colspan="3" id="showLimits"></td></tr>
 <tr><td style="width: 100%;">
       <table class="display" cellpadding="3">
        <thead class="theader">
@@ -43,7 +43,7 @@
     </td>
     <td id="buff"></td>
 </tr>
-<tr><td colspan="2" id="tdAddNewUserOrGroup">
+<tr><td colspan="3" id="tdAddNewUserOrGroup">
 <a href="#" id="addNewGroup">$msg.get("rightsmanager.addnewgroup")</a>
 </td></tr>
 </table>

@@ -5,7 +5,7 @@
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
 <table id="memberstable">
-<tr><td colspan="2" id="showLimits"></td></tr>
+<tr><td colspan="3" id="showLimits"></td></tr>
 <tr><td>
       <table class="display">
        <thead class="theader">

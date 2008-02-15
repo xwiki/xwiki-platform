@@ -134,6 +134,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public void setupCookie(Cookie cookie, boolean sessionCookie, String cookieDomain,
         HttpServletResponse response)
     {
+        cookie.setVersion(1);
         if (!sessionCookie) {
             setMaxAge(cookie);
         }

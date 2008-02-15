@@ -273,35 +273,39 @@ function start1() {
     pos = window.allPanelsPlace[i]['left'];
     if (pos != -1){
       el = panelsOnLeft[pos];
-      el.fullname=window.allPanelsPlace[i].fullname;
-      el.placeholder = document.createElement("div");
-      el.placeholder.className="placeholder";
-      if(window.ActiveXObject) {
-        el.displayHeight = (el.offsetHeight ? (el.offsetHeight) : 0);
+      if (el) {
+        el.fullname=window.allPanelsPlace[i].fullname;
+        el.placeholder = document.createElement("div");
+        el.placeholder.className="placeholder";
+        if(window.ActiveXObject) {
+          el.displayHeight = (el.offsetHeight ? (el.offsetHeight) : 0);
+        }
+        else {
+          el.displayHeight = (el.offsetHeight ? (el.offsetHeight-2) : 0);
+        }
+        el.placeholder.style.height = (el.displayHeight) +"px";
+        el.placeholder.style.display = "block";
+        panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
       }
-      else {
-        el.displayHeight = (el.offsetHeight ? (el.offsetHeight-2) : 0);
-      }
-      el.placeholder.style.height = (el.displayHeight) +"px";
-      el.placeholder.style.display = "block";
-      panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
     }
     pos = window.allPanelsPlace[i]['right'];
     if (pos != -1){
       el = panelsOnRight[pos];
-      el.fullname=window.allPanelsPlace[i].fullname;
-      el.placeholder = document.createElement("div");
-      el.placeholder.className="placeholder";
-      if(window.ActiveXObject) {
-        el.displayHeight = (el.offsetHeight ? (el.offsetHeight) : 0);
-      }
-      else {
-        el.displayHeight = (el.offsetHeight ? (el.offsetHeight-2) : 0);
-      }
-      el.placeholder.style.height = (el.displayHeight) +"px";
-      el.placeholder.style.display = "block";
-      if(panelsInList[i].parentNode) {
-        panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
+      if (el) {
+        el.fullname=window.allPanelsPlace[i].fullname;
+        el.placeholder = document.createElement("div");
+        el.placeholder.className="placeholder";
+        if(window.ActiveXObject) {
+          el.displayHeight = (el.offsetHeight ? (el.offsetHeight) : 0);
+        }
+        else {
+          el.displayHeight = (el.offsetHeight ? (el.offsetHeight-2) : 0);
+        }
+        el.placeholder.style.height = (el.displayHeight) +"px";
+        el.placeholder.style.display = "block";
+        if(panelsInList[i].parentNode) {
+          panelsInList[i].parentNode.replaceChild(el.placeholder, panelsInList[i]);
+        }
       }
     }
     panelsInList[i].fullname=window.allPanelsPlace[i].fullname;

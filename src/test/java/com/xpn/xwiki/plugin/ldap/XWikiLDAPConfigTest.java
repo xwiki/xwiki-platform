@@ -25,7 +25,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.jmock.cglib.MockObjectTestCase;
+import junit.framework.TestCase;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.XWikiEngineContext;
  * 
  * @version $Id: $
  */
-public class XWikiLDAPConfigTest extends MockObjectTestCase
+public class XWikiLDAPConfigTest extends TestCase
 {
     private XWikiContext prefContext;
 

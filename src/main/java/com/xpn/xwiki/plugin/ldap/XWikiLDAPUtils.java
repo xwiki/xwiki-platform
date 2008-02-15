@@ -158,7 +158,7 @@ public class XWikiLDAPUtils
             cache = (XWikiCache) cacheMap.get(cacheName);
         } else {
             cache = context.getWiki().getCacheService().newCache("ldap." + cacheName);
-            cacheMap.put(cacheKey, cache);
+            cacheMap.put(cacheName, cache);
         }
 
         return cache;

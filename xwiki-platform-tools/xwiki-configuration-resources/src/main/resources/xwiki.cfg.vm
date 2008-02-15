@@ -108,7 +108,7 @@ xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
 ## base DN for searches
 xwiki.authentication.ldap.base_DN=
 
-## specifies the LDAP attribute containg the identifier to be used as the XWiki name (default=cn)
+## specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
 xwiki.authentication.ldap.UID_attr=cn
 
 ## retrieve the following fields from LDAP and store them in the XWiki user object (xwiki-attribute=ldap-attribute)
@@ -120,9 +120,9 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,fulln
 # xwiki.authentication.ldap.update_user=1
 
 ## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-## mapps XWiki groups to LDAP groups, Starting with 1
-# xwiki.authentication.ldap.group_mapping_1=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US
-# xwiki.authentication.ldap.group_mapping_2=XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
+## mapps XWiki groups to LDAP groups, separator is "|"
+# xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
+#                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
 
 ## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
 ## time in s after which the list of members in a group is refreshed from LDAP (default=3600*6)

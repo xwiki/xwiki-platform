@@ -2529,6 +2529,27 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |=
             bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
 
+        // LDAP
+        needsUpdate |= bclass.addBooleanField("ldap", "Ldap", "yesno");
+        needsUpdate |= bclass.addTextField("ldap_server", "Ldap server adress", 60);
+        needsUpdate |= bclass.addNumberField("ldap_port", "Ldap server port", 5, "int");
+        needsUpdate |= bclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
+        needsUpdate |= bclass.addTextField("ldap_bind_pass", "Ldap password matching", 60);
+        needsUpdate |= bclass.addTextField("ldap_user_group", "Ldap group filter", 60);
+        needsUpdate |= bclass.addTextField("ldap_base_DN", "Ldap base DN", 60);
+        needsUpdate |= bclass.addTextField("ldap_UID_attr", "Ldap base DN", 60);
+        needsUpdate |= bclass.addTextField("ldap_fields_mapping", "Ldap user fiels mapping", 60);
+        needsUpdate |=
+            bclass.addBooleanField("ldap_update_user", "Update user from LDAP", "yesno");
+        needsUpdate |= bclass.addTextField("group_mapping", "Ldap groups mapping", 80);
+        needsUpdate |=
+            bclass.addNumberField("ldap_groupcache_expiration", "LDAP groups members cache", 10,
+                "long");
+        needsUpdate |=
+            bclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode",
+                "always|create");
+        needsUpdate |= bclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
+        
         if (((BooleanClass) bclass.get("showLeftPanels")).getDisplayType().equals("checkbox")) {
             ((BooleanClass) bclass.get("showLeftPanels")).setDisplayType("yesno");
             ((BooleanClass) bclass.get("showRightPanels")).setDisplayType("yesno");

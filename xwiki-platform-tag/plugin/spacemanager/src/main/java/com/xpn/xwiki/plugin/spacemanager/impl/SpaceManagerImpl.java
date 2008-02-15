@@ -1591,7 +1591,13 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements
 			toUsers = (String[]) admins.toArray(new String[admins.size()]);
 		} else if (SpaceAction.JOIN.equals(action)) {
 			// send join group confirmation e-mail
-			toUsers = new String[] { context.getUser() };
+            SpaceUserProfile profile =
+                getSpaceUserProfile(space.getSpaceName(), context.getUser(), context);
+            if (profile != null && profile.getAllowNotifications()) {
+                toUsers = new String[] {context.getUser()};
+            } else {
+                return;
+            }
 		}
 
 		if (fromUser == null) {

@@ -182,14 +182,6 @@ public class DBListClass extends ListClass
     {
         // First, get the hql query entered by the user.
         String sql = getSql();
-        try {
-            // TODO Why is it rendered? It is already parsed in the end, and I don't think it should
-            // also be rendered by Radeox.
-            sql = context.getDoc().getRenderedContent(sql, context);
-        } catch (Exception e) {
-            LOG.warn("Failed to render SQL script [" + sql + "]. Internal error ["
-                + e.getMessage() + "]. Continuing with non-rendered script.");
-        }
         // If the query field is blank, construct a query using the classname, idField and
         // valueField properties.
         if (StringUtils.isBlank(sql)) {
@@ -234,11 +226,10 @@ public class DBListClass extends ListClass
                 // The object is needed if there is a classname, or if at least one of the selected
                 // columns is an object property.
                 boolean usesObj =
-                    !StringUtils.isBlank(classname) || idField.startsWith("obj.")
-                        || valueField.startsWith("obj.");
+                    hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.");
                 // The document is needed if one of the selected columns is a document property, or
-                // if there is no classname specified and at least one of the selected columns is a
-                // document property.
+                // if there is no classname specified and at least one of the selected columns is
+                // not an object property.
                 boolean usesDoc = idField.startsWith("doc.") || valueField.startsWith("doc.");
                 if ((!idField.startsWith("obj.") || (hasValueField && !valueField
                     .startsWith("obj.")))
@@ -307,7 +298,13 @@ public class DBListClass extends ListClass
         }
         // Parse the query, so that it can contain velocity scripts, for example to use the
         // current document name, or the current username.
-        return context.getWiki().parseContent(sql, context);
+        try {
+            sql = context.getWiki().parseContent(sql, context);
+        } catch (Exception e) {
+            LOG.warn("Failed to parse SQL script [" + sql + "]. Internal error ["
+                + e.getMessage() + "]. Continuing with non-rendered script.");
+        }
+        return sql;
     }
 
     public String getSql()

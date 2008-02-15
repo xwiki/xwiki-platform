@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.xhtml.option;
@@ -39,6 +40,9 @@ import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
+/**
+ * @version $Id: $
+ */
 public class DBTreeListClass extends DBListClass
 {
     private static final Log LOG = LogFactory.getLog(DBTreeListClass.class);
@@ -306,77 +310,190 @@ public class DBTreeListClass extends DBListClass
         buffer.append(select.toString());
     }
 
+    /**
+     * <p>
+     * Computes the query corresponding to the current XProperty. The query is either manually
+     * specified by the XClass creator in the <tt>sql</tt> field, or, if the query field is blank,
+     * constructed using the <tt>classname</tt>, <tt>idField</tt>, <tt>valueField</tt> and
+     * <tt>parentField</tt> properties. The query is constructed according to the following rules:
+     * </p>
+     * <ul>
+     * <li>If no classname, id and value fields are selected, return a query that return no rows,
+     * as the parent is not enough to make a query.</li>
+     * <li>If no parent field is provided, use the document "parent" medatada.</li>
+     * <li>If only the classname is provided, select all document names which have an object of
+     * that type, preserving the hierarchy defined by the parent field.</li>
+     * <li>If only one of id and value is provided, use it for both columns.</li>
+     * <li>If no classname is provided, assume the fields are document properties.</li>
+     * <li>If the document is not used at all, don't put it in the query.</li>
+     * <li>If the object is not used at all, don't put it in the query.</li>
+     * </ul>
+     * <p>
+     * The generated query always selects 3 columns, the first one is used as the stored value, the
+     * second one as the displayed value, and the third one defines the "parent" of the current
+     * value.
+     * </p>
+     * 
+     * @param context The current {@link XWikiContext context}.
+     * @return The HQL query corresponding to this property.
+     */
     public String getQuery(XWikiContext context)
     {
+        // First, get the hql query entered by the user.
         String sql = getSql();
-        try {
-            sql = context.getDoc().getRenderedContent(sql, context);
-        } catch (Exception e) {
-            LOG.warn("Failed to render SQL script [" + sql + "]. Internal error ["
-                + e.getMessage() + "]. Continuing with non-rendered script.");
-        }
-        if ((sql == null) || (sql.trim().equals(""))) {
-            String classname = getClassname();
-            String idField = getIdField();
-            String valueField = getValueField();
-            if ((valueField == null) || (valueField.trim().equals(""))) {
-                valueField = idField;
-            }
+        // If the query field is blank, construct a query using the classname, idField,
+        // valueField and parentField properties.
+        if (StringUtils.isBlank(sql)) {
             if (context.getWiki().getHibernateStore() != null) {
-                StringBuffer select = new StringBuffer("select ");
-                StringBuffer tables =
-                    new StringBuffer(" from XWikiDocument as doc, BaseObject as obj");
-                StringBuffer where =
-                    new StringBuffer(" where doc.fullName=obj.name and obj.className='");
-                where.append(classname).append("'");
+                // Extract the 3 properties in non-null variables.
+                String classname = StringUtils.defaultString(getClassname());
+                String idField = StringUtils.defaultString(getIdField());
+                String valueField = StringUtils.defaultString(getValueField());
+                String parentField = StringUtils.defaultString(getParentField());
 
-                if (idField.startsWith("doc.") || idField.startsWith("obj.")) {
-                    select.append(idField);
-                } else {
-                    select.append("idprop.value");
-                    tables.append(", StringProperty as idprop");
-                    where.append(" and obj.id=idprop.id.id and idprop.id.name='").append(idField)
-                        .append("'");
+                // Check if the properties are specified or not.
+                boolean hasClassname = !StringUtils.isBlank(classname);
+                boolean hasIdField = !StringUtils.isBlank(idField);
+                boolean hasValueField = !StringUtils.isBlank(valueField);
+                boolean hasParentField = !StringUtils.isBlank(parentField);
+
+                if (!(hasIdField || hasValueField)) {
+                    // If only the classname is specified, return a query that selects all the
+                    // document names which have an object of that type, and the hierarchy is
+                    // defined by the document "parent" property (unless a parent property is
+                    // specified).
+                    if (hasClassname) {
+                        sql =
+                            "select distinct doc.fullName, doc.fullName, "
+                                + (hasParentField ? parentField : "doc.parent")
+                                + " from XWikiDocument as doc, BaseObject as obj"
+                                + " where doc.fullName=obj.name and obj.className='" + classname
+                                + "'";
+                    } else {
+                        // If none of the first 3 properties is specified, return a query that
+                        // always returns no rows (only with the parent field no query can be made)
+                        sql = DEFAULT_QUERY;
+                    }
+                    return sql;
                 }
 
-                if (valueField.startsWith("doc.") || valueField.startsWith("obj.")) {
-                    select.append(", ").append(valueField);
-                } else {
-                    if (idField.equals(valueField)) {
-                        select.append(", idprop.value");
-                    } else {
-                        select.append(", valueprop.value");
-                        tables.append(", StringProperty as valueprop");
-                        where.append(" and obj.id=valueprop.id.id and valueprop.id.name='")
-                            .append(valueField).append("'");
+                // If only one of the id and value fields is specified, use it for both columns.
+                if (!hasIdField && hasValueField) {
+                    idField = valueField;
+                } else if (hasIdField && !hasValueField) {
+                    valueField = idField;
+                }
+
+                // If no parent field was specified, use the document "parent" metadata
+                if (!hasParentField) {
+                    parentField = "doc.parent";
+                }
+
+                // Check if the document and object are needed or not.
+                // The object is needed if there is a classname, or if at least one of the selected
+                // columns is an object property.
+                boolean usesObj =
+                    hasClassname || idField.startsWith("obj.") || valueField.startsWith("obj.")
+                        || parentField.startsWith("obj.");
+                // The document is needed if one of the selected columns is a document property, or
+                // if there is no classname specified and at least one of the selected columns is
+                // not an object property.
+                boolean usesDoc =
+                    idField.startsWith("doc.") || valueField.startsWith("doc.")
+                        || parentField.startsWith("doc.");
+                if ((!idField.startsWith("obj.") || !valueField.startsWith("obj.") || !parentField
+                    .startsWith("obj."))
+                    && !hasClassname) {
+                    usesDoc = true;
+                }
+
+                // Build the query in this variable.
+                StringBuffer select = new StringBuffer("select distinct ");
+                // These will hold the components of the from and where parts of the query.
+                ArrayList fromStatements = new ArrayList();
+                ArrayList whereStatements = new ArrayList();
+
+                // Add the document to the query only if it is needed.
+                if (usesDoc) {
+                    fromStatements.add("XWikiDocument as doc");
+                    if (usesObj) {
+                        whereStatements.add("doc.fullName=obj.name");
+                    }
+                }
+                // Add the object to the query only if it is needed.
+                if (usesObj) {
+                    fromStatements.add("BaseObject as obj");
+                    if (hasClassname) {
+                        whereStatements.add("obj.className='" + classname + "'");
                     }
                 }
 
-                // DBTreeList specific part
-                String parentField = getParentField();
+                // Add the first column to the query.
+                if (idField.startsWith("doc.") || idField.startsWith("obj.")) {
+                    select.append(idField);
+                } else if (!hasClassname) {
+                    select.append("doc." + idField);
+                } else {
+                    select.append("idprop.value");
+                    fromStatements.add("StringProperty as idprop");
+                    whereStatements.add("obj.id=idprop.id.id and idprop.id.name='" + idField
+                        + "'");
+                }
+
+                // Add the second column to the query.
+                if (valueField.startsWith("doc.") || valueField.startsWith("obj.")) {
+                    select.append(", ").append(valueField);
+                } else if (!hasClassname) {
+                    select.append(", doc." + valueField);
+                } else {
+                    if (valueField.equals(idField)) {
+                        select.append(", idprop.value");
+                    } else {
+                        select.append(", valueprop.value");
+                        fromStatements.add("StringProperty as valueprop");
+                        whereStatements.add("obj.id=valueprop.id.id and valueprop.id.name='"
+                            + valueField + "'");
+                    }
+                }
+
+                // Add the third column to the query.
                 if (parentField.startsWith("doc.") || parentField.startsWith("obj.")) {
                     select.append(", ").append(parentField);
+                } else if (!hasClassname) {
+                    select.append(", doc." + parentField);
                 } else {
-                    if (idField.equals(parentField)) {
+                    if (parentField.equals(idField)) {
                         select.append(", idprop.value");
-                    } else if (valueField.equals(parentField)) {
+                    } else if (parentField.equals(valueField)) {
                         select.append(", valueprop.value");
                     } else {
                         select.append(", parentprop.value");
-                        tables.append(", StringProperty as parentprop");
-                        where.append(" and obj.id=parentprop.id.id and parentprop.id.name='")
-                            .append(parentField).append("'");
+                        fromStatements.add("StringProperty as parentprop");
+                        whereStatements.add("obj.id=parentprop.id.id and parentprop.id.name='"
+                            + parentField + "'");
                     }
                 }
-
-                // Let's create the sql
-                sql = select.append(tables).append(where).toString();
+                // Let's create the complete query
+                select.append(" from ");
+                select.append(StringUtils.join(fromStatements.iterator(), ", "));
+                if (whereStatements.size() > 0) {
+                    select.append(" where ");
+                    select.append(StringUtils.join(whereStatements.iterator(), " and "));
+                }
+                sql = select.toString();
             } else {
                 // TODO: query plugin impl.
                 // We need to generate the right query for the query plugin
             }
-
         }
-        return context.getWiki().parseContent(sql, context);
+        // Parse the query, so that it can contain velocity scripts, for example to use the
+        // current document name, or the current username.
+        try {
+            sql = context.getWiki().parseContent(sql, context);
+        } catch (Exception e) {
+            LOG.warn("Failed to parse SQL script [" + sql + "]. Internal error ["
+                + e.getMessage() + "]. Continuing with non-rendered script.");
+        }
+        return sql;
     }
 }

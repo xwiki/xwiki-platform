@@ -49,7 +49,7 @@ public class TOCGenerator
         int previousNumbers[] = {0, 0, 0, 0, 0, 0, 0};
 
         Pattern pattern =
-            Pattern.compile("^[\\p{Space}]*(1(\\.1)*)[\\p{Space}]+(.*?)$", Pattern.MULTILINE);
+            Pattern.compile("(?-s)^[ \\t]*+(1(\\.1){0,5}+)[ \\t]++(.++)$", Pattern.MULTILINE);
         Matcher matcher = pattern.matcher(content);
         while (matcher.find()) {
             int level = (matcher.group(1).lastIndexOf("1") + 2) / 2;

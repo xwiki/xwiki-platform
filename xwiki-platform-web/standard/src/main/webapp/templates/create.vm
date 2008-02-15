@@ -19,7 +19,7 @@
 #set($pcontent = "#")
 #set($pcontent = $pcontent.concat("panelheader('${title}')${xwiki.getNl()}${xwiki.getNl()}#"))
 #set($pcontent = $pcontent.concat("panelfooter()"))
-#set($pcontent = $xwiki.getURLEncoded($pcontent))
+#set($pcontent = $util.encodeURL($pcontent))
 $response.sendRedirect($newdoc.getURL("inline", "template=${template}&Panels.PanelClass_0_name=${title}&Panels.PanelClass_0_content=$pcontent"))
 #else
 $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
@@ -48,12 +48,12 @@ $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
 ##$newdoc.getURL("edit", "template=${template}&parent=${parent}$auxparams"))
 #if($newdoc.isNew())
 #if($tocreate == "post")
-#set($etitle = $xwiki.getURLEncoded($title))
+#set($etitle = $util.encodeURI($title))
 $response.sendRedirect($newdoc.getURL("inline", "parent=Blog.WebHome&template=XWiki.ArticleClassTemplate&XWiki.ArticleClass_0_title=$etitle"))
 #else
-#set($etitle = $xwiki.getURLEncoded($title))
-#set($etemplate = $xwiki.getURLEncoded("${template}"))
-#set($eparent = $xwiki.getURLEncoded("${parent}${auxparams}"))
+#set($etitle = $util.encodeURI($title))
+#set($etemplate = $util.encodeURI("${template}"))
+#set($eparent = $util.encodeURI("${parent}${auxparams}"))
 $response.sendRedirect($newdoc.getURL("edit", "template=${etemplate}&parent=${eparent}&title=$etitle"))
 #end
 #else
@@ -77,7 +77,7 @@ $response.sendRedirect($newdoc.getURL("view", "xpage=docalreadyexists"))
 ## #set($pcontent = "#")
 ## #set($pcontent = $pcontent.concat("panelheader('${title}')${xwiki.getNl()}${xwiki.getNl()}#"))
 ## #set($pcontent = $pcontent.concat("panelfooter()"))
-## #set($pcontent = $xwiki.getURLEncoded($pcontent))
+## #set($pcontent = $util.encodeURI($pcontent))
 ## $pcontent
 ## $response.sendRedirect($newdoc.getURL("inline", "template=${template}&Panels.PanelClass_0_name=${title}&Panels.PanelClass_0_content=$pcontent"))
 ## #else

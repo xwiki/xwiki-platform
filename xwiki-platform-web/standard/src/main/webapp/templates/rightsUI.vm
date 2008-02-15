@@ -171,7 +171,7 @@ var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.ge
         <td>$!doc.displayEdit($class.groups,"${class.name}_${obj.number}_",$obj)</td>
         <td>$!doc.displayEdit($class.levels,"${class.name}_${obj.number}_",$obj)</td>
         <td>$!doc.displayEdit($class.allow,"${class.name}_${obj.number}_",$obj)</td>
-        <td class="xwikibuttonlink"><a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${xwiki.getURLEncoded($redirect)}")" onclick="return confirm('$msg.get("confirmobjectremove")')">$msg.get("Remove")</a></td>
+        <td class="xwikibuttonlink"><a href="$doc.getURL("objectremove", "classname=${class.name}&amp;classid=${obj.number}&amp;xredirect=${util.encodeURI($redirect)}")" onclick="return confirm('$msg.get("confirmobjectremove")')">$msg.get("Remove")</a></td>
     </tr>
 #end
   </table>

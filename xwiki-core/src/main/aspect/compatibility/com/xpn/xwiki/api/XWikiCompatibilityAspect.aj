@@ -462,4 +462,16 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return this.util.add(a,  b);
     }
+
+    /**
+     * Transform a text in a URL compatible text
+     * 
+     * @param content text to transform
+     * @return encoded result
+     * @deprecated replaced by {@link Util#encodeURI(String)} since 1.3M2
+     */
+    public String XWiki.getURLEncoded(String content)
+    {
+        return this.util.encodeURI(content);
+    }
 }

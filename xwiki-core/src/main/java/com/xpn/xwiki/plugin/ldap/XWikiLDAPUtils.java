@@ -308,7 +308,7 @@ public class XWikiLDAPUtils
     }
 
     /**
-     * Get group members from cache or update it from LDAP if it is not already in cached.
+     * Get group members from cache or update it from LDAP if it is not already cached.
      * 
      * @param groupDN the name of the group.
      * @param context the XWiki context.

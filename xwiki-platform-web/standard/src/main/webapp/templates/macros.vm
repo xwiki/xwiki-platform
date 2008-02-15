@@ -208,6 +208,7 @@ $xwiki.getUserName("xwiki:${username}")
  #set ($lastLevel = $init - 1)
  #set ($depth = 0)
  #set ($openeditem = true)
+<div class="toc">
  #foreach ($tocEntry in $tocData.entrySet())
   #set ($level = $tocEntry.value.level)
   #if ($level > $lastLevel)
@@ -219,7 +220,7 @@ $xwiki.getUserName("xwiki:${username}")
     #else
 <li>
     #end
-<ul>
+<ul class="tocLevel">
     #set ($depth = $depth + 1)
    #end
   #elseif ($level < $lastLevel)
@@ -244,7 +245,7 @@ $xwiki.getUserName("xwiki:${username}")
  </li>
 </ul>#end
  #end
-
+</div>
 #end
 
 #macro(exportPackage)

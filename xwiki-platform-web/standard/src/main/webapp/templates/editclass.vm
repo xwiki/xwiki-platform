@@ -9,7 +9,9 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 <div id="xwikieditcontent" class="clear">
 <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL("edit", "editor=class")"/></div>
 <div id="xwikiclassproperties" class="accordion">
+#set($hasProps = false)
 #foreach ($field in $class.properties)
+#set($hasProps = true)
 <div id="field_$field.name">
 <div id="field_${field.name}_title" class="accordionTabTitleBar"><h6><tt>$field.prettyName</tt></h6></div>
 <div id="field_${field.name}_content" class="accordionTabContentBox"><div>
@@ -27,5 +29,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 </div> ## editcontent
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
+#if($hasProps)
 <script type="text/javascript">new Rico.Accordion( 'xwikiclassproperties', {panelHeight:'flex'} );</script>
+#end
 #end

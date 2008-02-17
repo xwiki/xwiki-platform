@@ -1438,13 +1438,16 @@ html > body .panels{
   color: #000;
   width: 190px;
   display: block;
-  margin: 0px 0px 10px 10px;
   padding: 0px;
   background-color: transparent;
 }
 #leftPanels .panel,#leftPanels .fakepanel{
   margin: 0px 0px 10px 20px;
 }
+#rightPanels .panel,#rightPanels .fakepanel{
+  margin: 0px 0px 10px 10px;
+}
+
 .fakepanel{
   display: none;
   height: 320px;

@@ -4633,7 +4633,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 text =
                     userobj.getStringValue("first_name") + " "
                         + userobj.getStringValue("last_name");
-                if (text.trim().equals("")) {
+                if (StringUtils.isBlank(text)) {
                     text = userdoc.getName();
                 }
             } else {
@@ -4647,10 +4647,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
             if (link == false)
-                return text;
+                return text.trim();
             else {
                 return "<span class=\"wikilink\"><a href=\"" + userdoc.getURL("view", context)
-                    + "\">" + text + "</a></span>";
+                    + "\">" + text.trim() + "</a></span>";
             }
         } catch (Exception e) {
             e.printStackTrace();

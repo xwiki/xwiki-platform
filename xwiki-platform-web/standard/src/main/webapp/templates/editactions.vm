@@ -56,9 +56,11 @@ $msg.get("core.comment"): <input type="text" name="comment" value="" size="80" /
 #if ($sectionNumber && ($sectionNumber != 0))
    #set($param = "section=$sectionNumber")
 #end
+<div>
   <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" value="$msg.get("cancel")" onclick="document.forms.${formname}.action='$doc.getURL("cancel")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();"/></span>
 #if($previewenabled)  <span class="buttonwrapper"><input class="button" type="submit" name="formactionpreview" value="$msg.get("preview")" onclick="document.forms.${formname}.action='$doc.getURL("preview", $param)'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;"/></span>
 #end
   <span class="buttonwrapper"><input class="button" type="submit" name="formactionsac" value="$msg.get("saveandcontinue")" onclick="document.forms.${formname}.action='$doc.getURL("saveandcontinue", $param)'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;"/></span>
   <span class="buttonwrapper"><input class="button" type="submit" name="formactionsave" value="$msg.get("saveandview")" onclick="document.forms.${formname}.action='$doc.getURL("${saveaction}", $param)'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();if (checkDocumentContent()) document.forms.${formname}.submit(); return false;"/></span>
+</div>
 #end

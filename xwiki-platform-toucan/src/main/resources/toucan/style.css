@@ -552,9 +552,9 @@ a.footnoteBackRef{
 
 /* @group Layout */
 body{
-  font-size: 62.5%; /* 10px */
-   font-family: sans-serif;
-   color: #222;
+  font-size: 87.5%; /* 10px */
+  font-family: sans-serif;
+  color: #222;
   width: 100%; 
   padding: 0;
   margin: 0 ;
@@ -563,14 +563,13 @@ body{
   background-color: #fff;
 }
 body.mceContentBody {
-	background-image: none;
-	font-size:90%;
-	line-height:1.4em;
-	}
+  background-image: none;
+  font-size:90%;
+  line-height:1.4em;
+}
 
 #xwikimaincontainer,
 body.hideright #xwikimaincontainer {
-  font-size: 1.4em; /* 12px [1] */
   line-height: 1.2em;
   margin:0;
   padding: 0;

@@ -1384,26 +1384,24 @@ html > body .xwikitabbar li{
 /* @group Panels */
 /* --------------------------------------- */
 /* --------------------------------------- */
-#panellistaccordion .Search #globalsearch,
-#leftPanels .Search #globalsearch,
-#rightPanels .Search #globalsearch {
+.Search #globalsearch {
   text-align: center;
-  margin: 0px ;
+  margin: 0px;
   padding:15px 15px 0;
-line-height: 12px;
+  line-height: 12px;
   background-color: transparent;
   height:50px;
   background-image: url( images/search-bg.png );
   background-repeat: no-repeat;
-  margin:0 ;
+  margin:0;
 }
 .Search .xwikipanelcontents,
 .Search .xwikipaneltitle {
-background-image:none;
-padding:0px;
+  background-image:none;
+  padding:0px;
 }
 #globalsearch{
-	margin: 0px 0px 0px 10px;
+  margin: 0px 0px 0px 10px;
 }
 
 .xwikipanelcontents form{margin: 0;padding: 0px;}
@@ -2732,8 +2730,7 @@ form#inline #xwikiuserprofile label,
 * html h5.xwikipaneltitle,
 * html .collapsed h5.xwikipaneltitle,
 * html .xwikipanelcontents {background-image: url(images/panel-v.gif);}
-* html #leftPanels .Search #globalsearch,
-* html #rightPanels .Search #globalsearch {background-image:url(images/search-bg.gif);}
+* html .Search #globalsearch {background-image:url(images/search-bg.gif);}
 
 
 * html #editPanels .SyntaxHelp div.xwikipanelcontents {background-image: url(images/panel-e.gif);}

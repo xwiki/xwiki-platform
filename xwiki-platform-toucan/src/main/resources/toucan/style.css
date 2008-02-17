@@ -2777,3 +2777,6 @@ top:1px;
 * html #lb-content{
 	margin-top: -1px;
 }
+* html #webhomeblogdisplay, * html #webhomeNewsdisplay {
+  width: 48% !important;
+}

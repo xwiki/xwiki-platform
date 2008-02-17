@@ -128,7 +128,7 @@ function openURL(url) {
 }
 
 function openHelp() {
-  win = open( "http://www.xwiki.org/xwiki/bin/view/UserGuide/XWikiSyntax?xpage=print", "XWiki Syntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
+  win = open( "http://platform.xwiki.org/xwiki/bin/view/Main/XWikiSyntax?xpage=print", "XWikiSyntax", "titlebar=0,width=750,height=480,resizable,scrollbars");
   if( win ) {
     win.focus();
   }

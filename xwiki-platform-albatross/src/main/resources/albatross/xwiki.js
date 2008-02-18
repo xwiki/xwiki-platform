@@ -31,23 +31,11 @@ function showsubmenu(element){
         doHide();
       }
     }
-    /*if(element.lastChild.style.display == "block") return;*/
-    element.lastChild.style.left = (computeAbsoluteLeft(element)  - 10) + "px";
-    element.lastChild.style.top = computeAbsoluteTop(element)   + "px";
+    var coords = Position.positionedOffset(element);
+    element.lastChild.style.left = (coords[0]  - 10) + "px";
+    element.lastChild.style.top = (coords[1] + element.offsetHeight) + "px";
     element.lastChild.className = element.lastChild.className.replace("hidden", "visible");
   }
-}
-function computeAbsoluteLeft(element) {
-  if(window.ActiveXObject){
-    return element.offsetLeft - element.parentNode.parentNode.parentNode.currentStyle.marginLeft.match("[0-9]+") - element.lastChild.currentStyle.marginLeft.substring(0, 1);
-  }
-  return element.offsetLeft;
-}
-function computeAbsoluteTop(element) {
-  if(window.ActiveXObject){
-    return element.offsetHeight;
-  }
-  return element.offsetTop + element.offsetHeight;
 }
 function hidesubmenu(element){
   if(element.lastChild.tagName.toLowerCase() == "span"){

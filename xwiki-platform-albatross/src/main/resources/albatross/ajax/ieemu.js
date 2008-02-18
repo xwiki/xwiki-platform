@@ -30,7 +30,6 @@ if (browser.isMozilla) { // set up ie environment for Moz
 	Event.RIGHT = 2;
 }
 else {
-	Event = {};
 	// IE is returning wrong button number
 	Event.LEFT = 1;
 	Event.MIDDLE = 4;

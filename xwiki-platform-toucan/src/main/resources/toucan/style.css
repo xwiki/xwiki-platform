@@ -1404,18 +1404,14 @@ html > body .xwikitabbar li{
 }
 
 .xwikipanelcontents form{margin: 0;padding: 0px;}
-#panellistaccordion #globalsearch input,
-#leftPanels #globalsearch input,
-#rightPanels #globalsearch input{
+#body #globalsearch input{
   font-size: 0.9em;
-	width: 100px;
+  width: 100px;
   border: 1px solid #eee;
   display: inline !important;
   background-color: #fff;
 }
-#panellistaccordion  #globalsearch input.button,
-#leftPanels #globalsearch input.button,
-#rightPanels #globalsearch input.button{
+#body #globalsearch input.button {
   vertical-align: middle;
   font-size: 1em;
   border: 0px;
@@ -2211,8 +2207,7 @@ text-align: center;
 }
 /* panels */
 #panellistaccordion input[type=text],#panellistaccordion textarea,
-#leftPanels input[type=text],#leftPanels textarea,
-#rightPanels input[type=text],#rightPanels textarea,
+#body .panel input[type=text], #body .panel textarea,
 #inline input[type=text],#inline textarea{
 	background-color: #f9fcff;
 	width:100%;
@@ -2238,7 +2233,7 @@ margin-left:2em;
 list-style-type:none;
 margin-left:2em;
 }
-.panels input,.panels select,
+.panel input, .panel select,
 #editPanels dl dd input {
 	width:  100%;
 }

@@ -104,8 +104,10 @@ function onDragStart(el,x,y) {
   realParent = el.parentNode;
   parentNode = el.parentNode;
   var isAdded = (realParent != leftPanels && realParent != rightPanels);
-  var x = getX(el);
-  var y = getY(el);
+  var coords = Position.cumulativeOffset(el);
+  var coords2 = Position.realOffset(el);
+  var x = coords[0];
+  var y = coords[1] - coords2[1] + (document.documentElement.scrollTop - 0 + document.body.scrollTop - 0);
   if(window.ActiveXObject) {
     dragel.style.height = (el.offsetHeight ? (el.offsetHeight) : el.displayHeight) + "px";
   }

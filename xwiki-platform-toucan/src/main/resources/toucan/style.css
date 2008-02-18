@@ -1639,16 +1639,16 @@ span.panelitem{  display: block;}
 }
 
 .placeholder{
-	width: 170px;
-	margin-left: 20px;
-		background-color: #fff;
-	opacity:  .1;
+  width: 170px;
+  margin-left: 10px;
+  background-color: #fff;
+  opacity:  .1;
 }
 html > body #dragbox {width: 198px !important;}
 #xwikinavcontainer{ 
-margin : 0 0 0; 
-border: 1px solid #999;
-border-width: 0 0 1px 0;
+  margin : 0 0 0; 
+  border: 1px solid #999;
+  border-width: 0 0 1px 0;
 }
 
 span.pitemseparator{
@@ -2718,7 +2718,7 @@ form#inline #xwikiuserprofile label,
 /* IE */
 * html  * {zoom:1; }
 * html p {zoom: 0 !important;}
-* html a {position:relative; z-index:1;}
+* html a {position: relative; z-index:1;}
 * html #rightPanels, #editPanels { margin-top: -27px; height: 400px;}
 
 * html #globalsearch{margin-bottom: 1em}

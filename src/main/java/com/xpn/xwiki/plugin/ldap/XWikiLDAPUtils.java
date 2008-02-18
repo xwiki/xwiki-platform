@@ -335,15 +335,16 @@ public class XWikiLDAPUtils
         }
 
         if (groupMembers == null) {
-            groupMembers = new HashMap();
+            Map members = new HashMap();
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Retrieving Members of the group: " + groupDN);
             }
 
-            boolean isGroup = getGroupMembers(groupDN, groupMembers, new ArrayList(), context);
+            boolean isGroup = getGroupMembers(groupDN, members, new ArrayList(), context);
 
             if (isGroup) {
+                groupMembers = members;
                 synchronized (cache) {
                     cache.putInCache(groupDN, groupMembers);
                 }

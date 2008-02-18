@@ -2716,8 +2716,8 @@ form#inline #xwikiuserprofile label,
 
 
 /* IE */
-* html  * {zoom:1; }
-* html p {zoom: 0 !important;}
+* html  * {display: inline-block; }
+* html p {display: block !important;}
 * html a {position: relative; z-index:1;}
 * html #rightPanels, #editPanels { margin-top: -27px; height: 400px;}
 

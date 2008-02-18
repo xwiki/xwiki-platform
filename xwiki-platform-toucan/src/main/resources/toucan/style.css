@@ -1264,7 +1264,6 @@ html > body #actionmenu{
   position: absolute;
   margin-top: 0px;
   margin-left: 0px !important;
-  margin-left: 30px;/* position IE 6 */
   padding: 5px;
   border: 1px solid #222;
   background-color: transparent;

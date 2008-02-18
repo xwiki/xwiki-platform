@@ -98,9 +98,9 @@ function getClosestDropTarget(x, y, w, h) {
 
 function onDragStart(el,x,y) {
   if (el.isDragging) return;
-  hideddrivetip();
+  hideTip();
   window.isDraggingPanel = true;
-  if (enabletip==true) hideddrivetip();
+  if (enabletip==true) hideTip();
   realParent = el.parentNode;
   parentNode = el.parentNode;
   var isAdded = (realParent != leftPanels && realParent != rightPanels);
@@ -143,7 +143,7 @@ function onDragStart(el,x,y) {
 }
 
 function onDrag(el,x,y) {
-  if (enabletip==true) hideddrivetip();
+  if (enabletip==true) hideTip();
   parentNode = getClosestDropTarget(x,y, el.offsetWidth, el.offsetHeight);
   if(parentNode != prevcolumn){
     if(prevcolumn != allPanels) {

@@ -32,7 +32,7 @@
     <version>4-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-spacemanager</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.0-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Space Manager</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Space Manager</description>
@@ -41,6 +41,7 @@
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <version>1.2-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jmock</groupId>
@@ -56,8 +57,6 @@
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
-      <!-- Note: The 2.4 version is not technically correct as 2.4 corresponds to a specification
-           # and is not an implementation version. The central repo would need to be fixed... -->
       <version>2.4</version>
       <scope>provided</scope>
     </dependency>

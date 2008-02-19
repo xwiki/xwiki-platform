@@ -25,14 +25,6 @@ public class XWikiDocument
     private String space;
 
     /**
-     * Create {@link XWikiDocument} instance.
-     */
-    public XWikiDocument()
-    {
-
-    }
-
-    /**
      * Parse xml file to extract documents informations.
      * 
      * @param file the xml file.

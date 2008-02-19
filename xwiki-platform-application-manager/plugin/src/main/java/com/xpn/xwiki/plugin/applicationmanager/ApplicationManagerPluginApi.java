@@ -21,13 +21,11 @@
 package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
@@ -75,7 +73,7 @@ public class ApplicationManagerPluginApi extends PluginApi
     /**
      * The plugin internationalization service.
      */
-    private XWikiPluginMessageTool messageTool;
+    private ApplicationManagerMessageTool messageTool;
 
     /**
      * Create an instance of the Application Manager plugin user api.
@@ -93,8 +91,8 @@ public class ApplicationManagerPluginApi extends PluginApi
 
         // Message Tool
         Locale locale = (Locale) context.get("locale");
-        this.messageTool = new XWikiPluginMessageTool(locale, plugin, context);
-        context.put(ApplicationManager.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
+        this.messageTool = new ApplicationManagerMessageTool(locale, plugin, context);
+        context.put(ApplicationManagerMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
     }
 
     /**
@@ -159,11 +157,11 @@ public class ApplicationManagerPluginApi extends PluginApi
             ApplicationManager.getInstance().createApplication(
                 appXObjectDocument,
                 failOnExist,
-                this.messageTool.get("applicationmanager.plugin.createapplication.comment",
+                this.messageTool.get(ApplicationManagerMessageTool.COMMENT_CREATEAPPLICATION,
                     appXObjectDocument.toString()), context);
         } catch (ApplicationManagerException e) {
-            LOG.error(MessageFormat.format("Try to create application [{0}]",
-                new Object[] {appXObjectDocument}), e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_CREATEAPP,
+                appXObjectDocument.toString()), e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -201,8 +199,8 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             ApplicationManager.getInstance().deleteApplication(appName, context);
         } catch (ApplicationManagerException e) {
-            LOG.error(MessageFormat.format("Try to delete application [{0}]",
-                new Object[] {appName}), e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_DELETEAPP, appName),
+                e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -226,7 +224,7 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             listDocument = ApplicationManager.getInstance().getApplicationList(this.context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get all applications documents", e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETALLAPPS), e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -255,7 +253,7 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             app = ApplicationManager.getInstance().getApplication(appName, context, true);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get application document from application name", e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETAPP, appName), e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -314,7 +312,8 @@ public class ApplicationManagerPluginApi extends PluginApi
             ApplicationManager.getInstance().exportApplicationXAR(appName, recurse,
                 withDocHistory, context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to export application in a XAR package", e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_EXPORTAPP, appName),
+                e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -356,10 +355,11 @@ public class ApplicationManagerPluginApi extends PluginApi
             ApplicationManager.getInstance().importApplication(
                 context.getDoc(),
                 packageName,
-                this.messageTool.get("applicationmanager.plugin.importapplication.comment",
+                this.messageTool.get(ApplicationManagerMessageTool.COMMENT_IMPORTAPPLICATION,
                     packageName), context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to import applications from XAR package", e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_IMPORTAPP,
+                packageName), e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -404,10 +404,11 @@ public class ApplicationManagerPluginApi extends PluginApi
                 ApplicationManager.getInstance().getApplication(appName, context, true);
             ApplicationManager.getInstance().reloadApplication(
                 app,
-                this.messageTool.get("applicationmanager.plugin.reloadapplication.comment", app
+                this.messageTool.get(ApplicationManagerMessageTool.COMMENT_RELOADAPPLICATION, app
                     .getAppName()), context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to reload application", e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_RELOADAPP, appName),
+                e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -439,11 +440,13 @@ public class ApplicationManagerPluginApi extends PluginApi
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            ApplicationManager.getInstance().reloadAllApplications(
-                this.messageTool.get("applicationmanager.plugin.reloadallapplications.comment"),
-                context);
+            ApplicationManager.getInstance()
+                .reloadAllApplications(
+                    this.messageTool
+                        .get(ApplicationManagerMessageTool.COMMENT_RELOADALLAPPLICATIONS),
+                    context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to reload all applications", e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_REALOADALLAPPS), e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
@@ -467,7 +470,7 @@ public class ApplicationManagerPluginApi extends PluginApi
         try {
             app = ApplicationManager.getInstance().getRootApplication(context);
         } catch (ApplicationManagerException e) {
-            LOG.error("Try to get root application document", e);
+            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETROOTAPP), e);
 
             context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));

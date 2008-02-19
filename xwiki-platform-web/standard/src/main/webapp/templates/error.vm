@@ -1,5 +1,5 @@
 ###
 ### Generic error message
 ###
-#set($messageType = $msg.get("xwiki.core.errorMessageType"))
+#set($messageType = $msg.get("platform.core.errorMessageType"))
 #template("message.vm")

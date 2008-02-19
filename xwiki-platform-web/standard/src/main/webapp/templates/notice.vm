@@ -1,5 +1,5 @@
 ###
 ### Generic notification message
 ###
-#set($messageType = $msg.get("xwiki.core.noticeMessageType"))
+#set($messageType = $msg.get("platform.core.noticeMessageType"))
 #template("message.vm")

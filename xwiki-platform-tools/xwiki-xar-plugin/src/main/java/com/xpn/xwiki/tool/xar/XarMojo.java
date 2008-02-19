@@ -153,10 +153,12 @@ public class XarMojo extends AbstractXarMojo
         for (Iterator it = files.iterator(); it.hasNext();) {
             ArchiveEntry entry = (ArchiveEntry) it.next();
 
-            String fullName = getFullNameFromXML(entry.getFile());
-
-            if (fullName != null) {
-                fw.write(" <file defaultAction=\"0\" language=\"\">" + fullName + "</file>\n");
+            // Don't add files in META-INF to the package.xml file
+            if (entry.getFile().getPath().indexOf("META-INF") == -1) {
+                String fullName = getFullNameFromXML(entry.getFile());
+                if (fullName != null) {
+                    fw.write(" <file defaultAction=\"0\" language=\"\">" + fullName + "</file>\n");
+                }
             }
         }
 
@@ -180,7 +182,7 @@ public class XarMojo extends AbstractXarMojo
             doc.fromXML(file);
             fullname = doc.getFullName();
         } catch (Exception e) {
-            this.getLog().warn("Failed to parse " + file.getAbsolutePath(), e);
+            this.getLog().warn("Failed to parse [" + file.getAbsolutePath() + "], skipping it", e);
         }
 
         return fullname;

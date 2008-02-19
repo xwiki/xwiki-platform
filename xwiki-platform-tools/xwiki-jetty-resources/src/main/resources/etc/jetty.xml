@@ -123,7 +123,7 @@
   
   <Call name="addWebApplications">
     <Arg></Arg>
-    <Arg><SystemProperty name="jetty.home" default="."/>/webapps/</Arg>
+    <Arg><SystemProperty name="jetty.home" default="."/>/../webapps/</Arg>
     <Arg><SystemProperty name="jetty.home" default="."/>/etc/webdefault.xml</Arg>
     <Arg type="boolean">true</Arg><!--extract WARs-->
     <Arg type="boolean">false</Arg><!-- java 2 compliante class loader -->

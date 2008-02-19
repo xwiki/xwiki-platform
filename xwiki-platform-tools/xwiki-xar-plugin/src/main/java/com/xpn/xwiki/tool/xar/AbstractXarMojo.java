@@ -48,8 +48,12 @@ abstract class AbstractXarMojo extends AbstractMojo
     
 	/**
 	 * Default excludes
+	 * @todo For now we exclude all files in META-INF even though we would like to keep them. This
+	 *       is because we want that newly generated XAR be compatible with older versions of
+	 *       XWiki (as otherwise they wouldn't be able to be imported in those older versions as
+	 *       the Package plugin would fail.
 	 */
-    private static final String[] DEFAULT_EXCLUDES = null;
+    private static final String[] DEFAULT_EXCLUDES = new String[] { "**/META-INF/**" };
 
 	/**
 	 * Default includes

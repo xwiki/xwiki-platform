@@ -137,6 +137,16 @@ xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,fulln
 ## if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
 # xwiki.authentication.ldap.trylocal=1
 
+## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+## SSL connection to LDAP server
+## 0 : normal
+## 1 : SSL
+xwiki.authentication.ldap.ssl=1
+
+## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+## The keystore file to use in SSL connection
+xwiki.authentication.ldap.ssl.keystore=
+
 ######################################################################################
 
 xwiki.authentication.unauthorized_code=200

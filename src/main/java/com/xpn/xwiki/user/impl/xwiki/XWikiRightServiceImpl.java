@@ -104,6 +104,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
     }
 
     public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException {
+        log.debug("checkAccess for " + action + ", " + doc.getFullName());
         String username = null;
         XWikiUser user = null;
         boolean needsAuth = false;
@@ -131,7 +132,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     return true;
                 }
             }
-            right = "admin";
         }
 
         // We do not need to authenticate twice
@@ -431,6 +431,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
     public boolean hasAccessLevel(String accessLevel, String name, String resourceKey,
                                   boolean user, XWikiContext context) throws XWikiException {
+        log.debug("hasAccessLevel for " + accessLevel + ", " + name + ", " + resourceKey);
         boolean deny = false;
         boolean allow = false;
         boolean allow_found = false;
@@ -440,7 +441,6 @@ public class XWikiRightServiceImpl implements XWikiRightService
         XWikiDocument currentdoc = null;
 
         if (isReadOnly) {
-
             if ("edit".equals(accessLevel) ||
                     "delete".equals(accessLevel) ||
                     "undelete".equals(accessLevel) ||
@@ -452,9 +452,22 @@ public class XWikiRightServiceImpl implements XWikiRightService
         }
 
         if (name.equals("XWiki.XWikiGuest") || name.endsWith(":XWiki.XWikiGuest")) {
-            if (needsAuth(accessLevel, context))
+            if (needsAuth(accessLevel, context)) {
                 return false;
+            }
         }
+
+        // Fast return for delete right: allow the creator to delete the document
+        if (accessLevel.equals("delete") && user) {
+            currentdoc = (currentdoc==null) ? context.getWiki().getDocument(resourceKey, context) : currentdoc;            
+            String creator = currentdoc.getCreator();
+            if ((name != null) && (creator != null)) {
+                if (name.equals(creator)) {
+                    logAllow(name, resourceKey, accessLevel, "delete right from document ownership");
+                    return true;
+                } 
+            }
+        }        
 
         allow = isSuperAdminOrProgramming(name, resourceKey, accessLevel, user, context);
         if ((allow==true)||(accessLevel.equals("programming"))) {
@@ -607,8 +620,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
 // and that all users that were not denied
 // should be allowed.
             if (!allow_found) {
-                if (accessLevel.equals("register")) {
-                    logDeny(name, resourceKey, accessLevel, "global level (register right must be explicit)");
+                if (accessLevel.equals("register") || accessLevel.equals("delete")) {
+                    logDeny(name, resourceKey, accessLevel, "global level (" 
+                            + accessLevel + " right must be explicit)");
                     return false;
                 } else {
                     logAllow(name, resourceKey, accessLevel, "global level (no restricting right)");

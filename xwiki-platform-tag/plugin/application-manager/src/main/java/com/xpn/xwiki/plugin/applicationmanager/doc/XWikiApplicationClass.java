@@ -28,6 +28,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerException;
+import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
 
@@ -358,7 +359,8 @@ public class XWikiApplicationClass extends AbstractXClassManager
             if (validate) {
                 throw new ApplicationManagerException(
                     ApplicationManagerException.ERROR_AM_DOESNOTEXIST,
-                    appName + " application does not exist");
+                    ApplicationManagerMessageTool.getDefault(context).get(
+                        ApplicationManagerMessageTool.ERROR_APPDOESNOTEXISTS, appName));
             } else {
                 return xwiki.getDocument(getItemDocumentDefaultFullName(appName, context),
                     context);

@@ -39,6 +39,7 @@ import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplicationClass;
 import com.xpn.xwiki.plugin.packaging.DocumentInfo;
@@ -52,11 +53,6 @@ import com.xpn.xwiki.plugin.packaging.PackageAPI;
  */
 final class ApplicationManager implements XWikiDocChangeNotificationInterface
 {
-    /**
-     * Key to use with {@link XWikiContext#get(Object)}.
-     */
-    public static final String MESSAGETOOL_CONTEXT_KEY = "applicationmanagermessagetool";
-    
     /**
      * The logging tool.
      */
@@ -111,6 +107,17 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
     }
 
     /**
+     * Get the {@link XWikiPluginMessageTool} to use with ApplicationManager.
+     * 
+     * @param context the XWiki context.
+     * @return a translated strings manager.
+     */
+    public XWikiPluginMessageTool getMessageTool(XWikiContext context)
+    {
+        return ApplicationManagerMessageTool.getDefault(context);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
@@ -126,13 +133,14 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
                 List appList =
                     XWikiApplicationClass.getInstance(context).newXObjectDocumentList(newdoc,
                         context);
-                updateApplicationsTranslation(appList,
-                    "Auto update translations informations from applications in "
-                        + newdoc.getFullName(), context);
+                updateApplicationsTranslation(appList, getMessageTool(context).get(
+                    ApplicationManagerMessageTool.COMMENT_AUTOUPDATETRANSLATIONS,
+                    newdoc.getFullName()), context);
             }
         } catch (XWikiException e) {
-            LOG.error("Error when updating translations informations from applications in "
-                + newdoc.getFullName(), e);
+            LOG.error(getMessageTool(context).get(
+                ApplicationManagerMessageTool.LOG_AUTOUPDATETRANSLATIONS, newdoc.getFullName()),
+                e);
         }
     }
 
@@ -201,16 +209,19 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
             // If we are not allowed to continue if server page already exists
             if (failOnExist) {
                 if (LOG.isErrorEnabled()) {
-                    LOG.error("Wiki creation (" + userAppSuperDoc
-                        + ") failed: wiki server page already exists");
+                    LOG.error(getMessageTool(context).get(
+                        ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+                        userAppSuperDoc.getAppName()));
                 }
 
                 throw new ApplicationManagerException(
-                    ApplicationManagerException.ERROR_AM_APPDOCALREADYEXISTS,
-                    "Application \"" + userAppSuperDoc.getAppName() + "\" document already exist");
+                    ApplicationManagerException.ERROR_AM_APPDOCALREADYEXISTS, getMessageTool(
+                        context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+                            userAppSuperDoc.getAppName()));
             } else if (LOG.isWarnEnabled()) {
-                LOG.warn("Application creation (" + userAppSuperDoc
-                    + ") failed: application page already exists");
+                LOG.warn(getMessageTool(context).get(
+                    ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+                    userAppSuperDoc.getAppName()));
             }
 
         }
@@ -489,8 +500,9 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
         XWikiAttachment packFile = packageDoc.getAttachment(packageName);
 
         if (packFile == null) {
-            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, "Package "
-                + packageName + " does not exists.");
+            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
+                getMessageTool(context).get(
+                    ApplicationManagerMessageTool.ERROR_IMORT_PKGDOESNOTEXISTS, packageName));
         }
 
         // Import
@@ -501,13 +513,14 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
             importer.Import(packFile.getContent(context));
         } catch (IOException e) {
             throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Fail to import package " + packageName,
-                e);
+                getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_IMORT_IMPORT,
+                    packageName), e);
         }
 
         if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
             throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Fail to install package " + packageName);
+                getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_IMORT_INSTALL,
+                    packageName));
         }
 
         // Apply applications installation

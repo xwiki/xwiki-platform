@@ -30,5 +30,10 @@
       <directory>${basedir}/src/main/resources</directory>
       <outputDirectory>/</outputDirectory>
     </fileSet>
+    <!-- Add License/Notice files -->
+    <fileSet>
+      <directory>${basedir}/target/maven-shared-archive-resources/</directory>
+      <outputDirectory>albatross</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>

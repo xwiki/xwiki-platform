@@ -75,7 +75,7 @@
       initTagScript();
   // ]]>
       {/pre}</script>
-    #else
+    #else ## displayType != input && displayType != select
       #set($existingTags = $xwiki.arrayList)
       #foreach($tag in $!tdoc.tags.split("[|]"))
         #set($discard = $existingTags.add($tag))
@@ -87,10 +87,13 @@
       #end
       </dl>
     #end
-  #else
+  #else ## displayType == input
+    #set($path = $xwiki.getURL("Main.WebHome", "view"))
+    #set($script = $path+"?xpage=suggest&amp;classname=XWiki.TagClass&amp;fieldname=tags&amp;firCol=-&amp;secCol=-&amp;")
+    #set($seps = $xwiki.getDocument("XWiki.TagClass").xWikiClass.tags.getProperty('separators').value)
     <dl>
     <dt><label for="tags">$msg.get("core.tagedit.title")</label></dt>
-    <dd><input type="text" id="tags" name="tags" value="$!tdoc.tags"/></dd>
+    <dd><input type="text" id="tags" name="tags" autocomplete="off" onfocus="new ajaxSuggest(this, {script:'$script', varname: 'input', seps:'$seps', offsety: 13} );" value="$!tdoc.tags"/></dd>
     </dl>
   #end
 #end

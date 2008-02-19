@@ -1,0 +1,109 @@
+$response.setContentType("text/xml")
+##
+#set($classname = $request.get("classname"))
+#set($fieldname = $request.get("fieldname"))
+#set($firCol = $request.get("firCol"))
+#set($secCol = $request.get("secCol"))
+#set($templatename = $classname + 'Template')
+#set($p = $xwiki.getDocument($classname).getxWikiClass().get($fieldname).getPropertyClass())
+#set($hibquery = "$!p.getSql()")
+##
+## Determine what was the input. If the property accepts multiple values and has separators, then
+## use only the last token as the input.
+## TODO: What if the user is actually typing in the middle of the input string? The actual word for
+## which the autocompletion is triggered should be sent from JS.
+##
+#set($input = $request.get("input").toLowerCase())
+#set($sep = "$!{p.getSeparators()}")
+#if($p.isMultiSelect() && ($sep != "")) ### has separators
+  #set($input_words = $xwiki.split($input, $sep))
+  #foreach($i in $input_words)
+    #set($input = $i)
+  #end
+#end
+##
+######################### User hibernate query
+#if("$!hibquery" != "")
+  #if($secCol != "-")
+    ### two columns, hidden input
+    #set($likeCol = $secCol)
+    #set($resultsType = 1)
+  #else ### one column, no hidden input
+    #set($likeCol = $firCol)
+    #set($resultsType = 2)
+  #end
+  #set($whereidx = $hibquery.toLowerCase().indexOf("where"))
+  #if($whereidx < 0)
+    #set($like = " where lower("+ $likeCol + ") like '%" + $input + "%'")
+    #set($hibquery = $hibquery.concat($like))
+  #else
+    #set($whereidx = $whereidx + 5)
+    #set($like = " lower("+ $firCol + ") like '%" + $input + "%' and")
+    #set($hibquery = "${hibquery.substring(0, $whereidx)}${like}${hibquery.substring($whereidx)}")
+  #end
+  #set($results = $xwiki.search($hibquery, 30, 0))
+  <?xml version="1.0" encoding="UTF-8"?>
+  <results type="${resultsType}">
+  #foreach($res in $results)
+    #set($info = '')
+    #set($rs = $res)
+    #foreach($r in $res)
+      #if($velocityCount == 1)
+        #set($info = $r)
+      #elseif($velocityCount == 2)
+        #set($rs = $r)
+      #end
+    #end
+    #if(($info != '-') && ($rs != '-'))
+      <rs id="" info="$info">$rs</rs>
+    #end
+  #end
+  </results>
+#else ## hibquery == ""
+  ######################### DBListProperty query
+  #if($p.isRelationalStorage() && $p.isMultiSelect())
+    #set($query = "select distinct list from BaseObject as obj, DBStringListProperty as prop join prop.list list  where obj.className = '${classname}' and obj.id = prop.id.id and prop.id.name = '${fieldname}'")
+    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
+    #set($results = $queryResult.toArray())
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="3">
+    #foreach($res in $results)
+      #set($list = $p.getListFromString($res, $sep, false))
+      #set($list = $list.toArray())
+      #foreach($word in $list)
+        #if($word.indexOf($input) >=0 )
+          <rs id="$velocityCount" info="">$word</rs>
+        #end
+      #end
+    #end
+    </results>
+  ######################### StringListProperty query
+  #elseif($p.isMultiSelect())
+    #set($query =  "select distinct prop.textValue from BaseObject as obj, StringListProperty as prop where obj.name <> '${templatename}' and obj.className='${classname}' and prop.id.id = obj.id   and prop.name = '${fieldname}' and lower(prop.textValue) like '%${input}%'")
+    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
+    #set($results = $queryResult.toArray())
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="5">
+    #foreach($res in $results)
+      #set($list = $p.getListFromString($res, $sep, false))
+      #set($list = $list.toArray())
+      #foreach($word in $list)
+        #if($word.indexOf($input) >=0 )
+          <rs id="$velocityCount" info="">$word</rs>
+        #end
+      #end
+    #end
+    </results>
+  ######################### StringProperty query
+  #else
+    #set($query =  "select distinct prop.value from BaseObject as obj, StringProperty as prop where obj.className='${classname}' and obj.name<>'${templatename}' and prop.id.id = obj.id and prop.id.name='${fieldname}' and lower(prop.value) like '%${input}%'")
+    #set($queryResult = $xwiki.search($query.toString(), 30, 0))
+    #set($results = $queryResult.toArray())
+    <?xml version="1.0" encoding="UTF-8"?>
+    <results type="8">
+    #foreach($res in $results)
+      <rs id="$velocityCount" info="">$res</rs>
+    #end
+    </results>
+  #end
+#end ## if hibquery

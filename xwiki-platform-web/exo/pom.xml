@@ -56,6 +56,7 @@
         <artifactId>maven-remote-resources-plugin</artifactId>
         <executions>
           <execution>
+            <id>xwiki-configuration-resources</id>
             <!-- The remote resources plugin adds its output directory as a resource directory
                  so that the Maven resources plugin copies these resources to target/classes.
                  However copying them to target/classes will make them appear in WEB-INF/classes
@@ -70,22 +71,29 @@
             <goals>
               <goal>process</goal>
             </goals>
+            <configuration>
+              <resourceBundles>
+                <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:${platform.tool.configuration.version}</resourceBundle>
+              </resourceBundles>
+              <properties>
+                <xwikiCfgExo>1</xwikiCfgExo>
+              </properties>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <resourceBundles>
-            <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:${platform.tool.configuration.version}</resourceBundle>
-          </resourceBundles>
-          <properties>
-            <xwikiCfgExo>1</xwikiCfgExo>
-          </properties>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <webResources>
+            <!-- Include License resources.
+                 TODO: For some reason the META-INF directory is not copied from the standard
+                 WAR so we need to include the License files again. -->
+            <resource>
+              <directory>${project.build.directory}/maven-shared-archive-resources/META-INF</directory>
+              <targetPath>META-INF</targetPath>
+            </resource>
             <resource>
               <directory>${project.build.directory}/maven-shared-archive-resources</directory>
               <targetPath>WEB-INF</targetPath>

@@ -79,5 +79,14 @@
         <module>wiki-manager</module>
       </modules>
     </profile>
+    <profile>
+      <!-- Curriki -->
+      <id>curriki</id>
+      <modules>
+        <module>scheduler</module>
+        <module>mailsender</module>
+        <module>spacemanager</module>
+      </modules>
+    </profile>
   </profiles>
 </project>

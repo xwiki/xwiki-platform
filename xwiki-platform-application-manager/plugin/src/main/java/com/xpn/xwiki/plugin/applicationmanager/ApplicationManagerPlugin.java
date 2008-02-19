@@ -90,9 +90,11 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
             context.setURLFactory(urlf);
             context.setDatabase(context.getMainXWiki());
             ApplicationManager.getInstance().updateAllApplicationTranslation(
-                "Referesh applications translations informations", context);
+                ApplicationManagerMessageTool.getDefault(context).get(
+                    ApplicationManagerMessageTool.COMMENT_REFRESHALLTRANSLATIONS), context);
         } catch (XWikiException e) {
-            LOG.error("Error when updating all applications translations informations", e);
+            LOG.error(ApplicationManagerMessageTool.getDefault(context).get(
+                ApplicationManagerMessageTool.LOG_REFRESHALLTRANSLATIONS), e);
         } finally {
             context.setDatabase(database);
         }

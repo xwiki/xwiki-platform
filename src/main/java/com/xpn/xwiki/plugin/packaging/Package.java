@@ -377,7 +377,11 @@ public class Package
             bais = new ByteArrayInputStream(file);
             zis = new ZipInputStream(bais);
             while ((entry = zis.getNextEntry()) != null) {
-                if (entry.getName().compareTo(DefaultPackageFileName) == 0 || entry.isDirectory()) {
+                // Don't read the package.xml file (since we've already read it above),
+                 // directories or any file in the META-INF directory (we use that directory
+                 // to put meta data such as LICENSE/NOTICE files.
+                 if (entry.getName().compareTo(DefaultPackageFileName) == 0 || entry.isDirectory()
+                    || (entry.getName().indexOf("META-INF") != -1)) {
                     continue;
                 } else {
                     XWikiDocument doc =

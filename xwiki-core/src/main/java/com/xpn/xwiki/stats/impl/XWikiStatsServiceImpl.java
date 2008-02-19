@@ -677,7 +677,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             // database and thus we use a default one, which sould be ignored
             DocumentStats docStats =
                 new DocumentStats((String) result[0], action, now, StatsUtil.PERIOD_DAY);
-            docStats.setPageViews(((Integer) result[1]).intValue());
+            docStats.setPageViews(((Number) result[1]).intValue());
             stats.add(docStats);
         }
         return stats;
@@ -814,7 +814,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             // database and thus we use a default one, which sould be ignored
             RefererStats refStats =
                 new RefererStats("", (String) result[0], now, StatsUtil.PERIOD_DAY);
-            refStats.setPageViews(((Integer) result[1]).intValue());
+            refStats.setPageViews(((Number) result[1]).intValue());
             stats.add(refStats);
         }
         return stats;
@@ -892,9 +892,9 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             String cookie = "";
             String ip = "";
             String userAgent = "";
-            int pageSaves = ((Integer) result[1]).intValue();
-            int pageViews = ((Integer) result[2]).intValue();
-            int downloads = ((Integer) result[3]).intValue();
+            int pageSaves = ((Number) result[1]).intValue();
+            int pageViews = ((Number) result[2]).intValue();
+            int downloads = ((Number) result[3]).intValue();
             VisitStats vs =
                 new VisitStats(name, uniqueID, cookie, ip, userAgent, new Date(startDate
                     .getMillis()), StatsUtil.PERIOD_DAY);

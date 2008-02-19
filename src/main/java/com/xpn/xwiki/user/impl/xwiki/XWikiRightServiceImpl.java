@@ -677,6 +677,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             // and that all users that were not denied
             // should be allowed.
             if (!allow_found) {
+                // Should these rights be denied only if no deny rights were found?
                 if (accessLevel.equals("register") || accessLevel.equals("delete")) {
                     logDeny(name, resourceKey, accessLevel, "global level (" + accessLevel
                         + " right must be explicit)");

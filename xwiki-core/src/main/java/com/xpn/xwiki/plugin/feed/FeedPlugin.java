@@ -549,6 +549,8 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     private void saveEntry(String feedname, String feedurl, SyndEntry entry, XWikiDocument doc, BaseObject obj, boolean fullContent, XWikiContext context) throws XWikiException {
         obj.setStringValue("feedname", feedname);
         obj.setStringValue("title", entry.getTitle());
+        //set document title to the feed title
+        doc.setTitle(entry.getTitle());
         obj.setIntValue("flag", 0);
         List categList = entry.getCategories();
         StringBuffer categs = new StringBuffer("");

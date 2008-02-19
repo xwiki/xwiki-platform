@@ -27,11 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.skins</groupId>
     <artifactId>xwiki-skins</artifactId>
-    <version>3-SNAPSHOT</version>
+    <version>2</version>
   </parent>
   <artifactId>xwiki-skin-albatross</artifactId>
   <name>XWiki Platform - Skins - Albatross</name>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2</version>
   <packaging>pom</packaging>
   <description>Albatross Skin</description>
   <build>
@@ -42,4 +42,10 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/tags/xwiki-skin-albatross-1.2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/tags/xwiki-skin-albatross-1.2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/tags/xwiki-skin-albatross-1.2</url>
+  </scm>
 </project>

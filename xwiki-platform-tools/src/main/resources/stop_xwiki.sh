@@ -16,7 +16,7 @@ done
 PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
-JETTY_HOME=.
+JETTY_HOME=jetty
 
 java -jar $JETTY_HOME/stop.jar
 

@@ -161,8 +161,9 @@ public abstract class XWikiAction extends Action
 
             try {
                 // Prepare documents and put them in the context
-                if (xwiki.prepareDocuments(request, context, vcontext) == false)
+                if (xwiki.prepareDocuments(request, context, vcontext) == false) {
                     return null;
+                }
 
                 if (monitor != null) {
                     monitor.setWikiPage(context.getDoc().getFullName());

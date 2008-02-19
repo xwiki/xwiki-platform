@@ -18,19 +18,20 @@
         <artifactId>maven-remote-resources-plugin</artifactId>
         <executions>
           <execution>
+            <id>xwiki-configuration-resources</id>
             <goals>
               <goal>process</goal>
             </goals>
+            <configuration>
+              <resourceBundles>
+                <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:1.7</resourceBundle>
+              </resourceBundles>
+              <properties>
+                <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>
+              </properties>
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <resourceBundles>
-            <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:1.7</resourceBundle>
-          </resourceBundles>
-          <properties>
-            <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>
-          </properties>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>com.xpn.xwiki.platform.tools</groupId>

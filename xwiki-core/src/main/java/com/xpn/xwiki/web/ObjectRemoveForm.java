@@ -38,7 +38,7 @@ public class ObjectRemoveForm extends ObjectAddForm
         } catch (Exception ex) {
             setClassId(-1);
             LOG.warn("No or bad classid found while processing an objectremove request: "
-                + getRequest().getParameter("classid"), ex);
+                + getRequest().getParameter("classid"));
         }
     }
 

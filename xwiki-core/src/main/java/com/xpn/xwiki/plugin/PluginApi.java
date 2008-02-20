@@ -62,6 +62,20 @@ public class PluginApi extends Api
     }
 
     /**
+     * Return the inner plugin object. This method is only for the plugin API's internal use, and
+     * should not be exposed to scripting languages. It is an XWiki practice to expose all the
+     * functionality using an API, and allow access to the internal objects only to users with
+     * Programming Rights.
+     * 
+     * @return The wrapped plugin object.
+     * @since 1.3RC1
+     */
+    protected XWikiPluginInterface getInternalPlugin()
+    {
+        return plugin;
+    }
+
+    /**
      * Set the inner plugin object.
      * 
      * @param plugin The wrapped plugin object.

@@ -133,7 +133,7 @@
 <property>
 <content>#if($hasEdit || $showEmptyPanels)
 #panelheader($msg.get("Create"))
-&lt;form method="post" action="$doc.getURL("view", "xpage=create")" onsubmit="cancelCancelEdit()"&gt;
+&lt;form method="post" action="$doc.getURL("view", "xpage=create")"&gt;
 &lt;div class="padded centered"&gt;
 &lt;select name="tocreate" class="panelselect"&gt;
   &lt;option value="page"&gt;New Page\*&lt;/option&gt;

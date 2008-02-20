@@ -40,7 +40,10 @@ public class AlexaPluginApi extends Api {
         }
 
     public AlexaPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(AlexaPlugin plugin) {

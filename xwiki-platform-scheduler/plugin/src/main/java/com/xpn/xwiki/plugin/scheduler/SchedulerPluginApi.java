@@ -316,6 +316,9 @@ public class SchedulerPluginApi extends Api
 
     public XWikiPluginInterface getPlugin()
     {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 }

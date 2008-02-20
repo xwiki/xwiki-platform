@@ -51,7 +51,10 @@ public class JodaTimePluginApi extends Api
      */
     public JodaTimePlugin getPlugin()
     {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     /**

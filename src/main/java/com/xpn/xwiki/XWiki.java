@@ -2406,6 +2406,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             bclass.addStaticListField("pageWidth", "Preferred page width",
                 "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
+        
+        // Only used by LDAP authentication service
+        needsUpdate |= bclass.addTextField("ldap_dn", "LDAP DN", 80);
 
         String content = doc.getContent();
         if ((content == null) || (content.equals(""))) {
@@ -2537,7 +2540,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |=
             bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
 
-        // LDAP
+        // Only used by LDAP authentication service
+        
         needsUpdate |= bclass.addBooleanField("ldap", "Ldap", "yesno");
         needsUpdate |= bclass.addTextField("ldap_server", "Ldap server adress", 60);
         needsUpdate |= bclass.addNumberField("ldap_port", "Ldap server port", 5, "int");
@@ -2557,6 +2561,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             bclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode",
                 "always|create");
         needsUpdate |= bclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
+        
+        /////
         
         if (((BooleanClass) bclass.get("showLeftPanels")).getDisplayType().equals("checkbox")) {
             ((BooleanClass) bclass.get("showLeftPanels")).setDisplayType("yesno");

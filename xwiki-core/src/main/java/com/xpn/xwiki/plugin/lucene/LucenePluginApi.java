@@ -207,7 +207,10 @@ public class LucenePluginApi extends Api
      */
     public LucenePlugin getPlugin()
     {
-        return this.plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     /**

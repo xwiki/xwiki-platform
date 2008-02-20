@@ -22,7 +22,10 @@ public class DiffPluginApi extends Api {
     }
 
     public DiffPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(DiffPlugin plugin) {

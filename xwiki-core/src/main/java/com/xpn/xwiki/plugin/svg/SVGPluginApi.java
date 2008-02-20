@@ -36,7 +36,10 @@ public class SVGPluginApi extends Api {
         }
 
     public SVGPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(SVGPlugin plugin) {

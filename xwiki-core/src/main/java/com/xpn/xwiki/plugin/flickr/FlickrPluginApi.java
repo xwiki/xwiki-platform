@@ -37,7 +37,10 @@ public class FlickrPluginApi extends Api {
         }
 
     public FlickrPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
     
     /**

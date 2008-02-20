@@ -38,7 +38,10 @@ public class TerraServerPluginApi extends Api {
         }
 
     public TerraServerPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(TerraServerPlugin plugin) {

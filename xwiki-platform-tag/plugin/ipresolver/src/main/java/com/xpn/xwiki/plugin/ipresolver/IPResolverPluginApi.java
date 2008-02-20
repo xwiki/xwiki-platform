@@ -42,7 +42,10 @@ public class IPResolverPluginApi extends Api {
         }
 
     public IPResolverPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(IPResolverPlugin plugin) {

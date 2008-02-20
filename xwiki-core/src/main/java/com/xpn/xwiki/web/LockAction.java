@@ -2,7 +2,6 @@ package com.xpn.xwiki.web;
 
 import org.apache.commons.lang.BooleanUtils;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -12,14 +11,12 @@ public class LockAction extends XWikiAction
 {
     public boolean action(XWikiContext context) throws XWikiException
     {
-        XWiki xwiki = context.getWiki();
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         XWikiDocument doc = context.getDoc();
         XWikiForm form = context.getForm();
 
         String language = ((EditForm) form).getLanguage();
-        String defaultLanguage = ((EditForm) form).getDefaultLanguage();
         XWikiDocument tdoc;
 
         if ((language == null) || (language.equals("")) || (language.equals("default"))

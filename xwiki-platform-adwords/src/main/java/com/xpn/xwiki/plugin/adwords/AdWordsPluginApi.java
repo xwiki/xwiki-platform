@@ -44,7 +44,10 @@ public class AdWordsPluginApi extends Api {
         }
 
     public AdWordsPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(AdWordsPlugin plugin) {

@@ -53,28 +53,28 @@ public class CalendarPluginApi extends Api {
     }
 
     public CalendarParams getCalendarParams(String month, String year) {
-        return getPlugin().getCalendarParams(month, year, getXWikiContext());
+        return plugin.getCalendarParams(month, year, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, String user) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, user, getXWikiContext());
+        return plugin.getHTMLCalendar(calendarParams, user, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, Document doc, String user) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, doc.getDocument(), user, getXWikiContext());
+        return plugin.getHTMLCalendar(calendarParams, doc.getDocument(), user, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, String hql, String user) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, hql, user, getXWikiContext());
+        return plugin.getHTMLCalendar(calendarParams, hql, user, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, String hql, int nb) throws XWikiException {
-        return getPlugin().getHTMLCalendar(calendarParams, hql, nb, getXWikiContext());
+        return plugin.getHTMLCalendar(calendarParams, hql, nb, getXWikiContext());
     }
 
     public String getHTMLCalendar(CalendarParams calendarParams, CalendarData calendarData) throws XWikiException
     {
-        return getPlugin().getHTMLCalendar(calendarParams, calendarData, getXWikiContext());
+        return plugin.getHTMLCalendar(calendarParams, calendarData, getXWikiContext());
     }
 
     public CalendarParams getCalendarParams() {
@@ -97,9 +97,11 @@ public class CalendarPluginApi extends Api {
         return getCalendarEvent(cdateStart, cdateEnd, user, description);
     }
 
-
     public CalendarPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(CalendarPlugin plugin) {

@@ -40,7 +40,10 @@ public class GooglePluginApi extends Api {
         }
 
     public GooglePlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(GooglePlugin plugin) {

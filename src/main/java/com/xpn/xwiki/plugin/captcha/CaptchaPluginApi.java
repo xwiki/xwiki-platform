@@ -36,7 +36,10 @@ public class CaptchaPluginApi extends Api
 
     public CaptchaPlugin getPlugin()
     {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     private void setPlugin(CaptchaPlugin plugin)
@@ -46,11 +49,11 @@ public class CaptchaPluginApi extends Api
 
     public String displayCaptcha(String action, String classname) throws XWikiException
     {
-        return getPlugin().displayCaptcha(action, classname, getXWikiContext());
+        return plugin.displayCaptcha(action, classname, getXWikiContext());
     }
 
     public Boolean verifyCaptcha(String action) throws XWikiException
     {
-        return getPlugin().verifyCaptcha(action, getXWikiContext());
+        return plugin.verifyCaptcha(action, getXWikiContext());
     }
 }

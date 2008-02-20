@@ -35,7 +35,10 @@ public class GraphVizPluginApi extends Api {
         }
 
     public GraphVizPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(GraphVizPlugin plugin) {

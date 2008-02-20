@@ -38,7 +38,10 @@ public class FeedPluginApi extends Api {
         }
 
     public FeedPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(FeedPlugin plugin) {

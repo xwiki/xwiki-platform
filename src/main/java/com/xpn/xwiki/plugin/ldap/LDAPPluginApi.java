@@ -38,7 +38,10 @@ public class LDAPPluginApi extends Api {
         }
 
     public LDAPPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(LDAPPlugin plugin) {

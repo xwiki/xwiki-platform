@@ -36,7 +36,10 @@ public class MailPluginApi extends Api {
         }
 
     public MailPlugin getPlugin() {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     public void setPlugin(MailPlugin plugin) {

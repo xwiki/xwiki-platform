@@ -40,7 +40,10 @@ public class ChartingPluginApi extends Api {
 	}
 	
 	public ChartingPlugin getPlugin() {
-		return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
 	}
 	
 	public Chart generateChart(ChartParams params, XWikiContext context) throws GenerateException {

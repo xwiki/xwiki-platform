@@ -1,5 +1,7 @@
 package com.xpn.xwiki.web;
 
+import org.apache.commons.lang.BooleanUtils;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -44,8 +46,10 @@ public class LockAction extends XWikiAction
         }
 
         // forward to view
-        String ajax = request.getParameter("ajax");
-        if (ajax == null || !ajax.equals("1")) {
+        if (BooleanUtils.isTrue((Boolean) context.get("ajax"))) {
+            response.setStatus(204);
+            response.setContentLength(0);
+        } else {
             String redirect = Utils.getRedirect("view", context);
             sendRedirect(response, redirect);
         }

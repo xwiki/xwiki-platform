@@ -52,11 +52,13 @@ public class PluginApi extends Api
      * Return the inner plugin object, if the user has the required programming rights.
      * 
      * @return The wrapped plugin object.
-     * @todo Why is this public and doesn't require programming rights?
      */
     public XWikiPluginInterface getPlugin()
     {
-        return plugin;
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     /**

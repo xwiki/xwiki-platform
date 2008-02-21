@@ -59,12 +59,9 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
      *
      * @return The MailSenderPlugin
      */
-    public MailSenderPlugin getMailSenderPlugin()
+    protected MailSenderPlugin getMailSenderPlugin()
     {
-        if (hasProgrammingRights()) {
-            return (MailSenderPlugin) getPlugin();
-        }
-        return null;
+        return (MailSenderPlugin) getInternalPlugin();
     }
 
     /**

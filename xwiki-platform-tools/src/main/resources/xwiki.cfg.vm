@@ -79,75 +79,74 @@ xwiki.plugin.captcha=0
 # it were set and you forgot about it.
 #xwiki.superadminpassword=system
 
-######################################################################################
+#-------------------------------------------------------------------------------------
 # LDAP
-######################################################################################
+#-------------------------------------------------------------------------------------
 
-## new LDAP authentication service
+#-# new LDAP authentication service
 # xwiki.authentication.authclass=com.xpn.xwiki.ldap.authentication.XWikiLDAPAuthServiceImpl
 
-## Turn LDAP authentication on - otherwise only XWiki authentication
-## 0 : disable
-## 1 : enable
+#-# Turn LDAP authentication on - otherwise only XWiki authentication
+#-# 0 : disable
+#-# 1 : enable
 xwiki.authentication.ldap=0
 
-## LDAP Server (Active Directory, eDirectory, OpenLDAP, etc.)
+#-# LDAP Server (Active Directory, eDirectory, OpenLDAP, etc.)
 xwiki.authentication.ldap.server=156.58.101.204
 xwiki.authentication.ldap.port=389
 
-## LDAP login, empty = anonymous access, otherwise specify full dn 
-## {0} is replaced with the username, {1} with the password
-## example:
+#-# LDAP login, empty = anonymous access, otherwise specify full dn 
+#-# {0} is replaced with the username, {1} with the password
 xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,department=1230,o=MP
 xwiki.authentication.ldap.bind_pass={1}
 
-## only members of the following group will be verified in the LDAP
-## otherwise only users that are found after searching starting from the base_DN
+#-# only members of the following group will be verified in the LDAP
+# otherwise only users that are found after searching starting from the base_DN
 xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
 
-## base DN for searches
+#-# base DN for searches
 xwiki.authentication.ldap.base_DN=
 
-## specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
+#-# specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
 xwiki.authentication.ldap.UID_attr=cn
 
-## retrieve the following fields from LDAP and store them in the XWiki user object (xwiki-attribute=ldap-attribute)
+#-# retrieve the following fields from LDAP and store them in the XWiki user object (xwiki-attribute=ldap-attribute)
 xwiki.authentication.ldap.fields_mapping=last_name=sn,first_name=givenName,fullname=fullName,email=mail,ldap_dn=dn
-## ldap_dn=dn  -- dn is set by class, caches dn in XWiki.user object for faster access
+#-# ldap_dn=dn  -- dn is set by class, caches dn in XWiki.user object for faster access
 
-## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-# on every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
-# xwiki.authentication.ldap.update_user=1
+#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# on every login update the mapped attributes from LDAP to XWiki otherwise this happens only once when the XWiki account is created.
+#-# xwiki.authentication.ldap.update_user=1
 
-## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-## mapps XWiki groups to LDAP groups, separator is "|"
+#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# mapps XWiki groups to LDAP groups, separator is "|"
 # xwiki.authentication.ldap.group_mapping=XWiki.XWikiAdminGroup=cn=AdminRole,ou=groups,o=MegaNova,c=US|\
 #                                         XWiki.Organisation=cn=testers,ou=groups,o=MegaNova,c=US
 
-## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-## time in s after which the list of members in a group is refreshed from LDAP (default=3600*6)
+#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# time in s after which the list of members in a group is refreshed from LDAP (default=3600*6)
 # xwiki.authentication.ldap.groupcache_expiration=21800
 
-## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-## - create : synchronize group membership only when the user is first created
-## - always: synchronize on every login
+#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# - create : synchronize group membership only when the user is first created
+#-# - always: synchronize on every login
 # xwiki.authentication.ldap.mode_group_sync=always
 
-## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-## if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
+#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# if ldap authentication fails for any reason, try XWiki DB authentication with the same credentials
 # xwiki.authentication.ldap.trylocal=1
 
-## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-## SSL connection to LDAP server
-## 0 : normal
-## 1 : SSL
+#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# SSL connection to LDAP server
+#-# 0 : normal
+#-# 1 : SSL
 xwiki.authentication.ldap.ssl=1
 
-## [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
-## The keystore file to use in SSL connection
+#-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
+#-# The keystore file to use in SSL connection
 xwiki.authentication.ldap.ssl.keystore=
 
-######################################################################################
+#-------------------------------------------------------------------------------------
 
 xwiki.authentication.unauthorized_code=200
 

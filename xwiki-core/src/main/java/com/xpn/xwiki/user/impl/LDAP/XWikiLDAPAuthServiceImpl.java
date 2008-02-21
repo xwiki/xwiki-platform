@@ -103,11 +103,12 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             return null;
         }
 
-        String userName = login.replaceAll(" ", "");
         if ((password == null) || (password.trim().length() == 0)) {
             return null;
         }
 
+        String userName = login;
+        
         // strip possible "XWiki."
         // ATTENTION: Possible incompatibility to before now user is NEVER located with
         // "XWiki.username" in LDAP

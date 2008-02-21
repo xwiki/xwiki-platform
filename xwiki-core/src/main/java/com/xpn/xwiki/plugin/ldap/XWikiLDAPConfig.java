@@ -224,7 +224,9 @@ public final class XWikiLDAPConfig
 
                     userMappings.put(ldapattr, xwikiattr);
 
-                    attrListToFill.add(ldapattr);
+                    if (attrListToFill != null) {
+                        attrListToFill.add(ldapattr);
+                    }
                 } else {
                     LOG.error("Error parsing ldap_fields_mapping attribute in xwiki.cfg: "
                         + fields[j]);

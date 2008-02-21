@@ -21,6 +21,7 @@
 
 package com.xpn.xwiki.plugin.ldap;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -84,14 +85,14 @@ public class XWikiLDAPConnection
         // open LDAP
         int ldapPort = config.getLDAPPort(context);
         String ldapHost = config.getLDAPParam("ldap_server", "localhost", context);
-        String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "", context);
+        String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
         String bindPasswordFormat = config.getLDAPParam("ldap_bind_pass", "{1}", context);
 
         Object[] arguments = {ldapUserName, password};
 
         // allow to use the given user and password also as the LDAP bind user and password
-        String bindDN = String.format(bindDNFormat, arguments);
-        String bindPassword = String.format(bindPasswordFormat, arguments);
+        String bindDN = MessageFormat.format(bindDNFormat, arguments);
+        String bindPassword = MessageFormat.format(bindPasswordFormat, arguments);
 
         boolean bind;
         if ("1".equals(config.getLDAPParam("ldap_ssl", "0", context))) {

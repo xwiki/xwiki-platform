@@ -35,11 +35,8 @@ public class LaszloPluginApi extends PluginApi {
             super(plugin, context);
         }
 
-    public LaszloPlugin getLaszloPlugin() {
-        if (hasProgrammingRights()) {
-            return (LaszloPlugin) getPlugin();
-        }
-        return null;
+    protected LaszloPlugin getLaszloPlugin() {
+        return (LaszloPlugin) getInternalPlugin();
     }
 
     public String getFileName(String name, String laszlocode) {

@@ -149,7 +149,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                     LOG.debug("LDAP authentication failed: LDAP not activ");
                 }
 
-                return null;
+                return principal;
             }
 
             // ////////////////////////////////////////////////////////////////////
@@ -157,9 +157,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // ////////////////////////////////////////////////////////////////////
 
             if (!connector.open(userName, password, context)) {
-                LOG.error("Bind to LDAP server failed.");
-
-                return null;
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                    XWikiException.ERROR_XWIKI_USER_INIT,
+                    "Bind to LDAP server failed.");
             }
 
             // ////////////////////////////////////////////////////////////////////
@@ -230,15 +230,15 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
                 if (!connector.checkPassword(userDN, password)) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("LDAP authentication failed:"
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                        XWikiException.ERROR_XWIKI_USER_INIT,
+                        "LDAP authentication failed:"
                             + " could not validate the password: wrong password for " + userDN);
-                    }
-
-                    return null;
                 }
             } else {
-                LOG.debug("Password is already supposed to be verified when bound to LDAP");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Password is already supposed to be verified when bound to LDAP");
+                }
             }
 
             // ////////////////////////////////////////////////////////////////////
@@ -250,8 +250,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // from now on we can enter the application
             principal = getUserPrincipal(userName, context);
             if (principal == null) {
-                LOG.debug("Could not create authenticated principal.");
-                return null;
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                    XWikiException.ERROR_XWIKI_USER_INIT,
+                    "Could not create authenticated principal.");
             }
 
             // ////////////////////////////////////////////////////////////////////
@@ -545,7 +546,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Adding user {0} to xwiki group {1}", new String[] {
-                    userName, groupName}));
+                userName, groupName}));
             }
 
             String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
@@ -578,7 +579,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         } catch (Exception e) {
             LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new String[] {
-                userName, groupName}), e);
+            userName, groupName}), e);
         }
     }
 

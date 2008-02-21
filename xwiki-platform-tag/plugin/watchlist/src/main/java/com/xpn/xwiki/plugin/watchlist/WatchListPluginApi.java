@@ -230,7 +230,6 @@ public class WatchListPluginApi extends PluginApi {
      * @return the WatchList plugin
      */
     private WatchListPlugin getWatchListPlugin() {
-        return (WatchListPlugin) getPlugin();
+        return (WatchListPlugin) getInternalPlugin();
     }
-
 }

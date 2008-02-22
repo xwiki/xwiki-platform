@@ -27,6 +27,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.xmlrpc.XWikiXmlRpcRequest;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.log4j.MDC;
@@ -55,7 +56,7 @@ public class Utils
     {
         XWikiResponse response = context.getResponse();
 
-        // Set content-type and encoding (this can be changed in the future by pages themselves)
+        // Set content-type and encoding (this can be changed later by pages themselves)
         if (context.getResponse() instanceof XWikiPortletResponse) {
             response.setContentType("text/html");
         } else {
@@ -115,9 +116,8 @@ public class Utils
 
         if (!context.isFinished()) {
             if (context.getResponse() instanceof XWikiServletResponse) {
-                // Set the content length to the numnber of bytes, not the
+                // Set the content length to the number of bytes, not the
                 // string length, so as to handle multi-byte encodings
-
                 try {
                     response
                         .setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
@@ -126,20 +126,28 @@ public class Utils
                 }
             }
 
-            try {
-                if (write) {
-                    response.getWriter().write(content);
+            if (write) {
+                try {
+                    try {
+                        response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));
+                    } catch (IllegalStateException ex) {
+                        response.getWriter().write(content);
+                    }
+                } catch (IOException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
+                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
+                        "Exception while sending response", e);
                 }
-            } catch (IOException e) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                    "Exception while sending response", e);
             }
         }
 
         try {
-            response.getWriter().flush();
-        } catch (Throwable e) {
+            response.getOutputStream().flush();
+        } catch (Throwable ex) {
+            try {
+                response.getWriter().flush();
+            } catch (Throwable ex2) {
+            }
         }
     }
 
@@ -157,7 +165,7 @@ public class Utils
     {
         String redirect;
         redirect = context.getRequest().getParameter("xredirect");
-        if ((redirect == null) || (redirect.equals(""))) {
+        if (StringUtils.isBlank(redirect)) {
             redirect = context.getDoc().getURL(action, params, true, context);
         }
         return redirect;
@@ -283,7 +291,6 @@ public class Utils
     public static Map parseParameters(String data, String encoding)
         throws UnsupportedEncodingException
     {
-
         if ((data != null) && (data.length() > 0)) {
 
             // use the specified encoding to extract bytes out of the

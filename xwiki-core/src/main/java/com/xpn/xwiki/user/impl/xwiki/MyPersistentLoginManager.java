@@ -409,11 +409,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             cookie.setPath(cookiePath);
             String cookieDomain = request.getServerName();
             if (cookieDomain != null) {
-                while (cookieDomain.indexOf(".") >= 0) {
+                do {
                     cookie.setDomain(cookieDomain);
                     addCookie(response, cookie);
                     cookieDomain = cookieDomain.substring(cookieDomain.indexOf(".") + 1);
-                }
+                } while (cookieDomain.indexOf(".") >= 0);
             }
         }
     }

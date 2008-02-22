@@ -311,8 +311,15 @@ public class WatchListJob implements Job
         String sender = xwiki.getXWikiPreference("admin_email", "mailer@xwiki.localdomain.com");
 
         // Set email template
-        String mailTemplate =
+        String mailTemplate = "";
+        if (xwiki.exists(jobMailTemplate)) {
+            mailTemplate = jobMailTemplate;
+        } else if (xwiki.exists(WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE)) {
+            mailTemplate = WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE;
+        } else {
+            mailTemplate =
                 xcontext.getMainWikiName() + ":" + WatchListPlugin.WATCHLIST_EMAIL_TEMPLATE;
+        }
 
         // Send message from template
         int sendResult =

@@ -68,7 +68,7 @@ public class WatchListPluginApi extends PluginApi
      * @return True if the document is in the current user's WatchList
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean isWatchedDocument() throws XWikiException
+    public boolean isDocumentWatched() throws XWikiException
     {
         return getWatchListPlugin().getWatchedDocuments(context.getLocalUser(), context)
             .contains(context.getDoc().getFullName());
@@ -134,7 +134,7 @@ public class WatchListPluginApi extends PluginApi
      * @return True if the document is in the current user's watchlist
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean isWatchedSpace() throws XWikiException
+    public boolean isSpaceWatched() throws XWikiException
     {
         return getWatchListPlugin().getWatchedSpaces(context.getLocalUser(), context)
             .contains(context.getDoc().getSpace());

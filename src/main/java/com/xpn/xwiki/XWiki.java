@@ -1934,6 +1934,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (XWikiException e) {
         }
 
+        // If the default language is prefered, and since the user didn't explicitely ask for a
+        // language already, then use the default wiki language.
+        if (Param("xwiki.language.preferDefault", "0").equals("1")
+            || getWebPreference("preferDefaultLanguage", "0", context).equals("1")) {
+            language = defaultLanguage;
+            context.setLanguage(language);
+            return language;
+        }
+
         // Then from the navigator language setting
         if (context.getRequest() != null) {
             String accept = context.getRequest().getHeader("Accept-Language");

@@ -543,7 +543,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         String request = "select doc.fullName from XWikiDocument as doc where doc.web in ('" +
             watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
             "order by doc.date desc";
-        return context.getWiki().getStore().search(request, 20, 0, context);
+        return globalSearchDocuments(request, 20, 0, new ArrayList(), new Context(context),
+            new XWiki(context.getWiki(), context));
     }
 
     /**
@@ -590,7 +591,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * @return a list of document names prefixed with the wiki they come from ex :
      *         xwiki:Main.WebHome
      */
-    protected List globalSearchDocuments(String request, List values, Context context, XWiki xwiki)
+    protected List globalSearchDocuments(String request, int nb, int start, List values,
+        Context context, XWiki xwiki)
     {
         String initialDb =
             !context.getDatabase().equals("") ? context.getDatabase() :
@@ -618,7 +620,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
                 String wikiPrefix = wiki + ":";
                 context.setDatabase(wiki);
                 try {
-                    List upDocsInWiki = xwiki.searchDocuments(request, 0, 0, values);
+                    // List upDocsInWiki = xwiki.searchDocuments(request, 0, 0, values);
+                    List upDocsInWiki = xwiki.searchDocumentsNames(wiki, request, 0, 0, values);
                     Iterator it = upDocsInWiki.iterator();
                     while (it.hasNext()) {
                         results.add(wikiPrefix + it.next());
@@ -641,8 +644,9 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     {
         String request = ", BaseObject as obj where obj.name=doc.fullName and obj.className='"
             + WatchListPlugin.WATCHLIST_CLASS + "'";
-        List subscribers = globalSearchDocuments(request, new ArrayList(), new Context(context),
-            new XWiki(context.getWiki(), context));
+        List subscribers =
+            globalSearchDocuments(request, 0, 0, new ArrayList(), new Context(context),
+                new XWiki(context.getWiki(), context));
         Iterator it = subscribers.iterator();
         while (it.hasNext()) {
             String user = (String) it.next();

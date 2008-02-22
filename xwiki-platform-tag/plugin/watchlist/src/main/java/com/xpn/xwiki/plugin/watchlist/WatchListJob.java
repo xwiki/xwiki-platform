@@ -179,7 +179,7 @@ public class WatchListJob implements Job
 
         if (query.length() > 0) {
             List queryDocuments =
-                plugin.globalSearchDocuments(query, new ArrayList(), xcontext, xwiki);
+                plugin.globalSearchDocuments(query, 0, 0, new ArrayList(), xcontext, xwiki);
             watchedDocuments.addAll(queryDocuments);
         }
 
@@ -235,7 +235,7 @@ public class WatchListJob implements Job
                 + WatchListPlugin.WATCHLIST_CLASS +
                 "' and prop.id.id=obj.id and prop.name='interval' " +
                 "and prop.value='" + interval + "')";
-        return plugin.globalSearchDocuments(request, new ArrayList(), xcontext, xwiki);
+        return plugin.globalSearchDocuments(request, 0, 0, new ArrayList(), xcontext, xwiki);
     }
 
     /**
@@ -269,7 +269,7 @@ public class WatchListJob implements Job
         values.add(dt.toDate());
         String updatedDocumentRequest = "where doc.date > ? order by doc.date desc";
 
-        return plugin.globalSearchDocuments(updatedDocumentRequest, values, xcontext, xwiki);
+        return plugin.globalSearchDocuments(updatedDocumentRequest, 0, 0, values, xcontext, xwiki);
     }
 
     /**

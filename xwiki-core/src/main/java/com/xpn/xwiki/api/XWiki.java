@@ -437,7 +437,7 @@ public class XWiki extends Api
      * Search documents by passing HQL where clause values as parameters. This allows generating
      * a Named HQL query which will automatically encode the passed values (like escaping single
      * quotes). This API is recommended to be used over the other similar methods where the values
-     * are passed inside the where clause and for which you'll need to do the encoding/escpaing
+     * are passed inside the where clause and for which you'll need to do the encoding/escaping
      * yourself before calling them.
      *
      * <p>Example</p>
@@ -474,6 +474,34 @@ public class XWiki extends Api
             parameterValues, getXWikiContext());
     }
 
+    /**
+     * Search documents in the provided by passing HQL where clause values as parameters. See
+     * {@link #searchDocuments(String, int, int, java.util.List)} for more details.
+     * 
+     * @param wikiName the name of the wiki where to search.
+     * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
+     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"</code>
+     * @param nb the number of rows to return. If 0 then all rows are returned
+     * @param start the number of rows to skip. If 0 don't skip any row
+     * @param parameterValues the where clause values that replace the question marks (?)
+     * @return a list of document full names (Space.Name).
+     * @see #searchDocuments(String, int, int, java.util.List)
+     * @throws XWikiException in case of error while performing the query
+     */
+    public List searchDocumentsNames(String wikiName, String parametrizedSqlClause, int nb,
+        int start, List parameterValues) throws XWikiException
+    {
+        String database = this.context.getDatabase();
+
+        try {
+            context.setDatabase(wikiName);
+
+            return searchDocuments(parametrizedSqlClause, nb, start, parameterValues);
+        } finally {
+            context.setDatabase(database);
+        }
+    }
+    
     /**
      * Function to wrap a list of XWikiDocument into Document objects
      * 

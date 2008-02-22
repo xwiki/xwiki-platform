@@ -23,4 +23,9 @@ public class AutoTagPluginAPI extends Api
     {
         return plugin.generateTagCloud(text, lang);
     }
+    
+    public TagCloud generateTagCloud(String text, String lang) 
+    {
+        return plugin.generateTagCloud(text, plugin.getLanguageConstant(lang));
+    }
 }

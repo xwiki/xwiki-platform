@@ -17,7 +17,6 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-
 package com.xpn.xwiki.plugin.watchlist;
 
 import com.xpn.xwiki.XWikiContext;
@@ -28,16 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they
- * want to follow. At a frequency choosen by the user XWiki will send an email notification to him with a list of the
- * elements that has been modified since the last notification.
+ * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages
+ * and spaces they want to follow. At a frequency choosen by the user XWiki will send an email
+ * notification to him with a list of the elements that has been modified since the last
+ * notification.
  *
  * This is the wrapper accessible from in-document scripts.
  *
  * @version $Id: $
  */
-public class WatchListPluginApi extends PluginApi {
-
+public class WatchListPluginApi extends PluginApi
+{
     /**
      * API constructor.
      *
@@ -45,7 +45,8 @@ public class WatchListPluginApi extends PluginApi {
      * @param context Context of the request.
      * @see PluginApi#PluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, XWikiContext)
      */
-    public WatchListPluginApi(WatchListPlugin plugin, XWikiContext context) {
+    public WatchListPluginApi(WatchListPlugin plugin, XWikiContext context)
+    {
         super(plugin, context);
     }
 
@@ -55,9 +56,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the containing space is watched
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean isDocInWatchedSpaces() throws XWikiException {
+    public boolean isDocInWatchedSpaces() throws XWikiException
+    {
         return getWatchListPlugin().getWatchedSpaces(getXWikiContext().getLocalUser(),
-                getXWikiContext()).contains(context.getDoc().getSpace());
+            getXWikiContext()).contains(context.getDoc().getSpace());
     }
 
     /**
@@ -66,8 +68,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the document is in the current user's WatchList
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean isWatchedDocument() throws XWikiException {
-        return getWatchListPlugin().getWatchedDocuments(context.getLocalUser(), context).contains(context.getDoc().getFullName());
+    public boolean isWatchedDocument() throws XWikiException
+    {
+        return getWatchListPlugin().getWatchedDocuments(context.getLocalUser(), context)
+            .contains(context.getDoc().getFullName());
     }
 
     /**
@@ -77,9 +81,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the document wasn't already in the WatchList
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean addDocument(String wDoc) throws XWikiException {
+    public boolean addDocument(String wDoc) throws XWikiException
+    {
         return getWatchListPlugin().addWatchedElement(getXWikiContext().getLocalUser(),
-                wDoc, false, getXWikiContext());
+            wDoc, false, getXWikiContext());
     }
 
     /**
@@ -90,9 +95,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the document wasn't already in the WatchList
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean addDocumentForUser(String localUser, String wDoc) throws XWikiException {
+    public boolean addDocumentForUser(String localUser, String wDoc) throws XWikiException
+    {
         return context.getWiki().getUser(context).hasAdminRights() &&
-                getWatchListPlugin().addWatchedElement(localUser, wDoc, false, getXWikiContext());
+            getWatchListPlugin().addWatchedElement(localUser, wDoc, false, getXWikiContext());
     }
 
     /**
@@ -102,9 +108,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the document was in the WatchList and has been removed
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean removeDocument(String wDoc) throws XWikiException {
+    public boolean removeDocument(String wDoc) throws XWikiException
+    {
         return getWatchListPlugin().removeWatchedElement(getXWikiContext().getLocalUser(),
-                wDoc, false, getXWikiContext());
+            wDoc, false, getXWikiContext());
     }
 
     /**
@@ -115,9 +122,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the document was in the WatchList and has been removed
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean removeDocumentForUser(String localUser, String wDoc) throws XWikiException {
+    public boolean removeDocumentForUser(String localUser, String wDoc) throws XWikiException
+    {
         return context.getWiki().getUser(context).hasAdminRights() &&
-                getWatchListPlugin().removeWatchedElement(localUser, wDoc, false, getXWikiContext());
+            getWatchListPlugin().removeWatchedElement(localUser, wDoc, false, getXWikiContext());
     }
 
     /**
@@ -126,8 +134,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the document is in the current user's watchlist
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean isWatchedSpace() throws XWikiException {
-        return getWatchListPlugin().getWatchedSpaces(context.getLocalUser(), context).contains(context.getDoc().getSpace());
+    public boolean isWatchedSpace() throws XWikiException
+    {
+        return getWatchListPlugin().getWatchedSpaces(context.getLocalUser(), context)
+            .contains(context.getDoc().getSpace());
     }
 
     /**
@@ -137,9 +147,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the space wasn't already in the user's WatchList and has been added
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean addSpace(String wSpace) throws XWikiException {
+    public boolean addSpace(String wSpace) throws XWikiException
+    {
         return getWatchListPlugin().addWatchedElement(getXWikiContext().getLocalUser(),
-                wSpace, true, getXWikiContext());
+            wSpace, true, getXWikiContext());
     }
 
     /**
@@ -150,9 +161,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the space wasn't already in the user's WatchList and has been added
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean addSpaceForUser(String localUser, String wSpace) throws XWikiException {
+    public boolean addSpaceForUser(String localUser, String wSpace) throws XWikiException
+    {
         return context.getWiki().getUser(context).hasAdminRights() &&
-                getWatchListPlugin().addWatchedElement(localUser, wSpace, true, getXWikiContext());
+            getWatchListPlugin().addWatchedElement(localUser, wSpace, true, getXWikiContext());
     }
 
     /**
@@ -162,9 +174,10 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the space was in the user's WatchList and has been removed
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean removeSpace(String wSpace) throws XWikiException {
-            return getWatchListPlugin().removeWatchedElement(getXWikiContext().getLocalUser(),
-                    wSpace, true, getXWikiContext());
+    public boolean removeSpace(String wSpace) throws XWikiException
+    {
+        return getWatchListPlugin().removeWatchedElement(getXWikiContext().getLocalUser(),
+            wSpace, true, getXWikiContext());
     }
 
     /**
@@ -175,7 +188,8 @@ public class WatchListPluginApi extends PluginApi {
      * @return True if the space was in the user's WatchList and has been removed
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public boolean removeSpaceForUser(String localUser, String wSpace) throws XWikiException {
+    public boolean removeSpaceForUser(String localUser, String wSpace) throws XWikiException
+    {
         return context.getWiki().getUser(context).hasAdminRights() &&
             getWatchListPlugin().removeWatchedElement(localUser, wSpace, true, getXWikiContext());
     }
@@ -186,7 +200,8 @@ public class WatchListPluginApi extends PluginApi {
      * @return The list of the documents in the user's WatchList
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public List getWatchedDocuments() throws XWikiException {
+    public List getWatchedDocuments() throws XWikiException
+    {
         return getWatchListPlugin().getWatchedDocuments(getXWikiContext().getLocalUser(), context);
     }
 
@@ -196,7 +211,8 @@ public class WatchListPluginApi extends PluginApi {
      * @return The list of the spaces in the user's WatchList
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public List getWatchedSpaces() throws XWikiException {
+    public List getWatchedSpaces() throws XWikiException
+    {
         return getWatchListPlugin().getWatchedSpaces(getXWikiContext().getLocalUser(), context);
     }
 
@@ -206,7 +222,8 @@ public class WatchListPluginApi extends PluginApi {
      * @return The list of the elements in the user's WatchList
      * @throws XWikiException If the user's WatchList Object cannot be retreived nor created
      */
-    public List getWatchedElements() throws XWikiException {
+    public List getWatchedElements() throws XWikiException
+    {
         List wEls = new ArrayList();
         wEls.addAll(getWatchedDocuments());
         wEls.addAll(getWatchedSpaces());
@@ -214,14 +231,17 @@ public class WatchListPluginApi extends PluginApi {
     }
 
     /**
-     * Get the list of the elements watched by localUser ordered by last modification date, descending
+     * Get the list of the elements watched by localUser ordered by last modification date,
+     * descending
      *
      * @param localUser XWiki User
-     * @return the list of the elements watched by localUser ordered by last modification date, descending
+     * @return the list of the elements watched by localUser ordered by last modification date,
+     *         descending
      * @throws XWikiException If the search request fails
      */
-    public List getWatchListWhatsNew(String localUser) throws XWikiException {
-        return getWatchListPlugin().getWatchListWhatsNew(localUser, context);        
+    public List getWatchListWhatsNew(String localUser) throws XWikiException
+    {
+        return getWatchListPlugin().getWatchListWhatsNew(localUser, context);
     }
 
     /**
@@ -229,7 +249,8 @@ public class WatchListPluginApi extends PluginApi {
      *
      * @return the WatchList plugin
      */
-    private WatchListPlugin getWatchListPlugin() {
+    private WatchListPlugin getWatchListPlugin()
+    {
         return (WatchListPlugin) getInternalPlugin();
     }
 }

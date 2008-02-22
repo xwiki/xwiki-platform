@@ -115,26 +115,26 @@ function watchlist(action)
 }
 //]]>
 </script>
-    #set ($isWatchedDoc = $xwiki.watchlist.isWatchedDocument())
-    #set ($isWatchedSpace = $xwiki.watchlist.isWatchedSpace())
-    #if ($isWatchedDoc || $isWatchedSpace)
+    #set ($isDocWatched = $xwiki.watchlist.isDocumentWatched())
+    #set ($isSpaceWatched = $xwiki.watchlist.isSpaceWatched())
+    #if ($isDocWatched || $isSpaceWatched)
       #xwikitopmenuentrystart("javascript:watchlist('removedocument')" $msg.get("core.menu.watch") "tmWatched")
     #else
       #xwikitopmenuentrystart("javascript:watchlist('adddocument')" $msg.get("core.menu.watch") "tmWatch")
     #end
-    #if (!$isWatchedDoc)
+    #if (!$isDocWatched)
       #submenuitem("javascript:watchlist('adddocument')" $msg.get("core.menu.watchlist.add.page"))
     #else
       #submenuitem("javascript:watchlist('removedocument')" $msg.get("core.menu.watchlist.remove.page"))
     #end
     #submenuseparator()
-    #if (!$isWatchedSpace)
+    #if (!$isSpaceWatched)
       #submenuitem("javascript:watchlist('addspace')" $msg.get("core.menu.watchlist.add.space"))
     #else
       #submenuitem("javascript:watchlist('removespace')" $msg.get("core.menu.watchlist.remove.space"))
     #end
     #submenuseparator()
-    #submenuitem($crtUserDoc.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
+    #submenuitem($docuser.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
     #xwikitopmenuentryend()
   #end
 #end

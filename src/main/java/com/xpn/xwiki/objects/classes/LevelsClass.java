@@ -1,5 +1,17 @@
 package com.xpn.xwiki.objects.classes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.xhtml.input;
+import org.apache.ecs.xhtml.option;
+import org.apache.ecs.xhtml.select;
+import org.dom4j.Element;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -7,25 +19,22 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 import com.xpn.xwiki.web.XWikiRequest;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.xhtml.input;
-import org.apache.ecs.xhtml.option;
-import org.apache.ecs.xhtml.select;
-import org.dom4j.Element;
 
-import java.util.*;
-
-public class LevelsClass extends ListClass {
-    public LevelsClass(PropertyMetaClass wclass) {
+public class LevelsClass extends ListClass
+{
+    public LevelsClass(PropertyMetaClass wclass)
+    {
         super("levelslist", "Levels List", wclass);
         setSize(6);
     }
 
-    public LevelsClass() {
+    public LevelsClass()
+    {
         this(null);
     }
 
-    public List getList(XWikiContext context) {
+    public List getList(XWikiContext context)
+    {
         List list;
         try {
             list = context.getWiki().getRightService().listAllLevels(context);
@@ -36,7 +45,7 @@ public class LevelsClass extends ListClass {
 
         XWikiRequest req = context.getRequest();
         if (("editrights".equals(req.get("xpage")) || "rights".equals(req.get("editor")))
-		&&(!"1".equals(req.get("global")))) {
+            && (!"1".equals(req.get("global")))) {
             list.remove("admin");
             list.remove("programming");
             list.remove("delete");
@@ -45,21 +54,25 @@ public class LevelsClass extends ListClass {
         return list;
     }
 
-    public Map getMap(XWikiContext context) {
+    public Map getMap(XWikiContext context)
+    {
         return new HashMap();
     }
 
-    public BaseProperty newProperty() {
+    public BaseProperty newProperty()
+    {
         return new StringProperty();
     }
 
-    public BaseProperty fromString(String value) {
+    public BaseProperty fromString(String value)
+    {
         BaseProperty prop = newProperty();
         prop.setValue(value);
         return prop;
     }
 
-    public BaseProperty fromStringArray(String[] strings) {
+    public BaseProperty fromStringArray(String[] strings)
+    {
         List list = new ArrayList();
         for (int i = 0; i < strings.length; i++) {
             if (!strings[i].trim().equals("")) {
@@ -71,23 +84,29 @@ public class LevelsClass extends ListClass {
         return prop;
     }
 
-    public String getText(String value, XWikiContext context) {
+    public String getText(String value, XWikiContext context)
+    {
         return value;
     }
 
-    public static List getListFromString(String value) {
+    public static List getListFromString(String value)
+    {
         List list = new ArrayList();
-        if (value == null)
+        if (value == null) {
             return list;
+        }
 
         String val = StringUtils.replace(value, "\\,", "%SEP%");
         String[] result = StringUtils.split(val, ", ");
-        for (int i = 0; i < result.length; i++)
+        for (int i = 0; i < result.length; i++) {
             list.add(StringUtils.replace(result[i], "%SEP%", ","));
+        }
         return list;
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
+    public void displayEdit(StringBuffer buffer, String name, String prefix,
+        BaseCollection object, XWikiContext context)
+    {
         select select = new select(prefix + name, 1);
         select.setMultiple(isMultiSelect());
         select.setSize(getSize());
@@ -109,10 +128,12 @@ public class LevelsClass extends ListClass {
             option option = new option(display, value);
             option.addElement(display);
             // If we don't have this option in the list then add it
-            if (!list.contains(value))
-                    list.add(value);
-            if (selectlist.contains(value))
+            if (!list.contains(value)) {
+                list.add(value);
+            }
+            if (selectlist.contains(value)) {
                 option.setSelected(true);
+            }
             select.addElement(option);
         }
 
@@ -123,9 +144,9 @@ public class LevelsClass extends ListClass {
         buffer.append(in.toString());
     }
 
-    public BaseProperty newPropertyfromXML(Element ppcel) {
+    public BaseProperty newPropertyfromXML(Element ppcel)
+    {
         String value = ppcel.getText();
         return fromString(value);
     }
-
 }

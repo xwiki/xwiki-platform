@@ -19,10 +19,11 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
-import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
@@ -30,12 +31,16 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
-import com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.regex.Pattern;
+import java.util.regex.Matcher;
 
 /**
  * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages
@@ -95,14 +100,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
-        try {
-            initWatchListClass(context);
-            initEmailTemplate(context);
-            initWatchlistJobs(context);
-        } catch (XWikiException e) {
-            log.error("virtualInit", e);
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -114,9 +111,11 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     {
         super.init(context);
         try {
+            // Main wiki
             initWatchListClass(context);
             initEmailTemplate(context);
             initWatchlistJobs(context);
+            sanitizeWatchlists(context);
         } catch (XWikiException e) {
             log.error("virtualInit", e);
             e.printStackTrace();
@@ -127,7 +126,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * {@inheritDoc}
      *
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface,
-     *XWikiContext)
+     *      XWikiContext)
      */
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
@@ -152,11 +151,10 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     protected BaseClass initWatchListClass(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
-        XWiki xwiki = context.getWiki();
         boolean needsUpdate = false;
 
         try {
-            doc = xwiki.getDocument(WATCHLIST_CLASS, context);
+            doc = context.getWiki().getDocument(WATCHLIST_CLASS, context);
         } catch (Exception e) {
             doc = new XWikiDocument();
             String[] spaceAndName = WATCHLIST_CLASS.split(".");
@@ -187,7 +185,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         }
 
         if (needsUpdate) {
-            xwiki.saveDocument(doc, context);
+            context.getWiki().saveDocument(doc, "", true, context);
         }
         return bclass;
     }
@@ -205,13 +203,12 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
-        XWiki xwiki = context.getWiki();
         boolean needsUpdate = false;
         String jobClass = "com.xpn.xwiki.plugin.watchlist.WatchListJob";
 
         String docName = WATCHLIST_EMAIL_JOB_COMMON_NAME + interval;
         try {
-            doc = xwiki.getDocument(docName, context);
+            doc = context.getWiki().getDocument(docName, context);
             BaseObject obj = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
             if (obj == null) {
                 needsUpdate = true;
@@ -236,8 +233,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             // set the needed context params
             // TODO create a watchlist application that holds those jobs as documents
             job.setStringValue("contextUser", "XWiki.Admin");
-            job.setStringValue("contextLang","en");
-            job.setStringValue("contextDatabase","xwiki");
+            job.setStringValue("contextLang", "en");
+            job.setStringValue("contextDatabase", "xwiki");
 
             doc.setContent("#includeInContext('XWiki.SchedulerJobSheet')");
             doc.setAuthor("XWiki.Admin");
@@ -247,7 +244,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             rights.setStringValue("groups", "XWiki.XWikiAdminGroup");
             rights.setStringValue("levels", "edit,delete");
             rights.setIntValue("allow", 1);
-            xwiki.saveDocument(doc, context);
+            context.getWiki().saveDocument(doc, "", true, context);
             ((SchedulerPlugin) context.getWiki().getPlugin("scheduler", context))
                 .scheduleJob(job, context);
         }
@@ -281,11 +278,11 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     protected void initEmailTemplate(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
-        XWiki xwiki = context.getWiki();
         boolean needsUpdate = false;
 
         try {
-            doc = xwiki.getDocument(context.getMainXWiki() + ":" + WATCHLIST_EMAIL_TEMPLATE, context);
+            doc =
+                context.getWiki().getDocument(WATCHLIST_EMAIL_TEMPLATE, context);
             BaseObject obj = doc.getObject(MailSenderPlugin.EMAIL_XWIKI_CLASS_NAME);
             if (obj == null) {
                 needsUpdate = true;
@@ -339,76 +336,75 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             if ((content == null) || (content.equals(""))) {
                 doc.setContent("1 Notification message");
             }
-            xwiki.saveDocument(doc, context);
+            context.getWiki().saveDocument(doc, "", true, context);
         }
     }
 
     /**
-     * Is the watchedDocument in localUser WatchList ?
+     * Is the watchedDocument in user WatchList ?
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param watchedElement XWiki Document name
      * @param context Context of the request
      * @return True if the page is watched by user
      */
-    public boolean isWatched(String localUser, String watchedElement, XWikiContext context)
+    public boolean isWatched(String user, String watchedElement, XWikiContext context)
         throws XWikiException
     {
-        return this.getWatchedDocuments(localUser, context).contains(watchedElement) |
-            this.getWatchedSpaces(localUser, context).contains(watchedElement);
+        return this.getWatchedDocuments(user, context).contains(watchedElement) |
+            this.getWatchedSpaces(user, context).contains(watchedElement);
     }
 
     /**
-     * Creates a WatchList XWiki Object in the localUser's profile's page
+     * Creates a WatchList XWiki Object in the user's profile's page
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param context Context of the request
      * @throws XWikiException if the document cannot be saved
      */
-    public void createWatchListObject(String localUser, XWikiContext context) throws XWikiException
+    public void createWatchListObject(String user, XWikiContext context) throws XWikiException
     {
-        XWiki wiki = context.getWiki();
-        XWikiDocument userDocument = wiki.getDocument(localUser, context);
+        XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         int nb = userDocument.createNewObject(WATCHLIST_CLASS, context);
         BaseObject wObj = userDocument.getObject(WATCHLIST_CLASS, nb);
         wObj.set("interval", "1", context);
-        wiki.saveDocument(userDocument, context.getMessageTool().get("watchlist.create.object"),
-            true, context);
+        context.getWiki()
+            .saveDocument(userDocument, context.getMessageTool().get("watchlist.create.object"),
+                true, context);
     }
 
     /**
-     * Gets the WatchList XWiki Object from localUser's profile's page
+     * Gets the WatchList XWiki Object from user's profile's page
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param context Context of the request
      * @return the WatchList XWiki BaseObject
      * @throws XWikiException if BaseObject creation fails
      */
-    private BaseObject getWatchListObject(String localUser, XWikiContext context)
+    public BaseObject getWatchListObject(String user, XWikiContext context)
         throws XWikiException
     {
-        XWikiDocument userDocument = context.getWiki().getDocument(localUser, context);
+        XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         if (userDocument.getObjectNumbers(WATCHLIST_CLASS) == 0) {
-            this.createWatchListObject(localUser, context);
-            return this.getWatchListObject(localUser, context);
+            this.createWatchListObject(user, context);
+            return this.getWatchListObject(user, context);
         }
         return userDocument.getObject(WATCHLIST_CLASS);
     }
 
     /**
-     * Sets a largeString property in the localUser's WatchList Object, then saves the localUser's
-     * profile
+     * Sets a largeString property in the user's WatchList Object, then saves the user's profile
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param prop Property name (documents,spaces,query)
      * @param value Property value (list of documents,list of pages,hql query)
      * @param context Context of the request
      * @throws XWikiException if the user's profile cannot be saved
      */
-    private void setWatchListLargeStringProperty(String localUser, String prop, String value,
+    public void setWatchListLargeStringProperty(String user, String prop, String value,
         XWikiContext context) throws XWikiException
     {
-        XWikiDocument userDocument = context.getWiki().getDocument(localUser, context);
+        XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         userDocument.setLargeStringValue(WATCHLIST_CLASS, prop, value);
         userDocument.isMinorEdit();
         context.getWiki().saveDocument(userDocument,
@@ -416,57 +412,59 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
-     * Get the list of documents watched by localUser
+     * Get the list of documents watched by user
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param context Context of the request
      * @return List of watched documents
      * @throws XWikiException if the WatchList Object cannot be retreived
      */
-    public List getWatchedDocuments(String localUser, XWikiContext context) throws XWikiException
+    public List getWatchedDocuments(String user, XWikiContext context) throws XWikiException
     {
-        BaseObject watchListObject = this.getWatchListObject(localUser, context);
+        BaseObject watchListObject = this.getWatchListObject(user, context);
         String watchedItems = watchListObject.getLargeStringValue("documents").trim();
         return Arrays.asList(watchedItems.split(","));
     }
 
     /**
-     * Get the list of spaces watched by localUser
+     * Get the list of spaces watched by user
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param context Context of the request
      * @return List of watched space
      * @throws XWikiException if the WatchList Object cannot be retreived
      */
-    public List getWatchedSpaces(String localUser, XWikiContext context) throws XWikiException
+    public List getWatchedSpaces(String user, XWikiContext context) throws XWikiException
     {
-        BaseObject watchListObject = this.getWatchListObject(localUser, context);
+        BaseObject watchListObject = this.getWatchListObject(user, context);
         String watchedItems = watchListObject.getLargeStringValue("spaces").trim();
         return Arrays.asList(watchedItems.split(","));
     }
 
     /**
-     * Add the specified element (document or space) to the corresponding list in the localUser's
+     * Add the specified element (document or space) to the corresponding list in the user's
      * WatchList
      *
-     * @param localUser XWikiUser
+     * @param user XWikiUser
      * @param newWatchedElement The name of the element to add (document of space)
      * @param isSpace True if the element is a space, false if it's a document
      * @param context Context of the request
      * @return True if the element was'nt already in list
      * @throws XWikiException if the modification hasn't been saved
      */
-    public boolean addWatchedElement(String localUser, String newWatchedElement,
+    public boolean addWatchedElement(String user, String newWatchedElement,
         boolean isSpace, XWikiContext context) throws XWikiException
     {
-        if (this.isWatched(localUser, newWatchedElement, context)) {
+        newWatchedElement = context.getDatabase() + ":" + newWatchedElement;
+
+        if (this.isWatched(user, newWatchedElement, context)) {
             return false;
         }
 
         String prop = isSpace ? "spaces" : "documents";
         List watchedItems = isSpace ?
-            this.getWatchedSpaces(localUser, context) :
-            this.getWatchedDocuments(localUser, context);
+            this.getWatchedSpaces(user, context) :
+            this.getWatchedDocuments(user, context);
 
         StringBuffer updatedWatchedElements = new StringBuffer();
         for (int i = 0; i < watchedItems.size(); i++) {
@@ -479,35 +477,37 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             updatedWatchedElements.append(",");
         }
         updatedWatchedElements.append(newWatchedElement);
-        this.setWatchListLargeStringProperty(localUser, prop, updatedWatchedElements.toString(),
+        this.setWatchListLargeStringProperty(user, prop, updatedWatchedElements.toString(),
             context);
         return true;
     }
 
     /**
-     * Remove the specified element (document or space) from the corresponding list in the
-     * localUser's WatchList
+     * Remove the specified element (document or space) from the corresponding list in the user's
+     * WatchList
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param watchedElement The name of the element to remove (document or space)
      * @param isSpace True if the element is a space, false if it's a document
      * @param context Context of the request
      * @return True if the element was in list and has been removed, false if the element was'nt in
      *         the list
-     * @throws XWikiException If the WatchList Object cannot be retreived or if the localUser's
-     * profile cannot be saved
+     * @throws XWikiException If the WatchList Object cannot be retreived or if the user's profile
+     * cannot be saved
      */
-    public boolean removeWatchedElement(String localUser, String watchedElement,
+    public boolean removeWatchedElement(String user, String watchedElement,
         boolean isSpace, XWikiContext context) throws XWikiException
     {
-        if (!this.isWatched(localUser, watchedElement, context)) {
+        watchedElement = context.getDatabase() + ":" + watchedElement;
+
+        if (!this.isWatched(user, watchedElement, context)) {
             return false;
         }
 
         String prop = isSpace ? "spaces" : "documents";
         List watchedItems = isSpace ?
-            this.getWatchedSpaces(localUser, context) :
-            this.getWatchedDocuments(localUser, context);
+            this.getWatchedSpaces(user, context) :
+            this.getWatchedDocuments(user, context);
 
         StringBuffer updatedWatchedElements = new StringBuffer();
         for (int i = 0; i < watchedItems.size(); i++) {
@@ -518,23 +518,22 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
                 updatedWatchedElements.append(watchedItems.get(i));
             }
         }
-        this.setWatchListLargeStringProperty(localUser, prop, updatedWatchedElements.toString(),
+        this.setWatchListLargeStringProperty(user, prop, updatedWatchedElements.toString(),
             context);
         return true;
     }
 
     /**
-     * Get the list of the elements watched by localUser ordered by last modification date,
-     * descending
+     * Get the list of the elements watched by user ordered by last modification date, descending
      *
-     * @param localUser XWiki User
+     * @param user XWiki User
      * @param context Context of the request
      * @return The list of the watched elements ordered by last modification date, descending
      * @throws XWikiException If the search request fails
      */
-    public List getWatchListWhatsNew(String localUser, XWikiContext context) throws XWikiException
+    public List getWatchListWhatsNew(String user, XWikiContext context) throws XWikiException
     {
-        BaseObject watchListObject = this.getWatchListObject(localUser, context);
+        BaseObject watchListObject = this.getWatchListObject(user, context);
         String watchedDocuments =
             watchListObject.getLargeStringValue("documents").trim().replaceFirst("^,", "")
                 .replaceAll(",", "','");
@@ -545,5 +544,146 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
             "order by doc.date desc";
         return context.getWiki().getStore().search(request, 20, 0, context);
+    }
+
+    /**
+     * @return the full list of all database names of all defined virtual wikis. The database names
+     *         are computed from the names of documents having a XWiki.XWikiServerClass object
+     *         attached to them by removing the "XWiki.XWikiServer" prefix and making it lower case.
+     *         For example a page named "XWiki.XWikiServerMyDatabase" would return "mydatabase" as
+     *         the database name.
+     */
+    public List getVirtualWikisDatabaseNames(Context context, XWiki xwiki) throws XWikiException
+    {
+        List databaseNames = new ArrayList();
+
+        String database = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainWikiName());
+
+            String hql =
+                ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
+                    +
+                    " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
+                    + "and prop.id.id = obj.id ";
+            List list = xwiki.searchDocuments(hql);
+
+            for (Iterator it = list.iterator(); it.hasNext();) {
+                String docname = (String) it.next();
+                if (docname.startsWith("XWiki.XWikiServer")) {
+                    databaseNames.add(docname.substring("XWiki.XWikiServer".length())
+                        .toLowerCase());
+                }
+            }
+        } finally {
+            context.setDatabase(database);
+        }
+
+        return databaseNames;
+    }
+
+    /**
+     * Search documents on all the wikis by passing HQL where clause values as parameters.
+     *
+     * @param request the HQL where clause.
+     * @param values the where clause values that replace the question marks (?)
+     * @return a list of document names prefixed with the wiki they come from ex :
+     *         xwiki:Main.WebHome
+     */
+    protected List globalSearchDocuments(String request, List values, Context context, XWiki xwiki)
+    {
+        String initialDb =
+            !context.getDatabase().equals("") ? context.getDatabase() :
+                context.getMainWikiName();
+        List wikiServers = Collections.EMPTY_LIST;
+        List results = new ArrayList();
+
+        if (xwiki.isVirtual()) {
+            try {
+                wikiServers = getVirtualWikisDatabaseNames(context, xwiki);
+                if (!wikiServers.contains(context.getMainWikiName())) {
+                    wikiServers.add(context.getMainWikiName());
+                }
+            } catch (Exception e) {
+                getLogger().error("error getting list of wiki servers!", e);
+            }
+        } else {
+            wikiServers = new ArrayList();
+            wikiServers.add(context.getMainWikiName());
+        }
+
+        try {
+            for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
+                String wiki = (String) iter.next();
+                String wikiPrefix = wiki + ":";
+                context.setDatabase(wiki);
+                try {
+                    List upDocsInWiki = xwiki.searchDocuments(request, 0, 0, values);
+                    Iterator it = upDocsInWiki.iterator();
+                    while (it.hasNext()) {
+                        results.add(wikiPrefix + it.next());
+                    }
+                } catch (Exception e) {
+                    getLogger().error("error getting list of documents in the wiki : " + wiki, e);
+                }
+            }
+        } finally {
+            context.setDatabase(initialDb);
+        }
+        return results;
+    }
+
+    /**
+     * Loop over all the watchlists stored in all the wikis. Verify if the database prefix is
+     * present on all the watchlist items, if not adds MainWiki as prefix.
+     */
+    protected void sanitizeWatchlists(XWikiContext context)
+    {
+        String request = ", BaseObject as obj where obj.name=doc.fullName and obj.className='"
+            + WatchListPlugin.WATCHLIST_CLASS + "'";
+        List subscribers = globalSearchDocuments(request, new ArrayList(), new Context(context),
+            new XWiki(context.getWiki(), context));
+        Iterator it = subscribers.iterator();
+        while (it.hasNext()) {
+            String user = (String) it.next();
+            try {
+
+                XWikiDocument userDocument =
+                    context.getWiki().getDocument(user, context);
+                BaseObject wobj = userDocument.getObject(WatchListPlugin.WATCHLIST_CLASS);
+                String docs = wobj.getLargeStringValue("documents").trim();
+                String spaces = wobj.getLargeStringValue("spaces").trim();
+                boolean update = false;
+
+                // Add db prefixes to document names stored in the watchlist object
+                Pattern p = Pattern.compile("(^|,)([^\\.,:]+)(\\.)([^\\.,]+)");
+                Matcher m = p.matcher(docs);
+                if (m.find()) {
+                    String newdocs = docs.replaceAll("(^|,)([^\\.,:]+)(\\.)([^\\.,]+)",
+                        "$1" + context.getMainXWiki() + ":$2$3$4");
+                    wobj.setLargeStringValue("documents", newdocs);
+                    getLogger().info("Sanitizing watchlist documents for user : " + user);
+                    update = true;
+                }
+
+                // Add db prefixes to space names stored in the watchlist object
+                p = Pattern.compile("(^|,)([^:,]+)(?=(,|$))");
+                m = p.matcher(spaces);
+                if (m.find()) {
+                    String newspaces = spaces.replaceAll("(^|,)([^:,]+)(?=(,|$))",
+                        "$1" + context.getMainXWiki() + ":$2");
+                    wobj.setLargeStringValue("spaces", newspaces);
+                    getLogger().info("Sanitizing watchlist spaces for user : " + user);
+                    update = true;
+                }
+
+                if (update) {
+                    context.getWiki().saveDocument(userDocument, "", true, context);
+                }
+            } catch (Exception e) {
+                getLogger().error("Exception while sanitizing watchlist for user : " + user);
+                e.printStackTrace();
+            }
+        }
     }
 }

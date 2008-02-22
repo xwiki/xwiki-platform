@@ -40,6 +40,16 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         "toutes", "tu", "un", "une", "va", "vers", "voici", "voil\u00e0", "vos", "votre", "vous",
         "vu", "v\u00f4tre", "v\u00f4tres", "y", "\u00e0", "\u00e7a", "\u00e8s", "\u00e9t\u00e9",
         "\u00eatre", "\u00f4", "avez", "parce", "suis"};
+    
+    public final static String[] ENGLISH_STOP_WORDS =
+        {"the", "of", "and", "a", "to", "in", "is", "you", "that", "it", "he", "was", "for", "on", 
+        "are", "as", "with", "his", "they", "I", "at", "be", "this", "have", "from", "or", "one", 
+        "had", "by", "but", "not", "what", "all", "were", "we", "when", "your", "can", "said",
+        "there", "use", "an", "each", "which", "she", "do", "how", "their", "if", "will", "up", 
+        "other", "about", "out", "many", "then", "them", "these", "so", "some", "her", "would", 
+        "make", "like", "him", "into", "time", "has", "look", "two", "more", "go", "see", "no", 
+        "way", "could", "my", "than", "first", "been", "call", "who", "its", "now", "find", "long", 
+        "down", "day", "did", "get", "come", "may"};    
 
     List ignoreList = new ArrayList();
 
@@ -220,10 +230,20 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
     private Map clearStopWords(TagCloud tagcloud, int lang)
     {
         Map words = tagcloud.getCountedWordMap();
-        if (lang == LANG_FRENCH) {
-            for (int i = 0; i < FRENCH_STOP_WORDS.length; i++) {
-                words.remove(FRENCH_STOP_WORDS[i]);
-            }
+        String[] stopWordsArray = new String[0];
+        switch(lang) {
+            case LANG_ENGLISH:
+                stopWordsArray = ENGLISH_STOP_WORDS;
+                break;
+            case LANG_FRENCH:
+                stopWordsArray = FRENCH_STOP_WORDS;
+                break;
+            default: 
+                //nothing
+                break;
+        }
+        for (int i = 0; i < stopWordsArray.length; i++) {
+            words.remove(stopWordsArray[i]);
         }
 
         Iterator wit = words.keySet().iterator();
@@ -330,5 +350,12 @@ public class AutoTagPlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         tagcloud.setWordList(words);
         return words;
     }
-
+    
+    public int getLanguageConstant(String lang) {
+        if (lang.trim().toLowerCase().equals("fr")) {
+            return AutoTagPlugin.LANG_FRENCH;
+        }        
+        //default english
+        return AutoTagPlugin.LANG_ENGLISH;
+    }
 }

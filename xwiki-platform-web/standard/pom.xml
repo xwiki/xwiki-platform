@@ -175,11 +175,16 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-remote-resources-plugin</artifactId>
-            <configuration>
-              <properties>
-                <xwikiDbConnectionUrl>${xwiki.db.connection.url}</xwikiDbConnectionUrl>
-              </properties>
-            </configuration>
+            <executions>
+              <execution>
+                <id>xwiki-configuration-resources</id>
+                <configuration>
+                  <properties>
+                    <xwikiDbConnectionUrl>${xwiki.db.connection.url}</xwikiDbConnectionUrl>
+                  </properties>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>

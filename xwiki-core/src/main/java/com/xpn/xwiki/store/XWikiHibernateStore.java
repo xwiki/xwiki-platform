@@ -376,6 +376,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 bclass.setName(doc.getFullName());
                 if ((bclass.getFieldList().size()>0)&&(useClassesTable(true, context)))
                     saveXWikiClass(bclass, context, false);
+                // Store this XWikiClass in the context so that we can use it in case of recursive usage of classes
+                context.addBaseClass(bclass);
                 // update objects of the class
                 for (Iterator itf=bclass.getFieldList().iterator(); itf.hasNext(); ) {
                     PropertyClass prop = (PropertyClass) itf.next();

@@ -85,6 +85,7 @@ pre {
 	white-space:pre;
 	padding: 10px;
 	margin: 0em;
+	overflow: auto;
 	/*word-wrap:break-word;*/
 }
 .main pre p {margin:0;}
@@ -305,7 +306,7 @@ table td{
 #xwikicontent .sortarrow img {margin: 0;}
 .main p {
 	line-height : 1.4em;
-	margin: 1em 0
+	margin: 1em 0;
 	}
 .main ol, .main ul {
 		line-height : 1.4em;
@@ -750,7 +751,8 @@ padding: -30px -250px;
 	}
 
 #xwikicontent {
-	 overflow: auto;
+	 overflow-x: auto;
+	 overflow-y:hidden;
 	 padding: 0;
 	 position: relative;
 	 } 
@@ -1260,7 +1262,7 @@ html > body #actionmenu{
 
 .submenu{
   display: block;
-  width: 10em;
+  width: 12em;
   position: absolute;
   margin-top: 0px;
   margin-left: 0px !important;
@@ -1272,12 +1274,13 @@ html > body #actionmenu{
 .submenu.hidden, .submenu .submenuseparator{ display: none;}
 #actionmenu .submenuitem a, #actionmenu .submenuitem a:link, #actionmenu .submenuitem a:visited, #actionmenu .submenuitem a:active  {
 display:block;
-width:12em;
+float: none;
+width: 100%;
 font-size:0.8em;
 font-weight: bold;
 text-decoration:none; 
 height:auto; 
-padding:2px 2px 0px 2px;
+padding:2px 0px 0px 0px;
 line-height:1.2em;
 border: 0;
 text-align: left;
@@ -1304,12 +1307,11 @@ Tabs
 .alleditcontent .floatcontainer {background-color: #fff;}
 ul.xwikitabbar{
   padding: 0px 0 0 3px;
-  margin: -30px 0 0 0;
-	float: left;
-	width:100%;
-	height: 30px;
-	border-bottom: none;
-	overflow:auto;
+  margin: 0px 0 0 0;
+width:100%;
+height: 30px;
+border-bottom: none;
+
 }
 #xwikieditor ul.xwikitabbar{
 	overflow: hidden;
@@ -1317,17 +1319,17 @@ ul.xwikitabbar{
 #xwikicontent ul.xwikitabbar{
 	overflow: hidden;
 	margin: 0px;
-	border-bottom: 2px solid #555;
+	border-bottom: 0px solid #555;
 	}
 .xwikitabbar li{
 	position:  relative;
   display: inline;
-  padding: 5px 0px;
+  height: 30px;
+  line-height: 30px;
   list-style-type: none;
   border: 0px solid;
   border-bottom: none;
   margin-right: 2px;
-  margin-top: 2px;
   text-align: center;
   display: block;
   float: left;
@@ -1342,14 +1344,12 @@ ul.xwikitabbar{
 .xwikitabbar li:hover{
 	background-position: top center;
 }
-html > body .xwikitabbar li{
-  padding: 5px 0px;
-}
+
 .xwikitabbar li a{
-  padding: 5px 3px;
+  padding: 0px 3px;
   font-weight: normal;
   font-size:0.85em;
-  line-height: 1em;
+  line-height: 30px;
   letter-spacing: -0.5px;
   text-decoration: none;
 }
@@ -1777,6 +1777,7 @@ background-position: 0% 50%;
   cursor: default;
 }
 .accordionTabContentBox {
+	position:  relative;
 	padding: 5px;
 	overflow: auto;
 }
@@ -1829,9 +1830,7 @@ Misc
 #xwikihelplistsContent ul, #xwikihelplistsContent ol{
   margin: 0px;
 }
-#contentcolumn .panel.large{
-  width: 290px;
-}
+#contentcolumn .panel.large{}
 .accordionTabTitleBar tt{
   font-style: normal;
   font-size: 100%;
@@ -2001,13 +2000,13 @@ body.adminbody .alleditcontent{
 
 #xwikidoctitleinput {
 	margin-top: 1em;
-	
 	width: 70%;
 }
 
 #xwikicontent .floatcontainer{
   overflow: hidden;
-  width: 100%;
+  width: auto;
+  border-bottom: 2px solid #333;
 }
 
 #xwikieditcontent{
@@ -2247,7 +2246,7 @@ padding-top: 10px;
 #body .buttonwrapper * {
 display: inline-block;
 display:inline;
-line-height:1.6em !important;
+line-height:1.35em !important;
 margin:0px !important;
 min-height:24px !important;
 background:transparent url( images/buttons3.png ) repeat-x scroll right top;
@@ -2295,17 +2294,7 @@ margin: 0;
 
 /* @end */
 
-
-
-
-
-
-
-
-
-
-
-
+/* @group tablesearch */
 
 table#searchTableUnique {width: 99.8%;}
 table#searchTableUnique td span.wikilink {
@@ -2336,15 +2325,13 @@ table#searchTableUnique td.actions a span{
 	float: left;
 	padding: 16px 0 0 0;
 }
-table#searchTableUnique input,
-table#searchTableUnique select{
-/*	width:  100%;*/
-}
 table#referenceTable,
 table#referenceTable input,
 table#referenceTableselect {width: 98%;}
 table#referenceTable input#flt3_referenceTable {width: 59%;margin-right: 1%;}
 table#referenceTable input#btn3_referenceTable {width: 39%;}
+
+/* @end */
 /*
 ---------------------------------------
 Messages
@@ -2493,7 +2480,7 @@ table.mceEditor textarea{ width :100%; height: 100%;}
 }
 
 #treeview table { margin: 0px;}
-#treeview table td{ text-align: left; padding: 0px;}
+#treeview table td{ text-align: left; padding: 0px;border: 0px;}
 
 .roundedbox {
 	margin: 0em;
@@ -2711,13 +2698,57 @@ form#inline #xwikiuserprofile input ,
 form#inline #xwikiuserprofile label,
 #lb-content #xwikiuserprofile label {font-size: 1.4em;}
 
+/* @group contentPanels */
 
+div.panellayoutcontainer-1col .panellayoutcol {	width: 100%;}
+div.panellayoutcontainer-2col .panellayoutcol {	width: 50%;}
+div.panellayoutcontainer-3col .panellayoutcol {	width: 33%;}
+div.panellayoutcontainer-4col .panellayoutcol {	width: 25%;}
+div.panellayoutcontainer-5col .panellayoutcol {	width: 20%;}
+
+div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutcontainer-3col,div.panellayoutcontainer-4col,div.panellayoutcontainer-5col
+	{
+	overflow: auto;
+	clear: left;
+}
+.panellayoutcol {
+	overflow: auto;
+	float: left;
+	height: 1%;
+}
+.panellayoutcol .panel {
+	width: 90%;
+	margin: 0 0 20px 5%;
+	border: 1px solid #ddd;
+}
+#xwikicontent .panel ul {
+	margin: 0 5px;
+	padding: 0;
+	list-style-position: inside;
+}
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents {background-color: transparent; background-image: none;padding: 10px;}
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents a {color: #000;}
+#xwikicontent .panellayoutcol .panel .xwikipanelcontents a:hover {color: #06F;}
+#xwikicontent .panellayoutcol .expanded .xwikipaneltitle {
+	color: #fff;
+	background: #aaa url("icons/black-less-cont.png") no-repeat 100% 50%;
+}
+
+#xwikicontent .panellayoutcol .collapsed .xwikipaneltitle {
+	height: 30px;
+	color: #fff;
+	background: #dcdce1 url("icons/black-more-cont.png") no-repeat 100% 50%;
+}
+
+#xwikicontent .panellayoutcol .expanded h5.xwikipaneltitle:hover,#xwikicontent .panellayoutcol .collapsed h5.xwikipaneltitle:hover	{color: #fff;}
+
+/* @end */
 
 
 
 /* IE */
-* html  * {display: inline-block; }
-* html p {display: block !important;}
+* html div ,
+* html .buttonwrapper *{display: inline-block; }
 * html a {position: relative; z-index:1;}
 * html #rightPanels, #editPanels { margin-top: -27px; height: 400px;}
 
@@ -2744,10 +2775,7 @@ form#inline #xwikiuserprofile label,
 * html #headerspace .minwidth{ display:block; width:710px;}/* 740 - 30 padding */
 * html .minwidthc{}
 * html .minwidthd{}
-* html body  #show-dialog-btn {
-right:1px;
-top:1px;
-}
+* html body  #show-dialog-btn {right:1px;top:1px;}
 * html ul.xwikitabbar{margin: 0;}
 * html ul.xwikitabbar li a{line-height: 1em;}
 * html .roundedbox ,
@@ -2758,6 +2786,8 @@ top:1px;
 	float: left;
 	width: 50px;
 }
+* html pre {word-wrap: break-word}
+
 * html div.floatinginfobox,
 * html fieldset.floatinginfobox,
 * html fieldset.floatinginfobox *,
@@ -2774,3 +2804,6 @@ top:1px;
 * html #webhomeblogdisplay, * html #webhomeNewsdisplay {
   width: 48% !important;
 }
+
+.main p {position: static; border-collapse: collapse;}
+

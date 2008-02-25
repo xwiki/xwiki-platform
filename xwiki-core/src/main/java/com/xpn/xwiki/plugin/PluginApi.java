@@ -66,6 +66,7 @@ public class PluginApi extends Api
      * Return the inner plugin object, if the user has the required programming rights.
      * 
      * @return The wrapped plugin object.
+     * @since 1.3RC1
      */
     public XWikiPluginInterface getInternalPlugin()
     {

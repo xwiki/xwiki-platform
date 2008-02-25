@@ -516,12 +516,16 @@ public class Package
         }
 
         int status = DocumentInfo.INSTALL_OK;
+
+        // Start by installing all documents having a class definition so that their
+        // definitions are available when installing documents using them. 
         for (int i = 0; i < classFiles.size(); i++) {
             if (installDocument(((DocumentInfo) classFiles.get(i)), isAdmin, context) == DocumentInfo.INSTALL_ERROR) {
                 status = DocumentInfo.INSTALL_ERROR;
             }
         }
 
+        // Install the remaining documents (without class definitions). 
         for (int i = 0; i < files.size(); i++) {
             DocumentInfo di = (DocumentInfo) files.get(i);
             if (!classFiles.contains(di)) {

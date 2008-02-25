@@ -21,16 +21,20 @@
 
 package com.xpn.xwiki.web;
 
-import javax.portlet.*;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.Locale;
 import java.util.Map;
+
+import javax.portlet.PortletMode;
+import javax.portlet.PortletModeException;
+import javax.portlet.PortletURL;
+import javax.portlet.WindowState;
+import javax.portlet.WindowStateException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 
 public class XWikiServletResponse implements XWikiResponse {
     private HttpServletResponse response;
@@ -102,6 +106,7 @@ public class XWikiServletResponse implements XWikiResponse {
 
     public void addCookie(String cookieName, String cookieValue, int age) {
         Cookie cookie = new Cookie(cookieName, cookieValue);
+        cookie.setVersion(1);
         cookie.setMaxAge(age);
         response.addCookie(cookie);
     }

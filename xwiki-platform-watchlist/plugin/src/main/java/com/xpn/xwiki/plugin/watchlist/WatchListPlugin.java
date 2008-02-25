@@ -19,20 +19,26 @@
  */
 package com.xpn.xwiki.plugin.watchlist;
 
-import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.*;
+import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
+import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.velocity.VelocityContext;
+import org.joda.time.DateTime;
+import org.joda.time.Hours;
+import org.joda.time.Days;
+import org.joda.time.Weeks;
+import org.joda.time.Months;
 
 import java.util.Arrays;
 import java.util.List;
@@ -540,47 +546,13 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         String watchedSpaces =
             watchListObject.getLargeStringValue("spaces").trim().replaceFirst("^,", "")
                 .replaceAll(",", "','");
+
+        // TODO : sort watched elements by wiki and query each of them 
+
         String request = "select doc.fullName from XWikiDocument as doc where doc.web in ('" +
             watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
             "order by doc.date desc";
-        return globalSearchDocuments(request, 20, 0, new ArrayList(), new Context(context),
-            new XWiki(context.getWiki(), context));
-    }
-
-    /**
-     * @return the full list of all database names of all defined virtual wikis. The database names
-     *         are computed from the names of documents having a XWiki.XWikiServerClass object
-     *         attached to them by removing the "XWiki.XWikiServer" prefix and making it lower case.
-     *         For example a page named "XWiki.XWikiServerMyDatabase" would return "mydatabase" as
-     *         the database name.
-     */
-    public List getVirtualWikisDatabaseNames(Context context, XWiki xwiki) throws XWikiException
-    {
-        List databaseNames = new ArrayList();
-
-        String database = context.getDatabase();
-        try {
-            context.setDatabase(context.getMainWikiName());
-
-            String hql =
-                ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                    +
-                    " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
-                    + "and prop.id.id = obj.id ";
-            List list = xwiki.searchDocuments(hql);
-
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                String docname = (String) it.next();
-                if (docname.startsWith("XWiki.XWikiServer")) {
-                    databaseNames.add(docname.substring("XWiki.XWikiServer".length())
-                        .toLowerCase());
-                }
-            }
-        } finally {
-            context.setDatabase(database);
-        }
-
-        return databaseNames;
+        return globalSearchDocuments(request, 20, 0, new ArrayList(), context);
     }
 
     /**
@@ -592,26 +564,26 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      *         xwiki:Main.WebHome
      */
     protected List globalSearchDocuments(String request, int nb, int start, List values,
-        Context context, XWiki xwiki)
+        XWikiContext context)
     {
         String initialDb =
             !context.getDatabase().equals("") ? context.getDatabase() :
-                context.getMainWikiName();
+                context.getMainXWiki();
         List wikiServers = Collections.EMPTY_LIST;
         List results = new ArrayList();
 
-        if (xwiki.isVirtual()) {
+        if (context.getWiki().isVirtual()) {
             try {
-                wikiServers = getVirtualWikisDatabaseNames(context, xwiki);
-                if (!wikiServers.contains(context.getMainWikiName())) {
-                    wikiServers.add(context.getMainWikiName());
+                wikiServers = context.getWiki().getVirtualWikiList();
+                if (!wikiServers.contains(context.getMainXWiki())) {
+                    wikiServers.add(context.getMainXWiki());
                 }
             } catch (Exception e) {
                 getLogger().error("error getting list of wiki servers!", e);
             }
         } else {
             wikiServers = new ArrayList();
-            wikiServers.add(context.getMainWikiName());
+            wikiServers.add(context.getMainXWiki());
         }
 
         try {
@@ -620,8 +592,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
                 String wikiPrefix = wiki + ":";
                 context.setDatabase(wiki);
                 try {
-                    // List upDocsInWiki = xwiki.searchDocuments(request, 0, 0, values);
-                    List upDocsInWiki = xwiki.searchDocumentsNames(wiki, request, 0, 0, values);
+                    List upDocsInWiki = context.getWiki().getStore()
+                        .searchDocumentsNames(request, 0, 0, values, context);
                     Iterator it = upDocsInWiki.iterator();
                     while (it.hasNext()) {
                         results.add(wikiPrefix + it.next());
@@ -645,8 +617,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         String request = ", BaseObject as obj where obj.name=doc.fullName and obj.className='"
             + WatchListPlugin.WATCHLIST_CLASS + "'";
         List subscribers =
-            globalSearchDocuments(request, 0, 0, new ArrayList(), new Context(context),
-                new XWiki(context.getWiki(), context));
+            globalSearchDocuments(request, 0, 0, new ArrayList(), context);
         Iterator it = subscribers.iterator();
         while (it.hasNext()) {
             String user = (String) it.next();

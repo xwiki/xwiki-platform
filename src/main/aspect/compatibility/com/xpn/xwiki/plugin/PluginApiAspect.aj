@@ -8,9 +8,7 @@ package com.xpn.xwiki.plugin;
 public privileged aspect PluginApiAspect
 {
     /**
-     * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
-     *
-     * @version $Id: $
+     * @deprecated Replaced by {@link com.xpn.xwiki.plugin.PluginApi#getInternalPlugin()} since 1.3RC1.
      */
     public XWikiPluginInterface PluginApi.getPlugin()
     {

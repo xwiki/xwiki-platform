@@ -1,6 +1,7 @@
 // ------------------------------------------------------------------
 // NOTICE file containing copyrights,
 // in this case for #if ($projectName)$projectName#else${project.name}#end
+
 // ------------------------------------------------------------------
 
 #if ($projectName)$projectName#else${project.name}#end

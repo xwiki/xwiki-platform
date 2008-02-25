@@ -91,7 +91,7 @@
             <tr>
                 #set ($idoc = $xwiki.getDocument($item))
                 #if (!$idoc.isNew())
-                <td><a href="$idoc.getURL()">$idoc.getDisplayTitle()</a></td>
+                <td><a href="$idoc.getURL()">$idoc.getDisplayTitle().replaceAll("[^\\.,:]+:", "")</a></td>
                 <td>$idoc.web</td>
                 <td><a href="$doc.getURL("view", "xpage=watchlist&removedocument=${item}")" title="$msg.get("watchlist.delete.tooltip")">$msg.get("watchlist.delete")</a></td>
                 #else
@@ -118,7 +118,7 @@
         #foreach($item in $wlist)
             #if ($item != "")
             <tr>
-                <td>$item</td>
+                <td>$item.replaceAll("[^\\.,:]+:", "")</td>
                 <td><a href="$doc.getURL("view", "xpage=watchlist&removespace=${item}")" title="$msg.get("watchlist.delete.tooltip")">$msg.get("watchlist.delete")</a></td>
             </tr>
             #end

@@ -56,7 +56,7 @@ public class FileUploadPluginApi extends PluginApi
      */
     private FileUploadPlugin getFileUploadPlugin()
     {
-        return (FileUploadPlugin) getPlugin();
+        return (FileUploadPlugin) getProtectedPlugin();
     }
 
     /**

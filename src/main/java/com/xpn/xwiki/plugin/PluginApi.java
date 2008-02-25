@@ -49,19 +49,6 @@ public class PluginApi extends Api
     }
 
     /**
-     * Return the inner plugin object, if the user has the required programming rights.
-     * 
-     * @return The wrapped plugin object.
-     */
-    public XWikiPluginInterface getPlugin()
-    {
-        if (hasProgrammingRights()) {
-            return plugin;
-        }
-        return null;
-    }
-
-    /**
      * Return the inner plugin object. This method is only for the plugin API's internal use, and
      * should not be exposed to scripting languages. It is an XWiki practice to expose all the
      * functionality using an API, and allow access to the internal objects only to users with
@@ -70,9 +57,22 @@ public class PluginApi extends Api
      * @return The wrapped plugin object.
      * @since 1.3RC1
      */
-    protected XWikiPluginInterface getInternalPlugin()
+    protected XWikiPluginInterface getProtectedPlugin()
     {
         return plugin;
+    }
+
+    /**
+     * Return the inner plugin object, if the user has the required programming rights.
+     * 
+     * @return The wrapped plugin object.
+     */
+    public XWikiPluginInterface getInternalPlugin()
+    {
+        if (hasProgrammingRights()) {
+            return plugin;
+        }
+        return null;
     }
 
     /**

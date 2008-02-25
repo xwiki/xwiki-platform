@@ -134,7 +134,7 @@ function watchlist(action)
       #submenuitem("javascript:watchlist('removespace')" $msg.get("core.menu.watchlist.remove.space"))
     #end
     #submenuseparator()
-    #submenuitem($docuser.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
+    #submenuitem($crtUserDoc.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
     #xwikitopmenuentryend()
   #end
 #end

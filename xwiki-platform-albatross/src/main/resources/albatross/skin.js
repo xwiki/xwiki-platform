@@ -129,6 +129,9 @@ var XWikiAjax = {
 
 function checkAdvancedContent(message) {
    result = false;
+   if (!document.forms.edit) {
+     return true;
+   }
    data = document.forms.edit.content.value;
    myRE = new RegExp("</?(html|body|img|a|i|b|embed|script|form|input|textarea|object|font|li|ul|ol|table|center|hr|br|p) ?([^>]*)>", "ig")
    results = data.match(myRE)

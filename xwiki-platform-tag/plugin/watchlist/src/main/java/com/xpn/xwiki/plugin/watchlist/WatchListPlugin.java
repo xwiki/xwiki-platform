@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
@@ -540,19 +542,62 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public List getWatchListWhatsNew(String user, XWikiContext context) throws XWikiException
     {
         BaseObject watchListObject = this.getWatchListObject(user, context);
-        String watchedDocuments =
-            watchListObject.getLargeStringValue("documents").trim().replaceFirst("^,", "")
-                .replaceAll(",", "','");
-        String watchedSpaces =
-            watchListObject.getLargeStringValue("spaces").trim().replaceFirst("^,", "")
-                .replaceAll(",", "','");
 
-        // TODO : sort watched elements by wiki and query each of them 
+        if (context.getWiki().isVirtual()) {
+            // TODO : code getWatchListWhatsNew for virtual mode
+            /* List results = new ArrayList();
+            List watchedElements = Arrays.asList(watchListObject.getLargeStringValue("documents")
+                .trim().replaceFirst("^,", "").replaceAll(",$", "").split(","));
+            watchedElements.addAll(Arrays.asList(watchListObject.getLargeStringValue("spaces")
+                .trim().replaceFirst("^,", "").replaceAll(",$", "").split(",")));
+            Collections.sort(watchedElements);
 
-        String request = "select doc.fullName from XWikiDocument as doc where doc.web in ('" +
-            watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
-            "order by doc.date desc";
-        return globalSearchDocuments(request, 20, 0, new ArrayList(), context);
+            Iterator it = watchedElements.iterator();
+            String previousWiki = "";
+            String currentWiki = "";
+            List currentWikiDocList = new ArrayList();
+            List currentWikiSpaceList = new ArrayList();
+
+            while (it.hasNext()) {
+                String currentEl = (String) it.next();
+                String docWiki = currentEl.split(":")[0];
+                if (!docWiki.equals(currentWiki)) {
+                    if (!previousWiki.equals("")) {
+                        String request =
+                            "select doc.fullName from XWikiDocument as doc where doc.web in (?) " +
+                                "or doc.fullName in (?) order by doc.date desc";
+                        List values = new ArrayList();
+                        // TODO : format docs and spaces lists
+                        values.add(currentWikiSpaceList);
+                        values.add(currentWikiSpaceList);
+                        results.addAll(globalSearchDocuments(request, 20, 0, values, context));
+                        currentWikiDocList.clear();
+                        currentWikiSpaceList.clear();
+                    }
+                    previousWiki = currentWiki;
+                    currentWiki = docWiki;
+                }
+
+                if (currentEl.contains(".")) {
+                    currentWikiDocList.add(currentEl);
+                } else {
+                    currentWikiSpaceList.add(currentEl);
+                }
+            }
+            return results; */
+            return new ArrayList();
+        } else {
+            String watchedDocuments =
+                watchListObject.getLargeStringValue("documents").trim().replaceFirst("^,", "")
+                    .replaceAll("[^\\.,:]+:", "").replaceAll(",", "','");
+            String watchedSpaces =
+                watchListObject.getLargeStringValue("spaces").trim().replaceFirst("^,", "")
+                    .replaceAll("[^\\.,:]+:", "").replaceAll(",", "','");
+            String request = "select doc.fullName from XWikiDocument as doc where doc.web in ('" +
+                watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
+                "order by doc.date desc";
+            return context.getWiki().getStore().search(request, 20, 0, context);
+        }
     }
 
     /**

@@ -19,11 +19,12 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.api.Context;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.plugin.PluginApi;
 
 /**
  * This plugin allows index based search in the contents of Wiki Pages and their attachments, as far
@@ -37,16 +38,18 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @version $Id: $
  */
-public class LucenePluginApi extends Api
+public class LucenePluginApi extends PluginApi
 {
     private static final Log LOG = LogFactory.getLog(LucenePluginApi.class);
 
-    private LucenePlugin plugin;
-
     public LucenePluginApi(LucenePlugin plugin, XWikiContext context)
     {
-        super(context);
-        setPlugin(plugin);
+        super(plugin, context);
+    }
+
+    public LucenePlugin getLucenePlugin()
+    {
+        return (LucenePlugin) getProtectedPlugin();
     }
 
     /**
@@ -58,7 +61,7 @@ public class LucenePluginApi extends Api
     {
         int nbDocuments = -1;
         if (hasAdminRights()) {
-            nbDocuments = getPlugin().rebuildIndex(context);
+            nbDocuments = getLucenePlugin().rebuildIndex(context);
         }
 
         return nbDocuments;
@@ -76,7 +79,7 @@ public class LucenePluginApi extends Api
     {
         int nbDocuments = -1;
         if (wiki.hasAdminRights()) {
-            nbDocuments = getPlugin().rebuildIndex(context.getContext());
+            nbDocuments = getLucenePlugin().rebuildIndex(context.getContext());
         }
 
         return nbDocuments;
@@ -97,7 +100,7 @@ public class LucenePluginApi extends Api
         String languages, com.xpn.xwiki.api.XWiki wiki)
     {
         try {
-            return getPlugin().getSearchResults(query, (String) null, indexDirs, languages,
+            return getLucenePlugin().getSearchResults(query, (String) null, indexDirs, languages,
                 context);
         } catch (Exception e) {
             e.printStackTrace();
@@ -158,8 +161,8 @@ public class LucenePluginApi extends Api
     {
         try {
             SearchResults retval =
-                getPlugin().getSearchResults(query, (String) null, virtualWikiNames, languages,
-                    context);
+                getLucenePlugin().getSearchResults(query, (String) null, virtualWikiNames,
+                    languages, context);
             if (LOG.isDebugEnabled())
                 LOG.debug("returning " + retval.getHitcount() + " results");
             return retval;
@@ -175,7 +178,7 @@ public class LucenePluginApi extends Api
      */
     public long getQueueSize()
     {
-        return plugin.getQueueSize();
+        return getLucenePlugin().getQueueSize();
     }
 
     /**
@@ -183,7 +186,7 @@ public class LucenePluginApi extends Api
      */
     public long getActiveQueueSize()
     {
-        return plugin.getActiveQueueSize();
+        return getLucenePlugin().getActiveQueueSize();
     }
 
     /**
@@ -191,26 +194,7 @@ public class LucenePluginApi extends Api
      */
     public long getLuceneDocCount()
     {
-        return plugin.getLuceneDocCount();
-    }
-
-    /**
-     * @param plugin plugin instance we are the facade for.
-     */
-    public void setPlugin(LucenePlugin plugin)
-    {
-        this.plugin = plugin;
-    }
-
-    /**
-     * @return the plugin instance we are the facade for.
-     */
-    public LucenePlugin getPlugin()
-    {
-        if (hasProgrammingRights()) {
-            return plugin;
-        }
-        return null;
+        return getLucenePlugin().getLuceneDocCount();
     }
 
     /**
@@ -226,7 +210,7 @@ public class LucenePluginApi extends Api
         String languages)
     {
         try {
-            return getPlugin().getSearchResults(query, (String) null, indexDirs, languages,
+            return getLucenePlugin().getSearchResults(query, (String) null, indexDirs, languages,
                 context);
         } catch (Exception e) {
             e.printStackTrace();
@@ -273,7 +257,8 @@ public class LucenePluginApi extends Api
         String indexDirs, String languages)
     {
         try {
-            return getPlugin().getSearchResults(query, sortField, indexDirs, languages, context);
+            return getLucenePlugin().getSearchResults(query, sortField, indexDirs, languages,
+                context);
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
@@ -295,7 +280,8 @@ public class LucenePluginApi extends Api
         String indexDirs, String languages)
     {
         try {
-            return getPlugin().getSearchResults(query, sortField, indexDirs, languages, context);
+            return getLucenePlugin().getSearchResults(query, sortField, indexDirs, languages,
+                context);
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
@@ -353,7 +339,7 @@ public class LucenePluginApi extends Api
     {
         try {
             SearchResults retval =
-                getPlugin().getSearchResults(query, sortField, virtualWikiNames, languages,
+                getLucenePlugin().getSearchResults(query, sortField, virtualWikiNames, languages,
                     context);
             if (LOG.isDebugEnabled())
                 LOG.debug("returning " + retval.getHitcount() + " results");
@@ -415,7 +401,7 @@ public class LucenePluginApi extends Api
     {
         try {
             SearchResults retval =
-                getPlugin().getSearchResults(query, sortField, virtualWikiNames, languages,
+                getLucenePlugin().getSearchResults(query, sortField, virtualWikiNames, languages,
                     context);
             if (LOG.isDebugEnabled())
                 LOG.debug("returning " + retval.getHitcount() + " results");

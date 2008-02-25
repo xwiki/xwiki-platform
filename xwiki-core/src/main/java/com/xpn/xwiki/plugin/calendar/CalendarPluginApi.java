@@ -224,11 +224,11 @@ public class CalendarPluginApi extends Api {
     }
 
     public String getHTMLCalendarFromICal(CalendarParams calendarParams, String surl, String user) throws XWikiException, ParserException, IOException {
-        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user), getXWikiContext());
+        return plugin.getHTMLCalendar(calendarParams, getCalendarEvents(surl, user), getXWikiContext());
     }
 
     public String getHTMLCalendarFromICal(CalendarParams calendarParams, String surl, String user, String username, String password) throws XWikiException, ParserException, IOException {
-        return getPlugin().getHTMLCalendar(calendarParams, getCalendarEvents(surl, user, username, password), getXWikiContext());
+        return plugin.getHTMLCalendar(calendarParams, getCalendarEvents(surl, user, username, password), getXWikiContext());
     }
 
 }

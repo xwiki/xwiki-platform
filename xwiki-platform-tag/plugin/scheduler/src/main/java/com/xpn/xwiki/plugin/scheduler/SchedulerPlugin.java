@@ -329,9 +329,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
 // Let's prepare an execution context...
             XWikiContext stubContext = prepareJobStubContext(object, context);
-            Context stub = new Context(stubContext);
 
-            data.put("context", stub);
+            data.put("context", stubContext);
             data.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), stubContext));
             data.put("xjob", object);
 

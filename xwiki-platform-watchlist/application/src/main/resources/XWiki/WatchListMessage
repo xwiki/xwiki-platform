@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>WatchListMessage</name>
+<language></language>
+<defaultLanguage></defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator></creator>
+<author></author>
+<customClass></customClass>
+<contentAuthor></contentAuthor>
+<creationDate>1197307330000</creationDate>
+<date>1197307330000</date>
+<contentUpdateDate>1197307330000</contentUpdateDate>
+<version>1.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<object>
+<class>
+<name>XWiki.Mail</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<html>
+<name>html</name>
+<number>4</number>
+<prettyName>HTML</prettyName>
+<rows>15</rows>
+<size>80</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</html>
+<language>
+<name>language</name>
+<number>2</number>
+<prettyName>Language</prettyName>
+<size>5</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</language>
+<subject>
+<name>subject</name>
+<number>1</number>
+<prettyName>Subject</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.StringClass</classType>
+</subject>
+<text>
+<name>text</name>
+<number>3</number>
+<prettyName>Text</prettyName>
+<rows>15</rows>
+<size>80</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</text>
+</class>
+<name>XWiki.WatchListMessage</name>
+<number>0</number>
+<className>XWiki.Mail</className>
+<property>
+<html>&lt;b&gt;Hello $pseudo,&lt;/b&gt;&lt;br/&gt;
+&lt;i&gt;This message is sent by XWiki. Here are the documents in your watchlist that have been created or updated since the last notification :&lt;/i&gt;&lt;br/&gt;
+&lt;br/&gt;
+&lt;table width="100%"&gt;
+&lt;tr style="background-color:#EFEFEF;font-weight:bold;"&gt;
+&lt;td&gt;Name&lt;/td&gt;&lt;td&gt;Space&lt;/td&gt;&lt;td&gt;Modified by&lt;/td&gt;&lt;td&gt;Comment&lt;/td&gt;&lt;td&gt;Modified on&lt;/td&gt;
+&lt;/tr&gt;
+#foreach ($udocname in $documents)
+#set ($udoc = $xwiki.getDocument($udocname))
+#if ($velocityCount % 2 == 0)
+  #set ($color = "#E5F0FE")
+#else
+  #set ($color = "#FFF")
+#end
+&lt;tr style="background-color:${color};"&gt;
+&lt;td&gt;&lt;a href="${udoc.getExternalURL()}"&gt;$udoc.getDisplayTitle()&lt;/a&gt;&lt;/td&gt;
+&lt;td&gt;$udoc.web&lt;/td&gt;
+&lt;td&gt;$xwiki.getLocalUserName($udoc.author, true)&lt;/td&gt;
+&lt;td&gt;$udoc.getComment()&lt;/td&gt;
+&lt;td&gt;$xwiki.formatDate($udoc.date)&lt;/td&gt;
+&lt;/tr&gt;
+#end
+&lt;/table&gt;</html>
+</property>
+<property>
+<language>en</language>
+</property>
+<property>
+<subject>XWiki : Watchlist Updates, #set($format="dd/MM/yyyy")#if ($interval == 1)#set($format="${format} hh:mm")#end$xwiki.formatDate($xwiki.date, $format)</subject>
+</property>
+<property>
+<text>Hello $pseudo,
+This message is sent by XWiki. Here are the documents in your watchlist that have been created or updated since the last notification :
+
+#foreach ($udocname in $documents)
+#set ($udoc = $xwiki.getDocument($udocname))$udoc.getDisplayTitle() : ${udoc.getExternalURL()}
+#end</text>
+</property>
+</object>
+<content>
+</content></xwikidoc>

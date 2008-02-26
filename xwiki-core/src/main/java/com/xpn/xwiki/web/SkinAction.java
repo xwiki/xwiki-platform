@@ -73,15 +73,22 @@ public class SkinAction extends XWikiAction
         String baseskin = xwiki.getBaseSkin(context, true);
         XWikiDocument baseskindoc = xwiki.getDocument(baseskin, context);
         String defaultbaseskin = xwiki.getDefaultBaseSkin(context);
+
         String path = request.getPathInfo();
-        LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
-            + " ; defaultbaseskin: " + defaultbaseskin);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
+                + " ; defaultbaseskin: " + defaultbaseskin);
+        }
+        
         int idx = path.lastIndexOf(DELIMITER);
         boolean found = false;
         while (idx > 0) {
             try {
                 String filename = Util.decodeURI(path.substring(idx + 1), context);
-                LOG.debug("Trying '" + filename + "'");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Trying '" + filename + "'");
+                }
 
                 if (renderSkin(filename, doc, context)) {
                     found = true;
@@ -128,7 +135,7 @@ public class SkinAction extends XWikiAction
      * XWikiSkins object attached to the document.</li>
      * <li>As the content of an attachment with the same name as the requested filename.</li>
      * <li>As a file located on the filesystem, in the directory with the same name as the current
-     * document (in case the URL was actually pointing to <tt>/skins/directory/file</tt>.</li>
+     * document (in case the URL was actually pointing to <tt>/skins/directory/file</tt>).</li>
      * </ol>
      * 
      * @param filename The name of the skin file that should be rendered.
@@ -140,13 +147,14 @@ public class SkinAction extends XWikiAction
     private boolean renderSkin(String filename, XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
-        LOG.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
-            + "' document");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Rendering file '" + filename + "' within the '" + doc.getFullName()
+                + "' document");
+        }
         try {
             if (doc.isNew()) {
-                LOG.debug(doc.getName() + " is not a document");
-                if (SKINS_DIRECTORY.equals(doc.getSpace())) {
-                    LOG.debug("Trying on the filesystem");
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(doc.getName() + " is not a document");
                 }
             } else {
                 return renderFileFromObjectField(filename, doc, context)
@@ -176,8 +184,10 @@ public class SkinAction extends XWikiAction
     private boolean renderSkinFromFilesystem(String filename, String skin, XWikiContext context)
         throws XWikiException
     {
-        LOG.debug("Rendering filesystem file '" + filename + "' from the '" + skin
-            + "' skin directory");
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Rendering filesystem file '" + filename + "' from the '" + skin
+                + "' skin directory");
+        }
         XWikiResponse response = context.getResponse();
         String path = DELIMITER + SKINS_DIRECTORY + DELIMITER + skin + DELIMITER + filename;
         try {

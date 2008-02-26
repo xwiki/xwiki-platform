@@ -57,7 +57,6 @@ import com.xpn.xwiki.api.Attachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin;
 
 /**
  * Plugin for XML processing. Uses Xerces as the XML processor.
@@ -67,7 +66,7 @@ import com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin;
 public class XmlPlugin extends XWikiDefaultPlugin
 {
     /** Log object to log messages in this class. */
-    private static final Log LOG = LogFactory.getLog(ZipExplorerPlugin.class);
+    private static final Log LOG = LogFactory.getLog(XmlPlugin.class);
 
     private DOMImplementationLS lsImpl;
 

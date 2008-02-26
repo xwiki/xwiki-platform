@@ -30,7 +30,7 @@ table, caption, tbody, tfoot, thead, tr, th, td {
 	font-weight: inherit;
 	font-style: inherit;
 	font-size: 100%;
-	font-family: inherit;
+	font-family: sans-serif;
 }
 a, a:link, a:active, a:visited {color: #39397f; text-decoration: none;}
 a:hover {color: #00007e;text-decoration:underline;}
@@ -39,7 +39,7 @@ a:hover {color: #00007e;text-decoration:underline;}
 	outline: 0;
 }
 body {
-	line-height: 1;
+	line-height: 1em;
 	color: black;
 	background: white;
 }
@@ -48,7 +48,6 @@ ol, ul {
 	margin-left: 2em;
 }
 /* Tables still need 'cellspacing="0"' in the markup. */
-
 caption, th, td {
 	text-align: left;
 	font-weight: normal;
@@ -68,9 +67,9 @@ blockquote, q {
 	background-color: #fff;
 	margin:0 220px;
 }
-body.hideleft .clearfloat {margin: 0px 220px 0px 30px;}
-body.hideright .clearfloat {margin: 0px 30px 0px 220px;}
-body.hidelefthideright .clearfloat { margin: 0px 30px;}
+body.hideleft .clearfloat {margin: 0 220px 0 30px;}
+body.hideright .clearfloat {margin: 0 30px 0 220px;}
+body.hidelefthideright .clearfloat { margin: 0 30px;}
 body#body.loginbody .clearfloats {display: none;}
 
 body.editbody .clearfloats {
@@ -84,8 +83,9 @@ pre {
 	float:left;
 	white-space:pre;
 	padding: 10px;
-	margin: 0em;
+	margin: 0;
 	overflow: auto;
+	position: relative;
 	/*word-wrap:break-word;*/
 }
 .main pre p {margin:0;}
@@ -103,6 +103,7 @@ strong, .strong {font-weight: bold;}
 .heading-1 span, .heading-1-1 span,
 .heading-1-1-1 span, .heading-1-1-1-1 span {
   display: block;
+  position: relative;
   color: #000;
   background-color: inherit;
   padding: 0;
@@ -116,7 +117,7 @@ strong, .strong {font-weight: bold;}
   background-color: inherit;
   padding: 0;
   margin:  0;
-  border-bottom: 0px;}
+  border-bottom: 0;}
 body#mceSpanFonts .heading-1, body#mceSpanFonts .heading-1-1,
 body#mceSpanFonts .heading-1-1-1, body#mceSpanFonts .heading-1-1-1-1 {
   display: block;
@@ -157,7 +158,7 @@ h1 {
 .heading-1-1-1-1, h5 {
   font-weight:normal;
   color: #404040;
-  left: 0px;
+  left: 0;
   font-size: 1.4em;
   line-height: 1.1em;
 }
@@ -184,8 +185,8 @@ span.edit_section{
 }
 .edit_section a{
   position: absolute;
-  top: 0px;
-  right:  0px;
+  top: 0;
+  right:  0;
     margin: 0;
   margin-right: -52px;
   padding-left: 50px;
@@ -193,7 +194,7 @@ span.edit_section{
   visibility: visible;
   background: transparent url("images/black-edit.png") left top no-repeat;
 overflow: hidden;
-border: 0px solid blue;
+border: 0 solid blue;
 }
 
 
@@ -268,13 +269,12 @@ table td{
 .main td {
  color: #4e6172;
  border-color: #e5eff8;
- padding:.3em 0.5em;
+ padding: 3px 4px;
  border-width: 1px;
  border-style: solid;
  }				
 .mceContentBody tr.table-head td,
 .main th {
- text-align:left;
  border-color: #e5eff8;
  padding:.3em 0.5em;
  background:#f4f9fe;
@@ -315,8 +315,8 @@ table td{
 		list-style-position: inside;
 		}
 .main ol ol, .main ul ul {
-		margin-top: 0em;
-		margin-bottom:0em; 
+		margin-top: 0;
+		margin-bottom:0;
 }
 .main dt{
 	font-weight : bold;
@@ -324,18 +324,18 @@ table td{
 .main dd{
 	font-style: italic;
 	padding-left: 1em;
-	background: transparent url( images/bullet-3.png ) no-repeat 0em 0.3em;
+	background: transparent url( images/bullet-3.png ) no-repeat 0 0.3em;
 }
-.main dd p {margin-top: 0px;}
+.main dd p {margin-top: 0;}
 .list {}
 .list-title {
   font-weight: bold;
 }
 .list ul {
-  margin-top: 0px;
-  margin-bottom: 0px;
-  margin-left: 0px;
-  padding-left: 0px;
+  margin-top: 0;
+  margin-bottom: 0;
+  margin-left: 0;
+  padding-left: 0;
   list-style-type: none;
 }
 /* wiki lists */
@@ -356,22 +356,20 @@ ol.ALPHA { list-style-type: upper-alpha; }
   text-decoration: none;
   font-size: 90%;
   color: white;
-  border: 0px solid black;
+  border: 0 solid black;
   background: #008;
-  padding: 3px;
-  padding-top: 0px;
-  padding-bottom: 0px;
-  margin: 0px;
+  padding: 0 3px;
+  margin: 0;
   margin-left: 3px;
 }
 .wiki-calendar-table *{
   text-align: center;
   border-collapse: collapse;
-  border-spacing: 0px;
+  border-spacing: 0;
 }
 .wiki-calendar-table div{
   font-size: 90%;
-  margin: 2px 0px;
+  margin: 2px 0;
 }
 * html .wiki-calendar-table div{
   font-size: 80%;
@@ -392,7 +390,7 @@ ol.ALPHA { list-style-type: upper-alpha; }
   border: 1px #C0D4E7 solid;
   height: 60px;
   width: 90px;
-  padding-top: 0px !important;
+  padding-top: 0 !important;
 }
 .wiki-calendar-daynotinmonth{
  color: #BBBBBB;
@@ -417,8 +415,8 @@ ol.ALPHA { list-style-type: upper-alpha; }
 .wiki-calendar-daytitle {
   background-color: #E8EEF7;
   font-size: 75% !important;
-  padding: 0px 5px;
-  margin: 0px !important;
+  padding: 0 5px;
+  margin: 0 !important;
 }
 .wiki-calendar-daynotinmonth .wiki-calendar-daytitle {
   background-color: transparent !important;
@@ -472,7 +470,7 @@ ol.ALPHA { list-style-type: upper-alpha; }
 }
 .hentry a h4 {
 	color: #000;
-	margin: 0px 0 0.5em 0;
+	margin: 0 0 0.5em 0;
 	font-size:1.4em;
 	}
 .article_title {
@@ -495,7 +493,7 @@ ol.ALPHA { list-style-type: upper-alpha; }
  margin: 0 0 2em 0;
 }
 #webhomeNewsdisplay ul {
-	margin-left: 0px;
+	margin-left: 0;
 }
 #webhomeNewsdisplay ul li{
 	margin-bottom: 0.5em;
@@ -510,15 +508,15 @@ sup.footnoteRef:target a{
 }
 div.footnotes{
   font-size: 70%;
-  margin: 10px 0px;
+  margin: 10px 0;
   border: 1px solid #ddd;
 }
 .footnotes ol{
   padding-left: 1em;
 }
 .footnotes li{
-  padding: 0px 4px;
-  margin: 0px;
+  padding: 0 4px;
+  margin: 0;
 }
 .footnotes li:target{
   background-color: #E5F0FE;
@@ -529,11 +527,11 @@ a.footnoteBackRef{
 }
 .pagedNavigation {
   text-align: center;
-  padding: 8px 0px;
+  padding: 8px 0;
   margin: auto;
 }
 .pagedNavigation span{
-  padding: 0px 8px;
+  padding: 0 8px;
 }
 .pagedNavigation .pagedLink{
   background-color: #E5F0FE;
@@ -594,11 +592,9 @@ body.editbody #xwikimaincontainer
 
 
 #xwikimaincontainerinner {
-  text-align: left;
   height: 100%;
   margin:  0 0 0 0;
   padding-top: 20px;
-  border: none;
   border: none;
   text-align: left;
   clear: both;
@@ -680,33 +676,33 @@ body.adminbody #globallinks a{
 	font-weight: normal;
 	padding-right:10px;
 }
-#companylogo{margin:0px 220px;}
-body.hidelefthideright #companylogo {margin:  0px;}
-body.hideleft #companylogo {margin:  0px 0px 0px 0px;}
-body.hideright #companylogo {margin:  0px 0px 0px 220px;}
-#body.editbody #companylogo {margin:  0px ;}
+#companylogo{margin:0 220px;}
+body.hidelefthideright #companylogo {margin:  0;}
+body.hideleft #companylogo {margin:  0 0 0 0;}
+body.hideright #companylogo {margin:  0 0 0 220px;}
+#body.editbody #companylogo {margin:  0 ;}
 body#body.adminbody #companylogo{margin: 0;}
-body#body.editbody #headerspace {margin: 0px 220px 0px 0px;}
-body.hideleft #headerspace {margin: 0px 220px 0px 0px;}
+body#body.editbody #headerspace {margin: 0 220px 0 0;}
+body.hideleft #headerspace {margin: 0 220px 0 0;}
 
 body#body.exportbody #headerspace,
 body#body.importbody #headerspace,
-body#body.adminbody #headerspace {margin: 0px}
+body#body.adminbody #headerspace {margin: 0;}
 
-#body.hidelefthideright #headerspace {margin:  0px;}
-#body.hideright #headerspace {margin:  0px 0px 0px 220px;}
+#body.hidelefthideright #headerspace {margin:  0;}
+#body.hideright #headerspace {margin:  0 0 0 220px;}
 
-#footerglobal { margin: 0px 220px;}
-#body.hidelefthideright #footerglobal { margin: 0px ;}
-body#body.editbody #footerglobal { margin: 0px 220px 0px 0px;}
-#body.hideleft #footerglobal { margin: 0px 220px 0px 0px;}
-#body.hideright #footerglobal { margin: 0px 0px 0px 220px;}
+#footerglobal { margin: 0 220px;}
+#body.hidelefthideright #footerglobal { margin: 0 ;}
+body#body.editbody #footerglobal { margin: 0 220px 0 0;}
+#body.hideleft #footerglobal { margin: 0 220px 0 0;}
+#body.hideright #footerglobal { margin: 0 0 0 220px;}
 
 
 body#body.exportbody #footerglobal,
 body#body.importbody #footerglobal,
 body#body.adminbody #footerglobal{
-	margin-right: 0px;
+	margin-right: 0;
 }
 
 .leftsidecolumns{
@@ -744,7 +740,7 @@ padding: -30px -250px;
 	}
 
 .hidelefthideright #contentcolumn .main{
-	margin:0px;
+	margin:0;
 	}
 .content #contentcolumn .main{
 	margin: 0 220px;
@@ -763,7 +759,7 @@ html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
 }
 .minwidth, .minwidthb, .minwidthc, .minwidthd{
   display: none;
-  height: 0px;
+  height: 0;
   font:normal 1px/1px sans-serif;
 }
 .minwidthb{}
@@ -925,7 +921,6 @@ Space header, footer
 }
 #headerspace {
 height: 25px;
-margin:0;
 font-size: 0.9em;
 width: auto;
 padding-left: 30px;
@@ -995,7 +990,7 @@ fieldset.xwikimessage, div.xwikimessage{
   border: none;
  border-top: 4em solid #efffd4;
  border-bottom: 65px solid #FFF;
-  padding: 0px 8px 16px;
+  padding: 0 8px 16px;
   background-color: #efffd4;
   text-align: center;
 }
@@ -1042,7 +1037,7 @@ Zone for Comments, attachments, History...
 ---------------------------------------
 */
 #xwikidata{
-  padding: 0px;
+  padding: 0;
   border: none;
 }
 #xwikidatacontents{
@@ -1050,7 +1045,7 @@ Zone for Comments, attachments, History...
 	margin-top : 2em;
 	}
 .xwikiintratitle{}
-.xwikiintracontent{ margin: 0px;}
+.xwikiintracontent{ margin: 0;}
 /* @end */
 /* @group Comments */
 /*
@@ -1064,7 +1059,7 @@ Comments
 	border-bottom : 1px solid #bbb;
 }
 #comments, #attachments {
-  padding: 0px 20px 20px 20px;
+  padding: 0 20px 20px 20px;
 }
 #xwikidata .xwikititlewrapper{
   cursor: pointer;
@@ -1076,7 +1071,7 @@ h3.xwikiintratitle{
   text-transform: uppercase;
   letter-spacing: 0.1em;
   text-align: left;
-  margin: 0px;
+  margin: 0;
   padding: 5px 10px ;
 }
 .xwikiintratitle span.hidden{ display: inline;}
@@ -1103,8 +1098,8 @@ h3.xwikiintratitle{
 }
 .commentavatar{
   position: absolute;
-  left: 0px;
-  top: 0px;
+  left: 0;
+  top: 0;
   width: 54px;
 }
 .commentavatar img{
@@ -1113,7 +1108,7 @@ h3.xwikiintratitle{
   margin: auto;
 }
 .commentheader{
-  padding: 6px 0px;
+  padding: 6px 0;
 }
 .commentauthor{
   font-size: 130%;
@@ -1150,7 +1145,7 @@ table.xwikidatatable td{
 color : #39397f;
 }
 html > body .xwikiintracontent legend{
-  margin-bottom: 0px;
+  margin-bottom: 0;
 }
 #xwikiuploadfile {margin:10px;}
 .xwikiintracontent fieldset.collapsed{
@@ -1180,12 +1175,12 @@ Menu
   	position: absolute;   	
  	 width: expression(body.scrollLeft + document.body.clientWidth  + "px");  
   	height: 20px !important;
-  	top: 0px;
-  	left: 0px;
-  	right: 0px;
+  	top: 0;
+  	left: 0;
+  	right: 0;
   	z-index: 1000;
   	overflow: visible;
-  	border-top: 0px solid #ccc;
+  	border-top: 0 solid #ccc;
 	background-color: #ccc;
 	border-bottom: 1px solid #444;
 	text-align: center;
@@ -1207,7 +1202,7 @@ html > body #actionmenu{
 	height: 20px;
  	float: left;
   	border:1px solid  #444; 
- 	border-width:0px 1px;  
+ 	border-width:0 1px;
  	margin-right: -1px;
   	text-align: center;
   	line-height:20px;
@@ -1221,7 +1216,7 @@ html > body #actionmenu{
 	height: 20px;
  	float: none;
   	border:1px solid  #444; 
- 	border-width:0px ;  
+ 	border-width:0 ;
   	text-align: center;
   	line-height:20px;
   	font-size: 0.9em;
@@ -1238,11 +1233,10 @@ html > body #actionmenu{
 
 #actionmenu .editinfo a:hover{
 	color:  #fff;
-	background-image: url( toucan/images/ );
 }
 .rightmenu{
 	position: absolute;
-	right: 0px;
+	right: 0;
 	margin-right: 25px;
 }
 #actionmenu .rightmenu a {
@@ -1264,8 +1258,8 @@ html > body #actionmenu{
   display: block;
   width: 12em;
   position: absolute;
-  margin-top: 0px;
-  margin-left: 0px !important;
+  margin-top: 0;
+  margin-left: 0 !important;
   padding: 5px;
   border: 1px solid #222;
   background-color: transparent;
@@ -1280,7 +1274,7 @@ font-size:0.8em;
 font-weight: bold;
 text-decoration:none; 
 height:auto; 
-padding:2px 0px 0px 0px;
+padding:2px 0 0 0;
 line-height:1.2em;
 border: 0;
 text-align: left;
@@ -1306,8 +1300,8 @@ Tabs
 #body.adminbody .alleditcontent {border-color:  #fff;}
 .alleditcontent .floatcontainer {background-color: #fff;}
 ul.xwikitabbar{
-  padding: 0px 0 0 3px;
-  margin: 0px 0 0 0;
+  padding: 0 0 0 3px;
+  margin: 0 0 0 0;
 width:100%;
 height: 30px;
 border-bottom: none;
@@ -1318,8 +1312,8 @@ border-bottom: none;
 	}
 #xwikicontent ul.xwikitabbar{
 	overflow: hidden;
-	margin: 0px;
-	border-bottom: 0px solid #555;
+	margin: 0;
+	border-bottom: 0 solid #555;
 	}
 .xwikitabbar li{
 	position:  relative;
@@ -1327,8 +1321,6 @@ border-bottom: none;
   height: 30px;
   line-height: 30px;
   list-style-type: none;
-  border: 0px solid;
-  border-bottom: none;
   margin-right: 2px;
   text-align: center;
   display: block;
@@ -1346,7 +1338,7 @@ border-bottom: none;
 }
 
 .xwikitabbar li a{
-  padding: 0px 3px;
+  padding: 0 3px;
   font-weight: normal;
   font-size:0.85em;
   line-height: 30px;
@@ -1384,7 +1376,6 @@ border-bottom: none;
 /* --------------------------------------- */
 .Search #globalsearch {
   text-align: center;
-  margin: 0px;
   padding:15px 15px 0;
   line-height: 12px;
   background-color: transparent;
@@ -1396,13 +1387,13 @@ border-bottom: none;
 .Search .xwikipanelcontents,
 .Search .xwikipaneltitle {
   background-image:none;
-  padding:0px;
+  padding:0;
 }
 #globalsearch{
-  margin: 0px 0px 0px 10px;
+  margin: 0 0 0 10px;
 }
 
-.xwikipanelcontents form{margin: 0;padding: 0px;}
+.xwikipanelcontents form{margin: 0;padding: 0;}
 #body #globalsearch input{
   font-size: 0.9em;
   width: 100px;
@@ -1413,27 +1404,27 @@ border-bottom: none;
 #body #globalsearch input.button {
   vertical-align: middle;
   font-size: 1em;
-  border: 0px;
-  padding: 0px;
+  border: 0;
+  padding: 0;
   width: auto;
 }
 #leftPanels ,
 #rightPanels{padding:  0 0 100px 0; height:  1%;}
 .panels{}
 html > body .panels{
-  margin-top: 0px;
+  margin-top: 0;
 }
 .panels.left {
 	  position: relative;
   float: left;
-  margin-left: 0px;
+  margin-left: 0;
 }
 .panels.right {  position: relative; float: right;}
 .panel, .fakepanel{
   color: #000;
   width: 190px;
   display: block;
-  padding: 0px;
+  padding: 0;
   background-color: transparent;
 }
 #leftPanels .panel,#leftPanels .fakepanel{
@@ -1662,7 +1653,7 @@ span.pitemseparator{
 }
 .panelitemc{
   height: 256px;
-  margin: 0px 4px;
+  margin: 0 4px;
   width: 210px;
     position: relative;
   float: left;
@@ -1677,7 +1668,7 @@ font-weight: bold;
   text-align: center;
 	background-color: transparent;
 	border: 1px solid #fff;
-	border-top: 0px;
+	border-top: 0;
 	color: #eee;
 }
 .panelitemc .xwikibuttonlink a {color: #eee; padding: 0 5px;}
@@ -1696,7 +1687,7 @@ font-weight: bold;
 	display: block;
 	position:absolute;
 	min-width:155px;
-	right: 0px;
+	right: 0;
 	padding: 0 5px;
 	top: -1em;
 	background-color:#FEFEE4;
@@ -1711,12 +1702,12 @@ Rico Acordeon
 ----------------------------------
 */
 #xwikisyntaxhelp {
-  margin-top:0px; 
+  margin-top:0;
   border: none;
   font-size: 0.9em;
 }
 .accordionTabTitleBar h6{
- margin: 0px;
+ margin: 0;
  padding:4px;
 font:bold 1em/1.1em sans-serif;
 color: #FFF;
@@ -1727,7 +1718,7 @@ background-color: #8799b3;
 	background-color: #fff;
 	color: #333;
 	border: 1px solid #999;
-	margin-top: 0px;
+	margin-top: 0;
 	border-width: 1px 0 0 0;
 }
 
@@ -1736,7 +1727,7 @@ background-color: #8799b3;
 }
 
 #xwikieditcontent .accordionTabTitleBar h6{
-margin: 0px;
+margin: 0;
 padding:4px 21px;
 height: 20px;
 font-weight: normal;
@@ -1769,7 +1760,7 @@ background-position: 0% 50%;
   text-align: center;
 }
 #xwikihelptitlesContent h1, #xwikihelptitlesContent h2, #xwikihelptitlesContent h3, #xwikihelptitlesContent h4, #xwikihelptitlesContent h5, #xwikihelptitlesContent h6{
-  margin: 0px;
+  margin: 0;
   text-align: right;
 }
 .accordionTabTitleBar{
@@ -1811,7 +1802,7 @@ list-style-type: none;
 #xwikisyntaxhelp table tbody tr td {
 	display: block;
 	width:  175px;
-	border:  0px solid red;
+	border:  0 solid red;
 }
 #xwikisyntaxhelp .accordionTabContentBox {
 padding: 0;
@@ -1828,13 +1819,13 @@ Misc
 */
 /* @end */
 #xwikihelplistsContent ul, #xwikihelplistsContent ol{
-  margin: 0px;
+  margin: 0;
 }
 #contentcolumn .panel.large{}
 .accordionTabTitleBar tt{
   font-style: normal;
   font-size: 100%;
-  padding: 0px 4px;
+  padding: 0 4px;
 }
 /*.accordionTabContentBox div{
   padding: 0px;
@@ -1855,7 +1846,7 @@ td.label{
 .editactions{
   border: none !important;
   margin-top: 10px;
-  padding: 0px;
+  padding: 0;
 }
 #historycontent td{
   padding: 2px;
@@ -1882,7 +1873,7 @@ Page Layout Selection
 ------------------------
 */
 td div.pagelayoutoption{
-  margin: 0px auto;
+  margin: 0 auto;
   width: 106px;
 }
 div.layoutmaquette{
@@ -2763,10 +2754,10 @@ div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutconta
 * html #editPanels .SyntaxHelp div.xwikipanelcontents {background-image: url(images/panel-e.gif);}
  #editPanels .expanded h5.xwikipaneltitle {background-image: url(images/panel-e.gif);}
 * html #editPanels .xwikipanelcontents {background-image: url(images/panel-e.gif);}
-* html #editPanels .EditModes .xwikipanelcontents ul li.active {background-image: url();}
+* html #editPanels .EditModes .xwikipanelcontents ul li.active {background-image: none;}
 * html #editPanels .EditModes h5,
 * html #editPanels .EditModes .xwikipanelcontents {background-image: url(images/panel-m.gif);}
-* html #xwikicontent{overflow-y: hidden;}
+* html #xwikicontent{overflow-y: hidden; width:  100%;}
 
 * html .minwidthd {display: none;}
 * html .minwidth,* html  .minwidthb,* html  .minwidthc{}

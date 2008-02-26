@@ -132,13 +132,13 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                     buffer.append(Util.escapeURL(href));
                     buffer.append("\"");
                     if(target != null){
-                        buffer.append(" target=\"" + target + "\"");
+                        buffer.append(" " + constructRelAttribute(target));
                     } else {
                         XWikiContext xcontext = (XWikiContext)context.getRenderContext().get("xcontext");
                         XWiki xwiki = xcontext.getWiki();
                         String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "");
                         if (!defaulttarget.equals("")) {
-                            buffer.append(" target=\"" + defaulttarget + "\"");
+                            buffer.append(" " + constructRelAttribute(defaulttarget));
                         }
                     }
                     buffer.append(">");
@@ -223,7 +223,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                     if(target != null){
                         int where = buffer.lastIndexOf(" href=\"");
                         if(where >= 0) {
-                            buffer.insert(where, " target=\"" + target + "\"");
+                            buffer.insert(where, " " + constructRelAttribute(target));
                         }
                     }
                 }
@@ -263,4 +263,10 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
         }
     }
 
+    private String constructRelAttribute(String target)
+    {
+        // We prefix with "_" since a target can be any token and we need to
+        // differentiate with other valid rel tokens.
+        return "rel=\"_" + target + "\"";
+    }
 }

@@ -4148,7 +4148,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 docname = getDocumentNameFromPath(fixDecodedURI(request, path), context);
             }
         }
-        return docname;
+        return (docname.indexOf(":") < 0) ? context.getDatabase() + ":" + docname : docname;
     }
 
     /**

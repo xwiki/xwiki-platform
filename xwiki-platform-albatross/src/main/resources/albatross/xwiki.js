@@ -1,6 +1,7 @@
 function hideForm(form){
   form.getElementsByTagName("fieldset").item(0).className = "collapsed";
 }
+
 function toggleForm(form){
   var fieldset = form.getElementsByTagName("fieldset").item(0);
   if(fieldset.className == "collapsed"){
@@ -19,6 +20,7 @@ function togglePanelVisibility(element){
     element.className = element.className.replace('collapsed', 'expanded');
   }
 }
+
 function showsubmenu(element){
   if(element.lastChild.tagName.toLowerCase() == "span"){
     if(window.hidetimer){
@@ -37,6 +39,7 @@ function showsubmenu(element){
     element.lastChild.className = element.lastChild.className.replace("hidden", "visible");
   }
 }
+
 function hidesubmenu(element){
   if(element.lastChild.tagName.toLowerCase() == "span"){
     window.hideelement = element.lastChild;
@@ -57,6 +60,7 @@ function doHide(){
   window.hidetimer = null;
   window.hideelement = null;
 }
+
 function updateAttachName(form, msg) {
   var fname = form.filepath.value;
 
@@ -93,6 +97,7 @@ function toggleClass(o, className){
     rmClass(o, className);
   }
 }
+
 function addClass(o, className){
   if(!eltHasClass(o,className))
     o.className += ' ' + className
@@ -244,6 +249,7 @@ function noaccent(txt) {
   temp = temp.replace(/[^a-zA-Z0-9_]/g,"");
   return temp;
 }
+
 function prepareName(form) {
   var fname = form.register_first_name.value;
   var lname = form.register_last_name.value;
@@ -288,4 +294,30 @@ function readCookie(name) {
 
 function eraseCookie(name) {
   createCookie(name,"",-1);
+}
+
+/* Open links marked with rel="external" in an external window and sets the target attribute to any
+   rel attribute starting with "_". Note that We need to do this in Javascript
+   as opposed to using target="_blank" since the target attribute is not valid XHTML.
+ */
+function externalLinks() {
+  if (!document.getElementsByTagName) return;
+  var anchors = document.getElementsByTagName("a");
+  for (var i=0; i<anchors.length; i++) {
+    var anchor = anchors[i];
+    if (anchor.hasAttribute("href") && anchor.hasAttribute("rel")) { 
+      // Since the rel attribute can have other values we need to only take into account the ones
+      // starting with "_"
+      var values = anchor.getAttribute("rel").split(" ");
+      for(var j = 0; j<values.length; j++) {
+        if (values[j].charAt(0) == "_") {
+          anchor.target = values[j].substring(1);
+          break;
+        } else if (values[j] == "external") {
+          anchor.target = "_blank";
+          break;
+        }
+      }
+    }
+  }
 }

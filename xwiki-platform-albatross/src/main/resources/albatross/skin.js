@@ -57,6 +57,7 @@ window.onload = function(e) {
   var cookie = readCookie("style");
   var title = cookie ? cookie : getPreferredStyleSheet();
   setActiveStyleSheet(title);
+  externalLinks();
 }
 
 window.onunload = function(e) {

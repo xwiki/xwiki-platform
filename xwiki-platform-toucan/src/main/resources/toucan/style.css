@@ -2684,7 +2684,7 @@ form#inline #xwikiuserprofile,
 form#inline #xwikiuserprofile input ,
 #lb-content #xwikiuserprofile input {width: 350px;}
 form#inline #xwikiuserprofile label,
-#lb-content #xwikiuserprofile label {font-size: 1.4em;}
+#lb-content #xwikiuserprofile label {font-size: 1.4em;line-height: 1.2em;}
 
 /* @group contentPanels */
 

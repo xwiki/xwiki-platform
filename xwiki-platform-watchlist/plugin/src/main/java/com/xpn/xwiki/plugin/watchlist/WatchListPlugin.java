@@ -121,7 +121,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         try {
             // Main wiki
             initWatchListClass(context);
-            initEmailTemplate(context);
             initWatchlistJobs(context);
             sanitizeWatchlists(context);
         } catch (XWikiException e) {
@@ -278,74 +277,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         // First day of every month at 00:00
         initWatchListJob(WATCHLIST_INTERVAL_MONTH, "WatchList monthly notifications",
             "WatchList monthly email watchlist job", "0 0 0 ? * L", context);
-    }
-
-    /**
-     * Creates the email notification template (XWiki Object)
-     */
-    protected void initEmailTemplate(XWikiContext context) throws XWikiException
-    {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        try {
-            doc =
-                context.getWiki().getDocument(WATCHLIST_EMAIL_TEMPLATE, context);
-            BaseObject obj = doc.getObject(MailSenderPlugin.EMAIL_XWIKI_CLASS_NAME);
-            if (obj == null) {
-                needsUpdate = true;
-            }
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            String[] spaceAndName = WATCHLIST_EMAIL_TEMPLATE.split(".");
-            doc.setSpace(spaceAndName[0]);
-            doc.setName(spaceAndName[1]);
-            needsUpdate = true;
-        }
-
-        if (needsUpdate) {
-
-            int index = doc.createNewObject(MailSenderPlugin.EMAIL_XWIKI_CLASS_NAME, context);
-            BaseObject mail = doc.getObject(MailSenderPlugin.EMAIL_XWIKI_CLASS_NAME, index);
-            mail.setStringValue("language", "en");
-            mail.setStringValue("subject",
-                "XWiki : Watchlist Updates, #set($format=\"dd/MM/yyyy\")#if ($interval == 1)" +
-                    "#set($format=\"${format} hh:mm\")#end$xwiki.formatDate($xwiki.date, $format)");
-            mail.setLargeStringValue("text", "Hello $pseudo,\n" +
-                "This message is sent by XWiki. Here are the documents in your watchlist that have been created or updated since the last notification :\n" +
-                "\n" +
-                "#foreach ($udocname in $documents)\n" +
-                "#set ($udoc = $xwiki.getDocument($udocname))$udoc.getDisplayTitle() : ${udoc.getExternalURL()}\n" +
-                "#end");
-            mail.setLargeStringValue("html", "<b>Hello $pseudo,</b><br/>\n" +
-                "<i>This message is sent by XWiki. Here are the documents in your watchlist that have been created or updated since the last notification :</i><br/>\n" +
-                "<br/>\n" +
-                "<table width=\"100%\">\n" +
-                "<tr style=\"background-color:#EFEFEF;font-weight:bold;\">\n" +
-                "<td>Name</td><td>Space</td><td>Modified by</td><td>Comment</td><td>Modified on</td>\n" +
-                "</tr>\n" +
-                "#foreach ($udocname in $documents)\n" +
-                "#set ($udoc = $xwiki.getDocument($udocname))\n" +
-                "#if ($velocityCount % 2 == 0)\n" +
-                "  #set ($color = \"#E5F0FE\")\n" +
-                "#else\n" +
-                "  #set ($color = \"#FFF\")\n" +
-                "#end\n" +
-                "<tr style=\"background-color:${color};\">\n" +
-                "<td><a href=\"${udoc.getExternalURL()}\">$udoc.getDisplayTitle()</a></td>\n" +
-                "<td>$udoc.web</td>\n" +
-                "<td>$xwiki.getLocalUserName($udoc.author, false)</td>\n" +
-                "<td>$udoc.getComment()</td>\n" +
-                "<td>$xwiki.formatDate($udoc.date)</td>\n" +
-                "</tr>\n" +
-                "#end\n" +
-                "</table>");
-            String content = doc.getContent();
-            if ((content == null) || (content.equals(""))) {
-                doc.setContent("1 Notification message");
-            }
-            context.getWiki().saveDocument(doc, "", true, context);
-        }
     }
 
     /**
@@ -544,47 +475,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         BaseObject watchListObject = this.getWatchListObject(user, context);
 
         if (context.getWiki().isVirtual()) {
-            // TODO : code getWatchListWhatsNew for virtual mode
-            /* List results = new ArrayList();
-            List watchedElements = Arrays.asList(watchListObject.getLargeStringValue("documents")
-                .trim().replaceFirst("^,", "").replaceAll(",$", "").split(","));
-            watchedElements.addAll(Arrays.asList(watchListObject.getLargeStringValue("spaces")
-                .trim().replaceFirst("^,", "").replaceAll(",$", "").split(",")));
-            Collections.sort(watchedElements);
-
-            Iterator it = watchedElements.iterator();
-            String previousWiki = "";
-            String currentWiki = "";
-            List currentWikiDocList = new ArrayList();
-            List currentWikiSpaceList = new ArrayList();
-
-            while (it.hasNext()) {
-                String currentEl = (String) it.next();
-                String docWiki = currentEl.split(":")[0];
-                if (!docWiki.equals(currentWiki)) {
-                    if (!previousWiki.equals("")) {
-                        String request =
-                            "select doc.fullName from XWikiDocument as doc where doc.web in (?) " +
-                                "or doc.fullName in (?) order by doc.date desc";
-                        List values = new ArrayList();
-                        // TODO : format docs and spaces lists
-                        values.add(currentWikiSpaceList);
-                        values.add(currentWikiSpaceList);
-                        results.addAll(globalSearchDocuments(request, 20, 0, values, context));
-                        currentWikiDocList.clear();
-                        currentWikiSpaceList.clear();
-                    }
-                    previousWiki = currentWiki;
-                    currentWiki = docWiki;
-                }
-
-                if (currentEl.contains(".")) {
-                    currentWikiDocList.add(currentEl);
-                } else {
-                    currentWikiSpaceList.add(currentEl);
-                }
-            }
-            return results; */
+            // TODO : code getWatchListWhatsNew for virtual mode using LucenePlugin
             return new ArrayList();
         } else {
             String watchedDocuments =

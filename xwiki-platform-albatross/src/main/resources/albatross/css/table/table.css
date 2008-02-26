@@ -43,7 +43,7 @@
 }
 
 /* Filter input box */
-input[type=text].flt, select.flt {
+input.flt, select.flt {
  background-color: #f5f5f5;
  background-image: url(icons/table/filter.gif);
  background-repeat: no-repeat;
@@ -55,7 +55,7 @@ input[type=text].flt, select.flt {
 }
 
 /* Filter input box when the filter is next to the filter button */
-input[type=text].flt_s, select.flt_s {
+input.flt_s, select.flt_s {
  background-color: #f5f5f5;
  background-image: url(icons/table/filter.gif);
  background-repeat: no-repeat;

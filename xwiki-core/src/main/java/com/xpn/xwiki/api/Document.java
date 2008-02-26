@@ -1664,6 +1664,8 @@ public class Document extends Api
             (FileUploadPlugin) xwiki.getPlugin("fileupload", getXWikiContext());
         List fileuploadlist = fileupload.getFileItems(getXWikiContext());
         List attachments = new ArrayList();
+        // adding attachment list to context so we find the names
+        context.put("addedAttachments", attachments);
         int nb = 0;
 
         if (fileuploadlist == null) {
@@ -1693,7 +1695,8 @@ public class Document extends Api
             if ((data != null) && (data.length > 0)) {
                 XWikiAttachment attachment = addAttachment(filename, data);
                 getDoc().saveAttachmentContent(attachment, getXWikiContext());
-                getDoc().getAttachmentList().add(attachment);
+                // commenting because this was already done by addAttachment
+                // getDoc().getAttachmentList().add(attachment);
                 attachments.add(attachment);
                 nb++;
             }
@@ -1729,7 +1732,8 @@ public class Document extends Api
         if (attachment == null) {
             attachment = new XWikiAttachment();
             // TODO: Review this code and understand why it's needed.
-            getDoc().getOriginalDocument().getAttachmentList().add(attachment);
+            // Add the attachment in the current doc 
+            getDoc().getAttachmentList().add(attachment);
         }
 
         attachment.setContent(data);

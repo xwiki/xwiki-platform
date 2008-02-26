@@ -581,15 +581,12 @@ body.hideright #xwikimaincontainer {
   background-repeat: repeat-y;
   border-bottom: 1px solid #ccc;
   }
-body.eportbody #xwikimaincontainer,
-body.importbody #xwikimaincontainer,
-body.adminbody #xwikimaincontainer,
+body#body.exportbody #xwikimaincontainer,
+body#body.importbody #xwikimaincontainer,
+body#body.adminbody #xwikimaincontainer,
 body.hidelefthideright #xwikimaincontainer,
 body.hideleft #xwikimaincontainer,
-body.editbody #xwikimaincontainer
- {  background-image :url( images/colors/gray/bg-GRAY.png ) ;}
-
-
+body.editbody #xwikimaincontainer{  background-image :url( images/colors/gray/bg-GRAY.png ) ;}
 
 #xwikimaincontainerinner {
   height: 100%;
@@ -649,9 +646,9 @@ body.editbody #globallinks {
   margin-left: -220px;
 }
 
-body.exportbody #companylogo,
-body.importbody #companylogo,
-body.adminbody #companylogo{
+body#body.exportbody #companylogo,
+body#body.importbody #companylogo,
+body#body.adminbody #companylogo{
 	margin-right: 30px;
 	padding-right: 220px;
 	margin-left: 0;

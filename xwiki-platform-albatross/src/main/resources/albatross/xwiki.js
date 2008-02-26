@@ -305,7 +305,7 @@ function externalLinks() {
   var anchors = document.getElementsByTagName("a");
   for (var i=0; i<anchors.length; i++) {
     var anchor = anchors[i];
-    if (anchor.hasAttribute("href") && anchor.hasAttribute("rel")) { 
+    if (anchor.getAttribute("href") && anchor.getAttribute("rel")) { 
       // Since the rel attribute can have other values we need to only take into account the ones
       // starting with "_"
       var values = anchor.getAttribute("rel").split(" ");

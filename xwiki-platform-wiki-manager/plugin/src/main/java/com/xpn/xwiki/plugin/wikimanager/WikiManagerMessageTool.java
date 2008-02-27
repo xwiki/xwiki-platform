@@ -149,6 +149,13 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
         "wikimanager.plugin.error.wikitemplatealiasdoesnotexists";
 
     /**
+     * Used as {@link WikiManagerException} message when trying to delete the main wiki.
+     * 
+     * @since 1.1
+     */
+    public static final String ERROR_DELETEMAINWIKI = "wikimanager.plugin.error.deletemainwiki";
+
+    /**
      * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new wiki
      * with a wiki descriptor that already exist.
      */

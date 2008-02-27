@@ -87,7 +87,7 @@
 ## We're disabling the Watchlist menu for now since the Watchlist doesn't work yet in multiwiki
 ## mode. Remove when http://jira.xwiki.org/jira/browse/XPWATCHLIST-4 is fixed.
 #if (!$xwiki.isVirtual())
-  #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew())
+  #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew() && $xwiki.exists("XWiki.WatchListManager"))
 <script type="text/javascript">
 //<![CDATA[
 function reloadActionMenu()
@@ -134,7 +134,7 @@ function watchlist(action)
       #submenuitem("javascript:watchlist('removespace')" $msg.get("core.menu.watchlist.remove.space"))
     #end
     #submenuseparator()
-    #submenuitem($crtUserDoc.getURL("view", "xpage=watchlist") $msg.get("core.menu.watchlist.management"))
+    #submenuitem($xwiki.getURL("XWiki.WatchListManager", "view") $msg.get("core.menu.watchlist.management"))
     #xwikitopmenuentryend()
   #end
 #end

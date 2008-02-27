@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>11</version>
+    <version>12-SNAPSHOT</version>
     <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>
@@ -50,7 +50,7 @@
   </dependencies>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
-    <platform.tool.verification.version>1.8</platform.tool.verification.version>
+    <platform.tool.verification.version>1.9-SNAPSHOT</platform.tool.verification.version>
   </properties>
   <modules>
     <module>xwiki-core</module>

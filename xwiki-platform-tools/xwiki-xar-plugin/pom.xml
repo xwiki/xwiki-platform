@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>7</version>
+    <version>8-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-xar-plugin</artifactId>
   <name>XWiki Platform - Tools - XAR Plugin</name>
@@ -71,7 +71,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform.tools</groupId>
             <artifactId>xwiki-verification-resources</artifactId>
-            <version>1.8</version>
+            <version>1.9-SNAPSHOT</version>
           </dependency>
         </dependencies>
       </plugin>

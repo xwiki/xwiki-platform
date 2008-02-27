@@ -437,7 +437,9 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public boolean removeWatchedElement(String user, String watchedElement,
         boolean isSpace, XWikiContext context) throws XWikiException
     {
-        watchedElement = context.getDatabase() + ":" + watchedElement;
+        if (!watchedElement.contains(":")) {
+            watchedElement = context.getDatabase() + ":" + watchedElement;
+        }
 
         if (!this.isWatched(user, watchedElement, context)) {
             return false;

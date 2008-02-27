@@ -43,7 +43,7 @@ public class SpaceManagerPluginApi extends PluginApi {
 	}
 
 	protected SpaceManager getSpaceManager() {
-		return (SpaceManager) getInternalPlugin();
+		return (SpaceManager) getPlugin();
 	}
 
 	/**

@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>7-SNAPSHOT</version>
+    <version>7</version>
   </parent>
   <groupId>com.xpn.xwiki.platform.tools</groupId>
   <artifactId>xwiki-backup-sample-basic-import-export</artifactId>

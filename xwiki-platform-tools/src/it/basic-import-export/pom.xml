@@ -48,7 +48,7 @@
             </goals>
             <configuration>
               <resourceBundles>
-                <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:1.10-SNAPSHOT</resourceBundle>
+                <resourceBundle>com.xpn.xwiki.platform.tools:xwiki-configuration-resources:1.10</resourceBundle>
               </resourceBundles>
               <properties>
                 <xwikiDbConnectionUrl>jdbc:hsqldb:mem:.</xwikiDbConnectionUrl>

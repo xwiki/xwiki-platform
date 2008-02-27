@@ -727,19 +727,19 @@ padding: -30px -250px;
 
 
 
-.hideleft #contentcolumn .main{
+body.hideleft #contentcolumn .main{
 	margin: 0 220px 0 0;
 	}
 
-.hideright #contentcolumn .main{
+body.hideright #contentcolumn .main{
 	margin:0 0 0 220px;
 	
 	}
 
-.hidelefthideright #contentcolumn .main{
+body.hidelefthideright #contentcolumn .main{
 	margin:0;
 	}
-.content #contentcolumn .main{
+body.content #contentcolumn .main{
 	margin: 0 220px;
 	}
 

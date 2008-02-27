@@ -50,6 +50,12 @@ public class Wiki extends Document
      */
     public void delete(boolean deleteDatabase) throws XWikiException
     {
+        if (getWikiName().equals(context.getMainXWiki())) {
+            throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                WikiManagerMessageTool.getDefault(context).get(
+                    WikiManagerMessageTool.ERROR_DELETEMAINWIKI, getWikiName()));
+        }
+        
         if (hasAdminRights()) {
             this.context.getWiki().getStore().deleteWiki(getWikiName(), context);
         } else {

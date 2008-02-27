@@ -1,43 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>xwiki-extensions</groupId>
-	<artifactId>xwiki-rootwebapp</artifactId>
-	<packaging>war</packaging>
-	<name>xwiki-rootwebapp</name>
-	<version>0.0.1-SNAPSHOT</version>
-	<description />
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-				<version>2.0.2</version>
-			</plugin>
-			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>jetty-maven-plugin</artifactId>
-				<version>7.0.0pre1</version>
-				<configuration>
-					<contextPath>/</contextPath>
-					<scanIntervalSeconds>0</scanIntervalSeconds>
-					<stopKey>stop</stopKey>
-					<stopPort>9999</stopPort>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<dependencies>
-		<dependency>
-			<groupId>tomcat</groupId>
-			<artifactId>servlet-api</artifactId>
-			<version>5.5.23</version>
-		</dependency>
-	</dependencies>
+
+<!--
+ *
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki.platform</groupId>
+    <artifactId>xwiki</artifactId>
+    <version>11</version>
+    <relativePath>../xwiki-platform-pom</relativePath>
+  </parent>
+  <groupId>com.xpn.xwiki.platform.tools</groupId>
+  <artifactId>xwiki-tools</artifactId>
+  <name>XWiki Platform - Tools - Parent POM</name>
+  <version>7</version>
+  <packaging>pom</packaging>
+  <description>XWiki Tools</description>
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-7</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-7</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-tools-parent-7</url>
+  </scm>
+  <modules>
+    <module>xwiki-license-resources</module>
+    <module>xwiki-verification-resources</module>
+    <module>xwiki-shared-tests</module>
+    <module>xwiki-xar-plugin</module>
+    <module>xwiki-xar-handlers</module>
+    <module>xwiki-xmldoc-update-plugin</module>
+    <module>xwiki-packager-plugin</module>
+    <module>xwiki-configuration-resources</module>
+    <module>xwiki-jetty-resources</module>
+  </modules>
 </project>

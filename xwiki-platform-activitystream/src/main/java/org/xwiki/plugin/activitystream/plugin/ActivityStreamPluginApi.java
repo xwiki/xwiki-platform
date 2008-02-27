@@ -51,7 +51,7 @@ public class ActivityStreamPluginApi extends PluginApi
      */
     protected ActivityStream getActivityStream()
     {
-        return ((ActivityStreamPlugin) getPlugin()).getActivityStream();
+        return ((ActivityStreamPlugin) getProtectedPlugin()).getActivityStream();
     }
 
     public void addActivityEvent(org.xwiki.plugin.activitystream.api.ActivityEvent event)

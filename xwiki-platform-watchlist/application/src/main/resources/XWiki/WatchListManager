@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>WatchListManager</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent></parent>
+<creator>XWiki.Admin</creator>
+<author>XWiki.Admin</author>
+<customClass></customClass>
+<contentAuthor>XWiki.Admin</contentAuthor>
+<creationDate>1204121756000</creationDate>
+<date>1204122314000</date>
+<contentUpdateDate>1204122314000</contentUpdateDate>
+<version>4.1</version>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>XWiki.WatchListManager</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>###
+### User's watchlist
+###
+###
+#if ($request.user)
+  #set ($udoc = $xwiki.getDocument($request.user))
+  #if ($udoc.getObjects("XWiki.XWikiUsers").size() &gt; 0)
+    #set ($profileDoc = $udoc)
+    #set ($isMyProfile = false)
+  #else
+    #xwikimessageboxstart($msg.get("watchlist") $msg.get("notauser"))
+    #xwikimessageboxend()
+  #end
+#else
+  #set ($profileDoc = $crtUserDoc)
+  #set ($isMyProfile = true)
+#end
+#if ($profileDoc)
+&lt;h5 class="heading-1"&gt;$msg.get("watchlist.title", [$xwiki.getUserName($profileDoc.fullName, false)])&lt;/h5&gt;
+&lt;br/&gt;
+#if ($request.removedocument || $request.removespace)
+  #set ($el = "")
+  #if ($isMyProfile)
+    #if ($request.removedocument)
+      #set ($el = $request.removedocument)
+      #set ($ret = $xwiki.watchlist.removeDocument($request.removedocument))
+    #else
+      #set ($el = $request.removespace)
+      #set ($ret = $xwiki.watchlist.removeSpace($request.removespace))
+    #end
+  #else
+    #if ($request.removedocument)
+      #set ($el = $request.removedocument)
+      #set ($ret = $xwiki.watchlist.removeDocumentForUser($profileDoc.fullName, $request.removedocument))
+    #else
+      #set ($el = $request.removespace)
+      #set ($ret = $xwiki.watchlist.removeSpaceForUser($profileDoc.fullName, $request.removespace))
+    #end
+  #end
+  #if ($ret == true)
+    #info($msg.get("watchlist.delete.ok", [$el]))
+  #else
+    #error($msg.get("watchlist.delete.ko", [$el]))
+  #end
+#elseif ($request.removespace)
+#end
+    ##
+    ## Info
+    ##
+    &lt;h2 class="heading-1-1"&gt;$msg.get("watchlist.staytuned")&lt;/h2&gt;
+    ##
+    ## Notifications
+    ##
+    &lt;div class="padded"&gt;
+        &lt;div style="width:48%;float:left;"&gt;
+        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.staytuned.email")&lt;/h5&gt;
+        $msg.get("watchlist.staytuned.email.info")&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;form action="$profileDoc.getURL("save")" method="post"&gt;
+        $msg.get("watchlist.staytuned.email.frequency") :
+        #set ($iVal = $profileDoc.display("interval", "view"))
+        #set ($sel = "selected=\"selected\"")
+            &lt;select size="1" name="XWiki.WatchListClass_0_interval" id="XWiki.WatchListClass_0_interval"&gt;
+                &lt;option label="never" value="0" #if ($iVal == "never") $sel #end&gt;never&lt;/option&gt;
+                &lt;option label="hourly" value="1" #if ($iVal == "hourly") $sel #end&gt;hourly&lt;/option&gt;
+                &lt;option label="daily" value="2" #if ($iVal == "daily") $sel #end&gt;daily&lt;/option&gt;
+                &lt;option label="weekly" value="3" #if ($iVal == "weekly") $sel #end&gt;weekly&lt;/option&gt;
+                &lt;option label="monthly" value="4" #if ($iVal == "monthly") $sel #end&gt;monthly&lt;/option&gt;
+            &lt;/select&gt;
+            &lt;input type="hidden" name="xredirect" id="xredirect" value="$doc.getURL("view")"&gt;
+            &lt;input type="submit" value="$msg.get("watchlist.staytuned.email.frequency.save")" class="button"/&gt;
+        &lt;/div&gt;
+        &lt;/form&gt;
+        &lt;div style="width:48%;float:right;"&gt;
+        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.staytuned.rss")&lt;/h5&gt;
+        &lt;a target="_blank" href="$profileDoc.getURL("view", "xpage=watchlistrss")" style="padding-left:16px;background:url($xwiki.getSkinFile("icons/black-rss-mini2.png")) left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
+        &lt;br/&gt;
+        &lt;/div&gt;
+        &lt;div style="clear:both;"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    ##
+    ## Watched elements
+    ##
+    &lt;div class="padded"&gt;
+        ##
+        ## Pages
+        ##
+        &lt;h5 class="heading-1-1"&gt;$msg.get("watchlist.elements")&lt;/h5&gt;
+        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.pages")&lt;/h5&gt;
+        &lt;table id="searchTable" class="grid sortable filterable doOddEven"&gt;
+        &lt;tr class="sortHeader"&gt;
+            &lt;th&gt;$msg.get("watchlist.page")&lt;/th&gt;
+            &lt;th style="width:140px" class="selectFilter"&gt;$msg.get("watchlist.space")&lt;/th&gt;
+            &lt;th style="width:180px" class="unsortable noFilter"&gt;$msg.get("watchlist.actions")&lt;/th&gt;
+        &lt;/tr&gt;
+        #set ($wlist = $xwiki.watchlist.getWatchedDocuments())
+        #foreach($item in $wlist)
+            #if ($item != "")
+            &lt;tr&gt;
+                #set ($idoc = $xwiki.getDocument($item))
+                #if (!$idoc.isNew())
+                &lt;td&gt;&lt;a href="$idoc.getURL()"&gt;$idoc.getDisplayTitle().replaceAll("[^\\.,:]+:", "")&lt;/a&gt;&lt;/td&gt;
+                &lt;td&gt;$idoc.web&lt;/td&gt;
+                &lt;td&gt;&lt;a href="$doc.getURL("view", "removedocument=${item}")" title="$msg.get("watchlist.delete.tooltip")"&gt;$msg.get("watchlist.delete")&lt;/a&gt;&lt;/td&gt;
+                #else
+                  #if ($isMyProfile)
+                    #set ($ret = $xwiki.watchlist.removeDocument($item))
+                  #else
+                    #set ($ret = $xwiki.watchlist.removeDocumentForUser($profileDoc.fullName, $item))
+                  #end
+                #end
+            &lt;/tr&gt;
+            #end
+        #end
+        &lt;/table&gt;
+        ##
+        ## Spaces
+        ##
+        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.spaces")&lt;/h5&gt;
+        &lt;table id="searchTable" class="grid sortable doOddEven"&gt;
+        &lt;tr class=""&gt;
+            &lt;th&gt;$msg.get("watchlist.space")&lt;/th&gt;
+            &lt;th style="width:180px" class="unsortable noFilter"&gt;$msg.get("watchlist.actions")&lt;/th&gt;
+        &lt;/tr&gt;
+        #set ($wlist = $xwiki.watchlist.getWatchedSpaces())
+        #foreach($item in $wlist)
+            #if ($item != "")
+            &lt;tr&gt;
+                &lt;td&gt;$item.replaceAll("[^\\.,:]+:", "")&lt;/td&gt;
+                &lt;td&gt;&lt;a href="$doc.getURL("view", "removespace=${item}")" title="$msg.get("watchlist.delete.tooltip")"&gt;$msg.get("watchlist.delete")&lt;/a&gt;&lt;/td&gt;
+            &lt;/tr&gt;
+            #end
+        #end
+        &lt;/table&gt;
+    &lt;/div&gt;
+#end</content>
+</xwikidoc>

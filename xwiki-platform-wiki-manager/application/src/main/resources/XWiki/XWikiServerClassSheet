@@ -7,14 +7,14 @@
 <defaultLanguage></defaultLanguage>
 <translation>1</translation>
 <parent>XWiki.XWikiServerClass</parent>
-<creator></creator>
+<creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881143000</creationDate>
-<date>1201519693000</date>
-<contentUpdateDate>1201519693000</contentUpdateDate>
-<version>8.1</version>
+<date>1204206253000</date>
+<contentUpdateDate>1204206253000</contentUpdateDate>
+<version>46.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -54,86 +54,118 @@
 <tags/>
 </property>
 </object>
-<content>#set($WikiManager = $xwiki.wikimanager)
-#set($Exception = $WikiManager.DefaultException)
+<content>#set ($WikiManager = $xwiki.wikimanager)
+#set ($Exception = $WikiManager.DefaultException)
 ##
-#set($action = $request.getParameter("action"))
-#set($domain = $request.getParameter("domain"))
+#set ($action = $request.getParameter("action"))
+#set ($domain = $request.getParameter("domain"))
 ##
 #############################################################################
 ##
-#if($doc.fullName == "XWiki.XWikiServerClassSheet" || $doc.fullName == "XWiki.XWikiServerClassTemplate")
+#if ($doc.fullName == "XWiki.XWikiServerClassSheet" || $doc.fullName == "XWiki.XWikiServerClassTemplate")
   1 Document "$doc.name"
 #else
-  #set($wiki = $WikiManager.getWikiFromDocumentName($doc.fullName))
+  #set ($wiki = $WikiManager.getWikiFromDocumentName($doc.fullName))
   ##
-  #if($action &amp;&amp; ($action == "create") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
-    #set($alias = $wiki.getWikiAlias($domain))
-    #if(!$alias)
-      #set($alias = $wiki.newObject("XWiki.XWikiServerClass"))
+  #if ($action &amp;&amp; ($action == "create") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
+    #if (!$wiki.containsWikiAlias($domain))
+      #set ($alias = $wiki.newObject("XWiki.XWikiServerClass"))
       $alias.set("server", $domain)
       $wiki.save()
+    #else
+      #error($msg.get("wikimanager.erroraliasalreadynotexists", [$domain]))
     #end
   #end
   ##
-  #if($action &amp;&amp; ($action == "delete") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
-    #set($alias = $wiki.getWikiAlias($domain))
-    #if($alias)
-      #set($removed = $wiki.removeObject($alias.objectApi))
+  #if ($action &amp;&amp; ($action == "delete") &amp;&amp; $domain &amp;&amp; ($domain.trim().length() &gt; 0))
+    #if ($wiki.containsWikiAlias($domain))
+      #set ($alias = $wiki.getWikiAlias($domain))
+      #set ($removed = $wiki.removeObject($alias.objectApi))
       $wiki.save()
+    #else
+      #error($msg.get("wikimanager.erroraliasdoesnotexists", [$domain]))
     #end
   #end
   ##
   #############################################################################
   ##
-  #set($wikiAliasList = $wiki.wikiAliasList)
+  #set ($wikiAliasList = $wiki.wikiAliasList)
   ##
-  #if($wikiAliasList.size() &gt; 0)
+  #if ($wikiAliasList.size() &gt; 0)
     1 Wiki "$wiki.wikiName"
     ##
-    #if($context.action == "view")
-      1.1 Create new alias
+    #set ($firstalias = $wikiAliasList.get(0))
+    #if ($context.action == "view")
+      1.1 $msg.get("wikimanager.title.wikisettings")
+    #else
+      &lt;fieldset&gt;
+        &lt;legend&gt;$msg.get("wikimanager.title.wikisettings")&lt;/legend&gt;
+    #end
+    ##
+      &lt;dl&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.wikiprettyname"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("wikiprettyname", $firstalias.objectApi)&lt;/dd&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.owner"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("owner", $firstalias.objectApi)&lt;/dd&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.secure"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("secure", $firstalias.objectApi)&lt;/dd&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.visibility"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("visibility", $firstalias.objectApi)&lt;/dd&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.language"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("language", $firstalias.objectApi)&lt;/dd&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.server"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("server", $firstalias.objectApi)&lt;/dd&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.description"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("description", $firstalias.objectApi)&lt;/dd&gt;
+        &lt;dt&gt;$msg.get("wikimanager.alias.prop.homepage"):&lt;/dt&gt;
+          &lt;dd&gt;$doc.display("homepage", $firstalias.objectApi)&lt;/dd&gt;
+      &lt;/dl&gt;
+    #if ($context.action != "view")
+      &lt;/fieldset&gt;
+    #end
+    ##
+    #if ($context.action == "view")
+      1.1 $msg.get("wikimanager.title.createnewalias")
       ##
-      &lt;form method="get" action="$doc.getURL("inline")"&gt;
+      &lt;form method="get" action=""&gt;
         &lt;fieldset&gt;
           &lt;legend&gt;Create new alias&lt;/legend&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
-            Wiki domain name: &lt;input type="text" name="domain" class="wikialiasinput"/&gt;
+            $msg.get("wikimanager.alias.prop.server"): &lt;input type="text" name="domain" class="wikialiasinput"/&gt;
           &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
           &lt;/fieldset&gt;
       &lt;/form&gt;
     #end
     ##
-    #if($context.action == "view")
-      1.1 View aliases
-    #end
-    ##
-    #foreach($wikiAlias in $wikiAliasList)
-      #if($context.action == "view")
-        &lt;form method="get" action="$doc.getURL("view")"&gt;
+    #if ($wikiAliasList.size() &gt; 1)
+      #if ($context.action == "view")
+        1.1 $msg.get("wikimanager.title.viewaliases")
       #end
-          &lt;fieldset&gt;
-            &lt;legend&gt;#if((!$wikiAlias.wikiPrettyName) || ($wikiAlias.wikiPrettyName != "")) $wikiAlias.wikiPrettyName #else $wikiAlias.server #end&lt;/legend&gt;
-
-            &lt;dl&gt;
-              #set($class = $wikiAlias.objectApi.xWikiClass)
-              #foreach($prop in $class.properties)
-                #if($prop.name != "state")
-                  &lt;dt&gt;${prop.prettyName}:&lt;/dt&gt;
-                  &lt;dd&gt;$doc.display($prop.getName(), $wikiAlias.objectApi)&lt;/dd&gt;
-                #end
-              #end
-            &lt;/dl&gt;
-      #if($context.action == "view")
-            &lt;input type="hidden" name="action" value="delete"/&gt;
-            &lt;input type="hidden" name="domain" value="$wikiAlias.server"/&gt;
-            &lt;input type="submit" class="button" value="$msg.get("delete")"/&gt;
-      #end
-          &lt;/fieldset&gt;
-      #if($context.action == "view")
-        &lt;/form&gt;
+      ##
+      #foreach($wikiAlias in $wikiAliasList.subList(1, $wikiAliasList.size()))
+        #if ($context.action == "view")
+          &lt;form method="get" action="$doc.getURL("view")"&gt;
+        #end
+            &lt;fieldset&gt;
+              &lt;legend&gt;$doc.display("server", $wikiAlias.objectApi)&lt;/legend&gt;
+              ##
+              &lt;dl&gt;
+                &lt;dt&gt;$msg.get("wikimanager.alias.prop.description"):&lt;/dt&gt;
+                  &lt;dd&gt;$doc.display("description", $wikiAlias.objectApi)&lt;/dd&gt;
+                &lt;dt&gt;$msg.get("wikimanager.alias.prop.homepage"):&lt;/dt&gt;
+                  &lt;dd&gt;$doc.display("homepage", $wikiAlias.objectApi)&lt;/dd&gt;
+              &lt;/dl&gt;
+        #if ($context.action == "view")
+              &lt;input type="hidden" name="action" value="delete"/&gt;
+              &lt;input type="hidden" name="domain" value="$wikiAlias.server"/&gt;
+              &lt;input type="submit" class="button" value="$msg.get("delete")"/&gt;
+        #end
+            &lt;/fieldset&gt;
+        #if ($context.action == "view")
+          &lt;/form&gt;
+        #end
       #end
     #end
   #end
-#end</content>
-</xwikidoc>
+#end
+</content></xwikidoc>

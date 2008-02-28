@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1192218584000</creationDate>
-<date>1204112584000</date>
-<contentUpdateDate>1204112584000</contentUpdateDate>
-<version>7.1</version>
+<date>1204206414000</date>
+<contentUpdateDate>1204206414000</contentUpdateDate>
+<version>8.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -263,6 +263,7 @@
 <value>[XAppResources.%]</value>
 <value>[XAppCode.%]</value>
 <value>[XApp.WebPreferences]</value>
+<value>[XApp.WebHome]</value>
 </documents>
 </property>
 <property>

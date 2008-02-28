@@ -55,7 +55,7 @@ public class Wiki extends Document
                 WikiManagerMessageTool.getDefault(context).get(
                     WikiManagerMessageTool.ERROR_DELETEMAINWIKI, getWikiName()));
         }
-        
+
         if (hasAdminRights()) {
             this.context.getWiki().getStore().deleteWiki(getWikiName(), context);
         } else {
@@ -127,7 +127,7 @@ public class Wiki extends Document
      * Get wiki alias with provided domain name.
      * 
      * @param domain the domain name of the wiki alias.
-     * @return an wiki alias.
+     * @return a wiki alias.
      * @throws XWikiException error when :
      *             <ul>
      *             <li>getting {@link XWikiServerClass} instance</li>
@@ -152,6 +152,28 @@ public class Wiki extends Document
     {
         return (XWikiServer) XWikiServerClass.getInstance(context).newXObjectDocument(doc, id,
             context);
+    }
+
+    /**
+     * Check if a wiki alias with provided name exists.
+     * 
+     * @param domain the domain name of the wiki alias.
+     * @return true if the wiki alias with provided domain name exists, false otherwise or if there
+     *         is any error.
+     * @since 1.1
+     */
+    public boolean containsWikiAlias(String domain)
+    {
+        boolean contains = false;
+
+        try {
+            getWikiAliasIdFromDomain(domain);
+            contains = true;
+        } catch (XWikiException e) {
+            //
+        }
+
+        return contains;
     }
 
     /**

@@ -131,13 +131,21 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
         "wikimanager.plugin.error.righttodeletewiki";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to delete wiki with not
-     * administrator user.
+     * Used as {@link WikiManagerException} message when trying to get a wiki alias which does not
+     * exists.
      * 
      * @since 1.1
      */
     public static final String ERROR_WIKIALIASDOESNOTEXISTS =
         "wikimanager.plugin.error.wikialiasdoesnotexists";
+
+    /**
+     * Used as {@link WikiManagerException} message when trying to get a wiki which does not exists.
+     * 
+     * @since 1.1
+     */
+    public static final String ERROR_WIKIDOESNOTEXISTS =
+        "wikimanager.plugin.error.wikidoesnotexists";
 
     /**
      * Used as {@link WikiManagerException} message when trying to delete wiki with not

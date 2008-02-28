@@ -332,16 +332,18 @@ final class WikiManager
 
             Collection[] docsNames = getDocsNames(sourceWiki, context);
 
+            Object[] includeFormatParams =
+                new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, null};
+
             // Replace documents contents to include
             Collection docsNameToInclude = docsNames[0];
             for (Iterator it = docsNameToInclude.iterator(); it.hasNext();) {
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                targetDoc
-                    .setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")",
-                        new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR,
-                            docFullName}));
+                includeFormatParams[2] = docFullName;
+                targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")",
+                    includeFormatParams));
             }
 
             // Replace documents contents to link
@@ -350,10 +352,9 @@ final class WikiManager
                 String docFullName = (String) it.next();
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
-                targetDoc
-                    .setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")",
-                        new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR,
-                            docFullName}));
+                includeFormatParams[2] = docFullName;
+                targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")",
+                    includeFormatParams));
             }
         } finally {
             context.setDatabase(database);
@@ -612,8 +613,9 @@ final class WikiManager
                 // If we are not allowed to continue in case wiki descriptor page already
                 // exists.
                 if (failOnExist) {
-                    throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALREADYEXISTS,
-                        msg.get(WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS,
+                    throw new WikiManagerException(
+                        WikiManagerException.ERROR_WM_WIKIALREADYEXISTS, msg.get(
+                            WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS,
                             userWikiSuperDoc.getFullName()));
                 } else if (LOG.isWarnEnabled()) {
                     LOG.warn(msg.get(WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS,
@@ -764,6 +766,12 @@ final class WikiManager
         throws XWikiException
     {
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
+
+        if (!XWikiServerClass.getInstance(context).isInstance(wiki)) {
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
+                getMessageTool(context).get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS,
+                    wikiNameToDelete));
+        }
 
         wiki.delete(deleteDatabase);
     }

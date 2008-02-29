@@ -318,6 +318,7 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
     public Object parseGroovyFromString(String script, XWikiContext context) throws XWikiException
     {
         prepareCache(context);
+        ClassLoader parentClassLoader = (ClassLoader) context.get("parentclassloader");
         try {
             CachedGroovyClass cgc;
             Class gc;
@@ -327,7 +328,8 @@ public class XWikiGroovyRenderer implements XWikiRenderer, XWikiInterpreter
             }
             catch (XWikiCacheNeedsRefreshException e) {
                 classCache.cancelUpdate(script);
-                GroovyClassLoader gcl = new GroovyClassLoader();
+                GroovyClassLoader gcl = (parentClassLoader==null) ? 
+                    new GroovyClassLoader() : new GroovyClassLoader(parentClassLoader);
                 gc = gcl.parseClass(script);
                 cgc = new CachedGroovyClass(gc);
                 classCache.putInCache(script, cgc);

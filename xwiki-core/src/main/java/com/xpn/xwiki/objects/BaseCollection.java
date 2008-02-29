@@ -438,58 +438,71 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
               safeput(name, (PropertyInterface) ((BaseElement)object.safeget(name)).clone());
         }
     }
-    
 
-    public List getDiff(Object coll, XWikiContext context) {
-        ArrayList difflist = new ArrayList();
-        BaseCollection collection = (BaseCollection) coll;
-        Iterator itfields = getFields().keySet().iterator();
-        while (itfields.hasNext()) {
-            String name = (String) itfields.next();
-            BaseProperty prop = (BaseProperty) getFields().get(name);
-            BaseProperty prop2 = (BaseProperty) collection.getFields().get(name);
+    public List getDiff(Object oldObject, XWikiContext context) {
+        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
+        BaseCollection oldCollection = (BaseCollection) oldObject;
+        // Iterate over the new properties first, to handle changed and added objects
+        for (Object key : this.getFields().keySet()) {
+            String propertyName = (String) key;
+            BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
+            BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
 
-            if (prop2==null) {
-                // this is the case property exist in object 1 and not in object 2
-                if ((prop!=null)&&(!prop.toText().equals(""))) {
-                    String dprop = (prop.getValue() instanceof String) ? prop.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,this,context);
+            if (oldProperty==null) {
+                // The property exist in the new object, but not in the old one
+                if ((newProperty != null) && (!newProperty.toText().equals(""))) {
+                    String dprop =
+                        (newProperty.getValue() instanceof String) ? newProperty.toText()
+                            : ((PropertyClass) getxWikiClass(context).getField(propertyName))
+                                .displayView(propertyName, this, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
-                            name, dprop , ""));
+                            propertyName, dprop , ""));
                 }
-            } else if (!prop2.toText().equals(((prop==null) ? "" : prop.toText()))) {
-                // this is the case property exists in both and is different
+            } else if (!oldProperty.toText().equals(((newProperty==null) ? "" : newProperty.toText()))) {
+                // The property exists in both objects and is different
                 BaseClass bclass = getxWikiClass(context);
-                PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
-                if (pclass==null) {
+                PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(propertyName));
+                if (pclass != null) {
+                    // Put the values as they would be displayed in the interface
+                    String newPropertyValue =
+                        (newProperty.getValue() instanceof String) ? newProperty.toText()
+                            : pclass.displayView(propertyName, this, context);
+                    String oldPropertyValue =
+                        (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                            : pclass.displayView(propertyName, oldCollection, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                            name, prop.toText() , prop2.toText()));
+                            propertyName, oldPropertyValue, newPropertyValue));
                 } else {
-                    String dprop = (prop.getValue() instanceof String) ? prop.toText() : pclass.displayView(name,this,context);
-                    String dprop2 = (prop2.getValue() instanceof String) ? prop2.toText() : pclass.displayView(name,collection,context);
+                    // Cannot get property definition, so use the plain value
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                            name, dprop , dprop2));
+                        propertyName, newProperty.toText() , oldProperty.toText()));
                 }
             }
         }
 
-        itfields = collection.getFields().keySet().iterator();
-        while (itfields.hasNext()) {
-            String name = (String) itfields.next();
-            BaseProperty prop = (BaseProperty)getFields().get(name);
-            BaseProperty prop2 = (BaseProperty)collection.getFields().get(name);
+        // Iterate over the old properties, in case there are some removed properties
+        for (Object key : oldCollection.getFields().keySet()) {
+            String propertyName = (String) key;
+            BaseProperty newProperty = (BaseProperty) this.getFields().get(propertyName);
+            BaseProperty oldProperty = (BaseProperty) oldCollection.getFields().get(propertyName);
 
-            if (prop==null) {
-                // this is the case property exists in object2 and not in object1
-                if ((prop2!=null)&&(!prop2.toText().equals(""))) {
+            if (newProperty == null) {
+                // The property exists in the old object, but not in the new one
+                if ((oldProperty!=null)&&(!oldProperty.toText().equals(""))) {
                     BaseClass bclass = getxWikiClass(context);
-                    PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(name));
-                    if (pclass==null) {
-                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                                name, "" , prop2.toText()));
-                    } else {
-                        String dprop2 = (prop2.getValue() instanceof String) ? prop2.toText() : ((PropertyClass)getxWikiClass(context).getField(name)).displayView(name,collection,context);
+                    PropertyClass pclass = (PropertyClass) ((bclass==null) ? null : bclass.getField(propertyName));
+                    if (pclass != null) {
+                        // Put the values as they would be displayed in the interface
+                        String oldPropertyValue =
+                            (oldProperty.getValue() instanceof String) ? oldProperty.toText()
+                                : ((PropertyClass) getxWikiClass(context).getField(propertyName))
+                                    .displayView(propertyName, oldCollection, context);
                         difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
-                                name, "" , dprop2));
+                                propertyName, oldPropertyValue, ""));
+                    } else {
+                        // Cannot get property definition, so use the plain value
+                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
+                                propertyName, "" , oldProperty.toText()));
                     }
                 }
             }

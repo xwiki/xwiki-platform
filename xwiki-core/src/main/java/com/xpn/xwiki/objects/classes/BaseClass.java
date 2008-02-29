@@ -797,32 +797,32 @@ public class BaseClass extends BaseCollection implements ClassInterface {
     }
 
     public List getDiff(Object oldObject, XWikiContext context) {
-        ArrayList difflist = new ArrayList();
+        ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
         BaseClass oldClass = (BaseClass) oldObject;
         Iterator itfields = this.getFieldList().iterator();
         while (itfields.hasNext()) {
             PropertyClass newProperty = (PropertyClass) itfields.next();
-            String name = newProperty.getName();
-            PropertyClass oldProperty = (PropertyClass) oldClass.get(name);
+            String propertyName = newProperty.getName();
+            PropertyClass oldProperty = (PropertyClass) oldClass.get(propertyName);
 
             if (oldProperty == null) {
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
-                            name, "" , ""));
+                            propertyName, "" , ""));
             } else if (!oldProperty.equals(newProperty)) {
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                            name, "", ""));
+                            propertyName, "", ""));
             }
         }
 
         itfields = oldClass.getFieldList().iterator();
         while (itfields.hasNext()) {
             PropertyClass oldProperty = (PropertyClass) itfields.next();
-            String name = oldProperty.getName();
-            PropertyClass newProperty = (PropertyClass) get(name);
+            String propertyName = oldProperty.getName();
+            PropertyClass newProperty = (PropertyClass) get(propertyName);
 
             if (newProperty == null) {
                 difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
-                        name, "" , ""));
+                        propertyName, "" , ""));
             }
         }
 

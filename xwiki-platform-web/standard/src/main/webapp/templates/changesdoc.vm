@@ -255,18 +255,26 @@ $objdiff.getNewValue().toString()
 #foreach($objdiff in $objdiffs)
 #if((!$objdiff.getClassName().equals("XWiki.ArticleClass"))&&(!$objdiff.getClassName().equals("XWiki.TagClass"))&&(!$objdiff.getClassName().equals("XWiki.XWikiComments")))
 #set($hasobjectchanges = 1)
+#if($objdiff.action == "object-added")
+<tr>
+<td>$msg.get("changes.objectAdded")</td><td></td><td>$objdiff.getClassName()[$objdiff.number]</td>
+</tr>
+#elseif($objdiff.action == "object-removed")
+<tr>
+<td>$msg.get("changes.objectRemoved")</td><td>$objdiff.getClassName()[$objdiff.number]</td><td></td>
+</tr>
+#else
 #set($propname = $objdiff.getPropName())
 <tr>
 <td>$propname $msg.get("changes.ofclass") $objdiff.getClassName()</td>
 <td>
-#set($value = $objdiff.getPrevValue().toString())
-$value
+$!objdiff.getPrevValue()
 </td>
 <td>
-#set($value = $objdiff.getNewValue().toString())
-$value
+$!objdiff.getNewValue()
 </td>
 </tr>
+#end
 #end
 #end
 #end

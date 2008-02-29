@@ -195,8 +195,9 @@ function updateName(field1, field2, removeclass) {
   } else {
     field2.value = name;
   }
-  if (name=="")
-  return false;
+  if (name=="") {
+    return false;
+  }
   return true;
 }
 

@@ -796,31 +796,31 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         }
     }
 
-    public List getDiff(Object coll, XWikiContext context) {
+    public List getDiff(Object oldObject, XWikiContext context) {
         ArrayList difflist = new ArrayList();
-        BaseClass bclass = (BaseClass) coll;
-        Iterator itfields = getFieldList().iterator();
+        BaseClass oldClass = (BaseClass) oldObject;
+        Iterator itfields = this.getFieldList().iterator();
         while (itfields.hasNext()) {
-            PropertyClass prop = (PropertyClass) itfields.next();
-            String name = prop.getName();
-            PropertyClass prop2 = (PropertyClass) bclass.get(name);
+            PropertyClass newProperty = (PropertyClass) itfields.next();
+            String name = newProperty.getName();
+            PropertyClass oldProperty = (PropertyClass) oldClass.get(name);
 
-            if (prop2==null) {
+            if (oldProperty == null) {
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
                             name, "" , ""));
-            } else if (!prop2.equals(prop)) {
+            } else if (!oldProperty.equals(newProperty)) {
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
                             name, "", ""));
             }
         }
 
-        itfields = bclass.getFieldList().iterator();
+        itfields = oldClass.getFieldList().iterator();
         while (itfields.hasNext()) {
-            PropertyClass prop2 = (PropertyClass) itfields.next();
-            String name = prop2.getName();
-            PropertyClass prop = (PropertyClass) get(name);
+            PropertyClass oldProperty = (PropertyClass) itfields.next();
+            String name = oldProperty.getName();
+            PropertyClass newProperty = (PropertyClass) get(name);
 
-            if (prop==null) {
+            if (newProperty == null) {
                 difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
                         name, "" , ""));
             }

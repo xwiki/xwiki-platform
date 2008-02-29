@@ -18,5 +18,13 @@ cd "$PRGDIR"
 
 JETTY_HOME=jetty
 
-java -jar $JETTY_HOME/stop.jar
+# The port on which to stop Jetty can be passed to this script as the first argument
+if [ -n "$1" ]; then
+  JETTY_PORT=$1
+else
+  JETTY_PORT=8080
+fi
 
+echo Stopping Jetty on port $JETTY_PORT ...
+
+java -Djetty.port=$JETTY_PORT -Djetty.home=$JETTY_HOME -jar $JETTY_HOME/stop.jar

@@ -3335,6 +3335,14 @@ public class XWikiDocument
                     if (newObj == null) {
                         // The object was deleted.
                         dlist = originalObj.getDiff(new BaseObject(), context);
+                        ObjectDiff deleteMarker =
+                            new ObjectDiff(originalObj.getClassName(),
+                                originalObj.getNumber(),
+                                "object-removed",
+                                "",
+                                "",
+                                "");
+                        dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
                         dlist = originalObj.getDiff(newObj, context);
@@ -3362,6 +3370,14 @@ public class XWikiDocument
                         originalObj.setClassName(newObj.getClassName());
                         originalObj.setNumber(newObj.getNumber());
                         List dlist = originalObj.getDiff(newObj, context);
+                        ObjectDiff addMarker =
+                            new ObjectDiff(newObj.getClassName(),
+                                newObj.getNumber(),
+                                "object-added",
+                                "",
+                                "",
+                                "");
+                        dlist.add(0, addMarker);
                         if (dlist.size() > 0) {
                             difflist.add(dlist);
                         }

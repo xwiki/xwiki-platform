@@ -28,12 +28,20 @@ import org.codehaus.plexus.archiver.ArchiveEntry;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
 
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.dom.DOMDocument;
+import org.dom4j.dom.DOMElement;
+import org.dom4j.io.OutputFormat;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
+import java.io.StringWriter;
+import org.dom4j.io.XMLWriter;
 
 /**
  * Gather all resources in a XAR file (which is actually a ZIP file). Also generates a XAR
@@ -135,57 +143,95 @@ public class XarMojo extends AbstractXarMojo
         this.getLog()
             .info("Generating package.xml descriptor at [" + packageFile.getPath() + "]");
 
+        OutputFormat outputFormat = new OutputFormat("", true);
+        outputFormat.setEncoding("ISO-8859-1");
         FileWriter fw = new FileWriter(packageFile);
-        fw.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n");
-        fw.write("<package>\n");
-        fw.write("  <infos>\n");
-        fw.write("    <name>" + this.project.getName() + "</name>\n");
-        fw.write("    <description>" + this.project.getDescription() + "</description>\n");
-        fw.write("    <licence></licence>\n");
-        fw.write("    <author>XWiki.Admin</author>\n");
-        fw.write("    <version>" + this.project.getVersion() + "</version>\n");
-        fw.write("    <backupPack>true</backupPack>\n");
-        fw.write("  </infos>\n");
-        fw.write("  <files>\n");
+        XMLWriter writer = new XMLWriter(fw, outputFormat);
+        writer.write(toXML(files));
+        writer.close();
+        fw.close();
+    }
 
-        // First element before the "/" is the space name, rest is the document name. Warn if there
-        // are more than 1 "/".
+    /**
+     * Generate a DOM4J Document containing the generated XML.
+     *
+     * @param files the list of files that we want to include in the generated package XML file.
+     * @return the DOM4J Document containing the generated XML
+     */
+    private Document toXML(Collection files)
+    {
+        Document doc = new DOMDocument();
+        Element docel = new DOMElement("package");
+        doc.setRootElement(docel);
+
+        Element infosel = new DOMElement("infos");
+        docel.add(infosel);
+
+        Element el = new DOMElement("name");
+        el.addText(this.project.getName());
+        infosel.add(el);
+
+        el = new DOMElement("description");
+        el.addText(this.project.getDescription());
+        infosel.add(el);
+
+        el = new DOMElement("licence");
+        el.addText("");
+        infosel.add(el);
+
+        el = new DOMElement("author");
+        el.addText("XWiki.Admin");
+        infosel.add(el);
+
+        el = new DOMElement("version");
+        el.addText(this.project.getVersion());
+        infosel.add(el);
+
+        el = new DOMElement("backupPack");
+        el.addText("true");
+        infosel.add(el);
+ 
+        Element filesel = new DOMElement("files");
+        docel.add(filesel);
+
         for (Iterator it = files.iterator(); it.hasNext();) {
             ArchiveEntry entry = (ArchiveEntry) it.next();
 
             // Don't add files in META-INF to the package.xml file
             if (entry.getFile().getPath().indexOf("META-INF") == -1) {
-                String fullName = getFullNameFromXML(entry.getFile());
-                if (fullName != null) {
-                    fw.write(" <file defaultAction=\"0\" language=\"\">" + fullName + "</file>\n");
+                XWikiDocument xdoc  = getDocFromXML(entry.getFile());
+                if (xdoc != null) {
+                    String fullName = xdoc.getFullName();
+                    Element el2 = new DOMElement("file");
+                    el2.setText(fullName);
+                    el2.addAttribute("language", xdoc.getLanguage());
+                    el2.addAttribute("defaultAction", "0");
+                    filesel.add(el2);
                 }
             }
         }
-
-        fw.write("  </files>\n");
-        fw.write("</package>\n");
-        fw.close();
+        return doc;
     }
 
     /**
-     * Get wiki document full name found in xml.
+     * Load a XWiki document from its XML representation.
      * 
      * @param file the file to parse.
-     * @return the full name of the document.
+     * @return the loaded document object or null if the document cannot be parsed
      */
-    private String getFullNameFromXML(File file)
+    private XWikiDocument getDocFromXML(File file)
     {
-        String fullname = null;
+        XWikiDocument doc = null;
 
         try {
-            XWikiDocument doc = new XWikiDocument();
+            doc = new XWikiDocument();
             doc.fromXML(file);
-            fullname = doc.getFullName();
         } catch (Exception e) {
-            this.getLog().warn("Failed to parse [" + file.getAbsolutePath() + "], skipping it", e);
+            this.getLog().warn("Failed to parse [" + file.getAbsolutePath() + "], skipping it. "
+                + "The error was [" + e.getMessage() + "]", e);
         }
 
-        return fullname;
+        return doc;
     }
 
     /**

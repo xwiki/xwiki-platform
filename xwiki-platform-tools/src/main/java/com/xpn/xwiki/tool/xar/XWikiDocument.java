@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.tool.xar;
 
 import java.io.File;
@@ -8,7 +27,7 @@ import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 
 /**
- * Parse XWiki document from xml.
+ * Parse XWiki document from XML.
  * 
  * @version $Id: $
  */
@@ -24,11 +43,22 @@ public class XWikiDocument
      */
     private String space;
 
+
+    /**
+     * The language of the document.
+     */
+    private String language;
+
+    /**
+     * The default language of the document.
+     */
+    private String defaultLanguage;
+
     /**
      * Parse xml file to extract documents informations.
      * 
      * @param file the xml file.
-     * @throws DocumentException error when parsing xml file.
+     * @throws DocumentException error when parsing XML file.
      */
     public void fromXML(File file) throws DocumentException
     {
@@ -45,6 +75,16 @@ public class XWikiDocument
         Element space = docel.element("web");
         if (space != null) {
             this.space = space.getText();
+        }
+
+        Element language = docel.element("language");
+        if (language != null) {
+            this.language = language.getText();
+        }
+
+        Element defaultLanguage = docel.element("defaultLanguage");
+        if (defaultLanguage != null) {
+            this.defaultLanguage = defaultLanguage.getText();
         }
     }
 
@@ -79,7 +119,39 @@ public class XWikiDocument
     {
         this.space = space;
     }
-    
+   
+    /**
+     * @return the language of the document.
+     */
+    public String getLanguage()
+    {
+        return this.language;
+    }
+
+    /**
+     * @param language the language of the document.
+     */
+    public void setLanguage(String language)
+    {
+        this.language = language;
+    }
+
+    /**
+     * @return the default language of the document.
+     */
+    public String getDefaultLanguage()
+    {
+        return this.defaultLanguage;
+    }
+
+    /**
+     * @param defaultLanguage the default language of the document.
+     */
+    public void setDefaultLanguage(String defaultLanguage)
+    {
+        this.defaultLanguage = defaultLanguage;
+    }
+ 
     /**
      * @return the full name of the document.
      */

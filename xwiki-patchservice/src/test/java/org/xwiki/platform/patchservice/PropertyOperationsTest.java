@@ -1,4 +1,4 @@
-package org.xwiki.platform;
+package org.xwiki.platform.patchservice;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;

@@ -1,4 +1,4 @@
-package org.xwiki.platform;
+package org.xwiki.platform.patchservice;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

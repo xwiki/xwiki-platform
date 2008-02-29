@@ -30,6 +30,7 @@ public class ObjectAddOperation extends AbstractOperationImpl implements RWOpera
      */
     public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
+        System.out.println(this);
         BaseObject obj = doc.newObject(this.className, context);
         if (obj == null) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,

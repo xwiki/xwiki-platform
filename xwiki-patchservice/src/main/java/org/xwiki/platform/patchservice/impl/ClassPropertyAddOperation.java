@@ -25,7 +25,7 @@ public class ClassPropertyAddOperation extends AbstractOperationImpl implements 
 
     private String propertyType;
 
-    private Map propertyConfig;
+    private Map<String, String> propertyConfig;
 
     private String className;
 
@@ -64,14 +64,14 @@ public class ClassPropertyAddOperation extends AbstractOperationImpl implements 
      * {@inheritDoc}
      */
     public boolean createType(String className, String propertyName, String propertyType,
-        Map properties)
+        Map<String, ?> properties)
     {
         this.className = className;
         this.propertyName = propertyName;
         this.propertyType = propertyType;
-        this.propertyConfig = new HashMap();
-        for (Iterator it = properties.keySet().iterator(); it.hasNext();) {
-            String prop = (String) it.next();
+        this.propertyConfig = new HashMap<String, String>();
+        for (Iterator<String> it = properties.keySet().iterator(); it.hasNext();) {
+            String prop = it.next();
             this.propertyConfig.put(prop, properties.get(prop).toString());
         }
         return true;
@@ -86,7 +86,7 @@ public class ClassPropertyAddOperation extends AbstractOperationImpl implements 
         this.propertyName = getPropertyName(e);
         this.propertyType = getPropertyType(e);
         Element propertyNode = getPropertyNode(getClassNode(e));
-        this.propertyConfig = new HashMap();
+        this.propertyConfig = new HashMap<String, String>();
         NodeList properties = propertyNode.getElementsByTagName(PROPERTY_NODE_NAME);
         for (int i = 0; i < properties.getLength(); ++i) {
             Element prop = (Element) properties.item(i);
@@ -104,7 +104,7 @@ public class ClassPropertyAddOperation extends AbstractOperationImpl implements 
         Element xmlNode = createOperationNode(doc);
         Element classNode = createClassNode(className, doc);
         Element typeNode = createClassPropertyNode(propertyName, propertyType, doc);
-        for (Iterator it = propertyConfig.keySet().iterator(); it.hasNext();) {
+        for (Iterator<String> it = propertyConfig.keySet().iterator(); it.hasNext();) {
             String propName = (String) it.next();
             typeNode.appendChild(createPropertyNode(propName, propertyConfig.get(propName)
                 .toString(), doc));

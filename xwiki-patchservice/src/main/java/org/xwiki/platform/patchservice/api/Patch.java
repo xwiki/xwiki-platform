@@ -1,6 +1,9 @@
 package org.xwiki.platform.patchservice.api;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
+
+import org.apache.commons.lang.time.DateFormatUtils;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -28,6 +31,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public interface Patch extends XmlSerializable
 {
+
+    /** Date format used in the XML export. A vector is needed by apache-commons. */
+    SimpleDateFormat DATE_FORMAT =
+        new SimpleDateFormat(DateFormatUtils.ISO_DATETIME_TIME_ZONE_FORMAT.getPattern());
+
     /**
      * Returns the version of the patch model used in this patch. This allows the patch model do
      * evolve, while allowing older patches to still be recognized and used in a newer platform.
@@ -64,7 +72,7 @@ public interface Patch extends XmlSerializable
      * 
      * @return The list of patch operations.
      */
-    List getOperations();
+    List<Operation> getOperations();
 
     /**
      * Apply this patch on a document. The object will be changed by the patch in a non-transaction

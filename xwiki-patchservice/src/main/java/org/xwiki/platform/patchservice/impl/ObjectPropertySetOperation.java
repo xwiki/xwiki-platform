@@ -51,7 +51,7 @@ public class ObjectPropertySetOperation extends AbstractOperationImpl implements
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
                 XWikiException.ERROR_XWIKI_UNKNOWN,
                 new Formatter().format("Invalid value: [%s] for object property [%s]",
-                    new Object[] {value, propertyName}).toString());
+                    new Object[] {value, propertyName}).toString(), e);
         }
     }
 

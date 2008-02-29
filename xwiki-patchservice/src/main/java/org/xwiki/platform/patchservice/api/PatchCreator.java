@@ -1,5 +1,6 @@
 package org.xwiki.platform.patchservice.api;
 
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
@@ -19,5 +20,5 @@ public interface PatchCreator
      * @param newDoc The updated version of the document.
      * @return A {@link Patch patch} reflecting the changes between the two versions. 
      */
-    Patch getPatch(XWikiDocument oldDoc, XWikiDocument newDoc);
+    Patch getPatch(XWikiDocument oldDoc, XWikiDocument newDoc, XWikiContext context);
 }

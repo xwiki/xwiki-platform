@@ -1,4 +1,4 @@
-package org.xwiki.platform;
+package org.xwiki.platform.patchservice;
 
 import junit.framework.TestCase;
 
@@ -29,10 +29,10 @@ public class PositionImplTest extends TestCase
         assertFalse(p.checkPosition("\n\n\n"));
 
         p = new PositionImpl(1, 0);
-        assertFalse(p.checkPosition(null));
-        assertFalse(p.checkPosition(""));
+        assertTrue(p.checkPosition(null));
+        assertTrue(p.checkPosition(""));
         assertTrue(p.checkPosition("\n"));
-        assertFalse(p.checkPosition("some text"));
+        assertTrue(p.checkPosition("some text"));
         assertTrue(p.checkPosition("some text\n"));
         assertTrue(p.checkPosition(" \n s\nome text with newlines"));
         assertTrue(p.checkPosition("first line\nsecond line\nthird line"));
@@ -80,7 +80,7 @@ public class PositionImplTest extends TestCase
         assertFalse(p.checkPosition("before\n"));
 
         p = new PositionImpl(1, 0, "before\n", null);
-        assertFalse(p.checkPosition("before"));
+        assertTrue(p.checkPosition("before"));
         assertFalse(p.checkPosition("efore\n"));
         assertTrue(p.checkPosition("before\n"));
         assertTrue(p.checkPosition("before\nafter"));
@@ -189,20 +189,20 @@ public class PositionImplTest extends TestCase
         assertEquals(" ", p.getTextBeforePosition(" \n s\nome text with newlines"));
 
         p = new PositionImpl(1, 0);
-        assertEquals("", p.getTextBeforePosition(null));
-        assertEquals("", p.getTextBeforePosition(""));
+        assertEquals("\n", p.getTextBeforePosition(null));
+        assertEquals("\n", p.getTextBeforePosition(""));
         assertEquals("\n", p.getTextBeforePosition("\n"));
-        assertEquals("some text", p.getTextBeforePosition("some text"));
+        assertEquals("some text\n", p.getTextBeforePosition("some text"));
         assertEquals("some text\n", p.getTextBeforePosition("some text\n"));
         assertEquals(" \n", p.getTextBeforePosition(" \n s\nome text with newlines"));
         assertEquals("first line\n", p
             .getTextBeforePosition("first line\nsecond line\nthird line"));
 
         p = new PositionImpl(1, 5);
-        assertEquals("", p.getTextBeforePosition(null));
-        assertEquals("", p.getTextBeforePosition(""));
+        assertEquals("\n", p.getTextBeforePosition(null));
+        assertEquals("\n", p.getTextBeforePosition(""));
         assertEquals("\n", p.getTextBeforePosition("\n"));
-        assertEquals("some text", p.getTextBeforePosition("some text"));
+        assertEquals("some text\n", p.getTextBeforePosition("some text"));
         assertEquals("some text\n", p.getTextBeforePosition("some text\n"));
         assertEquals("some text\n", p.getTextBeforePosition("some text\n\nsome more text"));
         assertEquals(" \n s", p.getTextBeforePosition(" \n s\nome text with newlines"));

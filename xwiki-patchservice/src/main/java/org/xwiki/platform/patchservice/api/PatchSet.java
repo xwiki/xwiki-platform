@@ -21,7 +21,7 @@ public interface PatchSet extends XmlSerializable
      * 
      * @return The list of patches.
      */
-    List getPatches();
+    List<Patch> getPatches();
 
     /**
      * Apply this patch set on a document.

@@ -75,7 +75,7 @@ public abstract class AbstractOperationImpl implements RWOperation
      * {@inheritDoc}
      */
     public boolean createType(String className, String propertyName, String propertyType,
-        Map properties)
+        Map<String, ?> properties)
     {
         return false;
     }
@@ -83,7 +83,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean modifyType(String className, String propertyName, Map properties)
+    public boolean modifyType(String className, String propertyName, Map<String, ?> properties)
     {
         return false;
     }

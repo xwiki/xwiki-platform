@@ -12,7 +12,7 @@ public interface RWPatch extends Patch
 
     void setOriginator(Originator originator);
 
-    void setOperations(List operations);
+    void setOperations(List<Operation> operations);
 
     void addOperation(Operation op);
 

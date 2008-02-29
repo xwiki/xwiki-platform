@@ -28,7 +28,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.4-SNAPSHOT</version>
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-patchservice</artifactId>
@@ -46,7 +46,12 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.3-SNAPSHOT</version>
+      <version>${pom.parent.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-observation</artifactId>
+      <version>${pom.parent.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.santuario</groupId>
@@ -62,13 +67,6 @@
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
       <version>2.1</version>
-    </dependency>
-    <dependency>
-      <!-- Needed for the tests to run, otherwise a NoClassDefFoundError occurs -->
-      <groupId>javax.servlet</groupId>
-      <artifactId>servlet-api</artifactId>
-      <version>2.4</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>jmock</groupId>
@@ -88,6 +86,34 @@
       <version>2.8.1</version>
       <scope>test</scope>
     </dependency>
+<!--
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>5.1.5</version>
+      <scope>test</scope>
+    </dependency>
+-->
+    <dependency>
+      <!-- Needed for the tests to run, otherwise a NoClassDefFoundError occurs -->
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- Needed for the tests to run, otherwise a NoClassDefFoundError occurs -->
+      <groupId>portlet-api</groupId>
+      <artifactId>portlet-api</artifactId>
+      <version>1.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>hsqldb</groupId>
+      <artifactId>hsqldb</artifactId>
+      <version>1.8.0.7</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -99,7 +125,7 @@
       <version>1.2</version>
     </dependency>
   </dependencies>
-  <build>
+<!--  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -114,4 +140,4 @@
       </plugin>
     </plugins>
   </build>
-</project>
+--></project>

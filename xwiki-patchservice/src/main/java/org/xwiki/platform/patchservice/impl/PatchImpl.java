@@ -1,12 +1,22 @@
 package org.xwiki.platform.patchservice.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.xml.sax.SAXException;
 import org.xwiki.platform.patchservice.api.Operation;
 import org.xwiki.platform.patchservice.api.Originator;
 import org.xwiki.platform.patchservice.api.Patch;
@@ -203,8 +213,12 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
             Element xmlNode = doc.createElement(NODE_NAME);
             xmlNode.setAttribute(SPEC_VERSION_ATTRIBUTE_NAME, specVersion);
             xmlNode.setAttribute(DESCRIPTION_ATTRIBUTE_NAME, description);
-            xmlNode.appendChild(id.toXml(doc));
-            xmlNode.appendChild(originator.toXml(doc));
+            if (id != null) {
+                xmlNode.appendChild(id.toXml(doc));
+            }
+            if (originator != null) {
+                xmlNode.appendChild(originator.toXml(doc));
+            }
             for (Iterator it = operations.iterator(); it.hasNext();) {
                 xmlNode.appendChild(((Operation) it.next()).toXml(doc));
             }
@@ -225,8 +239,11 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
         try {
             specVersion = e.getAttribute(SPEC_VERSION_ATTRIBUTE_NAME);
             description = e.getAttribute(DESCRIPTION_ATTRIBUTE_NAME);
-            id = new PatchIdImpl();
-            id.fromXml((Element) e.getElementsByTagName(PatchIdImpl.NODE_NAME).item(0));
+            Element idElement = (Element) e.getElementsByTagName(PatchIdImpl.NODE_NAME).item(0);
+            if (idElement != null) {
+                id = new PatchIdImpl();
+                id.fromXml(idElement);
+            }
             NodeList operationNodes = e.getElementsByTagName(AbstractOperationImpl.NODE_NAME);
             clearOperations();
             for (int i = 0; i < operationNodes.getLength(); ++i) {
@@ -240,6 +257,50 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
                 XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to load patch from XML",
                 ex);
+        }
+    }
+
+    public String getContent()
+    {
+        try {
+            Document doc =
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            doc.appendChild(toXml(doc));
+            DOMImplementationLS ls = (DOMImplementationLS) doc.getImplementation();
+
+            LSOutput output = ls.createLSOutput();
+            StringWriter content = new StringWriter();
+            output.setCharacterStream(content);
+            output.setEncoding("ISO-8859-1");
+            ls.createLSSerializer().write(doc, output);
+            return content.toString();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (DOMException e) {
+            e.printStackTrace();
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public void setContent(String content)
+    {
+        try {
+            Document doc =
+                DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+                    new ByteArrayInputStream(content.getBytes()));
+            this.fromXml((Element) doc.getDocumentElement());
+        } catch (SAXException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        } catch (XWikiException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

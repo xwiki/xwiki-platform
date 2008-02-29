@@ -1,5 +1,6 @@
 package org.xwiki.platform.patchservice.api;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -11,7 +12,7 @@ import java.util.Date;
  * @version $Id: $
  * @since XWikiPlatform 1.3
  */
-public interface PatchId extends XmlSerializable
+public interface PatchId extends XmlSerializable, Serializable
 {
     /**
      * Get the identifier of the host where the patch was created.

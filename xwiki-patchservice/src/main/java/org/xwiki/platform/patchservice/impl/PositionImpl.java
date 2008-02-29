@@ -86,11 +86,12 @@ public class PositionImpl implements Position, XmlSerializable
     public boolean checkPosition(String text)
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
-        if (rows != null && rows.length > row && rows[row].length() >= column) {
+        if (rows != null
+            && ((rows.length > row && rows[row].length() >= column) || (rows.length == row && column == 0))) {
             return (StringUtils.isEmpty(before) || getTextBeforePosition(text).endsWith(before))
                 && (StringUtils.isEmpty(after) || getTextAfterPosition(text).startsWith(after));
         }
-        return row == 0 && column == 0 && StringUtils.isEmpty(before)
+        return (row == 0 || row == 1) && column == 0 && StringUtils.isEmpty(before)
             && StringUtils.isEmpty(after);
     }
 
@@ -101,7 +102,7 @@ public class PositionImpl implements Position, XmlSerializable
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
         if (ArrayUtils.getLength(rows) <= row) {
-            return StringUtils.defaultString(StringUtils.join(rows, SEPARATOR));
+            return StringUtils.defaultString(StringUtils.join(rows, SEPARATOR)) + (row == 0 ? "" : "\n");
         }
         return StringUtils.join(ArrayUtils.subarray(rows, 0, row), SEPARATOR)
             + ((row > 0) ? SEPARATOR : "") + StringUtils.substring(rows[row], 0, column);

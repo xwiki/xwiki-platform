@@ -18,7 +18,7 @@ public final class OperationFactoryImpl implements OperationFactory
 {
     private static final Log LOG = LogFactory.getLog(OperationFactoryImpl.class);
 
-    private static Map typeMap = new HashMap();
+    private static Map<String, Class> typeMap = new HashMap<String, Class>();
 
     private static class SingletonHolder
     {
@@ -27,7 +27,7 @@ public final class OperationFactoryImpl implements OperationFactory
 
     private OperationFactoryImpl()
     {
-        for (Iterator it = Service.providers(RWOperation.class); it.hasNext();) {
+        for (Iterator<RWOperation> it = Service.providers(RWOperation.class); it.hasNext();) {
             Operation op = (Operation) it.next();
             LOG.info("Registering " + op.getClass().getCanonicalName() + " for type "
                 + op.getType());

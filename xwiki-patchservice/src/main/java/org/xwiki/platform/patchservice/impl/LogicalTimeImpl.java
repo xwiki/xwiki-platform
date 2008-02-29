@@ -1,5 +1,7 @@
 package org.xwiki.platform.patchservice.impl;
 
+import java.io.Serializable;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xwiki.platform.patchservice.api.LogicalTime;
@@ -13,7 +15,7 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id: $
  * @since XWikiPlatform 1.3
  */
-public class LogicalTimeImpl implements LogicalTime
+public class LogicalTimeImpl implements LogicalTime, Serializable
 {
     /** The name of the XML element corresponding to logical time objects. */
     public static final String NODE_NAME = "logicalTime";
@@ -54,5 +56,4 @@ public class LogicalTimeImpl implements LogicalTime
         }
         return 0;
     }
-
 }

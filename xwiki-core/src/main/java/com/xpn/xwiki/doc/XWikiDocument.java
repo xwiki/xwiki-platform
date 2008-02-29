@@ -3162,33 +3162,33 @@ public class XWikiDocument
         return getStore().getTranslationList(this, context);
     }
 
-    public List getXMLDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context)
+    public List getXMLDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
     {
-        return getDeltas(Diff.diff(ToString.stringToArray(origdoc.toXML(context)),
-            ToString.stringToArray(newdoc.toXML(context))));
+        return getDeltas(Diff.diff(ToString.stringToArray(fromDoc.toXML(context)),
+            ToString.stringToArray(toDoc.toXML(context))));
     }
 
-    public List getContentDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context)
+    public List getContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
     {
-        return getDeltas(Diff.diff(ToString.stringToArray(origdoc.getContent()),
-            ToString.stringToArray(newdoc.getContent())));
+        return getDeltas(Diff.diff(ToString.stringToArray(fromDoc.getContent()),
+            ToString.stringToArray(toDoc.getContent())));
     }
 
-    public List getContentDiff(String origrev, String newrev, XWikiContext context)
+    public List getContentDiff(String fromRev, String toRev, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
     {
-        XWikiDocument origdoc = context.getWiki().getDocument(this, origrev, context);
-        XWikiDocument newdoc = context.getWiki().getDocument(this, newrev, context);
-        return getContentDiff(origdoc, newdoc, context);
+        XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
+        XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
+        return getContentDiff(fromDoc, toDoc, context);
     }
 
-    public List getContentDiff(String rev, XWikiContext context)
+    public List getContentDiff(String fromRev, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
     {
-        XWikiDocument revdoc = context.getWiki().getDocument(this, rev, context);
-        return getContentDiff(this, revdoc, context);
+        XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
+        return getContentDiff(revdoc, this, context);
     }
 
     public List getLastChanges(XWikiContext context)
@@ -3197,39 +3197,39 @@ public class XWikiDocument
         Version version = getRCSVersion();
         // TODO This is not right with the new version numbering.
         String prev = "1." + (version.last() - 1);
-        XWikiDocument prevdoc = context.getWiki().getDocument(this, prev, context);
+        XWikiDocument prevDoc = context.getWiki().getDocument(this, prev, context);
 
-        return getDeltas(Diff.diff(ToString.stringToArray(getContent()),
-            ToString.stringToArray(prevdoc.getContent())));
+        return getDeltas(Diff.diff(ToString.stringToArray(prevDoc.getContent()),
+            ToString.stringToArray(getContent())));
     }
 
-    public List getRenderedContentDiff(XWikiDocument origdoc, XWikiDocument newdoc,
+    public List getRenderedContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc,
         XWikiContext context) throws XWikiException, DifferentiationFailedException
     {
-        String content1, content2;
+        String originalContent, newContent;
 
-        content1 = context.getWiki().getRenderingEngine()
-            .renderText(origdoc.getContent(), origdoc, context);
-        content2 =
-            context.getWiki().getRenderingEngine().renderText(newdoc.getContent(), newdoc, context);
+        originalContent = context.getWiki().getRenderingEngine()
+            .renderText(fromDoc.getContent(), fromDoc, context);
+        newContent =
+            context.getWiki().getRenderingEngine().renderText(toDoc.getContent(), toDoc, context);
 
-        return getDeltas(Diff.diff(ToString.stringToArray(content1),
-            ToString.stringToArray(content2)));
+        return getDeltas(Diff.diff(ToString.stringToArray(originalContent),
+            ToString.stringToArray(newContent)));
     }
 
-    public List getRenderedContentDiff(String origrev, String newrev, XWikiContext context)
+    public List getRenderedContentDiff(String fromRev, String toRev, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
     {
-        XWikiDocument origdoc = context.getWiki().getDocument(this, origrev, context);
-        XWikiDocument newdoc = context.getWiki().getDocument(this, newrev, context);
-        return getRenderedContentDiff(origdoc, newdoc, context);
+        XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
+        XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
+        return getRenderedContentDiff(fromDoc, toDoc, context);
     }
 
-    public List getRenderedContentDiff(String rev, XWikiContext context)
+    public List getRenderedContentDiff(String fromRev, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
     {
-        XWikiDocument revdoc = context.getWiki().getDocument(this, rev, context);
-        return getRenderedContentDiff(this, revdoc, context);
+        XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
+        return getRenderedContentDiff(revdoc, this, context);
     }
 
     protected List getDeltas(Revision rev)
@@ -3241,63 +3241,63 @@ public class XWikiDocument
         return list;
     }
 
-    public List getMetaDataDiff(String origrev, String newrev, XWikiContext context)
+    public List getMetaDataDiff(String fromRev, String toRev, XWikiContext context)
         throws XWikiException
     {
-        XWikiDocument origdoc = context.getWiki().getDocument(this, origrev, context);
-        XWikiDocument newdoc = context.getWiki().getDocument(this, newrev, context);
-        return getMetaDataDiff(origdoc, newdoc, context);
+        XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
+        XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
+        return getMetaDataDiff(fromDoc, toDoc, context);
     }
 
-    public List getMetaDataDiff(String rev, XWikiContext context) throws XWikiException
+    public List getMetaDataDiff(String fromRev, XWikiContext context) throws XWikiException
     {
-        XWikiDocument revdoc = context.getWiki().getDocument(this, rev, context);
-        return getMetaDataDiff(this, revdoc, context);
+        XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
+        return getMetaDataDiff(revdoc, this, context);
     }
 
-    public List getMetaDataDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context)
+    public List getMetaDataDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException
     {
-        List list = new ArrayList();
+        List<MetaDataDiff> list = new ArrayList<MetaDataDiff>();
 
-        if ((origdoc == null) || (newdoc == null)) {
+        if ((fromDoc == null) || (toDoc == null)) {
             return list;
         }
 
-        if (!origdoc.getParent().equals(newdoc.getParent())) {
-            list.add(new MetaDataDiff("parent", origdoc.getParent(), newdoc.getParent()));
+        if (!fromDoc.getParent().equals(toDoc.getParent())) {
+            list.add(new MetaDataDiff("parent", fromDoc.getParent(), toDoc.getParent()));
         }
-        if (!origdoc.getAuthor().equals(newdoc.getAuthor())) {
-            list.add(new MetaDataDiff("author", origdoc.getAuthor(), newdoc.getAuthor()));
+        if (!fromDoc.getAuthor().equals(toDoc.getAuthor())) {
+            list.add(new MetaDataDiff("author", fromDoc.getAuthor(), toDoc.getAuthor()));
         }
-        if (!origdoc.getSpace().equals(newdoc.getSpace())) {
-            list.add(new MetaDataDiff("web", origdoc.getSpace(), newdoc.getSpace()));
+        if (!fromDoc.getSpace().equals(toDoc.getSpace())) {
+            list.add(new MetaDataDiff("web", fromDoc.getSpace(), toDoc.getSpace()));
         }
-        if (!origdoc.getName().equals(newdoc.getName())) {
-            list.add(new MetaDataDiff("name", origdoc.getName(), newdoc.getName()));
+        if (!fromDoc.getName().equals(toDoc.getName())) {
+            list.add(new MetaDataDiff("name", fromDoc.getName(), toDoc.getName()));
         }
-        if (!origdoc.getLanguage().equals(newdoc.getLanguage())) {
-            list.add(new MetaDataDiff("language", origdoc.getLanguage(), newdoc.getLanguage()));
+        if (!fromDoc.getLanguage().equals(toDoc.getLanguage())) {
+            list.add(new MetaDataDiff("language", fromDoc.getLanguage(), toDoc.getLanguage()));
         }
-        if (!origdoc.getDefaultLanguage().equals(newdoc.getDefaultLanguage())) {
-            list.add(new MetaDataDiff("defaultLanguage", origdoc.getDefaultLanguage(),
-                newdoc.getDefaultLanguage()));
+        if (!fromDoc.getDefaultLanguage().equals(toDoc.getDefaultLanguage())) {
+            list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(),
+                toDoc.getDefaultLanguage()));
         }
         return list;
     }
 
-    public List getObjectDiff(String origrev, String newrev, XWikiContext context)
+    public List getObjectDiff(String fromRev, String toRev, XWikiContext context)
         throws XWikiException
     {
-        XWikiDocument origdoc = context.getWiki().getDocument(this, origrev, context);
-        XWikiDocument newdoc = context.getWiki().getDocument(this, newrev, context);
-        return getObjectDiff(origdoc, newdoc, context);
+        XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
+        XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
+        return getObjectDiff(fromDoc, toDoc, context);
     }
 
-    public List getObjectDiff(String rev, XWikiContext context) throws XWikiException
+    public List getObjectDiff(String fromRev, XWikiContext context) throws XWikiException
     {
-        XWikiDocument revdoc = context.getWiki().getDocument(this, rev, context);
-        return getObjectDiff(this, revdoc, context);
+        XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
+        return getObjectDiff(revdoc, this, context);
     }
 
     /**
@@ -3305,15 +3305,17 @@ public class XWikiDocument
      * the order of the two versions, but the results are semantically correct only if the two
      * versions are given in the right order.
      * 
-     * @param oldDoc The old ('before') version of the document.
-     * @param newDoc The new ('after') version of the document.
+     * @param fromDoc The old ('before') version of the document.
+     * @param toDoc The new ('after') version of the document.
      * @param context The {@link com.xpn.xwiki.XWikiContext context}.
      * @return The object differences. The returned list's elements are other lists, one for each
      *         changed object. The inner lists contain {@link ObjectDiff} elements, one object for
-     *         each changed property of the object.
+     *         each changed property of the object. Additionally, if the object was added or
+     *         removed, then the first entry in the list will be an "object-added" or
+     *         "object-removed" marker.
      * @throws XWikiException If there's an error computing the differences.
      */
-    public List getObjectDiff(XWikiDocument oldDoc, XWikiDocument newDoc, XWikiContext context)
+    public List getObjectDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException
     {
         ArrayList difflist = new ArrayList();
@@ -3321,7 +3323,7 @@ public class XWikiDocument
         // object collections.
         // First, iterate over the old objects.
         for (Iterator originalObjectClassesIterator =
-            oldDoc.getxWikiObjects().values().iterator(); originalObjectClassesIterator.hasNext();) {
+            fromDoc.getxWikiObjects().values().iterator(); originalObjectClassesIterator.hasNext();) {
             Vector objects = (Vector) originalObjectClassesIterator.next();
             for (Iterator originalObjectsIterator = objects.iterator(); originalObjectsIterator
                 .hasNext();) {
@@ -3330,11 +3332,11 @@ public class XWikiDocument
                 // storage.
                 if (originalObj != null) {
                     BaseObject newObj =
-                        newDoc.getObject(originalObj.getClassName(), originalObj.getNumber());
+                        toDoc.getObject(originalObj.getClassName(), originalObj.getNumber());
                     List dlist;
                     if (newObj == null) {
                         // The object was deleted.
-                        dlist = originalObj.getDiff(new BaseObject(), context);
+                        dlist = new BaseObject().getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
                             new ObjectDiff(originalObj.getClassName(),
                                 originalObj.getNumber(),
@@ -3345,7 +3347,7 @@ public class XWikiDocument
                         dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
-                        dlist = originalObj.getDiff(newObj, context);
+                        dlist = newObj.getDiff(originalObj, context);
                     }
                     if (dlist.size() > 0) {
                         difflist.add(dlist);
@@ -3354,7 +3356,7 @@ public class XWikiDocument
             }
         }
         // Second, iterate over the objects which are only in the new version.
-        for (Iterator newObjectClassesIterator = newDoc.getxWikiObjects().values().iterator(); newObjectClassesIterator
+        for (Iterator newObjectClassesIterator = toDoc.getxWikiObjects().values().iterator(); newObjectClassesIterator
             .hasNext();) {
             Vector objects = (Vector) newObjectClassesIterator.next();
             for (Iterator newObjectsIterator = objects.iterator(); newObjectsIterator.hasNext();) {
@@ -3363,13 +3365,13 @@ public class XWikiDocument
                 // storage.
                 if (newObj != null) {
                     BaseObject originalObj =
-                        oldDoc.getObject(newObj.getClassName(), newObj.getNumber());
+                        fromDoc.getObject(newObj.getClassName(), newObj.getNumber());
                     if (originalObj == null) {
                         // Only consider added objects, the other case was treated above.
                         originalObj = new BaseObject();
                         originalObj.setClassName(newObj.getClassName());
                         originalObj.setNumber(newObj.getNumber());
-                        List dlist = originalObj.getDiff(newObj, context);
+                        List dlist = newObj.getDiff(originalObj, context);
                         ObjectDiff addMarker =
                             new ObjectDiff(newObj.getClassName(),
                                 newObj.getNumber(),
@@ -3388,18 +3390,18 @@ public class XWikiDocument
         return difflist;
     }
 
-    public List getClassDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context)
+    public List getClassDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException
     {
         ArrayList difflist = new ArrayList();
-        BaseClass origclass = origdoc.getxWikiClass();
-        BaseClass newclass = newdoc.getxWikiClass();
+        BaseClass oldClass = fromDoc.getxWikiClass();
+        BaseClass newClass = toDoc.getxWikiClass();
 
-        if ((newclass == null) && (origclass == null)) {
+        if ((newClass == null) && (oldClass == null)) {
             return difflist;
         }
 
-        List dlist = newclass.getDiff(origclass, context);
+        List dlist = newClass.getDiff(oldClass, context);
         if (dlist.size() > 0) {
             difflist.add(dlist);
         }
@@ -3408,34 +3410,34 @@ public class XWikiDocument
 
     /**
      *
-     * @param origdoc
-     * @param newdoc
+     * @param fromDoc
+     * @param toDoc
      * @param context
      * @return
      * @throws XWikiException
      */
-    public List getAttachmentDiff(XWikiDocument origdoc, XWikiDocument newdoc, XWikiContext context)
+    public List getAttachmentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException
     {
         List difflist = new ArrayList();
-        List origAttachList = origdoc.getAttachmentList();
-        for (int i=0;i<origAttachList.size();i++) {
+        List origAttachList = fromDoc.getAttachmentList();
+        for (int i = 0; i < origAttachList.size(); i++) {
             XWikiAttachment origAttach = (XWikiAttachment) origAttachList.get(i);
             String fileName = origAttach.getFilename();
-            XWikiAttachment newAttach = newdoc.getAttachment(fileName);
-            if (newAttach==null) {
+            XWikiAttachment newAttach = toDoc.getAttachment(fileName);
+            if (newAttach == null) {
                difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), null));
             } else {
                 if (!origAttach.getVersion().equals(newAttach.getVersion()))
                     difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), newAttach.getVersion()));
             }
         }
-        List newAttachList = newdoc.getAttachmentList();
-        for (int i=0;i<newAttachList.size();i++) {
+        List newAttachList = toDoc.getAttachmentList();
+        for (int i = 0; i < newAttachList.size(); i++) {
             XWikiAttachment newAttach = (XWikiAttachment) newAttachList.get(i);
             String fileName = newAttach.getFilename();
-            XWikiAttachment origAttach = origdoc.getAttachment(fileName);
-            if (origAttach==null) {
+            XWikiAttachment origAttach = fromDoc.getAttachment(fileName);
+            if (origAttach == null) {
                difflist.add(new AttachmentDiff(fileName, null, newAttach.getVersion()));
             }
         }

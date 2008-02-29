@@ -451,12 +451,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             if (oldProperty==null) {
                 // The property exist in the new object, but not in the old one
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
-                    String dprop =
+                    String newPropertyValue =
                         (newProperty.getValue() instanceof String) ? newProperty.toText()
                             : ((PropertyClass) getxWikiClass(context).getField(propertyName))
                                 .displayView(propertyName, this, context);
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "added",
-                            propertyName, dprop , ""));
+                            propertyName, "", newPropertyValue));
                 }
             } else if (!oldProperty.toText().equals(((newProperty==null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
@@ -475,7 +475,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                 } else {
                     // Cannot get property definition, so use the plain value
                     difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed",
-                        propertyName, newProperty.toText() , oldProperty.toText()));
+                        propertyName, oldProperty.toText(), newProperty.toText()));
                 }
             }
         }
@@ -502,7 +502,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                     } else {
                         // Cannot get property definition, so use the plain value
                         difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed",
-                                propertyName, "" , oldProperty.toText()));
+                                propertyName, oldProperty.toText(), ""));
                     }
                 }
             }

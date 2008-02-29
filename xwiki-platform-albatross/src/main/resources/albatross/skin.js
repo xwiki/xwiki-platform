@@ -139,7 +139,7 @@ function checkAdvancedContent(message) {
    if (results&&results.length>0) 
      result = true;
 
-   myRE2 = new RegExp("(#set|#include|#if|#end|#for|## Advanced content|public class|/\* Advanced content \*/)", "ig")
+   myRE2 = new RegExp("(#(set|include|if|end|for)|#(#) Advanced content|public class|/\* Advanced content \*/)", "ig")
    results = data.match(myRE2)
    if (results&&results.length>0) 
      result = true;

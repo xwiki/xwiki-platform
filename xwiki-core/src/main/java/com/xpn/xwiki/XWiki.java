@@ -3277,9 +3277,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         throws XWikiException
     {
         String database = null, incdatabase = null;
+        String prefixedTopic, localTopic;
         Document currentdoc = null, currentcdoc = null, currenttdoc = null;
         Document gcurrentdoc = null, gcurrentcdoc = null, gcurrenttdoc = null;
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        String currentDocName = context.getDatabase() + ":" + context.getDoc().getFullName();
         if (vcontext != null) {
             currentdoc = (Document) vcontext.get("doc");
             currentcdoc = (Document) vcontext.get("cdoc");
@@ -3293,46 +3295,44 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         try {
+            int i0 = topic.indexOf(":");
+            if (i0 != -1) {
+                incdatabase = topic.substring(0, i0);
+                database = context.getDatabase();
+                context.setDatabase(incdatabase);
+                prefixedTopic = topic;
+                localTopic = topic.substring(i0 + 1);
+            } else {
+                prefixedTopic = context.getDatabase() + ":" + topic;
+                localTopic = topic;
+            }
+
             XWikiDocument doc = null;
             try {
                 LOG.debug("Including Topic " + topic);
-
-                int i0 = topic.indexOf(":");
-                if (i0 != -1) {
-                    incdatabase = topic.substring(0, i0);
-                    topic = topic.substring(i0 + 1);
-                    database = context.getDatabase();
-                    context.setDatabase(incdatabase);
-                }
-
                 try {
-                    Integer includecounter = ((Integer) context.get("include_counter"));
-                    if (includecounter != null) {
-                        context
-                            .put("include_counter", new Integer(1 + includecounter.intValue()));
-                    } else {
-                        includecounter = new Integer(1);
-                        context.put("include_counter", includecounter);
+                    Set<String> includedDocs = (Set<String>) context.get("included_docs");
+                    if (includedDocs == null) {
+                        includedDocs = new HashSet<String>();
+                        context.put("included_docs", includedDocs);
                     }
 
-                    if ((includecounter.intValue() > 30)
-                        || ((database.equals(incdatabase) && (topic.equals(currentdoc
-                            .getFullName()))))) {
+                    if (includedDocs.contains(prefixedTopic) || currentDocName.equals(prefixedTopic)) {
                         LOG.warn("Error on too many recursive includes for topic " + topic);
                         return "Cannot make recursive include";
                     }
+                    includedDocs.add(prefixedTopic);
                 } catch (Exception e) {
                 }
 
                 doc =
-                    getDocument(((XWikiDocument) context.get("doc")).getSpace(), topic, context);
+                    getDocument(((XWikiDocument) context.get("doc")).getSpace(), localTopic, context);
 
                 if (checkAccess("view", doc, context) == false) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                         XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                         "Access to this document is denied");
                 }
-
             } catch (XWikiException e) {
                 LOG.warn("Exception Including Topic " + topic, e);
                 return "Topic " + topic + " does not exist";
@@ -3340,28 +3340,29 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             XWikiDocument contentdoc = doc.getTranslatedDocument(context);
 
+            String result;
             if (isForm) {
                 // We do everything in the context of the including document
                 if (database != null)
                     context.setDatabase(database);
-                return getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
+                result =  getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
                     (XWikiDocument) context.get("doc"), context);
             } else {
                 // We stay in the context included document
-                return getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc,
+                result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc,
                     context);
             }
-        } finally {
-            if (database != null)
-                context.setDatabase(database);
-
             try {
-                Integer includecounter = ((Integer) context.get("include_counter"));
-                if (includecounter != null) {
-                    context.put("include_counter", new Integer(includecounter.intValue() - 1));
+                Set<String> includedDocs = (Set<String>) context.get("included_docs");
+                if (includedDocs != null) {
+                    includedDocs.remove(prefixedTopic);
                 }
             } catch (Exception e) {
             }
+            return result;
+        } finally {
+            if (database != null)
+                context.setDatabase(database);
 
             if (currentdoc != null) {
                 if (vcontext != null)

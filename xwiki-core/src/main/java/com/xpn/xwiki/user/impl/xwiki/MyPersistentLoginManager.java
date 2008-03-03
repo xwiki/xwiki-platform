@@ -407,6 +407,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (cookie != null) {
             cookie.setMaxAge(0);
             cookie.setPath(cookiePath);
+            addCookie(response, cookie);
             String cookieDomain = request.getServerName();
             if (cookieDomain != null) {
                 do {

@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -3311,9 +3312,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             try {
                 LOG.debug("Including Topic " + topic);
                 try {
-                    Set<String> includedDocs = (Set<String>) context.get("included_docs");
+                    Set includedDocs = (Set) context.get("included_docs");
                     if (includedDocs == null) {
-                        includedDocs = new HashSet<String>();
+                        includedDocs = new HashSet();
                         context.put("included_docs", includedDocs);
                     }
 
@@ -3353,7 +3354,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     context);
             }
             try {
-                Set<String> includedDocs = (Set<String>) context.get("included_docs");
+                Set includedDocs = (Set) context.get("included_docs");
                 if (includedDocs != null) {
                     includedDocs.remove(prefixedTopic);
                 }

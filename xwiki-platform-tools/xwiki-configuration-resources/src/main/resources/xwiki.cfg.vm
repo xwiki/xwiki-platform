@@ -87,8 +87,8 @@ xwiki.plugin.captcha=0
 # xwiki.authentication.authclass=com.xpn.xwiki.user.impl.LDAP.XWikiLDAPAuthServiceImpl
 
 #-# Turn LDAP authentication on - otherwise only XWiki authentication
-#-# 0 : disable
-#-# 1 : enable
+#-# 0: disable
+#-# 1: enable
 # xwiki.authentication.ldap=1
 
 #-# LDAP Server (Active Directory, eDirectory, OpenLDAP, etc.)
@@ -99,6 +99,11 @@ xwiki.authentication.ldap.port=389
 #-# {0} is replaced with the username, {1} with the password
 xwiki.authentication.ldap.bind_DN=cn={0},department=USER,department=INFORMATIK,department=1230,o=MP
 xwiki.authentication.ldap.bind_pass={1}
+
+#-# Force to check password after LDAP connection
+#-# 0: disable
+#-# 1: enable
+xwiki.authentication.ldap.validate_password=0
 
 #-# only members of the following group will be verified in the LDAP
 # otherwise only users that are found after searching starting from the base_DN
@@ -138,8 +143,8 @@ xwiki.authentication.ldap.trylocal=1
 
 #-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# SSL connection to LDAP server
-#-# 0 : normal
-#-# 1 : SSL
+#-# 0: normal
+#-# 1: SSL
 # xwiki.authentication.ldap.ssl=0
 
 #-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]

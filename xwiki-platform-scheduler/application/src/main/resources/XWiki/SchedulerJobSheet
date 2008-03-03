@@ -74,7 +74,7 @@ $codevar.toLowerCase()
 #if($context.action=="inline")
 #info("The script is the code that will be executed when the job will be triggered by the scheduler. It should be written in the groovy language. XWiki api is available through the *xwiki* et *context* pre-defined variables.")
 
-#info("Below some example of valid cron expression, from the [official quartz scheduler documentation>http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html]:
+#info("Below some example of valid cron expression, from the [official quartz scheduler documentation>http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html>_blank]:
 {table}
 Cron expression|Meaning
 *{pre}0 15 10 * * ?{/pre}*|Fire at 10:15am every day

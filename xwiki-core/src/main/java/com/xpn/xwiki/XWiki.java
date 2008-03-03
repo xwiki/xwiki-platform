@@ -4209,13 +4209,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 null,
                 args);
         } else if (checkActive(context) == 0) {
-            Object[] args = {context.getUser()};
-            setPhonyDocument(docName, context, vcontext);
-            throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                XWikiException.ERROR_XWIKI_USER_INACTIVE,
-                "User {0} account is inactive",
-                null,
-                args);
+            boolean allow = false;
+            String allowed = Param("xwiki.inactiveuser.allowedpages", "");
+            if (context.getAction().equals("view") && !allowed.equals("")) {
+                String[] allowedList = StringUtils.split(allowed, " ,");
+                for (int i=0; i < allowedList.length; i++) {
+                    if (allowedList[i].equals(doc.getFullName())) {
+                        allow = true;
+                        break;
+                    }
+                }
+            }
+            if (!allow) {
+                Object[] args = {context.getUser()};
+                setPhonyDocument(docName, context, vcontext);
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                    XWikiException.ERROR_XWIKI_USER_INACTIVE,
+                    "User {0} account is inactive",
+                    null,
+                    args);
+            }
         }
 
         context.put("doc", doc);

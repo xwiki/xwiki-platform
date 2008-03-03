@@ -47,6 +47,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
+import java.util.HashSet;
 import java.util.zip.ZipOutputStream;
 
 import javax.naming.Context;
@@ -854,9 +855,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see XWikiInterface#getVersion()
+     * @return the XWiki core version as specified in the {@link #VERSION_FILE} file 
      */
     public String getVersion()
     {

@@ -20,53 +20,83 @@
  */
 package org.xwiki.observation.internal;
 
-import org.xwiki.observation.event.Event;
-import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.EventListener;
-
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.Event;
+
+/**
+ * Default implementation of the {@link ObservationManager}.
+ * 
+ * @version $Id$
+ */
 public class DefaultObservationManager implements ObservationManager
 {
     /**
-     * Registered listeners.
-     * The Map key is the Event class name and the values is a List with (Event, Listener) pairs.
+     * Internal class for holding an (Event, EventListener) pair. Too bad there's no simple Pair
+     * class in the JDK.
      */
-    private Map listeners = new HashMap();
+    protected static class RegisteredListener
+    {
+        /** The event for which this listener is registered. * */
+        Event event;
+
+        /** The Event Listener. * */
+        EventListener listener;
+
+        /**
+         * Simple constructor, stores the passed Event and Listener.
+         * 
+         * @param e The Event.
+         * @param l The Listener.
+         */
+        RegisteredListener(Event e, EventListener l)
+        {
+            event = e;
+            listener = l;
+        }
+    }
+
+    /**
+     * Registered listeners. The Map key is the Event class name and the value is a List with
+     * (Event, Listener) pairs.
+     */
+    private Map<String, List<RegisteredListener>> listeners =
+        new HashMap<String, List<RegisteredListener>>();
 
     /**
      * {@inheritDoc}
+     * 
      * @see ObservationManager#addListener(Event,org.xwiki.observation.EventListener)
      */
     public void addListener(Event event, EventListener eventListener)
     {
         // Check if this is a new Event not already registered
-        List eventListeners = (List) this.listeners.get(event.getClass().getName());
+        List<RegisteredListener> eventListeners = this.listeners.get(event.getClass().getName());
         if (eventListeners == null) {
-            eventListeners = new ArrayList();
-            this.listeners.put(event.getClass().getName(),  eventListeners);
+            eventListeners = new ArrayList<RegisteredListener>();
+            this.listeners.put(event.getClass().getName(), eventListeners);
         }
 
         // Check to see if the event/listener pair is already there
-        for (Iterator it = eventListeners.iterator(); it.hasNext(); ) {
-            WeakReference reference = (WeakReference) it.next();
-            Object[] pairs = (Object[]) reference.get();
-            if (pairs[1] == eventListener) {
+        for (RegisteredListener pair : eventListeners) {
+            if (pair.listener == eventListener) {
                 return;
             }
         }
 
         // Add the event/listener pair
-        eventListeners.add(new WeakReference(new Object[] {event, eventListener}));
+        eventListeners.add(new RegisteredListener(event, eventListener));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see ObservationManager#removeListener(org.xwiki.observation.event.Event, EventListener)
      */
     public void removeListener(Event event, EventListener eventListener)
@@ -77,16 +107,15 @@ public class DefaultObservationManager implements ObservationManager
         }
 
         // Find the event key for the specified event
-        List eventListeners = (List) this.listeners.get(event.getClass().getName());
+        List<RegisteredListener> eventListeners = this.listeners.get(event.getClass().getName());
         if (eventListeners == null) {
             return;
         }
 
         // Remove the listener
-        for (Iterator it = eventListeners.iterator(); it.hasNext();) {
-            WeakReference reference = (WeakReference) it.next();
-            Object[] pairs = (Object[]) reference.get();
-            if (pairs[1] == eventListener) {
+        for (Iterator<RegisteredListener> it = eventListeners.iterator(); it.hasNext();) {
+            RegisteredListener pair = it.next();
+            if (pair.listener == eventListener) {
                 it.remove();
                 break;
             }
@@ -100,6 +129,7 @@ public class DefaultObservationManager implements ObservationManager
 
     /**
      * {@inheritDoc}
+     * 
      * @see ObservationManager#removeListener(EventListener)
      */
     public void removeListener(EventListener eventListener)
@@ -107,39 +137,12 @@ public class DefaultObservationManager implements ObservationManager
         // Loop over all registered events and remove the specified listener
         // Loop over a copy in case the removeListener() call wants to
         // remove the entire event from the map.
-        List listeners = new ArrayList(this.listeners.keySet());
-        for (Iterator it = listeners.iterator(); it.hasNext();) {
-            Object[] pairs = (Object[]) it.next();
-            if (pairs[1] == eventListener) {
-                removeListener((Event) pairs[0], eventListener);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see ObservationManager#notify(org.xwiki.observation.event.Event, Object, Object)
-     */
-    public void notify(Event event, Object source, Object data)
-    {
-        // Find all event/listeners pairs for this event
-        List eventListeners = (List) this.listeners.get(event.getClass().getName());
-        if (eventListeners == null) {
-            return;
-        }
-
-        // Loop over a copy of the list in case it is altered by a listener
-        List copy = new ArrayList(eventListeners);
-        for (Iterator it = copy.iterator(); it.hasNext();) {
-            WeakReference reference = (WeakReference) it.next();
-            Object[] pairs = (Object[]) reference.get();
-            if (pairs[1] == null) {
-                it.remove();
-            } else {
-                Event storedEvent = (Event) pairs[0];
-                if (storedEvent.matches(event)) {
-                    EventListener eventListener = (EventListener) pairs[1];
-                    eventListener.onEvent(event, source, data);
+        for (List<RegisteredListener> list : listeners.values()) {
+            for (RegisteredListener p : list) {
+                if (p.listener == eventListener) {
+                    // TODO This is not efficient. We already found the element to remove, why
+                    // search for it again?
+                    removeListener(p.event, eventListener);
                 }
             }
         }
@@ -147,6 +150,29 @@ public class DefaultObservationManager implements ObservationManager
 
     /**
      * {@inheritDoc}
+     * 
+     * @see ObservationManager#notify(org.xwiki.observation.event.Event, Object, Object)
+     */
+    public void notify(Event event, Object source, Object data)
+    {
+        // Find all event/listeners pairs for this event
+        List<RegisteredListener> eventListeners = this.listeners.get(event.getClass().getName());
+        if (eventListeners == null) {
+            return;
+        }
+
+        // Loop over a copy of the list in case it is altered by a listener
+        List<RegisteredListener> copy = new ArrayList<RegisteredListener>(eventListeners);
+        for (RegisteredListener pair : copy) {
+            if (pair.event.matches(event)) {
+                pair.listener.onEvent(event, source, data);
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see ObservationManager#notify(org.xwiki.observation.event.Event, Object)
      */
     public void notify(Event event, Object source)

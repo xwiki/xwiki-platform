@@ -23,7 +23,7 @@ package org.xwiki.observation;
 import org.xwiki.observation.event.Event;
 
 /**
- * The main orchestrator for event notification. You register {@link EventListener} against this
+ * The main orchestrator for event notification. You register {@link EventListener}s against this
  * manager. It's also used to notify event listeners when an event is triggered. 
  */
 public interface ObservationManager

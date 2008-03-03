@@ -254,6 +254,6 @@ public class WatchListPluginApi extends PluginApi
      */
     private WatchListPlugin getWatchListPlugin()
     {
-        return (WatchListPlugin) getInternalPlugin();
+        return (WatchListPlugin) getProtectedPlugin();
     }
 }

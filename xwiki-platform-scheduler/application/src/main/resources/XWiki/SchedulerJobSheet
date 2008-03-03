@@ -74,7 +74,7 @@ $codevar.toLowerCase()
 #if($context.action=="inline")
 #info("The script is the code that will be executed when the job will be triggered by the scheduler. It should be written in the groovy language. XWiki api is available through the *xwiki* et *context* pre-defined variables.")
 
-#info("Below some example of valid cron expression, from the official quartz scheduler documentation :
+#info("Below some example of valid cron expression, from the [official quartz scheduler documentation>http://www.opensymphony.com/quartz/api/org/quartz/CronExpression.html]:
 {table}
 Cron expression|Meaning
 *{pre}0 15 10 * * ?{/pre}*|Fire at 10:15am every day
@@ -82,7 +82,6 @@ Cron expression|Meaning
 *{pre}0 0/5 14 * * ?{/pre}*|Fire every 5 minutes starting at 2pm and ending at 2:55pm, every day
 *{pre}0 15 10 ? * 6L{/pre}*|Fire at 10:15am on the last Friday of every month
 {table}
-Please refer to quartz official documentation for more details.
 ")
 #elseif($context.action=="view")
 [Back to the job list&gt;Scheduler.WebHome]

@@ -275,8 +275,6 @@ public class XWikiLDAPConnection
             if (LOG.isDebugEnabled()) {
                 LOG.debug("LDAP Search failed", e);
             }
-
-            searchAttributeList = null;
         }
 
         return searchAttributeList;

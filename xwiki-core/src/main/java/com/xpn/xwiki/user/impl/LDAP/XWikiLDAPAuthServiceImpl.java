@@ -21,6 +21,7 @@
 
 package com.xpn.xwiki.user.impl.LDAP;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -108,7 +109,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         String userName = login;
-        
+
         // strip possible "XWiki."
         // ATTENTION: Possible incompatibility to before now user is NEVER located with
         // "XWiki.username" in LDAP
@@ -201,7 +202,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
                 // search for the user in LDAP
                 String query =
-                    String.format("({0}={1})", new String[] {uidAttributeName, userName});
+                    MessageFormat.format("({0}={1})", new Object[] {uidAttributeName, userName});
                 String baseDN = config.getLDAPParam("ldap_base_DN", "", context);
 
                 if (LOG.isDebugEnabled()) {
@@ -225,10 +226,28 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 }
             }
 
+            if (userDN == null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                    XWikiException.ERROR_XWIKI_USER_INIT,
+                    "Can't find LDAP user DN.");
+            }
+
             // ////////////////////////////////////////////////////////////////////
-            // 6. compare pwd
+            // 6. if user used for LDAP connection is not the one authenticated try to bind
             // ////////////////////////////////////////////////////////////////////
 
+            String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
+            String bindDN = MessageFormat.format(bindDNFormat, new Object[] {userName});
+
+            if (!userDN.equals(bindDN)) {
+                connector.getConnection().bind(LDAPConnection.LDAP_V3, userDN,
+                    password.getBytes("UTF8"));
+            }
+
+            // ////////////////////////////////////////////////////////////////////
+            // 7. apply validate_password property
+            // ////////////////////////////////////////////////////////////////////
+            
             if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
                 if (!connector.checkPassword(userDN, password)) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
@@ -243,7 +262,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             }
 
             // ////////////////////////////////////////////////////////////////////
-            // 6. sync user
+            // 8. sync user
             // ////////////////////////////////////////////////////////////////////
 
             boolean createuser = syncUser(userName, userDN, searchAttributes, ldapUtils, context);
@@ -257,7 +276,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             }
 
             // ////////////////////////////////////////////////////////////////////
-            // 7. sync groups membership
+            // 9. sync groups membership
             // ////////////////////////////////////////////////////////////////////
 
             syncGroupsMembership(userName, userDN, createuser, ldapUtils, context);
@@ -546,7 +565,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     {
         try {
             if (LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Adding user {0} to xwiki group {1}", new String[] {
+                LOG.debug(String.format("Adding user {0} to xwiki group {1}", new Object[] {
                 userName, groupName}));
             }
 
@@ -575,11 +594,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // c.add(xwikigroupname);
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Finished adding user {0} to xwiki group {1}",
-                    new String[] {userName, groupName}));
+                    new Object[] {userName, groupName}));
             }
 
         } catch (Exception e) {
-            LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new String[] {
+            LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new Object[] {
             userName, groupName}), e);
         }
     }

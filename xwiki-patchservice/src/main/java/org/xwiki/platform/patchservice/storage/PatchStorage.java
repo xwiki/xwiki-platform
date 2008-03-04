@@ -79,18 +79,18 @@ public class PatchStorage
         }
     }
 
-    public List loadAllPatches()
+    public List<Patch> loadAllPatches()
     {
         return loadPatches("select patch.content from PatchImpl patch");
     }
 
-    public List loadAllDocumentPatches(String documentId)
+    public List<Patch> loadAllDocumentPatches(String documentId)
     {
         return loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '"
             + documentId + "'");
     }
 
-    public List loadAllDocumentPatchesSince(PatchId id)
+    public List<Patch> loadAllDocumentPatchesSince(PatchId id)
     {
         return loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '"
             + StringEscapeUtils.escapeSql(id.getDocumentId())
@@ -98,17 +98,17 @@ public class PatchStorage
             + DATE_FORMAT.format(id.getTime()) + "'");
     }
 
-    public List loadAllPatchesSince(PatchId id)
+    public List<Patch> loadAllPatchesSince(PatchId id)
     {
         return loadPatches("select patch.content from PatchImpl patch where patch.id.time > '"
             + DATE_FORMAT.format(id.getTime()) + "'");
     }
 
-    protected List loadPatches(String query)
+    protected List<Patch> loadPatches(String query)
     {
         Session s = factory.openSession();
         List contents = s.createQuery(query).list();
-        List patches = new ArrayList();
+        List<Patch> patches = new ArrayList<Patch>();
         for (Iterator it = contents.iterator(); it.hasNext();) {
             PatchImpl patch = new PatchImpl();
             patch.setContent(it.next().toString());

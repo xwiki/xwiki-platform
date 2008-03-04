@@ -76,6 +76,11 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ActionExecutionEvent;
+import org.xwiki.observation.event.DocumentDeleteEvent;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
 
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
@@ -1070,14 +1075,37 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument originalDocument = doc.getOriginalDocument();
 
             // Notify listeners about the document change
-            getNotificationManager().preverify(doc, originalDocument,
-                XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+            if (originalDocument == null || originalDocument.isNew()) {
+                getNotificationManager().preverify(doc, originalDocument,
+                    XWikiDocChangeNotificationInterface.EVENT_NEW, context);
+            } else {
+                getNotificationManager().preverify(doc, originalDocument,
+                    XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+            }
 
             getStore().saveXWikiDoc(doc, context);
 
-            // Notify listeners about the document change
-            getNotificationManager().verify(doc, originalDocument,
-                XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+            try {
+                ObservationManager om =
+                    (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
+                        context);
+                // Notify listeners about the document change
+                if (originalDocument == null || originalDocument.isNew()) {
+                    getNotificationManager().verify(doc, originalDocument,
+                        XWikiDocChangeNotificationInterface.EVENT_NEW, context);
+                    if (om != null) {
+                        om.notify(new DocumentSaveEvent(doc.getFullName()), doc, context);
+                    }
+                } else {
+                    getNotificationManager().verify(doc, originalDocument,
+                        XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+                    if (om != null) {
+                        om.notify(new DocumentUpdateEvent(doc.getFullName()), doc, context);
+                    }
+                }
+            } catch (Exception ex) {
+                LOG.warn("Failed to send document notifications", ex);
+            }
         } finally {
             if ((server != null) && (database != null)) {
                 context.setDatabase(database);
@@ -3406,8 +3434,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 true);
         }
         getStore().deleteXWikiDoc(doc, context);
-        getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
-            XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+        try {
+            getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
+                XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
+            ObservationManager om =
+                (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
+                    context);
+            om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
+        } catch (Exception ex) {
+            LOG.warn("Failed to send document notifications", ex);
+        }
     }
 
     public String getDatabase()

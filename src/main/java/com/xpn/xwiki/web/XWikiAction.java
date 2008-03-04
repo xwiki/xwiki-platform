@@ -35,6 +35,8 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.ActionExecutionEvent;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -283,6 +285,14 @@ public abstract class XWikiAction extends Action
                         context);
                 } catch (Throwable e) {
                     e.printStackTrace();
+                }
+                try {
+                    ObservationManager om =
+                        (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
+                            context);
+                    om.notify(new ActionExecutionEvent(mapping.getName()), context.getDoc(), context);
+                } catch (Throwable ex) {
+                    LOG.warn("Cannot send notifications", ex);
                 }
 
                 if (monitor != null) {

@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -95,7 +94,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      * 
      * @see Patch#getOperations()
      */
-    private List operations = new ArrayList();
+    private List<Operation> operations = new ArrayList<Operation>();
 
     /**
      * {@inheritDoc}
@@ -164,7 +163,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
     /**
      * {@inheritDoc}
      */
-    public List getOperations()
+    public List<Operation> getOperations()
     {
         return operations;
     }
@@ -188,7 +187,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
     /**
      * {@inheritDoc}
      */
-    public void setOperations(List operations)
+    public void setOperations(List<Operation> operations)
     {
         this.clearOperations();
         this.operations.addAll(operations);
@@ -199,8 +198,8 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      */
     public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        for (Iterator it = operations.iterator(); it.hasNext();) {
-            ((Operation) it.next()).apply(doc, context);
+        for (Operation op : operations) {
+            op.apply(doc, context);
         }
     }
 
@@ -219,8 +218,8 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
             if (originator != null) {
                 xmlNode.appendChild(originator.toXml(doc));
             }
-            for (Iterator it = operations.iterator(); it.hasNext();) {
-                xmlNode.appendChild(((Operation) it.next()).toXml(doc));
+            for (Operation op : operations) {
+                xmlNode.appendChild(op.toXml(doc));
             }
             return xmlNode;
         } catch (RuntimeException ex) {

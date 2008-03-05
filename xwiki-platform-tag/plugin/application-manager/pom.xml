@@ -71,6 +71,13 @@
             <version>${platform.tool.verification.version}</version>
           </dependency>
         </dependencies>
+        <configuration>
+          <excludes>
+              <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
+              **/ApplicationManager.java,
+              **/ApplicationManagerPluginApi.java
+          </excludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

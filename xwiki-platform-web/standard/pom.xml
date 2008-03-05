@@ -65,7 +65,8 @@
       <!-- Unpack the Albatross Skin -->
       <plugin>
         <!-- Make sure the skins dir exists since Maven or its plugins doesn't always create it if
-             doesn't exist -->
+             doesn't exist. Note that it works fine without this in Maven 2.1.x for some reason
+             but fails in Maven 2.0.x. -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
         <executions>

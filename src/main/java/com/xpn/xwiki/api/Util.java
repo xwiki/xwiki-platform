@@ -183,6 +183,19 @@ public class Util extends Api
     }
 
     /**
+     * Reverse the order of the elements within a list, so that the last element is moved to the
+     * beginning of the list, the next-to-last element to the second position, and so on.
+     *
+     * @param list the list to reverse
+     * @return the reversed list
+     * @since 1.4 Milestone 1
+     */
+    public List reverseList(List list) {
+        Collections.reverse(list);
+        return list;
+    }        
+
+    /**
      * Get a stack trace as a String
      * 
      * @param e the exception to convert to a String

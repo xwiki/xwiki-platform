@@ -583,22 +583,21 @@
               **/XWikiListFilter.java,
               **/doc/rcs/*.java,
               **/api/RevisionInfo.java,
-              **/web/DeleteVersions*.java,
-              **/web/SkinAction.java,
-	            **/migration/**.java,
-	            **/*RecycleBin*.java,
-	            **/*DeletedDocument.java,
-	            **/UndeleteAction.java,
+              **/web/DeleteVersionsForm.java,
+              **/migration/**.java,
+              **/*RecycleBin*.java,
+              **/*DeletedDocument.java,
+              **/UndeleteAction.java,
               **/rightsmanager/**/*.java
               **/plugin/ldap/XWikiLDAP*.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,
-	            <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
+              <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
               **/XWikiPatchUtils.java,
-	            **/XWikiRCSArchive.java,
+              **/XWikiRCSArchive.java,
               **/XWikiHibernateRecycleBinStore.java,
-	            **/migration/AbstractXWikiMigrationManager.java
+              **/migration/AbstractXWikiMigrationManager.java
           </excludes>
         </configuration>
       </plugin>

@@ -29,6 +29,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.user.api.XWikiUser;
+import com.xpn.xwiki.util.Programming;
 
 /**
  * Scriptable API for easy handling of users. For the moment this API is very limited, containing
@@ -64,6 +65,7 @@ public class User extends Api
      * @return The wrapped XWikiUser object, or <tt>null</tt> if the user does not have
      *         programming rights.
      */
+    @Programming
     public XWikiUser getUser()
     {
         if (hasProgrammingRights()) {

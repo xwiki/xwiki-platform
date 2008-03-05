@@ -4,6 +4,9 @@ import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
+import org.w3c.dom.Document;
+import org.w3c.dom.bootstrap.DOMImplementationRegistry;
+import org.w3c.dom.ls.DOMImplementationLS;
 import org.xwiki.platform.patchservice.hook.PatchCreator;
 import org.xwiki.platform.patchservice.impl.PatchImpl;
 
@@ -36,6 +39,8 @@ public class HookTest extends MockObjectTestCase
         bclass.addNumberField("number", "Number Property", 10, "integer");
         this.mockXWiki.stubs().method("getClass").with(eq("XWiki.SomeClass"), eq(context)).will(
             returnValue(bclass));
+        this.mockXWiki.stubs().method("getClass").with(eq(""), eq(context)).will(
+            returnValue(new BaseClass()));
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
 
@@ -181,19 +186,23 @@ public class HookTest extends MockObjectTestCase
         assertNull(origDoc.getxWikiClass().getField("fieldToRemove"));
     }
 
-    public void testObjectChanges() throws XWikiException
+    public void testObjectChanges() throws Exception
     {
         XWikiDocument origDoc = new XWikiDocument("XWiki", "Document");
         origDoc.newObject("XWiki.SomeClass", context);
         origDoc.setStringValue("XWiki.SomeClass", "changedProperty", "old value");
         origDoc.setStringValue("XWiki.SomeClass", "changedProperty2", "old value");
+        BaseObject obj = origDoc.newObject("XWiki.SomeClass", context);
+        obj.setStringValue("changedProperty", "value");
         XWikiDocument newDoc = (XWikiDocument) origDoc.clone();
         newDoc.setStringValue("XWiki.SomeClass", "changedProperty", "new value");
         newDoc.setStringValue("XWiki.SomeClass", "changedProperty2", "new value");
         newDoc.setStringValue("XWiki.SomeClass", "addedProperty", "added value");
-        BaseObject obj = newDoc.newObject("XWiki.SomeClass", context);
+        obj = newDoc.newObject("XWiki.SomeClass", context);
         obj.setStringValue("addedProperty", "added value in added object");
+        newDoc.removeObject(newDoc.getObject("XWiki.SomeClass", 1));
         PatchImpl p = (PatchImpl) new PatchCreator().getPatch(origDoc, newDoc, context);
+
         p.apply(origDoc, context);
         assertEquals(newDoc.getObject("XWiki.SomeClass", 0).displayView("changedProperty",
             context), origDoc.getObject("XWiki.SomeClass", 0).displayView("changedProperty",
@@ -204,5 +213,14 @@ public class HookTest extends MockObjectTestCase
         assertEquals(
             newDoc.getObject("XWiki.SomeClass", 0).displayView("addedProperty", context), origDoc
                 .getObject("XWiki.SomeClass", 0).displayView("addedProperty", context));
+        assertEquals(
+            newDoc.getObject("XWiki.SomeClass", 2).displayView("addedProperty", context), origDoc
+                .getObject("XWiki.SomeClass", 2).displayView("addedProperty", context));
+        assertEquals(null, origDoc.getObject("XWiki.SomeClass", 1));
+    }
+
+    public void testAttachmentChanges() throws XWikiException
+    {
+        XWikiDocument origDoc = new XWikiDocument("XWiki", "Document");
     }
 }

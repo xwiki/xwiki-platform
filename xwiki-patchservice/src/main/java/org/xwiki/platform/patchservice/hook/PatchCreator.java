@@ -1,5 +1,6 @@
 package org.xwiki.platform.patchservice.hook;
 
+import java.io.ByteArrayInputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,9 +22,12 @@ import org.xwiki.platform.patchservice.api.RWPatch;
 import org.xwiki.platform.patchservice.impl.OperationFactoryImpl;
 import org.xwiki.platform.patchservice.impl.PatchImpl;
 import org.xwiki.platform.patchservice.impl.PositionImpl;
+import org.xwiki.platform.patchservice.plugin.PatchservicePlugin;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.AttachmentDiff;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.ObjectDiff;
@@ -32,13 +36,26 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 public class PatchCreator implements EventListener,
     org.xwiki.platform.patchservice.api.PatchCreator
 {
+    PatchservicePlugin plugin = null;
+
+    public PatchCreator()
+    {
+    }
+
+    public PatchCreator(PatchservicePlugin plugin)
+    {
+        this.plugin = plugin;
+    }
+
     /**
      * Event listener method, listens for document changes, and creates the corresponding patches.
      * {@inheritDoc}
      */
     public void onEvent(Event e, Object source, Object data)
     {
-        // TODO write me!
+        XWikiDocument doc = (XWikiDocument) source;
+        Patch p = getPatch(doc, doc.getOriginalDocument(), (XWikiContext) data);
+        plugin.getStorage().storePatch(p);
     }
 
     public Patch getPatch(XWikiDocument oldDoc, XWikiDocument newDoc, XWikiContext context)
@@ -49,6 +66,7 @@ public class PatchCreator implements EventListener,
             getPropertyChanges(oldDoc, newDoc, patch, context);
             getClassChanges(oldDoc, newDoc, patch, context);
             getObjectChanges(oldDoc, newDoc, patch, context);
+            getAttachmentChanges(oldDoc, newDoc, patch, context);
         } catch (DifferentiationFailedException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -62,9 +80,8 @@ public class PatchCreator implements EventListener,
     private void getContentChanges(XWikiDocument oldDoc, XWikiDocument newDoc, RWPatch patch,
         XWikiContext context) throws DifferentiationFailedException, XWikiException
     {
-        List contentChanges = newDoc.getContentDiff(oldDoc, newDoc, context);
-        for (Iterator it = contentChanges.iterator(); it.hasNext();) {
-            Delta change = (Delta) it.next();
+        List<Delta> contentChanges = newDoc.getContentDiff(oldDoc, newDoc, context);
+        for (Delta change : contentChanges) {
             if (change instanceof ChangeDelta) {
                 RWOperation delete =
                     OperationFactoryImpl.getInstance()
@@ -184,11 +201,9 @@ public class PatchCreator implements EventListener,
     private void getClassChanges(XWikiDocument oldDoc, XWikiDocument newDoc, RWPatch patch,
         XWikiContext context) throws DifferentiationFailedException, XWikiException
     {
-        List classesChanged = newDoc.getClassDiff(oldDoc, newDoc, context);
-        for (Iterator it = classesChanged.iterator(); it.hasNext();) {
-            List classChanges = (List) it.next();
-            for (Iterator it2 = classChanges.iterator(); it2.hasNext();) {
-                ObjectDiff diff = (ObjectDiff) it2.next();
+        List<List<ObjectDiff>> classesChanged = newDoc.getClassDiff(oldDoc, newDoc, context);
+        for (List<ObjectDiff> classChanges : classesChanged) {
+            for (ObjectDiff diff : classChanges) {
                 if ("added".equals(diff.getAction())) {
                     RWOperation operation =
                         OperationFactoryImpl.getInstance().newOperation(
@@ -209,7 +224,7 @@ public class PatchCreator implements EventListener,
                             Operation.TYPE_CLASS_PROPERTY_CHANGE);
                     PropertyClass property =
                         (PropertyClass) newDoc.getxWikiClass().get(diff.getPropName());
-                    Map config = new HashMap();
+                    Map<String, Object> config = new HashMap<String, Object>();
                     for (Iterator it3 = property.getFieldList().iterator(); it3.hasNext();) {
                         BaseProperty pr = (BaseProperty) it3.next();
                         config.put(pr.getName(), pr.getValue());
@@ -230,28 +245,24 @@ public class PatchCreator implements EventListener,
     private void getObjectChanges(XWikiDocument oldDoc, XWikiDocument newDoc, RWPatch patch,
         XWikiContext context) throws DifferentiationFailedException, XWikiException
     {
-        List objectClassesChanged = newDoc.getObjectDiff(oldDoc, newDoc, context);
-        for (Iterator classNames = objectClassesChanged.iterator(); classNames.hasNext();) {
-            List<ObjectDiff> classChanges = (List<ObjectDiff>) classNames.next();
-            System.out.println();
+        List<List<ObjectDiff>> objectClassesChanged =
+            newDoc.getObjectDiff(oldDoc, newDoc, context);
+        for (List<ObjectDiff> classChanges : objectClassesChanged) {
             for (ObjectDiff diff : classChanges) {
-                System.out.println(diff.getAction());
                 if ("object-added".equals(diff.getAction())) {
-                    System.out.println(" added object " + diff);
                     RWOperation operation =
                         OperationFactoryImpl.getInstance()
                             .newOperation(Operation.TYPE_OBJECT_ADD);
                     operation.addObject(diff.getClassName());
                     patch.addOperation(operation);
                 } else if ("object-removed".equals(diff.getAction())) {
-                    System.out.println(" rem " + diff);
                     RWOperation operation =
                         OperationFactoryImpl.getInstance().newOperation(
                             Operation.TYPE_OBJECT_DELETE);
                     operation.deleteObject(diff.getClassName(), diff.getNumber());
                     patch.addOperation(operation);
+                    break;
                 } else {
-                    System.out.println(" changed " + diff);
                     RWOperation operation =
                         OperationFactoryImpl.getInstance().newOperation(
                             Operation.TYPE_OBJECT_PROPERTY_SET);
@@ -259,6 +270,41 @@ public class PatchCreator implements EventListener,
                         .getPropName(), (String) diff.getNewValue());
                     patch.addOperation(operation);
                 }
+            }
+        }
+    }
+
+    private void getAttachmentChanges(XWikiDocument oldDoc, XWikiDocument newDoc, RWPatch patch,
+        XWikiContext context) throws DifferentiationFailedException, XWikiException
+    {
+        List<AttachmentDiff> attachmentsChanged =
+            newDoc.getAttachmentDiff(oldDoc, newDoc, context);
+        for (AttachmentDiff diff : attachmentsChanged) {
+            if (diff.getOrigVersion() == null) {
+                // Added attachment
+                RWOperation operation =
+                    OperationFactoryImpl.getInstance()
+                        .newOperation(Operation.TYPE_ATTACHMENT_ADD);
+                XWikiAttachment attachment = newDoc.getAttachment(diff.getFileName());
+                operation.addAttachment(new ByteArrayInputStream(attachment.getContent(context)),
+                    attachment.getFilename(), attachment.getAuthor());
+                patch.addOperation(operation);
+            } else if (diff.getNewVersion() == null) {
+                // Deleted attachment
+                RWOperation operation =
+                    OperationFactoryImpl.getInstance().newOperation(
+                        Operation.TYPE_ATTACHMENT_DELETE);
+                operation.deleteAttachment(diff.getFileName());
+                patch.addOperation(operation);
+            } else {
+                // Updated attachment
+                RWOperation operation =
+                    OperationFactoryImpl.getInstance()
+                        .newOperation(Operation.TYPE_ATTACHMENT_SET);
+                XWikiAttachment attachment = newDoc.getAttachment(diff.getFileName());
+                operation.setAttachment(new ByteArrayInputStream(attachment.getContent(context)),
+                    attachment.getFilename(), attachment.getAuthor());
+                patch.addOperation(operation);
             }
         }
     }

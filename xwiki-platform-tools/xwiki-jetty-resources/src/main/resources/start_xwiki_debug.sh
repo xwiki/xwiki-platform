@@ -17,7 +17,7 @@ PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
 JETTY_HOME=jetty
-JAVA_OPTS="-Xmx300m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005"
+JAVA_OPTS="-Xmx300m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005 -Dorg.mortbay.http.HttpRequest.maxFormContentSize=1000000"
 
 # For enabling YourKit Profiling:
 # JAVA_OPTS="$JAVA_OPTS -agentlib:yjpagent"

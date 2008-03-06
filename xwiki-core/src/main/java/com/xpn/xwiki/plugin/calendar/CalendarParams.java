@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import com.xpn.xwiki.XWikiContext;
+
 public class CalendarParams
 {
     private Map map = new HashMap();
@@ -80,20 +82,48 @@ public class CalendarParams
         return cal;
     }
 
+    public String computePrevMonthURL(XWikiContext context)
+    {
+        Calendar c = this.getCalendar(Locale.getDefault());
+
+        int prevBound = (int) context.getWiki().ParamAsLong("xwiki.calendar.bound.prev", 6);
+        if (Calendar.getInstance().get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12
+            * (Calendar.getInstance().get(Calendar.YEAR) - c.get(Calendar.YEAR)) < prevBound) {
+            c.add(Calendar.MONTH, -1);
+            return getQueryString(c);
+        }
+        return "";
+    }
+
+    public String computeNextMonthURL(XWikiContext context)
+    {
+        Calendar c = this.getCalendar(Locale.getDefault());
+
+        int nextBound = (int) context.getWiki().ParamAsLong("xwiki.calendar.bound.next", 12);
+        if (c.get(Calendar.MONTH) - Calendar.getInstance().get(Calendar.MONTH) + 12
+            * (c.get(Calendar.YEAR) - Calendar.getInstance().get(Calendar.YEAR)) < nextBound) {
+            c.add(Calendar.MONTH, 1);
+            return getQueryString(c);
+        }
+        return "";
+    }
+
     public String computePrevMonthURL()
     {
         Calendar c = this.getCalendar(Locale.getDefault());
         c.add(Calendar.MONTH, -1);
-        if (c.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {
-            return "?year=" + c.get(Calendar.YEAR) + "&amp;month=" + c.get(Calendar.MONTH);
-        }
-        return "?month=" + c.get(Calendar.MONTH);
+        return getQueryString(c);
     }
 
     public String computeNextMonthURL()
     {
         Calendar c = this.getCalendar(Locale.getDefault());
         c.add(Calendar.MONTH, 1);
+        return getQueryString(c);
+    }
+    
+    protected String getQueryString(Calendar c)
+    {
         if (c.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {
             return "?year=" + c.get(Calendar.YEAR) + "&amp;month=" + c.get(Calendar.MONTH);
         }

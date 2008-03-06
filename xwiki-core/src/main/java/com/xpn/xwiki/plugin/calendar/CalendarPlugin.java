@@ -176,18 +176,33 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         // -------------------------
         // --- draw the calendar ---
         // -------------------------
+        String tempMonthUrl;
+
         output.append("<table summary=\"Event calendar\"");
         output.append(" id=\"wiki-calendar-table-" + id + "\"");
         output.append(" class=\"wiki-calendar-table\">");
 
         output.append("<tr class=\"wiki-calendar-month\">");
-        output.append("<th class=\"wiki-calendar-month-nav prev-month\"><a href=\""
-            + calendarParams.computePrevMonthURL() + "\">&lt;</a></th>");
+        if ((tempMonthUrl = calendarParams.computePrevMonthURL(context)) != "") {
+            tempMonthUrl = "<a href=\"" + tempMonthUrl + "\">&lt;</a>";
+        } else {
+            tempMonthUrl = "<span class=\"disabled\">&lt</span>";
+        }
+        output.append("<th class=\"wiki-calendar-month-nav prev-month\">" + tempMonthUrl
+            + "</th>");
+
         output.append("<th colspan=\"5\" " + "class=\"wiki-calendar-monthyearrow\">");
         output.append(formatTitle.format(dayCal.getTime()));
         output.append("</th>");
-        output.append("<th class=\"wiki-calendar-month-nav next-month\"><a href=\""
-            + calendarParams.computeNextMonthURL() + "\">&gt;</a></th>");
+
+        if ((tempMonthUrl = calendarParams.computeNextMonthURL(context)) != "") {
+            tempMonthUrl = "<a href=\"" + tempMonthUrl + "\">&gt;</a>";
+        } else {
+            tempMonthUrl = "<span class=\"disabled\">&gt</span>";
+        }
+        output.append("<th class=\"wiki-calendar-month-nav next-month\">" + tempMonthUrl
+            + "</th>");
+
         output.append("</tr>");
 
         // emit the HTML calendar

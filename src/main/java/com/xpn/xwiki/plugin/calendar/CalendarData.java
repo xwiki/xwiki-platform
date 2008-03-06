@@ -21,6 +21,18 @@
 
 package com.xpn.xwiki.plugin.calendar;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
+
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -31,42 +43,45 @@ import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import org.apache.velocity.VelocityContext;
-
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
- * CalendarData stores a list of events that can be displayed in an Event Calendar.
- * The internal data is of type {@link com.xpn.xwiki.plugin.calendar.CalendarEvent}.
- * The list can be populated with CalendarEvent XWiki objects from a document, with
- * document names retrieved by a custom hibernate query, or  with recently changed document names.
+ * CalendarData stores a list of events that can be displayed in an Event Calendar. The internal
+ * data is of type {@link com.xpn.xwiki.plugin.calendar.CalendarEvent}. The list can be populated
+ * with CalendarEvent XWiki objects from a document, with document names retrieved by a custom
+ * hibernate query, or with recently changed document names.
  */
-public class CalendarData {
+public class CalendarData
+{
     private Map cdata = new HashMap();
 
     /**
      * Default constructor. Leaves the list of events empty.
      */
-    public CalendarData() {
+    public CalendarData()
+    {
     }
 
     /**
-     * The most used constructor, which populates the list with CalendarEvent
-     * XWiki objects from the current document.
+     * The most used constructor, which populates the list with CalendarEvent XWiki objects from the
+     * current document.
+     * 
      * @param user The default user to be used.
      * @param context The request context
      * @throws XWikiException
      */
-    public CalendarData(String user, XWikiContext context) throws XWikiException {
+    public CalendarData(String user, XWikiContext context) throws XWikiException
+    {
         addCalendarData(context.getDoc(), user);
     }
 
-    public CalendarData(XWikiDocument doc, String user, XWikiContext context) throws XWikiException {
+    public CalendarData(XWikiDocument doc, String user, XWikiContext context)
+        throws XWikiException
+    {
         addCalendarData(doc, user);
     }
 
-    public CalendarData(String hql, String user, XWikiContext context) throws XWikiException {
+    public CalendarData(String hql, String user, XWikiContext context) throws XWikiException
+    {
         XWiki xwiki = context.getWiki();
         List list = xwiki.getStore().searchDocumentsNames(hql, context);
         for (int i = 0; i < list.size(); i++) {
@@ -76,7 +91,8 @@ public class CalendarData {
         }
     }
 
-    public CalendarData(String hql, int nb, XWikiContext context) throws XWikiException {
+    public CalendarData(String hql, int nb, XWikiContext context) throws XWikiException
+    {
         XWiki xwiki = context.getWiki();
         List list = xwiki.getStore().searchDocumentsNames(hql, nb, 0, context);
         SimpleDateFormat df = new SimpleDateFormat("yyMMdd");
@@ -86,42 +102,48 @@ public class CalendarData {
             Date date = doc.getDate();
             Calendar cdate = Calendar.getInstance();
             cdate.setTime(date);
-            cdata.put(df.format(date), new CalendarEvent(cdate, cdate, "", "[" + doc.getName() + ">" + doc.getFullName() + "] by "
-                    + context.getWiki().getLocalUserName(doc.getAuthor(), context)));
+            cdata.put(df.format(date), new CalendarEvent(cdate, cdate, "", "[" + doc.getName()
+                + ">" + doc.getFullName() + "] by "
+                + context.getWiki().getLocalUserName(doc.getAuthor(), context)));
         }
     }
 
-    public List getCalendarData() {
+    public List getCalendarData()
+    {
         List ldata = new ArrayList();
         List sortedKeys = new ArrayList(cdata.keySet());
         java.util.Collections.sort(sortedKeys);
-        for(Iterator it = sortedKeys.iterator(); it.hasNext(); ) {
-            ldata.addAll((List)cdata.get(it.next()));
+        for (Iterator it = sortedKeys.iterator(); it.hasNext();) {
+            ldata.addAll((List) cdata.get(it.next()));
         }
         return ldata;
     }
 
-    public Map getMappedCalendarData() {
+    public Map getMappedCalendarData()
+    {
         return cdata;
     }
 
-    public List getCalendarData(Calendar date) {
+    public List getCalendarData(Calendar date)
+    {
         Object result = cdata.get(new SimpleDateFormat("yyMMdd").format(date.getTime()));
-        if(result == null) {
+        if (result == null) {
             result = new ArrayList();
         }
-        return (List)result;
+        return (List) result;
     }
 
     /**
      * List populating method. It iterates the CalendarEvent objects stored in the given document
      * and creates Java wrappers that can be used by the Calendar plugin.
+     * 
      * @param doc The source document, populated with CalendarEvent objects.
      * @param defaultUser The username to be used ig objects do not have a User field.
      * @throws XWikiException
      */
-    public void addCalendarData(XWikiDocument doc, String defaultUser) throws XWikiException {
-        if(doc == null) {
+    public void addCalendarData(XWikiDocument doc, String defaultUser) throws XWikiException
+    {
+        if (doc == null) {
             return;
         }
         if (defaultUser == null) {
@@ -149,7 +171,8 @@ public class CalendarData {
 
                     String description = "";
                     try {
-                        description = (String) ((LargeStringProperty) bobj.get("description")).getValue();
+                        description =
+                            (String) ((LargeStringProperty) bobj.get("description")).getValue();
                     } catch (Exception e) {
                     }
 
@@ -218,7 +241,14 @@ public class CalendarData {
                     cdateStart.setTime(dateStart);
                     Calendar cdateEnd = Calendar.getInstance();
                     cdateEnd.setTime(dateEnd);
-                    addCalendarData(new CalendarEvent(cdateStart, cdateEnd, user, description, title, category, url, location));
+                    addCalendarData(new CalendarEvent(cdateStart,
+                        cdateEnd,
+                        user,
+                        description,
+                        title,
+                        category,
+                        url,
+                        location));
                 } catch (Exception e) {
                     // Let's continue in case of failure
                     e.printStackTrace();
@@ -227,20 +257,25 @@ public class CalendarData {
         }
     }
 
-    public String getContent(Calendar tddate, XWikiContext context) {
+    public String getContent(Calendar tddate, XWikiContext context)
+    {
         return getContent(tddate, null, null, null, context);
     }
 
-    public String getContent(Calendar tddate, String filteredUser, String filteredLocation, List filteredCategories, XWikiContext context) {
+    public String getContent(Calendar tddate, String filteredUser, String filteredLocation,
+        List filteredCategories, XWikiContext context)
+    {
         StringBuffer result = new StringBuffer();
-        for (Iterator it = getCalendarData(tddate).iterator(); it.hasNext(); ) {
+        for (Iterator it = getCalendarData(tddate).iterator(); it.hasNext();) {
             CalendarEvent event = (CalendarEvent) it.next();
             String user = event.getUser().trim();
-            if ((filteredUser != null) && (!filteredUser.trim().equals("")) && (!filteredUser.trim().equals(user))) {
+            if ((filteredUser != null) && (!filteredUser.trim().equals(""))
+                && (!filteredUser.trim().equals(user))) {
                 continue;
             }
             String location = event.getLocation().trim();
-            if ((filteredLocation != null) && (!filteredLocation.trim().equals("")) && (!filteredLocation.trim().equals(location))) {
+            if ((filteredLocation != null) && (!filteredLocation.trim().equals(""))
+                && (!filteredLocation.trim().equals(location))) {
                 continue;
             }
             List categories;
@@ -256,22 +291,24 @@ public class CalendarData {
             String url = event.getUrl();
             result.append("<div class=\"event");
             if (categories != null && categories.size() > 0) {
-                for (Iterator cit = categories.iterator(); cit.hasNext(); ) {
+                for (Iterator cit = categories.iterator(); cit.hasNext();) {
                     result.append(" " + cit.next());
                 }
             }
             result.append("\">");
             if ((user != null) && (!user.equals(""))) {
-                result.append("<span class=\"username\">" + context.getWiki().getLocalUserName(event.getUser(), context) + "</span>");
+                result.append("<span class=\"username\">"
+                    + context.getWiki().getLocalUserName(event.getUser(), context) + "</span>");
             }
-            if ((user != null) && (!user.equals("")) && (title != null) && (!title.trim().equals(""))) {
+            if ((user != null) && (!user.equals("")) && (title != null)
+                && (!title.trim().equals(""))) {
                 result.append(": ");
             }
-            if(url != null && !url.equals("")) {
+            if (url != null && !url.equals("")) {
                 result.append("<a href=\"" + url + "\">");
             }
             result.append(title);
-            if(url != null && !url.equals("")) {
+            if (url != null && !url.equals("")) {
                 result.append("</a>");
             }
             result.append("</div>");
@@ -279,7 +316,8 @@ public class CalendarData {
         return result.toString();
     }
 
-    public String getContent(Calendar tddate, String velocityScript, XWikiContext context) {
+    public String getContent(Calendar tddate, String velocityScript, XWikiContext context)
+    {
         VelocityContext vcontext = new VelocityContext();
         vcontext.put("date", tddate);
         List events = getCalendarData(tddate);
@@ -288,11 +326,12 @@ public class CalendarData {
             vcontext, context);
     }
 
-    public void addCalendarData(CalendarEvent event) {
+    public void addCalendarData(CalendarEvent event)
+    {
         SimpleDateFormat df = new SimpleDateFormat("yyMMdd");
         Calendar cdateStart = event.getDateStart();
         String dateEnd = df.format(event.getDateEnd().getTime());
-        Calendar crtDate = (Calendar)cdateStart.clone();
+        Calendar crtDate = (Calendar) cdateStart.clone();
         List evtList;
         do {
             evtList = (List) cdata.get(df.format(crtDate.getTime()));
@@ -302,15 +341,17 @@ public class CalendarData {
             evtList.add(event);
             cdata.put(df.format(crtDate.getTime()), evtList);
             crtDate.add(Calendar.DATE, 1);
-        }
-        while (df.format(crtDate.getTime()).compareTo(dateEnd) <= 0);
+        } while (df.format(crtDate.getTime()).compareTo(dateEnd) <= 0);
     }
 
-    public void addCalendarData(Calendar dateStart, Calendar dateEnd, String user, String description) {
+    public void addCalendarData(Calendar dateStart, Calendar dateEnd, String user,
+        String description)
+    {
         addCalendarData(new CalendarEvent(dateStart, dateEnd, user, description));
     }
 
-    public void addCalendarData(Date dateStart, Date dateEnd, String user, String description) {
+    public void addCalendarData(Date dateStart, Date dateEnd, String user, String description)
+    {
         Calendar cdateStart = Calendar.getInstance();
         cdateStart.setTime(dateStart);
         Calendar cdateEnd = Calendar.getInstance();

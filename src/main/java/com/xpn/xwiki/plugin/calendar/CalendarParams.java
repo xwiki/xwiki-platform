@@ -20,27 +20,37 @@
 
 package com.xpn.xwiki.plugin.calendar;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
-public class CalendarParams {
+public class CalendarParams
+{
     private Map map = new HashMap();
 
-    public CalendarParams() {
+    public CalendarParams()
+    {
     }
 
-    public CalendarParams(Map map) {
+    public CalendarParams(Map map)
+    {
         this.map = map;
     }
 
-    public Object get(Object key) {
+    public Object get(Object key)
+    {
         return map.get(key);
     }
 
-    public void put(Object key, Object value) {
+    public void put(Object key, Object value)
+    {
         map.put(key, value);
     }
 
-    public Calendar getCalendar(Locale locale) {
+    public Calendar getCalendar(Locale locale)
+    {
         Calendar cal = Calendar.getInstance(locale);
         cal.setTime(new Date());
         String smonth = (String) get("month");
@@ -69,7 +79,9 @@ public class CalendarParams {
         }
         return cal;
     }
-    public String computePrevMonthURL() {
+
+    public String computePrevMonthURL()
+    {
         Calendar c = this.getCalendar(Locale.getDefault());
         c.add(Calendar.MONTH, -1);
         if (c.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {
@@ -77,7 +89,9 @@ public class CalendarParams {
         }
         return "?month=" + c.get(Calendar.MONTH);
     }
-    public String computeNextMonthURL() {
+
+    public String computeNextMonthURL()
+    {
         Calendar c = this.getCalendar(Locale.getDefault());
         c.add(Calendar.MONTH, 1);
         if (c.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {

@@ -24,40 +24,59 @@ package com.xpn.xwiki.plugin.calendar;
 import java.util.Calendar;
 import java.util.List;
 
-public class CalendarEvent {
+public class CalendarEvent
+{
     private Calendar dateStart;
+
     private Calendar dateEnd;
+
     private String title;
+
     private String description;
+
     private String user;
+
     private List category;
+
     private String url;
+
     private String location;
 
-    public CalendarEvent() {
+    public CalendarEvent()
+    {
     }
 
-    public CalendarEvent(Calendar date, String user, String description) {
+    public CalendarEvent(Calendar date, String user, String description)
+    {
         this(date, date, user, description, description, null, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description) {
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description)
+    {
         this(dateStart, dateEnd, user, description, description, null, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title) {
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
+        String title)
+    {
         this(dateStart, dateEnd, user, description, title, null, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title, List category) {
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
+        String title, List category)
+    {
         this(dateStart, dateEnd, user, description, title, category, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title, List category, String url) {
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
+        String title, List category, String url)
+    {
         this(dateStart, dateEnd, user, description, title, category, url, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title, List category, String url, String location) {
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
+        String title, List category, String url, String location)
+    {
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
         this.user = user;
@@ -68,67 +87,83 @@ public class CalendarEvent {
         this.location = location;
     }
 
-    public Calendar getDateStart() {
+    public Calendar getDateStart()
+    {
         return dateStart;
     }
 
-    public void setDateStart(Calendar dateStart) {
+    public void setDateStart(Calendar dateStart)
+    {
         this.dateStart = dateStart;
     }
 
-    public Calendar getDateEnd() {
+    public Calendar getDateEnd()
+    {
         return dateEnd;
     }
 
-    public void setDateEnd(Calendar dateEnd) {
+    public void setDateEnd(Calendar dateEnd)
+    {
         this.dateEnd = dateEnd;
     }
 
-    public String getUser() {
+    public String getUser()
+    {
         return user;
     }
 
-    public void setUser(String user) {
+    public void setUser(String user)
+    {
         this.user = user;
     }
 
-    public String getDescription() {
+    public String getDescription()
+    {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(String description)
+    {
         this.description = description;
     }
 
-    public String getTitle() {
+    public String getTitle()
+    {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title)
+    {
         this.title = title;
     }
 
-    public List getCategory() {
+    public List getCategory()
+    {
         return category;
     }
 
-    public void setCategory(List category) {
+    public void setCategory(List category)
+    {
         this.category = category;
     }
 
-    public String getUrl() {
+    public String getUrl()
+    {
         return url;
     }
 
-    public void setUrl(String url) {
+    public void setUrl(String url)
+    {
         this.url = url;
     }
 
-    public String getLocation() {
+    public String getLocation()
+    {
         return location;
     }
 
-    public void setLocation(String location) {
+    public void setLocation(String location)
+    {
         this.location = location;
     }
 }

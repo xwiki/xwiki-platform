@@ -24,7 +24,6 @@ package com.xpn.xwiki.plugin.calendar;
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -42,12 +41,15 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
-public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
-    public CalendarPlugin(String name, String className, XWikiContext context) {
+public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+{
+    public CalendarPlugin(String name, String className, XWikiContext context)
+    {
         super(name, className, context);
     }
 
-    protected BaseClass getCalendarEventClass(XWikiContext context) throws XWikiException {
+    protected BaseClass getCalendarEventClass(XWikiContext context) throws XWikiException
+    {
         XWikiDocument doc;
         XWiki xwiki = context.getWiki();
         boolean needsUpdate = false;
@@ -83,45 +85,57 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return bclass;
     }
 
-    public CalendarParams getCalendarParams(String month, String year, XWikiContext context) {
+    public CalendarParams getCalendarParams(String month, String year, XWikiContext context)
+    {
         CalendarParams cparams = new CalendarParams();
         cparams.put("month", month);
         cparams.put("year", year);
         return cparams;
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, String user, XWikiContext context) throws XWikiException {
+    public String getHTMLCalendar(CalendarParams calendarParams, String user, XWikiContext context)
+        throws XWikiException
+    {
         CalendarData cData = new CalendarData(user, context);
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, XWikiDocument doc, String user, XWikiContext context) throws XWikiException {
+    public String getHTMLCalendar(CalendarParams calendarParams, XWikiDocument doc, String user,
+        XWikiContext context) throws XWikiException
+    {
         CalendarData cData = new CalendarData(doc, user, context);
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, String hql, String user, XWikiContext context) throws XWikiException {
+    public String getHTMLCalendar(CalendarParams calendarParams, String hql, String user,
+        XWikiContext context) throws XWikiException
+    {
         CalendarData cData = new CalendarData(hql, user, context);
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, String hql, int nb, XWikiContext context) throws XWikiException {
+    public String getHTMLCalendar(CalendarParams calendarParams, String hql, int nb,
+        XWikiContext context) throws XWikiException
+    {
         CalendarData cData = new CalendarData(hql, nb, context);
         return getHTMLCalendar(calendarParams, cData, context);
     }
 
-    public String getHTMLCalendar(CalendarParams calendarParams, CalendarData calendarData, XWikiContext context) throws XWikiException {
+    public String getHTMLCalendar(CalendarParams calendarParams, CalendarData calendarData,
+        XWikiContext context) throws XWikiException
+    {
         StringBuffer output = new StringBuffer();
         Calendar cal; // For iterating through days of month
         Calendar dayCal; // First day of the displayed month
         Calendar todayCal; // Today
 
         Locale locale = context.getResponse().getLocale();
-        if(locale == null) {
+        if (locale == null) {
             locale = new Locale("en");
         }
         todayCal = Calendar.getInstance(locale);
-        // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future JDK-s.
+        // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future
+        // JDK-s.
         fixJDKLocaleBugs(todayCal, locale);
         todayCal.setTime(new Date());
 
@@ -145,11 +159,13 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
         // go back to first day in month
         dayCal = calendarParams.getCalendar(locale);
-        // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future JDK-s.
+        // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future
+        // JDK-s.
         fixJDKLocaleBugs(dayCal, locale);
         cal = (Calendar) dayCal.clone();
         cal.set(Calendar.DAY_OF_MONTH, cal.getMinimum(Calendar.DAY_OF_MONTH));
-        // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future JDK-s.
+        // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future
+        // JDK-s.
         fixJDKLocaleBugs(cal, locale);
 
         // go back to sunday before that: the first sunday in the calendar
@@ -165,11 +181,13 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         output.append(" class=\"wiki-calendar-table\">");
 
         output.append("<tr class=\"wiki-calendar-month\">");
-        output.append("<th class=\"wiki-calendar-month-nav prev-month\"><a href=\"" + calendarParams.computePrevMonthURL() + "\">&lt;</a></th>");
+        output.append("<th class=\"wiki-calendar-month-nav prev-month\"><a href=\""
+            + calendarParams.computePrevMonthURL() + "\">&lt;</a></th>");
         output.append("<th colspan=\"5\" " + "class=\"wiki-calendar-monthyearrow\">");
         output.append(formatTitle.format(dayCal.getTime()));
         output.append("</th>");
-        output.append("<th class=\"wiki-calendar-month-nav next-month\"><a href=\"" + calendarParams.computeNextMonthURL() + "\">&gt;</a></th>");
+        output.append("<th class=\"wiki-calendar-month-nav next-month\"><a href=\""
+            + calendarParams.computeNextMonthURL() + "\">&gt;</a></th>");
         output.append("</tr>");
 
         // emit the HTML calendar
@@ -181,7 +199,10 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
             continue;
         }
         output.append("</tr>");
-        int weeks = (int) Math.ceil((dayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + (dayCal.get(Calendar.DAY_OF_WEEK) - dayCal.getFirstDayOfWeek() + 7) % 7 ) / 7.0);
+        int weeks =
+            (int) Math.ceil((dayCal.getActualMaximum(Calendar.DAY_OF_MONTH) + (dayCal
+                .get(Calendar.DAY_OF_WEEK)
+                - dayCal.getFirstDayOfWeek() + 7) % 7) / 7.0);
         for (int w = 0; w < weeks; w++) {
             output.append("<tr>");
             for (int d = 0; d < 7; d++) {
@@ -189,22 +210,27 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
                 String script = (String) calendarParams.get("script");
 
                 if (script == null)
-                    content = calendarData.getContent(cal, (String) calendarParams.get("user"), (String) calendarParams.get("location"), (List) calendarParams.get("categories"), context);
+                    content =
+                        calendarData.getContent(cal, (String) calendarParams.get("user"),
+                            (String) calendarParams.get("location"), (List) calendarParams
+                                .get("categories"), context);
                 else
                     content = calendarData.getContent(cal, script, context);
 
                 if // day is today then use today style
                 ((cal.get(Calendar.DAY_OF_MONTH) == todayCal.get(Calendar.DAY_OF_MONTH))
-                        && (cal.get(Calendar.MONTH) == todayCal.get(Calendar.MONTH))
-                        && (cal.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR))) {
-                    printDay(output, cal, null, content, true, cal.get(Calendar.MONTH) == dayCal.get(Calendar.MONTH));
+                    && (cal.get(Calendar.MONTH) == todayCal.get(Calendar.MONTH))
+                    && (cal.get(Calendar.YEAR) == todayCal.get(Calendar.YEAR))) {
+                    printDay(output, cal, null, content, true, cal.get(Calendar.MONTH) == dayCal
+                        .get(Calendar.MONTH));
                 } else if // day is in calendar month
-                ((cal.get(Calendar.MONTH) == dayCal.get(Calendar.MONTH)) && (cal.get(Calendar.YEAR) == dayCal.get(Calendar.YEAR))) {
-                    //printDayInThisMonth(output, cal, null, content);
+                ((cal.get(Calendar.MONTH) == dayCal.get(Calendar.MONTH))
+                    && (cal.get(Calendar.YEAR) == dayCal.get(Calendar.YEAR))) {
+                    // printDayInThisMonth(output, cal, null, content);
                     printDay(output, cal, null, content, false, true);
                 } else // apply day-not-in-month style ;-)
                 {
-                    //printDayNotInMonth(output, cal);
+                    // printDayNotInMonth(output, cal);
                     printDay(output, cal, null, content, false, false);
                 }
 
@@ -215,29 +241,26 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
 
         /*
-         output.append("<tr class=\"wiki-calendar-nextprev\">");
-         output.append("<td colspan=\"7\" align=\"center\">");
-         output.append("<a href=\""+ calendarParams.computeTodayMonthUrl()
-         +"\" class=\"wiki-calendar-navbar\">"
-         + msg.get("calendar.today")
-         +"</a>");
-         output.append("</td>");
-         output.append("</tr>");
+         * output.append("<tr class=\"wiki-calendar-nextprev\">"); output.append("<td colspan=\"7\" align=\"center\">");
+         * output.append("<a href=\""+ calendarParams.computeTodayMonthUrl() +"\"
+         * class=\"wiki-calendar-navbar\">" + msg.get("calendar.today") +"</a>"); output.append("</td>");
+         * output.append("</tr>");
          */
 
         output.append("</table>");
         return output.toString();
     }
 
-    private void printDay(StringBuffer output, Calendar cal, String url, String content, boolean today, boolean inThisMonth) {
+    private void printDay(StringBuffer output, Calendar cal, String url, String content,
+        boolean today, boolean inThisMonth)
+    {
         if (inThisMonth) {
             if (today) {
                 output.append("<td class=\"wiki-calendar-today\">");
             } else {
                 output.append("<td class=\"wiki-calendar-dayinmonth\">");
             }
-        }   
-        else {
+        } else {
             if (today) {
                 output.append("<td class=\"wiki-calendar-today-notinmonth\">");
             } else {
@@ -267,11 +290,12 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
     }
 
     /**
-     * Helper method to build the names of the weekdays. This
-     * used to take place in the <code>CalendarTag</code> constructor,
-     * but there, <code>mLocale</code> doesn't have the correct value yet.
+     * Helper method to build the names of the weekdays. This used to take place in the
+     * <code>CalendarTag</code> constructor, but there, <code>mLocale</code> doesn't have the
+     * correct value yet.
      */
-    private String[] buildDayNames(Locale locale) {
+    private String[] buildDayNames(Locale locale)
+    {
         // build array of names of days of week
         String[] mDayNames = new String[7];
         Calendar dayNameCal = Calendar.getInstance(locale);
@@ -285,11 +309,13 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return mDayNames;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return "calendar";
     }
 
-    public void init(XWikiContext context) {
+    public void init(XWikiContext context)
+    {
         try {
             getCalendarEventClass(context);
         } catch (Exception e) {
@@ -297,7 +323,8 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
     }
 
-    public void virtualInit(XWikiContext context) {
+    public void virtualInit(XWikiContext context)
+    {
         try {
             getCalendarEventClass(context);
         } catch (Exception e) {
@@ -305,11 +332,14 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         }
     }
 
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
         return new CalendarPluginApi((CalendarPlugin) plugin, context);
     }
 
-    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, XWikiContext context) throws ParserException, IOException {
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, XWikiContext context)
+        throws ParserException, IOException
+    {
         CalendarBuilder builder = new CalendarBuilder();
         String sical = context.getWiki().getURLContent(surl, context);
         StringReader reader = new StringReader(sical);
@@ -317,8 +347,9 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
         return calendar;
     }
 
-    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username, String password, XWikiContext context) throws ParserException,
-            IOException {
+    public net.fortuna.ical4j.model.Calendar getCalendar(String surl, String username,
+        String password, XWikiContext context) throws ParserException, IOException
+    {
         CalendarBuilder builder = new CalendarBuilder();
         String sical = context.getWiki().getURLContent(surl, username, password, context);
         StringReader reader = new StringReader(sical);
@@ -327,60 +358,33 @@ public class CalendarPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
     }
 
     // JDK bug: Romanian weeks start on monday, not sunday. This should be fixed in future JDK-s.
-    private void fixJDKLocaleBugs(Calendar c, Locale l) {
-        if("ro".equals(l.getLanguage())) {
+    private void fixJDKLocaleBugs(Calendar c, Locale l)
+    {
+        if ("ro".equals(l.getLanguage())) {
             c.setFirstDayOfWeek(Calendar.MONDAY);
         }
     }
 
     /*
-    private void printDayNotInMonth(StringBuffer output, Calendar cal) {
-        output.append("<td class=\"wiki-calendar-daynotinmonth\">");
-        output.append(cal.get(Calendar.DAY_OF_MONTH));
-        output.append("&nbsp;");
-        output.append("</td>");
-    }
-
-    private void printDayInThisMonth(StringBuffer output, Calendar cal, String url, String content, boolean today) {
-        if (today)
-            output.append("<td class=\"wiki-calendar-today\">");
-        else
-            output.append("<td class=\"wiki-calendar-dayinmonth\">");
-        if (url != null) {
-            output.append("<div class=\"wiki-calendar-daytitle\">");
-            if (content != null && content.length() > 0)
-                output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
-            output.append("<a href=\"" + url + "\">");
-            output.append(cal.get(Calendar.DAY_OF_MONTH));
-            if (content != null && content.length() > 0) {
-                output.append("<br />");
-                output.append(content);
-                output.append("</div>");
-            }
-            output.append("</a></div>");
-        } else {
-            output.append("<div class=\"wiki-calendar-daytitle\">");
-            if (content != null && content.length() > 0)
-                output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
-            output.append(cal.get(Calendar.DAY_OF_MONTH));
-            if (content != null && content.length() > 0) {
-                output.append("<br />");
-                output.append(content);
-                output.append("</div>");
-            }
-            output.append("</div>");
-        }
-        output.append("</td>");
-    }
-
-    private void printDayInThisMonth(StringBuffer output, Calendar cal, String url, String content) {
-        //printDayInThisMonth(output, cal, url, content, false);
-        printDay(output, cal, url, content, false, true);
-    }
-
-    private void printToday(StringBuffer output, Calendar cal, String url, String content) {
-        //printDayInThisMonth(output, cal, url, content, true);
-        printDay(output, cal, url, content, true, true);
-    }
-    */
+     * private void printDayNotInMonth(StringBuffer output, Calendar cal) { output.append("<td class=\"wiki-calendar-daynotinmonth\">");
+     * output.append(cal.get(Calendar.DAY_OF_MONTH)); output.append("&nbsp;"); output.append("</td>"); }
+     * private void printDayInThisMonth(StringBuffer output, Calendar cal, String url, String
+     * content, boolean today) { if (today) output.append("<td class=\"wiki-calendar-today\">");
+     * else output.append("<td class=\"wiki-calendar-dayinmonth\">"); if (url != null) {
+     * output.append("<div class=\"wiki-calendar-daytitle\">"); if (content != null &&
+     * content.length() > 0) output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
+     * output.append("<a href=\"" + url + "\">"); output.append(cal.get(Calendar.DAY_OF_MONTH)); if
+     * (content != null && content.length() > 0) { output.append("<br />");
+     * output.append(content); output.append("</div>"); } output.append("</a></div>"); } else {
+     * output.append("<div class=\"wiki-calendar-daytitle\">"); if (content != null &&
+     * content.length() > 0) output.append("<div class=\"wiki-calendar-daytitle-hasevent\">");
+     * output.append(cal.get(Calendar.DAY_OF_MONTH)); if (content != null && content.length() > 0) {
+     * output.append("<br />"); output.append(content); output.append("</div>"); }
+     * output.append("</div>"); } output.append("</td>"); } private void
+     * printDayInThisMonth(StringBuffer output, Calendar cal, String url, String content) {
+     * //printDayInThisMonth(output, cal, url, content, false); printDay(output, cal, url, content,
+     * false, true); } private void printToday(StringBuffer output, Calendar cal, String url, String
+     * content) { //printDayInThisMonth(output, cal, url, content, true); printDay(output, cal, url,
+     * content, true, true); }
+     */
 }

@@ -30,6 +30,14 @@ import com.xpn.xwiki.XWikiContext;
 
 public class CalendarParams
 {
+    public static final String CONFIG_LOWER_BOUND = "xwiki.calendar.bound.prev";
+
+    public static final int CONFIG_DEFAULT_LOWER_BOUND = 6;
+
+    public static final String CONFIG_UPPER_BOUND = "xwiki.calendar.bound.next";
+
+    public static final int CONFIG_DEFAULT_UPPER_BOUND = 12;
+
     private Map map = new HashMap();
 
     public CalendarParams()
@@ -86,9 +94,11 @@ public class CalendarParams
     {
         Calendar c = this.getCalendar(Locale.getDefault());
 
-        int prevBound = (int) context.getWiki().ParamAsLong("xwiki.calendar.bound.prev", 6);
-        if (Calendar.getInstance().get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12
-            * (Calendar.getInstance().get(Calendar.YEAR) - c.get(Calendar.YEAR)) < prevBound) {
+        int prevBound =
+            (int) context.getWiki().ParamAsLong(CONFIG_LOWER_BOUND, CONFIG_DEFAULT_LOWER_BOUND);
+        if (prevBound <= 0
+            || Calendar.getInstance().get(Calendar.MONTH) - c.get(Calendar.MONTH) + 12
+                * (Calendar.getInstance().get(Calendar.YEAR) - c.get(Calendar.YEAR)) < prevBound) {
             c.add(Calendar.MONTH, -1);
             return getQueryString(c);
         }
@@ -99,9 +109,11 @@ public class CalendarParams
     {
         Calendar c = this.getCalendar(Locale.getDefault());
 
-        int nextBound = (int) context.getWiki().ParamAsLong("xwiki.calendar.bound.next", 12);
-        if (c.get(Calendar.MONTH) - Calendar.getInstance().get(Calendar.MONTH) + 12
-            * (c.get(Calendar.YEAR) - Calendar.getInstance().get(Calendar.YEAR)) < nextBound) {
+        int nextBound =
+            (int) context.getWiki().ParamAsLong(CONFIG_UPPER_BOUND, CONFIG_DEFAULT_UPPER_BOUND);
+        if (nextBound <= 0
+            || c.get(Calendar.MONTH) - Calendar.getInstance().get(Calendar.MONTH) + 12
+                * (c.get(Calendar.YEAR) - Calendar.getInstance().get(Calendar.YEAR)) < nextBound) {
             c.add(Calendar.MONTH, 1);
             return getQueryString(c);
         }
@@ -121,7 +133,7 @@ public class CalendarParams
         c.add(Calendar.MONTH, 1);
         return getQueryString(c);
     }
-    
+
     protected String getQueryString(Calendar c)
     {
         if (c.get(Calendar.YEAR) != Calendar.getInstance().get(Calendar.YEAR)) {

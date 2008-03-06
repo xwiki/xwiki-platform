@@ -25,9 +25,11 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Model interface for the CalendarTag. The CalendarTag will set a day, then use the computeUrl method to get the URLs it needs.
+ * Model interface for the CalendarTag. The CalendarTag will set a day, then use the computeUrl
+ * method to get the URLs it needs.
  */
-public interface CalendarModel {
+public interface CalendarModel
+{
     public Calendar getCalendar();
 
     public void setDay(String month) throws Exception;
@@ -43,7 +45,8 @@ public interface CalendarModel {
     public String computeNextMonthUrl();
 
     /**
-     * Create URL for use on edit-weblog page, preserves the request parameters used by the tabbed-menu tag for navigation.
+     * Create URL for use on edit-weblog page, preserves the request parameters used by the
+     * tabbed-menu tag for navigation.
      * 
      * @param day Day for URL
      * @param valid Always return a URL, never return null

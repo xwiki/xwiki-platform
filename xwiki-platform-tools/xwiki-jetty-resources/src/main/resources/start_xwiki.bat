@@ -2,7 +2,7 @@
 set LANG=fr_FR.ISO8859-1
 set JETTY_HOME=jetty
 set JETTY_PORT=8080
-set JAVA_OPTS=-Xmx300m -Dorg.mortbay.http.HttpRequest.maxFormContentSize=1000000
+set JAVA_OPTS="-Xmx300m -Dorg.mortbay.http.HttpRequest.maxFormContentSize=1000000"
 
 REM Ensure the logs directory exists as otherwise Jetty reports an error
 if not exist %JETTY_HOME%\logs mkdir %JETTY_HOME%\logs

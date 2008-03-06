@@ -17,7 +17,7 @@ PRGDIR=`dirname "$PRG"`
 cd "$PRGDIR"
 
 JETTY_HOME=jetty
-JAVA_OPTS=-Xmx300m -Dorg.mortbay.http.HttpRequest.maxFormContentSize=1000000
+JAVA_OPTS="-Xmx300m -Dorg.mortbay.http.HttpRequest.maxFormContentSize=1000000"
 
 # The port on which to start Jetty can be passed to this script as the first argument
 if [ -n "$1" ]; then

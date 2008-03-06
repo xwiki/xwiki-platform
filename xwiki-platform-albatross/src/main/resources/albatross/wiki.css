@@ -280,11 +280,14 @@ ol.HEBREW { list-style-type: hebrew; }
 .wiki-calendar-month-nav{
   border: none !important;
 }
-.wiki-calendar-month-nav a{
+.wiki-calendar-month-nav *{
   font-size: 140%;
   font-weight: bold;
   color: #C0D4E7 !important;
   text-decoration: none;
+}
+.wiki-calendar-month-nav .disabled{
+  color: #aaa !important;
 }
 .wiki-calendar-month-nav a:hover{
   text-decoration: none !important;

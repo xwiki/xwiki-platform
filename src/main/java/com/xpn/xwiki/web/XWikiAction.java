@@ -105,6 +105,7 @@ public abstract class XWikiAction extends Action
         MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
         XWikiContext context = null;
+        String docName = "";
 
         try {
             XWikiRequest request = new XWikiServletRequest(req);
@@ -187,6 +188,7 @@ public abstract class XWikiAction extends Action
 
                 String renderResult = null;
                 XWikiDocument doc = context.getDoc();
+                docName = doc.getFullName();
                 if (action(context)) {
                     renderResult = render(context);
                 }
@@ -280,19 +282,26 @@ public abstract class XWikiAction extends Action
                 }
 
                 // Let's handle the notification and make sure it never fails
+                // This is the old notification mechanism. It is kept here because it is in a
+                // deprecation stage. It will be removed later.
                 try {
                     xwiki.getNotificationManager().verify(context.getDoc(), mapping.getName(),
                         context);
                 } catch (Throwable e) {
                     e.printStackTrace();
                 }
+                // This is the new notification mechanism, implemented as a Plexus Component.
+                // For the moment we're sending the XWiki context as the data, but this will be
+                // changed in the future, when the whole platform will be written using components
+                // and there won't be a need for the context.
                 try {
                     ObservationManager om =
                         (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
                             context);
                     om.notify(new ActionExecutionEvent(mapping.getName()), context.getDoc(), context);
                 } catch (Throwable ex) {
-                    LOG.warn("Cannot send notifications", ex);
+                    LOG.error("Cannot send action notifications for document [" + docName
+                        + " using action [" + action + "]", ex);
                 }
 
                 if (monitor != null) {

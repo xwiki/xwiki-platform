@@ -3,7 +3,7 @@
 @import "css/table/table.css";
 @import "usersandgroups.css";
 @import "suggest/ajaxSuggest.css";
-
+@import "rss.css";
 /* @group RESET */
 /* -------------------------------------------------------------- 
   
@@ -43,7 +43,8 @@ body {
 	color: black;
 	background: white;
 }
-ol, ul {
+ol {margin-left: 2em;}
+ul {
 	list-style: none;
 	margin-left: 2em;
 }
@@ -301,6 +302,7 @@ table td{
  font-style: normal;
  }
 .main table.sortable span.sortarrow {padding-left: 5px; }
+table#memberstable td {border: none;}
 .main img { margin: 0 }
 .main h1 img, .main h2 img,.main h3 img,.main h4 img,.main h5 img,.main h6 img { margin: 0; vertical-align: middle; }
 #xwikicontent .sortarrow img {margin: 0;}
@@ -985,7 +987,7 @@ body.editbody .leftsidecolumns .centered{ margin-right:220px;}
 fieldset.xwikimessage, div.xwikimessage{
   display: block;
   float: none;
-  width: 300px;
+  width: 400px;
   margin: 65px auto  0 ;
   border: none;
  border-top: 4em solid #efffd4;
@@ -1326,11 +1328,13 @@ border-bottom: none;
   display: block;
   float: left;
   width: 106px;
-  background: transparent url(images/tab.png ) top left no-repeat;
   border: none;
 }
 .xwikitabbar li#xwikiorphansview{
   width: 206px;
+  background-image: url( images/tab2.png );
+}
+.xwikitabbar li#xwikiorphansview a{
   background-image: url( images/tab2.png );
 }
 .xwikitabbar li:hover{
@@ -1338,19 +1342,24 @@ border-bottom: none;
 }
 
 .xwikitabbar li a{
+	display: block;
+	height: 30px;
   padding: 0 3px;
   font-weight: normal;
   font-size:0.85em;
-  line-height: 30px;
+  line-height: 30px !important;
   letter-spacing: -0.5px;
   text-decoration: none;
+  background: transparent url(images/tab.png ) top left no-repeat;
 }
 .xwikitabbar li a:hover{
   text-decoration: none;
+  background-position: top center;
 }
-
+.xwikitabbar li.active a,
 .xwikitabbar li.active a:hover{
   cursor: default;
+  background-position: top center;
 }
 .xwikitabbar li a{ color:#111;}
 .xwikitabbar li.active a{ color: #333;}
@@ -1977,6 +1986,7 @@ body.importbody .alleditcontent,
 body.exportbody .alleditcontent,
 body.adminbody .alleditcontent{
   margin: 30px 50px 20px 20px;
+  border: none;
 }
 .alleditcontent label {
 	position: relative;
@@ -2797,3 +2807,6 @@ div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutconta
 
 .main p {position: static; border-collapse: collapse;}
 
+.rsschanneltitle {
+  background-color: #f4f9fe;
+}

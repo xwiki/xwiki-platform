@@ -441,11 +441,14 @@ ol.ALPHA { list-style-type: upper-alpha; }
 .wiki-calendar-month-nav{
   border: none !important;
 }
-.wiki-calendar-month-nav a{
+.wiki-calendar-month-nav *{
   font-size: 140%;
   font-weight: bold;
   color: #C0D4E7 !important;
   text-decoration: none;
+}
+.wiki-calendar-month-nav .disabled{
+  color: #aaa !important;
 }
 .wiki-calendar-month-nav a:hover{
   text-decoration: none !important;
@@ -2193,8 +2196,7 @@ text-align: center;
 }
 /* panels */
 #panellistaccordion input[type=text],#panellistaccordion textarea,
-#body .panel input[type=text], #body .panel textarea,
-#inline input[type=text],#inline textarea{
+#body .panel input[type=text], #body .panel textarea{
 	background-color: #f9fcff;
 	width:100%;
 }

@@ -1090,6 +1090,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
                         context);
                 // Notify listeners about the document change
+                // The first call is for the old notification mechanism. It is kept here because it
+                // is in a deprecation stage. It will be removed later.
+                //
+                // The second is the new notification mechanism, implemented as a Plexus Component.
+                // For the moment we're sending the XWiki context as the data, but this will be
+                // changed in the future, when the whole platform will be written using components
+                // and there won't be a need for the context. The old version is available using
+                // doc.getOriginalDocument()
                 if (originalDocument == null || originalDocument.isNew()) {
                     getNotificationManager().verify(doc, originalDocument,
                         XWikiDocChangeNotificationInterface.EVENT_NEW, context);
@@ -1104,7 +1112,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
                 }
             } catch (Exception ex) {
-                LOG.warn("Failed to send document notifications", ex);
+                LOG.error("Failed to send document save notifications for document ["
+                    + doc.getFullName() + "]", ex);
             }
         } finally {
             if ((server != null) && (database != null)) {
@@ -3435,14 +3444,22 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
         getStore().deleteXWikiDoc(doc, context);
         try {
+            // This is the old notification mechanism. It is kept here because it is in a
+            // deprecation stage. It will be removed later.
             getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
                 XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
+            // This is the new notification mechanism, implemented as a Plexus Component.
+            // For the moment we're sending the XWiki context as the data, but this will be
+            // changed in the future, when the whole platform will be written using components
+            // and there won't be a need for the context. The old version is available using
+            // doc.getOriginalDocument()
             ObservationManager om =
                 (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
                     context);
             om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
         } catch (Exception ex) {
-            LOG.warn("Failed to send document notifications", ex);
+            LOG.error("Failed to send document delete notifications for document ["
+                + doc.getFullName() + "]", ex);
         }
     }
 

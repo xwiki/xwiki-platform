@@ -19,18 +19,13 @@
  *
  */
 
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 /**
  * Helper factory class for creating Scope objects in velocity
  */
 public class ScopeFactory
 {
-    /**
-     * This factory is implemented as a singleton. This is its only instance.
-     */
-    private static final ScopeFactory instance = new ScopeFactory();
-
     /**
      * A scope that matches all pages within any space and any wiki
      */
@@ -51,16 +46,8 @@ public class ScopeFactory
      */
     public static final Scope ALL = createScope(Scope.GLOBAL_SCOPE, "", false);
 
-    private ScopeFactory()
+    public ScopeFactory()
     {
-    }
-
-    /**
-     * @return The only instance of this singleton factory
-     */
-    public static ScopeFactory getInstance()
-    {
-        return instance;
     }
 
     /**

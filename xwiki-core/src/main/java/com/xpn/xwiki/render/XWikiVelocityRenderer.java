@@ -30,6 +30,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.tools.generic.ListTool;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.tools.VelocityFormatter;
 import org.apache.velocity.context.InternalContextAdapterImpl;
@@ -134,6 +135,9 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 
         // Put the Util API in the Velocity context.
         vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
+
+        // Put the velocity ListTool in the Velocity context
+        vcontext.put("listtool", new ListTool());        
 
         // Save the Velocity Context in the XWiki context so that users can access the objects
         // we've put in it (xwiki, request, response, etc).

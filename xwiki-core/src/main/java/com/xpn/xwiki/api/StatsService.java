@@ -26,16 +26,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.criteria.impl.Duration;
+import com.xpn.xwiki.criteria.impl.Period;
+import com.xpn.xwiki.criteria.impl.Range;
+import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.DocumentStats;
-import com.xpn.xwiki.stats.impl.Duration;
-import com.xpn.xwiki.stats.impl.DurationFactory;
-import com.xpn.xwiki.stats.impl.Interval;
-import com.xpn.xwiki.stats.impl.IntervalFactory;
-import com.xpn.xwiki.stats.impl.Period;
-import com.xpn.xwiki.stats.impl.PeriodFactory;
-import com.xpn.xwiki.stats.impl.Scope;
-import com.xpn.xwiki.stats.impl.ScopeFactory;
 
 /**
  * Statistics api. The Statistics module needs to be activated (xwiki.stats=1 in xwiki.cfg)
@@ -61,42 +57,6 @@ public class StatsService extends Api
     }
 
     /**
-     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Scope} objects in
-     *         velocity.
-     */
-    public ScopeFactory getScopeFactory()
-    {
-        return ScopeFactory.getInstance();
-    }
-
-    /**
-     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Period} objects in
-     *         velocity.
-     */
-    public PeriodFactory getPeriodFactory()
-    {
-        return PeriodFactory.getInstance();
-    }
-
-    /**
-     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Duration} objects in
-     *         velocity.
-     */
-    public DurationFactory getDurationFactory()
-    {
-        return DurationFactory.getInstance();
-    }
-
-    /**
-     * @return A helper factory for creating {@link com.xpn.xwiki.stats.impl.Interval} objects in
-     *         velocity.
-     */
-    public IntervalFactory getIntervalFactory()
-    {
-        return IntervalFactory.getInstance();
-    }
-
-    /**
      * Retrieves document statistics.
      * 
      * @param action The action the results should be ordered by. It can be one of: "view", "save"
@@ -104,16 +64,16 @@ public class StatsService extends Api
      *            number of times they have been viewed so far.
      * @param scope The set of documents for which to retrieve statistics
      * @param period The period of time
-     * @param interval The sub-interval to return from the entire result set. Use this parameter for
+     * @param range The sub-range to return from the entire result set. Use this parameter for
      *            pagination
      * @return A list of DocumentStats objects
      */
-    public List getDocumentStatistics(String action, Scope scope, Period period, Interval interval)
+    public List getDocumentStatistics(String action, Scope scope, Period period, Range range)
     {
         XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (stats == null)
             return Collections.EMPTY_LIST;
-        return stats.getDocumentStatistics(action, scope, period, interval, getXWikiContext());
+        return stats.getDocumentStatistics(action, scope, period, range, getXWikiContext());
     }
 
     /**
@@ -123,16 +83,16 @@ public class StatsService extends Api
      *            or "download". If the action is "view" then the visitors are ordered by the number
      *            of pages they have viewed so far.
      * @param period The period of time
-     * @param interval The sub-interval to return from the entire result set. Use this parameter for
+     * @param range The sub-range to return from the entire result set. Use this parameter for
      *            pagination
      * @return A list of VisitStats objects
      */
-    public List getVisitStatistics(String action, Period period, Interval interval)
+    public List getVisitStatistics(String action, Period period, Range range)
     {
         XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (stats == null)
             return Collections.EMPTY_LIST;
-        return stats.getVisitStatistics(action, period, interval, getXWikiContext());
+        return stats.getVisitStatistics(action, period, range, getXWikiContext());
     }
 
     /**
@@ -142,16 +102,16 @@ public class StatsService extends Api
      *            domains use the empty string.
      * @param scope The scope of referred documents to use for filtering the results.
      * @param period The period of time
-     * @param interval The sub-interval to return from the entire result set. Use this parameter for
+     * @param range The sub-range to return from the entire result set. Use this parameter for
      *            pagination
      * @return A list of RefererStats objects
      */
-    public List getRefererStatistics(String domain, Scope scope, Period period, Interval interval)
+    public List getRefererStatistics(String domain, Scope scope, Period period, Range range)
     {
         XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (stats == null)
             return Collections.EMPTY_LIST;
-        return stats.getRefererStatistics(domain, scope, period, interval, getXWikiContext());
+        return stats.getRefererStatistics(domain, scope, period, range, getXWikiContext());
     }
 
     /**
@@ -160,16 +120,16 @@ public class StatsService extends Api
      * @param domain The domain used for filtering the results
      * @param scope The scope of referred documents for which to retrieve statistics.
      * @param period The period of time
-     * @param interval The sub-interval to return from the entire result set. Use this parameter for
+     * @param range The sub-range to return from the entire result set. Use this parameter for
      *            pagination
      * @return A list of DocumentStats objects
      */
-    public List getBackLinkStatistics(String domain, Scope scope, Period period, Interval interval)
+    public List getBackLinkStatistics(String domain, Scope scope, Period period, Range range)
     {
         XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
         if (stats == null)
             return Collections.EMPTY_LIST;
-        return stats.getBackLinkStatistics(domain, scope, period, interval, getXWikiContext());
+        return stats.getBackLinkStatistics(domain, scope, period, range, getXWikiContext());
     }
 
     /**
@@ -197,7 +157,7 @@ public class StatsService extends Api
      * @param action action for which to retrieve statistics (view/save/download)
      * @return A DocumentStats object with number of actions performed, unique visitors, number of
      *         visits
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Interval)} instead
+     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range)} instead
      */
     public DocumentStats getCurrentMonthXWikiStats(String action)
     {

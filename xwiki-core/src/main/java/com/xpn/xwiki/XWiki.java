@@ -155,6 +155,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 
 public class XWiki implements XWikiDocChangeNotificationInterface
 {
@@ -188,6 +189,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private XWikiURLFactoryService urlFactoryService;
 
     private static XWikiCacheService cacheService;
+
+    private XWikiCriteriaService criteriaService;
 
     private final Object AUTH_SERVICE_LOCK = new Object();
 
@@ -750,6 +753,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             setStore(cachestore);
         } else
             setStore(basestore);
+
+        setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
+            "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
         setAttachmentStore((XWikiAttachmentStoreInterface) createClassFromConfig(
             "xwiki.store.attachment.class", "com.xpn.xwiki.store.XWikiHibernateAttachmentStore",
@@ -2326,6 +2332,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void setRecycleBinStore(XWikiRecycleBinStoreInterface recycleBinStore)
     {
         this.recycleBinStore = recycleBinStore;
+    }
+
+    public void setCriteriaService(XWikiCriteriaService criteriaService)
+    {
+        this.criteriaService = criteriaService;
     }
 
     public void setVersion(String version)
@@ -4541,6 +4552,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
         }
         return urlFactoryService;
+    }
+
+    public XWikiCriteriaService getCriteriaService(XWikiContext context)
+    {
+        return criteriaService;
     }
 
     /**

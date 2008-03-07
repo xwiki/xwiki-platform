@@ -18,9 +18,11 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 import junit.framework.TestCase;
+import com.xpn.xwiki.criteria.impl.Duration;
+import com.xpn.xwiki.criteria.impl.DurationFactory;
 
 /**
  * Unit tests for the {@link DurationFactory} class.

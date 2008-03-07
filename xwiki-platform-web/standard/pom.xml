@@ -210,7 +210,10 @@
               </execution>
             </executions>
             <configuration>
-              <doCheck>true</doCheck>
+              <!-- We're setting it to false since this is now causing some issue during the release process as
+                   the release plugin makes modification during release:prepare and this the buildnumber plugin
+                   fails -->
+              <doCheck>false</doCheck>
               <doUpdate>true</doUpdate>
             </configuration>
           </plugin>

@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1204110214000</date>
-<contentUpdateDate>1204110214000</contentUpdateDate>
-<version>9.1</version>
+<date>1204903048000</date>
+<contentUpdateDate>1204903048000</contentUpdateDate>
+<version>394.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -54,60 +54,74 @@
 <tags/>
 </property>
 </object>
-<content>#set($WikiManager = $xwiki.wikimanager)
-#if(!$WikiManager)
+<content>############################################################################################
+## Create a new wiki with initial minimum informations step by step or in one page.
+##
+## Can use URL parameters :
+## -doc
+##   0   : Just show input and properties names
+##   1   : Print documentation for each field
+## -stepbystep
+##   0   : All informations in one page and create button
+##   1   : Step by step based on javascript
+##
+############################################################################################
+## PLUGINS DEPENDANCIES
+#set ($WikiManager = $xwiki.wikimanager)
+#if (!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))
 #end
-#if(!$xwiki.applicationmanager)
+#if (!$xwiki.applicationmanager)
   #error($msg.get("xapp.pluginnotenabled"))
 #end
 ############################################################################################
+## MACROS
 #macro(getRequestList $paramlist $paramname)
-  #set($paramtable = [])
-  #set($paramtable = $request.getParameterValues($paramname))
-  #if($paramtable)
-    #set($paramlist = [])
+  #set ($paramtable = [])
+  #set ($paramtable = $request.getParameterValues($paramname))
+  #if ($paramtable)
+    #set ($paramlist = [])
     #foreach($paramvalue in $paramtable)
-      #set($ok = $paramlist.add($paramvalue))
+      #set ($ok = $paramlist.add($paramvalue))
     #end
   #end
 #end
 ##
-#macro(printUsersAndGroups $users $groups $rightlevel $userlist $grouplist)
-  &lt;select name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
+#macro(printUsersAndGroups $users $groups $rightlevel $userlist $grouplist $hidden)
+  &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
     #foreach ($user in $users)
-      #if($context.database == $context.mainWikiName) #set($user = "${context.mainWikiName}:${user}") #end
-      &lt;option value="$user" #if($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $xwiki.null, false)&lt;/option&gt;
+      #if ($context.database == $context.mainWikiName) #set ($user = "${context.mainWikiName}:${user}") #end
+      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $xwiki.null, false)&lt;/option&gt;
     #end
   &lt;/select&gt;
-  &lt;select name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;
+  &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;
     #foreach ($group in $groups)
-      #if($context.database == $context.mainWikiName) #set($group = "${context.mainWikiName}:${group}") #end
-      #set($pointindex = $group.indexOf(".") + 1)
-      &lt;option value="$group" #if($grouplist &amp;&amp; $grouplist.contains($group)) selected="selected" #end&gt;$group.substring($pointindex)&lt;/option&gt;
+      #if ($context.database == $context.mainWikiName) #set ($group = "${context.mainWikiName}:${group}") #end
+      #set ($pointindex = $group.indexOf(".") + 1)
+      &lt;option value="$group" #if ($grouplist &amp;&amp; $grouplist.contains($group)) selected="selected" #end&gt;$group.substring($pointindex)&lt;/option&gt;
     #end
   &lt;/select&gt;
 #end
 ##
 #macro(addRights $prefdoc $userlist $grouplist $rights $needsave)
-  #set($users = "")
+  #set ($users = "")
   #foreach($user in $userlist)
-    #if($users != "")
-      #set($users = "${users},${user}")
+    #if ($users != "")
+      #set ($users = "${users},${user}")
     #else
-      #set($users = $user)
+      #set ($users = $user)
     #end
   #end
-  #set($groups = "")
+  #set ($groups = "")
   #foreach($group in $grouplist)
-    #if($groups != "")
-      #set($groups = "${groups},${group}")
+    #if ($groups != "")
+      #set ($groups = "${groups},${group}")
     #else
-      #set($groups = $group)
+      #set ($groups = $group)
     #end
   #end
   ##
-  #if(($users != "") || ($groups != ""))
+  #if (($users != "") || ($groups != ""))
     #set ($rightsobj = $prefdoc.newObject("XWiki.XWikiGlobalRights"))
     ##
     #set ($ok = $rightsobj.set("users", $users))
@@ -115,27 +129,53 @@
     #set ($ok = $rightsobj.set("levels", $rights))
     #set ($ok = $rightsobj.set("allow", 1))
     ##
-    #set($needsave = true)
+    #set ($needsave = true)
   #end
 #end
 ############################################################################################
-#set($Exception = $WikiManager.DefaultException)
+## TOOLS
+#set ($Exception = $WikiManager.DefaultException)
+#set ($DOMAINNAME = "localdomain.com")
+#set ($WSTEPID_INTRO = 0)    ## Wiki creation introduction
+#set ($WSTEPNAME_INTRO = "wstep_intro")
+#set ($WSTEPID_WIKINAME = 1) ## Wiki name
+#set ($WSTEPNAME_WIKINAME = "wstep_wikiname")
+#set ($WSTEPID_WIKIDESC = 2) ## Wiki descriptor informations
+#set ($WSTEPNAME_WIKIDESC = "wstep_wikidesc")
+#set ($WSTEPID_DATAFROM = 3) ## Initialise wiki data from wiki template or XAR package
+#set ($WSTEPNAME_DATAFROM = "wstep_datafrom")
+#set ($WSTEPID_USERS = 4)    ## Preregistered users
+#set ($WSTEPNAME_USERS = "wstep_users")
+#set ($WSTEPID_SUMMARY = 5)  ## Summary be fore create
+#set ($WSTEPNAME_SUMMARY = "wstep_summary")
+#set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
 ##
-#set($domainname = "localdomain.com")
+############################################################################################
+## REQUEST PARAMETERS
+#if ($request.stepbystep)
+  #set ($wstepbystep = $request.stepbystep)
+#end
+#if ($request.doc &amp;&amp; $request.doc == "1")
+  #set ($documentation = 1)
+#end
 ##
-#set($wikidocument = $WikiManager.createWikiDocument())
-#set($wikidocumentobject = $wikidocument.updateObjectFromRequest("XWiki.XWikiServerClass"))
+#set ($wikidocument = $WikiManager.createWikiDocument())
+#set ($wikidocumentobject = $wikidocument.updateObjectFromRequest("XWiki.XWikiServerClass"))
 ##
-#set($action = $request.getParameter("action"))
+#if ($request.actioncreate)
+  #set ($action = "create")
+#else
+  #set ($action = $request.getParameter("action"))
+#end
 ##
-#set($wikiname = $request.getParameter("wikiname"))
-#set($wikitemplate = $request.getParameter("wikitemplate"))
-#set($wikipackage = $request.getParameter("wikipackage"))
+#set ($wikiname = $request.getParameter("wikiname"))
+#set ($wikitemplate = $request.getParameter("wikitemplate"))
+#set ($wikipackage = $request.getParameter("wikipackage"))
 #if ($wikidocument.owner == "")
   $wikidocument.set("owner", $context.user)
 #end
 #if ($wikidocument.server == "" &amp;&amp; $wikiname &amp;&amp; $wikiname != "")
-  $wikidocument.set("server", "${wikiname}.${domainname}")
+  $wikidocument.set("server", "${wikiname}.${DOMAINNAME}")
 #end
 ##
 #getRequestList($readeruserlist "readersusers")
@@ -148,28 +188,31 @@
 #############################################################################
 ##
 1 $msg.get("wikimanager.createwiki")
+#if ($wstepbystep)
+#else
+#end
 ##
 #if ($action &amp;&amp; $action == "create")
-  #set($result = $WikiManager.createNewWiki($wikiname, $wikitemplate, $wikipackage, $wikidocument, true))
+  #set ($result = $WikiManager.createNewWiki($wikiname, $wikitemplate, $wikipackage, $wikidocument, true))
   ##
   #if ($result == $Exception.ERROR_NOERROR)
     ## Init new wiki global rights
-    #set($currentwiki = $context.database)
-    #set($ok = $context.setDatabase($wikidocument.wikiName))
+    #set ($currentwiki = $context.database)
+    #set ($ok = $context.setDatabase($wikidocument.wikiName))
     ##
-    #set($prefdoc = $xwiki.getDocument("XWiki.XWikiPreferences"))
+    #set ($prefdoc = $xwiki.getDocument("XWiki.XWikiPreferences"))
     ##
-    #set($needsave = false)
+    #set ($needsave = false)
     ##
     #addRights($prefdoc $readeruserlist $readergrouplist "view, comment" $needsave)
     #addRights($prefdoc $writeruserlist $writergrouplist "edit, view, comment" $needsave)
     #addRights($prefdoc $adminuserlist $admingrouplist "admin" $needsave)
     ##
-    #if($needsave)
+    #if ($needsave)
       $prefdoc.save()
     #end
     ##
-    #set($ok = $context.setDatabase($currentwiki))
+    #set ($ok = $context.setDatabase($currentwiki))
     ##
     #info($msg.get("wikimanager.successcreatewiki", [$wikiname, $wikidocument.getHomePageUrl()]))
   #else
@@ -181,88 +224,333 @@
   #end
 #end
 ##
-&lt;form method="get" action="#"&gt;
-  &lt;fieldset&gt;
-    &lt;legend&gt;$msg.get("wikimanager.legend.wiki")&lt;/legend&gt;
-    &lt;input type="hidden" name="action" value="create" /&gt;
-    ##
-    &lt;dl&gt;
-      &lt;dt&gt;$msg.get("wikimanager.wikiname")&lt;/dt&gt;
-      &lt;dd&gt;&lt;input size="30" id="wikiname" name="wikiname" type="text" /&gt;&lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;$msg.get("wikimanager.wikidesc")&lt;/dt&gt;
-      &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;$msg.get("wikimanager.wikidomain")&lt;/dt&gt;
-      &lt;dd&gt;$wikidocument.display("server", "edit")&lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;$msg.get("wikimanager.wikiadmin")&lt;/dt&gt;
-      &lt;dd&gt;$wikidocument.display("owner", "edit")&lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;$msg.get("wikimanager.wikivisibility")&lt;/dt&gt;
-      &lt;dd&gt;$wikidocument.display("visibility", "edit")&lt;/dd&gt;
-    &lt;/dl&gt;
-##    &lt;dl&gt;
-##      &lt;dt&gt;$msg.get("wikimanager.wikistate")&lt;/dt&gt;
-##      &lt;dd&gt;$wikidocument.display("state", "edit")&lt;/dd&gt;
-##    &lt;/dl&gt;
+#############################################################################
+##
+{pre}
+&lt;script type="text/javascript"&gt;
+// &lt;![CDATA[
+ var domainnamesetted = false;
+ var prettynamesetted = false;
+#if ($wstepbystep)
+ var steps = new Array(#foreach ($wstep in $WSTEPLIST)#if ($velocityCount &gt; 1), #end"$wstep"#end)
+ var currentstep = $wstepbystep;
+
+ function getUsersGroupsValue(users, groups)
+ {
+   var str = "";
+
+   if (users.value != "" || users.value != "") {
+     str = "&lt;ul class=\"star\"&gt;";
+
+     if (users.value != "")
+       str += "&lt;li&gt;Users: " + users.value + "&lt;\/li&gt;"
+     if (groups.value != "")
+       str += "&lt;li&gt;Groups: " + groups.value + "&lt;\/li&gt;"
+
+     str += "&lt;\/ul&gt;";
+   }
+   
+   return str;
+ }
+
+ function refreshSummary()
+ {
+   $("summarywikiname").innerHTML = "&lt;p&gt;" + $("wikiname").value + "&lt;\/p&gt;";
+   $("summarywikiprettyname").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_wikiprettyname").value + "&lt;\/p&gt;";
+   $("summarywikidesc").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_description").value + "&lt;\/p&gt;";
+   $("summarywikidomain").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_server").value + "&lt;\/p&gt;";
+   $("summarywikiadmin").innerHTML = "&lt;p&gt;" + $("XWiki.XWikiServerClass_0_owner").value + "&lt;\/p&gt;";
+   $("summarywikitemplate").innerHTML = "&lt;p&gt;" + $("wikitemplate").value + "&lt;\/p&gt;";
+   $("summarywikipackage").innerHTML = "&lt;p&gt;" + $("wikipackage").value + "&lt;\/p&gt;";
+   $("summaryreaders").innerHTML = getUsersGroupsValue($("readersusers"), $("readersgroups"));
+   $("summarywriters").innerHTML = getUsersGroupsValue($("writersusers"), $("writersgroups"));
+   $("summaryadmins").innerHTML = getUsersGroupsValue($("adminsusers"), $("adminsgroups"));
+ }
+
+ function showStep()
+ {
+   for (var i = 0; i &lt; steps.length; ++i) {
+     if (i != currentstep)
+       addClass($(steps[i]), "hidden");
+     else
+       rmClass($(steps[i]), "hidden");
+   }
+   
+   if (currentstep &gt; 0)
+     rmClass($("actionprevious"), "hidden");
+   else
+     addClass($("actionprevious"), "hidden");
+     
+   if (currentstep &lt; steps.length-1) {
+     rmClass($("actionnext"), "hidden");
+     addClass($("actioncreate"), "hidden");
+   } else {
+     addClass($("actionnext"), "hidden");
+     rmClass($("actioncreate"), "hidden");
+     
+     refreshSummary();
+   }
+ }
+ 
+ function goNext()
+ {
+   ++currentstep;
+   showStep();
+ }
+ 
+ function goPrevious()
+ {
+   --currentstep;
+   showStep();
+ }
+ 
+#end
+
+ function validateWikiName()
+ {
+   $("wikiname").value = noaccent($("wikiname").value).toLowerCase();
+ }
+ 
+ function wikiNameChanged()
+ {
+   validateWikiName();
+
+   if (domainnamesetted == false) {
+     $("XWiki.XWikiServerClass_0_server").value = $("wikiname").value + ".$DOMAINNAME";
+   }
+
+   if (prettynamesetted == false) {
+     $("XWiki.XWikiServerClass_0_wikiprettyname").value = $("wikiname").value.substring(0,1).toUpperCase() + $("wikiname").value.substring(1);
+   }
+ }
+ 
+ function domainNameChanged()
+ {
+   domainnamesetted = true;
+ }
+ 
+ function prettyNameChanged()
+ {
+   prettynamesetted = true;
+ }
+ 
+ function validate()
+ {
+ }
+// ]]&gt;
+&lt;/script&gt;
+{/pre}
+&lt;form method="get" action="" id="wikicreationform"&gt;
+  #if ($wstepbystep)
+  &lt;fieldset id="$WSTEPNAME_INTRO"&gt;
+    ##1.1 $msg.get("wikimanager.title.createwiki.intro")
+    &lt;p&gt;$msg.get("wikimanager.doc.createwiki.intro")&lt;/p&gt;
   &lt;/fieldset&gt;
+  #end
+  ##
   #############################################################################
-  &lt;fieldset&gt;
-    &lt;legend&gt;$msg.get("wikimanager.legend.sources")&lt;/legend&gt;
-    ##
-    &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="wikitemplate"&gt;$msg.get("wikimanager.wikitemplate")&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select name="wikitemplate" id="wikitemplate"&gt;
-          &lt;option value=""&gt;---&lt;/option&gt;
-          #set($listtemplate=$WikiManager.getWikiTemplateList())
-          #foreach ($template in $listtemplate)
-            &lt;option value="$template.wikiName"&gt;$template.wikiName&lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="wikipackage"&gt;$msg.get("wikimanager.wikipackage")&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;
-        &lt;select name="wikipackage" id="wikipackage"&gt;
-          &lt;option value=""&gt;---&lt;/option&gt;
-          #set($listpackage=$doc.getAttachmentList())
-          #foreach ($package in $listpackage)
-            &lt;option value="$package.getFilename()"&gt;$package.getFilename()&lt;/option&gt;
-          #end
-        &lt;/select&gt;
-      &lt;/dd&gt;
-    &lt;/dl&gt;
+  ##
+  &lt;fieldset id="$WSTEPNAME_WIKINAME"&gt;
+    #if ($wstepbystep)
+      1.1 $msg.get("wikimanager.title.createwiki.wikiname")
+    #end
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+           &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiname")&lt;/dt&gt;
+           &lt;dd&gt;&lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" /&gt;&lt;/dd&gt;
+         &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.wikiname")&lt;/td&gt; #end
+      &lt;/tr&gt;
+    &lt;/table&gt;
   &lt;/fieldset&gt;
+  ##
   #############################################################################
-  #set($rightsmanager = $xwiki.rightsmanager)
-  #set($users = $rightsmanager.usersApi.allGlobalUsersNames)
-  #set($groups = $rightsmanager.groupsApi.allGlobalGroupsNames)
-  &lt;fieldset&gt;
-    &lt;legend&gt;$msg.get("wikimanager.legend.members")&lt;/legend&gt;
-    ##
-    &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="readersusers"&gt;$msg.get("wikimanager.readers")&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;#printUsersAndGroups($users $groups "readers" $readeruserlist $readergrouplist)&lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="writersusers"&gt;$msg.get("wikimanager.writers")&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;#printUsersAndGroups($users $groups "writers" $writeruserlist $writergrouplist)&lt;/dd&gt;
-    &lt;/dl&gt;
-    &lt;dl&gt;
-      &lt;dt&gt;&lt;label for="adminsusers"&gt;$msg.get("wikimanager.admins")&lt;/label&gt;&lt;/dt&gt;
-      &lt;dd&gt;#printUsersAndGroups($users $groups "admins" $adminuserlist $admingrouplist)&lt;/dd&gt;
-    &lt;/dl&gt;
+  ##
+  &lt;fieldset id="$WSTEPNAME_WIKIDESC"&gt;
+    #if ($wstepbystep)
+      1.1 $msg.get("wikimanager.title.createwiki.desc")
+      #if ($documentation) $msg.get("wikimanager.doc.createwiki.desc") #end
+    #end
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname")&lt;/dt&gt;
+            &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_wikiprettyname" name="XWiki.XWikiServerClass_0_wikiprettyname" type="text" onchange="prettyNameChanged();" /&gt;&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.wikiprettyname")&lt;/td&gt; #end
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.description")&lt;/dt&gt;
+            &lt;dd&gt;$wikidocument.display("description", "edit")&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.description")&lt;/td&gt; #end
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.server")&lt;/dt&gt;
+            &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_server" name="XWiki.XWikiServerClass_0_server" type="text" onchange="domainNameChanged();" /&gt;&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.server", [$DOMAINNAME])&lt;/td&gt; #end
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.owner")&lt;/dt&gt;
+            &lt;dd&gt;$wikidocument.display("owner", "edit")&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.owner")&lt;/td&gt; #end
+      &lt;/tr&gt;
+    &lt;/table&gt;
   &lt;/fieldset&gt;
+  ##
+  #############################################################################
+  ##
+  &lt;fieldset id="$WSTEPNAME_DATAFROM"&gt;
+    #if ($wstepbystep)
+      1.1 $msg.get("wikimanager.title.createwiki.datafrom")
+      #if ($documentation) $msg.get("wikimanager.doc.createwiki.datafrom") #end
+    #end
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;&lt;label for="wikitemplate"&gt;$msg.get("wikimanager.wikitemplate")&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;select name="wikitemplate" id="wikitemplate"&gt;
+                &lt;option value=""&gt;---&lt;/option&gt;
+                #set ($listtemplate=$WikiManager.getWikiTemplateList())
+                #foreach ($template in $listtemplate)
+                  &lt;option value="$template.wikiName"&gt;$template.wikiName&lt;/option&gt;
+                #end
+              &lt;/select&gt;
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.datafrom.template")&lt;/td&gt; #end
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;&lt;label for="wikipackage"&gt;$msg.get("wikimanager.wikipackage")&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;
+              &lt;select name="wikipackage" id="wikipackage"&gt;
+                &lt;option value=""&gt;---&lt;/option&gt;
+                #set ($listpackage=$doc.getAttachmentList())
+                #foreach ($package in $listpackage)
+                  &lt;option value="$package.getFilename()"&gt;$package.getFilename()&lt;/option&gt;
+                #end
+              &lt;/select&gt;
+            &lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.datafrom.package")&lt;/td&gt; #end
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/fieldset&gt;
+  ##
+  #############################################################################
+  ##
+  #set ($rightsmanager = $xwiki.rightsmanager)
+  #set ($users = $rightsmanager.usersApi.allGlobalUsersNames)
+  #set ($groups = $rightsmanager.groupsApi.allGlobalGroupsNames)
+  &lt;fieldset id="$WSTEPNAME_USERS"&gt;
+    #if ($wstepbystep)
+      1.1 $msg.get("wikimanager.title.createwiki.members")
+      #if ($documentation) $msg.get("wikimanager.doc.createwiki.members") #end
+    #end
+    &lt;table&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;&lt;label for="readersusers"&gt;$msg.get("wikimanager.readers")&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;#printUsersAndGroups($users $groups "readers" $readeruserlist $readergrouplist false)&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.readers")&lt;/td&gt; #end
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;&lt;label for="writersusers"&gt;$msg.get("wikimanager.writers")&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;#printUsersAndGroups($users $groups "writers" $writeruserlist $writergrouplist false)&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.writers")&lt;/td&gt; #end
+      &lt;/tr&gt;
+      &lt;tr&gt;
+        &lt;td&gt;
+          &lt;dl&gt;
+            &lt;dt&gt;&lt;label for="adminsusers"&gt;$msg.get("wikimanager.admins")&lt;/label&gt;&lt;/dt&gt;
+            &lt;dd&gt;#printUsersAndGroups($users $groups "admins" $adminuserlist $admingrouplist false)&lt;/dd&gt;
+          &lt;/dl&gt;
+        &lt;/td&gt;
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.administrators")&lt;/td&gt; #end
+      &lt;/tr&gt;
+    &lt;/table&gt;
+  &lt;/fieldset&gt;
+  ##
+  #############################################################################
+  ##
+  #if ($wstepbystep)
+  &lt;fieldset id="$WSTEPNAME_SUMMARY"&gt;
+    1.1 $msg.get("wikimanager.title.createwiki.summary")
+    #if ($documentation) $msg.get("wikimanager.doc.createwiki.summary") #end
+    &lt;table class="wiki-table" border="0" cellpadding="0" cellspacing="0"&gt;
+      &lt;tbody&gt;
+        &lt;tr&gt;&lt;th&gt;Properties&lt;/th&gt;&lt;th&gt;Values&lt;/th&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.wikiname")*&lt;/td&gt;&lt;td id="summarywikiname"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.wikiprettyname")*&lt;/td&gt;&lt;td id="summarywikiprettyname"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.description")*&lt;/td&gt;&lt;td id="summarywikidesc"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-even"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.server")*&lt;/td&gt;&lt;td id="summarywikidomain"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.prop.wiki.owner")*&lt;/td&gt;&lt;td id="summarywikiadmin"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.wikitemplate")*&lt;/td&gt;&lt;td id="summarywikitemplate"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.wikipackage")*&lt;/td&gt;&lt;td id="summarywikipackage"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.readers")*&lt;/td&gt;&lt;td id="summaryreaders"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.writers")*&lt;/td&gt;&lt;td id="summarywriters"&gt;---&lt;/td&gt;&lt;/tr&gt;
+        &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.admins")*&lt;/td&gt;&lt;td id="summaryadmins"&gt;---&lt;/td&gt;&lt;/tr&gt;
+      &lt;/tbody&gt;
+    &lt;/table&gt;
+  &lt;/fieldset&gt;
+  #end
+  ##
+  #############################################################################
+  ##
   &lt;fieldset&gt;
-    &lt;legend&gt;$msg.get("wikimanager.legend.validate")&lt;/legend&gt;
-    &lt;input type="submit" value="create" /&gt;
+    #if ($wstepbystep)
+      &lt;a href="javascript:void(0)" id="actionprevious" class="button" onclick="goPrevious();"&gt;${msg.get("wikimanager.action.previous")}&lt;/a&gt;
+      |
+      &lt;a href="javascript:void(0)" id="actionnext" class="button" onclick="goNext();"&gt;${msg.get("wikimanager.action.next")}&lt;/a&gt;
+    #end
+    &lt;div id="actioncreate"&gt;
+      &lt;br /&gt;
+      &lt;input type="submit" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
+    &lt;/div&gt;
   &lt;/fieldset&gt;
 &lt;/form&gt;
-</content></xwikidoc>
+#if ($wstepbystep)
+{pre}
+&lt;script type="text/javascript"&gt;
+// &lt;![CDATA[
+ showStep();
+
+ if ($("XWiki.XWikiServerClass_0_server").value != "")
+   domainnamesetted = true;
+  
+ if ($("XWiki.XWikiServerClass_0_wikiprettyname").value != "")
+   prettynamesetted = true;
+// ]]&gt;
+&lt;/script&gt;
+{/pre}
+#end</content>
+</xwikidoc>

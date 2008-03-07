@@ -33,7 +33,7 @@
     <!-- Add License/Notice files -->
     <fileSet>
       <directory>${basedir}/target/maven-shared-archive-resources/</directory>
-      <outputDirectory>albatross</outputDirectory>
+      <outputDirectory>toucan</outputDirectory>
     </fileSet>
   </fileSets>
 </assembly>

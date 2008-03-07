@@ -39,6 +39,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
@@ -718,7 +719,23 @@ public class Document extends Api
     {
         return doc.getRecentRevisions(nb, getXWikiContext());
     }
-    
+
+    /**
+     * Get document versions matching criterias like author, minimum creation date, etc.
+     *
+     * @param criteria criteria used to match versions
+     * @return a list of matching versions
+     */
+    public List getRevisions(RevisionCriteria criteria) throws XWikiException{
+        return doc.getRevisions(criteria, context);
+    }
+
+    /**
+     * Get information about a document version : author, date, etc.
+     * 
+     * @param version the version you want to get information about
+     * @return a new RevisionInfo object    
+     */
     public RevisionInfo getRevisionInfo(String version) throws XWikiException {
         return new RevisionInfo( doc.getRevisionInfo(version, getXWikiContext()), getXWikiContext() );
     }

@@ -19,7 +19,7 @@
  *
  */
 
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 /**
  * Immutable scope for retrieving statistics. A scope is associated with a single document but it

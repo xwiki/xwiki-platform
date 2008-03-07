@@ -23,6 +23,11 @@ package com.xpn.xwiki.stats.impl;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.criteria.impl.Duration;
+import com.xpn.xwiki.criteria.impl.Period;
+import com.xpn.xwiki.criteria.impl.Range;
+import com.xpn.xwiki.criteria.impl.RangeFactory;
+import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
@@ -576,7 +581,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiStatsService#getActionStatistics(String, Scope, Period, Duration, XWikiContext)
+     * @see XWikiStatsService#getActionStatistics(String, Scope, com.xpn.xwiki.criteria.impl.Period , com.xpn.xwiki.criteria.impl.Duration , XWikiContext)
      */
     public Map getActionStatistics(String action, Scope scope, Period period, Duration step,
         XWikiContext context)
@@ -594,7 +599,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             }
             List stats =
                 this.getDocumentStatistics(action, scope, new Period(stepStart.getMillis(),
-                    stepEnd.getMillis()), IntervalFactory.FIRST, context);
+                    stepEnd.getMillis()), RangeFactory.FIRST, context);
             int actionCount = 0;
             if (stats.size() > 0) {
                 actionCount = ((DocumentStats) stats.get(0)).getPageViews();
@@ -608,10 +613,10 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiStatsService#getDocumentStatistics(String, Scope, Period, Interval, XWikiContext)
+     * @see XWikiStatsService#getDocumentStatistics(String, Scope, Period, Range , XWikiContext)
      */
     public List getDocumentStatistics(String action, Scope scope, Period period,
-        Interval interval, XWikiContext context)
+        Range range, XWikiContext context)
     {
         String nameFilter = "name like :name";
         boolean hasNameParam = true;
@@ -620,7 +625,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             hasNameParam = false;
         }
         String sortOrder = "desc";
-        if (interval.getSize() < 0) {
+        if (range.getSize() < 0) {
             sortOrder = "asc";
         }
         XWikiHibernateStore store = null;
@@ -642,9 +647,9 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             query.setInteger("endDate", period.getEndCode());
 
             List results =
-                getDocumentStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                getDocumentStatistics(store.search(query, range.getAbsoluteSize(), range
                     .getAbsoluteStart(), context), action);
-            if (interval.getSize() < 0) {
+            if (range.getSize() < 0) {
                 Collections.reverse(results);
             }
             return results;
@@ -664,7 +669,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
      * @param resultSet the result of a database query for document statistics
      * @param action the action for which the statistics were retrieved
      * @return a list of {@link com.xpn.xwiki.stats.impl.DocumentStats} objects
-     * @see #getDocumentStatistics(String, Scope, Period, Interval, XWikiContext)
+     * @see #getDocumentStatistics(String, Scope, com.xpn.xwiki.criteria.impl.Period , Range , XWikiContext)
      */
     private List getDocumentStatistics(List resultSet, String action)
     {
@@ -686,10 +691,10 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiStatsService#getBackLinkStatistics(String, Scope, Period, Interval, XWikiContext)
+     * @see XWikiStatsService#getBackLinkStatistics(String, Scope, Period, Range , XWikiContext)
      */
     public List getBackLinkStatistics(String domain, Scope scope, Period period,
-        Interval interval, XWikiContext context)
+        Range range, XWikiContext context)
     {
         if (domain == null || domain.trim().length() == 0) {
             domain = "%";
@@ -701,7 +706,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             hasNameParam = false;
         }
         String sortOrder = "desc";
-        if (interval.getSize() < 0) {
+        if (range.getSize() < 0) {
             sortOrder = "asc";
         }
         XWikiHibernateStore store = null;
@@ -723,9 +728,9 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             query.setInteger("endDate", period.getEndCode());
 
             List results =
-                getDocumentStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                getDocumentStatistics(store.search(query, range.getAbsoluteSize(), range
                     .getAbsoluteStart(), context), "refer");
-            if (interval.getSize() < 0) {
+            if (range.getSize() < 0) {
                 Collections.reverse(results);
             }
             return results;
@@ -742,10 +747,10 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiStatsService#getRefererStatistics(String, Scope, Period, Interval, XWikiContext)
+     * @see XWikiStatsService#getRefererStatistics(String, Scope, Period, Range , XWikiContext)
      */
     public List getRefererStatistics(String domain, Scope scope, Period period,
-        Interval interval, XWikiContext context)
+        Range range, XWikiContext context)
     {
         if (domain == null || domain.trim().length() == 0) {
             domain = "%";
@@ -757,7 +762,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             hasNameParam = false;
         }
         String sortOrder = "desc";
-        if (interval.getSize() < 0) {
+        if (range.getSize() < 0) {
             sortOrder = "asc";
         }
         XWikiHibernateStore store = null;
@@ -779,9 +784,9 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             query.setInteger("endDate", period.getEndCode());
 
             List results =
-                getRefererStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                getRefererStatistics(store.search(query, range.getAbsoluteSize(), range
                     .getAbsoluteStart(), context));
-            if (interval.getSize() < 0) {
+            if (range.getSize() < 0) {
                 Collections.reverse(results);
             }
             return results;
@@ -801,7 +806,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
      * 
      * @param resultSet The result of a database query for referer statistics
      * @return A list of {@link com.xpn.xwiki.stats.impl.RefererStats} objects
-     * @see #getRefererStatistics(String, Scope, Period, Interval, XWikiContext)
+     * @see #getRefererStatistics(String, Scope, Period, Range , XWikiContext)
      */
     private List getRefererStatistics(List resultSet)
     {
@@ -823,13 +828,13 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
     /**
      * {@inheritDoc}
      * 
-     * @see XWikiStatsService#getVisitStatistics(String, Period, Interval, XWikiContext)
+     * @see XWikiStatsService#getVisitStatistics(String, com.xpn.xwiki.criteria.impl.Period , Range , XWikiContext)
      */
-    public List getVisitStatistics(String action, Period period, Interval interval,
+    public List getVisitStatistics(String action, Period period, Range range,
         XWikiContext context)
     {
         String sortOrder = "desc";
-        if (interval.getSize() < 0) {
+        if (range.getSize() < 0) {
             sortOrder = "asc";
         }
         String orderByClause =
@@ -855,10 +860,10 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
             query.setDate("endDate", new Date(period.getEnd()));
 
             List results =
-                getVisitStatistics(store.search(query, interval.getAbsoluteSize(), interval
+                getVisitStatistics(store.search(query, range.getAbsoluteSize(), range
                     .getAbsoluteStart(), context), new DateTime(period.getStart()),
                     new DateTime(period.getEnd()));
-            if (interval.getSize() < 0) {
+            if (range.getSize() < 0) {
                 Collections.reverse(results);
             }
             return results;
@@ -879,7 +884,7 @@ public class XWikiStatsServiceImpl implements XWikiStatsService {
      * @param startDate the start date used in the query
      * @param endDate the end date used in the query
      * @return a list of {@link com.xpn.xwiki.stats.impl.VisitStats} objects
-     * @see #getVisitStatistics(Period, Interval, XWikiContext)
+     * @see #getVisitStatistics(com.xpn.xwiki.criteria.impl.Period , Range , XWikiContext)
      */
     private List getVisitStatistics(List resultSet, DateTime startDate, DateTime endDate)
     {

@@ -70,6 +70,9 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.criteria.impl.RevisionCriteria;
+import com.xpn.xwiki.criteria.impl.Range;
+import com.xpn.xwiki.criteria.impl.RangeFactory;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.content.Link;
 import com.xpn.xwiki.content.parsers.DocumentParser;
@@ -898,7 +901,6 @@ public class XWikiDocument
         try {
             Version[] revisions = getVersioningStore(context).getXWikiDocVersions(this, context);
             int length = nb;
-
             // 0 means all revisions
             if (nb == 0) {
                 length = revisions.length;
@@ -917,6 +919,40 @@ public class XWikiDocument
         } catch (Exception e) {
             return new String[0];
         }
+    }
+
+    /**
+     * Get document versions matching criterias like author, minimum creation date, etc.
+     *
+     * @param criteria criteria used to match versions
+     * @return a list of matching versions
+     */
+    public List getRevisions(RevisionCriteria criteria, XWikiContext context) throws XWikiException
+    {
+        List results = new ArrayList();
+
+        Version[] revisions = getRevisions(context);
+
+        for (int i = 0; i < revisions.length; i++) {
+            XWikiRCSNodeInfo nodeinfo = getRevisionInfo(revisions[i].toString(), context);
+
+            // Minor/Major version matching
+            if (nodeinfo.isMinorEdit() == criteria.getWithMinorEdits()) {
+                // Author matching
+                if (criteria.getAuthor().equals("") ||
+                    criteria.getAuthor().equals(nodeinfo.getAuthor()))
+                {
+                    // Date range matching
+                    if (nodeinfo.getDate().after(criteria.getMinDate()) &&
+                        nodeinfo.getDate().before(criteria.getMaxDate()))
+                    {
+                        results.add(nodeinfo.getVersion().toString());
+                    }
+                }
+            }
+        }
+
+        return criteria.getRange().subList(results);
     }
 
     public XWikiRCSNodeInfo getRevisionInfo(String version, XWikiContext context) throws XWikiException
@@ -1374,7 +1410,7 @@ public class XWikiDocument
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
             log.warn("Failed to display field [" + fieldname + "] in [" + type
-                + "] mode for Object [" + (obj == null ? "NULL" : obj.getName()) + "]");
+                + "] mode for Object [" + (obj == null ? "NULL" : obj.getName()) + "]");            
             return "";
         }
         finally {
@@ -2444,7 +2480,7 @@ public class XWikiDocument
     /**
      * Check if provided xml document is a wiki document.
      * 
-     * @param is the xml document.
+     * @param domdoc the xml document.
      * @return true if provided xml document is a wiki document.
      */
     public static boolean containsXMLWikiDocument(Document domdoc)

@@ -30,56 +30,56 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.notify.XWikiActionNotificationInterface;
 import com.xpn.xwiki.stats.impl.DocumentStats;
-import com.xpn.xwiki.stats.impl.Duration;
-import com.xpn.xwiki.stats.impl.Interval;
-import com.xpn.xwiki.stats.impl.Period;
-import com.xpn.xwiki.stats.impl.Scope;
+import com.xpn.xwiki.criteria.impl.Duration;
+import com.xpn.xwiki.criteria.impl.Period;
+import com.xpn.xwiki.criteria.impl.Range;
+import com.xpn.xwiki.criteria.impl.Scope;
 
 public interface XWikiStatsService extends XWikiActionNotificationInterface {
     public void init(XWikiContext context);
     
     /**
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Interval, XWikiContext)} instead
+     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range , XWikiContext)} instead
      */
     public DocumentStats getDocTotalStats(String docname, String action, XWikiContext context);
     
     /**
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Interval, XWikiContext)} instead
+     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range , XWikiContext)} instead
      */
     public DocumentStats getDocMonthStats(String docname, String action, Date month, XWikiContext context);
     
     /**
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, Interval, XWikiContext)} instead
+     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range , XWikiContext)} instead
      */
     public DocumentStats getDocDayStats(String docname, String action, Date day, XWikiContext context);
     
     /**
-     * @deprecated use {@link #getRefererStatistics(Period, Interval, XWikiContext)} instead
+     * @deprecated use {@link #getRefererStatistics(Period, com.xpn.xwiki.criteria.impl.Range , XWikiContext)} instead
      */
     public List getRefMonthStats(String docName, Date month, XWikiContext context) throws XWikiException;
     public Collection getRecentActions(String action, int size, XWikiContext context);
     
     /**
-     * @see com.xpn.xwiki.api.StatsService#getDocumentStatistics(String, Scope, Period, Interval)
+     * @see com.xpn.xwiki.api.StatsService#getDocumentStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range)
      */
-    List getDocumentStatistics(String action, Scope scope, Period period, Interval interval,
+    List getDocumentStatistics(String action, Scope scope, Period period, Range range,
         XWikiContext context);
 
     /**
      * @see com.xpn.xwiki.api.StatsService#getActionStatistics(String, Scope, Period, Period)
      */
-    List getVisitStatistics(String action, Period period, Interval interval, XWikiContext context);
+    List getVisitStatistics(String action, Period period, Range range, XWikiContext context);
 
     /**
-     * @see com.xpn.xwiki.api.StatsService#getRefererStatistics(String, Scope, Period, Interval)
+     * @see com.xpn.xwiki.api.StatsService#getRefererStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range)
      */
-    List getRefererStatistics(String domain, Scope scope, Period period, Interval interval,
+    List getRefererStatistics(String domain, Scope scope, Period period, Range range,
         XWikiContext context);
 
     /**
-     * @see com.xpn.xwiki.api.StatsService#getBackLinkStatistics(String, Scope, Period, Interval)
+     * @see com.xpn.xwiki.api.StatsService#getBackLinkStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range)
      */
-    List getBackLinkStatistics(String domain, Scope scope, Period period, Interval interval,
+    List getBackLinkStatistics(String domain, Scope scope, Period period, Range range,
         XWikiContext context);
 
     /**

@@ -19,7 +19,7 @@
  *
  */
 
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 import org.joda.time.Interval;
 import org.joda.time.format.DateTimeFormat;

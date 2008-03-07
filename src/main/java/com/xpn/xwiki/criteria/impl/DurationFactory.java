@@ -18,21 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 /**
- * Helper factory class for creating Duration objects in velocity
+ * Helper factory class for creating Duration objects in velocity.
  */
 public class DurationFactory
 {
     /**
-     * A duration of exactly one day
+     * A duration of exactly one day.
      */
     public static final Duration DAY = createDuration(0, 0, 0, 1);
 
     /**
-     * A duration of exactly one week
+     * A duration of exactly one week.
      */
     public static final Duration WEEK = createDuration(0, 0, 1, 0);
 
@@ -42,25 +41,12 @@ public class DurationFactory
     public static final Duration MONTH = createDuration(0, 1, 0, 0);
 
     /**
-     * A duration of exactly one year
+     * A duration of exactly one year.
      */
     public static final Duration YEAR = createDuration(1, 0, 0, 0);
 
-    /**
-     * This factory is implemented as a singleton. This is its only instance.
-     */
-    private static final DurationFactory instance = new DurationFactory();
-
-    private DurationFactory()
+    public DurationFactory()
     {
-    }
-
-    /**
-     * @return The only instance of this singleton factory
-     */
-    public static DurationFactory getInstance()
-    {
-        return instance;
     }
 
     /**
@@ -74,7 +60,7 @@ public class DurationFactory
     /**
      * Creates a new Duration instance having just the specified number of days. All the other
      * fields are 0.
-     * 
+     *
      * @param days The number of days
      * @return A new Duration instance
      */
@@ -86,7 +72,7 @@ public class DurationFactory
     /**
      * Creates a new Duration instance having just the specified number of weeks. All the other
      * fields are 0.
-     * 
+     *
      * @param weeks The number of weeks
      * @return A new Duration instance
      */
@@ -98,7 +84,7 @@ public class DurationFactory
     /**
      * Creates a new Duration instance having just the specified number of months. All the other
      * fields are 0.
-     * 
+     *
      * @param months The number of months
      * @return A new Duration instance
      */
@@ -110,7 +96,7 @@ public class DurationFactory
     /**
      * Creates a new Duration instance having just the specified number of years. All the other
      * fields are 0.
-     * 
+     *
      * @param years The number of years
      * @return A new Duration instance
      */
@@ -120,7 +106,7 @@ public class DurationFactory
     }
 
     /**
-     * Helper method for accessing {@link #DAY} static field in velocity
+     * Helper method for accessing {@link #DAY} static field in velocity.
      */
     public static Duration getDAY()
     {
@@ -128,7 +114,7 @@ public class DurationFactory
     }
 
     /**
-     * Helper method for accessing {@link #WEEK} static field in velocity
+     * Helper method for accessing {@link #WEEK} static field in velocity.
      */
     public static Duration getWEEK()
     {
@@ -136,7 +122,7 @@ public class DurationFactory
     }
 
     /**
-     * Helper method for accessing {@link #MONTH} static field in velocity
+     * Helper method for accessing {@link #MONTH} static field in velocity.
      */
     public static Duration getMONTH()
     {
@@ -144,7 +130,7 @@ public class DurationFactory
     }
 
     /**
-     * Helper method for accessing {@link #YEAR} static field in velocity
+     * Helper method for accessing {@link #YEAR} static field in velocity.
      */
     public static Duration getYEAR()
     {

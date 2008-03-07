@@ -19,81 +19,78 @@
  *
  */
 
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 /**
- * Helper factory class for creating Interval objects in velocity
+ * Helper factory class for creating Range objects in velocity
  */
-public class IntervalFactory
+public class RangeFactory
 {
     /**
      * The interval that matches the entire list it is applied to.
      */
-    public static final Interval ALL = createInterval(0, 0);
+    public static final Range ALL = createRange(0, 0);
 
     /**
      * The interval that matches just the first element of the list it is applied to.
      */
-    public static final Interval FIRST = createInterval(0, 1);
+    public static final Range FIRST = createRange(0, 1);
 
     /**
      * The interval that matches just the last element of the list it is applied to.
      */
-    public static final Interval LAST = createInterval(0, -1);
+    public static final Range LAST = createRange(0, -1);
+
+    public RangeFactory()
+    {
+    }    
 
     /**
-     * This factory is implemented as a singleton. This is its only instance.
+     * @see Range#Range(int, int)
      */
-    private static final IntervalFactory instance = new IntervalFactory();
-
-    private IntervalFactory()
+    public static Range createRange(int start, int size)
     {
+        return new Range(start, size);
     }
 
     /**
-     * @return The only instance of this singleton factory
+     * Creates a new Range which matches all the elements of the list it is applied to.
+     *
+     * @return A new Range instance
      */
-    public static IntervalFactory getInstance()
+    public static Range createAllRange()
     {
-        return instance;
+        return new Range(0, 0);    
     }
 
     /**
-     * @see Interval#Interval(int, int)
-     */
-    public static Interval createInterval(int start, int size)
-    {
-        return new Interval(start, size);
-    }
-
-    /**
-     * Creates a new Interval starting from 0 and having the specified size. It matches the first
+     * Creates a new Range starting from 0 and having the specified size. It matches the first
      * <code>size</code> elements of the list it is applied to.
      * 
      * @param size The size of the interval
-     * @return A new Interval instance
+     * @return A new Range instance
      */
-    public static Interval createHeadInterval(int size)
+    public static Range createHeadRange(int size)
     {
-        return createInterval(0, Math.abs(size));
+        return createRange(0, Math.abs(size));
     }
 
     /**
-     * Creates a new Interval starting from the end of the list it is applied to and having the
+     * Creates a new Range starting from the end of the list it is applied to and having the
      * specified size. It matches the last <code>size</code> elements of the list.
      * 
      * @param size The size of the interval
-     * @return A new Interval instance
+     * @return A new Range instance
      */
-    public static Interval createTailInterval(int size)
+    public static Range createTailRange(int size)
     {
-        return createInterval(0, -Math.abs(size));
+        return createRange(0, -Math.abs(size));
     }
 
     /**
      * Helper method for accessing {@link #ALL} static field in velocity
      */
-    public static Interval getALL()
+    public static Range getALL()
     {
         return ALL;
     }
@@ -101,7 +98,7 @@ public class IntervalFactory
     /**
      * Helper method for accessing {@link #FIRST} static field in velocity
      */
-    public static Interval getFIRST()
+    public static Range getFIRST()
     {
         return FIRST;
     }
@@ -109,7 +106,7 @@ public class IntervalFactory
     /**
      * Helper method for accessing {@link #LAST} static field in velocity
      */
-    public static Interval getLAST()
+    public static Range getLAST()
     {
         return LAST;
     }

@@ -18,8 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 /**
  * Immutable duration for retrieving statistics. A duration of time is uniquely identified by its
@@ -34,7 +33,7 @@ public class Duration
 
     /**
      * Creates a duration by specifying a value for each of its fields.
-     * 
+     *
      * @param years The number of years
      * @param months The number of months
      * @param weeks The number of weeks
@@ -43,6 +42,19 @@ public class Duration
     public Duration(int years, int months, int weeks, int days)
     {
         span = new org.joda.time.Period(years, months, weeks, days, 0, 0, 0, 0);
+    }
+
+    /**
+     * Creates a duration by specifying a value for each of its fields.
+     *
+     * @param years The number of years
+     * @param months The number of months
+     * @param weeks The number of weeks
+     * @param days The number of days
+     */
+    public Duration(int years, int months, int weeks, int days, int hours)
+    {
+        span = new org.joda.time.Period(years, months, weeks, days, hours, 0, 0, 0);
     }
 
     /**
@@ -75,5 +87,13 @@ public class Duration
     public int getDays()
     {
         return span.getDays();
+    }
+
+    /**
+     * @return The number of hours this duration has
+     */
+    public int getHours()
+    {
+        return span.getHours();
     }
 }

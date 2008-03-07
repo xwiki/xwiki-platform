@@ -18,17 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package com.xpn.xwiki.stats.impl;
+package com.xpn.xwiki.criteria.impl;
 
 import junit.framework.TestCase;
+import com.xpn.xwiki.criteria.impl.Duration;
 
 /**
- * Unit tests for the {@link Duration} class.
+ * Unit tests for the {@link com.xpn.xwiki.criteria.impl.Duration} class.
  */
 public class DurationTest extends TestCase
 {
     /**
-     * Test for {@link Duration#Duration(int, int, int, int)}
+     * Test for {@link com.xpn.xwiki.criteria.impl.Duration#Duration(int, int, int, int)}
      */
     public void testConstructor()
     {

@@ -22,6 +22,7 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
@@ -50,6 +51,11 @@ public class XWiki extends Api
     private StatsService statsService;
 
     /**
+     * @see #getCriteriaService()
+     */
+    private CriteriaService criteriaService;
+
+    /**
      * XWiki API Constructor
      * 
      * @param xwiki XWiki Main Object to wrap
@@ -60,6 +66,7 @@ public class XWiki extends Api
         super(context);
         this.xwiki = xwiki;
         this.statsService = new StatsService(context);
+        this.criteriaService = new CriteriaService(context);
     }
 
     /**
@@ -2573,5 +2580,16 @@ public class XWiki extends Api
     public StatsService getStatsService()
     {
         return this.statsService;
+    }
+
+    /**
+     * API to get the xwiki criteria service which allow to create various criteria : integer
+     * ranges, date periods, date intervals, etc.
+     *
+     * @return the xwiki criteria service
+     */
+    public CriteriaService getCriteriaService()
+    {
+        return this.criteriaService;
     }
 }

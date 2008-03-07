@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1204209494000</date>
-<contentUpdateDate>1204209494000</contentUpdateDate>
-<version>16.1</version>
+<date>1204903256000</date>
+<contentUpdateDate>1204903256000</contentUpdateDate>
+<version>56.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -71,14 +71,11 @@ wikimanager.defaultdatetimeformat=yyyy MMMM dd 'at' HH:mm
 ##
 wikimanager.createwiki=Create a new wiki
 wikimanager.totalnumberofwiki=Total number of wiki
-wikimanager.wikiname=Wiki name
-wikimanager.wikidesc=Description
-wikimanager.wikidomain=Domain
-wikimanager.wikiadmin=Administrator
-wikimanager.wikivisibility=Visibility
-wikimanager.wikistate=State
 wikimanager.wikitemplate=From wiki template
 wikimanager.wikipackage=From package (attached file)
+wikimanager.readers=Readers
+wikimanager.writers=Writers
+wikimanager.admins=Administrators
 wikimanager.listwikiname=Name
 wikimanager.listwikidomains=Domain names
 wikimanager.listwikirank=Rank
@@ -90,12 +87,15 @@ wikimanager.legend.wiki=Wiki
 wikimanager.legend.validate=Validate
 wikimanager.legend.members=Members
 wikimanager.legend.sources=Create new wiki from
-wikimanager.readers=Readers
-wikimanager.writers=Writers
-wikimanager.admins=Administrators
 wikimanager.title.wikisettings=Wiki properties
 wikimanager.title.createnewalias=Create new alias
 wikimanager.title.viewaliases=View aliases
+wikimanager.title.createwiki.intro=Intro
+wikimanager.title.createwiki.wikiname=Wiki identifier
+wikimanager.title.createwiki.desc=Wiki description
+wikimanager.title.createwiki.datafrom=Create wiki from
+wikimanager.title.createwiki.members=Initial global members
+wikimanager.title.createwiki.summary=Summary
 ##
 # WIDGETS
 ##
@@ -123,6 +123,12 @@ wikimanager.action.setvisibility.public=Set as public
 wikimanager.action.setvisibility.private=Set as private
 wikimanager.action.setvisibility.template=Set as template
 wikimanager.action.settings=Settings
+wikimanager.action.previous=Previous
+wikimanager.action.next=Next
+wikimanager.action.createwiki.stepbystep=Switch to wizard view mode
+wikimanager.action.createwiki.nonstepbystep=Switch to normal view mode
+wikimanager.action.createwiki.showdoc=Show documentation
+wikimanager.action.createwiki.hidedoc=Hide documentation
 ##
 # MESSAGES
 ##
@@ -139,14 +145,39 @@ wikimanager.erroraliasalreadynotexists=Wiki alias \"{0}\" already exists.
 ##
 # PROPERTIES
 ##
-wikimanager.alias.prop.owner=Owner
-wikimanager.alias.prop.secure=Secure (SSL)
-wikimanager.alias.prop.visibility=Visibility
-wikimanager.alias.prop.language=Language
-wikimanager.alias.prop.description=Description
-wikimanager.alias.prop.server=Domain name
-wikimanager.alias.prop.homepage=Home page
-wikimanager.alias.prop.wikiprettyname=Pretty name
+wikimanager.prop.wiki.wikiname=Wiki identifier
+wikimanager.prop.wiki.wikiprettyname=Pretty name
+wikimanager.prop.wiki.owner=Owner
+wikimanager.prop.wiki.secure=Secure (SSL)
+wikimanager.prop.wiki.visibility=Visibility
+wikimanager.prop.wiki.language=Language
+wikimanager.prop.wiki.description=Description
+wikimanager.prop.wiki.server=Domain name
+wikimanager.prop.wiki.homepage=Home page
+wikimanager.prop.alias.server=Domain name
+wikimanager.prop.alias.homepage=Home page
+##
+# DOC
+##
+wikimanager.doc.createwiki.intro=Create a new wiki. This will create the wiki descriptor document in the main wiki and its associated database or schema depends on the database engine being used.
+wikimanager.doc.createwiki.wikiname=Choose an identifier name for your wiki. It will be use :\n\
+* as database name in the database engine used as XWiki back-end.\n\
+* to target the wiki pages from another wiki with "wikiname:Space.Name" syntax.\n\
+* to generate the wiki descriptor page name in the main wiki (~~XWiki.XWikiServer*Wikiindentifier*~~).\n\
+Wiki identifier has to contains only lowercase alphanumeric characters (0-9, a-z).
+wikimanager.doc.createwiki.desc=Set all the properties  of your wiki here. All theses properties can be changed at any time in the wiki's descriptor page.
+wikimanager.doc.createwiki.desc.wikiprettyname=The display name of the wiki.
+wikimanager.doc.createwiki.desc.description=A brief wiki description.
+wikimanager.doc.createwiki.desc.server=The domain name used to access the wiki. The default domain name suffix is ~~{0}~~. To change it edit this wiki page and search the $DOMAINNAME in TOOLS section.&lt;br /&gt;You can add more domains latter in the wiki's descriptor page.
+wikimanager.doc.createwiki.desc.owner=A global user who will have all the rights on this wiki.
+wikimanager.doc.createwiki.datafrom=When creating a new wiki you obtain by default an empty wiki. You can use wiki template and/or XAR packages as content sources for the new wiki.
+wikimanager.doc.createwiki.datafrom.template=First the wiki template content will be copied in the new wiki. To add more templates in the list set property ~~Visibility~~ of the wiki "template" in its wiki descriptor page.
+wikimanager.doc.createwiki.datafrom.package=Then the attached XAR file will be imported into the new wiki. To add more packages in the list attach XAR files to this page.
+wikimanager.doc.createwiki.members=By default a new wiki is independent meaning that except for administrators no global user will have access to it. Here you can decide which global users and groups will have access to the new wiki.
+wikimanager.doc.createwiki.members.readers=Give "read" and "comment" rights to provided users and groups.
+wikimanager.doc.createwiki.members.writers=Give readers rights as well as "write" to provided users and groups.
+wikimanager.doc.createwiki.members.administrators=Give "admin" right which means all rights to provided users and groups.
+wikimanager.doc.createwiki.summary=You are about to create a new wiki with following options. Makes sure it's correct. You can click Previous to reach previous pages and modify informations.
 ##
 # MOVE IN STANDARD XWIKI
 error.ERROR_XWIKI_ACCESS_DENIED=You don't have permission to make this action.

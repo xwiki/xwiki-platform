@@ -106,7 +106,7 @@
 #set($chartHeight=150)
 #end
 #set($pattern='yyyy')
-#set($currentYear=$xwiki.statsService.periodFactory.currentYear)
+#set($currentYear=$xwiki.criteriaService.periodFactory.currentYear)
 #set($periodStart=$xwiki.jodatime.getDateTime($currentYear.start).minusYears(2))
 #set($periodEnd=$xwiki.jodatime.getDateTime($currentYear.end).plusYears(2))
 #set($dtf=$xwiki.jodatime.getDateTimeFormatterForPattern($pattern))

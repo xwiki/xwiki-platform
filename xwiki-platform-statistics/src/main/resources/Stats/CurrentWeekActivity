@@ -106,7 +106,7 @@
 #set($chartHeight=150)
 #end
 #set($pattern='yyyy.MM.dd')
-#set($currentWeek=$xwiki.statsService.periodFactory.currentWeek)
+#set($currentWeek=$xwiki.criteriaService.periodFactory.currentWeek)
 #set($weekStart=$xwiki.jodatime.getDateTime($currentWeek.start))
 #set($weekEnd=$xwiki.jodatime.getDateTime($currentWeek.end))
 #set($dtf=$xwiki.jodatime.getDateTimeFormatterForPattern($pattern))

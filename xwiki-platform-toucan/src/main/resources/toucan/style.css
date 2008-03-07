@@ -45,7 +45,7 @@ body {
 }
 ol {margin-left: 2em;}
 ul {
-	list-style: none;
+	list-style: circle;
 	margin-left: 2em;
 }
 /* Tables still need 'cellspacing="0"' in the markup. */

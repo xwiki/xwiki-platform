@@ -214,6 +214,14 @@
     </profile>
     <profile>
       <id>ci</id>
+      <activation>
+        <!-- This property is automatically defined by the Release profile in the top level POM when executing
+             a release. Thus this profile will be automatically enabled when releasing -->
+        <property>
+          <name>release</name>
+          <value>true</value>
+        </property>
+      </activation>
       <build>
         <plugins>
           <!-- Use the build number plugin to add the SVN revision number to XWiki's
@@ -233,10 +241,7 @@
               </execution>
             </executions>
             <configuration>
-              <!-- We're setting it to false since this is now causing some issue during the release process as
-                   the release plugin makes modification during release:prepare and this the buildnumber plugin
-                   fails -->
-              <doCheck>false</doCheck>
+              <doCheck>true</doCheck>
               <doUpdate>true</doUpdate>
             </configuration>
           </plugin>

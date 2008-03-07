@@ -40,7 +40,6 @@ import java.io.FileWriter;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
-import java.io.StringWriter;
 import org.dom4j.io.XMLWriter;
 
 /**

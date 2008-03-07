@@ -191,13 +191,6 @@
     </profile>
     <profile>
       <id>ci</id>
-      <activation>
-        <!-- This property is automatically defined by the Maven release plugin when executing
-             a release. Thus this profile will be automatically enabled when releasing -->
-        <property>
-          <name>performRelease</name>
-        </property>
-      </activation>
       <build>
         <plugins>
           <!-- Use the build number plugin to add the SVN revision number to XWiki's

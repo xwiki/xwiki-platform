@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-web</artifactId>
-    <version>1.3-SNAPSHOT</version>
+    <version>1.3</version>
   </parent>
   <artifactId>xwiki-web-standard</artifactId>
   <name>XWiki Platform - Web - Standard</name>
@@ -191,13 +191,6 @@
     </profile>
     <profile>
       <id>ci</id>
-      <activation>
-        <!-- This property is automatically defined by the Maven release plugin when executing
-             a release. Thus this profile will be automatically enabled when releasing -->
-        <property>
-          <name>performRelease</name>
-        </property>
-      </activation>
       <build>
         <plugins>
           <!-- Use the build number plugin to add the SVN revision number to XWiki's
@@ -217,7 +210,10 @@
               </execution>
             </executions>
             <configuration>
-              <doCheck>true</doCheck>
+              <!-- We're setting it to false since this is now causing some issue during the release process as
+                   the release plugin makes modification during release:prepare and this the buildnumber plugin
+                   fails -->
+              <doCheck>false</doCheck>
               <doUpdate>true</doUpdate>
             </configuration>
           </plugin>

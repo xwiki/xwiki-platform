@@ -33,6 +33,20 @@ abstract class AbstractXarMojo extends AbstractMojo
     protected static final String PACKAGE_XML = "package.xml";
 
     /**
+     * Default excludes.
+     * @todo For now we exclude all files in META-INF even though we would like to keep them. This
+     *       is because we want that newly generated XAR be compatible with older versions of
+     *       XWiki (as otherwise they wouldn't be able to be imported in those older versions as
+     *       the Package plugin would fail.
+     */
+    private static final String[] DEFAULT_EXCLUDES = new String[] {"**/META-INF/**"};
+
+    /**
+     * Default includes.
+     */
+    private static final String[] DEFAULT_INCLUDES = new String[] {"**/**"};
+
+    /**
      * List of files to include. Specified as fileset patterns.
      *
      * @parameter
@@ -46,26 +60,12 @@ abstract class AbstractXarMojo extends AbstractMojo
      */
     protected String[] excludes;
     
-	/**
-	 * Default excludes
-	 * @todo For now we exclude all files in META-INF even though we would like to keep them. This
-	 *       is because we want that newly generated XAR be compatible with older versions of
-	 *       XWiki (as otherwise they wouldn't be able to be imported in those older versions as
-	 *       the Package plugin would fail.
-	 */
-    private static final String[] DEFAULT_EXCLUDES = new String[] { "**/META-INF/**" };
-
-	/**
-	 * Default includes
-	 */
-    private static final String[] DEFAULT_INCLUDES = new String[] { "**/**" };
-    
     /**
      * @return the includes
      */
     protected String[] getIncludes()
     {
-        if ( includes != null && includes.length > 0 )
+        if (includes != null && includes.length > 0)
         {
             return includes;
         }
@@ -77,7 +77,7 @@ abstract class AbstractXarMojo extends AbstractMojo
      */
     protected String[] getExcludes()
     {
-        if ( excludes != null && excludes.length > 0 )
+        if (excludes != null && excludes.length > 0)
         {
             return excludes;
         }
@@ -118,8 +118,7 @@ abstract class AbstractXarMojo extends AbstractMojo
                 IncludeExcludeFileSelector fs2 = new IncludeExcludeFileSelector();
                 fs2.setExcludes(new String[]{PACKAGE_XML});
                 selectors = new FileSelector[]{fs, fs2};
-            }
-            else {
+            } else {
                 selectors = new FileSelector[]{fs};
             }
 

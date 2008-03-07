@@ -99,9 +99,9 @@
 <property>
 <content>#panelheader('Most Viewed Spaces')
 #if($xwiki.statsService.enabled)
-#set($scope=$xwiki.statsService.scopeFactory.ALL_SPACES)
-#set($period=$xwiki.statsService.periodFactory.ALL_TIME)
-#set($interval=$xwiki.statsService.intervalFactory.createHeadInterval(5))
+#set($scope=$xwiki.criteriaService.scopeFactory.ALL_SPACES)
+#set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)
+#set($interval=$xwiki.criteriaService.rangeFactory.createHeadRange(5))
 #set($stats=$xwiki.statsService.getDocumentStatistics("view",$scope,$period,$interval))
 #if($stats.size() &gt; 0)
 #printSpaceStats($stats)

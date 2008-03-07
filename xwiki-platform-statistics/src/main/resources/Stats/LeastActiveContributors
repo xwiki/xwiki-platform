@@ -99,8 +99,8 @@
 <property>
 <content>#panelheader('Least Active Contributors')
 #if($xwiki.statsService.enabled)
-#set($period=$xwiki.statsService.periodFactory.ALL_TIME)
-#set($interval=$xwiki.statsService.intervalFactory.createTailInterval(5))
+#set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)
+#set($interval=$xwiki.criteriaService.rangeFactory.createTailRange(5))
 #set($stats=$xwiki.statsService.getVisitStatistics('save',$period,$interval))
 #if($stats.size() &gt; 0)
 #printContributorStats($stats)

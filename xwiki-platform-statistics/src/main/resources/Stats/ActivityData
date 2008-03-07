@@ -57,9 +57,9 @@
 <content>#if($xwiki.statsService.enabled)
 1 Current week activity
 
-#set($scope = $xwiki.statsService.scopeFactory.ALL)
-#set($period = $xwiki.statsService.periodFactory.currentWeek)
-#set($step = $xwiki.statsService.durationFactory.DAY)
+#set($scope = $xwiki.criteriaService.scopeFactory.ALL)
+#set($period = $xwiki.criteriaService.periodFactory.currentWeek)
+#set($step = $xwiki.criteriaService.durationFactory.DAY)
 #set($myviews = $xwiki.statsService.getActionStatistics('view', $scope, $period, $step))
 #set($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM.dd'))
@@ -76,8 +76,8 @@ $dtf.print($item.key) | $item.value | $myedits.get($item.key)
 
 1 Current month activity
 
-#set($period = $xwiki.statsService.periodFactory.currentMonth)
-#set($step = $xwiki.statsService.durationFactory.DAY)
+#set($period = $xwiki.criteriaService.periodFactory.currentMonth)
+#set($step = $xwiki.criteriaService.durationFactory.DAY)
 #set($myviews = $xwiki.statsService.getActionStatistics('view', $scope, $period, $step))
 #set($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM.dd'))
@@ -94,8 +94,8 @@ $dtf.print($item.key) | $item.value | $myedits.get($item.key)
 
 1 Current year activity
 
-#set($period = $xwiki.statsService.periodFactory.currentYear)
-#set($step = $xwiki.statsService.durationFactory.MONTH)
+#set($period = $xwiki.criteriaService.periodFactory.currentYear)
+#set($step = $xwiki.criteriaService.durationFactory.MONTH)
 #set($myviews = $xwiki.statsService.getActionStatistics('view', $scope, $period, $step))
 #set($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy.MM'))
@@ -112,8 +112,8 @@ $dtf.print($item.key) | $item.value | $myedits.get($item.key)
 
 1 All time activity
 
-#set($period = $xwiki.statsService.periodFactory.createPeriod('20060101', '20090101'))
-#set($step = $xwiki.statsService.durationFactory.YEAR)
+#set($period = $xwiki.criteriaService.periodFactory.createPeriod('20060101', '20090101'))
+#set($step = $xwiki.criteriaService.durationFactory.YEAR)
 #set($myviews = $xwiki.statsService.getActionStatistics('view', $scope, $period, $step))
 #set($myedits = $xwiki.statsService.getActionStatistics('save', $scope, $period, $step))
 #set($dtf = $xwiki.jodatime.getDateTimeFormatterForPattern('yyyy'))

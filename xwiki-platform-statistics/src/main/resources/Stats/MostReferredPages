@@ -99,9 +99,9 @@
 <property>
 <content>#panelheader('Most Referred Pages')
 #if($xwiki.statsService.enabled)
-#set($scope=$xwiki.statsService.scopeFactory.ALL_PAGES)
-#set($period=$xwiki.statsService.periodFactory.ALL_TIME)
-#set($interval=$xwiki.statsService.intervalFactory.createHeadInterval(5))
+#set($scope=$xwiki.criteriaService.scopeFactory.ALL_PAGES)
+#set($period=$xwiki.criteriaService.periodFactory.ALL_TIME)
+#set($interval=$xwiki.criteriaService.rangeFactory.createHeadRange(5))
 #set($stats=$xwiki.statsService.getBackLinkStatistics('',$scope,$period,$interval))
 #if($stats.size() &gt; 0)
 #printPageStats($stats)

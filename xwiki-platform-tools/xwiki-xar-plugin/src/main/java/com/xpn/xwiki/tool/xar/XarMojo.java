@@ -150,39 +150,63 @@ public class XarMojo extends AbstractXarMojo
     private Document toXML(Collection files)
     {
         Document doc = new DOMDocument();
-        Element docel = new DOMElement("package");
-        doc.setRootElement(docel);
 
-        Element infosel = new DOMElement("infos");
-        docel.add(infosel);
+        Element packageElement = new DOMElement("package");
+        doc.setRootElement(packageElement);
 
+        Element infoElement = new DOMElement("infos");
+        packageElement.add(infoElement);
+        addInfoElements(infoElement);
+
+        Element filesElement = new DOMElement("files");
+        packageElement.add(filesElement);
+        addFileElements(files, filesElement);
+
+        return doc;
+    }
+
+    /**
+     * Add all the XML elements under the &lt;info&gt; element (name, description, license,
+     * author, version and whether it's a backup pack or not).
+     *
+     * @param infoElement the info element to which to add to
+     */
+    private void addInfoElements(Element infoElement)
+    {
         Element el = new DOMElement("name");
         el.addText(this.project.getName());
-        infosel.add(el);
+        infoElement.add(el);
 
         el = new DOMElement("description");
         el.addText(this.project.getDescription());
-        infosel.add(el);
+        infoElement.add(el);
 
         el = new DOMElement("licence");
         el.addText("");
-        infosel.add(el);
+        infoElement.add(el);
 
         el = new DOMElement("author");
         el.addText("XWiki.Admin");
-        infosel.add(el);
+        infoElement.add(el);
 
         el = new DOMElement("version");
         el.addText(this.project.getVersion());
-        infosel.add(el);
+        infoElement.add(el);
 
         el = new DOMElement("backupPack");
         el.addText("true");
-        infosel.add(el);
- 
-        Element filesel = new DOMElement("files");
-        docel.add(filesel);
+        infoElement.add(el);
+    }
 
+    /**
+     * Add all the XML elements under the &lt;files&gt; element (the list of files present in the
+     * XAR).
+     *
+     * @param files the list of files that we want to include in the generated package XML file.
+     * @param filesElement the files element to which to add to
+     */
+    private void addFileElements(Collection files, Element filesElement)
+    {
         for (Iterator it = files.iterator(); it.hasNext();) {
             ArchiveEntry entry = (ArchiveEntry) it.next();
 
@@ -191,15 +215,14 @@ public class XarMojo extends AbstractXarMojo
                 XWikiDocument xdoc  = getDocFromXML(entry.getFile());
                 if (xdoc != null) {
                     String fullName = xdoc.getFullName();
-                    Element el2 = new DOMElement("file");
-                    el2.setText(fullName);
-                    el2.addAttribute("language", xdoc.getLanguage());
-                    el2.addAttribute("defaultAction", "0");
-                    filesel.add(el2);
+                    Element element = new DOMElement("file");
+                    element.setText(fullName);
+                    element.addAttribute("language", xdoc.getLanguage());
+                    element.addAttribute("defaultAction", "0");
+                    filesElement.add(element);
                 }
             }
         }
-        return doc;
     }
 
     /**

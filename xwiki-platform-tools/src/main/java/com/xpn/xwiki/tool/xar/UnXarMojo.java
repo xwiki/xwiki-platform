@@ -21,7 +21,6 @@ package com.xpn.xwiki.tool.xar;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.apache.maven.artifact.Artifact;
 import org.codehaus.plexus.archiver.ArchiverException;
 
@@ -47,15 +46,6 @@ public class UnXarMojo extends AbstractXarMojo
      * "...".
      */
     private static final String DOTDOTDOT = "...";
-
-    /**
-     * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
 
     /**
      * The groupId of the XAR dependency to expand.

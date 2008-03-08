@@ -23,7 +23,6 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.resolver.filter.ScopeArtifactFilter;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.ArchiveEntry;
 import org.codehaus.plexus.archiver.manager.ArchiverManager;
 import org.codehaus.plexus.archiver.zip.ZipArchiver;
@@ -63,15 +62,6 @@ public class XarMojo extends AbstractXarMojo
      * @required
      */
     protected ArchiverManager archiverManager;
-
-    /**
-     * The maven project.
-     * 
-     * @parameter expression="${project}"
-     * @required
-     * @readonly
-     */
-    private MavenProject project;
 
     /**
      * {@inheritDoc}

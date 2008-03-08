@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.archiver.zip.ZipUnArchiver;
 import org.codehaus.plexus.components.io.fileselectors.FileSelector;
 import org.codehaus.plexus.components.io.fileselectors.IncludeExcludeFileSelector;
@@ -60,6 +61,15 @@ abstract class AbstractXarMojo extends AbstractMojo
      */
     protected String[] excludes;
     
+    /**
+     * The maven project.
+     *
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    protected MavenProject project;
+
     /**
      * @return the includes
      */

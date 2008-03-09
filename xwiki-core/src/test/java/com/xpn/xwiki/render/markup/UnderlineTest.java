@@ -11,8 +11,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testNotTriggeredWithWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not __ underlined __");
         expects.add("This is not __ underlined __");
         tests.add("This is not __underlined __");
@@ -24,8 +24,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testSimple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is __underlined__");
         expects.add("This is <em class=\"underline\">underlined</em>");
         tests.add("This is __a__ letter underlined");
@@ -37,8 +37,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testThree()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is __a__ short underline__");
         expects.add("This is <em class=\"underline\">a</em> short underline__");
         tests.add("This is __all __ underlined__");
@@ -52,8 +52,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testMultiple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("More __underlines__ on a __line__");
         expects
             .add("More <em class=\"underline\">underlines</em> on a <em class=\"underline\">line</em>");
@@ -62,8 +62,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testExtraUnderscoresAreInside()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("The extra underscores are ___inside___");
         expects.add("The extra underscores are <em class=\"underline\">_inside_</em>");
         tests.add("The extra underscores are ___ inside ___");
@@ -73,8 +73,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testWithoutWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This__is__underlined");
         expects.add("This<em class=\"underline\">is</em>underlined");
         test(tests, expects);
@@ -82,8 +82,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testSequence()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("__Eeny__meeny__miny__moe__");
         expects
             .add("<em class=\"underline\">Eeny</em>meeny<em class=\"underline\">miny</em>moe__");
@@ -95,8 +95,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testSeveralInARow()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("this is not an underline: ____ ");
         expects.add("this is not an underline: ____ ");
         tests.add("this is an underscore underlined: _____ ");
@@ -108,8 +108,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testMultiline()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not __not\nunderlined__");
         expects.add("This is not __not\nunderlined__");
         test(tests, expects);
@@ -117,8 +117,8 @@ public class UnderlineTest extends SyntaxTestsParent
 
     public void testTimeComplexity()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         // Something like this should be (negatively) matched in linear time, thus it should take no
         // time. If the build takes a lot, then the regular expression is not in linear time, thus
         // wrong.

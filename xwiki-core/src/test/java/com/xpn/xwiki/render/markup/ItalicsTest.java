@@ -11,8 +11,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testNotTriggeredWithWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not ~~ italics ~~");
         expects.add("This is not ~~ italics ~~");
         tests.add("This is not ~~italics ~~");
@@ -24,8 +24,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testSimple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is in ~~italics~~");
         expects.add("This is in <em>italics</em>");
         tests.add("This is ~~a~~ letter in italics");
@@ -37,8 +37,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testThree()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is ~~a~~ short italics~~");
         expects.add("This is <em>a</em> short italics~~");
         tests.add("This is ~~all ~~ italics~~");
@@ -52,8 +52,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testMultiple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("More ~~italics~~ on a ~~line~~");
         expects
             .add("More <em>italics</em> on a <em>line</em>");
@@ -62,8 +62,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testExtraTildeAreInside()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("The extra tilde are ~~~inside~~~");
         expects.add("The extra tilde are <em>~inside~</em>");
         tests.add("The extra tilde are ~~~ inside ~~~");
@@ -73,8 +73,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testWithoutWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This~~is~~italics");
         expects.add("This<em>is</em>italics");
         test(tests, expects);
@@ -82,8 +82,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testSequence()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("~~Eeny~~meeny~~miny~~moe~~");
         expects
             .add("<em>Eeny</em>meeny<em>miny</em>moe~~");
@@ -95,8 +95,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testSeveralInARow()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("this is not in italics: ~~~~ ");
         expects.add("this is not in italics: ~~~~ ");
         tests.add("this is a tilde in italics: ~~~~~ ");
@@ -108,8 +108,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testMultiline()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not ~~not\nitalics~~");
         expects.add("This is not ~~not\nitalics~~");
         test(tests, expects);
@@ -117,8 +117,8 @@ public class ItalicsTest extends SyntaxTestsParent
 
     public void testTimeComplexity()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         // Something like this should be (negatively) matched in linear time, thus it should take no
         // time. If the build takes a lot, then the regular expression is not in linear time, thus
         // wrong.

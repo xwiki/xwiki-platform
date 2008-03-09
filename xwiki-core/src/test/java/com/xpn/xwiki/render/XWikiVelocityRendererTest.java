@@ -89,6 +89,4 @@ public class XWikiVelocityRendererTest extends MockObjectTestCase
 
         assertEquals("hello world\n", result);
     }
-
-
 }

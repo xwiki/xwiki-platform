@@ -11,8 +11,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testNotTriggeredWithWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not * bold *");
         expects.add("This is not * bold *");
         tests.add("This is not *bold *");
@@ -24,8 +24,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testSimple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is *bold*");
         expects.add("This is <strong>bold</strong>");
         tests.add("This is *a* bold letter");
@@ -37,8 +37,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testThree()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is *a* short bold*");
         expects.add("This is <strong>a</strong> short bold*");
         tests.add("This is *all * bold*");
@@ -52,8 +52,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testMultiple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("More *bolds* on a *line*");
         expects
             .add("More <strong>bolds</strong> on a <strong>line</strong>");
@@ -62,8 +62,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testExtraStarsAreInside()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("The extra stars are **inside**");
         expects.add("The extra stars are <strong>*inside*</strong>");
         tests.add("The extra stars are ** inside **");
@@ -73,8 +73,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testWithoutWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This*is*bold");
         expects.add("This<strong>is</strong>bold");
         test(tests, expects);
@@ -82,8 +82,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testSequence()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("*Eeny*meeny*miny*moe*");
         expects
             .add("<strong>Eeny</strong>meeny<strong>miny</strong>moe*");
@@ -95,8 +95,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testWithLists()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("* this is a list item*");
         expects.add("...<li>this is a list item*</li>...");
         tests.add("* this is a list *item*");
@@ -106,8 +106,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testSeveralInARow()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("this is not bold: ** ");
         expects.add("this is not bold: ** ");
         tests.add("this is a bold star: *** ");
@@ -119,8 +119,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testMultiline()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not *not\nbold*");
         expects.add("This is not *not\nbold*");
         test(tests, expects);
@@ -128,8 +128,8 @@ public class BoldTest extends SyntaxTestsParent
 
     public void testTimeComplexity()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         // Something like this should be (negatively) matched in linear time, thus it should take no
         // time. If the build takes a lot, then the regular expression is not in linear time, thus
         // wrong.

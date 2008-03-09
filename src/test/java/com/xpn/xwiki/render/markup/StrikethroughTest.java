@@ -11,8 +11,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testNotTriggeredWithWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not -- stroked --");
         expects.add("This is not -- stroked --");
         tests.add("This is not --stroked --");
@@ -24,8 +24,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testSimple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is --stroked--");
         expects.add("This is <del>stroked</del>");
         tests.add("This is --a-- stroke");
@@ -37,8 +37,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testThree()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is --a-- short stroke--");
         expects.add("This is <del>a</del> short stroke--");
         tests.add("This is --all -- stroked--");
@@ -52,8 +52,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testMultiple()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("More --strokes-- on a --line--");
         expects.add("More <del>strokes</del> on a <del>line</del>");
         test(tests, expects);
@@ -61,8 +61,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testExtraDashesAreInside()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("The extra dashes are ---inside---");
         expects.add("The extra dashes are <del>-inside-</del>");
         tests.add("The extra dashes are --- inside ---");
@@ -72,8 +72,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testWithoutWhitespace()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This--is--stroked");
         expects.add("This<del>is</del>stroked");
         test(tests, expects);
@@ -81,8 +81,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testSequence()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("--Eeny--meeny--miny--moe--");
         expects.add("<del>Eeny</del>meeny<del>miny</del>moe--");
         tests.add("-- Eeny--meeny--miny--moe--");
@@ -92,17 +92,17 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testHR()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("this is a ------ line");
-        expects.add("this is a <hr class=\"line\"/> line");
+        expects.add("this is a <hr/> line");
         test(tests, expects);
     }
 
     public void testWithLists()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("-- this is a list item--");
         expects.add("...<li>this is a list item--</li>...");
         tests.add("-- this is a list --item--");
@@ -112,8 +112,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testHtmlComments()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("HTML <!-- comments are ignored -->");
         expects.add("HTML <!-- comments are ignored -->");
         tests.add("Multiple HTML <!-- comments --> are <!-- ignored -->");
@@ -123,8 +123,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testMultiline()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         tests.add("This is not --not\nstroked--");
         expects.add("This is not --not\nstroked--");
         test(tests, expects);
@@ -132,8 +132,8 @@ public class StrikethroughTest extends SyntaxTestsParent
 
     public void testTimeComplexity()
     {
-        ArrayList tests = new ArrayList();
-        ArrayList expects = new ArrayList();
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
         // Something like this should be (negatively) matched in linear time, thus it should take no
         // time. If the build takes a lot, then the regular expression is not in linear time, thus
         // wrong.

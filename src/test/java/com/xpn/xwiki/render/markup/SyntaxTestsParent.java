@@ -39,7 +39,7 @@ public class SyntaxTestsParent extends MockObjectTestCase
         this.context.setDoc(document);
     }
 
-    protected void test(ArrayList tests, ArrayList expects)
+    protected void test(ArrayList<String> tests, ArrayList<String> expects)
     {
         for (int i = 0; i < tests.size(); ++i) {
             String result = renderer.render(tests.get(i).toString(), document, document, context);

@@ -1,41 +1,101 @@
+##
+##
+## #template("name.vm")
+## Searches for the given velocity template and interprets it.
+## Only the velocity parser is executed on the file.
+## The template is searched in the following locations, in this order:
+## - as a property of the XWikiSkins object attached to the current skin document
+## - as an attachment to the current skin document
+## - as a file in the directory corresponding to the current skin
+## - the above 3 locations corresponding to the base skin
+## - the above 3 locations corresponding to the default skin
+## - as a file in the /templates/ directory
+##
 #macro(template $tname)
 $xwiki.parseTemplate($tname)
 #end
-
+##
+##
+## #renderTemplate("name.vm")
+## Searches for the given velocity template and renders it.
+## The template is searched in the following locations, in this order:
+## - as a property of the XWikiSkins object attached to the current skin document
+## - as an attachment to the current skin document
+## - as a file in the directory corresponding to the current skin
+## - the above 3 locations corresponding to the base skin
+## - the above 3 locations corresponding to the default skin
+## - as a file in the /templates/ directory
+##
 #macro(renderTemplate $tname )
 $xwiki.renderTemplate($tname)
 #end
-
+##
+##
+## #includeTopic("Space.Document")
+## Includes another fully rendered document inside the current response.
+## The topic is interpreted and rendered exactly as if it were viewed in a separate response,
+## meaning that the $doc variable will point to the included document. The resulting string is
+## wrapped with {pre}...{/pre}, in order to prevent double-rendering.
+## The platform prevents recursive includes.
+## This macro is useful for creating composite documents from smaller parts, or the other way around,
+## splitting a large document into smaller distinct chunks which can be edited in parallel.
+##
 #macro(includeTopic $topic)
 $xwiki.includeTopic($topic)
 #end
-
+##
+##
+## #includeMacros("Space.Document")
+## Includes the content of another document as velocity macros. Because of the way the velocity
+## engine works, trying to place macros in another document and including it with another method
+## will not have the expected result. Other than making the macros available, it works just as
+## #includeForm($topic)
+##
 #macro(includeMacros $topic)
 $xwiki.includeForm($topic)
 #end
-
+##
+##
+## #includeForm("Space.Document")
+## Includes another fully rendered document inside the current response.
+## The included content is interpreted and rendered in the current context, meaning that $doc will
+## point to the current document (the includer), and not the included one. The resulting string is
+## wrapped with {pre}...{/pre}, in order to prevent double-rendering.
+## The platform prevents recursive includes.
+## This macro is the core of the document-template-sheet functionality of XWiki, where a document
+## has an XObject attached to it, its content consists of the "#includeForm('Some.Sheet')" statement,
+## and the sheet works just as if it were actually inside the document's content.
+##
 #macro(includeForm $topic)
 $xwiki.includeForm($topic)
 #end
-
+##
+##
+## #includeInContext("Some.Document")
+## Alias for #includeForm
+##
 #macro(includeInContext $topic)
 $xwiki.includeForm($topic)
 #end
-
+##
+##
+## #includeServlet("/xwiki/bin/view/Some/Document?params")
+## Invokes on the server another servlet corresponding to the passed URL, and returns the output.
+## This is done using standard servlet mechanisms (javax.servlet.RequestDispatcher#include).
+##
 #macro(includeServlet $url)
 <!-- including $url -->
 $xwiki.invokeServletAndReturnAsString($url)
 <!-- included $url -->
 #end 
-
-#macro(editactions)
-<a href="$doc.getURL("preview")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;">$msg.get("preview")</a>
-<span> | </span>
-<a href="$doc.getURL("save")" onclick="document.forms.edit.action=this.href; document.forms.edit.submit(); return false;" >$msg.get("save")</a>
-#end
-
+##
+##
+## #versions()
+## Displays links to the last 4 versions (including the current one), and to the full history
+## page of the current document.
+##
 #macro(versions)
-#foreach( $rev in $tdoc.getRecentRevisions(4) )
+#foreach($rev in $tdoc.getRecentRevisions(4))
 <a href="$doc.getURL("view", "rev=$rev")">$rev</a><span class="xwikisep"> | </span>
 #end
 #if ($tdoc.realLanguage!="")
@@ -44,53 +104,84 @@ $xwiki.invokeServletAndReturnAsString($url)
 <a href="$doc.getURL("view", "xpage=diff")">$msg.get("history")</a><span class="xwikisep"> | </span>
 #end
 #end
-
+##
+##
+## #errorMarkup()
 ## Display all queued Struts errors
+##
 #macro(errorMarkup)
-    #if ($errors.exist() )
-        <ul>
-        #foreach ($e in $errors.all )
-            $e
-        #end
-        </ul>
+  #if ($errors && $!errors.exist() )
+    <ul>
+    #foreach ($e in $errors.all )
+      $e
     #end
+    </ul>
+  #end
 #end
-
+##
+##
+## #errorMarkupForProperty("prop")
 ## Display all queued Struts errors for a particular property
+##
 #macro(errorMarkupForProperty $property)
-    #if ($errors.exist($property) )
-        <ul>
-        #foreach ($er in $errors.get($property))
-            $er
-        #end
-        </ul>
+  #if ($errors && $!errors.exist($property) )
+    <ul>
+    #foreach ($er in $errors.get($property))
+      $er
     #end
+    </ul>
+  #end
 #end
-
+##
+##
+## #jabber("jabberId")
+## Displays the status for the given Jabber id 
+##
 #macro(jabber $id)
 <img src="http://edgar.netflint.net/status.php?jid=${id}&amp;type=image&amp;iconset=phpbb" alt="jabber $id" />
 #end
-
+##
+##
+## #skype("skypeId")
+## Displays the status for the given Skype id 
+##
 #macro(skype $id)
 <a href="skype:${id}?call"><img width="182" height="44" src="http://mystatus.skype.com/bigclassic/${id}" style="border: none;"></a>
 #end
-
+##
+##
+## #yahoo("yahooId")
+## Displays the status for the given Yahoo! id 
+##
 #macro(yahoo $id)
 <img border="0" src="http://opi.yahoo.com/online?u=${id}&amp;m=g&amp;t=1" alt="yahoo $id" />
 #end
-
+##
+##
+## #aim("aimId")
+## Displays the status for the given AIM id 
+##
 #macro(aim $id)
 #set($onurl = "http://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
 #set($offurl = "http://${request.serverName}${xwiki.getSkinFile('aimoffline.gif')}")
 <img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${onurl}&off_url=${offurl}" alt="Online detector"></a>
 #end
-
+##
+##
+## #msn("msnId")
+## Displays the status for the given MSN id 
+##
 #macro(msn $id)
 #set($onurl = "${request.serverName}${xwiki.getSkinFile('msnonline.gif')}")
 #set($offurl = "${request.serverName}${xwiki.getSkinFile('msnoffline.gif')}")
 <img border="0" src="http://turdinc.kicks-ass.net:6969/msn/${id}/onurl=${onurl}/offurl=${offurl}/unknownurl=${offurl}" />
 #end
-
+##
+##
+## #im("XWiki.Username")
+## Displays the instant messaging account status of the given user. The IM network and the account
+## name are taken from the user profile.  
+##
 #macro(im $user)
 #set($userdoc = $xwiki.getDocument($user))
 #set($userobj = $userdoc.getObject("XWiki.XWikiUsers"))
@@ -112,7 +203,11 @@ $xwiki.invokeServletAndReturnAsString($url)
 #skype("$imaccount")
 #end
 #end
-
+##
+##
+## #sign("XWiki.Username")
+## Displays a "signature", a link to the user's profile page.
+##
 #macro(sign $username)
 #if($username.indexOf(".")==-1)
 #set($username = "XWiki.${username}")

@@ -87,6 +87,7 @@ public class LineTest extends SyntaxTestsParent
         test(tests, expects);
     }
 
+    /*
     public void testSequence()
     {
         ArrayList<String> tests = new ArrayList<String>();
@@ -95,6 +96,7 @@ public class LineTest extends SyntaxTestsParent
         expects.add("<hr/> <hr/>   <hr/>");
         test(tests, expects);
     }
+    */
 
     public void testXmlComments()
     {

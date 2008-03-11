@@ -7,9 +7,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-/**
- * Created by IntelliJ IDEA. User: ludovic Date: 11 d�c. 2007 Time: 15:39:05 To change this
- * template use File | Settings | File Templates.
+/** 
+ * @version $Id: $
  */
 public class SpaceManagers
 {

@@ -21,6 +21,9 @@ import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
+/** 
+ * @version $Id: $
+ */
 public class SpaceImplTest extends org.jmock.cglib.MockObjectTestCase
 {
 
@@ -149,13 +152,6 @@ public class SpaceImplTest extends org.jmock.cglib.MockObjectTestCase
         String desc = "Space description";
         this.space.setDescription(desc);
         assertEquals(desc, this.space.getDescription());
-    }
-
-    public void testPreferences()
-    {
-        /**
-         * @todo we need to know who will save preferences first
-         */
     }
 
     public void testHomeShortcutURL()

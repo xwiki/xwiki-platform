@@ -12,8 +12,9 @@ import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerException;
 import com.xpn.xwiki.plugin.spacemanager.api.SpaceUserProfile;
 
 /**
- * Created by IntelliJ IDEA. User: ludovic Date: 13 d�c. 2007 Time: 14:37:24 To change this
- * template use File | Settings | File Templates.
+ * a {@link Document} that represent a user profile inside a {@link Space}
+ * 
+ * @version $Id: $
  */
 public class SpaceUserProfileImpl extends Document implements SpaceUserProfile
 {

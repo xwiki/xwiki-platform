@@ -23,6 +23,9 @@ import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
+/** 
+ * @version $Id: $
+ */
 public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
 {
 

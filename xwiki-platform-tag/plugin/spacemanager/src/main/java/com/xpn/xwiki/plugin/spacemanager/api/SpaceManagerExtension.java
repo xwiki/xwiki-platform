@@ -5,6 +5,8 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * A SpaceManagerExtension contains a list of methods that need to be implemented by specific
  * SpaceManagers
+ * 
+ * @version $Id: $
  */
 public interface SpaceManagerExtension
 {

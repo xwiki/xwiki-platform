@@ -9,6 +9,8 @@ import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerExtension;
 
 /**
  * Implementation of a specific SpaceManagerExtension
+ * 
+ * @version $Id: $
  */
 public class SpaceManagerExtensionImpl implements SpaceManagerExtension
 {

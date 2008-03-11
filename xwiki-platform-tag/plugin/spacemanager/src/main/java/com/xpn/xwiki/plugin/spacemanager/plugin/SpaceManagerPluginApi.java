@@ -34,6 +34,8 @@ import com.xpn.xwiki.plugin.spacemanager.api.SpaceUserProfile;
  * Api for creating and retrieving Spaces
  * The plugin will contain SpaceManager api calls to the underlying space manager plugin.
  * Security will be handled by this plugin.
+ * 
+ * @version $Id: $
  */
 public class SpaceManagerPluginApi extends PluginApi
 {
@@ -237,12 +239,6 @@ public class SpaceManagerPluginApi extends PluginApi
         List spacesList = getSpaceManager().getSpaces(nb, start, ordersql, context);
         return spacesList;
     }
-
-    /*
-     * private List wrapSpaces(List spacesList) { List list = new ArrayList(); if (spacesList==null)
-     * return null; for (int i=0;i<spacesList.size();i++) { list.add(new Space((Space)
-     * spacesList.get(i), context)); } return list; }
-     */
 
     /**
      * Get the list of space objects
@@ -493,31 +489,7 @@ public class SpaceManagerPluginApi extends PluginApi
         }
     }
 
-    /**
-     * Search for documents in the space
-     * 
-     * @param space
-     * @param hql
-     * @return
-     */
-    // public List searchDocuments(Space space, String hql) throws
-    // SpaceManagerException;
-    /**
-     * Add a wiki user as admin in the space
-     * 
-     * @param space
-     * @param wikiname
-     */
-    // public void addAdmin(Space space, String wikiname) throws
-    // SpaceManagerException;
-    /**
-     * Add a list of admins in the space
-     * 
-     * @param space
-     * @param wikinames
-     */
-    // public void addAdmins(Space space, List wikinames) throws
-    // SpaceManagerException;
+
     /**
      * @return the list of all members of the space that are admins
      */
@@ -526,24 +498,7 @@ public class SpaceManagerPluginApi extends PluginApi
         return getSpaceManager().getAdmins(spaceName, context);
     }
 
-    /**
-     * Add user to the specific role in the space
-     * 
-     * @param space
-     * @param wikiname
-     * @param roles
-     */
-    // public void addUserToRole(Space space, String wikiname, List roles)
-    // throws SpaceManagerException;
-    /**
-     * Add a list of users to a specific role in the space
-     * 
-     * @param space
-     * @param wikinames
-     * @param roles
-     */
-    // public void addUsersToRole(Space space, List wikinames, List roles)
-    // throws SpaceManagerException;
+
     /**
      * Get the list of users for a role
      * 

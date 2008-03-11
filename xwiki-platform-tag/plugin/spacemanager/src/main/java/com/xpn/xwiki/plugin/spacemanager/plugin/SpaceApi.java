@@ -9,6 +9,8 @@ import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerException;
 
 /**
  * Api wrapper for a {@link Space}, exposed for scripting inside wiki pages.
+ * 
+ * @version $Id: $
  */
 public class SpaceApi
 {

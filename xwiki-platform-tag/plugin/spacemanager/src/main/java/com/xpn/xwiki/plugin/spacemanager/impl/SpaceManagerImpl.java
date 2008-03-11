@@ -1233,11 +1233,11 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                 removeAdmin(spaceName, userName, context);
             }
             // remove all the other roles
-            // Iterator it = getRoles(spaceName, context).iterator();
-            // while (it.hasNext()) {
-            // String role = (String) it.next();
-            // removeUserFromRole(spaceName, userName, role, context);
-            // }
+            Iterator it = getRoles(spaceName, context).iterator();
+            while (it.hasNext()) {
+                String role = (String) it.next();
+                removeUserFromRole(spaceName, userName, role, context);
+            }
             // delete space user profile
             deleteSpaceUserProfile(spaceName, userName, context);
             // remove member
@@ -1290,12 +1290,6 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             groupDoc.setContent("#includeForm(\"XWiki.XWikiGroupSheet\")");
         xwiki.saveDocument(groupDoc, context.getMessageTool()
             .get("core.comment.addedUserToGroup"), context);
-        /*
-         * if (groupDoc.isNew()) { } else { xwiki.getHibernateStore().saveXWikiObject(memberObject,
-         * context, true); } // we need to make sure we add the user to the group cache try {
-         * xwiki.getGroupService(context).addUserToGroup(username, context.getDatabase(), groupName,
-         * context); } catch (Exception e) {}
-         */
     }
 
     private void removeUserFromGroup(String userName, String groupName, XWikiContext context)
@@ -1447,8 +1441,11 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     public Collection getRoles(String spaceName, XWikiContext context)
         throws SpaceManagerException
     {
-        notImplemented();
-        return null;
+        // The roles notion is not natively implemented in the spacemanager plugin yet,
+        // so we return a empty list. Plugins that extend the spacemanager plugin can overload this
+        // method to implement roles, either by hardcoding or retrieving from DB the roles list.
+        // @TODO Implement methods to set a list of roles for a space.
+        return Collections.EMPTY_LIST;
     }
 
     /**

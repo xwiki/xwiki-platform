@@ -31,7 +31,9 @@ import com.xpn.xwiki.plugin.spacemanager.api.Space;
 import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerException;
 
 /**
- * Implementing class
+ * Implementing class if a {@link Space}
+ * 
+ * @version $Id: $
  */
 public class SpaceImpl extends Document implements Space
 {

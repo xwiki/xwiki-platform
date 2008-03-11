@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.mailsender;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.plugin.PluginApi;
 import org.apache.velocity.VelocityContext;
 import org.apache.commons.logging.Log;
@@ -59,9 +60,9 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
      *
      * @return The MailSenderPlugin
      */
-    protected MailSenderPlugin getMailSenderPlugin()
+    private MailSenderPlugin getMailSenderPlugin()
     {
-        return (MailSenderPlugin) getInternalPlugin();
+        return (MailSenderPlugin) getProtectedPlugin();
     }
 
     /**
@@ -71,23 +72,16 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
     public int sendHtmlMessage(String from, String to, String cc, String bcc, String subject,
         String body, String alternative, List attachments)
     {
-        try {
-            Mail email = new Mail();
-            email.setSubject(subject);
-            email.setFrom(from);
-            email.setTo(to);
-            email.setCc(cc);
-            email.setBcc(bcc);
-            email.setTextPart(alternative);
-            email.setHtmlPart(body);
-            email.setAttachments(attachments);
-            getMailSenderPlugin().sendMail(email, context);
-            return 0;
-        } catch (Exception e) {
-            context.put("error", e.getMessage());
-            LOG.error("sendHtmlMessage", e);
-            return -1;
-        }
+        Mail email = new Mail();
+        email.setSubject(subject);
+        email.setFrom(from);
+        email.setTo(to);
+        email.setCc(cc);
+        email.setBcc(bcc);
+        email.setTextPart(alternative);
+        email.setHtmlPart(body);
+        email.setAttachments(attachments);
+        return sendMail(email);
     }
 
     /**
@@ -96,20 +90,12 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
      */
     public int sendTextMessage(String from, String to, String subject, String message)
     {
-        try {
-            Mail email = new Mail();
-            email.setSubject(subject);
-            email.setTextPart(message);
-            email.setFrom(from);
-            email.setTo(to);
-
-            getMailSenderPlugin().sendMail(email, context);
-            return 0;
-        } catch (Exception e) {
-            context.put("error", e.getMessage());
-            LOG.error("sendTextMessage", e);
-            return -1;
-        }
+        Mail email = new Mail();
+        email.setSubject(subject);
+        email.setTextPart(message);
+        email.setFrom(from);
+        email.setTo(to);
+        return sendMail(email);
     }
 
     /**
@@ -119,22 +105,15 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
     public int sendTextMessage(String from, String to, String cc, String bcc, String subject,
         String message, List attachments)
     {
-        try {
-            Mail email = new Mail();
-            email.setSubject(subject);
-            email.setTextPart(message);
-            email.setFrom(from);
-            email.setTo(to);
-            email.setCc(cc);
-            email.setBcc(bcc);
-            email.setAttachments(attachments);
-            getMailSenderPlugin().sendMail(email, context);
-            return 0;
-        } catch (Exception e) {
-            context.put("error", e.getMessage());
-            LOG.error("sendTextMessage", e);
-            return -1;
-        }
+        Mail email = new Mail();
+        email.setSubject(subject);
+        email.setTextPart(message);
+        email.setFrom(from);
+        email.setTo(to);
+        email.setCc(cc);
+        email.setBcc(bcc);
+        email.setAttachments(attachments);
+        return sendMail(email);
     }
 
     /**
@@ -148,8 +127,64 @@ public class MailSenderPluginApi extends PluginApi implements MailSender
             return getMailSenderPlugin().sendMailFromTemplate(documentFullName, from, to, cc, bcc,
                 language, vcontext, context);
         } catch (Exception e) {
+            context.put("error", e.getMessage());
             LOG.error("sendMessageFromTemplate", e);
             return -1;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see MailSender#createMail()   
+     */
+    public Mail createMail()
+    {
+        return new Mail();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see MailSender#sendMail(Mail)  
+     */
+    public int sendMail(Mail mail)
+    {
+        int result = 0;
+        try {
+            getMailSenderPlugin().sendMail(mail, context);
+        } catch (Exception e) {
+            context.put("error", e.getMessage());
+            LOG.error("Failed to send email [" + mail.toString() + "]", e);
+            result = -1;
+        }
+
+        return result;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see MailSender#createMailConfiguration(com.xpn.xwiki.api.XWiki)
+     */
+    public MailConfiguration createMailConfiguration(XWiki xwiki)
+    {
+        return new MailConfiguration(xwiki);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see MailSender#sendMail(Mail, MailConfiguration)  
+     */
+    public int sendMail(Mail mail, MailConfiguration mailConfiguration)
+    {
+        int result = 0;
+        try {
+            getMailSenderPlugin().sendMail(mail, mailConfiguration, context);
+        } catch (Exception e) {
+            context.put("error", e.getMessage());
+            LOG.error("Failed to send email [" + mail.toString() + "] using mail configuration ["
+                + mailConfiguration.toString() + "]", e);
+            result = -1;
+        }
+
+        return result;
     }
 }

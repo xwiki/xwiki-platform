@@ -2,7 +2,7 @@ package com.xpn.xwiki.render.markup;
 
 import java.util.ArrayList;
 
-public class UnderlineTest extends SyntaxTestsParent
+public class UnderlineTest extends AbstractSyntaxTest
 {
     protected void setUp()
     {

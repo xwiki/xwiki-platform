@@ -2,7 +2,7 @@ package com.xpn.xwiki.render.markup;
 
 import java.util.ArrayList;
 
-public class ItalicsTest extends SyntaxTestsParent
+public class ItalicsTest extends AbstractSyntaxTest
 {
     protected void setUp()
     {

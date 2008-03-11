@@ -35,7 +35,7 @@
   <artifactId>xwiki-plugins</artifactId>
   <packaging>pom</packaging>
   <name>XWiki Platform - Plugins - Parent POM</name>
-  <version>4-SNAPSHOT</version>
+  <version>6-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Parent POM</description>
   <scm>
     <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</connection>

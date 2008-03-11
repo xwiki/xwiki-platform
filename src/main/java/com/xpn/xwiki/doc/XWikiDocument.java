@@ -29,16 +29,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.Vector;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -71,8 +62,6 @@ import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.criteria.impl.RevisionCriteria;
-import com.xpn.xwiki.criteria.impl.Range;
-import com.xpn.xwiki.criteria.impl.RangeFactory;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.content.Link;
 import com.xpn.xwiki.content.parsers.DocumentParser;
@@ -3562,8 +3551,8 @@ public class XWikiDocument
                 backlinkDocument.getContent(), oldLink, newLink, linkHandler, getSpace());
 
             backlinkDocument.setContent((String) result.getModifiedContent());
-            context.getWiki().saveDocument(backlinkDocument,
-                "Update links to " + newDocumentName, true, context);
+            context.getWiki().saveDocument(backlinkDocument, context.getMessageTool().get("core.comment.renameLink",
+                Arrays.asList(new String[] { newDocumentName })), true, context);
         }
 
         // Step 3: Delete the old document

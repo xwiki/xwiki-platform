@@ -315,25 +315,4 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
         assertEquals(testlist, l);
     }
 
-    /**
-     * Tests the correct functioning of addUserToRole() and getUsertForRole()
-     */
-    /*
-     * public void testAddUserToRole() throws SpaceManagerException {
-     * this.spaceManager.createSpace(displayTitle, context); Space s1 =
-     * this.spaceManager.getSpace(displayTitle, context); List roles = new ArrayList();
-     * roles.add("testrole"); roles.add("testrole2"); this.spaceManager.addUserToRole(s1, "cristi",
-     * roles, context); List l = this.spaceManager.getUsersForRole(s1, "testrole", context);
-     * assertEquals(l.get(0),"cristi"); List newusers = new ArrayList(); newusers.add("testuser1");
-     * newusers.add("testuser2"); this.spaceManager.addUsersToRole(s1, newusers, roles, context);
-     * List testlist = new ArrayList(); testlist.add("cristi"); testlist.add(newusers); l =
-     * this.spaceManager.getUsersForRole(s1, "testrole", context); assertEquals(l, testlist); }
-     * public void testGetRoles() throws SpaceManagerException { List roles = new ArrayList();
-     * roles.add("testrole"); roles.add("testrole2"); List r1 = new ArrayList(); r1.add("testrole");
-     * List r2 = new ArrayList(); r1.add("testrole2"); this.spaceManager.createSpace(displayTitle,
-     * context); Space s1 = this.spaceManager.getSpace(displayTitle, context);
-     * this.spaceManager.addUserToRole(s1, "cristi", r1, context);
-     * this.spaceManager.addUserToRole(s1, "cristi2", r2, context);
-     * assertEquals(this.spaceManager.getRoles(s1, context),roles); }
-     */
 }

@@ -42,7 +42,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
  * @version $Id: $
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
-public class RightsManageGroupsApi extends Api
+public class RightsManagerGroupsApi extends Api
 {
     /**
      * Field name of the last error code inserted in context.
@@ -59,14 +59,14 @@ public class RightsManageGroupsApi extends Api
     /**
      * The logging toolkit.
      */
-    protected static final Log LOG = LogFactory.getLog(RightsManageGroupsApi.class);
+    protected static final Log LOG = LogFactory.getLog(RightsManagerGroupsApi.class);
 
     /**
      * Create an instance of RightsManageRightsApi.
      * 
      * @param context the XWiki context.
      */
-    public RightsManageGroupsApi(XWikiContext context)
+    public RightsManagerGroupsApi(XWikiContext context)
     {
         super(context);
     }

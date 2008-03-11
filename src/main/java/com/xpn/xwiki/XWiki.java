@@ -1492,9 +1492,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // Try parsing a file located in the directory with the same name.
         try {
             String path = "/skins/" + skin + "/" + template;
-            String content = getResourceContent(path);
-            return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context
-                .get("vcontext"), context);
+            File f = new File(path);
+            path = f.getCanonicalPath();
+            if (path.startsWith("/skins/")) {
+                String content = getResourceContent(path);
+                return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context
+                    .get("vcontext"), context);
+            } else {
+                LOG.warn("Illegal access, tried to use file [" + path + "] as a template." +
+                                " Possible break-in attempt!");
+            }
         } catch (Exception e) {
         }
 

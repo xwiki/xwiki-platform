@@ -165,7 +165,7 @@
 
   <error-page>
     <error-code>404</error-code>
-    <location>/xwiki/bin/view/Main/DocumentDoesNotExist</location>
+    <location>/bin/view/Main/DocumentDoesNotExist</location>
   </error-page>
 
   <!-- Struts Tag Library Descriptors -->

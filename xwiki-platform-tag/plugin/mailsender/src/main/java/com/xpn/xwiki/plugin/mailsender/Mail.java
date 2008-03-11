@@ -19,7 +19,9 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * The variables to, cc, bcc can contain several email addresses, separated by commas.
@@ -27,45 +29,50 @@ import java.util.List;
 public class Mail
 {
     private String to;
+
     private String from;
+
     private String cc;
+
     private String bcc;
+
     private String subject;
+
     private String textPart;
+
     private String htmlPart;
+
     private List attachments;
-    
+
+    private Map<String, String> headers;
+
+    public Mail()
+    {
+        headers = new HashMap<String, String>();
+    }
+
+    public Mail(String from, String to, String cc, String bcc, String subject, String textPart, String htmlPart)
+    {
+        this();
+        
+        this.from = from;
+        this.to = to;
+        this.cc = cc;
+        this.bcc = bcc;
+        this.subject = subject;
+        this.textPart = textPart;
+        this.htmlPart = htmlPart;
+    }
 
     public List getAttachments()
     {
         return attachments;
     }
 
-
     public void setAttachments(List attachments)
     {
         this.attachments = attachments;
     }
-
-
-    public Mail()
-    {
-        super();
-    }
-    
-    
-    public Mail(String from, String to, String cc, String bcc, String subject, String message, String htmlPart)
-    {
-        super();
-        this.from = from;
-        this.to = to;
-        this.cc = cc;
-        this.bcc = bcc;
-        this.subject = subject;
-        this.textPart = message;
-        this.htmlPart = htmlPart;
-    }
-
 
     public String getFrom()
     {
@@ -127,22 +134,81 @@ public class Mail
         this.textPart = message;
     }
 
-    public String toFullString()
+    public String toString()
     {
-        return "From: " + from + "\nTo: " + to + "\nCc: " + cc + "\nBcc: " + bcc + "\nSubject:"
-            + subject + "\nText: " + textPart+" \nHTML:"+htmlPart;
+        StringBuffer buffer = new StringBuffer();
+
+        if (getFrom() != null) {
+            buffer.append("From [" + getFrom() + "]");
+        }
+
+        if (getTo() != null) {
+            buffer.append(", To [" + getTo() + "]");
+        }
+
+        if (getCc() != null) {
+            buffer.append(", Cc [" + getCc() + "]");
+        }
+
+        if (getBcc() != null) {
+            buffer.append(", Bcc [" + getBcc() + "]");
+        }
+
+        if (getSubject() != null) {
+            buffer.append(", Subject [" + getSubject() + "]");
+        }
+
+        if (getTextPart() != null) {
+            buffer.append(", Text [" + getTextPart() + "]");
+        }
+
+        if (getHtmlPart() != null) {
+            buffer.append(", HTML [" + getHtmlPart() + "]");
+        }
+
+        if (!getHeaders().isEmpty()) {
+            buffer.append(", Headers [" + toStringHeaders() + "]");
+        }
+
+        return buffer.toString();
     }
 
+    private String toStringHeaders()
+    {
+        StringBuffer buffer = new StringBuffer();
+        for(Map.Entry<String,String> header : getHeaders().entrySet()) {
+            buffer.append("[" + header.getKey() + "] = [" + header.getValue() + "]");
+        }
+        return buffer.toString();
+    }
 
     public String getHtmlPart()
     {
         return htmlPart;
     }
 
-
     public void setHtmlPart(String htmlPart)
     {
         this.htmlPart = htmlPart;
     }
 
+    public void setHeader(String header, String value)
+    {
+        headers.put(header, value);
+    }
+
+    public String getHeader(String header)
+    {
+        return headers.get(header);
+    }
+
+    public void setHeaders(Map<String, String> headers)
+    {
+        this.headers = headers;
+    }
+
+    public Map<String, String> getHeaders()
+    {
+        return headers;
+    }
 }

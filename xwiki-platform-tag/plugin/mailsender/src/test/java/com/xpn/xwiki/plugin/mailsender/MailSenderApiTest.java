@@ -1,0 +1,116 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
+package com.xpn.xwiki.plugin.mailsender;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.doc.XWikiDocument;
+
+import java.util.List;
+
+import org.jvnet.mock_javamail.Mailbox;
+import org.jmock.cglib.MockObjectTestCase;
+import org.jmock.Mock;
+
+import javax.mail.Message;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+
+/**
+ * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}. The tests start a
+ * SMTP server.
+ */
+public class MailSenderApiTest extends MockObjectTestCase
+{
+    private XWikiContext context;
+    private Mock mockXWiki;
+    private XWiki xwiki;
+    private MailSenderPluginApi api;
+
+    protected void setUp()
+    {
+        this.context = new XWikiContext();
+        this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
+            new Object[] {new XWikiConfig(), this.context});
+        this.xwiki = (XWiki) this.mockXWiki.proxy();
+        this.context.setWiki(this.xwiki);
+
+        // The plugin init creates a XWiki.Mail document if it doesn't exist and ensure it has the correct
+        // class properties.
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Mail"), ANYTHING).will(returnValue(
+            new XWikiDocument()));
+        this.mockXWiki.stubs().method("saveDocument");
+
+        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server"), ANYTHING).will(
+            returnValue("myserver"));
+        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_from"), ANYTHING).will(
+            returnValue(""));
+        
+        MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy",  this.context);
+        this.api = new MailSenderPluginApi(plugin, this.context);
+
+        // Ensure that there are no messages in inbox
+        Mailbox.clearAll();
+    }
+
+    public void testSendMail() throws Exception
+    {
+        Mail mail = this.api.createMail();
+        mail.setFrom("john@acme.org");
+        mail.setTo("peter@acme.org");
+        mail.setSubject("Test subject");
+        mail.setTextPart("Text content");
+        mail.setHeader("header", "value");
+
+        assertEquals(0, this.api.sendMail(mail));
+
+        // Verify that the email was received
+        List<Message> inbox = Mailbox.get("peter@acme.org");
+        assertEquals(1, inbox.size());
+        Message message = inbox.get(0);
+        assertEquals("Test subject", message.getSubject());
+        assertEquals("john@acme.org", ((InternetAddress) message.getFrom()[0]).getAddress());
+        assertEquals("value", message.getHeader("header")[0]);
+    }
+
+    public void testSendMailWithCustomConfiguration() throws Exception
+    {
+        Mail mail = this.api.createMail();
+        mail.setFrom("john@acme.org");
+        mail.setTo("peter@acme.org");
+        mail.setSubject("Test subject");
+        mail.setTextPart("Text content");
+
+        MailConfiguration config = this.api.createMailConfiguration(
+            new com.xpn.xwiki.api.XWiki(this.xwiki, this.context));
+        assertEquals(25, config.getPort());
+        assertEquals("myserver", config.getHost());
+        assertNull(config.getFrom());
+
+        // Modify the SMTP From value
+        config.setFrom("jason@acme.org");
+
+        assertEquals(0, this.api.sendMail(mail, config));
+
+        // TODO: Find a way to ensure that the SMTP From value has been used.
+    }
+}

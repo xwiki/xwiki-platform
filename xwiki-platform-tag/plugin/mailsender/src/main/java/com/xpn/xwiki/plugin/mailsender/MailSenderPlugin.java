@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.activation.DataHandler;
@@ -294,6 +295,10 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
 
         message.setSubject(mail.getSubject(), "UTF-8");
 
+        for(Map.Entry<String,String> header : mail.getHeaders().entrySet()) {
+            message.setHeader(header.getKey(), header.getValue());
+        }
+
         if (mail.getHtmlPart() != null || mail.getAttachments() != null) {
             Multipart multipart = createMimeMultipart(mail, context);
             message.setContent(multipart);
@@ -397,24 +402,23 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
      *
      * @return The properties
      */
-    private Properties initProperties(XWikiContext context)
+    private Properties initProperties(MailConfiguration mailConfiguration)
     {
         Properties properties = new Properties();
 
-        /*if ( (mailOption.username != null) && (mailOption.username.length() > 0) ) {
-            props.put("mail.smtp.auth", "true");
-        }*/
+        // Note: The full list of available properties that we can set is defined here:
+        // http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
 
-        properties.put("mail.smtp.port", "25");
-
-        String smtp =
-            context != null ? context.getWiki().getXWikiPreference("smtp_server", context)
-                : "localhost";
+        properties.put("mail.smtp.port", Integer.toString(mailConfiguration.getPort()));
+        properties.put("mail.smtp.host", mailConfiguration.getHost());
         properties.put("mail.smtp.localhost", "localhost");
         properties.put("mail.host", "localhost");
-        properties.put("mail.smtp.host", smtp);
         properties.put("mail.debug", "false");
-        LOG.debug("smtp: " + smtp);
+
+        if (mailConfiguration.getFrom() != null) {
+            properties.put("mail.smtp.from", mailConfiguration.getFrom());
+        }
+
         return properties;
     }
 
@@ -477,12 +481,26 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
      * @param mailItem The Mail to send
      * @return True if the the email has been sent
      */
-    public boolean sendMail(Mail mailItem, XWikiContext context) throws MessagingException,
-        UnsupportedEncodingException
+    public boolean sendMail(Mail mailItem, XWikiContext context)
+        throws MessagingException, UnsupportedEncodingException
+    {
+        // TODO: Fix the need to instantiate a new XWiki API object
+        com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
+        return sendMail(mailItem, new MailConfiguration(xwikiApi), context);
+    }
+
+    /**
+     * Send a single Mail
+     *
+     * @param mailItem The Mail to send
+     * @return True if the the email has been sent
+     */
+    public boolean sendMail(Mail mailItem, MailConfiguration mailConfiguration, XWikiContext context)
+        throws MessagingException, UnsupportedEncodingException
     {
         ArrayList mailList = new ArrayList();
         mailList.add(mailItem);
-        return sendMails(mailList, context);
+        return sendMails(mailList, mailConfiguration, context);
     }
 
     /**
@@ -491,8 +509,22 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
-    public boolean sendMails(Collection emails, XWikiContext context) throws MessagingException,
-        UnsupportedEncodingException
+    public boolean sendMails(Collection emails, XWikiContext context)
+        throws MessagingException, UnsupportedEncodingException
+    {
+        // TODO: Fix the need to instantiate a new XWiki API object
+        com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
+        return sendMails(emails, new MailConfiguration(xwikiApi), context);
+    }
+
+    /**
+     * Send a Collection of Mails (multiple emails)
+     *
+     * @param emails Mail Collection
+     * @return True in any case (TODO ?)
+     */
+    public boolean sendMails(Collection emails, MailConfiguration mailConfiguration, XWikiContext context)
+        throws MessagingException, UnsupportedEncodingException
     {
         Session session = null;
         Transport transport = null;
@@ -502,15 +534,16 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
         try {
             for (Iterator emailIt = emails.iterator(); emailIt.hasNext();) {
                 count++;
+
+                Mail mail = (Mail) emailIt.next();
+                LOG.info("Sending email: " + mail.toString());
+
                 if ((transport == null) || (session == null)) {
-                    Properties props = initProperties(context);
+                    Properties props = initProperties(mailConfiguration);
                     session = Session.getDefaultInstance(props, null);
                     transport = session.getTransport("smtp");
                     transport.connect();
                 }
-
-                Mail mail = (Mail) emailIt.next();
-                LOG.info("Sending email: " + mail.toFullString());
 
                 try {
 
@@ -536,7 +569,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
                 } catch (SendFailedException ex) {
                     sendFailedCount++;
                     LOG.error("SendFailedException has occured.", ex);
-                    LOG.error("Detailed email information" + mail.toFullString());
+                    LOG.error("Detailed email information" + mail.toString());
                     if (emailCount == 1) {
                         throw ex;
                     }
@@ -545,7 +578,7 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
                     }
                 } catch (MessagingException mex) {
                     LOG.error("MessagingException has occured.", mex);
-                    LOG.error("Detailed email information" + mail.toFullString());
+                    LOG.error("Detailed email information" + mail.toString());
                     if (emailCount == 1) {
                         throw mex;
                     }
@@ -615,16 +648,13 @@ public final class MailSenderPlugin extends XWikiDefaultPlugin
                 updatedVelocityContext);
 
         Mail mail = new Mail();
+        mail.setFrom((String) updatedVelocityContext.get("from.address"));
+        mail.setTo((String) updatedVelocityContext.get("to.address"));
+        mail.setBcc((String) updatedVelocityContext.get("to.bcc"));
+        mail.setSubject(subject);
+        mail.setTextPart(msg);
+        mail.setHtmlPart(html);
         try {
-            mail.setSubject(subject);
-            mail.setFrom((String) updatedVelocityContext.get("from.address"));
-            mail.setTo((String) updatedVelocityContext.get("to.address"));
-            String toBcc = (String) updatedVelocityContext.get("to.bcc");
-            if (toBcc != null) {
-                mail.setBcc(toBcc);
-            }
-            mail.setTextPart(msg);
-            mail.setHtmlPart(html);
             sendMail(mail, context);
             return 0;
         } catch (Exception e) {

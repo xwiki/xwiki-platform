@@ -26,35 +26,48 @@ public class SpaceManagerException extends XWikiException
     public static final int MODULE_PLUGIN_SPACEMANAGER = 100;
 
     public static final int ERROR_SPACE_ALREADY_EXISTS = 100001;
+
     public static final int ERROR_SPACE_TITLE_MISSING = 100002;
+
     public static final int ERROR_SPACE_DATA_INVALID = 100003;
+
     public static final int ERROR_SPACE_SENDER_EMAIL_INVALID = 100004;
+
     public static final int ERROR_SPACE_TARGET_EMAIL_INVALID = 100005;
+
     public static final int ERROR_SPACE_MANAGER_REQUIRES_MAILSENDER_PLUGIN = 100006;
+
     public static final int ERROR_SPACE_SENDING_EMAIL_FAILED = 100007;
+
     public static final int ERROR_SPACE_CANNOT_FIND_EMAIL_ADDRESS = 100008;
+
     public static final int ERROR_SPACE_CREATION_ABORTED_BY_EXTENSION = 100009;
-    
+
     public static final int ERROR_VALIDATE_TITLE_TOO_SHORT = 100009;
+
     public static final int ERROR_VALIDATE_TITLE_TOO_LONG = 100010;
 
-    public SpaceManagerException(){
-	}
+    public SpaceManagerException()
+    {
+    }
 
-    public SpaceManagerException(int module, int code, String message){
+    public SpaceManagerException(int module, int code, String message)
+    {
         super(module, code, message);
     }
 
-    public SpaceManagerException(int module, int code, String message, Exception e){
+    public SpaceManagerException(int module, int code, String message, Exception e)
+    {
         super(module, code, message, e);
     }
 
-    public SpaceManagerException( XWikiException e ){
+    public SpaceManagerException(XWikiException e)
+    {
         super();
         setModule(e.getModule());
         setCode(e.getCode());
         setException(e.getException());
         setArgs(e.getArgs());
         setMessage(e.getMessage());
-	}
+    }
 }

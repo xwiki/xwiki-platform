@@ -3562,7 +3562,8 @@ public class XWikiDocument
                 backlinkDocument.getContent(), oldLink, newLink, linkHandler, getSpace());
 
             backlinkDocument.setContent((String) result.getModifiedContent());
-            context.getWiki().saveDocument(backlinkDocument, context);
+            context.getWiki().saveDocument(backlinkDocument,
+                "Update links to " + newDocumentName, true, context);
         }
 
         // Step 3: Delete the old document

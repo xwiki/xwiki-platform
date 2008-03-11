@@ -2,7 +2,7 @@ package com.xpn.xwiki.render.markup;
 
 import java.util.ArrayList;
 
-public class StrikethroughTest extends SyntaxTestsParent
+public class StrikethroughTest extends AbstractSyntaxTest
 {
     protected void setUp()
     {

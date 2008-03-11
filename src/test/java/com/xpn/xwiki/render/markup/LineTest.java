@@ -2,7 +2,7 @@ package com.xpn.xwiki.render.markup;
 
 import java.util.ArrayList;
 
-public class LineTest extends SyntaxTestsParent
+public class LineTest extends AbstractSyntaxTest
 {
     protected void setUp()
     {

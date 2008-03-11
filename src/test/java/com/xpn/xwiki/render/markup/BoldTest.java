@@ -2,7 +2,7 @@ package com.xpn.xwiki.render.markup;
 
 import java.util.ArrayList;
 
-public class BoldTest extends SyntaxTestsParent
+public class BoldTest extends AbstractSyntaxTest
 {
     protected void setUp()
     {

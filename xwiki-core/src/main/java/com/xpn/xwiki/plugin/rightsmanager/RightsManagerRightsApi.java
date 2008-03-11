@@ -37,7 +37,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @version $Id: $
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
-public class RightsManageRightsApi extends Api
+public class RightsManagerRightsApi extends Api
 {
     /**
      * Field name of the last error code inserted in context.
@@ -52,14 +52,14 @@ public class RightsManageRightsApi extends Api
     /**
      * The logging toolkit.
      */
-    protected static final Log LOG = LogFactory.getLog(RightsManageRightsApi.class);
+    protected static final Log LOG = LogFactory.getLog(RightsManagerRightsApi.class);
     
     /**
      * Create an instance of RightsManageRightsApi.
      * 
      * @param context the XWiki context.
      */
-    public RightsManageRightsApi(XWikiContext context)
+    public RightsManagerRightsApi(XWikiContext context)
     {
         super(context);
     }

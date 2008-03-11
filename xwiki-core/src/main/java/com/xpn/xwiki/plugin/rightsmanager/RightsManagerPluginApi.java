@@ -78,17 +78,17 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * API for managing rights and inheritance.
      */
-    private RightsManageRightsApi rightsApi;
+    private RightsManagerRightsApi rightsApi;
 
     /**
      * API for managing users.
      */
-    private RightsManageUsersApi usersApi;
+    private RightsManagerUsersApi usersApi;
 
     /**
      * API for managing groups.
      */
-    private RightsManageGroupsApi groupsApi;
+    private RightsManagerGroupsApi groupsApi;
 
     /**
      * Create an instance of the Rights Manager plugin user api.
@@ -100,15 +100,15 @@ public class RightsManagerPluginApi extends PluginApi
     {
         super(plugin, context);
 
-        this.rightsApi = new RightsManageRightsApi(context);
-        this.usersApi = new RightsManageUsersApi(context);
-        this.groupsApi = new RightsManageGroupsApi(context);
+        this.rightsApi = new RightsManagerRightsApi(context);
+        this.usersApi = new RightsManagerUsersApi(context);
+        this.groupsApi = new RightsManagerGroupsApi(context);
     }
 
     /**
      * @return the API for managing rights and inheritance.
      */
-    public RightsManageRightsApi getRightsApi()
+    public RightsManagerRightsApi getRightsApi()
     {
         return this.rightsApi;
     }
@@ -116,7 +116,7 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * @return the API for managing users.
      */
-    public RightsManageUsersApi getUsersApi()
+    public RightsManagerUsersApi getUsersApi()
     {
         return this.usersApi;
     }
@@ -124,7 +124,7 @@ public class RightsManagerPluginApi extends PluginApi
     /**
      * @return the API for managing groups.
      */
-    public RightsManageGroupsApi getGroupsApi()
+    public RightsManagerGroupsApi getGroupsApi()
     {
         return this.groupsApi;
     }

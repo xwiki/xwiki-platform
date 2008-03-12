@@ -77,8 +77,10 @@ public class XWikiLDAPConnection
      * @param password the password to connect to LDAP server.
      * @param context the XWiki context.
      * @return true if connection succeed, false otherwise.
+     * @throws XWikiLDAPException error when trying to open connection.
      */
     public boolean open(String ldapUserName, String password, XWikiContext context)
+        throws XWikiLDAPException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -120,9 +122,10 @@ public class XWikiLDAPConnection
      * @param pathToKeys the patch to SSL keystore to use.
      * @param ssl if true connect using SSL.
      * @return true if the connection succeed, false otherwise.
+     * @throws XWikiLDAPException error when trying to open connection.
      */
     public boolean open(String ldapHost, int ldapPort, String loginDN, String password,
-        String pathToKeys, boolean ssl)
+        String pathToKeys, boolean ssl) throws XWikiLDAPException
     {
         boolean succeed = false;
 
@@ -166,20 +169,13 @@ public class XWikiLDAPConnection
             // authenticate to the server
             this.connection.bind(ldapVersion, loginDN, password.getBytes("UTF8"));
 
-            if (!this.connection.isConnected() || !this.connection.isConnectionAlive()) {
-                LOG.error("Connection to LDAP failed.");
-
-                /*
-                 * if (ssl) { LOG.error("Verify that the SSL certificate is found in the
-                 * keystore."); }
-                 */
-            }
-
-            succeed = this.connection.isBound();
+            succeed =
+                this.connection.isConnected() && this.connection.isConnectionAlive()
+                    && this.connection.isBound();
         } catch (UnsupportedEncodingException e) {
-            LOG.error("LDAP bind failed with UnsupportedEncodingException.", e);
+            throw new XWikiLDAPException("LDAP bind failed with UnsupportedEncodingException.", e);
         } catch (LDAPException e) {
-            LOG.error("LDAP bind failed with LDAPException.", e);
+            throw new XWikiLDAPException("LDAP bind failed with LDAPException.", e);
         }
 
         return succeed;
@@ -195,7 +191,9 @@ public class XWikiLDAPConnection
                 this.connection.disconnect();
             }
         } catch (LDAPException e) {
-            LOG.debug("LDAP close failed.", e);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("LDAP close failed.", e);
+            }
         }
     }
 
@@ -213,12 +211,18 @@ public class XWikiLDAPConnection
             return this.connection.compare(userDN, attribute);
         } catch (LDAPException e) {
             if (e.getResultCode() == LDAPException.NO_SUCH_OBJECT) {
-                LOG.error("Unable to locate user_dn:" + userDN, e);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Unable to locate user_dn:" + userDN, e);
+                }
             } else if (e.getResultCode() == LDAPException.NO_SUCH_ATTRIBUTE) {
-                LOG.error("Unable to verify password because userPassword attribute not found.",
-                    e);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug(
+                        "Unable to verify password because userPassword attribute not found.", e);
+                }
             } else {
-                LOG.error("Unable to verify password", e);
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Unable to verify password", e);
+                }
             }
         }
 

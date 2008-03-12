@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1203938786000</creationDate>
-<date>1204021914000</date>
-<contentUpdateDate>1204021914000</contentUpdateDate>
-<version>2.1</version>
+<date>1205320524000</date>
+<contentUpdateDate>1205320524000</contentUpdateDate>
+<version>4.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -99,8 +99,19 @@
 modified by $xwiki.getLocalUserName($udoc.author, false) on $xwiki.formatDate($udoc.date) #if (!$udoc.getComment().equals("")), comment : $udoc.getComment() #end
 &lt;/td&gt;
 &lt;/tr&gt;
-#set ($rev1 = "")
-#foreach ($rev in $udoc.getRecentRevisions(2))
+#if ($interval == 1)
+  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceHoursPeriod(1))
+#elseif ($interval == 2)
+  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceDaysPeriod(1))
+#elseif ($interval == 3)
+  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceWeeksPeriod(1))
+#else
+  #set ($period = $xwiki.getCriteriaService().getPeriodFactory().createSinceYearsPeriod(1))
+#end
+#set ($criteria = $xwiki.getCriteriaService().getRevisionCriteriaFactory().createRevisionCriteria($period))
+#set ($ret = $criteria.setRange($xwiki.getCriteriaService().getRangeFactory().createRange(0, 1)))
+#set ($revisions = $udoc.getRevisions($criteria))
+#foreach ($rev in $revisions)
   #set ($rev1 = $rev)
 #end
 #set ($rev2 = $udoc.getVersion())

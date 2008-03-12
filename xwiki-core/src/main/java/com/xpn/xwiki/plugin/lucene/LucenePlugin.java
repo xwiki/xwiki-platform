@@ -27,6 +27,8 @@ import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiActionRule;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -224,61 +226,127 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     }
 
     /**
-     * @param query
-     * @param sortField sort field(s)
-     * @param indexes
-     * @param virtualWikiNames comma separated list of virtual wiki names to search in, may be null
-     *            to search all virtual wikis
-     * @param languages comma separated list of language codes to search in, may be null to search
-     *            all languages
-     * @context context of the request
-     * @return
-     * @throws IOException
-     * @throws ParseException
+     * Creates and submits a query to the Lucene engine.
+     * 
+     * @param query The base query.
+     * @param sortField The name of a field to sort results by. If the name starts with '-', then
+     *            the field (excluding the -) is used for reverse sorting. If <tt>null</tt> or
+     *            empty, sort by hit score.
+     * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be null
+     *            to search all virtual wikis.
+     * @param languages Comma separated list of language codes to search in, may be null to search
+     *            all languages.
+     * @param indexes List of Lucene indexes (searchers) to search.
+     * @param context The context of the request.
+     * @return The list of search results.
+     * @throws IOException If the Lucene searchers encounter a problem reading the indexes.
+     * @throws ParseException If the query is not valid.
      */
     private SearchResults search(String query, String sortField, String virtualWikiNames,
         String languages, Searcher[] indexes, XWikiContext context) throws IOException,
         ParseException
     {
-        MultiSearcher searcher = new MultiSearcher(indexes);
-        Query q = buildQuery(query, virtualWikiNames, languages);
-        Hits hits =
-            (sortField == null) ? searcher.search(q) : searcher.search(q, new Sort(sortField));
-        final int hitcount = hits.length();
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("query " + q + " returned " + hitcount + " hits");
-        }
-        
-        return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context), context);
+        SortField sort = getSortField(sortField);
+        // Perform the actual search
+        return search(query, (sort != null) ? new Sort(sort) : null, virtualWikiNames,
+            languages, indexes, context);
     }
 
     /**
-     * @param sortField sort field(s)
-     * @param indexes
-     * @param virtualWikiNames comma separated list of virtual wiki names to search in, may be null
-     *            to search all virtual wikis
-     * @param languages comma separated list of language codes to search in, may be null to search
-     *            all languages
-     * @context context of the request
-     * @return
-     * @throws IOException
-     * @throws ParseException
+     * Creates and submits a query to the Lucene engine.
+     * 
+     * @param query The base query.
+     * @param sortFields A list of fields to sort results by. For each field, if the name starts with
+     *            '-', then that field (excluding the -) is used for reverse sorting. If
+     *            <tt>null</tt> or empty, sort by hit score.
+     * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be null
+     *            to search all virtual wikis.
+     * @param languages Comma separated list of language codes to search in, may be null to search
+     *            all languages.
+     * @param indexes List of Lucene indexes (searchers) to search.
+     * @param context The context of the request.
+     * @return The list of search results.
+     * @throws IOException If the Lucene searchers encounter a problem reading the indexes.
+     * @throws ParseException If the query is not valid.
      */
-    private SearchResults search(String query, String[] sortField, String virtualWikiNames,
+    private SearchResults search(String query, String[] sortFields, String virtualWikiNames,
+        String languages, Searcher[] indexes, XWikiContext context) throws IOException,
+        ParseException
+    {
+        // Turn the sorting field names into SortField objects.
+        SortField[] sorts = null;
+        if (sortFields != null && sortFields.length > 0) {
+            sorts = new SortField[sortFields.length];
+            for (int i = 0; i < sortFields.length; ++i) {
+                sorts[i] = getSortField(sortFields[i]);
+            }
+            // Remove any null values from the list.
+            int prevLength = -1;
+            while (prevLength != sorts.length) {
+                prevLength = sorts.length;
+                sorts = (SortField[]) ArrayUtils.removeElement(sorts, null);
+            }
+        }
+        // Perform the actual search
+        return search(query, (sorts != null) ? new Sort(sorts) : null, virtualWikiNames,
+            languages, indexes, context);
+    }
+
+    /**
+     * Creates and submits a query to the Lucene engine.
+     * 
+     * @param query The base query.
+     * @param sort A Lucene sort object, can contain one or more sort criterias. If <tt>null</tt>,
+     *            sort by hit score.
+     * @param virtualWikiNames Comma separated list of virtual wiki names to search in, may be null
+     *            to search all virtual wikis.
+     * @param languages Comma separated list of language codes to search in, may be null to search
+     *            all languages.
+     * @param indexes List of Lucene indexes (searchers) to search.
+     * @param context The context of the request.
+     * @return The list of search results.
+     * @throws IOException If the Lucene searchers encounter a problem reading the indexes.
+     * @throws ParseException If the query is not valid.
+     */
+    private SearchResults search(String query, Sort sort, String virtualWikiNames,
         String languages, Searcher[] indexes, XWikiContext context) throws IOException,
         ParseException
     {
         MultiSearcher searcher = new MultiSearcher(indexes);
+        // Enhance the base query with wiki names and languages.
         Query q = buildQuery(query, virtualWikiNames, languages);
-        Hits hits =
-            (sortField == null) ? searcher.search(q) : searcher.search(q, new Sort(sortField));
+        // Perform the actual search
+        Hits hits = (sort == null) ? searcher.search(q) : searcher.search(q, sort);
         final int hitcount = hits.length();
-        if (LOG.isDebugEnabled())
+        if (LOG.isDebugEnabled()) {
             LOG.debug("query " + q + " returned " + hitcount + " hits");
-        
+        }
+        // Transform the raw Lucene search results into XWiki-aware results 
         return new SearchResults(hits, new com.xpn.xwiki.api.XWiki(context.getWiki(), context), context);
     }
 
+    /**
+     * Create a {@link SortField} corresponding to the field name. If the field name starts with
+     * '-', then the field (excluding the leading -) will be used for reverse sorting.
+     * 
+     * @param sortField The name of the field to sort by. If <tt>null</tt>, return a
+     *            <tt>null</tt> SortField. If starts with '-', then return a SortField that does a
+     *            reverse sort on the field.
+     * @return A SortFiled that sorts on the given field, or <tt>null</tt>.
+     */
+    private SortField getSortField(String sortField)
+    {
+        SortField sort = null;
+        if (!StringUtils.isEmpty(sortField)) {
+            if (sortField.startsWith("-")) {
+                sort = new SortField(sortField.substring(1), true);
+            } else {
+                sort = new SortField(sortField);
+            }
+        }
+        return sort;
+    }
+    
     /**
      * @param query
      * @param virtualWikiNames comma separated list of virtual wiki names

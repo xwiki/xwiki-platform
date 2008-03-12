@@ -1492,8 +1492,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // Try parsing a file located in the directory with the same name.
         try {
             String path = "/skins/" + skin + "/" + template;
+            // We must make sure the file is taken from the skins directory, otherwise people might
+            // try to read things from WEB-INF.
             File f = new File(path);
             path = f.getCanonicalPath();
+            // This is a safe assumption, as templates found under /templates/ are treated
+            // separately, and there is no need to have templates in another place.
             if (path.startsWith("/skins/")) {
                 String content = getResourceContent(path);
                 return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context

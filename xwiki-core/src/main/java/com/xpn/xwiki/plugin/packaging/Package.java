@@ -388,7 +388,7 @@ public class Package
                     XWikiDocument doc = null;
                     try {
                         doc = readFromXML(readByteArrayFromInputStream(zis, entry.getSize()));
-                    } catch (Exception ex) {
+                    } catch (Throwable ex) {
                         log.warn("Failed to parse document [" + entry.getName() + "] from XML");
                         addToErrors(entry.getName().replaceAll("/", "."), context);
                         continue;
@@ -400,9 +400,9 @@ public class Package
                             description)) {
                             this.add(doc, context);
                         } else {
-                            throw new PackageException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                                "document " + doc.getFullName()
-                                    + " does not exist in package definition");
+                            log.warn("document " + doc.getFullName()
+                                + " does not exist in package definition");
+                            addToSkipped(doc.getFullName(), context);
                         }
                     } catch (ExcludeDocumentException e) {
                         log.info("Skip the document '" + doc.getFullName() + "'");

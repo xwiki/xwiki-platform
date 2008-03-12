@@ -2,6 +2,7 @@
 ###
 ###
 #if((!$showactions)||($showactions==1))
+#set($keyboardShortcutsEnabled = true)
 #set($editor = $request.getHeader('Referer'))
 #if((!$editor) || ($editor == ""))
 #if(($xwiki.getUserPreference("editor")=="Wysiwyg")&&(!$doc.isAdvancedContent()))
@@ -14,17 +15,27 @@
 #if ($sectionNumber && ($sectionNumber != 0))
 #set($editparams = "section=$sectionNumber")
 #end
-<form style="display: inline;" action="$tdoc.getURL("cancel")" method="post"><div style="display: inline;">
-<span class="buttonwrapper"><button class="button" type="submit">$msg.get("cancel")</button></span></div></form>
-<form style="display: inline;" action="$editor" method="post"><div style="display: inline;">
+<form id="cancel" style="display: inline;" action="$tdoc.getURL("cancel")" method="post"><div style="display: inline;">
+<span class="buttonwrapper"><button class="button" type="submit" #if($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.cancel")"#end>$msg.get("cancel")</button></span></div></form>
+<form id="backtoedit" style="display: inline;" action="$editor" method="post"><div style="display: inline;">
 #foreach($param in $request.getParameterNames())#foreach($value in $request.getParameterValues($param))<input type="hidden" name="$param" value="$xwiki.getFormEncoded($value)"/>#end#end
-<span class="buttonwrapper"><button class="button" type="submit">$msg.get("backtoedit")</button></span>
+<span class="buttonwrapper"><button class="button" type="submit" #if($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.backtoedit")"#end>$msg.get("backtoedit")</button></span>
 </div></form>
-<form style="display: inline;" action="$tdoc.getURL("saveandcontinue", $editparams)" method="post"><div style="display: inline;">
+<form id="saveandcontinue" style="display: inline;" action="$tdoc.getURL("saveandcontinue", $editparams)" method="post"><div style="display: inline;">
 <input type="hidden" name="xredirect" value="$editor"/>#foreach($param in $request.getParameterNames())#foreach($value in $request.getParameterValues($param))<input type="hidden" name="$param" value="$xwiki.getFormEncoded($value)"/>#end#end
-<span class="buttonwrapper"><button class="button" type="submit">$msg.get("saveandcontinue")</button></span>
+<span class="buttonwrapper"><button class="button" type="submit" #if($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.saveandcontinue")"#end>$msg.get("saveandcontinue")</button></span>
 </div></form>
-<form style="display: inline;" action="$tdoc.getURL("save", $editparams)" method="post"><div style="display: inline;">
+<form id="saveandview" style="display: inline;" action="$tdoc.getURL("save", $editparams)" method="post"><div style="display: inline;">
 #foreach($param in $request.getParameterNames())#foreach($value in $request.getParameterValues($param))<input type="hidden" name="$param" value="$xwiki.getFormEncoded($value)"/>#end#end
-<span class="buttonwrapper"><button class="button" type="submit">$msg.get("saveandview")</button></span></div></form>
+<span class="buttonwrapper"><button class="button" type="submit" #if($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.saveandview")"#end>$msg.get("saveandview")</button></span></div></form>
+#if($keyboardShortcutsEnabled)
+  <script type="text/javascript">
+  //<![CDATA[
+    shortcut.add("$msg.get("core.shortcuts.edit.cancel")",function() { $('cancel').submit(); }, {'propagate':false} );
+    shortcut.add("$msg.get("core.shortcuts.edit.backtoedit")",function() { $('backtoedit').submit(); }, {'propagate':false} );
+    shortcut.add("$msg.get("core.shortcuts.edit.saveandcontinue")",function() { $('saveandcontinue').submit(); }, {'propagate':false} );
+    shortcut.add("$msg.get("core.shortcuts.edit.saveandview")",function() { $('saveandview').submit(); }, {'propagate':false} );
+  //]]>
+  </script>
+#end
 #end

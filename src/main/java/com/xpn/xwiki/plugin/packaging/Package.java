@@ -385,8 +385,14 @@ public class Package
                     || (entry.getName().indexOf("META-INF") != -1)) {
                     continue;
                 } else {
-                    XWikiDocument doc =
-                        readFromXML(readByteArrayFromInputStream(zis, entry.getSize()));
+                    XWikiDocument doc = null;
+                    try {
+                        doc = readFromXML(readByteArrayFromInputStream(zis, entry.getSize()));
+                    } catch (Exception ex) {
+                        log.warn("Failed to parse document [" + entry.getName() + "] from XML");
+                        addToErrors(entry.getName().replaceAll("/", "."), context);
+                        continue;
+                    }
 
                     try {
                         filter(doc, context);

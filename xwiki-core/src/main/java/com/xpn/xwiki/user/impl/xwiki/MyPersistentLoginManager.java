@@ -104,12 +104,24 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     /**
      * Setter for the {@link #cookieDomains} parameter.
      * 
-     * @param cdlist The new value for {@link #cookieDomains}.
+     * @param cdlist The new value for {@link #cookieDomains}. The list is processed, so that any
+     *            value not starting with a dot is prefixed with one, to respect the cookie RFC.
      * @see #cookieDomains
      */
     public void setCookieDomains(String[] cdlist)
     {
-        cookieDomains = cdlist;
+        if (cdlist != null && cdlist.length > 0) {
+            cookieDomains = new String[cdlist.length];
+            for (int i = 0; i < cdlist.length; ++i) {
+                if (cdlist[i] != null && !cdlist[i].startsWith(".")) {
+                    cookieDomains[i] = ".".concat(cdlist[i]);
+                } else {
+                    cookieDomains[i] = cdlist[i];
+                }
+            }
+        } else {
+            cookieDomains = null;
+        }
     }
 
     /**

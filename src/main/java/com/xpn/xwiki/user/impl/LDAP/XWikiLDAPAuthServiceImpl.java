@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.securityfilter.realm.SimplePrincipal;
 
 import com.novell.ldap.LDAPConnection;
+import com.novell.ldap.LDAPException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -44,6 +45,8 @@ import com.xpn.xwiki.plugin.ldap.XWikiLDAPSearchAttribute;
 import com.xpn.xwiki.plugin.ldap.XWikiLDAPUtils;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
+
+import java.io.UnsupportedEncodingException;
 import java.security.Principal;
 import java.util.HashMap;
 
@@ -86,7 +89,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     /**
      * {@inheritDoc}
      * <p>
-     * TODO : cut this methods in more sub methods to be valudate XWiki checkstyle.
+     * TODO : cut this methods in more sub methods to validate XWiki checkstyle.
      * 
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#authenticate(java.lang.String,
      *      java.lang.String, com.xpn.xwiki.XWikiContext)
@@ -96,17 +99,47 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     {
         Principal principal = null;
 
+        if (login != null && login.length() > 0 && password != null
+            && password.trim().length() > 0) {
+            Exception exception = null;
+
+            try {
+                principal = ldapAuthenticate(login, password, context);
+            } catch (Exception e) {
+                exception = e;
+            }
+
+            if (principal == null) {
+                principal = xwikiAuthenticate(login, password, context);
+
+                if (LOG.isWarnEnabled() && principal == null && exception != null) {
+                    LOG.warn("LDAP authentication failed.", exception);
+                }
+            }
+        }
+
+        return principal;
+    }
+
+    /**
+     * Try LDAP login and return {@link Principal}.
+     * 
+     * @param login the name of the user to log in.
+     * @param password the password of the user to log in.
+     * @param context the XWiki context.
+     * @return the {@link Principal}.
+     * @throws XWikiException error when login.
+     * @throws UnsupportedEncodingException error when login.
+     * @throws LDAPException error when login.
+     */
+    protected Principal ldapAuthenticate(String login, String password, XWikiContext context)
+        throws XWikiException, UnsupportedEncodingException, LDAPException
+    {
+        Principal principal = null;
+
         // ////////////////////////////////////////////////////////////////////
         // Clean login
         // ////////////////////////////////////////////////////////////////////
-
-        if ((login == null) || (login.length() == 0)) {
-            return null;
-        }
-
-        if ((password == null) || (password.trim().length() == 0)) {
-            return null;
-        }
 
         String userName = login;
 
@@ -129,166 +162,179 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         ldapUtils.setUidAttributeName(config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UID,
             LDAP_DEFAULT_UID, context));
 
-        try {
-            // ////////////////////////////////////////////////////////////////////
-            // 1. Check for superadmin
-            // ////////////////////////////////////////////////////////////////////
+        // ////////////////////////////////////////////////////////////////////
+        // 1. Check for superadmin
+        // ////////////////////////////////////////////////////////////////////
 
-            if (isSuperAdmin(userName)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Superadmin logged in.");
-                }
-
-                return authenticateSuperAdmin(password, context);
+        if (isSuperAdmin(userName)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Superadmin logged in.");
             }
 
-            // ////////////////////////////////////////////////////////////////////
-            // 2. check if ldap authentication is off => authenticate against db
-            // ////////////////////////////////////////////////////////////////////
+            return authenticateSuperAdmin(password, context);
+        }
 
-            if (!config.isLDAPEnabled(context)) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("LDAP authentication failed: LDAP not activ");
-                }
+        // ////////////////////////////////////////////////////////////////////
+        // 2. check if ldap authentication is off => authenticate against db
+        // ////////////////////////////////////////////////////////////////////
 
-                return principal;
+        if (!config.isLDAPEnabled(context)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("LDAP authentication failed: LDAP not activ");
             }
 
-            // ////////////////////////////////////////////////////////////////////
-            // 3. bind to LDAP => if failed try db
-            // ////////////////////////////////////////////////////////////////////
+            return principal;
+        }
 
-            if (!connector.open(userName, password, context)) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                    XWikiException.ERROR_XWIKI_USER_INIT,
-                    "Bind to LDAP server failed.");
-            }
+        // ////////////////////////////////////////////////////////////////////
+        // 3. bind to LDAP => if failed try db
+        // ////////////////////////////////////////////////////////////////////
 
-            // ////////////////////////////////////////////////////////////////////
-            // 4. if group param, verify group membership (& get DN)
-            // ////////////////////////////////////////////////////////////////////
+        if (!connector.open(userName, password, context)) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                XWikiException.ERROR_XWIKI_USER_INIT, "Bind to LDAP server failed.");
+        }
 
-            String userDN = null;
-            String filterGroupDN = config.getLDAPParam("ldap_user_group", "", context);
+        // ////////////////////////////////////////////////////////////////////
+        // 4. if group param, verify group membership (& get DN)
+        // ////////////////////////////////////////////////////////////////////
+
+        String userDN = null;
+        String filterGroupDN = config.getLDAPParam("ldap_user_group", "", context);
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Checking if the user belongs to the user group: " + filterGroupDN);
+        }
+
+        if (filterGroupDN.length() > 0) {
+            userDN = ldapUtils.isUserInGroup(userName, filterGroupDN, context);
+        }
+
+        // ////////////////////////////////////////////////////////////////////
+        // 5. if no dn search for user
+        // ////////////////////////////////////////////////////////////////////
+
+        if (userDN == null) {
+            // get DN from existing XWiki user
+            userDN = getUserDNFromXWiki(userName, context);
 
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Checking if the user belongs to the user group: " + filterGroupDN);
+                LOG.debug("Found user dn with the user object: " + userDN);
+            }
+        }
+
+        List searchAttributes = null;
+
+        // if we still don't have a dn, search for it. Also get the attributes, we might need
+        // them
+        if (userDN == null) {
+            String uidAttributeName =
+                config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UID, LDAP_DEFAULT_UID, context);
+
+            // search for the user in LDAP
+            String query =
+                MessageFormat.format("({0}={1})", new Object[] {uidAttributeName, userName});
+            String baseDN = config.getLDAPParam("ldap_base_DN", "", context);
+
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Searching for the user in LDAP: user:" + userName + " base:" + baseDN
+                    + " query:" + query + " uid:" + uidAttributeName);
             }
 
-            if (filterGroupDN.length() > 0) {
-                userDN = ldapUtils.isUserInGroup(userName, filterGroupDN, context);
-            }
+            searchAttributes =
+                connector.searchLDAP(baseDN, query, getAttributeNameTable(context),
+                    LDAPConnection.SCOPE_SUB);
 
-            // ////////////////////////////////////////////////////////////////////
-            // 5. if no dn search for user
-            // ////////////////////////////////////////////////////////////////////
+            for (Iterator it = searchAttributes.iterator(); it.hasNext();) {
+                XWikiLDAPSearchAttribute searchAttribute = (XWikiLDAPSearchAttribute) it.next();
 
-            if (userDN == null) {
-                // get DN from existing XWiki user
-                userDN = getUserDNFromXWiki(userName, context);
+                if ("dn".equals(searchAttribute.name)) {
+                    userDN = searchAttribute.value;
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Found user dn with the user object: " + userDN);
+                    break;
                 }
             }
+        }
 
-            List searchAttributes = null;
+        if (userDN == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                XWikiException.ERROR_XWIKI_USER_INIT, "Can't find LDAP user DN.");
+        }
 
-            // if we still don't have a dn, search for it. Also get the attributes, we might need
-            // them
-            if (userDN == null) {
-                String uidAttributeName =
-                    config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UID, LDAP_DEFAULT_UID, context);
+        // ////////////////////////////////////////////////////////////////////
+        // 6. if user used for LDAP connection is not the one authenticated try to bind
+        // ////////////////////////////////////////////////////////////////////
 
-                // search for the user in LDAP
-                String query =
-                    MessageFormat.format("({0}={1})", new Object[] {uidAttributeName, userName});
-                String baseDN = config.getLDAPParam("ldap_base_DN", "", context);
+        String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
+        String bindDN = MessageFormat.format(bindDNFormat, new Object[] {userName});
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Searching for the user in LDAP: user:" + userName + " base:"
-                        + baseDN + " query:" + query + " uid:" + uidAttributeName);
-                }
+        if (!userDN.equals(bindDN)) {
+            connector.getConnection().bind(LDAPConnection.LDAP_V3, userDN,
+                password.getBytes("UTF8"));
+        }
 
-                searchAttributes =
-                    connector.searchLDAP(baseDN, query, getAttributeNameTable(context),
-                        LDAPConnection.SCOPE_SUB);
+        // ////////////////////////////////////////////////////////////////////
+        // 7. apply validate_password property
+        // ////////////////////////////////////////////////////////////////////
 
-                for (Iterator it = searchAttributes.iterator(); it.hasNext();) {
-                    XWikiLDAPSearchAttribute searchAttribute =
-                        (XWikiLDAPSearchAttribute) it.next();
-
-                    if ("dn".equals(searchAttribute.name)) {
-                        userDN = searchAttribute.value;
-
-                        break;
-                    }
-                }
-            }
-
-            if (userDN == null) {
+        if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
+            if (!connector.checkPassword(userDN, password)) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                    XWikiException.ERROR_XWIKI_USER_INIT,
-                    "Can't find LDAP user DN.");
+                    XWikiException.ERROR_XWIKI_USER_INIT, "LDAP authentication failed:"
+                        + " could not validate the password: wrong password for " + userDN);
+            }
+        } else {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Password is already supposed to be verified when bound to LDAP");
+            }
+        }
+
+        // ////////////////////////////////////////////////////////////////////
+        // 8. sync user
+        // ////////////////////////////////////////////////////////////////////
+
+        boolean createuser = syncUser(userName, userDN, searchAttributes, ldapUtils, context);
+
+        // from now on we can enter the application
+        principal = getUserPrincipal(userName, context);
+        if (principal == null) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                XWikiException.ERROR_XWIKI_USER_INIT, "Could not create authenticated principal.");
+        }
+
+        // ////////////////////////////////////////////////////////////////////
+        // 9. sync groups membership
+        // ////////////////////////////////////////////////////////////////////
+
+        syncGroupsMembership(userName, userDN, createuser, ldapUtils, context);
+
+        return principal;
+    }
+
+    /**
+     * Try local DB login and return {@link Principal}.
+     * 
+     * @param login the name of the user to log in.
+     * @param password the password of the user to log in.
+     * @param context the XWiki context.
+     * @return the {@link Principal}.
+     * @throws XWikiException error when checking user name and password.
+     */
+    protected Principal xwikiAuthenticate(String login, String password, XWikiContext context)
+        throws XWikiException
+    {
+        Principal principal = null;
+
+        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+        String trylocal = config.getLDAPParam("ldap_trylocal", "0", context);
+
+        if ("1".equals(trylocal)) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Trying authentication against XWiki DB");
             }
 
-            // ////////////////////////////////////////////////////////////////////
-            // 6. if user used for LDAP connection is not the one authenticated try to bind
-            // ////////////////////////////////////////////////////////////////////
-
-            String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
-            String bindDN = MessageFormat.format(bindDNFormat, new Object[] {userName});
-
-            if (!userDN.equals(bindDN)) {
-                connector.getConnection().bind(LDAPConnection.LDAP_V3, userDN,
-                    password.getBytes("UTF8"));
-            }
-
-            // ////////////////////////////////////////////////////////////////////
-            // 7. apply validate_password property
-            // ////////////////////////////////////////////////////////////////////
-            
-            if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
-                if (!connector.checkPassword(userDN, password)) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                        XWikiException.ERROR_XWIKI_USER_INIT,
-                        "LDAP authentication failed:"
-                            + " could not validate the password: wrong password for " + userDN);
-                }
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Password is already supposed to be verified when bound to LDAP");
-                }
-            }
-
-            // ////////////////////////////////////////////////////////////////////
-            // 8. sync user
-            // ////////////////////////////////////////////////////////////////////
-
-            boolean createuser = syncUser(userName, userDN, searchAttributes, ldapUtils, context);
-
-            // from now on we can enter the application
-            principal = getUserPrincipal(userName, context);
-            if (principal == null) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                    XWikiException.ERROR_XWIKI_USER_INIT,
-                    "Could not create authenticated principal.");
-            }
-
-            // ////////////////////////////////////////////////////////////////////
-            // 9. sync groups membership
-            // ////////////////////////////////////////////////////////////////////
-
-            syncGroupsMembership(userName, userDN, createuser, ldapUtils, context);
-        } catch (Exception e) {
-            LOG.error("LDAP authentication failed.", e);
-        } finally {
-            connector.close();
-
-            // one last option
-            if (principal == null) {
-                principal = localDBLogin(login, password, context);
-            }
+            principal = super.authenticate(login, password, context);
         }
 
         return principal;
@@ -375,48 +421,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         return createuser;
-    }
-
-    /**
-     * Try local DB login and return {@link Principal}.
-     * 
-     * @param userName the name of the user to log in.
-     * @param password the password of the user to log in.
-     * @param context the XWiki context.
-     * @return the {@link Principal}.
-     * @throws XWikiException error when checking user name and password.
-     */
-    protected Principal localDBLogin(String userName, String password, XWikiContext context)
-        throws XWikiException
-    {
-        Principal principal = null;
-
-        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
-
-        String trylocal = config.getLDAPParam("ldap_trylocal", "0", context);
-
-        if ("1".equals(trylocal)) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Trying authentication against XWiki DB");
-            }
-
-            // try local user
-            // Use XWiki password
-            if (checkPassword(findUser(userName, context), password, context)) {
-                principal = getUserPrincipal(userName, context);
-
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("XWiki DB login succeeded");
-                }
-            } else {
-                context.put("message", "loginfailed");
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("XWiki DB login failed");
-                }
-            }
-        }
-
-        return principal;
     }
 
     /**

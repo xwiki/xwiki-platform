@@ -389,7 +389,10 @@ public class Package
                     try {
                         doc = readFromXML(readByteArrayFromInputStream(zis, entry.getSize()));
                     } catch (Throwable ex) {
-                        log.warn("Failed to parse document [" + entry.getName() + "] from XML");
+                        log.warn("Failed to parse document [" + entry.getName()
+                            + "] from XML during import, thus it will not be installed. "
+                            + "The error was: " + ex.getMessage());
+                        // It will be listed in the "failed documents" section after the import.
                         addToErrors(entry.getName().replaceAll("/", "."), context);
                         continue;
                     }
@@ -401,7 +404,10 @@ public class Package
                             this.add(doc, context);
                         } else {
                             log.warn("document " + doc.getFullName()
-                                + " does not exist in package definition");
+                                + " does not exist in package definition."
+                                + " It will not be installed.");
+                            // It will be listed in the "skipped documents" section after the
+                            // import.
                             addToSkipped(doc.getFullName(), context);
                         }
                     } catch (ExcludeDocumentException e) {

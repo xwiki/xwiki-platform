@@ -18,15 +18,19 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+
 package com.xpn.xwiki.plugin.packaging;
 
 import com.xpn.xwiki.plugin.PluginException;
 
-
-public class PackageException extends PluginException {
+public class PackageException extends PluginException
+{
     static String plugName = "Package";
+
     public static final int ERROR_PACKAGE_UNKNOWN = 1;
+
     public static final int ERROR_PACKAGE_NODESCRIPTION = 2;
+
     public static final int ERROR_PACKAGE_INVALID_FILTER = 3;
 
     public PackageException(int code, String message, Throwable e, Object[] args)
@@ -34,15 +38,18 @@ public class PackageException extends PluginException {
         super(plugName, code, message, e, args);
     }
 
-    public PackageException(int code, String message, Throwable e){
+    public PackageException(int code, String message, Throwable e)
+    {
         super(plugName, code, message, e);
     }
 
-    public PackageException(int code, String message){
+    public PackageException(int code, String message)
+    {
         super(plugName, code, message);
     }
 
-    public PackageException(){
+    public PackageException()
+    {
         super();
     }
 }

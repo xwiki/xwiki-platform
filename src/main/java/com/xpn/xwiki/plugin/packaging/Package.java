@@ -17,6 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
+
 package com.xpn.xwiki.plugin.packaging;
 
 import java.io.ByteArrayInputStream;
@@ -378,9 +379,9 @@ public class Package
             zis = new ZipInputStream(bais);
             while ((entry = zis.getNextEntry()) != null) {
                 // Don't read the package.xml file (since we've already read it above),
-                 // directories or any file in the META-INF directory (we use that directory
-                 // to put meta data such as LICENSE/NOTICE files.
-                 if (entry.getName().compareTo(DefaultPackageFileName) == 0 || entry.isDirectory()
+                // directories or any file in the META-INF directory (we use that directory
+                // to put meta data such as LICENSE/NOTICE files.
+                if (entry.getName().compareTo(DefaultPackageFileName) == 0 || entry.isDirectory()
                     || (entry.getName().indexOf("META-INF") != -1)) {
                     continue;
                 } else {
@@ -518,14 +519,14 @@ public class Package
         int status = DocumentInfo.INSTALL_OK;
 
         // Start by installing all documents having a class definition so that their
-        // definitions are available when installing documents using them. 
+        // definitions are available when installing documents using them.
         for (int i = 0; i < classFiles.size(); i++) {
             if (installDocument(((DocumentInfo) classFiles.get(i)), isAdmin, context) == DocumentInfo.INSTALL_ERROR) {
                 status = DocumentInfo.INSTALL_ERROR;
             }
         }
 
-        // Install the remaining documents (without class definitions). 
+        // Install the remaining documents (without class definitions).
         for (int i = 0; i < files.size(); i++) {
             DocumentInfo di = (DocumentInfo) files.get(i);
             if (!classFiles.contains(di)) {
@@ -597,9 +598,10 @@ public class Package
 
                 if (withVersions) {
                     // we need to force the saving the document archive.
-                    if (doc.getDoc().getDocumentArchive() != null)
+                    if (doc.getDoc().getDocumentArchive() != null) {
                         context.getWiki().getVersioningStore().saveXWikiDocArchive(
                             doc.getDoc().getDocumentArchive(context), true, context);
+                    }
                 }
                 // if there is no archive in xml and content&metaData Dirty is not set
                 // then archive was not saved
@@ -1040,7 +1042,7 @@ public class Package
      * 
      * @param dir the directory from where to load documents.
      * @param context the XWiki context.
-     * @return 
+     * @return
      * @throws IOException error when loading documents.
      * @throws XWikiException error when loading documents.
      */

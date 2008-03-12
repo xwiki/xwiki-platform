@@ -2618,7 +2618,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("ldap_fields_mapping", "Ldap user fiels mapping", 60);
         needsUpdate |=
             bclass.addBooleanField("ldap_update_user", "Update user from LDAP", "yesno");
-        needsUpdate |= bclass.addTextField("group_mapping", "Ldap groups mapping", 80);
+        needsUpdate |= bclass.addTextField("ldap_group_mapping", "Ldap groups mapping", 80);
         needsUpdate |=
             bclass.addTextField("ldap_groupcache_expiration", "LDAP groups members cache", 60);
         needsUpdate |=

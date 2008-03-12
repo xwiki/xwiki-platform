@@ -26,7 +26,7 @@ import com.xpn.xwiki.api.Api;
 
 public class DocumentInfoAPI extends Api
 {
-    private DocumentInfo       doc;
+    private DocumentInfo doc;
 
     public DocumentInfoAPI(DocumentInfo doc, XWikiContext context)
     {
@@ -36,8 +36,9 @@ public class DocumentInfoAPI extends Api
 
     public DocumentInfo getDocInfo()
     {
-        if (hasProgrammingRights())
+        if (hasProgrammingRights()) {
             return doc;
+        }
         return null;
     }
 
@@ -46,11 +47,13 @@ public class DocumentInfoAPI extends Api
         return doc.isNew();
     }
 
-    public int getFileType() {
+    public int getFileType()
+    {
         return doc.getFileType();
     }
 
-    public void setFileType(int fileType) {
+    public void setFileType(int fileType)
+    {
         doc.setFileType(fileType);
     }
 
@@ -64,11 +67,13 @@ public class DocumentInfoAPI extends Api
         return doc.isInstallable();
     }
 
-    public int getAction() {
+    public int getAction()
+    {
         return doc.getAction();
     }
 
-   public void setAction(int action) {
+    public void setAction(int action)
+    {
         doc.setAction(action);
     }
 

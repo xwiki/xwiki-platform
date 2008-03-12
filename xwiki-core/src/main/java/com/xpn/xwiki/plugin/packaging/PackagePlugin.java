@@ -26,18 +26,22 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
-public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInterface {
+public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
+{
 
-        public PackagePlugin(String name, String className, XWikiContext context) {
-            super(name, className, context);
-            init(context);
-        }
+    public PackagePlugin(String name, String className, XWikiContext context)
+    {
+        super(name, className, context);
+        init(context);
+    }
 
-    public String getName() {
+    public String getName()
+    {
         return "package";
     }
 
-    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context) {
+    public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    {
         try {
             return new PackageAPI(new Package(), context);
         } catch (PackageException e) {
@@ -45,10 +49,12 @@ public class PackagePlugin extends XWikiDefaultPlugin implements XWikiPluginInte
         }
     }
 
-    public void flushCache() {
+    public void flushCache()
+    {
     }
 
-    public void init(XWikiContext context) {
+    public void init(XWikiContext context)
+    {
         super.init(context);
     }
 }

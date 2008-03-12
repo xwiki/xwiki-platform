@@ -18,8 +18,10 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+
 package com.xpn.xwiki.plugin.packaging;
 
-public class ExcludeDocumentException extends Exception{
+public class ExcludeDocumentException extends Exception
+{
 
 }

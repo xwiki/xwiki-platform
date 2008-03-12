@@ -59,6 +59,7 @@
         <module>watchlist</module>
         <module>swizzle</module>
         <module>spacemanager</module>
+        <module>lucene</module>
       </modules>
     </profile>
     <profile>

@@ -146,7 +146,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public void setupCookie(Cookie cookie, boolean sessionCookie, String cookieDomain,
         HttpServletResponse response)
     {
-        cookie.setVersion(1);
         if (!sessionCookie) {
             setMaxAge(cookie);
         }
@@ -179,6 +178,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 LOG.error("Remember Me function will be disabled!!");
                 return;
             }
+            protectedUsername = protectedUsername.replaceAll("=", "_");
+            protectedPassword = protectedPassword.replaceAll("=", "_");
         }
 
         // Let's check if the cookies should be session cookies or persistent ones.
@@ -361,7 +362,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             }
         } catch (Exception e) {
             if (LOG.isErrorEnabled()) {
-                LOG.error(e);
+                LOG.error("Failed to encrypt text: " + clearText, e);
             }
         }
         return null;
@@ -512,6 +513,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (!username.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
                 if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
+                    username = username.replaceAll("_", "=");
                     username = decryptText(username);
                 }
                 return username;
@@ -534,6 +536,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (!password.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
                 if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
+                    password = password.replaceAll("_", "=");
                     password = decryptText(password);
                 }
                 return password;
@@ -558,7 +561,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             String decryptedTextString = new String(decryptedText);
             return decryptedTextString;
         } catch (Exception e) {
-            LOG.error(e);
+            LOG.error("Error decypting text: " + encryptedText, e);
             return null;
         }
     }

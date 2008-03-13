@@ -208,6 +208,13 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         if (filterGroupDN.length() > 0) {
             userDN = ldapUtils.isUserInGroup(userName, filterGroupDN, context);
+
+            if (userDN == null) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
+                    XWikiException.ERROR_XWIKI_USER_INIT,
+                    "LDAP user {0} does not belong to LDAP group {1}.", null, new Object[] {
+                    userName, filterGroupDN});
+            }
         }
 
         // ////////////////////////////////////////////////////////////////////
@@ -397,26 +404,23 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                         getAttributeNameTable(context), LDAPConnection.SCOPE_BASE);
             }
 
-            // create user
-            if (xwikiuser == null) {
+            if (createuser) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Creating new XWiki user based on LDAP attribues located at "
                         + userDN);
                 }
 
-                createUserFromLDAP(userName, searchAttributeList, context);
+                createUserFromLDAP(xwikiuser, searchAttributeList, context);
 
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("New XWiki user created: " + userName);
+                    LOG.debug("New XWiki user created: " + xwikiuser);
                 }
-
-                createuser = true;
             } else {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Updating existing user with LDAP attribues located at " + userDN);
                 }
 
-                updateUserFromLDAP(userName, searchAttributeList, context);
+                updateUserFromLDAP(xwikiuser, searchAttributeList, context);
             }
         }
 
@@ -514,7 +518,10 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             // check if group is in list of all groups
             if (!allxwikigroups.contains(xwikiGroupName)) {
-                LOG.error("XWiki group not found:" + xwikiGroupName);
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("XWiki group not found:" + xwikiGroupName);
+                }
+
                 continue;
             }
 
@@ -547,7 +554,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // remove from group if there
             if (userGroups.contains(xwikiGroupName)) {
                 removeUserFromGroup(userName, xwikiGroupName, context);
-                // c.remove(xwikigroupname);
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Finished removing xwiki group " + xwikiGroupName + " from user "
@@ -575,14 +581,16 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
 
-            String groupClassName = context.getWiki().getGroupClass(context).getName();
+            BaseClass groupClass = context.getWiki().getGroupClass(context);
 
             // Get document representing group
             XWikiDocument groupDoc = context.getWiki().getDocument(groupName, context);
 
             // Add a member object to document
-            BaseObject memberobj = groupDoc.newObject(groupClassName, context);
-            memberobj.setStringValue(XWIKI_GROUP_MEMBERFIELD, fullWikiUserName);
+            BaseObject memberObj = groupDoc.newObject(groupClass.getName(), context);
+            Map map = new HashMap();
+            map.put(XWIKI_GROUP_MEMBERFIELD, fullWikiUserName);
+            groupClass.fromMap(map, memberObj);
 
             // Save modifications
             context.getWiki().saveDocument(groupDoc, context);
@@ -591,11 +599,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             XWikiGroupService gservice = context.getWiki().getGroupService(context);
             gservice.addUserToGroup(fullWikiUserName, context.getDatabase(), groupName, context);
 
-            // is supposed to equivalent to
-            // context.getWiki().getGroupService(context).addUserToGroup(user,
-            // context.getDatabase(), xwikigroupname, context);
-
-            // c.add(xwikigroupname);
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Finished adding user {0} to xwiki group {1}",
                     new Object[] {userName, groupName}));
@@ -632,10 +635,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             // Save modifications
             context.getWiki().saveDocument(groupDoc, context);
-
-            // XWikiGroupService gservice = context.getWiki().getGroupService(context);
-            // gservice.addUserToGroup(fullwikiname, context.getDatabase(), groupname, context);
-
         } catch (Exception e) {
             LOG.error(
                 "Failed to remove a user from a group " + userName + " group: " + groupName, e);
@@ -697,13 +696,13 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     /**
      * Sets attributes on the user object based on attribute values provided by the LDAP.
      * 
-     * @param userName the user name.
+     * @param xwikiUserName the XWiki user name.
      * @param searchAttributes the attributes.
      * @param context the XWiki context.
      * @throws XWikiException error when updating XWiki user.
      */
-    protected void updateUserFromLDAP(String userName, List searchAttributes, XWikiContext context)
-        throws XWikiException
+    protected void updateUserFromLDAP(String xwikiUserName, List searchAttributes,
+        XWikiContext context) throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -711,46 +710,37 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         BaseClass userClass = context.getWiki().getUserClass(context);
 
-        String fullWikiUserName = "XWiki." + userName;
-        XWikiDocument doc = context.getWiki().getDocument(fullWikiUserName, context);
-        BaseObject bobj = doc.getObject(userClass.getName());
+        XWikiDocument userDoc = context.getWiki().getDocument(xwikiUserName, context);
+        BaseObject userObj = userDoc.getObject(userClass.getName());
 
+        Map map = new HashMap();
         for (Iterator it = searchAttributes.iterator(); it.hasNext();) {
             XWikiLDAPSearchAttribute lattr = (XWikiLDAPSearchAttribute) it.next();
 
             String lval = lattr.value;
             String xattr = (String) userMappings.get(lattr.name);
-
-            if (xattr != null) {
-                if (xattr.equals("name")) {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Ignoring a mapping for name since the name is already set to "
-                            + userName);
-                    }
-                } else {
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("Setting XWiki field " + xattr + " (from LDAP attribute: "
-                            + lattr.name + ") Value:" + lval);
-                    }
-
-                    bobj.setStringValue(xattr, lval);
-                }
+            if (xattr == null) {
+                continue;
             }
+
+            map.put(xattr, lval);
         }
 
-        context.getWiki().saveDocument(doc, context);
+        userClass.fromMap(map, userObj);
+
+        context.getWiki().saveDocument(userDoc, context);
     }
 
     /**
      * Create an XWiki user and set all mapped attributes from LDAP to XWiki attributes.
      * 
-     * @param userName the user name.
+     * @param xwikiUserName the XWiki user name.
      * @param searchAttributes the attributes.
      * @param context the XWiki context.
      * @throws XWikiException error when creating XWiki user.
      */
-    protected void createUserFromLDAP(String userName, List searchAttributes, XWikiContext context)
-        throws XWikiException
+    protected void createUserFromLDAP(String xwikiUserName, List searchAttributes,
+        XWikiContext context) throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -767,17 +757,14 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             if (xattr == null) {
                 continue;
             }
+
             map.put(xattr, lval);
-            LOG.debug("Mapping " + xattr + " to " + lval);
         }
+
         // Mark user active
         map.put("active", "1");
 
-        if (LOG.isDebugEnabled()) {
-            LOG.debug("Creating User: " + userName);
-        }
-
-        context.getWiki().createUser(userName, map, userClass.getName(),
+        context.getWiki().createUser(xwikiUserName.replace("XWiki.", ""), map, userClass.getName(),
             "#includeForm(\"XWiki.XWikiUserTemplate\")", "edit", context);
     }
 

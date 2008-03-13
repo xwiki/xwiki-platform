@@ -916,17 +916,24 @@ public class XWikiDocument
      * @param criteria criteria used to match versions
      * @return a list of matching versions
      */
-    public List getRevisions(RevisionCriteria criteria, XWikiContext context) throws XWikiException
+    public List<String> getRevisions(RevisionCriteria criteria, XWikiContext context) throws XWikiException
     {
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
 
         Version[] revisions = getRevisions(context);
 
+        XWikiRCSNodeInfo nextNodeinfo = null;
+        XWikiRCSNodeInfo nodeinfo = null;
         for (int i = 0; i < revisions.length; i++) {
-            XWikiRCSNodeInfo nodeinfo = getRevisionInfo(revisions[i].toString(), context);
+            nodeinfo = nextNodeinfo;
+            nextNodeinfo = getRevisionInfo(revisions[i].toString(), context);
+
+            if (nodeinfo == null) {
+                continue;
+            }
 
             // Minor/Major version matching
-            if (nodeinfo.isMinorEdit() == criteria.getWithMinorEdits()) {
+            if (criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit()) {
                 // Author matching
                 if (criteria.getAuthor().equals("") ||
                     criteria.getAuthor().equals(nodeinfo.getAuthor()))
@@ -937,6 +944,20 @@ public class XWikiDocument
                     {
                         results.add(nodeinfo.getVersion().toString());
                     }
+                }
+            }
+        }
+        
+        nodeinfo = nextNodeinfo;
+        if (nodeinfo != null) {
+            if (criteria.getAuthor().equals("") ||
+                criteria.getAuthor().equals(nodeinfo.getAuthor()))
+            {
+                // Date range matching
+                if (nodeinfo.getDate().after(criteria.getMinDate()) &&
+                    nodeinfo.getDate().before(criteria.getMaxDate()))
+                {
+                    results.add(nodeinfo.getVersion().toString());
                 }
             }
         }

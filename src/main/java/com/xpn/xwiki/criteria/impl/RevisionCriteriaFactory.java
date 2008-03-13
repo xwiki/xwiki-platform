@@ -51,13 +51,13 @@ public class RevisionCriteriaFactory
      * Creates a revision criteria matching all the revisions created by the given author.
      *
      * @param author the author of the result set
-     * @param withMinorEdits include minor versions in the set
+     * @param includeMinorVersions include minor versions in the set
      * @return a new revision criteria
      */
-    public RevisionCriteria createRevisionCriteria(String author, boolean withMinorEdits)
+    public RevisionCriteria createRevisionCriteria(String author, boolean includeMinorVersions)
     {
         return new RevisionCriteria(author, PeriodFactory.createMaximumPeriod(),
-            RangeFactory.createAllRange(), withMinorEdits);
+            RangeFactory.createAllRange(), includeMinorVersions);
     }
 
     /**
@@ -77,12 +77,12 @@ public class RevisionCriteriaFactory
      * period.
      *
      * @param period the time period during which the revisions has been created
-     * @param withMinorEdits include minor versions in the set
+     * @param includeMinorVersions include minor versions in the set
      * @return a new revision criteria
      */
-    public RevisionCriteria createRevisionCriteria(Period period, boolean withMinorEdits)
+    public RevisionCriteria createRevisionCriteria(Period period, boolean includeMinorVersions)
     {
-        return new RevisionCriteria("", period, RangeFactory.createAllRange(), withMinorEdits);
+        return new RevisionCriteria("", period, RangeFactory.createAllRange(), includeMinorVersions);
     }
 
     /**
@@ -104,12 +104,12 @@ public class RevisionCriteriaFactory
      *
      * @param author the author of the result set
      * @param period the time period during which the revisions has been created
-     * @param withMinorEdits include minor versions in the set
+     * @param includeMinorVersions include minor versions in the set
      * @return a new revision criteria
      */
     public RevisionCriteria createRevisionCriteria(String author, Period period,
-        boolean withMinorEdits)
+        boolean includeMinorVersions)
     {
-        return new RevisionCriteria(author, period, RangeFactory.createAllRange(), withMinorEdits);
+        return new RevisionCriteria(author, period, RangeFactory.createAllRange(), includeMinorVersions);
     }
 }

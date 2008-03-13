@@ -34,6 +34,10 @@ import org.xwiki.container.servlet.ServletApplicationContext;
 import java.util.Enumeration;
 import java.util.Properties;
 
+/**
+ * Default implementation of the Velocity service which initializes te Velocity system using
+ * configuration values defined in the component's configuration.
+ */
 public class DefaultVelocityManager extends AbstractLogEnabled
     implements VelocityManager, Initializable, LogSystem
 {
@@ -68,6 +72,7 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
         getEngine().setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, this);
 
+        // Configure Velocity by passing the properties defined in this component's configuration
         if (this.properties != null) {
             for (Enumeration e = this.properties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
@@ -85,16 +90,28 @@ public class DefaultVelocityManager extends AbstractLogEnabled
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see VelocityManager#getEngine() 
+     */
     public VelocityEngine getEngine()
     {
         return this.engine;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see LogSystem#init(org.apache.velocity.runtime.RuntimeServices)   
+     */
     public void init(RuntimeServices runtimeServices)
     {
         this.runtimeServices = runtimeServices;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see LogSystem#logVelocityMessage(int, String)    
+     */
     public void logVelocityMessage(int level, String message)
     {
         switch (level) {

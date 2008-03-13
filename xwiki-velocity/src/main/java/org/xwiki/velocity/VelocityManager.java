@@ -22,9 +22,18 @@ package org.xwiki.velocity;
 
 import org.apache.velocity.app.VelocityEngine;
 
+/**
+ * Initialize the Velocity subsystem and make Velocity services available.
+ */
 public interface VelocityManager
 {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
     public final static String ROLE = VelocityManager.class.getName();
 
+    /**
+     * @return the initialized Velocity engine which can be used to call all Velocity services 
+     */
     VelocityEngine getEngine();
 }

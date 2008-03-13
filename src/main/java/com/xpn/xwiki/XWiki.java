@@ -1866,13 +1866,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String language = context.getLanguage();
         if (language != null)
             return language;
-
-        // Find out what is the default language from the XWiki preferences settings.
-        String defaultLanguage =
-            context.getWiki().getXWikiPreference("default_language", "", context);
-        if (defaultLanguage == null || defaultLanguage.equals("")) {
-            defaultLanguage = "en";
-        }
+        
+        String defaultLanguage = getDefaultLanguage(context);
 
         // If the wiki is non multilingual then the language is the default language.
         if (!context.getWiki().isMultiLingual(context)) {
@@ -1958,6 +1953,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Then from the global preference
         context.setLanguage(defaultLanguage);
+        return defaultLanguage;
+    }
+
+    public String getDefaultLanguage(XWikiContext context) {
+        // Find out what is the default language from the XWiki preferences settings.
+        String defaultLanguage =
+            context.getWiki().getXWikiPreference("default_language", "", context);
+        if (defaultLanguage == null || defaultLanguage.equals("")) {
+            defaultLanguage = "en";
+        }
         return defaultLanguage;
     }
 

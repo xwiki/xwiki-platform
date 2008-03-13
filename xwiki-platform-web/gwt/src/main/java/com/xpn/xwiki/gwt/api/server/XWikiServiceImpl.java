@@ -59,6 +59,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.io.UnsupportedEncodingException;
 
 
 public class
@@ -1051,27 +1052,35 @@ public class
         try {
             XWikiContext context = getXWikiContext();
             XWikiMessageTool msg = context.getMessageTool();
+            String defaultLanguage = context.getWiki().getDefaultLanguage(context);
 
-            // Get the translated version of the translation page document
-            XWikiDocument docBundle = context.getWiki().getDocument(translationPage, context);
-            docBundle = docBundle.getTranslatedDocument(context);
-
-            Properties encproperties = (msg==null) ? null : msg.getDocumentBundleProperties(docBundle);
+            // Get the translated version of the translation page document with the default language one
+            List docBundles = msg.getDocumentBundles(translationPage, defaultLanguage);
             Properties properties = new Properties();
-            // Let's convert properties from internal encoding to xwiki encoding
-            Iterator it = encproperties.keySet().iterator();
-            while (it.hasNext()) {
-                String key = (String) it.next();
-                String value = encproperties.getProperty(key);
-                String newvalue = new String(value.getBytes(), XWikiMessageTool.BYTE_ENCODING);
-                properties.setProperty(key, newvalue);
+
+            // loop backwards to have the default language updated first and then overwritten with the current language
+            for (int i=0;i<docBundles.size();i++) {
+            Properties encproperties = (msg==null) ? null : msg.getDocumentBundleProperties((XWikiDocument) docBundles.get(docBundles.size() - i - 1));
+              addProperties(encproperties, properties);
             }
+
             if (properties==null)
              return new Dictionary();
             else
              return new Dictionary(properties);
         } catch (Exception e) {
             throw getXWikiGWTException(e);
+        }
+    }
+
+    private void addProperties(Properties encproperties, Properties properties) throws UnsupportedEncodingException {
+        // Let's convert properties from internal encoding to xwiki encoding
+        Iterator it = encproperties.keySet().iterator();
+        while (it.hasNext()) {
+            String key = (String) it.next();
+            String value = encproperties.getProperty(key);
+            String newvalue = new String(value.getBytes("ISO-8859-1"), XWikiMessageTool.BYTE_ENCODING);
+            properties.setProperty(key, newvalue);
         }
     }
 }

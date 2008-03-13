@@ -209,7 +209,7 @@ public class XWikiLDAPUtils
                 (XWikiLDAPSearchAttribute) searchAttributeIt.next();
 
             String key = searchAttribute.name;
-            if (LDAP_GROUP_MEMBER.contains(key)) {
+            if (LDAP_GROUP_MEMBER.contains(key.toLowerCase())) {
 
                 // or subgroup
                 String member = searchAttribute.value;

@@ -198,30 +198,34 @@ public class XWikiMessageTool
      * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
      *      document bundles
      */
-    protected List getDocumentBundles()
+    public List getDocumentBundles()
     {
+        String defaultLanguage = context.getWiki().getDefaultLanguage(context);
         List result = new ArrayList();
         Iterator docNames = getDocumentBundleNames().iterator();
         while (docNames.hasNext()) {
             String docName = ((String) docNames.next()).trim();
-            XWikiDocument docBundle = getDocumentBundle(docName);
-            if (docBundle != null) {
-                if (!docBundle.isNew()) {
-                    // Checks for a name update
-                    Long docId = new Long(docBundle.getId());
-                    Date docDate = docBundle.getDate();
-                    // Check for a doc modification
-                    if (!docDate.equals(this.previousDates.get(docId))) {
-                        this.docsToRefresh.add(docId);
-                        this.previousDates.put(docId, docDate);
+            List docBundles = getDocumentBundles(docName, defaultLanguage);
+            for (int i=0;i<docBundles.size();i++) {
+                XWikiDocument docBundle = (XWikiDocument) docBundles.get(i);
+                if (docBundle != null) {
+                    if (!docBundle.isNew()) {
+                        // Checks for a name update
+                        Long docId = new Long(docBundle.getId());
+                        Date docDate = docBundle.getDate();
+                        // Check for a doc modification
+                        if (!docDate.equals(this.previousDates.get(docId))) {
+                            this.docsToRefresh.add(docId);
+                            this.previousDates.put(docId, docDate);
+                        }
+                        result.add(docBundle);
+                    } else {
+                        // The document listed as a document bundle doesn't exist. Do nothing
+                        // and log.
+                        LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
+                                + "as an internationalization document bundle but it does not "
+                                + "exist.");
                     }
-                    result.add(docBundle);
-                } else {
-                    // The document listed as a document bundle doesn't exist. Do nothing
-                    // and log.
-                    LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
-                        + "as an internationalization document bundle but it does not "
-                        + "exist.");
                 }
             }
         }
@@ -236,7 +240,7 @@ public class XWikiMessageTool
      * @return the document object corresponding to the passed document's name. A translated version
      *         of the document for the current Locale is looked for.
      */
-    private XWikiDocument getDocumentBundle(String documentName)
+    public XWikiDocument getDocumentBundle(String documentName)
     {
         XWikiDocument docBundle;
 
@@ -260,13 +264,47 @@ public class XWikiMessageTool
         return docBundle;
     }
 
-    /**
-     * @param docBundle the resource bundle document containing Translation Resources
-     * @return the properties found in the passed resource bundle document. A translated version
+
+     /**
+     * Helper method to help get a translated version of a document. It handles any exception
+     * raised to make it easy to use.
+     *
+     * @param documentName the document's name (eg Space.Document)
+     * @return the document object corresponding to the passed document's name. A translated version
      *         of the document for the current Locale is looked for.
      */
-    public Properties getDocumentBundleProperties(XWikiDocument docBundle)
+    public List getDocumentBundles(String documentName, String defaultLanguage)
     {
+        ArrayList list = new ArrayList();
+
+        if (documentName.length() == 0) {
+            return list;
+        } else {
+            try {
+                // First, looks for a document suffixed by the language
+                XWikiDocument docBundle = this.context.getWiki().getDocument(documentName, this.context);
+                XWikiDocument tdocBundle = docBundle.getTranslatedDocument(this.context);
+                list.add(tdocBundle);
+                if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
+                    XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, this.context);
+                    if (tdocBundle!=defdocBundle)
+                     list.add(defdocBundle);
+                }
+
+            } catch (XWikiException e) {
+                // Error while loading the document.
+                // TODO: A runtime exception should be thrown that will bubble up till the
+                // topmost level. For now simply log the error
+                LOG.error("Failed to load internationalization document bundle [" + documentName
+                    + "].", e);
+                return list;
+            }
+        }
+
+        return list;
+    }
+
+    public Properties getDocumentBundleProperties(XWikiDocument docBundle) {
         Properties props = new Properties();
         String content = docBundle.getContent();
         byte[] docContent;

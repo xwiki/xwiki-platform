@@ -1495,13 +1495,17 @@ public class Document extends Api
 
     public void save() throws XWikiException
     {
-        save("");
+        save("", false);
     }
 
     public void save(String comment) throws XWikiException
     {
+        save(comment, false);
+    }
+    public void save(String comment, boolean minorEdit) throws XWikiException
+    {
         if (hasAccessLevel("edit")) {
-            saveDocument(comment);
+            saveDocument(comment, minorEdit);
         } else {
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1512,13 +1516,18 @@ public class Document extends Api
 
     public void saveWithProgrammingRights() throws XWikiException
     {
-        saveWithProgrammingRights("");
+        saveWithProgrammingRights("", false);
     }
 
     public void saveWithProgrammingRights(String comment) throws XWikiException
     {
+        saveWithProgrammingRights(comment, false);
+    }
+
+    public void saveWithProgrammingRights(String comment, boolean minorEdit) throws XWikiException
+    {
         if (hasProgrammingRights()) {
-            saveDocument(comment);
+            saveDocument(comment, minorEdit);
         } else {
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -1527,14 +1536,14 @@ public class Document extends Api
         }
     }
 
-    protected void saveDocument(String comment) throws XWikiException
+    protected void saveDocument(String comment, boolean minorEdit) throws XWikiException
     {
         XWikiDocument doc = getDoc();
         doc.setAuthor(context.getUser());
         if (doc.isNew()) {
             doc.setCreator(context.getUser());
         }
-        getXWikiContext().getWiki().saveDocument(doc, comment, getXWikiContext());
+        getXWikiContext().getWiki().saveDocument(doc, comment, minorEdit, getXWikiContext());
         cloned = false;
     }
 

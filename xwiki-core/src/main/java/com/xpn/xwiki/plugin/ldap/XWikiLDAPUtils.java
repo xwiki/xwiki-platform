@@ -143,7 +143,8 @@ public class XWikiLDAPUtils
         XWikiCache cache;
 
         String cacheKey =
-            connection.getConnection().getHost() + ":" + connection.getConnection().getPort();
+            getUidAttributeName() + "." + connection.getConnection().getHost() + ":"
+                + connection.getConnection().getPort();
 
         Map cacheMap;
 

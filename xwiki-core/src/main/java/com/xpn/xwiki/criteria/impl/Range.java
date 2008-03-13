@@ -102,9 +102,9 @@ public class Range
      * @param list the list from which the sublist will be extracted
      * @return a sublist of the given list computed from this range
      */
-    public List subList(List list)
+    public List<String> subList(List<String> list)
     {
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
         results.addAll(list);
 
         if (getAbsoluteSize() > 0) {

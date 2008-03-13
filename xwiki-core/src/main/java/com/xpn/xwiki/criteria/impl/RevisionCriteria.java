@@ -48,7 +48,7 @@ public class RevisionCriteria
     /**
      * include minor edit versions in the set.
      */
-    private boolean withMinorEdits = false;
+    private boolean includeMinorVersions = false;
 
     /**
      * Default constructor, the default query match the versions created by any author, from January
@@ -62,7 +62,7 @@ public class RevisionCriteria
      * ignored
      */
     public RevisionCriteria(String author, Period period, Range range,
-        boolean withMinorEdits)
+        boolean includeMinorVersions)
     {
         if (author != null) {
             setAuthor(author);
@@ -73,7 +73,7 @@ public class RevisionCriteria
         if (range != null) {
             setRange(range);
         }
-        setWithMinorEdits(withMinorEdits);
+        setIncludeMinorVersions(includeMinorVersions);
     }
 
     /**
@@ -145,18 +145,18 @@ public class RevisionCriteria
     }
 
     /**
-     * include minor edit versions in the set.
+     * include minor versions in the set.
      */
-    public boolean getWithMinorEdits()
+    public boolean getIncludeMinorVersions()
     {
-        return withMinorEdits;
+        return includeMinorVersions;
     }
 
     /**
-     * @param withMinorEdits true to include minor edits in the set, false to ignore them.
+     * @param includeMinorVersions true to include minor versions in the set, false to ignore them.
      */
-    public void setWithMinorEdits(boolean withMinorEdits)
+    public void setIncludeMinorVersions(boolean includeMinorVersions)
     {
-        this.withMinorEdits = withMinorEdits;
+        this.includeMinorVersions = includeMinorVersions;
     }
 }

@@ -47,7 +47,7 @@ public class LucenePluginApi extends PluginApi
         super(plugin, context);
     }
 
-    public LucenePlugin getLucenePlugin()
+    private LucenePlugin getLucenePlugin()
     {
         return (LucenePlugin) getProtectedPlugin();
     }

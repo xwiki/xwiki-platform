@@ -481,7 +481,8 @@ public abstract class ListClass extends PropertyClass
         }
 
         // Add options from Set
-        for (Iterator it = list.iterator(); it.hasNext();) {
+        int count = 0;
+        for (Iterator it = list.iterator(); it.hasNext(); count++) {
             Object rawvalue = it.next();
             String value = getElementValue(rawvalue);
             input radio =
@@ -493,7 +494,7 @@ public abstract class ListClass extends PropertyClass
             }
             radio.addElement(getDisplayValue(rawvalue, name, map, context));
 
-            buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "\">");
+            buffer.append("<span class=\"xwiki-form-listclass\" id=\"xwiki-form-" + name + "-" + count + "\">");
             buffer.append(radio.toString());
             buffer.append("</span>");
         }

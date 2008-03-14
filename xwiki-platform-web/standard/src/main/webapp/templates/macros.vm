@@ -950,14 +950,6 @@ $html
 #end
 
 ###
-###    Display Panel content
-###
-###
-#macro(displaypanelcontent $doc $obj)
-$doc.display("content", $obj)
-#end
-
-###
 ###    Display in page panels layout
 ###
 ###

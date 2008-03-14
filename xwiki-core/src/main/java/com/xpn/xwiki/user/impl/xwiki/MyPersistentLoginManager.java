@@ -178,8 +178,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 LOG.error("Remember Me function will be disabled!!");
                 return;
             }
-            protectedUsername = protectedUsername.replaceAll("=", "_");
-            protectedPassword = protectedPassword.replaceAll("=", "_");
         }
 
         // Let's check if the cookies should be session cookies or persistent ones.
@@ -354,7 +352,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 clearTextBytes = clearText.getBytes();
                 byte[] encryptedText = c1.doFinal(clearTextBytes);
                 String encryptedEncodedText = new String(Base64.encodeBase64(encryptedText));
-                return encryptedEncodedText;
+                return encryptedEncodedText.replaceAll("=", "_");
             }
             if (LOG.isErrorEnabled()) {
                 LOG.error("ERROR! >> SecretKey not generated...");
@@ -513,7 +511,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (!username.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
                 if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
-                    username = username.replaceAll("_", "=");
                     username = decryptText(username);
                 }
                 return username;
@@ -536,7 +533,6 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         if (!password.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
                 if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
-                    password = password.replaceAll("_", "=");
                     password = decryptText(password);
                 }
                 return password;
@@ -554,7 +550,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private String decryptText(String encryptedText)
     {
         try {
-            byte[] decodedEncryptedText = Base64.decodeBase64(encryptedText.getBytes("ISO-8859-1"));
+            byte[] decodedEncryptedText =
+                Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
             Cipher c1 = Cipher.getInstance(cipherParameters);
             c1.init(Cipher.DECRYPT_MODE, secretKey);
             byte[] decryptedText = c1.doFinal(decodedEncryptedText);

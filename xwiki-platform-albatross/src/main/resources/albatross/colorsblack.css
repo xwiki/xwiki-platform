@@ -748,6 +748,7 @@ a.deletelink:hover{
 }
 .about{
   color: #888;
+  clear:both;
 }
 .about a{
   color: #333;

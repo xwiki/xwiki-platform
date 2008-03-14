@@ -42,36 +42,36 @@ $response.setContentType("application/x-json")
 
 #foreach( $i in $params.get( "wiki" ) ) #set( $value = $i ) #end
 #if( $value == "local" )
-  #set( $users = $rm.getAllMatchedLocalGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.countAllMatchedLocalGroups( $filterMap ) )
+  #set( $groups = $rm.getAllMatchedLocalGroups( $filterMap, $limit, $off, $orderList ) )
+  #set( $countGroups = $rm.countAllMatchedLocalGroups( $filterMap ) )
 #elseif( $value == "global" )
-  #set( $users = $rm.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.countAllMatchedGlobalGroups( $filterMap ) )
+  #set( $groups = $rm.getAllMatchedGlobalGroups( $filterMap, $limit, $off, $orderList ) )
+  #set( $countGroups = $rm.countAllMatchedGlobalGroups( $filterMap ) )
 #else
-  ## get both local and global users
-  #set( $users = $rm.getAllMatchedGroups( $filterMap, $limit, $off, $orderList ) )
-  #set( $countUsers = $rm.countAllMatchedGroups( $filterMap ) )
+  ## get both local and global groups
+  #set( $groups = $rm.getAllMatchedGroups( $filterMap, $limit, $off, $orderList ) )
+  #set( $countGroups = $rm.countAllMatchedGroups( $filterMap ) )
 #end
 
 ### json starts
 {
-"totalrows": $countUsers,
-"returnedrows": #if($countUsers < $limit) $countUsers #else $limit #end,
+"totalrows": $countGroups,
+"returnedrows": #if($countGroups < $limit) $countGroups #else $limit #end,
 "offset": $offset,
 "reqNo": $request.reqNo,
 "rows": [
-#foreach( $user in $users )
-  #set($wikiname = $user.getWiki())
+#foreach( $group in $groups )
+  #set($wikiname = $group.getWiki())
   #if($wikiname != "xwiki" || $wikiname == $context.database) #set($wikiname = "local") #end
-   #set( $grs = $xwiki.rightsmanager.getAllGroupsForUser( $user.fullName ) )
+   #set( $grs = $xwiki.rightsmanager.getAllGroupsForUser( $group.fullName ) )
    #if( $velocityCount > 1 ) , #end
-   {"username"      : "$user.name", 
-    "fullname"      : "$user.fullName",
+   {"username"      : "$group.name", 
+    "fullname"      : "$group.fullName",
     "wikiname"      : "$wikiname",
-    "members"       : "$xwiki.getDocument($user.fullName).getObjects("XWiki.XWikiGroups").size()", 
-    "userurl"       : "$xwiki.getURL($user.fullName)",
-    "usersaveurl"   : "$user.getURL('save')",
-    "userinlineurl" : "$user.getURL("inline", "xpage=editgroup")",
+    "members"       : "$xwiki.rightsmanager.countAllMembersNamesForGroup($group.fullName)", 
+    "userurl"       : "$xwiki.getURL($group.fullName)",
+    "usersaveurl"   : "$group.getURL('save')",
+    "userinlineurl" : "$group.getURL("inline", "xpage=editgroup")",
     "docurl"        : "$xwiki.getURL("XWiki.XWikiGroups", "admin", "editor=groups&space=XWiki")"
   }
 #end

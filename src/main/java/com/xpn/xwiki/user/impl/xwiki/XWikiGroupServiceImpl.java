@@ -290,8 +290,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         List parameterValues = new ArrayList();
 
         StringBuffer where =
-            new StringBuffer(", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className='"
-                + CLASS_XWIKIGROUPS + "'");
+            new StringBuffer(
+                ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?");
+        parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
 
         where.append(" and obj.id=prop.id.id");
 
@@ -331,7 +332,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
     public List listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
         List list = new ArrayList();
-        String database = context.getDatabase();
         String sql = "";
 
         try {
@@ -356,7 +356,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
                         BaseObject bobj = (BaseObject) itGroups.next();
                         if (bobj != null) {
                             String members = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
-                            list.addAll(ListClass.getListFromString(members, " ,", false));
+                            if (members.length() > 0) {
+                                list.addAll(ListClass.getListFromString(members, " ,", false));
+                            }
                         }
                     }
                 }
@@ -366,9 +368,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         } catch (XWikiException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
-        } finally {
-            context.setDatabase(database);
         }
+        
         return null;
     }
 
@@ -467,7 +468,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
         StringBuffer where =
-            new StringBuffer(" where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
+            new StringBuffer(
+                " where doc.fullName=obj.name and doc.fullName<>? and obj.className=?");
         parameterValues.add(classtemplate);
         parameterValues.add("XWiki." + documentClass);
 
@@ -497,12 +499,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
                     }
 
                     where.append(" and lower(" + fieldPrefix + ".value) like ?");
-                    parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase()
+                        + HQLLIKE_ALL_SYMBOL);
 
                     fieldMap.put(fieldName, fieldPrefix);
                 } else {
                     where.append(" and lower(doc." + fieldName + ") like ?");
-                    parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+                    parameterValues.add(HQLLIKE_ALL_SYMBOL + value.toLowerCase()
+                        + HQLLIKE_ALL_SYMBOL);
                 }
             }
         }
@@ -580,16 +584,20 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         boolean withdetails, int nb, int start, Object[][] order, XWikiContext context)
         throws XWikiException
     {
+        List groups = null;
+
         if (context.getWiki().getHibernateStore() != null) {
             List parameterValues = new ArrayList();
             String where = createWhereClause(user, matchFields, order, parameterValues);
 
             if (withdetails)
-                return context.getWiki().getStore().searchDocuments(where, nb, start,
-                    parameterValues, context);
+                groups =
+                    context.getWiki().getStore().searchDocuments(where, nb, start,
+                        parameterValues, context);
             else
-                return context.getWiki().getStore().searchDocumentsNames(where, nb, start,
-                    parameterValues, context);
+                groups =
+                    context.getWiki().getStore().searchDocumentsNames(where, nb, start,
+                        parameterValues, context);
         } else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
             // TODO : fully implement this methods for XPATH platform
 
@@ -597,7 +605,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
                 throw new NotImplementedException();
             }
 
-            List list = listAllGroups(context);
+            String xpath =
+                "/*/*/obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS)
+                    + "/jcr:deref(@doc, '*')/@fullName";
+            QueryPlugin qp = (QueryPlugin) context.getWiki().getPlugin("query", context);
+            List list = qp.xpath(xpath).list();
 
             if (nb > 0 || start > 0) {
                 int fromIndex = start < 0 ? 0 : start;
@@ -606,9 +618,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
                 list = list.subList(fromIndex, toIndex);
             }
 
-            return list;
-        } else
-            return null;
+            groups = list;
+        }
+
+        return groups;
     }
 
     /**

@@ -731,39 +731,134 @@ $fn
 ##
 ##
 ##  Generate navigation links for paged documents
+## Deprecated, replaced by #printPagedViewLinks
 ##
 #macro(pagedViewLinks $itemsPerPage $totalPages $crtPageNumber)
 #if($totalPages > 0)
 <div class="pagedNavigation">
 #if($crtPageNumber > 0)
 #set($prevPage = $crtPageNumber - 1)
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=0&ipp=${itemsPerPage}")">$msg.get("core.paging.firstPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${prevPage}&ipp=${itemsPerPage}")">$msg.get("core.paging.previousPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=0&ipp=${itemsPerPage}")">$msg.get("web.paging.firstPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${prevPage}&ipp=${itemsPerPage}")">$msg.get("web.paging.previousPage")</a></span>
 #else
-<span class="pagedLink inactive">$msg.get("core.paging.firstPage")</span>
-<span class="pagedLink inactive">$msg.get("core.paging.previousPage")</span>
+<span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
+<span class="pagedLink inactive">$msg.get("web.paging.previousPage")</span>
 #end
 #set($displayCrtPageNumber = $crtPageNumber + 1)
 #set($displayTotalPages = $totalPages + 1)
-<span class="pagedStatus">$msg.get("core.paging.pageNumberOf", [$displayCrtPageNumber, $displayTotalPages])</span>
+<span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$displayCrtPageNumber, $displayTotalPages])</span>
 #if($crtPageNumber < $totalPages)
 #set($nextPage = $crtPageNumber + 1)
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${nextPage}&ipp=${itemsPerPage}")">$msg.get("core.paging.nextPage")</a></span>
-<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&ipp=${itemsPerPage}")">$msg.get("core.paging.lastPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${nextPage}&ipp=${itemsPerPage}")">$msg.get("web.paging.nextPage")</a></span>
+<span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&ipp=${itemsPerPage}")">$msg.get("web.paging.lastPage")</a></span>
 #else
-<span class="pagedLink inactive">$msg.get("core.paging.nextPage")</span>
-<span class="pagedLink inactive">$msg.get("core.paging.lastPage")</span>
+<span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
+<span class="pagedLink inactive">$msg.get("web.paging.lastPage")</span>
 #end
 </div>
 #end
 #end
-
+##
+##
+##  Generate navigation links for paged documents. It will use the URL parameters "ipp" to forward
+## the number of items per page, and "page" to indicate a certain page. The actual range (in items,
+## not in pages) can be computer using #preparePagedViewParams. The macro does not print anything
+## if only one page exists and $alwaysDisplay is not set to true. Does not alter any variables.
+##
+## @param itemsPerPage The number of items per page, will be forwarded in the links to other pages.
+## @param totalPages The total number of pages, starting at 1.
+## @param currentPageNumber The currently displayed page, starting at 1.
+## @param additionalQueryParams Query string fragmentthat should be put in the links. Should not
+##        start or end with ? or &
+## @param alwaysDisplay Force display of the links, even if there is only one page in total.
+##
+#macro(printPagedViewLinks $itemsPerPage $totalPages $currentPageNumber $additionalQueryParams $alwaysDisplay)
+  ## Only display if there are more than 1 pages or we explicitely require it.
+  #if(($totalPages > 1) || $alwaysDisplay)
+    <div class="pagedNavigation">
+    #if($currentPageNumber > 1)
+      #set($currentPageNumber = $currentPageNumber - 1)
+      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=1&ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.firstPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${currentPageNumber}&ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.previousPage")</a></span>
+      #set($currentPageNumber = $currentPageNumber + 1)
+    #else
+      <span class="pagedLink inactive">$msg.get("web.paging.firstPage")</span>
+      <span class="pagedLink inactive">$msg.get("web.paging.previousPage")</span>
+    #end
+    <span class="pagedStatus">$msg.get("web.paging.pageNumberOf", [$currentPageNumber, $totalPages])</span>
+    #if($currentPageNumber < $totalPages)
+      #set($currentPageNumber = $currentPageNumber + 1)
+      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${currentPageNumber}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.nextPage")</a></span>
+      <span class="pagedLink"><a href="$doc.getURL($context.action, "page=${totalPages}&amp;ipp=${itemsPerPage}")#if("$!additionalQueryParams" != "")&amp;$additionalQueryParams#end">$msg.get("web.paging.lastPage")</a></span>
+      #set($currentPageNumber = $currentPageNumber - 1)
+    #else
+      <span class="pagedLink inactive">$msg.get("web.paging.nextPage")</span>
+      <span class="pagedLink inactive">$msg.get("web.paging.lastPage")</span>
+    #end
+    </div>
+  #end
+#end
+##
+##
+##  Used together with #printPagedViewLinks, computes the range of items to show and the
+## variables used by #printPagedViewLinks, $currentPageNumber, $itemsPerPage, $totalPages.
+##
+## @param totalItems The total number of items that need to be displayed.
+## @param defaultItemsPerPage The default number of items per page, if no override is found in the
+##        URL. If 0, then display all items.
+## @sets startAt The first item to display (inclusive).
+## @sets endAt The last item to display (exclusive).
+## @sets itemsPerPage The requested number of items per page.
+## @sets totalPages The total number of pages according to the requested number of items per page
+##        and total items. Starts at 1.
+## @sets currentPageNumber The current page displayed. If the requested page is not available (out
+##        of range), then it will be corrected to a valid number. Starts at 1.
+##
+#macro(preparePagedViewParams $totalItems $defaultItemsPerPage)
+  ## Reuse existing variable, in case it is manually overriden somewhere else
+  #if(!$itemsPerPage)
+    #if($request.ipp)
+      #set($itemsPerPage = $util.parseInt($request.ipp))
+    #else
+      #set($itemsPerPage = $defaultItemsPerPage)
+    #end
+  #end
+  ## Page numbers start at 1 outside this macro, but for internal computations we use 0-indexed values.
+  #set($currentPageNumber = $util.parseInt($request.page) - 1)
+  ## The first item to show. Must be >= 0.
+  #set($startAt = $itemsPerPage * $currentPageNumber)
+  #if($startAt < 0)
+    #set($startAt = 0)
+  #end
+  ## The last item to show (exclusive). Must be <= total number of items.
+  #set($endAt = $itemsPerPage * ($currentPageNumber + 1))
+  #if(($endAt > $totalItems) || ($itemsPerPage == 0))
+    #set($endAt = $totalItems)
+  #end
+  ## Never show the items after the last one... They don't exist!
+  #if($startAt >= $endAt)
+    #set($startAt = $endAt - 1)
+  #end
+  ## Compute the total number of pages.
+  #if($itemsPerPage == 0)
+    #set($totalPages = 1)
+  #else
+    #set($totalPages = ($totalItems - 1) / $itemsPerPage + 1)
+  #end
+  ## The requested page might not be available, so correct it to correspond to the displayed items.
+  #set($currentPageNumber = $startAt / $itemsPerPage + 1)
+#end
+##
+##
 ## Macro to set a page break used in print, pdf and rtf mode
+##
 #macro(pagebreak)
 <p style="page-break-before: always;" />
 #end
-
+##
+##
 ## Macro to include childs of a page
+##
 #set($clevel = 1)
 #macro(includeChilds $page)
  #includeChilds($page false)

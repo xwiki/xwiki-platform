@@ -1916,9 +1916,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // First we try to get the language from the XWiki Context. This is the current language
         // being used.
         String language = context.getLanguage();
-        if (language != null)
+        if (language != null) {
             return language;
-        
+        }
+
         String defaultLanguage = getDefaultLanguage(context);
 
         // If the wiki is non multilingual then the language is the default language.
@@ -1935,6 +1936,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             language = context.getRequest().getParameter("language");
             if ((language != null) && (!language.equals(""))) {
+                language = language.toLowerCase();
                 if (language.equals("default")) {
                     // forgetting language cookie
                     Cookie cookie = new Cookie("language", "");
@@ -1973,7 +1975,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument userdoc = null;
             userdoc = getDocument(user, context);
             if (userdoc != null) {
-                language = userdoc.getStringValue("XWiki.XWikiUsers", "default_language");
+                language =
+                    userdoc.getStringValue("XWiki.XWikiUsers", "default_language").toLowerCase();
                 if (!language.equals("")) {
                     context.setLanguage(language);
                     return language;
@@ -1995,7 +1998,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (context.getRequest() != null) {
             String accept = context.getRequest().getHeader("Accept-Language");
             if ((accept != null) && (!accept.equals(""))) {
-                String[] alist = StringUtils.split(accept, ",;-_");
+                String[] alist = StringUtils.split(accept.toLowerCase(), ",;-_");
                 if ((alist != null) && !(alist.length == 0)) {
                     context.setLanguage(alist[0]);
                     return alist[0];
@@ -2015,7 +2018,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (defaultLanguage == null || defaultLanguage.equals("")) {
             defaultLanguage = "en";
         }
-        return defaultLanguage;
+        return defaultLanguage.toLowerCase();
     }
 
     public String getDocLanguagePreferenceNew(XWikiContext context)

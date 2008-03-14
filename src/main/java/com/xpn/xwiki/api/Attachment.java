@@ -155,14 +155,6 @@ public class Attachment extends Api {
         }
     }
 
-    /**
-     *
-     * @return the rcs archive of the attachement
-     */
-    public Archive getArchive() {
-        return attachment.getArchive();
-    }
-
     public Version[] getVersions() throws XWikiException {
         attachment.loadArchive(getXWikiContext());
         return attachment.getVersions();
@@ -206,7 +198,14 @@ public class Attachment extends Api {
         return attachment.isImage(getXWikiContext());
     }
 
-     public XWikiAttachment getAttachmentRevision(String rev) throws XWikiException{
-        return attachment.getAttachmentRevision(rev, getXWikiContext());
+    /**
+     * Allow to easily access any revision of a attachment
+     * @param rev version to access
+     * @return Attachment object
+     * @throws XWikiException in case of an error
+     */
+    public Attachment getAttachmentRevision(String rev) throws XWikiException{
+        XWikiAttachment att = attachment.getAttachmentRevision(rev, getXWikiContext());
+        return att==null ? null : new Attachment(getDocument(), att, context); 
     }
 }

@@ -5338,11 +5338,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public boolean showViewAction(XWikiContext context)
     {
         String bl = getXWikiPreference("showviewaction", "", context);
-        if ("1".equals(bl))
+        if ("1".equals(bl)) {
             return true;
-        if ("0".equals(bl))
+        } else if ("0".equals(bl)) {
             return false;
-        return "1".equals(Param("xwiki.showviewaction", "1"));
+        }
+        return "1".equals(Param("xwiki.showviewaction", "0"));
     }
 
     public boolean useDefaultAction(XWikiContext context)

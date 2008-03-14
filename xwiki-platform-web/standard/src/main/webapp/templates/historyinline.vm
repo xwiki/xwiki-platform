@@ -1,61 +1,89 @@
-<div id="historycontent" class="xwikiintracontent">
+###
+### Document history table
+###
+### Displays a paged list of document versions, with the possiblity to view a version, compare two
+### versions, delete one or a range of versions, restore a version as the current document.
+###
+##
+## Preamble, output some HTML.
+##
+  <div id="historycontent" class="xwikiintracontent">
+## If this is displayed inside the document "extra" area, along with the comments and the
+## attachments, then this toggle header must be displayed.
 #if($inline && ($inline == true))    <div class="xwikititlewrapper" onclick="toggleClass($('history'), 'hidden'); toggleClass($('historycontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("history")</h3></div>#end
     <form id="history" action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
       #set($formname="history")
       <div id="history">
       <div class="centered">
       <table class="xwikidatatable" summary="$msg.get(document) ${doc.displayTitle} &mdash; $msg.get("history")">
+## Print the table header
         <tr>
           <th>$msg.get("from")</th>
           <th>$msg.get("to")</th>
           <th>$msg.get("version")</th>
           <th>$msg.get("reveditor")</th>
           <th>$msg.get("date")</th>
-#if($xwiki.hasEditComment())
+## Might be disabled in certain wikis.
+  #if($xwiki.hasEditComment())
           <th>$msg.get("comment")</th>
-#end
-#if($hasEdit || $hasAdmin)
+  #end
+## Editors see the Revert button.
+  #if($hasEdit && !$hasAdmin)
+          <th></th>
+## Admins see the Revert and Delete buttons.
+  #elseif($hasAdmin)
           <th colspan="2"></th>
-#end
+  #end
         </tr>
-#if(!$revisionscount)
-#set($revisionscount = 0)
-#end
-#set($skipnext = false)
-#set($versionshown = 0)
-#if ($tdoc.realLanguage!="")
-#set($lang = "&amp;language=${tdoc.realLanguage}")
-#else
-#set($lang = "")
-#end
-#foreach ($version in $tdoc.getRecentRevisions($revisionscount))
-#set($nextversion = $version)
-#set($revinfo = $tdoc.getRevisionInfo($nextversion))
-#if($xwiki.hasMinorEdit() && (!$request.getParameter("showminor")))
-  #set($skipcur = $skipnext)
-  #set($skipnext = $revinfo.isMinorEdit())
-#end
-#if(!$skipcur)
-  #set($versionshown = $versionshown + 1)
-        <tr class="row#if($versionshown % 2 == 1) even #else odd #end">
-          <td><input type="radio" name="rev1" value="$nextversion" /></td>
-          <td><input type="radio" name="rev2" value="$nextversion" /></td>
-          <td><a href="$tdoc.getURL("viewrev","rev=$nextversion")">$nextversion</a></td>
+##
+## Settings, compute what versions should be displayed.
+##
+  #set($minorVersions = (!$xwiki.hasMinorEdit()) || ("$!request.showminor" == "true"))
+## Revision criteria. The following requests for all versions, filtered by the minorVersions option.
+  #set($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria("", $minorVersions))
+  #set($totalVersions = $tdoc.getRevisions($criteria).size())
+## This will fill in $startAt, $endAt and the variables needed later by #printPagedViewLinks
+  #preparePagedViewParams($totalVersions, $xwiki.getXWikiPreferenceAsInt("web_history_versionsPerPage", 50))
+## Since we're displaying revisions starting from the last one, we need to mirror the range inside
+## the total versions range.
+  #set($startAt = $totalVersions - $startAt)
+  #set($endAt = 0 - $itemsPerPage)
+  #set($range = $xwiki.criteriaService.rangeFactory.createRange($startAt, $endAt))
+## Reuse the old object, just add the range.
+  $criteria.setRange($range)
+  #if ($tdoc.realLanguage!="")
+    #set($lang = "&amp;language=${tdoc.realLanguage}")
+  #else
+    #set($lang = "")
+  #end
+##
+## Display, loop over the extracted revisions and print them in the table.
+##
+  #foreach ($version in $util.reverseList($tdoc.getRevisions($criteria)))
+    #set($revinfo = $tdoc.getRevisionInfo($version))
+        <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
+          <td><input type="radio" name="rev1" value="$version" /></td>
+          <td><input type="radio" name="rev2" value="$version" /></td>
+          <td><a href="$tdoc.getURL("viewrev","rev=$version")">$version</a></td>
           <td>$xwiki.getLocalUserName($revinfo.author)</td>
           <td>$xwiki.formatDate($revinfo.date, "dd/MM/yyyy hh:mm")</td>
-#if($xwiki.hasEditComment())
+    #if($xwiki.hasEditComment())
           <td>$!{revinfo.comment}</td>
-#end
-#if($hasEdit || $hasAdmin)
-          <td class="xwikibuttonlink"><a href="$tdoc.getURL("rollback","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("readytorollback") $nextversion')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("rollback")</a></td>
-#end
-#if($hasAdmin)
-          <td class="xwikibuttonlink"><a href="$tdoc.getURL("deleteversions","rev=$nextversion$lang")" onclick="if (confirm('$msg.get("core.versions.delete.confirm.single", [$nextversion])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("core.versions.delete.single")</a></td>
-#end
+    #end
+    #if($hasEdit || $hasAdmin)
+          <td class="xwikibuttonlink"><a href="$tdoc.getURL("rollback","rev=$version$lang")" onclick="if (confirm('$msg.get("readytorollback") $version')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("rollback")</a></td>
+    #end
+    #if($hasAdmin)
+          <td class="xwikibuttonlink"><a href="$tdoc.getURL("deleteversions","rev=$version$lang")" onclick="if (confirm('$msg.get("core.versions.delete.confirm.single", [$version])')){this.href += '&amp;confirm=1'; return true;} return false;">$msg.get("core.versions.delete.single")</a></td>
+    #end
         </tr>
-#end
-#end
-</table>
+  #end ## foreach
+##
+## Footer, print some more HTML.
+##
+      </table>
+## Print the page navigation links, if needed.
+  #printPagedViewLinks($itemsPerPage $totalPages $currentPageNumber "viewer=history&amp;showminor=${minorVersions}" false)
       <div class="buttons">
         <div class="buttonwrapper"><input type="submit" accesskey="c" value="$msg.get("compare")" class="button"/></div>
         #if($hasAdmin)
@@ -65,7 +93,7 @@
         #if($xwiki.hasMinorEdit())
           #if(!$request.getParameter("showminor"))
             <div class="buttonwrapper"><input class="button" type="submit" name="viewminorversions" value="$msg.get("core.minoredit.show")"
-              onclick="document.forms.${formname}.action='$tdoc.getURL("view","viewer=history&amp;showminor=1&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
+              onclick="document.forms.${formname}.action='$tdoc.getURL("view","viewer=history&amp;showminor=true&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>
           #else
             <div class="buttonwrapper"><input class="button" type="submit" name="hideminorversions" value="$msg.get("core.minoredit.hide")"
               onclick="document.forms.${formname}.action='$tdoc.getURL("view","viewer=history&amp;$docvariant")'; if (document.forms.${formname}.onsubmit) document.forms.${formname}.onsubmit();" /></div>

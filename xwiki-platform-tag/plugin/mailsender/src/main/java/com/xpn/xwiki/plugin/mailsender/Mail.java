@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,7 +48,7 @@ public class Mail
 
     public Mail()
     {
-        headers = new HashMap<String, String>();
+        headers = new TreeMap<String, String>();
     }
 
     public Mail(String from, String to, String cc, String bcc, String subject, String textPart, String htmlPart)

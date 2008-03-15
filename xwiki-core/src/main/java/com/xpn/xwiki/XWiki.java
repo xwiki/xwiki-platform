@@ -36,9 +36,11 @@ import java.net.URL;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -866,7 +868,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @return the XWiki core version as specified in the {@link #VERSION_FILE} file 
+     * @return the XWiki core version as specified in the {@link #VERSION_FILE} file
      */
     public String getVersion()
     {
@@ -1073,7 +1075,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
             // Setting comment & minoredit before saving
-            doc.setComment((comment == null) ? "" : comment);
+            doc.setComment(StringUtils.defaultString(comment));
             doc.setMinorEdit(isMinorEdit);
 
             // We need to save the original document since saveXWikiDoc() will reset it and we
@@ -1503,8 +1505,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context
                     .get("vcontext"), context);
             } else {
-                LOG.warn("Illegal access, tried to use file [" + path + "] as a template." +
-                                " Possible break-in attempt!");
+                LOG.warn("Illegal access, tried to use file [" + path + "] as a template."
+                    + " Possible break-in attempt!");
             }
         } catch (Exception e) {
         }
@@ -2011,7 +2013,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return defaultLanguage;
     }
 
-    public String getDefaultLanguage(XWikiContext context) {
+    public String getDefaultLanguage(XWikiContext context)
+    {
         // Find out what is the default language from the XWiki preferences settings.
         String defaultLanguage =
             context.getWiki().getXWikiPreference("default_language", "", context);
@@ -2481,7 +2484,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             bclass.addStaticListField("pageWidth", "Preferred page width",
                 "default|640|800|1024|1280|1600");
         needsUpdate |= bclass.addTextField("avatar", "Avatar", 30);
-        
+
         // Only used by LDAP authentication service
         needsUpdate |= bclass.addTextField("ldap_dn", "LDAP DN", 80);
 
@@ -2616,14 +2619,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             bclass.addTextField("documentBundles", "Internationalization Document Bundles", 60);
 
         // Only used by LDAP authentication service
-        
+
         needsUpdate |= bclass.addBooleanField("ldap", "Ldap", "yesno");
         needsUpdate |= bclass.addTextField("ldap_server", "Ldap server adress", 60);
         needsUpdate |= bclass.addTextField("ldap_port", "Ldap server port", 60);
         needsUpdate |= bclass.addTextField("ldap_bind_DN", "Ldap login matching", 60);
         needsUpdate |= bclass.addTextField("ldap_bind_pass", "Ldap password matching", 60);
         needsUpdate |=
-            bclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", "yesno");
+            bclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password",
+                "yesno");
         needsUpdate |= bclass.addTextField("ldap_user_group", "Ldap group filter", 60);
         needsUpdate |= bclass.addTextField("ldap_base_DN", "Ldap base DN", 60);
         needsUpdate |= bclass.addTextField("ldap_UID_attr", "Ldap UID attribute name", 60);
@@ -2637,9 +2641,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             bclass.addStaticListField("ldap_mode_group_sync", "LDAP groups sync mode",
                 "|always|create");
         needsUpdate |= bclass.addBooleanField("ldap_trylocal", "Try local login", "yesno");
-        
-        /////
-        
+
         if (((BooleanClass) bclass.get("showLeftPanels")).getDisplayType().equals("checkbox")) {
             ((BooleanClass) bclass.get("showLeftPanels")).setDisplayType("yesno");
             ((BooleanClass) bclass.get("showRightPanels")).setDisplayType("yesno");
@@ -3026,9 +3028,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @deprecated replaced by the
-     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *   Plugin</a>
+     * @deprecated replaced by the <a
+     *             href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *             Plugin</a>
      */
     public void sendMessage(String sender, String[] recipient, String message,
         XWikiContext context) throws XWikiException
@@ -3105,9 +3107,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * @deprecated replaced by the
-     *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
-     *   Plugin</a>
+     * @deprecated replaced by the <a
+     *             href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
+     *             Plugin</a>
      */
     public void sendMessage(String sender, String recipient, String message, XWikiContext context)
         throws XWikiException
@@ -3384,7 +3386,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         context.put("included_docs", includedDocs);
                     }
 
-                    if (includedDocs.contains(prefixedTopic) || currentDocName.equals(prefixedTopic)) {
+                    if (includedDocs.contains(prefixedTopic)
+                        || currentDocName.equals(prefixedTopic)) {
                         LOG.warn("Error on too many recursive includes for topic " + topic);
                         return "Cannot make recursive include";
                     }
@@ -3393,7 +3396,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
 
                 doc =
-                    getDocument(((XWikiDocument) context.get("doc")).getSpace(), localTopic, context);
+                    getDocument(((XWikiDocument) context.get("doc")).getSpace(), localTopic,
+                        context);
 
                 if (checkAccess("view", doc, context) == false) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
@@ -3412,12 +3416,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 // We do everything in the context of the including document
                 if (database != null)
                     context.setDatabase(database);
-                result =  getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
-                    (XWikiDocument) context.get("doc"), context);
+                result =
+                    getRenderingEngine().renderText(contentdoc.getContent(), contentdoc,
+                        (XWikiDocument) context.get("doc"), context);
             } else {
                 // We stay in the context included document
-                result = getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc,
-                    context);
+                result =
+                    getRenderingEngine().renderText(contentdoc.getContent(), contentdoc, doc,
+                        context);
             }
             try {
                 Set<String> includedDocs = (Set<String>) context.get("included_docs");
@@ -3467,7 +3473,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         throws XWikiException
     {
         getNotificationManager().preverify(doc, new XWikiDocument(doc.getSpace(), doc.getName()),
-            XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
+            XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
         if (hasRecycleBin(context) && totrash) {
             getRecycleBinStore().saveToRecycleBin(doc, context.getUser(), new Date(), context,
                 true);
@@ -3476,16 +3482,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             // This is the old notification mechanism. It is kept here because it is in a
             // deprecation stage. It will be removed later.
-            getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()), doc,
-                XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
+            getNotificationManager().verify(new XWikiDocument(doc.getSpace(), doc.getName()),
+                doc, XWikiDocChangeNotificationInterface.EVENT_DELETE, context);
             // This is the new notification mechanism, implemented as a Plexus Component.
             // For the moment we're sending the XWiki context as the data, but this will be
             // changed in the future, when the whole platform will be written using components
             // and there won't be a need for the context. The old version is available using
             // doc.getOriginalDocument()
             ObservationManager om =
-                (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
-                    context);
+                (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null, context);
             om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
         } catch (Exception ex) {
             LOG.error("Failed to send document delete notifications for document ["
@@ -4109,6 +4114,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     // Usefull date functions
+
     public Date getCurrentDate()
     {
         return new Date();
@@ -4296,7 +4302,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             String allowed = Param("xwiki.inactiveuser.allowedpages", "");
             if (context.getAction().equals("view") && !allowed.equals("")) {
                 String[] allowedList = StringUtils.split(allowed, " ,");
-                for (int i=0; i < allowedList.length; i++) {
+                for (int i = 0; i < allowedList.length; i++) {
                     if (allowedList[i].equals(doc.getFullName())) {
                         allow = true;
                         break;
@@ -4767,8 +4773,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String propname = (String) it.next();
                     vcontext.put(propname, userobj.getStringValue(propname));
                 }
-                text = XWikiVelocityRenderer.evaluate(format, "<username formatting code in " +
-                    context.getDoc().getFullName() + ">", vcontext, context);
+                text =
+                    XWikiVelocityRenderer.evaluate(format, "<username formatting code in "
+                        + context.getDoc().getFullName() + ">", vcontext, context);
             }
 
             if (link == false)
@@ -5474,9 +5481,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Privileged API to retrieve an object instantiated from groovy code in a String.
-     * Note that Groovy scripts compilation is cached.
-     *
+     * Privileged API to retrieve an object instantiated from groovy code in a String. Note that
+     * Groovy scripts compilation is cached.
+     * 
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
      * @throws XWikiException
@@ -5492,10 +5499,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Privileged API to retrieve an object instantiated from groovy code in a String,
-     * using a classloader including all JAR files located in the passed page as attachments.
-     * Note that Groovy scripts compilation is cached
-     *
+     * Privileged API to retrieve an object instantiated from groovy code in a String, using a
+     * classloader including all JAR files located in the passed page as attachments. Note that
+     * Groovy scripts compilation is cached
+     * 
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
      * @throws XWikiException

@@ -64,14 +64,19 @@ import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
+import com.xpn.xwiki.objects.DoubleProperty;
+import com.xpn.xwiki.objects.FloatProperty;
+import com.xpn.xwiki.objects.IntegerProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.ListProperty;
+import com.xpn.xwiki.objects.LongProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.StringListProperty;
 import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.NumberClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
@@ -415,6 +420,33 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     }
                                     session.delete(lp);
                                     session.save(lp1);
+                                }
+                            }
+                        }
+                    }
+                    // migrate values of list properties
+                    else if (prop instanceof NumberClass) {
+                        NumberClass nc = (NumberClass) prop;
+                        // @see NumberClass#newProperty()
+                        String[] classes =
+                            {IntegerProperty.class.getName(), LongProperty.class.getName(),
+                            FloatProperty.class.getName(), DoubleProperty.class.getName()};
+                        for (int i=0; i<classes.length; i++) {
+                            String oldclass = classes[i];
+                            if (!oldclass.equals(nc.newProperty().getClass().getName())) {
+                                Query q = session.createQuery("select p from "+oldclass+" as p, BaseObject as o" +
+                                    " where o.className=?" +
+                                    "  and p.id=o.id and p.name=?")
+                                    .setString(0, bclass.getName())
+                                    .setString(1, nc.getName());
+                                for (Iterator it = q.list().iterator(); it.hasNext(); ) {
+                                    BaseProperty np = (BaseProperty) it.next();
+                                    BaseProperty np1 = nc.newProperty();
+                                    np1.setId(np.getId());
+                                    np1.setName(np.getName());
+                                    np1.setValue(np.getValue());
+                                    session.delete(np);
+                                    session.save(np1);
                                 }
                             }
                         }

@@ -113,6 +113,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 principal = xwikiAuthenticate(login, password, context);
 
                 if (LOG.isWarnEnabled() && principal == null && exception != null) {
+                    context.put("message", "loginfailed");
                     LOG.warn("LDAP authentication failed.", exception);
                 }
             }
@@ -269,19 +270,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         // ////////////////////////////////////////////////////////////////////
-        // 6. if user used for LDAP connection is not the one authenticated try to bind
-        // ////////////////////////////////////////////////////////////////////
-
-        String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
-        String bindDN = MessageFormat.format(bindDNFormat, new Object[] {userName});
-
-        if (!userDN.equals(bindDN)) {
-            connector.getConnection().bind(LDAPConnection.LDAP_V3, userDN,
-                password.getBytes("UTF8"));
-        }
-
-        // ////////////////////////////////////////////////////////////////////
-        // 7. apply validate_password property
+        // 6. apply validate_password property or if user used for LDAP connection is not the one
+        // authenticated try to bind
         // ////////////////////////////////////////////////////////////////////
 
         if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
@@ -291,13 +281,17 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                         + " could not validate the password: wrong password for " + userDN);
             }
         } else {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Password is already supposed to be verified when bound to LDAP");
+            String bindDNFormat = config.getLDAPParam("ldap_bind_DN", "{0}", context);
+            String bindDN = MessageFormat.format(bindDNFormat, new Object[] {userName});
+
+            if (!userDN.equals(bindDN)) {
+                connector.getConnection().bind(LDAPConnection.LDAP_V3, userDN,
+                    password.getBytes("UTF8"));
             }
         }
 
         // ////////////////////////////////////////////////////////////////////
-        // 8. sync user
+        // 7. sync user
         // ////////////////////////////////////////////////////////////////////
 
         boolean createuser = syncUser(userName, userDN, searchAttributes, ldapUtils, context);
@@ -310,7 +304,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         // ////////////////////////////////////////////////////////////////////
-        // 9. sync groups membership
+        // 8. sync groups membership
         // ////////////////////////////////////////////////////////////////////
 
         syncGroupsMembership(userName, userDN, createuser, ldapUtils, context);
@@ -739,8 +733,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      * @throws XWikiException error when creating XWiki user.
      */
-    protected void createUserFromLDAP(String userName, List searchAttributes,
-        XWikiContext context) throws XWikiException
+    protected void createUserFromLDAP(String userName, List searchAttributes, XWikiContext context)
+        throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 

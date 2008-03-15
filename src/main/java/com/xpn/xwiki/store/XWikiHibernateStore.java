@@ -444,7 +444,15 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                                     BaseProperty np1 = nc.newProperty();
                                     np1.setId(np.getId());
                                     np1.setName(np.getName());
-                                    np1.setValue(np.getValue());
+                                    if (nc.getNumberType().equals("integer")) {
+                                        np1.setValue(new Integer(((Number)np.getValue()).intValue()));
+                                    } else if (nc.getNumberType().equals("float")) {
+                                        np1.setValue(new Float(((Number)np.getValue()).floatValue()));
+                                    } else if (nc.getNumberType().equals("double")) {
+                                        np1.setValue(new Double(((Number)np.getValue()).doubleValue()));
+                                    } else if (nc.getNumberType().equals("long")) {
+                                        np1.setValue(new Long(((Number)np.getValue()).longValue()));
+                                    }
                                     session.delete(np);
                                     session.save(np1);
                                 }

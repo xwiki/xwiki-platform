@@ -352,6 +352,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 clearTextBytes = clearText.getBytes();
                 byte[] encryptedText = c1.doFinal(clearTextBytes);
                 String encryptedEncodedText = new String(Base64.encodeBase64(encryptedText));
+                // Since the cookie spec does not allow = in the cookie value, it must be replaced
+                // with something else. Bas64 does not use _, and it is allowed in cookies, so
+                // we're using that instead of =. In decryptText the reverse operation is perfomed.
+                // See XWIKI-2211
                 return encryptedEncodedText.replaceAll("=", "_");
             }
             if (LOG.isErrorEnabled()) {
@@ -550,6 +554,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     private String decryptText(String encryptedText)
     {
         try {
+            // Since the cookie spec does not allow = in the cookie value, it must be replaced
+            // with something else. Bas64 does not use _, and it is allowed in cookies, so
+            // we're using that instead of =. In encryptText the reverse operation was perfomed,
+            // so here we must re-introduce the = sign needed by Base64.
+            // See XWIKI-2211
             byte[] decodedEncryptedText =
                 Base64.decodeBase64(encryptedText.replaceAll("_", "=").getBytes("ISO-8859-1"));
             Cipher c1 = Cipher.getInstance(cipherParameters);

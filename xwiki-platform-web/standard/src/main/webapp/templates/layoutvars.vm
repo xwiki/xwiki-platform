@@ -8,7 +8,7 @@
 #if(!$pageWidth || $pageWidth == "" || $pageWidth == "default")
 #set($pageWidth = "1024")
 #end
-#set($contentwidth = $xwiki.parseInt($pageWidth) - 80)
+#set($contentwidth = $util.parseInt($pageWidth) - 80)
 #set($panelwidth = 168)
 #set($editpanelwidth = 290)
 #set($padding = 4)

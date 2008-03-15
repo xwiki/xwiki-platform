@@ -33,6 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.InetAddress;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -3054,7 +3055,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if ((port == null) || (port.equals("")))
                 port = "25";
             if ((login == null) || login.equals(""))
-                login = "XWiki version " + getVersion();
+                login = InetAddress.getLocalHost().getHostName();
 
             smtpc = new SMTPClient();
             smtpc.connect(server, Integer.parseInt(port));

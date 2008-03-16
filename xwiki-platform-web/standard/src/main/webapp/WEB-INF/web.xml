@@ -9,13 +9,6 @@
   <display-name>xwiki</display-name>
   <description>XWiki Application</description>
 
-  <!-- Define context level parameters for XWiki's initialization -->
-  <context-param>
-    <param-name>org.apache.velocity.properties</param-name>
-    <param-value>/WEB-INF/velocity.properties</param-value>
-    <description>Velocity's configuration</description>
-  </context-param>
-
   <filter>
     <filter-name>Set Character Encoding</filter-name>
     <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
@@ -29,14 +22,6 @@
     <filter-name>Set Character Encoding</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-
-  <!-- XWiki's initialization is done in a Servlet Context Listener. This is where we set up
-       everything that should be initialized prior to XWiki servicing requests. For example this
-       is where we initialize Velocity.
-       TODO: Remove this in favor of the new Velocity Plexus Component -->
-  <listener>
-    <listener-class>com.xpn.xwiki.web.InitializationServletContextListener</listener-class>
-  </listener>
 
   <!-- Initializes Plexus and puts a reference to the Plexus Component Manager in the Servlet
        Context. Also initializes the Container Manager component with the Servlet Context. -->

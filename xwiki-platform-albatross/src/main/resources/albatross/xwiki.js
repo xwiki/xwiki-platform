@@ -322,3 +322,19 @@ function externalLinks() {
     }
   }
 }
+
+function createAccordion(params)
+{
+    var acc = new accordion(params.div, { 
+      resizeSpeed:10,
+      classNames: {
+      toggle: "accordionTabTitleBar",
+      content: "accordionTabContentBox"
+      },
+      defaultSize: {
+        width: ('width' in params ? params.width : null),
+        height: ('height' in params ? params.height : null)
+      }
+    });
+    acc.activate($$('#'+params.div+' .accordionTabTitleBar')[params.no]);
+}

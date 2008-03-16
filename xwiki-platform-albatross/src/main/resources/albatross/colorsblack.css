@@ -540,6 +540,7 @@ th{
   border: 1px solid #C0D4E7 !important;
   margin: 0px;
   padding: 0px;
+  overflow: auto !important;
 }
 .panel .accordionTabContentBox ul{
   margin: 4px;

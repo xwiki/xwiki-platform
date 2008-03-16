@@ -334,7 +334,6 @@ function start1() {
       }
     }
   }
-  new Rico.Accordion('panellistaccordion', {panelHeight:512, backgroundColor: "#676D73", textColor: "#FFF", collapsedBg: "#384554", expandedBg: "#384554", hoverBg: "#384554", expandedTextColor: "#FFF", collapsedTextColor: "#EEE", hoverTextColor: "#C0D4E7"} );
   window.activeWizardPage = document.getElementById("PanelListSection");
   window.activeWizardTab  = document.getElementById("firstwtab");
   document.getElementById("PageLayoutSection").style.display = "none";

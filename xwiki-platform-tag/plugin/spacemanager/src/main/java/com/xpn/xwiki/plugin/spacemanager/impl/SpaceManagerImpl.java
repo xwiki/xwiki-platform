@@ -1613,10 +1613,10 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             vContext.put("context", new com.xpn.xwiki.api.Context(context));
             String mailSubject =
                 XWikiVelocityRenderer.evaluate(translatedMailDoc.getTitle(), templateDocFullName,
-                    vContext);
+                    vContext, context);
             String mailContent =
                 XWikiVelocityRenderer.evaluate(translatedMailDoc.getContent(),
-                    templateDocFullName, vContext);
+                    templateDocFullName, vContext, context);
 
             Mail mail =
                 new Mail(fromUser, strToUsers, null, null, mailSubject, mailContent, null);

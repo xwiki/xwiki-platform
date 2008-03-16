@@ -30,6 +30,9 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
 #if($hasProps)
-<script type="text/javascript">new Rico.Accordion( 'xwikiclassproperties', {panelHeight:'flex'} );</script>
+<script type="text/javascript">
+var obj={div:'xwikiclassproperties',no:0};
+Event.observe(window,'load',createAccordion.bind(this,obj));
+</script>
 #end
 #end

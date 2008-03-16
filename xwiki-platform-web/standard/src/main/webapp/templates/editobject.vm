@@ -43,8 +43,10 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #else
 #set($objects = $doc.getObjects($class.name))
 #end
+#set($hasobjs = false)
 #foreach($obj in $objects)
 #if(!$hasCustomObject)
+#set($hasobjs = true)
 <div id="field_${class.name}_${obj.number}">
 <div id="field_${class.name}_${obj.number}_title" class="accordionTabTitleBar"><h6><tt><strong>${class.name}[${obj.number}]: </strong>$doc.display($firstfield, $obj)</tt></h6></div>
 <div id="field_${class.name}_${obj.number}_content" class="accordionTabContentBox"><div>
@@ -70,5 +72,10 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 </div>
 <div class="bottombuttons">#template("editactions.vm")</div>
 </form>
-<script type="text/javascript">new Rico.Accordion( 'xwikiobjects', {panelHeight:'flex'} );</script>
+#if($hasobjs)
+<script type="text/javascript">
+var obj={div:'xwikiobjects', no:0};
+Event.observe(window,'load',createAccordion.bind(this,obj));
+#end
+</script>
 #end

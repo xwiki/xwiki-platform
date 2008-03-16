@@ -96,12 +96,15 @@ $doc.displayEdit($prop, "${class.name}_${obj.number}_",  $obj)
 <input type="hidden" name="classname" value="XWiki.XWikiPreferences" />
 <input type="hidden" name="global" value="1" />
 </div>
-<div id="xwikiprefs">
+<div id="xwikiprefs" class="accordion">
 #foreach($section in $sections)
 #showsection($section $sectionitemsmap)
 #end
 </div> ## xwikiprefs
-<script type="text/javascript">new Rico.Accordion( 'xwikiprefs', {panelHeight:'max', maxHeight: 320} );</script>
+<script type="text/javascript">
+var obj={div:'xwikiprefs', no:0};
+Event.observe(window,'load',createAccordion.bind(this,obj));
+</script>
 </div> ## noname
 </div> ## xwikieditcontent
 <div class="bottombuttons">#template("adminactions.vm")</div>

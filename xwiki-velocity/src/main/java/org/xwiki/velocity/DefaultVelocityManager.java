@@ -20,26 +20,28 @@
  */
 package org.xwiki.velocity;
 
+import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeServices;
-import org.apache.velocity.runtime.log.LogSystem;
+import org.apache.velocity.runtime.log.LogChute;
 import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletApplicationContext;
 
 import java.util.Enumeration;
 import java.util.Properties;
+import java.io.Writer;
+import java.io.Reader;
 
 /**
- * Default implementation of the Velocity service which initializes te Velocity system using
- * configuration values defined in the component's configuration.
+ * Default implementation of the Velocity service which initializes the Velocity system using
+ * configuration values defined in the component's configuration. Note that the {@link #initialize}
+ * method has to be executed before any other method can be called.
  */
 public class DefaultVelocityManager extends AbstractLogEnabled
-    implements VelocityManager, Initializable, LogSystem
+    implements VelocityManager, LogChute
 {
     private VelocityEngine engine;
 
@@ -51,14 +53,14 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.component.phase.Initializable#initialize()
+     * @see VelocityManager#initialize(Properties)
      */
-    public void initialize() throws InitializationException
+    public void initialize(Properties properties) throws XWikiVelocityException
     {
         this.engine = new VelocityEngine();
 
         // If the Velocity configuration uses the Velocity Tools
-        // org.apache.velocity.tools.view.servlet.WebappLoader class then we need to set the
+        // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> class then we need to set the
         // ServletContext object as a Velocity Application Attribute as it's used to load resources
         // from the webapp directory in WebapLoader.
         ApplicationContext context = this.container.getApplicationContext();
@@ -76,32 +78,74 @@ public class DefaultVelocityManager extends AbstractLogEnabled
         if (this.properties != null) {
             for (Enumeration e = this.properties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
-                String value = this.properties.getProperty(key);
-                getEngine().setProperty(key, value);
-                getLogger().debug("Setting property [" + key + "] = [" + value + "]");
+                // Only set a property if it's not overridden by one of the passed properties
+                if (!properties.containsKey(key)) {
+	                String value = this.properties.getProperty(key);
+	                getEngine().setProperty(key, value);
+	                getLogger().debug("Setting property [" + key + "] = [" + value + "]");
+                }
             }
         }
 
+        // Override the component's static properties with the ones passed in parameter
+        if (properties != null) {
+            for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
+                String key = e.nextElement().toString();
+                String value = properties.getProperty(key);
+                getEngine().setProperty(key, value);
+                getLogger().debug("Overriding property [" + key + "] = [" + value + "]");
+            }
+        }
+        
         try {
             getEngine().init();
         }
         catch (Exception e) {
-            throw new InitializationException("Cannot start the Velocity engine", e);
+            throw new XWikiVelocityException("Cannot start the Velocity engine", e);
         }
     }
 
     /**
      * {@inheritDoc}
-     * @see VelocityManager#getEngine() 
+     * @see VelocityManager#evaluate(VelocityContext, java.io.Writer, String, String)
      */
-    public VelocityEngine getEngine()
+    public boolean evaluate(VelocityContext context, Writer out, String templateName,
+        String source) throws XWikiVelocityException
+    {
+        try {
+            return getEngine().evaluate(context, out, templateName, source);
+        } catch (Exception e) {
+            throw new XWikiVelocityException("Failed to evaluate content with id [" + templateName
+                + "]", e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see VelocityManager#evaluate(VelocityContext, java.io.Writer, String, String)
+     */
+    public boolean evaluate(VelocityContext context, Writer out, String templateName,
+        Reader source) throws XWikiVelocityException
+    {
+        try {
+            return getEngine().evaluate(context, out, templateName, source);
+        } catch (Exception e) {
+            throw new XWikiVelocityException("Failed to evaluate content with id [" + templateName
+                + "]", e);
+        }
+    }
+
+    /**
+     * @return the initialized Velocity engine which can be used to call all Velocity services
+     */
+    private VelocityEngine getEngine()
     {
         return this.engine;
     }
 
     /**
      * {@inheritDoc}
-     * @see LogSystem#init(org.apache.velocity.runtime.RuntimeServices)   
+     * @see LogChute#init(org.apache.velocity.runtime.RuntimeServices)   
      */
     public void init(RuntimeServices runtimeServices)
     {
@@ -110,27 +154,83 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see LogSystem#logVelocityMessage(int, String)    
+     * @see LogChute#log(int, String) 
      */
-    public void logVelocityMessage(int level, String message)
+    public void log(int level, String message)
     {
         switch (level) {
-            case LogSystem.WARN_ID:
+            case LogChute.WARN_ID:
                 getLogger().warn(message);
                 break;
-            case LogSystem.INFO_ID:
+            case LogChute.INFO_ID:
                 // Velocity info messages are too verbose, just consider them as debug messages...
                 getLogger().debug(message);
                 break;
-            case LogSystem.DEBUG_ID:
+            case LogChute.DEBUG_ID:
                 getLogger().debug(message);
                 break;
-            case LogSystem.ERROR_ID:
+            case LogChute.ERROR_ID:
                 getLogger().error(message);
                 break;
             default:
                 getLogger().debug(message);
                 break;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see LogChute#log(int, String, Throwable)
+     */
+    public void log(int level, String message, Throwable throwable)
+    {
+        switch (level) {
+            case LogChute.WARN_ID:
+                getLogger().warn(message, throwable);
+                break;
+            case LogChute.INFO_ID:
+                // Velocity info messages are too verbose, just consider them as debug messages...
+                getLogger().debug(message, throwable);
+                break;
+            case LogChute.DEBUG_ID:
+                getLogger().debug(message, throwable);
+                break;
+            case LogChute.ERROR_ID:
+                getLogger().error(message, throwable);
+                break;
+            default:
+                getLogger().debug(message, throwable);
+                break;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see LogChute#isLevelEnabled(int) 
+     */
+    public boolean isLevelEnabled(int level)
+    {
+        boolean isEnabled;
+
+        switch (level) {
+            case LogChute.WARN_ID:
+                isEnabled = getLogger().isWarnEnabled();
+                break;
+            case LogChute.INFO_ID:
+                // Velocity info messages are too verbose, just consider them as debug messages...
+                isEnabled = getLogger().isDebugEnabled();
+                break;
+            case LogChute.DEBUG_ID:
+                isEnabled = getLogger().isDebugEnabled();
+                break;
+            case LogChute.ERROR_ID:
+                isEnabled = getLogger().isErrorEnabled();
+                break;
+            default:
+                isEnabled = getLogger().isDebugEnabled();
+                break;
+        }
+
+        return isEnabled;
     }
 }

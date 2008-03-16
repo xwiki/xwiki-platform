@@ -1,10 +1,17 @@
 <component-set>
   <components>
     <component>
+      <role>org.xwiki.velocity.VelocityFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.velocity.DefaultVelocityFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+    </component>
+    <component>
       <role>org.xwiki.velocity.VelocityManager</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.velocity.DefaultVelocityManager</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
@@ -23,18 +30,58 @@
             <value>org.apache.velocity.tools.view.servlet.WebappLoader</value>
           </property>
           <property>
-            <name>runtime.log.invalid.references</name>
-            <value>false</value>
-          </property>
-          <property>
             <name>velocimacro.messages.on</name>
             <value>false</value>
+          </property>
+          <!-- Prevents users from writing dangerous Velocity code like using Class.forName or Java threading APIs. -->
+          <property>
+            <name>runtime.introspector.uberspect</name>
+            <value>org.apache.velocity.util.introspection.SecureUberspector</value>
           </property>
           <property>
             <name>resource.manager.logwhenfound</name>
             <value>false</value>
           </property>
+          <property>
+            <name>velocimacro.permissions.allow.inline.local.scope</name>
+            <value>true</value>
+          </property>
         </properties>
+      </configuration>
+    </component>
+    <component>
+      <role>org.xwiki.velocity.VelocityContext</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.velocity.DefaultVelocityContext</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <configuration>
+        <tools>
+          <tool>
+            <name>listtool</name>
+            <value>org.apache.velocity.tools.generic.ListTool</value>
+          </tool>
+          <tool>
+            <name>numbertool</name>
+            <value>org.apache.velocity.tools.generic.NumberTool</value>
+          </tool>
+          <tool>
+            <name>datetool</name>
+            <value>org.apache.velocity.tools.generic.DateTool</value>
+          </tool>
+          <tool>
+            <name>mathtool</name>
+            <value>org.apache.velocity.tools.generic.MathTool</value>
+          </tool>
+          <tool>
+            <name>sorttool</name>
+            <value>org.apache.velocity.tools.generic.SortTool</value>
+          </tool>
+          <tool>
+            <name>escapetool</name>
+            <value>org.apache.velocity.tools.generic.EscapeTool</value>
+          </tool>
+        </tools>
       </configuration>
     </component>
   </components>

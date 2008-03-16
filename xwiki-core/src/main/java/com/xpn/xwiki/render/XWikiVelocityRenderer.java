@@ -21,6 +21,7 @@ package com.xpn.xwiki.render;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
@@ -30,27 +31,25 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.tools.generic.ListTool;
-import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.tools.VelocityFormatter;
-import org.apache.velocity.context.InternalContextAdapterImpl;
-import org.apache.velocity.exception.MethodInvocationException;
-import org.apache.velocity.exception.ParseErrorException;
-import org.apache.velocity.exception.ResourceNotFoundException;
-import org.apache.velocity.runtime.RuntimeSingleton;
-import org.apache.velocity.runtime.parser.ParseException;
-import org.apache.velocity.runtime.parser.node.SimpleNode;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.xwiki.velocity.VelocityFactory;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.XWikiVelocityException;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
     private static final Log LOG = LogFactory.getLog(XWikiVelocityRenderer.class);
 
+    private static Map<String, VelocityContext> velocityContexts = new HashMap<String, VelocityContext>();
+    
     /**
      * {@inheritDoc}
      *
@@ -107,19 +106,72 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     }
 
     /**
-     * @todo this method is used in several places which is why it had to be made static. Instead we
-     * need to move it in a VelocityServices class or something similar as it's not related to
-     * rendering.
+     * @todo Move this initialization code to a Skin Manager component.
+     */
+    public static VelocityManager getVelocityManager(XWikiContext context) throws XWikiVelocityException
+    {
+    	// Note: For improved performance we cache the Velocity Managers in order not to 
+    	// recreate them all the time. The key we use is the location to the skin's macro.vm
+    	// file since caching on the skin would create more Managers than needed (some skins
+    	// don't have a macros.vm file and some skins inherit from others).
+    	
+    	// Create a Velocity context using the Velocity Manager associated to the current skin's
+    	// macros.vm
+    	
+        // Get the location of the skin's macros.vm file
+        String skin = context.getWiki().getSkin(context);
+        // We need the path relative to the webapp's home folder so we need to remove all path before
+        // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
+        String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
+        String cacheKey;
+        if (skinMacros != null) {
+        	cacheKey = skinMacros.substring(skinMacros.indexOf("/skins/"));
+        } else {
+            // If no skin macros.vm file exists then use a "default" cache id
+        	cacheKey = "default";
+        }
+
+        // Get the Velocity Manager to use
+        VelocityFactory velocityFactory =
+            (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE, context);
+        VelocityManager velocityManager;
+        if (velocityFactory.hasVelocityManager(cacheKey)) {
+        	velocityManager = velocityFactory.getVelocityManager(cacheKey); 
+        } else {
+	        // Gather the global Velocity macros that we want to have. These are skin dependent. 
+	        Properties properties = new Properties();
+	        String macroList = "/templates/macros.vm" + ((skinMacros == null) ? "" : "," + cacheKey); 
+	        properties.put(RuntimeConstants.VM_LIBRARY, macroList);
+    		velocityManager = velocityFactory.createVelocityManager(cacheKey, properties);
+        }    	
+
+        return velocityManager;
+    }
+    
+    /**
+     * @todo move this method to the VelocityManager component once we've moved to using the new 
+     * Container component + once we have the new XWiki Model.
      */
     public static VelocityContext prepareContext(XWikiContext context)
     {
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+    	// Note: At each Request the XWiki Context is recreated and thus at each request we need to
+    	// populate it with the Velocity context. During the same request (several Velocity
+    	// renderings are done in the same request) we cache the Velocity context for better performance.
+    	VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         if (vcontext == null) {
-            vcontext = new VelocityContext();
+	        // Create the Velocity Context
+	        vcontext = (VelocityContext) Utils.getComponent(org.xwiki.velocity.VelocityContext.ROLE, context);
+
+	        // Initialize it with read only objects (for better performances)
+	        
+	        // TODO: Remove since it's been replaced by the Number and Date tools. We need to find
+	        // all places in our VM and Documents where we might be using it.
+	        vcontext.put("formatter", new VelocityFormatter(vcontext));
+
+	        // Put the Util API in the Velocity context.
+	        vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
         }
-
-        vcontext.put("formatter", new VelocityFormatter(vcontext));
-
+        
         // We put the com.xpn.xwiki.api.XWiki object into the context and not the
         // com.xpn.xwiki.XWiki one which is for internal use only. In this manner we control what
         // the user can access.
@@ -133,12 +185,6 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         // what the user can access.
         vcontext.put("context", new Context(context));
 
-        // Put the Util API in the Velocity context.
-        vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
-
-        // Put the velocity ListTool in the Velocity context
-        vcontext.put("listtool", new ListTool());        
-
         // Save the Velocity Context in the XWiki context so that users can access the objects
         // we've put in it (xwiki, request, response, etc).
         context.put("vcontext", vcontext);
@@ -146,17 +192,13 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         return vcontext;
     }
 
-    public static String evaluate(String content, String name, VelocityContext vcontext)
-    {
-        return evaluate(content, name, vcontext, null);
-    }
-
     public static String evaluate(String content, String name, VelocityContext vcontext,
         XWikiContext context)
     {
         StringWriter writer = new StringWriter();
         try {
-            XWikiVelocityRenderer.evaluate(vcontext, writer, name, new StringReader(content));
+            VelocityManager velocityManager = getVelocityManager(context);
+            velocityManager.evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {
             e.printStackTrace();
@@ -166,92 +208,6 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
                 "Error while parsing velocity page {0}", e, args);
             return Util.getHTMLExceptionMessage(xe, context);
         }
-    }
-
-    public static boolean evaluate(org.apache.velocity.context.Context context, Writer writer,
-        String logTag, InputStream instream)
-        throws ParseErrorException, MethodInvocationException,
-        ResourceNotFoundException, IOException
-    {
-        /*
-         *  first, parse - convert ParseException if thrown
-         */
-
-        BufferedReader br = null;
-        String encoding = null;
-
-        try {
-            encoding =
-                RuntimeSingleton.getString(Velocity.INPUT_ENCODING, Velocity.ENCODING_DEFAULT);
-            br = new BufferedReader(new InputStreamReader(instream, encoding));
-        }
-        catch (UnsupportedEncodingException uce) {
-            String msg = "Unsupported input encoding : " + encoding
-                + " for template " + logTag;
-            throw new ParseErrorException(msg);
-        }
-
-        return XWikiVelocityRenderer.evaluate(context, writer, logTag, br);
-    }
-
-    /**
-     * Renders the input reader using the context into the output writer. To be used when a template
-     * is dynamically constructed, or want to use Velocity as a token replacer.
-     *
-     * @param context context to use in rendering input string
-     * @param writer Writer in which to render the output
-     * @param logTag string to be used as the template name for log messages in case of error
-     * @param reader Reader containing the VTL to be rendered
-     * @return true if successful, false otherwise.  If false, see Velocity runtime log
-     * @since Velocity v1.1
-     */
-    public static boolean evaluate(org.apache.velocity.context.Context context, Writer writer,
-        String logTag, Reader reader)
-        throws ParseErrorException, MethodInvocationException,
-        ResourceNotFoundException, IOException
-    {
-        SimpleNode nodeTree = null;
-
-        try {
-            nodeTree = RuntimeSingleton.parse(reader, logTag, false);
-        }
-        catch (ParseException pex) {
-            throw new ParseErrorException(pex.getMessage());
-        }
-
-        /*
-         * now we want to init and render
-         */
-
-        if (nodeTree != null) {
-            InternalContextAdapterImpl ica =
-                new InternalContextAdapterImpl(context);
-
-            ica.pushCurrentTemplateName(logTag);
-
-            try {
-                try {
-                    nodeTree.init(ica, RuntimeSingleton.getRuntimeServices());
-                }
-                catch (Exception e) {
-                    RuntimeSingleton.error("Velocity.evaluate() : init exception for tag = "
-                        + logTag + " : " + e);
-                }
-
-                /*
-                 *  now render, and let any exceptions fly
-                 */
-
-                nodeTree.render(ica, writer);
-            }
-            finally {
-                ica.popCurrentTemplateName();
-            }
-
-            return true;
-        }
-
-        return false;
     }
 
     private void generateFunction(StringBuffer result, String param, String data,

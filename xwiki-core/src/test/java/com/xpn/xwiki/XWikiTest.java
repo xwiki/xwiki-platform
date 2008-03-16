@@ -25,10 +25,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
-
+import org.xwiki.component.manager.ComponentManager;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -42,7 +41,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
  * 
  * @version $Id: $
  */
-public class XWikiTest extends MockObjectTestCase
+public class XWikiTest extends AbstractXWikiTestCase
 {
     private XWikiContext context;
 
@@ -56,11 +55,14 @@ public class XWikiTest extends MockObjectTestCase
 
     private Map docs = new HashMap();
 
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
         this.context = new XWikiContext();
         this.document = new XWikiDocument("MilkyWay", "Fidis");
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
+
+        // We need to initialize the Component Manager so that tcomponents can be looked up
+        this.context.put(ComponentManager.class.getName(), getComponentManager());
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},

@@ -19,13 +19,14 @@
  */
 package com.xpn.xwiki.render;
 
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.Mock;
+import org.xwiki.component.manager.ComponentManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.AbstractXWikiTestCase;
 
 import java.util.Collections;
 
@@ -34,7 +35,7 @@ import java.util.Collections;
  *
  * @version $Id: $
  */
-public class XWikiVelocityRendererTest extends MockObjectTestCase
+public class XWikiVelocityRendererTest extends AbstractXWikiTestCase
 {
     private XWikiContext context;
     private XWikiVelocityRenderer renderer;
@@ -44,13 +45,20 @@ public class XWikiVelocityRendererTest extends MockObjectTestCase
     private XWikiDocument document;
     private XWikiDocument contentDocument;
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
         this.renderer = new XWikiVelocityRenderer();
         this.context = new XWikiContext();
 
+        // We need to initialize the Component Manager so that the Velocity component can be
+        // looked up
+        this.context.put(ComponentManager.class.getName(), getComponentManager());
+
         this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
             new Object[] {new XWikiConfig(), context});
+        this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
+        this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
+        this.mockXWiki.stubs().method("getResourceContent").will(returnValue(null));
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockContentDocument = mock(XWikiDocument.class);

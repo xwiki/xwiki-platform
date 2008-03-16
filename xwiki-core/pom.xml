@@ -405,18 +405,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock</artifactId>
-      <version>1.1.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>jmock</groupId>
-      <artifactId>jmock-cglib</artifactId>
-      <version>1.1.0</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.lucene</groupId>
       <artifactId>lucene-core</artifactId>
       <version>2.3.0</version>
@@ -512,6 +500,11 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-velocity</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
       <version>1.4</version>
@@ -526,6 +519,24 @@
       <groupId>aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
       <version>1.5.2a</version>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-plexus</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>

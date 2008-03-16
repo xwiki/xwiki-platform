@@ -20,10 +20,14 @@
  */
 package org.xwiki.velocity;
 
-import org.apache.velocity.app.VelocityEngine;
+import java.io.Writer;
+import java.io.Reader;
+import java.util.Properties;
+
+import org.apache.velocity.VelocityContext;
 
 /**
- * Initialize the Velocity subsystem and make Velocity services available.
+ * Initialize a Velocity Engine and make Velocity services available.
  */
 public interface VelocityManager
 {
@@ -33,7 +37,40 @@ public interface VelocityManager
     public final static String ROLE = VelocityManager.class.getName();
 
     /**
-     * @return the initialized Velocity engine which can be used to call all Velocity services 
+     * Initializes the Velocity manager by setting its configuration both from the component's configuration
+     * and from the passed properties. This method must be called before any other method from this class
+     * can be executed.
+     *   
+     * @param properties the properties that will override the static properties defined in the component's configuration 
+     * @throws XWikiVelocityException in case of error 
      */
-    VelocityEngine getEngine();
+    void initialize(Properties properties) throws XWikiVelocityException;
+
+    /**
+     * Renders the input string using the context into the output writer.
+     *
+     * @param context the Velocity context to use in rendering the input string
+     * @param out the writer in which to render the output
+     * @param templateName the string to be used as the template name for log messages in case of
+     *        error
+     * @param source the input string containing the VTL to be rendered
+     * @return true if successful, false otherwise. If false, see the Velocity runtime log
+     * @throws XWikiVelocityException in case of error
+     */
+    boolean evaluate(VelocityContext context, Writer out, String templateName, String source)
+        throws XWikiVelocityException;
+
+    /**
+     * Renders the input string using the context into the output writer.
+     *
+     * @param context the Velocity context to use in rendering the input string
+     * @param out the writer in which to render the output
+     * @param templateName the string to be used as the template name for log messages in case of
+     *        error
+     * @param source the input containing the VTL to be rendered, as a Reader
+     * @return true if successful, false otherwise. If false, see the Velocity runtime log
+     * @throws XWikiVelocityException in case of error
+     */
+    boolean evaluate(VelocityContext context, Writer out, String templateName, Reader source)
+        throws XWikiVelocityException;
 }

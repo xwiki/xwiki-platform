@@ -12,13 +12,15 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1154257620000</creationDate>
-<date>1166177445000</date>
-<contentUpdateDate>1169801141000</contentUpdateDate>
-<version>1.17</version>
+<date>1204820838000</date>
+<contentUpdateDate>1204820838000</contentUpdateDate>
+<version>1.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
 <object>
 <class>
 <name>Panels.PanelClass</name>
@@ -29,72 +31,68 @@
 <defaultWeb></defaultWeb>
 <nameField></nameField>
 <validationScript></validationScript>
-<type>
-<name>type</name>
-<prettyName>Panel type</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
-<displayType>select</displayType>
-<multiSelect>0</multiSelect>
-<size>1</size>
-<separator> </separator>
-<separators> ,|</separators>
-<values>view|edit</values>
-<number>2</number>
-<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
-</type>
 <category>
-<name>category</name>
-<prettyName>Category</prettyName>
-<unmodifiable>0</unmodifiable>
-<relationalStorage>0</relationalStorage>
+<cache>0</cache>
 <displayType>select</displayType>
 <multiSelect>0</multiSelect>
-<size>1</size>
+<name>category</name>
+<number>5</number>
+<prettyName>Category</prettyName>
+<relationalStorage>0</relationalStorage>
 <separator> </separator>
 <separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
 <values>Information|Navigation|Tools|Administration|Other</values>
-<number>5</number>
 <classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
 </category>
-<description>
-<name>description</name>
-<prettyName>Description</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
-<rows>5</rows>
-<number>3</number>
-<editor>Text</editor>
-<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
-</description>
 <content>
-<name>content</name>
-<prettyName>Content</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>60</size>
-<rows>25</rows>
-<number>4</number>
 <editor>Text</editor>
+<name>content</name>
+<number>4</number>
+<prettyName>Content</prettyName>
+<rows>25</rows>
+<size>60</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
 </content>
+<description>
+<editor>Text</editor>
+<name>description</name>
+<number>3</number>
+<prettyName>Description</prettyName>
+<rows>5</rows>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
+<classType>com.xpn.xwiki.objects.classes.TextAreaClass</classType>
+</description>
 <name>
 <name>name</name>
-<prettyName>Name</prettyName>
-<unmodifiable>0</unmodifiable>
-<size>40</size>
 <number>1</number>
+<prettyName>Name</prettyName>
+<size>40</size>
+<unmodifiable>0</unmodifiable>
 <classType>com.xpn.xwiki.objects.classes.StringClass</classType>
 </name>
+<type>
+<cache>0</cache>
+<displayType>select</displayType>
+<multiSelect>0</multiSelect>
+<name>type</name>
+<number>2</number>
+<prettyName>Panel type</prettyName>
+<relationalStorage>0</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>1</size>
+<unmodifiable>0</unmodifiable>
+<values>view|edit</values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</type>
 </class>
 <name>Panels.RightsTips</name>
 <number>0</number>
 <className>Panels.PanelClass</className>
-<property>
-<type>edit</type>
-</property>
-<property>
-<description>Extended help on Rights Editor Usage.</description>
-</property>
 <property>
 <category>Information</category>
 </property>
@@ -113,7 +111,7 @@ To open a Wiki for editing by the public:
 * Allow/Deny: Allow
     &lt;/div&gt;
   &lt;/div&gt;
-  &lt;div id="xwikitipsregistered"&gt;
+  &lt;div id="xwikitipsregistered" class="accordion"&gt;
     &lt;div id="xwikitipsregisteredHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Authenticate on view/edit&lt;/h6&gt;&lt;/div&gt;
     &lt;div id="xwikitipsregisteredContent" class="accordionTabContentBox"&gt;
 To protect a Wiki or Space by allowing only logged-in users using an account created on your Wiki use:
@@ -138,10 +136,19 @@ To protect a Wiki or Space by disallowing banned users to edit documents use:
 &lt;/div&gt;
 #panelfooter()
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;new Rico.Accordion( 'xwikirightstips', {panelHeight:'max'} ); togglePanelVisibility((document.getElementById('xwikirightstipspanel')).getElementsByTagName('div').item(0));&lt;/script&gt;</content>
+&lt;script type="text/javascript"&gt;
+var obj = {div:'xwikirightstips',no:0,height:250};
+var acc = createAccordion(obj);
+togglePanelVisibility((document.getElementById('xwikirightstipspanel')).getElementsByTagName('div').item(0));&lt;/script&gt;</content>
+</property>
+<property>
+<description>Extended help on Rights Editor Usage.</description>
 </property>
 <property>
 <name>Rights Tips</name>
+</property>
+<property>
+<type>edit</type>
 </property>
 </object>
 <content>#includeForm("Panels.PanelSheet")</content>

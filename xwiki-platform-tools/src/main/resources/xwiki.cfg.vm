@@ -177,6 +177,12 @@ xwiki.section.edit=1
 xwiki.defaultskin=$xwikiCfgDefaultSkin
 xwiki.defaultbaseskin=$xwikiCfgDefaultBaseSkin
 
+# Calendar Prev/Next Month bounds.
+# The calendar generates links to the previous/next months for a limited range, by default 6 months back and 12 months after.
+# A value of 0 means that there is no limit in that direction.
+# xwiki.calendar.bound.prev=6
+# xwiki.calendar.bound.next=12
+
 ## XWiki temporary directory
 # xwiki.temp.dir=/tmp/xwiki
 ## XWiki work directory

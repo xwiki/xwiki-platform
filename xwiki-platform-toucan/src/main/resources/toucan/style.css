@@ -1664,14 +1664,17 @@ span.pitemseparator{
   height: 256px;
   margin: 0 4px;
   width: 210px;
-    position: relative;
+  position: relative;
   float: left;
 }
 .panelitemc .label{
   text-align: center;
-background-color: transparent;
-padding: 2px 0;
-font-weight: bold;
+  background-color: transparent;
+  padding: 2px 0;
+  font-weight: bold;
+}
+.accordionTabContentBox .panelitemc .label {
+  color: #fff;
 }
 .panelitemc .xwikibuttonlink{
   text-align: center;
@@ -1718,9 +1721,9 @@ Rico Acordeon
 .accordionTabTitleBar h6{
  margin: 0;
  padding:4px;
-font:bold 1em/1.1em sans-serif;
-color: #FFF;
-background-color: #8799b3;
+ font:bold 1em/1.1em sans-serif;
+ color: #FFF;
+ background-color: #8799b3;
 }
 #panellistaccordion #xwikinav .accordionTabTitleBar h6,
 #xwikinav .accordionTabTitleBar h6{
@@ -1730,11 +1733,13 @@ background-color: #8799b3;
 	margin-top: 0;
 	border-width: 1px 0 0 0;
 }
-
+#xwikinav .accordionTabContentBox {
+  background-color: #fff;
+  border-top: 1px solid #999;
+}
 #xwikinavcontainer #xwikinav .tbexpanded h6 {
 	border-width: 1px 0;
 }
-
 #xwikieditcontent .accordionTabTitleBar h6{
 margin: 0;
 padding:4px 21px;
@@ -1755,11 +1760,9 @@ background-position: 0% 50%;
 	padding: 2px 3px;
 	font-weight: bold;
 }
-
-
 #editPanels .accordionTabContentBox{
   border: none;
-  overflow: auto;
+  overflow: auto !important;
 }
 #editPanels .accordionTabContentBox table{
   border: none;
@@ -1779,21 +1782,24 @@ background-position: 0% 50%;
 .accordionTabContentBox {
 	position:  relative;
 	padding: 5px;
-	overflow: auto;
+	overflow: hidden;
 }
 #allviewpanels .accordionTabContentBox {
 	padding: 5px;
-	overflow: auto;
+	overflow: auto !important;
 	background-image: url( images/H4x4.png );
 }
 #panellistaccordion #xwikinav .accordionTabContentBox{
 	background-image: none;
-	overflow: hidden;
-	}
+	overflow: auto !important;
+}
+#xwikinav .accordionTabContentBox {
+  overflow: auto !important;
+}
 #xwikinav ul.minus {
-margin: 0;
-padding: 0 5px;
-list-style-type: none;
+  margin: 0;
+  padding: 0 5px;
+  list-style-type: none;
 }
 #xwikisyntaxhelp table tbody tr {
 	display: block;

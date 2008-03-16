@@ -417,16 +417,16 @@ ASSFilter.prototype = {
       var key = inputs[i].name;
       if (inputs[i].type == "radio" || inputs[i].type == "checkbox" ) {
         if (inputs[i].checked) {
-          this.filters[key] = inputs[i].value.trim();
+          this.filters[key] = inputs[i].value.strip();
         }
       } else {
-        this.filters[key] = inputs[i].value.trim();
+        this.filters[key] = inputs[i].value.strip();
       }
     }
 
     var selects = this.filterNode.getElementsByTagName('select');
     for(var i = 0; i < selects.length; i++) {
-      this.filters[selects[i].name] = selects[i].value.trim();
+      this.filters[selects[i].name] = selects[i].value.strip();
     }
 
     var filterString = "";
@@ -861,13 +861,3 @@ function makeAddHandler(url, saveurl, redirecturl)
     window.lb = new Lightbox(url, saveurl, redirecturl);
   }
 }
-
-String.prototype.extend({
-  /**
-    * Utility function, removes preceding and trailing spaces from a string.
-    * @addon
-    */
-  trim: function() {
-    return /^[ ]*(.*?)[ ]*$/.exec(this)[1];
-  }
-});

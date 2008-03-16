@@ -143,7 +143,7 @@
 #set($spaces = $xwiki.spaces)
 #set($i = 0)
 #set($spacecount = 0)
-&lt;div id="xwikinav"&gt;
+&lt;div id="xwikinav" class="accordion"&gt;
 #foreach($space in $spaces)
 #if (!$hiddenSpaces.contains($space) || ($hiddenSpaces.contains($space) &amp;&amp; $xwiki.hasAdminRights()))
 #if ($doc.web == $space)
@@ -174,7 +174,10 @@
 #end
 &lt;/div&gt;
 &lt;/div&gt;
-&lt;script type="text/javascript"&gt;new Rico.Accordion( 'xwikinav', {panelHeight:'250',onLoadShowTab:'$spacecount'} );&lt;/script&gt;
+&lt;script type="text/javascript"&gt;
+var obj = {div:'xwikinav',no:$spacecount,height:250};
+var acc = createAccordion(obj);
+&lt;/script&gt;
 #panelfooter()</content>
 </property>
 <property>

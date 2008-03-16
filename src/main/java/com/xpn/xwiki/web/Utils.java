@@ -517,10 +517,22 @@ public class Utils
             try {
                 component = componentManager.lookup(role, hint);
             } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to load component [" + role + "]", e);
+                throw new RuntimeException("Failed to load component [" + role + "] for hint ["
+                    + "]", e);
             }
         }
         return component;
     }
 
+    /**
+     * Lookup a XWiki component by role (uses the default hint).
+     *
+     * @param role the component's identity (usually the component's interface name as a String)
+     * @param context the XWiki Context where the Component Manager is stored
+     * @return the component's Object
+     */
+    public static Object getComponent(String role, XWikiContext context)
+    {
+        return getComponent(role, "default", context);
+    }
 }

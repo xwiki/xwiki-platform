@@ -20,20 +20,20 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import junit.framework.TestCase;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.AbstractXWikiTestCase;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import org.xwiki.component.manager.ComponentManager;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.objects.classes.DBTreeListClass}.
  * 
  * @version $Id: $
  */
-public class DBTreeListClassTest extends TestCase
+public class DBTreeListClassTest extends AbstractXWikiTestCase
 {
     private XWikiContext context;
 
@@ -41,6 +41,10 @@ public class DBTreeListClassTest extends TestCase
     {
         this.context = new XWikiContext();
         this.context.setDoc(new XWikiDocument());
+
+        // The DBTreeListClass uses the Velocity Renderer so we need to set it up.
+        this.context.put(ComponentManager.class.getName(), getComponentManager());
+
         XWikiHibernateStore store = new XWikiHibernateStore("dummy");
         XWiki xwiki = new XWiki(new XWikiConfig(), context);
         xwiki.setStore(store);

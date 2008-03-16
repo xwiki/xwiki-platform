@@ -25,11 +25,11 @@ import java.io.ByteArrayInputStream;
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
-
+import org.xwiki.component.manager.ComponentManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.AbstractXWikiTestCase;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiServletContext;
 
@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.XWikiServletContext;
  * 
  * @version $Id: $
  */
-public class DefaultXWikiRenderingEngineTest extends MockObjectTestCase
+public class DefaultXWikiRenderingEngineTest extends AbstractXWikiTestCase
 {
 	private DefaultXWikiRenderingEngine engine;
 	private XWikiContext context;
@@ -48,11 +48,16 @@ public class DefaultXWikiRenderingEngineTest extends MockObjectTestCase
         XWikiConfig config = new XWikiConfig();
         this.context = new XWikiContext();
 
+        // We need to initialize the Component Manager so that tcomponents can be looked up
+        this.context.put(ComponentManager.class.getName(), getComponentManager());
+
         Mock mockServletContext = mock(ServletContext.class);
         ByteArrayInputStream bais = new ByteArrayInputStream("code=wiki:code:type:content".getBytes());
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.txt")).will(returnValue(bais));
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache.properties")).will(returnValue(new ByteArrayInputStream("".getBytes())));
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/WEB-INF/oscache-local.properties")).will(returnValue(new ByteArrayInputStream("".getBytes())));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/skins/albatross/macros.vm")).will(returnValue(new ByteArrayInputStream("".getBytes())));
+        mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.vm")).will(returnValue(new ByteArrayInputStream("".getBytes())));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
                 
         XWiki xwiki = new XWiki(config, context, engineContext, false);

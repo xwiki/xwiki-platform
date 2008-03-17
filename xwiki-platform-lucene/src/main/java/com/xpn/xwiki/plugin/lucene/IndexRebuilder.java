@@ -75,7 +75,7 @@ public class IndexRebuilder
         Collection wikiServers;
         XWiki xwiki = context.getWiki();
 
-        if (xwiki.isVirtual()) {
+        if (xwiki.isVirtualMode()) {
             wikiServers = findWikiServers(context);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("found " + wikiServers.size() + " virtual wikis:");

@@ -166,8 +166,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             return authenticator;
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                XWikiException.ERROR_XWIKI_USER_INIT,
-                "Cannot initialize authentication system",
+                XWikiException.ERROR_XWIKI_USER_INIT, "Cannot initialize authentication system",
                 e);
         }
     }
@@ -231,7 +230,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     /**
      * Method to authenticate and set the cookie from a username and password passed as parameters
-     *
+     * 
      * @return null if the user is not authenticated properly
      */
     public XWikiUser checkAuth(String username, String password, String rememberme,
@@ -257,8 +256,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             new SecurityRequestWrapper(request, null, null, auth.getAuthMethod());
         try {
             if (!auth.processLogin(username, password, rememberme, wrappedRequest, response,
-                context))
-            {
+                context)) {
                 return null;
             }
 
@@ -294,19 +292,19 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see XWikiAuthService#authenticate(String,String,XWikiContext)
      */
     public Principal authenticate(String username, String password, XWikiContext context)
         throws XWikiException
     {
         /*
-         * This method was returning null on failure so I preserved that behaviour, while adding
-         * the exact error messages to the context given as argument. However, the right way to do
-         * this would probably be to throw XWikiException-s.
+         * This method was returning null on failure so I preserved that behaviour, while adding the
+         * exact error messages to the context given as argument. However, the right way to do this
+         * would probably be to throw XWikiException-s.
          */
 
-        if (username==null) {
+        if (username == null) {
             // If we can't find the username field then we are probably on the login screen
             return null;
         }
@@ -357,11 +355,11 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 // continue
             }
 
-            if (context.isVirtual()) {
+            if (!context.isMainWiki()) {
                 // Then we check in the main database
                 String db = context.getDatabase();
                 try {
-                    context.setDatabase(context.getWiki().getDatabase());
+                    context.setDatabase(context.getMainXWiki());
                     try {
                         String user = findUser(susername, context);
                         if (user != null) {
@@ -406,7 +404,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             // enter it exactly as they've created it.
             String sql = "select distinct doc.fullName from XWikiDocument as doc";
             Object[][] whereParameters =
-                new Object[][] {{"doc.web", "XWiki"}, {"doc.name", username}};
+                new Object[][] { {"doc.web", "XWiki"}, {"doc.name", username}};
 
             List list = context.getWiki().search(sql, whereParameters, context);
             if (list.size() == 0) {
@@ -416,7 +414,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             }
         }
 
-        return user; 
+        return user;
     }
 
     protected boolean checkPassword(String username, String password, XWikiContext context)
@@ -495,8 +493,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                         ldapplugin.createUserFromLDAP(wikiname, user, null, null, context);
                     } else {
                         if (log.isErrorEnabled()) {
-                            log.error(
-                                "Impossible to create user from LDAP because LDAP plugin is not activated");
+                            log
+                                .error("Impossible to create user from LDAP because LDAP plugin is not activated");
                         }
                     }
                 } else if ("empty".equals(createuser)) {

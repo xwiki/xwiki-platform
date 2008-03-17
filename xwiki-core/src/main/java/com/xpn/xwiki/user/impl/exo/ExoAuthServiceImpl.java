@@ -127,12 +127,12 @@ public class ExoAuthServiceImpl extends XWikiAuthServiceImpl {
             } catch (Exception e) {
             }
 
-            if (context.isVirtual()) {
+            if (!context.isMainWiki()) {
                 if (EX == null || EX.length() == 0) {
                     // Then we check in the main database
                     String db = context.getDatabase();
                     try {
-                        context.setDatabase(context.getWiki().getDatabase());
+                        context.setDatabase(context.getMainXWiki());
                         try {
                             String user = findUser(susername, context);
                             if (user != null && user.length() != 0)

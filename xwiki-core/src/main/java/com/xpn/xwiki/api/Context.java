@@ -103,11 +103,11 @@ public class Context extends Api
     }
 
     /**
-     * @return true if the server is in virtual mode (ie host more than one wiki)
+     * @return true it's main wiki's context, false otherwise.
      */
-    public boolean isVirtual()
+    public boolean isMainWiki()
     {
-        return getXWikiContext().isVirtual();
+        return getXWikiContext().isMainWiki();
     }
 
     /**

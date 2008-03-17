@@ -162,18 +162,6 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Indicate if context target the main wiki.
-     * 
-     * @param context the XWiki context.
-     * @return true if in main wiki, false otherwise.
-     */
-    public boolean isInMainWiki(XWikiContext context)
-    {
-        return !context.isVirtual()
-            || context.getDatabase().equalsIgnoreCase(context.getMainXWiki());
-    }
-
-    /**
      * Remove reference to provided user or group in all groups and rights in current wiki.
      * 
      * @param userOrGroupWiki the wiki name of the group or user.
@@ -206,7 +194,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace,
         String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
     {
-        if (!context.isVirtual()) {
+        if (!context.getWiki().isVirtualMode()) {
             cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
                 userOrGroupName, user, context);
         } else {
@@ -219,7 +207,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
                 for (Iterator it = wikiList.iterator(); it.hasNext();) {
                     String wikiName = (String) it.next();
 
-                    if (wikiName.equalsIgnoreCase(context.getMainXWiki())) {
+                    if (context.isMainWiki(wikiName)) {
                         foundMainWiki = true;
                     }
 
@@ -293,7 +281,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     public int countAllUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
         throws XWikiException
     {
-        if (isInMainWiki(context)) {
+        if (context.isMainWiki()) {
             return countAllLocalUsersOrGroups(user, matchFields, context);
         }
 
@@ -320,7 +308,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     public int countAllWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields,
         XWikiContext context) throws XWikiException
     {
-        if (isInMainWiki(context)) {
+        if (context.isMainWiki()) {
             return countAllLocalUsersOrGroups(user, matchFields, context);
         }
 
@@ -352,7 +340,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
     public int countAllGlobalUsersOrGroups(boolean user, Object[][] matchFields,
         XWikiContext context) throws XWikiException
     {
-        if (isInMainWiki(context)) {
+        if (context.isMainWiki()) {
             return countAllLocalUsersOrGroups(user, matchFields, context);
         }
 
@@ -416,7 +404,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {
-        if (isInMainWiki(context)) {
+        if (context.isMainWiki()) {
             return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
                 context);
         }
@@ -478,8 +466,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {
-        if (!context.isVirtual()
-            || context.getDatabase().equalsIgnoreCase(context.getMainXWiki())) {
+        if (context.isMainWiki()) {
             return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
                 context);
         }
@@ -519,7 +506,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
         Object[][] matchFields, boolean withdetails, RequestLimit limit, Object[][] order,
         XWikiContext context) throws XWikiException
     {
-        if (isInMainWiki(context)) {
+        if (context.isMainWiki()) {
             return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
                 context);
         }
@@ -849,7 +836,7 @@ final class RightsManager implements XWikiDocChangeNotificationInterface
 
         if (currentGlobal) {
             if (currentPreference.getFullName().equals(WIKI_PREFERENCES)) {
-                if (!context.getMainXWiki().equalsIgnoreCase(context.getDatabase())) {
+                if (!context.isMainWiki()) {
                     parentPreferences =
                         context.getWiki()
                             .getDocument(

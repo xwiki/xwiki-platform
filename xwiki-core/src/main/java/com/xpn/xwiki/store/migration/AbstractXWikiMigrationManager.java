@@ -102,9 +102,8 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
      */
     public void startMigrations(XWikiContext context) throws XWikiException
     {
-        if (context.getWiki().isVirtual()) {
+        if (context.getWiki().isVirtualMode()) {
             // Save context values so that we can restore them as they were before the migration.
-            boolean currentIsVirtual = context.isVirtual();
             String currentDatabase = context.getDatabase();
             String currentOriginalDatabase = context.getOriginalDatabase();
 
@@ -115,7 +114,6 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                         new Object[] {database}));
                     // Set up the context so that it points to the virtual wiki corresponding to the
                     // database.
-                    context.setVirtual(true);
                     context.setDatabase(database);
                     context.setOriginalDatabase(database);
                     try {
@@ -133,7 +131,6 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
                     }
                 }
             } finally {
-                context.setVirtual(currentIsVirtual);
                 context.setDatabase(currentDatabase);
                 context.setOriginalDatabase(currentOriginalDatabase);
             }
@@ -169,7 +166,7 @@ public abstract class AbstractXWikiMigrationManager implements XWikiMigrationMan
         // Add the databases listed by the user (if any). If there's a single database named and if
         // it's "all" or "ALL"
         // then automatically add all the registered databases.
-        if (context.getWiki().isVirtual()) {
+        if (context.getWiki().isVirtualMode()) {
             String[] databases =
                 context.getWiki().getConfig().getPropertyAsList("xwiki.store.migration.databases");
             if ((databases.length == 1) && databases[0].equalsIgnoreCase("all")) {

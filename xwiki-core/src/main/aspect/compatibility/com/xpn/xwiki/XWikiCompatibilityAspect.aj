@@ -24,7 +24,6 @@ import com.xpn.xwiki.XWiki;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.*;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -47,5 +46,14 @@ public privileged aspect XWikiCompatibilityAspect
         } catch (UnsupportedEncodingException e) {
             return content;
         }
+    }
+    
+    /**
+     * @return true for multi-wiki/false for mono-wiki
+     * @deprecated replaced by {@link XWiki#isVirtualMode()} since 1.4M1.
+     */
+    public boolean XWiki.isVirtual()
+    {
+        return this.isVirtualMode();
     }
 }

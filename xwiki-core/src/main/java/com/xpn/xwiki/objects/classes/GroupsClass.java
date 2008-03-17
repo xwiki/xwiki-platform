@@ -125,7 +125,7 @@ public class GroupsClass extends ListClass
 
         list.remove("XWiki.XWikiAllGroup");
         list.add(0, "XWiki.XWikiAllGroup");
-        if ((context.getWiki().isVirtual() && (!context.getDatabase().equals("xwiki")))) {
+        if (!context.isMainWiki()) {
             list.remove("xwiki:XWiki.XWikiAllGroup");
             list.add(1, "xwiki:XWiki.XWikiAllGroup");
         }

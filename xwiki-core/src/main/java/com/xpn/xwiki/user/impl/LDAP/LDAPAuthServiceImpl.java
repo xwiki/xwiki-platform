@@ -95,7 +95,7 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
 
                 	   // In case of Virtual Wikis, users should be added in the main wiki
                 	   	// if ldap is not configured for the virtual wiki
-						if (context.isVirtual()) {
+						if (context.getWiki().isVirtualMode()) {
 							String db = context.getDatabase();
 							try {
 								// Switch to the main database in case of
@@ -199,12 +199,12 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
         } catch (Exception e) {
         }
 
-        if (context.isVirtual()) {
+        if (!context.isMainWiki()) {
             if (principal == null) {
                 // Then we check in the main database
                 String db = context.getDatabase();
                 try {
-                    context.setDatabase(context.getWiki().getDatabase());
+                    context.setDatabase(context.getMainXWiki());
                     try {
                         String user = findUser(susername, context);
                         if (user != null)
@@ -231,12 +231,12 @@ public class LDAPAuthServiceImpl extends XWikiAuthServiceImpl {
             } catch (Exception e) {
             }
 
-            if (context.isVirtual()) {
+            if (!context.isMainWiki()) {
                 if (DN == null || DN.length() == 0) {
                     // Then we check in the main database
                     String db = context.getDatabase();
                     try {
-                        context.setDatabase(context.getWiki().getDatabase());
+                        context.setDatabase(context.getMainXWiki());
                         try {
                             String user = findUser(susername, context);
                             if (user != null && user.length() != 0)

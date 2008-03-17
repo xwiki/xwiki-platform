@@ -776,11 +776,11 @@ public class Util {
      * @param elementName the XML element name to validate
      * @return true if the element name is valid, false if it is not
      */
-    public boolean isValidXMLElementName(String elementName)
+    public static boolean isValidXMLElementName(String elementName)
     {
         if (elementName == null
             || elementName.equals("")
-            || elementName.matches("^(xml).*")
+            || elementName.matches("(?i)^(xml).*")
             || !elementName.matches("(^[a-zA-Z\\-\\_]+[\\w\\.\\-\\_\\:]*$)"))
         {
             return false;

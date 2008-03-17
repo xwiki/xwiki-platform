@@ -36,4 +36,20 @@ public class UtilTest extends TestCase
         assertEquals("e", Util.convertToAlphaNumeric("e$%£#^()"));
         assertEquals("e", Util.convertToAlphaNumeric(":\u0205!"));
     }
+
+    public void testIsValidXMLElementName()
+    {
+        assertTrue(Util.isValidXMLElementName("myprop"));
+        assertTrue(Util.isValidXMLElementName("my_prop"));
+        assertTrue(Util.isValidXMLElementName("my_prop-1"));
+        assertTrue(Util.isValidXMLElementName("ns:my_prop-1"));
+        assertTrue(Util.isValidXMLElementName("ns:my_prop-1.1"));
+        assertFalse(Util.isValidXMLElementName("1prop"));        
+        assertFalse(Util.isValidXMLElementName("xmlprop"));
+        assertFalse(Util.isValidXMLElementName("XMLprop"));
+        assertFalse(Util.isValidXMLElementName("xMLprop"));
+        assertFalse(Util.isValidXMLElementName("Xmlprop"));
+        assertFalse(Util.isValidXMLElementName("ns my_prop"));
+        assertFalse(Util.isValidXMLElementName("ns,my_prop"));
+    }
 }

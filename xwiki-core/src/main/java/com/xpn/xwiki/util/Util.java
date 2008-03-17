@@ -762,4 +762,26 @@ public class Util {
         return result.toString();
     }
 
+    /**
+     * Validate a XML element name.
+     *
+     * XML elements must follow these naming rules :
+     * Names can contain letters, numbers, and the following characters [., -, _, :].
+     * Names must not start with a number or punctuation character. Names must not start with the
+     * letters xml (or XML, or Xml, etc). Names cannot contain spaces.
+     *
+     * @param elementName the XML element name to validate
+     * @return true if the element name is valid, false if it is not
+     */
+    public boolean isValidXMLElementName(String elementName)
+    {
+        if (elementName == null
+            || elementName.equals("")
+            || elementName.matches("^(xml).*")
+            || !elementName.matches("(^[a-zA-Z\\-\\_]+[\\w\\.\\-\\_\\:]*$)"))
+        {
+            return false;
+        }
+        return true;
+    }
 }

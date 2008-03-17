@@ -4,9 +4,21 @@
 ### TODO: Web service?
 ###
 <div id="xwikicontent">
+$context.resetProgrammingRightsChecker()
 $cdoc.getRenderedContent()
+#set ($needProgrammingRights = $context.haveProgrammingRightsBeenChecked())
 #putFootnotes()
 </div>
 <div class="about">
 $msg.get("version") $tdoc.version $msg.get("lastmodifiedby") $xwiki.getLocalUserName($tdoc.author) $msg.get("lastmodifiedon") $!xwiki.formatDate($tdoc.date, "dd/MM/yyyy") $msg.get("at") $!xwiki.formatDate($tdoc.date, "HH:mm")
 </div>
+#if ($needProgrammingRights)
+  #if (!$doc.hasProgrammingRights())
+    #if ($xwiki.hasAccessLevel("programming", $doc.fullName))
+      #set ($viewdocurl = $doc.getURL("view"))
+      #error($msg.get("core.programmingRightsChecker.error.programmers", [$doc.getURL("view", "viewer=code"), $doc.getURL("objectadd", "classname=XWiki.XWikiRights&XWiki.XWikiRights_groups=XWiki.XWikiAdminGroup&XWiki.XWikiRights_levels=edit&XWiki.XWikiRights_allow=1&xredirect=${viewdocurl}")]))
+    #else
+      #error($msg.get("core.programmingRightsChecker.error.basicusers"))
+    #end
+  #end
+#end

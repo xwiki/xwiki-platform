@@ -38,7 +38,7 @@ public class PropAddAction extends XWikiAction {
 
         String propName = ((PropAddForm) form).getPropName();
 
-        if(propName ==null || propName.equals("") || !propName.matches("[\\w\\.\\-\\_]+") ){
+        if (!context.getUtil().isValidXMLElementName(propName)){
             context.put("message","propertynamenotcorrect");
             return true;
         }

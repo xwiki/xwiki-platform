@@ -764,11 +764,14 @@ public class Util {
 
     /**
      * Validate a XML element name.
-     *
      * XML elements must follow these naming rules :
-     * Names can contain letters, numbers, and the following characters [., -, _, :].
-     * Names must not start with a number or punctuation character. Names must not start with the
-     * letters xml (or XML, or Xml, etc). Names cannot contain spaces.
+     *
+     * <ul>
+     * <li>Names can contain letters, numbers, and the following characters [., -, _, :].</li>
+     * <li>Names must not start with a number or punctuation character.</li>
+     * <li>Names must not start with the letters xml (or XML, or Xml, etc).</li>
+     * <li>Names cannot contain spaces.</li>
+     * </ul>
      *
      * @param elementName the XML element name to validate
      * @return true if the element name is valid, false if it is not

@@ -222,14 +222,6 @@ public class Context extends Api
         }
     }
 
-    public void resetProgrammingRightsChecker() {
-        getXWikiContext().put(PROGRAMMING_RIGHTS_CHECKER_FLAG, false);
-    }
-
-    public boolean haveProgrammingRightsBeenChecked() {
-        return (Boolean) getXWikiContext().get(PROGRAMMING_RIGHTS_CHECKER_FLAG);
-    }
-
     public void setFinished(boolean finished)
     {
         getXWikiContext().setFinished(finished);

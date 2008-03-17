@@ -145,7 +145,7 @@ final class GlobalSearch
         List orderColumns = parseOrderColumns(query.getHql());
 
         Collection wikiNameList;
-        if (context.isVirtual()) {
+        if (context.getWiki().isVirtualMode()) {
             wikiNameList = query.getWikiNameList();
             if (wikiNameList.isEmpty()) {
                 wikiNameList = getAllWikiNameList(context);

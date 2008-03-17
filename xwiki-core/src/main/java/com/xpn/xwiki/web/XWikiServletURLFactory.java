@@ -134,8 +134,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (host != null) {
                 int comaind = host.indexOf(',');
                 final String host1 = comaind > 0 ? host.substring(0, comaind) : host;
-                if (!host1.equals(""))
-                    serverURL = new URL("http://" + host1);
+                if (!host1.equals(""))                     
+                    serverURL = new URL(context.getRequest().getScheme() + "://" + host1);
             }
         }
         if (xwikidb == null)

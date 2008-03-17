@@ -73,7 +73,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             (context.getWiki() == null) ? "" : context.getWiki().Param("xwiki.servletpath", "");
         if (contextPath.equals("")) {
             try {
-                contextPath = context.getRequest().getContextPath().substring(1) + "/";
+                contextPath = context.getRequest().getContextPath();
+                // TODO We're using URL parts in a wrong way, since contextPath and servletPath are
+                // returned with a leading /, while we need a trailing /. This code moves the / from
+                // the beginning to the end.
+                // If the app is deployed as the ROOT ap, then there's no need to move the /.
+                if (contextPath.length() > 0) {
+                    contextPath = contextPath.substring(1) + "/";
+                }
             } catch (Exception e) {
                 contextPath = path.substring(0, path.indexOf('/', 1) + 1);
             }

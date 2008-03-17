@@ -683,8 +683,10 @@ public class Document extends Api
     public String getXMLContent() throws XWikiException
     {
         String xml = doc.getXMLContent(getXWikiContext());
-        return getXWikiContext().getUtil()
-            .substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml);
+        return getXWikiContext().getUtil().substitute(
+            "s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
+            getXWikiContext().getUtil()
+            .substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml));
     }
 
     public String toXML() throws XWikiException

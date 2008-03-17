@@ -23,6 +23,7 @@ package com.xpn.xwiki.web;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
@@ -38,7 +39,7 @@ public class PropAddAction extends XWikiAction {
 
         String propName = ((PropAddForm) form).getPropName();
 
-        if (!context.getUtil().isValidXMLElementName(propName)){
+        if (!Util.isValidXMLElementName(propName)){
             context.put("message","propertynamenotcorrect");
             return true;
         }

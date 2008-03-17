@@ -25,11 +25,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.jmock.Mock;
+import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
-import org.xwiki.component.manager.ComponentManager;
 
-import com.xpn.xwiki.AbstractXWikiTestCase;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -45,7 +44,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
  * 
  * @version $Id: $
  */
-public class WikiManagerTest extends AbstractXWikiTestCase
+public class WikiManagerTest extends MockObjectTestCase
 {
     private XWikiContext context;
 
@@ -66,8 +65,6 @@ public class WikiManagerTest extends AbstractXWikiTestCase
     {
         this.context = new XWikiContext();
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
-
-        this.context.put(ComponentManager.class.getName(), getComponentManager());
 
         databases.put(WIKI_NAME, new HashMap<String, XWikiDocument>());
 

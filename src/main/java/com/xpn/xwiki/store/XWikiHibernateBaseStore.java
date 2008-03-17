@@ -332,10 +332,10 @@ public class XWikiHibernateBaseStore
         DatabaseProduct databaseProduct = getDatabaseProductName(context);
 
         if (databaseProduct == DatabaseProduct.DERBY) {
-            return wikiName.equalsIgnoreCase(context.getMainXWiki()) ? "APP" : wikiName.replace(
+            return context.isMainWiki(wikiName) ? "APP" : wikiName.replace(
                 '-', '_');
         } else if (databaseProduct == DatabaseProduct.HSQLDB) {
-            return wikiName.equalsIgnoreCase(context.getMainXWiki()) ? "PUBLIC" : wikiName
+            return context.isMainWiki(wikiName) ? "PUBLIC" : wikiName
                 .replace('-', '_');
         } else
             return wikiName.replace('-', '_');
@@ -525,14 +525,16 @@ public class XWikiHibernateBaseStore
      * Checks if this xwiki setup is virtual meaning if multiple wikis can be accessed using the
      * same database pool
      * 
-     * @param context
-     * @return
+     * @param context the XWiki context.
+     * @return true if multi-wiki, false otherwise.
      */
     protected boolean isVirtual(XWikiContext context)
     {
-        if ((context == null) || (context.getWiki() == null))
+        if ((context == null) || (context.getWiki() == null)) {
             return true;
-        return context.getWiki().isVirtual();
+        }
+        
+        return context.getWiki().isVirtualMode();
     }
 
     /**

@@ -22,7 +22,6 @@ package com.xpn.xwiki.api;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.plugin.query.XWikiCriteria;
@@ -969,9 +968,9 @@ public class XWiki extends Api
      * 
      * @return true for multi-wiki/false for mono-wiki
      */
-    public boolean isVirtual()
+    public boolean isVirtualMode()
     {
-        return xwiki.isVirtual();
+        return xwiki.isVirtualMode();
     }
 
     /**

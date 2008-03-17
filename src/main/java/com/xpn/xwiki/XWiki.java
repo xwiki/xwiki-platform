@@ -37,7 +37,6 @@ import java.net.InetAddress;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -50,7 +49,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.Vector;
-import java.util.HashSet;
 import java.util.zip.ZipOutputStream;
 
 import javax.naming.Context;
@@ -80,7 +78,6 @@ import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
 import org.xwiki.observation.ObservationManager;
-import org.xwiki.observation.event.ActionExecutionEvent;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
 import org.xwiki.observation.event.DocumentUpdateEvent;
@@ -500,7 +497,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         XWiki xwiki = getMainXWiki(context);
 
-        if (xwiki.isVirtual()) {
+        if (xwiki.isVirtualMode()) {
             XWikiRequest request = context.getRequest();
             String host = "";
             try {
@@ -559,7 +556,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     wikiOwner = xwiki.getDatabase() + ":" + wikiOwner;
                 context.setWikiOwner(wikiOwner);
                 context.setWikiServer(doc);
-                context.setVirtual(true);
                 context.setDatabase(appname);
                 context.setOriginalDatabase(appname);
 
@@ -656,7 +652,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         String wikiOwner = context.getWikiOwner();
 
-        if (isVirtual() && (!servername.equals(context.getMainXWiki()))) {
+        if (!context.isMainWiki(servername)) {
             String serverwikipage = getServerWikiPage(servername);
 
             String currentdatabase = context.getDatabase();
@@ -2380,7 +2376,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
         int event, XWikiContext context)
     {
-        if (!isVirtual()) {
+        if (!isVirtualMode()) {
             if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
                 preparePlugins(context);
             }
@@ -4137,11 +4133,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return "1".equals(getXWikiPreference("multilingual", "1", context));
     }
 
-    public boolean isVirtual()
+    /**
+     * @return true for multi-wiki/false for mono-wiki
+     */
+    public boolean isVirtualMode()
     {
         // With exo we can't be using virtual mode
-        if (isExo())
+        if (isExo()) {
             return false;
+        }
 
         return "1".equals(Param("xwiki.virtual"));
     }
@@ -4912,7 +4912,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getAdType(XWikiContext context)
     {
         String adtype = "";
-        if (isVirtual()) {
+        if (isVirtualMode()) {
             XWikiDocument wikiServer = context.getWikiServer();
             if (wikiServer != null) {
                 adtype = wikiServer.getStringValue("XWiki.XWikiServerClass", "adtype");
@@ -4929,7 +4929,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         final String defaultadclientid = "pub-2778691407285481";
         String adclientid = "";
-        if (isVirtual()) {
+        if (isVirtualMode()) {
             XWikiDocument wikiServer = context.getWikiServer();
             if (wikiServer != null) {
                 adclientid = wikiServer.getStringValue("XWiki.XWikiServerClass", "adclientid");

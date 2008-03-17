@@ -474,4 +474,13 @@ public privileged aspect XWikiCompatibilityAspect
     {
         return this.util.encodeURI(content);
     }
+    
+    /**
+     * @return true for multi-wiki/false for mono-wiki
+     * @deprecated replaced by {@link XWiki#isVirtualMode()} since 1.4M1.
+     */
+    public boolean XWiki.isVirtual()
+    {
+        return this.isVirtualMode();
+    }
 }

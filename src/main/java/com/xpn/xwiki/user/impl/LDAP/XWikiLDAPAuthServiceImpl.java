@@ -646,7 +646,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
     {
         Principal principal = getUserPrincipal(context.getDatabase(), userName, context);
 
-        if (context.isVirtual() && principal == null) {
+        if (!context.isMainWiki() && principal == null) {
             principal = getUserPrincipal(context.getMainXWiki(), userName, context);
         }
 
@@ -777,7 +777,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // First we check in the local database
             dn = getUserDNFromXWiki(context.getDatabase(), userName, context);
 
-            if (context.isVirtual() && (dn == null || dn.length() == 0)) {
+            if (!context.isMainWiki() && (dn == null || dn.length() == 0)) {
                 // Then we check in the main database
                 dn = getUserDNFromXWiki(context.getMainXWiki(), userName, context);
             }

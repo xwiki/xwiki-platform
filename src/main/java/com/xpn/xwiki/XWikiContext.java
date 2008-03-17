@@ -61,7 +61,6 @@ public class XWikiContext extends Hashtable {
    private String action;
    private String orig_database;
    private String database;
-   private boolean virtual;
    private XWikiUser user;
    private String language;
    private String interfaceLanguage;
@@ -151,13 +150,24 @@ public class XWikiContext extends Hashtable {
     public void setOriginalDatabase(String database) {
         this.orig_database = database;
     }
-
-    public boolean isVirtual() {
-        return virtual;
+    
+    /**
+     * @return true it's main wiki's context, false otherwise.
+     */
+    public boolean isMainWiki()
+    {
+        return isMainWiki(getDatabase());
     }
-
-    public void setVirtual(boolean virtual) {
-        this.virtual = virtual;
+    
+    /**
+     * @param wikiName the name of the wiki.
+     * @return true it's main wiki's context, false otherwise.
+     */
+    public boolean isMainWiki(String wikiName)
+    {
+        return !getWiki().isVirtualMode()
+            || (wikiName == null ? getMainXWiki() == null : wikiName.equalsIgnoreCase(
+                getMainXWiki()));
     }
 
     public XWikiDocument getDoc() {

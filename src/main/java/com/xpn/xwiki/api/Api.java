@@ -36,6 +36,8 @@ public class Api
      *       non-core plugins but better do it now rather than after the 1.0 release...
      */
     protected XWikiContext context;
+    
+    protected static String PROGRAMMING_RIGHTS_CHECKER_FLAG = "programmingrightschecked";
 
     /**
      * @param context the XWiki Context object
@@ -73,6 +75,7 @@ public class Api
     public boolean hasProgrammingRights()
     {
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
+        context.put(PROGRAMMING_RIGHTS_CHECKER_FLAG, true);
         return xwiki.getRightService().hasProgrammingRights(context);
     }
 

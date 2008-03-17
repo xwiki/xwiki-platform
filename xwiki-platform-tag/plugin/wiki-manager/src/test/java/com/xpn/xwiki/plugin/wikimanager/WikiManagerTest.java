@@ -62,7 +62,6 @@ public class WikiManagerTest extends MockObjectTestCase
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.context.setVirtual(true);
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
 
         databases.put(WIKI_NAME, new HashMap());

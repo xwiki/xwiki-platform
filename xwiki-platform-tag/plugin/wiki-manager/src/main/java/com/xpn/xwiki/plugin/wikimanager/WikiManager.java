@@ -513,7 +513,7 @@ final class WikiManager
 
         XWiki xwiki = context.getWiki();
 
-        if (!xwiki.isVirtual()) {
+        if (!xwiki.isVirtualMode()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL, msg
                 .get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
         }
@@ -659,7 +659,7 @@ final class WikiManager
 
         XWiki xwiki = context.getWiki();
 
-        if (!xwiki.isVirtual()) {
+        if (!xwiki.isVirtualMode()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL, msg
                 .get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
         }
@@ -708,7 +708,7 @@ final class WikiManager
 
         XWiki xwiki = context.getWiki();
 
-        if (!xwiki.isVirtual()) {
+        if (!xwiki.isVirtualMode()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_XWIKINOTVIRTUAL, msg
                 .get(WikiManagerMessageTool.ERROR_XWIKINOTVIRTUAL));
         }

@@ -273,12 +273,12 @@ public class XWikiHibernateBaseStore
         if ((!force) && (context.getWiki() != null)
             && ("0".equals(context.getWiki().Param("xwiki.store.hibernate.updateschema")))) {
             if (log.isDebugEnabled())
-                log.debug("Schema update deactivated for wiki " + context.getDatabase());
+                log.debug("Schema update deactivated for wiki [" + context.getDatabase() + "]");
             return;
         }
 
         if (log.isInfoEnabled()) {
-            log.info("Updating schema update for wiki " + context.getDatabase() + " ...");
+            log.info("Updating schema update for wiki [" + context.getDatabase() + "]...");
         }
 
         try {
@@ -310,7 +310,7 @@ public class XWikiHibernateBaseStore
             updateSchema(sql, context);
         } finally {
             if (log.isInfoEnabled()) {
-                log.info("Schema update for wiki " + context.getDatabase() + " done");
+                log.info("Schema update for wiki [" + context.getDatabase() + "] done");
             }
         }
     }
@@ -449,13 +449,13 @@ public class XWikiHibernateBaseStore
             for (int j = 0; j < createSQL.length; j++) {
                 sql = createSQL[j];
                 if (log.isDebugEnabled())
-                    log.debug("Update Schema sql: " + sql);
+                    log.debug("Update Schema sql: [" + sql + "]");
                 stmt.executeUpdate(sql);
             }
             connection.commit();
         } catch (Exception e) {
             if (log.isErrorEnabled()) {
-                log.error("Failed updating schema while executing query \"" + sql + "\"", e);
+                log.error("Failed updating schema while executing query [" + sql + "]", e);
             }
         } finally {
             try {
@@ -549,7 +549,7 @@ public class XWikiHibernateBaseStore
         if (isVirtual(context)) {
             try {
                 if (log.isDebugEnabled())
-                    log.debug("Switch database to: " + context.getDatabase());
+                    log.debug("Switch database to: [" + context.getDatabase() + "]");
 
                 if (context.getDatabase() != null) {
                     String schemaName = getSchemaFromWikiName(context);

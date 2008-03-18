@@ -37,6 +37,17 @@ public class PropertyClass extends Collection
         return (com.xpn.xwiki.objects.classes.PropertyClass) getCollection();
     }
 
+    public String getClassType()
+    {
+        return getBasePropertyClass().getClassType();
+    }
+
+    public String getType()
+    {
+        String result = getBasePropertyClass().getClassType();
+        return result.substring(result.lastIndexOf(".") + 1);
+    }
+
     public String getClassName()
     {
         return getCollection().getClassName();

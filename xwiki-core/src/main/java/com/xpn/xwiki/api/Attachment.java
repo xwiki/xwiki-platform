@@ -165,7 +165,7 @@ public class Attachment extends Api
      * @return a list of string with all the versions number in String
      * @throws XWikiException
      */
-    public List getVersionList() throws XWikiException
+    public List<Version> getVersionList() throws XWikiException
     {
         attachment.loadArchive(getXWikiContext());
         return attachment.getVersionList();

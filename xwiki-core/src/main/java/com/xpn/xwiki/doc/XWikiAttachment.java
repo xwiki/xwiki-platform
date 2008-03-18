@@ -352,7 +352,6 @@ public class XWikiAttachment {
             String archive = archiveel.getText();
             setArchive(archive);
         }
-
     }
 
     public XWikiAttachmentContent getAttachment_content() {
@@ -414,13 +413,14 @@ public class XWikiAttachment {
 
     // We assume versions go from 1.1 to the current one
     // This allows not to read the full archive file
-    public synchronized List getVersionList() throws XWikiException {
-            List list = new ArrayList();
+    public synchronized List<Version> getVersionList() throws XWikiException {
+            List<Version> list = new ArrayList<Version>();
             Version v = new Version("1.1");
             while (true) {
                 list.add(v);
-                if (v.toString().equals(version.toString()))
+                if (v.toString().equals(version.toString())) {
                     break;
+                }
                 v.next();
             }
             return list;

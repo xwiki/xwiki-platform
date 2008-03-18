@@ -36,7 +36,7 @@ public class DefaultVelocityContext extends org.apache.velocity.VelocityContext
 {
     private Logger logger;
 
-	private Properties tools;
+	private Properties properties;
 
 	/**
      * {@inheritDoc}
@@ -45,11 +45,18 @@ public class DefaultVelocityContext extends org.apache.velocity.VelocityContext
 	public void initialize() throws InitializationException
 	{
         // Configure Velocity tools
-        if (this.tools != null) {
-            for (Enumeration e = this.tools.propertyNames(); e.hasMoreElements();) {
-                String key = e.nextElement().toString();
-                String value = this.tools.getProperty(key);
-                put(key, value);
+        if (this.properties != null) {
+            for (Enumeration props = this.properties.propertyNames(); props.hasMoreElements();) {
+                String key = props.nextElement().toString();
+                String value = this.properties.getProperty(key);
+                Object toolInstance;
+                try {
+                    toolInstance = Class.forName(value).newInstance();
+                } catch (Exception e) {
+                    throw new InitializationException("Failed to initialize tool [" 
+                        + value + "]", e);
+                }
+                put(key, toolInstance);
                 getLogger().debug("Setting tool [" + key + "] = [" + value + "]");
             }
         }

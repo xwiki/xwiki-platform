@@ -64,7 +64,8 @@ public class DefaultVelocityManagerTest extends AbstractXWikiComponentTestCase
         manager.initialize(new Properties());
         StringWriter writer = new StringWriter();
         manager.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
-            "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList').newInstance())$object.size()");
+            "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
+            + ".newInstance())$object.size()");
         assertEquals("$object.size()", writer.toString());
     }
 
@@ -72,11 +73,13 @@ public class DefaultVelocityManagerTest extends AbstractXWikiComponentTestCase
     {
         // For example try setting a non secure Uberspector.
         Properties properties = new Properties();
-        properties.setProperty("runtime.introspector.uberspect", "org.apache.velocity.util.introspection.UberspectImpl");
+        properties.setProperty("runtime.introspector.uberspect",
+            "org.apache.velocity.util.introspection.UberspectImpl");
         manager.initialize(properties);
         StringWriter writer = new StringWriter();
         manager.evaluate(new org.apache.velocity.VelocityContext(), writer, "mytemplate",
-            "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList').newInstance())$object.size()");
+            "#set($foo = 'test')#set($object = $foo.class.forName('java.util.ArrayList')"
+            + ".newInstance())$object.size()");
         assertEquals("0", writer.toString());
     }
 }

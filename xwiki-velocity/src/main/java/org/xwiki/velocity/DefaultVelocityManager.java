@@ -20,8 +20,8 @@
  */
 package org.xwiki.velocity;
 
-import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.context.Context;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
@@ -107,9 +107,9 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see VelocityManager#evaluate(VelocityContext, java.io.Writer, String, String)
+     * @see VelocityManager#evaluate(Context, java.io.Writer, String, String)
      */
-    public boolean evaluate(VelocityContext context, Writer out, String templateName,
+    public boolean evaluate(Context context, Writer out, String templateName,
         String source) throws XWikiVelocityException
     {
         try {
@@ -122,9 +122,9 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see VelocityManager#evaluate(VelocityContext, java.io.Writer, String, String)
+     * @see VelocityManager#evaluate(Context, java.io.Writer, String, String)
      */
-    public boolean evaluate(VelocityContext context, Writer out, String templateName,
+    public boolean evaluate(Context context, Writer out, String templateName,
         Reader source) throws XWikiVelocityException
     {
         try {

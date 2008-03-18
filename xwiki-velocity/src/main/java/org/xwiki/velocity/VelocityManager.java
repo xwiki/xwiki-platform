@@ -24,7 +24,7 @@ import java.io.Writer;
 import java.io.Reader;
 import java.util.Properties;
 
-import org.apache.velocity.VelocityContext;
+import org.apache.velocity.context.Context;
 
 /**
  * Initialize a Velocity Engine and make Velocity services available.
@@ -57,7 +57,7 @@ public interface VelocityManager
      * @return true if successful, false otherwise. If false, see the Velocity runtime log
      * @throws XWikiVelocityException in case of error
      */
-    boolean evaluate(VelocityContext context, Writer out, String templateName, String source)
+    boolean evaluate(Context context, Writer out, String templateName, String source)
         throws XWikiVelocityException;
 
     /**
@@ -71,6 +71,6 @@ public interface VelocityManager
      * @return true if successful, false otherwise. If false, see the Velocity runtime log
      * @throws XWikiVelocityException in case of error
      */
-    boolean evaluate(VelocityContext context, Writer out, String templateName, Reader source)
+    boolean evaluate(Context context, Writer out, String templateName, Reader source)
         throws XWikiVelocityException;
 }

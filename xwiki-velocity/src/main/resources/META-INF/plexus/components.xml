@@ -56,32 +56,32 @@
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <configuration>
-        <tools>
-          <tool>
+        <properties>
+          <property>
             <name>listtool</name>
             <value>org.apache.velocity.tools.generic.ListTool</value>
-          </tool>
-          <tool>
+          </property>
+          <property>
             <name>numbertool</name>
             <value>org.apache.velocity.tools.generic.NumberTool</value>
-          </tool>
-          <tool>
+          </property>
+          <property>
             <name>datetool</name>
             <value>org.apache.velocity.tools.generic.DateTool</value>
-          </tool>
-          <tool>
+          </property>
+          <property>
             <name>mathtool</name>
             <value>org.apache.velocity.tools.generic.MathTool</value>
-          </tool>
-          <tool>
+          </property>
+          <property>
             <name>sorttool</name>
             <value>org.apache.velocity.tools.generic.SortTool</value>
-          </tool>
-          <tool>
+          </property>
+          <property>
             <name>escapetool</name>
             <value>org.apache.velocity.tools.generic.EscapeTool</value>
-          </tool>
-        </tools>
+          </property>
+        </properties>
       </configuration>
     </component>
   </components>

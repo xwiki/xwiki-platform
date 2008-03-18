@@ -63,4 +63,17 @@ public class AttachmentDiff
     {
         this.newVersion = newVersion;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String toString()
+    {
+        StringBuffer buf = new StringBuffer(fileName);
+        buf.append(": ");
+        buf.append(origVersion);
+        buf.append(" &gt; ");
+        buf.append(newVersion);
+        return buf.toString();
+    }
 }

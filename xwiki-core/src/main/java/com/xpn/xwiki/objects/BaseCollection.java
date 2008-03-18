@@ -439,7 +439,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
-    public List getDiff(Object oldObject, XWikiContext context) {
+    public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context) {
         ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
         BaseCollection oldCollection = (BaseCollection) oldObject;
         // Iterate over the new properties first, to handle changed and added objects

@@ -23,9 +23,10 @@ package com.xpn.xwiki.objects.classes;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.AbstractXWikiTestCase;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+
 import org.xwiki.component.manager.ComponentManager;
 
 /**
@@ -33,7 +34,7 @@ import org.xwiki.component.manager.ComponentManager;
  * 
  * @version $Id: $
  */
-public class DBTreeListClassTest extends AbstractXWikiTestCase
+public class DBTreeListClassTest extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;
 

@@ -49,8 +49,9 @@
     </dependency>
   </dependencies>
   <properties>
-    <!-- Versions of XWiki dependencies used in Platform/Web modules -->
+    <!-- Versions of XWiki dependencies used in Core modules -->
     <platform.tool.verification.version>1.9-SNAPSHOT</platform.tool.verification.version>
+    <platform.tool.test.version>1.9-SNAPSHOT</platform.tool.test.version>
   </properties>
   <modules>
     <module>xwiki-core</module>

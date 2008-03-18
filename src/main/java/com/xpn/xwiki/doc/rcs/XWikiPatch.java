@@ -123,16 +123,16 @@ public class XWikiPatch
      * Create history patch between originalVersion and newVersion as difference on the XML export
      * of the two versions. The patch is created between newVersion and originalVersion.
      * 
-     * @param newVersion Current version of the document.
      * @param originalVersion Original version of the document document.
+     * @param newVersion Current version of the document.
      * @param context Needed for serializing documents to xml.
      * @return Self, with the patch content set to the generated diff between the two version.
      * @throws XWikiException if any error occurs
      */
-    public XWikiPatch setDiffVersion(XWikiDocument newVersion, XWikiDocument originalVersion,
+    public XWikiPatch setDiffVersion(XWikiDocument originalVersion, XWikiDocument newVersion,
         XWikiContext context) throws XWikiException
     {
-        return setDiffVersion(newVersion.toXML(context), originalVersion.toXML(context),
+        return setDiffVersion(originalVersion.toXML(context), newVersion.toXML(context),
             newVersion.getFullName());
     }
 
@@ -140,17 +140,17 @@ public class XWikiPatch
      * Create history patch between originalVersion and newVersion as difference on the XML export
      * of the two versions. The patch is created between newVersion and originalVersion.
      * 
-     * @param newVersion Current version of the document.
      * @param originalVersionXml Original version of the document document, in the XML export
      *            format.
+     * @param newVersion Current version of the document.
      * @param context Needed for serializing documents to xml.
      * @return Self, with the patch content set to the generated diff between the two version.
      * @throws XWikiException if any error occurs
      */
-    public XWikiPatch setDiffVersion(XWikiDocument newVersion, String originalVersionXml,
+    public XWikiPatch setDiffVersion(String originalVersionXml, XWikiDocument newVersion,
         XWikiContext context) throws XWikiException
     {
-        return setDiffVersion(newVersion.toXML(context), originalVersionXml, newVersion
+        return setDiffVersion(originalVersionXml, newVersion.toXML(context), newVersion
             .getFullName());
     }
 
@@ -158,18 +158,19 @@ public class XWikiPatch
      * Create history patch between originalVersion and newVersion as difference on the XML export
      * of the two versions. The patch is created between newVersion and originalVersion.
      * 
-     * @param newVersionXml Current version of the document, in the XML export format.
      * @param originalVersionXml Original version of the document document, in the XML export
      *            format.
+     * @param newVersionXml Current version of the document, in the XML export format.
      * @param docName Needed for the exception report.
      * @return Self, with the patch content set to the generated diff between the two version.
      * @throws XWikiException if any error occurs
      */
-    public XWikiPatch setDiffVersion(String newVersionXml, String originalVersionXml,
+    public XWikiPatch setDiffVersion(String originalVersionXml, String newVersionXml,
         String docName) throws XWikiException
     {
         setDiff(true);
         try {
+            // The history keeps reversed patches, from the most recent to the previous version.
             setContent(XWikiPatchUtils.getDiff(newVersionXml, originalVersionXml));
         } catch (Exception e) {
             Object[] args = {docName};
@@ -188,11 +189,11 @@ public class XWikiPatch
      * @param origText - text to patch
      * @throws XWikiException if exception while patching
      */
-    public void patch(List origText) throws XWikiException
+    public void patch(List<String> origText) throws XWikiException
     {
         if (!isDiff()) {
             origText.clear();
-            origText.addAll(new ArrayList(Arrays.asList(ToString.stringToArray(getContent()))));
+            origText.addAll(new ArrayList<String>(Arrays.asList(ToString.stringToArray(getContent()))));
         } else {
             try {
                 XWikiPatchUtils.patch(origText, getContent());

@@ -157,7 +157,9 @@ public class StatsService extends Api
      * @param action action for which to retrieve statistics (view/save/download)
      * @return A DocumentStats object with number of actions performed, unique visitors, number of
      *         visits
-     * @deprecated use {@link #getDocumentStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range)} instead
+     * @deprecated use
+     *             {@link #getDocumentStatistics(String, Scope, Period, com.xpn.xwiki.criteria.impl.Range)}
+     *             instead
      */
     public DocumentStats getCurrentMonthXWikiStats(String action)
     {

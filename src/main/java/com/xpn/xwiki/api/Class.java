@@ -22,7 +22,6 @@ package com.xpn.xwiki.api;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Iterator;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;

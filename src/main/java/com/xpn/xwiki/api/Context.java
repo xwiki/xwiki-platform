@@ -20,6 +20,8 @@
  */
 package com.xpn.xwiki.api;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Programming;
@@ -28,8 +30,6 @@ import com.xpn.xwiki.validation.XWikiValidationStatus;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
-
-import java.util.List;
 
 /**
  * The <code>Context</code> class represents a secure proxy for the XWiki context, which in turn

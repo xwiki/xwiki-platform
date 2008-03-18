@@ -20,14 +20,14 @@
  */
 package com.xpn.xwiki.api;
 
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Iterator;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.Iterator;
 
 public class Class extends Collection
 {
@@ -60,15 +60,15 @@ public class Class extends Collection
      */
     public Element[] getProperties()
     {
-        java.util.Collection coll = getCollection().getFieldList();
+        java.util.Collection<com.xpn.xwiki.objects.classes.PropertyClass> coll =
+            getCollection().getFieldList();
         if (coll == null) {
             return null;
         }
         PropertyClass[] properties = new PropertyClass[coll.size()];
         int i = 0;
-        for (Iterator it = coll.iterator(); it.hasNext(); i++) {
-            properties[i] = new PropertyClass(
-                (com.xpn.xwiki.objects.classes.PropertyClass) it.next(), getXWikiContext());
+        for (com.xpn.xwiki.objects.classes.PropertyClass prop : coll) {
+            properties[i++] = new PropertyClass(prop, getXWikiContext());
         }
         Arrays.sort(properties, new PropertyComparator());
         return properties;
@@ -82,9 +82,8 @@ public class Class extends Collection
      */
     public Element get(String name)
     {
-        return new PropertyClass(
-            (com.xpn.xwiki.objects.classes.PropertyClass) getCollection().safeget(name),
-            getXWikiContext());
+        return new PropertyClass((com.xpn.xwiki.objects.classes.PropertyClass) getCollection()
+            .safeget(name), getXWikiContext());
     }
 
     /**

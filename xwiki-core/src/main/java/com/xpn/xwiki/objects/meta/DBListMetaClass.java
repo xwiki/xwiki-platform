@@ -23,7 +23,6 @@ package com.xpn.xwiki.objects.meta;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.classes.BooleanClass;
 import com.xpn.xwiki.objects.classes.DBListClass;
 import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
@@ -60,13 +59,6 @@ public class DBListMetaClass extends ListMetaClass
         valuefield_class.setPrettyName("Value Field Name");
         valuefield_class.setSize(20);
         safeput("valueField", valuefield_class);
-
-        BooleanClass picker_class = new BooleanClass(this);
-        picker_class.setName("picker");
-        picker_class.setPrettyName("Use Suggest");
-        picker_class.setDisplayType("yesno");
-        picker_class.setUnmodifiable(true);
-        safeput("picker", picker_class);
     }
 
     public BaseCollection newObject(XWikiContext context)

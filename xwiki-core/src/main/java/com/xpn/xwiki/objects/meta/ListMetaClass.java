@@ -45,21 +45,24 @@ public class ListMetaClass extends PropertyMetaClass
         multi_class.setName("multiSelect");
         multi_class.setPrettyName("Multiple Select");
         multi_class.setDisplayType("yesno");
-        multi_class.setUnmodifiable(true);
+        multi_class.setDisplayFormType("checkbox");
+        multi_class.setDefaultValue(0);
         safeput("multiSelect", multi_class);
 
         BooleanClass relational_class = new BooleanClass(this);
         relational_class.setName("relationalStorage");
         relational_class.setPrettyName("Relational Storage");
         relational_class.setDisplayType("yesno");
-        relational_class.setUnmodifiable(true);
+        relational_class.setDisplayFormType("checkbox");
+        relational_class.setDefaultValue(0);
         safeput("relationalStorage", relational_class);
 
         BooleanClass picker_class = new BooleanClass(this);
         picker_class.setName("picker");
         picker_class.setPrettyName("Use Picker");
         picker_class.setDisplayType("yesno");
-        picker_class.setUnmodifiable(true);
+        picker_class.setDisplayFormType("checkbox");
+        picker_class.setDefaultValue(1);
         safeput("picker", picker_class);
 
         NumberClass size_class = new NumberClass(this);
@@ -91,7 +94,8 @@ public class ListMetaClass extends PropertyMetaClass
         cache_class.setName("cache");
         cache_class.setPrettyName("Cache");
         cache_class.setDisplayType("yesno");
-        cache_class.setUnmodifiable(true);
+        cache_class.setDisplayFormType("checkbox");
+        cache_class.setDefaultValue(0);
         safeput("cache", cache_class);
     }
 }

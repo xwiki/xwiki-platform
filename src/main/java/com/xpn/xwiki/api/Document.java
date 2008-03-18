@@ -33,6 +33,7 @@ import java.util.Vector;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.suigeneris.jrcs.diff.DifferentiationFailedException;
 import org.suigeneris.jrcs.rcs.Version;
 
@@ -560,13 +561,12 @@ public class Document extends Api
         return doc.getObjectNumbers(classname);
     }
 
-    public Map getxWikiObjects()
+    public Map<String, Vector<Object>> getxWikiObjects()
     {
-        Map map = doc.getxWikiObjects();
-        Map resultmap = new HashMap();
-        for (Iterator it = map.keySet().iterator(); it.hasNext();) {
-            String name = (String) it.next();
-            Vector objects = (Vector) map.get(name);
+        Map<String, Vector<BaseObject>> map = doc.getxWikiObjects();
+        Map<String, Vector<Object>> resultmap = new HashMap<String, Vector<Object>>();
+        for (String name : map.keySet()) {
+            Vector<BaseObject> objects = map.get(name);
             if (objects != null) {
                 resultmap.put(name, getObjects(objects));
             }
@@ -574,14 +574,13 @@ public class Document extends Api
         return resultmap;
     }
 
-    protected Vector getObjects(Vector objects)
+    protected Vector<Object> getObjects(Vector<BaseObject> objects)
     {
-        Vector result = new Vector();
+        Vector<Object> result = new Vector<Object>();
         if (objects == null) {
             return result;
         }
-        for (int i = 0; i < objects.size(); i++) {
-            BaseObject bobj = (BaseObject) objects.get(i);
+        for (BaseObject bobj : objects) {
             if (bobj != null) {
                 result.add(newObjectApi(bobj, getXWikiContext()));
             }
@@ -589,9 +588,9 @@ public class Document extends Api
         return result;
     }
 
-    public Vector getObjects(String classname)
+    public Vector<Object> getObjects(String classname)
     {
-        Vector objects = doc.getObjects(classname);
+        Vector<BaseObject> objects = doc.getObjects(classname);
         return getObjects(objects);
     }
 

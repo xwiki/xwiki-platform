@@ -29,8 +29,8 @@ import org.xwiki.component.manager.ComponentManager;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.AbstractXWikiTestCase;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletContext;
 
 /**
@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.XWikiServletContext;
  * 
  * @version $Id: $
  */
-public class DefaultXWikiRenderingEngineTest extends AbstractXWikiTestCase
+public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestCase
 {
 	private DefaultXWikiRenderingEngine engine;
 	private XWikiContext context;

@@ -22,11 +22,11 @@ package com.xpn.xwiki.render;
 import org.jmock.Mock;
 import org.xwiki.component.manager.ComponentManager;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.AbstractXWikiTestCase;
 
 import java.util.Collections;
 
@@ -35,7 +35,7 @@ import java.util.Collections;
  *
  * @version $Id: $
  */
-public class XWikiVelocityRendererTest extends AbstractXWikiTestCase
+public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;
     private XWikiVelocityRenderer renderer;

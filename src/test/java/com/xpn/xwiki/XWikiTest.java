@@ -35,13 +35,14 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
  * 
  * @version $Id: $
  */
-public class XWikiTest extends AbstractXWikiTestCase
+public class XWikiTest extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;
 

@@ -4432,12 +4432,7 @@ public class XWikiDocument
     }
 
     public String getPreviousVersion() {
-        Version version = getRCSVersion();
-        int last = version.last();
-        if (last<=1)
-         return "";
-        int prev = last - 1;
-        return "1." + prev;
+        return getDocumentArchive().getPrevVersion(version).toString();        
     }
     
     public String toString() {

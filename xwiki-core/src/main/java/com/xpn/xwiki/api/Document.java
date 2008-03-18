@@ -56,6 +56,7 @@ import com.xpn.xwiki.util.Util;
 public class Document extends Api
 {
     protected XWikiDocument doc;
+
     protected boolean cloned = false;
 
     protected Object currentObj;
@@ -85,13 +86,13 @@ public class Document extends Api
             doc = (XWikiDocument) doc.clone();
             cloned = true;
         }
-        
+
         return doc;
     }
 
     /**
      * return the ID of the document. this ID is uniq accross the wiki.
-     *
+     * 
      * @return the id of the document
      */
     public long getId()
@@ -100,10 +101,9 @@ public class Document extends Api
     }
 
     /**
-     * return the name of a document.
-     *
-     * for exemple if the fullName of a document is "MySpace.Mydoc", the name is MyDoc
-     *
+     * return the name of a document. for exemple if the fullName of a document is "MySpace.Mydoc",
+     * the name is MyDoc
+     * 
      * @return the name of the document
      */
     public String getName()
@@ -112,10 +112,9 @@ public class Document extends Api
     }
 
     /**
-     * return the name of the space of the document
-     *
-     * for example if the fullName of a document is "MySpace.Mydoc", the name is MySpace
-     *
+     * return the name of the space of the document for example if the fullName of a document is
+     * "MySpace.Mydoc", the name is MySpace
+     * 
      * @return the name of the space of the document
      */
     public String getSpace()
@@ -133,10 +132,9 @@ public class Document extends Api
     }
 
     /**
-     * return the name of the space of the document
-     *
-     * for exemple if the fullName of a document is "MySpace.Mydoc", the name is MySpace
-     *
+     * return the name of the space of the document for exemple if the fullName of a document is
+     * "MySpace.Mydoc", the name is MySpace
+     * 
      * @deprecated use {@link #getSpace()} instead of this function
      */
     public String getWeb()
@@ -145,10 +143,8 @@ public class Document extends Api
     }
 
     /**
-     * return the fullName of a document
-     *
-     * if a document has for name "MyDoc" and space "MySpace", the fullname is "MySpace.MyDoc" In a
-     * wiki, all the documents have a different fullName.
+     * return the fullName of a document if a document has for name "MyDoc" and space "MySpace", the
+     * fullname is "MySpace.MyDoc" In a wiki, all the documents have a different fullName.
      */
     public String getFullName()
     {
@@ -156,8 +152,9 @@ public class Document extends Api
     }
 
     /**
-     * @return the real full name of a document containing wiki name where document is stored.
-     * For document in "xwiki" wiki, with name "MyDoc" and space "MySpace" the extended full name is "xwiki:MySpace.MyDoc".
+     * @return the real full name of a document containing wiki name where document is stored. For
+     *         document in "xwiki" wiki, with name "MyDoc" and space "MySpace" the extended full
+     *         name is "xwiki:MySpace.MyDoc".
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
     public String getPrefixedFullName()
@@ -195,10 +192,10 @@ public class Document extends Api
     }
 
     /**
-     * @return the document title. If a title has not been provided, look for a section title in
-     *         the document's content and if not found return the page name. The returned title
-     *         is also interpreted which means it's allowed to use Velocity, Groovy, etc syntax
-     *         within a title.
+     * @return the document title. If a title has not been provided, look for a section title in the
+     *         document's content and if not found return the page name. The returned title is also
+     *         interpreted which means it's allowed to use Velocity, Groovy, etc syntax within a
+     *         title.
      */
     public String getDisplayTitle()
     {
@@ -315,7 +312,7 @@ public class Document extends Api
     {
         return doc.getComment();
     }
-    
+
     public boolean isMinorEdit()
     {
         return doc.isMinorEdit();
@@ -352,7 +349,8 @@ public class Document extends Api
      */
     public Document getTranslatedDocument(String language) throws XWikiException
     {
-        return doc.getTranslatedDocument(language, getXWikiContext()).newDocument(getXWikiContext());
+        return doc.getTranslatedDocument(language, getXWikiContext()).newDocument(
+            getXWikiContext());
     }
 
     /**
@@ -418,8 +416,8 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of download for the  the given attachment name
-     *
+     * return the URL of download for the the given attachment name
+     * 
      * @param filename the name of the attachment
      * @return A String with the URL
      */
@@ -429,8 +427,8 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of the given action for the  the given attachment name
-     *
+     * return the URL of the given action for the the given attachment name
+     * 
      * @return A string with the URL
      */
     public String getAttachmentURL(String filename, String action)
@@ -439,9 +437,9 @@ public class Document extends Api
     }
 
     /**
-     * return the URL of the given action for the  the given attachment name with "queryString"
+     * return the URL of the given action for the the given attachment name with "queryString"
      * parameters
-     *
+     * 
      * @param queryString parameters added to the URL
      */
     public String getAttachmentURL(String filename, String action, String queryString)
@@ -460,7 +458,7 @@ public class Document extends Api
 
     /**
      * return the URL for accessing to the archive of the attachment "filename" at the version
-     * "version" and  with the given queryString parameters
+     * "version" and with the given queryString parameters
      */
     public String getAttachmentRevisionURL(String filename, String version, String querystring)
     {
@@ -684,8 +682,8 @@ public class Document extends Api
         String xml = doc.getXMLContent(getXWikiContext());
         return getXWikiContext().getUtil().substitute(
             "s/<email>.*?<\\/email>/<email>********<\\/email>/goi",
-            getXWikiContext().getUtil()
-            .substitute("s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml));
+            getXWikiContext().getUtil().substitute(
+                "s/<password>.*?<\\/password>/<password>********<\\/password>/goi", xml));
     }
 
     public String toXML() throws XWikiException
@@ -723,11 +721,12 @@ public class Document extends Api
 
     /**
      * Get document versions matching criterias like author, minimum creation date, etc.
-     *
+     * 
      * @param criteria criteria used to match versions
      * @return a list of matching versions
      */
-    public List getRevisions(RevisionCriteria criteria) throws XWikiException{
+    public List getRevisions(RevisionCriteria criteria) throws XWikiException
+    {
         return doc.getRevisions(criteria, context);
     }
 
@@ -735,10 +734,12 @@ public class Document extends Api
      * Get information about a document version : author, date, etc.
      * 
      * @param version the version you want to get information about
-     * @return a new RevisionInfo object    
+     * @return a new RevisionInfo object
      */
-    public RevisionInfo getRevisionInfo(String version) throws XWikiException {
-        return new RevisionInfo( doc.getRevisionInfo(version, getXWikiContext()), getXWikiContext() );
+    public RevisionInfo getRevisionInfo(String version) throws XWikiException
+    {
+        return new RevisionInfo(doc.getRevisionInfo(version, getXWikiContext()),
+            getXWikiContext());
     }
 
     public List getAttachmentList()
@@ -802,7 +803,8 @@ public class Document extends Api
         if (currentObj == null) {
             return doc.displayPrettyName(fieldname, getXWikiContext());
         } else {
-            return doc.displayPrettyName(fieldname, currentObj.getBaseObject(), getXWikiContext());
+            return doc
+                .displayPrettyName(fieldname, currentObj.getBaseObject(), getXWikiContext());
         }
     }
 
@@ -829,7 +831,8 @@ public class Document extends Api
         if (obj == null) {
             return "";
         }
-        return doc.displayPrettyName(fieldname, showMandatory, obj.getBaseObject(), getXWikiContext());
+        return doc.displayPrettyName(fieldname, showMandatory, obj.getBaseObject(),
+            getXWikiContext());
     }
 
     public String displayPrettyName(String fieldname, boolean showMandatory, boolean before)
@@ -837,8 +840,8 @@ public class Document extends Api
         if (currentObj == null) {
             return doc.displayPrettyName(fieldname, showMandatory, before, getXWikiContext());
         } else {
-            return doc.displayPrettyName(fieldname, showMandatory, before,
-                currentObj.getBaseObject(), getXWikiContext());
+            return doc.displayPrettyName(fieldname, showMandatory, before, currentObj
+                .getBaseObject(), getXWikiContext());
         }
     }
 
@@ -848,8 +851,8 @@ public class Document extends Api
         if (obj == null) {
             return "";
         }
-        return doc
-            .displayPrettyName(fieldname, showMandatory, before, obj.getBaseObject(), getXWikiContext());
+        return doc.displayPrettyName(fieldname, showMandatory, before, obj.getBaseObject(),
+            getXWikiContext());
     }
 
     public String displayTooltip(String fieldname)
@@ -892,7 +895,8 @@ public class Document extends Api
         if (currentObj == null) {
             return doc.display(fieldname, mode, prefix, getXWikiContext());
         } else {
-            return doc.display(fieldname, mode, prefix, currentObj.getBaseObject(), getXWikiContext());
+            return doc.display(fieldname, mode, prefix, currentObj.getBaseObject(),
+                getXWikiContext());
         }
     }
 
@@ -1000,8 +1004,8 @@ public class Document extends Api
         }
     }
 
-    public List getContentDiff(Document origdoc, Document newdoc)
-        throws XWikiException, DifferentiationFailedException
+    public List getContentDiff(Document origdoc, Document newdoc) throws XWikiException,
+        DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
@@ -1012,8 +1016,8 @@ public class Document extends Api
                     newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getContentDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                return doc.getContentDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(),
+                    origdoc.getName()), getXWikiContext());
             }
 
             return doc.getContentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1021,18 +1025,20 @@ public class Document extends Api
             java.lang.Object[] args =
                 {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
-                "Error while making content diff of {0} between version {1} and version {2}", e,
-                args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                    XWikiException.ERROR_XWIKI_DIFF_CONTENT_ERROR,
+                    "Error while making content diff of {0} between version {1} and version {2}",
+                    e,
+                    args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
         }
     }
 
-    public List getXMLDiff(Document origdoc, Document newdoc)
-        throws XWikiException, DifferentiationFailedException
+    public List getXMLDiff(Document origdoc, Document newdoc) throws XWikiException,
+        DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
@@ -1043,8 +1049,8 @@ public class Document extends Api
                     newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getXMLDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                return doc.getXMLDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(), origdoc
+                    .getName()), getXWikiContext());
             }
 
             return doc.getXMLDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1052,30 +1058,32 @@ public class Document extends Api
             java.lang.Object[] args =
                 {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
-                "Error while making xml diff of {0} between version {1} and version {2}", e, args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                    XWikiException.ERROR_XWIKI_DIFF_XML_ERROR,
+                    "Error while making xml diff of {0} between version {1} and version {2}",
+                    e,
+                    args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
         }
     }
 
-    public List getRenderedContentDiff(Document origdoc, Document newdoc)
-        throws XWikiException, DifferentiationFailedException
+    public List getRenderedContentDiff(Document origdoc, Document newdoc) throws XWikiException,
+        DifferentiationFailedException
     {
         try {
             if ((origdoc == null) && (newdoc == null)) {
                 return new ArrayList();
             }
             if (origdoc == null) {
-                return doc.getRenderedContentDiff(
-                    new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
-                    getXWikiContext());
+                return doc.getRenderedContentDiff(new XWikiDocument(newdoc.getSpace(), newdoc
+                    .getName()), newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getRenderedContentDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                return doc.getRenderedContentDiff(origdoc.doc, new XWikiDocument(origdoc
+                    .getSpace(), origdoc.getName()), getXWikiContext());
             }
 
             return doc.getRenderedContentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1083,10 +1091,12 @@ public class Document extends Api
             java.lang.Object[] args =
                 {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_RENDERED_ERROR,
-                "Error while making rendered diff of {0} between version {1} and version {2}", e,
-                args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                    XWikiException.ERROR_XWIKI_DIFF_RENDERED_ERROR,
+                    "Error while making rendered diff of {0} between version {1} and version {2}",
+                    e,
+                    args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1100,12 +1110,13 @@ public class Document extends Api
                 return new ArrayList();
             }
             if (origdoc == null) {
-                return doc.getMetaDataDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()),
-                    newdoc.doc, getXWikiContext());
+                return doc.getMetaDataDiff(
+                    new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
+                    getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getMetaDataDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                return doc.getMetaDataDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(),
+                    origdoc.getName()), getXWikiContext());
             }
 
             return doc.getMetaDataDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1113,10 +1124,12 @@ public class Document extends Api
             java.lang.Object[] args =
                 {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
-                "Error while making meta data diff of {0} between version {1} and version {2}", e,
-                args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                    XWikiException.ERROR_XWIKI_DIFF_METADATA_ERROR,
+                    "Error while making meta data diff of {0} between version {1} and version {2}",
+                    e,
+                    args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1130,13 +1143,12 @@ public class Document extends Api
                 return new ArrayList();
             }
             if (origdoc == null) {
-                return doc.getObjectDiff(
-                    new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
-                    getXWikiContext());
+                return doc.getObjectDiff(new XWikiDocument(newdoc.getSpace(), newdoc.getName()),
+                    newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getObjectDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                return doc.getObjectDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(),
+                    origdoc.getName()), getXWikiContext());
             }
 
             return doc.getObjectDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1144,10 +1156,12 @@ public class Document extends Api
             java.lang.Object[] args =
                 {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_OBJECT_ERROR,
-                "Error while making meta object diff of {0} between version {1} and version {2}", e,
-                args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                    XWikiException.ERROR_XWIKI_DIFF_OBJECT_ERROR,
+                    "Error while making meta object diff of {0} between version {1} and version {2}",
+                    e,
+                    args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1165,8 +1179,8 @@ public class Document extends Api
                     newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getClassDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                return doc.getClassDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(),
+                    origdoc.getName()), getXWikiContext());
             }
 
             return doc.getClassDiff(origdoc.doc, newdoc.doc, getXWikiContext());
@@ -1174,10 +1188,12 @@ public class Document extends Api
             java.lang.Object[] args =
                 {origdoc.getFullName(), origdoc.getVersion(), newdoc.getVersion()};
             List list = new ArrayList();
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_CLASS_ERROR,
-                "Error while making class diff of {0} between version {1} and version {2}", e,
-                args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                    XWikiException.ERROR_XWIKI_DIFF_CLASS_ERROR,
+                    "Error while making class diff of {0} between version {1} and version {2}",
+                    e,
+                    args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1191,24 +1207,27 @@ public class Document extends Api
                 return new ArrayList();
             }
             if (origdoc == null) {
-                return doc.getAttachmentDiff(
-                    new XWikiDocument(newdoc.getSpace(), newdoc.getName()), newdoc.doc,
-                    getXWikiContext());
+                return doc.getAttachmentDiff(new XWikiDocument(newdoc.getSpace(), newdoc
+                    .getName()), newdoc.doc, getXWikiContext());
             }
             if (newdoc == null) {
-                return doc.getAttachmentDiff(origdoc.doc,
-                    new XWikiDocument(origdoc.getSpace(), origdoc.getName()), getXWikiContext());
+                return doc.getAttachmentDiff(origdoc.doc, new XWikiDocument(origdoc.getSpace(),
+                    origdoc.getName()), getXWikiContext());
             }
 
             return doc.getAttachmentDiff(origdoc.doc, newdoc.doc, getXWikiContext());
         } catch (Exception e) {
             java.lang.Object[] args =
-                {(origdoc != null) ? origdoc.getFullName() : null, (origdoc != null) ? origdoc.getVersion() : null, (newdoc != null) ? newdoc.getVersion() : null};
+                {(origdoc != null) ? origdoc.getFullName() : null,
+                (origdoc != null) ? origdoc.getVersion() : null,
+                (newdoc != null) ? newdoc.getVersion() : null};
             List list = new ArrayList();
-            XWikiException xe = new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
-                XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
-                "Error while making attachment diff of {0} between version {1} and version {2}", e,
-                args);
+            XWikiException xe =
+                new XWikiException(XWikiException.MODULE_XWIKI_DIFF,
+                    XWikiException.ERROR_XWIKI_DIFF_ATTACHMENT_ERROR,
+                    "Error while making attachment diff of {0} between version {1} and version {2}",
+                    e,
+                    args);
             String errormsg = Util.getHTMLExceptionMessage(xe, getXWikiContext());
             list.add(errormsg);
             return list;
@@ -1222,20 +1241,20 @@ public class Document extends Api
 
     public DocumentStats getCurrentMonthPageStats(String action)
     {
-        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
-            .getDocMonthStats(doc.getFullName(), action, new Date(), getXWikiContext());
+        return getXWikiContext().getWiki().getStatsService(getXWikiContext()).getDocMonthStats(
+            doc.getFullName(), action, new Date(), getXWikiContext());
     }
 
     public DocumentStats getCurrentMonthWebStats(String action)
     {
-        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
-            .getDocMonthStats(doc.getSpace(), action, new Date(), getXWikiContext());
+        return getXWikiContext().getWiki().getStatsService(getXWikiContext()).getDocMonthStats(
+            doc.getSpace(), action, new Date(), getXWikiContext());
     }
 
     public List getCurrentMonthRefStats() throws XWikiException
     {
-        return getXWikiContext().getWiki().getStatsService(getXWikiContext())
-            .getRefMonthStats(doc.getFullName(), new Date(), getXWikiContext());
+        return getXWikiContext().getWiki().getStatsService(getXWikiContext()).getRefMonthStats(
+            doc.getFullName(), new Date(), getXWikiContext());
     }
 
     public boolean checkAccess(String right)
@@ -1260,8 +1279,8 @@ public class Document extends Api
     public boolean hasAccessLevel(String level, String user)
     {
         try {
-            return getXWikiContext().getWiki().getRightService()
-                .hasAccessLevel(level, user, doc.getFullName(), getXWikiContext());
+            return getXWikiContext().getWiki().getRightService().hasAccessLevel(level, user,
+                doc.getFullName(), getXWikiContext());
         } catch (Exception e) {
             return false;
         }
@@ -1325,7 +1344,8 @@ public class Document extends Api
     {
         Object object;
         if (currentObj == null) {
-            object = new Object(doc.getFirstObject(fieldName, getXWikiContext()), getXWikiContext());
+            object =
+                new Object(doc.getFirstObject(fieldName, getXWikiContext()), getXWikiContext());
         } else {
             object = currentObj;
         }
@@ -1337,8 +1357,7 @@ public class Document extends Api
         if (object != null) {
             try {
                 return ((BaseProperty) object.getBaseObject().safeget(fieldName)).getValue();
-            }
-            catch (NullPointerException e) {
+            } catch (NullPointerException e) {
                 return null;
             }
         }
@@ -1352,7 +1371,7 @@ public class Document extends Api
 
     /**
      * Returns data needed for a generation of Table of Content for this document.
-     *
+     * 
      * @param init an intial level where the TOC generation should start at
      * @param max maximum level TOC is generated for
      * @param numbered if should generate numbering for headings
@@ -1489,8 +1508,9 @@ public class Document extends Api
     {
         getDoc().setComment(comment);
     }
-    
-    public void setMinorEdit(boolean isMinor) {
+
+    public void setMinorEdit(boolean isMinor)
+    {
         getDoc().setMinorEdit(isMinor);
     }
 
@@ -1503,6 +1523,7 @@ public class Document extends Api
     {
         save(comment, false);
     }
+
     public void save(String comment, boolean minorEdit) throws XWikiException
     {
         if (hasAccessLevel("edit")) {
@@ -1511,7 +1532,9 @@ public class Document extends Api
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access denied in edit mode on document {0}", null, args);
+                "Access denied in edit mode on document {0}",
+                null,
+                args);
         }
     }
 
@@ -1525,7 +1548,8 @@ public class Document extends Api
         saveWithProgrammingRights(comment, false);
     }
 
-    public void saveWithProgrammingRights(String comment, boolean minorEdit) throws XWikiException
+    public void saveWithProgrammingRights(String comment, boolean minorEdit)
+        throws XWikiException
     {
         if (hasProgrammingRights()) {
             saveDocument(comment, minorEdit);
@@ -1533,7 +1557,9 @@ public class Document extends Api
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access denied with no programming rights document {0}", null, args);
+                "Access denied with no programming rights document {0}",
+                null,
+                args);
         }
     }
 
@@ -1557,8 +1583,8 @@ public class Document extends Api
 
     public com.xpn.xwiki.api.Object addObjectFromRequest(String className) throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className, getXWikiContext()),
-            getXWikiContext());
+        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className,
+            getXWikiContext()), getXWikiContext());
     }
 
     public List addObjectsFromRequest(String className) throws XWikiException
@@ -1569,8 +1595,8 @@ public class Document extends Api
     public com.xpn.xwiki.api.Object addObjectFromRequest(String className, String prefix)
         throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(
-            getDoc().addObjectFromRequest(className, prefix, getXWikiContext()), getXWikiContext());
+        return new com.xpn.xwiki.api.Object(getDoc().addObjectFromRequest(className, prefix,
+            getXWikiContext()), getXWikiContext());
     }
 
     public List addObjectsFromRequest(String className, String prefix) throws XWikiException
@@ -1584,10 +1610,11 @@ public class Document extends Api
         return wrapped;
     }
 
-    public com.xpn.xwiki.api.Object updateObjectFromRequest(String className) throws XWikiException
+    public com.xpn.xwiki.api.Object updateObjectFromRequest(String className)
+        throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(
-            getDoc().updateObjectFromRequest(className, getXWikiContext()), getXWikiContext());
+        return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className,
+            getXWikiContext()), getXWikiContext());
     }
 
     public List updateObjectsFromRequest(String className) throws XWikiException
@@ -1598,8 +1625,8 @@ public class Document extends Api
     public com.xpn.xwiki.api.Object updateObjectFromRequest(String className, String prefix)
         throws XWikiException
     {
-        return new com.xpn.xwiki.api.Object(
-            getDoc().updateObjectFromRequest(className, prefix, getXWikiContext()), getXWikiContext());
+        return new com.xpn.xwiki.api.Object(getDoc().updateObjectFromRequest(className, prefix,
+            getXWikiContext()), getXWikiContext());
     }
 
     public List updateObjectsFromRequest(String className, String prefix) throws XWikiException
@@ -1632,7 +1659,7 @@ public class Document extends Api
     {
         return getDoc().removeObjects(className);
     }
-    
+
     /**
      * Remove document from the wiki. Reinit <code>cloned</code>.
      * 
@@ -1652,7 +1679,9 @@ public class Document extends Api
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access denied in edit mode on document {0}", null, args);
+                "Access denied in edit mode on document {0}",
+                null,
+                args);
         }
     }
 
@@ -1664,7 +1693,9 @@ public class Document extends Api
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access denied with no programming rights document {0}", null, args);
+                "Access denied with no programming rights document {0}",
+                null,
+                args);
         }
     }
 
@@ -1684,7 +1715,9 @@ public class Document extends Api
             java.lang.Object[] args = {doc.getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access denied in edit mode on document {0}", null, args);
+                "Access denied in edit mode on document {0}",
+                null,
+                args);
         }
         XWiki xwiki = getXWikiContext().getWiki();
         FileUploadPlugin fileupload =
@@ -1750,16 +1783,17 @@ public class Document extends Api
             i = fileName.indexOf("/");
         }
         String filename = fileName.substring(i + 1);
-        
+
         // TODO : avoid name clearing when encoding problems will be solved
         // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
-        filename = getXWikiContext().getWiki().clearName(filename, false, true, getXWikiContext());
+        filename =
+            getXWikiContext().getWiki().clearName(filename, false, true, getXWikiContext());
 
         XWikiAttachment attachment = getDoc().getAttachment(filename);
         if (attachment == null) {
             attachment = new XWikiAttachment();
             // TODO: Review this code and understand why it's needed.
-            // Add the attachment in the current doc 
+            // Add the attachment in the current doc
             getDoc().getAttachmentList().add(attachment);
         }
 
@@ -1792,9 +1826,9 @@ public class Document extends Api
     /**
      * Rename the current document and all the backlinks leading to it. See
      * {@link #renameDocument(String, java.util.List)} for more details.
-     *
-     * @param newDocumentName the new document name. If the space is not specified then defaults
-     *        to the current space.
+     * 
+     * @param newDocumentName the new document name. If the space is not specified then defaults to
+     *            the current space.
      * @throws XWikiException in case of an error
      */
     public void rename(String newDocumentName) throws XWikiException
@@ -1817,49 +1851,55 @@ public class Document extends Api
      * write a link to a given page and all those forms need to be renamed. For example the
      * following links all point to the same page:
      * <ul>
-     *   <li>[Page]</li>
-     *   <li>[Page?param=1]</li>
-     *   <li>[currentwiki:Page]</li>
-     *   <li>[CurrentSpace.Page]</li>
+     * <li>[Page]</li>
+     * <li>[Page?param=1]</li>
+     * <li>[currentwiki:Page]</li>
+     * <li>[CurrentSpace.Page]</li>
      * </ul>
-     * <p>Note: links without a space are renamed with the space added.</p>
-     *
-     * @param newDocumentName the new document name. If the space is not specified then defaults
-     *        to the current space.
+     * <p>
+     * Note: links without a space are renamed with the space added.
+     * </p>
+     * 
+     * @param newDocumentName the new document name. If the space is not specified then defaults to
+     *            the current space.
      * @param backlinkDocumentNames the list of documents to parse and for which links will be
-     *        modified to point to the new renamed document.
+     *            modified to point to the new renamed document.
      * @throws XWikiException in case of an error
      */
-    public void rename(String newDocumentName, List backlinkDocumentNames)
-        throws XWikiException
+    public void rename(String newDocumentName, List backlinkDocumentNames) throws XWikiException
     {
         doc.rename(newDocumentName, backlinkDocumentNames, getXWikiContext());
     }
 
     /**
      * Allow to easily access any revision of a document
+     * 
      * @param revision version to access
      * @return Document object
      * @throws XWikiException
      */
-    public Document getDocumentRevision(String revision) throws XWikiException {
+    public Document getDocumentRevision(String revision) throws XWikiException
+    {
         return new Document(context.getWiki().getDocument(doc, revision, context), context);
     }
 
     /**
      * Allow to easily access the previous revision of a document
+     * 
      * @return Document
      * @throws XWikiException
      */
-    public Document getPreviousDocument() throws XWikiException {
+    public Document getPreviousDocument() throws XWikiException
+    {
         return getDocumentRevision(getPreviousVersion());
     }
 
     /**
-     * @return is document most recent.
-     *  false if and only if there are older versions of this document.
+     * @return is document most recent. false if and only if there are older versions of this
+     *         document.
      */
-    public boolean isMostRecent() {
+    public boolean isMostRecent()
+    {
         return doc.isMostRecent();
     }
 

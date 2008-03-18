@@ -3195,12 +3195,15 @@ public class XWikiDocument
         throws XWikiException, DifferentiationFailedException
     {
         Version version = getRCSVersion();
-        // TODO This is not right with the new version numbering.
-        String prev = "1." + (version.last() - 1);
-        XWikiDocument prevdoc = context.getWiki().getDocument(this, prev, context);
-
-        return getDeltas(Diff.diff(ToString.stringToArray(getContent()),
-            ToString.stringToArray(prevdoc.getContent())));
+        try {
+            String prev = getDocumentArchive(context).getPrevVersion(version).toString();
+            XWikiDocument prevDoc = context.getWiki().getDocument(this, prev, context);
+            return getDeltas(Diff.diff(ToString.stringToArray(getContent()),
+                ToString.stringToArray(prevDoc.getContent())));
+        } catch (Exception ex) {
+            log.debug("Exception getting differences from previous version: " + ex.getMessage());
+        }
+        return new ArrayList();
     }
 
     public List getRenderedContentDiff(XWikiDocument origdoc, XWikiDocument newdoc,

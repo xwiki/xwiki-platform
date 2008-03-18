@@ -245,18 +245,18 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
 
     /**
      * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.api.Document#deleteDocument()
+     *
+     * @see com.xpn.xwiki.api.Document#delete()
      */
-    protected void deleteDocument() throws XWikiException
+    public void delete() throws XWikiException
     {
         if (getObjectNumbers(sclass.getClassFullName()) == 1) {
-            super.deleteDocument();
+            super.delete();
         } else {
             doc.removeObject(getBaseObject(false));
             save();
         }
-
+        
         this.isNew = true;
     }
 

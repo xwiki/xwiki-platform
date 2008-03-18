@@ -17,8 +17,13 @@ $response.sendRedirect($doc.getURL($context.action, "editor=class"))
 <div id="field_${field.name}_content" class="accordionTabContentBox"><div>
 <dl>
 #foreach ($classprop in $field.xWikiClass.propertyNames)
-<dt><label for="${field.name}_$classprop">$field.xWikiClass.get("$classprop").getPrettyName():</label></dt>
-<dd>$doc.displayEdit($field.xWikiClass.get("$classprop"), "${field.name}_" , $field)</dd>
+#set($propDef = $field.xWikiClass.get("$classprop"))
+#if($propDef.type.indexOf("Boolean") != -1)
+<dt><label>$doc.displayEdit($propDef, "${field.name}_" , $field) $propDef.getPrettyName()</label></dt>
+#else
+<dt><label for="${field.name}_$classprop">$propDef.getPrettyName():</label></dt>
+<dd>$doc.displayEdit($propDef, "${field.name}_" , $field)</dd>
+#end
 #end
 </dl>
 </div> ## noname

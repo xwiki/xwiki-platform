@@ -63,14 +63,13 @@ public class XWikiRCSArchive extends Archive
      * @param context - for loading nodes content 
      * @throws XWikiException if can't load nodes content
      * */
-    public XWikiRCSArchive(Collection nodeInfos, XWikiContext context) throws XWikiException
+    public XWikiRCSArchive(Collection<XWikiRCSNodeInfo> nodeInfos, XWikiContext context) throws XWikiException
     {
         super(new Object[0], "");
         nodes.clear();
         head = null;
         if (nodeInfos.size() > 0) {
-            for (Iterator it = nodeInfos.iterator(); it.hasNext();) {
-                XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+            for (XWikiRCSNodeInfo nodeInfo : nodeInfos) {
                 XWikiJRCSNode node = new XWikiJRCSNode(nodeInfo.getId().getVersion(), null);
                 node.setAuthor(nodeInfo.getAuthor());
                 node.setDate(nodeInfo.getDate());

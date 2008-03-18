@@ -137,8 +137,8 @@ public class XWikiDocumentArchive
                     .getProperty("xwiki.store.rcs.nodesPerFull", "5"));
             if (nodesPerFull <= 0 || (nodesCount % nodesPerFull) != 0) {
                 XWikiRCSNodeContent latestContent = latestNode.getContent(context);
-                latestContent.getPatch().setDiffVersion(doc,
-                    latestContent.getPatch().getContent(), context);
+                latestContent.getPatch().setDiffVersion(latestContent.getPatch().getContent(),
+                    doc, context);
                 latestNode.setContent(latestContent);
                 updateNode(latestNode);
                 getUpdatedNodeContents().add(latestContent);
@@ -300,7 +300,7 @@ public class XWikiDocumentArchive
             String xmlBefore = getVersionXml(firstVersionBefore, context);
             XWikiRCSNodeInfo niBefore = getNode(firstVersionBefore);
             XWikiRCSNodeContent ncBefore = niBefore.getContent(context);
-            ncBefore.getPatch().setDiffVersion(xmlAfter, xmlBefore, "");
+            ncBefore.getPatch().setDiffVersion(xmlBefore, xmlAfter, "");
             niBefore.setContent(ncBefore);
             updateNode(niBefore);
             getUpdatedNodeContents().add(ncBefore);
@@ -361,9 +361,8 @@ public class XWikiDocumentArchive
         Version nearestFullVersion = getNearestFullVersion(version);
 
         List<XWikiRCSNodeContent> lstContent = loadRCSNodeContents(nearestFullVersion, version, context);
-        List origText = new ArrayList();
-        for (Iterator it = lstContent.iterator(); it.hasNext();) {
-            XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
+        List<String> origText = new ArrayList<String>();
+        for (XWikiRCSNodeContent nodeContent : lstContent) {
             nodeContent.getPatch().patch(origText);
         }
 

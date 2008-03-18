@@ -41,6 +41,21 @@
       <version>3.8.2</version>
     </dependency>
     <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.1.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-plexus</artifactId>
+      <version>1.4-SNAPSHOT</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>
       <version>1.7.0</version>

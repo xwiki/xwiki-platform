@@ -25,12 +25,14 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from
  * Velocity or Groovy in XWiki documents.
- *
+ * 
  * @version $Id: $
  */
 public class Api
 {
     /**
+     * The current context, needed by the underlying protected object.
+     * 
      * @see #getXWikiContext()
      * @todo make this variable private after we agree on it on the mailing list. It'll break
      *       non-core plugins but better do it now rather than after the 1.0 release...
@@ -47,9 +49,11 @@ public class Api
     }
 
     /**
-     * Note: This method is protected so that users of this API do not get to see the XWikiContext
-     * object which should not be exposed.
-     *
+     * Get the current context. For the moment, this is a crucial part of the request lifecycle, as
+     * it is the only access point to all the components needed for handling a request. Note: This
+     * method is protected so that users of this API do not get to see the XWikiContext object which
+     * should not be exposed.
+     * 
      * @return The XWiki Context object containing all information about the current XWiki instance,
      *         including information on the current request and response.
      */
@@ -59,16 +63,11 @@ public class Api
     }
 
     /**
-     * @return true if the current user has the Programming right or false otherwise
-     * @deprecated use #hasProgrammingRights() instead
-     */
-    public boolean checkProgrammingRights()
-    {
-        return hasProgrammingRights();
-    }
-
-    /**
-     * @return true if the current user has the Programming right or false otherwise
+     * Check if the current document has programming rights, meaning that it was last saved by a
+     * user with the programming right globally granted.
+     * 
+     * @return <tt>true</tt> if the current document has the Programming right or <tt>false</tt>
+     *         otherwise.
      */
     public boolean hasProgrammingRights()
     {
@@ -77,7 +76,10 @@ public class Api
     }
 
     /**
-     * @return true if the current user has the Admin right or false otherwise
+     * Check if the current user has administration rights on the current space.
+     * 
+     * @return <tt>true</tt> if the current user has the Admin right or <tt>false</tt>
+     *         otherwise.
      */
     public boolean hasAdminRights()
     {
@@ -86,11 +88,14 @@ public class Api
     }
 
     /**
-     * @param right the name of the right to verify (eg "programming", "admin", "register", etc)
-     * @param docname the document for which to verify the right
-     * @return true if the current user has the specified right
-     * @exception XWikiException in case of an error finding the document or accessing groups
-     *            information
+     * Check if the current user has an access level on a given document.
+     * 
+     * @param right The name of the right to verify (eg "programming", "admin", "register", etc).
+     * @param docname The document for which to verify the right.
+     * @return <tt>true</tt> if the current user has the specified right, <tt>false</tt>
+     *         otherwise.
+     * @exception XWikiException In case of an error finding the document or accessing groups
+     *                information.
      */
     public boolean hasAccessLevel(String right, String docname) throws XWikiException
     {

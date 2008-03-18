@@ -367,7 +367,7 @@ public class XWikiContext extends Hashtable {
         return displayedFields;
     }
 
-    public Object getEditorWysiwyg() {
-        return get("editor_wysiwyg");
+    public String getEditorWysiwyg() {
+        return (String) get("editor_wysiwyg");
     }
 }

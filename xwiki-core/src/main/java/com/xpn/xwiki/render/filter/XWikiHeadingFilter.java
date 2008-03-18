@@ -91,10 +91,10 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
 
         log.debug("Processing '" + text + "'");
         // generate unique ID of the heading
-        List processedHeadings = (List) rcontext.get("processedHeadings");
+        List<String> processedHeadings = (List<String>) xcontext.get("processedHeadings");
         if (processedHeadings == null) {
             processedHeadings = new ArrayList();
-            rcontext.set("processedHeadings", processedHeadings);
+            xcontext.put("processedHeadings", processedHeadings);
         }
         id = TOCGenerator.makeHeadingID(text, 0, xcontext);
         int occurence = 0;

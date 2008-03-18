@@ -25,8 +25,6 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 
-import java.util.Iterator;
-
 public abstract class Collection extends Element
 {
     public Collection(BaseCollection collection, XWikiContext context)
@@ -66,14 +64,14 @@ public abstract class Collection extends Element
 
     public Element[] getProperties()
     {
-        java.util.Collection coll = getCollection().getFieldList();
+        java.util.Collection<BaseProperty> coll = getCollection().getFieldList();
         if (coll == null) {
             return null;
         }
         Property[] properties = new Property[coll.size()];
         int i = 0;
-        for (Iterator it = coll.iterator(); it.hasNext(); i++) {
-            properties[i] = new Property((BaseProperty) it.next(), getXWikiContext());
+        for (BaseProperty prop : coll) {
+            properties[i++] = new Property(prop, getXWikiContext());
         }
         return properties;
     }

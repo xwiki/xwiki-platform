@@ -796,7 +796,7 @@ public class BaseClass extends BaseCollection implements ClassInterface {
         }
     }
 
-    public List getDiff(Object oldObject, XWikiContext context) {
+    public List<ObjectDiff> getDiff(Object oldObject, XWikiContext context) {
         ArrayList<ObjectDiff> difflist = new ArrayList<ObjectDiff>();
         BaseClass oldClass = (BaseClass) oldObject;
         Iterator itfields = this.getFieldList().iterator();

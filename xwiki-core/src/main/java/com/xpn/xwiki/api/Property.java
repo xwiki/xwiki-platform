@@ -51,9 +51,9 @@ public class Property extends Element
 
     public java.lang.Object getValue()
     {
-        if (element.getName().equals("password") &&
-            !getXWikiContext().getWiki().getRightService().hasProgrammingRights(getXWikiContext()))
-        {
+        if (element.getName().equals("password")
+            && !getXWikiContext().getWiki().getRightService().hasProgrammingRights(
+                getXWikiContext())) {
             return null;
         }
         return ((BaseProperty) element).getValue();

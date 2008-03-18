@@ -20,48 +20,62 @@
  */
 package com.xpn.xwiki.api;
 
-public class DocumentSection {
+public class DocumentSection
+{
     private int sectionNumber;
+
     private int sectionIndex;
+
     private String sectionLevel;
+
     private String sectionTitle;
 
-    public DocumentSection(int sectionNumber, int sectionIndex, String sectionLevel, String sectionTitle) {
+    public DocumentSection(int sectionNumber, int sectionIndex, String sectionLevel,
+        String sectionTitle)
+    {
         setSectionNumber(sectionNumber);
         setSectionIndex(sectionIndex);
         setSectionLevel(sectionLevel);
         setSectionTitle(sectionTitle);
     }
 
-    public int getSectionNumber() {
+    public int getSectionNumber()
+    {
         return this.sectionNumber;
     }
 
-    public void setSectionNumber(int sectionNumber) {
+    public void setSectionNumber(int sectionNumber)
+    {
         this.sectionNumber = sectionNumber;
     }
 
-    public int getSectionIndex() {
+    public int getSectionIndex()
+    {
         return this.sectionIndex;
     }
 
-    public void setSectionIndex(int sectionIndex) {
+    public void setSectionIndex(int sectionIndex)
+    {
         this.sectionIndex = sectionIndex;
     }
 
-    public String getSectionLevel() {
-        return  this.sectionLevel;
+    public String getSectionLevel()
+    {
+        return this.sectionLevel;
     }
 
-    public void setSectionLevel(String sectionLevel) {
+    public void setSectionLevel(String sectionLevel)
+    {
         this.sectionLevel = sectionLevel;
     }
 
-    public String getSectionTitle() {
+    public String getSectionTitle()
+    {
         return sectionTitle;
     }
 
-    public void setSectionTitle(String sectionTitle) {
+    public void setSectionTitle(String sectionTitle)
+    {
         this.sectionTitle = sectionTitle;
     }
 }

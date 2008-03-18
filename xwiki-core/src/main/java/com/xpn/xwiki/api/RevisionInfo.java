@@ -27,12 +27,14 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 /**
  * API object for get info about some version of Document.
- * @version $Id: $ 
+ * 
+ * @version $Id: $
  */
 public class RevisionInfo extends Api
 {
     /** used for get all information. */
     private XWikiRCSNodeInfo nodeInfo;
+
     /**
      * @param nodeInfo - from that nodeinfo all information is getting
      * @param context - needed for {@link Api}
@@ -42,28 +44,34 @@ public class RevisionInfo extends Api
         super(context);
         this.nodeInfo = nodeInfo;
     }
+
     /** @return version of this revision */
     public String getVersion()
     {
         return nodeInfo.getId().getVersion().toString();
     }
+
     /** @return date of this revision */
     public Date getDate()
     {
         return nodeInfo.getDate();
     }
+
     /** @return author of this revision */
     public String getAuthor()
     {
         return nodeInfo.getAuthor();
     }
+
     /** @return revision comment */
     public String getComment()
     {
         return nodeInfo.getComment();
     }
+
     /** @return is revision is minor */
-    public boolean isMinorEdit() {
+    public boolean isMinorEdit()
+    {
         return nodeInfo.isMinorEdit();
     }
 }

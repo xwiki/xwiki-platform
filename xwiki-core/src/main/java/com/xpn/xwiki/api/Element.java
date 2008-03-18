@@ -24,19 +24,23 @@ package com.xpn.xwiki.api;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseElement;
 
-public class Element extends Api {
+public class Element extends Api
+{
     protected BaseElement element;
 
-    public Element(BaseElement element, XWikiContext context) {
-       super(context);
-       this.element = element;
+    public Element(BaseElement element, XWikiContext context)
+    {
+        super(context);
+        this.element = element;
     }
 
-    protected BaseElement getBaseElement() {
+    protected BaseElement getBaseElement()
+    {
         return element;
     }
 
-    public String getName() {
+    public String getName()
+    {
         return element.getName();
     }
 }

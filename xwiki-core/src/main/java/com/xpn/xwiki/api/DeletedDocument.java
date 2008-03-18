@@ -27,8 +27,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
- * Information about deleted document in recycle bin. 
+ * Information about deleted document in recycle bin.
+ * 
  * @version $Id: $
  */
 public class DeletedDocument extends Api
@@ -55,7 +57,7 @@ public class DeletedDocument extends Api
     {
         return deldoc.getFullName();
     }
-    
+
     /**
      * @return language of document
      */
@@ -63,7 +65,7 @@ public class DeletedDocument extends Api
     {
         return deldoc.getLanguage();
     }
-    
+
     /**
      * @return date of delete action
      */
@@ -79,7 +81,7 @@ public class DeletedDocument extends Api
     {
         return deldoc.getDeleter();
     }
-    
+
     /**
      * @return id of deleted document. id is unique only for this document.
      */
@@ -100,18 +102,17 @@ public class DeletedDocument extends Api
     /**
      * @return can current user permanently delete this document
      * @throws XWikiException if any error
-     * @xwikicfg xwiki.store.recyclebin.adminWaitDays
-     *      how many days should wait admin to delete document. 0 by default
-     * @xwikicfg xwiki.store.recyclebin.waitDays
-     *      how many days should wait user with "delete" right to delete document
+     * @xwikicfg xwiki.store.recyclebin.adminWaitDays how many days should wait admin to delete
+     *           document. 0 by default
+     * @xwikicfg xwiki.store.recyclebin.waitDays how many days should wait user with "delete" right
+     *           to delete document
      */
     public boolean canDelete() throws XWikiException
     {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(getFullName(), context);
         if (!hasAdminRights()
-            && !getXWikiContext().getWiki().getRightService()
-                .checkAccess("delete", doc, context)) {
+            && !getXWikiContext().getWiki().getRightService().checkAccess("delete", doc, context)) {
             return false;
         }
         String waitdays;
@@ -139,10 +140,10 @@ public class DeletedDocument extends Api
             return null;
         }
     }
-    
+
     /**
-     * @return document, restored from recycle bin 
-     * @throws XWikiException if error 
+     * @return document, restored from recycle bin
+     * @throws XWikiException if error
      */
     public Document getDocument() throws XWikiException
     {

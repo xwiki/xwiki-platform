@@ -24,8 +24,8 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.criteria.impl.DurationFactory;
 import com.xpn.xwiki.criteria.impl.PeriodFactory;
 import com.xpn.xwiki.criteria.impl.RangeFactory;
-import com.xpn.xwiki.criteria.impl.ScopeFactory;
 import com.xpn.xwiki.criteria.impl.RevisionCriteriaFactory;
+import com.xpn.xwiki.criteria.impl.ScopeFactory;
 
 /**
  * Criteria service api.
@@ -43,7 +43,8 @@ public class CriteriaService extends Api
      */
     public ScopeFactory getScopeFactory()
     {
-        return getXWikiContext().getWiki().getCriteriaService(getXWikiContext()).getScopeFactory();
+        return getXWikiContext().getWiki().getCriteriaService(getXWikiContext())
+            .getScopeFactory();
     }
 
     /**
@@ -52,7 +53,8 @@ public class CriteriaService extends Api
      */
     public PeriodFactory getPeriodFactory()
     {
-        return getXWikiContext().getWiki().getCriteriaService(getXWikiContext()).getPeriodFactory();
+        return getXWikiContext().getWiki().getCriteriaService(getXWikiContext())
+            .getPeriodFactory();
     }
 
     /**
@@ -71,7 +73,8 @@ public class CriteriaService extends Api
      */
     public RangeFactory getRangeFactory()
     {
-        return getXWikiContext().getWiki().getCriteriaService(getXWikiContext()).getRangeFactory();
+        return getXWikiContext().getWiki().getCriteriaService(getXWikiContext())
+            .getRangeFactory();
     }
 
     /**

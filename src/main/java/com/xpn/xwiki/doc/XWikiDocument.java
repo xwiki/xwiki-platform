@@ -3242,11 +3242,15 @@ public class XWikiDocument
     {
         Version version = getRCSVersion();
         // TODO This is not right with the new version numbering.
-        String prev = "1." + (version.last() - 1);
-        XWikiDocument prevDoc = context.getWiki().getDocument(this, prev, context);
-
-        return getDeltas(Diff.diff(ToString.stringToArray(prevDoc.getContent()),
-            ToString.stringToArray(getContent())));
+        try {
+            String prev = getDocumentArchive(context).getPrevVersion(version).toString();
+            XWikiDocument prevDoc = context.getWiki().getDocument(this, prev, context);
+            return getDeltas(Diff.diff(ToString.stringToArray(prevDoc.getContent()),
+                ToString.stringToArray(getContent())));
+        } catch (Exception ex) {
+            log.debug("Exception getting differences from previous version: " + ex.getMessage());
+        }
+        return new ArrayList();
     }
 
     public List getRenderedContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc,

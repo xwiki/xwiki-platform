@@ -17,8 +17,9 @@ public class GroupsMetaClass extends ListMetaClass
         uselist_class.setName("usesList");
         uselist_class.setPrettyName("Uses List");
         uselist_class.setDisplayType("yesno");
+        uselist_class.setDisplayFormType("checkbox");
+        uselist_class.setDefaultValue(1);
         safeput("usesList", uselist_class);
-
     }
 
     public BaseCollection newObject(XWikiContext context)

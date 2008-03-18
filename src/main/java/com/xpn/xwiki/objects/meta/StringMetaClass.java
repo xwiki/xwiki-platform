@@ -47,7 +47,8 @@ public class StringMetaClass extends PropertyMetaClass
         picker_class.setName("picker");
         picker_class.setPrettyName("Use Suggest");
         picker_class.setDisplayType("yesno");
-        picker_class.setUnmodifiable(true);
+        picker_class.setDisplayFormType("checkbox");
+        picker_class.setDefaultValue(1);
         safeput("picker", picker_class);
     }
 

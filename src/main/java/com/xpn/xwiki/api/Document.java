@@ -620,6 +620,43 @@ public class Document extends Api
         }
     }
 
+    /**
+     * Select a subset of objects from a given class, filtered on a "key = value" criteria.
+     * 
+     * @param classname The type of objects to return.
+     * @param key The name of the property used for filtering.
+     * @param value The required value.
+     * @return A Vector of {@link Object objects} matching the criteria. If no objects are found, or
+     *         if the key is an empty String, then an empty vector is returned.
+     */
+    public Vector<Object> getObjects(String classname, String key, String value)
+    {
+        Vector<Object> result = new Vector<Object>();
+        if (StringUtils.isBlank(key) || value == null) {
+            return getObjects(classname);
+        }
+        try {
+            Vector<BaseObject> allObjects = doc.getObjects(classname);
+            if (allObjects == null || allObjects.size() == 0) {
+                return result;
+            } else {
+                for (BaseObject obj : allObjects) {
+                    if (obj != null) {
+                        BaseProperty prop = (BaseProperty) obj.get(key);
+                        if (prop == null || prop.getValue() == null) {
+                            continue;
+                        }
+                        if (value.equals(prop.getValue())) {
+                            result.add(newObjectApi(obj, getXWikiContext()));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+        }
+        return result;
+    }
+
     public Object getObject(String classname, String key, String value)
     {
         try {

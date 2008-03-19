@@ -527,7 +527,7 @@ public class Document extends Api
 
     public Class[] getxWikiClasses()
     {
-        List list = doc.getxWikiClasses(getXWikiContext());
+        List<BaseClass> list = doc.getxWikiClasses(getXWikiContext());
         if (list == null) {
             return null;
         }
@@ -762,7 +762,7 @@ public class Document extends Api
      * @param criteria criteria used to match versions
      * @return a list of matching versions
      */
-    public List getRevisions(RevisionCriteria criteria) throws XWikiException
+    public List<String> getRevisions(RevisionCriteria criteria) throws XWikiException
     {
         return doc.getRevisions(criteria, context);
     }
@@ -779,36 +779,23 @@ public class Document extends Api
             getXWikiContext());
     }
 
-    public List getAttachmentList()
+    public List<Attachment> getAttachmentList()
     {
-        List list = doc.getAttachmentList();
-        List list2 = new ArrayList();
-        for (int i = 0; i < list.size(); i++) {
-            list2.add(new Attachment(this, (XWikiAttachment) list.get(i), getXWikiContext()));
+        List<Attachment> apis = new ArrayList<Attachment>();
+        for (XWikiAttachment attachment : doc.getAttachmentList()) {
+            apis.add(new Attachment(this, attachment, getXWikiContext()));
         }
-        return list2;
+        return apis;
     }
 
-    public Vector getComments()
+    public Vector<Object> getComments()
     {
         return getComments(true);
     }
 
-    public Vector getComments(boolean asc)
+    public Vector<Object> getComments(boolean asc)
     {
-        if (asc) {
-            return getObjects("XWiki.XWikiComments");
-        } else {
-            Vector list = getObjects("XWiki.XWikiComments");
-            if (list == null) {
-                return list;
-            }
-            Vector newlist = new Vector();
-            for (int i = list.size() - 1; i >= 0; i--) {
-                newlist.add(list.get(i));
-            }
-            return newlist;
-        }
+        return getObjects(doc.getComments(asc));
     }
 
     public void use(Object object)
@@ -1016,7 +1003,7 @@ public class Document extends Api
             getXWikiContext());
     }
 
-    public List getIncludedPages()
+    public List<String> getIncludedPages()
     {
         return doc.getIncludedPages(getXWikiContext());
     }

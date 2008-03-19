@@ -20,11 +20,15 @@
  */
 package org.xwiki.component.manager;
 
-public interface ComponentManager
+public class ComponentLifecycleException extends Exception
 {
-    Object lookup(String role) throws ComponentLookupException;
-    Object lookup(String role, String roleHint) throws ComponentLookupException;
-    boolean hasComponent(String role);
-    boolean hasComponent(String role, String roleHint);
-    void release(Object component) throws ComponentLifecycleException;
+    public ComponentLifecycleException(String message)
+    {
+        super(message);
+    }
+
+    public ComponentLifecycleException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

@@ -21,6 +21,7 @@
 package org.xwiki.plexus.manager;
 
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.ServiceLocator;
+import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.manager.ComponentLookupException;
 
@@ -55,6 +56,15 @@ public class PlexusComponentManager implements ComponentManager
                 + role + "] for hint [" + roleHint + "]", e);
         }
         return result;
+    }
+
+    public void release(Object component) throws ComponentLifecycleException
+    {
+        try {
+            this.serviceLocator.release(component);
+        } catch (org.codehaus.plexus.component.repository.exception.ComponentLifecycleException e) {
+            throw new ComponentLifecycleException("Failed to release component [" + component + "]", e);
+        }
     }
 
     public boolean hasComponent(String role)

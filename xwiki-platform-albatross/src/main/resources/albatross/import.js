@@ -1,23 +1,25 @@
-Ajax.XWikiRequest = Class.create();
-
-Object.extend(Object.extend(Ajax.XWikiRequest.prototype, Ajax.Request.prototype), {
-    initialize: function(space, docName, options, action) {
+Ajax.XWikiRequest = Class.create(Ajax.Request, {
+    initialize: function($super, space, docName, options, action) {
 
         this.transport = Ajax.getTransport();
-        this.setOptions(options);
         if (action)
             this.action = action;
         else
             this.action = "view";
         this.baseUrl = "${request.contextPath}/bin/" + action;
 
-        var onComplete = this.options.onComplete || Prototype.emptyFunction;
-        this.options.onComplete = (function() {
+        options = Object.clone(options);
+
+        var onComplete = options.onComplete || Prototype.emptyFunction;
+
+        options.onComplete = (function() {
             this.returnValue(onComplete);
             //onComplete(this.transport);
         }).bind(this);
 
-        this.request(this.generateUrl(space, docName));
+        //this.request(this.generateUrl(space, docName));
+
+        $super(this.generateUrl(space, docName), options);
     },
 
     generateUrl: function(space, docName){

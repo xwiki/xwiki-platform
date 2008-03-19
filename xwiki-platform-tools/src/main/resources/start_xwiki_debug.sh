@@ -28,15 +28,20 @@ JAVA_OPTS="$JAVA_OPTS -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport
 # service attacks.
 JAVA_OPTS="$JAVA_OPTS -Dorg.mortbay.http.HttpRequest.maxFormContentSize=1000000"
 
-# For enabling YourKit Profiling:
-# JAVA_OPTS="$JAVA_OPTS -agentlib:yjpagent"
-# export 'DYLD_LIBRARY_PATH=/Applications/YourKit Java Profiler 6.0.15.app/bin/mac'
-
 # The port on which to start Jetty can be passed to this script as the first argument
 if [ -n "$1" ]; then
   JETTY_PORT=$1
 else
   JETTY_PORT=8080
+fi
+
+# For enabling YourKit Profiling.
+# $3 must the path where Yourkit can find the agent.
+# For example: "/Applications/YourKit Java Profiler 7.0.11.app/bin/mac"
+# Note: you must also pass the port as $1 for now till we use getopts.
+if [ "$2" = "profiler" ]; then
+  JAVA_OPTS="$JAVA_OPTS -agentlib:yjpagent"
+  export DYLD_LIBRARY_PATH="$3"
 fi
 
 echo Starting Jetty on port $JETTY_PORT ...

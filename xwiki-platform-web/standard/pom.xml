@@ -218,7 +218,7 @@
         <!-- This property is automatically defined by the Release profile in the top level POM when executing
              a release. Thus this profile will be automatically enabled when releasing -->
         <property>
-          <name>release</name>
+          <name>performRelease</name>
           <value>true</value>
         </property>
       </activation>

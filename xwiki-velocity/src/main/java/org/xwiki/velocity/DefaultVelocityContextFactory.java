@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
+import org.apache.velocity.context.Context;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -43,10 +44,10 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
     private Properties properties;
 
     /**
-     * The Velocity Tools (instantiated as Objects) that we use to create new
-     * Velocity Contexts.
+     * An internal read-only Velocity Context containing the Tools defined in the component's
+     * configuration. We reuse them across Contexts for better performance.
      */
-    private Map<String, Object> tools;
+    private Context toolsContext;
     
     /**
      * {@inheritDoc}
@@ -54,7 +55,7 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
      */
     public void initialize() throws InitializationException
     {
-        this.tools = new HashMap<String, Object>();
+        this.toolsContext = new VelocityContext();
         
         // Instantiate Velocity tools
         if (this.properties != null) {
@@ -68,7 +69,7 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
                     throw new InitializationException("Failed to initialize tool [" 
                         + value + "]", e);
                 }
-                this.tools.put(key, toolInstance);
+                this.toolsContext.put(key, toolInstance);
                 getLogger().debug("Setting tool [" + key + "] = [" + value + "]");
             }
         }
@@ -80,6 +81,7 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
      */
     public VelocityContext createContext()
     {
-        return new VelocityContext(this.tools);
+        // Note: This constructor uses the passed context as an internal read-only context.
+        return new VelocityContext(this.toolsContext);
     }
 }

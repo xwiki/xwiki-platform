@@ -41,16 +41,20 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
 
     /**
      * Verify that we get different contexts when we call the createContext method but that
-     * they contain the same references to the Velocity tools.
+     * they contain the same references to the Velocity tools. Also tests that objects we
+     * put in one context are not shared with other contexts.
      */
-    public void testCreateDifferentContextButSameTools() throws Exception
+    public void testCreateDifferentContext() throws Exception
     {
         VelocityContext context1 = this.factory.createContext();
+        context1.put("param", "value");
+
         VelocityContext context2= this.factory.createContext();
         assertNotSame(context1, context2);
         assertSame(context2.get("listtool"), context1.get("listtool"));
+        assertNull(context2.get("param"));
     }
-    
+
     public void testDefaultToolsPresent() throws Exception
     {
         // Verify for example that the List tool is present and working.
@@ -66,5 +70,5 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
             "#set($list=[1, 2, 3])$listtool.get($list, 2)");
         assertEquals("3", writer.toString());
     }
-
+   
 }

@@ -35,7 +35,6 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ActionExecutionEvent;
 
@@ -316,19 +315,6 @@ public abstract class XWikiAction extends Action
                 }
             }
         } finally {
-            
-            // Make sure we clean all per-lookup components.
-            // Specifically since we create a new VelocityContext component per request, make sure we release it
-            // against the component manager as otherwise this will generate memory leaks.
-            if (context != null) {
-                ComponentManager componentManager =
-                    (ComponentManager) context.get(ComponentManager.class.getName());
-                Object component = context.get("vcontext");
-                if (component != null) {
-                    componentManager.release(component);
-                }
-            }
-            
             // End request
             if (monitor != null)
                 monitor.endRequest();

@@ -72,7 +72,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
  * @see MailSender
  * @version $Id: $
  */
-public final class MailSenderPlugin extends XWikiDefaultPlugin
+public class MailSenderPlugin extends XWikiDefaultPlugin
 {
     /**
      * Log object to log messages in this class.

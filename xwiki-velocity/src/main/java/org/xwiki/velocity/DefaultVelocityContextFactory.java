@@ -21,8 +21,6 @@
 package org.xwiki.velocity;
 
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.velocity.VelocityContext;
@@ -59,7 +57,7 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
         
         // Instantiate Velocity tools
         if (this.properties != null) {
-            for (Enumeration props = this.properties.propertyNames(); props.hasMoreElements();) {
+            for (Enumeration<?> props = this.properties.propertyNames(); props.hasMoreElements();) {
                 String key = props.nextElement().toString();
                 String value = this.properties.getProperty(key);
                 Object toolInstance;

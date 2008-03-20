@@ -47,8 +47,6 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     private Properties properties;
 
-    private RuntimeServices runtimeServices;
-
     private Container container;
 
     /**
@@ -76,7 +74,7 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
         // Configure Velocity by passing the properties defined in this component's configuration
         if (this.properties != null) {
-            for (Enumeration e = this.properties.propertyNames(); e.hasMoreElements();) {
+            for (Enumeration<?> e = this.properties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
                 // Only set a property if it's not overridden by one of the passed properties
                 if (!properties.containsKey(key)) {
@@ -89,7 +87,7 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
         // Override the component's static properties with the ones passed in parameter
         if (properties != null) {
-            for (Enumeration e = properties.propertyNames(); e.hasMoreElements();) {
+            for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
                 String value = properties.getProperty(key);
                 getEngine().setProperty(key, value);
@@ -149,7 +147,7 @@ public class DefaultVelocityManager extends AbstractLogEnabled
      */
     public void init(RuntimeServices runtimeServices)
     {
-        this.runtimeServices = runtimeServices;
+        // Do nothing.
     }
 
     /**

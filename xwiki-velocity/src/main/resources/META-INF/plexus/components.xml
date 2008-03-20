@@ -50,10 +50,10 @@
       </configuration>
     </component>
     <component>
-      <role>org.xwiki.velocity.VelocityContext</role>
+      <role>org.xwiki.velocity.VelocityContextFactory</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.velocity.DefaultVelocityContext</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
+      <implementation>org.xwiki.velocity.DefaultVelocityContextFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <configuration>
         <properties>

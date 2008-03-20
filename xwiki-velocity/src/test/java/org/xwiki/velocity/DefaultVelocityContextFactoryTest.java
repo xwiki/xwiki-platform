@@ -23,30 +23,46 @@ package org.xwiki.velocity;
 import java.io.StringWriter;
 import java.util.Properties;
 
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
- * Unit tests for {@link DefaultVelocityContext}.
+ * Unit tests for {@link DefaultVelocityContextFactory}.
  */
-public class DefaultVelocityContextTest extends AbstractXWikiComponentTestCase
+public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTestCase
 {
-    private VelocityContext context;
+    private VelocityContextFactory factory;
 
     protected void setUp() throws Exception
     {
-        this.context = (VelocityContext) getComponentManager().lookup(VelocityContext.ROLE);
+        this.factory = (VelocityContextFactory) getComponentManager().lookup(VelocityContextFactory.ROLE);
     }
 
+    /**
+     * Verify that we get different contexts when we call the createContext method but that
+     * they contain the same references to the Velocity tools.
+     */
+    public void testCreateDifferentContextButSameTools() throws Exception
+    {
+        VelocityContext context1 = this.factory.createContext();
+        VelocityContext context2= this.factory.createContext();
+        assertNotSame(context1, context2);
+        assertSame(context2.get("listtool"), context1.get("listtool"));
+    }
+    
     public void testDefaultToolsPresent() throws Exception
     {
         // Verify for example that the List tool is present and working.
+        VelocityContext context = this.factory.createContext();
+        
         assertEquals("org.apache.velocity.tools.generic.ListTool", 
-            this.context.get("listtool").getClass().getName());
+            context.get("listtool").getClass().getName());
         VelocityManager manager = 
             (VelocityManager) getComponentManager().lookup(VelocityManager.ROLE);
         manager.initialize(new Properties());
         StringWriter writer = new StringWriter();
-        manager.evaluate(this.context, writer, "mytemplate",
+        manager.evaluate(context, writer, "mytemplate",
             "#set($list=[1, 2, 3])$listtool.get($list, 2)");
         assertEquals("3", writer.toString());
     }

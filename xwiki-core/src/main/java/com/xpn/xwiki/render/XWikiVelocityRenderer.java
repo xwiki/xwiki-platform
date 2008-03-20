@@ -33,6 +33,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;
 import org.apache.velocity.runtime.RuntimeConstants;
+import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.VelocityManager;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -160,7 +161,9 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     	VelocityContext vcontext = (VelocityContext) context.get("vcontext");
         if (vcontext == null) {
 	        // Create the Velocity Context
-	        vcontext = (VelocityContext) Utils.getComponent(org.xwiki.velocity.VelocityContext.ROLE, context);
+            VelocityContextFactory contextFactory = 
+                (VelocityContextFactory) Utils.getComponent(VelocityContextFactory.ROLE, context); 
+	        vcontext = contextFactory.createContext();
 
 	        // Initialize it with read only objects (for better performances)
 	        

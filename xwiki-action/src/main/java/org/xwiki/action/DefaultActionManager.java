@@ -57,7 +57,7 @@ public class DefaultActionManager implements ActionManager, Composable
     public void handleRequest(Container container, String actionName, Object additionalData)
         throws ActionException
     {
-        // Actions are registered with a role hint correponding to the action name
+        // Actions are registered with a role hint corresponding to the action name
         try {
             Action action = (Action) this.componentManager.lookup(Action.ROLE, actionName);
             action.execute(container, additionalData);

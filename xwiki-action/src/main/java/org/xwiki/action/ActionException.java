@@ -22,6 +22,11 @@ package org.xwiki.action;
 
 public class ActionException extends Exception
 {
+    /**
+     * Unique ID for Class Serialization.
+     */
+    private static final long serialVersionUID = 9195072421204204773L;
+
     public ActionException(String message)
     {
         super(message);

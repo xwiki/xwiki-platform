@@ -48,9 +48,9 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
  * Hidden toolkit use by the plugin API that make all the plugin's actions.
  * 
  * @version $Id: $
- * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+ * @since XWiki Core 1.1.2, XWiki Core 1.2M2 (public since 1.4M1)
  */
-final class RightsManager implements XWikiDocChangeNotificationInterface
+final public class RightsManager implements XWikiDocChangeNotificationInterface
 {
     /**
      * Name of the default space where users and groups are stored.

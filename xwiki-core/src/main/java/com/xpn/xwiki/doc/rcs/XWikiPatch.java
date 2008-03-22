@@ -30,8 +30,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Contains differences between revisions. One field (diff for xml or full xml) for now. Created for
- * easy migrate to future XWikiPatch system
+ * Contains differences between revisions. One field (diff for xml or full xml) for now.
+ * Created for easy migration to future XWikiPatch system.
  * 
  * @version $Id: $
  * @since 1.2M1
@@ -184,7 +184,7 @@ public class XWikiPatch
     }
 
     /**
-     * patch text.
+     * Patch text.
      * 
      * @param origText - text to patch
      * @throws XWikiException if exception while patching
@@ -193,7 +193,8 @@ public class XWikiPatch
     {
         if (!isDiff()) {
             origText.clear();
-            origText.addAll(new ArrayList<String>(Arrays.asList(ToString.stringToArray(getContent()))));
+            origText.addAll(
+                new ArrayList<String>(Arrays.asList(ToString.stringToArray(getContent()))));
         } else {
             try {
                 XWikiPatchUtils.patch(origText, getContent());

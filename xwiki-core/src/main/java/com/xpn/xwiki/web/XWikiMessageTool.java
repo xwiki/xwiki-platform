@@ -206,7 +206,7 @@ public class XWikiMessageTool
         while (docNames.hasNext()) {
             String docName = ((String) docNames.next()).trim();
             List docBundles = getDocumentBundles(docName, defaultLanguage);
-            for (int i=0;i<docBundles.size();i++) {
+            for (int i = 0; i < docBundles.size(); i++) {
                 XWikiDocument docBundle = (XWikiDocument) docBundles.get(i);
                 if (docBundle != null) {
                     if (!docBundle.isNew()) {
@@ -277,18 +277,19 @@ public class XWikiMessageTool
     {
         ArrayList list = new ArrayList();
 
-        if (documentName.length() == 0) {
-            return list;
-        } else {
+        if (documentName.length() != 0) {
             try {
                 // First, looks for a document suffixed by the language
-                XWikiDocument docBundle = this.context.getWiki().getDocument(documentName, this.context);
+                XWikiDocument docBundle = 
+                    this.context.getWiki().getDocument(documentName, this.context);
                 XWikiDocument tdocBundle = docBundle.getTranslatedDocument(this.context);
                 list.add(tdocBundle);
                 if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
-                    XWikiDocument defdocBundle = docBundle.getTranslatedDocument(defaultLanguage, this.context);
-                    if (tdocBundle!=defdocBundle)
-                     list.add(defdocBundle);
+                    XWikiDocument defdocBundle = 
+                        docBundle.getTranslatedDocument(defaultLanguage, this.context);
+                    if (tdocBundle != defdocBundle) {
+                        list.add(defdocBundle);
+                    }
                 }
 
             } catch (XWikiException e) {
@@ -297,7 +298,6 @@ public class XWikiMessageTool
                 // topmost level. For now simply log the error
                 LOG.error("Failed to load internationalization document bundle [" + documentName
                     + "].", e);
-                return list;
             }
         }
 

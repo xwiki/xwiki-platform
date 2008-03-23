@@ -94,21 +94,22 @@ public class DBTreeListClass extends DBListClass
      * @param treemap
      * @return list of ListItems
      */
-    protected List getTreeList(Map treemap)
+    protected List getTreeList(Map treemap, Map map, XWikiContext context)
     {
         List list = new ArrayList();
-        addToTreeList(list, treemap, "");
+        addToTreeList(list, treemap, map, "", context);
         return list;
     }
 
-    protected void addToTreeList(List treelist, Map treemap, String parent)
+    protected void addToTreeList(List treelist, Map treemap, Map map, String parent, XWikiContext context)
     {
         List list = (List) treemap.get(parent);
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
                 ListItem item = (ListItem) list.get(i);
-                treelist.add(item);
-                addToTreeList(treelist, treemap, item.getId());
+                ListItem item2 = new ListItem(item.getId(),getDisplayValue(item.getId(), "", map, context), item.getParent());
+                treelist.add(item2);
+                addToTreeList(treelist, treemap, map, item.getId(), context);
             }
         }
     }
@@ -173,8 +174,9 @@ public class DBTreeListClass extends DBListClass
 
     private String displayFlatView(List selectlist, XWikiContext context)
     {
-        Map map = getTreeMap(context);
-        List fullTreeList = getTreeList(map);
+        Map map = getMap(context);
+        Map treemap = getTreeMap(context);
+        List fullTreeList = getTreeList(treemap, map, context);
         List resList = new ArrayList(selectlist.size());
 
         Iterator it = selectlist.iterator();
@@ -253,11 +255,12 @@ public class DBTreeListClass extends DBListClass
         XWikiContext context)
     {
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        Map map = getTreeMap(context);
+        Map map = getMap(context);
+        Map treemap = getTreeMap(context);
         vcontext.put("selectlist", selectlist);
         vcontext.put("fieldname", prefix + name);
         vcontext.put("tree", map);
-        vcontext.put("treelist", getTreeList(map));
+        vcontext.put("treelist", getTreeList(treemap, map, context));
         vcontext.put("mode", mode);
         return context.getWiki().parseTemplate("treeview.vm", context);
     }

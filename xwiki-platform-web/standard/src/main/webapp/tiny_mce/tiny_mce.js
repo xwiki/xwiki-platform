@@ -3678,8 +3678,9 @@ TinyMCE_Control.prototype = {
 		if (this.formElement)
 			this.formElement.value = htm;
 
-		if (tinyMCE.isSafari && this.formElement)
-			this.formElement.innerText = htm;
+                // This seems not necessary on Safari 3/leopard and removes line breaks
+		// if (tinyMCE.isSafari && this.formElement)
+		// 	this.formElement.innerText = htm;
 
 		// Hide them again (tabs in MSIE)
 		for (i=0; i<nl.length; i++) {
@@ -5848,8 +5849,11 @@ TinyMCE_Selection.prototype = {
 			return false;
 
 		if (tinyMCE.isSafari) {
+                        // this seems to break on Safari3/Leopard
+                        try {
 			sel.setBaseAndExtent(bookmark.startContainer, bookmark.startOffset, bookmark.endContainer, bookmark.endOffset);
-			return true;
+			} catch (e) {}
+                        return true;
 		}
 
 		if (tinyMCE.isMSIE) {
@@ -5953,7 +5957,10 @@ TinyMCE_Selection.prototype = {
 				return;
 
 			if (tinyMCE.isSafari) {
-				sel.setBaseAndExtent(node, 0, node, node.innerText.length);
+			//This seems to break on Safari 3/Leopard
+                          try {
+                        	sel.setBaseAndExtent(node, 0, node, node.innerText.length);
+			  } catch (e) {}
 
 				if (collapse) {
 					if (to_start)

@@ -1,5 +1,6 @@
 /*
- * Copyright 2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -15,20 +16,17 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.doc.rcs;
 
 import java.lang.ref.SoftReference;
 import java.util.Date;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.ToStringBuilder;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
  * Contains information about document version.
@@ -36,7 +34,7 @@ import com.xpn.xwiki.XWikiException;
  * @version $Id: $
  * @since 1.2M1
  */
-public class XWikiRCSNodeInfo implements Comparable
+public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<XWikiRCSNodeInfo>
 {
     /**
      * composite primary id of class. 
@@ -61,7 +59,7 @@ public class XWikiRCSNodeInfo implements Comparable
     /**
      * reference to its XWikiRCSNodeContent.
      */
-    private SoftReference contentRef;
+    private SoftReference<XWikiRCSNodeContent> contentRef;
     /**
      * default constructor used in Hibernate to load this class.
      */
@@ -151,7 +149,7 @@ public class XWikiRCSNodeInfo implements Comparable
     }
     /**
      * @param diff - is patch (true) or full version (false).
-     * Should not be used dirrectly.
+     * Should not be used directly.
      * @see XWikiPatch#setDiff(boolean)
      */
     public void setDiff(boolean diff)
@@ -175,7 +173,7 @@ public class XWikiRCSNodeInfo implements Comparable
         }
         nodeContent = context.getWiki().getVersioningStore()
             .loadRCSNodeContent(this.id, true, context);
-        contentRef = new SoftReference(nodeContent);
+        contentRef = new SoftReference<XWikiRCSNodeContent>(nodeContent);
         return nodeContent;
     }
     /**
@@ -184,7 +182,7 @@ public class XWikiRCSNodeInfo implements Comparable
     public void setContent(XWikiRCSNodeContent content)
     {
         content.setId(getId());
-        contentRef = new SoftReference(content);
+        contentRef = new SoftReference<XWikiRCSNodeContent>(content);
         setDiff(content.getPatch().isDiff());
     }
 
@@ -199,30 +197,8 @@ public class XWikiRCSNodeInfo implements Comparable
     /**
      * {@inheritDoc}
      */
-    public int hashCode()
+    public int compareTo(XWikiRCSNodeInfo o)
     {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equals(Object obj)
-    {
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public String toString()
-    {
-        return ToStringBuilder.reflectionToString(this);
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public int compareTo(Object arg0)
-    {
-        final XWikiRCSNodeInfo o = (XWikiRCSNodeInfo) arg0;
         return getId().getVersion().compareTo(o.getId().getVersion());
     }
 }

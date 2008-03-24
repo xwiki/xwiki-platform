@@ -1,5 +1,6 @@
 /*
- * Copyright 2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -15,7 +16,6 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.doc.rcs;
 
@@ -69,7 +69,7 @@ public class XWikiPatchUtils
      * @throws InvalidFileFormatException if diff is incorrect 
      * @throws PatchFailedException if error in patching
      */
-    public static void patch(List orig, String diff) 
+    public static void patch(List<String> orig, String diff) 
         throws InvalidFileFormatException, PatchFailedException 
     {
         Revision revision = new Revision();

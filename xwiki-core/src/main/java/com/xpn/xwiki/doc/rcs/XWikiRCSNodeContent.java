@@ -1,5 +1,6 @@
 /*
- * Copyright 2007, XpertNet SARL, and individual contributors.
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
  *
  * This is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as
@@ -15,13 +16,12 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
 package com.xpn.xwiki.doc.rcs;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.ToStringBuilder;
+
+import com.xpn.xwiki.util.AbstractSimpleClass;
 
 /**
  * Contains differences between document versions.
@@ -29,7 +29,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * @version $Id: $
  * @since 1.2M1
  */
-public class XWikiRCSNodeContent implements Comparable
+public class XWikiRCSNodeContent extends AbstractSimpleClass 
+    implements Comparable<XWikiRCSNodeContent>
 {
     /** composite primary id of class. Not null. */
     private XWikiRCSNodeId  id;
@@ -80,20 +81,6 @@ public class XWikiRCSNodeContent implements Comparable
     /**
      * {@inheritDoc}
      */
-    public int hashCode()
-    {
-        return HashCodeBuilder.reflectionHashCode(this);
-    }
-    /**
-     * {@inheritDoc}
-     */
-    public boolean equals(Object obj)
-    {
-        return EqualsBuilder.reflectionEquals(this, obj);
-    }
-    /**
-     * {@inheritDoc}
-     */
     public String toString()
     {
         return new ToStringBuilder(this)
@@ -103,9 +90,8 @@ public class XWikiRCSNodeContent implements Comparable
     /**
      * {@inheritDoc}
      */
-    public int compareTo(Object arg0)
+    public int compareTo(XWikiRCSNodeContent o)
     {
-        final XWikiRCSNodeContent o = (XWikiRCSNodeContent) arg0;
         return getId().getVersion().compareTo(o.getId().getVersion());
     }
 }

@@ -257,7 +257,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
                        int event, XWikiContext context)
     {
         ArrayList params = new ArrayList();
-        params.set(0, newdoc.getDisplayTitle(context));
+        params.add(0, newdoc.getDisplayTitle(context));
 
         String streamName = getStreamName(newdoc.getSpace(), context);
 

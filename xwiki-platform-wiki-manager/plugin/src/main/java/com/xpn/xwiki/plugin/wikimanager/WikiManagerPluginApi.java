@@ -707,7 +707,7 @@ public class WikiManagerPluginApi extends PluginApi
         List listDocument = new ArrayList();
 
         try {
-            return WikiManager.getInstance().getWikiTemplateAliasList(this.context);
+            listDocument = WikiManager.getInstance().getWikiTemplateAliasList(this.context);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
 

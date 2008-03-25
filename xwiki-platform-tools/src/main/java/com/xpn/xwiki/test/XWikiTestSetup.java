@@ -134,6 +134,8 @@ public class XWikiTestSetup extends TestSetup
                     System.out.println("Result of pinging [" + url + "] = [" + responseCode
                         + "], Message = [" + connection.getResponseMessage() + "]");
                 }
+                // check the http response code is either not an error, either "unauthorized"
+                // (which is the case for products that deny view for guest, for example).
                 connected = (responseCode < 400 || responseCode == 401);
             } catch (IOException e) {
                 // Do nothing as it simply means the server is not ready yet...

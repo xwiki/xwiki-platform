@@ -511,13 +511,43 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 	public void cleanUp(XWikiContext context) {
 	}
 
-	public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
-		try {
-			jcr.initWorkspace(wikiName);
-		} catch (Exception e) {
-			throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Cannot create new xwiki workspace: "+wikiName, e);
-		}
-	}
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#createWiki(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public void createWiki(String wikiName, XWikiContext context) throws XWikiException
+    {
+        try {
+            jcr.initWorkspace(wikiName);
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_JCR_OTHER, "Cannot create new xwiki workspace: "
+                    + wikiName, e);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#isWikiNameAvailable(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public boolean isWikiNameAvailable(String wikiName, XWikiContext context)
+        throws XWikiException
+    {
+        boolean available;
+        
+        try {
+            jcr.getSession(wikiName);
+            available = false;
+        } catch (RepositoryException e) {
+            available = true;
+        }
+        
+        return available;
+    }
 	
     /**
      * {@inheritDoc}

@@ -392,6 +392,25 @@ public interface XWikiStoreInterface {
         List parameterValues, XWikiContext context) throws XWikiException;
 
     public void cleanUp(XWikiContext context);
+
+    /**
+     * Indicate if the provided wiki name could be used to create a new wiki.
+     * 
+     * @param wikiName the name of the wiki.
+     * @param context the XWiki context.
+     * @return true if the name is already used, false otherwise.
+     * @throws XWikiException error when looking if wiki name already used.
+     */
+    public boolean isWikiNameAvailable(String wikiName, XWikiContext context)
+        throws XWikiException;
+
+    /**
+     * Allows to create a new wiki database and initialize the default tables.
+     * 
+     * @param wikiName the name of the new wiki.
+     * @param context the XWiki context.
+     * @throws XWikiException error when creating new wiki.
+     */
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException;
     
     /**
@@ -402,7 +421,7 @@ public interface XWikiStoreInterface {
      * @throws XWikiException error when deleting wiki database.
      */
     public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException;
-   
+
     public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
     public boolean isCustomMappingValid(BaseClass bclass, String custommapping1, XWikiContext context) throws XWikiException;
     public boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext) throws XWikiException;

@@ -125,6 +125,7 @@ public class XWikiException extends Exception {
     public static final int ERROR_XWIKI_STORE_HIBERNATE_SWITCH_DATABASE = 3301;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_CREATE_DATABASE = 3401;
     public static final int ERROR_XWIKI_STORE_HIBERNATE_DELETE_DATABASE = 3402;
+    public static final int ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DATABASE = 3403;
 
     public static final int ERROR_XWIKI_STORE_JCR_SAVING_DOC = 3501;
     public static final int ERROR_XWIKI_STORE_JCR_READING_DOC = 3502;

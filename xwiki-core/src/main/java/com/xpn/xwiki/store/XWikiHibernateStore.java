@@ -139,11 +139,52 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * Allows to create a new wiki database
-     * and initialize the default tables
-     * @param wikiName
-     * @param context
-     * @throws XWikiException
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#isWikiNameAvailable(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public boolean isWikiNameAvailable(String wikiName, XWikiContext context)
+        throws XWikiException
+    {
+        boolean available;
+        
+        boolean bTransaction = true;
+        String database = context.getDatabase();
+
+        try {
+            bTransaction = beginTransaction(context);
+            Session session = getSession(context);
+
+            context.setDatabase(wikiName);
+            try {
+                setDatabase(session, context);
+                available = false;
+            } catch (XWikiException e) {
+                // Failed to switch to database. Assume it means database does not exists.
+                available = true;
+            }
+        } catch (Exception e) {
+            Object[] args = {wikiName};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_CHECK_EXISTS_DATABASE,
+                "Exception while listing databases to search for {0}", e, args);
+        } finally {
+            context.setDatabase(database);
+            try {
+                if (bTransaction)
+                    endTransaction(context, false);
+            } catch (Exception e) {
+            }
+        }
+        
+        return available;
+    }
+    
+    /**
+     * {@inheritDoc}
+     *
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#createWiki(java.lang.String, com.xpn.xwiki.XWikiContext)
      */
     public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
     	boolean bTransaction = true;

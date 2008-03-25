@@ -460,8 +460,29 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
         store.cleanUp(context);
     }
 
-    public void createWiki(String wikiName, XWikiContext context) throws XWikiException {
-        synchronized(wikiName) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#isWikiNameAvailable(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public boolean isWikiNameAvailable(String wikiName, XWikiContext context)
+        throws XWikiException
+    {
+        synchronized (wikiName) {
+            return store.isWikiNameAvailable(wikiName, context);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.store.XWikiStoreInterface#createWiki(java.lang.String,
+     *      com.xpn.xwiki.XWikiContext)
+     */
+    public void createWiki(String wikiName, XWikiContext context) throws XWikiException
+    {
+        synchronized (wikiName) {
             store.createWiki(wikiName, context);
         }
     }

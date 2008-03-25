@@ -161,7 +161,7 @@ final class WikiManager
      * @param context the XWiki context.
      * @return the list of documents that match the <code>wheresql</code> conditions. If nothing
      *         found return empty List.
-     * @throws XWikiException error when seraching for documents.
+     * @throws XWikiException error when searching for documents.
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, XWikiContext)
      */
     public List searchDocuments(String wikiName, String wheresql, XWikiContext context)

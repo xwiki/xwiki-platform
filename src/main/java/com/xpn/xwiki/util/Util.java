@@ -32,9 +32,18 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.io.StringReader;
-import java.util.*;
-import java.net.URLEncoder;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -58,43 +67,53 @@ import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.novell.ldap.util.Base64;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.WikiSubstitution;
 import com.xpn.xwiki.web.XWikiRequest;
-import com.novell.ldap.util.Base64;
 
-public class Util {
+public class Util
+{
 
     private static PatternCache patterns = new PatternCacheLRU(200);
+
     private Perl5Matcher matcher = new Perl5Matcher();
+
     private Perl5Util p5util = new Perl5Util(getPatterns());
+
     private static final Log log = LogFactory.getLog(Util.class);
 
-    public String substitute(String pattern, String text) {
+    public String substitute(String pattern, String text)
+    {
         return getP5util().substitute(pattern, text);
     }
 
-    public boolean match(String pattern, String text) {
+    public boolean match(String pattern, String text)
+    {
         return getP5util().match(pattern, text);
     }
 
-    public boolean matched() {
-        return (getP5util().getMatch()!=null);
+    public boolean matched()
+    {
+        return (getP5util().getMatch() != null);
     }
 
-    public String substitute(String pattern, String substitution, String text) {
+    public String substitute(String pattern, String substitution, String text)
+    {
         WikiSubstitution subst = new WikiSubstitution(this, pattern);
         subst.setSubstitution(substitution);
         return subst.substitute(text);
     }
 
-    public Perl5Matcher getMatcher() {
+    public Perl5Matcher getMatcher()
+    {
         return matcher;
     }
 
-    public Perl5Util getP5util() {
+    public Perl5Util getP5util()
+    {
         return p5util;
     }
 
@@ -134,59 +153,65 @@ public class Util {
         return getUniqueMatches(content, spattern, group);
     }
 
-    public static String cleanValue(String value) {
-        value = StringUtils.replace(value,"\r\r\n", "%_N_%");
-        value = StringUtils.replace(value,"\r\n", "%_N_%");
-        value = StringUtils.replace(value,"\n\r", "%_N_%");
-        value = StringUtils.replace(value,"\r", "\n");
-        value = StringUtils.replace(value,"\n", "%_N_%");
-        value = StringUtils.replace(value,"\"", "%_Q_%");
+    public static String cleanValue(String value)
+    {
+        value = StringUtils.replace(value, "\r\r\n", "%_N_%");
+        value = StringUtils.replace(value, "\r\n", "%_N_%");
+        value = StringUtils.replace(value, "\n\r", "%_N_%");
+        value = StringUtils.replace(value, "\r", "\n");
+        value = StringUtils.replace(value, "\n", "%_N_%");
+        value = StringUtils.replace(value, "\"", "%_Q_%");
         return value;
     }
 
-    public static String restoreValue(String value) {
-        value = StringUtils.replace(value,"%_N_%", "\n");
-        value = StringUtils.replace(value,"%_Q_%", "\"");
+    public static String restoreValue(String value)
+    {
+        value = StringUtils.replace(value, "%_N_%", "\n");
+        value = StringUtils.replace(value, "%_Q_%", "\"");
         return value;
     }
 
     /*
-    Treats lines of format name="value1" name2="value2"...
-    */
-    public static Hashtable keyValueToHashtable(String keyvalue) throws IOException {
+     * Treats lines of format name="value1" name2="value2"...
+     */
+    public static Hashtable keyValueToHashtable(String keyvalue) throws IOException
+    {
         Hashtable hash = new Hashtable();
         StreamTokenizer st = new StreamTokenizer(new BufferedReader(new StringReader(keyvalue)));
         st.resetSyntax();
         st.quoteChar('"');
-        st.wordChars('a','z');
-        st.wordChars('A','Z');
+        st.wordChars('a', 'z');
+        st.wordChars('A', 'Z');
         // st.wordChars(' ',' ');
-        st.whitespaceChars(' ',' ');
-        st.whitespaceChars('=','=');
+        st.whitespaceChars(' ', ' ');
+        st.whitespaceChars('=', '=');
         while (st.nextToken() != StreamTokenizer.TT_EOF) {
             String key = st.sval;
             st.nextToken();
-            String value = (st.sval!=null) ? st.sval : "";
-            hash.put(key,restoreValue(value));
+            String value = (st.sval != null) ? st.sval : "";
+            hash.put(key, restoreValue(value));
         }
         return hash;
     }
 
-    public static PatternCache getPatterns() {
+    public static PatternCache getPatterns()
+    {
         return patterns;
     }
 
-    public static Map getObject(XWikiRequest request, String prefix) {
+    public static Map getObject(XWikiRequest request, String prefix)
+    {
         return getSubMap(request.getParameterMap(), prefix);
     }
 
-    public static Map getSubMap(Map map, String prefix) {
+    public static Map getSubMap(Map map, String prefix)
+    {
         HashMap map2 = new HashMap();
         Iterator it = map.keySet().iterator();
         while (it.hasNext()) {
             String name = (String) it.next();
             if (name.startsWith(prefix + "_")) {
-                String newname = name.substring(prefix.length()+1);
+                String newname = name.substring(prefix.length() + 1);
                 map2.put(newname, map.get(name));
             }
             if (name.equals(prefix)) {
@@ -196,29 +221,32 @@ public class Util {
         return map2;
     }
 
-    public static String getWeb(String fullname) {
+    public static String getWeb(String fullname)
+    {
         int i = fullname.lastIndexOf(".");
         return fullname.substring(0, i);
     }
 
-    public Vector<String> split (String pattern,
-                         String text) {
+    public Vector<String> split(String pattern, String text)
+    {
         Vector<String> results = new Vector<String>();
         getP5util().split(results, pattern, text);
         return results;
     }
 
-    public static String getFileContent(File file) throws IOException {
+    public static String getFileContent(File file) throws IOException
+    {
         return getFileContent(new FileReader(file));
     }
 
-    public static String getFileContent(Reader reader) throws IOException {
+    public static String getFileContent(Reader reader) throws IOException
+    {
         StringBuffer content = new StringBuffer();
         BufferedReader fr = new BufferedReader(reader);
         String line;
         line = fr.readLine();
         while (true) {
-            if (line==null) {
+            if (line == null) {
                 fr.close();
                 return content.toString();
             }
@@ -228,27 +256,31 @@ public class Util {
         }
     }
 
-    public static byte[] getFileContentAsBytes(File file) throws IOException {
+    public static byte[] getFileContentAsBytes(File file) throws IOException
+    {
         return getFileContentAsBytes(new FileInputStream(file));
     }
 
-    public static byte[] getFileContentAsBytes(InputStream is) throws IOException {
+    public static byte[] getFileContentAsBytes(InputStream is) throws IOException
+    {
         BufferedInputStream bis = new BufferedInputStream(is);
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         byte[] data = new byte[65536];
         int nb = 0;
-        while((nb = bis.read(data))>0) {
+        while ((nb = bis.read(data)) > 0) {
             baos.write(data, 0, nb);
         }
         return baos.toByteArray();
     }
 
-    public static boolean contains(String name, String list, String sep) {
+    public static boolean contains(String name, String list, String sep)
+    {
         String[] sarray = StringUtils.split(list, sep);
         return ArrayUtils.contains(sarray, name);
     }
 
-    public static String noaccents(String text) {
+    public static String noaccents(String text)
+    {
         String temp = text;
         temp = temp.replaceAll("\u00c0", "A");
         temp = temp.replaceAll("\u00c1", "A");
@@ -532,45 +564,50 @@ public class Util {
         return temp;
     }
 
-    public static boolean isAlphaNumeric(String text) {
+    public static boolean isAlphaNumeric(String text)
+    {
         return StringUtils.isAlphanumeric(text.replaceAll("-", "a").replaceAll("\\.", "a"));
     }
 
-    public static String getName(String name) {
+    public static String getName(String name)
+    {
         int i0 = name.indexOf(":");
-        if (i0!=-1) {
-            name = name.substring(i0+1);
+        if (i0 != -1) {
+            name = name.substring(i0 + 1);
             return name;
         }
 
-        if (name.indexOf(".") !=-1)
+        if (name.indexOf(".") != -1)
             return name;
         else
             return "XWiki." + name;
     }
 
-    public static String getName(String name, XWikiContext context) {
+    public static String getName(String name, XWikiContext context)
+    {
         String database = null;
         int i0 = name.indexOf(":");
-        if (i0!=-1) {
-            database = name.substring(0,i0);
-            name = name.substring(i0+1);
+        if (i0 != -1) {
+            database = name.substring(0, i0);
+            name = name.substring(i0 + 1);
             context.setDatabase(database);
             return name;
         }
         // This does not make sense
         // context.setDatabase(context.getWiki().getDatabase());
-        if (name.indexOf(".") !=-1)
+        if (name.indexOf(".") != -1)
             return name;
         else
             return "XWiki." + name;
     }
 
-    public static Cookie getCookie(String cookieName, XWikiContext context) {
+    public static Cookie getCookie(String cookieName, XWikiContext context)
+    {
         return getCookie(cookieName, context.getRequest());
     }
 
-    public static Cookie getCookie(String cookieName, HttpServletRequest request) {
+    public static Cookie getCookie(String cookieName, HttpServletRequest request)
+    {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
@@ -583,46 +620,54 @@ public class Util {
         return null;
     }
 
-    public static String getHTMLExceptionMessage(XWikiException xe, XWikiContext context) {
+    public static String getHTMLExceptionMessage(XWikiException xe, XWikiContext context)
+    {
         String title;
         String text;
         title = xe.getMessage();
         text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
-        String id = (String)context.get("xwikierrorid");
-        if (id==null)
-         id = "1";
+        String id = (String) context.get("xwikierrorid");
+        if (id == null)
+            id = "1";
         else
-         id = "" + (Integer.parseInt(id) + 1);
+            id = "" + (Integer.parseInt(id) + 1);
 
-        return "<a href=\"\" onclick=\"document.getElementById('xwikierror" + id + "').style.display='block'; return false;\">"
-                + title + "</a><div id=\"xwikierror" + id + "\" style=\"display: none;\"><pre>\n"
-                + text + "</pre></div>";
+        return "<a href=\"\" onclick=\"document.getElementById('xwikierror" + id
+            + "').style.display='block'; return false;\">" + title + "</a><div id=\"xwikierror"
+            + id + "\" style=\"display: none;\"><pre>\n" + text + "</pre></div>";
     }
 
-    public static String secureLaszloCode(String laszlocode) throws XWikiException {
+    public static String secureLaszloCode(String laszlocode) throws XWikiException
+    {
         SAXReader reader = new SAXReader();
-              Document domdoc;
+        Document domdoc;
 
-              try {
-                  StringReader in = new StringReader(laszlocode);
-                  domdoc = reader.read(in);
-              } catch (DocumentException e) {
-                  throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_XML, "Invalid Laszlo XML", e);
-              }
+        try {
+            StringReader in = new StringReader(laszlocode);
+            domdoc = reader.read(in);
+        } catch (DocumentException e) {
+            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO,
+                XWikiException.ERROR_LASZLO_INVALID_XML,
+                "Invalid Laszlo XML",
+                e);
+        }
 
         String code = domdoc.asXML();
-        if (code.indexOf("..")!=-1)
-            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_DOTDOT, "Invalid content in Laszlo XML");
+        if (code.indexOf("..") != -1)
+            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO,
+                XWikiException.ERROR_LASZLO_INVALID_DOTDOT,
+                "Invalid content in Laszlo XML");
 
         return laszlocode;
     }
 
-    public static MonitorPlugin getMonitorPlugin(XWikiContext context) {
+    public static MonitorPlugin getMonitorPlugin(XWikiContext context)
+    {
         try {
-        if ((context==null)||(context.getWiki()==null))
-            return null;
+            if ((context == null) || (context.getWiki() == null))
+                return null;
 
-        return (MonitorPlugin) context.getWiki().getPlugin("monitor", context);
+            return (MonitorPlugin) context.getWiki().getPlugin("monitor", context);
         } catch (Exception e) {
             return null;
         }
@@ -630,13 +675,15 @@ public class Util {
 
     /**
      * API to obtain a DOM document for the specified string
+     * 
      * @param str The parsed text
      * @return A DOM document element corresponding to the string, or null on error
      */
     public org.w3c.dom.Document getDOMForString(String str)
     {
         try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new InputSource(new StringReader(str)));
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
+                new InputSource(new StringReader(str)));
         } catch (SAXException ex) {
             log.warn("Cannot parse string:" + str, ex);
         } catch (IOException ex) {
@@ -646,8 +693,10 @@ public class Util {
         }
         return null;
     }
+
     /**
      * API to get a new DOM document
+     * 
      * @return a new DOM document element, or null on error
      */
     public org.w3c.dom.Document getDOMDocument()
@@ -662,10 +711,12 @@ public class Util {
 
     /**
      * API to protect Text from Radeox transformation
+     * 
      * @param text
      * @return escaped text
      */
-    public static String escapeText(String text) {
+    public static String escapeText(String text)
+    {
         text = text.replaceAll("http://", "&#104;ttp://");
         text = text.replaceAll("ftp://", "&#102;tp://");
         text = text.replaceAll("\\-", "&#45;");
@@ -681,10 +732,12 @@ public class Util {
 
     /**
      * API to protect URLs from Radeox transformation
+     * 
      * @param url
      * @return encoded URL
      */
-    public static String escapeURL(String url) {
+    public static String escapeURL(String url)
+    {
         url = url.replaceAll("\\~", "%7E");
         url = url.replaceAll("\\[", "%5B");
         url = url.replaceAll("\\]", "%5D");
@@ -692,7 +745,7 @@ public class Util {
         url = url.replaceAll("\\}", "%7D");
         // We should not encode the following char for non local urls
         // since this might not be handle correctly by FF
-        if (url.indexOf("//")==-1) {
+        if (url.indexOf("//") == -1) {
             url = url.replaceAll("-", "%2D");
             url = url.replaceAll("\\*", "%2A");
         }
@@ -701,6 +754,7 @@ public class Util {
 
     /**
      * API to make a text URI compliant
+     * 
      * @param text
      * @param context
      * @return encoded text
@@ -716,6 +770,7 @@ public class Util {
 
     /**
      * API to make readable an URI compliant text
+     * 
      * @param text
      * @param context
      * @return decoded text
@@ -742,7 +797,7 @@ public class Util {
     /**
      * Removes all non alpha numerical characters from the passed text. First tries to convert
      * accented chars to their alpha numeric representation.
-     *
+     * 
      * @param text the text to convert
      * @return the alpha numeric equivalent
      */
@@ -763,26 +818,21 @@ public class Util {
     }
 
     /**
-     * Validate a XML element name.
-     * XML elements must follow these naming rules :
-     *
+     * Validate a XML element name. XML elements must follow these naming rules :
      * <ul>
      * <li>Names can contain letters, numbers, and the following characters [., -, _, :].</li>
      * <li>Names must not start with a number or punctuation character.</li>
      * <li>Names must not start with the letters xml (or XML, or Xml, etc).</li>
      * <li>Names cannot contain spaces.</li>
      * </ul>
-     *
+     * 
      * @param elementName the XML element name to validate
      * @return true if the element name is valid, false if it is not
      */
     public static boolean isValidXMLElementName(String elementName)
     {
-        if (elementName == null
-            || elementName.equals("")
-            || elementName.matches("(?i)^(xml).*")
-            || !elementName.matches("(^[a-zA-Z\\-\\_]+[\\w\\.\\-\\_\\:]*$)"))
-        {
+        if (elementName == null || elementName.equals("") || elementName.matches("(?i)^(xml).*")
+            || !elementName.matches("(^[a-zA-Z\\-\\_]+[\\w\\.\\-\\_\\:]*$)")) {
             return false;
         }
         return true;

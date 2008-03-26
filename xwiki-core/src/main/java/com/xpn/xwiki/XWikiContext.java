@@ -31,6 +31,7 @@ import org.apache.commons.collections.map.LRUMap;
 import org.apache.xmlrpc.server.XmlRpcServer;
 
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.doc.XWikiDocumentArchive;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.util.Util;
@@ -42,7 +43,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class XWikiContext extends Hashtable {
+public class XWikiContext extends Hashtable<Object, Object> {
 
    public static final int MODE_SERVLET = 0;
    public static final int MODE_PORTLET = 1;
@@ -75,11 +76,11 @@ public class XWikiContext extends Hashtable {
    private int archiveCacheSize = 20;
 
    // Used to avoid recursive loading of documents if there are recursives usage of classes
-   private Map classCache = new LRUMap(classCacheSize);
+   private Map<String, BaseClass> classCache = new LRUMap(classCacheSize);
    // Used to avoid reloading archives in the same request
-   private Map archiveCache = new LRUMap(archiveCacheSize);
+   private Map<String, XWikiDocumentArchive> archiveCache = new LRUMap(archiveCacheSize);
 
-   private List displayedFields = new ArrayList();
+   private List<String> displayedFields = new ArrayList<String>();
 
    public XWikiContext() {
    }
@@ -305,16 +306,16 @@ public class XWikiContext extends Hashtable {
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
     public BaseClass getBaseClass(String name) {
-        return (BaseClass) classCache.get(name);
+        return classCache.get(name);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public void addDocumentArchive(String  key, Object obj) {
+    public void addDocumentArchive(String  key, XWikiDocumentArchive obj) {
         archiveCache.put(key, obj);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public Object getDocumentArchive(String key) {
+    public XWikiDocumentArchive getDocumentArchive(String key) {
         return archiveCache.get(key);
     }
 
@@ -363,7 +364,7 @@ public class XWikiContext extends Hashtable {
         displayedFields.add(fieldname);
     }
 
-    public List getDisplayedFields() {
+    public List<String> getDisplayedFields() {
         return displayedFields;
     }
 

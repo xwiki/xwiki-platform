@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -76,7 +75,6 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class Util
 {
-
     private static PatternCache patterns = new PatternCacheLRU(200);
 
     private Perl5Matcher matcher = new Perl5Matcher();
@@ -171,27 +169,34 @@ public class Util
         return value;
     }
 
-    /*
-     * Treats lines of format name="value1" name2="value2"...
+    /**
+     * Create a Map from a string holding a space separated list of key=value pairs. If keys or
+     * values must contain spaces, they can be placed inside quotes, like
+     * <code>"this key"="a larger value"</code>. To use a quote as part of a key/value, use
+     * <code>%_Q_%</code>.
+     * 
+     * @param mapString The string that must be parsed.
+     * @return A Map containing the keys and values. If a key is defined more than once, the last
+     *         value is used.
      */
-    public static Hashtable keyValueToHashtable(String keyvalue) throws IOException
+    public static Hashtable<String, String> keyValueToHashtable(String mapString)
+        throws IOException
     {
-        Hashtable hash = new Hashtable();
-        StreamTokenizer st = new StreamTokenizer(new BufferedReader(new StringReader(keyvalue)));
+        Hashtable<String, String> result = new Hashtable<String, String>();
+        StreamTokenizer st = new StreamTokenizer(new BufferedReader(new StringReader(mapString)));
         st.resetSyntax();
         st.quoteChar('"');
         st.wordChars('a', 'z');
         st.wordChars('A', 'Z');
-        // st.wordChars(' ',' ');
         st.whitespaceChars(' ', ' ');
         st.whitespaceChars('=', '=');
         while (st.nextToken() != StreamTokenizer.TT_EOF) {
             String key = st.sval;
             st.nextToken();
             String value = (st.sval != null) ? st.sval : "";
-            hash.put(key, restoreValue(value));
+            result.put(key, restoreValue(value));
         }
-        return hash;
+        return result;
     }
 
     public static PatternCache getPatterns()
@@ -199,26 +204,24 @@ public class Util
         return patterns;
     }
 
-    public static Map getObject(XWikiRequest request, String prefix)
+    @SuppressWarnings("unchecked")
+    public static Map<String, String[]> getObject(XWikiRequest request, String prefix)
     {
         return getSubMap(request.getParameterMap(), prefix);
     }
 
-    public static Map getSubMap(Map map, String prefix)
+    public static Map<String, String[]> getSubMap(Map<String, String[]> map, String prefix)
     {
-        HashMap map2 = new HashMap();
-        Iterator it = map.keySet().iterator();
-        while (it.hasNext()) {
-            String name = (String) it.next();
+        HashMap<String, String[]> result = new HashMap<String, String[]>();
+        for (String name : map.keySet()) {
             if (name.startsWith(prefix + "_")) {
                 String newname = name.substring(prefix.length() + 1);
-                map2.put(newname, map.get(name));
-            }
-            if (name.equals(prefix)) {
-                map2.put("", map.get(name));
+                result.put(newname, map.get(name));
+            } else if (name.equals(prefix)) {
+                result.put("", map.get(name));
             }
         }
-        return map2;
+        return result;
     }
 
     public static String getWeb(String fullname)

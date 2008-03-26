@@ -20,6 +20,9 @@
  */
 package org.xwiki.component.manager;
 
+import java.util.List;
+import java.util.Map;
+
 public interface ComponentManager
 {
     Object lookup(String role) throws ComponentLookupException;
@@ -27,4 +30,6 @@ public interface ComponentManager
     boolean hasComponent(String role);
     boolean hasComponent(String role, String roleHint);
     void release(Object component) throws ComponentLifecycleException;
+    Map lookupMap(String role) throws ComponentLookupException;
+    List lookupList(String role) throws ComponentLookupException;
 }

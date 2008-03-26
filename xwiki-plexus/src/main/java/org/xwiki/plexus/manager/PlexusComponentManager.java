@@ -20,6 +20,9 @@
  */
 package org.xwiki.plexus.manager;
 
+import java.util.List;
+import java.util.Map;
+
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.ServiceLocator;
 import org.xwiki.component.manager.ComponentLifecycleException;
 import org.xwiki.component.manager.ComponentManager;
@@ -54,6 +57,30 @@ public class PlexusComponentManager implements ComponentManager
         } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
             throw new ComponentLookupException("Failed to lookup component role ["
                 + role + "] for hint [" + roleHint + "]", e);
+        }
+        return result;
+    }
+
+    public Map lookupMap(String role) throws ComponentLookupException
+    {
+        Map result;
+        try {
+            result = this.serviceLocator.lookupMap(role);
+        } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
+            throw new ComponentLookupException("Failed to lookup components for role [" 
+                + role + "]", e);
+        }
+        return result;
+    }
+
+    public List lookupList(String role) throws ComponentLookupException
+    {
+        List result;
+        try {
+            result = this.serviceLocator.lookupList(role);
+        } catch (org.codehaus.plexus.component.repository.exception.ComponentLookupException e) {
+            throw new ComponentLookupException("Failed to lookup components for role [" 
+                + role + "]", e);
         }
         return result;
     }

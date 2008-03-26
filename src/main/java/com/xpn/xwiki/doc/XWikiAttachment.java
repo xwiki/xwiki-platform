@@ -549,14 +549,15 @@ public class XWikiAttachment
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context)
         throws XWikiException
     {
-
         try {
-            context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
-
             Archive archive = getArchive();
+            if (archive == null) {
+                context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
+            }
 
-            if (archive == null)
+            if (archive == null) {
                 return null;
+            }
 
             Version v = archive.getRevisionVersion(rev);
             Object[] lines = archive.getRevision(v);

@@ -42,11 +42,13 @@ public class DeleteAttachmentAction extends XWikiAction
             // Note: We use getRequestURI() because the spec says the server doesn't decode it, as
             // we want to use our own decoding.
             String requestUri = request.getRequestURI();
-            filename = Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
+            filename =
+                Util.decodeURI(requestUri.substring(requestUri.lastIndexOf("/") + 1), context);
         }
 
         XWikiDocument newdoc = (XWikiDocument) doc.clone();
 
+        // An attachment can be indicated either using an id, or using the filename.
         if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = (XWikiAttachment) newdoc.getAttachmentList().get(id);
@@ -54,16 +56,18 @@ public class DeleteAttachmentAction extends XWikiAction
             attachment = newdoc.getAttachment(filename);
         }
 
-
         newdoc.setAuthor(context.getUser());
 
-        // set delete Attachment comment
+        // Set "deleted attachment" as the version comment.
         ArrayList params = new ArrayList();
         params.add(filename);
-        if (attachment.isImage(context))
-            newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment", params));
-        else
-            newdoc.setComment(context.getMessageTool().get("core.comment.deleteAttachmentComment", params));
+        if (attachment.isImage(context)) {
+            newdoc.setComment(context.getMessageTool().get("core.comment.deleteImageComment",
+                params));
+        } else {
+            newdoc.setComment(context.getMessageTool().get(
+                "core.comment.deleteAttachmentComment", params));
+        }
 
         newdoc.deleteAttachment(attachment, context);
         // forward to attach page

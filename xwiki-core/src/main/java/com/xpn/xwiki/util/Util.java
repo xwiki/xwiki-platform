@@ -98,10 +98,10 @@ public class Util {
         return p5util;
     }
 
-    public List getAllMatches(String content, String spattern, int group)
+    public List<String> getAllMatches(String content, String spattern, int group)
         throws MalformedPatternException
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         PatternMatcherInput input = new PatternMatcherInput(content);
         Pattern pattern = patterns.addPattern(spattern);
         while (matcher.contains(input, pattern)) {
@@ -112,14 +112,14 @@ public class Util {
         return list;
     }
 
-    public List getUniqueMatches(String content, String spattern, int group)
+    public List<String> getUniqueMatches(String content, String spattern, int group)
         throws MalformedPatternException
     {
         // Remove duplicate entries
-        Set uniqueMatches = new HashSet();
+        Set<String> uniqueMatches = new HashSet<String>();
         uniqueMatches.addAll(getAllMatches(content, spattern, group));
 
-        List matches = new ArrayList();
+        List<String> matches = new ArrayList<String>();
         matches.addAll(uniqueMatches);
 
         return matches;
@@ -128,7 +128,7 @@ public class Util {
     /**
      * @deprecated use {@link #getUniqueMatches(String, String, int)} instead
      */
-    public List getMatches(String content, String spattern, int group)
+    public List<String> getMatches(String content, String spattern, int group)
         throws MalformedPatternException
     {
         return getUniqueMatches(content, spattern, group);
@@ -201,10 +201,10 @@ public class Util {
         return fullname.substring(0, i);
     }
 
-    public Vector split (String pattern,
+    public Vector<String> split (String pattern,
                          String text) {
-        Vector results = new Vector();
-        getP5util().split (results,pattern,text);
+        Vector<String> results = new Vector<String>();
+        getP5util().split(results, pattern, text);
         return results;
     }
 

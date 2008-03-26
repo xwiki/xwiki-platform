@@ -39,27 +39,31 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
-public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements XWikiVersioningStoreInterface {
+public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements
+    XWikiVersioningStoreInterface
+{
 
     private static final Log log = LogFactory.getLog(XWikiHibernateVersioningStore.class);
 
     /**
-     * This allows to initialize our storage engine.
-     * The hibernate config file path is taken from xwiki.cfg
-     * or directly in the WEB-INF directory.
+     * This allows to initialize our storage engine. The hibernate config file path is taken from
+     * xwiki.cfg or directly in the WEB-INF directory.
+     * 
      * @param xwiki
      * @param context
      */
-    public XWikiHibernateVersioningStore(XWiki xwiki, XWikiContext context) {
+    public XWikiHibernateVersioningStore(XWiki xwiki, XWikiContext context)
+    {
         super(xwiki, context);
     }
 
     /**
-     * Initialize the storage engine with a specific path
-     * This is used for tests.
+     * Initialize the storage engine with a specific path This is used for tests.
+     * 
      * @param hibpath
      */
-    public XWikiHibernateVersioningStore(String hibpath) {
+    public XWikiHibernateVersioningStore(String hibpath)
+    {
         super(hibpath);
     }
 
@@ -71,40 +75,48 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         this(context.getWiki(), context);
     }
 
-    public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context) throws XWikiException {
+    public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context)
+        throws XWikiException
+    {
         try {
             XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
-            if (archive==null)
+            if (archive == null)
                 return new Version[0];
             Collection nodes = archive.getNodes();
             Version[] versions = new Version[nodes.size()];
             Iterator it = nodes.iterator();
-            for (int i=0; i<versions.length; i++) {
+            for (int i = 0; i < versions.length; i++) {
                 XWikiRCSNodeInfo node = (XWikiRCSNodeInfo) it.next();
-                versions[versions.length-1-i] = node.getId().getVersion();
+                versions[versions.length - 1 - i] = node.getId().getVersion();
             }
             return versions;
         } catch (Exception e) {
-            Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS,
-                    "Exception while reading document {0} revisions", e, args);
+            Object[] args = {doc.getFullName()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_READING_REVISIONS,
+                "Exception while reading document {0} revisions",
+                e,
+                args);
         }
     }
 
-    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context) throws XWikiException {
+    public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context)
+        throws XWikiException
+    {
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
         if (archiveDoc != null)
             return archiveDoc;
-        String key = ((doc.getDatabase()==null)?"xwiki":doc.getDatabase()) + ":" + doc.getFullName();
+        String key =
+            ((doc.getDatabase() == null) ? "xwiki" : doc.getDatabase()) + ":" + doc.getFullName();
         if (!"".equals(doc.getLanguage()))
             key = key + ":" + doc.getLanguage();
 
         synchronized (key) {
             archiveDoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
-            if (archiveDoc==null) {
+            if (archiveDoc == null) {
                 String db = context.getDatabase();
                 try {
-                    if (doc.getDatabase()!=null)
+                    if (doc.getDatabase() != null)
                         context.setDatabase(doc.getDatabase());
                     archiveDoc = new XWikiDocumentArchive(doc.getId());
                     loadXWikiDocArchive(archiveDoc, true, context);
@@ -120,32 +132,40 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException {
+    public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
         try {
             List nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), bTransaction);
             archivedoc.setNodes(nodes);
         } catch (Exception e) {
-            Object[] args = { new Long(archivedoc.getId()) };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
-                    "Exception while loading archive {0}", e, args);
+            Object[] args = {new Long(archivedoc.getId())};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_OBJECT,
+                "Exception while loading archive {0}",
+                e,
+                args);
         }
     }
 
-    public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException {
-        executeWrite(context, bTransaction, new HibernateCallback(){
+    public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction,
+        XWikiContext context) throws XWikiException
+    {
+        executeWrite(context, bTransaction, new HibernateCallback()
+        {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                for (Iterator it = archivedoc.getDeletedNodeInfo().iterator(); it.hasNext(); ) {
+                for (Iterator it = archivedoc.getDeletedNodeInfo().iterator(); it.hasNext();) {
                     XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
                     session.delete(nodeInfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdatedNodeInfos().iterator(); it.hasNext(); ) {
+                for (Iterator it = archivedoc.getUpdatedNodeInfos().iterator(); it.hasNext();) {
                     XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
                     session.saveOrUpdate(nodeInfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdatedNodeContents().iterator(); it.hasNext(); ) {
+                for (Iterator it = archivedoc.getUpdatedNodeContents().iterator(); it.hasNext();) {
                     XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
                     session.update(nodeContent);
                     it.remove();
@@ -155,15 +175,20 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext context) throws XWikiException {
+    public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext context)
+        throws XWikiException
+    {
         XWikiDocumentArchive archive = getXWikiDocumentArchive(basedoc, context);
         Version version = new Version(sversion);
 
         XWikiDocument doc = archive.loadDocument(version, context);
-        if (doc==null) {
-            Object[] args = { basedoc.getFullName(), version.toString() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
-                "Version {1} does not exist while reading document {0}", null, args);
+        if (doc == null) {
+            Object[] args = {basedoc.getFullName(), version.toString()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_UNEXISTANT_VERSION,
+                "Version {1} does not exist while reading document {0}",
+                null,
+                args);
         }
         // Make sure the document has the same name
         // as the new document (in case there was a name change
@@ -175,9 +200,13 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         return doc;
     }
 
-    public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction, final XWikiContext context) throws XWikiException {
-        executeWrite(context, true, new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+    public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction,
+        final XWikiContext context) throws XWikiException
+    {
+        executeWrite(context, true, new HibernateCallback()
+        {
+            public Object doInHibernate(Session session) throws HibernateException,
+                XWikiException
             {
                 XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
                 archive.resetArchive();
@@ -190,57 +219,69 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         });
     }
 
-    public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context)
-        throws XWikiException
+    public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction,
+        XWikiContext context) throws XWikiException
     {
         try {
             XWikiDocumentArchive archiveDoc = getXWikiDocumentArchive(doc, context);
-            archiveDoc.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), doc.getRCSVersion(), context);
-            doc.setRCSVersion( archiveDoc.getLatestVersion() );
+            archiveDoc.updateArchive(doc, doc.getAuthor(), doc.getDate(), doc.getComment(), doc
+                .getRCSVersion(), context);
+            doc.setRCSVersion(archiveDoc.getLatestVersion());
             saveXWikiDocArchive(archiveDoc, bTransaction, context);
         } catch (Exception e) {
-            Object[] args = { doc.getFullName() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
-                "Exception while updating archive {0}", e, args);
+            Object[] args = {doc.getFullName()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_SAVING_OBJECT,
+                "Exception while updating archive {0}",
+                e,
+                args);
         }
     }
-    protected List loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction) throws XWikiException {
-        return (List) executeRead(context, bTransaction, new HibernateCallback() {
+
+    protected List loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
+        throws XWikiException
+    {
+        return (List) executeRead(context, bTransaction, new HibernateCallback()
+        {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                return session.createCriteria(XWikiRCSNodeInfo.class)
-                    .add(Restrictions.eq("id.docId", Long.valueOf(id)))
-                    .list();
+                return session.createCriteria(XWikiRCSNodeInfo.class).add(
+                    Restrictions.eq("id.docId", Long.valueOf(id))).list();
             }
         });
     }
+
     /**
      * {@inheritDoc}
      */
-    public XWikiRCSNodeContent loadRCSNodeContent(final XWikiRCSNodeId id, boolean bTransaction, XWikiContext context) throws XWikiException
+    public XWikiRCSNodeContent loadRCSNodeContent(final XWikiRCSNodeId id, boolean bTransaction,
+        XWikiContext context) throws XWikiException
     {
-        return (XWikiRCSNodeContent) executeRead(context, bTransaction, new HibernateCallback() {
+        return (XWikiRCSNodeContent) executeRead(context, bTransaction, new HibernateCallback()
+        {
             public Object doInHibernate(Session session) throws HibernateException
             {
                 XWikiRCSNodeContent content = new XWikiRCSNodeContent(id);
-                session.load( content, content.getId() );
+                session.load(content, content.getId());
                 return content;
             }
         });
     }
+
     /**
      * {@inheritDoc}
      */
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
-        executeWrite(context, bTransaction, new HibernateCallback() {
+        executeWrite(context, bTransaction, new HibernateCallback()
+        {
             public Object doInHibernate(Session session) throws HibernateException,
                 XWikiException
             {
-                session.createQuery("delete from "+XWikiRCSNodeInfo.class.getName()+" where id.docId=?")
-                    .setLong(0, doc.getId())
-                    .executeUpdate();
+                session.createQuery(
+                    "delete from " + XWikiRCSNodeInfo.class.getName() + " where id.docId=?")
+                    .setLong(0, doc.getId()).executeUpdate();
                 return null;
             }
         });

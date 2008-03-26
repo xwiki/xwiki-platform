@@ -2,7 +2,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD//EN"
         "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="org.xwiki.plugin.activitystream.impl.ActivityEventImpl" table="activitystream_events">
+    <class name="com.xpn.xwiki.plugin.activitystream.impl.ActivityEventImpl" table="activitystream_events">
         <id name="eventId" type="string" unsaved-value="any"><column name="ase_eventid" length="255" not-null="true" /><generator class="assigned" /></id>
         <property name="requestId" type="string"><column name="ase_requestid" length="2000" /></property>
         <property name="stream" type="string"><column name="ase_stream" length="255" /></property>

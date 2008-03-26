@@ -21,9 +21,6 @@ package com.xpn.xwiki.plugin.activitystream.api;
 
 import com.xpn.xwiki.XWikiException;
 
-/**
- * @version $Id: $
- */
 public class ActivityStreamException extends XWikiException
 {
     public static final int MODULE_PLUGIN_ACTIVITY_STREAM = 102;

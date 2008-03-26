@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+
 import com.sun.syndication.feed.synd.SyndEntry;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.xpn.xwiki.XWikiContext;
@@ -34,8 +35,6 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
 
 /**
  * API for {@link ActivityStreamPlugin}
- * 
- * @version $Id: $
  */
 public class ActivityStreamPluginApi extends PluginApi
 {

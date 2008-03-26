@@ -26,8 +26,6 @@ import com.xpn.xwiki.XWikiContext;
 
 /**
  * An Activity Event represents a event done by a user in a certain context.
- * 
- * @version $Id: $
  */
 public interface ActivityEvent
 {
@@ -274,7 +272,6 @@ public interface ActivityEvent
 
     /**
      * Set all params at once
-     * 
      * @param params
      */
     void setParams(List params);

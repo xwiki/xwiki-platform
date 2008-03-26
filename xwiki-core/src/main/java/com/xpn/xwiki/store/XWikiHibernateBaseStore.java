@@ -65,7 +65,8 @@ public class XWikiHibernateBaseStore
         String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
         log.debug("Hibernate configuration file: [" + path + "]");
         try {
-            if ((path != null) && ((new File(path).exists() || context.getEngineContext() == null))) {
+            if ((path != null)
+                && ((new File(path).exists() || context.getEngineContext() == null))) {
                 setPath(path);
                 return;
             }
@@ -80,7 +81,10 @@ public class XWikiHibernateBaseStore
             try {
                 setHibUrl(XWiki.class.getClassLoader().getResource(path));
             } catch (Exception ex2) {
-                log.error("Failed setting the Hibernate configuration file with any method, storage cannot be configured", ex2);
+                log
+                    .error(
+                        "Failed setting the Hibernate configuration file with any method, storage cannot be configured",
+                        ex2);
             }
         }
     }
@@ -332,11 +336,9 @@ public class XWikiHibernateBaseStore
         DatabaseProduct databaseProduct = getDatabaseProductName(context);
 
         if (databaseProduct == DatabaseProduct.DERBY) {
-            return context.isMainWiki(wikiName) ? "APP" : wikiName.replace(
-                '-', '_');
+            return context.isMainWiki(wikiName) ? "APP" : wikiName.replace('-', '_');
         } else if (databaseProduct == DatabaseProduct.HSQLDB) {
-            return context.isMainWiki(wikiName) ? "PUBLIC" : wikiName
-                .replace('-', '_');
+            return context.isMainWiki(wikiName) ? "PUBLIC" : wikiName.replace('-', '_');
         } else
             return wikiName.replace('-', '_');
     }
@@ -533,7 +535,7 @@ public class XWikiHibernateBaseStore
         if ((context == null) || (context.getWiki() == null)) {
             return true;
         }
-        
+
         return context.getWiki().isVirtualMode();
     }
 
@@ -1022,8 +1024,9 @@ public class XWikiHibernateBaseStore
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
             // Start monitoring timer
-            if (monitor != null)
+            if (monitor != null) {
                 monitor.startTimer("hibernate");
+            }
 
             if (bTransaction) {
                 checkHibernate(context);
@@ -1032,18 +1035,21 @@ public class XWikiHibernateBaseStore
 
             return cb.doInHibernate(getSession(context));
         } catch (Exception e) {
-            if (e instanceof XWikiException)
+            if (e instanceof XWikiException) {
                 throw (XWikiException) e;
+            }
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Exception while hibernate execute",
                 e);
         } finally {
             try {
-                if (bTransaction)
+                if (bTransaction) {
                     endTransaction(context, doCommit);
-                if (monitor != null)
+                }
+                if (monitor != null) {
                     monitor.endTimer("hibernate");
+                }
             } catch (Exception e) {
                 if (log.isErrorEnabled())
                     log.error("Exeption while close transaction", e);

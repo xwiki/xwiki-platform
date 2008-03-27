@@ -42,7 +42,15 @@ public class ViewAttachRevAction extends XWikiAction {
             filename = Util.decodeURI(path.substring(path.lastIndexOf("/") + 1), context);
 
         XWikiAttachment attachment = null;
-        if (request.getParameter("id") != null) {
+        
+        if (context.getWiki().hasAttachmentRecycleBin(context)
+            && request.getParameter("rid") != null) {
+            int recycleId = Integer.parseInt(request.getParameter("rid"));
+            attachment = new XWikiAttachment(doc, filename);
+            attachment =
+                (XWikiAttachment) context.getWiki().getAttachmentRecycleBinStore()
+                    .restoreFromRecycleBin(attachment, recycleId, context, true);
+        } else if (request.getParameter("id") != null) {
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
         } else {

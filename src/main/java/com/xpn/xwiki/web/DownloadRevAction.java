@@ -19,11 +19,17 @@ public class DownloadRevAction extends XWikiAction {
         String filename = Util.decodeURI(path.substring(path.lastIndexOf("/")+1),context);
         XWikiAttachment attachment = null;
 
-        if (request.getParameter("id")!=null) {
+        if (context.getWiki().hasAttachmentRecycleBin(context)
+            && request.getParameter("rid") != null) {
+            int recycleId = Integer.parseInt(request.getParameter("rid"));
+            attachment = new XWikiAttachment(doc, filename);
+            attachment =
+                (XWikiAttachment) context.getWiki().getAttachmentRecycleBinStore()
+                    .restoreFromRecycleBin(attachment, recycleId, context, true);
+        } else if (request.getParameter("id")!=null) {
             int id = Integer.parseInt(request.getParameter("id"));
             attachment = (XWikiAttachment) doc.getAttachmentList().get(id);
-        }
-        else {
+        } else {
             attachment = doc.getAttachment(filename);
         }
         if (attachment==null) {
@@ -38,8 +44,12 @@ public class DownloadRevAction extends XWikiAction {
                 attachment = attachment.getAttachmentRevision(rev, context);
             } catch(XWikiException e){
                 String url = context.getDoc().getURL("viewattachrev", true, context);
+                url += "/" + filename;
+                if (request.getParameter("rid") != null) {
+                    url += "?rid=" + request.getParameter("rid");
+                }
                 try {
-                    context.getResponse().sendRedirect(url+"/" + filename);
+                    context.getResponse().sendRedirect(url);
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }

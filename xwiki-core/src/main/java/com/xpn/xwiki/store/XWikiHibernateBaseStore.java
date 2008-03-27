@@ -512,7 +512,6 @@ public class XWikiHibernateBaseStore
      */
     public void checkHibernate(XWikiContext context) throws HibernateException
     {
-
         if (getSessionFactory() == null) {
             initHibernate();
 
@@ -1035,6 +1034,7 @@ public class XWikiHibernateBaseStore
 
             return cb.doInHibernate(getSession(context));
         } catch (Exception e) {
+            doCommit = false;
             if (e instanceof XWikiException) {
                 throw (XWikiException) e;
             }

@@ -2602,6 +2602,10 @@ public class XWikiDocument
             try {
                 // We need to make sure there is a version upgrade
                 setMetaDataDirty(true);
+                if (context.getWiki().hasAttachmentRecycleBin(context)) {
+                    context.getWiki().getAttachmentRecycleBinStore().saveToRecycleBin(attachment,
+                        context.getUser(), new Date(), context, true);
+                }
                 context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context,
                     true);
             } catch (java.lang.OutOfMemoryError e) {

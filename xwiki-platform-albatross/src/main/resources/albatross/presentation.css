@@ -179,6 +179,9 @@ Panels
 .panel input.panelinput, .panel select{
   width: 135px;
 }
+#editPanels .panel input.panelinput, #editPanels .panel select{
+  width: 200px;
+}
 #xwikiincludeddocuments .xwikibuttonlink a{
   padding: 2px 8px;
   margin-left: 8px;

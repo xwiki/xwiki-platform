@@ -97,7 +97,7 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             if (principal != null) {
                 if (log.isDebugEnabled()) log.debug("User " + principal.getName() + " has been authentified from cookie");
                 request.setUserPrincipal(principal);
-            } else {
+            } else if (username != null || password != null) {
                 // failed authentication with remembered login, better forget login now
                 persistentLoginManager.forgetLogin(request, response);
             }

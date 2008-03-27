@@ -128,6 +128,7 @@ import com.xpn.xwiki.render.groovy.XWikiPageClassLoader;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
+import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
@@ -172,6 +173,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     /** store for deleted documents */
     private XWikiRecycleBinStoreInterface recycleBinStore;
+
+    /** Storage for deleted attachment */
+    private AttachmentRecycleBinStore attachmentRecycleBinStore;
 
     private XWikiRenderingEngine renderingEngine;
 
@@ -773,6 +777,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 "com.xpn.xwiki.store.XWikiHibernateRecycleBinStore", context));
         }
 
+        if (hasAttachmentRecycleBin(context)) {
+            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) createClassFromConfig(
+                "storage.attachment.recyclebin.class",
+                "com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore", context));
+        }
+
         // Run migrations
         if ("1".equals(Param("xwiki.store.migration", "0"))) {
             if (LOG.isInfoEnabled())
@@ -1046,6 +1056,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public XWikiRecycleBinStoreInterface getRecycleBinStore()
     {
         return recycleBinStore;
+    }
+
+    public AttachmentRecycleBinStore getAttachmentRecycleBinStore()
+    {
+        return attachmentRecycleBinStore;
     }
 
     public void saveDocument(XWikiDocument doc, XWikiContext context) throws XWikiException
@@ -2351,6 +2366,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void setRecycleBinStore(XWikiRecycleBinStoreInterface recycleBinStore)
     {
         this.recycleBinStore = recycleBinStore;
+    }
+
+    public void setAttachmentRecycleBinStore(AttachmentRecycleBinStore attachmentRecycleBinStore)
+    {
+        this.attachmentRecycleBinStore = attachmentRecycleBinStore;
     }
 
     public void setCriteriaService(XWikiCriteriaService criteriaService)
@@ -5433,6 +5453,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public boolean hasRecycleBin(XWikiContext context)
     {
         return "1".equals(Param("xwiki.recyclebin", "1"));
+    }
+
+    /**
+     * Indicates whether deleted attachments are stored in a recycle bin or not. This can be
+     * configured using the key <var>storage.attachment.recyclebin</var>.
+     * 
+     * @see com.xpn.xwiki.api.XWiki#hasAttachmentRecycleBin()
+     * @param context The current {@link XWikiContext context}, maybe will be useful.
+     */
+    public boolean hasAttachmentRecycleBin(XWikiContext context)
+    {
+        return "1".equals(Param("storage.attachment.recyclebin", "1"));
     }
 
     /**

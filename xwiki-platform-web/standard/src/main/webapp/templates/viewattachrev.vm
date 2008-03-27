@@ -14,9 +14,14 @@
 #foreach ($version in $attachment.getVersions())
     <tr#if($velocityCount % 2 == 1) class="table-odd"#else class="table-even"#end>
 #set($attachrev = $attachment.getAttachmentRevision($version.toString()))
-#set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}))
+#if("$!{request.rid}" != "")
+  #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}, "rid=${request.rid}"))
+#else
+  #set($url = $doc.getAttachmentRevisionURL("${attachment.filename}", ${version.toString()}))
+#end
 #if ($attachment.isImage())
-        <td><img src="${url}" alt="${attachment.filename}" width="80" />#else
+        <td><img src="${url}" alt="${attachment.filename}" width="80" />
+#else
         <td class="mime">#mimetypeimg($attachment.getMimeType().toLowerCase() $attachment.getFilename().toLowerCase())
 #end
         </td>

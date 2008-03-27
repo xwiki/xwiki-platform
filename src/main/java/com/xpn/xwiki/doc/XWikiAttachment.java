@@ -553,6 +553,7 @@ public class XWikiAttachment
             Archive archive = getArchive();
             if (archive == null) {
                 context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
+                archive = getArchive();
             }
 
             if (archive == null) {

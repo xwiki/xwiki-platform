@@ -29,7 +29,17 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -62,13 +72,13 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.content.Link;
 import com.xpn.xwiki.content.parsers.DocumentParser;
 import com.xpn.xwiki.content.parsers.LinkParser;
 import com.xpn.xwiki.content.parsers.RenamePageReplaceLinkHandler;
 import com.xpn.xwiki.content.parsers.ReplacementResultCollection;
+import com.xpn.xwiki.criteria.impl.RevisionCriteria;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -839,19 +849,19 @@ public class XWikiDocument
                     .getConstructor(classes).newInstance(args);
             } catch (InstantiationException e) {
                 e.printStackTrace(); // To change body of catch statement use File | Settings |
-                                        // File Templates.
+                // File Templates.
             } catch (IllegalAccessException e) {
                 e.printStackTrace(); // To change body of catch statement use File | Settings |
-                                        // File Templates.
+                // File Templates.
             } catch (ClassNotFoundException e) {
                 e.printStackTrace(); // To change body of catch statement use File | Settings |
-                                        // File Templates.
+                // File Templates.
             } catch (NoSuchMethodException e) {
                 e.printStackTrace(); // To change body of catch statement use File | Settings |
-                                        // File Templates.
+                // File Templates.
             } catch (InvocationTargetException e) {
                 e.printStackTrace(); // To change body of catch statement use File | Settings |
-                                        // File Templates.
+                // File Templates.
             }
         }
         return new com.xpn.xwiki.api.Document(this, context);
@@ -2632,12 +2642,11 @@ public class XWikiDocument
 
     public void renameProperties(String className, Map fieldsToRename)
     {
-        Vector objects = getObjects(className);
+        Vector<BaseObject> objects = getObjects(className);
         if (objects == null) {
             return;
         }
-        for (int j = 0; j < objects.size(); j++) {
-            BaseObject bobject = (BaseObject) objects.get(j);
+        for (BaseObject bobject : objects) {
             if (bobject == null) {
                 continue;
             }
@@ -2705,15 +2714,14 @@ public class XWikiDocument
         return context.getWiki().getIncludedMacros(getSpace(), getContent(), context);
     }
 
-    public List getLinkedPages(XWikiContext context)
+    public List<String> getLinkedPages(XWikiContext context)
     {
         try {
             String pattern = "\\[(.*?)\\]";
-            List newlist = new ArrayList();
-            List list = context.getUtil().getUniqueMatches(getContent(), pattern, 1);
-            for (int i = 0; i < list.size(); i++) {
+            List<String> newlist = new ArrayList<String>();
+            List<String> list = context.getUtil().getUniqueMatches(getContent(), pattern, 1);
+            for (String name : list) {
                 try {
-                    String name = (String) list.get(i);
                     int i1 = name.indexOf(">");
                     if (i1 != -1) {
                         name = name.substring(i1 + 1);
@@ -3198,7 +3206,7 @@ public class XWikiDocument
         }
     }
 
-    public List getTranslationList(XWikiContext context) throws XWikiException
+    public List<String> getTranslationList(XWikiContext context) throws XWikiException
     {
         return getStore().getTranslationList(this, context);
     }
@@ -3332,7 +3340,7 @@ public class XWikiDocument
         return list;
     }
 
-    public List getObjectDiff(String fromRev, String toRev, XWikiContext context)
+    public List<List<ObjectDiff>> getObjectDiff(String fromRev, String toRev, XWikiContext context)
         throws XWikiException
     {
         XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
@@ -3340,7 +3348,8 @@ public class XWikiDocument
         return getObjectDiff(fromDoc, toDoc, context);
     }
 
-    public List getObjectDiff(String fromRev, XWikiContext context) throws XWikiException
+    public List<List<ObjectDiff>> getObjectDiff(String fromRev, XWikiContext context)
+        throws XWikiException
     {
         XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
         return getObjectDiff(revdoc, this, context);
@@ -3515,8 +3524,8 @@ public class XWikiDocument
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      */
-    public void rename(String newDocumentName, List backlinkDocumentNames, XWikiContext context)
-        throws XWikiException
+    public void rename(String newDocumentName, List<String> backlinkDocumentNames,
+        XWikiContext context) throws XWikiException
     {
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
         // something fails in the middle...
@@ -3549,8 +3558,7 @@ public class XWikiDocument
         // that they fix them but the rename feature ignores them.
         DocumentParser documentParser = new DocumentParser();
 
-        for (Iterator it = backlinkDocumentNames.iterator(); it.hasNext();) {
-            String backlinkDocumentName = (String) it.next();
+        for (String backlinkDocumentName : backlinkDocumentNames) {
             XWikiDocument backlinkDocument =
                 context.getWiki().getDocument(backlinkDocumentName, context);
 
@@ -3593,11 +3601,9 @@ public class XWikiDocument
         newdoc.setFullName(newDocumentName, context);
         newdoc.setContentDirty(true);
         newdoc.getxWikiClass().setName(newDocumentName);
-        Vector objects = newdoc.getObjects(oldname);
+        Vector<BaseObject> objects = newdoc.getObjects(oldname);
         if (objects != null) {
-            Iterator it = objects.iterator();
-            while (it.hasNext()) {
-                BaseObject object = (BaseObject) it.next();
+            for (BaseObject object : objects) {
                 object.setName(newDocumentName);
             }
         }
@@ -3838,7 +3844,7 @@ public class XWikiDocument
     }
 
     // This functions adds multiple objects from an new objects creation form
-    public List addObjectsFromRequest(String className, XWikiContext context)
+    public List<BaseObject> addObjectsFromRequest(String className, XWikiContext context)
         throws XWikiException
     {
         return addObjectsFromRequest(className, "", context);
@@ -3937,12 +3943,12 @@ public class XWikiDocument
     }
 
     // This functions adds multiple objects from an new objects creation form
-    public List updateObjectsFromRequest(String className, String pref, XWikiContext context)
-        throws XWikiException
+    public List<BaseObject> updateObjectsFromRequest(String className, String pref,
+        XWikiContext context) throws XWikiException
     {
         Map map = context.getRequest().getParameterMap();
-        List objectsNumberDone = new ArrayList();
-        List objects = new ArrayList();
+        List<Integer> objectsNumberDone = new ArrayList<Integer>();
+        List<BaseObject> objects = new ArrayList<BaseObject>();
         Iterator it = map.keySet().iterator();
         String start = pref + className + "_";
 
@@ -4434,7 +4440,7 @@ public class XWikiDocument
 
     public String getPreviousVersion()
     {
-        return getDocumentArchive().getPrevVersion(version).toString();        
+        return getDocumentArchive().getPrevVersion(version).toString();
     }
 
     public String toString()

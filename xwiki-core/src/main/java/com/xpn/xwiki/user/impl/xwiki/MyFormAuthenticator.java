@@ -100,7 +100,6 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
             } else {
                 // failed authentication with remembered login, better forget login now
                 persistentLoginManager.forgetLogin(request, response);
-                persistentLoginManager.forgetLogin(request, response);
             }
         }
 

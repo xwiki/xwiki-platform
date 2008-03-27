@@ -20,6 +20,7 @@
 package com.xpn.xwiki.store;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -245,8 +246,15 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                return session.createCriteria(XWikiRCSNodeInfo.class).add(
-                    Restrictions.eq("id.docId", Long.valueOf(id))).list();
+                try {
+                    return session.createCriteria(XWikiRCSNodeInfo.class).add(
+                        Restrictions.eq("id.docId", Long.valueOf(id))).add(
+                        Restrictions.isNotNull("diff")).list();
+                } catch (IllegalArgumentException ex) {
+                    // This happens when the database has wrong values...
+                    log.warn("Invalid history for document " + id);
+                    return Collections.emptyList();
+                }
             }
         });
     }

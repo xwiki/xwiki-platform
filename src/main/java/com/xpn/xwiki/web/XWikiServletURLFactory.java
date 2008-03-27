@@ -25,6 +25,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.commons.logging.Log;
@@ -36,6 +37,8 @@ import java.net.URL;
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
     protected URL serverURL;
+
+    private static final Log log = LogFactory.getLog(XWikiServletURLFactory.class);
 
     protected String contextPath;
 
@@ -141,7 +144,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (host != null) {
                 int comaind = host.indexOf(',');
                 final String host1 = comaind > 0 ? host.substring(0, comaind) : host;
-                if (!host1.equals(""))                     
+                if (!host1.equals(""))
                     serverURL = new URL(context.getRequest().getScheme() + "://" + host1);
             }
         }
@@ -316,52 +319,39 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createAttachmentURL(String filename, String web, String name, String action,
         String querystring, String xwikidb, XWikiContext context)
     {
-        StringBuffer newpath = new StringBuffer(contextPath);
-        newpath.append(servletPath);
-        addAction(newpath, action, context);
-        addSpace(newpath, web, action, context);
-        addName(newpath, name, action, context);
-        addFileName(newpath, filename, context);
-        XWikiAttachment attachment = null;
-        XWikiAttachment attLastVer = null;
-        String revdoc = null;
-        String lastver = null;
-
-        if ((querystring != null) && (!querystring.equals(""))) {
-            newpath.append("?");
-            newpath.append(querystring);
-        }
-
         if ((context != null) && "viewrev".equals(context.getAction())) {
-            revdoc = context.get("rev").toString();
-            Log log = LogFactory.getLog(XWikiServletURLFactory.class);
             try {
-                lastver =
-                    context.getWiki().getDocument(context.getDoc().getFullName(), context)
-                        .getVersion();
-                attLastVer =
-                    context.getWiki().getDocument(context.getDoc().getFullName(), context)
-                        .getAttachment(filename);
-                attachment =
-                    findAttachmentForDocRevision(context.getDoc(), revdoc, filename, context);
+                String docRevision = context.get("rev").toString();
+                XWikiAttachment attachment =
+                    findAttachmentForDocRevision(context.getDoc(), docRevision, filename, context);
+                if (attachment == null) {
+                    action = "viewattachrev";
+                } else {
+                    long arbId =
+                        findDeletedAttachmentForDocRevision(context.getDoc(), docRevision,
+                            filename, context);
+                    return createAttachmentRevisionURL(filename, web, name, attachment
+                        .getVersion(), arbId, querystring, xwikidb, context);
+                }
             } catch (XWikiException e) {
                 if (log.isErrorEnabled())
                     log.error("Exception while trying to get attachment version !", e);
             }
         }
 
-        try {
-            if (attLastVer != null) {
-                if (revdoc != null && !revdoc.equals(lastver)) {
-                    String veratt = attachment.getVersion();
-                    String lastveratt = attLastVer.getVersion();
-                    if (!veratt.equals(lastveratt)) {
-                        return createAttachmentRevisionURL(filename, web, name, veratt,
-                            querystring, xwikidb, context);
-                    }
-                }
-            }
+        StringBuffer newpath = new StringBuffer(contextPath);
+        newpath.append(servletPath);
+        addAction(newpath, action, context);
+        addSpace(newpath, web, action, context);
+        addName(newpath, name, action, context);
+        addFileName(newpath, filename, context);
 
+        if ((querystring != null) && (!querystring.equals(""))) {
+            newpath.append("?");
+            newpath.append(querystring);
+        }
+
+        try {
             return new URL(getServerURL(xwikidb, context), newpath.toString());
         } catch (Exception e) {
             return null;
@@ -370,6 +360,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
     public URL createAttachmentRevisionURL(String filename, String web, String name,
         String revision, String querystring, String xwikidb, XWikiContext context)
+    {
+        return createAttachmentRevisionURL(filename, web, name, revision, -1, querystring,
+            xwikidb, context);
+    }
+
+    public URL createAttachmentRevisionURL(String filename, String web, String name,
+        String revision, long recycleId, String querystring, String xwikidb, XWikiContext context)
     {
         String action = "downloadrev";
         StringBuffer newpath = new StringBuffer(contextPath);
@@ -380,6 +377,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         addFileName(newpath, filename, context);
 
         String qstring = "rev=" + revision;
+        if (recycleId >= 0) {
+            qstring += "&rid=" + recycleId;
+        }
         if ((querystring != null) && (!querystring.equals("")))
             qstring += "&" + querystring;
         if ((qstring != null) && (!qstring.equals(""))) {
@@ -440,17 +440,37 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         }
     }
 
-    public XWikiAttachment findAttachmentForDocRevision(XWikiDocument doc, String revdoc,
+    public XWikiAttachment findAttachmentForDocRevision(XWikiDocument doc, String docRevision,
         String filename, XWikiContext context) throws XWikiException
     {
         XWikiAttachment attachment = null;
-        XWikiDocument rdoc = context.getWiki().getDocument(doc, revdoc, context);
+        XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
         if (filename != null) {
             attachment = rdoc.getAttachment(filename);
-        } else {
-            return null;
         }
 
         return attachment;
+    }
+
+    public long findDeletedAttachmentForDocRevision(XWikiDocument doc, String docRevision,
+        String filename, XWikiContext context) throws XWikiException
+    {
+        XWikiAttachment attachment = null;
+        XWikiDocument rdoc = context.getWiki().getDocument(doc, docRevision, context);
+        if (context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
+            attachment = rdoc.getAttachment(filename);
+            if (attachment != null) {
+                DeletedAttachment[] deleted =
+                    context.getWiki().getAttachmentRecycleBinStore().getAllDeletedAttachments(
+                        attachment, context, true);
+                for (int i = deleted.length - 1; i >= 0; --i) {
+                    if (deleted[i].getDate().after(rdoc.getDate())) {
+                        return deleted[i].getId();
+                    }
+                }
+            }
+        }
+
+        return -1;
     }
 }

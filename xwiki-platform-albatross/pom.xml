@@ -44,8 +44,8 @@
   </build>
 
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/tags/xwiki-skin-albatross-1.4</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/tags/xwiki-skin-albatross-1.4</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/tags/xwiki-skin-albatross-1.4</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/branches/xwiki-skin-albatross-1.4</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/branches/xwiki-skin-albatross-1.4</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/skins/branches/xwiki-skin-albatross-1.4</url>
   </scm>
 </project>

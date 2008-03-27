@@ -31,10 +31,10 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
-import java.net.InetAddress;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -91,6 +91,7 @@ import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.cache.impl.XWikiCacheListener;
+import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -156,7 +157,6 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
-import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 
 public class XWiki implements XWikiDocChangeNotificationInterface
 {
@@ -5200,14 +5200,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return docs;
     }
 
-    public List getIncludedMacros(String defaultweb, String content, XWikiContext context)
+    public List<String> getIncludedMacros(String defaultweb, String content, XWikiContext context)
     {
         try {
             String pattern = "#includeMacros\\(\"(.*?)\"\\)";
-            List list = context.getUtil().getUniqueMatches(content, pattern, 1);
+            List<String> list = context.getUtil().getUniqueMatches(content, pattern, 1);
             for (int i = 0; i < list.size(); i++) {
                 try {
-                    String name = (String) list.get(i);
+                    String name = list.get(i);
                     if (name.indexOf(".") == -1) {
                         list.set(i, defaultweb + "." + name);
                     }
@@ -5215,7 +5215,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     // This should never happen
                     // TODO: log a nice error message instead
                     e.printStackTrace();
-                    return Collections.EMPTY_LIST;
+                    return Collections.emptyList();
                 }
             }
 
@@ -5225,7 +5225,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // TODO: log a nice error message instead
             e.printStackTrace();
             // @todo Shouldn't we return an empty list instead!!!!
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
     }
 

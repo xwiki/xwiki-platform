@@ -155,9 +155,7 @@
         </natural-id>
         <property name="docName" column="XDA_DOC_NAME" type="string" length="255" />
         <property name="deleter" type="string" column="XDA_DELETER" index="deleter"/>
-        <!-- This one is lazy as the XML isn't always needed. Does improve performance when there are several deleted attachments with the same name. -->
-        <!-- TODO: Should this be lazy or not? Need to run a profiler... -->
-        <property name="xml" type="text" column="XDA_XML" not-null="true" length="1000000000" lazy="true"/>
+        <property name="xml" type="text" column="XDA_XML" not-null="true" length="1000000000" />
     </class>
 
     <class name="com.xpn.xwiki.doc.XWikiLock" table="xwikilock">

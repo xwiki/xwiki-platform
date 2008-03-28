@@ -95,7 +95,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
      */
     public void run()
     {
-        MDC.put("url", "index updating thread");
+        MDC.put("url", "Lucene index updating thread");
 
         while (!this.exit) {
             if (this.queue.isEmpty()) {

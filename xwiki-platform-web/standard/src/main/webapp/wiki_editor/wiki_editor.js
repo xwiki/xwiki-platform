@@ -287,7 +287,7 @@ WikiEditor.prototype.convertExternal = function(content) {
 	}
     content = unescape(content);
     content = content.replace(/\\<(.*?)\\>/g, '\\&lt;$1\\&gt;');
-//	alert(content);
+    // alert(content);
 	return content;
 }
 
@@ -301,6 +301,7 @@ WikiEditor.prototype.convertInternal = function(content) {
     var regexp, r;
 	var lines;
 	var lastIndex;
+    // alert(content);
     content = content.replace(/\$(\d)/g, "&#036;$1");
     for(var i=0; i < this._htmlFilters.length; i++) {
 		RegExp.lastIndex = 0;

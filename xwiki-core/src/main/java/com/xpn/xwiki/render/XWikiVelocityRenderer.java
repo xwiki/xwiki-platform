@@ -49,8 +49,6 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
     private static final Log LOG = LogFactory.getLog(XWikiVelocityRenderer.class);
 
-    private static Map<String, VelocityContext> velocityContexts = new HashMap<String, VelocityContext>();
-    
     /**
      * {@inheritDoc}
      *
@@ -78,12 +76,11 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
             vcontext.put("doc", contextdoc.newDocument(context));
             try {
                 // We need to do this in case there are any macros in the content
-                List macrolist =
+                List<String> macrolist =
                     context.getWiki().getIncludedMacros(contentdoc.getSpace(), content, context);
                 if (macrolist != null) {
                     com.xpn.xwiki.XWiki xwiki = context.getWiki();
-                    for (int i = 0; i < macrolist.size(); i++) {
-                        String docname = (String) macrolist.get(i);
+                    for (String docname: macrolist) {
                         LOG.debug("Pre-including macro topic " + docname);
                         xwiki.include(docname, true, context);
                     }

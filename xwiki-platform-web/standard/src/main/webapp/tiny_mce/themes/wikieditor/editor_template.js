@@ -379,7 +379,7 @@ var TinyMCE_WikieditorTheme = {
 		if (!tinyMCE.imgElement && tinyMCE.isSafari) {
 			var html = "";
             if (halign != null && (halign != "none")){
-                html += "<div class=\"img" + halign.trim() + "\">" ;
+                html += "<div class=\"img" + halign + "\">" ;
             }
 			html += '<img class="wikiimage" src="' + src + '" alt="' + alt + '"';
 			html += ' border="' + border + '" hspace="' + hspace + '"';

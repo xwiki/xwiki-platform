@@ -17,7 +17,8 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;?<\/p>/gi), "\\\\\r\n");
 
-    this.addExternalProcessor((/\\\\([\r\n]+)/gi), '<br />');
+    this.addExternalProcessor((/\\\\(\r\n)+/gi), '<br />\r\n');
+    this.addExternalProcessor((/\\\\/gi), '<br />');
 
     this.addExternalProcessor((/----(-*)/i), 'convertHRExternal');
 	this.addInternalProcessor((/<hr(.*?)>/i), 'convertHRInternal');
@@ -35,7 +36,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addExternalProcessor((/((\s|\S)*)/i), 'convertParagraphExternal');
 	this.addInternalProcessor((/<p(.*?)>([\s\S]+?)<\/p>/i), 'convertParagraphInternal');
 
-    this.addInternalProcessor((/(<br\s*\/>|<br\s*>)(\s*\r*\n*)/gi), '\\\\\r\n');
+    this.addInternalProcessor((/(<br\s*\/>|<br\s*>)(\s*\r*\n*)/gi), '\\\\$2');
 
     this.addExternalProcessor((/\[(.*?)((>|\|)(.*?))?((>|\|)(.*?))?\]/i), 'convertLinkExternal');
     this.addInternalProcessor((/<a\s*([^>]*)>(.*?)<\/a>/i), 'convertLinkInternal');
@@ -205,7 +206,7 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
             if ((cell.lastIndexOf("\\\\") > 1) && (cell.lastIndexOf("\\\\") == (cell.length-2))) {
                 cell = cell.substring(0, cell.lastIndexOf("\\\\"));
             }
-            cell = cell.replace(/[\r\n]{3,}/g, "\\\\\r\n\\\\\r\n");
+            cell = cell.replace(/[\r\n]{3,}/g, "\\\\");
             if (cell == "") cell = "&nbsp;"
             if (j == 0) {
                 str += "\r\n" + cell;
@@ -948,25 +949,23 @@ WikiEditor.prototype.convertParagraphInternal = function(regexp, result, content
 WikiEditor.prototype.PARAGRAPH_CLASS_NAME = "paragraph";
 
 WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content) {
-	//alert(content);
 	var lines = this._getLines(content);
 	var str="";
 	var line = "";
 	var insideP = false;
 	var firstLine = false;
+        var insideBR = false;
 
-	if(lines == null || lines.length == 0) {
+    if(lines == null || lines.length == 0) {
 		return "";
 	}
 
-	for(var i=0; i < lines.length; i++) {
-		//alert("line(" + i + "): " + lines[i]);
+    for(var i=0; i < lines.length; i++) {
 		// Consume blank spaces
 		line = lines[i];
 		var hh = this._hasHTML(line);
         var hbr = this._onlyHasBr(line);
         line = line.replace(/(\r$)|(\n$)|(\r\n$)/gi, "");
-
         if(line != "" && (!hh || hbr)) {
             if(!insideP) {
 				insideP=true;
@@ -979,15 +978,19 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
 			continue;
 		} else if(insideP) {
             insideP = false;
-			str += '<\/p>\r\n';
-		}
+			str += '<br />\r\n<\/p>\r\n';
+        }
 		if(hh) {
 			str += line + "\r\n";
-		}
+	        }	
+           insideBR = hbr;
 	}
 	if(insideP) {
+                if (insideBR) {
+		  str += '<br />\r\n';
+                }
 		str += '<\/p>\r\n';
-	}
+   	}
     str = str.replace(/<p\s*(.*?)>\s*<\/p>/g,'');
     return str;
 }
@@ -1137,6 +1140,7 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
     var text = this.trimRNString(result[1]);
+    text = text.replace(/<br \/>\r\n/gi, "<br />");
     var _lines = this._getLines(text);
     var str = "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" align=\"center\">"
     var lines = new Array();

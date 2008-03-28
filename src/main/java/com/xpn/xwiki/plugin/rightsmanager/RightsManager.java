@@ -50,7 +50,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
  * @version $Id: $
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2 (public since 1.4M1)
  */
-final public class RightsManager implements XWikiDocChangeNotificationInterface
+public final class RightsManager implements XWikiDocChangeNotificationInterface
 {
     /**
      * Name of the default space where users and groups are stored.

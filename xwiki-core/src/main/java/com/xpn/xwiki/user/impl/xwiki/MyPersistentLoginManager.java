@@ -423,13 +423,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             cookie.setMaxAge(0);
             cookie.setPath(cookiePath);
             addCookie(response, cookie);
-            String cookieDomain = request.getServerName();
+            String cookieDomain = getCookieDomain(request);
             if (cookieDomain != null) {
-                do {
-                    cookie.setDomain(cookieDomain);
-                    addCookie(response, cookie);
-                    cookieDomain = cookieDomain.substring(cookieDomain.indexOf(".") + 1);
-                } while (cookieDomain.indexOf(".") >= 0);
+                cookie.setDomain(cookieDomain);
+                addCookie(response, cookie);
             }
         }
     }
@@ -459,15 +456,16 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     private static String getCookieValue(Cookie[] cookies, String cookieName, String defaultValue)
     {
+        String value = defaultValue;
         if (cookies != null) {
             for (int i = 0; i < cookies.length; i++) {
                 Cookie cookie = cookies[i];
                 if (cookieName.equals(cookie.getName())) {
-                    return (cookie.getValue());
+                    value = cookie.getValue();
                 }
             }
         }
-        return (defaultValue);
+        return value;
     }
 
     /**

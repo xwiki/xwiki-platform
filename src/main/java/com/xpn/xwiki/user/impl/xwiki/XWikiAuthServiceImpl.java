@@ -103,6 +103,9 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 }
 
                 MyPersistentLoginManager persistent = new MyPersistentLoginManager();
+                if (xwiki.Param("xwiki.authentication.cookieprefix") != null) {
+                    persistent.setCookiePrefix(xwiki.Param("xwiki.authentication.cookieprefix"));
+                }
                 if (xwiki.Param("xwiki.authentication.cookiepath") != null) {
                     persistent.setCookiePath(xwiki.Param("xwiki.authentication.cookiepath"));
                 }

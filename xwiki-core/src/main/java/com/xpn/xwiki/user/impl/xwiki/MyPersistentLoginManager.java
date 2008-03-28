@@ -38,9 +38,7 @@ import org.securityfilter.filter.SecurityRequestWrapper;
 /**
  * Class responsible for remembering the login information between requests. It uses (encrypted)
  * cookies for this. The encryption key is stored in xwiki.cfg, xwiki.authentication.encryptionKey
- * parameter.
- * 
- * The cookies used are:
+ * parameter. The cookies used are:
  * <dl>
  * <dt>username</dt>
  * <dd>The logged in username</dd>
@@ -90,6 +88,11 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      * the configured domains.
      */
     protected String cookiePath = "/";
+
+    /**
+     * The prefix that should be used for cookie names.
+     */
+    protected String cookiePrefix = "";
 
     /**
      * Default constructor. The configuration is done outside, in
@@ -187,15 +190,17 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         // Create client cookies to remember the login information.
 
         // Username
-        Cookie usernameCookie = new Cookie(COOKIE_USERNAME, protectedUsername);
+        Cookie usernameCookie =
+            new Cookie(getCookiePrefix() + COOKIE_USERNAME, protectedUsername);
         setupCookie(usernameCookie, sessionCookie, cookieDomain, response);
 
         // Password
-        Cookie passwdCookie = new Cookie(COOKIE_PASSWORD, protectedPassword);
+        Cookie passwdCookie = new Cookie(getCookiePrefix() + COOKIE_PASSWORD, protectedPassword);
         setupCookie(passwdCookie, sessionCookie, cookieDomain, response);
 
         // Remember me
-        Cookie rememberCookie = new Cookie(COOKIE_REMEMBERME, !sessionCookie + "");
+        Cookie rememberCookie =
+            new Cookie(getCookiePrefix() + COOKIE_REMEMBERME, !sessionCookie + "");
         setupCookie(rememberCookie, sessionCookie, cookieDomain, response);
 
         if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
@@ -203,7 +208,8 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
                 getValidationHash(protectedUsername, protectedPassword, getClientIP(request));
             if (validationHash != null) {
                 // Validation
-                Cookie validationCookie = new Cookie(COOKIE_VALIDATION, validationHash);
+                Cookie validationCookie =
+                    new Cookie(getCookiePrefix() + COOKIE_VALIDATION, validationHash);
                 setupCookie(validationCookie, sessionCookie, cookieDomain, response);
             } else {
                 if (LOG.isErrorEnabled()) {
@@ -278,10 +284,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 
     /**
      * Get validation hash for the specified parameters. The hash includes a secret password, and
-     * optionally binds the cookie to the requester's IP.
-     * 
-     * The hash secret is configured using the xwiki.authentication.validationKey parameter. The IP
-     * binding is enabled using the xwiki.authentication.useip parameter.
+     * optionally binds the cookie to the requester's IP. The hash secret is configured using the
+     * xwiki.authentication.validationKey parameter. The IP binding is enabled using the
+     * xwiki.authentication.useip parameter.
      * 
      * @param username The remembered username.
      * @param password The remembered password.
@@ -379,10 +384,10 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     public void forgetLogin(HttpServletRequest request, HttpServletResponse response)
     {
         ((SecurityRequestWrapper) request).setUserPrincipal(null);
-        removeCookie(request, response, COOKIE_USERNAME);
-        removeCookie(request, response, COOKIE_PASSWORD);
-        removeCookie(request, response, COOKIE_REMEMBERME);
-        removeCookie(request, response, COOKIE_VALIDATION);
+        removeCookie(request, response, getCookiePrefix() + COOKIE_USERNAME);
+        removeCookie(request, response, getCookiePrefix() + COOKIE_PASSWORD);
+        removeCookie(request, response, getCookiePrefix() + COOKIE_REMEMBERME);
+        removeCookie(request, response, getCookiePrefix() + COOKIE_VALIDATION);
         return;
     }
 
@@ -480,11 +485,14 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
     {
         if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_VALIDATION)) {
             String username =
-                getCookieValue(request.getCookies(), COOKIE_USERNAME, DEFAULT_VALUE);
+                getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME,
+                    DEFAULT_VALUE);
             String password =
-                getCookieValue(request.getCookies(), COOKIE_PASSWORD, DEFAULT_VALUE);
+                getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD,
+                    DEFAULT_VALUE);
             String cookieHash =
-                getCookieValue(request.getCookies(), COOKIE_VALIDATION, DEFAULT_VALUE);
+                getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_VALIDATION,
+                    DEFAULT_VALUE);
             String calculatedHash = getValidationHash(username, password, getClientIP(request));
             if (cookieHash.equals(calculatedHash)) {
                 return true;
@@ -508,7 +516,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     public String getRememberedUsername(HttpServletRequest request, HttpServletResponse response)
     {
-        String username = getCookieValue(request.getCookies(), COOKIE_USERNAME, DEFAULT_VALUE);
+        String username =
+            getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_USERNAME,
+                DEFAULT_VALUE);
 
         if (!username.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
@@ -531,7 +541,9 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
      */
     public String getRememberedPassword(HttpServletRequest request, HttpServletResponse response)
     {
-        String password = getCookieValue(request.getCookies(), COOKIE_PASSWORD, DEFAULT_VALUE);
+        String password =
+            getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_PASSWORD,
+                DEFAULT_VALUE);
         if (!password.equals(DEFAULT_VALUE)) {
             if (checkValidation(request, response)) {
                 if (protection.equals(PROTECTION_ALL) || protection.equals(PROTECTION_ENCRYPTION)) {
@@ -541,6 +553,22 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             }
         }
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DefaultPersistentLoginManager#rememberingLogin(javax.servlet.http.HttpServletRequest)
+     */
+    @Override
+    public boolean rememberingLogin(HttpServletRequest request)
+    {
+        if (getCookieValue(request.getCookies(), getCookiePrefix() + COOKIE_REMEMBERME, "false")
+            .equals("true")) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -587,5 +615,27 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
             remoteIP = remoteIP.substring(0, remoteIP.indexOf(','));
         }
         return remoteIP;
+    }
+
+    /**
+     * Setter for the {@link #cookiePrefix} parameter.
+     * 
+     * @param prefix The new value for {@link #cookiePrefix}.
+     * @see #cookiePrefix
+     */
+    public void setCookiePrefix(String prefix)
+    {
+        this.cookiePrefix = prefix;
+    }
+
+    /**
+     * Getter for the {@link #cookiePrefix} parameter.
+     * 
+     * @return The value for {@link #cookiePrefix}.
+     * @see #cookiePrefix
+     */
+    public String getCookiePrefix()
+    {
+        return this.cookiePrefix;
     }
 }

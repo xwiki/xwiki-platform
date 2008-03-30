@@ -203,10 +203,11 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
         var cols = trow.split("<\/td>");
         for (var j=0; j<(cols.length-1); j++) {
             var cell = this.trimRNString(cols[j].replace(/<td(.*?)>/g, ""));
-            if ((cell.lastIndexOf("\\\\") > 1) && (cell.lastIndexOf("\\\\") == (cell.length-2))) {
-                cell = cell.substring(0, cell.lastIndexOf("\\\\"));
+            cell = cell.replace(/\r/gi, "");
+            cell = cell.replace(/\n/gi, "");
+            if ((cell.lastIndexOf("\\\\") >= 0) && (cell.lastIndexOf("\\\\") == (cell.length-2))) {
+                cell += " ";
             }
-            cell = cell.replace(/[\r\n]{3,}/g, "\\\\");
             if (cell == "") cell = "&nbsp;"
             if (j == 0) {
                 str += "\r\n" + cell;
@@ -1161,7 +1162,7 @@ WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
         do {
             row += lines[i+k];
             k++;
-        } while ((lines[i + k] != null) && (lines[i+k-1].lastIndexOf("\\\\") == (lines[i+k-1].length - 2)))
+        } while ((lines[i + k] != null) && (lines[i+k-1].lastIndexOf("\\\\") == (lines[i+k-1].length - 2)) && (lines[i+k-1].lastIndexOf("\\\\")!=-1))
         rows[rowindex] = row;
         rowindex++;
         i += (k - 1);
@@ -1177,8 +1178,7 @@ WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {
         }
         var cols = rows[i].split("|");  // get cols
         for (var j=0; j < cols.length; j++) {
-            if ( i== 0) str += "<td>";
-            else  str += "<td>";
+            str += "<td>";
             var linescol = cols[j].split("\\\\");
             if (linescol.length == 1) str += linescol[0];
             else if (linescol.length > 1)

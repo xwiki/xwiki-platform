@@ -1065,9 +1065,13 @@ TinyMCE_Engine.prototype = {
 
 				// Insert P element
                 var selectedDiv = tinyMCE.getParentElement(tinyMCE.selectedInstance.selection.getFocusElement(), "div");
+                var isInTable = tinyMCE.getParentElement(tinyMCE.selectedInstance.selection.getFocusElement(), "table");
                 if (tinyMCE.isGecko && tinyMCE.settings['force_p_newlines'] && e.keyCode == 13 && !e.shiftKey) {
                     if (selectedDiv && (selectedDiv.className == 'code')) {
                         return false;
+                    }
+                    if (isInTable) {
+                          return false;
                     }
 					// Insert P element instead of BR
 					if (TinyMCE_ForceParagraphs._insertPara(tinyMCE.selectedInstance, e)) {
@@ -1090,7 +1094,7 @@ TinyMCE_Engine.prototype = {
 				}
 
 				// Return key pressed
-				if (tinyMCE.isMSIE && selectedDiv && (selectedDiv.className == 'code') && e.keyCode == 13 && !e.shiftKey) {
+            	if (tinyMCE.isMSIE && selectedDiv && (selectedDiv.className == 'code') && e.keyCode == 13 && !e.shiftKey) {
                     if (e.target.editorId)
 						tinyMCE.selectedInstance = tinyMCE.instances[e.target.editorId];
 
@@ -1117,7 +1121,34 @@ TinyMCE_Engine.prototype = {
 					}
 				}
 
-				// Backspace or delete
+                if (tinyMCE.isMSIE && isInTable && e.keyCode == 13 && !e.shiftKey) {
+                    if (e.target.editorId)
+                        tinyMCE.selectedInstance = tinyMCE.instances[e.target.editorId];
+
+                    if (tinyMCE.selectedInstance) {
+                        var sel = tinyMCE.selectedInstance.getDoc().selection;
+                        var rng = sel.createRange();
+
+
+                        if (tinyMCE.getParentElement(rng.parentElement(), "li") != null)
+                            return false;
+
+                                   // Cancel event
+                        e.returnValue = false;
+                        e.cancelBubble = true;
+
+                                    // Insert BR element
+                        rng.pasteHTML("<br />");
+                        rng.collapse(false);
+                        rng.select();
+
+                        tinyMCE.execCommand("mceAddUndoLevel");
+                        tinyMCE.triggerNodeChange(false);
+                        return false;
+                    }
+                }
+
+                // Backspace or delete
 				if (e.keyCode == 8 || e.keyCode == 46) {
 					tinyMCE.selectedElement = e.target;
 					tinyMCE.linkElement = tinyMCE.getParentElement(e.target, "a");

@@ -160,7 +160,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
           Mock mockCurrentDocument = mock(XWikiDocument.class);
           this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
           String result = renderer.render("a\\\\\n\n\nb", contentDocument, document, context);
-          assertEquals("a<br/><p/>\nb", result);
+          assertEquals("a<br/><br/><p/>\nb", result);
       }
 
 }

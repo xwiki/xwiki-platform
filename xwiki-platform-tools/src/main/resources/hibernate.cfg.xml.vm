@@ -42,6 +42,12 @@
     <!-- Mapping files -->
     <mapping resource="$xwikiDbHbmXwiki"/>
     <mapping resource="$xwikiDbHbmFeeds"/>
+    #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
+    #foreach($mapping in $!xwikiDbHbmDefaultExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
     #end
     
     <!-- MySQL configuration.
@@ -58,6 +64,12 @@
     <property name="statement_cache.size">2</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
+    #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
+    #foreach($mapping in $!xwikiDbHbmMySQLExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
     -->
 
     <!-- HSQLDB configuration.
@@ -73,6 +85,12 @@
     <property name="statement_cache.size">2</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
+    #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
+    #foreach($mapping in $!xwikiDbHbmHSQLDBExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
     -->
 
     <!-- PostgreSQL configuration.
@@ -88,6 +106,12 @@
     <property name="statement_cache.size">2</property>
     <mapping resource="xwiki.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
+    #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
+    #foreach($mapping in $!xwikiDbHbmPostgreSQLExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
     -->
 
     <!-- Oracle configuration.
@@ -107,6 +131,12 @@
     <property name="hibernate.jdbc.batch_size">0</property>
     <mapping resource="xwiki.oracle.hbm.xml"/>
     <mapping resource="feeds.oracle.hbm.xml"/>
+    #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
+    #foreach($mapping in $!xwikiDbHbmOracleExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
     -->
 
     <!-- Derby configuration.
@@ -120,6 +150,12 @@
     <property name="statement_cache.size">2</property>
     <mapping resource="xwiki.derby.hbm.xml"/>
     <mapping resource="feeds.hbm.xml"/>
+    #foreach($mapping in $!xwikiDbHbmCommonExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
+    #foreach($mapping in $!xwikiDbHbmDerbyExtraMappings.split(","))
+    <mapping resource="$mapping"/>
+    #end
     -->
 
   </session-factory>

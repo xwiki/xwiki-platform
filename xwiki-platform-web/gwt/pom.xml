@@ -31,26 +31,19 @@
   <name>XWiki Platform - Web - GWT API</name>
   <packaging>jar</packaging>
   <description>The Common GWT API XWiki JAR</description>
+  <properties>
+    <gwtVersion>1.4.61</gwtVersion>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-servlet</artifactId>
-      <version>1.3.3</version>
+      <version>${gwtVersion}</version>
     </dependency>
     <dependency>
       <groupId>com.google.gwt</groupId>
       <artifactId>gwt-user</artifactId>
-      <version>1.3.3</version>
-      <!-- This JAR is used to generate JS files and shouldn't be included in the server side
-           WAR -->
-      <scope>provided</scope>
-    </dependency>
-    <!-- The GWT TK library is not in any Maven2 remote repository. For the time being we
-         have uploaded it in our custom Maven repository on http://maven.xwiki.org. -->
-    <dependency>
-      <groupId>gwttk</groupId>
-      <artifactId>gwttk</artifactId>
-      <version>0.2.2</version>
+      <version>${gwtVersion}</version>
       <!-- This JAR is used to generate JS files and shouldn't be included in the server side
            WAR -->
       <scope>provided</scope>

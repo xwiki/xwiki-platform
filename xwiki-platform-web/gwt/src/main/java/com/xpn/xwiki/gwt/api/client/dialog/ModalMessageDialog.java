@@ -1,7 +1,7 @@
-package com.xpn.xwiki.gwt.api.client.app;
-
-import asquare.gwt.tk.client.ui.ModalDialog;
+package com.xpn.xwiki.gwt.api.client.dialog;
 import com.google.gwt.user.client.ui.*;
+import com.xpn.xwiki.gwt.api.client.dialog.DefaultDialog;
+import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 
 /**
  * See the NOTICE file distributed with this work for additional
@@ -21,58 +21,41 @@ import com.google.gwt.user.client.ui.*;
  * License along with this software;if not,write to the Free
  * Software Foundation,Inc.,51 Franklin St,Fifth Floor,Boston,MA
  * 02110-1301 USA,or see the FSF site:http://www.fsf.org.
- *
- * @author ldubost
  */
 
 
-public class ModalMessageDialogBox {
+public class ModalMessageDialog extends DefaultDialog
+{
     private XWikiGWTApp app;
-    private ModalDialog dialog = new ModalDialog();
 
-    public ModalMessageDialogBox() {
+    public ModalMessageDialog() {
     }
 
-    public ModalMessageDialogBox(XWikiGWTApp app, String title, String msg){
+    public ModalMessageDialog(XWikiGWTApp app, String title, String msg){
         this(app, title, msg, null);
     }
 
-    public ModalMessageDialogBox(XWikiGWTApp app, String title, String msg, String styleName){
-       this.app = app;
-        dialog.setCaption(title, false);
+    public ModalMessageDialog(XWikiGWTApp app, String title, String msg, String styleName){
+        super(false, true);
+        this.app = app;
+        this.addStyleName("dialog-message");
+        this.setText(title);
         if (styleName!=null) {
             ScrollPanel scroll = new ScrollPanel();
             scroll.add(new Label(msg));
             scroll.addStyleName(styleName);
-            dialog.add(scroll);
+            this.add(scroll);
         } else {
-            dialog.add(new Label(msg));
+            this.add(new Label(msg));
         }
-        dialog.add(new CloseButton(dialog, app.getTranslation("Ok")));
-        dialog.show();
+        Button closeButton = new Button(this.app.getTranslation("Ok"));
+        closeButton.addClickListener(new ClickListener(){
+           public void onClick(Widget arg0)
+           {
+               ModalMessageDialog.this.hide();
+           }
+        });
+        this.add(closeButton);
+        this.show();
     }
-
-    class CloseListener implements ClickListener {
-        private final ModalDialog m_dialog;
-
-        public CloseListener(ModalDialog dialog)
-        {
-            m_dialog = dialog;
-        }
-
-        public void onClick(Widget sender)
-        {
-            m_dialog.hide();
-            m_dialog.removeFromParent();
-        }
-    }
-
-    class CloseButton extends Button {
-        public CloseButton(ModalDialog dialog, String msg)
-        {
-            super(msg);
-            addClickListener(new CloseListener(dialog));
-        }
-    }
-
 }

@@ -1,7 +1,5 @@
 package com.xpn.xwiki.gwt.api.client.dialog;
 
-import asquare.gwt.tk.client.ui.ModalDialog;
-import asquare.gwt.tk.client.ui.behavior.TabFocusController;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
 import com.xpn.xwiki.gwt.api.client.wizard.Wizard;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -30,7 +28,7 @@ import com.google.gwt.user.client.Window;
  * @author ldubost
  */
 
-public class Dialog extends ModalDialog {
+public class Dialog extends DefaultDialog {
     public static int BUTTON_CANCEL = 1;
     public static int BUTTON_PREVIOUS = 2;
     public static int BUTTON_NEXT = 4;
@@ -48,7 +46,6 @@ public class Dialog extends ModalDialog {
     protected String cancelText = "cancel";
     protected String previousText = "back";
     protected String nextText = "next";
-
 
     /**
      * Dialog
@@ -68,6 +65,7 @@ public class Dialog extends ModalDialog {
      * @param nextCallback Callback when dialog is finished
      */
     public Dialog(XWikiGWTApp app, String name, int buttonModes, AsyncCallback nextCallback) {
+        super(false, true);
         this.app = app;
         this.nextCallback = nextCallback;
         this.name = name;
@@ -75,8 +73,7 @@ public class Dialog extends ModalDialog {
         this.dialogTranslationName = name;
         this.buttonModes = buttonModes;
         addStyleName(getCSSName(null));
-        setCaption(app.getTranslation(dialogTranslationName + ".caption"), false);
-        removeController(getController(TabFocusController.class));
+        setText(app.getTranslation(dialogTranslationName + ".caption"));
     }
 
     public void setAsyncCallback(AsyncCallback nextCallback) {
@@ -118,6 +115,7 @@ public class Dialog extends ModalDialog {
                     cancelDialogAsBack();
                 }
             };
+
             Button cancel = new Button(app.getTranslation("button." + previousName));
             cancel.addClickListener(cancelListener);
             cancel.addStyleName(getCSSName(previousName));
@@ -241,7 +239,7 @@ public class Dialog extends ModalDialog {
 
     public void setDialogTranslationName(String dialogTranslationName) {
         this.dialogTranslationName = dialogTranslationName;
-        setCaption(app.getTranslation(dialogTranslationName + ".caption"), false);
+        setText(app.getTranslation(dialogTranslationName + ".caption"));
     }
 
     public String getCssPrefix() {

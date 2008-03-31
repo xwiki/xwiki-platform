@@ -1,8 +1,12 @@
-package com.xpn.xwiki.gwt.api.client.app;
+package com.xpn.xwiki.gwt.api.client.dialog;
 
-import asquare.gwt.tk.client.ui.ModalDialog;
+import com.google.gwt.user.client.ui.DialogBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Image;
+import com.xpn.xwiki.gwt.api.client.dialog.DefaultDialog;
+import com.xpn.xwiki.gwt.api.client.app.XWikiGWTApp;
+import com.xpn.xwiki.gwt.api.client.app.XWikiGWTAppConstants;
 
 /** See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -25,17 +29,15 @@ import com.google.gwt.user.client.ui.Image;
  * @author ldubost
  */
 
-public class LoadingDialog {
-    
+public class LoadingDialog {    
     private XWikiGWTApp app;
-    protected ModalDialog loadingPanel;
+    protected DefaultDialog loadingPanel;
     private int currentRequest = 0;
     private boolean disable = false;
 
     public LoadingDialog(XWikiGWTApp app) {
-            this.app = app;
+        this.app = app;
     }
-
 
     public void disable(){
         disable = true;
@@ -47,12 +49,13 @@ public class LoadingDialog {
 
     public void startLoading() {
         if (loadingPanel == null && !disable){
-            loadingPanel = new ModalDialog();
+            loadingPanel = new DefaultDialog(false, true);
             loadingPanel.addStyleName("dialog-loading");
             loadingPanel.add(new Label(app.getTranslation("loading.loading_msg")));
             String iconspinner = app.getTranslation("loading.loading_icon_spinner");
-            if (iconspinner.equals("loading.loading_icon_spinner"))
-             iconspinner = XWikiGWTAppConstants.LOADING_ICON_SPINNER;
+            if (iconspinner.equals("loading.loading_icon_spinner")) {
+                iconspinner = XWikiGWTAppConstants.LOADING_ICON_SPINNER;
+            }
             loadingPanel.add(new Image(app.getSkinFile(iconspinner)));
         }
 
@@ -60,11 +63,10 @@ public class LoadingDialog {
             loadingPanel.show();
         }
         currentRequest++;
-
     }
 
     public void finishLoading() {
-     currentRequest--;
+        currentRequest--;
         if (currentRequest <= 0 && loadingPanel != null) {
             loadingPanel.hide();
             loadingPanel.removeFromParent();
@@ -73,8 +75,5 @@ public class LoadingDialog {
         if (currentRequest < 0){
             currentRequest = 0;
         }
-
     }
-    
-
 }

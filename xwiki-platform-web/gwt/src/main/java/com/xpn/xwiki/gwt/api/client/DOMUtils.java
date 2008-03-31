@@ -38,7 +38,7 @@ public class DOMUtils {
     private static List getElementByTagName(Element parentEl, String tagName, List elms){
         for(int i = 0; i < DOM.getChildCount(parentEl); i++){
             Element el = DOM.getChild(parentEl, i);
-            if (DOM.getAttribute(el, "tagName").equalsIgnoreCase(tagName)){
+            if (DOM.getElementProperty(el, "tagName").equalsIgnoreCase(tagName)){
                 elms.add(el);
             }
             getElementByTagName(el, tagName, elms);
@@ -49,7 +49,7 @@ public class DOMUtils {
     public static Element getFirstElementByTagName(Element parentEl, String tagName){
         for(int i = 0; i < DOM.getChildCount(parentEl); i++){
             Element el = DOM.getChild(parentEl, i);
-            if (DOM.getAttribute(el, "tagName").equalsIgnoreCase(tagName)){
+            if (DOM.getElementProperty(el, "tagName").equalsIgnoreCase(tagName)){
                 return el;
             }
             getFirstElementByTagName(el, tagName);
@@ -73,7 +73,7 @@ public class DOMUtils {
         //algorithm from UIObject.setStyleName(...)
 
         // Get the current style string.
-        String elStyle = DOM.getAttribute(elem, "className");
+        String elStyle = DOM.getElementProperty(elem, "className");
         if (elStyle == null) {
           return false;
         }

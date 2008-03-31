@@ -1,14 +1,19 @@
 package com.xpn.xwiki.gwt.api.client.app;
 
-import com.xpn.xwiki.gwt.api.client.XWikiService;
 import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
+import com.xpn.xwiki.gwt.api.client.XWikiService;
+import com.xpn.xwiki.gwt.api.client.dialog.ModalMessageDialog;
+import com.xpn.xwiki.gwt.api.client.dialog.LoadingDialog;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.core.client.GWT;
+
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * See the NOTICE file distributed with this work for additional
@@ -37,9 +42,10 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
     protected LoadingDialog loadingDialog;
     protected XWikiServiceAsync serviceInstance;
     protected String name;
+    protected static Map _metaPropertiesMap = null;
 
     public XWikiGWTDefaultApp() {
-        loadingDialog = new com.xpn.xwiki.gwt.api.client.app.LoadingDialog(this);
+        loadingDialog = new LoadingDialog(this);
     }
 
 
@@ -54,23 +60,49 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
         this.name = name;
     }
 
+    private static native Map getMetaProperties(Map map) /*-{
+      var metas = $wnd.document.getElementsByTagName("meta");
+      var n = metas.length;
+      for (var i = 0; i < n; ++i) {
+         var meta = metas[i];
+         var name = meta.getAttribute("name");
+         if (name && name == "gwt:property") {
+            var content = meta.getAttribute("content");
+            if (content) {
+                var name = content;
+                var value = "";
+                var eq = content.indexOf("=");
+                if (eq != -1) {
+                    name  = content.substring(0, eq);
+                    value = content.substring(eq+1);
+                }
+                map.@java.util.Map::put(Ljava/lang/Object;Ljava/lang/Object;)(name,value);
+            } 
+         }
+      }
+      return map;
+   }-*/;
+
     /**
      * Native method in JavaScript to access gwt:property
      */
-    public static native String getProperty(String name) /*-{
-	 return $wnd.__gwt_getMetaProperty(name);
-     }-*/;
+    public static String getProperty(String name) {
+      if (_metaPropertiesMap == null) {
+          _metaPropertiesMap = getMetaProperties(new HashMap());
+      }
+      return (String) _metaPropertiesMap.get(name);
+    };
 
     public String getParam(String key) {
         return getParam(key, "");
     }
 
     public String getParam(String key, String defaultValue) {
-        String param = getProperty(key);
-        if ((param==null)||(param.equals("")))
-            return defaultValue;
-        else
-            return param;
+            String param = getProperty(key);
+            if ((param==null)||(param.equals("")))
+                return defaultValue;
+            else
+                return param;
     }
 
     public int getParamAsInt(String key) {
@@ -200,7 +232,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * @param cback Where to call previousStep after the translator is loaded.
      */
     public void checkTranslator(AsyncCallback cback) {
-        if (translator==null) {
+            if (translator==null) {
             // We need to disable the loading box
             // otherwise it shows without translations
             getLoadingDialog().disable();
@@ -220,7 +252,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * @param message
      */
     public void showDialog(String title, String message) {
-        new ModalMessageDialogBox(this, title, message);
+        new ModalMessageDialog(this, title, message);
     }
 
     /**
@@ -228,7 +260,7 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
      * @param message
      */
     public void showDialog(String message) {
-        new ModalMessageDialogBox(this, getTranslation("appname"), message);
+        new ModalMessageDialog(this, getTranslation("appname"), message);
     }
 
 

@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.plugin.activitystream.plugin;
 
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -31,6 +30,7 @@ import com.xpn.xwiki.plugin.activitystream.impl.ActivityStreamImpl;
  * Plug-in for for managing streams of activity events
  * 
  * @see ActivityStream
+ * @version $Id: $
  */
 public class ActivityStreamPlugin extends XWikiDefaultPlugin
 {

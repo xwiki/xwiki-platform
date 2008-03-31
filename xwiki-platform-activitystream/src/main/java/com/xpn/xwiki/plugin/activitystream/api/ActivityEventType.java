@@ -21,6 +21,8 @@ package com.xpn.xwiki.plugin.activitystream.api;
 
 /**
  * The type of request. This list is extensible.
+ * 
+ * @version $Id: $
  */
 public interface ActivityEventType
 {

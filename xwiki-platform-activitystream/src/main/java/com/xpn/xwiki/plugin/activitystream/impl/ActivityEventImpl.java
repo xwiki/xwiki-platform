@@ -23,10 +23,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.plugin.activitystream.api.ActivityEvent;
 
+/**
+ * @version $Id: $
+ */
 public class ActivityEventImpl implements ActivityEvent
 {
     protected String eventId;

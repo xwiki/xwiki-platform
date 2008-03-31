@@ -22,6 +22,8 @@ package com.xpn.xwiki.plugin.activitystream.api;
 /**
  * The priorities possible for an Activity Event. This allows to filter complex events by only
  * keeping the most high level event or by getting page level event.
+ * 
+ * @version $Id: $
  */
 public interface ActivityEventPriority
 {

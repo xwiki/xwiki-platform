@@ -60,6 +60,7 @@
         <module>swizzle</module>
         <module>spacemanager</module>
         <module>lucene</module>
+        <module>activitystream</module>
       </modules>
     </profile>
     <profile>
@@ -80,12 +81,23 @@
       </modules>
     </profile>
     <profile>
+      <!-- XWiki Workspaces -->
+      <id>xws</id>
+      <modules>
+        <module>application-manager</module>
+        <module>mailsender</module>
+        <module>spacemanager</module>
+        <module>activitystream</module>
+      </modules>
+    </profile>
+    <profile>
       <!-- Curriki -->
       <id>curriki</id>
       <modules>
         <module>scheduler</module>
         <module>mailsender</module>
         <module>spacemanager</module>
+        <module>activitystream</module>
       </modules>
     </profile>
   </profiles>

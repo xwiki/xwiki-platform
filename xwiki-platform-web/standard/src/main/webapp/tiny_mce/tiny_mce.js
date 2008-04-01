@@ -254,10 +254,20 @@ TinyMCE_Engine.prototype = {
 
 		// Only do this once
 		if (this.configs.length == 0) {
-			// Is Safari enabled
-			if (this.isSafari && this.getParam('safari_warning', false))
-				alert("Safari support is very limited and should be considered experimental.\nSo there is no need to even submit bugreports on this early version.\nYou can disable this message by setting: safari_warning option to false");
-
+		        // Is Safari enabled
+                        if (this.isSafari && this.getParam('safari_warning', true)) {
+                           if (this.getParam('safari_notsupported', true)) {
+                              if (this.getParam('safari_notsupported_message', '') != '')
+                                alert(this.getParam('safari_notsupported_message'));
+                              else 
+                                alert('Editing tools in this location are not supported by the Safari browser.\n\nPlease use the Firefox browser to take advantage of these features.'); 
+                           } else {
+                              if (this.getParam('safari_warning_message','') != '')
+                                alert(this.getParam('safari_warning_message'));
+                              else
+                                alert('Safari support is very limited and should be considered experimental.\nSo there is no need to even submit bugreports on this early version.');
+                           }
+                        }
 			if (typeof(TinyMCECompressed) == "undefined") {
 				tinyMCE.addEvent(window, "DOMContentLoaded", TinyMCE_Engine.prototype.onLoad);
 
@@ -276,6 +286,7 @@ TinyMCE_Engine.prototype = {
 		this.loadScript(tinyMCE.baseURL + '/themes/' + this.settings['theme'] + '/editor_template' + tinyMCE.srcMode + '.js');
 		this.loadScript(tinyMCE.baseURL + '/langs/' + this.settings['language'] +  '.js');
 		this.loadCSS(this.settings['editor_css']);
+
 
 		// Add plugins
 		var p = tinyMCE.getParam('plugins', '', true, ',');
@@ -498,6 +509,11 @@ TinyMCE_Engine.prototype = {
 	},
 
 	addMCEControl : function(replace_element, form_element_name, target_document) {
+                // Editor is currently not supported on Safari
+		if (this.isSafari) {
+ 		  return;
+                }
+
 		var id = "mce_editor_" + tinyMCE.idCounter++;
 		var inst = new TinyMCE_Control(tinyMCE.settings);
 

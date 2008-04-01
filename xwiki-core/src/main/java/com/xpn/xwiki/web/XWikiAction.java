@@ -22,6 +22,8 @@
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
+import java.util.Vector;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,6 +43,7 @@ import org.xwiki.observation.event.ActionExecutionEvent;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
@@ -117,17 +120,23 @@ public abstract class XWikiAction extends Action
             // Add the form to the context
             context.setForm((XWikiForm) form);
             XWiki xwiki = null;
+
+            // Verify that the wiki exists
             try {
                 xwiki = XWiki.getXWiki(context);
             } catch (XWikiException e) {
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
-                    // redirect
-                    String redirect = context.getWiki().Param("xwiki.virtual.redirect");
-                    response.sendRedirect(redirect);
+                    if (!sendGlobalRedirect(response, context.getURL().toString(), context))
+                        response.sendRedirect(context.getWiki().Param("xwiki.virtual.redirect"));
                     return null;
                 } else {
                     throw e;
                 }
+            }
+
+            // Send global redirection (if any)
+            if (sendGlobalRedirect(response, context.getURL().toString(), context)) {
+                return null;
             }
 
             // Start monitoring timer
@@ -363,6 +372,38 @@ public abstract class XWikiAction extends Action
             vcontext.put("cdoc", vcontext.get("doc"));
             vcontext.put("tdoc", rtdoc.newDocument(context));
         }
+    }
+
+    /**
+     * Send redirection based on a regexp pattern (if any) set at the main wiki level.
+     * To enable this feature you must add xwiki.preferences.redirect=1 to your xwiki.cfg
+     *
+     * @param response the servlet response
+     * @param url      url of the request
+     * @param context  the XWiki context
+     * @return true if a redirection has been sent
+     * @throws Exception
+     */
+    protected boolean sendGlobalRedirect(XWikiResponse response, String url, XWikiContext context)
+            throws Exception {
+        if ("1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
+            XWikiDocument globalPreferences = context.getWiki().getDocument("xwiki:XWiki.XWikiPreferences", context);
+            Vector redirects = globalPreferences.getObjects("XWiki.GlobalRedirect");
+
+            if (redirects != null) {
+                Iterator it = redirects.iterator();
+                while (it.hasNext()) {
+                    BaseObject redir = (BaseObject) it.next();
+                    String p = redir.getStringValue("pattern");
+                    if (url.matches(p)) {
+                        String dest = redir.getStringValue("destination");
+                        response.sendRedirect(url.replaceAll(p, dest));
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     protected void sendRedirect(XWikiResponse response, String page) throws XWikiException

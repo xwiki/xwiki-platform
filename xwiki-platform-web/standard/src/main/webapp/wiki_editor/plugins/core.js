@@ -383,7 +383,7 @@ WikiEditor.prototype.encodeNode = function(node) {
         s = "" + s;
         // Encoding wiki syntax to allow copy/pasting big text
         // without it being broken by the wiki syntax.
-        s = s.replace(/^(\s+)1/g, '&#49;');
+        s = s.replace(/^(\s*)1/g, '$1&#49;');
         s = s.replace(/\*/g, '&#42;');
         s = s.replace(/\~/g, '&#126;');
         s = s.replace(/\[/g, '&#91;');

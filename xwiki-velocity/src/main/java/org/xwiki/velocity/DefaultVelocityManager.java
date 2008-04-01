@@ -22,9 +22,11 @@ package org.xwiki.velocity;
 
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
+import org.apache.velocity.context.InternalContextAdapterImpl;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.runtime.log.LogChute;
+import org.apache.velocity.runtime.parser.node.SimpleNode;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -32,6 +34,7 @@ import org.xwiki.container.servlet.ServletApplicationContext;
 
 import java.util.Enumeration;
 import java.util.Properties;
+import java.io.StringReader;
 import java.io.Writer;
 import java.io.Reader;
 
@@ -49,6 +52,8 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     private Container container;
 
+    private RuntimeServices rsvc;
+    
     /**
      * {@inheritDoc}
      * @see VelocityManager#initialize(Properties)
@@ -110,23 +115,50 @@ public class DefaultVelocityManager extends AbstractLogEnabled
     public boolean evaluate(Context context, Writer out, String templateName,
         String source) throws XWikiVelocityException
     {
-        try {
+        return evaluate(context, out, templateName, new StringReader(source));
+/*        try {
             return getEngine().evaluate(context, out, templateName, source);
         } catch (Exception e) {
             throw new XWikiVelocityException("Failed to evaluate content with id [" + templateName
                 + "]", e);
         }
+        */
     }
 
     /**
      * {@inheritDoc}
      * @see VelocityManager#evaluate(Context, java.io.Writer, String, String)
+     * @see #init(RuntimeServices)
      */
     public boolean evaluate(Context context, Writer out, String templateName,
         Reader source) throws XWikiVelocityException
     {
+        // We override the default implementation here. See #init(RuntimeServices)
+        // for explanations.
         try {
-            return getEngine().evaluate(context, out, templateName, source);
+            SimpleNode nodeTree = null;
+
+            // The trick is done here: We use the signature that allows 
+            // passing a boolean and we pass false, thus preventing Velocity
+            // from cleaning the context of its velocimacros even though the
+            // config property velocimacro.permissions.allow.inline.local.scope
+            // is set to true.
+            nodeTree = this.rsvc.parse(source, templateName, false);
+
+            if (nodeTree != null) {
+                InternalContextAdapterImpl ica = new InternalContextAdapterImpl(context);
+                ica.pushCurrentTemplateName(templateName);
+                try {
+                    nodeTree.init(ica, this.rsvc);
+                    nodeTree.render(ica, out);
+                }
+                finally {
+                    ica.popCurrentTemplateName();
+                }
+                return true;
+            }
+
+            return false;
         } catch (Exception e) {
             throw new XWikiVelocityException("Failed to evaluate content with id [" + templateName
                 + "]", e);
@@ -147,7 +179,15 @@ public class DefaultVelocityManager extends AbstractLogEnabled
      */
     public void init(RuntimeServices runtimeServices)
     {
-        // Do nothing.
+        // We save the RuntimeServices instance in order to be able to override the
+        // VelocityEngine.evaluate() method. We need to do this so that it's possible 
+        // to make macros included with #includeMacros() work even though we're using 
+        // the Velocity setting:
+        //   velocimacro.permissions.allow.inline.local.scope = true
+        // TODO: Fix this when by rewriting the XWiki.include() implementation so that
+        // included Velocity templates are added to the current document before 
+        // evaluation instead of doing 2 separate executions.
+        this.rsvc = runtimeServices;
     }
 
     /**

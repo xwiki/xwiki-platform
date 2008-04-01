@@ -553,7 +553,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 context.setOriginalDatabase(appname);
 
                 try {
-                    // Let's make sure the virtaul wikis are upgraded to the latest database version
+                    // Let's make sure the virtual wikis are upgraded to the latest database version
                     xwiki.updateDatabase(appname, false, context);
                 } catch (HibernateException e) {
                     // Just to report it
@@ -802,6 +802,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             getSkinClass(context);
             getGlobalRightsClass(context);
             getStatsService(context);
+            if (context.getDatabase().equals(context.getMainXWiki())
+                    && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
+                getRedirectClass(context);
+            }
         }
 
         // Add a notification for notifications
@@ -2433,6 +2437,41 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         if (needsUpdate)
             saveDocument(doc, context);
+        return bclass;
+    }
+
+    /**
+     * Verify if the <code>XWiki.GlobalRedirect</code> page exists and that it contains all the
+     * required configuration properties to make the redirection feature work properly. If some properties are missing
+     * they are created and saved in the database.
+     *
+     * @param context the XWiki Context
+     * @return the GlobalRedirect Base Class object containing the properties
+     * @throws XWikiException if an error happens during the save to the datavase
+     */
+    public BaseClass getRedirectClass(XWikiContext context) throws XWikiException {
+        XWikiDocument doc;
+        boolean needsUpdate = false;
+
+        doc = getDocument("XWiki.GlobalRedirect", context);
+
+        BaseClass bclass = doc.getxWikiClass();
+        if (context.get("initdone") != null) {
+            return bclass;
+        }
+
+        bclass.setName("XWiki.GlobalRedirect");
+        needsUpdate |= bclass.addTextField("pattern", "Pattern", 30);
+        needsUpdate |= bclass.addTextField("destination", "Destination", 30);
+        String content = doc.getContent();
+        if ((content == null) || (content.equals(""))) {
+            needsUpdate = true;
+            doc.setContent("1 XWiki Global Redirect Class");
+        }
+
+        if (needsUpdate) {
+            saveDocument(doc, context);
+        }
         return bclass;
     }
 

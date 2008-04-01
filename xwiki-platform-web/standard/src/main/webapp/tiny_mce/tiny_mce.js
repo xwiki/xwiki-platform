@@ -254,10 +254,20 @@ TinyMCE_Engine.prototype = {
 
 		// Only do this once
 		if (this.configs.length == 0) {
-			// Is Safari enabled
-			if (this.isSafari && this.getParam('safari_warning', false))
-				alert("Safari support is very limited and should be considered experimental.\nSo there is no need to even submit bugreports on this early version.\nYou can disable this message by setting: safari_warning option to false");
-
+		        // Is Safari enabled
+                        if (this.isSafari && this.getParam('safari_warning', true)) {
+                           if (this.getParam('safari_notsupported', true)) {
+                              if (this.getParam('safari_notsupported_message', '') != '')
+                                alert(this.getParam('safari_notsupported_message'));
+                              else 
+                                alert('Editing tools in this location are not supported by the Safari browser.\n\nPlease use the Firefox browser to take advantage of these features.'); 
+                           } else {
+                              if (this.getParam('safari_warning_message','') != '')
+                                alert(this.getParam('safari_warning_message'));
+                              else
+                                alert('Safari support is very limited and should be considered experimental.\nSo there is no need to even submit bugreports on this early version.');
+                           }
+                        }
 			if (typeof(TinyMCECompressed) == "undefined") {
 				tinyMCE.addEvent(window, "DOMContentLoaded", TinyMCE_Engine.prototype.onLoad);
 
@@ -276,6 +286,7 @@ TinyMCE_Engine.prototype = {
 		this.loadScript(tinyMCE.baseURL + '/themes/' + this.settings['theme'] + '/editor_template' + tinyMCE.srcMode + '.js');
 		this.loadScript(tinyMCE.baseURL + '/langs/' + this.settings['language'] +  '.js');
 		this.loadCSS(this.settings['editor_css']);
+
 
 		// Add plugins
 		var p = tinyMCE.getParam('plugins', '', true, ',');
@@ -498,6 +509,11 @@ TinyMCE_Engine.prototype = {
 	},
 
 	addMCEControl : function(replace_element, form_element_name, target_document) {
+                // Editor is currently not supported on Safari
+		if (this.isSafari) {
+ 		  return;
+                }
+
 		var id = "mce_editor_" + tinyMCE.idCounter++;
 		var inst = new TinyMCE_Control(tinyMCE.settings);
 
@@ -1065,9 +1081,13 @@ TinyMCE_Engine.prototype = {
 
 				// Insert P element
                 var selectedDiv = tinyMCE.getParentElement(tinyMCE.selectedInstance.selection.getFocusElement(), "div");
+                var isInTable = tinyMCE.getParentElement(tinyMCE.selectedInstance.selection.getFocusElement(), "table");
                 if (tinyMCE.isGecko && tinyMCE.settings['force_p_newlines'] && e.keyCode == 13 && !e.shiftKey) {
                     if (selectedDiv && (selectedDiv.className == 'code')) {
                         return false;
+                    }
+                    if (isInTable) {
+                          return false;
                     }
 					// Insert P element instead of BR
 					if (TinyMCE_ForceParagraphs._insertPara(tinyMCE.selectedInstance, e)) {
@@ -1090,7 +1110,7 @@ TinyMCE_Engine.prototype = {
 				}
 
 				// Return key pressed
-				if (tinyMCE.isMSIE && selectedDiv && (selectedDiv.className == 'code') && e.keyCode == 13 && !e.shiftKey) {
+            	if (tinyMCE.isMSIE && selectedDiv && (selectedDiv.className == 'code') && e.keyCode == 13 && !e.shiftKey) {
                     if (e.target.editorId)
 						tinyMCE.selectedInstance = tinyMCE.instances[e.target.editorId];
 
@@ -1117,7 +1137,34 @@ TinyMCE_Engine.prototype = {
 					}
 				}
 
-				// Backspace or delete
+                if (tinyMCE.isMSIE && isInTable && e.keyCode == 13 && !e.shiftKey) {
+                    if (e.target.editorId)
+                        tinyMCE.selectedInstance = tinyMCE.instances[e.target.editorId];
+
+                    if (tinyMCE.selectedInstance) {
+                        var sel = tinyMCE.selectedInstance.getDoc().selection;
+                        var rng = sel.createRange();
+
+
+                        if (tinyMCE.getParentElement(rng.parentElement(), "li") != null)
+                            return false;
+
+                                   // Cancel event
+                        e.returnValue = false;
+                        e.cancelBubble = true;
+
+                                    // Insert BR element
+                        rng.pasteHTML("<br />");
+                        rng.collapse(false);
+                        rng.select();
+
+                        tinyMCE.execCommand("mceAddUndoLevel");
+                        tinyMCE.triggerNodeChange(false);
+                        return false;
+                    }
+                }
+
+                // Backspace or delete
 				if (e.keyCode == 8 || e.keyCode == 46) {
 					tinyMCE.selectedElement = e.target;
 					tinyMCE.linkElement = tinyMCE.getParentElement(e.target, "a");

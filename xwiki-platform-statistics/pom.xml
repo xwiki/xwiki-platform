@@ -27,26 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.applications</groupId>
     <artifactId>xwiki-applications</artifactId>
-    <version>12-SNAPSHOT</version>
+    <version>11</version>
   </parent>
   <artifactId>xwiki-application-statistics</artifactId>
   <name>XWiki Platform - Applications - Statistics</name>
   <version>1.1-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Panels and pages providing XWiki statistics</description>
-  <dependencies>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform.applications</groupId>
-      <artifactId>xwiki-application-panels</artifactId>
-      <version>1.3</version>
-      <type>xar</type>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>1.2-SNAPSHOT</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
 </project>

@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>8</version>
   </parent>
   <artifactId>xwiki-packager-plugin</artifactId>
   <name>XWiki Platform - Tools - Packager</name>
@@ -47,7 +47,7 @@
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
       <!-- We're using a fixed version as otherwise we have a circular dependency on XWiki Core -->
-      <version>1.3</version>
+      <version>1.3.1</version>
     </dependency>
   </dependencies>
   <build>
@@ -60,7 +60,7 @@
           <dependency>
             <groupId>com.xpn.xwiki.platform.tools</groupId>
             <artifactId>xwiki-verification-resources</artifactId>
-            <version>1.9-SNAPSHOT</version>
+            <version>1.8</version>
           </dependency>
         </dependencies>
       </plugin>

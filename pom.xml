@@ -246,11 +246,6 @@
     <!-- Standard dependencies found in the central repository -->
 
     <dependency>
-      <groupId>velocity</groupId>
-      <artifactId>velocity</artifactId>
-      <version>1.5</version>
-    </dependency>
-    <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
       <version>1.1.1</version>

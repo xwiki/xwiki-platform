@@ -17,7 +17,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;?<\/p>/gi), "\\\\\r\n");
 
-    this.addExternalProcessor((/\\\\(\r\n)+/gi), '<br />\r\n');
+    this.addExternalProcessor((/\\\\(\r?)(\n?)/gi), '<br />$1$2');
     this.addExternalProcessor((/\\\\/gi), '<br />');
 
     this.addExternalProcessor((/----(-*)/i), 'convertHRExternal');
@@ -950,7 +950,7 @@ WikiEditor.prototype.convertParagraphInternal = function(regexp, result, content
 WikiEditor.prototype.PARAGRAPH_CLASS_NAME = "paragraph";
 
 WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content) {
-	var lines = this._getLines(content);
+    var lines = this._getLines(content);
 	var str="";
 	var line = "";
 	var insideP = false;
@@ -964,9 +964,9 @@ WikiEditor.prototype.convertParagraphExternal = function(regexp, result, content
     for(var i=0; i < lines.length; i++) {
 		// Consume blank spaces
 		line = lines[i];
-		var hh = this._hasHTML(line);
-        var hbr = this._onlyHasBr(line);
         line = line.replace(/(\r$)|(\n$)|(\r\n$)/gi, "");
+        var hh = this._hasHTML(line);
+        var hbr = this._onlyHasBr(line);
         if(line != "" && (!hh || hbr)) {
             if(!insideP) {
 				insideP=true;

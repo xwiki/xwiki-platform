@@ -75,23 +75,6 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <!-- We need to generate the source JAR as it'll be needed by the GWT module that depends
-           on this as the GWT compiler needs the sources to generate the JS files -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   <repositories>
     <repository>
       <id>gwt-maven</id>

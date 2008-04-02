@@ -8,16 +8,24 @@ com.xpn.xwiki.plugin.laszlo.LaszloMacro
 com.xpn.xwiki.plugin.graphviz.GraphVizMacro
 com.xpn.xwiki.plugin.svg.SVGMacro
 com.xpn.xwiki.plugin.charts.ChartingMacro
-org.radeox.macro.ApiDocMacro
-org.radeox.macro.ApiMacro
-org.radeox.macro.XrefMacro
-org.radeox.macro.AsinMacro
-org.radeox.macro.FilePathMacro
-org.radeox.macro.IsbnMacro
 com.xpn.xwiki.render.macro.LinkMacro
 org.radeox.macro.MailToMacro
 org.radeox.macro.QuoteMacro
-org.radeox.macro.RfcMacro
 com.xpn.xwiki.render.macro.TableMacro
-org.radeox.macro.InterWikiMacro
-org.radeox.macro.XrefMacro
+## Link to APIs: {api:java.lang.String} will link to the String class in the Sun Java Documentation
+## This one is quite useful, it should be configured to link to the online XWiki javadoc.
+org.radeox.macro.ApiMacro
+## List configured interwiki targets.
+# org.radeox.macro.InterWikiMacro
+## List registered API locations: {api-docs} will display a table with the configured API locations. The configuration is done in a file called apidocs.txt
+# org.radeox.macro.ApiDocMacro
+## Link to XRef pages
+# org.radeox.macro.XrefMacro
+## Amazon Standard Identification Number: {asin:ASIN-VALUE-HERE} will create a link to a product on Amazon
+# org.radeox.macro.AsinMacro
+## Link to books based on ISBN: {isbn:ISBN-VALUE-HERE} will create a link to a book on Amazon
+# org.radeox.macro.IsbnMacro
+## Link to RFC documents: {rfc:2616} will link to the HTTP 1.1 protocol RFC
+# org.radeox.macro.RfcMacro
+## Displays a file path. Doesn't seem to work, though.
+# org.radeox.macro.FilePathMacro

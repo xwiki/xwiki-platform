@@ -28,7 +28,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>7-SNAPSHOT</version>
+    <version>6</version>
   </parent>
   <artifactId>xwiki-plugin-spacemanager</artifactId>
   <version>1.1-SNAPSHOT</version>
@@ -51,7 +51,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-mailsender</artifactId>
-      <version>1.1-SNAPSHOT</version>
+      <version>1.1</version>
     </dependency>
     <dependency>
       <groupId>javax.servlet</groupId>

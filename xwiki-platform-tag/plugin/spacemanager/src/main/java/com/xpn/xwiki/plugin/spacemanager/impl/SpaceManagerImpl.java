@@ -736,25 +736,39 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     public void deleteSpace(String spaceName, boolean deleteData, XWikiContext context)
         throws SpaceManagerException
     {
-        if (deleteData) {
-            // we are not implementing full delete yet
-            throw new SpaceManagerException(SpaceManagerException.MODULE_PLUGIN_SPACEMANAGER,
-                SpaceManagerException.ERROR_XWIKI_NOT_IMPLEMENTED,
-                "Not implemented");
-        }
         Space space = getSpace(spaceName, context);
 
-        // execute pre delete actions
-        if (getSpaceManagerExtension().preDeleteSpace(space.getSpaceName(), deleteData, context)) {
-            if (!space.isNew()) {
-                space.setType("deleted");
+        if (deleteData) {
+            if (getSpaceManagerExtension().preDeleteSpace(space.getSpaceName(), true,
+                context)) {
+                // search for all documents in the space
+                String hql = "where doc.web = '" + space.getSpaceName() + "'";
                 try {
-                    space.saveWithProgrammingRights();
-                    // execute post delete actions
-                    getSpaceManagerExtension().postDeleteSpace(space.getSpaceName(), deleteData,
+                    List spaceDocs = context.getWiki().getStore().searchDocuments(hql, context);
+                    for (Iterator it = spaceDocs.iterator(); it.hasNext();) {
+                        XWikiDocument toBeDeleted = (XWikiDocument) it.next();
+                        context.getWiki().deleteDocument(toBeDeleted, context);
+                    }
+                    getSpaceManagerExtension().postDeleteSpace(space.getSpaceName(), true,
                         context);
                 } catch (XWikiException e) {
                     throw new SpaceManagerException(e);
+                }
+            }
+        } else {
+            // execute pre delete actions
+            if (getSpaceManagerExtension().preDeleteSpace(space.getSpaceName(), deleteData,
+                context)) {
+                if (!space.isNew()) {
+                    space.setType("deleted");
+                    try {
+                        space.saveWithProgrammingRights();
+                        // execute post delete actions
+                        getSpaceManagerExtension().postDeleteSpace(space.getSpaceName(),
+                            deleteData, context);
+                    } catch (XWikiException e) {
+                        throw new SpaceManagerException(e);
+                    }
                 }
             }
         }

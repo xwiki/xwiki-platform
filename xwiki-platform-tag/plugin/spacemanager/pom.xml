@@ -31,7 +31,7 @@
     <version>6</version>
   </parent>
   <artifactId>xwiki-plugin-spacemanager</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <name>XWiki Platform - Plugins - Space Manager</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Space Manager</description>
@@ -60,4 +60,10 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-spacemanager-1.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-spacemanager-1.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-spacemanager-1.1</url>
+  </scm>
 </project>      

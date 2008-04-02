@@ -163,4 +163,40 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
           assertEquals("a<br/><p/>\nb", result);
       }
 
+    public void testRenderNewline() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("a\\\\b", contentDocument, document, context);
+        assertEquals("a<br/>b", result);
+    }
+
+    public void testRenderNewlineWithCarriageReturn() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("a\\\\\nb", contentDocument, document, context);
+        assertEquals("a<br/>b", result);
+    }
+
+    public void testRenderTwoNewline() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("a\\\\\\\\b", contentDocument, document, context);
+        assertEquals("a<br/><br/>b", result);
+    }
+
+    public void testRenderTwoNewlineWithCarriageReturn() throws Exception
+    {
+        // This is required just to return the current space...
+        Mock mockCurrentDocument = mock(XWikiDocument.class);
+        this.context.setDoc((XWikiDocument) mockCurrentDocument.proxy());
+        String result = renderer.render("a\\\\\\\\\nb", contentDocument, document, context);
+        assertEquals("a<br/><br/>b", result);
+    }
+
 }

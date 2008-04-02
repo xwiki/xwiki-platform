@@ -232,8 +232,9 @@ public class XWikiWikiBaseRenderer implements XWikiRenderer {
           ls.dumpCurrentList(output, true);
 
         // PLUGIN: call endRenderingHandler at the end with the full content
-        output.append(plugins.endRenderingHandler("", context));
-        return preTagSubst.insertNonWikiText(output.toString());
+        String result = output.toString();
+        result = plugins.endRenderingHandler(result, context);
+        return preTagSubst.insertNonWikiText(result);
     }
 
     public void flushCache() {

@@ -27,11 +27,11 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.tools</groupId>
     <artifactId>xwiki-tools</artifactId>
-    <version>9-SNAPSHOT</version>
+    <version>8</version>
   </parent>
   <artifactId>xwiki-shared-tests</artifactId>
   <name>XWiki Platform - Tools - Build - Shared Test</name>
-  <version>1.9-SNAPSHOT</version>
+  <version>1.9</version>
   <packaging>jar</packaging>
   <description>Test framework classes shared between functional test modules</description>
   <dependencies>
@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-plexus</artifactId>
-      <version>1.4-SNAPSHOT</version>
+      <version>1.3.1</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
@@ -61,4 +61,10 @@
       <version>1.7.0</version>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-shared-tests-1.9</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-shared-tests-1.9</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-shared-tests-1.9</url>
+  </scm>
 </project>

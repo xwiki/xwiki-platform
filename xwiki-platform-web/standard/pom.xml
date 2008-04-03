@@ -3,7 +3,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-web</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4-milestone-1</version>
   </parent>
   <artifactId>xwiki-web-standard</artifactId>
   <name>XWiki Platform - Web - Standard</name>
@@ -80,7 +80,7 @@
             </goals>
             <configuration>
               <tasks>
-                <mkdir dir="${project.build.directory}/skin"/>
+                <mkdir dir="${project.build.directory}/skin" />
               </tasks>
             </configuration>
           </execution>

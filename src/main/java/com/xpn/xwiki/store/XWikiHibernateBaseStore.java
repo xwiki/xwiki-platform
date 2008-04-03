@@ -993,7 +993,7 @@ public class XWikiHibernateBaseStore
     /**
      * Callback (closure) interface for operations in hibernate. spring like.
      */
-    public interface HibernateCallback
+    public interface HibernateCallback<T>
     {
         /**
          * method executed by {@link XWikiHibernateBaseStore} and pass open session to it.
@@ -1004,7 +1004,7 @@ public class XWikiHibernateBaseStore
          * @throws HibernateException if any store specific exception
          * @throws XWikiException if exception in xwiki.
          */
-        Object doInHibernate(Session session) throws HibernateException, XWikiException;
+        T doInHibernate(Session session) throws HibernateException, XWikiException;
     }
 
     /**
@@ -1017,8 +1017,8 @@ public class XWikiHibernateBaseStore
      * @param cb - callback to execute
      * @throws XWikiException if any error
      */
-    public Object execute(XWikiContext context, boolean bTransaction, boolean doCommit,
-        HibernateCallback cb) throws XWikiException
+    public <T> T execute(XWikiContext context, boolean bTransaction, boolean doCommit,
+        HibernateCallback<T> cb) throws XWikiException
     {
         MonitorPlugin monitor = Util.getMonitorPlugin(context);
         try {
@@ -1068,7 +1068,7 @@ public class XWikiHibernateBaseStore
      * @see #execute(XWikiContext, boolean, boolean,
      *      com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback)
      */
-    public Object executeRead(XWikiContext context, boolean bTransaction, HibernateCallback cb)
+    public <T> T executeRead(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb)
         throws XWikiException
     {
         return execute(context, bTransaction, false, cb);
@@ -1085,7 +1085,7 @@ public class XWikiHibernateBaseStore
      * @see #execute(XWikiContext, boolean, boolean,
      *      com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback)
      */
-    public Object executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback cb)
+    public <T> T executeWrite(XWikiContext context, boolean bTransaction, HibernateCallback<T> cb)
         throws XWikiException
     {
         return execute(context, bTransaction, true, cb);

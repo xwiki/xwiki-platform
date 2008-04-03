@@ -83,11 +83,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
             XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
             if (archive == null)
                 return new Version[0];
-            Collection nodes = archive.getNodes();
+            Collection<XWikiRCSNodeInfo> nodes = archive.getNodes();
             Version[] versions = new Version[nodes.size()];
-            Iterator it = nodes.iterator();
+            Iterator<XWikiRCSNodeInfo> it = nodes.iterator();
             for (int i = 0; i < versions.length; i++) {
-                XWikiRCSNodeInfo node = (XWikiRCSNodeInfo) it.next();
+                XWikiRCSNodeInfo node = it.next();
                 versions[versions.length - 1 - i] = node.getId().getVersion();
             }
             return versions;
@@ -137,7 +137,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         XWikiContext context) throws XWikiException
     {
         try {
-            List nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), bTransaction);
+            List<XWikiRCSNodeInfo> nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), bTransaction);
             archivedoc.setNodes(nodes);
         } catch (Exception e) {
             Object[] args = {new Long(archivedoc.getId())};
@@ -152,22 +152,22 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
-        executeWrite(context, bTransaction, new HibernateCallback()
+        executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                for (Iterator it = archivedoc.getDeletedNodeInfo().iterator(); it.hasNext();) {
-                    XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+                for (Iterator<XWikiRCSNodeInfo> it = archivedoc.getDeletedNodeInfo().iterator(); it.hasNext();) {
+                    XWikiRCSNodeInfo nodeInfo = it.next();
                     session.delete(nodeInfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdatedNodeInfos().iterator(); it.hasNext();) {
-                    XWikiRCSNodeInfo nodeInfo = (XWikiRCSNodeInfo) it.next();
+                for (Iterator<XWikiRCSNodeInfo> it = archivedoc.getUpdatedNodeInfos().iterator(); it.hasNext();) {
+                    XWikiRCSNodeInfo nodeInfo = it.next();
                     session.saveOrUpdate(nodeInfo);
                     it.remove();
                 }
-                for (Iterator it = archivedoc.getUpdatedNodeContents().iterator(); it.hasNext();) {
-                    XWikiRCSNodeContent nodeContent = (XWikiRCSNodeContent) it.next();
+                for (Iterator<XWikiRCSNodeContent> it = archivedoc.getUpdatedNodeContents().iterator(); it.hasNext();) {
+                    XWikiRCSNodeContent nodeContent = it.next();
                     session.update(nodeContent);
                     it.remove();
                 }
@@ -204,7 +204,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction,
         final XWikiContext context) throws XWikiException
     {
-        executeWrite(context, true, new HibernateCallback()
+        executeWrite(context, true, new HibernateCallback<Object>()
         {
             public Object doInHibernate(Session session) throws HibernateException,
                 XWikiException
@@ -239,12 +239,13 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    protected List loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
+    protected List<XWikiRCSNodeInfo> loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
         throws XWikiException
     {
-        return (List) executeRead(context, bTransaction, new HibernateCallback()
+        return executeRead(context, bTransaction, new HibernateCallback<List<XWikiRCSNodeInfo>>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            @SuppressWarnings("unchecked")
+            public List<XWikiRCSNodeInfo> doInHibernate(Session session) throws HibernateException
             {
                 try {
                     return session.createCriteria(XWikiRCSNodeInfo.class).add(
@@ -265,9 +266,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public XWikiRCSNodeContent loadRCSNodeContent(final XWikiRCSNodeId id, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
-        return (XWikiRCSNodeContent) executeRead(context, bTransaction, new HibernateCallback()
+        return executeRead(context, bTransaction, new HibernateCallback<XWikiRCSNodeContent>()
         {
-            public Object doInHibernate(Session session) throws HibernateException
+            public XWikiRCSNodeContent doInHibernate(Session session) throws HibernateException
             {
                 XWikiRCSNodeContent content = new XWikiRCSNodeContent(id);
                 session.load(content, content.getId());
@@ -282,7 +283,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     public void deleteArchive(final XWikiDocument doc, boolean bTransaction, XWikiContext context)
         throws XWikiException
     {
-        executeWrite(context, bTransaction, new HibernateCallback()
+        executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
             public Object doInHibernate(Session session) throws HibernateException,
                 XWikiException

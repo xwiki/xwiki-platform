@@ -39,7 +39,7 @@
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-watchlist</artifactId>
       <!-- We want to release the Watchlist plugin and application together. Hence they should have the same version -->
-      <version>1.4-SNAPSHOT</version>
+      <version>1.4</version>
       <scope>runtime</scope>
     </dependency>
   </dependencies>

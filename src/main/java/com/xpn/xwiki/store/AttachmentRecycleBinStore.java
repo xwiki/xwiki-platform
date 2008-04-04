@@ -20,6 +20,7 @@
 package com.xpn.xwiki.store;
 
 import java.util.Date;
+import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -95,7 +96,7 @@ public interface AttachmentRecycleBinStore
      * @param bTransaction Should use old transaction (false) or create new (true).
      * @throws XWikiException If an error occurs while loading or restoring the attachments.
      */
-    DeletedAttachment[] getAllDeletedAttachments(XWikiAttachment attachment,
+    List<DeletedAttachment> getAllDeletedAttachments(XWikiAttachment attachment,
         XWikiContext context, boolean bTransaction) throws XWikiException;
 
     /**
@@ -107,7 +108,7 @@ public interface AttachmentRecycleBinStore
      * @param bTransaction Should use old transaction (false) or create new (true).
      * @throws XWikiException If an error occurs while loading or restoring the attachments.
      */
-    DeletedAttachment[] getAllDeletedAttachments(XWikiDocument doc, XWikiContext context,
+    List<DeletedAttachment> getAllDeletedAttachments(XWikiDocument doc, XWikiContext context,
         boolean bTransaction) throws XWikiException;
 
     /**

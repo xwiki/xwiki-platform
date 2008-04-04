@@ -81,6 +81,12 @@ public class XWikiMessageTool
     private static final String KEY = "documentBundles";
 
     /**
+     * Format string for the error message used to log load failures.
+     */
+    private static final String LOAD_ERROR_MSG_FMT =
+        "Failed to load internationalization document bundle [ %s ].";
+
+    /**
      * The default Resource Bundle to fall back to if no document bundle is found when trying to get
      * a key.
      */
@@ -223,8 +229,8 @@ public class XWikiMessageTool
                         // The document listed as a document bundle doesn't exist. Do nothing
                         // and log.
                         LOG.warn("The document [" + docBundle.getFullName() + "] is listed "
-                                + "as an internationalization document bundle but it does not "
-                                + "exist.");
+                            + "as an internationalization document bundle but it does not "
+                            + "exist.");
                     }
                 }
             }
@@ -233,9 +239,9 @@ public class XWikiMessageTool
     }
 
     /**
-     * Helper method to help get a translated version of a document. It handles any exception
-     * raised to make it easy to use.
-     *  
+     * Helper method to help get a translated version of a document. It handles any exception raised
+     * to make it easy to use.
+     * 
      * @param documentName the document's name (eg Space.Document)
      * @return the document object corresponding to the passed document's name. A translated version
      *         of the document for the current Locale is looked for.
@@ -255,8 +261,7 @@ public class XWikiMessageTool
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOG.error("Failed to load internationalization document bundle [" + documentName
-                    + "].", e);
+                LOG.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
                 docBundle = null;
             }
         }
@@ -264,28 +269,28 @@ public class XWikiMessageTool
         return docBundle;
     }
 
-
-     /**
-     * Helper method to help get a translated version of a document. It handles any exception
-     * raised to make it easy to use.
-     *
+    /**
+     * Helper method to help get a translated version of a document. It handles any exception raised
+     * to make it easy to use.
+     * 
      * @param documentName the document's name (eg Space.Document)
+     * @param defaultLanguage default language
      * @return the document object corresponding to the passed document's name. A translated version
      *         of the document for the current Locale is looked for.
      */
     public List getDocumentBundles(String documentName, String defaultLanguage)
     {
-        ArrayList list = new ArrayList();
+        List list = new ArrayList();
 
         if (documentName.length() != 0) {
             try {
                 // First, looks for a document suffixed by the language
-                XWikiDocument docBundle = 
+                XWikiDocument docBundle =
                     this.context.getWiki().getDocument(documentName, this.context);
                 XWikiDocument tdocBundle = docBundle.getTranslatedDocument(this.context);
                 list.add(tdocBundle);
                 if (!tdocBundle.getRealLanguage().equals(defaultLanguage)) {
-                    XWikiDocument defdocBundle = 
+                    XWikiDocument defdocBundle =
                         docBundle.getTranslatedDocument(defaultLanguage, this.context);
                     if (tdocBundle != defdocBundle) {
                         list.add(defdocBundle);
@@ -296,15 +301,19 @@ public class XWikiMessageTool
                 // Error while loading the document.
                 // TODO: A runtime exception should be thrown that will bubble up till the
                 // topmost level. For now simply log the error
-                LOG.error("Failed to load internationalization document bundle [" + documentName
-                    + "].", e);
+                LOG.error(String.format(LOAD_ERROR_MSG_FMT, documentName), e);
             }
         }
 
         return list;
     }
 
-    public Properties getDocumentBundleProperties(XWikiDocument docBundle) {
+    /**
+     * @param docBundle the document bundle.
+     * @return properties of the document bundle.
+     */
+    public Properties getDocumentBundleProperties(XWikiDocument docBundle)
+    {
         Properties props = new Properties();
         String content = docBundle.getContent();
         byte[] docContent;

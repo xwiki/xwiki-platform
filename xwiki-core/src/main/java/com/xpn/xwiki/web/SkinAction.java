@@ -20,6 +20,13 @@
  */
 package com.xpn.xwiki.web;
 
+import java.io.IOException;
+import java.util.Date;
+
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -27,12 +34,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.util.Util;
-import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.io.IOException;
-import java.util.Date;
 
 /**
  * <p>
@@ -80,7 +81,7 @@ public class SkinAction extends XWikiAction
             LOG.debug("document: " + doc.getFullName() + " ; baseskin: " + baseskin
                 + " ; defaultbaseskin: " + defaultbaseskin);
         }
-        
+
         int idx = path.lastIndexOf(DELIMITER);
         boolean found = false;
         while (idx > 0) {

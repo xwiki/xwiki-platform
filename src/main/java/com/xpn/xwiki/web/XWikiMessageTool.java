@@ -208,7 +208,7 @@ public class XWikiMessageTool
         String defaultLanguage = context.getWiki().getDefaultLanguage(context);
         List<XWikiDocument> result = new ArrayList<XWikiDocument>();
         for (String docName : getDocumentBundleNames()) {
-            for (XWikiDocument docBundle : getDocumentBundles(docName, defaultLanguage)) {
+            for (XWikiDocument docBundle : getDocumentBundles(docName.trim(), defaultLanguage)) {
                 if (docBundle != null) {
                     if (!docBundle.isNew()) {
                         // Checks for a name update

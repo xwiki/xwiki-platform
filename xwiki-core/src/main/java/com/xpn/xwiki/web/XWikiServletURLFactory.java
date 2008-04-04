@@ -33,6 +33,8 @@ import org.apache.commons.logging.LogFactory;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
@@ -460,12 +462,13 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (context.getWiki().hasAttachmentRecycleBin(context) && filename != null) {
             attachment = rdoc.getAttachment(filename);
             if (attachment != null) {
-                DeletedAttachment[] deleted =
+                List<DeletedAttachment> deleted =
                     context.getWiki().getAttachmentRecycleBinStore().getAllDeletedAttachments(
                         attachment, context, true);
-                for (int i = deleted.length - 1; i >= 0; --i) {
-                    if (deleted[i].getDate().after(rdoc.getDate())) {
-                        return deleted[i].getId();
+                Collections.reverse(deleted);
+                for (DeletedAttachment entry : deleted) {
+                    if (entry.getDate().after(rdoc.getDate())) {
+                        return entry.getId();
                     }
                 }
             }

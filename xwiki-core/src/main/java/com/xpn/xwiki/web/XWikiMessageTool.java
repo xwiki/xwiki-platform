@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -102,14 +101,14 @@ public class XWikiMessageTool
      * Cache properties loaded from the document bundles for maximum efficiency. The map is of type
      * (Long, Properties) where Long is the XWiki document ids.
      */
-    private Map propsCache = new HashMap();
+    private Map<Long, Properties> propsCache = new HashMap<Long, Properties>();
 
     /**
      * Cache for saving the last modified dates of document bundles that have been loaded. This is
      * used so that we can reload them if they've been modified since last time they were cached.
      * The map is of type (Long, Date) where Long is the XWiki document ids.
      */
-    private Map previousDates = new HashMap();
+    private Map<Long, Date> previousDates = new HashMap<Long, Date>();
 
     /**
      * List of document bundles that have been modified since the last time they were cached. The
@@ -117,7 +116,7 @@ public class XWikiMessageTool
      * should be removed as it's used internally and its state shouldn't encompass several calls to
      * get().
      */
-    private Set docsToRefresh = new HashSet();
+    private Set<Long> docsToRefresh = new HashSet<Long>();
 
     /**
      * @param bundle the default Resource Bundle to fall back to if no document bundle is found when
@@ -166,7 +165,7 @@ public class XWikiMessageTool
      *            {@link java.text.MessageFormat} for the full syntax
      * @return the translated string with parameters resolved
      */
-    public String get(String key, List params)
+    public String get(String key, List< ? > params)
     {
         String translation = get(key);
         if (params != null) {
@@ -181,9 +180,9 @@ public class XWikiMessageTool
      * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
      *      document bundles
      */
-    protected List getDocumentBundleNames()
+    protected List<String> getDocumentBundleNames()
     {
-        List docNamesList;
+        List<String> docNamesList;
 
         String docNames = this.context.getWiki().getXWikiPreference(KEY, this.context);
         if (docNames == null || "".equals(docNames)) {
@@ -191,7 +190,7 @@ public class XWikiMessageTool
         }
 
         if (docNames == null) {
-            docNamesList = new ArrayList();
+            docNamesList = new ArrayList<String>();
         } else {
             docNamesList = Arrays.asList(docNames.split(","));
         }
@@ -204,16 +203,12 @@ public class XWikiMessageTool
      * @see com.xpn.xwiki.web.XWikiMessageTool for more details on the algorithm used to find the
      *      document bundles
      */
-    public List getDocumentBundles()
+    public List<XWikiDocument> getDocumentBundles()
     {
         String defaultLanguage = context.getWiki().getDefaultLanguage(context);
-        List result = new ArrayList();
-        Iterator docNames = getDocumentBundleNames().iterator();
-        while (docNames.hasNext()) {
-            String docName = ((String) docNames.next()).trim();
-            List docBundles = getDocumentBundles(docName, defaultLanguage);
-            for (int i = 0; i < docBundles.size(); i++) {
-                XWikiDocument docBundle = (XWikiDocument) docBundles.get(i);
+        List<XWikiDocument> result = new ArrayList<XWikiDocument>();
+        for (String docName : getDocumentBundleNames()) {
+            for (XWikiDocument docBundle : getDocumentBundles(docName, defaultLanguage)) {
                 if (docBundle != null) {
                     if (!docBundle.isNew()) {
                         // Checks for a name update
@@ -278,9 +273,9 @@ public class XWikiMessageTool
      * @return the document object corresponding to the passed document's name. A translated version
      *         of the document for the current Locale is looked for.
      */
-    public List getDocumentBundles(String documentName, String defaultLanguage)
+    public List<XWikiDocument> getDocumentBundles(String documentName, String defaultLanguage)
     {
-        List list = new ArrayList();
+        List<XWikiDocument> list = new ArrayList<XWikiDocument>();
 
         if (documentName.length() != 0) {
             try {
@@ -344,9 +339,7 @@ public class XWikiMessageTool
         String returnValue = null;
 
         if (key != null) {
-            Iterator it = getDocumentBundles().iterator();
-            while (it.hasNext()) {
-                XWikiDocument docBundle = (XWikiDocument) it.next();
+            for (XWikiDocument docBundle : getDocumentBundles()) {
                 if (docBundle != null) {
                     Long docId = new Long(docBundle.getId());
                     Properties props = null;

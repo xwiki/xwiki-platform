@@ -29,7 +29,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.DeletedAttachment;
@@ -47,6 +46,15 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore implements
     AttachmentRecycleBinStore
 {
+    /** String used to annotate unchecked exceptions. */
+    private static final String ANOTATE_UNCHECKED = "unchecked";
+
+    /** Constant string used to refer Document ID. */
+    private static final String DOC_ID = "docId";
+
+    /** Constant string used to refer date. */
+    private static final String DATE = "date";
+
     /**
      * Constructor used by {@link XWiki} during storage initialization.
      * 
@@ -65,7 +73,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     {
         final DeletedAttachment trashAtachment =
             new DeletedAttachment(attachment, deleter, date, context);
-        executeWrite(context, bTransaction, new HibernateCallback()
+        executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
@@ -81,9 +89,9 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     public XWikiAttachment restoreFromRecycleBin(final XWikiAttachment attachment,
         final long index, final XWikiContext context, boolean bTransaction) throws XWikiException
     {
-        return (XWikiAttachment) executeRead(context, bTransaction, new HibernateCallback()
+        return executeRead(context, bTransaction, new HibernateCallback<XWikiAttachment>()
         {
-            public Object doInHibernate(Session session) throws HibernateException,
+            public XWikiAttachment doInHibernate(Session session) throws HibernateException,
                 XWikiException
             {
                 try {
@@ -92,6 +100,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
                             .valueOf(index));
                     return trashAttachment.restoreAttachment(attachment, context);
                 } catch (Exception ex) {
+                    // Invalid recycle entry.
                     return null;
                 }
             }
@@ -104,63 +113,61 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     public DeletedAttachment getDeletedAttachment(final long index, XWikiContext context,
         boolean bTransaction) throws XWikiException
     {
-        return (DeletedAttachment) executeRead(context, bTransaction, new HibernateCallback()
-        {
-            public Object doInHibernate(Session session) throws HibernateException,
-                XWikiException
+        return (DeletedAttachment) executeRead(context, bTransaction,
+            new HibernateCallback<DeletedAttachment>()
             {
-                return session.get(DeletedAttachment.class, Long.valueOf(index));
-            }
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public DeletedAttachment[] getAllDeletedAttachments(final XWikiAttachment attachment,
-        XWikiContext context, boolean bTransaction) throws XWikiException
-    {
-        return (DeletedAttachment[]) executeRead(context, bTransaction, new HibernateCallback()
-        {
-            @SuppressWarnings("unchecked")
-            public Object doInHibernate(Session session) throws HibernateException,
-                XWikiException
-            {
-                Criteria c = session.createCriteria(DeletedAttachment.class);
-                if (attachment != null) {
-                    c.add(Restrictions.eq("docId", attachment.getDocId()));
-                    if (!StringUtils.isBlank(attachment.getFilename())) {
-                        c.add(Restrictions.eq("filename", attachment.getFilename()));
-                    }
+                public DeletedAttachment doInHibernate(Session session)
+                    throws HibernateException, XWikiException
+                {
+                    return (DeletedAttachment) session.get(DeletedAttachment.class, Long
+                        .valueOf(index));
                 }
-                List<DeletedAttachment> lst = c.addOrder(Order.desc("date")).list();
-                DeletedAttachment[] result = new DeletedAttachment[lst.size()];
-                return lst.toArray(result);
-            }
-        });
+            });
     }
 
     /**
      * {@inheritDoc}
      */
-    public DeletedAttachment[] getAllDeletedAttachments(final XWikiDocument doc,
+    public List<DeletedAttachment> getAllDeletedAttachments(final XWikiAttachment attachment,
         XWikiContext context, boolean bTransaction) throws XWikiException
     {
-        return (DeletedAttachment[]) executeRead(context, bTransaction, new HibernateCallback()
-        {
-            @SuppressWarnings("unchecked")
-            public Object doInHibernate(Session session) throws HibernateException,
-                XWikiException
+        return executeRead(context, bTransaction,
+            new HibernateCallback<List<DeletedAttachment>>()
             {
-                assert doc != null;
-                List<DeletedAttachment> lst =
-                    session.createCriteria(DeletedAttachment.class).add(
-                        Restrictions.eq("docId", doc.getId())).addOrder(Order.desc("date"))
-                        .list();
-                DeletedAttachment[] result = new DeletedAttachment[lst.size()];
-                return lst.toArray(result);
-            }
-        });
+                @SuppressWarnings("unchecked")
+                public List<DeletedAttachment> doInHibernate(Session session)
+                    throws HibernateException, XWikiException
+                {
+                    Criteria c = session.createCriteria(DeletedAttachment.class);
+                    if (attachment != null) {
+                        c.add(Restrictions.eq(DOC_ID, attachment.getDocId()));
+                        if (!StringUtils.isBlank(attachment.getFilename())) {
+                            c.add(Restrictions.eq("filename", attachment.getFilename()));
+                        }
+                    }
+                    return (List<DeletedAttachment>) c.addOrder(Order.desc(DATE)).list();
+                }
+            });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public List<DeletedAttachment> getAllDeletedAttachments(final XWikiDocument doc,
+        XWikiContext context, boolean bTransaction) throws XWikiException
+    {
+        return executeRead(context, bTransaction,
+            new HibernateCallback<List<DeletedAttachment>>()
+            {
+                @SuppressWarnings(ANOTATE_UNCHECKED)
+                public List<DeletedAttachment> doInHibernate(Session session)
+                    throws HibernateException, XWikiException
+                {
+                    assert doc != null;
+                    return session.createCriteria(DeletedAttachment.class).add(
+                        Restrictions.eq(DOC_ID, doc.getId())).addOrder(Order.desc(DATE)).list();
+                }
+            });
     }
 
     /**
@@ -169,7 +176,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
     public void deleteFromRecycleBin(final long index, XWikiContext context, boolean bTransaction)
         throws XWikiException
     {
-        executeWrite(context, bTransaction, new HibernateCallback()
+        executeWrite(context, bTransaction, new HibernateCallback<Object>()
         {
             public Object doInHibernate(Session session) throws HibernateException,
                 XWikiException

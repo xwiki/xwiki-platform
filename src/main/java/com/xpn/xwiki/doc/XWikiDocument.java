@@ -2602,6 +2602,12 @@ public class XWikiDocument
     public void deleteAttachment(XWikiAttachment attachment, XWikiContext context)
         throws XWikiException
     {
+        deleteAttachment(attachment, true, context);
+    }
+
+    public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
+        throws XWikiException
+    {
         String database = context.getDatabase();
         try {
             // We might need to switch database to
@@ -2612,7 +2618,7 @@ public class XWikiDocument
             try {
                 // We need to make sure there is a version upgrade
                 setMetaDataDirty(true);
-                if (context.getWiki().hasAttachmentRecycleBin(context)) {
+                if (toRecycleBin && context.getWiki().hasAttachmentRecycleBin(context)) {
                     context.getWiki().getAttachmentRecycleBinStore().saveToRecycleBin(attachment,
                         context.getUser(), new Date(), context, true);
                 }

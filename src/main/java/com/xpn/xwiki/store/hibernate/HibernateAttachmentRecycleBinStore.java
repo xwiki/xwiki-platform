@@ -134,7 +134,7 @@ public class HibernateAttachmentRecycleBinStore extends XWikiHibernateBaseStore 
         return executeRead(context, bTransaction,
             new HibernateCallback<List<DeletedAttachment>>()
             {
-                @SuppressWarnings("unchecked")
+                @SuppressWarnings(ANOTATE_UNCHECKED)
                 public List<DeletedAttachment> doInHibernate(Session session)
                     throws HibernateException, XWikiException
                 {

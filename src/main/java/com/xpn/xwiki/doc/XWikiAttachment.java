@@ -37,7 +37,6 @@ import org.dom4j.dom.DOMElement;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.hibernate.ObjectNotFoundException;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.rcs.impl.Node;
@@ -60,9 +59,6 @@ public class XWikiAttachment
     private String comment;
 
     private Date date;
-
-    // Meta Data Archive
-    private Archive metaArchive;
 
     private XWikiAttachmentContent attachment_content;
 
@@ -501,8 +497,10 @@ public class XWikiAttachment
 
     public void loadArchive(XWikiContext context) throws XWikiException
     {
-        if (attachment_archive == null)
-            context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
+        if (attachment_archive == null) {
+            context.getWiki().getAttachmentVersioningStore()
+                .loadArchive(this, context, true);
+        }
     }
 
     public void updateContentArchive(XWikiContext context) throws XWikiException
@@ -511,19 +509,10 @@ public class XWikiAttachment
             return;
 
         if (attachment_archive == null) {
-            try {
-                context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
-            } catch (XWikiException e) {
-                if (!(e.getException() instanceof ObjectNotFoundException))
-                    throw e;
-            }
+            attachment_archive = context.getWiki().getAttachmentVersioningStore()
+                .loadArchive(this, context, true);
         }
-
-        if (attachment_archive == null) {
-            attachment_archive = new XWikiAttachmentArchive();
-            attachment_archive.setAttachment(this);
-        }
-
+        
         attachment_archive.updateArchive(getContent(context), context);
     }
 
@@ -552,13 +541,12 @@ public class XWikiAttachment
         try {
             Archive archive = getArchive();
             if (archive == null) {
-                context.getWiki().getAttachmentStore().loadAttachmentArchive(this, context, true);
-                archive = getArchive();
+                archive = context.getWiki().getAttachmentVersioningStore()
+                    .loadArchive(this, context, true).getRCSArchive();
             }
 
-            if (archive == null) {
+            if (archive == null)
                 return null;
-            }
 
             Version v = archive.getRevisionVersion(rev);
             Object[] lines = archive.getRevision(v);

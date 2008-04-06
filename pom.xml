@@ -576,8 +576,9 @@
               **/*RecycleBin*.java,
               **/*DeletedDocument.java,
               **/UndeleteAction.java,
-              **/rightsmanager/**/*.java
-              **/plugin/ldap/XWikiLDAP*.java
+              **/rightsmanager/**/*.java,
+              **/plugin/ldap/XWikiLDAP*.java,
+			  **/*AttachmentVersioningStore.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,

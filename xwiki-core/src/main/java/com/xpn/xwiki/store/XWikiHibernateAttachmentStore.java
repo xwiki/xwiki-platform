@@ -12,7 +12,6 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiAttachmentContent;
 import com.xpn.xwiki.doc.XWikiDocument;
 
@@ -65,8 +64,6 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             if (content.isContentDirty()) {
                 attachment.updateContentArchive(context);
             }
-            XWikiAttachmentArchive archive = attachment.getAttachment_archive();
-
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
@@ -91,15 +88,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     session.update(content);
                 }
 
-                query =
-                    session
-                        .createQuery("select attach.id from XWikiAttachmentArchive as attach where attach.id = :id");
-                query.setLong("id", archive.getId());
-                if (query.uniqueResult() == null) {
-                    session.save(archive);
-                } else {
-                    session.update(archive);
-                }
+                context.getWiki().getAttachmentVersioningStore()
+                    .saveArchive(attachment.getAttachment_archive(), context, false);
+                
                 if (parentUpdate) {
                     context.getWiki().getStore().saveXWikiDoc(attachment.getDoc(), context, true);
                 }
@@ -129,7 +120,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     }
 
-    public void saveAttachmentsContent(List attachments, XWikiDocument doc,
+    public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc,
         boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException
     {
         try {
@@ -140,9 +131,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
             if (attachments == null) {
                 return;
             }
-            Iterator it = attachments.iterator();
+            Iterator<XWikiAttachment> it = attachments.iterator();
             while (it.hasNext()) {
-                XWikiAttachment att = (XWikiAttachment) it.next();
+                XWikiAttachment att = it.next();
                 saveAttachmentContent(att, false, context, false);
             }
             if (bParentUpdate) {
@@ -184,52 +175,6 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                 XWikiAttachmentContent content = new XWikiAttachmentContent(attachment);
                 attachment.setAttachment_content(content);
                 session.load(content, new Long(content.getId()));
-            } finally {
-                context.setDatabase(db);
-            }
-
-            if (bTransaction) {
-                endTransaction(context, false, false);
-            }
-        } catch (Exception e) {
-            Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
-                "Exception while loading attachment {0} of document {1}",
-                e,
-                args);
-        } finally {
-            try {
-                if (bTransaction) {
-                    endTransaction(context, false, false);
-                }
-            } catch (Exception e) {
-            }
-        }
-    }
-
-    public void loadAttachmentArchive(XWikiAttachment attachment, XWikiContext context,
-        boolean bTransaction) throws XWikiException
-    {
-        try {
-            if (bTransaction) {
-                checkHibernate(context);
-                bTransaction = beginTransaction(false, context);
-            }
-            Session session = getSession(context);
-
-            String db = context.getDatabase();
-            String attachdb =
-                (attachment.getDoc() == null) ? null : attachment.getDoc().getDatabase();
-            try {
-                if (attachdb != null) {
-                    context.setDatabase(attachdb);
-                }
-
-                XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
-                archive.setAttachment(attachment);
-                attachment.setAttachment_archive(archive);
-                session.load(archive, new Long(archive.getId()));
             } finally {
                 context.setDatabase(db);
             }
@@ -298,24 +243,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                             + attachment.getDoc().getFullName());
                     }
                 }
-                try {
-                    loadAttachmentArchive(attachment, context, false);
-                    try {
-                        session.delete(attachment.getAttachment_archive());
-                    } catch (Exception e) {
-                        if (log.isWarnEnabled()) {
-                            log.warn("Error deleting attachment archive "
-                                + attachment.getFilename() + " of doc "
-                                + attachment.getDoc().getFullName());
-                        }
-                    }
-                } catch (XWikiException e) {
-                    if (log.isWarnEnabled()) {
-                        log.warn("Error loading attachment archive when deleting attachment "
-                            + attachment.getFilename() + " of doc "
-                            + attachment.getDoc().getFullName());
-                    }
-                }
+                
+                context.getWiki().getAttachmentVersioningStore()
+                    .deleteArchive(attachment, context, false);
 
                 try {
                     session.delete(attachment);
@@ -333,9 +263,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
             try {
                 if (parentUpdate) {
-                    List list = attachment.getDoc().getAttachmentList();
+                    List<XWikiAttachment> list = attachment.getDoc().getAttachmentList();
                     for (int i = 0; i < list.size(); i++) {
-                        XWikiAttachment attach = (XWikiAttachment) list.get(i);
+                        XWikiAttachment attach = list.get(i);
                         if (attachment.getFilename().equals(attach.getFilename())) {
                             list.remove(i);
                             break;

@@ -129,6 +129,7 @@ import com.xpn.xwiki.stats.api.XWikiStatsService;
 import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
+import com.xpn.xwiki.store.AttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
@@ -168,6 +169,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private XWikiStoreInterface store;
 
     private XWikiAttachmentStoreInterface attachmentStore;
+    
+    /** Store for attachment archives. */
+    private AttachmentVersioningStore attachmentVersioningStore;
 
     private XWikiVersioningStoreInterface versioningStore;
 
@@ -770,6 +774,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 "xwiki.store.versioning.class",
                 "com.xpn.xwiki.store.XWikiHibernateVersioningStore", context));
         }
+        
+        setAttachmentVersioningStore((AttachmentVersioningStore) createClassFromConfig(
+            "xwiki.store.attachment.versioning.class", 
+            "com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore",
+            context));
 
         if (hasRecycleBin(context)) {
             setRecycleBinStore((XWikiRecycleBinStoreInterface) createClassFromConfig(
@@ -847,7 +856,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         String storeclass = Param(param, defClass);
         try {
-            Class[] classes = new Class[] {XWikiContext.class};
+            Class<?>[] classes = new Class<?>[] {XWikiContext.class};
             Object[] args = new Object[] {context};
             Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
@@ -1050,6 +1059,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public XWikiAttachmentStoreInterface getAttachmentStore()
     {
         return attachmentStore;
+    }
+
+    public AttachmentVersioningStore getAttachmentVersioningStore()
+    {
+        return attachmentVersioningStore;
     }
 
     public XWikiVersioningStoreInterface getVersioningStore()
@@ -2360,6 +2374,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void setAttachmentStore(XWikiAttachmentStoreInterface attachmentStore)
     {
         this.attachmentStore = attachmentStore;
+    }
+    
+    public void setAttachmentVersioningStore(AttachmentVersioningStore avStore)
+    {
+        this.attachmentVersioningStore = avStore;
     }
 
     public void setVersioningStore(XWikiVersioningStoreInterface versioningStore)

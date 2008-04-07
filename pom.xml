@@ -578,7 +578,7 @@
               **/UndeleteAction.java,
               **/rightsmanager/**/*.java,
               **/plugin/ldap/XWikiLDAP*.java,
-			  **/*AttachmentVersioningStore.java
+              **/*AttachmentVersioningStore.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,

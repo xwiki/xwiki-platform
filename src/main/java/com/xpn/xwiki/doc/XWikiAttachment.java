@@ -545,8 +545,9 @@ public class XWikiAttachment
                     .loadArchive(this, context, true).getRCSArchive();
             }
 
-            if (archive == null)
+            if (archive == null) {
                 return null;
+            }
 
             Version v = archive.getRevisionVersion(rev);
             Object[] lines = archive.getRevision(v);

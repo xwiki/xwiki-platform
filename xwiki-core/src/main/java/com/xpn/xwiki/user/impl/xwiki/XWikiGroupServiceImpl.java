@@ -292,7 +292,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService,
         StringBuffer where =
             new StringBuffer(
                 ", BaseObject as obj, StringProperty as prop where doc.fullName=obj.name and obj.className=?");
-        parameterValues.add(FIELD_XWIKIGROUPS_MEMBER);
+        parameterValues.add(CLASS_XWIKIGROUPS);
 
         where.append(" and obj.id=prop.id.id");
 

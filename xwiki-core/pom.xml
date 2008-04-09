@@ -248,7 +248,6 @@
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <version>1.1.1</version>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -361,7 +360,6 @@
       <artifactId>rome</artifactId>
       <version>0.8</version>
     </dependency>
-    <!-- NOte: in lib/ we're using 0.9.19M. We need to verfy if version 0.9.19 is ok to be used -->
     <dependency>
       <groupId>ical4j</groupId>
       <artifactId>ical4j</artifactId>

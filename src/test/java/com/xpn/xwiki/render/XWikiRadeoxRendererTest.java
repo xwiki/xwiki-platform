@@ -164,5 +164,22 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         String result = renderer.render("a\\\\\\\\\nb", contentDocument, document, context);
         assertEquals("a<br/><br/>b", result);
     }
+    
+    public void testRenderThreeNewline() throws Exception
+    {
+        String result = renderer.render("a\\\\\\\\\\\\b", contentDocument, document, context);
+        assertEquals("a<br/><br/><br/>b", result);
+    }
 
+    public void testRenderEncodedBackslash() throws Exception
+    {
+        String result = renderer.render("\\\\\\", contentDocument, document, context);
+        assertEquals("&#92;", result);
+    }
+
+    public void testRenderEscapedCharacters() throws Exception
+    {
+        String result = renderer.render("\\[NotALink\\]", contentDocument, document, context);
+        assertEquals("&#91;NotALink&#93;", result);
+    }
 }

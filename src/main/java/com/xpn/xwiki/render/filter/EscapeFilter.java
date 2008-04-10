@@ -66,16 +66,13 @@ public class EscapeFilter extends LocaleRegexTokenFilter implements CacheFilter
 
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
-        buffer.append(handleMatch(result, context));
+        buffer.append(handleMatch(result, context));                    
     }
 
     public String handleMatch(MatchResult result, FilterContext context)
     {
         if (result.group(1) == null) {
             String match = result.group(2);
-            if (match == null) {
-                match = result.group(3);
-            }
             if ("\\".equals(match)) {
                 return "\\\\";
             }

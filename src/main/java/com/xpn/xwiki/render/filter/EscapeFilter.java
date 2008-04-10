@@ -73,9 +73,6 @@ public class EscapeFilter extends LocaleRegexTokenFilter implements CacheFilter
     {
         if (result.group(1) == null) {
             String match = result.group(2);
-            if (match == null) {
-                match = result.group(3);
-            }
             if ("\\".equals(match)) {
                 return "\\\\";
             }

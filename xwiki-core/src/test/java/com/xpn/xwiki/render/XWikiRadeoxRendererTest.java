@@ -171,6 +171,18 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         assertEquals("a<p/>\nb", result);
     }
 
+    public void testRenderOneParagraphForSeveralNewlines() throws Exception
+    {
+        String result = renderer.render("a\n\n\n\n\nb", contentDocument, document, context);
+        assertEquals("a<p/>\nb", result);
+    }
+
+    public void testRenderParagraphIgnoresSpaces() throws Exception
+    {
+        String result = renderer.render("a\n  \t\n  b", contentDocument, document, context);
+        assertEquals("a<p/>\n  b", result);
+    }
+
     public void testRenderParagraphWithBr() throws Exception
     {
         String result = renderer.render("a\\\\\n\n\nb", contentDocument, document, context);

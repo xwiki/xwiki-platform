@@ -1252,8 +1252,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         String web, name;
         int i1 = 0;
         int i2;
-        if (StringUtils.countMatches(path, "/") > 2)
+        if (StringUtils.countMatches(path, "/") > 2) {
             i1 = path.indexOf("/", 1);
+        }
 
         if (StringUtils.countMatches(path, "/") > 1) {
             i2 = path.indexOf("/", i1 + 1);
@@ -1263,15 +1264,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             web = context.getWiki().getDefaultWeb(context);
         }
         int i3 = path.indexOf("/", i2 + 1);
-        if (i3 == -1)
+        if (i3 == -1) {
             name = path.substring(i2 + 1);
-        else
+        } else {
             name = path.substring(i2 + 1, i3);
-        if (name.equals(""))
+        }
+        if (name.equals("")) {
             name = "WebHome";
+        }
 
         web = Util.decodeURI(web, context);
         name = Util.decodeURI(name, context);
+        if (StringUtils.contains(web, ':')) {
+            web = StringUtils.substringAfterLast(web, ":");
+        }
+        if (StringUtils.contains(name, ':')) {
+            name = StringUtils.substringAfterLast(name, ":");
+        }
         String fullname = web + "." + name;
         return fullname;
     }

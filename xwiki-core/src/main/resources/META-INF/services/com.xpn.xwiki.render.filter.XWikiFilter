@@ -2,7 +2,7 @@
 # The content is restored later on in the CodeRestoreFilter. The filter has to be executed first
 # to ensure no modifications is done to the content.
 com.xpn.xwiki.render.filter.CodeRemoveFilter
-#com.xpn.xwiki.render.filter.EscapeFilter
+com.xpn.xwiki.render.filter.EscapeFilter
 org.radeox.filter.ParamFilter
 com.xpn.xwiki.render.filter.StyleFilter
 com.xpn.xwiki.render.filter.MacroFilter

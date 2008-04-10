@@ -19,30 +19,37 @@
  */
 package com.xpn.xwiki.render;
 
-import org.jmock.cglib.MockObjectTestCase;
+import java.net.URL;
+
 import org.jmock.Mock;
+import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
-import com.xpn.xwiki.XWikiContext;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.web.XWikiURLFactory;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import java.net.URL;
+import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.render.XWikiRadeoxRenderer}.
- *
+ * 
  * @version $Id: $
  */
 public class XWikiRadeoxRendererTest extends MockObjectTestCase
 {
     private XWikiContext context;
+
     private XWikiRadeoxRenderer renderer;
+
     private Mock mockXWiki;
+
     private Mock mockDocument;
+
     private Mock mockContentDocument;
+
     private XWikiDocument document;
+
     private XWikiDocument contentDocument;
 
     protected void setUp()
@@ -50,8 +57,9 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         this.renderer = new XWikiRadeoxRenderer();
         this.context = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
-            new Object[] {new XWikiConfig(), context});
+        this.mockXWiki =
+            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
+            new XWikiConfig(), context});
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockContentDocument = mock(XWikiDocument.class);
@@ -75,7 +83,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
     }
 
     /**
-     * @todo this test is too complex and show that the rendering API is not right... 
+     * @todo this test is too complex and show that the rendering API is not right...
      */
     public void testRenderLinkToNewPage() throws Exception
     {
@@ -86,13 +94,15 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         this.mockXWiki.expects(once()).method("getEditorPreference").will(returnValue("text"));
 
         Mock mockUrlFactory = mock(XWikiURLFactory.class);
-        mockUrlFactory.expects(once()).method("createURL").with(new Constraint[] {
-            eq("Main"), eq("new link"), eq("edit"), eq("parent=Main.WebHome"), ANYTHING, ANYTHING})
-            .will(returnValue(new URL("http://server.com/Main/new link")));
-        mockUrlFactory.expects(atLeastOnce()).method("getURL").will(returnValue("/Main/new link"));
+        mockUrlFactory.expects(once()).method("createURL").with(
+            new Constraint[] {eq("Main"), eq("new link"), eq("edit"), eq("parent=Main.WebHome"),
+            ANYTHING, ANYTHING}).will(returnValue(new URL("http://server.com/Main/new link")));
+        mockUrlFactory.expects(atLeastOnce()).method("getURL")
+            .will(returnValue("/Main/new link"));
         this.context.setURLFactory((XWikiURLFactory) mockUrlFactory.proxy());
 
-        String result = renderer.render("This is a [new link]", contentDocument, document, context);
+        String result =
+            renderer.render("This is a [new link]", contentDocument, document, context);
 
         assertEquals("This is a <a class=\"wikicreatelink\" href=\"/Main/new link\">"
             + "<span class=\"wikicreatelinktext\">new link</span>"
@@ -101,45 +111,71 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
 
     public void testRenderStyleMacro() throws Exception
     {
-        String result = renderer.render("{style:type=div|align=justify}Hello{style}", contentDocument, document, context);
+        String result =
+            renderer.render("{style:type=div|align=justify}Hello{style}", contentDocument,
+                document, context);
         assertEquals("<div align=\"justify\" style=\"\" >Hello</div>", result);
     }
 
     public void testRenderStyleMacroNotImbricated() throws Exception
     {
-        String result = renderer.render("{style:type=span|font-size=24px}One font{style} and {style:type=span|font-size=22px}another font size{style}. How fun.", contentDocument, document, context);
-        assertEquals("<span style=\"font-size:24px; \" >One font</span> and <span style=\"font-size:22px; \" >another font size</span>. How fun.", result);
+        String result =
+            renderer
+                .render(
+                    "{style:type=span|font-size=24px}One font{style} and {style:type=span|font-size=22px}another font size{style}. How fun.",
+                    contentDocument, document, context);
+        assertEquals(
+            "<span style=\"font-size:24px; \" >One font</span> and <span style=\"font-size:22px; \" >another font size</span>. How fun.",
+            result);
     }
 
     public void testRenderStyleMacroNotImbricatedInImbricated() throws Exception
     {
-        String result = renderer.render("{style:type=div|align=justify}{style:type=span|font-size=24px}One font{style} and {style:type=span|font-size=22px}another font size{style}.{style} How fun.", contentDocument, document, context);
-        assertEquals("<div align=\"justify\" style=\"\" ><span style=\"font-size:24px; \" >One font</span> and <span style=\"font-size:22px; \" >another font size</span>.</div> How fun.", result);
+        String result =
+            renderer
+                .render(
+                    "{style:type=div|align=justify}{style:type=span|font-size=24px}One font{style} and {style:type=span|font-size=22px}another font size{style}.{style} How fun.",
+                    contentDocument, document, context);
+        assertEquals(
+            "<div align=\"justify\" style=\"\" ><span style=\"font-size:24px; \" >One font</span> and <span style=\"font-size:22px; \" >another font size</span>.</div> How fun.",
+            result);
     }
 
     public void testRenderStyleMacroImbricated() throws Exception
     {
-        String result = renderer.render("{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style}", contentDocument, document, context);
-        assertEquals("<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside</span> the paragraph.</div>", result);
+        String result =
+            renderer
+                .render(
+                    "{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style}",
+                    contentDocument, document, context);
+        assertEquals(
+            "<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside</span> the paragraph.</div>",
+            result);
     }
 
     public void testRenderStyleMacroImbricated2() throws Exception
     {
-        String result = renderer.render("{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style} and this is very fun {style}", contentDocument, document, context);
-        assertEquals("<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside</span> the paragraph.</div> and this is very fun <span style=\"\" ></span>", result);
+        String result =
+            renderer
+                .render(
+                    "{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style} and this is very fun {style}",
+                    contentDocument, document, context);
+        assertEquals(
+            "<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside</span> the paragraph.</div> and this is very fun <span style=\"\" ></span>",
+            result);
     }
 
     public void testRenderParagraph() throws Exception
-      {
-          String result = renderer.render("a\n\nb", contentDocument, document, context);
-          assertEquals("a<p/>\nb", result);
-      }
+    {
+        String result = renderer.render("a\n\nb", contentDocument, document, context);
+        assertEquals("a<p/>\nb", result);
+    }
 
-     public void testRenderParagraphWithBr() throws Exception
-      {
-          String result = renderer.render("a\\\\\n\n\nb", contentDocument, document, context);
-          assertEquals("a<br/><p/>\nb", result);
-      }
+    public void testRenderParagraphWithBr() throws Exception
+    {
+        String result = renderer.render("a\\\\\n\n\nb", contentDocument, document, context);
+        assertEquals("a<br/><p/>\nb", result);
+    }
 
     public void testRenderNewline() throws Exception
     {
@@ -164,7 +200,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         String result = renderer.render("a\\\\\\\\\nb", contentDocument, document, context);
         assertEquals("a<br/><br/>b", result);
     }
-    
+
     public void testRenderThreeNewline() throws Exception
     {
         String result = renderer.render("a\\\\\\\\\\\\b", contentDocument, document, context);

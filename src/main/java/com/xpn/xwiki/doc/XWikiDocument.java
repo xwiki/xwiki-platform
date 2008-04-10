@@ -4206,8 +4206,8 @@ public class XWikiDocument
     {
         String methodName = "get" + StringUtils.capitalize(propname);
         try {
-            Method method = getClass().getDeclaredMethod(methodName, null);
-            return (String) method.invoke(this, null);
+            Method method = getClass().getDeclaredMethod(methodName, (Class[]) null);
+            return (String) method.invoke(this, (Object[]) null);
         } catch (Exception e) {
             return null;
         }
@@ -4367,7 +4367,7 @@ public class XWikiDocument
         }
     }
 
-    public static void backupContext(HashMap backup, XWikiContext context)
+    public static void backupContext(HashMap<String, Object> backup, XWikiContext context)
     {
         backup.put("doc", context.getDoc());
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");
@@ -4384,7 +4384,7 @@ public class XWikiDocument
         }
     }
 
-    public static void restoreContext(HashMap backup, XWikiContext context)
+    public static void restoreContext(HashMap<String, Object> backup, XWikiContext context)
     {
         context.setDoc((XWikiDocument) backup.get("doc"));
         VelocityContext vcontext = (VelocityContext) context.get("vcontext");

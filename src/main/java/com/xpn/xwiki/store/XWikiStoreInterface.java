@@ -36,10 +36,10 @@ public interface XWikiStoreInterface {
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction) throws XWikiException;
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
     public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
-    public List getClassList(XWikiContext context) throws XWikiException;
-    public List searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
-    public List searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
-    public List searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException;
+    public List<String> getClassList(XWikiContext context) throws XWikiException;
+    public List<String> searchDocumentsNames(String wheresql, XWikiContext context) throws XWikiException;
+    public List<String> searchDocumentsNames(String wheresql, int nb, int start, XWikiContext context) throws XWikiException;
+    public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns, XWikiContext context) throws XWikiException;
 
     /**
      * Search documents by passing HQL where clause values as parameters. This allows generating

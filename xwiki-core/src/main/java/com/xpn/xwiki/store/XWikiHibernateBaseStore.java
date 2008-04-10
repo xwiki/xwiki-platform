@@ -510,13 +510,18 @@ public class XWikiHibernateBaseStore
      */
     public void checkHibernate(XWikiContext context) throws HibernateException
     {
-
+        // Note : double locking is not a recommended pattern and is not guaranteed to work on all
+        // machines. See for example http://www.ibm.com/developerworks/java/library/j-dcl.html
         if (getSessionFactory() == null) {
-            initHibernate();
-
-            /* Check Schema */
-            if (getSessionFactory() != null) {
-                updateSchema(context);
+            synchronized(this) {
+                if (getSessionFactory() == null) {
+                    
+                    initHibernate();
+                    /* Check Schema */
+                    if (getSessionFactory() != null) {
+                        updateSchema(context);
+                    }
+                }
             }
         }
     }

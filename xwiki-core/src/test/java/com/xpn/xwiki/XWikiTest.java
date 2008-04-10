@@ -229,5 +229,6 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
     public void testDocNameFromPathRemovesPrefixes()
     {
         assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Space", context));
+        assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Other%3ASpace", context));
     }
 }

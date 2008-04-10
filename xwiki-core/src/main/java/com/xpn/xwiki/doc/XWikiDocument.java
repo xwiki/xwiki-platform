@@ -4076,29 +4076,24 @@ public class XWikiDocument
     public DocumentSection getDocumentSection(int sectionNumber) throws XWikiException
     {
         // return a document section according to section number
-        return (DocumentSection) getSplitSectionsAccordingToTitle().get(sectionNumber - 1);
+        return getSplitSectionsAccordingToTitle().get(sectionNumber - 1);
     }
 
     // This method to return the content of a section
     public String getContentOfSection(int sectionNumber) throws XWikiException
     {
-        List splitSections = getSplitSectionsAccordingToTitle();
+        List<DocumentSection> splitSections = getSplitSectionsAccordingToTitle();
         int indexEnd = 0;
         // get current section
-        DocumentSection section = getDocumentSection(sectionNumber);
+        DocumentSection section = splitSections.get(sectionNumber);
         int indexStart = section.getSectionIndex();
         String sectionLevel = section.getSectionLevel();
+        // Determine where this section ends, which is at the start of the next section of the
+        // same or a higher level.
         for (int i = sectionNumber; i < splitSections.size(); i++) {
-            // get next section
-            DocumentSection nextSection = getDocumentSection(i + 1);
+            DocumentSection nextSection = splitSections.get(i + 1);
             String nextLevel = nextSection.getSectionLevel();
-            if (sectionLevel.equals(nextLevel)) {
-                // if section level is next section level
-                indexEnd = nextSection.getSectionIndex();
-                break;
-            }
-            if (sectionLevel.length() > nextLevel.length()) {
-                // section level length is greater than next section level length (1.1 and 1)
+            if (sectionLevel.equals(nextLevel) || sectionLevel.length() > nextLevel.length()) {
                 indexEnd = nextSection.getSectionIndex();
                 break;
             }
@@ -4110,7 +4105,7 @@ public class XWikiDocument
         if (indexEnd == 0) {
             sectionContent = getContent().substring(indexStart);
         } else {
-            sectionContent = getContent().substring(indexStart, indexEnd); // get section content
+            sectionContent = getContent().substring(indexStart, indexEnd);
         }
         return sectionContent;
     }
@@ -4122,14 +4117,14 @@ public class XWikiDocument
         StringBuffer newContent = new StringBuffer();
         // get document section that will be edited
         DocumentSection docSection = getDocumentSection(sectionNumber);
-        int numberOfSection = getSplitSectionsAccordingToTitle().size();
+        int numberOfSections = getSplitSectionsAccordingToTitle().size();
         int indexSection = docSection.getSectionIndex();
-        if (numberOfSection == 1) {
+        if (numberOfSections == 1) {
             // there is only a sections in document
             String contentBegin = getContent().substring(0, indexSection);
             newContent = newContent.append(contentBegin).append(newSectionContent);
             return newContent.toString();
-        } else if (sectionNumber == numberOfSection) {
+        } else if (sectionNumber == numberOfSections) {
             // edit lastest section that doesn't contain subtitle
             String contentBegin = getContent().substring(0, indexSection);
             newContent = newContent.append(contentBegin).append(newSectionContent);
@@ -4138,7 +4133,7 @@ public class XWikiDocument
             String sectionLevel = docSection.getSectionLevel();
             int nextSectionIndex = 0;
             // get index of next section
-            for (int i = sectionNumber; i < numberOfSection; i++) {
+            for (int i = sectionNumber; i < numberOfSections; i++) {
                 DocumentSection nextSection = getDocumentSection(i + 1); // get next section
                 String nextSectionLevel = nextSection.getSectionLevel();
                 if (sectionLevel.equals(nextSectionLevel)) {

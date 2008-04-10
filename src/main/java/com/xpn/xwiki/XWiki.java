@@ -446,7 +446,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     getSkinClass(context);
                     getGlobalRightsClass(context);
                     getTagClass(context);
-                    getRedirectRuleClass(context);                    
                     getPluginManager().virtualInit(context);
                 }
 
@@ -838,7 +837,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             getCommentsClass(context);
             getSkinClass(context);
             getGlobalRightsClass(context);
-            getRedirectRuleClass(context);
             getStatsService(context);
             if (context.getDatabase().equals(context.getMainXWiki())
                 && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
@@ -1643,7 +1641,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             String path = "/skins/" + skin + "/" + filename;
             if (resourceExists(path)) {
-                
                 URL url;
 
                 if (forceSkinAction)
@@ -1693,51 +1690,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getSkin(XWikiContext context)
     {
         String skin = "";
-
         try {
             // Try to get it from context
             skin = (String) context.get("skin");
-            if (skin != null) {
+            if (skin != null)
                 return skin;
-            }
 
             // Try to get it from URL
-            skin = context.getRequest().getParameter("skin");
-            if ((skin != null) && (!skin.equals(""))) {
-                // setting language cookie
-                Cookie cookie = new Cookie("skin", skin);
-                cookie.setMaxAge(60 * 60 * 24 * 365 * 10);
-                cookie.setPath("/");
-                context.getResponse().addCookie(cookie);
-                context.put("skin", skin);
-                return skin;
+            if (context.getRequest() != null) {
+                skin = context.getRequest().getParameter("skin");
             }
-
-            // As no skin parameter was passed in the request, try to get the skin to use from a
-            // cookie
-            skin = getUserPreferenceFromCookie("skin", context);
-            if ((skin != null) && (!skin.equals(""))) {
-                context.put("skin", skin);
-                return skin;
-            }
-
-            // Handle skins specific to special devices
-            /* if (context.getUserAgent().hasSpecialSkin()) {
-                context.put("skin", skin);
-                return skin;
-            } */
 
             if ((skin == null) || (skin.equals(""))) {
                 skin = getUserPreference("skin", context);
             }
-
             if (skin.equals("")) {
                 skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
             }
         } catch (Exception e) {
             skin = getDefaultBaseSkin(context);
         }
-
         try {
             if (skin.indexOf(".") != -1) {
                 if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context))
@@ -6352,40 +6324,5 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         saveDocument(rolledbackDoc,
             context.getMessageTool().get("core.comment.rollback", params), context);
         return rolledbackDoc;
-    }
-
-    public BaseClass getRedirectRuleClass(XWikiContext context) throws XWikiException
-    {
-        // Create the class only if :
-        // The xwiki.preferences.redirect option is set to 1
-        // The current wiki is the main wiki since this feature is ignored in subwikis
-        if (context.getDatabase().equals(context.getMainXWiki())
-            && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
-            XWikiDocument doc;
-            boolean needsUpdate = false;
-
-            doc = getDocument("XWiki.RedirectRule", context);
-
-            BaseClass bclass = doc.getxWikiClass();
-            if (context.get("initdone") != null) {
-                return bclass;
-            }
-
-            bclass.setName("XWiki.RedirectRule");
-
-            needsUpdate |= bclass.addTextField("pattern", "Pattern", 30);
-            needsUpdate |= bclass.addTextField("destination", "Destination", 30);
-            String content = doc.getContent();
-            if ((content == null) || (content.equals(""))) {
-                needsUpdate = true;
-                doc.setContent("1 XWiki RedirectRuleClass");
-            }
-
-            if (needsUpdate) {
-                saveDocument(doc, context);
-            }
-            return bclass;
-        }
-        return null;
     }
 }

@@ -60,6 +60,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
     {                
         try {
             final XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
+            archive.setAttachment(attachment);
             executeRead(context, bTransaction,
                 new HibernateCallback<Object>() {
                     public Object doInHibernate(Session session)
@@ -73,7 +74,6 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
                         return null;                        
                     }
                 });
-            archive.setAttachment(attachment);
             attachment.setAttachment_archive(archive);
             return archive;
         } catch (Exception e) {

@@ -515,7 +515,7 @@ public class XWikiHibernateBaseStore
         // Note : double locking is not a recommended pattern and is not guaranteed to work on all
         // machines. See for example http://www.ibm.com/developerworks/java/library/j-dcl.html
         if (getSessionFactory() == null) {
-            synchronized(this) {
+            synchronized (this) {
                 if (getSessionFactory() == null) {
 
                     initHibernate();

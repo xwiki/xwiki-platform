@@ -38,6 +38,7 @@ import java.net.URL;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -92,6 +93,7 @@ import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.cache.impl.OSCacheService;
 import com.xpn.xwiki.cache.impl.XWikiCacheListener;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
+import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
@@ -169,7 +171,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private XWikiStoreInterface store;
 
     private XWikiAttachmentStoreInterface attachmentStore;
-    
+
     /** Store for attachment archives. */
     private AttachmentVersioningStore attachmentVersioningStore;
 
@@ -178,7 +180,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     /** store for deleted documents */
     private XWikiRecycleBinStoreInterface recycleBinStore;
 
-    /** Storage for deleted attachment */
+    /**
+     * Storage for deleted attachment.
+     * 
+     * @since 1.4M1
+     */
     private AttachmentRecycleBinStore attachmentRecycleBinStore;
 
     private XWikiRenderingEngine renderingEngine;
@@ -228,7 +234,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private URLPatternMatcher urlPatternMatcher = new URLPatternMatcher();
 
     // These are caches in order to improve finding virtual wikis
-    private List virtualWikiList = new ArrayList();
+    private List<String> virtualWikiList = new ArrayList<String>();
 
     private XWikiCache virtualWikiMap;
 
@@ -457,7 +463,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      *         request). To get a full list of all virtual wikis database names use
      *         {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
      */
-    public List getVirtualWikiList()
+    public List<String> getVirtualWikiList()
     {
         return virtualWikiList;
     }
@@ -469,9 +475,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      *         For example a page named "XWiki.XWikiServerMyDatabase" would return "mydatabase" as
      *         the database name.
      */
-    public List getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
+    public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
     {
-        List databaseNames = new ArrayList();
+        List<String> databaseNames = new ArrayList<String>();
 
         String database = context.getDatabase();
         try {
@@ -481,10 +487,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
                     + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
                     + "and prop.id.id = obj.id ";
-            List list = getStore().searchDocumentsNames(hql, context);
+            List<String> list = getStore().searchDocumentsNames(hql, context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                String docname = (String) it.next();
+            for (String docname : list) {
                 if (docname.startsWith("XWiki.XWikiServer")) {
                     databaseNames.add(docname.substring("XWiki.XWikiServer".length())
                         .toLowerCase());
@@ -635,12 +640,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                         + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
                         + "and prop.id.name = 'server' and prop.value='" + host + "'";
                 try {
-                    List list = context.getWiki().getStore().searchDocumentsNames(hql, context);
+                    List<String> list =
+                        context.getWiki().getStore().searchDocumentsNames(hql, context);
                     if ((list != null) && (list.size() > 0)) {
-                        String docname = (String) list.get(0);
-                        if (docname.startsWith("XWiki.XWikiServer"))
+                        String docname = list.get(0);
+                        if (docname.startsWith("XWiki.XWikiServer")) {
                             wikiserver =
                                 docname.substring("XWiki.XWikiServer".length()).toLowerCase();
+                        }
                     }
                     virtualWikiMap.putInCache(host, wikiserver);
                     return wikiserver;
@@ -774,11 +781,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 "xwiki.store.versioning.class",
                 "com.xpn.xwiki.store.XWikiHibernateVersioningStore", context));
         }
-        
+
         setAttachmentVersioningStore((AttachmentVersioningStore) createClassFromConfig(
-            "xwiki.store.attachment.versioning.class", 
-            "com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore",
-            context));
+            "xwiki.store.attachment.versioning.class",
+            "com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore", context));
 
         if (hasRecycleBin(context)) {
             setRecycleBinStore((XWikiRecycleBinStoreInterface) createClassFromConfig(
@@ -833,7 +839,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             getGlobalRightsClass(context);
             getStatsService(context);
             if (context.getDatabase().equals(context.getMainXWiki())
-                    && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
+                && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
                 getRedirectClass(context);
             }
         }
@@ -856,7 +862,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         String storeclass = Param(param, defClass);
         try {
-            Class<?>[] classes = new Class<?>[] {XWikiContext.class};
+            Class< ? >[] classes = new Class< ? >[] {XWikiContext.class};
             Object[] args = new Object[] {context};
             Object result = Class.forName(storeclass).getConstructor(classes).newInstance(args);
             return result;
@@ -1397,7 +1403,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return textarea.toString();
     }
 
-    public List getClassList(XWikiContext context) throws XWikiException
+    public List<String> getClassList(XWikiContext context) throws XWikiException
     {
         return getStore().getClassList(context);
     }
@@ -2311,7 +2317,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void flushCache(XWikiContext context)
     {
         // We need to flush the virtual wiki list
-        virtualWikiList = new ArrayList();
+        virtualWikiList = new ArrayList<String>();
         // We need to flush the server Cache
         if (virtualWikiMap != null) {
             virtualWikiMap.flushAll();
@@ -2338,9 +2344,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Make sure we call all classes flushCache function
         try {
-            List classes = getClassList(context);
+            List<String> classes = getClassList(context);
             for (int i = 0; i < classes.size(); i++) {
-                String className = (String) classes.get(i);
+                String className = classes.get(i);
                 try {
                     getClass(className, context).flushCache();
                 } catch (Exception e) {
@@ -2375,7 +2381,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         this.attachmentStore = attachmentStore;
     }
-    
+
     public void setAttachmentVersioningStore(AttachmentVersioningStore avStore)
     {
         this.attachmentVersioningStore = avStore;
@@ -2433,11 +2439,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     private void flushVirtualWikis(XWikiDocument doc)
     {
-        List bobjects = doc.getObjects("XWiki.XWikiServerClass");
+        List<BaseObject> bobjects = doc.getObjects("XWiki.XWikiServerClass");
         if (bobjects != null) {
-            Iterator it = bobjects.iterator();
-            while (it.hasNext()) {
-                BaseObject bobj = (BaseObject) it.next();
+            for (BaseObject bobj : bobjects) {
                 if (bobj != null) {
                     String host = bobj.getStringValue("server");
                     if ((host != null) && (!"".equals(host))) {
@@ -2456,10 +2460,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Verify if the <code>XWiki.TagClass</code> page exists and that it contains all the
-     * required configuration properties to make the tag feature work properly. If some properties are missing
-     * they are created and saved in the database.
-     *
+     * Verify if the <code>XWiki.TagClass</code> page exists and that it contains all the required
+     * configuration properties to make the tag feature work properly. If some properties are
+     * missing they are created and saved in the database.
+     * 
      * @param context the XWiki Context
      * @return the TagClass Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2499,9 +2503,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     /**
      * Verify if the <code>XWiki.XWikiUsers</code> page exists and that it contains all the
-     * required configuration properties to make the user feature work properly. If some properties are missing
-     * they are created and saved in the database.
-     *
+     * required configuration properties to make the user feature work properly. If some properties
+     * are missing they are created and saved in the database.
+     * 
      * @param context the XWiki Context
      * @return the XWikiUsers Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
@@ -2559,14 +2563,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     /**
      * Verify if the <code>XWiki.GlobalRedirect</code> page exists and that it contains all the
-     * required configuration properties to make the redirection feature work properly. If some properties are missing
-     * they are created and saved in the database.
-     *
+     * required configuration properties to make the redirection feature work properly. If some
+     * properties are missing they are created and saved in the database.
+     * 
      * @param context the XWiki Context
      * @return the GlobalRedirect Base Class object containing the properties
      * @throws XWikiException if an error happens during the save to the datavase
      */
-    public BaseClass getRedirectClass(XWikiContext context) throws XWikiException {
+    public BaseClass getRedirectClass(XWikiContext context) throws XWikiException
+    {
         XWikiDocument doc;
         boolean needsUpdate = false;
 
@@ -3774,35 +3779,33 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     saveDocument(tdoc, context);
 
                     if (!reset) {
-                        if (sourceWiki != null)
+                        if (sourceWiki != null) {
                             context.setDatabase(sourceWiki);
+                        }
                         XWikiDocumentArchive txda =
                             getVersioningStore().getXWikiDocumentArchive(sdoc, context);
-                        if (targetWiki != null)
+                        if (targetWiki != null) {
                             context.setDatabase(targetWiki);
+                        }
                         txda = txda.clone(tdoc.getId(), context);
                         getVersioningStore().saveXWikiDocArchive(txda, true, context);
                     } else {
                         getVersioningStore().resetRCSArchive(tdoc, true, context);
                     }
 
-                    if (targetWiki != null)
+                    if (targetWiki != null) {
                         context.setDatabase(targetWiki);
-                    List attachlist = tdoc.getAttachmentList();
-                    if (attachlist.size() > 0) {
-                        for (int i = 0; i < attachlist.size(); i++) {
-                            XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                            getAttachmentStore().saveAttachmentContent(attachment, false,
-                                context, true);
-                        }
+                    }
+                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
+                        getAttachmentStore().saveAttachmentContent(attachment, false, context,
+                            true);
                     }
 
                     // Now we need to copy the translations
                     if (sourceWiki != null)
                         context.setDatabase(sourceWiki);
-                    List tlist = sdoc.getTranslationList(context);
-                    for (int i = 0; i < tlist.size(); i++) {
-                        String clanguage = (String) tlist.get(i);
+                    List<String> tlist = sdoc.getTranslationList(context);
+                    for (String clanguage : tlist) {
                         XWikiDocument stdoc = sdoc.getTranslatedDocument(clanguage, context);
                         if (LOG.isInfoEnabled())
                             LOG.info("Copying document: " + docname + "(" + clanguage + ") to "
@@ -3904,13 +3907,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                     if (targetWiki != null)
                         context.setDatabase(targetWiki);
-                    List attachlist = tdoc.getAttachmentList();
-                    if (attachlist.size() > 0) {
-                        for (int i = 0; i < attachlist.size(); i++) {
-                            XWikiAttachment attachment = (XWikiAttachment) attachlist.get(i);
-                            getAttachmentStore().saveAttachmentContent(attachment, false,
-                                context, true);
-                        }
+                    for (XWikiAttachment attachment : tdoc.getAttachmentList()) {
+                        getAttachmentStore().saveAttachmentContent(attachment, false, context,
+                            true);
                     }
                 }
             }
@@ -3938,12 +3937,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (clean) {
             try {
                 context.setDatabase(targetWiki);
-                List list = getStore().searchDocumentsNames(sql, context);
-                if (LOG.isInfoEnabled())
+                List<String> list = getStore().searchDocumentsNames(sql, context);
+                if (LOG.isInfoEnabled()) {
                     LOG.info("Deleting " + list.size() + " documents from wiki " + targetWiki);
+                }
 
-                for (Iterator it = list.iterator(); it.hasNext();) {
-                    String docname = (String) it.next();
+                for (String docname : list) {
                     XWikiDocument doc = getDocument(docname, context);
                     deleteDocument(doc, context);
                 }
@@ -3954,13 +3953,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         try {
             context.setDatabase(sourceWiki);
-            List list = getStore().searchDocumentsNames(sql, context);
-            if (LOG.isInfoEnabled())
+            List<String> list = getStore().searchDocumentsNames(sql, context);
+            if (LOG.isInfoEnabled()) {
                 LOG.info("Copying " + list.size() + " documents from wiki " + sourceWiki
                     + " to wiki " + targetWiki);
+            }
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                String docname = (String) it.next();
+            for (String docname : list) {
                 copyDocument(docname, sourceWiki, targetWiki, wikilanguage, context);
                 nb++;
             }
@@ -4750,11 +4749,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return new ZipOutputStream(context.getResponse().getOutputStream());
     }
 
-    private Map getSearchEngineRules(XWikiContext context)
+    private Map<String, SearchEngineRule> getSearchEngineRules(XWikiContext context)
     {
         // We currently hardcode the rules
         // We will put them in the preferences soon
-        Map map = new HashMap();
+        Map<String, SearchEngineRule> map = new HashMap<String, SearchEngineRule>();
         map.put("Google", new SearchEngineRule("google.", "s/(^|.*&)q=(.*?)(&.*|$)/$2/"));
         map.put("MSN", new SearchEngineRule("search.msn.", "s/(^|.*&)q=(.*?)(&.*|$)/$2/"));
         map.put("Yahoo", new SearchEngineRule("search.yahoo.", "s/(^|.*&)p=(.*?)(&.*|$)/$2/"));
@@ -4766,12 +4765,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         try {
             URL url = new URL(referer);
-            Map searchengines = getSearchEngineRules(context);
+            Map<String, SearchEngineRule> searchengines = getSearchEngineRules(context);
             if (searchengines != null) {
-                Iterator seit = searchengines.keySet().iterator();
-                while (seit.hasNext()) {
-                    String sengine = (String) seit.next();
-                    SearchEngineRule senginerule = (SearchEngineRule) searchengines.get(sengine);
+                for (SearchEngineRule senginerule : searchengines.values()) {
                     String host = url.getHost();
                     int i1 = host.indexOf(senginerule.getHost());
                     if (i1 != -1) {
@@ -5272,9 +5268,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
-    public List getSpaces(XWikiContext context) throws XWikiException
+    public List<String> getSpaces(XWikiContext context) throws XWikiException
     {
-        List webs = null;
+        List<String> webs = null;
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
             webs = this.search("select distinct doc.web from XWikiDocument doc", context);
         } else if (getNotCacheStore() instanceof XWikiJcrStore) {
@@ -5283,9 +5279,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return webs;
     }
 
-    public List getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
+    public List<String> getSpaceDocsName(String spaceName, XWikiContext context)
+        throws XWikiException
     {
-        List docs = null;
+        List<String> docs = null;
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
             docs =
                 this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{
@@ -5364,9 +5361,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         throws XWikiException
     {
         // Delete all documents
-        List list = doc.getTranslationList(context);
-        for (int i = 0; i < list.size(); i++) {
-            String lang = (String) list.get(i);
+        for (String lang : doc.getTranslationList(context)) {
             XWikiDocument tdoc = doc.getTranslatedDocument(lang, context);
             deleteDocument(tdoc, totrash, context);
         }
@@ -5376,7 +5371,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void refreshLinks(XWikiContext context) throws XWikiException
     {
         // refreshes all Links of each doc of the wiki
-        List docs = null;
+        List<String> docs = null;
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
             docs = this.search("select doc.fullName from XWikiDocument as doc", context);
         } else if (getNotCacheStore() instanceof XWikiJcrStore) {
@@ -5385,7 +5380,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             return;
         }
         for (int i = 0; i < docs.size(); i++) {
-            XWikiDocument myDoc = this.getDocument((String) docs.get(i), context);
+            XWikiDocument myDoc = this.getDocument(docs.get(i), context);
             myDoc.getStore().saveLinks(myDoc, context, true);
         }
     }
@@ -5667,7 +5662,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public BaseObject getObjectFromRequest(String className, XWikiContext context)
         throws XWikiException
     {
-        Map map = Util.getObject(context.getRequest(), className);
+        Map<String, String[]> map = Util.getObject(context.getRequest(), className);
         BaseClass bclass = context.getWiki().getClass(className, context);
         BaseObject newobject = (BaseObject) bclass.fromMap(map, context);
         return newobject;

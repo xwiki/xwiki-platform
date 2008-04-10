@@ -309,6 +309,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             xwiki = (XWiki) econtext.getAttribute(xwikiname);
             if (xwiki == null) {
                 synchronized (XWiki.class) {
+                    xwiki = (XWiki) econtext.getAttribute(xwikiname);
                     if (xwiki == null) {
                         InputStream xwikicfgis =
                             XWiki.readXWikiConfiguration(getConfigPath(), econtext, context);

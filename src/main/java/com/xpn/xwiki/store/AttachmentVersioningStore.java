@@ -44,7 +44,7 @@ public interface AttachmentVersioningStore
         boolean bTransaction) throws XWikiException;
     
     /**
-     * Save attachment archive.
+     * Save or update attachment archive.
      * @param archive       The attachment archive to save.
      * @param context       The current context.
      * @param bTransaction  Should use old transaction (false) or create new (true).
@@ -54,7 +54,7 @@ public interface AttachmentVersioningStore
         throws XWikiException;
 
     /**
-     * Permanently delete attachment archive from recycle bin.
+     * Permanently delete attachment archive.
      * @param attachment    The attachment to delete.
      * @param context       The current context.
      * @param bTransaction  Should use old transaction (false) or create new (true).

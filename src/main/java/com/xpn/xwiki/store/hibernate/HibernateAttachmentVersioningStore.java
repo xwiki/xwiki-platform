@@ -57,24 +57,25 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
      */
     public XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, 
         XWikiContext context, boolean bTransaction) throws XWikiException
-    {
-        final XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
-        archive.setAttachment(attachment);
+    {                
         try {
-            return executeRead(context, bTransaction,
-                new HibernateCallback<XWikiAttachmentArchive>() {
-                    public XWikiAttachmentArchive doInHibernate(Session session)
+            final XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
+            executeRead(context, bTransaction,
+                new HibernateCallback<Object>() {
+                    public Object doInHibernate(Session session)
                         throws HibernateException
                     {
                         try {
-                            session.load(archive, new Long(archive.getId()));
+                            session.load(archive, archive.getId());
                         } catch (ObjectNotFoundException e) {
                             // if none found then return empty created archive
                         }
-                        attachment.setAttachment_archive(archive);
-                        return archive;
+                        return null;                        
                     }
                 });
+            archive.setAttachment(attachment);
+            attachment.setAttachment_archive(archive);
+            return archive;
         } catch (Exception e) {
             Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

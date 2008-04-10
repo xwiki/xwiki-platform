@@ -222,7 +222,7 @@ public class XWikiDocument
     // We are using a SoftReference which will allow the archive to be
     // discarded by the Garbage collector as long as the context is closed (usually during the
     // request)
-    private SoftReference archive;
+    private SoftReference<XWikiDocumentArchive> archive;
 
     private XWikiStoreInterface store;
 
@@ -426,7 +426,7 @@ public class XWikiDocument
     public String getRenderedContent(String text, XWikiContext context)
     {
         String result;
-        HashMap backup = new HashMap();
+        HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
             backupContext(backup, context);
             setAsContextDoc(context);
@@ -843,7 +843,7 @@ public class XWikiDocument
     {
         if (!((customClassName == null) || (customClassName.equals("")))) {
             try {
-                Class[] classes = new Class[] {XWikiDocument.class, XWikiContext.class};
+                Class< ? >[] classes = new Class[] {XWikiDocument.class, XWikiContext.class};
                 Object[] args = new Object[] {this, context};
                 return (com.xpn.xwiki.api.Document) Class.forName(customClassName)
                     .getConstructor(classes).newInstance(args);
@@ -881,7 +881,7 @@ public class XWikiDocument
             // We are using a SoftReference which will allow the archive to be
             // discarded by the Garbage collector as long as the context is closed (usually during
             // the request)
-            archive = new SoftReference(arch);
+            archive = new SoftReference<XWikiDocumentArchive>(arch);
         }
     }
 
@@ -903,7 +903,7 @@ public class XWikiDocument
         // discarded by the Garbage collector as long as the context is closed (usually during the
         // request)
         if (arch != null) {
-            this.archive = new SoftReference(arch);
+            this.archive = new SoftReference<XWikiDocumentArchive>(arch);
         }
     }
 
@@ -1077,9 +1077,9 @@ public class XWikiDocument
         BaseObject object = BaseClass.newCustomClassInstance(classname, context);
         object.setName(getFullName());
         object.setClassName(classname);
-        Vector objects = getObjects(classname);
+        Vector<BaseObject> objects = getObjects(classname);
         if (objects == null) {
-            objects = new Vector();
+            objects = new Vector<BaseObject>();
             setObjects(classname, objects);
         }
         objects.add(object);
@@ -1092,7 +1092,7 @@ public class XWikiDocument
     public int getObjectNumbers(String classname)
     {
         try {
-            return ((Vector) getxWikiObjects().get(classname)).size();
+            return getxWikiObjects().get(classname).size();
         } catch (Exception e) {
             return 0;
         }
@@ -1109,7 +1109,7 @@ public class XWikiDocument
         return getxWikiObjects().get(classname);
     }
 
-    public void setObjects(String classname, Vector objects)
+    public void setObjects(String classname, Vector<BaseObject> objects)
     {
         if (classname.indexOf(".") == -1) {
             classname = "XWiki." + classname;
@@ -1122,12 +1122,12 @@ public class XWikiDocument
         if (classname.indexOf(".") == -1) {
             classname = "XWiki." + classname;
         }
-        Vector objects = (Vector) getxWikiObjects().get(classname);
+        Vector<BaseObject> objects = getxWikiObjects().get(classname);
         if (objects == null) {
             return null;
         }
         for (int i = 0; i < objects.size(); i++) {
-            BaseObject obj = (BaseObject) objects.get(i);
+            BaseObject obj = objects.get(i);
             if (obj != null) {
                 return obj;
             }
@@ -1166,12 +1166,12 @@ public class XWikiDocument
                 }
             }
 
-            Vector objects = (Vector) getxWikiObjects().get(classname);
+            Vector<BaseObject> objects = getxWikiObjects().get(classname);
             if ((objects == null) || (objects.size() == 0)) {
                 return null;
             }
             for (int i = 0; i < objects.size(); i++) {
-                BaseObject obj = (BaseObject) objects.get(i);
+                BaseObject obj = objects.get(i);
                 if (obj != null) {
                     if (value.equals(obj.getStringValue(key))) {
                         return obj;
@@ -1196,7 +1196,7 @@ public class XWikiDocument
 
     public void addObject(String classname, BaseObject object)
     {
-        Vector vobj = getObjects(classname);
+        Vector<BaseObject> vobj = getObjects(classname);
         if (vobj == null) {
             setObject(classname, 0, object);
         } else {
@@ -1207,9 +1207,9 @@ public class XWikiDocument
 
     public void setObject(String classname, int nb, BaseObject object)
     {
-        Vector objects = getObjects(classname);
+        Vector<BaseObject> objects = getObjects(classname);
         if (objects == null) {
-            objects = new Vector();
+            objects = new Vector<BaseObject>();
             setObjects(classname, objects);
         }
         if (nb >= objects.size()) {
@@ -1390,7 +1390,7 @@ public class XWikiDocument
     public String display(String fieldname, String type, String pref, BaseObject obj,
         XWikiContext context)
     {
-        HashMap backup = new HashMap();
+        HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
             backupContext(backup, context);
             setAsContextDoc(context);
@@ -1517,7 +1517,6 @@ public class XWikiDocument
 
         StringBuffer result = new StringBuffer();
         VelocityContext vcontext = new VelocityContext();
-        vcontext.put("formatter", new VelocityFormatter(vcontext));
         for (Iterator it = fields.iterator(); it.hasNext();) {
             PropertyClass pclass = (PropertyClass) it.next();
             vcontext.put(pclass.getName(), pclass.getPrettyName());
@@ -2715,7 +2714,7 @@ public class XWikiDocument
         }
     }
 
-    public List getIncludedMacros(XWikiContext context)
+    public List<String> getIncludedMacros(XWikiContext context)
     {
         return context.getWiki().getIncludedMacros(getSpace(), getContent(), context);
     }

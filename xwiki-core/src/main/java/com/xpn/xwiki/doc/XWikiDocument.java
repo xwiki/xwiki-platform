@@ -2605,8 +2605,8 @@ public class XWikiDocument
         deleteAttachment(attachment, true, context);
     }
 
-    public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
-        throws XWikiException
+    public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin,
+        XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
         try {
@@ -4049,30 +4049,25 @@ public class XWikiDocument
     }
 
     // This method to split section according to title .
-    public List getSplitSectionsAccordingToTitle() throws XWikiException
+    public List<DocumentSection> getSplitSectionsAccordingToTitle() throws XWikiException
     {
-        // pattern to match the title
-        Pattern pattern =
-            Pattern.compile("^[\\p{Space}]*(1(\\.1)*)[\\p{Space}]+(.*?)$", Pattern.MULTILINE);
-        Matcher matcher = pattern.matcher(getContent());
-        List splitSections = new ArrayList();
+        // Pattern to match the title. Matches only level 1 and level 2 headings.
+        Pattern headingPattern =
+            Pattern.compile("^[ \\t]*+(1(\\.1){0,1}+)[ \\t]++(.++)$", Pattern.MULTILINE);
+        Matcher matcher = headingPattern.matcher(getContent());
+        List<DocumentSection> splitSections = new ArrayList<DocumentSection>();
         int sectionNumber = 0;
-        String contentTemp = getContent();
-        int beforeIndex = 0;
-        while (matcher.find()) { // find title to split
+        // find title to split
+        while (matcher.find()) {
+            ++sectionNumber;
             String sectionLevel = matcher.group(1);
-            if (sectionLevel.equals("1") || sectionLevel.equals("1.1")) {
-                // only set editting for the title that is 1 or 1.1
-                sectionNumber++;
-                String sectionTitle = matcher.group(3);
-                int sectionIndex = contentTemp.indexOf(matcher.group(0), beforeIndex);
-                beforeIndex = sectionIndex + matcher.group(0).length();
-                // initialize a documentSection object
-                DocumentSection docSection =
-                    new DocumentSection(sectionNumber, sectionIndex, sectionLevel, sectionTitle);
-                // add the document section to list
-                splitSections.add(docSection);
-            }
+            String sectionTitle = matcher.group(3);
+            int sectionIndex = matcher.start();
+            // Initialize a documentSection object.
+            DocumentSection docSection =
+                new DocumentSection(sectionNumber, sectionIndex, sectionLevel, sectionTitle);
+            // Add the document section to list.
+            splitSections.add(docSection);
         }
         return splitSections;
     }

@@ -22,11 +22,12 @@ package com.xpn.xwiki.doc;
 import java.util.Date;
 import java.util.List;
 
-import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.Mock;
-import com.xpn.xwiki.XWikiContext;
+import org.jmock.cglib.MockObjectTestCase;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
+import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
 import com.xpn.xwiki.render.XWikiRenderingEngine;
@@ -154,5 +155,56 @@ public class XWikiDocumentTest extends MockObjectTestCase
     {
         assertEquals("Space.Page", document.toString());
         assertEquals("Main.WebHome", new XWikiDocument().toString());
+    }
+
+    public void testSectionSplit() throws XWikiException
+    {
+        List<DocumentSection> sections;
+        // Simple test
+        document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        sections = document.getSplitSectionsAccordingToTitle();
+        assertEquals(3, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        assertEquals(3, sections.get(2).getSectionNumber());
+        assertEquals(80, sections.get(2).getSectionIndex());
+        // Test comments don't break the section editing
+        document.setContent("1 Section 1\n" + "Content of first section\n"
+            + "## 1.1 Subsection 2\n" + "Content of second section\n" + "1 Section 3\n"
+            + "Content of section 3");
+        sections = document.getSplitSectionsAccordingToTitle();
+        assertEquals(2, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("1", sections.get(1).getSectionLevel());
+        assertEquals(2, sections.get(1).getSectionNumber());
+        assertEquals(83, sections.get(1).getSectionIndex());
+        // Test spaces are ignored
+        document.setContent("1 Section 1\n" + "Content of first section\n"
+            + "   1.1    Subsection 2  \n" + "Content of second section\n" + "1 Section 3\n"
+            + "Content of section 3");
+        sections = document.getSplitSectionsAccordingToTitle();
+        assertEquals(3, sections.size());
+        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        // Test lower headings are ignored
+        document.setContent("1 Section 1\n" + "Content of first section\n"
+            + "1.1.1 Lower subsection\n" + "This content is not important\n"
+            + "   1.1    Subsection 2  \n" + "Content of second section\n" + "1 Section 3\n"
+            + "Content of section 3");
+        sections = document.getSplitSectionsAccordingToTitle();
+        assertEquals(3, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        // Test blank lines are preserved
+        document.setContent("\n\n1 Section 1\n\n\n" + "Content of first section\n\n\n"
+            + "   1.1    Subsection 2  \n\n" + "Content of second section\n" + "1 Section 3\n"
+            + "Content of section 3");
+        sections = document.getSplitSectionsAccordingToTitle();
+        assertEquals(3, sections.size());
+        assertEquals(2, sections.get(0).getSectionIndex());
+        assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
+        assertEquals(43, sections.get(1).getSectionIndex());
     }
 }

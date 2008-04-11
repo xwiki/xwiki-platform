@@ -68,7 +68,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
 /**
  * Plugin that brings powerful mailing capabilities.
- *
+ * 
  * @see MailSender
  * @version $Id: $
  */
@@ -91,7 +91,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public MailSenderPlugin(String name, String className, XWikiContext context)
@@ -102,7 +102,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(XWikiContext)
      */
     public void init(XWikiContext context)
@@ -116,7 +116,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#virtualInit(XWikiContext)
      */
     public void virtualInit(XWikiContext context)
@@ -130,9 +130,8 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface,
-     *XWikiContext)
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface, XWikiContext)
      */
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
@@ -141,7 +140,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Split comma separated list of emails
-     *
+     * 
      * @param email comma separated list of emails
      * @return An array containing the emails
      */
@@ -160,7 +159,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Filters a list of emails : removes illegal addresses
-     *
+     * 
      * @param email List of emails
      * @return An Array containing the correct adresses
      */
@@ -180,7 +179,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Creates the Mail XWiki Class
-     *
+     * 
      * @param context Context of the request
      * @return the Mail XWiki Class
      */
@@ -221,7 +220,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Add attachments to a multipart message
-     *
+     * 
      * @param mpart Multipart message
      * @param attachments List of attachments
      */
@@ -257,14 +256,13 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     /**
      * Creates a MIME message (message with binary content carrying capabilities) from an existing
      * Mail
-     *
+     * 
      * @param mail The original Mail object
      * @param session Mail session
      * @return The MIME message
      */
     private MimeMessage createMimeMessage(Mail mail, Session session, XWikiContext context)
-        throws MessagingException,
-        XWikiException, IOException
+        throws MessagingException, XWikiException, IOException
     {
         // this will also check for email error
         InternetAddress from = new InternetAddress(mail.getFrom());
@@ -295,7 +293,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
         message.setSubject(mail.getSubject(), "UTF-8");
 
-        for(Map.Entry<String,String> header : mail.getHeaders().entrySet()) {
+        for (Map.Entry<String, String> header : mail.getHeaders().entrySet()) {
             message.setHeader(header.getKey(), header.getValue());
         }
 
@@ -314,13 +312,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     /**
      * Creates a Multipart MIME Message (multiple content-types within the same message) from an
      * existing mail
-     *
+     * 
      * @param mail The original Mail
      * @return The Multipart MIME message
      */
     public Multipart createMimeMultipart(Mail mail, XWikiContext context)
-        throws MessagingException, XWikiException,
-        IOException
+        throws MessagingException, XWikiException, IOException
     {
 
         if (mail.getHtmlPart() == null && mail.getAttachments() != null) {
@@ -367,7 +364,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Evaluates a String property containing Velocity
-     *
+     * 
      * @param property The String property
      * @param context Context of the request
      * @return The evaluated String
@@ -383,7 +380,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Get a file name from its path
-     *
+     * 
      * @param path The file path
      * @return The file name
      */
@@ -399,7 +396,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Init a Mail Properties map (exs: smtp, host)
-     *
+     * 
      * @return The properties
      */
     private Properties initProperties(MailConfiguration mailConfiguration)
@@ -424,33 +421,35 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Prepares a Mail Velocity context
-     *
+     * 
      * @param fromAddr Mail from
      * @param toAddr Mail to
+     * @param ccAddr Mail cc
      * @param bccAddr Mail bcc
      * @param vcontext The Velocity context to prepare
      * @return The prepared context
      */
-    public VelocityContext prepareVelocityContext(String fromAddr, String toAddr, String bccAddr,
-        VelocityContext vcontext, XWikiContext context)
+    public VelocityContext prepareVelocityContext(String fromAddr, String toAddr, String ccAddr,
+        String bccAddr, VelocityContext vcontext, XWikiContext context)
     {
         if (vcontext == null) {
             vcontext = new VelocityContext();
         }
-        
+
         vcontext.put("from.name", fromAddr);
         vcontext.put("from.address", fromAddr);
         vcontext.put("to.name", toAddr);
         vcontext.put("to.address", toAddr);
+        vcontext.put("to.cc", ccAddr);
         vcontext.put("to.bcc", bccAddr);
-        vcontext.put("bounce", fromAddr);        
+        vcontext.put("bounce", fromAddr);
 
         return vcontext;
     }
 
     /**
      * Transform Images URLs to point on Message parts (cid: MIME Multipart)
-     *
+     * 
      * @param html The HTML message
      * @return The Transformed HTML message
      */
@@ -477,26 +476,27 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Send a single Mail
-     *
+     * 
      * @param mailItem The Mail to send
      * @return True if the the email has been sent
      */
-    public boolean sendMail(Mail mailItem, XWikiContext context)
-        throws MessagingException, UnsupportedEncodingException
+    public boolean sendMail(Mail mailItem, XWikiContext context) throws MessagingException,
+        UnsupportedEncodingException
     {
         // TODO: Fix the need to instantiate a new XWiki API object
-        com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
+        com.xpn.xwiki.api.XWiki xwikiApi =
+            new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
         return sendMail(mailItem, new MailConfiguration(xwikiApi), context);
     }
 
     /**
      * Send a single Mail
-     *
+     * 
      * @param mailItem The Mail to send
      * @return True if the the email has been sent
      */
-    public boolean sendMail(Mail mailItem, MailConfiguration mailConfiguration, XWikiContext context)
-        throws MessagingException, UnsupportedEncodingException
+    public boolean sendMail(Mail mailItem, MailConfiguration mailConfiguration,
+        XWikiContext context) throws MessagingException, UnsupportedEncodingException
     {
         ArrayList mailList = new ArrayList();
         mailList.add(mailItem);
@@ -505,26 +505,27 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
     /**
      * Send a Collection of Mails (multiple emails)
-     *
+     * 
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
-    public boolean sendMails(Collection emails, XWikiContext context)
-        throws MessagingException, UnsupportedEncodingException
+    public boolean sendMails(Collection emails, XWikiContext context) throws MessagingException,
+        UnsupportedEncodingException
     {
         // TODO: Fix the need to instantiate a new XWiki API object
-        com.xpn.xwiki.api.XWiki xwikiApi = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
+        com.xpn.xwiki.api.XWiki xwikiApi =
+            new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
         return sendMails(emails, new MailConfiguration(xwikiApi), context);
     }
 
     /**
      * Send a Collection of Mails (multiple emails)
-     *
+     * 
      * @param emails Mail Collection
      * @return True in any case (TODO ?)
      */
-    public boolean sendMails(Collection emails, MailConfiguration mailConfiguration, XWikiContext context)
-        throws MessagingException, UnsupportedEncodingException
+    public boolean sendMails(Collection emails, MailConfiguration mailConfiguration,
+        XWikiContext context) throws MessagingException, UnsupportedEncodingException
     {
         Session session = null;
         Transport transport = null;
@@ -605,9 +606,9 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     /**
      * Uses an XWiki document to build the message subject and context, based on variables stored in
      * the VelocityContext. Sends the email.
-     *
+     * 
      * @param templateDocFullName Full name of the template to be used (example:
-     * XWiki.MyEmailTemplate). The template needs to have an XWiki.Email object attached
+     *            XWiki.MyEmailTemplate). The template needs to have an XWiki.Email object attached
      * @param from Email sender
      * @param to Email recipient
      * @param cc Email Carbon Copy
@@ -622,7 +623,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
     {
 
         VelocityContext updatedVelocityContext =
-            prepareVelocityContext(from, to, bcc, vcontext, context);
+            prepareVelocityContext(from, to, cc, bcc, vcontext, context);
         XWiki xwiki = context.getWiki();
         XWikiDocument doc = xwiki.getDocument(templateDocFullName, context);
         BaseObject obj = doc.getObject(EMAIL_XWIKI_CLASS_NAME, "language", language);
@@ -650,6 +651,7 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         Mail mail = new Mail();
         mail.setFrom((String) updatedVelocityContext.get("from.address"));
         mail.setTo((String) updatedVelocityContext.get("to.address"));
+        mail.setCc((String) updatedVelocityContext.get("to.cc"));
         mail.setBcc((String) updatedVelocityContext.get("to.bcc"));
         mail.setSubject(subject);
         mail.setTextPart(msg);

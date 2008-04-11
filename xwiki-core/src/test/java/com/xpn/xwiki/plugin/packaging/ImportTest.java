@@ -56,7 +56,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
 
 public class ImportTest extends AbstractXWikiComponentTestCase 
 {
-	private Package pack;
+    private Package pack;
     private XWikiContext context;
     private XWiki xwiki;
     private Mock mockXWikiStore;

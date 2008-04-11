@@ -72,7 +72,7 @@ public class R7350XWIKI2079Migrator extends AbstractXWikiHibernateMigrator
     public void migrate(XWikiHibernateMigrationManager manager, final XWikiContext context)
         throws XWikiException
     {
-        manager.getStore(context).executeWrite(context, true, new HibernateCallback()
+        manager.getStore(context).executeWrite(context, true, new HibernateCallback<Object>()
         {
             public Object doInHibernate(Session session) throws HibernateException,
                 XWikiException

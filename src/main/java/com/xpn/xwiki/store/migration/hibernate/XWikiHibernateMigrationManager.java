@@ -33,6 +33,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
 import com.xpn.xwiki.store.migration.XWikiDBVersion;
+import com.xpn.xwiki.store.migration.XWikiMigratorInterface;
 
 /**
  * Migration manager for hibernate store.
@@ -58,9 +59,9 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
     /** {@inheritDoc} */
     public XWikiDBVersion getDBVersion(XWikiContext context) throws XWikiException {
         XWikiDBVersion ver = getDBVersionFromConfig(context);
-        return ver != null ? ver : (XWikiDBVersion) getStore(context).executeRead(context, true,
-            new HibernateCallback() { 
-            public Object doInHibernate(Session session) throws HibernateException
+        return ver != null ? ver : getStore(context).executeRead(context, true,
+            new HibernateCallback<XWikiDBVersion>() { 
+            public XWikiDBVersion doInHibernate(Session session) throws HibernateException
             {
                 XWikiDBVersion result = (XWikiDBVersion) session.createCriteria(
                     XWikiDBVersion.class).uniqueResult();
@@ -70,7 +71,7 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
     }
     /** {@inheritDoc} */
     protected void setDBVersion(final XWikiDBVersion version, XWikiContext context) throws XWikiException {
-        getStore(context).executeWrite(context, true, new HibernateCallback() {
+        getStore(context).executeWrite(context, true, new HibernateCallback<Object>() {
             public Object doInHibernate(Session session) throws HibernateException
             {
                 session.createQuery("delete from "+XWikiDBVersion.class.getName()).executeUpdate();
@@ -80,9 +81,9 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         });
     }
     /** {@inheritDoc} */
-    protected List getAllMigrations(XWikiContext context) throws XWikiException
+    protected List<XWikiMigratorInterface> getAllMigrations(XWikiContext context) throws XWikiException
     {
-        List result = new ArrayList();
+        List<XWikiMigratorInterface> result = new ArrayList<XWikiMigratorInterface>();
         // TODO: how to register migrations?
         // 1st way:
         result.add(new R4340XWIKI883Migrator());
@@ -90,7 +91,7 @@ public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManage
         result.add(new R6079XWIKI1878Migrator());
         result.add(new R6405XWIKI1933Migrator());
         result.add(new R7350XWIKI2079Migrator());
-        // 2nd way - via classloader
+        // 2nd way - via component manager
         
         return result;
     }

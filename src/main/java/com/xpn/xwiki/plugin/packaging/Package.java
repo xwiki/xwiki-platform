@@ -574,8 +574,11 @@ public class Package
         if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST
             && doc.getAction() == DocumentInfo.ACTION_OVERWRITE) {
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST) {
-                XWikiDocument deleteddoc =
-                    context.getWiki().getDocument(doc.getFullName(), context);
+            	XWikiDocument deleteddoc = context.getWiki().getDocument(doc.getFullName(), context);
+        		//if this document is a translation: we should only delete the translation
+                if (doc.getDoc().getTranslation() != 0) {
+                    deleteddoc = deleteddoc.getTranslatedDocument(doc.getLanguage(), context);
+                }
                 try {
                     context.getWiki().deleteDocument(deleteddoc, context);
                 } catch (Exception e) {

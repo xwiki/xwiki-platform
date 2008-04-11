@@ -39,7 +39,8 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Migration for XWIKI1459: keep document history in a separate table
- * @version $Id: $ 
+ * 
+ * @version $Id: $
  */
 public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
 {
@@ -48,6 +49,7 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
 
     /**
      * {@inheritDoc}
+     * 
      * @see AbstractXWikiHibernateMigrator#getName()
      */
     public String getName()
@@ -57,6 +59,7 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
 
     /**
      * {@inheritDoc}
+     * 
      * @see com.xpn.xwiki.store.migration.hibernate.AbstractXWikiHibernateMigrator#getDescription()
      */
     public String getDescription()
@@ -75,29 +78,42 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
         throws XWikiException
     {
         // migrate data
-        manager.getStore(context).executeWrite(context, true, new HibernateCallback() {
-            public Object doInHibernate(Session session) throws HibernateException, XWikiException
+        manager.getStore(context).executeWrite(context, true, new HibernateCallback<Object>()
+        {
+            public Object doInHibernate(Session session) throws HibernateException,
+                XWikiException
             {
                 try {
                     Statement stmt = session.connection().createStatement();
                     ResultSet rs;
                     try {
-                        // We place an empty character in archives for documents that have already been migrated so
+                        // We place an empty character in archives for documents that have already
+                        // been migrated so
                         // that we can re-execute this migrator and not start over.
-                        // Note that we cannot use NULL since in old databases (prior to 1.1) the XWD_ARCHIVE column
-                        // had a not null constraint and since this column has disappeared in 1.2 and after, the
+                        // Note that we cannot use NULL since in old databases (prior to 1.1) the
+                        // XWD_ARCHIVE column
+                        // had a not null constraint and since this column has disappeared in 1.2
+                        // and after, the
                         // hibernate update script will not have modified the nullability of it...
                         // (see http://jira.xwiki.org/jira/browse/XWIKI-2074).
-                        rs = stmt.executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION");
+                        rs =
+                            stmt
+                                .executeQuery("select XWD_ID, XWD_ARCHIVE, XWD_FULLNAME from xwikidoc where (XWD_ARCHIVE is not null and XWD_ARCHIVE <> ' ') order by XWD_VERSION");
                     } catch (SQLException e) {
                         // most likely there is no XWD_ARCHIVE column, so migration is not needed
                         // is there easier way to find what column is not exist?
                         return null;
                     }
-                    Transaction originalTransaction = ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).getTransaction(context);
-                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(null, context);
-                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(null, context);
-                    PreparedStatement deleteStatement = session.connection().prepareStatement("update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
+                    Transaction originalTransaction =
+                        ((XWikiHibernateVersioningStore) context.getWiki().getVersioningStore())
+                            .getTransaction(context);
+                    ((XWikiHibernateVersioningStore) context.getWiki().getVersioningStore())
+                        .setSession(null, context);
+                    ((XWikiHibernateVersioningStore) context.getWiki().getVersioningStore())
+                        .setTransaction(null, context);
+                    PreparedStatement deleteStatement =
+                        session.connection().prepareStatement(
+                            "update xwikidoc set XWD_ARCHIVE=' ' where XWD_ID=?");
 
                     while (rs.next()) {
                         if (LOG.isInfoEnabled()) {
@@ -106,25 +122,32 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                         long docId = Long.parseLong(rs.getString(1));
                         String sArchive = rs.getString(2);
 
-                        // In some weird cases it can happen that the XWD_ARCHIVE field is empty (that shouldn't happen but we've seen it happening).
+                        // In some weird cases it can happen that the XWD_ARCHIVE field is empty
+                        // (that shouldn't happen but we've seen it happening).
                         // In this case just ignore the archive...
                         if (sArchive.trim().length() != 0) {
                             XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
                             docArchive.setArchive(sArchive);
-                            context.getWiki().getVersioningStore().saveXWikiDocArchive(docArchive, true, context);
+                            context.getWiki().getVersioningStore().saveXWikiDocArchive(
+                                docArchive, true, context);
                         } else {
-                            LOG.warn("Empty revision found for document [" + rs.getString(3) + "]. Ignoring non-fatal error.");
+                            LOG.warn("Empty revision found for document [" + rs.getString(3)
+                                + "]. Ignoring non-fatal error.");
                         }
                         deleteStatement.setLong(1, docId);
                         deleteStatement.executeUpdate();
                     }
                     deleteStatement.close();
                     stmt.close();
-                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setSession(session, context);
-                    ((XWikiHibernateVersioningStore)context.getWiki().getVersioningStore()).setTransaction(originalTransaction, context);
+                    ((XWikiHibernateVersioningStore) context.getWiki().getVersioningStore())
+                        .setSession(session, context);
+                    ((XWikiHibernateVersioningStore) context.getWiki().getVersioningStore())
+                        .setTransaction(originalTransaction, context);
                 } catch (SQLException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                        XWikiException.ERROR_XWIKI_STORE_MIGRATION, getName() + " migration failed", e);
+                        XWikiException.ERROR_XWIKI_STORE_MIGRATION,
+                        getName() + " migration failed",
+                        e);
                 }
                 return Boolean.TRUE;
             }

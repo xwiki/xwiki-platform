@@ -90,7 +90,7 @@ public class R6079XWIKI1878Migrator extends AbstractXWikiHibernateMigrator
         throws XWikiException
     {
         // migrate data
-        manager.getStore(context).executeWrite(context, true, new XWikiHibernateBaseStore.HibernateCallback() {
+        manager.getStore(context).executeWrite(context, true, new XWikiHibernateBaseStore.HibernateCallback<Object>() {
             public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 try {

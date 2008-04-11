@@ -38,7 +38,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 import com.xpn.xwiki.plugin.rightsmanager.utils.AllowDeny;
 import com.xpn.xwiki.plugin.rightsmanager.utils.LevelTree;
 import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
@@ -1086,10 +1088,36 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                 needUpdate |=
                     removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace,
                         userOrGroupName, user, context);
+
+                if (needUpdate && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0
+                    && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0) {
+                    rightsDocument.removeObject(bobj);
+                }
             }
         }
 
         return needUpdate;
+    }
+
+    /**
+     * Remove all references to provided user or group from provided rights document.
+     * 
+     * @param rightsDocument the document containing the rights preferences.
+     * @param userOrGroupWiki the name of the wiki of the use or group.
+     * @param userOrGroupSpace the name of the space of the use or group.
+     * @param userOrGroupName the name of the use or group.
+     * @param user indicate if it is a user or a group.
+     * @param context the XWiki context.
+     * @return true if user or group has been found and removed.
+     */
+    public boolean removeUserOrGroupFromAllRights(XWikiDocument rightsDocument,
+        String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName, boolean user,
+        XWikiContext context)
+    {
+        return removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace,
+            userOrGroupName, user, true, context)
+            || removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace,
+                userOrGroupName, user, false, context);
     }
 
     /**
@@ -1107,22 +1135,32 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
     {
         List parameterValues = new ArrayList();
 
+        String fieldName;
+        if (user) {
+            fieldName = RIGHTSFIELD_USERS;
+        } else {
+            fieldName = RIGHTSFIELD_GROUPS;
+        }
+
+        BaseClass rightClass = context.getWiki().getRightsClass(context);
+        BaseClass globalRightClass = context.getWiki().getGlobalRightsClass(context);
+
+        String fieldTypeName =
+            ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
+
         StringBuffer where =
-            new StringBuffer(", BaseObject as obj"
-                + ", StringProperty as prop where doc.fullName=obj.name"
-                + " and (obj.className='" + RIGHTS_CLASS + "' or obj.className='"
-                + GLOBAL_RIGHTS_CLASS + "')");
+            new StringBuffer(", BaseObject as obj" + ", " + fieldTypeName
+                + " as prop where doc.fullName=obj.name"
+                + " and (obj.className=? or obj.className=?)");
+        parameterValues.add(rightClass.getName());
+        parameterValues.add(globalRightClass.getName());
 
         where.append(" and obj.id=prop.id.id");
 
         where.append(" and prop.name=?");
-        if (user) {
-            parameterValues.add(RIGHTSFIELD_USERS);
-        } else {
-            parameterValues.add(RIGHTSFIELD_GROUPS);
-        }
+        parameterValues.add(fieldName);
 
-        where.append(" and lower(prop.value) like ?");
+        where.append(" and prop.value like ?");
 
         if (context.getDatabase() == null
             || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
@@ -1143,8 +1181,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         for (Iterator it = documentList.iterator(); it.hasNext();) {
             XWikiDocument groupDocument = (XWikiDocument) it.next();
-            if (removeUserOrGroupFromRights(groupDocument, userOrGroupWiki, userOrGroupSpace,
-                userOrGroupName, user, true, context)) {
+            if (removeUserOrGroupFromAllRights(groupDocument, userOrGroupWiki, userOrGroupSpace,
+                userOrGroupName, user, context)) {
                 context.getWiki().saveDocument(groupDocument, context);
             }
         }

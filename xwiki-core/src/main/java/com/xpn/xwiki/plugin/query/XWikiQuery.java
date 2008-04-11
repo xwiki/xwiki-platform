@@ -63,7 +63,7 @@ public class XWikiQuery extends XWikiCriteria
         Iterator propid = properties.iterator();
         while (propid.hasNext()) {
             String propname = (String) propid.next();
-            Map map = Util.getObject(request, className + "_" + propname);
+            Map<String, String[]> map = Util.getObject(request, className + "_" + propname);
             ((PropertyClass) (bclass.get(propname))).fromSearchMap(this, map);
         }
     }

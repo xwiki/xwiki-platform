@@ -132,6 +132,7 @@ import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
+import com.xpn.xwiki.store.FakeAttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
@@ -139,6 +140,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore;
 import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
 import com.xpn.xwiki.user.api.XWikiAuthService;
@@ -785,7 +787,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         setAttachmentVersioningStore((AttachmentVersioningStore) createClassFromConfig(
             "xwiki.store.attachment.versioning.class",
-            "com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore", context));
+            hasAttachmentVersioning(context)
+                ? HibernateAttachmentVersioningStore.class.getName()
+                : FakeAttachmentVersioningStore.class.getName(),
+            context));
 
         if (hasRecycleBin(context)) {
             setRecycleBinStore((XWikiRecycleBinStoreInterface) createClassFromConfig(
@@ -6064,6 +6069,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public boolean hasVersioning(String fullName, XWikiContext context)
     {
         return ("1".equals(context.getWiki().Param("xwiki.store.versioning", "1")));
+    }
+    
+    public boolean hasAttachmentVersioning(XWikiContext context)
+    {
+        return ("1".equals(context.getWiki().Param("xwiki.store.attachment.versioning", "1")));
     }
 
     public String getExternalAttachmentURL(String fullName, String filename, XWikiContext context)

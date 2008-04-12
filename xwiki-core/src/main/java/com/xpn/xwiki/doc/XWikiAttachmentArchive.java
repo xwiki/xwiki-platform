@@ -21,15 +21,21 @@
 
 package com.xpn.xwiki.doc;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import org.suigeneris.jrcs.rcs.Archive;
-import org.suigeneris.jrcs.util.ToString;
-
 import java.io.ByteArrayInputStream;
 import java.util.Date;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.suigeneris.jrcs.rcs.Archive;
+import org.suigeneris.jrcs.rcs.Version;
+import org.suigeneris.jrcs.rcs.impl.Node;
+import org.suigeneris.jrcs.util.ToString;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+
 public class XWikiAttachmentArchive {
+    private static final Log LOG = LogFactory.getLog(XWikiAttachmentArchive.class);
 
     private XWikiAttachment attachment;
 
@@ -46,6 +52,7 @@ public class XWikiAttachmentArchive {
             attachmentarchive = (XWikiAttachmentArchive) getClass().newInstance();
         } catch (Exception e) {
             // This should not happen
+            LOG.error("Error while attachmentArchive.clone()", e);
         }
 
         attachmentarchive.setAttachment(getAttachment());
@@ -125,5 +132,52 @@ public class XWikiAttachmentArchive {
 
     public void setAttachment(XWikiAttachment attachment) {
         this.attachment = attachment;
+    }
+    
+    public Version[] getVersions() {
+        Node[] nodes = getRCSArchive().changeLog();
+        Version[] versions = new Version[nodes.length];
+        for (int i = 0; i < nodes.length; i++) {
+            versions[i] = nodes[i].getVersion();
+        }
+        return versions;
+    }
+    
+    public XWikiAttachment getRevision(XWikiAttachment attachment, String rev, 
+        XWikiContext context) throws XWikiException
+    {
+        try {
+            Archive archive = getRCSArchive();
+
+            if (archive == null) {
+                return null;
+            }
+
+            Version v = archive.getRevisionVersion(rev);
+            if (v == null) {
+                return null;
+            }
+            Object[] lines = archive.getRevision(v);
+            StringBuffer content = new StringBuffer();
+            for (int i = 0; i < lines.length; i++) {
+                String line = lines[i].toString();
+                content.append(line);
+                if (i != lines.length - 1)
+                    content.append("\n");
+            }
+
+            String scontent = content.toString();
+            XWikiAttachment revattach = new XWikiAttachment();
+            revattach.fromXML(scontent);
+            revattach.setDoc(attachment.getDoc());
+            revattach.setVersion(rev);
+            return revattach;
+        } catch (Exception e) {
+            Object[] args = { attachment.getFilename() };
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
+                "Exception while manipulating the archive for file {0}",
+                e, args);
+        }
     }
 }

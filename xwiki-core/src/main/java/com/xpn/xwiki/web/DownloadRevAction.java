@@ -42,6 +42,9 @@ public class DownloadRevAction extends XWikiAction {
         synchronized (attachment) {
             try {
                 attachment = attachment.getAttachmentRevision(rev, context);
+                if (attachment == null) {
+                    throw new XWikiException();
+                }
             } catch(XWikiException e){
                 String url = context.getDoc().getURL("viewattachrev", true, context);
                 url += "/" + filename;
@@ -50,6 +53,7 @@ public class DownloadRevAction extends XWikiAction {
                 }
                 try {
                     context.getResponse().sendRedirect(url);
+                    return null;
                 } catch (IOException ioe) {
                     ioe.printStackTrace();
                 }

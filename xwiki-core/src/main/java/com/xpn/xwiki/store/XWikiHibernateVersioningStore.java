@@ -40,18 +40,25 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeContent;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeId;
 import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
+/**
+ * Realization of {@link XWikiVersioningStoreInterface} for Hibernate-based storage.
+ * 
+ * @version $Id: $
+ */
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements
     XWikiVersioningStoreInterface
 {
-
-    private static final Log log = LogFactory.getLog(XWikiHibernateVersioningStore.class);
+    /** Logger. */
+    private static final Log LOG = LogFactory.getLog(XWikiHibernateVersioningStore.class);
+    /** Colon symbol. */
+    private static final String COLON = ":";
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from
      * xwiki.cfg or directly in the WEB-INF directory.
      * 
-     * @param xwiki
-     * @param context
+     * @param xwiki The xwiki object
+     * @param context The current context
      */
     public XWikiHibernateVersioningStore(XWiki xwiki, XWikiContext context)
     {
@@ -61,7 +68,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     /**
      * Initialize the storage engine with a specific path This is used for tests.
      * 
-     * @param hibpath
+     * @param hibpath path to hibernate.hbm.xml file
      */
     public XWikiHibernateVersioningStore(String hibpath)
     {
@@ -70,19 +77,24 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
 
     /**
      * @see #XWikiHibernateVersioningStore(XWiki, XWikiContext)
+     * @param context The current context
      */
     public XWikiHibernateVersioningStore(XWikiContext context)
     {
         this(context.getWiki(), context);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public Version[] getXWikiDocVersions(XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
         try {
             XWikiDocumentArchive archive = getXWikiDocumentArchive(doc, context);
-            if (archive == null)
+            if (archive == null) {
                 return new Version[0];
+            }
             Collection<XWikiRCSNodeInfo> nodes = archive.getNodes();
             Version[] versions = new Version[nodes.size()];
             Iterator<XWikiRCSNodeInfo> it = nodes.iterator();
@@ -100,25 +112,31 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                 args);
         }
     }
-
+    
+    /**
+     * {@inheritDoc}
+     */
     public XWikiDocumentArchive getXWikiDocumentArchive(XWikiDocument doc, XWikiContext context)
         throws XWikiException
     {
         XWikiDocumentArchive archiveDoc = doc.getDocumentArchive();
-        if (archiveDoc != null)
+        if (archiveDoc != null) {
             return archiveDoc;
+        }
         String key =
-            ((doc.getDatabase() == null) ? "xwiki" : doc.getDatabase()) + ":" + doc.getFullName();
-        if (!"".equals(doc.getLanguage()))
-            key = key + ":" + doc.getLanguage();
+            ((doc.getDatabase() == null) ? "xwiki" : doc.getDatabase()) + COLON + doc.getFullName();
+        if (!"".equals(doc.getLanguage())) {
+            key = key + COLON + doc.getLanguage();
+        }
 
         synchronized (key) {
             archiveDoc = (XWikiDocumentArchive) context.getDocumentArchive(key);
             if (archiveDoc == null) {
                 String db = context.getDatabase();
                 try {
-                    if (doc.getDatabase() != null)
+                    if (doc.getDatabase() != null) {
                         context.setDatabase(doc.getDatabase());
+                    }
                     archiveDoc = new XWikiDocumentArchive(doc.getId());
                     loadXWikiDocArchive(archiveDoc, true, context);
                     doc.setDocumentArchive(archiveDoc);
@@ -133,11 +151,15 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
         try {
-            List<XWikiRCSNodeInfo> nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), bTransaction);
+            List<XWikiRCSNodeInfo> nodes = loadAllRCSNodeInfo(context, archivedoc.getId(), 
+                bTransaction);
             archivedoc.setNodes(nodes);
         } catch (Exception e) {
             Object[] args = {new Long(archivedoc.getId())};
@@ -149,6 +171,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void saveXWikiDocArchive(final XWikiDocumentArchive archivedoc, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
@@ -156,26 +181,26 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         {
             public Object doInHibernate(Session session) throws HibernateException
             {
-                for (Iterator<XWikiRCSNodeInfo> it = archivedoc.getDeletedNodeInfo().iterator(); it.hasNext();) {
-                    XWikiRCSNodeInfo nodeInfo = it.next();
-                    session.delete(nodeInfo);
-                    it.remove();
+                for (XWikiRCSNodeInfo ni : archivedoc.getDeletedNodeInfo()) {
+                    session.delete(ni);
                 }
-                for (Iterator<XWikiRCSNodeInfo> it = archivedoc.getUpdatedNodeInfos().iterator(); it.hasNext();) {
-                    XWikiRCSNodeInfo nodeInfo = it.next();
-                    session.saveOrUpdate(nodeInfo);
-                    it.remove();
+                archivedoc.getDeletedNodeInfo().clear();
+                for (XWikiRCSNodeInfo ni : archivedoc.getUpdatedNodeInfos()) {
+                    session.saveOrUpdate(ni);
                 }
-                for (Iterator<XWikiRCSNodeContent> it = archivedoc.getUpdatedNodeContents().iterator(); it.hasNext();) {
-                    XWikiRCSNodeContent nodeContent = it.next();
-                    session.update(nodeContent);
-                    it.remove();
+                archivedoc.getUpdatedNodeInfos().clear();
+                for (XWikiRCSNodeContent nc : archivedoc.getUpdatedNodeContents()) {
+                    session.update(nc);
                 }
+                archivedoc.getUpdatedNodeContents().clear();
                 return null;
             }
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public XWikiDocument loadXWikiDoc(XWikiDocument basedoc, String sversion, XWikiContext context)
         throws XWikiException
     {
@@ -201,6 +226,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         return doc;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void resetRCSArchive(final XWikiDocument doc, boolean bTransaction,
         final XWikiContext context) throws XWikiException
     {
@@ -220,6 +248,9 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction,
         XWikiContext context) throws XWikiException
     {
@@ -239,8 +270,11 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
         }
     }
 
-    protected List<XWikiRCSNodeInfo> loadAllRCSNodeInfo(XWikiContext context, final long id, boolean bTransaction)
-        throws XWikiException
+    /**
+     * {@inheritDoc}
+     */
+    protected List<XWikiRCSNodeInfo> loadAllRCSNodeInfo(XWikiContext context, final long id, 
+        boolean bTransaction) throws XWikiException
     {
         return executeRead(context, bTransaction, new HibernateCallback<List<XWikiRCSNodeInfo>>()
         {
@@ -253,7 +287,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
                         Restrictions.isNotNull("diff")).list();
                 } catch (IllegalArgumentException ex) {
                     // This happens when the database has wrong values...
-                    log.warn("Invalid history for document " + id);
+                    LOG.warn("Invalid history for document " + id);
                     return Collections.emptyList();
                 }
             }

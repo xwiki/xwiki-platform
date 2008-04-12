@@ -1934,6 +1934,7 @@ public class XWikiDocument
 
         } catch (Exception e) {
             // This should not happen
+            log.error("Exception while doc.clone", e);
         }
         return doc;
     }

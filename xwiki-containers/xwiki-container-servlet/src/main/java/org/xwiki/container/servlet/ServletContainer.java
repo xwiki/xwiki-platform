@@ -37,9 +37,9 @@ public class ServletContainer implements Container
     private URLFactory urlFactory;
     
     private ApplicationContext applicationContext;
-    private ServletRequest request;
-    private Response response;
-    private Session session;
+    private ThreadLocal<ServletRequest> request = new ThreadLocal<ServletRequest>();
+    private ThreadLocal<ServletResponse> response = new ThreadLocal<ServletResponse>();
+    private ThreadLocal<ServletSession> session = new ThreadLocal<ServletSession>();
     
     /**
      * Called by XWikiServletContextListener when XWiki starts.
@@ -52,9 +52,14 @@ public class ServletContainer implements Container
     public void initialize(HttpServletRequest httpServletRequest,
         HttpServletResponse httpServletResponse) throws ServletContainerException
     {
-        this.request = initializeServletRequest(httpServletRequest);
-        this.response = new ServletResponse(httpServletResponse);
-        this.session = new ServletSession(httpServletRequest);
+        this.request.remove();
+        this.request.set(initializeServletRequest(httpServletRequest));
+        
+        this.response.remove();
+        this.response.set(new ServletResponse(httpServletResponse));
+        
+        this.session.remove();
+        this.session.set(new ServletSession(httpServletRequest));
     }
 
     private ServletRequest initializeServletRequest(HttpServletRequest httpServletRequest)
@@ -80,16 +85,16 @@ public class ServletContainer implements Container
 
     public Request getRequest()
     {
-        return this.request;
+        return this.request.get();
     }
 
     public Response getResponse()
     {
-        return this.response;
+        return this.response.get();
     }
 
     public Session getSession()
     {
-        return this.session;
+        return this.session.get();
     }
 }

@@ -21,17 +21,33 @@
 
 package com.xpn.xwiki.notify;
 
+import java.util.Vector;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 
+/**
+ * XWikiNotificationRule to check weather an object property has changed.
+ * <br />
+ * The rules are as follows:
+ * <ul>
+ * <li>if an object of the specified class is added or deleted a notification is sent</li>
+ * <li>if the objects list is the same then the values of the specified property in <tt>newdoc</tt> 
+ * and <tt>olddoc</tt> are checked on corresponding objects - the correspondence is done based on 
+ * the index of the objects in the list of objects of type <tt>classname</tt>.</li>
+ * <li>if <tt>classname</tt> or <tt>propertyName</tt> are not specified upon instantiation 
+ * (<tt>null</tt> or empty string), this <tt>PropertyChangedRule</tt> will never notify.</li>
+ * </ul>
+ */
 public class PropertyChangedRule extends DocChangeRule {
     private String className;
     private String propertyName;
 
     public PropertyChangedRule(XWikiDocChangeNotificationInterface target,String classname, String propertyName) {
         setTarget(target);
+        setClassName(classname);
         setPropertyName(propertyName);
     }
 
@@ -54,33 +70,58 @@ public class PropertyChangedRule extends DocChangeRule {
 
     public boolean hasEqualProperty(XWikiDocument newdoc, XWikiDocument olddoc,
                                     String className, String propertyName) {
-        BaseObject obj1 = newdoc.getxWikiObject();
-        BaseObject obj2 = (olddoc==null) ? null : olddoc.getxWikiObject();
-        if ((obj1==null) && (obj2==null))
+        Vector vobj1 = (newdoc == null) ? null : newdoc.getObjects(className);
+        Vector vobj2 = (olddoc == null) ? null : olddoc.getObjects(className);
+        if ((vobj1 == null) && (vobj2 == null)) {
             return true;
-        if (obj1==null) {
-            if (obj2.safeget(propertyName)==null)
-                return true;
-            else
-                return false;
         }
-        if (obj2==null) {
-            if (obj1.safeget(propertyName)==null)
-                return true;
-            else
-                return false;
+        if ((vobj1 == null) || (vobj2 == null)) {
+            return false;
         }
-        BaseProperty prop1 = (BaseProperty) obj1.safeget(propertyName);
-        BaseProperty prop2 = (BaseProperty) obj2.safeget(propertyName);
-        if ((prop1==null)&&(prop2==null))
-            return true;
-        if ((prop1==null)||(prop2==null))
+        if (vobj1.size() != vobj2.size()) {
+            return false;
+        }
+        for (int i = 0; i < vobj1.size(); i++) {
+            if (!((vobj1.get(i) == null) && (vobj2.get(i) == null))) {
+                if (vobj1.get(i) == null) {
+                    if (((BaseObject)vobj2.get(i)).safeget(propertyName) == null) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                if (vobj2.get(i) == null) {
+                    if (((BaseObject)vobj1.get(i)).safeget(propertyName) == null) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                BaseProperty prop1 = 
+                    (BaseProperty) ((BaseObject)vobj1.get(i)).safeget(propertyName);
+                BaseProperty prop2 = 
+                    (BaseProperty) ((BaseObject)vobj2.get(i)).safeget(propertyName);
+                if ((prop1 == null) && (prop2 == null)) {
+                    return true;
+                }
+                if ((prop1 == null) || (prop2 == null)) {
                     return false;
-        return prop1.equals(prop2);
+                }
+                if (!prop1.equals(prop2)) {
+                    // Found different property on an object, we can stop and return false 
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
-
     public void verify(XWikiDocument newdoc, XWikiDocument olddoc, XWikiContext context) {
+        if (this.className == null || this.className.equals("") 
+                || this.propertyName == null || this.propertyName.equals("")) {
+            // Not enough information, never notify
+            return;
+        }
         if (!hasEqualProperty(newdoc, olddoc, getClassName(), getPropertyName()))
             getTarget().notify(this, newdoc, olddoc, XWikiDocChangeNotificationInterface.EVENT_CHANGE, context);
     }

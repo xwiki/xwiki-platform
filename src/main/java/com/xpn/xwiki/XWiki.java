@@ -132,7 +132,7 @@ import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
-import com.xpn.xwiki.store.FakeAttachmentVersioningStore;
+import com.xpn.xwiki.store.VoidAttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
@@ -789,7 +789,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             "xwiki.store.attachment.versioning.class",
             hasAttachmentVersioning(context)
                 ? HibernateAttachmentVersioningStore.class.getName()
-                : FakeAttachmentVersioningStore.class.getName(),
+                : VoidAttachmentVersioningStore.class.getName(),
             context));
 
         if (hasRecycleBin(context)) {

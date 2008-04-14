@@ -28,19 +28,20 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.store.FakeAttachmentVersioningStore.FakeAttachmentArchive;
+import com.xpn.xwiki.store.VoidAttachmentVersioningStore.VoidAttachmentArchive;
 
 import junit.framework.TestCase;
 
 /**
- * Unit tests for {@link FakeAttachmentVersioningStore} and {@link FakeAttachmentArchive}.
+ * Unit tests for {@link VoidAttachmentVersioningStore} and {@link VoidAttachmentArchive}.
  * 
  * @version $Id: $
  */
-public class FakeAttachmentVersioningStoreTest extends TestCase
+public class VoidAttachmentVersioningStoreTest extends TestCase
 {
     XWikiContext context = new XWikiContext();
     XWiki xwiki;
+    AttachmentVersioningStore store;
 
     @Override
     protected void setUp() throws Exception
@@ -48,38 +49,40 @@ public class FakeAttachmentVersioningStoreTest extends TestCase
         XWikiConfig config = new XWikiConfig();
         config.setProperty("xwiki.store.attachment.versioning", "0");
         xwiki = new XWiki(config, context);
+        store = xwiki.getAttachmentVersioningStore();
     }
 
     public void testStore() throws XWikiException
     {
-        assertEquals(FakeAttachmentVersioningStore.class, xwiki.getAttachmentVersioningStore().getClass());
-
+        // is store correctly inited?
+        assertEquals(VoidAttachmentVersioningStore.class, store.getClass());
+        // create doc, attachment & attachment archive
         XWikiDocument doc = new XWikiDocument("Main", "Test");
         XWikiAttachment attachment = new XWikiAttachment(doc, "filename");
         attachment.setContent(new byte[] { 1 });
         attachment.updateContentArchive(context);
-
-        xwiki.getAttachmentVersioningStore().saveArchive(attachment.getAttachment_archive(),
-            context, true);
-        XWikiAttachmentArchive archive = xwiki.getAttachmentVersioningStore()
-            .loadArchive(attachment, context, false);
-        assertEquals(FakeAttachmentArchive.class, archive.getClass());
-        assertEquals(FakeAttachmentArchive.class, archive.clone().getClass());
-        xwiki.getAttachmentVersioningStore().deleteArchive(attachment, context, true);
+        // is archive correctly inited and cloneable?
+        store.saveArchive(attachment.getAttachment_archive(), context, true);
+        XWikiAttachmentArchive archive = store.loadArchive(attachment, context, false);
+        assertEquals(VoidAttachmentArchive.class, archive.getClass());
+        assertEquals(VoidAttachmentArchive.class, archive.clone().getClass());        
+        assertEquals(archive, store.loadArchive(attachment, context, true));
+        
+        store.deleteArchive(attachment, context, true);
     }
 
     public void testHistory() throws XWikiException {
         XWikiDocument doc = new XWikiDocument("Main", "Test");
         XWikiAttachment attachment = new XWikiAttachment(doc, "filename");
+        // 1.1
         attachment.setContent(new byte[] { 1 });
         attachment.updateContentArchive(context);
         assertEquals(attachment, attachment.getAttachmentRevision("1.1", context));
-
+        // 1.2
         attachment.setContent(new byte[] { 2 });
         attachment.updateContentArchive(context);
         assertEquals(attachment, attachment.getAttachmentRevision("1.2", context));
-        
-        // there is only 1.2 version should be.
+        // there should be only 1.2 version.
         assertNull(attachment.getAttachmentRevision("1.1", context));
         assertNull(attachment.getAttachmentRevision("1.3", context));
         assertEquals(1, attachment.getVersions().length);

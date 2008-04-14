@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 
 /**
- * Fake store for attachment versioning when it is disabled. 
+ * Void store for attachment versioning when it is disabled. 
  * ("xwiki.store.attachment.versioning=0" parameter is set in xwiki.cfg)
  * It says what there is only one version of attachment - latest.
  * It doesn't store anything. It is safe to use with any stores.
@@ -39,14 +39,14 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
  * @version $Id: $
  * @since 1.4M2
  */
-public class FakeAttachmentVersioningStore implements AttachmentVersioningStore
+public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
 {
     /**
      * Constructor used by {@link XWiki} during storage initialization.
      * 
      * @param context The current context.
      */
-    public FakeAttachmentVersioningStore(XWikiContext context)
+    public VoidAttachmentVersioningStore(XWikiContext context)
     { }
 
     /**
@@ -55,7 +55,7 @@ public class FakeAttachmentVersioningStore implements AttachmentVersioningStore
     public void deleteArchive(XWikiAttachment attachment, XWikiContext context,
         boolean transaction) throws XWikiException
     {
-        // not needed
+        // Don't do anything since it's a void implementation.
     }
     
     /**
@@ -64,7 +64,7 @@ public class FakeAttachmentVersioningStore implements AttachmentVersioningStore
     public void saveArchive(XWikiAttachmentArchive archive, XWikiContext context,
         boolean transaction) throws XWikiException
     {
-        // not needed
+        // Don't do anything since it's a void implementation.
     }
 
     /**
@@ -73,28 +73,31 @@ public class FakeAttachmentVersioningStore implements AttachmentVersioningStore
     public XWikiAttachmentArchive loadArchive(XWikiAttachment attachment, XWikiContext context,
         boolean transaction) throws XWikiException
     {
-        XWikiAttachmentArchive archive = new FakeAttachmentArchive(attachment);
+        XWikiAttachmentArchive archive = attachment.getAttachment_archive();
+        if (!(archive instanceof VoidAttachmentArchive)) {
+            archive = new VoidAttachmentArchive(attachment);
+        }
         attachment.setAttachment_archive(archive);
         return archive;
     }
     
     /**
-     * Fake realization of AttachmentArchive. 
+     * Void realization of AttachmentArchive. 
      * It says what there is only one version of attachment - latest.
      * Class is public because used in super.clone() via getClass().newInstance()
      */
-    public static class FakeAttachmentArchive extends XWikiAttachmentArchive
+    public static class VoidAttachmentArchive extends XWikiAttachmentArchive
     {
-        /** 
+        /**
          * Default constructor. Used in super.clone().
          */
-        public FakeAttachmentArchive() { }
-        
+        public VoidAttachmentArchive()
+        { }
         /**
          * Helper constructor.
          * @param attachment attachment of this archive
          */
-        public FakeAttachmentArchive(XWikiAttachment attachment)
+        public VoidAttachmentArchive(XWikiAttachment attachment)
         {
             setAttachment(attachment);
         }
@@ -115,7 +118,7 @@ public class FakeAttachmentVersioningStore implements AttachmentVersioningStore
         @Override
         public void setArchive(byte[] data) throws XWikiException
         {
-            // ignore
+            // Don't do anything since it's a void implementation.
         }
         
         /**
@@ -137,7 +140,7 @@ public class FakeAttachmentVersioningStore implements AttachmentVersioningStore
         @Override
         public void setRCSArchive(Archive archive)
         {
-            // ignore
+            // Don't do anything since it's a void implementation.
         }
         
         /**
@@ -159,6 +162,17 @@ public class FakeAttachmentVersioningStore implements AttachmentVersioningStore
             return (attachment.getVersion().equals(rev))
                 ? attachment
                 : null;
+        }
+        
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Object clone()
+        {
+            // super.clone() is needed for checkstyle
+            super.clone();
+            return new VoidAttachmentArchive(getAttachment());
         }
     }
 }

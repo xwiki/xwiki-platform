@@ -20,6 +20,7 @@
 package com.xpn.xwiki.notify;
 
 import org.jmock.Mock;
+import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsEqual;
 
 import com.xpn.xwiki.XWiki;
@@ -29,7 +30,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Tests the {@link PropertyChangedRule} in the notification mechanism. <br />
@@ -41,7 +41,7 @@ import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
  * <tt>verify(olddoc, newdoc, context)</tt>; some tests cases might be duplicated by the
  * symmetric call in another test function.
  */
-public class PropertyChangedRuleTest extends AbstractXWikiComponentTestCase implements
+public class PropertyChangedRuleTest extends MockObjectTestCase implements
     XWikiDocChangeNotificationInterface
 {
     private PropertyChangedRule rule;

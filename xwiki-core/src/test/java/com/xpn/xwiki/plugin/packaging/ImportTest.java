@@ -35,12 +35,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.jmock.Mock;
+import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.jmock.core.stub.VoidStub;
-import org.xwiki.component.manager.ComponentManager;
 
-import sun.reflect.generics.tree.VoidDescriptor;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
@@ -51,10 +50,9 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
-public class ImportTest extends AbstractXWikiComponentTestCase 
+public class ImportTest extends MockObjectTestCase 
 {
     private Package pack;
     private XWikiContext context;
@@ -70,9 +68,6 @@ public class ImportTest extends AbstractXWikiComponentTestCase
     	this.pack = new Package();
         this.context = new XWikiContext();
         this.xwiki = new XWiki(new XWikiConfig(), this.context);
-
-        // We need to initialize the Component Manager so that tcomponents can be looked up
-        this.context.put(ComponentManager.class.getName(), getComponentManager());
 
         //mock a store that would also hansle translations
         this.mockXWikiStore =

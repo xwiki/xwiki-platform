@@ -127,7 +127,13 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                         // In this case just ignore the archive...
                         if (sArchive.trim().length() != 0) {
                             XWikiDocumentArchive docArchive = new XWikiDocumentArchive(docId);
-                            docArchive.setArchive(sArchive);
+                            try {
+                                docArchive.setArchive(sArchive);
+                            } catch (XWikiException e) {
+                                LOG.warn(
+                                    "RCS archive is broken. The history of this document will be lost.",
+                                    e);
+                            }
                             context.getWiki().getVersioningStore().saveXWikiDocArchive(
                                 docArchive, true, context);
                         } else {

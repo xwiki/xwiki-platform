@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881143000</creationDate>
-<date>1204714754000</date>
-<contentUpdateDate>1204714754000</contentUpdateDate>
-<version>2.1</version>
+<date>1206537382000</date>
+<contentUpdateDate>1206537382000</contentUpdateDate>
+<version>3.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -103,21 +103,21 @@
     #end
     ##
       &lt;dl&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.wikiprettyname"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("wikiprettyname", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.owner"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.owner"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("owner", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.secure"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.secure"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("secure", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.visibility"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.visibility"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("visibility", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.language"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.language"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("language", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.server"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.server"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("server", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.description"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.description"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("description", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;dt&gt;$msg.get("wikimanager.alias.prop.homepage"):&lt;/dt&gt;
+        &lt;dt&gt;$msg.get("wikimanager.prop.wiki.homepage"):&lt;/dt&gt;
           &lt;dd&gt;$doc.display("homepage", $firstalias.objectApi)&lt;/dd&gt;
       &lt;/dl&gt;
     #if ($context.action != "view")
@@ -131,7 +131,7 @@
         &lt;fieldset&gt;
           &lt;legend&gt;Create new alias&lt;/legend&gt;
           &lt;input type="hidden" name="action" value="create"/&gt;
-            $msg.get("wikimanager.alias.prop.server"): &lt;input type="text" name="domain" class="wikialiasinput"/&gt;
+            $msg.get("wikimanager.prop.alias.server"): &lt;input type="text" name="domain" class="wikialiasinput"/&gt;
           &lt;input type="submit" class="button" value="$msg.get("create")"/&gt;
           &lt;/fieldset&gt;
       &lt;/form&gt;
@@ -152,7 +152,7 @@
               &lt;dl&gt;
                 &lt;dt&gt;$msg.get("wikimanager.alias.prop.description"):&lt;/dt&gt;
                   &lt;dd&gt;$doc.display("description", $wikiAlias.objectApi)&lt;/dd&gt;
-                &lt;dt&gt;$msg.get("wikimanager.alias.prop.homepage"):&lt;/dt&gt;
+                &lt;dt&gt;$msg.get("wikimanager.prop.alias.homepage"):&lt;/dt&gt;
                   &lt;dd&gt;$doc.display("homepage", $wikiAlias.objectApi)&lt;/dd&gt;
               &lt;/dl&gt;
         #if ($context.action == "view")

@@ -130,9 +130,10 @@ public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
                             try {
                                 docArchive.setArchive(sArchive);
                             } catch (XWikiException e) {
-                                LOG.warn(
-                                    "RCS archive is broken. The history of this document will be lost.",
-                                    e);
+                                LOG.warn("The RCS archive for " + rs.getString(3)
+                                    + " is broken. Internal error "
+                                    + e.getMessage() +
+                                    ". The history for this document has been reset.");
                             }
                             context.getWiki().getVersioningStore().saveXWikiDocArchive(
                                 docArchive, true, context);

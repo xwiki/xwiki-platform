@@ -25,14 +25,53 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Date;
 
-public class RefererStats extends XWikiStats {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-    public RefererStats() {
-        super();
+import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
+
+/**
+ * The referer statistics database object.
+ * 
+ * @version $Id: $
+ */
+public class RefererStats extends XWikiStats
+{
+    /**
+     * Logging tools.
+     */
+    private static final Log LOG = LogFactory.getLog(RefererStats.class);
+
+    /**
+     * The properties of document statistics object.
+     * 
+     * @version $Id: $
+     */
+    public enum Property
+    {
+        /**
+         * The referer.
+         */
+        referer
     }
 
-    public RefererStats(String docName, String referer, Date period, int periodtype) {
-        super(period, periodtype);
+    /**
+     * Default {@link RefererStats} constructor.
+     */
+    public RefererStats()
+    {
+    }
+
+    /**
+     * @param docName the name of the wiki/space/document.
+     * @param referer the referer.
+     * @param periodDate the date of the period.
+     * @param periodType the type of the period.
+     */
+    public RefererStats(String docName, String referer, Date periodDate, PeriodType periodType)
+    {
+        super(periodDate, periodType);
+
         setName(docName);
         setClassName("internal");
         String nb = referer + getPeriod();
@@ -40,20 +79,37 @@ public class RefererStats extends XWikiStats {
         setReferer(referer);
     }
 
-    public String getReferer() {
-        return getStringValue("referer");
+    /**
+     * @return the referer.
+     */
+    public String getReferer()
+    {
+        return getStringValue(Property.referer.toString());
     }
 
-    public void setReferer(String referer) {
-        setStringValue("referer", referer);
+    /**
+     * @param referer the referer.
+     */
+    public void setReferer(String referer)
+    {
+        setStringValue(Property.referer.toString(), referer);
     }
-    
+
+    /**
+     * @return the referer URL.
+     */
     public URL getURL()
     {
+        URL url = null;
+
         try {
-            return new URL(getReferer());
+            url = new URL(getReferer());
         } catch (MalformedURLException e) {
-            return null;
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Failed to construct URL from referer", e);
+            }
         }
+
+        return url;
     }
 }

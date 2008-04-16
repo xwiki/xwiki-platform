@@ -29,20 +29,22 @@ import org.apache.velocity.VelocityContext;
 import java.io.IOException;
 
 /**
- * Action called when the request URL has the "/view/" string in its path (this is configured
- * in <code>struts-config.xml</code>. It means the request is to display a page in view mode.
- *
- * @version $Id: $ 
+ * Action called when the request URL has the "/view/" string in its path (this is configured in
+ * <code>struts-config.xml</code>. It means the request is to display a page in view mode.
+ * 
+ * @version $Id: $
  */
 public class ViewAction extends XWikiAction
 {
     /**
+     * The identifier of the view action.
      * @todo need an enumerated class for actions.
      */
-    private static final String VIEW_ACTION = "view";
+    public static final String VIEW_ACTION = "view";
 
     /**
      * {@inheritDoc}
+     * 
      * @see XWikiAction#action(com.xpn.xwiki.XWikiContext)
      */
     public boolean action(XWikiContext context) throws XWikiException
@@ -70,7 +72,8 @@ public class ViewAction extends XWikiAction
 
     /**
      * {@inheritDoc}
-     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext) 
+     * 
+     * @see XWikiAction#render(com.xpn.xwiki.XWikiContext)
      */
     public String render(XWikiContext context) throws XWikiException
     {

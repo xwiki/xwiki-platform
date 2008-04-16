@@ -21,28 +21,62 @@
 
 package com.xpn.xwiki.stats.impl;
 
-public class SearchEngineRule extends Object {
-    private String regEx;
+/**
+ * Matching tool able to find if a referer is a particular search engine.
+ * 
+ * @version $Id: $
+ */
+public class SearchEngineRule extends Object
+{
+    /**
+     * The search engine server address.
+     */
     private String host;
+    
+    /**
+     * The regular expression to match.
+     */
+    private String regEx;
 
-    public SearchEngineRule(String host, String regEx) {
-     this.setRegEx(regEx);
-     this.setHost(host);
+    /**
+     * @param host the search engine server address.
+     * @param regEx the regular expression to match.
+     */
+    public SearchEngineRule(String host, String regEx)
+    {
+        setRegEx(regEx);
+        setHost(host);
     }
 
-    public String getRegEx() {
-        return regEx;
-    }
-
-    public void setRegEx(String regEx) {
-        this.regEx = regEx;
-    }
-
-    public String getHost() {
+    /**
+     * @return the search engine server address.
+     */
+    public String getHost()
+    {
         return host;
     }
 
-    public void setHost(String host) {
+    /**
+     * @param host the search engine server address.
+     */
+    public void setHost(String host)
+    {
         this.host = host;
+    }
+    
+    /**
+     * @return the regular expression to match.
+     */
+    public String getRegEx()
+    {
+        return regEx;
+    }
+
+    /**
+     * @param regEx the regular expression to match.
+     */
+    public void setRegEx(String regEx)
+    {
+        this.regEx = regEx;
     }
 }

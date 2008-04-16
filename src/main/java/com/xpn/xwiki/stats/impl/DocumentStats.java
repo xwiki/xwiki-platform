@@ -23,13 +23,55 @@ package com.xpn.xwiki.stats.impl;
 
 import java.util.Date;
 
-public class DocumentStats extends XWikiStats {
+import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 
-    public DocumentStats() {
+/**
+ * The document statistics database object.
+ * 
+ * @version $Id: $
+ */
+public class DocumentStats extends XWikiStats
+{
+    /**
+     * The properties of document statistics object.
+     * 
+     * @version $Id: $
+     */
+    public enum Property
+    {
+        /**
+         * The action made on the document ("view", "save", ...).
+         */
+        action,
+
+        /**
+         * The number of unique visitors.
+         */
+        uniqueVisitors,
+
+        /**
+         * The number of visits.
+         */
+        visits
     }
 
-    public DocumentStats(String docName, String action, Date period, int periodtype) {
-        super(period, periodtype);
+    /**
+     * Default {@link DocumentStats} constructor.
+     */
+    public DocumentStats()
+    {
+    }
+
+    /**
+     * @param docName the name of the wiki/space/document.
+     * @param action the action made on the document ("view", "save", ...).
+     * @param periodDate the date of the period.
+     * @param periodType the type of the period.
+     */
+    public DocumentStats(String docName, String action, Date periodDate, PeriodType periodType)
+    {
+        super(periodDate, periodType);
+        
         setName(docName);
         setClassName("internal");
         String nb = action + getPeriod();
@@ -37,37 +79,67 @@ public class DocumentStats extends XWikiStats {
         setAction(action);
     }
 
-    public String getAction() {
-        return getStringValue("action");
+    /**
+     * @return the action made on the document ("view", "save", ...).
+     */
+    public String getAction()
+    {
+        return getStringValue(Property.action.toString());
     }
 
-    public void setAction(String action) {
-        setStringValue("action", action);
+    /**
+     * @param action the action made on the document ("view", "save", ...).
+     */
+    public void setAction(String action)
+    {
+        setStringValue(Property.action.toString(), action);
     }
 
-    public int getUniqueVisitors() {
-        return getIntValue("uniqueVisitors");
+    /**
+     * @return the number of unique visitors.
+     */
+    public int getUniqueVisitors()
+    {
+        return getIntValue(Property.uniqueVisitors.toString());
     }
 
-    public void  setUniqueVisitors(int uniqueVisitors) {
-        setIntValue("uniqueVisitors", uniqueVisitors);
+    /**
+     * @param uniqueVisitors the number of unique visitors.
+     */
+    public void setUniqueVisitors(int uniqueVisitors)
+    {
+        setIntValue(Property.uniqueVisitors.toString(), uniqueVisitors);
     }
 
-    public void  incUniqueVisitors() {
-        setIntValue("uniqueVisitors", getUniqueVisitors() + 1);
+    /**
+     * Add 1 to the number of unique visitors.
+     */
+    public void incUniqueVisitors()
+    {
+        setIntValue(Property.uniqueVisitors.toString(), getUniqueVisitors() + 1);
     }
 
-    public int getVisits() {
-        return getIntValue("visits");
+    /**
+     * @return the number of visits.
+     */
+    public int getVisits()
+    {
+        return getIntValue(Property.visits.toString());
     }
 
-    public void  setVisits(int visits) {
-        setIntValue("visits", visits);
+    /**
+     * @param visits the number of visits.
+     */
+    public void setVisits(int visits)
+    {
+        setIntValue(Property.visits.toString(), visits);
     }
 
-    public void  incVisits() {
-        setIntValue("visits", getVisits() + 1);
+    /**
+     * Add 1 to the number of visits.
+     */
+    public void incVisits()
+    {
+        setIntValue(Property.visits.toString(), getVisits() + 1);
     }
-
-
 }

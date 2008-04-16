@@ -18,34 +18,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package compatibility.com.xpn.xwiki;
- 
-import com.xpn.xwiki.XWikiContext;
+
+package com.xpn.xwiki.stats.impl.xwiki;
+
+import java.util.List;
 
 /**
- * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWikiContext} class.
+ * Object containing statistics information to store.
  * 
  * @version $Id: $
+ * @since 1.4M2
  */
-public privileged aspect XWikiContextCompatibilityAspect
+public interface XWikiStatsStoreItem
 {
     /**
-     * @return true it's main wiki's context, false otherwise.
-     * @deprecated replaced by {@link XWikiContext#isMainWiki()} since 1.4M1.
+     * @return identifier for this type of store item. This value is used to merge same statistics
+     *         in one database query.
      */
-    public boolean XWikiContext.isVirtual()
-    {
-        return !this.isMainWiki();
-    }
+    String getId();
 
     /**
-     * @param virtual true it's main wiki's context, false otherwise.
-     * @deprecated this methods is now useless because the virtuality of a wiki is resolved with a
-     *             comparison between {@link XWikiContext#getDatabase()} and
-     *             {@link XWikiContext#getMainXWiki()} since 1.4M1.
+     * Store provided statistics into the database.
+     * @param statsList the list of statistics item to store.
      */
-    public void XWikiContext.setVirtual(boolean virtual)
-    {
-        // this.virtual = virtual;
-    }
+    void store(List<XWikiStatsStoreItem> statsList);
 }

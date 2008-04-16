@@ -22,6 +22,8 @@ package com.xpn.xwiki.stats.impl;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
+
 import junit.framework.TestCase;
 
 /**
@@ -30,7 +32,7 @@ import junit.framework.TestCase;
 public class StatsUtilTest extends TestCase
 {
     /**
-     * Test for the {@link StatsUtil#getPeriodAsInt(java.util.Date, int)}
+     * Test for the {@link StatsUtil#getPeriodAsInt(java.util.Date, PeriodType)}.
      */
     public void testGetPeriodAsInt()
     {
@@ -38,12 +40,12 @@ public class StatsUtilTest extends TestCase
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyyMM");
         String a = sdf.format(cal.getTime());
-        String b = StatsUtil.getPeriodAsInt(cal.getTime(), StatsUtil.PERIOD_MONTH) + "";
+        String b = StatsUtil.getPeriodAsInt(cal.getTime(), PeriodType.MONTH) + "";
         assertEquals("Wrong month period format", a, b);
 
         sdf = new SimpleDateFormat("yyyyMMdd");
         a = sdf.format(cal.getTime());
-        b = StatsUtil.getPeriodAsInt(cal.getTime(), StatsUtil.PERIOD_DAY) + "";
+        b = StatsUtil.getPeriodAsInt(cal.getTime(), PeriodType.DAY) + "";
         assertEquals("Wrong day period format", a, b);
     }
 }

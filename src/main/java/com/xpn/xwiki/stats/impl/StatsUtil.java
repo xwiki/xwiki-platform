@@ -25,41 +25,67 @@ import java.util.Calendar;
 import java.util.Date;
 
 /**
- * Utility class for statistics
+ * Utility class for statistics.
  * 
  * @version $Id: $
  */
-public class StatsUtil
+public final class StatsUtil
 {
-    public static int PERIOD_MONTH = 0;
-
-    public static int PERIOD_DAY = 1;
+    /**
+     * The type of the period.
+     * 
+     * @version $Id: $
+     */
+    public enum PeriodType
+    {
+        /**
+         * Based on month.
+         */
+        MONTH,
+        /**
+         * Based on day.
+         */
+        DAY
+    }
+    
+    /**
+     * Default {@link StatsUtil} constructor.
+     */
+    private StatsUtil()
+    {        
+    }
 
     /**
      * Computes an integer representation of the passed date using the following format:
      * <ul>
-     *   <li>"yyyMMdd" for {@link #PERIOD_DAY}</li>
-     *   <li>"yyyMM" for {@link #PERIOD_MONTH}</li>
-     * </ul>
+     * <li>"yyyMMdd" for {@link PeriodType#DAY}</li>
+     * <li>"yyyMM" for {@link PeriodType#MONTH}</li>
+     * </ul>.
      * 
-     * @param date the date for which to return an integer representation
-     * @param type the date type. It can be {@link #PERIOD_DAY} or {@link #PERIOD_MONTH}
-     * @return the integer representation of the specified date
+     * @param date the date for which to return an integer representation.
+     * @param type the date type. It can be {@link PeriodType#DAY} or {@link PeriodType#MONTH}.
+     * @return the integer representation of the specified date.
      * @see java.text.SimpleDateFormat
      */
-    public static int getPeriodAsInt(Date date, int type)
+    public static int getPeriodAsInt(Date date, PeriodType type)
     {
+        int period;
+
         Calendar cal = Calendar.getInstance();
         if (date != null) {
             cal.setTime(date);
         }
-        if (type == PERIOD_MONTH) {
+
+        if (type == PeriodType.MONTH) {
             // The first month of the year is JANUARY which is 0
-            return cal.get(Calendar.YEAR) * 100 + (cal.get(Calendar.MONTH) + 1);
+            period = cal.get(Calendar.YEAR) * 100 + (cal.get(Calendar.MONTH) + 1);
         } else {
             // The first day of the month has value 1
-            return cal.get(Calendar.YEAR) * 10000 + (cal.get(Calendar.MONTH) + 1) * 100
-                + cal.get(Calendar.DAY_OF_MONTH);
+            period =
+                cal.get(Calendar.YEAR) * 10000 + (cal.get(Calendar.MONTH) + 1) * 100
+                    + cal.get(Calendar.DAY_OF_MONTH);
         }
+
+        return period;
     }
 }

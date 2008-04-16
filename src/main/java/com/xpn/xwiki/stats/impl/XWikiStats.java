@@ -21,117 +21,240 @@
 
 package com.xpn.xwiki.stats.impl;
 
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.BaseCollection;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
+import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
+
 import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 
-import java.util.*;
+/**
+ * Base class for all stored statistics object.
+ * 
+ * @version $Id: $
+ */
+public class XWikiStats extends BaseCollection
+{
+    /**
+     * The properties of statistics object.
+     * 
+     * @version $Id: $
+     */
+    public enum Property
+    {
+        /**
+         * The name of the object database property <code>period</code>.
+         */
+        period,
 
-public class XWikiStats extends BaseCollection {
-    public XWikiStats() {
-        super();
+        /**
+         * The name of the object database property <code>pageViews</code>.
+         */
+        pageViews
     }
 
-    public XWikiStats(Date period, int periodtype) {
-        setPeriod(StatsUtil.getPeriodAsInt(period, periodtype));
+    /**
+     * The name of the XML node <code>object</code>.
+     */
+    private static final String XMLNODE_OBJECT = "object";
+
+    /**
+     * The name of the XML node <code>name</code>.
+     */
+    private static final String XMLNODE_NAME = "name";
+
+    /**
+     * The name of the XML node <code>number</code>.
+     */
+    private static final String XMLNODE_NUMBER = "number";
+
+    /**
+     * The name of the XML node <code>className</code>.
+     */
+    private static final String XMLNODE_CLASSNAME = "className";
+
+    /**
+     * The name of the XML node <code>property</code>.
+     */
+    private static final String XMLNODE_PROPERTY = "property";
+
+    /**
+     * Default constructor.
+     */
+    public XWikiStats()
+    {
     }
 
-    public int getPeriod() {
-        return getIntValue("period");
+    /**
+     * @param periodDate the period date.
+     * @param periodtype the period type.
+     */
+    public XWikiStats(Date periodDate, PeriodType periodtype)
+    {
+        setPeriod(StatsUtil.getPeriodAsInt(periodDate, periodtype));
     }
 
-    public void setPeriod(int period) {
-        setIntValue("period", period);
+    /**
+     * @return the time when statistic was stored.
+     */
+    public int getPeriod()
+    {
+        return getIntValue(Property.period.toString());
     }
 
-    public int getPageViews() {
-        return getIntValue("pageViews");
+    /**
+     * @param period the time when statistic was stored.
+     */
+    public void setPeriod(int period)
+    {
+        setIntValue(Property.period.toString(), period);
     }
 
-    public void  setPageViews(int pageViews) {
-        setIntValue("pageViews", pageViews);
+    /**
+     * @return the counter of view action of this statistic.
+     */
+    public int getPageViews()
+    {
+        return getIntValue(Property.pageViews.toString());
     }
 
-    public void  incPageViews() {
-        setIntValue("pageViews", getPageViews() + 1);
+    /**
+     * @param pageViews the counter of view action of this statistic.
+     */
+    public void setPageViews(int pageViews)
+    {
+        setIntValue(Property.pageViews.toString(), pageViews);
     }
 
-    public int hashCode() {
+    /**
+     * Add 1 to the counter of view action of this statistic.
+     */
+    public void incPageViews()
+    {
+        setIntValue(Property.pageViews.toString(), getPageViews() + 1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#hashCode()
+     */
+    @Override
+    public int hashCode()
+    {
         return (getName() + getClassName() + "_" + getNumber()).hashCode();
     }
 
-    public void setId(int id) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#setId(int)
+     */
+    @Override
+    public void setId(int id)
+    {
     }
 
-    public Object clone() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#clone()
+     */
+    @Override
+    public Object clone()
+    {
         BaseCollection object = (BaseCollection) super.clone();
         return object;
     }
 
-    public boolean equals(Object obj) {
-        if (!super.equals(obj))
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (!super.equals(obj)) {
             return false;
+        }
 
-        if (getNumber()!=((BaseCollection)obj).getNumber())
+        if (getNumber() != ((BaseCollection) obj).getNumber()) {
             return false;
+        }
 
         return true;
     }
 
-    public Element toXML(BaseClass bclass) {
-        Element oel = new DOMElement("object");
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
+     */
+    @Override
+    public Element toXML(BaseClass bclass)
+    {
+        Element oel = new DOMElement(XMLNODE_OBJECT);
 
         // Add Class
-        if (bclass!=null) {
-        Collection fields = bclass.getFieldList();
-        if (fields.size()>0) {
-            oel.add(bclass.toXML());
-          }
+        if (bclass != null) {
+            if (bclass.getFieldList().size() > 0) {
+                oel.add(bclass.toXML());
+            }
         }
 
-        Element el = new DOMElement("name");
+        Element el = new DOMElement(XMLNODE_NAME);
         el.addText(getName());
         oel.add(el);
 
-        el = new DOMElement("number");
+        el = new DOMElement(XMLNODE_NUMBER);
         el.addText(getNumber() + "");
         oel.add(el);
 
-        el = new DOMElement("className");
+        el = new DOMElement(XMLNODE_CLASSNAME);
         el.addText(getClassName());
         oel.add(el);
 
-        Iterator it = getFieldList().iterator();
-        while (it.hasNext()) {
-            Element pel = new DOMElement("property");
-            PropertyInterface bprop = (PropertyInterface)it.next();
+        for (Iterator< ? > it = getFieldList().iterator(); it.hasNext();) {
+            Element pel = new DOMElement(XMLNODE_PROPERTY);
+            PropertyInterface bprop = (PropertyInterface) it.next();
             pel.add(bprop.toXML());
             oel.add(pel);
         }
+
         return oel;
     }
 
-    public void fromXML(Element oel) throws XWikiException {
+    /**
+     * Initialize statistics object from XML schema.
+     * 
+     * @param oel the XML root node containing statistics datas.
+     * @throws XWikiException error when parsing XML schema.
+     */
+    public void fromXML(Element oel) throws XWikiException
+    {
         Element cel = oel.element("class");
         BaseClass bclass = new BaseClass();
-        if (cel!=null) {
+        if (cel != null) {
             bclass.fromXML(cel);
             setClassName(bclass.getName());
         }
 
-        setName(oel.element("name").getText());
-        List list = oel.elements("property");
-        for (int i=0;i<list.size();i++) {
-            Element pcel = (Element)((Element) list.get(i)).elements().get(0);
+        setName(oel.element(XMLNODE_NAME).getText());
+        List< ? > list = oel.elements(XMLNODE_PROPERTY);
+        for (int i = 0; i < list.size(); i++) {
+            Element pcel = (Element) ((Element) list.get(i)).elements().get(0);
             String name = pcel.getName();
             PropertyClass pclass = (PropertyClass) bclass.get(name);
-            if (pclass!=null) {
+            if (pclass != null) {
                 BaseProperty property = pclass.newPropertyfromXML(pcel);
                 property.setName(name);
                 property.setObject(this);

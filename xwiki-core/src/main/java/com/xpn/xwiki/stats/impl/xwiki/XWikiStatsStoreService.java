@@ -22,6 +22,7 @@
 package com.xpn.xwiki.stats.impl.xwiki;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -31,6 +32,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.stats.impl.StatsUtil;
+import com.xpn.xwiki.stats.impl.VisitStats;
+import com.xpn.xwiki.web.DownloadAction;
+import com.xpn.xwiki.web.SaveAction;
+import com.xpn.xwiki.web.ViewAction;
 
 /**
  * Back-end statistics storing service.
@@ -94,16 +101,6 @@ public class XWikiStatsStoreService implements Runnable
     }
 
     /**
-     * Add new statistic to store.
-     * 
-     * @param statsRegisterItem the statistic store item.
-     */
-    public void add(XWikiStatsStoreItem statsRegisterItem)
-    {
-        queue.add(statsRegisterItem);
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see java.lang.Runnable#run()
@@ -164,6 +161,113 @@ public class XWikiStatsStoreService implements Runnable
             stats.get(0).store(stats);
         }
     }
+    
+    //////////////////////////////////////////////////////////////////////////////
+    // Add stats to queue
+    //////////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * Add new statistic to store.
+     * 
+     * @param statsRegisterItem the statistic store item.
+     */
+    public void add(XWikiStatsStoreItem statsRegisterItem)
+    {
+        queue.add(statsRegisterItem);
+    }
+    
+    /**
+     * Add all the statistics to the save queue.
+     * 
+     * @param doc the document.
+     * @param action the user action.
+     * @param context the XWiki context.
+     */
+    public void addStats(XWikiDocument doc, String action, XWikiContext context)
+    {
+        VisitStats vobject = StatsUtil.findVisit(context);
+        synchronized (vobject) {
+            if (action.equals(ViewAction.VIEW_ACTION)) {
+                // We count page views in the sessions only for the "view" action
+                vobject.incPageViews();
+            } else if (action.equals(SaveAction.ACTION_NAME)) {
+                // We count "save" and "download" actions separately
+                vobject.incPageSaves();
+            } else if (action.equals(DownloadAction.ACTION_NAME)) {
+                // We count "save" and "download" actions separately
+                vobject.incDownloads();
+            }
+
+            addVisitStats(vobject, context);
+
+            boolean isVisit =
+                (vobject.getPageViews() == 1) && (action.equals(ViewAction.VIEW_ACTION));
+
+            addDocumentStats(doc, action, isVisit, context);
+        }
+
+        // In case of a "view" action we want to store referer info
+        if (action.equals(ViewAction.VIEW_ACTION)) {
+            addRefererStats(doc, context);
+        }
+    }
+
+    /**
+     * Add visit statistics to the save queue.
+     * 
+     * @param vobject the visit statistics object.
+     * @param context the XWiki context.
+     */
+    private void addVisitStats(VisitStats vobject, XWikiContext context)
+    {
+        Date currentDate = new Date();
+
+        vobject.setEndDate(currentDate);
+        add(new VisitStatsStoreItem(vobject, context));
+        vobject.unrememberOldObject();
+    }
+
+    /**
+     * Add document statistics to the save queue.
+     * 
+     * @param doc the document.
+     * @param action the user action.
+     * @param isVisit indicate if it's included in a visit.
+     * @param context the XWiki context.
+     */
+    private void addDocumentStats(XWikiDocument doc, String action, boolean isVisit,
+        XWikiContext context)
+    {
+        Date currentDate = new Date();
+
+        add(new DocumentStatsStoreItem(doc.getFullName(), currentDate,
+            StatsUtil.PeriodType.MONTH, action, isVisit, context));
+        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.MONTH,
+            action, isVisit, context));
+        add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.MONTH, action,
+            false, context));
+        add(new DocumentStatsStoreItem(doc.getFullName(), currentDate, StatsUtil.PeriodType.DAY,
+            action, isVisit, context));
+        add(new DocumentStatsStoreItem(doc.getSpace(), currentDate, StatsUtil.PeriodType.DAY,
+            action, isVisit, context));
+        add(new DocumentStatsStoreItem("", currentDate, StatsUtil.PeriodType.DAY, action, false,
+            context));
+    }
+
+    /**
+     * Add referer statistics to the save queue.
+     * 
+     * @param doc the document.
+     * @param context the XWiki context.
+     */
+    private void addRefererStats(XWikiDocument doc, XWikiContext context)
+    {
+        String referer = StatsUtil.getReferer(context);
+        if ((referer != null) && (!referer.equals(""))) {
+            add(new RefererStatsStoreItem(doc.getFullName(), new Date(),
+                StatsUtil.PeriodType.MONTH, referer, context));
+        }
+    }
 }
 
 /**
@@ -175,7 +279,7 @@ class StopStatsRegisterObject implements XWikiStatsStoreItem
 {
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#getId()
      */
     public String getId()
@@ -185,7 +289,7 @@ class StopStatsRegisterObject implements XWikiStatsStoreItem
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.stats.impl.xwiki.XWikiStatsStoreItem#store(java.util.List)
      */
     public void store(List<XWikiStatsStoreItem> register)
@@ -200,5 +304,5 @@ class StopStatsRegisterObject implements XWikiStatsStoreItem
  */
 class StopStatsStoreException extends Exception
 {
-    
+
 }

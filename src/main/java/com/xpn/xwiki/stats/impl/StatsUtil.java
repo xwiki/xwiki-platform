@@ -584,7 +584,7 @@ public final class StatsUtil
             new Cookie(COOKPROP_VISITID, RandomStringUtils.randomAlphanumeric(32).toUpperCase());
         cookie.setPath("/");
 
-        int time = (int) (cookieExpirationDate.getTime() - (new Date()).getTime()) / 1000;
+        int time = (int) (getCookieExpirationDate().getTime() - (new Date()).getTime()) / 1000;
         cookie.setMaxAge(time);
 
         String cookieDomain = null;

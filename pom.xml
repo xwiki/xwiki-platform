@@ -582,8 +582,6 @@
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,
-              **/stats/impl/XWikiStatsServiceImpl.java,
-              **/stats/impl/StatsUtil.java,
               <!-- these files are clean, but failed in checkstyle because http://jira.codehaus.org/browse/MCHECKSTYLE-54 : -->
               **/XWikiPatchUtils.java,
               **/XWikiRCSArchive.java,

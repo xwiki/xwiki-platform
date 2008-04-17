@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1204903048000</date>
-<contentUpdateDate>1204903048000</contentUpdateDate>
-<version>394.1</version>
+<date>1208445240000</date>
+<contentUpdateDate>1208445240000</contentUpdateDate>
+<version>23.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -189,7 +189,9 @@
 ##
 1 $msg.get("wikimanager.createwiki")
 #if ($wstepbystep)
+  [$msg.get("wikimanager.action.createwiki.nonstepbystep")&gt;CreateNewWiki#if($documentation)?doc=1#end]
 #else
+  [$msg.get("wikimanager.action.createwiki.stepbystep")&gt;CreateNewWiki?stepbystep=0&amp;#if($documentation)doc=1#end]
 #end
 ##
 #if ($action &amp;&amp; $action == "create")
@@ -427,9 +429,9 @@
           &lt;dl&gt;
             &lt;dt&gt;&lt;label for="wikitemplate"&gt;$msg.get("wikimanager.wikitemplate")&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;
-              &lt;select name="wikitemplate" id="wikitemplate"&gt;
+              #set ($listtemplate=$WikiManager.getWikiTemplateList())
+              &lt;select #if($listtemplate.size() == 0)disabled#end name="wikitemplate" id="wikitemplate"&gt;
                 &lt;option value=""&gt;---&lt;/option&gt;
-                #set ($listtemplate=$WikiManager.getWikiTemplateList())
                 #foreach ($template in $listtemplate)
                   &lt;option value="$template.wikiName"&gt;$template.wikiName&lt;/option&gt;
                 #end
@@ -444,9 +446,9 @@
           &lt;dl&gt;
             &lt;dt&gt;&lt;label for="wikipackage"&gt;$msg.get("wikimanager.wikipackage")&lt;/label&gt;&lt;/dt&gt;
             &lt;dd&gt;
-              &lt;select name="wikipackage" id="wikipackage"&gt;
+              #set ($listpackage=$doc.getAttachmentList())
+              &lt;select #if($listpackage.size() == 0)disabled#end name="wikipackage" id="wikipackage"&gt;
                 &lt;option value=""&gt;---&lt;/option&gt;
-                #set ($listpackage=$doc.getAttachmentList())
                 #foreach ($package in $listpackage)
                   &lt;option value="$package.getFilename()"&gt;$package.getFilename()&lt;/option&gt;
                 #end
@@ -534,6 +536,8 @@
     #end
     &lt;div id="actioncreate"&gt;
       &lt;br /&gt;
+      #if ($request.stepbystep) &lt;input type="hidden" name="stepbystep" value="$request.stepbystep" /&gt; #end
+      #if ($request.doc) &lt;input type="hidden" name="doc" value="$request.doc" /&gt; #end
       &lt;input type="submit" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
     &lt;/div&gt;
   &lt;/fieldset&gt;

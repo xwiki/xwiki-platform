@@ -78,7 +78,7 @@ public class XWikiStatsStoreService implements Runnable
      */
     public void start()
     {
-        if (thread != null) {
+        if (thread == null) {
             thread = new Thread(this);
             thread.start();
         }
@@ -93,6 +93,7 @@ public class XWikiStatsStoreService implements Runnable
         try {
             queue.put(new StopStatsRegisterObject());
             thread.join();
+            thread = null;
         } catch (InterruptedException e) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("Thread join has been interrupted", e);
@@ -173,7 +174,11 @@ public class XWikiStatsStoreService implements Runnable
      */
     public void add(XWikiStatsStoreItem statsRegisterItem)
     {
-        queue.add(statsRegisterItem);
+        try {
+            queue.put(statsRegisterItem);
+        } catch (InterruptedException e) {
+            LOG.error("Statistics storage thread has been interrupted", e);
+        }
     }
     
     /**

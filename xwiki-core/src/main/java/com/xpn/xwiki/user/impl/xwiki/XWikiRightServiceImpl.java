@@ -51,9 +51,9 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
     private static Map actionMap;
 
-    private static List allLevels =
-        Arrays.asList(new String[] {"admin", "view", "edit", "comment", "delete", "undelete",
-        "register", "programming"});
+    private static List<String> allLevels =
+        Arrays.asList("admin", "view", "edit", "comment", "delete", "undelete",
+        "register", "programming");
 
     protected void logAllow(String username, String page, String action, String info)
     {

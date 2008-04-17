@@ -59,6 +59,7 @@ Lightbox.prototype =  {
   },
 
   lbSaveForm: function() {
+    this.lbSaveData();
     Form.disable(this.form);
     this.lbSaveSync(this.saveUrl);
     this.lbHide();
@@ -83,7 +84,6 @@ Lightbox.prototype =  {
   },
 
   lbSaveSync: function(url) {
-    this.lbSaveData();
     new Ajax.Request(url + "?ajax=1", {parameters: this.formData, asynchronous: false});
   },
 

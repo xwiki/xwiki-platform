@@ -1,7 +1,6 @@
 /* USERS SCROLLING SYSTEM */
-
 div.scrollbar {
-  overflow: auto;
+  overflow: auto !important;
   height: 250px;
   margin: 0px;
   padding: 0px;
@@ -78,7 +77,7 @@ div.inscrollbar {
 }
 
 
-#userstable, #groupstable, #usersandgroupstable {
+#userstable, #groupstable, #usersandgroupstable, #alldocstable {
   width: 100%;
   position: relative;
   left: 4px;

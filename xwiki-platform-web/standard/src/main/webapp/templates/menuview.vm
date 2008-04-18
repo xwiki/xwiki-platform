@@ -65,12 +65,12 @@
 ## Show menu
 ##
 #if(!$doc.isNew())
-#xwikitopmenuentrystart($doc.getURL("view", "viewer=code&$docvariant") $msg.get("core.menu.view")  "tmShow")
-#submenuitem($doc.getURL("view", "viewer=comments&$docvariant") $msg.get("core.menu.view.comments"))
-#submenuitem($doc.getURL("view", "viewer=attachments&$docvariant") $msg.get("core.menu.view.attachments"))
-#submenuitem($doc.getURL("view", "viewer=history&$docvariant") $msg.get("core.menu.view.history"))
+#xwikitopmenuentrystart($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("core.menu.view")  "tmShow")
+#submenuitem($doc.getURL("view", "viewer=comments&amp;$docvariant") $msg.get("core.menu.view.comments"))
+#submenuitem($doc.getURL("view", "viewer=attachments&amp;$docvariant") $msg.get("core.menu.view.attachments"))
+#submenuitem($doc.getURL("view", "viewer=history&amp;$docvariant") $msg.get("core.menu.view.history"))
 #if($isAdvancedUser)
-#submenuitem($doc.getURL("view", "viewer=code&$docvariant") $msg.get("core.menu.view.code"))
+#submenuitem($doc.getURL("view", "viewer=code&amp;$docvariant") $msg.get("core.menu.view.code"))
 #end
 #xwikitopmenuentryend()
 #if($keyboardShortcutsEnable)

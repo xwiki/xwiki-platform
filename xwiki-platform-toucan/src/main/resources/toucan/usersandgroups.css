@@ -82,7 +82,7 @@ div.inscrollbar {
 	padding: 3px 0 3px 10px;
 }
 
-#userstable, #groupstable, #usersandgroupstable {
+#userstable, #groupstable, #usersandgroupstable, #alldocstable {
     width: 100%;
     position: relative;
     border: 5px solid #fff;

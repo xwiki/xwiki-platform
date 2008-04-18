@@ -139,6 +139,7 @@ public final class StatsUtil
      * The type of the period.
      * 
      * @version $Id: $
+     * @since 1.4M1
      */
     public enum PeriodType
     {
@@ -170,6 +171,7 @@ public final class StatsUtil
      * @param type the date type. It can be {@link PeriodType#DAY} or {@link PeriodType#MONTH}.
      * @return the integer representation of the specified date.
      * @see java.text.SimpleDateFormat
+     * @since 1.4M1
      */
     public static int getPeriodAsInt(Date date, PeriodType type)
     {
@@ -196,6 +198,7 @@ public final class StatsUtil
     /**
      * @param context the XWiki context.
      * @return the list of cookie domains.
+     * @since 1.4M1
      */
     public static String[] getCookieDomains(XWikiContext context)
     {
@@ -209,6 +212,7 @@ public final class StatsUtil
 
     /**
      * @return the expiration date of the cookie.
+     * @since 1.4M1
      */
     public static Date getCookieExpirationDate()
     {
@@ -224,6 +228,7 @@ public final class StatsUtil
      * @param context the XWiki context from where to get the HTTP session session.
      * @param action the action id.
      * @return the recent statistics actions stored in the session.
+     * @since 1.4M1
      */
     public static Collection< ? > getRecentActionFromSessions(XWikiContext context, String action)
     {
@@ -237,6 +242,7 @@ public final class StatsUtil
      * @param context the XWiki context from where to get the HTTP session session.
      * @param action the action id.
      * @param actions the actions.
+     * @since 1.4M1
      */
     public static void setRecentActionsFromSession(XWikiContext context, String action,
         Collection< ? > actions)
@@ -247,6 +253,7 @@ public final class StatsUtil
     /**
      * @param context the XWiki context.
      * @return the size of the recent list of visit statistics actions.
+     * @since 1.4M1
      */
     public static int getRecentVisitSize(XWikiContext context)
     {
@@ -257,6 +264,7 @@ public final class StatsUtil
     /**
      * @param session the session.
      * @return the visit object stored in the session.
+     * @since 1.4M1
      */
     public static VisitStats getVisitFromSession(HttpSession session)
     {
@@ -268,6 +276,7 @@ public final class StatsUtil
      * 
      * @param session the session.
      * @param visitStat the visit object.
+     * @since 1.4M1
      */
     public static void setVisitInSession(HttpSession session, VisitStats visitStat)
     {
@@ -277,6 +286,7 @@ public final class StatsUtil
     /**
      * @param context the XWiki context.
      * @return true if statistics are enabled, false otherwise.
+     * @since 1.4M1
      */
     public static boolean isStatsEnabled(XWikiContext context)
     {
@@ -286,6 +296,7 @@ public final class StatsUtil
     /**
      * @param context the XWiki context
      * @return true if statistics are enabled for this wiki, false otherwise.
+     * @since 1.4M1
      */
     public static boolean isWikiStatsEnabled(XWikiContext context)
     {
@@ -314,6 +325,7 @@ public final class StatsUtil
      * 
      * @param context The context of this request.
      * @return The visiting session, retrieved from the database or created.
+     * @since 1.4M1
      */
     public static VisitStats findVisit(XWikiContext context)
     {
@@ -370,6 +382,7 @@ public final class StatsUtil
      * 
      * @param context the XWiki context.
      * @return the visit statistics object found.
+     * @since 1.4M1
      */
     private static VisitStats findVisitByCookieOrIPUA(XWikiContext context)
     {
@@ -405,6 +418,7 @@ public final class StatsUtil
      * @param visitObject the visit object to validate.
      * @param context the XWiki context.
      * @return false if the visit object has to be recreated, true otherwise.
+     * @since 1.4M1
      */
     private static boolean isVisitObjectValid(VisitStats visitObject, XWikiContext context)
     {
@@ -448,6 +462,7 @@ public final class StatsUtil
      * 
      * @param context the XWiki context.
      * @return the new visit statistics object.
+     * @since 1.4M1
      */
     private static VisitStats createNewVisit(XWikiContext context)
     {
@@ -493,6 +508,7 @@ public final class StatsUtil
      * @param context the XWiki context.
      * @return the visit object, null if no object was found.
      * @throws XWikiException error when searching for visit object.
+     * @since 1.4M1
      */
     protected static VisitStats findVisitByField(String fieldName, String fieldValue,
         XWikiContext context) throws XWikiException
@@ -551,6 +567,7 @@ public final class StatsUtil
      * @param context the XWiki context.
      * @return the visit object, null if no object was found.
      * @throws XWikiException error when searching for visit object.
+     * @since 1.4M1
      */
     protected static VisitStats findVisitByCookie(String cookie, XWikiContext context)
         throws XWikiException
@@ -565,6 +582,7 @@ public final class StatsUtil
      * @param context the XWiki context.
      * @return the visit object.
      * @throws XWikiException error when searching for visit object.
+     * @since 1.4M1
      */
     protected static VisitStats findVisitByIPUA(String uniqueID, XWikiContext context)
         throws XWikiException
@@ -577,6 +595,7 @@ public final class StatsUtil
      * 
      * @param context the XWiki context.
      * @return the newly created cookie.
+     * @since 1.4M1
      */
     protected static Cookie addCookie(XWikiContext context)
     {
@@ -619,6 +638,7 @@ public final class StatsUtil
      * 
      * @param context The context of this request.
      * @return true if the cookie is created.
+     * @since 1.4M1
      */
     public static boolean findCookie(XWikiContext context)
     {
@@ -644,6 +664,7 @@ public final class StatsUtil
     /**
      * @param context the XWiki context.
      * @return the referer.
+     * @since 1.4M1
      */
     public static String getReferer(XWikiContext context)
     {

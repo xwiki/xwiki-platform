@@ -68,3 +68,5 @@
 // ]]>
 </script>
 #end
+## Hook for inserting JavaScript skin extensions
+<!-- com.xpn.xwiki.plugin.skinx.JsSkinExtensionPlugin -->

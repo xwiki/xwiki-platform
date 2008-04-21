@@ -25,3 +25,5 @@
 <!--[if IE]>
   <link href="$xwiki.getSkinFile("css/lightbox/lightboxIE.css", true)" rel="stylesheet" type="text/css" />
 <![endif]-->
+## Hook for inserting CSS skin extensions
+<!-- com.xpn.xwiki.plugin.skinx.CssSkinExtensionPlugin -->

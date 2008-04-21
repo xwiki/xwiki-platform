@@ -47,10 +47,11 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
      */
     public void showLogin(HttpServletRequest request, HttpServletResponse response, XWikiContext context) throws IOException {
         if ("1".equals(request.getParameter("basicauth"))) {
-            String realName = context.getWiki().Param("xwiki.authentication.realname");
-            if (realName==null)
-                realName = "XWiki";
-            MyBasicAuthenticator.showLogin(request, response, realName);
+            String realmName = context.getWiki().Param("xwiki.authentication.realmname");
+            if (realmName == null) {
+                realmName = "XWiki";
+            }
+            MyBasicAuthenticator.showLogin(request, response, realmName);
         } else {
             showLogin(request, response);
         }
@@ -203,5 +204,4 @@ public class MyFormAuthenticator extends FormAuthenticator implements XWikiAuthe
         }
         return result;
     }
-
 }

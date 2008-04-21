@@ -45,14 +45,16 @@ public interface XWikiPluginInterface {
      * @see flushCache(XWikiContext context)
      */
     void flushCache();
+    void beginRendering(XWikiContext context);
+    void endRendering(XWikiContext context);
     /*
     Called at the begin of each request
     */
-    void beginRendering(XWikiContext context);
+    void beginParsing(XWikiContext context);
     /*
     Called at the end of each request
     */
-    void endRendering(XWikiContext context);
+    String endParsing(String content, XWikiContext context);
 
     String commonTagsHandler(String line, XWikiContext context);
     String startRenderingHandler(String line, XWikiContext context);

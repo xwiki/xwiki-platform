@@ -105,8 +105,9 @@ public class Utils
             }
         }
 
+        context.getWiki().getPluginManager().beginParsing(context);
         String content = context.getWiki().parseTemplate(template + ".vm", context);
-        content = content.trim();
+        content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
 
         if (content.equals("")) {
             // get Error template "This template does not exist

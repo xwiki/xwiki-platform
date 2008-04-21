@@ -113,7 +113,7 @@ public class UploadAction extends XWikiAction
         // Adding a comment with a link to the download URL
         String comment;
         String nextRev = attachment.getNextVersion();
-        ArrayList params = new ArrayList();
+        ArrayList<String> params = new ArrayList<String>();
         params.add(filename);
         params.add(olddoc.getAttachmentRevisionURL(filename, nextRev, context));
         if (attachment.isImage(context)) {
@@ -167,6 +167,5 @@ public class UploadAction extends XWikiAction
             return null;
         }
         return "exception";
-
     }
 }

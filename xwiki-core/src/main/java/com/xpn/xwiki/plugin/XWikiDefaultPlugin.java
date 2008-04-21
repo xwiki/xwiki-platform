@@ -94,7 +94,14 @@ public class XWikiDefaultPlugin implements XWikiPluginInterface {
 
     public void endRendering(XWikiContext context) {
     }
-    
+
+    public void beginParsing(XWikiContext context) {
+    }
+
+    public String endParsing(String content, XWikiContext context) {
+        return content;
+    }
+
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context) {
     	return attachment;
     }

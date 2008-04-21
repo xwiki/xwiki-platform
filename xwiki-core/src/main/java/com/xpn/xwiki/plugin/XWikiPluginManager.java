@@ -250,6 +250,27 @@ public class XWikiPluginManager
         }
     }
 
+    public void beginParsing(XWikiContext context)
+    {
+        for (XWikiPluginInterface plugin : getPlugins("beginParsing")) {
+            try {
+                plugin.beginParsing(context);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public String endParsing(String content, XWikiContext context)
+    {
+        for (XWikiPluginInterface plugin : getPlugins("endParsing")) {
+            try {
+                content = plugin.endParsing(content, context);
+            } catch (Exception e) {
+            }
+        }
+        return content;
+    }
+
     public XWikiAttachment downloadAttachment(XWikiAttachment attachment, XWikiContext context)
     {
         XWikiAttachment attach = attachment;

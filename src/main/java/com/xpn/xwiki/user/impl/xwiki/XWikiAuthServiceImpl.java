@@ -60,8 +60,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 authenticator = new MyBasicAuthenticator();
                 SecurityConfig sconfig = new SecurityConfig(false);
                 sconfig.setAuthMethod("BASIC");
-                if (xwiki.Param("xwiki.authentication.realname") != null) {
-                    sconfig.setRealmName(xwiki.Param("xwiki.authentication.realname"));
+                if (xwiki.Param("xwiki.authentication.realmname") != null) {
+                    sconfig.setRealmName(xwiki.Param("xwiki.authentication.realmname"));
                 } else {
                     sconfig.setRealmName("XWiki");
                 }
@@ -72,8 +72,8 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
 
                 sconfig.setAuthMethod("FORM");
 
-                if (xwiki.Param("xwiki.authentication.realname") != null) {
-                    sconfig.setRealmName(xwiki.Param("xwiki.authentication.realname"));
+                if (xwiki.Param("xwiki.authentication.realmname") != null) {
+                    sconfig.setRealmName(xwiki.Param("xwiki.authentication.realmname"));
                 } else {
                     sconfig.setRealmName("XWiki");
                 }

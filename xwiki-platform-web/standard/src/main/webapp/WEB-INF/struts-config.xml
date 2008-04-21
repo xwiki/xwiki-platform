@@ -282,6 +282,18 @@
                 scope="request">
         </action>
 
+        <action path="/jsx/"
+                type="com.xpn.xwiki.web.JsxAction"
+                name="jsx"
+                scope="request">
+        </action>
+
+        <action path="/ssx/"
+                type="com.xpn.xwiki.web.SsxAction"
+                name="ssx"
+                scope="request">
+        </action>
+
         <action path="/login/"
                 type="com.xpn.xwiki.web.LoginAction"
                 name="login"

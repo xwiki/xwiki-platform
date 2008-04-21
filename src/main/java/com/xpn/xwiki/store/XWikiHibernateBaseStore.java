@@ -5,10 +5,9 @@ import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.Statement;
-import java.util.Collection;
-import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,15 +32,12 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.XWikiRequest;
-
-import edu.emory.mathcs.backport.java.util.concurrent.ConcurrentHashMap;
 
 public class XWikiHibernateBaseStore
 {
     private static final Log log = LogFactory.getLog(XWikiHibernateBaseStore.class);
 
-    private Map connections = new ConcurrentHashMap();
+    private Map<String, String> connections = new ConcurrentHashMap<String, String>();
 
     private int nbConnections = 0;
 
@@ -701,9 +697,9 @@ public class XWikiHibernateBaseStore
             if (log.isDebugEnabled())
                 log.debug("Taken session from pool " + session);
 
-            // Keep some statistics about session and connections
-            nbConnections++;
-            addConnection(getRealConnection(session), context);
+            if (log.isDebugEnabled()) {
+                addConnection(getRealConnection(session), context);
+            }
 
             setSession(session, context);
             setDatabase(session, context);
@@ -727,12 +723,34 @@ public class XWikiHibernateBaseStore
      * @param context
      * @todo This function is temporarily deactivated because of an error that causes memory leaks.
      */
-    private void addConnection(Connection connection, XWikiContext context)
+    private synchronized void addConnection(Connection connection, XWikiContext context)
     {
-        /*
-         * if (connection!=null) connections.put(connection, new ConnectionMonitor(connection,
-         * context));
-         */}
+        // connection.equals(connection) = false for some strange reasons, so we're remembering the
+        // toString representation of each active connection. We also remember the stack trace (if
+        // debug logging is enabled) to help spotting what code causes connections to leak.
+        if (connection != null) {
+            try {
+                // Keep some statistics about session and connections
+                if (connections.containsKey(connection.toString())) {
+                    log.info("Connection [" + connection.toString()
+                        + "] already in connection map for store " + this.toString());
+                } else {
+                    String value = "";
+                    if (log.isDebugEnabled()) {
+                        // No need to fill in the logging stack trace if debug is not enabled.
+                        XWikiException stackException = new XWikiException();
+                        stackException.fillInStackTrace();
+                        value = stackException.getStackTraceAsString();
+                    }
+                    connections.put(connection.toString(), value);
+                    nbConnections++;
+                }
+            } catch (Throwable e) {
+                // This should not happen
+                log.warn(e.getMessage(), e);
+            }
+        }
+    }
 
     /**
      * Remove a connection to the Monitor module
@@ -740,12 +758,23 @@ public class XWikiHibernateBaseStore
      * @param connection
      * @todo This function is temporarily deactivated because of an error that causes memory leaks.
      */
-    private void removeConnection(Connection connection)
+    private synchronized void removeConnection(Connection connection)
     {
-        // connection.equals(connection) = false for some strange reasons.
-        /*
-         * try { if (connection!=null) connections.remove(connection); } catch (Exception e) { }
-         */}
+        if (connection != null) {
+            try {
+                // Keep some statistics about session and connections
+                if (connections.containsKey(connection.toString())) {
+                    connections.remove(connection.toString());
+                    nbConnections--;
+                } else {
+                    log.info("Connection [" + connection.toString() + "] not in connection map");
+                }
+            } catch (Throwable e) {
+                // This should not happen
+                log.warn(e.getMessage(), e);
+            }
+        }
+    }
 
     /**
      * Ends a transaction
@@ -816,16 +845,12 @@ public class XWikiHibernateBaseStore
     private void preCloseSession(Session session) throws HibernateException
     {
         if (session != null) {
-            if (log.isDebugEnabled())
+            if (log.isDebugEnabled()) {
+                // Remove the connection from the list of active connections, used for debugging.
                 log.debug("Releasing hibernate session " + session);
-            Connection connection = getRealConnection(session);
-            if ((connection != null)) {
-                nbConnections--;
-                try {
+                Connection connection = getRealConnection(session);
+                if ((connection != null)) {
                     removeConnection(connection);
-                } catch (Throwable e) {
-                    // This should not happen
-                    e.printStackTrace();
                 }
             }
         }
@@ -888,9 +913,9 @@ public class XWikiHibernateBaseStore
         this.configuration = configuration;
     }
 
-    public Collection getConnections()
+    public Map<String, String> getConnections()
     {
-        return connections.values();
+        return connections;
     }
 
     public int getNbConnections()
@@ -901,73 +926,6 @@ public class XWikiHibernateBaseStore
     public void setNbConnections(int nbConnections)
     {
         this.nbConnections = nbConnections;
-    }
-
-    public class ConnectionMonitor
-    {
-        private Exception exception;
-
-        private Connection connection;
-
-        private Date date;
-
-        private URL url = null;
-
-        public ConnectionMonitor(Connection connection, XWikiContext context)
-        {
-            this.setConnection(connection);
-
-            try {
-                setDate(new Date());
-                setException(new XWikiException());
-                XWikiRequest request = context.getRequest();
-                if (request != null)
-                    setURL(XWiki.getRequestURL(context.getRequest()));
-            } catch (Throwable e) {
-            }
-
-        }
-
-        public Connection getConnection()
-        {
-            return connection;
-        }
-
-        public void setConnection(Connection connection)
-        {
-            this.connection = connection;
-        }
-
-        public Date getDate()
-        {
-            return date;
-        }
-
-        public void setDate(Date date)
-        {
-            this.date = date;
-        }
-
-        public Exception getException()
-        {
-            return exception;
-        }
-
-        public void setException(Exception exception)
-        {
-            this.exception = exception;
-        }
-
-        public URL getURL()
-        {
-            return url;
-        }
-
-        public void setURL(URL url)
-        {
-            this.url = url;
-        }
-
     }
 
     protected Configuration makeMapping(String className, String custommapping1)

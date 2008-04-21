@@ -200,15 +200,13 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
             cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
                 userOrGroupName, user, context);
         } else {
-            List wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
+            List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
 
             String database = context.getDatabase();
             try {
                 boolean foundMainWiki = false;
 
-                for (Iterator it = wikiList.iterator(); it.hasNext();) {
-                    String wikiName = (String) it.next();
-
+                for (String wikiName : wikiList) {
                     if (context.isMainWiki(wikiName)) {
                         foundMainWiki = true;
                     }
@@ -402,7 +400,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
+    public List<String> getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {
@@ -411,7 +409,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                 context);
         }
 
-        List groupList = new ArrayList();
+        List<String> groupList = new ArrayList<String>();
 
         int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, null, context);
 
@@ -464,7 +462,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields,
+    public List<String> getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {
@@ -504,7 +502,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List getAllMatchedWikiUsersOrGroups(boolean user, String wikiName,
+    public List<String> getAllMatchedWikiUsersOrGroups(boolean user, String wikiName,
         Object[][] matchFields, boolean withdetails, RequestLimit limit, Object[][] order,
         XWikiContext context) throws XWikiException
     {
@@ -518,14 +516,14 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         try {
             context.setDatabase(wikiName);
 
-            List localGroupList =
+            List<String> localGroupList =
                 getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
                     context);
 
             if (localGroupList != null && !withdetails) {
-                List wikiGroupList = new ArrayList(localGroupList.size());
-                for (Iterator it = localGroupList.iterator(); it.hasNext();) {
-                    wikiGroupList.add(wikiName + WIKIFULLNAME_SEP + it.next());
+                List<String> wikiGroupList = new ArrayList<String>(localGroupList.size());
+                for (String groupName : localGroupList) {
+                    wikiGroupList.add(wikiName + WIKIFULLNAME_SEP + groupName);
                 }
 
                 localGroupList = wikiGroupList;
@@ -563,7 +561,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields,
+    public List<String> getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {
@@ -586,7 +584,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllGroupsNamesForMember(String member, int nb, int start,
+    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start,
         XWikiContext context) throws XWikiException
     {
         return context.getWiki().getGroupService(context).getAllGroupsNamesForMember(member, nb,
@@ -603,7 +601,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link Collection} of {@link String} containing user name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllMembersNamesForGroup(String group, int nb, int start,
+    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start,
         XWikiContext context) throws XWikiException
     {
         return context.getWiki().getGroupService(context).getAllMembersNamesForGroup(group, nb,
@@ -643,7 +641,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
     // Rights management
 
     /**
-     * Get the {@link LevelTree} {@link Map} for he provided rights levels.
+     * Get the {@link LevelTree} {@link Map} for the provided rights levels.
      * 
      * @param preferences the document containing rights preferences.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
@@ -994,11 +992,9 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         boolean needUpdate = false;
 
-        List vobj = preferences.getObjects(rightsClass);
+        List<BaseObject> vobj = preferences.getObjects(rightsClass);
         if (vobj != null) {
-            for (Iterator it = vobj.iterator(); it.hasNext();) {
-                BaseObject bobj = (BaseObject) it.next();
-
+            for (BaseObject bobj : vobj) {
                 List levels =
                     ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS),
                         RIGHTSLISTFIELD_SEP, false);
@@ -1080,11 +1076,9 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
 
-        List vobj = rightsDocument.getObjects(rightsClass);
+        List<BaseObject> vobj = rightsDocument.getObjects(rightsClass);
         if (vobj != null) {
-            for (Iterator it = vobj.iterator(); it.hasNext();) {
-                BaseObject bobj = (BaseObject) it.next();
-
+            for (BaseObject bobj : vobj) {
                 needUpdate |=
                     removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace,
                         userOrGroupName, user, context);
@@ -1133,7 +1127,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
     public void removeUserOrGroupFromAllRights(String userOrGroupWiki, String userOrGroupSpace,
         String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
     {
-        List parameterValues = new ArrayList();
+        List<String> parameterValues = new ArrayList<String>();
 
         String fieldName;
         if (user) {
@@ -1207,7 +1201,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
 
-        List vobj = preferences.getObjects(rightsClass);
+        List<BaseObject> vobj = preferences.getObjects(rightsClass);
         if (vobj != null && !vobj.isEmpty()) {
             preferences.removeObjects(rightsClass);
             context.getWiki().saveDocument(preferences, comment, context);

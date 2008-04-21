@@ -26,7 +26,6 @@ import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 import org.apache.commons.codec.binary.Base64;
 import org.securityfilter.authenticator.BasicAuthenticator;
@@ -87,7 +86,6 @@ public class MyBasicAuthenticator extends BasicAuthenticator implements XWikiAut
     {
         // Always verify authentication
         String authorizationHeader = request.getHeader("Authorization");
-        HttpSession session = request.getSession();
         if (authorizationHeader != null) {
             String decoded = decodeBasicAuthorizationString(authorizationHeader);
             String username = convertUsername(parseUsername(decoded), context);

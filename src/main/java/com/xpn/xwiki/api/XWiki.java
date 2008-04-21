@@ -43,7 +43,7 @@ public class XWiki extends Api
     protected static final Log LOG = LogFactory.getLog(XWiki.class);
 
     private com.xpn.xwiki.XWiki xwiki;
-    
+
     /**
      * @see #getStatsService()
      */
@@ -120,32 +120,36 @@ public class XWiki extends Api
     }
 
     /**
-     * @return all deleted documents in recycle bin
-     * @param fullname - {@link XWikiDocument#getFullName()}
-     * @param lang - {@link XWikiDocument#getLanguage()}
+     * @return A list with all the deleted versions of a document in the recycle bin.
+     * @param fullname Tha {@link XWikiDocument#getFullName() name} of the document to search for.
+     * @param lang An optional {@link XWikiDocument#getLanguage() language} to filter results.
      * @throws XWikiException if any error
      */
-    public List getDeletedDocuments(String fullname, String lang) throws XWikiException
+    public List<DeletedDocument> getDeletedDocuments(String fullname, String lang)
+        throws XWikiException
     {
         XWikiDeletedDocument[] dds = xwiki.getDeletedDocuments(fullname, lang, context);
         if (dds == null || dds.length == 0) {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
-        List result = new ArrayList(dds.length);
+        List<DeletedDocument> result = new ArrayList<DeletedDocument>(dds.length);
         for (int i = 0; i < dds.length; i++) {
             result.add(new DeletedDocument(dds[i], context));
         }
         return result;
     }
+
     /**
      * @return specified documents in recycle bin
      * @param fullname - {@link XWikiDocument#getFullName()}
      * @param lang - {@link XWikiDocument#getLanguage()}
      * @throws XWikiException if any error
      */
-    public DeletedDocument getDeletedDocument(String fullname, String lang, String index) throws XWikiException
+    public DeletedDocument getDeletedDocument(String fullname, String lang, String index)
+        throws XWikiException
     {
-        XWikiDeletedDocument dd = xwiki.getDeletedDocument(fullname, lang, Integer.parseInt(index), context);
+        XWikiDeletedDocument dd =
+            xwiki.getDeletedDocument(fullname, lang, Integer.parseInt(index), context);
         if (dd == null) {
             return null;
         }
@@ -330,39 +334,35 @@ public class XWiki extends Api
     }
 
     /**
-     * API allowing to search for document names matching a query.
-     * Examples:
+     * API allowing to search for document names matching a query. Examples:
      * <ul>
-     *   <li>Query: <code>where doc.web='Main' order by doc.creationDate desc</code>.
-     *       Result: All the documents in space 'Main' ordered by the creation date from the most
-     *       recent</li>
-     *   <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>.
-     *       Result: All the documents containing 'sport' in their name ordered by document
-     *       name</li>
-     *   <li>Query: <code>where doc.content like '%sport%' order by doc.author</code>
-     *       Result: All the documents containing 'sport' in their content ordered by the
-     *       author</li>
-     *   <li>Query: <code>where doc.creator = 'XWiki.LudovicDubost' order by doc.creationDate
+     * <li>Query: <code>where doc.web='Main' order by doc.creationDate desc</code>. Result: All
+     * the documents in space 'Main' ordered by the creation date from the most recent</li>
+     * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All
+     * the documents containing 'sport' in their name ordered by document name</li>
+     * <li>Query: <code>where doc.content like '%sport%' order by doc.author</code> Result: All
+     * the documents containing 'sport' in their content ordered by the author</li>
+     * <li>Query: <code>where doc.creator = 'XWiki.LudovicDubost' order by doc.creationDate
      *       desc</code>.
-     *       Result: All the documents with creator LudovicDubost ordered by the creation date
-     *       from the most recent</li>
-     *   <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>.
-     *       Result: All the documents with last author LudovicDubost ordered by the last
-     *       modification date from the most recent.</li>
-     *   <li>Query: <code>,BaseObject as obj where doc.fullName=obj.name and
+     * Result: All the documents with creator LudovicDubost ordered by the creation date from the
+     * most recent</li>
+     * <li>Query: <code>where doc.author = 'XWiki.LudovicDubost' order by doc.date desc</code>.
+     * Result: All the documents with last author LudovicDubost ordered by the last modification
+     * date from the most recent.</li>
+     * <li>Query: <code>,BaseObject as obj where doc.fullName=obj.name and
      *       obj.className='XWiki.XWikiComments' order by doc.date desc</code>.
-     *       Result: All the documents with at least one comment ordered by the last modification
-     *       date from the most recent</li>
-     *   <li>Query: <code>,BaseObject as obj, StringProperty as prop where
+     * Result: All the documents with at least one comment ordered by the last modification date
+     * from the most recent</li>
+     * <li>Query: <code>,BaseObject as obj, StringProperty as prop where
      *       doc.fullName=obj.name and obj.className='XWiki.XWikiComments' and obj.id=prop.id.id
      *       and prop.id.name='author' and prop.value='XWiki.LudovicDubost' order by doc.date
      *       desc</code>.
-     *       Result: All the documents with at least one comment from LudovicDubost ordered by the
-     *       last modification date from the most recent</li>
+     * Result: All the documents with at least one comment from LudovicDubost ordered by the last
+     * modification date from the most recent</li>
      * </ul>
-     *
+     * 
      * @param wheresql Query to be run (either starting with ", BaseObject as obj where.." or by
-     *        "where ..."
+     *            "where ..."
      * @return List of document names matching (Main.Page1, Main.Page2)
      * @throws XWikiException
      */
@@ -420,7 +420,8 @@ public class XWiki extends Api
     public List searchDocuments(String wheresql, boolean distinctbylanguage)
         throws XWikiException
     {
-        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, getXWikiContext()));
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, distinctbylanguage,
+            getXWikiContext()));
     }
 
     /**
@@ -436,30 +437,33 @@ public class XWiki extends Api
     public List searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start)
         throws XWikiException
     {
-        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, nb, start, getXWikiContext()));
+        return wrapDocs(xwiki.getStore().searchDocuments(wheresql, distinctbylanguage, nb, start,
+            getXWikiContext()));
     }
 
     /**
-     * Search documents by passing HQL where clause values as parameters. This allows generating
-     * a Named HQL query which will automatically encode the passed values (like escaping single
+     * Search documents by passing HQL where clause values as parameters. This allows generating a
+     * Named HQL query which will automatically encode the passed values (like escaping single
      * quotes). This API is recommended to be used over the other similar methods where the values
      * are passed inside the where clause and for which you'll need to do the encoding/escaping
      * yourself before calling them.
-     *
-     * <p>Example</p>
+     * <p>
+     * Example
+     * </p>
+     * 
      * <pre><code>
-     * #set($orphans = $xwiki.searchDocuments(" where doc.fullName <> ? and (doc.parent = ? or "
-     *     + "(doc.parent = ? and doc.web = ?))",
-     *     ["${doc.fullName}as", ${doc.fullName}, ${doc.name}, ${doc.web}]))
+     * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ? and (doc.parent = ? or &quot;
+     *     + &quot;(doc.parent = ? and doc.web = ?))&quot;,
+     *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.web}]))
      * </code></pre>
-     *
+     * 
      * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"</code>
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
      * @return a list of document names
-     * @throws XWikiException in case of error while performing the query 
+     * @throws XWikiException in case of error while performing the query
      */
     public List searchDocuments(String parametrizedSqlClause, int nb, int start,
         List parameterValues) throws XWikiException
@@ -476,8 +480,8 @@ public class XWiki extends Api
     public List searchDocuments(String parametrizedSqlClause, List parameterValues)
         throws XWikiException
     {
-        return xwiki.getStore().searchDocumentsNames(parametrizedSqlClause,
-            parameterValues, getXWikiContext());
+        return xwiki.getStore().searchDocumentsNames(parametrizedSqlClause, parameterValues,
+            getXWikiContext());
     }
 
     /**
@@ -507,16 +511,16 @@ public class XWiki extends Api
             context.setDatabase(database);
         }
     }
-    
+
     /**
      * Function to wrap a list of XWikiDocument into Document objects
      * 
      * @param docs list of XWikiDocument
      * @return list of Document objects
      */
-    public List wrapDocs(List docs)
+    public List<Document> wrapDocs(List docs)
     {
-        List result = new ArrayList();
+        List<Document> result = new ArrayList<Document>();
         if (docs != null) {
             for (Iterator iter = docs.iterator(); iter.hasNext();) {
                 Object obj = iter.next();
@@ -526,10 +530,10 @@ public class XWiki extends Api
                         Document wrappedDoc = doc.newDocument(getXWikiContext());
                         result.add(wrappedDoc);
                     } else if (obj instanceof Document) {
-                        result.add(obj);
+                        result.add((Document) obj);
                     } else if (obj instanceof String) {
                         Document doc = getDocument(obj.toString());
-                        if(doc != null) {
+                        if (doc != null) {
                             result.add(doc);
                         }
                     }
@@ -937,13 +941,13 @@ public class XWiki extends Api
     }
 
     /**
-     * First try to find the current language in use from the XWiki context. If none is used
-     * and if the wiki is not multilingual use the default language defined in the XWiki
-     * preferences. If the wiki is multilingual try to get the language passed in the request.
-     * If none was passed try to get it from a cookie. If no language cookie exists then use the
-     * user default language and barring that use the browser's "Accept-Language" header sent in
-     * HTTP request. If none is defined use the default language.
-     *
+     * First try to find the current language in use from the XWiki context. If none is used and if
+     * the wiki is not multilingual use the default language defined in the XWiki preferences. If
+     * the wiki is multilingual try to get the language passed in the request. If none was passed
+     * try to get it from a cookie. If no language cookie exists then use the user default language
+     * and barring that use the browser's "Accept-Language" header sent in HTTP request. If none is
+     * defined use the default language.
+     * 
      * @return the language to use
      */
     public String getLanguagePreference()
@@ -1556,10 +1560,9 @@ public class XWiki extends Api
 
     /**
      * Privileged API to access an eXo Platform service from the Wiki Engine
-     *
+     * 
      * @param className eXo classname to retrieve the service from
-     * @return A object representing the service or null if the user doesn't have programming
-     *         rights
+     * @return A object representing the service or null if the user doesn't have programming rights
      * @throws XWikiException if the service cannot be loaded
      * @since 1.1 Beta 1
      */
@@ -1578,8 +1581,7 @@ public class XWiki extends Api
      * Privileged API to access an eXo Platform Portal service from the Wiki Engine
      * 
      * @param className eXo classname to retrieve the service from
-     * @return A object representing the service or null if the user doesn't have programming
-     *         rights
+     * @return A object representing the service or null if the user doesn't have programming rights
      * @throws XWikiException if the service cannot be loaded
      * @since 1.1 Beta 1
      */
@@ -1839,22 +1841,21 @@ public class XWiki extends Api
     }
 
     /*
-     Allow to read user setting providing the user timezone
-     All dates will be expressed with this timezone
-     @return the timezone
-    */
-    public String getUserTimeZone() {
+     * Allow to read user setting providing the user timezone All dates will be expressed with this
+     * timezone @return the timezone
+     */
+    public String getUserTimeZone()
+    {
         return xwiki.getUserTimeZone(context);
     }
 
     /**
-     * Returns a plugin from the plugin API. Plugin Rights can be verified. Note that although
-     * this API is a duplicate of {@link #getPlugin(String)} it used to provide an easy access
-     * from Velocity to XWiki plugins. Indeed Velocity has a feature in that if a class has
-     * a get method, using the dot notation will automatically call the get method for the class.
-     * See http://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#propertylookuprules.
-     * This this allows the following constructs:
-     * <code>$xwiki.pluginName.somePluginMethod()</code>
+     * Returns a plugin from the plugin API. Plugin Rights can be verified. Note that although this
+     * API is a duplicate of {@link #getPlugin(String)} it used to provide an easy access from
+     * Velocity to XWiki plugins. Indeed Velocity has a feature in that if a class has a get method,
+     * using the dot notation will automatically call the get method for the class. See
+     * http://velocity.apache.org/engine/releases/velocity-1.5/user-guide.html#propertylookuprules.
+     * This this allows the following constructs: <code>$xwiki.pluginName.somePluginMethod()</code>
      * 
      * @param name Name of the plugin to retrieve (either short of full class name)
      * @return a plugin object
@@ -1933,7 +1934,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication
-     *
+     * 
      * @param surl url to retrieve
      * @param username username for the basic authentication
      * @param password password for the basic authentication
@@ -1941,10 +1942,12 @@ public class XWiki extends Api
      * @return Content of the specified URL
      * @throws IOException
      */
-    public String getURLContent(String surl, String username, String password, int timeout) throws IOException
+    public String getURLContent(String surl, String username, String password, int timeout)
+        throws IOException
     {
         try {
-            return xwiki.getURLContent(surl, username, password, timeout, xwiki.getHttpUserAgent(context));
+            return xwiki.getURLContent(surl, username, password, timeout, xwiki
+                .getHttpUserAgent(context));
         } catch (Exception e) {
             return "";
         }
@@ -1952,7 +1955,7 @@ public class XWiki extends Api
 
     /**
      * Returns the content of an HTTP/HTTPS URL
-     *
+     * 
      * @param surl url to retrieve
      * @param timeout manuel timeout in milliseconds
      * @return Content of the specified URL
@@ -1966,7 +1969,6 @@ public class XWiki extends Api
             return "";
         }
     }
-
 
     /**
      * Returns the content of an HTTP/HTTPS URL protected using Basic Authentication as Bytes
@@ -2055,8 +2057,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to check if the backlinks feature is active
-     * Backlinks are activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the backlinks feature is active Backlinks are activated in xwiki.cfg or in
+     * the XWiki Preferences
+     * 
      * @return true if the backlinks feature is active
      * @throws XWikiException exception if the preference could not be retrieved
      */
@@ -2066,8 +2069,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to check if the tags feature is active.
-     * Tags are activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the tags feature is active. Tags are activated in xwiki.cfg or in the XWiki
+     * Preferences
+     * 
      * @return true if the tags feature is active, false otherwise
      * @throws XWikiException exception if the preference could not be retrieved
      */
@@ -2076,10 +2080,10 @@ public class XWiki extends Api
         return xwiki.hasTags(getXWikiContext());
     }
 
-
     /**
-     * API to check if the edit comment feature is active
-     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the edit comment feature is active Edit comments are activated in xwiki.cfg
+     * or in the XWiki Preferences
+     * 
      * @return
      */
     public boolean hasEditComment()
@@ -2088,8 +2092,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to check if the edit comment field is shown in the edit form
-     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the edit comment field is shown in the edit form Edit comments are activated
+     * in xwiki.cfg or in the XWiki Preferences
+     * 
      * @return
      */
     public boolean isEditCommentFieldHidden()
@@ -2098,8 +2103,9 @@ public class XWiki extends Api
     }
 
     /**
-     * API to check if the edit comment is suggested (prompted once by Javascript if empty)
-     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the edit comment is suggested (prompted once by Javascript if empty) Edit
+     * comments are activated in xwiki.cfg or in the XWiki Preferences
+     * 
      * @return
      */
     public boolean isEditCommentSuggested()
@@ -2108,28 +2114,31 @@ public class XWiki extends Api
     }
 
     /**
-     * API to check if the edit comment is mandatory (prompted by Javascript if empty)
-     * Edit comments are activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the edit comment is mandatory (prompted by Javascript if empty) Edit comments
+     * are activated in xwiki.cfg or in the XWiki Preferences
+     * 
      * @return
      */
     public boolean isEditCommentMandatory()
     {
         return xwiki.isEditCommentMandatory(context);
     }
-    
+
     /**
-     * API to check if the minor edit feature is active
-     * minor edit is activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the minor edit feature is active minor edit is activated in xwiki.cfg or in
+     * the XWiki Preferences
      */
-    public boolean hasMinorEdit() {
+    public boolean hasMinorEdit()
+    {
         return xwiki.hasMinorEdit(context);
     }
 
     /**
-     * API to check if the recycle bin feature is active
-     * recycle bin is activated in xwiki.cfg or in the XWiki Preferences
+     * API to check if the recycle bin feature is active recycle bin is activated in xwiki.cfg or in
+     * the XWiki Preferences
      */
-    public boolean hasRecycleBin() {
+    public boolean hasRecycleBin()
+    {
         return xwiki.hasRecycleBin(context);
     }
 
@@ -2170,8 +2179,8 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to retrieve an object instantiated from groovy code in a String.
-     * Note that Groovy scripts compilation is cached.
+     * Privileged API to retrieve an object instantiated from groovy code in a String. Note that
+     * Groovy scripts compilation is cached.
      * 
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
@@ -2185,9 +2194,9 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to retrieve an object instantiated from groovy code in a String,
-     * using a classloader including all JAR files located in the passed page as attachments.
-     * Note that Groovy scripts compilation is cached
+     * Privileged API to retrieve an object instantiated from groovy code in a String, using a
+     * classloader including all JAR files located in the passed page as attachments. Note that
+     * Groovy scripts compilation is cached
      * 
      * @param script the Groovy class definition string (public class MyClass { ... })
      * @return An object instantiating this class
@@ -2202,9 +2211,9 @@ public class XWiki extends Api
     }
 
     /**
-     * Privileged API to retrieve an object instanciated from groovy code in a String Groovy
-     * scripts compilation is cached
-     *
+     * Privileged API to retrieve an object instanciated from groovy code in a String Groovy scripts
+     * compilation is cached
+     * 
      * @param fullname // script containing a Groovy class definition (public class MyClass { ... })
      * @return An object instanciating this class
      * @throws XWikiException
@@ -2308,8 +2317,9 @@ public class XWiki extends Api
 
     /**
      * API to display a select box for the list of available field for a specific class This field
-     * data can then be used to generate the order element of an XWiki Query showing a table with the relevant data
-     *
+     * data can then be used to generate the order element of an XWiki Query showing a table with
+     * the relevant data
+     * 
      * @param className XWiki Class Name to display the list of columns for
      * @param query Query to pre-select the currently selected columns
      * @return text of the select field
@@ -2322,9 +2332,9 @@ public class XWiki extends Api
 
     /**
      * API to display a select box for the list of available field for a specific class, optionally
-     * adding a prefix This field data can then be used to generate the order element of an XWiki Query showing a table
-     * with the relevant data
-     *
+     * adding a prefix This field data can then be used to generate the order element of an XWiki
+     * Query showing a table with the relevant data
+     * 
      * @param className XWiki Class Name to display the list of columns for
      * @param prefix Prefix to add to the field name
      * @param query Query to pre-select the currently selected columns
@@ -2507,16 +2517,16 @@ public class XWiki extends Api
 
     /**
      * Get the XWiki Class object defined in the passed Document name.
-     *
-     * <p>Note: This method doesn't require any rights for accessing the passed Document (as
-     *          opposed to the {@link com.xpn.xwiki.api.Document#getxWikiClass()} method which
-     *          does require to get a Document object first. This is thus useful in cases where
-     *          the calling code doesn't have the access right to the specified Document. It is
-     *          safe because there are no sensitive data stored in a Class definition.
+     * <p>
+     * Note: This method doesn't require any rights for accessing the passed Document (as opposed to
+     * the {@link com.xpn.xwiki.api.Document#getxWikiClass()} method which does require to get a
+     * Document object first. This is thus useful in cases where the calling code doesn't have the
+     * access right to the specified Document. It is safe because there are no sensitive data stored
+     * in a Class definition.
      * </p>
      * 
-     * @param documentName the name of the document for which to get the Class object.
-     *        For example "XWiki.XWikiPreferences"
+     * @param documentName the name of the document for which to get the Class object. For example
+     *            "XWiki.XWikiPreferences"
      * @return the XWiki Class object defined in the passed Document name. If the passed Document
      *         name points to a Document with no Class defined then an empty Class object is
      *         returned (i.e. a Class object with no properties).
@@ -2529,17 +2539,18 @@ public class XWiki extends Api
         return new Class(xwiki.getDocument(documentName, context).getxWikiClass(), context);
     }
 
-
     /**
      * Provides an absolute counter
+     * 
      * @param name Counter name
-     * @return  String
+     * @return String
      */
-    public String getCounter(String name) {
+    public String getCounter(String name)
+    {
         XWikiEngineContext econtext = context.getEngineContext();
         Integer counter = (Integer) econtext.getAttribute(name);
-        if (counter==null) {
-           counter = new Integer(0);
+        if (counter == null) {
+            counter = new Integer(0);
         }
         counter = new Integer(counter.intValue() + 1);
         econtext.setAttribute(name, counter);
@@ -2547,9 +2558,10 @@ public class XWiki extends Api
     }
 
     /**
-     * Check authentication from request and set according persitent login information
-     * If it fails user is unlogged
-     * @return  null if failed, non null XWikiUser if sucess
+     * Check authentication from request and set according persitent login information If it fails
+     * user is unlogged
+     * 
+     * @return null if failed, non null XWikiUser if sucess
      * @throws XWikiException
      */
     public XWikiUser checkAuth() throws XWikiException
@@ -2560,15 +2572,18 @@ public class XWiki extends Api
     /**
      * Check authentication from username and password and set according persitent login information
      * If it fails user is unlogged
-     * @param username  username to check
-     * @param password  password to check
+     * 
+     * @param username username to check
+     * @param password password to check
      * @param rememberme "1" if you want to remember the login accross navigator restart
-     * @return  null if failed, non null XWikiUser if sucess
+     * @return null if failed, non null XWikiUser if sucess
      * @throws XWikiException
      */
-    public XWikiUser checkAuth(String username, String password, String rememberme) throws XWikiException
+    public XWikiUser checkAuth(String username, String password, String rememberme)
+        throws XWikiException
     {
-        return context.getWiki().getAuthService().checkAuth(username, password, rememberme, context);
+        return context.getWiki().getAuthService().checkAuth(username, password, rememberme,
+            context);
     }
 
     /**
@@ -2584,7 +2599,7 @@ public class XWiki extends Api
     /**
      * API to get the xwiki criteria service which allow to create various criteria : integer
      * ranges, date periods, date intervals, etc.
-     *
+     * 
      * @return the xwiki criteria service
      */
     public CriteriaService getCriteriaService()

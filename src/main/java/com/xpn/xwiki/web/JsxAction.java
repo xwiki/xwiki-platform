@@ -83,28 +83,30 @@ public class JsxAction extends XWikiAction
         CachePolicies finalCache = CachePolicies.LONG;
         StringBuilder resultBuilder = new StringBuilder();
 
-        for (BaseObject sxObj : doc.getObjects(JSX_CLASS_NAME)) {
-            String sxContent = sxObj.getLargeStringValue("code");
-            int parse = sxObj.getIntValue("parse");
-            try {
-                CachePolicies cache =
-                    CachePolicies.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
-                        .getStringValue("cache"), "LONG")));
-                if (cache.compareTo(finalCache) > 0) {
-                    finalCache = cache;
+        if (doc.getObjects(JSX_CLASS_NAME) != null) {
+            for (BaseObject sxObj : doc.getObjects(JSX_CLASS_NAME)) {
+                String sxContent = sxObj.getLargeStringValue("code");
+                int parse = sxObj.getIntValue("parse");
+                try {
+                    CachePolicies cache =
+                        CachePolicies.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
+                            .getStringValue("cache"), "LONG")));
+                    if (cache.compareTo(finalCache) > 0) {
+                        finalCache = cache;
+                    }
+                } catch (Exception ex) {
+                    LOG.warn(String.format("JSX object [%s#%s] has an invalid cache policy: [%s]",
+                        doc.getFullName(), sxObj.getStringValue("name"), sxObj
+                            .getStringValue("cache")));
                 }
-            } catch (Exception ex) {
-                LOG.warn(String.format("JSX object [%s#%s] has an invalid cache policy: [%s]",
-                    doc.getFullName(), sxObj.getStringValue("name"), sxObj
-                        .getStringValue("cache")));
+    
+                if (parse == 1) {
+                    sxContent = xwiki.getRenderingEngine().interpretText(sxContent, doc, context);
+                }
+                // Also add a newline, in case the different object contents don't end with a blank
+                // line, and could cause syntax errors when concatenated.
+                resultBuilder.append(sxContent + "\n");
             }
-
-            if (parse == 1) {
-                sxContent = xwiki.getRenderingEngine().interpretText(sxContent, doc, context);
-            }
-            // Also add a newline, in case the different object contents don't end with a blank
-            // line, and could cause syntax errors when concatenated.
-            resultBuilder.append(sxContent + "\n");
         }
 
         String result = resultBuilder.toString();

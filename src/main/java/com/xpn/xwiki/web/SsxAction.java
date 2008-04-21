@@ -29,8 +29,6 @@ import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.mozilla.javascript.ErrorReporter;
-import org.mozilla.javascript.EvaluatorException;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -38,7 +36,6 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.yahoo.platform.yui.compressor.CssCompressor;
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 /**
  * <p>
@@ -84,28 +81,31 @@ public class SsxAction extends XWikiAction
         CachePolicies finalCache = CachePolicies.LONG;
         StringBuilder resultBuilder = new StringBuilder();
 
-        for (BaseObject sxObj : doc.getObjects(SSX_CLASS_NAME)) {
-            String sxContent = sxObj.getLargeStringValue("code");
-            int parse = sxObj.getIntValue("parse");
-            try {
-                CachePolicies cache =
-                    CachePolicies.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(sxObj
-                        .getStringValue("cache"), "LONG")));
-                if (cache.compareTo(finalCache) > 0) {
-                    finalCache = cache;
+        if (doc.getObjects(SSX_CLASS_NAME) != null) {
+            for (BaseObject sxObj : doc.getObjects(SSX_CLASS_NAME)) {
+                String sxContent = sxObj.getLargeStringValue("code");
+                int parse = sxObj.getIntValue("parse");
+                try {
+                    CachePolicies cache =
+                        CachePolicies.valueOf(StringUtils.upperCase(StringUtils.defaultIfEmpty(
+                            sxObj.getStringValue("cache"), "LONG")));
+                    if (cache.compareTo(finalCache) > 0) {
+                        finalCache = cache;
+                    }
+                } catch (Exception ex) {
+                    LOG.warn(String.format(
+                        "JSX object [%s#%s] has an invalid cache policy: [%s]",
+                        doc.getFullName(), sxObj.getStringValue("name"), sxObj
+                            .getStringValue("cache")));
                 }
-            } catch (Exception ex) {
-                LOG.warn(String.format("JSX object [%s#%s] has an invalid cache policy: [%s]",
-                    doc.getFullName(), sxObj.getStringValue("name"), sxObj
-                        .getStringValue("cache")));
-            }
 
-            if (parse == 1) {
-                sxContent = xwiki.getRenderingEngine().interpretText(sxContent, doc, context);
+                if (parse == 1) {
+                    sxContent = xwiki.getRenderingEngine().interpretText(sxContent, doc, context);
+                }
+                // Also add a newline, in case the different object contents don't end with a blank
+                // line, and could cause syntax errors when concatenated.
+                resultBuilder.append(sxContent + "\n");
             }
-            // Also add a newline, in case the different object contents don't end with a blank
-            // line, and could cause syntax errors when concatenated.
-            resultBuilder.append(sxContent + "\n");
         }
 
         String result = resultBuilder.toString();

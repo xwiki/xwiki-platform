@@ -48,6 +48,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <modules>
+        <module>skinx</module>
         <module>adwords</module>
         <module>alexa</module>
         <module>exoplatform</module>

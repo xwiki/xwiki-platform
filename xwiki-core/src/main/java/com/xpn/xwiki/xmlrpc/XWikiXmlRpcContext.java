@@ -18,17 +18,68 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.xmlrpc;
 
-import com.xpn.xwiki.web.XWikiServletContext;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.XWiki;
 
-import javax.servlet.ServletContext;
-
-public class XWikiXmlRpcContext extends XWikiServletContext
+/**
+ * This is an helper class that contains information about the XWiki context and the current XMLRPC
+ * user.
+ *
+ * @author fmancinelli
+ */
+public class XWikiXmlRpcContext
 {
-    public XWikiXmlRpcContext(ServletContext scontext)
+    /*
+     * The XWiki API used by XMLRPC functions to perform operations
+     */
+    private XWiki xwiki;
+
+    /*
+     * The low-level XWiki API object. This is needed in some methods where the functionality cannot
+     * be completed by using the API wrapper (e.g., removing an attachment)
+     */
+    private com.xpn.xwiki.XWiki baseXWiki;
+
+    private XWikiXmlRpcUser user;
+
+    /*
+     * This XWikiContext is needed for performing operations with the low-level API.
+     */
+    private XWikiContext xwikiContext;
+
+    public XWikiXmlRpcContext(XWikiContext xwikiContext, com.xpn.xwiki.XWiki baseXWiki,
+        XWiki xwiki, XWikiXmlRpcUser user)
     {
-        super(scontext);
+        this.xwikiContext = xwikiContext;
+        this.baseXWiki = baseXWiki;
+        this.xwiki = xwiki;
+        this.user = user;
+    }
+
+    public XWiki getXWiki()
+    {
+        return xwiki;
+    }
+
+    public XWikiXmlRpcUser getUser()
+    {
+        return user;
+    }
+
+    public XWikiContext getXWikiContext()
+    {
+        return xwikiContext;
+    }
+
+    public com.xpn.xwiki.XWiki getBaseXWiki()
+    {
+        return baseXWiki;
+    }
+
+    public void setBaseXWiki(com.xpn.xwiki.XWiki baseXWiki)
+    {
+        this.baseXWiki = baseXWiki;
     }
 }

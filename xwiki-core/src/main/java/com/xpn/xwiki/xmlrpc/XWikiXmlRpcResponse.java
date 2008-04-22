@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.xmlrpc;
 
 import com.xpn.xwiki.web.XWikiServletResponse;
@@ -30,7 +29,6 @@ import java.io.PrintWriter;
 
 public class XWikiXmlRpcResponse extends XWikiServletResponse
 {
-
     public XWikiXmlRpcResponse(HttpServletResponse response)
     {
         super(response);

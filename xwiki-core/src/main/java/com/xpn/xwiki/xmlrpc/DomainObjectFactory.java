@@ -18,372 +18,381 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.xmlrpc;
 
-import java.util.Vector;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
+import org.codehaus.swizzle.confluence.Attachment;
+import org.codehaus.swizzle.confluence.Comment;
+import org.codehaus.swizzle.confluence.SearchResult;
+import org.codehaus.swizzle.confluence.Space;
+import org.codehaus.swizzle.confluence.SpaceSummary;
+import org.xwiki.xmlrpc.model.XWikiClass;
+import org.xwiki.xmlrpc.model.XWikiClassSummary;
+import org.xwiki.xmlrpc.model.XWikiExtendedId;
+import org.xwiki.xmlrpc.model.XWikiObject;
+import org.xwiki.xmlrpc.model.XWikiObjectSummary;
+import org.xwiki.xmlrpc.model.XWikiPage;
+import org.xwiki.xmlrpc.model.XWikiPageHistorySummary;
+import org.xwiki.xmlrpc.model.XWikiPageSummary;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.web.XWikiEngineContext;
-import com.xpn.xwiki.xmlrpc.model.Attachment;
-import com.xpn.xwiki.xmlrpc.model.Comment;
-import com.xpn.xwiki.xmlrpc.model.Page;
-import com.xpn.xwiki.xmlrpc.model.PageHistorySummary;
-import com.xpn.xwiki.xmlrpc.model.PageSummary;
-import com.xpn.xwiki.xmlrpc.model.SearchResult;
-import com.xpn.xwiki.xmlrpc.model.Space;
-import com.xpn.xwiki.xmlrpc.model.SpaceSummary;
-import com.xpn.xwiki.xmlrpc.model.User;
-import com.xpn.xwiki.xmlrpc.model.swizzle.AttachmentImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.CommentImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.PageHistorySummaryImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.PageImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.PageSummaryImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.SearchResultImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.SpaceImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.SpaceSummaryImpl;
-import com.xpn.xwiki.xmlrpc.model.swizzle.UserImpl;
-
-import org.suigeneris.jrcs.rcs.Version;
+import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Property;
+import com.xpn.xwiki.api.PropertyClass;
 
 /**
- * @version $Id: $
+ * This class contains utility methods for building xmlrpc domain objects.
+ *
+ * @author fmancinelli
  */
 public class DomainObjectFactory
 {
-    
-    private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
-
-    // TODO ":" is also used in XWiki for selecting a particular database. Change ?
-    private static final String PAGE_VERSION_SEPARATOR = ":";
-
-    private static final String OBJNO_SEPARATOR = ";";
-    
-    private static final Log log = LogFactory.getLog(DomainObjectFactory.class);
-
-    public String getPageId(String spaceKey, String pageTitle)
+    /**
+     * Create a space summary
+     *
+     * @return The SpaceSummary representing the space.
+     */
+    public static SpaceSummary createSpaceSummary(String spaceKey)
     {
-        return spaceKey + "." + pageTitle;
+        SpaceSummary result = new SpaceSummary();
+        result.setKey(spaceKey);
+        result.setName(spaceKey);
+        result.setUrl("");
+
+        return result;
     }
 
-    // TODO our ids are unique still they are sensitive to renaming
-    // Q: is this a problem ? If so we really need the numeric ids (globally unique)
-    public XWikiDocument getDocFromPageId(String pageId, XWikiContext context)
+    /**
+     * Create a space summary starting from the space Web home.
+     *
+     * @return The SpaceSummary representing the space.
+     */
+    public static SpaceSummary createSpaceSummary(Document spaceWebHome)
+    {
+        String spaceKey = spaceWebHome.getSpace();
+        String title = spaceWebHome.getTitle();
+
+        if (title == null || title.equals("")) {
+            title = spaceKey;
+        }
+
+        SpaceSummary result = new SpaceSummary();
+        result.setKey(spaceKey);
+        result.setName(title);
+        result.setUrl(spaceWebHome.getExternalURL("view"));
+
+        return result;
+    }
+
+    /**
+     * Create a space description.
+     *
+     * @return A Space object containing all the information about the space.
+     */
+    public static Space createSpace(String spaceKey)
+    {
+        Space result = new Space();
+        result.setKey(spaceKey);
+        result.setName(spaceKey);
+        result.setDescription("No description");
+        result.setHomepage("");
+        result.setUrl("");
+
+        return result;
+    }
+
+    /**
+     * Create a space from its WebHome document.
+     *
+     * @return A Space object containing all the information about the space.
+     */
+    public static Space createSpace(Document spaceWebHome)
+    {
+        Space result = new Space();
+        result.setKey(spaceWebHome.getSpace());
+        result.setName(spaceWebHome.getTitle());
+        result.setDescription("No description available");
+        result.setHomepage(spaceWebHome.getFullName());
+        result.setUrl(spaceWebHome.getExternalURL("view"));
+
+        return result;
+    }
+
+    /**
+     * Create a page summary description from an XWiki document.
+     *
+     * @return An XWikiPageSummary with the information.
+     * @throws XWikiException If there is a problem getting page translations.
+     */
+    public static XWikiPageSummary createXWikiPageSummary(Document document)
         throws XWikiException
     {
-        XWiki xwiki = context.getWiki();
+        XWikiPageSummary result = new XWikiPageSummary();
 
-        // First verify that the pageId is valid. It must be of the form Space.Page.
-        if (pageId.indexOf('.') == -1) {
-            throw exception("The page format for [" + pageId
-                + "] is invalid. A page id must be of the form Space.Page");
+        String pageTitle = document.getTitle();
+        if (pageTitle.equals("")) {
+            pageTitle = document.getName();
         }
 
-        if (!pageId.contains(PAGE_VERSION_SEPARATOR)) {
-            // Current version of document
-            if (xwiki.exists(pageId, context)) {
-
-                // TODO: This check shouldn't need to be done here as the right solution is to
-                // move the full XMLRPC implementation to use XWiki's public API instead.
-                checkRights(pageId, context);
-
-                return xwiki.getDocument(pageId, context);
-            } else {
-                throw exception("The page [" + pageId + "] does not exist.");
-            }
-        } else {
-            int i = pageId.indexOf(PAGE_VERSION_SEPARATOR);
-            String fullName = pageId.substring(0, i);
-            String version = pageId.substring(i + 1);
-            if (xwiki.exists(fullName, context)) {
-
-                // TODO: This check shouldn't need to be done here as the right solution is to
-                // move the full XMLRPC implementation to use XWiki's public API instead.
-                checkRights(fullName, context);
-
-                XWikiDocument currentDoc = xwiki.getDocument(fullName, context);
-                return xwiki.getDocument(currentDoc, version, context);
-            } else {
-                throw exception("The page [" + fullName + "] does not exist.");
-            }
-        }
-    }
-
-    /**
-     * TODO: Remove this method when we move the XMLRPC to use the XWiki public API.
-     */
-    private void checkRights(String pageId, XWikiContext context) throws XWikiException
-    {
-        XWiki xwiki = context.getWiki();
-        if (xwiki.getRightService().hasAccessLevel("view", context.getUser(),
-            pageId, context) == false)
-        {
-            Object[] args = {pageId, context.getUser()};
-            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
-                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access to document {0} has been denied to user {1}", null, args);
-        }
-    }
-
-    /**
-     * 
-     * @param commentId
-     * @param context
-     * @return
-     * @throws XWikiException
-     */
-    public Object[] getDocObjectPair(String commentId, XWikiContext context)
-        throws XWikiException
-    {
-        int i = commentId.indexOf(OBJNO_SEPARATOR);
-        if (i < 0) {
-            throw exception("Invalid comment ID.");
-        }
-        String pageId = commentId.substring(0, i);
-        int nb = 0;
-        try {
-            nb = (new Integer(commentId.substring(i + 1))).intValue();
-        } catch (NumberFormatException nfe) {
-            throw exception("Invalid comment ID.");
-        }
-
-        XWikiDocument doc = getDocFromPageId(pageId, context);
-
-        Vector comments = doc.getComments();
-        if (nb >= comments.size()) {
-            throw exception("Invalid comment ID.");
-        }
-        BaseObject obj = (BaseObject) comments.get(nb);
-
-        // TODO this is more general, is it also more efficient?
-        // XWiki xwiki = context.getWiki();
-        // BaseObject obj = doc.getObject(xwiki.getCommentsClass(context).getName(), nb);
-
-        if (obj == null) {
-            throw exception("This comment was already removed.");
-        }
-
-        return new Object[] {doc, obj};
-    }
-
-    /**
-     * Notes:
-     * <ul>
-     * <li>XWiki ignores the content type field set by the user and uses the file extension instead
-     * to determine it (Confluence requires this field to be set by the user).</li>
-     * <li>XWiki always sets the id of the attachments to the empty string since this field is
-     * totally useless.</li>
-     * <li>XWiki always sets the title of the attachment to its file name.</li>
-     * </ui>
-     * 
-     * @param doc the (@link com.xpn.xwiki.XWikiDocument), used to create the Attachment. The reason
-     *            we need its that some information for creating the Attachment is available only
-     *            from the XWikiDocument object and not in the passed XWikiAttachment.
-     * @param attachment the (@link com.xpn.xwiki.XWikiAttachment), used to create the Attachment
-     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *            primitives for loading documents
-     */
-    public Attachment createAttachment(XWikiDocument doc, XWikiAttachment attachment,
-        XWikiContext context)
-    {
-        Attachment result = new AttachmentImpl();
-
-        // Ids for attachments are useless so we don't set them (Confluence does)
-        result.setId("");
-        result.setPageId(doc.getFullName());
-        // We use the filename as the document title (Confluence does the same)
-        result.setTitle(attachment.getFilename());
-        result.setFileName(attachment.getFilename());
-        result.setFileSize(attachment.getFilesize());
-        XWiki xwiki = context.getWiki();
-        XWikiEngineContext engineContext = xwiki.getEngineContext();
-        String mimeType = engineContext.getMimeType(attachment.getFilename());
-        if (mimeType == null) {
-            mimeType = DEFAULT_MIME_TYPE;
-        }
-        result.setContentType(mimeType);
-        result.setCreator(attachment.getAuthor());
-        result.setCreated(attachment.getDate());
-        result.setUrl(doc.getAttachmentURL(attachment.getFilename(), "download", context));
-        result.setComment(attachment.getComment());
-
-        return result;
-    }
-
-    public Comment createComment(XWikiDocument doc, BaseObject obj, XWikiContext context)
-    {
-        Comment result = new CommentImpl();
-
-        if (doc.isMostRecent()) {
-            result.setId(doc.getFullName() + ";" + obj.getNumber());
-            result.setPageId(doc.getFullName());
-            result.setUrl(doc.getURL("view", context));
-        } else {
-            result.setId(doc.getFullName() + ":" + doc.getVersion() + ";" + obj.getNumber());
-            result.setPageId(doc.getFullName() + ":" + doc.getVersion());
-            result.setUrl(doc.getURL("view", "rev=" + doc.getVersion(), context));
-        }
-        result.setTitle(doc.getName());
-        result.setContent(obj.getStringValue("comment"));
-        result.setCreated(obj.getDateValue("date"));
-        result.setCreator(obj.getStringValue("author"));
-
-        return result;
-    }
-
-    public Page createPage(XWikiDocument doc, XWikiContext context)
-    {
-        Page result = new PageImpl();
-
-        // since we don't have multiple inheritance
-        // we had to copy paste this initial part from PageSummary
-        if (doc.isMostRecent()) {
-            // Current version of document
-            result.setId(doc.getFullName());
-            result.setUrl(doc.getURL("view", context));
-        } else {
-            // Old version of document
-            result.setId(doc.getFullName() + ":" + doc.getVersion());
-            result.setUrl(doc.getURL("view", "rev=" + doc.getVersion(), context));
-        }
-        result.setSpace(doc.getSpace());
-        result.setParentId(doc.getParent());
-        result.setTitle(doc.getName());
-        result.setLocks(0);
-
-        result.setVersion(constructVersion(doc.getRCSVersion()));
-        result.setContent(doc.getContent());
-        result.setCreated(doc.getCreationDate());
-        result.setCreator(doc.getAuthor());
-        result.setModified(doc.getDate());
-        result.setModifier(doc.getAuthor());
-        result.setHomePage((doc.getName().equals("WebHome")));
-
-        return result;
-    }
-
-    /**
-     * Notes:
-     * <ul>
-     * <li>XWiki does not have mutex locks to getLocks always returns 0.</li>
-     * </ul>
-     */
-    public PageSummary createPageSummary(XWikiDocument doc, XWikiContext context)
-    {
-        PageSummary result = new PageSummaryImpl();
-
-        if (doc.isMostRecent()) {
-            // Current version of document
-            result.setId(doc.getFullName());
-            result.setUrl(doc.getURL("view", context));
-        } else {
-            // Old version of document
-            result.setId(doc.getFullName() + ":" + doc.getVersion());
-            result.setUrl(doc.getURL("view", "rev=" + doc.getVersion(), context));
-        }
-
-        result.setSpace(doc.getSpace());
-        result.setParentId(doc.getParent());
-        result.setTitle(doc.getName());
-        result.setLocks(0);
-
-        return result;
-    }
-
-    public PageHistorySummary createPageHistorySummary(XWikiDocument document)
-    {
-        PageHistorySummary result = new PageHistorySummaryImpl();
-
-        result.setId(document.getFullName() + ":" + document.getVersion());
-        result.setVersion(constructVersion(document.getRCSVersion()));
-        result.setModified(document.getDate());
-        result.setModifier(document.getAuthor());
-
-        return result;
-    }
-
-    public SearchResult createSearchResult(XWikiDocument document, XWikiContext context)
-    {
-        SearchResult result = new SearchResultImpl();
-
-        result.setTitle(document.getName());
         result.setId(document.getFullName());
-        result.setUrl(document.getURL("view", context));
-        result.setType("page");
-        String content = document.getContent();
-        // TODO is this a good way to generate excerpts?
-        if (content.length() <= 256) {
-            result.setExcerpt(content);
-        } else {
-            result.setExcerpt(content.substring(0, 256));
-        }
-
-        return result;
-    }
-
-    public Space createSpace(String key, String name, String url, String description,
-        String homepage)
-    {
-        Space result = new SpaceImpl();
-
-        result.setKey(key);
-        result.setName(name);
-        result.setUrl(url);
-
-        result.setDescription(description);
-        result.setHomePage(homepage);
+        result.setSpace(document.getSpace());
+        result.setParentId(document.getParent());
+        result.setTitle(pageTitle);
+        result.setUrl(document.getExternalURL("view"));
+        result.setTranslations(document.getTranslationList());
 
         return result;
     }
 
     /**
-     * @param key of the space (usually the Space's name as it's unique)
-     * @param name of the space
-     * @param url to view the space online. Example: "http://server/xwiki/bin/view/Space/WebHome"
+     * Create a page description from an XWiki document.
+     *
+     * @param useExtendedPageId true if the id should contain additional information concerning the
+     * version, language etc. In this case the pageId will be in the form
+     * Space.Page?param=value&param=value&...
+     * @return An XWikiPage object representing the page.
+     * @throws XWikiException If there is a problem getting page translations.
      */
-    public SpaceSummary createSpaceSummary(String key, String name, String url)
+    public static XWikiPage createXWikiPage(Document document, boolean useExtendedPageId)
+        throws XWikiException
     {
-        SpaceSummary result = new SpaceSummaryImpl();
+        XWikiPage result = new XWikiPage();
 
-        result.setKey(key);
-        result.setName(name);
-        result.setUrl(url);
-        // TODO we do not set the type ... document at least
+        String pageTitle = document.getTitle();
+        if (pageTitle.equals("")) {
+            pageTitle = document.getName();
+        }
+
+        XWikiExtendedId extendedId = new XWikiExtendedId(document.getFullName());
+        extendedId.setParameter("version", Integer.toString(document.getRCSVersion().at(0)));
+        extendedId.setParameter("minorVersion", Integer.toString(document.getRCSVersion().at(1)));
+        extendedId.setParameter("language", document.getLanguage());
+
+        if (useExtendedPageId) {
+            result.setId(extendedId.toString());
+        } else {
+            result.setId(extendedId.getBasePageId());
+        }
+        result.setSpace(document.getSpace());
+        result.setParentId(document.getParent());
+        result.setTitle(pageTitle);
+        result.setUrl(document.getExternalURL("view"));
+        result.setTranslations(document.getTranslationList());
+        result.setVersion(document.getRCSVersion().at(0));
+        result.setMinorVersion(document.getRCSVersion().at(1));
+        result.setContent(document.getContent());
+        result.setCreated(document.getCreationDate());
+        result.setCreator(document.getCreator());
+        result.setModified(document.getContentUpdateDate());
+        result.setModifier(document.getContentAuthor());
+        result.setHomePage(document.getName().equals("WebHome"));
+        result.setLanguage(document.getLanguage());
 
         return result;
     }
 
-    public User createUser(XWikiDocument userdoc, XWikiContext context)
+    /**
+     * Create a page history summary containing revision information about a document.
+     *
+     * @return An XWikiPageHistorySummary object containing the revision information.
+     */
+    public static XWikiPageHistorySummary createXWikiPageHistorySummary(Document document)
     {
-        User result = new UserImpl();
+        XWikiExtendedId extendedId = new XWikiExtendedId(document.getFullName());
+        extendedId.setParameter("version", Integer.toString(document.getRCSVersion().at(0)));
+        extendedId.setParameter("minorVersion", Integer.toString(document.getRCSVersion().at(1)));
+        extendedId.setParameter("language", document.getLanguage());
 
-        result.setName(userdoc.getName());
-        result.setFullname(userdoc.getStringValue("XWiki.XWikiUsers", "fullName"));
-        result.setEmail(userdoc.getStringValue("XWiki.XWikiUsers", "email"));
-        result.setUrl(userdoc.getURL("view", context));
+        XWikiPageHistorySummary result = new XWikiPageHistorySummary();
+        result.setId(extendedId.toString());
+        result.setVersion(document.getRCSVersion().at(0));
+        result.setMinorVersion(document.getRCSVersion().at(1));
+        result.setModified(document.getContentUpdateDate());
+        result.setModifier(document.getContentAuthor());
 
         return result;
     }
 
-    private static int constructVersion(Version ver)
+    /**
+     * Create a comment object containing all the information concerning a document comment.
+     *
+     * @param commentObject The XWiki object of type "XWiki.Comment" containing the actual comment.
+     * @return A Comment Object containing comment information.
+     */
+    public static Comment createComment(Document document, com.xpn.xwiki.api.Object commentObject)
     {
-        return ((ver.at(0) - 1) << 16) + ver.at(1);
+        Property dateProperty = commentObject.getProperty("date");
+        Property authorProperty = commentObject.getProperty("author");
+        Property contentProperty = commentObject.getProperty("comment");
+
+        Date date = dateProperty != null ? (Date) dateProperty.getValue() : new Date();
+        String author = authorProperty != null ? (String) authorProperty.getValue() : "No author";
+        String content = contentProperty != null ? (String) contentProperty.getValue() : "";
+
+        Comment result = new Comment();
+        XWikiExtendedId extendedId = new XWikiExtendedId(document.getFullName());
+        extendedId.setParameter("commentId", Integer.toString(commentObject.getNumber()));
+        result.setId(extendedId.toString());
+        result.setPageId(document.getFullName());
+        result.setTitle(String.format("Comment %d", commentObject.getNumber()));
+        result.setContent(content);
+        result.setUrl(document.getExternalURL("view"));
+        result.setCreated(date);
+        result.setCreator(author);
+
+        return result;
     }
-    
-    private XWikiException exception(String message)
+
+    /**
+     * Create an Attachment object containing information about an attachment.
+     *
+     * @return An Attachment object containing all the information.
+     */
+    public static Attachment createAttachment(com.xpn.xwiki.api.Attachment xwikiAttachment)
     {
-        log.info("Exception thrown to XML-RPC client: " + message);
-        XWikiException ex = new XWikiException();
-        ex.setModule(XWikiException.MODULE_XWIKI_XMLRPC);
-        ex.setMessage(message);
-        return ex;
+        Attachment result = new Attachment();
+        result.setId(String.format("%d", xwikiAttachment.getId()));
+        result.setPageId(xwikiAttachment.getDocument().getFullName());
+        result.setTitle(xwikiAttachment.getFilename());
+        result.setFileName(xwikiAttachment.getFilename());
+        /*
+         * Due to a confluence API mismatch, we need to convert file sizes to strings :(
+         */
+        result.setFileSize(String.format("%d", xwikiAttachment.getFilesize()));
+        result.setContentType(xwikiAttachment.getMimeType());
+        result.setCreated(xwikiAttachment.getDate());
+        result.setCreator(xwikiAttachment.getAuthor());
+        result.setUrl(xwikiAttachment.getDocument().getAttachmentURL(
+            xwikiAttachment.getFilename()));
+        result.setComment(xwikiAttachment.getComment());
+
+        return result;
+    }
+
+    /**
+     * Create a summary of an XWiki class.
+     *
+     * @return An XWikiClassSummary containing information about the class.
+     */
+    public static XWikiClassSummary createXWikiClassSummary(String className)
+    {
+        XWikiClassSummary result = new XWikiClassSummary();
+        result.setId(className);
+
+        return result;
+    }
+
+    /**
+     * Create an XWikiClass object with all the information about a given XWiki class
+     *
+     * @return An XWikiClass object with all the information.
+     */
+    public static XWikiClass createXWikiClass(com.xpn.xwiki.api.Class xwikiClass)
+    {
+        Map<String, Map<String, Object>> userClassPropertyToAttributesMap =
+            new HashMap<String, Map<String, Object>>();
+
+        for (Object o : xwikiClass.getProperties()) {
+            PropertyClass userClassProperty = (PropertyClass) o;
+
+            Map<String, Object> attributeToValueMap = new HashMap<String, Object>();
+            attributeToValueMap.put(XWikiClass.XWIKICLASS_ATTRIBUTE, userClassProperty
+                .getxWikiClass().getName());
+            for (Object ucp : userClassProperty.getProperties()) {
+                Property property = (Property) ucp;
+                Object value = property.getValue();
+
+                if (value != null) {
+                    attributeToValueMap.put(property.getName(), XWikiUtils.xmlRpcConvert(value));
+                }
+            }
+
+            userClassPropertyToAttributesMap
+                .put(userClassProperty.getName(), attributeToValueMap);
+        }
+
+        XWikiClass result = new XWikiClass();
+        result.setId(xwikiClass.getName());
+        result.setPropertyToAttributesMap(userClassPropertyToAttributesMap);
+
+        return result;
+    }
+
+    /**
+     * Create a summary of a given xwiki object.
+     *
+     * @return An XWikiObjectSummary object containing all the information.
+     */
+    public static XWikiObjectSummary createXWikiObjectSummary(Document document,
+        com.xpn.xwiki.api.Object object)
+    {
+        String prettyName = object.getPrettyName();
+        if (prettyName == null || prettyName.equals("")) {
+            prettyName =
+                String.format("%s[%d]", object.getxWikiClass().getName(), object.getNumber());
+        }
+
+        XWikiObjectSummary result = new XWikiObjectSummary();
+        result.setPageId(document.getFullName());
+        result.setClassName(object.getxWikiClass().getName());
+        result.setId(object.getNumber());
+        result.setPrettyName(prettyName);
+
+        return result;
+    }
+
+    /**
+     * Create an XWikiObject containing all the information and attributed of a given xwiki object.
+     *
+     * @return An XWikiObject containing all the information.
+     */
+    public static XWikiObject createXWikiObject(Document document, com.xpn.xwiki.api.Object object)
+    {
+        Map<String, Object> propertyToValueMap = new HashMap<String, Object>();
+        for (Object o : object.getProperties()) {
+            Property property = (Property) o;
+            String name = property.getName();
+
+            /* Send only non-null values */
+            Object value = property.getValue();
+            if (value != null) {
+                propertyToValueMap.put(name, XWikiUtils.xmlRpcConvert(value));
+            }
+        }
+
+        String prettyName = object.getPrettyName();
+        if (prettyName == null || prettyName.equals("")) {
+            prettyName =
+                String.format("%s[%d]", object.getxWikiClass().getName(), object.getNumber());
+        }
+
+        XWikiObject result = new XWikiObject();
+        result.setPageId(document.getFullName());
+        result.setClassName(object.getxWikiClass().getName());
+        result.setId(object.getNumber());
+        result.setPrettyName(prettyName);
+        result.setPropertyToValueMap(propertyToValueMap);
+
+        return result;
+    }
+
+    /**
+     * Create a search result object.
+     *
+     * @param pageId The page id representing the page associated with this result.
+     * @return A SearchResult object containing the information.
+     */
+    public static SearchResult createSearchResult(String pageId)
+    {
+        SearchResult result = new SearchResult();
+        result.setId(pageId);
+        result.setTitle(pageId);
+        result.setUrl("");
+        result.setExcerpt("");
+        result.setType("pageid");
+
+        return result;
     }
 }

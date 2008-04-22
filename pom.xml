@@ -54,6 +54,7 @@
     <platform.tool.test.version>1.10-SNAPSHOT</platform.tool.test.version>
   </properties>
   <modules>
+    <module>xwiki-xmlrpc</module>
     <module>xwiki-core</module>
     <module>xwiki-component</module>
     <module>xwiki-url</module>

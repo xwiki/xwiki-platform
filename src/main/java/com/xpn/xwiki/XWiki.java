@@ -774,11 +774,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
 
         setAttachmentVersioningStore((AttachmentVersioningStore) createClassFromConfig(
-            "xwiki.store.attachment.versioning.class",
-            hasAttachmentVersioning(context)
+            "xwiki.store.attachment.versioning.class", hasAttachmentVersioning(context)
                 ? HibernateAttachmentVersioningStore.class.getName()
-                : VoidAttachmentVersioningStore.class.getName(),
-            context));
+                : VoidAttachmentVersioningStore.class.getName(), context));
 
         if (hasRecycleBin(context)) {
             setRecycleBinStore((XWikiRecycleBinStoreInterface) createClassFromConfig(
@@ -5919,11 +5917,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String searchAsTable(XWikiQuery query, XWikiContext context) throws XWikiException
     {
         QueryPlugin qp = (QueryPlugin) getPlugin("query", context);
-        if (qp == null)
+        if (qp == null) {
             return null;
+        }
         List list = qp.search(query);
         String result = "{table}\r\n";
-        List headerColumns = new ArrayList();
+        List<String> headerColumns = new ArrayList<String>();
         List displayProperties = query.getDisplayProperties();
         Iterator displayListIt = displayProperties.iterator();
         while (displayListIt.hasNext()) {
@@ -5943,7 +5942,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         result += StringUtils.join(headerColumns.toArray(), " | ") + "\r\n";
         Iterator resultIt = list.iterator();
         while (resultIt.hasNext()) {
-            List rowColumns = new ArrayList();
+            List<String> rowColumns = new ArrayList<String>();
             String docname = (String) resultIt.next();
             XWikiDocument doc = getDocument(docname, context);
             displayListIt = displayProperties.iterator();
@@ -6058,7 +6057,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         return ("1".equals(context.getWiki().Param("xwiki.store.versioning", "1")));
     }
-    
+
     public boolean hasAttachmentVersioning(XWikiContext context)
     {
         return ("1".equals(context.getWiki().Param("xwiki.store.attachment.versioning", "1")));
@@ -6223,10 +6222,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // version uploaded
             // Delete attachment that do not exist anymore but existed in the version to which we
             // rollback
-            List rolledbackAttachList = rolledbackDoc.getAttachmentList();
-            List toDelete = new ArrayList();
-            for (int i = 0; i < rolledbackAttachList.size(); i++) {
-                XWikiAttachment attach = (XWikiAttachment) rolledbackAttachList.get(i);
+            List<XWikiAttachment> rolledbackAttachList = rolledbackDoc.getAttachmentList();
+            List<XWikiAttachment> toDelete = new ArrayList<XWikiAttachment>();
+            for (XWikiAttachment attach : rolledbackAttachList) {
                 String fileName = attach.getFilename();
                 if (tdoc.getAttachment(fileName) == null) {
                     // we need to remove that attachment because it does not exist in the never one
@@ -6235,8 +6233,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     toDelete.add(attach);
                 }
             }
-            for (int i = 0; i < toDelete.size(); i++) {
-                XWikiAttachment newAttach = (XWikiAttachment) toDelete.get(i);
+            for (XWikiAttachment newAttach : toDelete) {
                 rolledbackAttachList.remove(newAttach);
             }
 
@@ -6249,10 +6246,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // to that doc, since we'll never be able to resolve it
             // so we want to keep this attachment and roll it back to the first ever uploaded
             // attachment
-            List currentAttachList = tdoc.getAttachmentList();
-            Map toRollbackMap = new HashMap();
-            for (int i = 0; i < currentAttachList.size(); i++) {
-                XWikiAttachment attach = (XWikiAttachment) currentAttachList.get(i);
+            List<XWikiAttachment> currentAttachList = tdoc.getAttachmentList();
+            Map<String, XWikiAttachment> toRollbackMap = new HashMap<String, XWikiAttachment>();
+            for (XWikiAttachment attach : currentAttachList) {
                 String fileName = attach.getFilename();
                 XWikiAttachment rolledbackAttach = rolledbackDoc.getAttachment(fileName);
                 XWikiAttachment correctAttach = null;
@@ -6299,11 +6295,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             // now we have the list of attachments to rollback.. let's do it
             // if this fails we might have saved some attachments without saving the document itself
-            Iterator fileNamesIt = toRollbackMap.keySet().iterator();
             int attachmentTreated = 0;
-            while (fileNamesIt.hasNext()) {
-                String fileName = (String) fileNamesIt.next();
-                XWikiAttachment newAttach = (XWikiAttachment) toRollbackMap.get(fileName);
+            for (String fileName : toRollbackMap.keySet()) {
+                XWikiAttachment newAttach = toRollbackMap.get(fileName);
                 try {
                     context.getWiki().getAttachmentStore().saveAttachmentContent(newAttach,
                         false, context, true);
@@ -6326,7 +6320,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         rolledbackDoc.setRCSVersion(tdoc.getRCSVersion());
         rolledbackDoc.setVersion(tdoc.getVersion());
         rolledbackDoc.setContentDirty(true);
-        List params = new ArrayList();
+        List<Object> params = new ArrayList<Object>();
         params.add(rev);
 
         saveDocument(rolledbackDoc,

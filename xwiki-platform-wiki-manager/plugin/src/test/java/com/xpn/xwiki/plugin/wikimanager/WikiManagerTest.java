@@ -61,6 +61,7 @@ public class WikiManagerTest extends MockObjectTestCase
 
     private static final String TARGET_WIKI_NAME = "wikitosave";
 
+    @Override
     protected void setUp() throws Exception
     {
         this.context = new XWikiContext();

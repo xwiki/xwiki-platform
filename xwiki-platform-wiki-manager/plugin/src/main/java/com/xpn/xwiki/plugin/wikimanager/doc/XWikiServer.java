@@ -155,7 +155,6 @@ public class XWikiServer extends DefaultXObjectDocument
      *         <ul>
      *         <li>{@link XWikiServerClass#FIELDL_VISIBILITY_PUBLIC}</li>
      *         <li>{@link XWikiServerClass#FIELDL_VISIBILITY_PRIVATE}</li>
-     *         <li>{@link XWikiServerClass#FIELDL_VISIBILITY_TEMPLATE}</li>
      *         </ul>
      */
     public String getVisibility()
@@ -170,7 +169,6 @@ public class XWikiServer extends DefaultXObjectDocument
      *            <ul>
      *            <li>{@link XWikiServerClass#FIELDL_VISIBILITY_PUBLIC}</li>
      *            <li>{@link XWikiServerClass#FIELDL_VISIBILITY_PRIVATE}</li>
-     *            <li>{@link XWikiServerClass#FIELDL_VISIBILITY_TEMPLATE}</li>
      *            </ul>
      */
     public void setVisibility(String visibility)
@@ -254,10 +252,27 @@ public class XWikiServer extends DefaultXObjectDocument
     }
 
     /**
+     * @param isWikiTemplate true if it's a wiki template, false otherwise.
+     */
+    public void setIsWikiTemplate(boolean isWikiTemplate)
+    {
+        setBooleanValue(XWikiServerClass.FIELD_ISWIKITEMPLATE, isWikiTemplate);
+    }
+
+    /**
+     * @return true if it's a wiki template, false otherwise.
+     */
+    public boolean isWikiTemplate()
+    {
+        return getBooleanValue(XWikiServerClass.FIELD_ISWIKITEMPLATE);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see Object#toString()
      */
+    @Override
     public String toString()
     {
         return getFullName() + COMMA + getServer() + COMMA + getOwner();

@@ -72,6 +72,7 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
@@ -90,6 +91,7 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
      *      com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new WikiManagerPluginApi((WikiManagerPlugin) plugin, context);

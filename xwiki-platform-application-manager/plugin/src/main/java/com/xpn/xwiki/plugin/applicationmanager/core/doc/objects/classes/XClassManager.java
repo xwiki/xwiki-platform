@@ -294,7 +294,7 @@ public interface XClassManager
      *            marks (?).
      * @return a HQL where clause.
      */
-    String createWhereClause(String[][] fieldDescriptors, List parameterValues);
+    String createWhereClause(Object[][] fieldDescriptors, List parameterValues);
 
     /**
      * Create new super document containing object of class {@link #getClassFullName()}. If

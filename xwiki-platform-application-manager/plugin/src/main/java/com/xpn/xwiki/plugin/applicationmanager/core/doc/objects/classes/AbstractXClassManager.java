@@ -222,7 +222,8 @@ public abstract class AbstractXClassManager implements XClassManager
         classSheetSpace =
             dispatch ? classSpacePrefix + XWIKI_CLASSSHEET_SPACE_SUFFIX : classSpacePrefix;
         classSheetName = classPrefix + XWIKI_CLASSSHEET_SUFFIX;
-        classSheetFullName = classSheetSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classSheetName;
+        classSheetFullName =
+            classSheetSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classSheetName;
 
         classTemplateSpace =
             dispatch ? classSpacePrefix + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : classSpacePrefix;
@@ -364,7 +365,7 @@ public abstract class AbstractXClassManager implements XClassManager
         synchronized (databasesInitedMap) {
             if (!this.databasesInitedMap.contains(context.getDatabase())) {
                 this.databasesInitedMap.add(context.getDatabase());
-                
+
                 checkClassDocument(context);
                 checkClassSheetDocument(context);
                 checkClassTemplateDocument(context);
@@ -696,7 +697,7 @@ public abstract class AbstractXClassManager implements XClassManager
      * @param parameterValues the where clause values that replace the question marks (?).
      * @return a HQL where clause.
      */
-    public String createWhereClause(String[][] fieldDescriptors, List parameterValues)
+    public String createWhereClause(Object[][] fieldDescriptors, List parameterValues)
     {
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
@@ -712,9 +713,9 @@ public abstract class AbstractXClassManager implements XClassManager
 
         if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {
-                String fieldName = fieldDescriptors[i][0];
-                String type = fieldDescriptors[i][1];
-                String value = fieldDescriptors[i][2];
+                String fieldName = fieldDescriptors[i][0].toString();
+                String type = fieldDescriptors[i][1].toString();
+                Object value = fieldDescriptors[i][2];
 
                 if (type != null) {
                     String fieldPrefix = "field" + i;
@@ -726,12 +727,23 @@ public abstract class AbstractXClassManager implements XClassManager
                     where.append(andSymbol + fieldPrefix + ".name=" + HQL_PARAMETER_STRING);
                     parameterValues.add(fieldName);
 
-                    where.append(andSymbol + "lower(" + fieldPrefix + ".value)="
-                        + HQL_PARAMETER_STRING);
-                    parameterValues.add(value.toLowerCase());
+                    if (value instanceof String) {
+                        where.append(andSymbol + "lower(" + fieldPrefix + ".value)="
+                            + HQL_PARAMETER_STRING);
+                        parameterValues.add(((String) value).toLowerCase());
+                    } else {
+                        where.append(andSymbol + "" + fieldPrefix + ".value="
+                            + HQL_PARAMETER_STRING);
+                        parameterValues.add(value);
+                    }
                 } else {
-                    where.append(" and lower(doc." + fieldName + ")=" + HQL_PARAMETER_STRING);
-                    parameterValues.add(value.toLowerCase());
+                    if (value instanceof String) {
+                        where.append(" and lower(doc." + fieldName + ")=" + HQL_PARAMETER_STRING);
+                        parameterValues.add(((String) value).toLowerCase());
+                    } else {
+                        where.append(" and doc." + fieldName + "=" + HQL_PARAMETER_STRING);
+                        parameterValues.add(value);
+                    }
                 }
             }
         }
@@ -762,10 +774,10 @@ public abstract class AbstractXClassManager implements XClassManager
      * @return the list of found {@link XObjectDocument}.
      * @throws XWikiException error when searching for documents from in database.
      */
-    public List searchXObjectDocumentsByField(String fieldName, String fieldValue,
+    public List searchXObjectDocumentsByField(String fieldName, Object fieldValue,
         String fieldType, XWikiContext context) throws XWikiException
     {
-        String[][] fieldDescriptors = new String[][] {{fieldName, fieldType, fieldValue}};
+        Object[][] fieldDescriptors = new Object[][] {{fieldName, fieldType, fieldValue}};
 
         return searchXObjectDocumentsByFields(fieldDescriptors, context);
     }
@@ -779,7 +791,7 @@ public abstract class AbstractXClassManager implements XClassManager
      * @return the list of found {@link XObjectDocument}.
      * @throws XWikiException error when searching for documents from in database.
      */
-    public List searchXObjectDocumentsByFields(String[][] fieldDescriptors, XWikiContext context)
+    public List searchXObjectDocumentsByFields(Object[][] fieldDescriptors, XWikiContext context)
         throws XWikiException
     {
         check(context);
@@ -847,7 +859,8 @@ public abstract class AbstractXClassManager implements XClassManager
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocumentList(java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List newXObjectDocumentList(List documents, XWikiContext context) throws XWikiException
+    public List newXObjectDocumentList(List documents, XWikiContext context)
+        throws XWikiException
     {
         List list = new ArrayList(documents.size());
         for (Iterator it = documents.iterator(); it.hasNext();) {

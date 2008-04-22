@@ -230,7 +230,7 @@
     <dependency>
       <groupId>org.codehaus.swizzle</groupId>
       <artifactId>swizzle-confluence</artifactId>
-      <version>1.1-20070908</version>
+      <version>1.2-20080419</version>
       <classifier>xwiki</classifier>
       <exclusions>
         <!-- We need to explicitely exclude JUnit since swizzle confluence depends transitively
@@ -494,6 +494,11 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-velocity</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-xmlrpc-model</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

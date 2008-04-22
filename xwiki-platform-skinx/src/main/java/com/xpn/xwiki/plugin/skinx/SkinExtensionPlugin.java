@@ -91,7 +91,7 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
      */
     public void use(String skinFile, XWikiContext context)
     {
-        LOG.debug("Using " + skinFile + " as a " + this.getName() + " extension");
+        LOG.debug(String.format("Using [%s] as [%s] extension", skinFile, this.getName()));
         getRequestList(context).add(skinFile);
     }
 
@@ -130,6 +130,8 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
     @Override
     public String endParsing(String content, XWikiContext context)
     {
+        // Using an XML comment is pretty safe, as extensions probably wouldn't work in other type
+        // of documents, like RTF, CSV or JSON.
         String hook = "<!-- " + this.getClass().getCanonicalName() + " -->";
         String result = content.replaceFirst(hook, getImportString(context));
         return result;

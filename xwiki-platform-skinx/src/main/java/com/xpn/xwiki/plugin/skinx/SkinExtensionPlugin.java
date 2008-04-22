@@ -91,7 +91,7 @@ public abstract class SkinExtensionPlugin extends XWikiDefaultPlugin
      */
     public void use(String skinFile, XWikiContext context)
     {
-        LOG.error("Using " + skinFile + " as a " + this.getName() + " extension");
+        LOG.debug("Using " + skinFile + " as a " + this.getName() + " extension");
         getRequestList(context).add(skinFile);
     }
 

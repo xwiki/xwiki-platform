@@ -27,6 +27,7 @@ import com.xpn.xwiki.api.Api;
  * Velocity or Groovy scripts in XWiki documents. They wrap around a fully functional Plugin object,
  * and forward safe calls to that object.
  * 
+ * @param <T> The type of the internal plugin.
  * @version $Id: $
  */
 public class PluginApi<T extends XWikiPluginInterface> extends Api

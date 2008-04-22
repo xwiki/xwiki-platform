@@ -57,7 +57,7 @@ public class JsSkinExtensionPlugin extends SkinExtensionPlugin
     {
         try {
             return "<script type='text/javascript' src='"
-                + context.getWiki().getURL(documentName, "ssx", context) + "'></script>";
+                + context.getWiki().getURL(documentName, "jsx", context) + "'></script>";
         } catch (XWikiException e) {
             LOG.warn("Cannot link to JS extension: " + documentName);
             return "";

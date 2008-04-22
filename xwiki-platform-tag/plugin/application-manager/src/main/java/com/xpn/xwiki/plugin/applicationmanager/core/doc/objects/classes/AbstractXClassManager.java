@@ -713,8 +713,8 @@ public abstract class AbstractXClassManager implements XClassManager
 
         if (fieldDescriptors != null) {
             for (int i = 0; i < fieldDescriptors.length; ++i) {
-                String fieldName = fieldDescriptors[i][0].toString();
-                String type = fieldDescriptors[i][1].toString();
+                String fieldName = (String) fieldDescriptors[i][0];
+                String type = (String) fieldDescriptors[i][1];
                 Object value = fieldDescriptors[i][2];
 
                 if (type != null) {

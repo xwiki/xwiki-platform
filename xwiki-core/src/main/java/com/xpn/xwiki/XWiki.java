@@ -577,24 +577,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 context.setOriginalDatabase(appname);
 
                 try {
-                    // Let's make sure the virtaul wikis are upgraded to the latest database version
+                    // Let's make sure the virtual wikis are upgraded to the latest database version
                     xwiki.updateDatabase(appname, false, context);
                 } catch (HibernateException e) {
                     // Just to report it
                     e.printStackTrace();
                 }
-
-                /*
-                 * // Run migrations if ("1".equals(xwiki.Param("xwiki.store.migration", "0"))) { if
-                 * (LOG.isInfoEnabled()) LOG.info("Running storage migrations");
-                 * AbstractXWikiMigrationManager manager = (AbstractXWikiMigrationManager)
-                 * xwiki.createClassFromConfig( "xwiki.store.migration.manager.class",
-                 * "com.xpn.xwiki.store.migration.hibernate.XWikiHibernateMigrationManager",
-                 * context); manager.startMigrations(context); if
-                 * ("1".equals(xwiki.Param("xwiki.store.migration.exitAfterEnd", "0"))) { if
-                 * (LOG.isErrorEnabled()) LOG.error("Exiting because
-                 * xwiki.store.migration.exitAfterEnd is set"); System.exit(0); } }
-                 */
             }
         }
         return xwiki;

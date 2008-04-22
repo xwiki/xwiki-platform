@@ -125,6 +125,9 @@ public abstract class XWikiAction extends Action
             try {
                 xwiki = XWiki.getXWiki(context);
             } catch (XWikiException e) {
+                // We're checking if there are any redirects when the wiki asked by the user doesn't exist
+                // because we want the ability to redirect somewhere when the wiki asked doesn't exist
+                // (like for example going to a special error page).
                 if (e.getCode() == XWikiException.ERROR_XWIKI_DOES_NOT_EXIST) {
                     if (!sendGlobalRedirect(response, context.getURL().toString(), context))
                         response.sendRedirect(context.getWiki().Param("xwiki.virtual.redirect"));

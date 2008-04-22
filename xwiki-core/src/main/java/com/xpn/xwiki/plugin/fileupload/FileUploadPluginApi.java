@@ -34,7 +34,7 @@ import java.util.List;
  * 
  * @version $Id: $
  */
-public class FileUploadPluginApi extends PluginApi
+public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
 {
 
     /**
@@ -50,21 +50,11 @@ public class FileUploadPluginApi extends PluginApi
     }
 
     /**
-     * Returns the plugin object behind this API.
-     * 
-     * @return The inner plugin.
-     */
-    private FileUploadPlugin getFileUploadPlugin()
-    {
-        return (FileUploadPlugin) getProtectedPlugin();
-    }
-
-    /**
      * Deletes all temporary files of the upload.
      */
     public void cleanFileList()
     {
-        getFileUploadPlugin().cleanFileList(getXWikiContext());
+        getProtectedPlugin().cleanFileList(getXWikiContext());
     }
 
     /**
@@ -75,7 +65,7 @@ public class FileUploadPluginApi extends PluginApi
      */
     public void loadFileList() throws XWikiException
     {
-        getFileUploadPlugin().loadFileList(getXWikiContext());
+        getProtectedPlugin().loadFileList(getXWikiContext());
     }
 
     /**
@@ -91,7 +81,7 @@ public class FileUploadPluginApi extends PluginApi
     public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir)
         throws XWikiException
     {
-        getFileUploadPlugin().loadFileList(uploadMaxSize, uploadSizeThreashold, tempdir,
+        getProtectedPlugin().loadFileList(uploadMaxSize, uploadSizeThreashold, tempdir,
             getXWikiContext());
     }
 
@@ -103,7 +93,7 @@ public class FileUploadPluginApi extends PluginApi
      */
     public List getFileItems()
     {
-        return getFileUploadPlugin().getFileItems(getXWikiContext());
+        return getProtectedPlugin().getFileItems(getXWikiContext());
     }
 
     /**
@@ -116,7 +106,7 @@ public class FileUploadPluginApi extends PluginApi
      */
     public byte[] getFileItemData(String formfieldName) throws XWikiException
     {
-        return getFileUploadPlugin().getFileItemData(formfieldName, getXWikiContext());
+        return getProtectedPlugin().getFileItemData(formfieldName, getXWikiContext());
     }
 
     /**
@@ -130,7 +120,7 @@ public class FileUploadPluginApi extends PluginApi
      */
     public String getFileItem(String formfieldName) throws XWikiException
     {
-        return getFileUploadPlugin().getFileItemAsString(formfieldName, getXWikiContext());
+        return getProtectedPlugin().getFileItemAsString(formfieldName, getXWikiContext());
     }
 
     /**
@@ -143,7 +133,7 @@ public class FileUploadPluginApi extends PluginApi
      */
     public String getFileItemAsString(String formfieldName) throws XWikiException
     {
-        return getFileUploadPlugin().getFileItemAsString(formfieldName, getXWikiContext());
+        return getProtectedPlugin().getFileItemAsString(formfieldName, getXWikiContext());
     }
 
     /**
@@ -153,7 +143,7 @@ public class FileUploadPluginApi extends PluginApi
      */
     public List getFileItemNames()
     {
-        return getFileUploadPlugin().getFileItemNames(getXWikiContext());
+        return getProtectedPlugin().getFileItemNames(getXWikiContext());
     }
 
     /**
@@ -164,6 +154,6 @@ public class FileUploadPluginApi extends PluginApi
      */
     public String getFileName(String formfieldName)
     {
-        return getFileUploadPlugin().getFileName(formfieldName, getXWikiContext());
+        return getProtectedPlugin().getFileName(formfieldName, getXWikiContext());
     }
 }

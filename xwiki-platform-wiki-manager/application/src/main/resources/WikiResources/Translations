@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186679007000</creationDate>
-<date>1208451484000</date>
-<contentUpdateDate>1208451484000</contentUpdateDate>
-<version>7.1</version>
+<date>1208861128000</date>
+<contentUpdateDate>1208861128000</contentUpdateDate>
+<version>16.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -82,7 +82,7 @@ wikimanager.listwikirank=Rank
 wikimanager.listwikiadmin=Admin
 wikimanager.listwikicreation=Creation
 wikimanager.listwikistate=State
-wikimanager.listwikivisibility=Visibility
+wikimanager.listwikitemplate=Wiki template
 wikimanager.legend.wiki=Wiki
 wikimanager.legend.validate=Validate
 wikimanager.legend.members=Members
@@ -119,9 +119,8 @@ wikimanager.listwikiactionsmembers=Members
 wikimanager.listwikiactionsrights=Rights
 wikimanager.listwikiactionsgroups=Groups
 wikimanager.listwikiactionsstat=Stat
-wikimanager.action.setvisibility.public=Set as public
-wikimanager.action.setvisibility.private=Set as private
-wikimanager.action.setvisibility.template=Set as template
+wikimanager.action.settemplate.true=Set
+wikimanager.action.settemplate.false=Unset
 wikimanager.action.settings=Settings
 wikimanager.action.previous=Previous
 wikimanager.action.next=Next
@@ -134,8 +133,8 @@ wikimanager.action.createwiki.hidedoc=Hide documentation
 ##
 wikimanager.successdeletewiki=Wiki \"{0}\" deleted.
 wikimanager.errordeletewiki=Wiki \"{0}\" delete failed: {1}.
-wikimanager.successsetvisibility=Wiki \"{0}\" visibility changed to \"{1}\".
-wikimanager.errorsetvisibility=Wiki \"{0}' visibility changing failed: {1}.
+wikimanager.successsettemplate=Wiki \"{0}\" visibility changed to \"{1}\".
+wikimanager.errorsettemplate=Wiki \"{0}\" template property changing failed: {1}.
 wikimanager.successcreatewiki=Your wiki \"{0}\" has been created. You can access it at the following address: {1}.
 wikimanager.errorcreatewiki=Wiki \"{0}\" creation failed: {1}.
 wikimanager.errorcreatewiki.ERROR_WM_WIKIALREADYEXISTS=This wiki \"{0}\" already exist. Please choose another name.
@@ -154,12 +153,11 @@ wikimanager.prop.wiki.language=Language
 wikimanager.prop.wiki.description=Description
 wikimanager.prop.wiki.server=Domain name
 wikimanager.prop.wiki.homepage=Home page
+wikimanager.prop.wiki.iswikitemplate=Wiki template
 wikimanager.prop.alias.server=Domain name
 wikimanager.prop.alias.homepage=Home page
-wikimanager.prop.alias.description=Description
 XWiki.XWikiServerClass_visibility_public=Public
 XWiki.XWikiServerClass_visibility_private=Private
-XWiki.XWikiServerClass_visibility_template=Template
 ##
 # DOC
 ##

@@ -164,8 +164,8 @@ final class WikiManager
      * @throws XWikiException error when searching for documents.
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, XWikiContext)
      */
-    public List searchDocuments(String wikiName, String wheresql, XWikiContext context)
-        throws XWikiException
+    public List<XWikiDocument> searchDocuments(String wikiName, String wheresql,
+        XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
 
@@ -230,19 +230,19 @@ final class WikiManager
      * @return the list of all {@link Wiki}.
      * @throws XWikiException error when getting wikis documents descriptors.
      */
-    public List getAllWikis(XWikiContext context) throws XWikiException
+    public List<Wiki> getAllWikis(XWikiContext context) throws XWikiException
     {
-        List wikiList = new ArrayList();
+        List<Wiki> wikiList = new ArrayList<Wiki>();
 
-        List parameterValues = new ArrayList();
+        List<Object> parameterValues = new ArrayList<Object>();
 
         String wheresql =
             XWikiServerClass.getInstance(context).createWhereClause(null, parameterValues);
-        List documents =
+        List<XWikiDocument> documents =
             context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
 
-        for (Iterator it = documents.iterator(); it.hasNext();) {
-            XWikiDocument document = (XWikiDocument) it.next();
+        for (Iterator<XWikiDocument> it = documents.iterator(); it.hasNext();) {
+            XWikiDocument document = it.next();
 
             wikiList.add(new Wiki(document, context));
         }
@@ -908,8 +908,7 @@ final class WikiManager
     public List getWikiTemplateAliasList(XWikiContext context) throws XWikiException
     {
         return XWikiServerClass.getInstance(context).searchXObjectDocumentsByField(
-            XWikiServerClass.FIELD_VISIBILITY, XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE,
-            "StringProperty", context);
+            XWikiServerClass.FIELD_ISWIKITEMPLATE, 1, "IntegerProperty", context);
     }
 
     /**
@@ -928,7 +927,7 @@ final class WikiManager
     public void createWikiTemplate(XWikiServer wikiXObjectDocument, String packageName,
         String comment, XWikiContext context) throws XWikiException
     {
-        wikiXObjectDocument.setVisibility(XWikiServerClass.FIELDL_VISIBILITY_TEMPLATE);
+        wikiXObjectDocument.setIsWikiTemplate(true);
 
         // Create empty wiki
         createNewWikiFromPackage(wikiXObjectDocument, packageName, false, comment, context);

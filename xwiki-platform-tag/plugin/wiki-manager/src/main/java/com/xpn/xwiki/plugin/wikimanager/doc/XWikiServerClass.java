@@ -102,18 +102,11 @@ public class XWikiServerClass extends AbstractXClassManager
     public static final String FIELDL_VISIBILITY_PRIVATE = "private";
 
     /**
-     * Third possible values for <code>visibility</code> for the XWiki class
-     * XWiki.XWikiServerClass.
-     */
-    public static final String FIELDL_VISIBILITY_TEMPLATE = "template";
-
-    /**
      * List of possible values for <code>visibility</code> for the XWiki class
      * XWiki.XWikiServerClass.
      */
     public static final String FIELDL_VISIBILITY =
-        FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS
-            + FIELDL_VISIBILITY_TEMPLATE;
+        FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS;
 
     /**
      * Pretty name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
@@ -194,6 +187,21 @@ public class XWikiServerClass extends AbstractXClassManager
     public static final String FIELDPN_HOMEPAGE = "Home page";
 
     /**
+     * Name of field <code>istemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final String FIELD_ISWIKITEMPLATE = "iswikitemplate";
+
+    /**
+     * Pretty name of field <code>istemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final String FIELDPN_ISWIKITEMPLATE = "Template";
+
+    /**
+     * Display type of field <code>istemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final String FIELDDT_ISWIKITEMPLATE = FIELDDT_SECURE;
+
+    /**
      * The full name of the default parent of a newly created document.
      */
     public static final String DEFAULT_PAGE_PARENT = "WikiManager.WebHome";
@@ -250,6 +258,7 @@ public class XWikiServerClass extends AbstractXClassManager
      * 
      * @see com.xpn.xwiki.util.AbstractXClassManager#updateBaseClass(com.xpn.xwiki.objects.classes.BaseClass)
      */
+    @Override
     protected boolean updateBaseClass(BaseClass baseClass)
     {
         boolean needsUpdate = super.updateBaseClass(baseClass);
@@ -267,6 +276,9 @@ public class XWikiServerClass extends AbstractXClassManager
             baseClass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
         needsUpdate |= baseClass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE);
         needsUpdate |= baseClass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
+        needsUpdate |=
+            baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE,
+                FIELDDT_ISWIKITEMPLATE);
 
         return needsUpdate;
     }
@@ -276,6 +288,7 @@ public class XWikiServerClass extends AbstractXClassManager
      * 
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#updateClassTemplateDocument(com.xpn.xwiki.doc.XWikiDocument)
      */
+    @Override
     protected boolean updateClassTemplateDocument(XWikiDocument doc)
     {
         boolean needsUpdate = false;
@@ -307,8 +320,7 @@ public class XWikiServerClass extends AbstractXClassManager
         } catch (XObjectDocumentDoesNotExistException e) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
                 WikiManagerMessageTool.getDefault(context).get(
-                    WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS, wikiName),
-                e);
+                    WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS, wikiName), e);
         }
     }
 
@@ -328,7 +340,7 @@ public class XWikiServerClass extends AbstractXClassManager
     {
         XWikiServer wiki = getWikiAlias(wikiName, objectId, validate, context);
 
-        if (validate && !wiki.getVisibility().equals(FIELDL_VISIBILITY_TEMPLATE)) {
+        if (validate && !wiki.isWikiTemplate()) {
             throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
                 WikiManagerMessageTool.getDefault(context).get(
                     WikiManagerMessageTool.ERROR_WIKITEMPLATEALIASDOESNOTEXISTS, wikiName));
@@ -345,6 +357,7 @@ public class XWikiServerClass extends AbstractXClassManager
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
      *      int, com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public XObjectDocument newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
         throws XWikiException
     {

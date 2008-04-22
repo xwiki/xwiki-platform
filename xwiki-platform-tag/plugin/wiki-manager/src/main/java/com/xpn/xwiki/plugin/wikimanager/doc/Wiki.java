@@ -7,6 +7,7 @@ import java.util.List;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
+import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
@@ -51,7 +52,7 @@ public class Wiki extends Document
     public void delete(boolean deleteDatabase) throws XWikiException
     {
         String wikiName = getWikiName();
-        
+
         if (wikiName.equals(context.getMainXWiki())) {
             throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 WikiManagerMessageTool.getDefault(context).get(
@@ -77,10 +78,11 @@ public class Wiki extends Document
      */
     public int countWikiAliases() throws XWikiException
     {
-        List objects = getObjects(XWikiServerClass.getInstance(context).getClassFullName());
+        List<Object> objects =
+            getObjects(XWikiServerClass.getInstance(context).getClassFullName());
 
         int nb = 0;
-        for (Iterator it = objects.iterator(); it.hasNext();) {
+        for (Iterator<Object> it = objects.iterator(); it.hasNext();) {
             if (it.next() != null) {
                 ++nb;
             }
@@ -99,11 +101,11 @@ public class Wiki extends Document
      */
     public int getWikiAliasIdFromDomain(String domain) throws XWikiException
     {
-        Collection objects =
+        Collection<BaseObject> objects =
             doc.getObjects(XWikiServerClass.getInstance(context).getClassFullName());
 
-        for (Iterator it = objects.iterator(); it.hasNext();) {
-            BaseObject bobect = (BaseObject) it.next();
+        for (Iterator<BaseObject> it = objects.iterator(); it.hasNext();) {
+            BaseObject bobect = it.next();
 
             if (bobect != null
                 && bobect.getStringValue(XWikiServerClass.FIELD_SERVER).equals(domain)) {
@@ -158,6 +160,18 @@ public class Wiki extends Document
     }
 
     /**
+     * @return the first wiki alias used to describe the wiki itself.
+     * @throws XWikiException error when creating wiki alias object.
+     */
+    public XWikiServer getFirstWikiAlias() throws XWikiException
+    {
+        Collection<BaseObject> objects =
+            doc.getObjects(XWikiServerClass.getInstance(context).getClassFullName());
+
+        return getWikiAlias(objects.iterator().next().getNumber());
+    }
+
+    /**
      * Check if a wiki alias with provided name exists.
      * 
      * @param domain the domain name of the wiki alias.
@@ -184,6 +198,7 @@ public class Wiki extends Document
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         try {

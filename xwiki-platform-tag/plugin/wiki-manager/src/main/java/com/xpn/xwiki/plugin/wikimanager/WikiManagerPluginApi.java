@@ -31,7 +31,6 @@ import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -281,6 +280,7 @@ public class WikiManagerPluginApi extends PluginApi
      * @throws XWikiException critical error in xwiki engine.
      * @deprecated Use {@link #deleteWikiAlias(String, int)} since 1.1.
      */
+    @Deprecated
     public int deleteWiki(String wikiName, int objectId) throws XWikiException
     {
         return deleteWikiAlias(wikiName, objectId);
@@ -355,9 +355,9 @@ public class WikiManagerPluginApi extends PluginApi
      * @return the list of all {@link Wiki}.
      * @throws XWikiException error when getting wiki documents descriptors.
      */
-    public List getAllWikis() throws XWikiException
+    public List<Wiki> getAllWikis() throws XWikiException
     {
-        List wikiList = Collections.EMPTY_LIST;
+        List<Wiki> wikiList = Collections.emptyList();
 
         try {
             wikiList = WikiManager.getInstance().getAllWikis(context);
@@ -456,7 +456,7 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public List getWikiDocumentList() throws XWikiException
     {
-        List listDocument = Collections.EMPTY_LIST;
+        List listDocument = Collections.emptyList();
 
         try {
             listDocument = WikiManager.getInstance().getWikiAliasList(this.context);
@@ -552,10 +552,10 @@ public class WikiManagerPluginApi extends PluginApi
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            XWikiServer wikiDoc =
+            XWikiServer wikiAlias =
                 WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
-            wikiDoc.setVisibility(visibility);
-            wikiDoc.save();
+            wikiAlias.setVisibility(visibility);
+            wikiAlias.save();
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
 
@@ -570,6 +570,43 @@ public class WikiManagerPluginApi extends PluginApi
 
     // ////////////////////////////////////////////////////////////////////////////
     // Template management
+
+    /**
+     * Change the {@link XWikiServerClass} "visibility" field of a wiki descriptor document.
+     * 
+     * @param wikiName the name of the wiki descriptor.
+     * @param isWikiTemplate true if it's a wiki template, false otherwise.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
+     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     *         <p>
+     *         Error codes can be :
+     *         <ul>
+     *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
+     *         not exists.</li>
+     *         </ul>
+     * @throws XWikiException critical error in xwiki engine.
+     */
+    public int setIsWikiTemplate(String wikiName, boolean isWikiTemplate) throws XWikiException
+    {
+        int returncode = XWikiExceptionApi.ERROR_NOERROR;
+
+        try {
+            Wiki wiki = WikiManager.getInstance().getWikiFromName(wikiName, context);
+            XWikiServer wikiAlias = wiki.getFirstWikiAlias();
+            wikiAlias.setIsWikiTemplate(isWikiTemplate);
+            wikiAlias.save();
+        } catch (WikiManagerException e) {
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
+
+            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
+            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+
+            returncode = e.getCode();
+        }
+
+        return returncode;
+    }
 
     /**
      * Create a new xiki with {@link XWikiServerClass} "visibility" field set to "template".
@@ -704,7 +741,7 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public List getWikiTemplateList() throws XWikiException
     {
-        List listDocument = new ArrayList();
+        List listDocument = Collections.emptyList();
 
         try {
             listDocument = WikiManager.getInstance().getWikiTemplateAliasList(this.context);

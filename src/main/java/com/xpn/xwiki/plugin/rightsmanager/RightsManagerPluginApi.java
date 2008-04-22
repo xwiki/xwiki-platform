@@ -40,7 +40,7 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id: $
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
-public class RightsManagerPluginApi extends PluginApi
+public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
 {
     /**
      * Field name of the last error code inserted in context.

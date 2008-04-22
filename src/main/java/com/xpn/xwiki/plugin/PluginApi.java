@@ -29,12 +29,12 @@ import com.xpn.xwiki.api.Api;
  * 
  * @version $Id: $
  */
-public class PluginApi extends Api
+public class PluginApi<T extends XWikiPluginInterface> extends Api
 {
     /**
      * The inner plugin object. API calls are usually forwarded to this object.
      */
-    private XWikiPluginInterface plugin;
+    private T plugin;
 
     /**
      * API constructor. The API must know the plugin object it wraps, and the request context.
@@ -42,7 +42,7 @@ public class PluginApi extends Api
      * @param plugin The wrapped plugin object.
      * @param context Context of the request.
      */
-    public PluginApi(XWikiPluginInterface plugin, XWikiContext context)
+    public PluginApi(T plugin, XWikiContext context)
     {
         super(context);
         setPlugin(plugin);
@@ -57,7 +57,7 @@ public class PluginApi extends Api
      * @return The wrapped plugin object.
      * @since 1.3RC1
      */
-    protected XWikiPluginInterface getProtectedPlugin()
+    protected T getProtectedPlugin()
     {
         return plugin;
     }
@@ -68,7 +68,7 @@ public class PluginApi extends Api
      * @return The wrapped plugin object.
      * @since 1.3RC1
      */
-    public XWikiPluginInterface getInternalPlugin()
+    public T getInternalPlugin()
     {
         if (hasProgrammingRights()) {
             return plugin;
@@ -82,7 +82,7 @@ public class PluginApi extends Api
      * @param plugin The wrapped plugin object.
      * @todo Is this really needed? The inner plugin should not be changed.
      */
-    public void setPlugin(XWikiPluginInterface plugin)
+    public void setPlugin(T plugin)
     {
         this.plugin = plugin;
     }

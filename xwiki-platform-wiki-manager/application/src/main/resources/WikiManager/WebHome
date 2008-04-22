@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676868000</creationDate>
-<date>1204823614000</date>
-<contentUpdateDate>1205423816000</contentUpdateDate>
-<version>1.1</version>
+<date>1208861244000</date>
+<contentUpdateDate>1208861244000</contentUpdateDate>
+<version>22.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -68,7 +68,11 @@
 #set($confirm = $request.getParameter("confirm"))
 ##
 #set($wikiname = $request.getParameter("wikiname"))
-#set($wikivisibility = $request.getParameter("wikivisibility"))
+#if ($request.getParameter("wikitemplate") &amp;&amp; $request.getParameter("wikitemplate") == "1")
+  #set ($wikitemplate = true)
+#else
+  #set ($wikitemplate = false)
+#end
 ##
 #############################################################################
 ##
@@ -81,8 +85,8 @@
 #if($action)
   #if($action == "delete")
     #includeInContext("WikiCode.DeleteWikiCode")
-  #elseif($action == "setvisibility")
-    #includeInContext("WikiCode.SetWikiVisibilityCode")
+  #elseif($action == "settemplate")
+    #includeInContext("WikiCode.SetWikiTemplateCode")
   #end
 #end
 ##
@@ -96,7 +100,7 @@
 $msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
 #if($hasadmin)
 \\
-  [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki?stepbystep=0&amp;doc=1]
+  [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki?stepbystep=0&amp;amp;doc=1]
 #end
 ##
 #if($wikiList.size()!=0)
@@ -106,14 +110,14 @@ $msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
         &lt;th&gt;$msg.get("wikimanager.listwikidomains")&lt;/th&gt;
         &lt;th&gt;$msg.get("wikimanager.listwikiadmin")&lt;/th&gt;
         &lt;th&gt;$msg.get("wikimanager.listwikicreation")&lt;/th&gt;
-        &lt;th&gt;$msg.get("wikimanager.listwikivisibility")&lt;/th&gt;
+        &lt;th&gt;$msg.get("wikimanager.listwikitemplate")&lt;/th&gt;
         &lt;th class="unsortable noFilter"&gt;$msg.get("more")&lt;/th&gt;
       &lt;/tr&gt;
     #foreach($wiki in $wikiList)
       #set($wikiAliasList = $wiki.wikiAliasList)
       #set($firstalias = $wikiAliasList.get(0))
       &lt;tr&gt;
-        &lt;td&gt;#if($wikiAliasList.size() &gt; 0 &amp;&amp; $firstalias.wikiPrettyName &amp;&amp; $firstalias.wikiPrettyName.trim().length() &gt; 0) $firstalias.wikiPrettyName ($wiki.wikiName) #else $wiki.wikiName #end&lt;/td&gt;
+        &lt;td&gt;#if($firstalias.wikiPrettyName &amp;&amp; $firstalias.wikiPrettyName.trim().length() &gt; 0) $firstalias.wikiPrettyName ($wiki.wikiName) #else $wiki.wikiName #end&lt;/td&gt;
         &lt;td&gt;
           #foreach ($wikialias in $wikiAliasList)
             #if ($wikialias.server &amp;&amp; $wikialias.server.trim().length() &gt; 0)
@@ -123,15 +127,14 @@ $msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
         &lt;/td&gt;
         &lt;td&gt;#printLink($firstalias.owner)&lt;/td&gt;
         &lt;td&gt;$xwiki.formatDate($wiki.creationDate,"dd/MM/yyyy")&lt;/td&gt;
-        &lt;td&gt;$firstalias.visibility&lt;/td&gt;
         &lt;td&gt;
-          #if($firstalias.visibility == "public")
-              [$msg.get("wikimanager.action.setvisibility.private")&gt;?action=setvisibility&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikivisibility=private] | 
-          #elseif($firstalias.visibility == "private")
-              [$msg.get("wikimanager.action.setvisibility.template")&gt;?action=setvisibility&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikivisibility=template] | 
-          #elseif($firstalias.visibility == "template")
-              [$msg.get("wikimanager.action.setvisibility.public")&gt;?action=setvisibility&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikivisibility=public] | 
+          #if($firstalias.isWikiTemplate())
+            $msg.yes \[[$msg.get("wikimanager.action.settemplate.false")&gt;?action=settemplate&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikitemplate=0]\]
+          #else
+            $msg.no \[[$msg.get("wikimanager.action.settemplate.true")&gt;?action=settemplate&amp;amp;wikiname=$wiki.wikiName&amp;amp;wikitemplate=1]\]
           #end
+        &lt;/td&gt;
+        &lt;td&gt;
           #if($wiki.WikiName != $context.mainWikiName) [$msg.get("delete")&gt;?action=delete&amp;amp;wikiname=$wiki.WikiName] |#end &lt;a href="$wiki.getURL("view")"&gt;$msg.get("wikimanager.action.settings")&lt;/a&gt;&lt;/td&gt;
       &lt;/tr&gt;
     #end

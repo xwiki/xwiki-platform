@@ -226,7 +226,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, XWikiContext context)
         throws XWikiException
     {
         return store.searchDocuments(wheresql, distinctbyname, context);
@@ -238,7 +238,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
      *      boolean, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
         XWikiContext context) throws XWikiException
     {
         return store.searchDocuments(wheresql, distinctbyname, customMapping, context);
@@ -250,7 +250,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int,
      *      int, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbyname, int nb, int start,
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, int nb, int start,
         XWikiContext context) throws XWikiException
     {
         return store.searchDocuments(wheresql, distinctbyname, nb, start, context);
@@ -262,7 +262,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
      *      boolean, int, int, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
         int nb, int start, XWikiContext context) throws XWikiException
     {
         return store.searchDocuments(wheresql, distinctbyname, customMapping, nb, start, context);
@@ -274,7 +274,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, XWikiContext context) throws XWikiException
+    public List<XWikiDocument> searchDocuments(String wheresql, XWikiContext context) throws XWikiException
     {
         return store.searchDocuments(wheresql, context);
     }
@@ -285,7 +285,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, int nb, int start, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         return store.searchDocuments(wheresql, nb, start, context);
@@ -297,7 +297,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
      *      boolean, boolean, int, int, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbyname, boolean customMapping,
         boolean checkRight, int nb, int start, XWikiContext context) throws XWikiException
     {
         return store.searchDocuments(wheresql, distinctbyname, customMapping, checkRight, nb,
@@ -310,7 +310,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean, int,
      *      int, java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage, int nb, int start,
         List parameterValues, XWikiContext context) throws XWikiException
     {
         return store.searchDocuments(wheresql, distinctbylanguage, nb, start, parameterValues,
@@ -323,7 +323,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String,
      *      java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, List parameterValues, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String wheresql, List parameterValues, XWikiContext context)
         throws XWikiException
     {
         return store.searchDocuments(wheresql, parameterValues, context);
@@ -335,7 +335,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
      *      boolean, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbylanguage,
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         boolean customMapping, int nb, int start, List parameterValues, XWikiContext context)
         throws XWikiException
     {
@@ -349,7 +349,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, int, int,
      *      java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, int nb, int start, List parameterValues,
+    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start, List parameterValues,
         XWikiContext context) throws XWikiException
     {
         return store.searchDocuments(wheresql, nb, start, parameterValues, context);
@@ -361,7 +361,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(java.lang.String, boolean,
      *      boolean, boolean, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List searchDocuments(String wheresql, boolean distinctbylanguage,
+    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         boolean customMapping, boolean checkRight, int nb, int start, List parameterValues,
         XWikiContext context) throws XWikiException
     {
@@ -369,13 +369,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface {
             start, parameterValues, context);
     }
     
-    public List searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
         List parameterValues, XWikiContext context) throws XWikiException
     {
         return store.searchDocumentsNames(parametrizedSqlClause, nb, start, parameterValues, context);
     }
 
-    public List searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
+    public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
         XWikiContext context) throws XWikiException
     {
         return store.searchDocumentsNames(parametrizedSqlClause, parameterValues, context);

@@ -206,6 +206,11 @@ public class XWikiServerClass extends AbstractXClassManager
      */
     public static final String DEFAULT_PAGE_PARENT = "WikiManager.WebHome";
 
+    /**
+     * The full name of the default home page of a newly created wiki.
+     */
+    public static final String DEFAULT_WIKI_HOMEPAGE = "Main.WebHome";
+
     // ///
 
     /**
@@ -295,6 +300,11 @@ public class XWikiServerClass extends AbstractXClassManager
 
         if (!DEFAULT_PAGE_PARENT.equals(doc.getParent())) {
             doc.setParent(DEFAULT_PAGE_PARENT);
+            needsUpdate = true;
+        }
+
+        if (!DEFAULT_WIKI_HOMEPAGE.equals(doc.getStringValue(getClassFullName(), FIELD_HOMEPAGE))) {
+            doc.setStringValue(getClassFullName(), FIELD_HOMEPAGE, DEFAULT_WIKI_HOMEPAGE);
             needsUpdate = true;
         }
 

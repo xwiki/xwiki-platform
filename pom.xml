@@ -587,7 +587,7 @@
               **/rightsmanager/**/*.java,
               **/plugin/ldap/XWikiLDAP*.java,
               **/*AttachmentVersioningStore.java,
-              **/api/StatsService.java
+              **/api/StatsService.java,
               **/stats/**/*.java
           </includes>
           <excludes>

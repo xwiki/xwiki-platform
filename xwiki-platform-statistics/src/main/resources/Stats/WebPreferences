@@ -914,7 +914,7 @@
 <rightPanels></rightPanels>
 </property>
 <property>
-<skin>Stats.Skin</skin>
+<skin></skin>
 </property>
 <property>
 <smtp_server></smtp_server>

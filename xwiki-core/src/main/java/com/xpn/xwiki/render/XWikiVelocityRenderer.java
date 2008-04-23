@@ -35,7 +35,7 @@ import org.apache.velocity.app.tools.VelocityFormatter;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.velocity.VelocityContextFactory;
 import org.xwiki.velocity.VelocityFactory;
-import org.xwiki.velocity.VelocityManager;
+import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 
 import java.io.*;
@@ -106,14 +106,14 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     /**
      * @todo Move this initialization code to a Skin Manager component.
      */
-    public static VelocityManager getVelocityManager(XWikiContext context) throws XWikiVelocityException
+    public static VelocityEngine getVelocityEngine(XWikiContext context) throws XWikiVelocityException
     {
-    	// Note: For improved performance we cache the Velocity Managers in order not to 
+    	// Note: For improved performance we cache the Velocity Engines in order not to 
     	// recreate them all the time. The key we use is the location to the skin's macro.vm
-    	// file since caching on the skin would create more Managers than needed (some skins
+    	// file since caching on the skin would create more Engines than needed (some skins
     	// don't have a macros.vm file and some skins inherit from others).
     	
-    	// Create a Velocity context using the Velocity Manager associated to the current skin's
+    	// Create a Velocity context using the Velocity Engine associated to the current skin's
     	// macros.vm
     	
         // Get the location of the skin's macros.vm file
@@ -129,21 +129,21 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         	cacheKey = "default";
         }
 
-        // Get the Velocity Manager to use
+        // Get the Velocity Engine to use
         VelocityFactory velocityFactory =
             (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE, context);
-        VelocityManager velocityManager;
-        if (velocityFactory.hasVelocityManager(cacheKey)) {
-        	velocityManager = velocityFactory.getVelocityManager(cacheKey); 
+        VelocityEngine velocityEngine;
+        if (velocityFactory.hasVelocityEngine(cacheKey)) {
+        	velocityEngine = velocityFactory.getVelocityEngine(cacheKey); 
         } else {
 	        // Gather the global Velocity macros that we want to have. These are skin dependent. 
 	        Properties properties = new Properties();
 	        String macroList = "/templates/macros.vm" + ((skinMacros == null) ? "" : "," + cacheKey); 
 	        properties.put(RuntimeConstants.VM_LIBRARY, macroList);
-    		velocityManager = velocityFactory.createVelocityManager(cacheKey, properties);
+    		velocityEngine = velocityFactory.createVelocityEngine(cacheKey, properties);
         }    	
 
-        return velocityManager;
+        return velocityEngine;
     }
     
     /**
@@ -197,8 +197,8 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     {
         StringWriter writer = new StringWriter();
         try {
-            VelocityManager velocityManager = getVelocityManager(context);
-            velocityManager.evaluate(vcontext, writer, name, content);
+            VelocityEngine velocityEngine = getVelocityEngine(context);
+            velocityEngine.evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {
             e.printStackTrace();

@@ -27,15 +27,15 @@ import java.util.Properties;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
- * Unit tests for {@link DefaultVelocityManager}.
+ * Unit tests for {@link DefaultVelocityEngine}.
  */
 public class DefaultVelocityManagerTest extends AbstractXWikiComponentTestCase
 {
-    private VelocityManager manager;
+    private VelocityEngine manager;
 
     protected void setUp() throws Exception
     {
-        this.manager = (VelocityManager) getComponentManager().lookup(VelocityManager.ROLE);
+        this.manager = (VelocityEngine) getComponentManager().lookup(VelocityEngine.ROLE);
     }
 
     public void testEvaluateReader() throws Exception

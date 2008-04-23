@@ -37,7 +37,7 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
 {
 	private ComponentManager componentManager;
 	
-	private Map<String, VelocityManager> velocityManagers = new HashMap<String, VelocityManager>();
+	private Map<String, VelocityEngine> velocityEngines = new HashMap<String, VelocityEngine>();
 
 	/**
 	 * {@inheritDoc}
@@ -50,40 +50,40 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
 
 	/**
 	 * {@inheritDoc}
-	 * @see VelocityFactory#hasVelocityManager(String)
+	 * @see VelocityFactory#hasVelocityEngine(String)
 	 */
-	public boolean hasVelocityManager(String key)
+	public boolean hasVelocityEngine(String key)
 	{
-		return this.velocityManagers.containsKey(key);
+		return this.velocityEngines.containsKey(key);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @see VelocityFactory#getVelocityManager(String)
+	 * @see VelocityFactory#getVelocityEngine(String)
 	 */
-	public VelocityManager getVelocityManager(String key)
+	public VelocityEngine getVelocityEngine(String key)
 	{
-		return this.velocityManagers.get(key);
+		return this.velocityEngines.get(key);
 	}
 	
 	/**
 	 * {@inheritDoc}
-	 * @see VelocityFactory#createVelocityManager(String, Properties)
+	 * @see VelocityFactory#createVelocityEngine(String, Properties)
 	 */
-	public VelocityManager createVelocityManager(String key, Properties properties) throws XWikiVelocityException
+	public VelocityEngine createVelocityEngine(String key, Properties properties) throws XWikiVelocityException
 	{
-		VelocityManager manager;
-		if (this.velocityManagers.containsKey(key)) {
-			manager = this.velocityManagers.get(key);
+		VelocityEngine engine;
+		if (this.velocityEngines.containsKey(key)) {
+			engine = this.velocityEngines.get(key);
 		} else {
 			try {
-				manager = (VelocityManager) this.componentManager.lookup(VelocityManager.ROLE);
+				engine = (VelocityEngine) this.componentManager.lookup(VelocityEngine.ROLE);
 			} catch (ComponentLookupException e) {
-				throw new XWikiVelocityException("Failed to create Velocity Manager", e);
+				throw new XWikiVelocityException("Failed to create Velocity Engine", e);
 			}
-			manager.initialize(properties);
-			this.velocityManagers.put(key, manager);
+			engine.initialize(properties);
+			this.velocityEngines.put(key, engine);
 		}
-		return manager;
+		return engine;
 	}
 }

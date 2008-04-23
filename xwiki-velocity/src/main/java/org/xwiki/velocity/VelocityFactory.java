@@ -37,22 +37,22 @@ public interface VelocityFactory
     public final static String ROLE = VelocityFactory.class.getName();
 
     /**
-     * @param key the key used to cache the Velocity manager instance to return
-     * @return true if there is a cached Velocity Manager matching the passed key
+     * @param key the key used to cache the Velocity engine instance to return
+     * @return true if there is a cached Velocity Engine matching the passed key
      */
-    boolean hasVelocityManager(String key);
+    boolean hasVelocityEngine(String key);
     
     /**
-     * @param key the key used to cache the Velocity manager instance to return
-     * @return the cached Velocity manager instance corresponding to the passed or null if not found 
+     * @param key the key used to cache the Velocity engine instance to return
+     * @return the cached Velocity engine instance corresponding to the passed or null if not found 
      */
-    VelocityManager getVelocityManager(String key);
+    VelocityEngine getVelocityEngine(String key);
     
     /**
-	 * Allow having different Velocity Managers so that each one can have its own special configuration. This is especially
+	 * Allow having different Velocity Engines so that each one can have its own special configuration. This is especially
 	 * handy for having different sets of global Velocity libraries (such as for different XWiki Skins for example).
 	 * 
-	 * @throws XWikiVelocityException if the Velocity Manager cannot be initialized for some reason
+	 * @throws XWikiVelocityException if the Velocity Engine cannot be initialized for some reason
 	 */
-	VelocityManager createVelocityManager(String key, Properties properties) throws XWikiVelocityException;
+	VelocityEngine createVelocityEngine(String key, Properties properties) throws XWikiVelocityException;
 }

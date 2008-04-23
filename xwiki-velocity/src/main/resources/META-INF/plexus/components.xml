@@ -8,9 +8,9 @@
       <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
-      <role>org.xwiki.velocity.VelocityManager</role>
+      <role>org.xwiki.velocity.VelocityEngine</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.velocity.DefaultVelocityManager</implementation>
+      <implementation>org.xwiki.velocity.DefaultVelocityEngine</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>

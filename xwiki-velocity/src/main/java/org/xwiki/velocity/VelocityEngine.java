@@ -29,15 +29,15 @@ import org.apache.velocity.context.Context;
 /**
  * Initialize a Velocity Engine and make Velocity services available.
  */
-public interface VelocityManager
+public interface VelocityEngine
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = VelocityManager.class.getName();
+    public final static String ROLE = VelocityEngine.class.getName();
 
     /**
-     * Initializes the Velocity manager by setting its configuration both from the component's configuration
+     * Initializes the Velocity engine by setting its configuration both from the component's configuration
      * and from the passed properties. This method must be called before any other method from this class
      * can be executed.
      *   

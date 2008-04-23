@@ -20,7 +20,6 @@
  */
 package org.xwiki.velocity;
 
-import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.context.Context;
 import org.apache.velocity.context.InternalContextAdapterImpl;
 import org.apache.velocity.runtime.RuntimeConstants;
@@ -43,10 +42,10 @@ import java.io.Reader;
  * configuration values defined in the component's configuration. Note that the {@link #initialize}
  * method has to be executed before any other method can be called.
  */
-public class DefaultVelocityManager extends AbstractLogEnabled
-    implements VelocityManager, LogChute
+public class DefaultVelocityEngine extends AbstractLogEnabled
+    implements VelocityEngine, LogChute
 {
-    private VelocityEngine engine;
+    private org.apache.velocity.app.VelocityEngine engine;
 
     private Properties properties;
 
@@ -56,11 +55,11 @@ public class DefaultVelocityManager extends AbstractLogEnabled
     
     /**
      * {@inheritDoc}
-     * @see VelocityManager#initialize(Properties)
+     * @see VelocityEngine#initialize(Properties)
      */
     public void initialize(Properties properties) throws XWikiVelocityException
     {
-        this.engine = new VelocityEngine();
+        this.engine = new org.apache.velocity.app.VelocityEngine();
 
         // If the Velocity configuration uses the Velocity Tools
         // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> class then we need to set the
@@ -110,7 +109,7 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see VelocityManager#evaluate(Context, java.io.Writer, String, String)
+     * @see VelocityEngine#evaluate(Context, java.io.Writer, String, String)
      */
     public boolean evaluate(Context context, Writer out, String templateName,
         String source) throws XWikiVelocityException
@@ -127,7 +126,7 @@ public class DefaultVelocityManager extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see VelocityManager#evaluate(Context, java.io.Writer, String, String)
+     * @see VelocityEngine#evaluate(Context, java.io.Writer, String, String)
      * @see #init(RuntimeServices)
      */
     public boolean evaluate(Context context, Writer out, String templateName,
@@ -168,7 +167,7 @@ public class DefaultVelocityManager extends AbstractLogEnabled
     /**
      * @return the initialized Velocity engine which can be used to call all Velocity services
      */
-    private VelocityEngine getEngine()
+    private org.apache.velocity.app.VelocityEngine getEngine()
     {
         return this.engine;
     }

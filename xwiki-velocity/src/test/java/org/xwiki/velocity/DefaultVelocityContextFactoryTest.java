@@ -62,8 +62,8 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
         
         assertEquals("org.apache.velocity.tools.generic.ListTool", 
             context.get("listtool").getClass().getName());
-        VelocityManager manager = 
-            (VelocityManager) getComponentManager().lookup(VelocityManager.ROLE);
+        VelocityEngine manager = 
+            (VelocityEngine) getComponentManager().lookup(VelocityEngine.ROLE);
         manager.initialize(new Properties());
         StringWriter writer = new StringWriter();
         manager.evaluate(context, writer, "mytemplate",

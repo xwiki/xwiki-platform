@@ -607,9 +607,9 @@ public class Package
                 doc.getDoc().setContentDirty(false);
                 doc.getDoc().setMetaDataDirty(false);
 
-                addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
                 context.getWiki().saveDocument(doc.getDoc(), context);
-                doc.getDoc().saveAllAttachments(context);
+                doc.getDoc().saveAllAttachments(false, true, context);
+                addToInstalled(doc.getFullName() + ":" + doc.getLanguage(), context);
 
                 if (withVersions) {
                     // we need to force the saving the document archive.

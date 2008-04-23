@@ -30,6 +30,7 @@ import com.xpn.xwiki.criteria.impl.Period;
 import com.xpn.xwiki.criteria.impl.Range;
 import com.xpn.xwiki.criteria.impl.Scope;
 import com.xpn.xwiki.stats.api.XWikiStatsService;
+import com.xpn.xwiki.stats.impl.StatsUtil;
 
 /**
  * Statistics api. The Statistics module needs to be activated (xwiki.stats=1 in xwiki.cfg).
@@ -49,16 +50,21 @@ public class StatsService extends Api
     }
 
     /**
-     * The Statistics module is disabled by default for improved performances. It can be globally
-     * activated by setting the value of <b><code>xwiki.stats</code></b> to <b><code>1</code></b>
-     * in the <b><code>xwiki.cfg</code></b> configuration file. Use this method to test if at
-     * some point the Statistics module is enabled or disabled.
+     * Indicate if statistics service is enabled for the current wiki.
+     * <p>
+     * To be true the <code>xwiki.stats</code> in xwiki.cfg has to be <code>1</code> and
+     * <code>xwiki.stats.default</code> too.
+     * </p>
+     * <p>
+     * <code>xwiki.stats.default</code> can be overwrited by <code>statistics</code> in
+     * <code>XWikiPreferences</code>.
+     * </p>
      * 
-     * @return true if the Statistics module is enabled
+     * @return true if statistics are enabled for the context's wiki.
      */
     public boolean isEnabled()
     {
-        return "1".equals(getXWikiContext().getWiki().Param("xwiki.stats"));
+        return StatsUtil.isWikiStatsEnabled(context);
     }
 
     /**

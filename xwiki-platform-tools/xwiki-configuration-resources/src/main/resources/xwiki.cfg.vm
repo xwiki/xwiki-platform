@@ -30,12 +30,12 @@ xwiki.authentication.cookiedomains=xwiki.com,wiki.fr
 # Comment if you want to enable logout only for /bin/logout/XWiki/XWikiLogout
 xwiki.authentication.logoutpage=/[^/]+/logout/*
 
-# Stats configuration allows to globally activate/deactivate stats module
-# It is also possible to choose a different stats service to record
-# statistics separately from XWiki.
-# Note: Statistics are disabled by default for improved performances.
+# Stats configuration allows to globally activate/deactivate stats module (launch storage thread, register events...)
 xwiki.stats=1
+# When statistics are globally enabled, storage can be enabled/disabled by wiki using the XWikiPreference property "statistics".
+# Note: Statistics are disabled by default for improved performances/space.
 xwiki.stats.default=0
+# It is also possible to choose a different stats service to record statistics separately from XWiki.
 xwiki.stats.class=com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl
 
 xwiki.encoding=$xwikiCfgEncoding

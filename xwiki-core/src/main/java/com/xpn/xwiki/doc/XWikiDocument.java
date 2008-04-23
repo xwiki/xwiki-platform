@@ -2522,6 +2522,13 @@ public class XWikiDocument
         }
     }
 
+    public void saveAllAttachments(boolean updateParent, boolean transaction, XWikiContext context) throws XWikiException
+    {
+        for (int i = 0; i < attachmentList.size(); i++) {
+            saveAttachmentContent(attachmentList.get(i), updateParent, transaction, context);
+        }
+    }
+
     public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiContext context)
         throws XWikiException
     {

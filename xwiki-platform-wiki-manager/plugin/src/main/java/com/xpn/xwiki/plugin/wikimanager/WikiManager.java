@@ -20,24 +20,6 @@
 
 package com.xpn.xwiki.plugin.wikimanager;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
-import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
-import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
-import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
-import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
-import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
-import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
-import com.xpn.xwiki.plugin.packaging.DocumentInfo;
-import com.xpn.xwiki.plugin.packaging.PackageAPI;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -47,6 +29,24 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
+import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager;
+import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
+import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
+import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
+import com.xpn.xwiki.plugin.packaging.DocumentInfo;
+import com.xpn.xwiki.plugin.packaging.PackageAPI;
+import com.xpn.xwiki.plugin.wikimanager.doc.Wiki;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServer;
+import com.xpn.xwiki.plugin.wikimanager.doc.XWikiServerClass;
+import com.xpn.xwiki.util.Util;
 
 /**
  * Hidden toolkit use by the plugin API that make all the plugins actions.
@@ -613,9 +613,8 @@ final class WikiManager
                 // If we are not allowed to continue in case wiki descriptor page already
                 // exists.
                 if (failOnExist) {
-                    throw new WikiManagerException(
-                        WikiManagerException.ERROR_WM_WIKIALREADYEXISTS, msg.get(
-                            WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS,
+                    throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALREADYEXISTS,
+                        msg.get(WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS,
                             userWikiSuperDoc.getFullName()));
                 } else if (LOG.isWarnEnabled()) {
                     LOG.warn(msg.get(WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS,

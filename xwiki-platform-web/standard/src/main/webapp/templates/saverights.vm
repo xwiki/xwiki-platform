@@ -99,4 +99,4 @@
 7. person: $fullname; rule: deny; action: deny; levels: $right
   $obj.set('allow', '0')
 #end
-#set($discard = $doc.save())
+#set($discard = $doc.save($msg.get("platform.core.rightsManagement.saveComment", [${action}, ${right}, ${fullname}]), true))

@@ -63,12 +63,12 @@
         <configuration>
           <transformationSets>
             <transformationSet>
-              <dir>${basedir}/src/main/resources</dir>
+              <dir>src/main/resources</dir>
               <outputDir>${project.build.outputDirectory}</outputDir>
               <includes>
                 <include>XApp/XWikiApplication*</include>
               </includes>
-              <stylesheet>src/main/xapp.xsl</stylesheet>
+              <stylesheet>src/main/build/transformation/xapp.xsl</stylesheet>
               <parameters>
                 <parameter>
                   <name>appversion</name>

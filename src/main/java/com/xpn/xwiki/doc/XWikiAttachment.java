@@ -48,7 +48,7 @@ import com.xpn.xwiki.XWikiException;
 public class XWikiAttachment
 {
     private static final Log LOG = LogFactory.getLog(XWikiAttachment.class);
-    
+
     private XWikiDocument doc;
 
     private int filesize;
@@ -489,15 +489,25 @@ public class XWikiAttachment
 
     public void loadContent(XWikiContext context) throws XWikiException
     {
-        if (attachment_content == null)
-            context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
+        if (attachment_content == null) {
+            try {
+                context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
+            } catch (Exception ex) {
+                LOG.error("Failed to load content for attachment [" + getFilename() + "]", ex);
+            }
+        }
     }
 
     public XWikiAttachmentArchive loadArchive(XWikiContext context) throws XWikiException
     {
         if (attachment_archive == null) {
-            attachment_archive = context.getWiki().getAttachmentVersioningStore()
-                .loadArchive(this, context, true);
+            try {
+                attachment_archive =
+                    context.getWiki().getAttachmentVersioningStore().loadArchive(this, context,
+                        true);
+            } catch (Exception ex) {
+                LOG.error("Failed to load archive for attachment [" + getFilename() + "]", ex);
+            }
         }
         return attachment_archive;
     }

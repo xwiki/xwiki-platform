@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage></defaultLanguage>
 <translation>0</translation>
-<parent></parent>
+<parent>Stats.WebHome</parent>
 <creator>XWiki.Admin</creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>
@@ -101,13 +101,7 @@ table.stats {
 }
 table.stats th {
   font-weight: normal;
-  color: #333333;
-  border-bottom: 1px solid #DDDDDD;
-  border-top: 1px solid #DDDDDD;
   padding-bottom: 2px;
-}
-table.stats td {
-  color: #888888;
 }
 table.stats th.numeric, table.stats td.numeric {
   text-align: right;

@@ -400,7 +400,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List<String> getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
+    public List< ? > getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {
@@ -409,7 +409,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                 context);
         }
 
-        List<String> groupList = new ArrayList<String>();
+        List<Object> userOroupList = new ArrayList<Object>();
 
         int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, null, context);
 
@@ -417,7 +417,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         // Get global groups
         if (newstart < nbGlobalUsersOrGroups) {
-            groupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails,
+            userOroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails,
                 new RequestLimit(limit.getNb(), newstart), order, context));
             newstart = 0;
         } else {
@@ -425,15 +425,17 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         }
 
         // Get local groups
-        if (limit.getNb() > groupList.size()) {
-            groupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
-                new RequestLimit(limit.getNb() - groupList.size(), newstart), order, context));
+        if (limit.getNb() > userOroupList.size()) {
+            userOroupList
+                .addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+                    new RequestLimit(limit.getNb() - userOroupList.size(), newstart), order,
+                    context));
         } else if (limit.getNb() <= 0) {
-            groupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+            userOroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
                 new RequestLimit(0, newstart), order, context));
         }
 
-        return groupList;
+        return userOroupList;
     }
 
     /**
@@ -462,7 +464,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List<String> getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields,
+    public List< ? > getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {
@@ -502,7 +504,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List<String> getAllMatchedWikiUsersOrGroups(boolean user, String wikiName,
+    public List< ? > getAllMatchedWikiUsersOrGroups(boolean user, String wikiName,
         Object[][] matchFields, boolean withdetails, RequestLimit limit, Object[][] order,
         XWikiContext context) throws XWikiException
     {
@@ -516,13 +518,13 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         try {
             context.setDatabase(wikiName);
 
-            List<String> localGroupList =
+            List< ? > localGroupList =
                 getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
                     context);
 
             if (localGroupList != null && !withdetails) {
                 List<String> wikiGroupList = new ArrayList<String>(localGroupList.size());
-                for (String groupName : localGroupList) {
+                for (Object groupName : localGroupList) {
                     wikiGroupList.add(wikiName + WIKIFULLNAME_SEP + groupName);
                 }
 
@@ -561,7 +563,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      *         {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List<String> getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields,
+    public List< ? > getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields,
         boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
         throws XWikiException
     {

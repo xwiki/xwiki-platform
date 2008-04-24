@@ -18,7 +18,7 @@
     </a>
   </div>
 </div>
-<div id="printcontainer" style="overflow: visible; border: none; padding: 10px; text-align: justify;">
+<div id="printcontainer">
 #template("contentview.vm")
 <div class="clearfloats"></div>
 </div>## printcontainer

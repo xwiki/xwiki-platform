@@ -55,6 +55,7 @@
 </property>
 </object>
 <content>#macro(printPageStats $stats)
+$!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -79,6 +80,7 @@
 &lt;/table&gt;
 #end
 #macro(printSpaceStats $stats)
+$!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -96,6 +98,7 @@
 &lt;/table&gt;
 #end
 #macro(printContributorStats $stats)
+$!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
@@ -117,6 +120,7 @@
 &lt;/table&gt;
 #end
 #macro(printRefererStats $stats)
+$!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;

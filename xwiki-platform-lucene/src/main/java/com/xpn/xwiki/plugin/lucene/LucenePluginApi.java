@@ -38,18 +38,13 @@ import com.xpn.xwiki.plugin.PluginApi;
  * 
  * @version $Id: $
  */
-public class LucenePluginApi extends PluginApi
+public class LucenePluginApi extends PluginApi<LucenePlugin>
 {
     private static final Log LOG = LogFactory.getLog(LucenePluginApi.class);
 
     public LucenePluginApi(LucenePlugin plugin, XWikiContext context)
     {
         super(plugin, context);
-    }
-
-    private LucenePlugin getLucenePlugin()
-    {
-        return (LucenePlugin) getProtectedPlugin();
     }
 
     /**
@@ -61,9 +56,8 @@ public class LucenePluginApi extends PluginApi
     {
         int nbDocuments = -1;
         if (hasAdminRights()) {
-            nbDocuments = getLucenePlugin().rebuildIndex(context);
+            nbDocuments = getProtectedPlugin().rebuildIndex(context);
         }
-
         return nbDocuments;
     }
 
@@ -79,9 +73,8 @@ public class LucenePluginApi extends PluginApi
     {
         int nbDocuments = -1;
         if (wiki.hasAdminRights()) {
-            nbDocuments = getLucenePlugin().rebuildIndex(context.getContext());
+            nbDocuments = getProtectedPlugin().rebuildIndex(context.getContext());
         }
-
         return nbDocuments;
     }
 
@@ -100,8 +93,8 @@ public class LucenePluginApi extends PluginApi
         String languages, com.xpn.xwiki.api.XWiki wiki)
     {
         try {
-            return getLucenePlugin().getSearchResults(query, (String) null, indexDirs, languages,
-                context);
+            return getProtectedPlugin().getSearchResults(query, (String) null, indexDirs,
+                languages, context);
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
@@ -161,7 +154,7 @@ public class LucenePluginApi extends PluginApi
     {
         try {
             SearchResults retval =
-                getLucenePlugin().getSearchResults(query, (String) null, virtualWikiNames,
+                getProtectedPlugin().getSearchResults(query, (String) null, virtualWikiNames,
                     languages, context);
             if (LOG.isDebugEnabled())
                 LOG.debug("returning " + retval.getHitcount() + " results");
@@ -178,7 +171,7 @@ public class LucenePluginApi extends PluginApi
      */
     public long getQueueSize()
     {
-        return getLucenePlugin().getQueueSize();
+        return getProtectedPlugin().getQueueSize();
     }
 
     /**
@@ -186,7 +179,7 @@ public class LucenePluginApi extends PluginApi
      */
     public long getActiveQueueSize()
     {
-        return getLucenePlugin().getActiveQueueSize();
+        return getProtectedPlugin().getActiveQueueSize();
     }
 
     /**
@@ -194,7 +187,7 @@ public class LucenePluginApi extends PluginApi
      */
     public long getLuceneDocCount()
     {
-        return getLucenePlugin().getLuceneDocCount();
+        return getProtectedPlugin().getLuceneDocCount();
     }
 
     /**
@@ -210,8 +203,8 @@ public class LucenePluginApi extends PluginApi
         String languages)
     {
         try {
-            return getLucenePlugin().getSearchResults(query, (String) null, indexDirs, languages,
-                context);
+            return getProtectedPlugin().getSearchResults(query, (String) null, indexDirs,
+                languages, context);
         } catch (Exception e) {
             e.printStackTrace();
         } // end of try-catch
@@ -257,7 +250,7 @@ public class LucenePluginApi extends PluginApi
         String indexDirs, String languages)
     {
         try {
-            return getLucenePlugin().getSearchResults(query, sortField, indexDirs, languages,
+            return getProtectedPlugin().getSearchResults(query, sortField, indexDirs, languages,
                 context);
         } catch (Exception e) {
             e.printStackTrace();
@@ -280,7 +273,7 @@ public class LucenePluginApi extends PluginApi
         String indexDirs, String languages)
     {
         try {
-            return getLucenePlugin().getSearchResults(query, sortField, indexDirs, languages,
+            return getProtectedPlugin().getSearchResults(query, sortField, indexDirs, languages,
                 context);
         } catch (Exception e) {
             e.printStackTrace();
@@ -339,8 +332,8 @@ public class LucenePluginApi extends PluginApi
     {
         try {
             SearchResults retval =
-                getLucenePlugin().getSearchResults(query, sortField, virtualWikiNames, languages,
-                    context);
+                getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames,
+                    languages, context);
             if (LOG.isDebugEnabled())
                 LOG.debug("returning " + retval.getHitcount() + " results");
             return retval;
@@ -401,8 +394,8 @@ public class LucenePluginApi extends PluginApi
     {
         try {
             SearchResults retval =
-                getLucenePlugin().getSearchResults(query, sortField, virtualWikiNames, languages,
-                    context);
+                getProtectedPlugin().getSearchResults(query, sortField, virtualWikiNames,
+                    languages, context);
             if (LOG.isDebugEnabled())
                 LOG.debug("returning " + retval.getHitcount() + " results");
             return retval;

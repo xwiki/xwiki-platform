@@ -1,6 +1,20 @@
-#body{
+#body, #xwikimaincontainer, #xwikimaincontainerinner, #xwikicontent {
+  background-image: none !important;
   background-color: #FFF !important;
+  float: none !important;
+  border: none !important;
+  width: auto !important;
+  margin: 0px !important;
+  padding: 10px !important;
+  overflow: visible !important;
 }
 .edit_section{
   display: none;
+}
+#printcontainer {
+	overflow: visible !important; 
+	border: none; 
+	padding: 10px; 
+	text-align: justify;
+	float: none !important;
 }

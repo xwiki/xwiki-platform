@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -241,9 +240,7 @@ final class WikiManager
         List<XWikiDocument> documents =
             context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
 
-        for (Iterator<XWikiDocument> it = documents.iterator(); it.hasNext();) {
-            XWikiDocument document = it.next();
-
+        for (XWikiDocument document : documents) {
             wikiList.add(new Wiki(document, context));
         }
 
@@ -337,8 +334,8 @@ final class WikiManager
 
             // Replace documents contents to include
             Collection docsNameToInclude = docsNames[0];
-            for (Iterator it = docsNameToInclude.iterator(); it.hasNext();) {
-                String docFullName = (String) it.next();
+            for (Object item : docsNameToInclude) {
+                String docFullName = (String) item;
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
                 includeFormatParams[2] = docFullName;
@@ -348,8 +345,8 @@ final class WikiManager
 
             // Replace documents contents to link
             Collection docsNameToLink = docsNames[1];
-            for (Iterator it = docsNameToLink.iterator(); it.hasNext();) {
-                String docFullName = (String) it.next();
+            for (Object item : docsNameToLink) {
+                String docFullName = (String) item;
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
                 includeFormatParams[2] = docFullName;

@@ -409,7 +409,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                 context);
         }
 
-        List<Object> userOrGoupList = new ArrayList<Object>();
+        List<Object> userOrGroupList = new ArrayList<Object>();
 
         int nbGlobalUsersOrGroups = countAllGlobalUsersOrGroups(user, null, context);
 
@@ -417,7 +417,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         // Get global groups
         if (newstart < nbGlobalUsersOrGroups) {
-            userOrGoupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields,
+            userOrGroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields,
                 withdetails, new RequestLimit(limit.getNb(), newstart), order, context));
             newstart = 0;
         } else {
@@ -425,17 +425,17 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         }
 
         // Get local groups
-        if (limit.getNb() > userOrGoupList.size()) {
-            userOrGoupList
+        if (limit.getNb() > userOrGroupList.size()) {
+            userOrGroupList
                 .addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
-                    new RequestLimit(limit.getNb() - userOrGoupList.size(), newstart), order,
+                    new RequestLimit(limit.getNb() - userOrGroupList.size(), newstart), order,
                     context));
         } else if (limit.getNb() <= 0) {
-            userOrGoupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
+            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
                 new RequestLimit(0, newstart), order, context));
         }
 
-        return userOrGoupList;
+        return userOrGroupList;
     }
 
     /**

@@ -79,7 +79,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
     private long activesIndexedDocs = 0;
 
-    static List fields = new ArrayList();
+    static List<String> fields = new ArrayList<String>();
 
     public boolean needInitialBuild = false;
 
@@ -107,19 +107,17 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                     LOG.debug("IndexUpdater: documents in queue, start indexing");
                 }
 
-                Map toIndex = new HashMap();
-                List toDelete = new ArrayList();
+                Map<String, IndexData> toIndex = new HashMap<String, IndexData>();
+                List<Integer> toDelete = new ArrayList<Integer>();
                 activesIndexedDocs = 0;
 
                 try {
                     openSearcher();
                     while (!this.queue.isEmpty()) {
                         IndexData data = this.queue.remove();
-                        List oldDocs = getOldIndexDocIds(data);
+                        List<Integer> oldDocs = getOldIndexDocIds(data);
                         if (oldDocs != null) {
-                            for (int i = 0; i < oldDocs.size(); i++) {
-                                Object id = oldDocs.get(i);
-
+                            for (Integer id : oldDocs) {
                                 if (LOG.isDebugEnabled()) {
                                     LOG.debug("Adding " + id + " to remove list");
                                 }
@@ -180,11 +178,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                     openWriter(false);
 
                     int nb = 0;
-                    for (Iterator entryIt = toIndex.entrySet().iterator(); entryIt.hasNext();) {
-                        Map.Entry entry = (Map.Entry) entryIt.next();
-
-                        String id = (String) entry.getKey();
-                        IndexData data = (IndexData) entry.getValue();
+                    for (Map.Entry<String, IndexData> entry : toIndex.entrySet()) {
+                        String id = entry.getKey();
+                        IndexData data = entry.getValue();
 
                         try {
                             XWikiDocument doc =
@@ -261,18 +257,17 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      * Deletes the documents with the given ids from the index.
      */
-    private int deleteOldDocs(List oldDocs)
+    private int deleteOldDocs(List<Integer> oldDocs)
     {
         int nb = 0;
 
-        for (Iterator iter = oldDocs.iterator(); iter.hasNext();) {
-            Integer id = (Integer) iter.next();
+        for (Integer id : oldDocs) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("delete doc " + id);
             }
 
             try {
-                this.reader.deleteDocument(id.intValue());
+                this.reader.deleteDocument(id);
                 nb++;
             } catch (IOException e1) {
                 LOG.error("error deleting doc " + id, e1);
@@ -282,9 +277,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         return nb;
     }
 
-    private List getOldIndexDocIds(IndexData data)
+    private List<Integer> getOldIndexDocIds(IndexData data)
     {
-        List retval = new ArrayList(3);
+        List<Integer> retval = new ArrayList<Integer>(3);
         Query query = data.buildQuery();
         try {
             Hits hits = this.searcher.search(query);
@@ -470,11 +465,10 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     {
         int retval = 0;
 
-        final List attachmentList = document.getAttachmentList();
+        final List<XWikiAttachment> attachmentList = document.getAttachmentList();
         retval += attachmentList.size();
-        for (Iterator attachmentIter = attachmentList.iterator(); attachmentIter.hasNext();) {
+        for (XWikiAttachment attachment : attachmentList) {
             try {
-                XWikiAttachment attachment = (XWikiAttachment) attachmentIter.next();
                 add(document, attachment, context);
             } catch (Exception e) {
                 LOG.error("error retrieving attachment of document " + document.getFullName(), e);
@@ -523,11 +517,10 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
             try {
                 // Retrieve the latest version (with the file just attached)
                 XWikiDocument basedoc = context.getWiki().getDocument(doc.getFullName(), context);
-                List attachments = basedoc.getAttachmentList();
+                List<XWikiAttachment> attachments = basedoc.getAttachmentList();
                 // find out the most recently changed attachment
                 XWikiAttachment newestAttachment = null;
-                for (Iterator iter = attachments.iterator(); iter.hasNext();) {
-                    XWikiAttachment attachment = (XWikiAttachment) iter.next();
+                for (XWikiAttachment attachment : attachments) {
                     if ((newestAttachment == null)
                         || attachment.getDate().after(newestAttachment.getDate())) {
                         newestAttachment = attachment;

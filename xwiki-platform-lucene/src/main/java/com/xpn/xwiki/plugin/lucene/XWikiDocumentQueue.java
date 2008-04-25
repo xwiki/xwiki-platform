@@ -23,51 +23,66 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.collections.Buffer;
+import org.apache.commons.collections.BufferUnderflowException;
 import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
 
 /**
  * This class represents a Queue (FirstInFirstOut) for XWikiDocument objects. It is used during
- * indexing of the wiki. The rebuilding of the index is done, until the processing queue is empty.
+ * indexing of the wiki. The index is updated whenever the processing queue is not empty. This class
+ * is threadsafe, as usually several threads add elements and one thread removes them for
+ * processing.
  * 
  * @version $Id: $
  */
 public class XWikiDocumentQueue
 {
     /**
-     * maps names of documents to the document instances itself
+     * Maps names of documents to the document instances.
      */
     private Map<String, IndexData> documentsByName = new HashMap<String, IndexData>();
 
     /**
-     * maintains fifo order
+     * Maintains FIFO order.
      */
     private Buffer namesQueue = new UnboundedFifoBuffer();
 
     /**
-     * @return remove an item from our queue and return it.
+     * Remove an item from the queue and return it. Since this is a FIFO, the element returned will
+     * be the oldes one in the queue.
+     * 
+     * @return The oldest element in the queue.
+     * @throws BufferUnderflowException If the queue is empty.
      */
-    public synchronized IndexData remove()
+    public synchronized IndexData remove() throws BufferUnderflowException
     {
         return documentsByName.remove(namesQueue.remove());
     }
 
     /**
-     * @param data IndexData object to add to our queue
+     * Adds an item to the queue. Since this is a FIFO, it will be removed after all the other items
+     * already in the queue have been processed. If the element was already in the queue, it will
+     * not be added again (as a duplicate), its position will remain unchanged, but the associated
+     * data is updated, so the new version will replace the old unprocessed one.
+     * 
+     * @param data IndexData object to add to the queue.
      */
+    @SuppressWarnings("unchecked")
     public synchronized void add(IndexData data)
     {
         final String key = data.getId();
         if (!documentsByName.containsKey(key)) {
-            // document with this name not yet in Queue, so add it
+            // Document with this name not yet in the Queue, so add it
             namesQueue.add(key);
         }
-        // in any case put new version of this document in the map, overwriting
+        // In any case put new version of this document in the map, overwriting
         // possibly existing older version
         documentsByName.put(key, data);
     }
 
     /**
-     * @return true if our queue is empty.
+     * Check if the queue is empty or not.
+     * 
+     * @return <code>true</code> if the queue is empty, <code>false</code> otherwise.
      */
     public synchronized boolean isEmpty()
     {
@@ -75,9 +90,11 @@ public class XWikiDocumentQueue
     }
 
     /**
-     * @return number of elements in our queue.
+     * Returns the number of elements in the queue.
+     * 
+     * @return Number of elements in the queue.
      */
-    public long getSize()
+    public synchronized int getSize()
     {
         return namesQueue.size();
     }

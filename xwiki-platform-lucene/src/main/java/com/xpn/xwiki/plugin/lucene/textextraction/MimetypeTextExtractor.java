@@ -21,7 +21,7 @@ package com.xpn.xwiki.plugin.lucene.textextraction;
 /**
  * A text extractor for a specific mime type.
  */
-public interface MimetypeTextExtractor {
-    
+public interface MimetypeTextExtractor
+{
     public String getText(byte[] data) throws Exception;
 }

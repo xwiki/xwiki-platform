@@ -1,4 +1,28 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.lucene.textextraction;
+
+import java.io.ByteArrayInputStream;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -11,18 +35,12 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 
-import java.io.ByteArrayInputStream;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 public class MSExcelTextExtractor implements MimetypeTextExtractor
 {
+    /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(MSExcelTextExtractor.class);
 
-    /**
-     * The currently preparing Excel workbook.
-     */
+    /** The currently preparing Excel workbook. */
     private HSSFWorkbook mWorkbook;
 
     /**
@@ -34,7 +52,7 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
 
     /**
      * Extracts all text from an Excel by parsing all the sheets in that excel document.
-     *
+     * 
      * @return String
      */
     public String getText(byte[] data) throws Exception
@@ -94,7 +112,7 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
         String cellValue = null;
 
         if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-            cellValue = cell.getStringCellValue();
+            cellValue = cell.getRichStringCellValue().getString();
         } else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
             HSSFCellStyle style = cell.getCellStyle();
             short formatId = style.getDataFormat();
@@ -108,8 +126,7 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
                 SimpleDateFormat format;
                 try {
                     format = new SimpleDateFormat(formatPattern);
-                }
-                catch (Throwable thr) {
+                } catch (Throwable thr) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Creating date format failed: '" + formatPattern + "'", thr);
                     }
@@ -124,8 +141,7 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
                 DecimalFormat format;
                 try {
                     format = new DecimalFormat(formatPattern);
-                }
-                catch (Throwable thr) {
+                } catch (Throwable thr) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Creating number format failed: '" + formatPattern + "'", thr);
                     }
@@ -148,7 +164,7 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
 
     /**
      * Checks cell is date formatted or not.
-     *
+     * 
      * @return boolean
      */
     private boolean isCellDateFormatted(HSSFCell cell)
@@ -164,12 +180,9 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
                 if (fmtText != null) {
                     fmtText = fmtText.toLowerCase();
 
-                    if (fmtText.indexOf("d") >= 0
-                        || fmtText.indexOf("m") >= 0
-                        || fmtText.indexOf("y") >= 0
-                        || fmtText.indexOf("h") >= 0
-                        || fmtText.indexOf("s") >= 0)
-                    {
+                    if (fmtText.indexOf("d") >= 0 || fmtText.indexOf("m") >= 0
+                        || fmtText.indexOf("y") >= 0 || fmtText.indexOf("h") >= 0
+                        || fmtText.indexOf("s") >= 0) {
                         return true;
                     }
                 }
@@ -181,7 +194,7 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
 
     /**
      * It will replace all occurances of pattern in the source with replacement value
-     *
+     * 
      * @return String
      */
     public static String replace(String source, String pattern, String replacement)
@@ -195,7 +208,7 @@ public class MSExcelTextExtractor implements MimetypeTextExtractor
 
         // Build a new String where pattern is replaced by the replacement
         StringBuffer target = new StringBuffer(source.length());
-        int start = 0;             // The start of a part without the pattern
+        int start = 0; // The start of a part without the pattern
         int end = firstPatternPos; // The end of a part without the pattern
         do {
             target.append(source.substring(start, end));

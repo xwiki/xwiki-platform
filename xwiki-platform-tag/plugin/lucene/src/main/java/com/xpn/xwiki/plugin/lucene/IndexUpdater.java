@@ -55,7 +55,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     /**
      * Milliseconds of sleep between checks for changed documents
      */
-    private int indexingInterval = 3000;
+    private int indexingInterval = 60000;
 
     private boolean exit = false;
 
@@ -405,7 +405,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
 
         this.indexingInterval =
             1000 * Integer.parseInt(config
-                .getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "300"));
+                .getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "60"));
 
         // Note: There's no need to open the Searcher here (with a call to
         // openSearcher()) as each

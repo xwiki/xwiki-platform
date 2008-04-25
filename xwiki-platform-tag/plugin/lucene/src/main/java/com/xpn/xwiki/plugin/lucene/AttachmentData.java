@@ -19,16 +19,17 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.lucene.document.Document;
+import org.apache.lucene.document.Field;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Holds all data but the content of an attachment to be indexed. The content is retrieved at
@@ -43,7 +44,7 @@ public class AttachmentData extends IndexData
      * Mapping from common file name endings to mime types. This is uses as a fallback when text
      * extraction by using the mime type delivered by xwiki doesn't work.
      */
-    static final Map MIMETYPES = new HashMap();
+    static final Map<String, String> MIMETYPES = new HashMap<String, String>();
 
     static {
         MIMETYPES.put("pdf", "application/pdf");
@@ -69,7 +70,7 @@ public class AttachmentData extends IndexData
         final XWikiContext context)
     {
         super(attachment.getDoc(), context);
-        
+
         setModificationDate(attachment.getDate());
         setAuthor(attachment.getAuthor());
         setSize(attachment.getFilesize());

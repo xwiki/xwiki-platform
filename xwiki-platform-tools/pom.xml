@@ -48,6 +48,7 @@
       <artifactId>servlet-api</artifactId>
       <!-- Note: Needed to create a XWikiDocument, and xwiki-core does not provide it anymore.  -->
       <version>2.4</version>
+      <scope>compile</scope>
     </dependency>	
     <dependency>
       <groupId>org.apache.maven</groupId>

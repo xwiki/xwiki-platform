@@ -115,13 +115,6 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
         String source) throws XWikiVelocityException
     {
         return evaluate(context, out, templateName, new StringReader(source));
-/*        try {
-            return getEngine().evaluate(context, out, templateName, source);
-        } catch (Exception e) {
-            throw new XWikiVelocityException("Failed to evaluate content with id [" + templateName
-                + "]", e);
-        }
-        */
     }
 
     /**

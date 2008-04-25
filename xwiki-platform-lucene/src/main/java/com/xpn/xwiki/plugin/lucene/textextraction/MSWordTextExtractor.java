@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 package com.xpn.xwiki.plugin.lucene.textextraction;
+
 import java.io.ByteArrayInputStream;
 
 import org.apache.poi.hwpf.HWPFDocument;
@@ -22,8 +23,10 @@ import org.apache.poi.hwpf.usermodel.Range;
 /**
  * Text extractor for Microsoft Word files.
  */
-public class MSWordTextExtractor implements MimetypeTextExtractor {
-    public String getText(byte[] data) throws Exception {
+public class MSWordTextExtractor implements MimetypeTextExtractor
+{
+    public String getText(byte[] data) throws Exception
+    {
         HWPFDocument wordDoc = new HWPFDocument(new ByteArrayInputStream(data));
         Range range = wordDoc.getRange();
         return range.text();

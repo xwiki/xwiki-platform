@@ -15,20 +15,22 @@
  */
 package com.xpn.xwiki.plugin.lucene.textextraction;
 
-import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.SAXException;
-
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.SAXParser;
 import java.io.ByteArrayInputStream;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
 /**
- * Extracts all text between tags in an XML document. Only works (of course)
- * for well formed XML documents.
- *
+ * Extracts all text between tags in an XML document. Only works (of course) for well formed XML
+ * documents.
  */
-public class XmlTextExtractor implements MimetypeTextExtractor {
-    public String getText(byte[] data) throws Exception {
+public class XmlTextExtractor implements MimetypeTextExtractor
+{
+    public String getText(byte[] data) throws Exception
+    {
         SAXParserFactory factory = SAXParserFactory.newInstance();
         SAXParser parser = factory.newSAXParser();
         MyHandler handler = new MyHandler();
@@ -36,14 +38,17 @@ public class XmlTextExtractor implements MimetypeTextExtractor {
         return handler.getText();
     }
 
-    private static class MyHandler extends DefaultHandler {
+    private static class MyHandler extends DefaultHandler
+    {
         StringBuffer text = new StringBuffer();
 
-        public void characters(char ch[], int start, int length) throws SAXException {
+        public void characters(char ch[], int start, int length) throws SAXException
+        {
             text.append(ch, start, length);
         }
 
-        public String getText() {
+        public String getText()
+        {
             return text.toString();
         }
     }

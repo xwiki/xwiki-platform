@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 package com.xpn.xwiki.plugin.lucene.textextraction;
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.pdfparser.PDFParser;
-import org.pdfbox.util.PDFTextStripper;
 
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
+import java.io.Writer;
 
-public class PDFTextExtractor implements MimetypeTextExtractor {
-    public String getText(byte[] data) throws Exception {
+import org.pdfbox.pdfparser.PDFParser;
+import org.pdfbox.pdmodel.PDDocument;
+import org.pdfbox.util.PDFTextStripper;
+
+public class PDFTextExtractor implements MimetypeTextExtractor
+{
+    public String getText(byte[] data) throws Exception
+    {
         PDDocument pdfDocument = null;
         try {
             PDFParser parser = new PDFParser(new ByteArrayInputStream(data));
@@ -30,13 +34,13 @@ public class PDFTextExtractor implements MimetypeTextExtractor {
 
             pdfDocument = parser.getPDDocument();
 
-            CharArrayWriter writer = new CharArrayWriter();
+            Writer writer = new CharArrayWriter();
             PDFTextStripper stripper = new PDFTextStripper();
             stripper.writeText(pdfDocument, writer);
 
             return writer.toString();
         } finally {
-            if( pdfDocument != null )
+            if (pdfDocument != null)
                 pdfDocument.close();
         }
     }

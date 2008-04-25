@@ -32,7 +32,7 @@
   <artifactId>xwiki-xmldoc-update-plugin</artifactId>
   <name>XWiki Platform - Tools - XML Doc Update Plugin</name>
   <packaging>maven-plugin</packaging>
-  <version>1.1</version>
+  <version>1.2-SNAPSHOT</version>
   <description>
     A Maven plugin to load XWiki documents from XML and perform file attachment or setting
     object properties, before writting the document back to XML
@@ -65,10 +65,4 @@
       <version>2.0</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-xmldoc-update-plugin-1.1</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-xmldoc-update-plugin-1.1</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-xmldoc-update-plugin-1.1</url>
-  </scm>
 </project>

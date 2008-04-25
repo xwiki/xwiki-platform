@@ -640,13 +640,13 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
 
         String subject =
             XWikiVelocityRenderer.evaluate(subjectContent, templateDocFullName,
-                updatedVelocityContext);
+                updatedVelocityContext, context);
         String msg =
             XWikiVelocityRenderer.evaluate(txtContent, templateDocFullName,
-                updatedVelocityContext);
+                updatedVelocityContext, context);
         String html =
             XWikiVelocityRenderer.evaluate(htmlContent, templateDocFullName,
-                updatedVelocityContext);
+                updatedVelocityContext, context);
 
         Mail mail = new Mail();
         mail.setFrom((String) updatedVelocityContext.get("from.address"));

@@ -40,7 +40,18 @@ import com.xpn.xwiki.plugin.PluginApi;
  */
 public class LucenePluginApi extends PluginApi<LucenePlugin>
 {
+    /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(LucenePluginApi.class);
+
+    /**
+     * Return value for {@link #rebuildIndex()} meaning that the caller does not have admin rights.
+     */
+    public static final int REBUILD_NOT_ALLOWED = -1;
+
+    /**
+     * Return value for {@link #rebuildIndex()} meaning that another rebuild is already in progress.
+     */
+    public static final int REBUILD_IN_PROGRESS = -2;
 
     public LucenePluginApi(LucenePlugin plugin, XWikiContext context)
     {
@@ -54,11 +65,10 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      */
     public int rebuildIndex()
     {
-        int nbDocuments = -1;
         if (hasAdminRights()) {
-            nbDocuments = getProtectedPlugin().rebuildIndex(context);
+            return getProtectedPlugin().rebuildIndex(context);
         }
-        return nbDocuments;
+        return REBUILD_NOT_ALLOWED;
     }
 
     /**
@@ -71,11 +81,10 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      */
     public int rebuildIndex(com.xpn.xwiki.api.XWiki wiki, Context context)
     {
-        int nbDocuments = -1;
         if (wiki.hasAdminRights()) {
-            nbDocuments = getProtectedPlugin().rebuildIndex(context.getContext());
+            return getProtectedPlugin().rebuildIndex(context.getContext());
         }
-        return nbDocuments;
+        return REBUILD_NOT_ALLOWED;
     }
 
     /**

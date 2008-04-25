@@ -1511,7 +1511,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String content = object.getStringValue(template);
                     if (!StringUtils.isBlank(content)) {
                         // Let's use this template
-                        return XWikiVelocityRenderer.evaluate(content, skin + "#" + template,
+                        return XWikiVelocityRenderer.evaluate(content, "",
                             (VelocityContext) context.get("vcontext"), context);
                     }
                 }
@@ -1521,7 +1521,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String content = new String(attachment.getContent(context));
                     if (!StringUtils.isBlank(content)) {
                         // Let's use this template
-                        return XWikiVelocityRenderer.evaluate(content, skin + "+" + template,
+                        return XWikiVelocityRenderer.evaluate(content, "",
                             (VelocityContext) context.get("vcontext"), context);
                     }
                 }
@@ -1539,7 +1539,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // separately, and there is no need to have templates in another place.
             if (path.startsWith("/skins/")) {
                 String content = getResourceContent(path);
-                return XWikiVelocityRenderer.evaluate(content, path, (VelocityContext) context
+                return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext) context
                     .get("vcontext"), context);
             } else {
                 LOG.warn("Illegal access, tried to use file [" + path + "] as a template."

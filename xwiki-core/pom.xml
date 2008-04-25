@@ -447,6 +447,12 @@
       <artifactId>yuicompressor</artifactId>
       <version>2.2.5</version>
     </dependency>
+    <!-- Better date manipulation than what JDK provides -->
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>1.4</version>
+    </dependency>
     <!-- RSS Feed processing -->
     <dependency>
       <groupId>rome</groupId>
@@ -535,21 +541,17 @@
     </dependency>
 
     <!-- Things that should probably be removed -->
+    <!--
     <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity-tools</artifactId>
       <version>1.3</version>
     </dependency>
     <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>1.4</version>
-    </dependency>
-    <dependency>
       <groupId>backport-util-concurrent</groupId>
       <artifactId>backport-util-concurrent</artifactId>
       <version>3.0</version>
-    </dependency>
+    </dependency> -->
   </dependencies>
   <build>
     <plugins>

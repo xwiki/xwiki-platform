@@ -19,14 +19,18 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.*;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Handles rebuilding of the whole Index. This involves the following steps:
@@ -51,11 +55,10 @@ public class IndexRebuilder
     public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
     {
         this.indexUpdater = indexUpdater;
-
         if (indexUpdater.needInitialBuild) {
-            int retval = this.rebuildIndex(context);
+            this.rebuildIndex(context);
             if (LOG.isInfoEnabled()) {
-                LOG.info("Initializing Lucene search index, " + retval + " documents found");
+                LOG.info("Launched initial lucene indexing");
             }
         }
     }
@@ -72,28 +75,28 @@ public class IndexRebuilder
     {
         this.indexUpdater.cleanIndex();
         int retval = 0;
-        Collection wikiServers;
+        Collection<String> wikiServers;
         XWiki xwiki = context.getWiki();
 
         if (xwiki.isVirtualMode()) {
             wikiServers = findWikiServers(context);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("found " + wikiServers.size() + " virtual wikis:");
-                for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
-                    LOG.debug(iter.next());
+                for (String wikiName : wikiServers) {
+                    LOG.debug(wikiName);
                 }
             }
         } else {
             // no virtual wiki configuration, just index the wiki the context
             // belongs to
-            wikiServers = new ArrayList();
+            wikiServers = new ArrayList<String>();
             wikiServers.add(context.getDatabase());
         }
 
         // Iterate all found virtual wikis
-        for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
-            int wikiResult = indexWiki((String) iter.next(), context);
-            if (retval != -1) {
+        for (String wikiName : wikiServers) {
+            int wikiResult = indexWiki(wikiName, context);
+            if (retval > 0) {
                 retval += wikiResult;
             }
         }
@@ -123,7 +126,7 @@ public class IndexRebuilder
         try {
             context.setDatabase(wikiName);
 
-            Collection docNames = null;
+            Collection<String> docNames = null;
             try {
                 docNames = xwiki.getStore().searchDocumentsNames("", context);
             } catch (XWikiException e1) {
@@ -131,9 +134,7 @@ public class IndexRebuilder
                 return -1;
             }
 
-            for (Iterator iterator = docNames.iterator(); iterator.hasNext();) {
-                String docName = (String) iterator.next();
-
+            for (String docName : docNames) {
                 XWikiDocument document;
                 try {
                     document = xwiki.getDocument(docName, context);
@@ -170,9 +171,8 @@ public class IndexRebuilder
     {
         int retval = 0;
 
-        Map xwikiObjects = document.getxWikiObjects();
         if (document.hasElement(XWikiDocument.HAS_OBJECTS)) {
-            retval += xwikiObjects.size();
+            retval += document.getxWikiObjects().size();
             this.indexUpdater.addObject(document, wikiContext);
         }
 
@@ -183,7 +183,7 @@ public class IndexRebuilder
     {
         int retval = 0;
 
-        List translations;
+        List<String> translations;
         try {
             translations = document.getTranslationList(wikiContext);
         } catch (XWikiException e) {
@@ -193,14 +193,13 @@ public class IndexRebuilder
             return 0;
         }
 
-        for (Iterator iter = translations.iterator(); iter.hasNext();) {
-            String lang = (String) iter.next();
+        for (String lang : translations) {
             try {
                 this.indexUpdater.add(document.getTranslatedDocument(lang, wikiContext),
                     wikiContext);
                 retval++;
             } catch (XWikiException e1) {
-                LOG.error("error getting translated document for document "
+                LOG.error("Error getting translated document for document "
                     + document.getFullName() + " and language " + lang, e1);
             }
         }
@@ -208,9 +207,9 @@ public class IndexRebuilder
         return retval;
     }
 
-    private Collection findWikiServers(XWikiContext context)
+    private Collection<String> findWikiServers(XWikiContext context)
     {
-        List retval = Collections.EMPTY_LIST;
+        List<String> retval = Collections.emptyList();
 
         try {
             retval = context.getWiki().getVirtualWikisDatabaseNames(context);
@@ -219,7 +218,7 @@ public class IndexRebuilder
                 retval.add(context.getMainXWiki());
             }
         } catch (Exception e) {
-            LOG.error("error getting list of wiki servers!", e);
+            LOG.error("Error getting list of wiki servers!", e);
         }
 
         return retval;

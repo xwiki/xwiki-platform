@@ -27,7 +27,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-core-parent</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4-milestone-2</version>
   </parent>
   <artifactId>xwiki-core</artifactId>
   <name>XWiki Platform - Core - Core</name>

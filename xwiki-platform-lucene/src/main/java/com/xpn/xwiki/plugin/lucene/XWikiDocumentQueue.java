@@ -19,11 +19,11 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.commons.collections.Buffer;
-import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.apache.commons.collections.Buffer;
+import org.apache.commons.collections.buffer.UnboundedFifoBuffer;
 
 /**
  * This class represents a Queue (FirstInFirstOut) for XWikiDocument objects. It is used during
@@ -36,7 +36,7 @@ public class XWikiDocumentQueue
     /**
      * maps names of documents to the document instances itself
      */
-    private Map documentsByName = new HashMap();
+    private Map<String, IndexData> documentsByName = new HashMap<String, IndexData>();
 
     /**
      * maintains fifo order
@@ -48,7 +48,7 @@ public class XWikiDocumentQueue
      */
     public synchronized IndexData remove()
     {
-        return (IndexData) documentsByName.remove(namesQueue.remove());
+        return documentsByName.remove(namesQueue.remove());
     }
 
     /**

@@ -493,7 +493,9 @@ public class XWikiAttachment
             try {
                 context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
             } catch (Exception ex) {
-                LOG.error("Failed to load content for attachment [" + getFilename() + "]", ex);
+                LOG.warn(String.format("Failed to load content for attachment [%s@%s]. "
+                    + "This attachment is broken, please consider re-uploading it.",
+                    getFilename(), (doc != null) ? doc.getFullName() : "<unknown>"));
             }
         }
     }
@@ -506,7 +508,9 @@ public class XWikiAttachment
                     context.getWiki().getAttachmentVersioningStore().loadArchive(this, context,
                         true);
             } catch (Exception ex) {
-                LOG.error("Failed to load archive for attachment [" + getFilename() + "]", ex);
+                LOG.warn(String.format("Failed to load archive for attachment [%s@%s]. "
+                    + "This attachment is broken, please consider re-uploading it.",
+                    getFilename(), (doc != null) ? doc.getFullName() : "<unknown>"));
             }
         }
         return attachment_archive;

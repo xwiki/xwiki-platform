@@ -19,17 +19,15 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import org.apache.commons.lang.time.FastDateFormat;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.apache.commons.lang.time.FastDateFormat;
 
 /**
  * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for
  * proper handling of special field values like dates.
- *
+ * 
  * @version $Id: $
  */
 public abstract class IndexFields
@@ -49,7 +47,7 @@ public abstract class IndexFields
      * Title of the document
      */
     public static final String DOCUMENT_TITLE = "title";
-    
+
     /**
      * Name of the document
      */
@@ -66,9 +64,8 @@ public abstract class IndexFields
     public static final String DOCUMENT_LANGUAGE = "lang";
 
     /**
-     * Type of a document, "attachment", "wikipage" or "objects", used to
-     * control presentation of searchresults.
-     * See {@link SearchResult}and xdocs/searchResult.vm.
+     * Type of a document, "attachment", "wikipage" or "objects", used to control presentation of
+     * searchresults. See {@link SearchResult}and xdocs/searchResult.vm.
      */
     public static final String DOCUMENT_TYPE = "type";
 
@@ -113,10 +110,7 @@ public abstract class IndexFields
      */
     public static final String DATE_FORMAT = "yyyyMMddHHmm";
 
-    private static final FastDateFormat df = FastDateFormat
-        .getInstance(IndexFields.DATE_FORMAT);
-
-    private static final Log LOG = LogFactory.getLog(IndexFields.class);
+    private static final FastDateFormat df = FastDateFormat.getInstance(IndexFields.DATE_FORMAT);
 
     public static final String dateToString(Date date)
     {

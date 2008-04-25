@@ -25,7 +25,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Holds all data but the content of a wiki page to be indexed. The content is retrieved at indexing
  * time, which should save us some memory especially when rebuilding an index for a big wiki.
- *
+ * 
  * @version $Id: $
  */
 public class DocumentData extends IndexData
@@ -33,7 +33,7 @@ public class DocumentData extends IndexData
     public DocumentData(final XWikiDocument doc, final XWikiContext context)
     {
         super(doc, context);
-        
+
         setAuthor(doc.getAuthor());
         setCreator(doc.getCreator());
         setModificationDate(doc.getDate());

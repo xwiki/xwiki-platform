@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 package com.xpn.xwiki.plugin.lucene.textextraction;
-public class PlainTextExtractor implements MimetypeTextExtractor {
-    public String getText(byte[] data) throws Exception {
+
+public class PlainTextExtractor implements MimetypeTextExtractor
+{
+    public String getText(byte[] data) throws Exception
+    {
         return new String(data);
     }
 }

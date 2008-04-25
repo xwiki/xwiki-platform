@@ -15,24 +15,28 @@
  */
 package com.xpn.xwiki.plugin.lucene.textextraction.xmlutil;
 
-import java.util.regex.Pattern;
-import java.util.regex.Matcher;
-import java.text.MessageFormat;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
- * Utility code to detect the encoding of XML provided as a byte array.
- * This code is based on the class com.sun.syndication.io.XmlReader
- * from the Rome project (https://rome.dev.java.net/), which is licensed
- * under the Apache V2 license (and doesn't include a NOTICE file).
+ * Utility code to detect the encoding of XML provided as a byte array. This code is based on the
+ * class com.sun.syndication.io.XmlReader from the Rome project (https://rome.dev.java.net/), which
+ * is licensed under the Apache V2 license (and doesn't include a NOTICE file).
  */
-public class XmlEncodingDetector {
+public class XmlEncodingDetector
+{
     private static final String UTF_8 = "UTF-8";
+
     private static final String UTF_16BE = "UTF-16BE";
+
     private static final String UTF_16LE = "UTF-16LE";
+
     private static final String UTF_16 = "UTF-16";
 
-    public static String detectEncoding(byte[] data) {
+    public static String detectEncoding(byte[] data)
+    {
         String bomEnc = getBOMEncoding(data);
         String xmlGuessEnc = getXMLGuessEncoding(data);
         String xmlEnc = getXMLPrologEncoding(data, xmlGuessEnc);
@@ -42,7 +46,8 @@ public class XmlEncodingDetector {
 
     // returns the BOM in the stream, NULL if not present,
     // if there was BOM the in the stream it is consumed
-    private static String getBOMEncoding(byte[] bytes) {
+    private static String getBOMEncoding(byte[] bytes)
+    {
         String encoding = null;
 
         if (bytes[0] == 0xFE && bytes[1] == 0xFF) {
@@ -56,29 +61,28 @@ public class XmlEncodingDetector {
     }
 
     // returns the best guess for the encoding by looking the first bytes of the stream, '<?'
-    private static String getXMLGuessEncoding(byte[] bytes) {
+    private static String getXMLGuessEncoding(byte[] bytes)
+    {
         String encoding = null;
 
         if (bytes[0] == 0x00 && bytes[1] == 0x3C && bytes[2] == 0x00 && bytes[3] == 0x3F) {
-                encoding = UTF_16BE;
-        }
-        else
-        if (bytes[0] == 0x3C && bytes[1] == 0x00 && bytes[2] == 0x3F && bytes[3] == 0x00) {
-                encoding = UTF_16LE;
-        }
-        else
-        if (bytes[0] == 0x3C && bytes[1] == 0x3F && bytes[2] == 0x78 && bytes[3] == 0x6D) {
+            encoding = UTF_16BE;
+        } else if (bytes[0] == 0x3C && bytes[1] == 0x00 && bytes[2] == 0x3F && bytes[3] == 0x00) {
+            encoding = UTF_16LE;
+        } else if (bytes[0] == 0x3C && bytes[1] == 0x3F && bytes[2] == 0x78 && bytes[3] == 0x6D) {
             encoding = UTF_8;
         }
         return encoding;
     }
 
-    private static final Pattern ENCODING_PATTERN = Pattern.compile("^<\\?xml.*encoding=\"(.*)\".*\\?>");
+    private static final Pattern ENCODING_PATTERN =
+        Pattern.compile("^<\\?xml.*encoding=\"(.*)\".*\\?>");
 
-    // returns the encoding declared in the <?xml encoding=...?>,  NULL if none
-    private static String getXMLPrologEncoding(byte[] data,String guessedEnc) {
+    // returns the encoding declared in the <?xml encoding=...?>, NULL if none
+    private static String getXMLPrologEncoding(byte[] data, String guessedEnc)
+    {
         String encoding = null;
-        if (guessedEnc!=null) {
+        if (guessedEnc != null) {
             if (data.length > -1) {
                 int endFirstLinePos = Math.min(data.length, 1024);
                 for (int i = 0; i < 1024 && i < data.length; i++) {
@@ -100,49 +104,48 @@ public class XmlEncodingDetector {
         return encoding;
     }
 
-    private static String calculateRawEncoding(String bomEnc,String xmlGuessEnc,String xmlEnc) {
+    private static String calculateRawEncoding(String bomEnc, String xmlGuessEnc, String xmlEnc)
+    {
         String encoding;
-        if (bomEnc==null) {
-            if (xmlGuessEnc==null || xmlEnc==null) {
+        if (bomEnc == null) {
+            if (xmlGuessEnc == null || xmlEnc == null) {
                 encoding = UTF_8;
-            }
-            else
-            if (xmlEnc.equals(UTF_16) && (xmlGuessEnc.equals(UTF_16BE) || xmlGuessEnc.equals(UTF_16LE))) {
+            } else if (xmlEnc.equals(UTF_16)
+                && (xmlGuessEnc.equals(UTF_16BE) || xmlGuessEnc.equals(UTF_16LE))) {
                 encoding = xmlGuessEnc;
-            }
-            else {
+            } else {
                 encoding = xmlEnc;
             }
-        }
-        else
-        if (bomEnc.equals(UTF_8)) {
-            if (xmlGuessEnc!=null && !xmlGuessEnc.equals(UTF_8)) {
-                throw new RuntimeException(RAW_EX_1.format(new Object[]{bomEnc,xmlGuessEnc,xmlEnc}));
+        } else if (bomEnc.equals(UTF_8)) {
+            if (xmlGuessEnc != null && !xmlGuessEnc.equals(UTF_8)) {
+                throw new RuntimeException(RAW_EX_1.format(new Object[] {bomEnc, xmlGuessEnc,
+                xmlEnc}));
             }
-            if (xmlEnc!=null && !xmlEnc.equals(UTF_8)) {
-                throw new RuntimeException(RAW_EX_1.format(new Object[]{bomEnc,xmlGuessEnc,xmlEnc}));
+            if (xmlEnc != null && !xmlEnc.equals(UTF_8)) {
+                throw new RuntimeException(RAW_EX_1.format(new Object[] {bomEnc, xmlGuessEnc,
+                xmlEnc}));
             }
             encoding = UTF_8;
-        }
-        else
-        if (bomEnc.equals(UTF_16BE) || bomEnc.equals(UTF_16LE)) {
-            if (xmlGuessEnc!=null && !xmlGuessEnc.equals(bomEnc)) {
-                throw new RuntimeException(RAW_EX_1.format(new Object[]{bomEnc,xmlGuessEnc,xmlEnc}));
+        } else if (bomEnc.equals(UTF_16BE) || bomEnc.equals(UTF_16LE)) {
+            if (xmlGuessEnc != null && !xmlGuessEnc.equals(bomEnc)) {
+                throw new RuntimeException(RAW_EX_1.format(new Object[] {bomEnc, xmlGuessEnc,
+                xmlEnc}));
             }
-            if (xmlEnc!=null && !xmlEnc.equals(UTF_16) && !xmlEnc.equals(bomEnc)) {
-                throw new RuntimeException(RAW_EX_1.format(new Object[]{bomEnc,xmlGuessEnc,xmlEnc}));
+            if (xmlEnc != null && !xmlEnc.equals(UTF_16) && !xmlEnc.equals(bomEnc)) {
+                throw new RuntimeException(RAW_EX_1.format(new Object[] {bomEnc, xmlGuessEnc,
+                xmlEnc}));
             }
-            encoding =bomEnc;
-        }
-        else {
-            throw new RuntimeException(RAW_EX_2.format(new Object[]{bomEnc,xmlGuessEnc,xmlEnc}));
+            encoding = bomEnc;
+        } else {
+            throw new RuntimeException(RAW_EX_2
+                .format(new Object[] {bomEnc, xmlGuessEnc, xmlEnc}));
         }
         return encoding;
     }
 
-    private static final MessageFormat RAW_EX_1 = new MessageFormat(
-            "Invalid encoding, BOM [{0}] XML guess [{1}] XML prolog [{2}] encoding mismatch");
+    private static final MessageFormat RAW_EX_1 =
+        new MessageFormat("Invalid encoding, BOM [{0}] XML guess [{1}] XML prolog [{2}] encoding mismatch");
 
-    private static final MessageFormat RAW_EX_2 = new MessageFormat(
-            "Invalid encoding, BOM [{0}] XML guess [{1}] XML prolog [{2}] unknown BOM");
+    private static final MessageFormat RAW_EX_2 =
+        new MessageFormat("Invalid encoding, BOM [{0}] XML guess [{1}] XML prolog [{2}] unknown BOM");
 }

@@ -327,8 +327,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             e.printStackTrace();
             throw new XWikiException(XWikiException.MODULE_XWIKI,
                 XWikiException.ERROR_XWIKI_INIT_FAILED,
-                "Could not initialize main XWiki context",
-                e);
+                "Could not initialize main XWiki context", e);
         }
     }
 
@@ -563,8 +562,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 XWikiDocument doc = xwiki.getDocument(serverwikipage, context);
                 if (doc.isNew()) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI,
-                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki " + appname + " does not exist");
+                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "The wiki " + appname
+                            + " does not exist");
                 }
 
                 // Set the wiki owner
@@ -600,8 +599,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
                 XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                "Exception while getting URL from request",
-                e);
+                "Exception while getting URL from request", e);
         }
     }
 
@@ -671,8 +669,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                 if (doc.isNew()) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI,
-                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki " + servername + " does not exist");
+                        XWikiException.ERROR_XWIKI_DOES_NOT_EXIST, "The wiki " + servername
+                            + " does not exist");
                 }
 
                 wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
@@ -719,9 +717,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             Object[] args = {xwikicfgpath};
             throw new XWikiException(XWikiException.MODULE_XWIKI_CONFIG,
                 XWikiException.ERROR_XWIKI_CONFIG_FILENOTFOUND,
-                "Configuration file {0} not found",
-                e,
-                args);
+                "Configuration file {0} not found", e, args);
         }
     }
 
@@ -865,9 +861,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             Object[] args = {param, storeclass};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_CLASSINVOCATIONERROR,
-                "Cannot load class {1} from param {0}",
-                ecause,
-                args);
+                "Cannot load class {1} from param {0}", ecause, args);
         }
     }
 
@@ -1210,8 +1204,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // The name isn't good. The most frequent cause for this is a kind of spam attempt which
             // gives some ugly URLs.
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION,
-                "Invalid document name: " + fullname);
+                XWikiException.ERROR_XWIKI_APP_URL_EXCEPTION, "Invalid document name: "
+                    + fullname);
         }
         return getDocument(doc, context);
     }
@@ -1511,6 +1505,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String content = object.getStringValue(template);
                     if (!StringUtils.isBlank(content)) {
                         // Let's use this template
+                        // Use "" as namespace to register macros in global namespace. That way it
+                        // can be used in a renderer content not parsed at the same level.
                         return XWikiVelocityRenderer.evaluate(content, "",
                             (VelocityContext) context.get("vcontext"), context);
                     }
@@ -1521,6 +1517,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String content = new String(attachment.getContent(context));
                     if (!StringUtils.isBlank(content)) {
                         // Let's use this template
+                        // Use "" as namespace to register macros in global namespace. That way it
+                        // can be used in a renderer content not parsed at the same level.
                         return XWikiVelocityRenderer.evaluate(content, "",
                             (VelocityContext) context.get("vcontext"), context);
                     }
@@ -1539,6 +1537,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // separately, and there is no need to have templates in another place.
             if (path.startsWith("/skins/")) {
                 String content = getResourceContent(path);
+                // Use "" as namespace to register macros in global namespace. That way it can be
+                // used in a renderer content not parsed at the same level.
                 return XWikiVelocityRenderer.evaluate(content, "", (VelocityContext) context
                     .get("vcontext"), context);
             } else {
@@ -2966,10 +2966,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             e.printStackTrace();
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_VALIDATE_USER,
-                "Exception while validating user",
-                e,
-                null);
+                XWikiException.ERROR_XWIKI_APP_VALIDATE_USER, "Exception while validating user",
+                e, null);
         }
     }
 
@@ -3043,9 +3041,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             e.printStackTrace();
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_CREATE_USER,
-                "Exception while creating user",
-                e,
+                XWikiException.ERROR_XWIKI_APP_CREATE_USER, "Exception while creating user", e,
                 null);
         }
     }
@@ -3099,9 +3095,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                 XWikiException.ERROR_XWIKI_EMAIL_CANNOT_GET_VALIDATION_CONFIG,
-                "Exception while reading the validation email config",
-                e,
-                null);
+                "Exception while reading the validation email config", e, null);
 
         }
 
@@ -3116,9 +3110,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                 XWikiException.ERROR_XWIKI_EMAIL_CANNOT_PREPARE_VALIDATION_EMAIL,
-                "Exception while preparing the validation email",
-                e,
-                null);
+                "Exception while preparing the validation email", e, null);
 
         }
 
@@ -3162,9 +3154,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 Object[] args = {server, port, new Integer(reply), smtpc.getReplyString()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                     XWikiException.ERROR_XWIKI_EMAIL_CONNECT_FAILED,
-                    "Could not connect to server {0} port {1} error code {2} ({3})",
-                    null,
-                    args);
+                    "Could not connect to server {0} port {1} error code {2} ({3})", null, args);
             }
 
             if (smtpc.login(login) == false) {
@@ -3172,8 +3162,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 Object[] args = {server, port, new Integer(reply), smtpc.getReplyString()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                     XWikiException.ERROR_XWIKI_EMAIL_LOGIN_FAILED,
-                    "Could not login to mail server {0} port {1} error code {2} ({3})",
-                    null,
+                    "Could not login to mail server {0} port {1} error code {2} ({3})", null,
                     args);
             }
 
@@ -3182,18 +3171,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 Object[] args = {server, port, new Integer(reply), smtpc.getReplyString()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                     XWikiException.ERROR_XWIKI_EMAIL_SEND_FAILED,
-                    "Could not send mail to server {0} port {1} error code {2} ({3})",
-                    null,
-                    args);
+                    "Could not send mail to server {0} port {1} error code {2} ({3})", null, args);
             }
 
         } catch (IOException e) {
             Object[] args = {sender, recipient};
             throw new XWikiException(XWikiException.MODULE_XWIKI_EMAIL,
                 XWikiException.ERROR_XWIKI_EMAIL_ERROR_SENDING_EMAIL,
-                "Exception while sending email from {0} to {1}",
-                e,
-                args);
+                "Exception while sending email from {0} to {1}", e, args);
         } finally {
             if ((smtpc != null) && (smtpc.isConnected())) {
                 try {
@@ -3266,10 +3251,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             Object[] args = {"XWiki." + xwikiname};
             throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                XWikiException.ERROR_XWIKI_USER_CREATE,
-                "Cannot create user {0}",
-                e,
-                args);
+                XWikiException.ERROR_XWIKI_USER_CREATE, "Cannot create user {0}", e, args);
         }
     }
 
@@ -4391,9 +4373,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             setPhonyDocument(docName, context, vcontext);
             throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
                 XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                "Access to document {0} has been denied to user {1}",
-                null,
-                args);
+                "Access to document {0} has been denied to user {1}", null, args);
         } else if (checkActive(context) == 0) {
             boolean allow = false;
             String allowed = Param("xwiki.inactiveuser.allowedpages", "");
@@ -4410,10 +4390,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 Object[] args = {context.getUser()};
                 setPhonyDocument(docName, context, vcontext);
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
-                    XWikiException.ERROR_XWIKI_USER_INACTIVE,
-                    "User {0} account is inactive",
-                    null,
-                    args);
+                    XWikiException.ERROR_XWIKI_USER_INACTIVE, "User {0} account is inactive",
+                    null, args);
             }
         }
 
@@ -4706,9 +4684,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             Object[] args = {className};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
-                "Service {0} not found",
-                e,
+                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND, "Service {0} not found", e,
                 args);
         }
     }
@@ -4738,9 +4714,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } catch (Exception e) {
             Object[] args = {className};
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND,
-                "Service {0} not found",
-                e,
+                XWikiException.ERROR_XWIKI_APP_SERVICE_NOT_FOUND, "Service {0} not found", e,
                 args);
         }
     }

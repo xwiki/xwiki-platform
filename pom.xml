@@ -50,8 +50,8 @@
   </dependencies>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tool.verification.version>1.8</platform.tool.verification.version>
-    <platform.tool.test.version>1.9</platform.tool.test.version>
+    <platform.tool.verification.version>1.10-SNAPSHOT</platform.tool.verification.version>
+    <platform.tool.test.version>1.10-SNAPSHOT</platform.tool.test.version>
   </properties>
   <modules>
     <module>xwiki-xmlrpc</module>

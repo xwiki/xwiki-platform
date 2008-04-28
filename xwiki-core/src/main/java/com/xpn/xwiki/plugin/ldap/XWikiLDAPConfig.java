@@ -172,23 +172,25 @@ public final class XWikiLDAPConfig
 
         String param = getLDAPParam("ldap_group_mapping", "", context);
 
-        String[] mappingTable = param.split("\\|");
+        if (param.trim().length() > 0) {
+            String[] mappingTable = param.split("\\|");
 
-        for (int i = 0; i < mappingTable.length; ++i) {
-            String mapping = mappingTable[i].trim();
+            for (int i = 0; i < mappingTable.length; ++i) {
+                String mapping = mappingTable[i].trim();
 
-            int splitIndex = mapping.indexOf('=');
+                int splitIndex = mapping.indexOf('=');
 
-            if (splitIndex < 1) {
-                LOG.error("Error parsing ldap_group_mapping attribute: " + mapping);
-            } else {
-                String xwikigroup = mapping.substring(0, splitIndex);
-                String ldapgroup = mapping.substring(splitIndex + 1);
+                if (splitIndex < 1) {
+                    LOG.error("Error parsing ldap_group_mapping attribute: " + mapping);
+                } else {
+                    String xwikigroup = mapping.substring(0, splitIndex);
+                    String ldapgroup = mapping.substring(splitIndex + 1);
 
-                groupMappings.put(ldapgroup, xwikigroup);
+                    groupMappings.put(ldapgroup, xwikigroup);
 
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Groupmapping found: " + xwikigroup + " " + ldapgroup);
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Groupmapping found: " + xwikigroup + " " + ldapgroup);
+                    }
                 }
             }
         }

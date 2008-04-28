@@ -41,7 +41,7 @@
   <properties>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.13-SNAPSHOT</platform.tool.configuration.version>
-    <platform.core.version>1.4-SNAPSHOT</platform.core.version>
+    <platform.core.version>1.5-SNAPSHOT</platform.core.version>
     <platform.skin.albatross.version>1.7-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.5-SNAPSHOT</platform.skin.toucan.version>
   </properties>

@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-wiki-manager</artifactId>
   <name>XWiki Platform - Plugins - Wiki Manager</name>
-  <version>1.2-SNAPSHOT</version>
+  <version>1.2-milestone-2</version>
   <description>XWiki Platform - Plugins - Wiki Manager</description>
   <properties>
     <platform.tool.verification.version>1.9</platform.tool.verification.version>
@@ -79,4 +79,10 @@
       </plugin>
     </plugins>
   </build>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.2-milestone-2</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.2-milestone-2</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-wiki-manager-1.2-milestone-2</url>
+  </scm>
 </project>

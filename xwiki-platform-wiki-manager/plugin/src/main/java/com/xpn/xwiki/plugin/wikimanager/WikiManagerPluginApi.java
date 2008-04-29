@@ -507,6 +507,18 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
+     * Indicate if the provided wiki name could be used to create a new wiki.
+     * 
+     * @param wikiName the name of the wiki.
+     * @return true if the name is already used, false otherwise.
+     * @throws XWikiException error when trying to find an existing database/schema by name.
+     */
+    public boolean isWikiNameAvailable(String wikiName) throws XWikiException
+    {
+        return this.context.getWiki().getStore().isWikiNameAvailable(wikiName, this.context);
+    }
+
+    /**
      * Change the {@link XWikiServerClass} "visibility" field of a wiki descriptor document.
      * 
      * @param wikiName the name of the wiki descriptor.

@@ -1,6 +1,10 @@
 ###
 ###
 ###
+#set($param = "")
+#if ($sectionNumber && ($sectionNumber != 0))
+   #set($param = "section=$sectionNumber")
+#end
 #if((!$showactions)||($showactions==1))
 #set($keyboardShortcutsEnabled = ($editor!="wysiwyg"))
 <script type="text/javascript">
@@ -84,10 +88,6 @@ $msg.get("core.comment"): <input type="text" name="comment" value="" size="80" /
 #end
 #end
 
-#set($param = "")
-#if ($sectionNumber && ($sectionNumber != 0))
-   #set($param = "section=$sectionNumber")
-#end
 <div>
   <span class="buttonwrapper"><input class="button" type="submit" name="formactioncancel" #if ($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.cancel")"#end value="$msg.get("cancel")" onclick="cancelEdit();"/></span>
 #if($previewenabled)  <span class="buttonwrapper"><input class="button" type="submit" name="formactionpreview" #if ($keyboardShortcutsEnabled)title="$msg.get("core.shortcuts.edit.preview")"#end value="$msg.get("preview")" onclick="preview(); return false;"/></span>

@@ -4092,13 +4092,13 @@ public class XWikiDocument
         List<DocumentSection> splitSections = getSplitSectionsAccordingToTitle();
         int indexEnd = 0;
         // get current section
-        DocumentSection section = splitSections.get(sectionNumber);
+        DocumentSection section = splitSections.get(sectionNumber - 1);
         int indexStart = section.getSectionIndex();
         String sectionLevel = section.getSectionLevel();
         // Determine where this section ends, which is at the start of the next section of the
         // same or a higher level.
         for (int i = sectionNumber; i < splitSections.size(); i++) {
-            DocumentSection nextSection = splitSections.get(i + 1);
+            DocumentSection nextSection = splitSections.get(i);
             String nextLevel = nextSection.getSectionLevel();
             if (sectionLevel.equals(nextLevel) || sectionLevel.length() > nextLevel.length()) {
                 indexEnd = nextSection.getSectionIndex();

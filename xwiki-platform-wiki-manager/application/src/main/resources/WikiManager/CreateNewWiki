@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1208861763000</date>
-<contentUpdateDate>1208861763000</contentUpdateDate>
-<version>24.1</version>
+<date>1209489360000</date>
+<contentUpdateDate>1209489360000</contentUpdateDate>
+<version>63.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -149,6 +149,10 @@
 #set ($WSTEPID_SUMMARY = 5)  ## Summary be fore create
 #set ($WSTEPNAME_SUMMARY = "wstep_summary")
 #set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
+#set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiNameAvailableService").externalURL)
+#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;This identifier is already used&lt;/div&gt;")
+#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;Identifier can't be empty&lt;/div&gt;")
+#set ($MSG_INFO_WIKINAMEVALID = "&lt;div class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;/span&gt;You can use this name as new wiki identifier&lt;/div&gt;")
 ##
 ############################################################################################
 ## REQUEST PARAMETERS
@@ -310,7 +314,37 @@
 
  function validateWikiName()
  {
-   $("wikiname").value = noaccent($("wikiname").value).toLowerCase();
+ $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
+ 
+   $('wikiname').value = noaccent($('wikiname').value).toLowerCase();
+   
+   if ($('wikiname').value &amp;&amp; $('wikiname').value != "")
+   {
+   $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
+   
+     var surl = "$ISWIKINAMEAVAILABLE" + "?xpage=plain&amp;ajax=1&amp;wikiname=" + escape($("wikiname").value);
+     new Ajax.Request(surl,
+               {
+                 method: 'get',
+                 onSuccess: function(transport) {
+                     if (transport.responseText == "true")
+                     {
+                       $('wikinamevalidation').innerHTML = "$MSG_INFO_WIKINAMEVALID";
+                       $('actioncreatebutton').disabled = false;
+                     }
+                     else
+                     {
+                       $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEALREADYUSED";
+                       $('actioncreatebutton').disabled = true;
+                     }
+                   }
+               });
+   }
+   else
+   {
+     $('wikinamevalidation').innerHTML = "$MSG_ERROR_WIKINAMEEMPTY";
+     $('actioncreatebutton').disabled = true;
+   }
  }
  
  function wikiNameChanged()
@@ -361,7 +395,11 @@
         &lt;td&gt;
           &lt;dl&gt;
            &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiname")&lt;/dt&gt;
-           &lt;dd&gt;&lt;input size="40" id="wikiname" name="wikiname" type="text" onchange="wikiNameChanged();" /&gt;&lt;/dd&gt;
+           &lt;dd&gt;
+             &lt;input size="40" id="wikiname" name="wikiname" type="text" onkeyup="wikiNameChanged();" /&gt;
+             &lt;br /&gt;
+             &lt;div id="wikinamevalidation"&gt;&lt;/div&gt;
+           &lt;/dd&gt;
          &lt;/dl&gt;
         &lt;/td&gt;
         #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.wikiname")&lt;/td&gt; #end
@@ -538,14 +576,17 @@
       &lt;br /&gt;
       #if ($request.stepbystep) &lt;input type="hidden" name="stepbystep" value="$request.stepbystep" /&gt; #end
       #if ($request.doc) &lt;input type="hidden" name="doc" value="$request.doc" /&gt; #end
-      &lt;input type="submit" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
+      &lt;input type="submit" id="actioncreatebutton" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
     &lt;/div&gt;
   &lt;/fieldset&gt;
 &lt;/form&gt;
-#if ($wstepbystep)
+
 {pre}
 &lt;script type="text/javascript"&gt;
 // &lt;![CDATA[
+ validateWikiName()
+
+#if ($wstepbystep) 
  showStep();
 
  if ($("XWiki.XWikiServerClass_0_server").value != "")
@@ -553,8 +594,8 @@
   
  if ($("XWiki.XWikiServerClass_0_wikiprettyname").value != "")
    prettynamesetted = true;
+#end
 // ]]&gt;
 &lt;/script&gt;
-{/pre}
-#end</content>
+{/pre}</content>
 </xwikidoc>

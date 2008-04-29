@@ -166,9 +166,14 @@ public class XWikiDocumentTest extends MockObjectTestCase
         sections = document.getSplitSectionsAccordingToTitle();
         assertEquals(3, sections.size());
         assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n", document.getContentOfSection(1));
         assertEquals("1.1", sections.get(1).getSectionLevel());
+        assertEquals("1.1 Subsection 2\nContent of second section\n",
+            document.getContentOfSection(2));
         assertEquals(3, sections.get(2).getSectionNumber());
         assertEquals(80, sections.get(2).getSectionIndex());
+        assertEquals("1 Section 3\nContent of section 3", document.getContentOfSection(3));
         // Test comments don't break the section editing
         document.setContent("1 Section 1\n" + "Content of first section\n"
             + "## 1.1 Subsection 2\n" + "Content of second section\n" + "1 Section 3\n"
@@ -205,6 +210,6 @@ public class XWikiDocumentTest extends MockObjectTestCase
         assertEquals(3, sections.size());
         assertEquals(2, sections.get(0).getSectionIndex());
         assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
-        assertEquals(43, sections.get(1).getSectionIndex());
+        assertEquals(43, sections.get(1).getSectionIndex());                        
     }
 }

@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
-
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -35,7 +34,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 
 /**
  * Unit tests for {@link XWikiDocument}.
- * 
+ *
  * @version $Id: $
  */
 public class XWikiDocumentTest extends MockObjectTestCase
@@ -56,8 +55,8 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.document = new XWikiDocument("Space", "Page");
 
         this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
-            new XWikiConfig(), this.context});
+            mock(XWiki.class, new Class[]{XWikiConfig.class, XWikiContext.class}, new Object[]{
+                new XWikiConfig(), this.context});
         this.mockXWiki.stubs().method("Param").will(returnValue(null));
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);
@@ -210,6 +209,31 @@ public class XWikiDocumentTest extends MockObjectTestCase
         assertEquals(3, sections.size());
         assertEquals(2, sections.get(0).getSectionIndex());
         assertEquals("Subsection 2  ", sections.get(1).getSectionTitle());
-        assertEquals(43, sections.get(1).getSectionIndex());                        
+        assertEquals(43, sections.get(1).getSectionIndex());
+    }
+
+    public void testUpdateDocumentSection() throws XWikiException
+    {
+        List<DocumentSection> sections;
+        // Fill the document
+        document.setContent("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n" + "1 Section 3\n" + "Content of section 3");
+        String content =
+            document.updateDocumentSection(3, "1 Section 3\n" + "Modified content of section 3");
+        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n" + "1 Section 3\n" + "Modified content of section 3",
+            content);
+        document.setContent(content);
+        sections = document.getSplitSectionsAccordingToTitle();
+        assertEquals(3, sections.size());
+        assertEquals("Section 1", sections.get(0).getSectionTitle());
+        assertEquals("1 Section 1\n" + "Content of first section\n" + "1.1 Subsection 2\n"
+            + "Content of second section\n", document.getContentOfSection(1));
+        assertEquals("1.1", sections.get(1).getSectionLevel());
+        assertEquals("1.1 Subsection 2\nContent of second section\n",
+            document.getContentOfSection(2));
+        assertEquals(3, sections.get(2).getSectionNumber());
+        assertEquals(80, sections.get(2).getSectionIndex());
+        assertEquals("1 Section 3\nModified content of section 3", document.getContentOfSection(3));
     }
 }

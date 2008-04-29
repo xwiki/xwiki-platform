@@ -86,7 +86,7 @@ public class XWikiStatsReader
 
         return list;
     }
-    
+
     /**
      * @param range the range.
      * @return the corresponding sort order.
@@ -142,7 +142,7 @@ public class XWikiStatsReader
      * 
      * @param action the action for which to retrieve statistics.
      * @param scope the set of documents to consider.
-     * @param period the period of time.
+     * @param period the period of time, including its start date but excluding its end date.
      * @param step the step used for sampling the period.
      * @param context the XWiki context.
      * @return a map of (date, actionCount) pairs.
@@ -183,7 +183,7 @@ public class XWikiStatsReader
      *            or "download". If the action is "view" then the documents are ordered by the
      *            number of times they have been viewed so far.
      * @param scope the set of documents for which to retrieve statistics.
-     * @param period the period of time.
+     * @param period the period of time, including its start date but excluding its end date.
      * @param range the sub-range to return from the entire result set. Use this parameter for
      *            pagination.
      * @param context the XWiki context.
@@ -205,7 +205,7 @@ public class XWikiStatsReader
         try {
             String query = MessageFormat.format(
                 "select name, sum(pageViews) from DocumentStats"
-                + " where {0} and action=? and ? <= period and period <= ? group by name order"
+                + " where {0} and action=? and ? <= period and period < ? group by name order"
                 + " by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(action);
@@ -260,7 +260,7 @@ public class XWikiStatsReader
      * 
      * @param domain the domain used for filtering the results.
      * @param scope the scope of referred documents for which to retrieve statistics.
-     * @param period the period of time.
+     * @param period the period of time, including its start date but excluding its end date.
      * @param range the sub-range to return from the entire result set. Use this parameter for
      *            pagination.
      * @param context the XWiki context.
@@ -281,7 +281,7 @@ public class XWikiStatsReader
         try {
             String query = MessageFormat.format(
                 "select name, sum(pageViews) from RefererStats"
-                + " where {0} and referer like ? and ? <= period and period <= ? group by name"
+                + " where {0} and referer like ? and ? <= period and period < ? group by name"
                 + " order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(getHqlValidDomain(domain));
@@ -309,7 +309,7 @@ public class XWikiStatsReader
      * @param domain the domain for which to retrieve statistics. To retrieve statistics for all
      *            domains use the empty string.
      * @param scope the scope of referred documents to use for filtering the results.
-     * @param period the period of time.
+     * @param period the period of time, including its start date but excluding its end date.
      * @param range the sub-range to return from the entire result set. Use this parameter for
      *            pagination.
      * @param context the XWiki context.
@@ -330,7 +330,7 @@ public class XWikiStatsReader
         try {
             String query =
                 MessageFormat.format("select referer, sum(pageViews) from RefererStats"
-                    + " where {0} and referer like ? and ? <= period and period <= ?"
+                    + " where {0} and referer like ? and ? <= period and period < ?"
                     + " group by referer order by sum(pageViews) {1}", nameFilter, sortOrder);
 
             paramList.add(getHqlValidDomain(domain));
@@ -384,7 +384,7 @@ public class XWikiStatsReader
      * @param action the action the results should be ordered by. It can be one of: "view", "save"
      *            or "download". If the action is "view" then the visitors are ordered by the number
      *            of pages they have viewed so far.
-     * @param period the period of time.
+     * @param period the period of time, including its start date but excluding its end date.
      * @param range the sub-range to return from the entire result set. Use this parameter for
      *            pagination.
      * @param context the XWiki context.

@@ -198,9 +198,6 @@ overflow: hidden;
 border: 0 solid blue;
 }
 
-
-
-
 .quote {
   font-style: italic;
   color: inherit;
@@ -553,6 +550,16 @@ a.footnoteBackRef{
 }
 /* @end */
 
+/* @wysiwyg */
+
+.vcomment {
+  background-color: #F9F9F9;
+  font-style: italic;
+  margin-left: 5px;
+  margin-right: 10px;
+}
+
+/* @end */
 
 /* @group Layout */
 body{

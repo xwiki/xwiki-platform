@@ -41,6 +41,8 @@ public class XWikiPluginManager
 
     private Vector<String> plugins = new Vector<String>();
 
+    private Vector<String> pluginClassNames = new Vector<String>();
+
     private Map<String, XWikiPluginInterface> plugins_classes =
         new HashMap<String, XWikiPluginInterface>();
 
@@ -65,6 +67,12 @@ public class XWikiPluginManager
     @SuppressWarnings("unchecked")
     public void addPlugin(String name, String className, XWikiContext context)
     {
+        if (pluginClassNames.contains(className)) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info(String.format("Skipping already registered plugin [%s]", name));
+            }
+            return;
+        }
         try {
             Class< ? >[] classes = new Class< ? >[3];
             classes[0] = String.class;
@@ -80,13 +88,13 @@ public class XWikiPluginManager
             if (plugin != null) {
                 plugins.add(plugin.getName());
                 plugins_classes.put(plugin.getName(), plugin);
+                pluginClassNames.add(className);
                 initPlugin(plugin, pluginClass, context);
             }
         } catch (Exception ex) {
             // Log an error but do not fai
             LOG.error("Cannot initialize plugin [" + className + "]", ex);
         }
-
     }
 
     public void removePlugin(String className)

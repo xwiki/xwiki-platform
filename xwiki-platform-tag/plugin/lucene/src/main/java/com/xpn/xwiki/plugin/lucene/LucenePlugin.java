@@ -77,6 +77,8 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     public static final String PROP_ANALYZER = "xwiki.plugins.lucene.analyzer";
 
     public static final String PROP_INDEXING_INTERVAL = "xwiki.plugins.lucene.indexinterval";
+    
+    public static final String PROP_MAX_QUEUE_SIZE = "xwiki.plugins.lucene.maxQueueSize";
 
     private static final String DEFAULT_ANALYZER =
         "org.apache.lucene.analysis.standard.StandardAnalyzer";
@@ -142,7 +144,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
 
     public synchronized int rebuildIndex(XWikiContext context)
     {
-        return indexRebuilder.rebuildIndex(context);
+        return indexRebuilder.startRebuildIndex(context);
     }
 
     /**
@@ -419,8 +421,8 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
             bQuery.add(parsedQuery, BooleanClause.Occur.MUST);
         } else if (query.startsWith("MULTI ")) {
             // for fulltext search
-            List fieldList = IndexUpdater.fields;
-            String[] fields = (String[]) fieldList.toArray(new String[fieldList.size()]);
+            List<String> fieldList = IndexUpdater.fields;
+            String[] fields = fieldList.toArray(new String[fieldList.size()]);
             BooleanClause.Occur[] flags = new BooleanClause.Occur[fields.length];
             for (int i = 0; i < flags.length; i++) {
                 flags[i] = BooleanClause.Occur.SHOULD;
@@ -497,7 +499,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
         indexUpdater = new IndexUpdater();
         indexUpdater.setAnalyzer(analyzer);
         indexUpdater.init(config, this, context);
-        indexUpdaterThread = new Thread(indexUpdater);
+        indexUpdaterThread = new Thread(indexUpdater, "Lucene Index Updater");
         indexUpdaterThread.start();
         indexRebuilder = new IndexRebuilder(indexUpdater, context);
 
@@ -550,7 +552,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     public static Searcher[] createSearchers(String indexDirs) throws Exception
     {
         String[] dirs = StringUtils.split(indexDirs, ",");
-        List searchersList = new ArrayList();
+        List<IndexSearcher> searchersList = new ArrayList<IndexSearcher>();
         for (int i = 0; i < dirs.length; i++) {
             try {
                 IndexReader reader = IndexReader.open(dirs[i]);
@@ -561,7 +563,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
             }
         }
 
-        return (Searcher[]) searchersList.toArray(new Searcher[searchersList.size()]);
+        return searchersList.toArray(new Searcher[searchersList.size()]);
     }
 
     /**

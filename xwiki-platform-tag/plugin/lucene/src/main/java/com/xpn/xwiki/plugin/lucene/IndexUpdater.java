@@ -21,11 +21,16 @@ package com.xpn.xwiki.plugin.lucene;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.logging.LogFactory;
 import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Field;
@@ -50,11 +55,10 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterface,
     XWikiActionNotificationInterface
 {
+    /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(IndexUpdater.class);
 
-    /**
-     * Milliseconds of sleep between checks for changed documents
-     */
+    /** Milliseconds of sleep between checks for changed documents. */
     private int indexingInterval = 30000;
 
     private boolean exit = false;
@@ -64,6 +68,14 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     private String indexDir;
 
     private XWikiDocumentQueue queue = new XWikiDocumentQueue();
+
+    /**
+     * Soft threshold after which no more documents will be added to the indexing queue. When the
+     * queue size gets larger than this value, the index rebuilding thread will sleep chuks of
+     * {@link IndexRebuilder#retryInterval} milliseconds until the queue size will get back bellow
+     * this threshold. This does not affect normal indexing through wiki updates.
+     */
+    public int maxQueueSize = 1000;
 
     private Analyzer analyzer;
 
@@ -287,8 +299,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 retval.add(new Integer(hits.id(i)));
             }
         } catch (Exception e) {
-            LOG.error("error looking for old versions of document " + data + " with query "
-                + query, e);
+            LOG.error(String.format(
+                "Error looking for old versions of document [%s] with query [%s]", data, query),
+                e);
         }
 
         return retval;
@@ -354,8 +367,8 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         Field fld = null;
 
         // collecting all the fields for using up in search
-        for (Iterator it = luceneDoc.getFields().iterator(); it.hasNext();) {
-            fld = (Field) it.next();
+        for (Iterator<Field> it = luceneDoc.getFields().iterator(); it.hasNext();) {
+            fld = it.next();
             if (!fields.contains(fld.name())) {
                 fields.add(fld.name());
             }
@@ -404,8 +417,10 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
         }
 
         this.indexingInterval =
-            1000 * Integer.parseInt(config
-                .getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "30"));
+            1000 * Integer
+                .parseInt(config.getProperty(LucenePlugin.PROP_INDEXING_INTERVAL, "30"));
+        this.maxQueueSize =
+            Integer.parseInt(config.getProperty(LucenePlugin.PROP_MAX_QUEUE_SIZE, "1000"));
 
         // Note: There's no need to open the Searcher here (with a call to
         // openSearcher()) as each

@@ -1,5 +1,6 @@
 package com.xpn.xwiki.plugin.skinx;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -98,8 +99,15 @@ public class JsSkinExtensionPlugin extends SkinExtensionPlugin
             needsUpdate |=
                 bclass.addStaticListField("cache", "Caching policy", "long|short|default|forbid");
 
-            String content = doc.getContent();
-            if ((content == null) || (content.equals(""))) {
+            if (StringUtils.isBlank(doc.getAuthor())) {
+                needsUpdate = true;
+                doc.setAuthor("XWiki.Admin");
+            }
+            if (StringUtils.isBlank(doc.getCreator())) {
+                needsUpdate = true;
+                doc.setCreator("XWiki.Admin");
+            }
+            if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setContent("1 XWiki Stylesheet Extension Class");
             }

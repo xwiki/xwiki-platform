@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.log4j.MDC;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -33,34 +34,106 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Handles rebuilding of the whole Index. This involves the following steps:
+ * <p>
+ * Handles rebuilding of the whole Lucene Search Index. This involves the following steps:
  * <ul>
  * <li>empty the existing index</li>
  * <li>retrieve the names of all virtual wikis</li>
- * <li>get and index all documents for each virtual wiki</li>
- * <li>get and index all translations of each document</li>
- * <li>get and index all attachments of each document</li>
+ * <li>foreach document in each virtual wiki:
+ * <ul>
+ * <li>index the document</li>
+ * <li>get and index all translations of the document</li>
+ * <li>get and index all attachments of the document</li>
+ * <li>get and index all objects of the document</li>
  * </ul>
- * The indexing of all contents fetched from the wiki is triggered by handing the data to the
- * indexUpdater thread.
+ * </li>
+ * </ul>
+ * The rebuild can be triggered using the {@link LucenePluginApi#rebuildIndex()} method of the
+ * {@link LucenePluginApi}. Once a rebuild request is made, a new thread is created, so the
+ * requesting script can continue processing, while the rebuilding is done in the background. The
+ * actual indexing is done by the IndexUpdater thread, this thread just gathers the data and passes
+ * it to the IndexUpdater.
+ * </p>
+ * <p>
+ * As a summary, this plugin:
+ * <ul>
+ * <li>cleans the Lucene search indexes and re-submits all the contents of all the wikis for
+ * indexing</li>
+ * <li>without clogging the indexing thread (since 1.2)</li>
+ * <li>all in a background thread (since 1.2)</li>
+ * <li>making sure that only one rebuild is in progress (since 1.2)</li>
+ * </ul>
+ * </p>
  * 
  * @version $Id: $
  */
-public class IndexRebuilder
+public class IndexRebuilder implements Runnable
 {
+    /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(IndexRebuilder.class);
 
+    /** The actual object/thread that indexes data. */
     private IndexUpdater indexUpdater;
+
+    /** The XWiki context. */
+    private XWikiContext context;
+
+    /** Amount of time (milliseconds) to sleep while waiting for the indexing queue to empty. */
+    private static int retryInterval = 30000;
+
+    /** Variable used for indicating that a rebuild is already in progress. */
+    private boolean rebuildInProgress = false;
 
     public IndexRebuilder(IndexUpdater indexUpdater, XWikiContext context)
     {
         this.indexUpdater = indexUpdater;
         if (indexUpdater.needInitialBuild) {
-            this.rebuildIndex(context);
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Launched initial lucene indexing");
-            }
+            this.startRebuildIndex(context);
+            LOG.info("Launched initial lucene indexing");
         }
+    }
+
+    public synchronized int startRebuildIndex(XWikiContext context)
+    {
+        if (rebuildInProgress) {
+            LOG.warn("Cannot launch rebuild because a build is in progress");
+            return LucenePluginApi.REBUILD_IN_PROGRESS;
+        } else {
+            this.rebuildInProgress = true;
+            this.context = context;
+            Thread indexRebuilderThread = new Thread(this, "Lucene Index Rebuilder");
+            // The JVM should be allowed to shutdown while this thread is running
+            indexRebuilderThread.setDaemon(true);
+            // Client requests are more important than indexing
+            indexRebuilderThread.setPriority(3);
+            // Finally, start the rebuild in the background
+            indexRebuilderThread.start();
+            // Too bad that now we can't tell how many items are there to be indexed...
+            return 0;
+        }
+    }
+
+    public void run()
+    {
+        MDC.put("url", "Lucene index rebuilder thread");
+        LOG.debug("Starting lucene index rebuild");
+        try {
+            // The context must be cloned, as otherwise setDatabase() might affect the response to
+            // the current request.
+            // TODO This is not a good way to do this; ideally there would be a method that creates
+            // a new context and copies only a few needed objects, as some objects are not supposed
+            // to be used in 2 different contexts.
+            XWikiContext context = (XWikiContext) this.context.clone();
+            // For example, we definitely don't want to use the same hibernate session...
+            context.remove("hibsession");
+            context.remove("hibtransaction");
+            rebuildIndex(context);
+        } catch (Exception e) {
+            LOG.error("Error in lucene rebuild thread", e);
+        } finally {
+            rebuildInProgress = false;
+        }
+        LOG.debug("Lucene index rebuild done");
     }
 
     /**
@@ -69,15 +142,14 @@ public class IndexRebuilder
      * 
      * @param context
      * @return total number of documents and attachments successfully added to the indexer queue, -1
-     *         when errors occured. TODO: give more detailed results
+     *         when errors occured.
      */
-    public int rebuildIndex(XWikiContext context)
+    private int rebuildIndex(XWikiContext context)
     {
         this.indexUpdater.cleanIndex();
         int retval = 0;
         Collection<String> wikiServers;
         XWiki xwiki = context.getWiki();
-
         if (xwiki.isVirtualMode()) {
             wikiServers = findWikiServers(context);
             if (LOG.isDebugEnabled()) {
@@ -87,8 +159,7 @@ public class IndexRebuilder
                 }
             }
         } else {
-            // no virtual wiki configuration, just index the wiki the context
-            // belongs to
+            // No virtual wiki configuration, just index the wiki the context belongs to
             wikiServers = new ArrayList<String>();
             wikiServers.add(context.getDatabase());
         }
@@ -96,7 +167,7 @@ public class IndexRebuilder
         // Iterate all found virtual wikis
         for (String wikiName : wikiServers) {
             int wikiResult = indexWiki(wikiName, context);
-            if (retval > 0) {
+            if (wikiResult > 0) {
                 retval += wikiResult;
             }
         }
@@ -113,27 +184,23 @@ public class IndexRebuilder
      */
     protected int indexWiki(String wikiName, XWikiContext context)
     {
-        if (LOG.isInfoEnabled()) {
-            LOG.info("reading content of wiki " + wikiName);
-        }
-
+        LOG.info("Reading content of wiki " + wikiName);
+        // Number of index entries processed
         int retval = 0;
-
         XWiki xwiki = context.getWiki();
-
         String database = context.getDatabase();
 
         try {
             context.setDatabase(wikiName);
-
             Collection<String> docNames = null;
             try {
                 docNames = xwiki.getStore().searchDocumentsNames("", context);
-            } catch (XWikiException e1) {
-                LOG.error("error getting document names for wiki " + wikiName, e1);
+            } catch (XWikiException ex) {
+                LOG.warn(String.format(
+                    "Error getting document names for wiki [%s]. Internal error is: $s",
+                    wikiName, ex.getMessage()));
                 return -1;
             }
-
             for (String docName : docNames) {
                 XWikiDocument document;
                 try {
@@ -144,6 +211,22 @@ public class IndexRebuilder
                 }
 
                 if (document != null) {
+                    // In order not to load the whole database in memory, we're limiting the number
+                    // of documents that are in the processing queue at a moment. We could use a
+                    // Bounded Queue in the index updater, but that would generate exceptions in the
+                    // rest of the platform, as the index rebuilder could fill the queue, and then a
+                    // user trying to save a document would cause an exception. Thus, it is better
+                    // to limit the index rebuilder thread only, and not the index updater.
+                    while (this.indexUpdater.getQueueSize() > this.indexUpdater.maxQueueSize) {
+                        try {
+                            // Don't leave any database connections open while sleeping
+                            // This shouldn't be needed, but we never know what bugs might be there
+                            context.getWiki().getStore().cleanUp(context);
+                            Thread.sleep(retryInterval);
+                        } catch (InterruptedException e) {
+                            return -2;
+                        }
+                    }
                     this.indexUpdater.add(document, context);
                     retval++;
                     retval += addTranslationsOfDocument(document, context);

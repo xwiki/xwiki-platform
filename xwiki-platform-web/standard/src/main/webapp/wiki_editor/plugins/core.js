@@ -24,7 +24,7 @@ WikiEditor.prototype.initCorePlugin = function() {
 	this.addInternalProcessor((/<hr(.*?)>/i), 'convertHRInternal');
 
     this.addExternalProcessor((/^\s*(\*+)\s+([^\r\n]+)$/im), 'convertListExternal');
-    this.addExternalProcessor((/^\s*(#+)\s+([^\r\n]+)$/im), 'convertListExternal');
+    this.addExternalProcessor((/^\s*(#)\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(1+)\.\s+([^\r\n]+)$/im), 'convertListExternal');
     this.addExternalProcessor((/^\s*(\-+)\s+([^\r\n]+)$/im), 'convertListExternal');
 

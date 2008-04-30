@@ -117,13 +117,14 @@ public class IndexRebuilder implements Runnable
     {
         MDC.put("url", "Lucene index rebuilder thread");
         LOG.debug("Starting lucene index rebuild");
+        XWikiContext context = null;
         try {
             // The context must be cloned, as otherwise setDatabase() might affect the response to
             // the current request.
             // TODO This is not a good way to do this; ideally there would be a method that creates
             // a new context and copies only a few needed objects, as some objects are not supposed
             // to be used in 2 different contexts.
-            XWikiContext context = (XWikiContext) this.context.clone();
+            context = (XWikiContext) this.context.clone();
             // For example, we definitely don't want to use the same hibernate session...
             context.remove("hibsession");
             context.remove("hibtransaction");
@@ -132,6 +133,9 @@ public class IndexRebuilder implements Runnable
             LOG.error("Error in lucene rebuild thread", e);
         } finally {
             rebuildInProgress = false;
+            if (context != null) {
+                context.getWiki().getStore().cleanUp(context);
+            }
         }
         LOG.debug("Lucene index rebuild done");
     }

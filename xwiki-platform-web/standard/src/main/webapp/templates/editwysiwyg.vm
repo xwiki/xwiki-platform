@@ -32,7 +32,8 @@ $xwiki.getTextArea($tdoc.content)
             language: "en",
             elements : "content",
             mode: "exact",
-            content_css: "$xwiki.getSkinFile("style.css")",
+            ## $defaultstyle is set in stylesheets.vm            
+            content_css: "$xwiki.getSkinFile($defaultstyle, true)",
             debug : false,
             remove_linebreaks : false,
             wiki_editor_toolbar: '$xwiki.getWysiwygToolbars()',

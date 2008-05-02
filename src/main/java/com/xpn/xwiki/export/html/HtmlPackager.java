@@ -11,6 +11,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWikiContext;
@@ -29,6 +31,8 @@ import com.xpn.xwiki.web.ExportURLFactory;
  */
 public class HtmlPackager
 {
+    private static final Log LOG = LogFactory.getLog(HtmlPackager.class);
+
     /**
      * A point.
      */
@@ -325,6 +329,10 @@ public class HtmlPackager
     private static void addDirToZip(File directory, ZipOutputStream out, String basePath)
         throws IOException
     {
+    	if (LOG.isDebugEnabled()) {
+    		LOG.debug("Adding dir [" + directory.getPath() + "] to the Zip file being generated.");
+    	}
+    	
         if (!directory.isDirectory()) {
             return;
         }
@@ -346,6 +354,7 @@ public class HtmlPackager
 
             FileInputStream in = new FileInputStream(file);
 
+            // Starts a new Zip entry. It automatically closes the previous entry if present. 
             out.putNextEntry(new ZipEntry(basePath + file.getName()));
 
             int len;

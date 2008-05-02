@@ -12,10 +12,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1209489360000</date>
-<contentUpdateDate>1209489360000</contentUpdateDate>
-<version>63.1</version>
-<title></title>
+<date>1209733029000</date>
+<contentUpdateDate>1209733029000</contentUpdateDate>
+<version>64.1</version>
+<title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -150,9 +150,9 @@
 #set ($WSTEPNAME_SUMMARY = "wstep_summary")
 #set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
 #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiNameAvailableService").externalURL)
-#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;This identifier is already used&lt;/div&gt;")
-#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;Identifier can't be empty&lt;/div&gt;")
-#set ($MSG_INFO_WIKINAMEVALID = "&lt;div class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;/span&gt;You can use this name as new wiki identifier&lt;/div&gt;")
+#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;/div&gt;")
+#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;/div&gt;")
+#set ($MSG_INFO_WIKINAMEVALID = "&lt;div class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;/div&gt;")
 ##
 ############################################################################################
 ## REQUEST PARAMETERS

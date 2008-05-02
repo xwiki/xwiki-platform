@@ -123,7 +123,10 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
         String cacheKey;
         if (skinMacros != null) {
-        	cacheKey = skinMacros.substring(skinMacros.indexOf("/skins/"));
+            // We're only using the path starting with the skin name since sometimes we'll
+            // get /skins/skins/<skinname>/..., sometimes we get "/skins/<skinname>/..." 
+            // and sometimes we get "skins/<skinname>/... 
+        	cacheKey = skinMacros.substring(skinMacros.indexOf("skins/"));
         } else {
             // If no skin macros.vm file exists then use a "default" cache id
         	cacheKey = "default";

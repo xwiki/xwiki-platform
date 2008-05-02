@@ -6,7 +6,7 @@
 <language></language>
 <defaultLanguage>en</defaultLanguage>
 <translation>0</translation>
-<parent>XAppManager.WebHome</parent>
+<parent>XAppCode.WebHome</parent>
 <creator></creator>
 <author>XWiki.Admin</author>
 <customClass></customClass>

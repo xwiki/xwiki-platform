@@ -31,6 +31,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.MultiFieldQueryParser;
 import org.apache.lucene.queryParser.ParseException;
@@ -77,7 +78,7 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
     public static final String PROP_ANALYZER = "xwiki.plugins.lucene.analyzer";
 
     public static final String PROP_INDEXING_INTERVAL = "xwiki.plugins.lucene.indexinterval";
-    
+
     public static final String PROP_MAX_QUEUE_SIZE = "xwiki.plugins.lucene.maxQueueSize";
 
     private static final String DEFAULT_ANALYZER =
@@ -549,17 +550,21 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
      * @param indexDirs Comma separated list of Lucene index directories to create searchers for.
      * @return Array of searchers
      */
-    public static Searcher[] createSearchers(String indexDirs) throws Exception
+    public Searcher[] createSearchers(String indexDirs) throws Exception
     {
         String[] dirs = StringUtils.split(indexDirs, ",");
         List<IndexSearcher> searchersList = new ArrayList<IndexSearcher>();
         for (int i = 0; i < dirs.length; i++) {
             try {
+                if (!IndexReader.indexExists(dirs[i])) {
+                    // If there's no index there, create an empty one; otherwise the reader
+                    // constructor will throw an exception and fail to initialize
+                    new IndexWriter(dirs[i], analyzer).close();
+                }
                 IndexReader reader = IndexReader.open(dirs[i]);
                 searchersList.add(new IndexSearcher(reader));
             } catch (IOException e) {
                 LOG.error("cannot open index " + dirs[i], e);
-                e.printStackTrace();
             }
         }
 

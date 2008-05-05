@@ -23,7 +23,6 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Vector;
-import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -43,9 +42,9 @@ import org.xwiki.observation.event.ActionExecutionEvent;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
+import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
 
@@ -391,12 +390,10 @@ public abstract class XWikiAction extends Action
             throws Exception {
         if ("1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
             XWikiDocument globalPreferences = context.getWiki().getDocument("xwiki:XWiki.XWikiPreferences", context);
-            Vector redirects = globalPreferences.getObjects("XWiki.GlobalRedirect");
+            Vector<BaseObject> redirects = globalPreferences.getObjects("XWiki.GlobalRedirect");
 
             if (redirects != null) {
-                Iterator it = redirects.iterator();
-                while (it.hasNext()) {
-                    BaseObject redir = (BaseObject) it.next();
+                for (BaseObject redir : redirects) {
                     String p = redir.getStringValue("pattern");
                     if (url.matches(p)) {
                         String dest = redir.getStringValue("destination");

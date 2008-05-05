@@ -1604,33 +1604,36 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         XWikiURLFactory urlf = context.getURLFactory();
 
         try {
+            // Try in the specified skin
             String skin = getSkin(context);
             String result = getSkinFile(filename, skin, forceSkinAction, context);
             if (result != null) {
                 return result;
             }
+            // Try in the parent skin
             String baseskin = getBaseSkin(context);
             if (!skin.equals(baseskin)) {
                 result = getSkinFile(filename, baseskin, forceSkinAction, context);
-                if (result != null)
+                if (result != null) {
                     return result;
+                }
             }
-            URL url;
-            if (forceSkinAction) {
-                url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
-            } else {
-                url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
-            }
-            return urlf.getURL(url, context);
         } catch (Exception e) {
         }
 
-        return "../../../skins/" + getDefaultBaseSkin(context) + "/" + filename;
+        // If all else fails, use the default base skin, even if the URLs could be invalid.
+        URL url;
+        if (forceSkinAction) {
+            url = urlf.createSkinURL(filename, "skins", getDefaultBaseSkin(context), context);
+        } else {
+            url = urlf.createSkinURL(filename, getDefaultBaseSkin(context), context);
+        }
+        return urlf.getURL(url, context);
     }
 
     public String getSkinFile(String filename, String skin, XWikiContext context)
     {
-        return getSkinFile(filename, false, context);
+        return getSkinFile(filename, skin, false, context);
     }
 
     public String getSkinFile(String filename, String skin, boolean forceSkinAction,
@@ -1638,47 +1641,39 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         XWikiURLFactory urlf = context.getURLFactory();
         try {
-            String path = "/skins/" + skin + "/" + filename;
-            if (resourceExists(path)) {
-                URL url;
-
-                if (forceSkinAction)
-                    url = urlf.createSkinURL(filename, "skins", skin, context);
-                else
-                    url = urlf.createSkinURL(filename, skin, context);
-                return urlf.getURL(url, context);
-            }
-
-        } catch (Exception e) {
-        }
-
-        try {
             XWikiDocument doc = getDocument(skin, context);
             if (!doc.isNew()) {
-                BaseObject object = doc.getObject("XWiki.XWikiSkins", 0);
+                // Look for an object property
+                BaseObject object = doc.getObject("XWiki.XWikiSkins");
                 if (object != null) {
                     String content = object.getStringValue(filename);
-                    if ((content != null) && (!content.equals(""))) {
+                    if (!StringUtils.isBlank(content)) {
                         URL url =
                             urlf.createSkinURL(filename, doc.getSpace(), doc.getName(), doc
                                 .getDatabase(), context);
                         return urlf.getURL(url, context);
-
                     }
                 }
 
-                // Read XWikiAttachment
-                XWikiAttachment attachment = null;
-                doc.getAttachmentList();
-                String shortname = filename.substring(0, filename.indexOf("."));
-                attachment = doc.getAttachment(shortname);
-
+                // Look for an attachment
+                String shortName = StringUtils.replaceChars(filename, '/', '.');
+                XWikiAttachment attachment = doc.getAttachment(shortName);
                 if (attachment != null) {
-                    URL url =
-                        urlf.createSkinURL(filename, doc.getSpace(), doc.getName(), doc
-                            .getDatabase(), context);
-                    return urlf.getURL(url, context);
+                    return doc.getAttachmentURL(shortName, context);
                 }
+            }
+
+            // Look for a filesystem file
+            String path = "/skins/" + skin + "/" + filename;
+            if (resourceExists(path)) {
+                URL url;
+
+                if (forceSkinAction) {
+                    url = urlf.createSkinURL(filename, "skins", skin, context);
+                } else {
+                    url = urlf.createSkinURL(filename, skin, context);
+                }
+                return urlf.getURL(url, context);
             }
         } catch (Exception e) {
         }
@@ -1692,8 +1687,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         try {
             // Try to get it from context
             skin = (String) context.get("skin");
-            if (skin != null)
+            if (skin != null) {
                 return skin;
+            }
 
             // Try to get it from URL
             if (context.getRequest() != null) {
@@ -1711,8 +1707,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
         try {
             if (skin.indexOf(".") != -1) {
-                if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context))
+                if (!getRightService().hasAccessLevel("view", context.getUser(), skin, context)) {
                     skin = Param("xwiki.defaultskin", getDefaultBaseSkin(context));
+                }
             }
         } catch (XWikiException e) {
             // if it fails here, let's just ignore it

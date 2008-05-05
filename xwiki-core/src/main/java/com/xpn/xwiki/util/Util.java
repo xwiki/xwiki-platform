@@ -35,6 +35,7 @@ import java.io.StringReader;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -818,6 +819,15 @@ public class Util
             }
         }
         return result.toString();
+    }
+
+    public static Date getFileLastModificationDate(String path) {
+        try {
+            File f = new File(path);
+            return (new Date(f.lastModified()));
+        } catch (Exception ex) {
+            return new Date();
+        }
     }
 
     /**

@@ -345,7 +345,7 @@ public interface XWikiStoreInterface
         throws XWikiException;
 
     /**
-     * Execute a reading request with parameters and return result.
+     * Execute a reading request and return result.
      * 
      * @param sql the HQL request clause. For example <code>" where doc.fullName
      *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"</code>.
@@ -359,11 +359,11 @@ public interface XWikiStoreInterface
     public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
 
     /**
-     * Search documents in the storing system.
+     * Execute a reading request with parameters and return result.
      * <p>
-     * Search documents by passing HQL request values as parameters. This allows generating a Named
-     * HQL query which will automatically encode the passed values (like escaping single quotes).
-     * This API is recommended to be used over the other similar methods where the values are passed
+     * Execute query by passing HQL request values as parameters. This allows generating a Named HQL
+     * query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed
      * inside the where clause and for which you'll need to do the encoding/escaping yourself before
      * calling them.
      * 
@@ -381,7 +381,7 @@ public interface XWikiStoreInterface
         throws XWikiException;
 
     /**
-     * Search documents in the storing system.
+     * Execute a reading request and return result.
      * 
      * @param sql the HQL request.
      * @param nb the number of rows to return. If 0 then all rows are returned.
@@ -397,11 +397,11 @@ public interface XWikiStoreInterface
         throws XWikiException;
 
     /**
-     * Search documents in the storing system.
+     * Execute a reading request with parameters and return result.
      * <p>
-     * Search documents by passing HQL request values as parameters. This allows generating a Named
-     * HQL query which will automatically encode the passed values (like escaping single quotes).
-     * This API is recommended to be used over the other similar methods where the values are passed
+     * Execute query by passing HQL request values as parameters. This allows generating a Named HQL
+     * query which will automatically encode the passed values (like escaping single quotes). This
+     * API is recommended to be used over the other similar methods where the values are passed
      * inside the where clause and for which you'll need to do the encoding/escaping yourself before
      * calling them.
      * 

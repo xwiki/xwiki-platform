@@ -22,6 +22,7 @@ package com.xpn.xwiki.web;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.Arrays;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -196,11 +197,22 @@ public class SkinAction extends XWikiAction
             data = context.getWiki().getResourceContentAsBytes(path);
             if (data != null && data.length > 0) {
                 String mimetype = context.getEngineContext().getMimeType(filename.toLowerCase());
+                Date modified = null;
                 if (isCssMimeType(mimetype) || isJavascriptMimeType(mimetype)) {
-                    data = context.getWiki().parseContent(new String(data), context).getBytes();
+                    byte[] newdata = context.getWiki().parseContent(new String(data), context).getBytes();
+                    // If the content contained velocity code, then it should not be cached
+                    if (Arrays.equals(newdata, data)) {
+                        modified = context.getWiki().getResourceLastModificationDate(path);
+                    }
+                    else {
+                        modified = new Date();
+                        data = newdata;
+                    }
                 }
-
-                setupHeaders(response, mimetype, new Date(), data.length);
+                else {
+                    modified = context.getWiki().getResourceLastModificationDate(path);
+                }
+                setupHeaders(response, mimetype, modified, data.length);
                 try {
                     response.getOutputStream().write(data);
                 } catch (IOException e) {

@@ -150,9 +150,9 @@
 #set ($WSTEPNAME_SUMMARY = "wstep_summary")
 #set ($WSTEPLIST = [$WSTEPNAME_INTRO, $WSTEPNAME_WIKINAME, $WSTEPNAME_WIKIDESC, $WSTEPNAME_DATAFROM, $WSTEPNAME_USERS, $WSTEPNAME_SUMMARY])
 #set ($ISWIKINAMEAVAILABLE = $xwiki.getDocument("WikiCode.IsWikiNameAvailableService").externalURL)
-#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;\\/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;\\/div&gt;")
-#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;\\/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;\\/div&gt;")
-#set ($MSG_INFO_WIKINAMEVALID = "&lt;div class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;\\/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;\\/div&gt;")
+#set ($MSG_ERROR_WIKINAMEALREADYUSED = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.alreadyused')&lt;/div&gt;")
+#set ($MSG_ERROR_WIKINAMEEMPTY = "&lt;div class=\"errormessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('error'): &lt;/span&gt;$msg.get('wikimanager.wikiname.error.empty')&lt;/div&gt;")
+#set ($MSG_INFO_WIKINAMEVALID = "&lt;div class=\"infomessage\"&gt;&lt;span class=\"messagetype\"&gt;$msg.get('info'): &lt;/span&gt;$msg.get('wikimanager.wikiname.info.valid')&lt;/div&gt;")
 ##
 ############################################################################################
 ## REQUEST PARAMETERS

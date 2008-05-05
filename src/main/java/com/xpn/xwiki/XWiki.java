@@ -929,6 +929,19 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return Util.getFileContent(new InputStreamReader(is));
     }
 
+    public Date getResourceLastModificationDate(String name)
+    {
+        try {
+            if (getEngineContext() != null) {
+                return Util.getFileLastModificationDate(getEngineContext().getRealPath(name));
+            }
+        } catch (Exception ex) {
+            // Probably a SecurityException or the file is not accessible (inside a war)
+            LOG.info("Failed to get file modification date: " + ex.getMessage());
+        }
+        return new Date();
+    }
+
     public byte[] getResourceContentAsBytes(String name) throws IOException
     {
         InputStream is = null;

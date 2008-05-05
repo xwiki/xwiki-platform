@@ -3580,7 +3580,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // doc.getOriginalDocument()
             ObservationManager om =
                 (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null, context);
-            om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
+            if (om != null) {
+                om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
+            }
         } catch (Exception ex) {
             LOG.error("Failed to send document delete notifications for document ["
                 + doc.getFullName() + "]", ex);

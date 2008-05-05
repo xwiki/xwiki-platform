@@ -92,7 +92,7 @@ public class XWikiPluginManager
                 initPlugin(plugin, pluginClass, context);
             }
         } catch (Exception ex) {
-            // Log an error but do not fai
+            // Log an error but do not fail
             LOG.error("Cannot initialize plugin [" + className + "]", ex);
         }
     }

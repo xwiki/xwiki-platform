@@ -39,6 +39,8 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
      */
     private ActivityStream activityStream;
 
+    public static final String PLUGIN_NAME = "activitystream";
+
     /**
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
@@ -55,7 +57,7 @@ public class ActivityStreamPlugin extends XWikiDefaultPlugin
      */
     public String getName()
     {
-        return new String("activitystream");
+        return PLUGIN_NAME;
     }
 
     /**

@@ -277,6 +277,6 @@ public interface ActivityEvent
      * 
      * @param params
      */
-    void setParams(List params);
+    void setParams(List<String> params);
 
 }

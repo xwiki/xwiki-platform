@@ -52,7 +52,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.ecs.filter.CharacterFilter;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.tools.VelocityFormatter;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -288,22 +287,6 @@ public class XWikiDocument
     public void setSpace(String space)
     {
         this.web = space;
-    }
-
-    /**
-     * @deprecated use {@link #getSpace()} instead
-     */
-    public String getWeb()
-    {
-        return getSpace();
-    }
-
-    /**
-     * @deprecated use {@link #setSpace(String)} instead
-     */
-    public void setWeb(String web)
-    {
-        setSpace(web);
     }
 
     public String getVersion()
@@ -2990,22 +2973,6 @@ public class XWikiDocument
         }
 
         return object.getListValue(fieldName);
-    }
-
-    /**
-     * @deprecated use setStringListValue or setDBStringListProperty
-     */
-    public void setListValue(String className, String fieldName, List value)
-    {
-        BaseObject bobject = getObject(className);
-        if (bobject == null) {
-            bobject = new BaseObject();
-            addObject(className, bobject);
-        }
-        bobject.setName(getFullName());
-        bobject.setClassName(className);
-        bobject.setListValue(fieldName, value);
-        setContentDirty(true);
     }
 
     public void setStringListValue(String className, String fieldName, List value)

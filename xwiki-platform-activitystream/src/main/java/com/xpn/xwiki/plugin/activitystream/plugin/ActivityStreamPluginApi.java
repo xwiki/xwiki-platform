@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.activitystream.plugin;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -37,7 +36,7 @@ import com.xpn.xwiki.plugin.activitystream.api.ActivityStreamException;
  * 
  * @version $Id: $
  */
-public class ActivityStreamPluginApi extends PluginApi
+public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
 {
     /**
      * @see PluginApi#PluginApi(XWikiPluginInterface, XWikiContext)
@@ -135,6 +134,19 @@ public class ActivityStreamPluginApi extends PluginApi
         }
     }
 
+    public void deleteActivityEvents(List<ActivityEvent> evs) throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events =
+                unwrapEvents(evs);
+            {
+                for (com.xpn.xwiki.plugin.activitystream.api.ActivityEvent ev : events) {
+                    getActivityStream().deleteActivityEvent(ev, context);
+                }
+            }
+        }
+    }
+
     /**
      * @see #addDocumentActivityEvent(String, Document, String, String)
      * @param params a list of up to 5 "free" String parameters that will be associated with the
@@ -175,7 +187,7 @@ public class ActivityStreamPluginApi extends PluginApi
      *         {@link com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent} objects.
      * @throws ActivityStreamException
      */
-    public List searchEvents(String hql, boolean filter, int nb, int start)
+    public List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -193,7 +205,8 @@ public class ActivityStreamPluginApi extends PluginApi
      * @param start the offset to start retrieving event at
      * @throws ActivityStreamException
      */
-    public List getEvents(boolean filter, int nb, int start) throws ActivityStreamException
+    public List<ActivityEvent> getEvents(boolean filter, int nb, int start)
+        throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().getEvents(filter, nb, start, context));
@@ -209,7 +222,7 @@ public class ActivityStreamPluginApi extends PluginApi
      * @param space the space to retrieve latest events for
      * @throws ActivityStreamException
      */
-    public List getEventsForSpace(String space, boolean filter, int nb, int start)
+    public List<ActivityEvent> getEventsForSpace(String space, boolean filter, int nb, int start)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -219,7 +232,7 @@ public class ActivityStreamPluginApi extends PluginApi
             return null;
         }
     }
-    
+
     /**
      * Return the latest recorded events triggered by the given user.
      * 
@@ -227,7 +240,7 @@ public class ActivityStreamPluginApi extends PluginApi
      * @param user the user to retrieve latest events for
      * @throws ActivityStreamException
      */
-    public List getEventsForUser(String user, boolean filter, int nb, int start)
+    public List<ActivityEvent> getEventsForUser(String user, boolean filter, int nb, int start)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -245,7 +258,7 @@ public class ActivityStreamPluginApi extends PluginApi
      * @param streamName the name of the stream to retrieve latest events for
      * @throws ActivityStreamException
      */
-    public List getEvents(String streamName, boolean filter, int nb, int start)
+    public List<ActivityEvent> getEvents(String streamName, boolean filter, int nb, int start)
         throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -262,8 +275,8 @@ public class ActivityStreamPluginApi extends PluginApi
      * @see #getEventsForSpace(String, boolean, int, int)
      * @see #getEvents(String, boolean, int, int)
      */
-    public List getEventsForSpace(String streamName, String space, boolean filter, int nb,
-        int start) throws ActivityStreamException
+    public List<ActivityEvent> getEventsForSpace(String streamName, String space, boolean filter,
+        int nb, int start) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().getEventsForSpace(streamName, space, filter,
@@ -279,8 +292,8 @@ public class ActivityStreamPluginApi extends PluginApi
      * @see #getEventsForUser(String, boolean, int, int)
      * @see #getEvents(String, boolean, int, int)
      */
-    public List getEventsForUser(String streamName, String user, boolean filter, int nb, int start)
-        throws ActivityStreamException
+    public List<ActivityEvent> getEventsForUser(String streamName, String user, boolean filter,
+        int nb, int start) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
             return wrapEvents(getActivityStream().getEventsForUser(streamName, user, filter, nb,
@@ -290,14 +303,12 @@ public class ActivityStreamPluginApi extends PluginApi
         }
     }
 
-    protected List wrapEvents(List events)
+    protected List<ActivityEvent> wrapEvents(
+        List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> events)
     {
-        List result = new ArrayList();
+        List<ActivityEvent> result = new ArrayList<ActivityEvent>();
         if (events != null) {
-            for (Iterator iter = events.iterator(); iter.hasNext();) {
-                Object obj = iter.next();
-                com.xpn.xwiki.plugin.activitystream.api.ActivityEvent event =
-                    (com.xpn.xwiki.plugin.activitystream.api.ActivityEvent) obj;
+            for (com.xpn.xwiki.plugin.activitystream.api.ActivityEvent event : events) {
                 com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent wrappedEvent =
                     new com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent(event,
                         getXWikiContext());
@@ -307,14 +318,13 @@ public class ActivityStreamPluginApi extends PluginApi
         return result;
     }
 
-    protected List unwrapEvents(List events)
+    protected List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> unwrapEvents(
+        List<ActivityEvent> events)
     {
-        List result = new ArrayList();
+        List<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent> result =
+            new ArrayList<com.xpn.xwiki.plugin.activitystream.api.ActivityEvent>();
         if (events != null) {
-            for (Iterator iter = events.iterator(); iter.hasNext();) {
-                Object obj = iter.next();
-                com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent event =
-                    (com.xpn.xwiki.plugin.activitystream.plugin.ActivityEvent) obj;
+            for (ActivityEvent event : events) {
                 com.xpn.xwiki.plugin.activitystream.api.ActivityEvent unwrappedEvent =
                     event.getEvent();
                 result.add(unwrappedEvent);
@@ -328,20 +338,20 @@ public class ActivityStreamPluginApi extends PluginApi
         return getActivityStream().getFeedEntry(event.getEvent(), context);
     }
 
-    public SyndFeed getFeed(List events)
+    public SyndFeed getFeed(List<ActivityEvent> events)
     {
         return getActivityStream().getFeed(unwrapEvents(events), context);
     }
 
-    public SyndFeed getFeed(List events, String author, String title, String description,
-        String copyright, String encoding, String url)
+    public SyndFeed getFeed(List<ActivityEvent> events, String author, String title,
+        String description, String copyright, String encoding, String url)
     {
         return getActivityStream().getFeed(unwrapEvents(events), author, title, description,
             copyright, encoding, url, context);
     }
 
-    public String getFeedOutput(List events, String author, String title, String description,
-        String copyright, String encoding, String url, String type)
+    public String getFeedOutput(List<ActivityEvent> events, String author, String title,
+        String description, String copyright, String encoding, String url, String type)
     {
         return getActivityStream().getFeedOutput(unwrapEvents(events), author, title,
             description, copyright, encoding, url, type, context);

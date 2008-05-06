@@ -62,7 +62,7 @@ public interface ActivityStream
     void addActivityEvent(String streamName, String type, String title, XWikiContext context)
         throws ActivityStreamException;
 
-    void addActivityEvent(String streamName, String type, String title, List params,
+    void addActivityEvent(String streamName, String type, String title, List<String> params,
         XWikiContext context) throws ActivityStreamException;
 
     void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type,
@@ -72,42 +72,46 @@ public interface ActivityStream
         int priority, String title, XWikiContext context) throws ActivityStreamException;
 
     void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type,
-        String title, List params, XWikiContext context) throws ActivityStreamException;
+        String title, List<String> params, XWikiContext context) throws ActivityStreamException;
 
     void addDocumentActivityEvent(String streamName, XWikiDocument doc, String type,
-        int priority, String title, List params, XWikiContext context)
+        int priority, String title, List<String> params, XWikiContext context)
         throws ActivityStreamException;
 
-    List searchEvents(String hql, boolean filter, int nb, int start, XWikiContext context)
+    void deleteActivityEvent(ActivityEvent event, XWikiContext context)
         throws ActivityStreamException;
 
-    List getEvents(boolean filter, int nb, int start, XWikiContext context)
-        throws ActivityStreamException;
-
-    List getEventsForSpace(String space, boolean filter, int nb, int start, XWikiContext context)
-        throws ActivityStreamException;
-
-    List getEventsForUser(String user, boolean filter, int nb, int start, XWikiContext context)
-        throws ActivityStreamException;
-
-    List getEvents(String streamName, boolean filter, int nb, int start, XWikiContext context)
-        throws ActivityStreamException;
-
-    List getEventsForSpace(String streamName, String space, boolean filter, int nb, int start,
+    List<ActivityEvent> searchEvents(String hql, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException;
 
-    List getEventsForUser(String streamName, String user, boolean filter, int nb, int start,
+    List<ActivityEvent> getEvents(boolean filter, int nb, int start, XWikiContext context)
+        throws ActivityStreamException;
+
+    List<ActivityEvent> getEventsForSpace(String space, boolean filter, int nb, int start,
         XWikiContext context) throws ActivityStreamException;
+
+    List<ActivityEvent> getEventsForUser(String user, boolean filter, int nb, int start,
+        XWikiContext context) throws ActivityStreamException;
+
+    List<ActivityEvent> getEvents(String streamName, boolean filter, int nb, int start,
+        XWikiContext context) throws ActivityStreamException;
+
+    List<ActivityEvent> getEventsForSpace(String streamName, String space, boolean filter,
+        int nb, int start, XWikiContext context) throws ActivityStreamException;
+
+    List<ActivityEvent> getEventsForUser(String streamName, String user, boolean filter, int nb,
+        int start, XWikiContext context) throws ActivityStreamException;
 
     SyndEntry getFeedEntry(ActivityEvent event, XWikiContext context);
 
-    SyndFeed getFeed(List events, XWikiContext context);
+    SyndFeed getFeed(List<ActivityEvent> events, XWikiContext context);
 
-    SyndFeed getFeed(List events, String author, String title, String description,
+    SyndFeed getFeed(List<ActivityEvent> events, String author, String title, String description,
         String copyright, String encoding, String url, XWikiContext context);
 
-    String getFeedOutput(List events, String author, String title, String description,
-        String copyright, String encoding, String url, String type, XWikiContext context);
+    String getFeedOutput(List<ActivityEvent> events, String author, String title,
+        String description, String copyright, String encoding, String url, String type,
+        XWikiContext context);
 
     String getFeedOutput(SyndFeed feed, String type);
 

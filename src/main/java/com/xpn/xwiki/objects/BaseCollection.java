@@ -332,20 +332,6 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
-    /**
-     * @deprecated use setStringListValue or setDBStringListProperty
-     * @param name
-     * @param value
-     */
-    public void setListValue(String name, List value)
-    {
-        ListProperty property = (ListProperty) safeget(name);
-        if (property == null)
-            property = new StringListProperty();
-        property.setValue(value);
-        safeput(name, property);
-    }
-
     public void setStringListValue(String name, List value)
     {
         ListProperty property = (ListProperty) safeget(name);

@@ -79,7 +79,7 @@ public class XWikiStatsStoreService implements Runnable
     public void start()
     {
         if (thread == null) {
-            thread = new Thread(this);
+            thread = new Thread(this, "Statistics storing daemon");
             thread.start();
         }
     }

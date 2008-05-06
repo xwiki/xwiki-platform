@@ -580,7 +580,7 @@ public class Package
                     deleteddoc = deleteddoc.getTranslatedDocument(doc.getLanguage(), context);
                 }
                 try {
-                    context.getWiki().deleteDocument(deleteddoc, context);
+                    context.getWiki().getStore().deleteXWikiDoc(deleteddoc, context);
                 } catch (Exception e) {
                     // let's log the error but not stop
                     result = DocumentInfo.INSTALL_ERROR;

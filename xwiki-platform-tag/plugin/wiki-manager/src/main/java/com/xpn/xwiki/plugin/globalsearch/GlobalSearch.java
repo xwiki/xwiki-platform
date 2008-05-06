@@ -115,9 +115,9 @@ final class GlobalSearch
      * @return the names of all virtual wikis.
      * @throws XWikiException error when getting the list of virtual wikis.
      */
-    private Collection getAllWikiNameList(XWikiContext context) throws XWikiException
+    private Collection<String> getAllWikiNameList(XWikiContext context) throws XWikiException
     {
-        Collection wikiNames = context.getWiki().getVirtualWikisDatabaseNames(context);
+        Collection<String> wikiNames = context.getWiki().getVirtualWikisDatabaseNames(context);
 
         if (!wikiNames.contains(context.getMainXWiki())) {
             wikiNames.add(context.getMainXWiki());
@@ -137,22 +137,22 @@ final class GlobalSearch
      *         fields values.
      * @throws XWikiException error when executing query.
      */
-    public Collection search(GlobalSearchQuery query, XWikiContext context) throws XWikiException
+    public Collection<GlobalSearchResult> search(GlobalSearchQuery query, XWikiContext context)
+        throws XWikiException
     {
-        List resultList = Collections.EMPTY_LIST;
+        List<GlobalSearchResult> resultList = Collections.emptyList();
 
-        List selectColumns = parseSelectColumns(query.getHql());
-        List orderColumns = parseOrderColumns(query.getHql());
+        List<String> selectColumns = parseSelectColumns(query.getHql());
+        List<Object[]> orderColumns = parseOrderColumns(query.getHql());
 
-        Collection wikiNameList;
+        Collection<String> wikiNameList;
         if (context.getWiki().isVirtualMode()) {
             wikiNameList = query.getWikiNameList();
             if (wikiNameList.isEmpty()) {
                 wikiNameList = getAllWikiNameList(context);
             }
         } else {
-            wikiNameList = new ArrayList(1);
-            wikiNameList.add(context.getMainXWiki());
+            wikiNameList = Collections.singletonList(context.getMainXWiki());
         }
 
         int max =
@@ -161,14 +161,12 @@ final class GlobalSearch
 
         String database = context.getDatabase();
         try {
-            resultList = new LinkedList();
+            resultList = new LinkedList<GlobalSearchResult>();
 
-            for (Iterator it = wikiNameList.iterator(); it.hasNext();) {
-                String wikiName = (String) it.next();
-
+            for (String wikiName : wikiNameList) {
                 context.setDatabase(wikiName);
 
-                List resultsTmp =
+                List< ? > resultsTmp =
                     context.getWiki().getStore().search(query.getHql(), max, 0,
                         query.getParameterList(), context);
 
@@ -199,13 +197,14 @@ final class GlobalSearch
      * @param orderColumns the fields to order.
      * @param context the XWiki context.
      */
-    private void insertResults(String wikiName, List sortedList, Collection list,
-        GlobalSearchQuery query, List selectColumns, List orderColumns, XWikiContext context)
+    private void insertResults(String wikiName, List<GlobalSearchResult> sortedList,
+        Collection< ? > list, GlobalSearchQuery query, List<String> selectColumns,
+        List<Object[]> orderColumns, XWikiContext context)
     {
         boolean sort = !sortedList.isEmpty();
 
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            Object[] objects = (Object[]) it.next();
+        for (Object item : list) {
+            Object[] objects = (Object[]) item;
 
             GlobalSearchResult result = new GlobalSearchResult(wikiName, selectColumns, objects);
 
@@ -227,17 +226,18 @@ final class GlobalSearch
      * @param orderColumns the fields to order.
      * @param context the XWiki context.
      */
-    private void insertResult(List sortedList, GlobalSearchResult result,
-        GlobalSearchQuery query, List selectColumns, List orderColumns, XWikiContext context)
+    private void insertResult(List<GlobalSearchResult> sortedList, GlobalSearchResult result,
+        GlobalSearchQuery query, List<String> selectColumns, List<Object[]> orderColumns,
+        XWikiContext context)
     {
         int max =
             query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0)
                 : -1;
 
         int index = 0;
-        for (Iterator itSorted = sortedList.iterator(); itSorted.hasNext()
+        for (Iterator<GlobalSearchResult> itSorted = sortedList.iterator(); itSorted.hasNext()
             && (max <= 0 || index < max); ++index) {
-            GlobalSearchResult sortedResult = (GlobalSearchResult) itSorted.next();
+            GlobalSearchResult sortedResult = itSorted.next();
 
             if (compare(sortedResult, result, orderColumns) > 0) {
                 break;
@@ -258,10 +258,11 @@ final class GlobalSearch
      * @return a negative integer, zero, or a positive integer as <code>map1</code> is less than,
      *         equal to, or greater than <code>map2</code>.
      */
-    private int compare(GlobalSearchResult result1, GlobalSearchResult result2, List orderColumns)
+    private int compare(GlobalSearchResult result1, GlobalSearchResult result2,
+        List<Object[]> orderColumns)
     {
-        for (Iterator it = orderColumns.iterator(); it.hasNext();) {
-            int result = compare(result1, result2, (Object[]) it.next());
+        for (Object[] orderField : orderColumns) {
+            int result = compare(result1, result2, orderField);
 
             if (result != 0) {
                 return result;
@@ -310,9 +311,9 @@ final class GlobalSearch
      *            </ul>
      * @return the names of selected fields from hql query.
      */
-    private List parseSelectColumns(String hql)
+    private List<String> parseSelectColumns(String hql)
     {
-        List columnList = new ArrayList();
+        List<String> columnList = new ArrayList<String>();
 
         int selectEnd = 0;
         int selectIndex = hql.toLowerCase().indexOf(SELECT_DISTINCT_KEYWORD);
@@ -349,9 +350,9 @@ final class GlobalSearch
      * @param hql the hql query.
      * @return the names of "order by" fields from hql query.
      */
-    private List parseOrderColumns(String hql)
+    private List<Object[]> parseOrderColumns(String hql)
     {
-        List columnList = new ArrayList();
+        List<Object[]> columnList = new ArrayList<Object[]>();
 
         int orderIndex = hql.toLowerCase().lastIndexOf(ORDER_KEYWORD);
 
@@ -395,10 +396,9 @@ final class GlobalSearch
             normalizedWhereSQL = whereSQL.trim();
         }
 
-        Collection orderColumns = parseOrderColumns(normalizedWhereSQL);
+        Collection<Object[]> orderColumns = parseOrderColumns(normalizedWhereSQL);
 
-        for (Iterator it = orderColumns.iterator(); it.hasNext();) {
-            Object[] orderField = (Object[]) it.next();
+        for (Object[] orderField : orderColumns) {
             if (!orderField.equals(HQL_DOC_SPACE) && !orderField.equals(HQL_DOC_NAME)) {
                 hql.append(FIELD_SEPARATOR);
                 hql.append(orderField[0]);
@@ -438,7 +438,7 @@ final class GlobalSearch
      * @return the found {@link XWikiDocument}.
      * @throws XWikiException error when searching for documents.
      */
-    private Collection searchDocumentsNamesInfos(GlobalSearchQuery query,
+    private Collection<GlobalSearchResult> searchDocumentsNamesInfos(GlobalSearchQuery query,
         boolean distinctbylanguage, boolean customMapping, boolean checkRight,
         XWikiContext context) throws XWikiException
     {
@@ -468,20 +468,19 @@ final class GlobalSearch
      * @return the found {@link XWikiDocument}.
      * @throws XWikiException error when searching for documents.
      */
-    public Collection searchDocuments(GlobalSearchQuery query, boolean distinctbylanguage,
-        boolean customMapping, boolean checkRight, XWikiContext context) throws XWikiException
+    public Collection<XWikiDocument> searchDocuments(GlobalSearchQuery query,
+        boolean distinctbylanguage, boolean customMapping, boolean checkRight,
+        XWikiContext context) throws XWikiException
     {
-        Collection results =
+        Collection<GlobalSearchResult> results =
             searchDocumentsNamesInfos(query, distinctbylanguage, customMapping, checkRight,
                 context);
 
-        List documents = new ArrayList(results.size());
+        List<XWikiDocument> documents = new ArrayList<XWikiDocument>(results.size());
 
         String database = context.getDatabase();
         try {
-            for (Iterator it = results.iterator(); it.hasNext();) {
-                GlobalSearchResult result = (GlobalSearchResult) it.next();
-
+            for (GlobalSearchResult result : results) {
                 XWikiDocument doc = new XWikiDocument();
                 doc.setSpace((String) result.get(HQL_DOC_SPACE));
                 doc.setName((String) result.get(HQL_DOC_NAME));
@@ -521,18 +520,17 @@ final class GlobalSearch
      * @return the found {@link XWikiDocument}.
      * @throws XWikiException error when searching for documents.
      */
-    public Collection searchDocumentsNames(GlobalSearchQuery query, boolean distinctbylanguage,
-        boolean customMapping, boolean checkRight, XWikiContext context) throws XWikiException
+    public Collection<String> searchDocumentsNames(GlobalSearchQuery query,
+        boolean distinctbylanguage, boolean customMapping, boolean checkRight,
+        XWikiContext context) throws XWikiException
     {
-        Collection results =
+        Collection<GlobalSearchResult> results =
             searchDocumentsNamesInfos(query, distinctbylanguage, customMapping, checkRight,
                 context);
 
-        List documentsNames = new ArrayList(results.size());
+        List<String> documentsNames = new ArrayList<String>(results.size());
 
-        for (Iterator it = results.iterator(); it.hasNext();) {
-            GlobalSearchResult result = (GlobalSearchResult) it.next();
-
+        for (GlobalSearchResult result : results) {
             documentsNames.add(result.getWikiName() + ":" + result.get(HQL_DOC_SPACE) + "."
                 + result.get(HQL_DOC_NAME));
         }

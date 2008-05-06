@@ -11,7 +11,7 @@ import java.util.Iterator;
  * 
  * @version $Id: $
  */
-public class GlobalSearchResult extends HashMap
+public class GlobalSearchResult extends HashMap<String, Object>
 {
     /**
      * The name of the wiki where this was found.
@@ -21,7 +21,7 @@ public class GlobalSearchResult extends HashMap
     /**
      * The found values.
      */
-    private Collection result;
+    private Collection<Object> result;
 
     /**
      * Create new {@link GlobalSearchResult} instance.
@@ -38,15 +38,14 @@ public class GlobalSearchResult extends HashMap
      * @param names the names of the columns to link with values.
      * @param values the found values.
      */
-    public GlobalSearchResult(String wikiName, Iterable names, Object[] values)
+    public GlobalSearchResult(String wikiName, Iterable<String> names, Object[] values)
     {
         setWikiName(wikiName);
 
-        this.result = new ArrayList(values.length);
-        Iterator nameIt = names.iterator();
-        for (int i = 0; i < values.length; ++i) {
-            Object value = values[i];
+        this.result = new ArrayList<Object>(values.length);
 
+        Iterator<String> nameIt = names.iterator();
+        for (Object value : values) {
             this.result.add(value);
             put(nameIt.next(), value);
         }
@@ -71,9 +70,9 @@ public class GlobalSearchResult extends HashMap
     /**
      * @param result the found values.
      */
-    public void setResult(Collection result)
+    public void setResult(Collection< ? > result)
     {
-        this.result = new ArrayList(result);
+        this.result = new ArrayList<Object>(result);
     }
 
     /**
@@ -87,7 +86,7 @@ public class GlobalSearchResult extends HashMap
     /**
      * @return the found values.
      */
-    public Collection getResult()
+    public Collection<Object> getResult()
     {
         return result;
     }

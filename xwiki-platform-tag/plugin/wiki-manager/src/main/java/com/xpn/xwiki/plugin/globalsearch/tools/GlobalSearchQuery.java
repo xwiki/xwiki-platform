@@ -14,7 +14,7 @@ public class GlobalSearchQuery
     /**
      * The names of wikis where to search.
      */
-    private List wikiNameList = new ArrayList();
+    private List<String> wikiNameList = new ArrayList<String>();
 
     /**
      * The hql query.
@@ -24,7 +24,7 @@ public class GlobalSearchQuery
     /**
      * The values to insert in the named query.
      */
-    private List parameterList = new ArrayList();
+    private List<Object> parameterList = new ArrayList<Object>();
 
     /**
      * The maximum number of results.
@@ -39,7 +39,7 @@ public class GlobalSearchQuery
     /**
      * @param wikiNameList names of wikis where to search.
      */
-    public void addWikiNameList(Collection wikiNameList)
+    public void addWikiNameList(Collection<String> wikiNameList)
     {
         this.wikiNameList.addAll(wikiNameList);
     }
@@ -47,7 +47,7 @@ public class GlobalSearchQuery
     /**
      * @param wikiNameList the names of wikis where to search.
      */
-    public void setWikiNameList(Collection wikiNameList)
+    public void setWikiNameList(Collection<String> wikiNameList)
     {
         this.wikiNameList.clear();
         if (wikiNameList != null) {
@@ -66,7 +66,7 @@ public class GlobalSearchQuery
     /**
      * @return the names of wikis where to search.
      */
-    public Collection getWikiNameList()
+    public Collection<String> getWikiNameList()
     {
         return this.wikiNameList;
     }
@@ -90,7 +90,7 @@ public class GlobalSearchQuery
     /**
      * @param values values to insert in the named query.
      */
-    public void addParameterList(Collection values)
+    public void addParameterList(Collection< ? > values)
     {
         this.parameterList.addAll(values);
     }
@@ -98,7 +98,7 @@ public class GlobalSearchQuery
     /**
      * @param values the values to insert in the named query.
      */
-    public void setParameterList(Collection values)
+    public void setParameterList(Collection< ? > values)
     {
         this.parameterList.clear();
         this.parameterList.addAll(values);
@@ -115,7 +115,7 @@ public class GlobalSearchQuery
     /**
      * @return the values to insert in the named query.
      */
-    public List getParameterList()
+    public List<Object> getParameterList()
     {
         return this.parameterList;
     }

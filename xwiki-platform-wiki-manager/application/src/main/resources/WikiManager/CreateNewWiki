@@ -12,10 +12,10 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1210062428000</date>
-<contentUpdateDate>1210062428000</contentUpdateDate>
-<version>79.1</version>
-<title></title>
+<date>1210081240000</date>
+<contentUpdateDate>1210081240000</contentUpdateDate>
+<version>82.1</version>
+<title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
@@ -378,15 +378,15 @@
 {/pre}
 &lt;form method="get" action="" id="wikicreationform"&gt;
   #if ($wstepbystep)
-  &lt;fieldset id="$WSTEPNAME_INTRO"&gt;
+  &lt;div id="$WSTEPNAME_INTRO"&gt;
     ##1.1 $msg.get("wikimanager.title.createwiki.intro")
     &lt;p&gt;$msg.get("wikimanager.doc.createwiki.intro")&lt;/p&gt;
-  &lt;/fieldset&gt;
+  &lt;/div&gt;
   #end
   ##
   #############################################################################
   ##
-  &lt;fieldset id="$WSTEPNAME_WIKINAME"&gt;
+  &lt;div id="$WSTEPNAME_WIKINAME"&gt;
     #if ($wstepbystep)
       1.1 $msg.get("wikimanager.title.createwiki.wikiname")
     #end
@@ -405,11 +405,11 @@
         #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.wikiname")&lt;/td&gt; #end
       &lt;/tr&gt;
     &lt;/table&gt;
-  &lt;/fieldset&gt;
+  &lt;/div&gt;
   ##
   #############################################################################
   ##
-  &lt;fieldset id="$WSTEPNAME_WIKIDESC"&gt;
+  &lt;div id="$WSTEPNAME_WIKIDESC"&gt;
     #if ($wstepbystep)
       1.1 $msg.get("wikimanager.title.createwiki.desc")
       #if ($documentation) $msg.get("wikimanager.doc.createwiki.desc") #end
@@ -452,11 +452,11 @@
         #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.owner")&lt;/td&gt; #end
       &lt;/tr&gt;
     &lt;/table&gt;
-  &lt;/fieldset&gt;
+  &lt;/div&gt;
   ##
   #############################################################################
   ##
-  &lt;fieldset id="$WSTEPNAME_DATAFROM"&gt;
+  &lt;div id="$WSTEPNAME_DATAFROM"&gt;
     #if ($wstepbystep)
       1.1 $msg.get("wikimanager.title.createwiki.datafrom")
       #if ($documentation) $msg.get("wikimanager.doc.createwiki.datafrom") #end
@@ -497,14 +497,14 @@
         #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.datafrom.package")&lt;/td&gt; #end
       &lt;/tr&gt;
     &lt;/table&gt;
-  &lt;/fieldset&gt;
+  &lt;/div&gt;
   ##
   #############################################################################
   ##
   #set ($rightsmanager = $xwiki.rightsmanager)
   #set ($users = $rightsmanager.usersApi.allGlobalUsersNames)
   #set ($groups = $rightsmanager.groupsApi.allGlobalGroupsNames)
-  &lt;fieldset id="$WSTEPNAME_USERS"&gt;
+  &lt;div id="$WSTEPNAME_USERS"&gt;
     #if ($wstepbystep)
       1.1 $msg.get("wikimanager.title.createwiki.members")
       #if ($documentation) $msg.get("wikimanager.doc.createwiki.members") #end
@@ -538,12 +538,12 @@
         #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.members.administrators")&lt;/td&gt; #end
       &lt;/tr&gt;
     &lt;/table&gt;
-  &lt;/fieldset&gt;
+  &lt;/div&gt;
   ##
   #############################################################################
   ##
   #if ($wstepbystep)
-  &lt;fieldset id="$WSTEPNAME_SUMMARY"&gt;
+  &lt;div id="$WSTEPNAME_SUMMARY"&gt;
     1.1 $msg.get("wikimanager.title.createwiki.summary")
     #if ($documentation) $msg.get("wikimanager.doc.createwiki.summary") #end
     &lt;table class="wiki-table" border="0" cellpadding="0" cellspacing="0"&gt;
@@ -561,12 +561,12 @@
         &lt;tr class="table-odd"&gt;&lt;td&gt;*$msg.get("wikimanager.admins")*&lt;/td&gt;&lt;td id="summaryadmins"&gt;---&lt;/td&gt;&lt;/tr&gt;
       &lt;/tbody&gt;
     &lt;/table&gt;
-  &lt;/fieldset&gt;
+  &lt;/div&gt;
   #end
   ##
   #############################################################################
   ##
-  &lt;fieldset&gt;
+  &lt;div&gt;
     #if ($wstepbystep)
       &lt;a href="javascript:void(0)" id="actionprevious" class="button" onclick="goPrevious();"&gt;${msg.get("wikimanager.action.previous")}&lt;/a&gt;
       |
@@ -578,7 +578,7 @@
       #if ($request.doc) &lt;input type="hidden" name="doc" value="$request.doc" /&gt; #end
       &lt;input type="submit" id="actioncreatebutton" name="actioncreate" value="${msg.get("create")}" onclick="return validate();" /&gt;
     &lt;/div&gt;
-  &lt;/fieldset&gt;
+  &lt;/div&gt;
 &lt;/form&gt;
 {pre}
 &lt;script type="text/javascript"&gt;

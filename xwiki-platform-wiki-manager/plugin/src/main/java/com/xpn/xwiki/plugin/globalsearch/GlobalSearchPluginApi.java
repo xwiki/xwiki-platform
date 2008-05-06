@@ -3,7 +3,6 @@ package com.xpn.xwiki.plugin.globalsearch;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.Locale;
 
 import org.apache.commons.logging.Log;
@@ -11,11 +10,13 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.PluginApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.api.XWikiExceptionApi;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchQuery;
+import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchResult;
 
 /**
  * API tool to be able to make and merge multi wikis search queries.
@@ -87,24 +88,27 @@ public class GlobalSearchPluginApi extends PluginApi
      *            <li>"*" is not supported in SELECT clause.</li>
      *            <li>All ORDER BY fields has to be listed in SELECT clause.</li>
      *            </ul>
-     * @return the search result as list of
-     *         {@link com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchResult} containing all
-     *         selected fields values.
+     * @return the search result as list of {@link GlobalSearchResult} containing all selected
+     *         fields values.
      * @throws XWikiException error when executing query.
      */
-    public Collection search(GlobalSearchQuery query) throws XWikiException
+    public Collection<GlobalSearchResult> search(GlobalSearchQuery query) throws XWikiException
     {
-        Collection results = Collections.EMPTY_LIST;
+        Collection<GlobalSearchResult> results;
 
         try {
             if (hasProgrammingRights()) {
                 results = search.search(query, this.context);
+            } else {
+                results = Collections.emptyList();
             }
         } catch (GlobalSearchException e) {
             LOG.error(messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            
+            results = Collections.emptyList();
         }
 
         return results;
@@ -123,27 +127,29 @@ public class GlobalSearchPluginApi extends PluginApi
      *            </ul>
      * @param distinctbylanguage when a document has multiple version for each language it is
      *            returned as one document a language.
-     * @return the found {@link com.xpn.xwiki.api.Document}.
+     * @return the found {@link Document}.
      * @throws XWikiException error when executing query.
      */
-    public Collection searchDocuments(GlobalSearchQuery query, boolean distinctbylanguage)
-        throws XWikiException
+    public Collection<Document> searchDocuments(GlobalSearchQuery query,
+        boolean distinctbylanguage) throws XWikiException
     {
-        Collection documentList = Collections.EMPTY_LIST;
+        Collection<Document> documentList;
 
         try {
-            Collection documents =
+            Collection<XWikiDocument> documents =
                 search.searchDocuments(query, distinctbylanguage, false, true, this.context);
 
-            documentList = new ArrayList(documents.size());
-            for (Iterator it = documents.iterator(); it.hasNext();) {
-                documentList.add(((XWikiDocument) it.next()).newDocument(context));
+            documentList = new ArrayList<Document>(documents.size());
+            for (XWikiDocument doc : documents) {
+                documentList.add(doc.newDocument(context));
             }
         } catch (GlobalSearchException e) {
             LOG.error(messageTool.get(GlobalSearchMessageTool.LOG_SEARCHDOCUMENTS), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+
+            documentList = Collections.emptyList();
         }
 
         return documentList;
@@ -167,10 +173,10 @@ public class GlobalSearchPluginApi extends PluginApi
      * @return the found {@link com.xpn.xwiki.api.Document}.
      * @throws XWikiException error when executing query.
      */
-    public Collection searchDocumentsNames(GlobalSearchQuery query, boolean distinctbylanguage,
-        boolean checkRight) throws XWikiException
+    public Collection<String> searchDocumentsNames(GlobalSearchQuery query,
+        boolean distinctbylanguage, boolean checkRight) throws XWikiException
     {
-        Collection results = Collections.EMPTY_LIST;
+        Collection<String> results;
 
         try {
             results =
@@ -181,6 +187,8 @@ public class GlobalSearchPluginApi extends PluginApi
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            
+            results = Collections.emptyList();
         }
 
         return results;

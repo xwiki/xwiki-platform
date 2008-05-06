@@ -89,30 +89,30 @@ public class ActivityEventImpl implements ActivityEvent
         return context.getWiki().getLocalUserName(user, context);
     }
 
-    public void setParams(List params)
+    public void setParams(List<String> params)
     {
         if (params != null) {
             if (params.size() > 0) {
-                setParam1(params.get(0).toString());
+                setParam1(params.get(0));
             }
             if (params.size() > 1) {
-                setParam2(params.get(1).toString());
+                setParam2(params.get(1));
             }
             if (params.size() > 2) {
-                setParam3(params.get(2).toString());
+                setParam3(params.get(2));
             }
             if (params.size() > 3) {
-                setParam4(params.get(3).toString());
+                setParam4(params.get(3));
             }
             if (params.size() > 4) {
-                setParam5(params.get(4).toString());
+                setParam5(params.get(4));
             }
         }
     }
 
-    public List getParams()
+    public List<String> getParams()
     {
-        List params = new ArrayList();
+        List<String> params = new ArrayList<String>();
         params.add(getParam1());
         params.add(getParam2());
         params.add(getParam3());

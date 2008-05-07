@@ -296,7 +296,7 @@ public class ActivityStreamImpl implements ActivityStream, XWikiDocChangeNotific
     public List<ActivityEvent> getEvents(boolean filter, int nb, int start, XWikiContext context)
         throws ActivityStreamException
     {
-        return searchEvents("1==1", filter, nb, start, context);
+        return searchEvents("1=1", filter, nb, start, context);
     }
 
     public List<ActivityEvent> getEventsForSpace(String space, boolean filter, int nb, int start,

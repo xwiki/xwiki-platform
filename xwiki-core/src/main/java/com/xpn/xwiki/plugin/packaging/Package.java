@@ -580,6 +580,8 @@ public class Package
                     deleteddoc = deleteddoc.getTranslatedDocument(doc.getLanguage(), context);
                 }
                 try {
+                    // This is not a real document delete, it's a upgrade. To be sure to not
+                    // generate DELETE notifications we directly use {@link XWikiStoreInterface}
                 	context.getWiki().getStore().deleteXWikiDoc(deleteddoc, context);
                 } catch (Exception e) {
                     // let's log the error but not stop

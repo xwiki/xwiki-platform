@@ -104,6 +104,40 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     }
 
     /**
+     * @return the key used to cache the Velocity Engines. We have one Velocity Engine
+     *         per skin which has a macros.vm file on the filesystem. Right now we don't
+     *         support macros.vm defined in custom skins in wiki pages.
+     */
+    private static String getVelocityEngineCacheKey(String skin, XWikiContext context)
+    {
+        // We need the path relative to the webapp's home folder so we need to remove all path before
+        // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
+        String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
+        String cacheKey;
+        if (skinMacros != null) {
+            // We're only using the path starting with the skin name since sometimes we'll
+            // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...", 
+            // sometimes we get "skins/<skinname>/..." and if the skin is done in wiki pages
+        	// we get ".../skin/...".
+        	int pos = skinMacros.indexOf("skins/");
+        	if (pos > -1) {
+        		cacheKey = skinMacros.substring(pos);
+        	} else {
+        		// If the macros.vm file is stored in a wiki page (in a macros.vm property in
+        		// a XWikiSkins object) then we use the parent skin's macros.vm since we 
+        		// currently don't support having global velocimacros defined in wiki pages.
+        		String baseSkin = context.getWiki().getBaseSkin(context);
+        		cacheKey = getVelocityEngineCacheKey(baseSkin, context);
+        	}
+        } else {
+            // If no skin macros.vm file exists then use a "default" cache id
+        	cacheKey = "default";
+        }
+        
+        return cacheKey;
+    }
+    
+    /**
      * @todo Move this initialization code to a Skin Manager component.
      */
     public static VelocityEngine getVelocityEngine(XWikiContext context) throws XWikiVelocityException
@@ -118,19 +152,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     	
         // Get the location of the skin's macros.vm file
         String skin = context.getWiki().getSkin(context);
-        // We need the path relative to the webapp's home folder so we need to remove all path before
-        // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
-        String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
-        String cacheKey;
-        if (skinMacros != null) {
-            // We're only using the path starting with the skin name since sometimes we'll
-            // get /skins/skins/<skinname>/..., sometimes we get "/skins/<skinname>/..." 
-            // and sometimes we get "skins/<skinname>/... 
-        	cacheKey = skinMacros.substring(skinMacros.indexOf("skins/"));
-        } else {
-            // If no skin macros.vm file exists then use a "default" cache id
-        	cacheKey = "default";
-        }
+        String cacheKey = getVelocityEngineCacheKey(skin, context);
 
         // Get the Velocity Engine to use
         VelocityFactory velocityFactory =
@@ -141,7 +163,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         } else {
 	        // Gather the global Velocity macros that we want to have. These are skin dependent. 
 	        Properties properties = new Properties();
-	        String macroList = "/templates/macros.vm" + ((skinMacros == null) ? "" : "," + cacheKey); 
+	        String macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey); 
 	        properties.put(RuntimeConstants.VM_LIBRARY, macroList);
     		velocityEngine = velocityFactory.createVelocityEngine(cacheKey, properties);
         }    	

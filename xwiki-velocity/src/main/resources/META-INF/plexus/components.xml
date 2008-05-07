@@ -36,7 +36,12 @@
           <!-- Prevents users from writing dangerous Velocity code like using Class.forName or Java threading APIs. -->
           <property>
             <name>runtime.introspector.uberspect</name>
-            <value>org.apache.velocity.util.introspection.SecureUberspector</value>
+<!--            <value>org.apache.velocity.util.introspection.SecureUberspector</value> -->
+            <value>org.xwiki.velocity.introspection.ChainingUberspector</value>
+          </property>
+          <property>
+            <name>runtime.introspector.uberspect.chainClasses</name>
+            <value>org.apache.velocity.util.introspection.SecureUberspector,org.xwiki.velocity.introspection.DeprecatedCheckUberspector</value>
           </property>
           <property>
             <name>resource.manager.logwhenfound</name>

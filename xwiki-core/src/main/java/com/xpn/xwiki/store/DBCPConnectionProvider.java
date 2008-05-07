@@ -185,7 +185,8 @@ public class DBCPConnectionProvider implements ConnectionProvider {
             logStatistics();
         }
         catch (Exception e) {
-            String message = "Could not create a DBCP pool";
+            String message = "Could not create a DBCP pool. " +
+            		"There is an error in the hibernate configuration file, please review it.";
             log.fatal(message, e);
             if (ds != null) {
                 try {

@@ -134,6 +134,11 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
         }
     }
 
+    /**
+     * Delete the passed events from the database.
+     * 
+     * @param evs the events to be deleted
+     */
     public void deleteActivityEvents(List<ActivityEvent> evs) throws ActivityStreamException
     {
         if (hasProgrammingRights()) {
@@ -144,6 +149,18 @@ public class ActivityStreamPluginApi extends PluginApi<ActivityStreamPlugin>
                     getActivityStream().deleteActivityEvent(ev, context);
                 }
             }
+        }
+    }
+
+    /**
+     * Delete the passed event form the database.
+     * 
+     * @param event the event to delete from database
+     */
+    public void deleteActivityEvent(ActivityEvent event) throws ActivityStreamException
+    {
+        if (hasProgrammingRights()) {
+            getActivityStream().deleteActivityEvent(event.getEvent(), context);
         }
     }
 

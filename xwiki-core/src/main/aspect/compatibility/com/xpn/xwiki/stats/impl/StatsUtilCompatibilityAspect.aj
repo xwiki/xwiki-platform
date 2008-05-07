@@ -32,14 +32,14 @@ public privileged aspect StatsUtilCompatibilityAspect
     /**
      * @deprecated Use {@link PeriodType} since 1.4M1.
      */
-    //@Deprecated
-    //public static int StatsUtil.PERIOD_MONTH = 0;
+    @Deprecated
+    public static int StatsUtil.PERIOD_MONTH = 0;
 
     /**
      * @deprecated Use {@link PeriodType} since 1.4M1.
      */
-    //@Deprecated
-    //public static int StatsUtil.PERIOD_DAY = 1;
+    @Deprecated
+    public static int StatsUtil.PERIOD_DAY = 1;
 
     /**
      * Computes an integer representation of the passed date using the following format:
@@ -56,9 +56,9 @@ public privileged aspect StatsUtilCompatibilityAspect
      *             {@link StatsUtil#getPeriodAsInt(Date, com.xpn.xwiki.stats.impl.StatsUtil.PeriodType)}
      *             since 1.4M1.
      */
-    //@Deprecated
-    /*public static int StatsUtil.getPeriodAsInt(Date date, int type)
+    @Deprecated
+    public static int StatsUtil.getPeriodAsInt(Date date, int type)
     {
         return StatsUtil.getPeriodAsInt(date, PeriodType.values()[type]);
-    }*/
+    }
 }

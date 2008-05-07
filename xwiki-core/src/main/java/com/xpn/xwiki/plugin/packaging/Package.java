@@ -346,10 +346,7 @@ public class Package
                 Object[] args = new Object[1];
                 args[0] = dir.toString();
                 throw new XWikiException(XWikiException.MODULE_XWIKI,
-                    XWikiException.ERROR_XWIKI_MKDIR,
-                    "Error creating directory {0}",
-                    null,
-                    args);
+                    XWikiException.ERROR_XWIKI_MKDIR, "Error creating directory {0}", null, args);
             }
         }
 
@@ -574,12 +571,15 @@ public class Package
         if (status == DocumentInfo.INSTALL_OK || status == DocumentInfo.INSTALL_ALREADY_EXIST
             && doc.getAction() == DocumentInfo.ACTION_OVERWRITE) {
             if (status == DocumentInfo.INSTALL_ALREADY_EXIST) {
-            	XWikiDocument deleteddoc = context.getWiki().getDocument(doc.getFullName(), context);
-        		//if this document is a translation: we should only delete the translation
+                XWikiDocument deleteddoc =
+                    context.getWiki().getDocument(doc.getFullName(), context);
+                // if this document is a translation: we should only delete the translation
                 if (doc.getDoc().getTranslation() != 0) {
                     deleteddoc = deleteddoc.getTranslatedDocument(doc.getLanguage(), context);
                 }
                 try {
+                    // This is not a real document delete, it's a upgrade. To be sure to not
+                    // generate DELETE notification we directly use {@link XWikiStoreInterface}
                     context.getWiki().getStore().deleteXWikiDoc(deleteddoc, context);
                 } catch (Exception e) {
                     // let's log the error but not stop
@@ -881,9 +881,7 @@ public class Package
                     Object[] args = new Object[1];
                     args[0] = dir.toString();
                     throw new XWikiException(XWikiException.MODULE_XWIKI,
-                        XWikiException.ERROR_XWIKI_MKDIR,
-                        "Error creating directory {0}",
-                        null,
+                        XWikiException.ERROR_XWIKI_MKDIR, "Error creating directory {0}", null,
                         args);
                 }
             }
@@ -909,10 +907,7 @@ public class Package
             Object[] args = new Object[1];
             args[0] = doc.getFullName();
             throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_XWIKI_DOC_EXPORT,
-                "Error creating file {0}",
-                e,
-                args);
+                XWikiException.ERROR_XWIKI_DOC_EXPORT, "Error creating file {0}", e, args);
         }
     }
 

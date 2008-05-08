@@ -42,8 +42,7 @@ import java.io.Reader;
  * configuration values defined in the component's configuration. Note that the {@link #initialize}
  * method has to be executed before any other method can be called.
  */
-public class DefaultVelocityEngine extends AbstractLogEnabled
-    implements VelocityEngine, LogChute
+public class DefaultVelocityEngine extends AbstractLogEnabled implements VelocityEngine, LogChute
 {
     private org.apache.velocity.app.VelocityEngine engine;
 
@@ -52,9 +51,10 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
     private Container container;
 
     private RuntimeServices rsvc;
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see VelocityEngine#initialize(Properties)
      */
     public void initialize(Properties properties) throws XWikiVelocityException
@@ -62,7 +62,8 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
         this.engine = new org.apache.velocity.app.VelocityEngine();
 
         // If the Velocity configuration uses the Velocity Tools
-        // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> class then we need to set the
+        // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> class then we need to
+        // set the
         // ServletContext object as a Velocity Application Attribute as it's used to load resources
         // from the webapp directory in WebapLoader.
         ApplicationContext context = this.container.getApplicationContext();
@@ -78,59 +79,60 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
 
         // Configure Velocity by passing the properties defined in this component's configuration
         if (this.properties != null) {
-            for (Enumeration<?> e = this.properties.propertyNames(); e.hasMoreElements();) {
+            for (Enumeration< ? > e = this.properties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
                 // Only set a property if it's not overridden by one of the passed properties
                 if (!properties.containsKey(key)) {
-	                String value = this.properties.getProperty(key);
-	                getEngine().setProperty(key, value);
-	                getLogger().debug("Setting property [" + key + "] = [" + value + "]");
+                    String value = this.properties.getProperty(key);
+                    getEngine().setProperty(key, value);
+                    getLogger().debug("Setting property [" + key + "] = [" + value + "]");
                 }
             }
         }
 
         // Override the component's static properties with the ones passed in parameter
         if (properties != null) {
-            for (Enumeration<?> e = properties.propertyNames(); e.hasMoreElements();) {
+            for (Enumeration< ? > e = properties.propertyNames(); e.hasMoreElements();) {
                 String key = e.nextElement().toString();
                 String value = properties.getProperty(key);
                 getEngine().setProperty(key, value);
                 getLogger().debug("Overriding property [" + key + "] = [" + value + "]");
             }
         }
-        
+
         try {
             getEngine().init();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new XWikiVelocityException("Cannot start the Velocity engine", e);
         }
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see VelocityEngine#evaluate(Context, java.io.Writer, String, String)
      */
-    public boolean evaluate(Context context, Writer out, String templateName,
-        String source) throws XWikiVelocityException
+    public boolean evaluate(Context context, Writer out, String templateName, String source)
+        throws XWikiVelocityException
     {
         return evaluate(context, out, templateName, new StringReader(source));
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see VelocityEngine#evaluate(Context, java.io.Writer, String, String)
      * @see #init(RuntimeServices)
      */
-    public boolean evaluate(Context context, Writer out, String templateName,
-        Reader source) throws XWikiVelocityException
+    public boolean evaluate(Context context, Writer out, String templateName, Reader source)
+        throws XWikiVelocityException
     {
         // We override the default implementation here. See #init(RuntimeServices)
         // for explanations.
         try {
             SimpleNode nodeTree = null;
 
-            // The trick is done here: We use the signature that allows 
+            // The trick is done here: We use the signature that allows
             // passing a boolean and we pass false, thus preventing Velocity
             // from cleaning the context of its velocimacros even though the
             // config property velocimacro.permissions.allow.inline.local.scope
@@ -143,8 +145,7 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
                 try {
                     nodeTree.init(ica, this.rsvc);
                     nodeTree.render(ica, out);
-                }
-                finally {
+                } finally {
                     ica.popCurrentTemplateName();
                 }
                 return true;
@@ -152,8 +153,8 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
 
             return false;
         } catch (Exception e) {
-            throw new XWikiVelocityException("Failed to evaluate content with id [" + templateName
-                + "]", e);
+            throw new XWikiVelocityException("Failed to evaluate content with id ["
+                + templateName + "]", e);
         }
     }
 
@@ -167,24 +168,26 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see LogChute#init(org.apache.velocity.runtime.RuntimeServices)   
+     * 
+     * @see LogChute#init(org.apache.velocity.runtime.RuntimeServices)
      */
     public void init(RuntimeServices runtimeServices)
     {
         // We save the RuntimeServices instance in order to be able to override the
-        // VelocityEngine.evaluate() method. We need to do this so that it's possible 
-        // to make macros included with #includeMacros() work even though we're using 
+        // VelocityEngine.evaluate() method. We need to do this so that it's possible
+        // to make macros included with #includeMacros() work even though we're using
         // the Velocity setting:
-        //   velocimacro.permissions.allow.inline.local.scope = true
+        // velocimacro.permissions.allow.inline.local.scope = true
         // TODO: Fix this when by rewriting the XWiki.include() implementation so that
-        // included Velocity templates are added to the current document before 
+        // included Velocity templates are added to the current document before
         // evaluation instead of doing 2 separate executions.
         this.rsvc = runtimeServices;
     }
 
     /**
      * {@inheritDoc}
-     * @see LogChute#log(int, String) 
+     * 
+     * @see LogChute#log(int, String)
      */
     public void log(int level, String message)
     {
@@ -210,6 +213,7 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
+     * 
      * @see LogChute#log(int, String, Throwable)
      */
     public void log(int level, String message, Throwable throwable)
@@ -236,7 +240,8 @@ public class DefaultVelocityEngine extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     * @see LogChute#isLevelEnabled(int) 
+     * 
+     * @see LogChute#isLevelEnabled(int)
      */
     public boolean isLevelEnabled(int level)
     {

@@ -45,10 +45,11 @@ import org.apache.velocity.util.introspection.UberspectLoggable;
  * The chain is defined using the configuration parameter
  * <code>runtime.introspector.uberspect.chainClasses</code>. This property should contain a list
  * of canonical class names. Any wrong entry in the list will be ignored. If this property is not
- * defined or contains only wrong classnames, then by default a SecureUberspector is used as the
- * only entry in the chain. The first (leftmost) uberspector must not be chinable (as it will not
- * need to forward calls). If a uberspector in the middle of the chain is not chainable, then it
- * will break the chain at that point (all previos uberspectors will be discarded from the chain).
+ * defined or contains only wrong classnames, then by default a <code>SecureUberspector</code> is
+ * used as the only entry in the chain. The first (leftmost) uberspector must not be chainable (as
+ * it will not need to forward calls). If a uberspector in the middle of the chain is not chainable,
+ * then it will break the chain at that point (all previos uberspectors will be discarded from the
+ * chain).
  * </p>
  * 
  * @since 1.5M1
@@ -65,11 +66,10 @@ public class ChainingUberspector extends ChainableUberspectorBase implements Ube
         "runtime.introspector.uberspect.chainClasses";
 
     /**
-     * {@inheritDoc RuntimeServicesAware}
+     * {@inheritDoc}
      * 
      * @see org.apache.velocity.util.RuntimeServicesAware#setRuntimeServices(org.apache.velocity.runtime.RuntimeServices)
      */
-    @Override
     public void setRuntimeServices(RuntimeServices rs)
     {
         this.runtime = rs;
@@ -101,14 +101,7 @@ public class ChainingUberspector extends ChainableUberspectorBase implements Ube
                 + "to actually allow method calls. Using SecureUberspect.");
             initializeUberspector("org.apache.velocity.util.introspection.SecureUberspector");
         }
-        // Now send the log and runtime services in the chain...
-        if (inner instanceof UberspectLoggable) {
-            ((UberspectLoggable) inner).setLog(log);
-        }
-        if (inner instanceof RuntimeServicesAware) {
-            ((RuntimeServicesAware) inner).setRuntimeServices(runtime);
-        }
-        // ...and initialize all the uberspectors in the chain
+        // Initialize all the uberspectors in the chain
         try {
             inner.init();
         } catch (Exception e) {
@@ -124,7 +117,7 @@ public class ChainingUberspector extends ChainableUberspectorBase implements Ube
      */
     protected void initializeUberspector(String classname)
     {
-        // Avoid recursive calls
+        // Avoids direct recursive calls
         if (!StringUtils.isEmpty(classname)
             && !classname.equals(this.getClass().getCanonicalName())) {
             Object o = null;
@@ -146,13 +139,24 @@ public class ChainingUberspector extends ChainableUberspectorBase implements Ube
             }
 
             if (!(o instanceof Uberspect)) {
-                log.error("The specified class for Uberspect [" + classname
-                    + "] does not implement " + Uberspect.class.getName());
+                if (o != null) {
+                    log.error("The specified class for Uberspect [" + classname
+                        + "] does not implement " + Uberspect.class.getName());
+                }
                 return;
             }
 
             Uberspect u = (Uberspect) o;
 
+            // Set the log and runtime services, if applicable
+            if (u instanceof UberspectLoggable) {
+                ((UberspectLoggable) u).setLog(log);
+            }
+            if (u instanceof RuntimeServicesAware) {
+                ((RuntimeServicesAware) u).setRuntimeServices(runtime);
+            }
+
+            // Link it in the chain
             if (u instanceof ChainableUberspector) {
                 ((ChainableUberspector) u).wrap(inner);
             }

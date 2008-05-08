@@ -22,27 +22,23 @@ package org.xwiki.velocity.introspection;
 
 import java.util.Iterator;
 
-import org.apache.velocity.runtime.RuntimeServices;
-import org.apache.velocity.runtime.log.Log;
-import org.apache.velocity.util.RuntimeServicesAware;
 import org.apache.velocity.util.introspection.Info;
 import org.apache.velocity.util.introspection.Uberspect;
 import org.apache.velocity.util.introspection.UberspectImpl;
-import org.apache.velocity.util.introspection.UberspectLoggable;
 import org.apache.velocity.util.introspection.VelMethod;
 import org.apache.velocity.util.introspection.VelPropertyGet;
 import org.apache.velocity.util.introspection.VelPropertySet;
 
 /**
  * Default implementation of a {@link ChainableUberspector chainable uberspector} that forwards all
- * calls to the wrapped uberspector (when that is possible, as it may not implement
- * RuntimeServicesAware, for example). It should be used as the base for all chainable uberspectors.
+ * calls to the wrapped uberspector (when that is possible). It should be used as the base class for
+ * all chainable uberspectors.
  * 
  * @since 1.5M1
  * @see ChainableUberspector
  */
-public class ChainableUberspectorBase extends UberspectImpl implements ChainableUberspector,
-    RuntimeServicesAware, UberspectLoggable
+public abstract class ChainableUberspectorBase extends UberspectImpl implements
+    ChainableUberspector
 {
     /** The wrapped (decorated) uberspector. */
     protected Uberspect inner;
@@ -58,10 +54,12 @@ public class ChainableUberspectorBase extends UberspectImpl implements Chainable
     @Override
     public void init()
     {
-        try {
-            inner.init();
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
+        if (inner != null) {
+            try {
+                inner.init();
+            } catch (Exception e) {
+                log.error(e.getMessage(), e);
+            }
         }
     }
 
@@ -140,39 +138,5 @@ public class ChainableUberspectorBase extends UberspectImpl implements Chainable
         throws Exception
     {
         return (inner != null) ? inner.getPropertySet(obj, identifier, arg, i) : null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This implementation stores the log in the current object and forwards the call to the wrapped
-     * uberspector, if it also implements <code>UberspectLoggable</code>.
-     * </p>
-     * 
-     * @see org.apache.velocity.util.introspection.UberspectLoggable#setLog(org.apache.velocity.runtime.log.Log)
-     */
-    @Override
-    public void setLog(Log log)
-    {
-        this.log = log;
-        if (inner instanceof UberspectLoggable) {
-            ((UberspectLoggable) inner).setLog(log);
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This implementation forwards the call to the wrapped uberspector, if it also implements
-     * <code>RuntimeServicesAware</code>.
-     * </p>
-     * 
-     * @see org.apache.velocity.util.RuntimeServicesAware#setRuntimeServices(org.apache.velocity.runtime.RuntimeServices)
-     */
-    public void setRuntimeServices(RuntimeServices rs)
-    {
-        if (inner instanceof RuntimeServicesAware) {
-            ((RuntimeServicesAware) inner).setRuntimeServices(rs);
-        }
     }
 }

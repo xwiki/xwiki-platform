@@ -62,6 +62,7 @@
         <module>spacemanager</module>
         <module>lucene</module>
         <module>activitystream</module>
+        <module>invitationmanager</module>
       </modules>
     </profile>
     <profile>
@@ -89,6 +90,7 @@
         <module>mailsender</module>
         <module>spacemanager</module>
         <module>activitystream</module>
+        <module>invitationmanager</module>
       </modules>
     </profile>
     <profile>
@@ -99,6 +101,7 @@
         <module>mailsender</module>
         <module>spacemanager</module>
         <module>activitystream</module>
+        <module>invitationmanager</module>
       </modules>
     </profile>
   </profiles>

@@ -120,7 +120,7 @@
 ##
 ## We're disabling the Watchlist menu for now since the Watchlist doesn't work yet in multiwiki
 ## mode. Remove when http://jira.xwiki.org/jira/browse/XPWATCHLIST-4 is fixed.
-#if (!$xwiki.isVirtual())
+#if (!$xwiki.isVirtualMode())
   #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew() && $xwiki.exists("XWiki.WatchListManager"))
 <script type="text/javascript">
 //<![CDATA[

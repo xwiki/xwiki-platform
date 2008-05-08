@@ -18,8 +18,8 @@ $string
 <div class="minwidth"></div>
 <hr/>
   <div id="breadcrumbs">
-    <span class="breadcrumbspace"><a href="$spaceViewUrl">$doc.web</a>: </span>
-#breadcrumb($doc "<a href='$doc.getURL('view')'>$tdoc.displayTitle</a>" 0)
+    <span class="breadcrumbspace"><a href="$spaceViewUrl">${doc.space}</a>: </span>
+#breadcrumb($doc "<a href='${doc.getURL('view')}'>$tdoc.displayTitle</a>" 0)
   </div>
 <hr/>
 </div>

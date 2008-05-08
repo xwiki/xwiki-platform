@@ -91,7 +91,9 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <phase>prepare-package</phase>
+            <!-- Right phase is prepare-package, but it is only in maven-2.1
+            <phase>prepare-package</phase>-->
+            <phase>test</phase>
             <goals>
               <goal>unpack</goal>
             </goals>

@@ -463,10 +463,8 @@ public class XWikiAttachment
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            if (LOG.isWarnEnabled()) {
-                LOG.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s",
-                    getFilename(), getDoc().getFullName(), ex.getMessage()));
-            }
+            LOG.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s",
+                getFilename(), getDoc().getFullName(), ex.getMessage()));
             return new Version[] {new Version(this.getVersion())};
         }
     }

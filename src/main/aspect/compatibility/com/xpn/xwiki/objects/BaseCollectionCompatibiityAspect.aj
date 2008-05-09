@@ -12,6 +12,7 @@ public aspect BaseCollectionCompatibiityAspect
     /**
      * @deprecated use setStringListValue or setDBStringListProperty
      */
+    @Deprecated
     public void BaseCollection.setListValue(String name, List value)
     {
         ListProperty property = (ListProperty) safeget(name);

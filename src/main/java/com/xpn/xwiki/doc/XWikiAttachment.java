@@ -459,7 +459,15 @@ public class XWikiAttachment
 
     public synchronized Version[] getVersions()
     {
-        return getAttachment_archive().getVersions();
+        try {
+            return getAttachment_archive().getVersions();
+        } catch (Exception ex) {
+            if (LOG.isWarnEnabled()) {
+                LOG.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s",
+                    getFilename(), getDoc().getFullName(), ex.getMessage()));
+            }
+            return new Version[] {new Version(this.getVersion())};
+        }
     }
 
     // We assume versions go from 1.1 to the current one

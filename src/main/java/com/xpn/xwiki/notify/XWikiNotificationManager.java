@@ -28,173 +28,245 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 
-public class XWikiNotificationManager {
-    private Vector generalrules = new Vector();
-    private Map namedrules = new HashMap();
+/**
+ * Manages general and named notifications rules.
+ * 
+ * @version $Id: $
+ */
+public class XWikiNotificationManager
+{
 
-    public XWikiNotificationManager() {
+    private Vector<XWikiNotificationRule> generalrules = new Vector<XWikiNotificationRule>();
+
+    private Map<String, Vector<XWikiNotificationRule>> namedrules =
+        new HashMap<String, Vector<XWikiNotificationRule>>();
+
+    public XWikiNotificationManager()
+    {
     }
 
-    public void addGeneralRule(XWikiNotificationRule rule) {
+    /**
+     * Add a "general" notification rule to be evaluated for any document (as opposed to a named
+     * rule)
+     * 
+     * @param rule the rule to be added
+     */
+    public void addGeneralRule(XWikiNotificationRule rule)
+    {
         synchronized (generalrules) {
             generalrules.add(rule);
         }
     }
 
-    public void removeGeneralRule(XWikiNotificationRule rule) {
+    /**
+     * Remove the given general rule
+     */
+    public void removeGeneralRule(XWikiNotificationRule rule)
+    {
         synchronized (generalrules) {
             generalrules.remove(rule);
         }
     }
 
-    public void addNamedRule(String name, XWikiNotificationRule rule) {
+    /**
+     * Add a "named" notification rule, to be evaluated only when the notification concerns the
+     * document with the given name
+     * 
+     * @param name the document's name for which the notification rule should apply. For example,
+     *            for the "Main.WebHome" document, the rule name should either be "Main.WebHome", or
+     *            "database:Main.WebHome"
+     * @param rule the rule to add for this name
+     */
+    public void addNamedRule(String name, XWikiNotificationRule rule)
+    {
         synchronized (namedrules) {
-            Vector vnamedrules = (Vector) namedrules.get(name);
-            if (vnamedrules==null) {
-                vnamedrules = new Vector();
+            Vector<XWikiNotificationRule> vnamedrules = namedrules.get(name);
+            if (vnamedrules == null) {
+                vnamedrules = new Vector<XWikiNotificationRule>();
                 namedrules.put(name, vnamedrules);
             }
             vnamedrules.add(rule);
         }
     }
 
-    public void removeNamedRule(String name) {
+    /**
+     * Remove all rules with the given name
+     */
+    public void removeNamedRule(String name)
+    {
         synchronized (namedrules) {
-            Vector vnamedrules = (Vector) namedrules.get(name);
-            if (vnamedrules!=null) {
-                vnamedrules.remove(name);
-                if (vnamedrules.size()==0)
+            Vector<XWikiNotificationRule> vnamedrules = namedrules.get(name);
+            if (vnamedrules != null) {
+                vnamedrules.removeAllElements();
+            }
+            namedrules.remove(name);
+        }
+    }
+
+    /**
+     * Remove the given rule (if it exists) from the rules with the given name
+     */
+    public void removeNamedRule(String name, XWikiNotificationRule rule)
+    {
+        synchronized (namedrules) {
+            Vector<XWikiNotificationRule> vnamedrules = namedrules.get(name);
+            if (vnamedrules != null) {
+                vnamedrules.remove(rule);
+                if (vnamedrules.size() == 0)
                     namedrules.remove(name);
             }
         }
     }
 
-    public Vector getNamedRules(String name) {
+    /**
+     * @return all named rules with the given name
+     */
+    public Vector<XWikiNotificationRule> getNamedRules(String name)
+    {
         synchronized (namedrules) {
-            return (Vector) namedrules.get(name);
+            return namedrules.get(name);
         }
     }
 
-    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
-        // Call rules explicitely for any actions of this document
-        Vector vnamedrules;
+    public void preverify(XWikiDocument newdoc, XWikiDocument olddoc, int event,
+        XWikiContext context)
+    {
+        // Call rules explicitly for any actions of this document
+        Vector<XWikiNotificationRule> vnamedrules;
         String name = newdoc.getFullName();
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
-            if (vnamedrules!=null)
-             vnamedrules = (Vector) vnamedrules.clone();
+            if (vnamedrules != null) {
+                vnamedrules = (Vector<XWikiNotificationRule>) vnamedrules.clone();
+            }
+
         }
-        if (vnamedrules!=null) {
-            for (int i=0;i<vnamedrules.size();i++)
-               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(newdoc, olddoc, context);
+        if (vnamedrules != null) {
+            for (XWikiNotificationRule rule : vnamedrules) {
+                rule.preverify(newdoc, olddoc, context);
+            }
         }
 
         name = context.getDatabase() + ":" + newdoc.getFullName();
 
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
-            if (vnamedrules!=null)
-             vnamedrules = (Vector) vnamedrules.clone();
+            if (vnamedrules != null)
+                vnamedrules = (Vector<XWikiNotificationRule>) vnamedrules.clone();
         }
-        if (vnamedrules!=null) {
-            for (int i=0;i<vnamedrules.size();i++)
-               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(newdoc, olddoc, context);
+        if (vnamedrules != null) {
+            for (XWikiNotificationRule rule : vnamedrules) {
+                rule.preverify(newdoc, olddoc, context);
+            }
         }
 
-        Vector grules;
+        Vector<XWikiNotificationRule> grules;
         synchronized (generalrules) {
-            grules = (Vector) generalrules.clone();
+            grules = (Vector<XWikiNotificationRule>) generalrules.clone();
         }
-        for (int i=0;i<grules.size();i++)
-            ((XWikiNotificationRule)grules.get(i)).preverify(newdoc, olddoc, context);
+
+        for (XWikiNotificationRule rule : grules) {
+            rule.preverify(newdoc, olddoc, context);
+        }
     }
 
-    public void verify(XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
+    public void verify(XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context)
+    {
         // Call the document notification function itself..
         newdoc.notify(null, newdoc, olddoc, event, context);
 
-        // Call rules explicitely for any actions of this document
-        Vector vnamedrules;
+        // Call rules explicitly for any actions of this document
+        Vector<XWikiNotificationRule> vnamedrules;
         String name = newdoc.getFullName();
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
-            if (vnamedrules!=null)
-             vnamedrules = (Vector) vnamedrules.clone();
+            if (vnamedrules != null)
+                vnamedrules = (Vector<XWikiNotificationRule>) vnamedrules.clone();
         }
-        if (vnamedrules!=null) {
-            for (int i=0;i<vnamedrules.size();i++)
-               ((XWikiNotificationRule)vnamedrules.get(i)).verify(newdoc, olddoc, context);
+        if (vnamedrules != null) {
+            for (XWikiNotificationRule rule : vnamedrules) {
+                rule.verify(newdoc, olddoc, context);
+            }
         }
 
         name = context.getDatabase() + ":" + newdoc.getFullName();
 
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
-            if (vnamedrules!=null)
-             vnamedrules = (Vector) vnamedrules.clone();
+            if (vnamedrules != null)
+                vnamedrules = (Vector<XWikiNotificationRule>) vnamedrules.clone();
         }
-        if (vnamedrules!=null) {
-            for (int i=0;i<vnamedrules.size();i++)
-               ((XWikiNotificationRule)vnamedrules.get(i)).verify(newdoc, olddoc, context);
+        if (vnamedrules != null) {
+            for (XWikiNotificationRule rule : vnamedrules) {
+                rule.verify(newdoc, olddoc, context);
+            }
         }
 
-        Vector grules;
+        Vector<XWikiNotificationRule> grules;
         synchronized (generalrules) {
-            grules = (Vector) generalrules.clone();
+            grules = (Vector<XWikiNotificationRule>) generalrules.clone();
         }
-        for (int i=0;i<grules.size();i++)
-            ((XWikiNotificationRule)grules.get(i)).verify(newdoc, olddoc, context);
+        for (XWikiNotificationRule rule : grules) {
+            rule.verify(newdoc, olddoc, context);
+        }
     }
 
-    public void verify(XWikiDocument doc, String action, XWikiContext context) {
-        // Call rules explicitely for any actions of this document
-        Vector vnamedrules;
+    public void verify(XWikiDocument doc, String action, XWikiContext context)
+    {
+        // Call rules explicitly for any actions of this document
+        Vector<XWikiNotificationRule> vnamedrules;
         String name = doc.getFullName();
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
-            if (vnamedrules!=null)
-             vnamedrules = (Vector) vnamedrules.clone();
+            if (vnamedrules != null)
+                vnamedrules = (Vector<XWikiNotificationRule>) vnamedrules.clone();
         }
-        if (vnamedrules!=null) {
-            for (int i=0;i<vnamedrules.size();i++)
-               ((XWikiNotificationRule)vnamedrules.get(i)).verify(doc, action, context);
+        if (vnamedrules != null) {
+            for (XWikiNotificationRule rule : vnamedrules) {
+                rule.verify(doc, action, context);
+            }
         }
         name = context.getDatabase() + ":" + doc.getFullName();
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
-            if (vnamedrules!=null)
-             vnamedrules = (Vector) vnamedrules.clone();
+            if (vnamedrules != null)
+                vnamedrules = (Vector<XWikiNotificationRule>) vnamedrules.clone();
         }
-        if (vnamedrules!=null) {
-            for (int i=0;i<vnamedrules.size();i++)
-               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(doc, action, context);
+        if (vnamedrules != null) {
+            for (XWikiNotificationRule rule : vnamedrules) {
+                rule.verify(doc, action, context);
+            }
         }
-        Vector grules;
+        Vector<XWikiNotificationRule> grules;
         synchronized (generalrules) {
-            grules = (Vector) generalrules.clone();
+            grules = (Vector<XWikiNotificationRule>) generalrules.clone();
         }
-        for (int i=0;i<grules.size();i++)
-            ((XWikiNotificationRule)grules.get(i)).verify(doc, action, context);
+        for (XWikiNotificationRule rule : grules) {
+            rule.verify(doc, action, context);
+        }
     }
 
-    public void preverify(XWikiDocument doc, String action, XWikiContext context) {
-        // Call rules explicitely for any actions of this document
-        Vector vnamedrules;
+    public void preverify(XWikiDocument doc, String action, XWikiContext context)
+    {
+        // Call rules explicitly for any actions of this document
+        Vector<XWikiNotificationRule> vnamedrules;
         String name = doc.getFullName();
         synchronized (namedrules) {
             vnamedrules = getNamedRules(name);
-            if (vnamedrules!=null)
-             vnamedrules = (Vector) vnamedrules.clone();
+            if (vnamedrules != null)
+                vnamedrules = (Vector<XWikiNotificationRule>) vnamedrules.clone();
         }
-        if (vnamedrules!=null) {
-            for (int i=0;i<vnamedrules.size();i++)
-               ((XWikiNotificationRule)vnamedrules.get(i)).preverify(doc, action, context);
+        if (vnamedrules != null) {
+            for (XWikiNotificationRule rule : vnamedrules) {
+                rule.preverify(doc, action, context);
+            }
         }
-        Vector grules;
+        Vector<XWikiNotificationRule> grules;
         synchronized (generalrules) {
-            grules = (Vector) generalrules.clone();
+            grules = (Vector<XWikiNotificationRule>) generalrules.clone();
         }
-        for (int i=0;i<grules.size();i++)
-            ((XWikiNotificationRule)grules.get(i)).preverify(doc, action, context);
+        for (XWikiNotificationRule rule : grules) {
+            rule.preverify(doc, action, context);
+        }
     }
 }

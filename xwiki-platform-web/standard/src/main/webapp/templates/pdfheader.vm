@@ -1,6 +1,6 @@
 #set($title = $pdfdoc.display("title", "rendered"))
 #if((!$title)||($title==""))
-$!doc.web - $!doc.displayTitle
+$!doc.space - $!doc.displayTitle
 #else
 $title
 #end

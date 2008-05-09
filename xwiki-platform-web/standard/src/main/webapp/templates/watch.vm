@@ -4,7 +4,7 @@
 #elseif ($do == "removedocument")
   $xwiki.watchlist.removeDocument($doc.fullName)
 #elseif ($do == "addspace")
-    $xwiki.watchlist.addSpace($doc.web)
+    $xwiki.watchlist.addSpace($doc.space)
 #elseif ($do == "removespace")
-    $xwiki.watchlist.removeSpace($doc.web)
+    $xwiki.watchlist.removeSpace($doc.space)
 #end

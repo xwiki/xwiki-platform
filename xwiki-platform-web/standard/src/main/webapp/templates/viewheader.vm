@@ -132,9 +132,9 @@
 ## Admin section
         #if($hasadmin && !$isReadOnly)
           <div class="xwikimenutitle">$msg.get("admin")</div>
-          #xwikiitem($xwiki.getURL("${doc.web}.WebHome", "view") "space")
-          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "edit", "xpage=editprefs") "webprefs")
-          #xwikiitem($xwiki.getURL("${doc.web}.WebPreferences", "edit" , "xpage=editrights&global=1") "webrights")
+          #xwikiitem($xwiki.getURL("${doc.space}.WebHome", "view") "space")
+          #xwikiitem($xwiki.getURL("${doc.space}.WebPreferences", "edit", "xpage=editprefs") "webprefs")
+          #xwikiitem($xwiki.getURL("${doc.space}.WebPreferences", "edit" , "xpage=editrights&global=1") "webrights")
           #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editprefs") "xwikiprefs")
           #xwikiitem($xwiki.getURL("XWiki.XWikiPreferences", "edit", "xpage=editrights&global=1") "xwikirights")
           #xwikiitem($doc.getURL("edit", "xpage=editclass") "classeditor")

@@ -1,5 +1,5 @@
 <div id="changes-title">
-<h1>$msg.get("changes.changesofpage") $doc.name $msg.get("changes.in") $msg.get("changes.space") $doc.web</h1>
+<h1>$msg.get("changes.changesofpage") $doc.name $msg.get("changes.in") $msg.get("changes.space") $doc.space</h1>
 </div>
 <div id="changes-info">
 <div id="changes-info-boxes">

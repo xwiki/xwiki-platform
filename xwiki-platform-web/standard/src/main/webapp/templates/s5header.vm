@@ -12,7 +12,7 @@
 #if ( $title != "")
 $xwiki.parseContent($title)
 #else
-XWiki . $!doc.web . $!doc.name
+XWiki . $!doc.space . $!doc.name
 #end
 </title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />

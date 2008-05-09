@@ -2777,6 +2777,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public BaseClass getGroupClass(XWikiContext context) throws XWikiException
     {
         XWikiDocument doc;
+        XWikiDocument template = null;
         boolean needsUpdate = false;
 
         try {
@@ -2800,6 +2801,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         if (needsUpdate)
             saveDocument(doc, context);
+        
+        // Create the group template document and attach a XWiki.XWikiGroupClass object
+        try {
+            template = getDocument("XWiki.XWikiGroupTemplate", context);
+        } catch (Exception e) {
+            template = new XWikiDocument();
+            template.setSpace("XWiki");
+            template.setName("XWikiGroupTemplate");
+        } finally {
+            if(template.isNew()) {
+                template.setContent("#includeForm(\"XWiki.XWikiGroupSheet\")");
+                template.createNewObject(bclass.getName(), context);
+                template.setCreator("XWiki.Admin");
+                template.setAuthor("XWiki.Admin");
+                List<String> args = new ArrayList<String>(1);
+                args.add("Group");
+                saveDocument(template, context.getMessageTool().get("core.comment.createdTemplate", args), context);                 
+            }
+        }
+        
         return bclass;
     }
 

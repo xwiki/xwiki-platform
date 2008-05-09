@@ -109,7 +109,7 @@ This field should contain the wikiname of each user you want to apply the rights
   &lt;div id="xwikihelpgroups"&gt;
     &lt;div id="xwikihelpgroupsHeader" class="accordionTabTitleBar"&gt;&lt;h6&gt;Groups&lt;/h6&gt;&lt;/div&gt;
     &lt;div id="xwikihelpgroupsContent" class="accordionTabContentBox"&gt;
-This field should contain the wikiname of each group you want to apply the rights to. &lt;em&gt;XWiki.XWikiAllGroup&lt;/em&gt; represents the group of all logged-in users with an account on your Wiki. #if($xwiki.isVirtual())&lt;em&gt;xwiki:XWiki.XWikiAllGroup&lt;/em&gt; represents the group of all logged-in users using an XWiki.com account.#end
+This field should contain the wikiname of each group you want to apply the rights to. &lt;em&gt;XWiki.XWikiAllGroup&lt;/em&gt; represents the group of all logged-in users with an account on your Wiki. #if($xwiki.isVirtualMode())&lt;em&gt;xwiki:XWiki.XWikiAllGroup&lt;/em&gt; represents the group of all logged-in users using an XWiki.com account.#end
     &lt;/div&gt;
   &lt;/div&gt;
   &lt;div id="xwikihelplevels"&gt;

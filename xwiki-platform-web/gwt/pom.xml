@@ -69,10 +69,9 @@
     </dependency>
   </dependencies>
   <build>
-    <!-- This plugin is already called at release time for all projects
     <plugins>
-      We need to generate the source JAR as it'll be needed by the GWT module that depends
-           on this as the GWT compiler needs the sources to generate the JS files
+      <!-- We need to generate the source JAR as it'll be needed by the GWT module that depends
+           on this as the GWT compiler needs the sources to generate the JS files -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -85,7 +84,6 @@
         </executions>
       </plugin>
     </plugins>
-    -->
   </build>
   <repositories>
     <repository>

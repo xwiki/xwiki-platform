@@ -124,10 +124,25 @@ public class IndexRebuilder implements Runnable
             // TODO This is not a good way to do this; ideally there would be a method that creates
             // a new context and copies only a few needed objects, as some objects are not supposed
             // to be used in 2 different contexts.
+            // TODO This seems to work on a simple run:
+            // context = new XWikiContext();
+            // context.setWiki(this.context.getWiki());
+            // context.put("msg", this.context.get("msg"));
+            // context.setMainXWiki(this.context.getMainXWiki());
+            // context.setURLFactory(this.context.getURLFactory());
+            // context.setLanguage(this.context.getLanguage());
+            // context.setDatabase(this.context.getDatabase());
+            // context.put("org.xwiki.component.manager.ComponentManager", this.context
+            // .get("org.xwiki.component.manager.ComponentManager"));
             context = (XWikiContext) this.context.clone();
+            this.context = null;
             // For example, we definitely don't want to use the same hibernate session...
             context.remove("hibsession");
             context.remove("hibtransaction");
+            // This is also causing seriuos problems, as the same xcontext gets shared between
+            // threads and causes the hibernate session to be shared in the end. The vcontext is
+            // automatically recreated by the velocity renderer, if it isn't found in the xcontext.
+            context.remove("vcontext");
             rebuildIndex(context);
         } catch (Exception e) {
             LOG.error("Error in lucene rebuild thread", e);

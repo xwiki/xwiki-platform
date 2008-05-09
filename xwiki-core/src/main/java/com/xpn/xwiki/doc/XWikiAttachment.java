@@ -29,6 +29,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -556,6 +557,9 @@ public class XWikiAttachment
     public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context)
         throws XWikiException
     {
+        if (StringUtils.equals(rev, this.getVersion())) {
+            return this;
+        }
         return loadArchive(context).getRevision(this, rev, context);
     }
 

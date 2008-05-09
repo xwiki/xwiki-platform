@@ -28,10 +28,10 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>7</version>
   </parent>
   <artifactId>xwiki-plugin-activitystream</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <name>XWiki Platform - Plugins - Activity Stream</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Activity Stream</description>
@@ -39,7 +39,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.4-rc-1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -51,7 +51,13 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.plugins</groupId>
       <artifactId>xwiki-plugin-mailsender</artifactId>
-      <version>1.2-SNAPSHOT</version>
+      <version>1.2</version>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-activitystream-1.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-activitystream-1.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-activitystream-1.1</url>
+  </scm>
 </project>      

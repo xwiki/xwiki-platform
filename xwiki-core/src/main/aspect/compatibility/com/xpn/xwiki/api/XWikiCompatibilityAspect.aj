@@ -59,6 +59,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return escaped text
      * @deprecated replaced by Util#escapeText since 1.3M2
      */
+    @Deprecated
     public String XWiki.escapeText(String text)
     {
         return this.util.escapeText(text);
@@ -70,6 +71,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return encoded URL
      * @deprecated replaced by Util#escapeURL since 1.3M2
      */
+    @Deprecated
     public String XWiki.escapeURL(String url)
     {
         return this.util.escapeURL(url);
@@ -78,6 +80,7 @@ public privileged aspect XWikiCompatibilityAspect
     /**
      * @deprecated use {@link #getLanguagePreference()} instead
      */
+    @Deprecated
     public String XWiki.getDocLanguagePreference()
     {
         return xwiki.getDocLanguagePreference(getXWikiContext());
@@ -94,6 +97,7 @@ public privileged aspect XWikiCompatibilityAspect
      *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
      *   Plugin</a> since 1.3M2
      */
+    @Deprecated
     public void XWiki.sendMessage(String sender, String recipient, String message)
         throws XWikiException
     {
@@ -112,6 +116,7 @@ public privileged aspect XWikiCompatibilityAspect
      *   <a href="http://code.xwiki.org/xwiki/bin/view/Plugins/MailSenderPlugin">Mail Sender
      *   Plugin</a> since 1.3M2
      */
+    @Deprecated
     public void XWiki.sendMessage(String sender, String[] recipient, String message)
         throws XWikiException
     {
@@ -123,6 +128,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the current date
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate()} since 1.3M2
      */
+    @Deprecated
     public Date XWiki.getCurrentDate()
     {
         return this.util.getDate();
@@ -132,6 +138,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the current date
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate()} since 1.3M2
      */
+    @Deprecated
     public Date XWiki.getDate()
     {
         return this.util.getDate();
@@ -143,6 +150,7 @@ public privileged aspect XWikiCompatibilityAspect
      *         as parameter
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getTimeDelta(long)} since 1.3M2
      */
+    @Deprecated
     public int XWiki.getTimeDelta(long time)
     {
         return this.util.getTimeDelta(time);
@@ -154,6 +162,7 @@ public privileged aspect XWikiCompatibilityAspect
      *         Java {@link Date} Object
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getDate(long)} since 1.3M2
      */
+    @Deprecated
     public Date XWiki.getDate(long time)
     {
         return this.util.getDate(time);
@@ -168,6 +177,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return An array containing the split text
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#split(String, String)} since 1.3M2
      */
+    @Deprecated
     public String[] XWiki.split(String text, String sep)
     {
         return this.util.split(text, sep);
@@ -179,8 +189,9 @@ public privileged aspect XWikiCompatibilityAspect
      * @param e the exception to convert to a String
      * @return the exception stack trace as a String
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#printStrackTrace(Throwable)}
-                   since 1.3M2
+     *             since 1.3M2
      */
+    @Deprecated
     public String XWiki.printStrackTrace(Throwable e)
     {
         return this.util.printStrackTrace(e);
@@ -193,6 +204,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return a Null Object
      * @deprecated replaced by {@link Util#getNull()} since 1.3M2
      */
+    @Deprecated
     public Object XWiki.getNull()
     {
         return this.util.getNull();
@@ -205,6 +217,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return a new line character
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getNewline()} since 1.3M2
      */
+    @Deprecated
     public String XWiki.getNl()
     {
         return this.util.getNewline();
@@ -214,6 +227,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @see #getExoService(String)
      * @deprecated use {@link #getExoService(String)} instead
      */
+    @Deprecated
     public java.lang.Object XWiki.getService(String className) throws XWikiException
     {
         return getExoService(className);
@@ -223,6 +237,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @see #getExoPortalService(String)
      * @deprecated use {@link #getExoPortalService(String)} instead
      */
+    @Deprecated
     public java.lang.Object XWiki.getPortalService(String className) throws XWikiException
     {
         return getExoPortalService(className);
@@ -235,6 +250,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return a {@link ArrayList} object
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getArrayList()} since 1.3M2
      */
+    @Deprecated
     public List XWiki.getArrayList()
     {
         return this.util.getArrayList();
@@ -247,6 +263,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return a {@link HashMap} object
      * @deprecated replaced by {@link Util#getHashMap()} since 1.3M2
      */
+    @Deprecated
     public Map XWiki.getHashMap()
     {
         return this.util.getHashMap();
@@ -259,6 +276,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return a {@link TreeMap} object
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#getTreeMap()} since 1.3M2
      */
+    @Deprecated
     public Map XWiki.getTreeMap()
     {
         return this.util.getTreeMap();
@@ -273,6 +291,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @see {@link java.util.Collections#sort(java.util.List)}
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#sort(java.util.List)} since 1.3M2
      */
+    @Deprecated
     public List XWiki.sort(List list)
     {
         return this.util.sort(list);
@@ -285,6 +304,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the object as a {@link Number}
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#toNumber(Object)} since 1.3M2
      */
+    @Deprecated
     public Number XWiki.toNumber(Object object)
     {
         return this.util.toNumber(object);
@@ -298,6 +318,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @deprecated replaced by {@link com.xpn.xwiki.api.Util#generateRandomString(int)}
                    since 1.3M2
      */
+    @Deprecated
     public String XWiki.generateRandomString(int size)
     {
         return this.util.generateRandomString(size);
@@ -315,6 +336,7 @@ public privileged aspect XWikiCompatibilityAspect
      *             {@link com.xpn.xwiki.api.Util#outputImage(java.awt.image.BufferedImage)}
      *             since 1.3M2
      */
+    @Deprecated
     public void XWiki.outputImage(BufferedImage image) throws IOException
     {
         this.util.outputImage(image);
@@ -328,6 +350,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return a ArrayList of document names
      * @deprecated use {@link #getStatsService()} instead
      */
+    @Deprecated
     public java.util.Collection XWiki.getRecentActions(String action, int size)
     {
         XWikiStatsService stats = getXWikiContext().getWiki().getStatsService(getXWikiContext());
@@ -341,6 +364,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the parsed integer or zero in case of exception
      * @deprecated replaced by {@link Util#parseInt(String)} since 1.3M2
      */
+    @Deprecated
     public int XWiki.parseInt(String str)
     {
         return this.util.parseInt(str);
@@ -351,6 +375,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the parsed integer or zero in case of exception
      * @deprecated replaced by {@link Util#parseInteger(String)} since 1.3M2
      */
+    @Deprecated
     public Integer XWiki.parseInteger(String str)
     {
         return this.util.parseInteger(str);
@@ -361,6 +386,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the parsed long or zero in case of exception
      * @deprecated replaced by {@link Util#parseLong(String)} since 1.3M2
      */
+    @Deprecated
     public long XWiki.parseLong(String str)
     {
         return this.util.parseLong(str);
@@ -371,6 +397,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the parsed float or zero in case of exception
      * @deprecated replaced by {@link Util#parseFloat(String)} since 1.3M2
      */
+    @Deprecated
     public float XWiki.parseFloat(String str)
     {
         return this.util.parseFloat(str);
@@ -381,6 +408,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the parsed double or zero in case of exception
      * @deprecated replaced by {@link Util#parseDouble(String)} since 1.3M2
      */
+    @Deprecated
     public double XWiki.parseDouble(String str)
     {
         return this.util.parseDouble(str);
@@ -394,6 +422,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return filtered text
      * @deprecated replaced by {@link Util#escapeSQL(String)} since 1.3M2
      */
+    @Deprecated
     public String XWiki.sqlfilter(String text)
     {
         return this.util.escapeSQL(text);
@@ -407,6 +436,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the valid page name
      * @deprecated replaced by {@link Util#clearName(String)} since 1.3M2
      */
+    @Deprecated
     public String XWiki.clearName(String name)
     {
         return this.util.clearName(name);
@@ -419,6 +449,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return a string with accents replaced with their alpha equivalent
      * @deprecated replaced by {@link Util#clearAccents(String)} since 1.3M2
      */
+    @Deprecated
     public String XWiki.clearAccents(String text)
     {
         return this.util.clearAccents(text);
@@ -432,6 +463,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the sum of a and b
      * @deprecated replaced by {@link Util#add(int, int)} since 1.3M2
      */
+    @Deprecated
     public int XWiki.add(int a, int b)
     {
         return this.util.add(a, b);
@@ -445,6 +477,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the sum of a and b
      * @deprecated replaced by {@link Util#add(long, long)} since 1.3M2
      */
+    @Deprecated
     public long XWiki.add(long a, long b)
     {
         return this.util.add(a, b);
@@ -458,6 +491,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return the sum of a and b as a String
      * @deprecated replaced by {@link Util#add(String, String)} since 1.3M2
      */
+    @Deprecated
     public String XWiki.add(String a, String b)
     {
         return this.util.add(a,  b);
@@ -470,6 +504,7 @@ public privileged aspect XWikiCompatibilityAspect
      * @return encoded result
      * @deprecated replaced by {@link Util#encodeURI(String)} since 1.3M2
      */
+    @Deprecated
     public String XWiki.getURLEncoded(String content)
     {
         return this.util.encodeURI(content);

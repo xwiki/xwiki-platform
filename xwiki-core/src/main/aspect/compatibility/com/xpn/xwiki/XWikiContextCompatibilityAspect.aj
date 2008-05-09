@@ -33,6 +33,7 @@ public privileged aspect XWikiContextCompatibilityAspect
      * @return true it's main wiki's context, false otherwise.
      * @deprecated replaced by {@link XWikiContext#isMainWiki()} since 1.4M1.
      */
+    @Deprecated
     public boolean XWikiContext.isVirtual()
     {
         return !this.isMainWiki();
@@ -44,6 +45,7 @@ public privileged aspect XWikiContextCompatibilityAspect
      *             comparison between {@link XWikiContext#getDatabase()} and
      *             {@link XWikiContext#getMainXWiki()} since 1.4M1.
      */
+    @Deprecated
     public void XWikiContext.setVirtual(boolean virtual)
     {
         // this.virtual = virtual;

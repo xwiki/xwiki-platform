@@ -14,6 +14,7 @@ public aspect XWikiDocumentCompatibilityAspect
     /**
      * @deprecated use {@link #getSpace()} instead
      */
+    @Deprecated
     public String XWikiDocument.getWeb()
     {
         return getSpace();
@@ -22,6 +23,7 @@ public aspect XWikiDocumentCompatibilityAspect
     /**
      * @deprecated use {@link #setSpace(String)} instead
      */
+    @Deprecated
     public void XWikiDocument.setWeb(String web)
     {
         setSpace(web);
@@ -30,6 +32,7 @@ public aspect XWikiDocumentCompatibilityAspect
     /**
      * @deprecated use setStringListValue or setDBStringListProperty
      */
+    @Deprecated
     public void XWikiDocument.setListValue(String className, String fieldName, List value)
     {
         BaseObject bobject = getObject(className);

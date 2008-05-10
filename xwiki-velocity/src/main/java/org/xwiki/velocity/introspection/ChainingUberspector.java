@@ -24,6 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.runtime.RuntimeServices;
 import org.apache.velocity.util.ClassUtils;
 import org.apache.velocity.util.RuntimeServicesAware;
+import org.apache.velocity.util.introspection.SecureUberspector;
 import org.apache.velocity.util.introspection.Uberspect;
 import org.apache.velocity.util.introspection.UberspectLoggable;
 
@@ -46,10 +47,10 @@ import org.apache.velocity.util.introspection.UberspectLoggable;
  * <code>runtime.introspector.uberspect.chainClasses</code>. This property should contain a list
  * of canonical class names. Any wrong entry in the list will be ignored. If this property is not
  * defined or contains only wrong classnames, then by default a <code>SecureUberspector</code> is
- * used as the only entry in the chain. The first (leftmost) uberspector must not be chainable (as
- * it will not need to forward calls). If a uberspector in the middle of the chain is not chainable,
- * then it will break the chain at that point (all previos uberspectors will be discarded from the
- * chain).
+ * used as the only entry in the chain. The first (leftmost) uberspector does not have to be
+ * chainable (as it will not need to forward calls). If a uberspector in the middle of the chain is
+ * not chainable, then it will break the chain at that point (all previos uberspectors will be
+ * discarded from the chain).
  * </p>
  * 
  * @since 1.5M1
@@ -99,7 +100,7 @@ public class ChainingUberspector extends ChainableUberspectorBase implements Ube
             log.error("No chained uberspectors defined! "
                 + "This uberspector is just a placeholder that relies on a real uberspector "
                 + "to actually allow method calls. Using SecureUberspect.");
-            initializeUberspector("org.apache.velocity.util.introspection.SecureUberspector");
+            initializeUberspector(SecureUberspector.class.getCanonicalName());
         }
         // Initialize all the uberspectors in the chain
         try {
@@ -110,8 +111,9 @@ public class ChainingUberspector extends ChainableUberspectorBase implements Ube
     }
 
     /**
-     * Instantiates an uberspector class and adds it to the chain. No other initialization (except
-     * chaining and what is present in the constructor) is done.
+     * Instantiates an uberspector class and adds it to the chain. Also set the log and runtime
+     * services, if the class implements the proper interfaces. The {@link Uberspect#init()} method
+     * is not called.
      * 
      * @param classname The name of the uberspector class to add to the chain.
      */

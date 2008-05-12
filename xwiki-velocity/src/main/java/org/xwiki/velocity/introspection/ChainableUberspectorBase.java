@@ -46,6 +46,20 @@ public abstract class ChainableUberspectorBase extends UberspectImpl implements
     /**
      * {@inheritDoc}
      * <p>
+     * This implementation stores the wrapped uberspector in the protected {@link #inner} member.
+     * </p>
+     * 
+     * @see ChainableUberspector#wrap(org.apache.velocity.util.introspection.Uberspect)
+     * @see #inner
+     */
+    public void wrap(Uberspect inner)
+    {
+        this.inner = inner;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
      * This implementation forwards the call to the wrapped uberspector, catching all exceptions.
      * </p>
      * 
@@ -61,20 +75,6 @@ public abstract class ChainableUberspectorBase extends UberspectImpl implements
                 log.error(e.getMessage(), e);
             }
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * This implementation stores the wrapped uberspector in the protected {@link #inner} member.
-     * </p>
-     * 
-     * @see ChainableUberspector#wrap(org.apache.velocity.util.introspection.Uberspect)
-     * @see #inner
-     */
-    public void wrap(Uberspect inner)
-    {
-        this.inner = inner;
     }
 
     /**

@@ -106,7 +106,7 @@ public class ChainingUberspector extends ChainableUberspectorBase implements Ube
         try {
             inner.init();
         } catch (Exception e) {
-            e.printStackTrace();
+            log.warn(e.getMessage());
         }
     }
 

@@ -771,7 +771,7 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
   }
 
   /*
-     Checks if a string is a valid #****** code
+     Checks if a string is a valid #xxxxxx code
    */
   this.validCode = function(code){
     if(!code.match("^#[0-9a-fA-F]{6}$")) return false;
@@ -906,8 +906,8 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
   }
 
   /*
-     RGB to #****** conversion
-     Join the RGB values into a #****** string
+     RGB to #xxxxxx conversion
+     Join the RGB values into a #xxxxxx string
    */
   this.rgb2code = function(red, green, blue){
     red = Math.round(red).toString(16);
@@ -919,7 +919,7 @@ function ColorPicker(hsmap, lmap, lpointer, colorShower, codeDisplay){
     return "#" + red + green + blue;
   }
   /*
-     Parse a #****** code into rgb values
+     Parse a #xxxxxx code into rgb values
    */
   this.code2rgb = function(code){
     if(!this.validCode(code)) return false;

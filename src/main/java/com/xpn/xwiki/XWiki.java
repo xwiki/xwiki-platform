@@ -1246,7 +1246,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getDocumentNameFromPath(String path, XWikiContext context)
     {
         if (StringUtils.countMatches(path, "/") == 0) {
-            return getDefaultWeb(context) + "." + getDefaultPage(context);
+            return context.getWiki().getDefaultWeb(context) + "."
+                + context.getWiki().getDefaultPage(context);
         }
 
         String web, name;

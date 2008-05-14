@@ -28,6 +28,8 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.DeletedAttachment;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -200,7 +202,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if ((querystring != null) && (!querystring.equals(""))) {
             newpath.append("?");
-            newpath.append(querystring);
+            newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
             // newpath.append(querystring.replaceAll("&","&amp;"));
         }
 
@@ -350,7 +352,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if ((querystring != null) && (!querystring.equals(""))) {
             newpath.append("?");
-            newpath.append(querystring);
+            newpath.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
         }
 
         try {
@@ -382,12 +384,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         if (recycleId >= 0) {
             qstring += "&rid=" + recycleId;
         }
-        if ((querystring != null) && (!querystring.equals("")))
+        if ((querystring != null) && (!querystring.equals(""))) {
             qstring += "&" + querystring;
-        if ((qstring != null) && (!qstring.equals(""))) {
-            newpath.append("?");
-            newpath.append(qstring);
         }
+        newpath.append("?");
+        newpath.append(StringUtils.chomp(StringUtils.chomp(qstring, "&"), "&amp;"));
 
         try {
             return new URL(getServerURL(xwikidb, context), newpath.toString());
@@ -411,7 +412,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                 String querystring = url.getQuery();
                 if ((querystring != null) && (!querystring.equals(""))) {
                     sbuf.append("?");
-                    sbuf.append(querystring);
+                    sbuf.append(StringUtils.chomp(StringUtils.chomp(querystring, "&"), "&amp;"));
                     // sbuf.append(querystring.replaceAll("&","&amp;"));
                 }
 

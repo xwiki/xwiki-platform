@@ -334,7 +334,7 @@ ol.HEBREW { list-style-type: hebrew; }
  color: gray;
 }
 
-## Footnotes
+/* Footnotes */
 sup.footnoteRef a{
   font-weight: bold;
   text-decoration: none;

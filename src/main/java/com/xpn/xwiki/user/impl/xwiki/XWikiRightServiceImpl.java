@@ -795,7 +795,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
             if (doc == null)
                 return false;
 
-            String username = doc.getAuthor();
+            String username = doc.getContentAuthor();
 
             if (username == null)
                 return false;

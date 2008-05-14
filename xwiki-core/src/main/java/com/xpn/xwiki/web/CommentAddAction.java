@@ -55,6 +55,7 @@ public class CommentAddAction extends XWikiAction {
                 newobject.setNumber(oldobject.getNumber());
                 newobject.setName(doc.getFullName());
                 doc.setObject(className, nb, newobject);
+                doc.setAuthor(context.getUser());
                 doc.setContentDirty(false); // Consider comments not being content
                 // if we consider that it is no contentDirty so it NEED be metaDataDirty for increment version and change history.
                 doc.setMetaDataDirty(true);

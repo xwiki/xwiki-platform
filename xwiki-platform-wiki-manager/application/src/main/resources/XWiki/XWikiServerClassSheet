@@ -150,7 +150,7 @@
               &lt;legend&gt;$doc.display("server", $wikiAlias.objectApi)&lt;/legend&gt;
               ##
               &lt;dl&gt;
-                &lt;dt&gt;$msg.get("wikimanager.alias.prop.description"):&lt;/dt&gt;
+                &lt;dt&gt;$msg.get("wikimanager.prop.alias.description"):&lt;/dt&gt;
                   &lt;dd&gt;$doc.display("description", $wikiAlias.objectApi)&lt;/dd&gt;
                 &lt;dt&gt;$msg.get("wikimanager.prop.alias.homepage"):&lt;/dt&gt;
                   &lt;dd&gt;$doc.display("homepage", $wikiAlias.objectApi)&lt;/dd&gt;

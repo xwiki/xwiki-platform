@@ -13,7 +13,7 @@
 #set ( $stylesheets = $xwiki.getWebPreference("stylesheets") )
 #if ( $stylesheets != "" )
   #set ( $stylenb = 1 )
-  #foreach ( $stylesheet in $xwiki.split($stylesheets, ",") )
+  #foreach ( $stylesheet in $util.split($stylesheets, ",") )
     #if( !$stylesheet.equalsIgnoreCase($defaultstyle) )
       <link href="$xwiki.getSkinFile($stylesheet, true)" rel="alternate stylesheet" type="text/css"  title="Alternate StyleSheet $stylenb" />
     #end

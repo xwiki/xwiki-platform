@@ -159,6 +159,7 @@ wikimanager.prop.wiki.homepage=Home page
 wikimanager.prop.wiki.iswikitemplate=Wiki template
 wikimanager.prop.alias.server=Domain name
 wikimanager.prop.alias.homepage=Home page
+wikimanager.prop.alias.description=Description
 XWiki.XWikiServerClass_visibility_public=Public
 XWiki.XWikiServerClass_visibility_private=Private
 ##

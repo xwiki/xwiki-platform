@@ -225,10 +225,34 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
     {
         assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, context));
     }
-    
+
+    public void testGedDocumentNameFromPath()
+    {
+        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("", context));
+        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", context));
+        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document", context));
+        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/Space/", context));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/Space/Document", context));
+        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/view/Space/", context));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document", context));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", context));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/attachment.pdf", context));
+    }
+
     public void testDocNameFromPathRemovesPrefixes()
     {
         assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Space", context));
         assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Other%3ASpace", context));
+    }
+
+    public void testGetDocumentNameFromPathUsesDefaultSpaceAndDocument()
+    {
+        assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", context));
+        xwiki.getDefaultPage(context);
+        xwiki.getConfig().setProperty("xwiki.defaultpage", "Default");
+        assertEquals("Main.Default", this.xwiki.getDocumentNameFromPath("/", context));
+        xwiki.getConfig().setProperty("xwiki.defaultweb", "Content");
+        assertEquals("Content.Default", this.xwiki.getDocumentNameFromPath("/", context));
+        assertEquals("Space.Default", this.xwiki.getDocumentNameFromPath("/Space/", context));
     }
 }

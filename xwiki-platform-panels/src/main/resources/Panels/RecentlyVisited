@@ -139,7 +139,7 @@
 #if($rv_maxItems == "")
 #set($rv_maxItems = 5)
 #end
-#set($recentlyViewed = $xwiki.getRecentActions("view", $rv_maxItems))
+#set($recentlyViewed = $xwiki.statsService.getRecentActions("view", $rv_maxItems))
 #if($recentlyViewed.size() &gt; 0 || $showEmptyPanels)
 #panelheader($msg.get("panels.recentlyVisited.title"))
 #set($first = true)

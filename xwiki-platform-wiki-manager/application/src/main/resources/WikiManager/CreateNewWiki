@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1210081240000</date>
-<contentUpdateDate>1210081240000</contentUpdateDate>
-<version>82.1</version>
+<date>1210777206000</date>
+<contentUpdateDate>1210777206000</contentUpdateDate>
+<version>83.1</version>
 <title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -91,7 +91,7 @@
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}users" id="${rightlevel}users" multiple="multiple"&gt;
     #foreach ($user in $users)
       #if ($context.database == $context.mainWikiName) #set ($user = "${context.mainWikiName}:${user}") #end
-      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $xwiki.null, false)&lt;/option&gt;
+      &lt;option value="$user" #if ($userlist &amp;&amp; $userlist.contains($user)) selected="selected" #end&gt;$xwiki.getUserName($user, $util.null, false)&lt;/option&gt;
     #end
   &lt;/select&gt;
   &lt;select #if ($hidden) type="hidden" #end name="${rightlevel}groups" id="${rightlevel}groups" multiple="multiple"&gt;

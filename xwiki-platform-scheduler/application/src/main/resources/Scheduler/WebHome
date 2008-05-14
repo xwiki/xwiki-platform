@@ -212,7 +212,7 @@ Welcome to the Job scheduler. This application allows you to create administrati
 Job Name|Job Status|Next fire time|Actions
 #set($hql = ", BaseObject as job where doc.web='Scheduler' and job.name=doc.fullName and job.className='XWiki.SchedulerJobClass' ")
 #foreach($docName in $xwiki.searchDocuments($hql))
- #set($actions = $xwiki.hashMap) ## get a hash to store action urls
+ #set($actions = $util.hashMap) ## get a hash to store action urls
  #set($jobHolder = $xwiki.getDocument($docName))
  #set($job = $jobHolder.getObject('XWiki.SchedulerJobClass'))
  #set($status = "") #set($status = $job.get('status')) #if($status=="") #set($status="None") #end

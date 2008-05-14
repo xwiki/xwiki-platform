@@ -74,9 +74,9 @@ $response.sendRedirect($doc.getURL("view", "forceLeftPanels=1&amp;forceRightPane
 #set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
 #set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
 #set($panelsList = $xwiki.searchDocuments($sql))
-#set($categoryMap = $xwiki.getHashMap())
+#set($categoryMap = $util.getHashMap())
 #foreach($category in $categoryList)
-  $!categoryMap.put($category, $xwiki.getArrayList())
+  $!categoryMap.put($category, $util.getArrayList())
 #end
 #foreach ($item in $panelsList)
   #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
@@ -107,8 +107,7 @@ window.allPanelsPlace = new Object();
 window.panelsavesuccess = "$msg.get("panelsavesuccess")";
 window.panelsaveerror = "$msg.get("panelsaveerror")";
 #set($counter = 0)
-#set($panelsStatus = $xwiki.hashMap)
-$xwiki.hashMap
+#set($panelsStatus = $util.hashMap)
 #foreach($category in $categoryList)
   #set($categPanels = $categoryMap.get($category))
   #foreach ($item in $categPanels)

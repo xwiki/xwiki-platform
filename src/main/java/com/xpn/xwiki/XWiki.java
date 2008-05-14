@@ -1245,6 +1245,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String getDocumentNameFromPath(String path, XWikiContext context)
     {
+        if (StringUtils.countMatches(path, "/") == 0) {
+            return getDefaultWeb(context) + "." + getDefaultPage(context);
+        }
+
         String web, name;
         int i1 = 0;
         int i2;
@@ -1266,7 +1270,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             name = path.substring(i2 + 1, i3);
         }
         if (name.equals("")) {
-            name = "WebHome";
+            name = getDefaultPage(context);
         }
 
         web = Util.decodeURI(web, context);

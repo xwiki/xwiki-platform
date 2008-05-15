@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-plugin-skinx</artifactId>
   <name>XWiki Platform - Plugins - Skin Extensions</name>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1</version>
   <description>XWiki Platform - Plugins - Skin Extensions</description>
   <dependencies>
     <dependency>
@@ -49,4 +49,10 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
   </dependencies>
+
+  <scm>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-skinx-1.1</url>
+  </scm>
 </project>

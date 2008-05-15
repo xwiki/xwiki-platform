@@ -3,7 +3,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>8-SNAPSHOT</version>
+    <version>7</version>
   </parent>
   <artifactId>xwiki-plugin-mailsender</artifactId>
   <name>XWiki Platform - Plugins - Mail Sender</name>
@@ -13,7 +13,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.4</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

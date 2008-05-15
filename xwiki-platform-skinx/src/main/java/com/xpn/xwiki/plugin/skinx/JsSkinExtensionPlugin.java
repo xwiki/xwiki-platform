@@ -107,6 +107,10 @@ public class JsSkinExtensionPlugin extends SkinExtensionPlugin
                 needsUpdate = true;
                 doc.setCreator("XWiki.Admin");
             }
+            if (StringUtils.isBlank(doc.getParent())) {
+                needsUpdate = true;
+                doc.setParent("XWiki.XWikiClasses");
+            }
             if (StringUtils.isBlank(doc.getContent())) {
                 needsUpdate = true;
                 doc.setContent("1 XWiki Stylesheet Extension Class");

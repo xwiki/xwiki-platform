@@ -50,6 +50,7 @@ import javax.mail.internet.MimeMultipart;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.context.Context;
@@ -206,8 +207,19 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
         needsUpdate |= bclass.addTextAreaField("text", "Text", 80, 15);
         needsUpdate |= bclass.addTextAreaField("html", "HTML", 80, 15);
 
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
+        if (StringUtils.isBlank(doc.getAuthor())) {
+            needsUpdate = true;
+            doc.setAuthor("XWiki.Admin");
+        }
+        if (StringUtils.isBlank(doc.getCreator())) {
+            needsUpdate = true;
+            doc.setCreator("XWiki.Admin");
+        }
+        if (StringUtils.isBlank(doc.getParent())) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
+        }
+        if (StringUtils.isBlank(doc.getContent())) {
             needsUpdate = true;
             doc.setContent("#includeForm(\"XWiki.XWikiMailSheet\"");
         }

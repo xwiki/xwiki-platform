@@ -33,6 +33,7 @@ import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
@@ -185,10 +186,21 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             bclass.addTextAreaField("documents", "Document list, separated by commas", 40, 5);
         needsUpdate |= bclass.addTextAreaField("query", "Query (HQL)", 40, 5);
 
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
+        if (StringUtils.isBlank(doc.getAuthor())) {
             needsUpdate = true;
-            doc.setContent("1 NotificationRule");
+            doc.setAuthor("XWiki.Admin");
+        }
+        if (StringUtils.isBlank(doc.getCreator())) {
+            needsUpdate = true;
+            doc.setCreator("XWiki.Admin");
+        }
+        if (StringUtils.isBlank(doc.getParent())) {
+            needsUpdate = true;
+            doc.setParent("XWiki.XWikiClasses");
+        }
+        if (StringUtils.isBlank(doc.getContent())) {
+            needsUpdate = true;
+            doc.setContent("1 XWiki Watchlist Notification Rule Class");
         }
 
         if (needsUpdate) {
@@ -207,53 +219,64 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * @param context Context of the request
      */
     protected void initWatchListJob(int interval, String name, String description, String cron,
-        XWikiContext context) throws XWikiException
-    {
+                                    XWikiContext context) throws XWikiException {
         XWikiDocument doc;
         boolean needsUpdate = false;
         String jobClass = "com.xpn.xwiki.plugin.watchlist.WatchListJob";
+        BaseObject job = null;
 
         String docName = WATCHLIST_EMAIL_JOB_COMMON_NAME + interval;
         try {
             doc = context.getWiki().getDocument(docName, context);
-            BaseObject obj = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
-            if (obj == null) {
+
+            job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS);
+            if (job == null) {
                 needsUpdate = true;
+                int index = doc.createNewObject(SchedulerPlugin.XWIKI_JOB_CLASS, context);
+                job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, index);
+                job.setStringValue("jobName", name);
+                job.setStringValue("jobClass", jobClass);
+                job.setStringValue("cron", cron);
+                job.setLargeStringValue("script", Integer.toString(interval));
+                job.setLargeStringValue("jobDescription", description);
+                job.setStringValue("contextUser", "XWiki.Admin");
+                job.setStringValue("contextLang", "en");
+                job.setStringValue("contextDatabase", "xwiki");
+            }
+
+            BaseObject rights = doc.getObject("XWiki.XWikiRights");
+            if (rights == null) {
+                needsUpdate = true;
+                int index = doc.createNewObject("XWiki.XWikiRights", context);
+                rights = doc.getObject("XWiki.XWikiRights", index);
+                rights.setStringValue("groups", "XWiki.XWikiAdminGroup");
+                rights.setStringValue("levels", "edit,delete");
+                rights.setIntValue("allow", 1);
+            }
+
+            if (StringUtils.isBlank(doc.getAuthor())) {
+                needsUpdate = true;
+                doc.setAuthor("XWiki.Admin");
+            }
+            if (StringUtils.isBlank(doc.getCreator())) {
+                needsUpdate = true;
+                doc.setCreator("XWiki.Admin");
+            }
+            if (StringUtils.isBlank(doc.getParent())) {
+                needsUpdate = true;
+                doc.setParent("XWiki.XWikiClasses");
+            }
+            if (StringUtils.isBlank(doc.getContent())) {
+                needsUpdate = true;
+                doc.setContent("#includeInContext(\"XWiki.SchedulerJobSheet\")");
+            }
+
+            if (needsUpdate) {
+                context.getWiki().saveDocument(doc, "", true, context);
+                ((SchedulerPlugin) context.getWiki().getPlugin("scheduler", context)).scheduleJob(job, context);
             }
         } catch (Exception e) {
-            doc = new XWikiDocument();
-            String[] spaceAndName = docName.split(".");
-            doc.setSpace(spaceAndName[0]);
-            doc.setName(spaceAndName[1]);
-            needsUpdate = true;
-        }
-
-        if (needsUpdate) {
-            int index = doc.createNewObject(SchedulerPlugin.XWIKI_JOB_CLASS, context);
-            BaseObject job = doc.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, index);
-            job.setStringValue("jobName", name);
-            job.setStringValue("jobClass", jobClass);
-            job.setStringValue("cron", cron);
-            job.setLargeStringValue("script", Integer.toString(interval));
-            job.setLargeStringValue("jobDescription", description);
-
-            // set the needed context params
-            // TODO create a watchlist application that holds those jobs as documents
-            job.setStringValue("contextUser", "XWiki.Admin");
-            job.setStringValue("contextLang", "en");
-            job.setStringValue("contextDatabase", "xwiki");
-
-            doc.setContent("#includeInContext('XWiki.SchedulerJobSheet')");
-            doc.setAuthor("XWiki.Admin");
-            doc.setCreator("XWiki.Admin");
-            index = doc.createNewObject("XWiki.XWikiRights", context);
-            BaseObject rights = doc.getObject("XWiki.XWikiRights", index);
-            rights.setStringValue("groups", "XWiki.XWikiAdminGroup");
-            rights.setStringValue("levels", "edit,delete");
-            rights.setIntValue("allow", 1);
-            context.getWiki().saveDocument(doc, "", true, context);
-            ((SchedulerPlugin) context.getWiki().getPlugin("scheduler", context))
-                .scheduleJob(job, context);
+            log.error("Cannot initialize WatchListJob", e);
         }
     }
 

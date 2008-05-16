@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.xmlrpc;
 
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
@@ -27,15 +28,18 @@ import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 /**
  * This is an helper class for storing the current HTTP request coming from an XMLRPC client
  * interacting with the XMLRPC endpoint servlet
- *
- * @author fmancinelli
  */
 public class XWikiXmlRpcHttpRequestConfig extends XmlRpcHttpRequestConfigImpl
 {
     private HttpServletRequest request;
 
-    public XWikiXmlRpcHttpRequestConfig(HttpServletRequest request)
+    private HttpServlet servlet;
+
+    private XWikiXmlRpcContext xmlRpcContext;
+
+    public XWikiXmlRpcHttpRequestConfig(HttpServlet servlet, HttpServletRequest request)
     {
+        this.servlet = servlet;
         this.request = request;
     }
 
@@ -43,4 +47,20 @@ public class XWikiXmlRpcHttpRequestConfig extends XmlRpcHttpRequestConfigImpl
     {
         return request;
     }
+
+    public HttpServlet getServlet()
+    {
+        return servlet;
+    }
+
+    public void setXmlRpcContext(XWikiXmlRpcContext xmlRpcContext)
+    {
+        this.xmlRpcContext = xmlRpcContext;
+    }
+
+    public XWikiXmlRpcContext getXmlRpcContext()
+    {
+        return xmlRpcContext;
+    }
+
 }

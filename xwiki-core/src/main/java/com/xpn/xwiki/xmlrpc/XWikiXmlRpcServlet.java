@@ -21,22 +21,24 @@
 package com.xpn.xwiki.xmlrpc;
 
 import java.io.IOException;
+import java.lang.reflect.Method;
 import java.net.URL;
+
 import javax.servlet.ServletConfig;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.XmlRpcHandler;
 import org.apache.xmlrpc.XmlRpcRequest;
 import org.apache.xmlrpc.common.XmlRpcHttpRequestConfigImpl;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory;
+import org.apache.xmlrpc.server.RequestProcessorFactoryFactory.RequestProcessorFactory;
 import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
 
 /**
  * This is the XMLRPC servlet that is used as a gateway for serving XMLRPC requests.
- *
- * @author fmancinelli
  */
 public class XWikiXmlRpcServlet extends XmlRpcServlet
 {
@@ -46,7 +48,44 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
     protected PropertyHandlerMapping newPropertyHandlerMapping(URL url) throws IOException,
         XmlRpcException
     {
-        PropertyHandlerMapping mapping = new PropertyHandlerMapping();
+
+        PropertyHandlerMapping mapping = new PropertyHandlerMapping()
+        {
+            /**
+             * This is almost a 1-to-1 copy of the implementation of
+             * org.apache.xmlrpc.server.PropertyHandlerMapping.newXmlRpcHandler() defined in its
+             * superclass AbstractReflectiveHandlerMapping. We had to do this because in the
+             * original implementation of the method newXmlRpcHandler in
+             * AbstractReflectiveHandlerMapping, the classes RelfectiveXmlRpcHandler and
+             * ReflectiveXmlRpcMetaDataHandler are hard-coded.
+             */
+            @Override
+            protected XmlRpcHandler newXmlRpcHandler(Class pClass, Method[] pMethods)
+                throws XmlRpcException
+            {
+
+                String[][] sig = getSignature(pMethods);
+                String help = getMethodHelp(pClass, pMethods);
+                RequestProcessorFactory factory =
+                    getRequestProcessorFactoryFactory().getRequestProcessorFactory(pClass);
+                if (sig == null || help == null) {
+                    return new XWikiReflectiveXmlRpcHandler(this,
+                        getTypeConverterFactory(),
+                        pClass,
+                        factory,
+                        pMethods);
+                }
+                return new XWikiReflectiveXmlRpcMetaDataHandler(this,
+                    getTypeConverterFactory(),
+                    pClass,
+                    factory,
+                    pMethods,
+                    sig,
+                    help);
+            }
+
+        };
+
         mapping.setTypeConverterFactory(getXmlRpcServletServer().getTypeConverterFactory());
 
         RequestProcessorFactoryFactory factory =
@@ -62,7 +101,7 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
                         HttpServletRequest request =
                             ((XWikiXmlRpcHttpRequestConfig) pRequest.getConfig()).getRequest();
 
-                        handler.init(XWikiXmlRpcServlet.this, request);
+                        handler.init((XWikiXmlRpcHttpRequestConfig) pRequest.getConfig());
                     }
 
                     return proc;
@@ -78,13 +117,16 @@ public class XWikiXmlRpcServlet extends XmlRpcServlet
     @Override
     protected XmlRpcServletServer newXmlRpcServer(ServletConfig config) throws XmlRpcException
     {
-        return new XmlRpcServletServer()
+        XmlRpcServletServer server = new XmlRpcServletServer()
         {
+
             @Override
             protected XmlRpcHttpRequestConfigImpl newConfig(HttpServletRequest request)
             {
-                return new XWikiXmlRpcHttpRequestConfig(request);
+                return new XWikiXmlRpcHttpRequestConfig(XWikiXmlRpcServlet.this, request);
             }
         };
+
+        return server;
     }
 }

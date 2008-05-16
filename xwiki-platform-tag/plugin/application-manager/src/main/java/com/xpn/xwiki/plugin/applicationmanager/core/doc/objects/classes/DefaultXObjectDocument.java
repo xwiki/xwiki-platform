@@ -202,7 +202,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
         BaseObject obj1 = getBaseObject(true);
         BaseObject obj2 = sdoc.getBaseObject(false);
 
-        for (Iterator it = obj1.getPropertyList().iterator(); it.hasNext();) {
+        for (Iterator it = obj2.getPropertyList().iterator(); it.hasNext();) {
             String fieldName = (String) it.next();
             Object fieldValue2 = obj2.safeget(fieldName);
 

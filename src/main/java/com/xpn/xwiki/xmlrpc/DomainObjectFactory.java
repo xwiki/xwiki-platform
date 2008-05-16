@@ -44,14 +44,12 @@ import com.xpn.xwiki.api.PropertyClass;
 
 /**
  * This class contains utility methods for building xmlrpc domain objects.
- *
- * @author fmancinelli
  */
 public class DomainObjectFactory
 {
     /**
      * Create a space summary
-     *
+     * 
      * @return The SpaceSummary representing the space.
      */
     public static SpaceSummary createSpaceSummary(String spaceKey)
@@ -66,7 +64,7 @@ public class DomainObjectFactory
 
     /**
      * Create a space summary starting from the space Web home.
-     *
+     * 
      * @return The SpaceSummary representing the space.
      */
     public static SpaceSummary createSpaceSummary(Document spaceWebHome)
@@ -88,7 +86,7 @@ public class DomainObjectFactory
 
     /**
      * Create a space description.
-     *
+     * 
      * @return A Space object containing all the information about the space.
      */
     public static Space createSpace(String spaceKey)
@@ -105,7 +103,7 @@ public class DomainObjectFactory
 
     /**
      * Create a space from its WebHome document.
-     *
+     * 
      * @return A Space object containing all the information about the space.
      */
     public static Space createSpace(Document spaceWebHome)
@@ -122,7 +120,7 @@ public class DomainObjectFactory
 
     /**
      * Create a page summary description from an XWiki document.
-     *
+     * 
      * @return An XWikiPageSummary with the information.
      * @throws XWikiException If there is a problem getting page translations.
      */
@@ -148,10 +146,10 @@ public class DomainObjectFactory
 
     /**
      * Create a page description from an XWiki document.
-     *
+     * 
      * @param useExtendedPageId true if the id should contain additional information concerning the
-     * version, language etc. In this case the pageId will be in the form
-     * Space.Page?param=value&param=value&...
+     *            version, language etc. In this case the pageId will be in the form
+     *            Space.Page?param=value&param=value&...
      * @return An XWikiPage object representing the page.
      * @throws XWikiException If there is a problem getting page translations.
      */
@@ -195,7 +193,7 @@ public class DomainObjectFactory
 
     /**
      * Create a page history summary containing revision information about a document.
-     *
+     * 
      * @return An XWikiPageHistorySummary object containing the revision information.
      */
     public static XWikiPageHistorySummary createXWikiPageHistorySummary(Document document)
@@ -217,7 +215,7 @@ public class DomainObjectFactory
 
     /**
      * Create a comment object containing all the information concerning a document comment.
-     *
+     * 
      * @param commentObject The XWiki object of type "XWiki.Comment" containing the actual comment.
      * @return A Comment Object containing comment information.
      */
@@ -247,7 +245,7 @@ public class DomainObjectFactory
 
     /**
      * Create an Attachment object containing information about an attachment.
-     *
+     * 
      * @return An Attachment object containing all the information.
      */
     public static Attachment createAttachment(com.xpn.xwiki.api.Attachment xwikiAttachment)
@@ -273,7 +271,7 @@ public class DomainObjectFactory
 
     /**
      * Create a summary of an XWiki class.
-     *
+     * 
      * @return An XWikiClassSummary containing information about the class.
      */
     public static XWikiClassSummary createXWikiClassSummary(String className)
@@ -286,7 +284,7 @@ public class DomainObjectFactory
 
     /**
      * Create an XWikiClass object with all the information about a given XWiki class
-     *
+     * 
      * @return An XWikiClass object with all the information.
      */
     public static XWikiClass createXWikiClass(com.xpn.xwiki.api.Class xwikiClass)
@@ -322,7 +320,7 @@ public class DomainObjectFactory
 
     /**
      * Create a summary of a given xwiki object.
-     *
+     * 
      * @return An XWikiObjectSummary object containing all the information.
      */
     public static XWikiObjectSummary createXWikiObjectSummary(Document document,
@@ -345,7 +343,7 @@ public class DomainObjectFactory
 
     /**
      * Create an XWikiObject containing all the information and attributed of a given xwiki object.
-     *
+     * 
      * @return An XWikiObject containing all the information.
      */
     public static XWikiObject createXWikiObject(Document document, com.xpn.xwiki.api.Object object)
@@ -380,7 +378,7 @@ public class DomainObjectFactory
 
     /**
      * Create a search result object.
-     *
+     * 
      * @param pageId The page id representing the page associated with this result.
      * @return A SearchResult object containing the information.
      */

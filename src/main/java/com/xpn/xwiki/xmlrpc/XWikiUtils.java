@@ -33,21 +33,12 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.apache.xmlrpc.XmlRpcException;
-import com.xpn.xwiki.XWiki;
+
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiResponse;
-import com.xpn.xwiki.web.XWikiServletContext;
-import com.xpn.xwiki.web.XWikiURLFactory;
 
 /**
  * This is an helper class containing some utility method for handling and setting up the XWiki and
  * XMLRPC data objects needed to serve XMLRPC requests.
- *
- * @author fmancinelli
  */
 public class XWikiUtils
 {
@@ -65,34 +56,9 @@ public class XWikiUtils
                 return null;
             }
         };
-        Class[] interfaces = new Class[]{someClass};
+        Class[] interfaces = new Class[] {someClass};
 
         return Proxy.newProxyInstance(loader, interfaces, handler);
-    }
-
-    public static XWikiXmlRpcContext getXWikiXmlRpcContext(String token, XWikiRequest request,
-        XWikiResponse response, XWikiServletContext servletContext) throws XWikiException,
-        XmlRpcException
-    {
-
-        XWikiContext context = getXWikiContext(request, response, servletContext);
-        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, context);
-        com.xpn.xwiki.api.XWiki xwiki = new com.xpn.xwiki.api.XWiki(context.getWiki(), context);
-
-        return new XWikiXmlRpcContext(context, context.getWiki(), xwiki, user);
-    }
-
-    public static XWikiContext getXWikiContext(XWikiRequest request, XWikiResponse response,
-        XWikiServletContext servletContext) throws XWikiException
-    {
-        XWikiContext context = Utils.prepareContext("", request, response, servletContext);
-        XWiki xwiki = XWiki.getXWiki(context);
-        XWikiURLFactory urlf =
-            xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
-        context.setURLFactory(urlf);
-        XWikiVelocityRenderer.prepareContext(context);
-
-        return context;
     }
 
     public static Map getTokens(XWikiContext context)
@@ -104,11 +70,6 @@ public class XWikiUtils
         }
 
         return tokens;
-    }
-
-    public static XWikiXmlRpcUser getUserForToken(XWikiContext context, String token)
-    {
-        return (XWikiXmlRpcUser) getTokens(context).get(token);
     }
 
     public static XWikiXmlRpcUser checkToken(String token, XWikiContext context)

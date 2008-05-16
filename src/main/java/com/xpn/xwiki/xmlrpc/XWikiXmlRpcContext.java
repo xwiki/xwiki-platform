@@ -26,8 +26,6 @@ import com.xpn.xwiki.api.XWiki;
 /**
  * This is an helper class that contains information about the XWiki context and the current XMLRPC
  * user.
- *
- * @author fmancinelli
  */
 public class XWikiXmlRpcContext
 {
@@ -42,30 +40,21 @@ public class XWikiXmlRpcContext
      */
     private com.xpn.xwiki.XWiki baseXWiki;
 
-    private XWikiXmlRpcUser user;
-
     /*
      * This XWikiContext is needed for performing operations with the low-level API.
      */
     private XWikiContext xwikiContext;
 
-    public XWikiXmlRpcContext(XWikiContext xwikiContext, com.xpn.xwiki.XWiki baseXWiki,
-        XWiki xwiki, XWikiXmlRpcUser user)
+    public XWikiXmlRpcContext(XWikiContext xwikiContext)
     {
         this.xwikiContext = xwikiContext;
-        this.baseXWiki = baseXWiki;
-        this.xwiki = xwiki;
-        this.user = user;
+        this.baseXWiki = xwikiContext.getWiki();
+        this.xwiki = new com.xpn.xwiki.api.XWiki(baseXWiki, xwikiContext);
     }
 
     public XWiki getXWiki()
     {
         return xwiki;
-    }
-
-    public XWikiXmlRpcUser getUser()
-    {
-        return user;
     }
 
     public XWikiContext getXWikiContext()
@@ -76,10 +65,5 @@ public class XWikiXmlRpcContext
     public com.xpn.xwiki.XWiki getBaseXWiki()
     {
         return baseXWiki;
-    }
-
-    public void setBaseXWiki(com.xpn.xwiki.XWiki baseXWiki)
-    {
-        this.baseXWiki = baseXWiki;
     }
 }

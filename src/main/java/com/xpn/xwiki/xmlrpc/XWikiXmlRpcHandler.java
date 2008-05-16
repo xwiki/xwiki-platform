@@ -25,9 +25,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,67 +39,56 @@ import org.xwiki.xmlrpc.model.XWikiExtendedId;
 import org.xwiki.xmlrpc.model.XWikiObject;
 import org.xwiki.xmlrpc.model.XWikiPage;
 import org.xwiki.xmlrpc.model.XWikiPageSummary;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.web.XWikiRequest;
-import com.xpn.xwiki.web.XWikiResponse;
-import com.xpn.xwiki.web.XWikiServletContext;
 
 /**
  * The class containing the implementation of the XML-RPC API. Methods tagged with the ConfluenceAPI
  * are compatible with Confluence.
- *
- * @author fmancinelli
  */
 public class XWikiXmlRpcHandler
 {
-    private XWikiRequest xwikiRequest;
-
-    private XWikiResponse xwikiResponse;
-
-    private XWikiServletContext xwikiServletContext;
+    private XWikiXmlRpcHttpRequestConfig xwikiXmlRpcHttpRequestConfig;
 
     private static final Log log = LogFactory.getLog(XWikiXmlRpcHandler.class);
 
     /**
      * Initialize the XML-RPC handler with respect to the current HTTP request.
-     *
+     * 
      * @param servlet The servlet requesting the XML-RPC call handling.
      * @param httpRequest The current HTTP request.
      */
-    public void init(HttpServlet servlet, HttpServletRequest httpRequest)
+    public void init(XWikiXmlRpcHttpRequestConfig requestConfig)
     {
-        xwikiRequest = new XWikiXmlRpcRequest(httpRequest);
-        xwikiResponse =
-            new XWikiXmlRpcResponse((XWikiResponse) XWikiUtils.mock(XWikiResponse.class));
-        ServletContext servletContext = servlet.getServletContext();
-        xwikiServletContext = new XWikiServletContext(servletContext);
+        this.xwikiXmlRpcHttpRequestConfig = requestConfig;
     }
 
     /**
      * Login.
-     *
+     * 
      * @return A token to be used in subsequent calls as an identification.
      * @throws XmlRpcException If authentication fails.
      * @category ConfluenceAPI
      */
     public String login(String userName, String password) throws XWikiException, XmlRpcException
     {
-        XWikiContext context =
-            XWikiUtils.getXWikiContext(xwikiRequest, xwikiResponse, xwikiServletContext);
-        com.xpn.xwiki.XWiki xwiki = context.getWiki();
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+
+        com.xpn.xwiki.XWiki xwiki = xwikiXmlRpcContext.getBaseXWiki();
         String token;
 
-        if (xwiki.getAuthService().authenticate(userName, password, context) != null) {
+        if (xwikiXmlRpcContext.getBaseXWiki().getAuthService().authenticate(userName, password,
+            xwikiXmlRpcContext.getXWikiContext()) != null) {
             // Generate "unique" token using a random number
             token = xwiki.generateValidationKey(128);
-            String ip = context.getRequest().getRemoteAddr();
+            String ip = xwikiXmlRpcContext.getXWikiContext().getRequest().getRemoteAddr();
 
-            XWikiUtils.getTokens(context).put(token,
+            XWikiUtils.getTokens(xwikiXmlRpcContext.getXWikiContext()).put(token,
                 new XWikiXmlRpcUser(String.format("XWiki.%s", userName), ip));
 
             return token;
@@ -114,7 +100,7 @@ public class XWikiXmlRpcHandler
 
     /**
      * Logout.
-     *
+     * 
      * @param token The authentication token.
      * @return True is logout was successful.
      * @throws XmlRpcException An invalid token is provided.
@@ -122,16 +108,15 @@ public class XWikiXmlRpcHandler
      */
     public Boolean logout(String token) throws XWikiException, XmlRpcException
     {
-        XWikiContext context =
-            XWikiUtils.getXWikiContext(xwikiRequest, xwikiResponse, xwikiServletContext);
-        XWikiUtils.checkToken(token, context);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
 
-        return XWikiUtils.getTokens(context).remove(token) != null;
+        return XWikiUtils.getTokens(xwikiXmlRpcContext.getXWikiContext()).remove(token) != null;
     }
 
     /**
      * Get server information.
-     *
+     * 
      * @param token The authentication token.
      * @return The server information
      * @throws XmlRpcException An invalid token is provided.
@@ -139,12 +124,10 @@ public class XWikiXmlRpcHandler
      */
     public Map getServerInfo(String token) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getServerInfo()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getServerInfo()", user.getName()));
 
         String version = xwiki.getVersion();
         Integer majorVersion = null;
@@ -157,10 +140,10 @@ public class XWikiXmlRpcHandler
                 String[] components = version.split("\\.");
                 majorVersion = new Integer(components[0]);
                 serverInfo.setMajorVersion(majorVersion);
-                if(components[1].indexOf('-') != -1) {
+                if (components[1].indexOf('-') != -1) {
                     // Removing possible suffixes (-SNAPSHOT for example)
-                    minorVersion = new Integer(components[1].substring(0,
-                        components[1].indexOf('-')));
+                    minorVersion =
+                        new Integer(components[1].substring(0, components[1].indexOf('-')));
                 } else {
                     minorVersion = new Integer(components[1]);
                 }
@@ -185,12 +168,10 @@ public class XWikiXmlRpcHandler
      */
     public List getSpaces(String token) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getSpaces()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getSpaces()", user.getName()));
 
         List result = new ArrayList();
         List<String> spaceKeys = xwiki.getSpaces();
@@ -220,17 +201,15 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @return A map representing a Space object.
      * @throws XmlRpcException An invalid token is provided or the user doesn't have enough rights
-     * to access the space.
+     *             to access the space.
      * @category ConfluenceAPI
      */
     public Map getSpace(String token, String spaceKey) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getSpace()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getSpace()", user.getName()));
 
         if (!xwiki.getSpaces().contains(spaceKey)) {
             throw new XmlRpcException(String.format("[Space '%s' does not exist]", spaceKey));
@@ -257,22 +236,20 @@ public class XWikiXmlRpcHandler
     /**
      * Add a new space. It basically creates a SpaceKey.WebHome page with no content and the space
      * title as its title.
-     *
+     * 
      * @param token The authentication token.
      * @param spaceMap The map representing a Space object.
      * @return The newly created space as a Space object.
      * @throws XmlRpcException Space cannot be created or it already exists and the user has not the
-     * rights to modify it
+     *             rights to modify it
      * @category ConfluenceAPI
      */
     public Map addSpace(String token, Map spaceMap) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called addSpace()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called addSpace()", user.getName()));
 
         Space space = new Space(spaceMap);
 
@@ -292,14 +269,14 @@ public class XWikiXmlRpcHandler
         } else {
             throw new XmlRpcException(String
                 .format(
-                "[Space cannot be created or it already exists and user '%s' has not the right to modify it]",
-                xwikiXmlRpcContext.getUser().getName()));
+                    "[Space cannot be created or it already exists and user '%s' has not the right to modify it]",
+                    user.getName()));
         }
     }
 
     /**
      * Removes a space by deleting every page in it.
-     *
+     * 
      * @param token The authentication token.
      * @return True if the space has been successfully deleted.
      * @category ConfluenceAPI
@@ -307,12 +284,10 @@ public class XWikiXmlRpcHandler
     public Boolean removeSpace(String token, String spaceKey) throws XWikiException,
         XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeSpace()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called removeSpace()", user.getName()));
 
         if (!xwiki.getSpaces().contains(spaceKey)) {
             throw new XmlRpcException(String.format("[Space '%s' does not exist.]", spaceKey));
@@ -359,12 +334,10 @@ public class XWikiXmlRpcHandler
      */
     public List getPages(String token, String spaceKey) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getPages()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getPages()", user.getName()));
 
         List result = new ArrayList();
         List<String> pageNames = xwiki.getSpaceDocsName(spaceKey);
@@ -392,7 +365,7 @@ public class XWikiXmlRpcHandler
 
     /**
      * Retrieves a page.
-     *
+     * 
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @param language The language id for the translation
@@ -401,16 +374,14 @@ public class XWikiXmlRpcHandler
      * @return A map representing a Page object containing information about the page at version
      *         'version.minorVersion'
      * @throws XmlRpcException If the user has not the right to access the page or the page does not
-     * exist at version 'version.minorVersion'.
+     *             exist at version 'version.minorVersion'.
      */
     public Map getPage(String token, String pageId) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getPage()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getPage()", user.getName()));
 
         /* Extract all needed information from the extended xwiki id */
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
@@ -472,7 +443,7 @@ public class XWikiXmlRpcHandler
 
     /**
      * Store a page or create it if it doesn't exist.
-     *
+     * 
      * @param token The authentication token.
      * @param pageMap A map representing the Page object to be stored.
      * @return A map representing a Page object with the updated information.
@@ -480,12 +451,10 @@ public class XWikiXmlRpcHandler
      */
     public Map storePage(String token, Map pageMap) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called storePage()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called storePage()", user.getName()));
 
         XWikiPage page = new XWikiPage(pageMap);
 
@@ -517,8 +486,7 @@ public class XWikiXmlRpcHandler
             }
 
             if (!page.getLanguage().equals("")
-                && !page.getLanguage().equals(doc.getDefaultLanguage()))
-            {
+                && !page.getLanguage().equals(doc.getDefaultLanguage())) {
                 /*
                  * Try to get the document in the translation specified in the page parameter...
                  */
@@ -555,17 +523,15 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      * @category ConfluenceAPI
      */
     public Boolean removePage(String token, String pageId) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removePage()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called removePage()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -575,7 +541,7 @@ public class XWikiXmlRpcHandler
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
                         "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                        .getName(), doc.getLockingUser()));
+                            .getName(), doc.getLockingUser()));
                 }
 
                 doc.delete();
@@ -596,18 +562,16 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing PageHistorySummary objects.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      * @category ConfluenceAPI
      */
     public List getPageHistory(String token, String pageId) throws XWikiException,
         XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removePage()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called removePage()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -640,26 +604,24 @@ public class XWikiXmlRpcHandler
 
     /**
      * Render a page or content in HTML.
-     *
+     * 
      * @param token The authentication token.
      * @param space Ignored
      * @param pageId The page id in the form of Space.Page
      * @param content The content to be rendered. If content == "" then the page content is
-     * rendered.
+     *            rendered.
      * @return The rendered content.
      * @throws XmlRpcException XmlRpcException If the page does not exist or the user has not the
-     * right to access it.
+     *             right to access it.
      * @category ConfluenceAPI
      */
     public String renderContent(String token, String space, String pageId, String content)
         throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removePage()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called removePage()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -701,17 +663,15 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing Comment objects.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      * @category ConfluenceAPI
      */
     public List getComments(String token, String pageId) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getComments()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getComments()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -742,12 +702,10 @@ public class XWikiXmlRpcHandler
 
     public Map getComment(String token, String commentId) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getComments()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getComments()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(commentId);
         int commentNumericalId = Integer.parseInt(extendedId.getParameter("commentId"));
@@ -758,7 +716,7 @@ public class XWikiXmlRpcHandler
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
                         "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                        .getName(), doc.getLockingUser()));
+                            .getName(), doc.getLockingUser()));
                 }
 
                 com.xpn.xwiki.api.Object commentObject =
@@ -781,17 +739,15 @@ public class XWikiXmlRpcHandler
      * @param commentMap A map representing a Comment object.
      * @return A map representing a Comment object with updated information.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      * @category ConfluenceAPI
      */
     public Map addComment(String token, Map commentMap) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called addComment()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called addComment()", user.getName()));
 
         Comment comment = new Comment((Map<String, Object>) commentMap);
         XWikiExtendedId extendedId = new XWikiExtendedId(comment.getPageId());
@@ -801,7 +757,7 @@ public class XWikiXmlRpcHandler
             if (doc != null) {
                 int id = doc.createNewObject("XWiki.XWikiComments");
                 com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", id);
-                commentObject.set("author", xwikiXmlRpcContext.getUser().getName());
+                commentObject.set("author", user.getName());
                 commentObject.set("date", new Date());
                 commentObject.set("comment", comment.getContent());
 
@@ -823,18 +779,16 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @return True if the comment has been successfully removed.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      * @category ConfluenceAPI
      */
     public Boolean removeComment(String token, String commentId) throws XWikiException,
         XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeComment()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called removeComment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(commentId);
         int commentNumericalId = Integer.parseInt(extendedId.getParameter("commentId"));
@@ -845,7 +799,7 @@ public class XWikiXmlRpcHandler
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
                         "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                        .getName(), doc.getLockingUser()));
+                            .getName(), doc.getLockingUser()));
                 }
 
                 com.xpn.xwiki.api.Object commentObject =
@@ -869,18 +823,16 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing Attachment objects.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      * @category ConfluenceAPI
      */
     public List getAttachments(String token, String pageId) throws XWikiException,
         XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getAttachments()", xwikiXmlRpcContext
-            .getUser().getName()));
+        log.info(String.format("User %s has called getAttachments()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -908,22 +860,20 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param contentId Ignored
      * @param attachment The Attachment object used to identify the page id, and attachment
-     * metadata.
+     *            metadata.
      * @param attachmentData The actual attachment data.
      * @return An Attachment object describing the newly added attachment.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      * @category ConfluenceAPI
      */
     public Map addAttachment(String token, Integer contentId, Map attachmentMap,
         byte[] attachmentData) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called addAttachment()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called addAttachment()", user.getName()));
 
         Attachment attachment = new Attachment((Map) attachmentMap);
         XWikiExtendedId extendedId = new XWikiExtendedId(attachment.getPageId());
@@ -958,7 +908,7 @@ public class XWikiXmlRpcHandler
                 }
                 xwikiBaseAttachment.setContent(attachmentData);
                 xwikiBaseAttachment.setFilename(attachment.getFileName());
-                xwikiBaseAttachment.setAuthor(xwikiXmlRpcContext.getUser().getName());
+                xwikiBaseAttachment.setAuthor(user.getName());
 
                 xwikiBaseAttachment.setDoc(xwikiDocument);
                 xwikiDocument.saveAttachmentContent(xwikiBaseAttachment, xwikiXmlRpcContext
@@ -987,18 +937,16 @@ public class XWikiXmlRpcHandler
      * @param versionNumber (Ignored)
      * @return An array of bytes with the actual attachment content.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     * or the attachment with the given fileName does not exist on the given page.
+     *             or the attachment with the given fileName does not exist on the given page.
      * @category ConfluenceAPI
      */
     public byte[] getAttachmentData(String token, String pageId, String fileName,
         String versionNumber) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getAttachmentData()", xwikiXmlRpcContext
-            .getUser().getName()));
+        log.info(String.format("User %s has called getAttachmentData()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1011,7 +959,7 @@ public class XWikiXmlRpcHandler
                 } else {
                     throw new XmlRpcException(String.format(
                         "Attachment '%s' does not exist on page '%s'", fileName, extendedId
-                        .getBasePageId()));
+                            .getBasePageId()));
                 }
             } else {
                 throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
@@ -1028,18 +976,16 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @return True if the attachment has been removed.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     * or the attachment with the given fileName does not exist on the given page.
+     *             or the attachment with the given fileName does not exist on the given page.
      * @category ConfluenceAPI
      */
     public Boolean removeAttachment(String token, String pageId, String fileName)
         throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeAttachment()", xwikiXmlRpcContext
-            .getUser().getName()));
+        log.info(String.format("User %s has called removeAttachment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1049,7 +995,7 @@ public class XWikiXmlRpcHandler
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
                         "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                        .getName(), doc.getLockingUser()));
+                            .getName(), doc.getLockingUser()));
                 }
 
                 com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(fileName);
@@ -1072,7 +1018,7 @@ public class XWikiXmlRpcHandler
                 } else {
                     throw new XmlRpcException(String.format(
                         "Attachment '%s' does not exist on page '%s'", fileName, extendedId
-                        .getBasePageId()));
+                            .getBasePageId()));
                 }
             } else {
                 throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
@@ -1092,12 +1038,10 @@ public class XWikiXmlRpcHandler
      */
     public List getClasses(String token) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getClasses()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getClasses()", user.getName()));
 
         List result = new ArrayList();
 
@@ -1116,12 +1060,10 @@ public class XWikiXmlRpcHandler
      */
     public Map getClass(String token, String className) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getClass()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getClass()", user.getName()));
 
         if (!xwiki.exists(className)) {
             throw new XmlRpcException(String.format("Class '%s' does not exist", className));
@@ -1139,16 +1081,14 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing XWikiObject objects.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      */
     public List getObjects(String token, String pageId) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getObjects()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getObjects()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1184,7 +1124,7 @@ public class XWikiXmlRpcHandler
      * The getObject function will return an XWikiObject where only non-null properties are included
      * in the mapping 'field' -> 'value' In order to know all the available fields and their
      * respective types and attributes, clients should refer to the object's class.
-     *
+     * 
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @param className The class of the object.
@@ -1192,17 +1132,15 @@ public class XWikiXmlRpcHandler
      * @return The XWikiObject containing the information about all the properties contained in the
      *         selected object.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     * or no object with the given id exist in the page.
+     *             or no object with the given id exist in the page.
      */
     public Map getObject(String token, String pageId, String className, Integer id)
         throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getObject()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called getObject()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1230,21 +1168,19 @@ public class XWikiXmlRpcHandler
 
     /**
      * Update the object or create a new one if it doesn't exist.
-     *
+     * 
      * @param token The authentication token.
      * @param objectMap A map representing the XWikiObject to be updated/created.
      * @return A map representing the XWikiObject with the updated information.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     * it.
+     *             it.
      */
     public Map storeObject(String token, Map objectMap) throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called storeObject()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called storeObject()", user.getName()));
 
         XWikiObject object = new XWikiObject(objectMap);
         XWikiExtendedId extendedId = new XWikiExtendedId(object.getPageId());
@@ -1303,17 +1239,15 @@ public class XWikiXmlRpcHandler
      * @param id The object's id.
      * @return True if the object has been successfully deleted.
      * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     * or no object with the given id exist in the page.
+     *             or no object with the given id exist in the page.
      */
     public Boolean removeObject(String token, String pageId, String className, Integer id)
         throws XWikiException, XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeComment()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called removeComment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1323,7 +1257,7 @@ public class XWikiXmlRpcHandler
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
                         "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                        .getName(), doc.getLockingUser()));
+                            .getName(), doc.getLockingUser()));
                 }
 
                 com.xpn.xwiki.api.Object commentObject = doc.getObject(className, id);
@@ -1333,7 +1267,7 @@ public class XWikiXmlRpcHandler
                 } else {
                     throw new XmlRpcException(String.format(
                         "Object %s[%d] on page '%s' does not exist", className, id, extendedId
-                        .getBasePageId()));
+                            .getBasePageId()));
                 }
             } else {
                 throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
@@ -1350,18 +1284,16 @@ public class XWikiXmlRpcHandler
     /**
      * @param token The authentication token.
      * @param query The string to be looked for. If it is "__ALL_PAGES__" the search will return all
-     * the page ids available in the Wiki.
+     *            the page ids available in the Wiki.
      * @return A list of SearchResults
      */
     public List search(String token, String query, int maxResults) throws XWikiException,
         XmlRpcException
     {
-        XWikiXmlRpcContext xwikiXmlRpcContext =
-            XWikiUtils.getXWikiXmlRpcContext(token, xwikiRequest, xwikiResponse,
-                xwikiServletContext);
+        XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
+        XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeComment()", xwikiXmlRpcContext.getUser()
-            .getName()));
+        log.info(String.format("User %s has called removeComment()", user.getName()));
 
         com.xpn.xwiki.XWiki baseXWiki = xwikiXmlRpcContext.getBaseXWiki();
 

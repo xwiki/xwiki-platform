@@ -156,7 +156,7 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
     private final String DEFAULT_SPACE = "Space";
 
-    private final String DEFAULT_DOCNAME = "Space";
+    private final String DEFAULT_DOCNAME = "Document";
 
     private final String DEFAULT_DOCFULLNAME = DEFAULT_SPACE + "." + DEFAULT_DOCNAME;
 
@@ -217,5 +217,28 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
         assertNotNull(obj);
         assertEquals(sdoc.getXClassManager(), sclass);
+    }
+    
+    public void testMergeObject() throws XWikiException
+    {
+        XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
+        DefaultXObjectDocument sdoc1 =
+            (DefaultXObjectDocument) sclass.newXObjectDocument(context);
+        
+        DefaultXObjectDocument sdoc2 =
+            (DefaultXObjectDocument) sclass.newXObjectDocument(context);
+        
+        sdoc1.setStringValue("field1", "valuesdoc1");
+        sdoc1.setStringValue("field2", "value2sdoc1");
+        
+        sdoc2.setStringValue("field1", "valuesdoc2");
+        sdoc2.setIntValue("field3", 2);
+        
+        sdoc1.mergeObject(sdoc2);
+        
+        assertEquals("The field is not overwritten", sdoc1.getStringValue("field1"), sdoc2.getStringValue("field1"));
+        assertEquals("The field is removed", "value2sdoc1", sdoc1.getStringValue("field2"));
+        assertEquals("The field is not added", sdoc1.getIntValue("field3"), sdoc1.getIntValue
+        ("field3"));
     }
 }

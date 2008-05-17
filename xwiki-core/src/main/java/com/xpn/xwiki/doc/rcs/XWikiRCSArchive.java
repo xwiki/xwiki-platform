@@ -153,7 +153,7 @@ public class XWikiRCSArchive extends Archive
             // empty author is error in jrcs
             if (user == null || "".equals(user)) {
                 super.setAuthor(sauthorIfEmpty);
-            } else {                
+            } else {
                 byte[] enc = URLCodec.encodeUrl(safeAuthorChars, user.getBytes());
                 String senc = new String(enc).replace('%', '_');
                 super.setAuthor(senc);
@@ -170,12 +170,17 @@ public class XWikiRCSArchive extends Archive
                 result = result.replace('_', '%');
                 try {
                     byte[] dec = URLCodec.decodeUrl(result.getBytes());
-                    String sdec = new String(dec);
-                    return sdec;
+                    result = new String(dec);
                 } catch (DecoderException e) {
-                    throw new Error(e);
+                    // Probably the archive was created before introducing this encoding (1.2M1/M2).
+                    result = super.getAuthor();
+                    if (!result.matches("^(\\w|\\d|\\.)++$")) {
+                        // It's safer to use an empty author than to use an invalid value.
+                        result = "";
+                    }
                 }
             }
+            return result;
         }
         /** @return is this node store diff or full version */
         public boolean isDiff() {

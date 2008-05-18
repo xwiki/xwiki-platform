@@ -319,10 +319,10 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
 
 
     public boolean startUpdateFeedsInSpace(String space, boolean fullContent, int scheduleTimer, XWikiContext context)  throws XWikiException {
-        UpdateThread updateThread = (UpdateThread) updateThreads.get(space);
+        UpdateThread updateThread = (UpdateThread) updateThreads.get(context.getDatabase() + ":" + space);
         if (updateThread==null) {
             updateThread = new UpdateThread(space, fullContent, scheduleTimer, this, context);
-            updateThreads.put(space, updateThread);
+            updateThreads.put(context.getDatabase() + ":" + space, updateThread);
             Thread thread = new Thread(updateThread);
             thread.start();
             return true;
@@ -332,22 +332,22 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
     }
 
     public void stopUpdateFeedsInSpace(String space, XWikiContext context)  throws XWikiException {
-        UpdateThread updateThread = (UpdateThread) updateThreads.get(space);
+        UpdateThread updateThread = (UpdateThread) updateThreads.get(context.getDatabase() + ":" + space);
         if (updateThread!=null) {
              updateThread.stopUpdate();
         }
     }
 
-    public void removeUpdateThread(String space, UpdateThread thread) {
+    public void removeUpdateThread(String space, UpdateThread thread, XWikiContext context) {
         // make sure the update thread is removed.
         // this is called by the update thread when the loop is last exited
-        if (thread==updateThreads.get(space)) {
-            updateThreads.remove(space);
+        if (thread==updateThreads.get(context.getDatabase() + ":" + space)) {
+            updateThreads.remove(context.getDatabase() + ":" + space);
         }
     }
 
-    public UpdateThread getUpdateThread(String space) {
-        return (UpdateThread) updateThreads.get(space);
+    public UpdateThread getUpdateThread(String space, XWikiContext context) {
+        return (UpdateThread) updateThreads.get(context.getDatabase() + ":" + space);
     }
 
     public Collection getActiveUpdateThreads() {

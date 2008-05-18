@@ -55,7 +55,7 @@ public class UpdateThread implements Runnable {
         while (true) {
             update();
             if (stopUpdate) {
-                feedPlugin.removeUpdateThread(space, this);
+                feedPlugin.removeUpdateThread(space, this, context);
                 break;
             }
             try {
@@ -126,7 +126,7 @@ public class UpdateThread implements Runnable {
 
     public void stopUpdate() {
         if (!updateInProgress) {
-            feedPlugin.removeUpdateThread(space, this);             
+            feedPlugin.removeUpdateThread(space, this, context);             
         }
         stopUpdate = true;
     }

@@ -27,6 +27,8 @@ import java.util.List;
 
 public interface XWikiRenderingEngine
 {
+    void virtualInit(XWikiContext context);
+
     void addRenderer(String name, XWikiRenderer renderer);
 
     XWikiRenderer getRenderer(String name);

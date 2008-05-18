@@ -161,7 +161,7 @@ public class FeedPluginApi extends Api {
 
 
     public UpdateThread getUpdateThread(String space) {
-        return plugin.getUpdateThread(space);
+        return plugin.getUpdateThread(space, context);
     }
 
     public Collection getActiveUpdateThreads() {

@@ -75,6 +75,12 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         initCache(context);
     }
 
+    public void virtualInit(XWikiContext context) {
+        XWikiMacrosMappingRenderer mmrendered = (XWikiMacrosMappingRenderer) getRenderer("mapping");
+        if (mmrendered!=null)
+         mmrendered.loadPreferences(context.getWiki(), context);
+    }
+
     public void initCache(XWikiContext context) throws XWikiException
     {
         int iCapacity = 100;

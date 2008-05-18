@@ -447,6 +447,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     getGlobalRightsClass(context);
                     getTagClass(context);
                     getPluginManager().virtualInit(context);
+                    getRenderingEngine().virtualInit(context);
                 }
 
                 // Add initdone which will allow to

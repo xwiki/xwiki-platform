@@ -62,7 +62,7 @@ public abstract class AbstractXClassManager implements XClassManager
     /**
      * The resource file extension containing pages contents.
      */
-    private static final String DOCUMENTCONTENT_EXT = ".svn";
+    private static final String DOCUMENTCONTENT_EXT = ".vm";
 
     /**
      * Resource path prefix for the class sheets documents content.

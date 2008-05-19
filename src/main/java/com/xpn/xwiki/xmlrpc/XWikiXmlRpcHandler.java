@@ -46,6 +46,8 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.VelocityManager;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * The class containing the implementation of the XML-RPC API. Methods tagged with the ConfluenceAPI
@@ -55,7 +57,7 @@ public class XWikiXmlRpcHandler
 {
     private XWikiXmlRpcHttpRequestConfig xwikiXmlRpcHttpRequestConfig;
 
-    private static final Log log = LogFactory.getLog(XWikiXmlRpcHandler.class);
+    private static final Log LOG = LogFactory.getLog(XWikiXmlRpcHandler.class);
 
     /**
      * Initialize the XML-RPC handler with respect to the current HTTP request.
@@ -127,7 +129,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getServerInfo()", user.getName()));
+        LOG.debug(String.format("User %s has called getServerInfo()", user.getName()));
 
         String version = xwiki.getVersion();
         Integer majorVersion = null;
@@ -171,7 +173,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getSpaces()", user.getName()));
+        LOG.debug(String.format("User %s has called getSpaces()", user.getName()));
 
         List result = new ArrayList();
         List<String> spaceKeys = xwiki.getSpaces();
@@ -209,7 +211,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getSpace()", user.getName()));
+        LOG.debug(String.format("User %s has called getSpace()", user.getName()));
 
         if (!xwiki.getSpaces().contains(spaceKey)) {
             throw new XmlRpcException(String.format("[Space '%s' does not exist]", spaceKey));
@@ -249,7 +251,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called addSpace()", user.getName()));
+        LOG.debug(String.format("User %s has called addSpace()", user.getName()));
 
         Space space = new Space(spaceMap);
 
@@ -287,7 +289,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeSpace()", user.getName()));
+        LOG.debug(String.format("User %s has called removeSpace()", user.getName()));
 
         if (!xwiki.getSpaces().contains(spaceKey)) {
             throw new XmlRpcException(String.format("[Space '%s' does not exist.]", spaceKey));
@@ -337,7 +339,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getPages()", user.getName()));
+        LOG.debug(String.format("User %s has called getPages()", user.getName()));
 
         List result = new ArrayList();
         List<String> pageNames = xwiki.getSpaceDocsName(spaceKey);
@@ -345,7 +347,7 @@ public class XWikiXmlRpcHandler
             String pageFullName = String.format("%s.%s", spaceKey, pageName);
 
             if (!xwiki.exists(pageFullName)) {
-                log.warn(String.format(
+                LOG.warn(String.format(
                     "[Page '%s' appears to be in space '%s' but no information is available.]",
                     pageName));
             } else {
@@ -381,7 +383,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getPage()", user.getName()));
+        LOG.debug(String.format("User %s has called getPage()", user.getName()));
 
         /* Extract all needed information from the extended xwiki id */
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
@@ -454,7 +456,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called storePage()", user.getName()));
+        LOG.debug(String.format("User %s has called storePage()", user.getName()));
 
         XWikiPage page = new XWikiPage(pageMap);
 
@@ -531,7 +533,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removePage()", user.getName()));
+        LOG.debug(String.format("User %s has called removePage()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -571,7 +573,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removePage()", user.getName()));
+        LOG.debug(String.format("User %s has called getPageHistory()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -621,7 +623,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removePage()", user.getName()));
+        LOG.debug(String.format("User %s has called renderContent()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -671,7 +673,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getComments()", user.getName()));
+        LOG.debug(String.format("User %s has called getComments()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -705,7 +707,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getComments()", user.getName()));
+        LOG.debug(String.format("User %s has called getComment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(commentId);
         int commentNumericalId = Integer.parseInt(extendedId.getParameter("commentId"));
@@ -747,7 +749,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called addComment()", user.getName()));
+        LOG.debug(String.format("User %s has called addComment()", user.getName()));
 
         Comment comment = new Comment((Map<String, Object>) commentMap);
         XWikiExtendedId extendedId = new XWikiExtendedId(comment.getPageId());
@@ -788,7 +790,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeComment()", user.getName()));
+        LOG.debug(String.format("User %s has called removeComment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(commentId);
         int commentNumericalId = Integer.parseInt(extendedId.getParameter("commentId"));
@@ -832,7 +834,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getAttachments()", user.getName()));
+        LOG.debug(String.format("User %s has called getAttachments()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -873,7 +875,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called addAttachment()", user.getName()));
+        LOG.debug(String.format("User %s has called addAttachment()", user.getName()));
 
         Attachment attachment = new Attachment((Map) attachmentMap);
         XWikiExtendedId extendedId = new XWikiExtendedId(attachment.getPageId());
@@ -946,7 +948,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getAttachmentData()", user.getName()));
+        LOG.debug(String.format("User %s has called getAttachmentData()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -985,7 +987,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeAttachment()", user.getName()));
+        LOG.debug(String.format("User %s has called removeAttachment()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1041,7 +1043,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getClasses()", user.getName()));
+        LOG.debug(String.format("User %s has called getClasses()", user.getName()));
 
         List result = new ArrayList();
 
@@ -1063,7 +1065,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getClass()", user.getName()));
+        LOG.debug(String.format("User %s has called getClass()", user.getName()));
 
         if (!xwiki.exists(className)) {
             throw new XmlRpcException(String.format("Class '%s' does not exist", className));
@@ -1088,7 +1090,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getObjects()", user.getName()));
+        LOG.debug(String.format("User %s has called getObjects()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1140,7 +1142,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called getObject()", user.getName()));
+        LOG.debug(String.format("User %s has called getObject()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1180,7 +1182,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called storeObject()", user.getName()));
+        LOG.debug(String.format("User %s has called storeObject()", user.getName()));
 
         XWikiObject object = new XWikiObject(objectMap);
         XWikiExtendedId extendedId = new XWikiExtendedId(object.getPageId());
@@ -1247,7 +1249,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeComment()", user.getName()));
+        LOG.debug(String.format("User %s has called removeObject()", user.getName()));
 
         XWikiExtendedId extendedId = new XWikiExtendedId(pageId);
 
@@ -1293,7 +1295,7 @@ public class XWikiXmlRpcHandler
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
         XWiki xwiki = xwikiXmlRpcContext.getXWiki();
-        log.info(String.format("User %s has called removeComment()", user.getName()));
+        LOG.debug(String.format("User %s has called search()", user.getName()));
 
         com.xpn.xwiki.XWiki baseXWiki = xwikiXmlRpcContext.getBaseXWiki();
 

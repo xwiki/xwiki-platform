@@ -46,8 +46,6 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.VelocityManager;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * The class containing the implementation of the XML-RPC API. Methods tagged with the ConfluenceAPI

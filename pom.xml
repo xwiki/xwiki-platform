@@ -408,6 +408,12 @@
       <artifactId>fop</artifactId>
       <version>0.95beta-1</version>
     </dependency>
+    <!-- fop depends on batik 1.7, but the batik folks forgot to release the rasterizer module
+         for this version, which we need. Since the 1.6 and 1.7 releases are fairly compatible,
+         but use different groupId names, we can use all twe modules from 1.7, and exclude all
+         the 1.6 dependencies pulled by the rasterizer, until we can depend on a clean 1.7
+         rasterizer module.
+         See https://issues.apache.org/bugzilla/show_bug.cgi?id=45020 -->
     <dependency>
       <groupId>batik</groupId>
       <artifactId>batik-rasterizer</artifactId>

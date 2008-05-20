@@ -127,6 +127,9 @@ public class IndexRebuilder implements Runnable
             // TODO This seems to work on a simple run:
             // context = new XWikiContext();
             // context.setWiki(this.context.getWiki());
+            // context.setEngineContext(this.context.getEngineContext());
+            // context.setMode(this.context.getMode());
+            // context.setAction(this.context.getAction());
             // context.put("msg", this.context.get("msg"));
             // context.setMainXWiki(this.context.getMainXWiki());
             // context.setURLFactory(this.context.getURLFactory());
@@ -143,6 +146,10 @@ public class IndexRebuilder implements Runnable
             // threads and causes the hibernate session to be shared in the end. The vcontext is
             // automatically recreated by the velocity renderer, if it isn't found in the xcontext.
             context.remove("vcontext");
+            // The original request and response should not be used outside the actual requet
+            // processing thread, as they will be cleaned later by the container.
+            context.setRequest(null);
+            context.setResponse(null);
             rebuildIndex(context);
         } catch (Exception e) {
             LOG.error("Error in lucene rebuild thread", e);

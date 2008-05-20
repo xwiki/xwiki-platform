@@ -93,12 +93,12 @@ public interface JoinRequest
      * @return The status of this request
      * @see JoinRequestStatus
      */
-    String getStatus();
+    int getStatus();
 
     /**
      * @see #getStatus()
      */
-    void setStatus(String status);
+    void setStatus(int status);
 
     /**
      * @return An explanatory text for this request

@@ -31,30 +31,30 @@ public interface JoinRequestStatus
      * The request status is not specified. It can have any of the allowed values. This can be
      * useful when retrieving stored requests.
      */
-    String ANY = "0";
+    int ANY = 0;
 
     /**
      * The request has been created but has not yet been sent
      */
-    String CREATED = "1";
+    int CREATED = 1;
 
     /**
      * The request has been sent but no answer has been received so far
      */
-    String SENT = "2";
+    int SENT = 2;
 
     /**
      * The request has been accepted
      */
-    String ACCEPTED = "3";
+    int ACCEPTED = 3;
 
     /**
      * The request has been refused
      */
-    String REFUSED = "4";
+    int REFUSED = 4;
 
     /**
      * The request has been canceled
      */
-    String CANCELLED = "5";
+    int CANCELLED = 5;
 }

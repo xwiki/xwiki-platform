@@ -11,8 +11,12 @@
 <input type="hidden" name="xnotification" value="$!xnotification" />
 <input type="hidden" name="template" value="$!request.template" />
 <input type="hidden" name="language" value="$!doc.language" />
-<input type="hidden" name="parent" value="$!request.parent" />
-<input type="hidden" name="title" value="$!request.title" />
+#if("$!request.parent" != "")
+  <input type="hidden" name="parent" value="$!request.parent" />
+#end
+#if("$!request.title" != "")
+  <input type="hidden" name="title" value="$!request.title" />
+#end
 #set($force = $!request.get("force"))
 #if (($doc.getLocked()==true)&&(!$force))
 <div>

@@ -223,7 +223,7 @@
         </id>
 
         <property name="content" type="binary">
-            <column name="XWA_CONTENT" length="4000000" not-null="true"/>
+            <column name="XWA_CONTENT" length="1000000000" not-null="true"/>
         </property>
     </class>
 
@@ -233,7 +233,7 @@
             <generator class="assigned" />
         </id>
         <property name="archive" type="binary">
-            <column name="XWA_ARCHIVE" length="4000000" />
+            <column name="XWA_ARCHIVE" length="1000000000" />
         </property>
     </class>
 

@@ -21,7 +21,6 @@ package com.xpn.xwiki.plugin.scheduler;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.objects.BaseObject;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;

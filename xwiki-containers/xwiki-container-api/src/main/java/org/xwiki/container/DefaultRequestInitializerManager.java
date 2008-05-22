@@ -24,15 +24,31 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 
+/**
+ * Default implementation for {@link org.xwiki.container.RequestInitializerManager}
+ * @see org.xwiki.container.RequestInitializerManager
+ */
 public class DefaultRequestInitializerManager implements RequestInitializerManager, Composable
 {
+    /**
+     * The component manager we used to find all components implementing the
+     * {@link org.xwiki.container.RequestInitializer} role.
+     */
     private ComponentManager componentManager;
-    
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
+     */
     public void compose(ComponentManager componentManager)
     {
         this.componentManager = componentManager;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.container.RequestInitializerManager#initializeRequest(Request)
+     */
     public void initializeRequest(Request request) throws ComponentLookupException
     {
         // Find all request interceptors and call them to initialize the Request

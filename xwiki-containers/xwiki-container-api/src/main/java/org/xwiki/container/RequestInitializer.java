@@ -32,5 +32,10 @@ public interface RequestInitializer
      */
     public final static String ROLE = RequestInitializer.class.getName();
 
+    /**
+     * Perform initializations here, such as storing objects in the Request.
+     * 
+     * @param request the XWiki Request object
+     */
     void initialize(Request request);
 }

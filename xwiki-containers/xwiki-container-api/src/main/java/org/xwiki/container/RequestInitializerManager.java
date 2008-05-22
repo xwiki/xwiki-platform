@@ -22,9 +22,23 @@ package org.xwiki.container;
 
 import org.xwiki.component.manager.ComponentLookupException;
 
+/**
+ * Manages initializations that have to be done when the XWiki Request object is initialized.
+ */
 public interface RequestInitializerManager
 {
+    /**
+     * Component's id so that it can be looked up.
+     */
     String ROLE = RequestInitializerManager.class.getName();
 
+    /**
+     * Call all components which implement the {@link org.xwiki.container.RequestInitializer} role so
+     * that they can each perform their own initializations.
+     *
+     * @param request the XWiki Request object
+     * @throws ComponentLookupException if a component implementing the {@link org.xwiki.container.RequestInitializer}
+     *         role cannot be located 
+     */
     void initializeRequest(Request request) throws ComponentLookupException;
 }

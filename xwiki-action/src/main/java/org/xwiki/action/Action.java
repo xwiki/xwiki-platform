@@ -20,13 +20,11 @@
  */
 package org.xwiki.action;
 
-import org.xwiki.container.Container;
-
 public interface Action
 {
     String ROLE = Action.class.getName();
 
-    void execute(Container container) throws ActionException;
+    void execute() throws ActionException;
 
-    void execute(Container container, Object additionalData) throws ActionException;
+    void execute(Object additionalData) throws ActionException;
 }

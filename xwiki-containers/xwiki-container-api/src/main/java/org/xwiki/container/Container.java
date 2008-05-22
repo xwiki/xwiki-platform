@@ -26,9 +26,23 @@ public interface Container
 
     ApplicationContext getApplicationContext();
 
+    void setApplicationContext(ApplicationContext context);
+    
     Request getRequest();
+    void setRequest(Request request);
+    void removeRequest();
+    void pushRequest(Request request);
+    void popRequest();
 
     Response getResponse();
+    void setResponse(Response response);
+    void removeResponse();
+    void pushResponse(Response response);
+    void popResponse();
 
     Session getSession();
+    void setSession(Session session);
+    void removeSession();
+    void pushSession(Session session);
+    void popSession();
 }

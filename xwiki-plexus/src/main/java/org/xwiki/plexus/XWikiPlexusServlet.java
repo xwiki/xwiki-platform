@@ -24,8 +24,8 @@ import org.codehaus.plexus.servlet.PlexusServlet;
 import org.xwiki.action.ActionException;
 import org.xwiki.action.ActionManager;
 import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainer;
 import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.container.servlet.ServletContainerFactory;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -40,15 +40,18 @@ public class XWikiPlexusServlet extends PlexusServlet
         ActionManager manager = (ActionManager) lookup(ActionManager.ROLE);
 
         // Initializes XWiki's Container with the Servlet request/response/session so that
-        // components needing them can depend on the Container Manager component to get them.
-        ServletContainer container =
-            (ServletContainer) lookup(Container.ROLE, "servlet");
+        // components needing them can depend on the Container component to get them.
+        Container container = (Container) lookup(Container.ROLE);
+        ServletContainerFactory containerFactory =
+            (ServletContainerFactory) lookup(ServletContainerFactory.ROLE);
         try {
-            container.initialize(httpServletRequest, httpServletResponse);
+            container.setRequest(containerFactory.createRequest(httpServletRequest));
+            container.setResponse(containerFactory.createResponse(httpServletResponse));
+            container.setSession(containerFactory.createSession(httpServletRequest));
         } catch (ServletContainerException e) {
             try {
                 // Call the error Action to handle the exception
-                manager.handleRequest(container, "error", e);
+                manager.handleRequest("error", e);
                 return;
             } catch (ActionException ae) {
                 throw new ServletException("Failed to call the error Action", ae);
@@ -57,12 +60,11 @@ public class XWikiPlexusServlet extends PlexusServlet
 
         // Call the Action Manager to handle the request
         try {
-            manager.handleRequest(container);
+            manager.handleRequest();
         } catch (ActionException e) {
             // We haven't been able to handle the exception in ActionManager so generate a
             // container exception.
-            throw new ServletException("Failed to handle request ["
-                + container.getRequest() + "]", e);
+            throw new ServletException("Failed to handle request", e);
         }
     }
 }

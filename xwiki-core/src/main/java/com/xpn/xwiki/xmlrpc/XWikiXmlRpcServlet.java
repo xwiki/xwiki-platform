@@ -38,7 +38,7 @@ import org.apache.xmlrpc.webserver.XmlRpcServlet;
 import org.apache.xmlrpc.webserver.XmlRpcServletServer;
 
 /**
- * This is the XMLRPC servlet that is used as a gateway for serving XMLRPC requests.
+ * This is the XMLRPC Servlet that is used as a gateway for serving XMLRPC requests.
  */
 public class XWikiXmlRpcServlet extends XmlRpcServlet
 {

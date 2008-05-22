@@ -24,14 +24,10 @@ import org.codehaus.plexus.servlet.PlexusServletContextListener;
 import org.codehaus.plexus.servlet.PlexusServletUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 import org.codehaus.plexus.PlexusContainer;
-import org.xwiki.action.ActionException;
-import org.xwiki.action.ActionManager;
 import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainer;
-import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.container.servlet.ServletContainerFactory;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletException;
 
@@ -42,24 +38,19 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
         // Initializes Plexus
         super.contextInitialized(servletContextEvent);
 
-        // Initializes XWiki's Container with the Servlet Context
-        ServletContainer container = null;
+        // Initializes XWiki's Container with the Servlet Conetext.
         try {
-            container = (ServletContainer) PlexusServletUtils.lookup(
-                servletContextEvent.getServletContext(), Container.ROLE, "servlet");
-            container.initialize(servletContextEvent.getServletContext());
+            Container container = (Container) PlexusServletUtils.lookup(
+                servletContextEvent.getServletContext(), Container.ROLE);
+            ServletContainerFactory containerFactory = 
+                (ServletContainerFactory) PlexusServletUtils.lookup(
+                    servletContextEvent.getServletContext(), ServletContainerFactory.ROLE);
+            container.setApplicationContext(containerFactory.createApplicationContext(
+                servletContextEvent.getServletContext()));
         } catch (ServletException se) {
-            throw new RuntimeException("Failed to lookup component role [" + Container.ROLE
-                + "] for hint [servlet]", se);
-        } catch (ServletContainerException sce) {
-            ActionManager manager = lookupActionManager(servletContextEvent.getServletContext());
-            try {
-                manager.handleRequest(container, "error", sce);
-            } catch (ActionException ae) {
-                throw new RuntimeException("Failed to call the error Action", ae);
-            }
+            throw new RuntimeException("Failed to initialize application contextt", se);
         }
-
+        
         // This is a temporary bridge to allow non XWiki components to lookup XWiki components.
         // We're putting the XWiki Component Manager instance in the Servlet Context so that it's
         // available in the XWikiAction class which in turn puts it into the XWikiContext instance.
@@ -74,17 +65,5 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
             new PlexusContainerLocator(plexusContainer));
         servletContextEvent.getServletContext().setAttribute(
             org.xwiki.component.manager.ComponentManager.class.getName(), xwikiManager);
-    }
-
-    private ActionManager lookupActionManager(ServletContext servletContext)
-    {
-        ActionManager manager;
-        try {
-            manager = (ActionManager) PlexusServletUtils.lookup(servletContext, ActionManager.ROLE);
-        } catch (ServletException e) {
-            throw new RuntimeException("Failed to lookup component role [" + ActionManager.ROLE
-                + "]", e);
-        }
-        return manager;
     }
 }

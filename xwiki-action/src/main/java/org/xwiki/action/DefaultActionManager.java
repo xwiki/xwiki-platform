@@ -29,6 +29,8 @@ public class DefaultActionManager implements ActionManager, Composable
 {
     private ComponentManager componentManager;
 
+    private Container container;
+    
     private Action errorAction;
 
     public void compose(ComponentManager componentManager)
@@ -36,12 +38,12 @@ public class DefaultActionManager implements ActionManager, Composable
         this.componentManager = componentManager;
     }
 
-    public void handleRequest(Container container) throws ActionException
+    public void handleRequest() throws ActionException
     {
         // Get the action to execute from the request URL
-        XWikiURL requestURL = container.getRequest().getURL();
+        XWikiURL requestURL = this.container.getRequest().getURL();
         String actionName = requestURL.getAction();
-        handleRequest(container, actionName);
+        handleRequest(actionName);
     }
 
     /**
@@ -49,20 +51,20 @@ public class DefaultActionManager implements ActionManager, Composable
      * @exception ActionException when we haven't been able to use the error action to handle
      *            the original exception
      */
-    public void handleRequest(Container container, String actionName) throws ActionException
+    public void handleRequest(String actionName) throws ActionException
     {
-        handleRequest(container, actionName, null);
+        handleRequest(actionName, null);
     }
 
-    public void handleRequest(Container container, String actionName, Object additionalData)
+    public void handleRequest(String actionName, Object additionalData)
         throws ActionException
     {
         // Actions are registered with a role hint corresponding to the action name
         try {
             Action action = (Action) this.componentManager.lookup(Action.ROLE, actionName);
-            action.execute(container, additionalData);
+            action.execute(additionalData);
         } catch (Exception e) {
-            this.errorAction.execute(container, e);
+            this.errorAction.execute(e);
         }
     }
 }

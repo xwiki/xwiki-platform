@@ -20,16 +20,14 @@
  */
 package org.xwiki.action;
 
-import org.xwiki.container.Container;
-
 public class ErrorAction implements Action
 {
-    public void execute(Container container) throws ActionException
+    public void execute() throws ActionException
     {
-        execute(container, null);
+        execute(null);
     }
 
-    public void execute(Container container, Object additionalData) throws ActionException
+    public void execute(Object additionalData) throws ActionException
     {
         if (additionalData != null && Throwable.class.isAssignableFrom(additionalData.getClass())) {
             Throwable throwable = (Throwable) additionalData;

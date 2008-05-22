@@ -1,14 +1,14 @@
 <component-set>
   <components>
     <component>
-      <role>org.xwiki.container.Container</role>
-      <role-hint>servlet</role-hint>
-      <implementation>org.xwiki.container.servlet.ServletContainer</implementation>
+      <role>org.xwiki.container.servlet.ServletContainerFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.container.servlet.DefaultServletContainerFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
-          <role>org.xwiki.url.URLFactory</role>
+          <role>org.xwiki.container.RequestInitializerManager</role>
           <role-hint>default</role-hint>
         </requirement>
       </requirements>

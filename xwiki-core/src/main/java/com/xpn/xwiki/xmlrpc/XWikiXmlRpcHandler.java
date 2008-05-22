@@ -46,6 +46,8 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.VelocityManager;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * The class containing the implementation of the XML-RPC API. Methods tagged with the ConfluenceAPI
@@ -640,7 +642,11 @@ public class XWikiXmlRpcHandler
                 XWikiDocument baseDocument =
                     baseXWiki.getDocument(extendedId.getBasePageId(), context);
                 context.setDoc(baseDocument);
-                VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+                
+                VelocityManager velocityManager = 
+                    (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+                VelocityContext vcontext = velocityManager.getVelocityContext();
+
                 baseXWiki.prepareDocuments(context.getRequest(), context, vcontext);
                 if (content.length() == 0) {
                     // If content is not provided, then the existing content of

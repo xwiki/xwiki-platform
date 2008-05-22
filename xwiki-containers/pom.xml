@@ -44,6 +44,8 @@
   <modules>
     <module>xwiki-container-api</module>
     <module>xwiki-container-servlet</module>
+    <module>xwiki-container-portlet</module>
+    <module>xwiki-container-daemon</module>
   </modules>
 </project>
        

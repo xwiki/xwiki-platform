@@ -1,0 +1,180 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
+package com.xpn.xwiki.render;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
+import org.apache.velocity.VelocityContext;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
+import org.xwiki.container.Container;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.VelocityFactory;
+import org.xwiki.velocity.VelocityRequestInitializer;
+import org.xwiki.velocity.XWikiVelocityException;
+
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.web.Utils;
+
+/**
+ * Note: This class should be moved to the Velocity module. However this is not possible right now
+ * since we need to populate the Velocity Context with XWiki objects that are located in the
+ * Core (such as the XWiki object for example) and since the Core needs to call the Velocity
+ * module this would cause a circular dependency.
+ */
+public class DefaultVelocityManager implements VelocityManager, Composable
+{
+    private ComponentManager componentManager;
+
+    /**
+     * Store one VelocityEngine instance per skin since a skin is allowed to have a global
+     * velocimacro macros.vm file.
+     */
+    private Map<String, VelocityEngine> velocityManagers = new HashMap<String, VelocityEngine>();
+
+    private Container container;
+
+    /**
+     * {@inheritDoc}
+     * @see Composable#compose(ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+    }
+
+    public VelocityContext getVelocityContext()
+    {
+        // The Velocity Context is set in VelocityRequestInterceptor,
+        // when the XWiki Request is initialized so we are guaranteed it is
+        // define when this method is called.
+        VelocityContext vcontext = (VelocityContext) this.container.getRequest().getProperty(
+            VelocityRequestInitializer.REQUEST_VELOCITY_CONTEXT);
+
+        // Bridge. To be removed later.
+        if (vcontext.get("util") == null) {
+            XWikiContext xcontext = (XWikiContext) this.container.getRequest().getProperty("xwikicontext");
+            
+            // Put the Util API in the Velocity context.
+            vcontext.put("util", new com.xpn.xwiki.api.Util(xcontext.getWiki(), xcontext));
+        
+            // We put the com.xpn.xwiki.api.XWiki object into the context and not the
+            // com.xpn.xwiki.XWiki one which is for internal use only. In this manner we control what
+            // the user can access.
+            vcontext.put("xwiki", new XWiki(xcontext.getWiki(), xcontext));
+        
+            vcontext.put("request", xcontext.getRequest());
+            vcontext.put("response", xcontext.getResponse());
+
+            // We put the com.xpn.xwiki.api.Context object into the context and not the
+            // com.xpn.xwiki.XWikiContext one which is for internal use only. In this manner we control
+            // what the user can access.
+            vcontext.put("context", new Context(xcontext));
+
+            // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
+            // Velocity context there. However if we create a new Velocity context we need to populate it with
+            // the message tool. This needs to be refactored to be made clean.
+            Object msg = xcontext.get("msg");
+            if (msg != null) {
+                if (vcontext.get("msg") == null) {
+                    vcontext.put("msg", msg);
+                }
+            }
+            
+            // Save the Velocity Context in the XWiki context so that users can access the objects
+            // we've put in it (xwiki, request, response, etc).
+            xcontext.put("vcontext", vcontext);
+        }
+        
+        return vcontext;
+    }
+
+    /**
+     * @return the key used to cache the Velocity Engines. We have one Velocity Engine
+     *         per skin which has a macros.vm file on the filesystem. Right now we don't
+     *         support macros.vm defined in custom skins in wiki pages.
+     */
+    private String getVelocityEngineCacheKey(String skin, XWikiContext context)
+    {
+        // We need the path relative to the webapp's home folder so we need to remove all path before
+        // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
+        String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
+        String cacheKey;
+        if (skinMacros != null) {
+            // We're only using the path starting with the skin name since sometimes we'll
+            // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...", 
+            // sometimes we get "skins/<skinname>/..." and if the skin is done in wiki pages
+            // we get ".../skin/...".
+            int pos = skinMacros.indexOf("skins/");
+            if (pos > -1) {
+                cacheKey = skinMacros.substring(pos);
+            } else {
+                // If the macros.vm file is stored in a wiki page (in a macros.vm property in
+                // a XWikiSkins object) then we use the parent skin's macros.vm since we 
+                // currently don't support having global velocimacros defined in wiki pages.
+                String baseSkin = context.getWiki().getBaseSkin(context);
+                cacheKey = getVelocityEngineCacheKey(baseSkin, context);
+            }
+        } else {
+            // If no skin macros.vm file exists then use a "default" cache id
+            cacheKey = "default";
+        }
+        
+        return cacheKey;
+    }
+
+    public VelocityEngine getVelocityEngine() throws XWikiVelocityException
+    {
+        // Note: For improved performance we cache the Velocity Managers in order not to 
+        // recreate them all the time. The key we use is the location to the skin's macro.vm
+        // file since caching on the skin would create more Managers than needed (some skins
+        // don't have a macros.vm file and some skins inherit from others).
+        
+        // Create a Velocity context using the Velocity Manager associated to the current skin's
+        // macros.vm
+
+        // Get the location of the skin's macros.vm file
+        XWikiContext xcontext = (XWikiContext) this.container.getRequest().getProperty("xwikicontext");
+        String skin = xcontext.getWiki().getSkin(xcontext);
+        String cacheKey = getVelocityEngineCacheKey(skin, xcontext);
+        
+        // Get the Velocity Manager to use
+        VelocityFactory velocityFactory =
+            (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE, xcontext);
+        VelocityEngine velocityEngine;
+        if (velocityFactory.hasVelocityEngine(cacheKey)) {
+            velocityEngine = velocityFactory.getVelocityEngine(cacheKey); 
+        } else {
+            // Gather the global Velocity macros that we want to have. These are skin dependent. 
+            Properties properties = new Properties();
+            String macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey); 
+            properties.put(RuntimeConstants.VM_LIBRARY, macroList);
+            velocityEngine = velocityFactory.createVelocityEngine(cacheKey, properties);
+        }       
+
+        return velocityEngine;
+    }
+}

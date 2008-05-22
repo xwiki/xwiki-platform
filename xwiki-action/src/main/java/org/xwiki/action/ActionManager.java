@@ -20,8 +20,6 @@
  */
 package org.xwiki.action;
 
-import org.xwiki.container.Container;
-
 public interface ActionManager
 {
     String ROLE = ActionManager.class.getName();
@@ -30,15 +28,15 @@ public interface ActionManager
      * @exception ActionException when we haven't been able to use the error action to handle
      *            the original exception
      */
-    void handleRequest(Container container) throws ActionException;
+    void handleRequest() throws ActionException;
 
     /**
      * Force execution of a specific action.
      * @exception ActionException when we haven't been able to use the error action to handle
      *            the original exception
      */
-    void handleRequest(Container container, String actionName) throws ActionException;
+    void handleRequest(String actionName) throws ActionException;
 
-    void handleRequest(Container container, String actionName, Object additionalData)
+    void handleRequest(String actionName, Object additionalData)
         throws ActionException;
 }

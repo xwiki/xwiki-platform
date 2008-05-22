@@ -8,6 +8,19 @@
       <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
+      <role>org.xwiki.container.RequestInitializer</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.velocity.VelocityRequestInitializer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.velocity.VelocityContextFactory</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
       <role>org.xwiki.velocity.VelocityEngine</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.velocity.DefaultVelocityEngine</implementation>
@@ -16,7 +29,6 @@
       <requirements>
         <requirement>
           <role>org.xwiki.container.Container</role>
-          <role-hint>servlet</role-hint>
         </requirement>
       </requirements>
       <configuration>

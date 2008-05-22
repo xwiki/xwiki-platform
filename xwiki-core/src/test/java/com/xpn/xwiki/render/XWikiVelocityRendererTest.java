@@ -20,7 +20,6 @@
 package com.xpn.xwiki.render;
 
 import org.jmock.Mock;
-import org.xwiki.component.manager.ComponentManager;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.XWikiContext;
@@ -37,7 +36,6 @@ import java.util.Collections;
  */
 public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
 {
-    private XWikiContext context;
     private XWikiVelocityRenderer renderer;
     private Mock mockXWiki;
     private Mock mockDocument;
@@ -47,19 +45,17 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
+        
         this.renderer = new XWikiVelocityRenderer();
-        this.context = new XWikiContext();
-
-        // We need to initialize the Component Manager so that the Velocity component can be
-        // looked up
-        this.context.put(ComponentManager.class.getName(), getComponentManager());
 
         this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
-            new Object[] {new XWikiConfig(), context});
+            new Object[] {new XWikiConfig(), getContext()});
         this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
         this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
         this.mockXWiki.stubs().method("getResourceContent").will(returnValue(null));
-        this.context.setWiki((XWiki) this.mockXWiki.proxy());
+        this.mockXWiki.stubs().method("prepareResources");
+        getContext().setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockContentDocument = mock(XWikiDocument.class);
         this.contentDocument = (XWikiDocument) this.mockContentDocument.proxy();
@@ -69,7 +65,7 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
 
         Mock mockApiDocument = mock(Document.class,
             new Class[] {XWikiDocument.class, XWikiContext.class},
-            new Object[] {this.document, this.context});
+            new Object[] {this.document, getContext()});
         this.mockDocument.stubs().method("newDocument").will(returnValue(mockApiDocument.proxy()));
     }
 
@@ -80,7 +76,7 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
         this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
 
-        String result = renderer.render("Simple content", contentDocument, document, context);
+        String result = renderer.render("Simple content", contentDocument, document, getContext());
 
         assertEquals("Simple content", result);
     }
@@ -93,7 +89,7 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
         this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
 
         String result = renderer.render("#set ($test = \"hello\")\n$test world\n## comment",
-            contentDocument, document, context);
+            contentDocument, document, getContext());
 
         assertEquals("hello world\n", result);
     }

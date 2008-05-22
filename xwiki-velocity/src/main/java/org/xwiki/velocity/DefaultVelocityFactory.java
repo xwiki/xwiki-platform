@@ -70,7 +70,8 @@ public class DefaultVelocityFactory extends AbstractLogEnabled implements Veloci
 	 * {@inheritDoc}
 	 * @see VelocityFactory#createVelocityEngine(String, Properties)
 	 */
-	public VelocityEngine createVelocityEngine(String key, Properties properties) throws XWikiVelocityException
+	public VelocityEngine createVelocityEngine(String key, Properties properties)
+	    throws XWikiVelocityException
 	{
 		VelocityEngine engine;
 		if (this.velocityEngines.containsKey(key)) {

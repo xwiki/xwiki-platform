@@ -14,6 +14,10 @@
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
+          <role>org.xwiki.container.Container</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
           <role>org.xwiki.action.Action</role>
           <role-hint>error</role-hint>
         </requirement>

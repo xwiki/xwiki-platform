@@ -14,14 +14,17 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.container.Container;
+import org.xwiki.container.daemon.DaemonContainerException;
+import org.xwiki.container.daemon.DaemonContainerFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.render.VelocityManager;
 import com.xpn.xwiki.web.ExportURLFactory;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Create a ZIP package containing a range of HTML pages with skin and attachment dependencies.
@@ -76,7 +79,7 @@ public class HtmlPackager
     /**
      * The pages to export. A {@link Set} of page name.
      */
-    private Set pages = new HashSet();
+    private Set<String> pages = new HashSet<String>();
 
     /**
      * Modify the name of the package for which packager append ".zip".
@@ -127,13 +130,11 @@ public class HtmlPackager
     /**
      * Add a range of pages to export.
      * 
-     * @param pages a range od pages to export.
+     * @param pages a range of pages to export.
      */
-    public void addPages(Collection pages)
+    public void addPages(Collection<String> pages)
     {
-        for (Iterator it = pages.iterator(); it.hasNext();) {
-            this.pages.add(it.next());
-        }
+        this.pages.addAll(pages);
     }
 
     /**
@@ -193,33 +194,47 @@ public class HtmlPackager
     private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf,
         XWikiContext context) throws XWikiException, IOException
     {
-        VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+        // Push a clean request in the Container since we don't want the
+        // main request to be used for rendering the HTML pages to export.
+        // The new request automatically gets initialized with a new Velocity Context by
+        // the VelocityRequestInitializer class.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        DaemonContainerFactory containerFactory =
+            (DaemonContainerFactory) Utils.getComponent(DaemonContainerFactory.ROLE, context);
 
-        Document currentDocument = (Document) vcontext.get(VCONTEXT_DOC);
-        Document currentCDocument = (Document) vcontext.get(VCONTEXT_CDOC);
-        Document currentTDocument = (Document) vcontext.get(VCONTEXT_TDOC);
+        VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
         try {
+            container.pushRequest(containerFactory.createRequest());
+
             XWikiContext renderContext = (XWikiContext) context.clone();
             renderContext.put("action", "view");
 
-            vcontext = XWikiVelocityRenderer.prepareContext(renderContext);
+            // This is a bridge that we need for old code to play well with new components.
+            // Old code relies on the XWikiContext object whereas new code uses the Container component.
+            container.getRequest().setProperty("xwikicontext", renderContext);
 
+            VelocityManager velocityManager = 
+                (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+
+            // At this stage we have a clean Velocity Context
+            VelocityContext vcontext = velocityManager.getVelocityContext();
+            
             urlf.init(this.pages, tempdir, renderContext);
             renderContext.setURLFactory(urlf);
 
-            for (Iterator it = this.pages.iterator(); it.hasNext();) {
-                String pageName = (String) it.next();
-
+            for (String pageName: this.pages) {
                 renderDocument(pageName, zos, renderContext, vcontext);
             }
+        } catch (DaemonContainerException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, 
+                XWikiException.ERROR_XWIKI_INIT_FAILED, "Failed to initialize request", e);
         } finally {
-            // Clean velocity context
-            vcontext = XWikiVelocityRenderer.prepareContext(context);
-
-            vcontext.put(VCONTEXT_DOC, currentDocument);
-            vcontext.put(VCONTEXT_CDOC, currentCDocument);
-            vcontext.put(VCONTEXT_TDOC, currentTDocument);
+            // We must ensure that the new request we've used is removed so that the current
+            // thread can continue to use its original request.
+            container.popRequest();
+            
+            context.put("vcontext", oldVelocityContext);
         }
     }
 

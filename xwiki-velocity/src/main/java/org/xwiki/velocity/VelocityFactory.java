@@ -49,9 +49,10 @@ public interface VelocityFactory
     VelocityEngine getVelocityEngine(String key);
     
     /**
-	 * Allow having different Velocity Engines so that each one can have its own special configuration. This is especially
-	 * handy for having different sets of global Velocity libraries (such as for different XWiki Skins for example).
-	 * 
+	 * Allow having different Velocity Engines so that each one can have its own special configuration.
+	 * This is especially handy for having different sets of global Velocity libraries (such as for 
+	 * different XWiki Skins for example).
+	 *
 	 * @throws XWikiVelocityException if the Velocity Engine cannot be initialized for some reason
 	 */
 	VelocityEngine createVelocityEngine(String key, Properties properties) throws XWikiVelocityException;

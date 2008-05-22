@@ -1,0 +1,17 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.container.daemon.DaemonContainerFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.container.daemon.DefaultDaemonContainerFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.container.RequestInitializerManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

@@ -49,4 +49,19 @@ public class ServletRequest implements Request
     {
         this.xwikiURL = url;
     }
+
+    public Object getProperty(String key)
+    {
+        return this.httpServletRequest.getAttribute(key);
+    }
+
+    public void setProperty(String key, Object value)
+    {
+        this.httpServletRequest.setAttribute(key, value);
+    }
+
+    public void removeProperty(String key)
+    {
+        this.httpServletRequest.removeAttribute(key);
+    }
 }

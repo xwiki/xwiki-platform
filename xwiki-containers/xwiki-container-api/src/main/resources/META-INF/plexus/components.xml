@@ -1,0 +1,18 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.container.Container</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.container.DefaultContainer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+    </component>
+    <component>
+      <role>org.xwiki.container.RequestInitializerManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.container.DefaultRequestInitializerManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+    </component>
+  </components>
+</component-set>

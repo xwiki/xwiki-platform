@@ -26,6 +26,9 @@ import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.Container;
+import org.xwiki.container.daemon.DaemonContainerFactory;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
@@ -41,15 +44,12 @@ import com.xpn.xwiki.web.XWikiServletContext;
 public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestCase
 {
 	private DefaultXWikiRenderingEngine engine;
-	private XWikiContext context;
 	
 	protected void setUp() throws Exception
 	{
+	    super.setUp();
+	    
         XWikiConfig config = new XWikiConfig();
-        this.context = new XWikiContext();
-
-        // We need to initialize the Component Manager so that tcomponents can be looked up
-        this.context.put(ComponentManager.class.getName(), getComponentManager());
 
         Mock mockServletContext = mock(ServletContext.class);
         ByteArrayInputStream bais = new ByteArrayInputStream("code=wiki:code:type:content".getBytes());
@@ -60,7 +60,7 @@ public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestC
         mockServletContext.stubs().method("getResourceAsStream").with(eq("/templates/macros.vm")).will(returnValue(new ByteArrayInputStream("".getBytes())));
         XWikiServletContext engineContext = new XWikiServletContext((ServletContext) mockServletContext.proxy());
                 
-        XWiki xwiki = new XWiki(config, context, engineContext, false);
+        XWiki xwiki = new XWiki(config, getContext(), engineContext, false);
         xwiki.setVersion("1.0");
         
         this.engine = (DefaultXWikiRenderingEngine) xwiki.getRenderingEngine();
@@ -103,6 +103,6 @@ public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestC
             + "<div class=\"code\"><pre>1 Something</pre></div>";
         
         XWikiDocument document = new XWikiDocument();
-        assertEquals(expectedText, engine.renderText(text, document, context));
+        assertEquals(expectedText, engine.renderText(text, document, getContext()));
     }
 }

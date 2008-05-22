@@ -22,9 +22,7 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.api.Context;
 import com.xpn.xwiki.api.Document;
-import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.util.Util;
 import org.apache.commons.lang.StringUtils;
@@ -32,18 +30,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.tools.VelocityFormatter;
-import org.apache.velocity.runtime.RuntimeConstants;
-import org.xwiki.velocity.VelocityContextFactory;
-import org.xwiki.velocity.VelocityFactory;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.XWikiVelocityException;
 
 import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
 {
@@ -67,7 +59,9 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
     public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc,
         XWikiContext context)
     {
-        VelocityContext vcontext = prepareContext(context);
+        VelocityManager velocityManager = (VelocityManager) Utils.getComponent(
+            VelocityManager.ROLE, context);
+        VelocityContext vcontext = velocityManager.getVelocityContext();
         Document previousdoc = (Document) vcontext.get("doc");
 
         content = context.getUtil().substitute("s/#include\\(/\\\\#include\\(/go", content);
@@ -103,127 +97,14 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         //To change body of implemented methods use File | Settings | File Templates.
     }
 
-    /**
-     * @return the key used to cache the Velocity Engines. We have one Velocity Engine
-     *         per skin which has a macros.vm file on the filesystem. Right now we don't
-     *         support macros.vm defined in custom skins in wiki pages.
-     */
-    private static String getVelocityEngineCacheKey(String skin, XWikiContext context)
-    {
-        // We need the path relative to the webapp's home folder so we need to remove all path before
-        // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
-        String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
-        String cacheKey;
-        if (skinMacros != null) {
-            // We're only using the path starting with the skin name since sometimes we'll
-            // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...", 
-            // sometimes we get "skins/<skinname>/..." and if the skin is done in wiki pages
-        	// we get ".../skin/...".
-        	int pos = skinMacros.indexOf("skins/");
-        	if (pos > -1) {
-        		cacheKey = skinMacros.substring(pos);
-        	} else {
-        		// If the macros.vm file is stored in a wiki page (in a macros.vm property in
-        		// a XWikiSkins object) then we use the parent skin's macros.vm since we 
-        		// currently don't support having global velocimacros defined in wiki pages.
-        		String baseSkin = context.getWiki().getBaseSkin(context);
-        		cacheKey = getVelocityEngineCacheKey(baseSkin, context);
-        	}
-        } else {
-            // If no skin macros.vm file exists then use a "default" cache id
-        	cacheKey = "default";
-        }
-        
-        return cacheKey;
-    }
-    
-    /**
-     * @todo Move this initialization code to a Skin Manager component.
-     */
-    public static VelocityEngine getVelocityEngine(XWikiContext context) throws XWikiVelocityException
-    {
-    	// Note: For improved performance we cache the Velocity Engines in order not to 
-    	// recreate them all the time. The key we use is the location to the skin's macro.vm
-    	// file since caching on the skin would create more Engines than needed (some skins
-    	// don't have a macros.vm file and some skins inherit from others).
-    	
-    	// Create a Velocity context using the Velocity Engine associated to the current skin's
-    	// macros.vm
-    	
-        // Get the location of the skin's macros.vm file
-        String skin = context.getWiki().getSkin(context);
-        String cacheKey = getVelocityEngineCacheKey(skin, context);
-
-        // Get the Velocity Engine to use
-        VelocityFactory velocityFactory =
-            (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE, context);
-        VelocityEngine velocityEngine;
-        if (velocityFactory.hasVelocityEngine(cacheKey)) {
-        	velocityEngine = velocityFactory.getVelocityEngine(cacheKey); 
-        } else {
-	        // Gather the global Velocity macros that we want to have. These are skin dependent. 
-	        Properties properties = new Properties();
-	        String macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey); 
-	        properties.put(RuntimeConstants.VM_LIBRARY, macroList);
-    		velocityEngine = velocityFactory.createVelocityEngine(cacheKey, properties);
-        }    	
-
-        return velocityEngine;
-    }
-    
-    /**
-     * @todo move this method to the VelocityManager component once we've moved to using the new 
-     * Container component + once we have the new XWiki Model.
-     */
-    public static VelocityContext prepareContext(XWikiContext context)
-    {
-    	// Note: At each Request the XWiki Context is recreated and thus at each request we need to
-    	// populate it with the Velocity context. During the same request (several Velocity
-    	// renderings are done in the same request) we cache the Velocity context for better performance.
-    	VelocityContext vcontext = (VelocityContext) context.get("vcontext");
-        if (vcontext == null) {
-	        // Create the Velocity Context
-            VelocityContextFactory contextFactory = 
-                (VelocityContextFactory) Utils.getComponent(VelocityContextFactory.ROLE, context); 
-	        vcontext = contextFactory.createContext();
-
-	        // Initialize it with read only objects (for better performances)
-	        
-	        // TODO: Remove since it's been replaced by the Number and Date tools. We need to find
-	        // all places in our VM and Documents where we might be using it.
-	        vcontext.put("formatter", new VelocityFormatter(vcontext));
-
-	        // Put the Util API in the Velocity context.
-	        vcontext.put("util", new com.xpn.xwiki.api.Util(context.getWiki(), context));
-        }
-        
-        // We put the com.xpn.xwiki.api.XWiki object into the context and not the
-        // com.xpn.xwiki.XWiki one which is for internal use only. In this manner we control what
-        // the user can access.
-        vcontext.put("xwiki", new XWiki(context.getWiki(), context));
-
-        vcontext.put("request", context.getRequest());
-        vcontext.put("response", context.getResponse());
-
-        // We put the com.xpn.xwiki.api.Context object into the context and not the
-        // com.xpn.xwiki.XWikiContext one which is for internal use only. In this manner we control
-        // what the user can access.
-        vcontext.put("context", new Context(context));
-
-        // Save the Velocity Context in the XWiki context so that users can access the objects
-        // we've put in it (xwiki, request, response, etc).
-        context.put("vcontext", vcontext);
-
-        return vcontext;
-    }
-
     public static String evaluate(String content, String name, VelocityContext vcontext,
         XWikiContext context)
     {
         StringWriter writer = new StringWriter();
         try {
-            VelocityEngine velocityEngine = getVelocityEngine(context);
-            velocityEngine.evaluate(vcontext, writer, name, content);
+            VelocityManager velocityManager =
+                (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+            velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {
             e.printStackTrace();

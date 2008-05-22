@@ -25,36 +25,36 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
-import com.xpn.xwiki.plugin.charts.actions.ChartingAction;
-import com.xpn.xwiki.plugin.charts.actions.PreviewChartAction;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
-import com.octo.captcha.module.struts.image.RenderImageCaptchaAction;
+import com.xpn.xwiki.render.VelocityManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
 import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
+import org.xwiki.container.Container;
+import org.xwiki.container.portlet.PortletContainerException;
+import org.xwiki.container.portlet.PortletContainerFactory;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
+
 import java.io.IOException;
 
-public class XWikiPortlet extends GenericPortlet {
+public class XWikiPortlet extends GenericPortlet
+{
     protected final Log logger = LogFactory.getLog(getClass());
 
     private String name = "XWiki Portlet";
     public static final PortletMode CONFIG_PORTLET_MODE = new PortletMode("config");
     public static final String ROOT_SPACE_PARAM_NAME = "rootSpace";
 
-    protected String getTitle(RenderRequest renderRequest) {
+    protected String getTitle(RenderRequest renderRequest)
+    {
         return name;
     }
 
-    protected XWikiContext prepareContext(String action, XWikiRequest request, XWikiResponse response, XWikiEngineContext engine_context) throws XWikiException {
-        return Utils.prepareContext(action, request, response, engine_context);
-    }
-
-    protected HttpServletRequest processMultipart(HttpServletRequest request) {
+    protected HttpServletRequest processMultipart(HttpServletRequest request)
+    {
         if (!"POST".equalsIgnoreCase(request.getMethod())) {
             return (request);
         }
@@ -70,18 +70,24 @@ public class XWikiPortlet extends GenericPortlet {
     }
 
     protected boolean prepareAction(String action, XWikiRequest request, XWikiResponse response,
-                                    XWikiEngineContext engine_context, XWikiContext context) throws XWikiException, IOException {
+        XWikiEngineContext engine_context, XWikiContext context) throws XWikiException, IOException
+    {
         XWiki xwiki = XWiki.getXWiki(context);
 
-        FileUploadPlugin fileupload = Utils.handleMultipart(processMultipart(request.getHttpServletRequest()), context);
+        Utils.handleMultipart(processMultipart(request.getHttpServletRequest()), context);
 
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
-        VelocityContext vcontext = XWikiVelocityRenderer.prepareContext(context);
+
+        VelocityManager velocityManager = 
+            (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+        VelocityContext vcontext = velocityManager.getVelocityContext();
+        
         return xwiki.prepareDocuments(request, context, vcontext);
     }
 
-    protected void cleanUp(XWikiContext context) {
+    protected void cleanUp(XWikiContext context)
+    {
         try {
             FileUploadPlugin fileupload = (FileUploadPlugin) context.get("fileuploadplugin");
             if (fileupload != null)
@@ -99,8 +105,8 @@ public class XWikiPortlet extends GenericPortlet {
         }
     }
 
-    protected void handleException(XWikiRequest request, XWikiResponse response, Throwable e, XWikiContext context) {
-
+    protected void handleException(XWikiRequest request, XWikiResponse response, Throwable e, XWikiContext context)
+    {
         if (!(e instanceof XWikiException)) {
             e = new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Uncaught exception", e);
@@ -130,7 +136,8 @@ public class XWikiPortlet extends GenericPortlet {
         }
     }
 
-    protected void doDispatch(RenderRequest aRenderRequest, RenderResponse aRenderResponse) throws PortletException, IOException {
+    protected void doDispatch(RenderRequest aRenderRequest, RenderResponse aRenderResponse) throws PortletException, IOException
+    {
         WindowState windowState = aRenderRequest.getWindowState();
         if (!windowState.equals(WindowState.MINIMIZED) && aRenderRequest.getPortletMode().equals(CONFIG_PORTLET_MODE)) {
             doView(aRenderRequest, aRenderResponse);
@@ -139,96 +146,107 @@ public class XWikiPortlet extends GenericPortlet {
         }
     }
 
-    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse) throws PortletException, IOException {
+    public void processAction(ActionRequest actionRequest, ActionResponse actionResponse) 
+        throws PortletException, IOException
+    {
         WindowState windowState = actionRequest.getWindowState();
         if (!windowState.equals(WindowState.MINIMIZED) && actionRequest.getPortletMode().equals(CONFIG_PORTLET_MODE)) {
             handleConfigForm(actionRequest, actionResponse);
         } else {
             XWikiContext context = null;
-            XWikiRequest request = new XWikiPortletRequest(actionRequest);
-            XWikiResponse response = new XWikiPortletResponse(actionResponse);
-            XWikiEngineContext engine_context = new XWikiPortletContext(actionRequest.getPortletSession().getPortletContext());
 
             try {
-                String action = request.getParameter("action");
-                if ((action == null) || (action.equals("")))
-                    action = "view";
+                // Initialize the XWiki Context which is the main object used to pass information across
+                // classes/methods. It's also wrapping the request, response, and all container objects
+                // in general.
+                context = initializeXWikiContext(actionRequest, actionResponse);
 
-                context = prepareContext(action, request, response, engine_context);
-                if (prepareAction(action, request, response, engine_context, context) == false)
-                    return;
-
-//				XWikiService xwikiservice = new XWikiService();
-
-
-                XWikiForm form = null;
-
-                if (action.equals("save"))
-                    form = new EditForm();
-                else if (action.equals("lock"))
-                    form = new EditForm();
-                else if (action.equals("cancel"))
-                    form = new EditForm();
-                else if (action.equals("rollback"))
-                    form = new RollbackForm();
-                else if (action.equals("objectadd"))
-                    form = new ObjectAddForm();
-                else if (action.equals("commentadd"))
-                    form = new ObjectAddForm();
-                else if (action.equals("objectremove"))
-                    form = new ObjectRemoveForm();
-                else if (action.equals("propadd"))
-                    form = new PropAddForm();
-                else if (action.equals("deleteversions"))
-                    form = new DeleteVersionsForm();
-
-                if (form != null) {
-                    form.reset(null, request);
-                    context.setForm(form);
-                }
-
-                if (action.equals("save")) {
-                    (new SaveAction()).action(context);
-                } else if (action.equals("rollback")) {
-                    (new RollbackAction()).action(context);
-                } else if (action.equals("cancel")) {
-                    (new CancelAction()).action(context);
-                } else if (action.equals("lock")) {
-                    (new LockAction()).action(context);
-                } else if (action.equals("delete")) {
-                    (new DeleteAction()).action(context);
-                } else if (action.equals("undelete")) {
-                    (new UndeleteAction()).action(context);
-                } else if (action.equals("propupdate")) {
-                    (new PropUpdateAction()).action(context);
-                } else if (action.equals("propadd")) {
-                    (new PropAddAction()).action(context);
-                } else if (action.equals("objectadd")) {
-                    (new ObjectAddAction()).action(context);
-                } else if (action.equals("commentadd")) {
-                    (new CommentAddAction()).action(context);
-                } else if (action.equals("objectremove")) {
-                    (new ObjectRemoveAction()).action(context);
-                } else if (action.equals("upload")) {
-                    (new UploadAction()).action(context);
-                } else if (action.equals("delattachment")) {
-                    (new DeleteAttachmentAction()).action(context);
-                } else if (action.equals("skin")) {
-                    (new SkinAction()).action(context);
-                } else if (action.equals("logout")) {
-                    (new LogoutAction()).action(context);
-                } else if (action.equals("register")) {
-                    (new RegisterAction()).action(context);
-                } else if (action.equals("inline")) {
-                    (new InlineAction()).action(context);
-                } else if (action.equals("deleteversions")) {
-                    (new DeleteVersionsAction()).action(context);
-                }
-            } catch (Throwable e) {
-                handleException(request, response, e, context);
+                // From this line forward all information can be found in the XWiki Context.
+                doView(context);
+            } catch (XWikiException e) {
+                throw new PortletException("Failed to initalize XWiki Context", e);
             } finally {
-                cleanUp(context);
+                if (context != null) {
+                    cleanupContainerComponent(context);
+                }
             }
+        }
+    }
+    
+    public void processAction(XWikiContext context) 
+        throws PortletException, IOException
+    {
+        try {
+            if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(), context.getEngineContext(), context) == false)
+                return;
+
+            XWikiForm form = null;
+
+            if (context.getAction().equals("save"))
+                form = new EditForm();
+            else if (context.getAction().equals("lock"))
+                form = new EditForm();
+            else if (context.getAction().equals("cancel"))
+                form = new EditForm();
+            else if (context.getAction().equals("rollback"))
+                form = new RollbackForm();
+            else if (context.getAction().equals("objectadd"))
+                form = new ObjectAddForm();
+            else if (context.getAction().equals("commentadd"))
+                form = new ObjectAddForm();
+            else if (context.getAction().equals("objectremove"))
+                form = new ObjectRemoveForm();
+            else if (context.getAction().equals("propadd"))
+                form = new PropAddForm();
+            else if (context.getAction().equals("deleteversions"))
+                form = new DeleteVersionsForm();
+
+            if (form != null) {
+                form.reset(null, context.getRequest());
+                context.setForm(form);
+            }
+
+            if (context.getAction().equals("save")) {
+                (new SaveAction()).action(context);
+            } else if (context.getAction().equals("rollback")) {
+                (new RollbackAction()).action(context);
+            } else if (context.getAction().equals("cancel")) {
+                (new CancelAction()).action(context);
+            } else if (context.getAction().equals("lock")) {
+                (new LockAction()).action(context);
+            } else if (context.getAction().equals("delete")) {
+                (new DeleteAction()).action(context);
+            } else if (context.getAction().equals("undelete")) {
+                (new UndeleteAction()).action(context);
+            } else if (context.getAction().equals("propupdate")) {
+                (new PropUpdateAction()).action(context);
+            } else if (context.getAction().equals("propadd")) {
+                (new PropAddAction()).action(context);
+            } else if (context.getAction().equals("objectadd")) {
+                (new ObjectAddAction()).action(context);
+            } else if (context.getAction().equals("commentadd")) {
+                (new CommentAddAction()).action(context);
+            } else if (context.getAction().equals("objectremove")) {
+                (new ObjectRemoveAction()).action(context);
+            } else if (context.getAction().equals("upload")) {
+                (new UploadAction()).action(context);
+            } else if (context.getAction().equals("delattachment")) {
+                (new DeleteAttachmentAction()).action(context);
+            } else if (context.getAction().equals("skin")) {
+                (new SkinAction()).action(context);
+            } else if (context.getAction().equals("logout")) {
+                (new LogoutAction()).action(context);
+            } else if (context.getAction().equals("register")) {
+                (new RegisterAction()).action(context);
+            } else if (context.getAction().equals("inline")) {
+                (new InlineAction()).action(context);
+            } else if (context.getAction().equals("deleteversions")) {
+                (new DeleteVersionsAction()).action(context);
+            }
+        } catch (Throwable e) {
+            handleException(context.getRequest(), context.getResponse(), e, context);
+        } finally {
+            cleanUp(context);
         }
     }
 
@@ -244,84 +262,95 @@ public class XWikiPortlet extends GenericPortlet {
 
     }
 
-    protected void doView(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
+    protected void doView(RenderRequest renderRequest, RenderResponse renderResponse) 
+        throws PortletException, IOException
+    {
         XWikiContext context = null;
-        XWikiRequest request = new XWikiPortletRequest(renderRequest);
-        XWikiResponse response = new XWikiPortletResponse(renderResponse);
-        XWikiEngineContext engine_context = new XWikiPortletContext(renderRequest.getPortletSession().getPortletContext());
-        String action = null;
 
         try {
-            action = request.getParameter("action");
-            if ((action == null) || (action.equals(""))) {
-                action = renderRequest.getPortletMode().equals(CONFIG_PORTLET_MODE)
-                        ? "portletConfig"
-                        : "view";
+            // Initialize the XWiki Context which is the main object used to pass information across
+            // classes/methods. It's also wrapping the request, response, and all container objects
+            // in general.
+            context = initializeXWikiContext(renderRequest, renderResponse);
+
+            // From this line forward all information can be found in the XWiki Context.
+            doView(context);
+        } catch (XWikiException e) {
+            throw new PortletException("Failed to initalize XWiki Context", e);
+        } finally {
+            if (context != null) {
+                cleanupContainerComponent(context);
             }
-            context = prepareContext(action, request, response, engine_context);
-            if (prepareAction(action, request, response, engine_context, context) == false)
+        }
+    }
+
+    protected void doView(XWikiContext context) 
+        throws PortletException, IOException
+    {
+        try {
+            if (prepareAction(context.getAction(), context.getRequest(), context.getResponse(), context.getEngineContext(), context) == false)
                 return;
 
             XWikiForm form = null;
 
-            if (action.equals("edit")
-                    || action.equals("inline"))
+            if (context.getAction().equals("edit")
+                    || context.getAction().equals("inline"))
                 form = new EditForm();
-            else if (action.equals("preview"))
+            else if (context.getAction().equals("preview"))
                 form = new EditForm();
 
             if (form != null) {
-                form.reset(null, request);
+                form.reset(null, context.getRequest());
                 context.setForm(form);
             }
 
             String renderResult = null;
             // Determine what to do
-            if (action.equals("view")) {
+            if (context.getAction().equals("view")) {
                 renderResult = (new ViewAction()).render(context);
-            } else if (action.equals("viewrev")) {
+            } else if (context.getAction().equals("viewrev")) {
                 renderResult = (new ViewrevAction()).render(context);
-            } else if (action.equals("inline")) {
+            } else if (context.getAction().equals("inline")) {
                 renderResult = (new InlineAction()).render(context);
-            } else if (action.equals("edit")) {
+            } else if (context.getAction().equals("edit")) {
                 renderResult = (new EditAction()).render(context);
-            } else if (action.equals("preview")) {
+            } else if (context.getAction().equals("preview")) {
                 renderResult = (new PreviewAction()).render(context);
-            } else if (action.equals("delete")) {
+            } else if (context.getAction().equals("delete")) {
                 renderResult = (new DeleteAction()).render(context);
-            } else if (action.equals("undelete")) {
+            } else if (context.getAction().equals("undelete")) {
                 renderResult = (new UndeleteAction()).render(context);
-            } else if (action.equals("download")) {
+            } else if (context.getAction().equals("download")) {
                 renderResult = (new DownloadAction()).render(context);
-            } else if (action.equals("downloadrev")) {
+            } else if (context.getAction().equals("downloadrev")) {
                 renderResult = (new DownloadRevAction()).render(context);
-            } else if (action.equals("viewattachrev")) {
+            } else if (context.getAction().equals("viewattachrev")) {
                 renderResult = (new ViewAttachRevAction()).render(context);
-            } else if (action.equals("dot")) {
+            } else if (context.getAction().equals("dot")) {
                 renderResult = (new DotAction()).render(context);
-            } else if (action.equals("svg")) {
+            } else if (context.getAction().equals("svg")) {
                 renderResult = (new SVGAction()).render(context);
-            } else if (action.equals("attach")) {
+            } else if (context.getAction().equals("attach")) {
                 renderResult = (new AttachAction()).render(context);
-            } else if (action.equals("login")) {
+            } else if (context.getAction().equals("login")) {
                 renderResult = (new LoginAction()).render(context);
-            } else if (action.equals("loginsubmit")) {
+            } else if (context.getAction().equals("loginsubmit")) {
                 renderResult = (new LoginSubmitAction()).render(context);
-            } else if (action.equals("loginerror")) {
+            } else if (context.getAction().equals("loginerror")) {
                 renderResult = (new LoginErrorAction()).render(context);
-            } else if (action.equals("register")) {
+            } else if (context.getAction().equals("register")) {
                 renderResult = (new RegisterAction()).render(context);
-            } else if (action.equals("skin")) {
+            } else if (context.getAction().equals("skin")) {
                 renderResult = (new SkinAction()).render(context);
-            } else if (action.equals("export")) {
+            } else if (context.getAction().equals("export")) {
                 renderResult = (new ExportAction()).render(context);
-            } else if (action.equals("import")) {
+            } else if (context.getAction().equals("import")) {
                 renderResult = (new ImportAction()).render(context);
-            } else if (action.equals("portletConfig")) {
+            } else if (context.getAction().equals("portletConfig")) {
                 renderResult = "portletConfig";
             } 
             if (renderResult != null) {
-                String page = Utils.getPage(request, renderResult);
+                String page = Utils.getPage(context.getRequest(), renderResult);
                 Utils.parseTemplate(page, context);
             }
         } catch (Throwable e) {
@@ -329,17 +358,17 @@ public class XWikiPortlet extends GenericPortlet {
                 logger.warn("oops", e);
             }
 
-            handleException(request, response, e, context);
+            handleException(context.getRequest(), context.getResponse(), e, context);
         } finally {
             // Let's make sure we have flushed content and closed
             try {
-                response.getWriter().flush();
+                context.getResponse().getWriter().flush();
             } catch (Throwable e) {
             }
 
             // / Let's handle the notification and make sure it never fails
             try {
-                context.getWiki().getNotificationManager().verify(context.getDoc(), action, context);
+                context.getWiki().getNotificationManager().verify(context.getDoc(), context.getAction(), context);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -350,5 +379,66 @@ public class XWikiPortlet extends GenericPortlet {
     protected void doEdit(RenderRequest renderRequest, RenderResponse renderResponse) throws PortletException, IOException {
         super.doEdit(renderRequest, renderResponse);
     }
+    
+    protected XWikiContext initializeXWikiContext(PortletRequest portletRequest, PortletResponse portletResponse)
+        throws XWikiException, PortletException
+    {
+        XWikiRequest request = new XWikiPortletRequest(portletRequest);
+        XWikiResponse response = new XWikiPortletResponse(portletResponse);
+        XWikiEngineContext engineContext = new XWikiPortletContext(portletRequest.getPortletSession().getPortletContext());
 
+        String action = request.getParameter("action");
+        if ((action == null) || (action.equals(""))) {
+            if (RenderRequest.class.isAssignableFrom(portletRequest.getClass())) {
+                action = portletRequest.getPortletMode().equals(CONFIG_PORTLET_MODE)
+                    ? "portletConfig" : "view";
+            } else {
+                action = "view";
+            }
+        }
+        
+        XWikiContext context = Utils.prepareContext(action, request, response, engineContext);
+
+        // Initialize the Container component which is the new of transporting the Context in the new
+        // component architecture.
+        initializeContainerComponent(context);
+
+        return context;
+    }
+
+    protected void initializeContainerComponent(XWikiContext context)
+        throws PortletException
+    {
+        // Initialize the Container fields (request, response, session).
+        // Note that this is a bridge between the old core and the component architecture.
+        // In the new component architecture we use ThreadLocal to transport the request, 
+        // response and session to components which require them.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        PortletContainerFactory containerFactory =
+            (PortletContainerFactory) Utils.getComponent(PortletContainerFactory.ROLE, context);
+        try {
+            container.setRequest(containerFactory.createRequest(
+                ((XWikiPortletRequest) context.getRequest()).getPortletRequest()));
+            container.setResponse(containerFactory.createResponse(
+                ((XWikiPortletResponse) context.getResponse()).getPortletResponse()));
+            container.setSession(containerFactory.createSession(
+                ((XWikiPortletRequest) context.getRequest()).getPortletRequest()));
+        } catch (PortletContainerException e) {
+            throw new PortletException("Failed to initialize request/response or session", e);
+        }            
+    
+        // This is a bridge that we need for old code to play well with new components.
+        // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        container.getRequest().setProperty("xwikicontext", context);
+    }    
+
+    protected void cleanupContainerComponent(XWikiContext context)
+    {
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        // We must ensure we clean the ThreadLocal variables located in the Container 
+        // component as otherwise we will have a potential memory leak.
+        container.removeRequest();
+        container.removeResponse();
+        container.removeSession();
+    }
 }

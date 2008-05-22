@@ -18,28 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package com.xpn.xwiki.web;
+package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import org.apache.struts.action.ActionForward;
+import org.apache.velocity.VelocityContext;
+import org.xwiki.velocity.VelocityEngine;
+import org.xwiki.velocity.XWikiVelocityException;
 
-public class StatusAction extends XWikiAction
+public interface VelocityManager
 {
     /**
-     * We override {@link XWikiAction#execute(XWikiContext) since we don't want any database calls 
-     * at all to happen during the execution of this action since we're displaying statuses about 
-     * the database.
+     * This component's role, used when code needs to look it up.
      */
-    public ActionForward execute(XWikiContext context) throws Exception
-    {
-        // We only get the main wiki since the database statuses are available from it and getting
-        // the other wiki will call the database.
-        XWiki.getMainXWiki(context);
-    
-        String page = Utils.getPage(context.getRequest(), "status");
-        Utils.parseTemplate(page, !page.equals("direct"), context);
+    public final static String ROLE = VelocityManager.class.getName();
 
-        return null;
-	}
+    VelocityContext getVelocityContext();
+    
+    VelocityEngine getVelocityEngine() throws XWikiVelocityException;
 }

@@ -28,11 +28,13 @@ import org.apache.xmlrpc.common.TypeConverterFactory;
 import org.apache.xmlrpc.server.AbstractReflectiveHandlerMapping;
 import org.apache.xmlrpc.server.ReflectiveXmlRpcHandler;
 import org.apache.xmlrpc.server.RequestProcessorFactoryFactory.RequestProcessorFactory;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.container.servlet.ServletContainerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
@@ -62,6 +64,8 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
     @Override
     public Object execute(final XmlRpcRequest request) throws XmlRpcException
     {
+        XWikiContext context = null;
+        
         try {
             // Here we prepare the XWikiXmlRpcContext object and we put it in the config object so
             // that XMLRPC methods can get it. The config object is the same that is passed to the
@@ -76,21 +80,19 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
             XWikiServletContext xwikiServletContext =
                 new XWikiServletContext(config.getServlet().getServletContext());
 
-            XWikiContext context =
-                Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiServletContext);
+            context = Utils.prepareContext("", xwikiRequest, xwikiResponse, xwikiServletContext);
+            
             XWiki xwiki = XWiki.getXWiki(context);
             XWikiURLFactory urlf =
                 xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
-            XWikiVelocityRenderer.prepareContext(context);
-
-            // XWikiXmlRpcContext xmlRpcContext =
-            // XWikiUtils
-            // .getXWikiXmlRpcContext(xwikiRequest, xwikiResponse, xwikiServletContext);
 
             // Here we set the prepared context
             config.setXmlRpcContext(new XWikiXmlRpcContext(context));
 
+            // Initialize new Container subsystem
+            initializeContainerComponent(context);
+            
             // This performs the actual XMLRPC method invocation using all the logic we don't care
             // of :)
             return super.execute(request);
@@ -99,7 +101,46 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
         } catch (XWikiException e) {
             throw new XmlRpcException(e.getMessage(), e);
         } finally {
-            // Put here all the cleanup code.
+            // Cleanup code
+            if (context != null) {
+                cleanupContainerComponent(context);
+            }
         }
+    }
+
+    private void initializeContainerComponent(XWikiContext context)
+        throws XmlRpcException
+    {
+        // Initialize the Container fields (request, response, session).
+        // Note that this is a bridge between the old core and the component architecture.
+        // In the new component architecture we use ThreadLocal to transport the request, 
+        // response and session to components which require them.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        ServletContainerFactory containerFactory =
+            (ServletContainerFactory) Utils.getComponent(ServletContainerFactory.ROLE, context);
+        try {
+            container.setRequest(containerFactory.createRequest(
+                context.getRequest().getHttpServletRequest()));
+            container.setResponse(containerFactory.createResponse(
+                context.getResponse().getHttpServletResponse()));
+            container.setSession(containerFactory.createSession(
+                context.getRequest().getHttpServletRequest()));
+        } catch (ServletContainerException e) {
+            throw new XmlRpcException("Failed to initialize request/response or session", e);
+        }            
+
+        // This is a bridge that we need for old code to play well with new components.
+        // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        container.getRequest().setProperty("xwikicontext", context);
+    }
+
+    private void cleanupContainerComponent(XWikiContext context)
+    {
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        // We must ensure we clean the ThreadLocal variables located in the Container 
+        // component as otherwise we will have a potential memory leak.
+        container.removeRequest();
+        container.removeResponse();
+        container.removeSession();
     }
 }

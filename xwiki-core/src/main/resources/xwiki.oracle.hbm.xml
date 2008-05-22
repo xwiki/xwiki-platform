@@ -104,10 +104,6 @@
         <property name="minorEdit1" type="boolean">
             <column name="XWD_MINOREDIT" not-null="true" />
         </property>
-
-        <property name="syntaxId" type="string">
-            <column name="XWD_SYNTAX_ID" length="50" />
-        </property>
     </class>
     
     <class name="com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo" table="xwikircs">

@@ -499,7 +499,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     {
         BaseObject watchListObject = this.getWatchListObject(user, context);
 
-        if (context.getWiki().isVirtual()) {
+        if (context.getWiki().isVirtualMode()) {
             // TODO : code getWatchListWhatsNew for virtual mode using LucenePlugin
             return new ArrayList();
         } else {
@@ -533,7 +533,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         List wikiServers = Collections.EMPTY_LIST;
         List results = new ArrayList();
 
-        if (context.getWiki().isVirtual()) {
+        if (context.getWiki().isVirtualMode()) {
             try {
                 wikiServers = context.getWiki().getVirtualWikiList();
                 if (!wikiServers.contains(context.getMainXWiki())) {

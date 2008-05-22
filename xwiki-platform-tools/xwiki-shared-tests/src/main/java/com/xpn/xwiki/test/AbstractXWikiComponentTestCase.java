@@ -22,10 +22,14 @@ package com.xpn.xwiki.test;
 
 import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.container.Container;
+import org.xwiki.container.daemon.DaemonContainerFactory;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
+
+import com.xpn.xwiki.XWikiContext;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
@@ -34,6 +38,38 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLoc
 public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 {
     private ComponentManager componentManager;
+    
+    private XWikiContext context;
+    
+    protected void setUp() throws Exception
+    {
+        this.context = new XWikiContext();
+
+        // We need to initialize the Component Manager so that the components can be looked up
+        getContext().put(ComponentManager.class.getName(), getComponentManager());
+
+        // Initialize the Container objects
+        DaemonContainerFactory dcf = (DaemonContainerFactory) getComponentManager().lookup(DaemonContainerFactory.ROLE);
+        Container container = (Container) getComponentManager().lookup(Container.ROLE);
+        container.setRequest(dcf.createRequest());
+
+        // This is a bridge that we need for old code to play well with new components.
+        // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        container.getRequest().setProperty("xwikicontext", getContext());
+    }
+
+    protected void tearDown() throws Exception
+    {
+        Container container = (Container) getComponentManager().lookup(Container.ROLE);
+        container.removeRequest();
+        container.removeResponse();
+        container.removeSession();
+    }
+    
+    public XWikiContext getContext()
+    {
+        return this.context;
+    }
 
     /**
      * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) 

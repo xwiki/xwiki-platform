@@ -481,13 +481,11 @@ public class LucenePlugin extends XWikiDefaultPlugin implements XWikiPluginInter
                 (Analyzer) Class.forName(config.getProperty(PROP_ANALYZER, DEFAULT_ANALYZER))
                     .newInstance();
         } catch (Exception e) {
-            e.printStackTrace();
             LOG.error("error instantiating analyzer : ", e);
             LOG.warn("using default analyzer class: " + DEFAULT_ANALYZER);
             try {
                 analyzer = (Analyzer) Class.forName(DEFAULT_ANALYZER).newInstance();
             } catch (Exception e1) {
-                e1.printStackTrace();
                 throw new RuntimeException("instantiation of default analyzer "
                     + DEFAULT_ANALYZER + " failed", e1);
             }

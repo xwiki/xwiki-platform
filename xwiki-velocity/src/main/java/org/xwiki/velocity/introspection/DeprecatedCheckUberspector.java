@@ -127,7 +127,7 @@ public class DeprecatedCheckUberspector extends AbstractChainableUberspector imp
      */
     private void logWarning(String deprecationType, Object object, String methodName, Info info)
     {
-        log.warn(String.format("Deprecated usage of " + deprecationType + " [%s] in %s@%d,%d",
+        log.warn(String.format("Deprecated usage of %s [%s] in %s@%d,%d", deprecationType,
             object.getClass().getCanonicalName() + "." + methodName, info.getTemplateName(),
             info.getLine(), info.getColumn()));
     }

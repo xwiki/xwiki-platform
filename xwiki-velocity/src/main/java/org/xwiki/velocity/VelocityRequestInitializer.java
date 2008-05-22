@@ -10,6 +10,7 @@ import org.xwiki.container.RequestInitializer;
  *
  * @See RequestInitializerManager
  * @see RequestInitializer
+ * @since 1.5M1
  * @version $Id: $
  */
 public class VelocityRequestInitializer implements RequestInitializer

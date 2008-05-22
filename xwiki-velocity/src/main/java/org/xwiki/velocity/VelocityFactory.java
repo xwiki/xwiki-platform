@@ -28,6 +28,8 @@ import java.util.Properties;
  * global templates in Velocity are part of the configuration the only solution to use different
  * global templates is to use different Velocity engines. As an example we need this in XWiki since
  * we want to allow each Skin to provide its own global macros.
+ *
+ * @version $Id: $
  */
 public interface VelocityFactory
 {

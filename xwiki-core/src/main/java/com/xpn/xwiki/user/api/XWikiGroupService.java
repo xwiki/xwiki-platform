@@ -46,7 +46,7 @@ public interface XWikiGroupService
     /**
      * @deprecated Use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)}.
      */
-    public Collection listGroupsForUser(String username, XWikiContext context)
+    public Collection<String> listGroupsForUser(String username, XWikiContext context)
         throws XWikiException;
 
     public void addUserToGroup(String user, String database, String group, XWikiContext context)
@@ -68,13 +68,13 @@ public interface XWikiGroupService
     /**
      * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
      */
-    public List listMemberForGroup(String s, XWikiContext context) throws XWikiException;
+    public List<String> listMemberForGroup(String s, XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated Use
      *             {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
      */
-    public List listAllGroups(XWikiContext context) throws XWikiException;
+    public List<String> listAllGroups(XWikiContext context) throws XWikiException;
 
     /**
      * Search for all users with provided constraints and in a provided order.
@@ -101,7 +101,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when getting users.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start,
+    List< ? > getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start,
         Object[][] order, XWikiContext context) throws XWikiException;
 
     /**
@@ -129,7 +129,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when getting groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start,
+    List< ? > getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start,
         Object[][] order, XWikiContext context) throws XWikiException;
 
     /**
@@ -177,7 +177,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection getAllGroupsNamesForMember(String member, int nb, int start,
+    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -191,7 +191,7 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection getAllMembersNamesForGroup(String group, int nb, int start,
+    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start,
         XWikiContext context) throws XWikiException;
 
     /**

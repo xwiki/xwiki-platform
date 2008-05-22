@@ -1,8 +1,10 @@
 package com.xpn.xwiki.plugin.ldap;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -166,9 +168,9 @@ public final class XWikiLDAPConfig
      * @param context the XWiki context.
      * @return the mapping between XWiki users and LDAP users.
      */
-    public Map getGroupMappings(XWikiContext context)
+    public Map<String, Set<String>> getGroupMappings(XWikiContext context)
     {
-        Map groupMappings = new HashMap();
+        Map<String, Set<String>> groupMappings = new HashMap<String, Set<String>>();
 
         String param = getLDAPParam("ldap_group_mapping", "", context);
 
@@ -186,7 +188,14 @@ public final class XWikiLDAPConfig
                     String xwikigroup = mapping.substring(0, splitIndex);
                     String ldapgroup = mapping.substring(splitIndex + 1);
 
-                    groupMappings.put(ldapgroup, xwikigroup);
+                    Set<String> xwikigroups = groupMappings.get(ldapgroup);
+                    
+                    if (xwikigroups == null) {
+                        xwikigroups = new HashSet<String>();
+                        groupMappings.put(ldapgroup, xwikigroups);
+                    }
+                    
+                    xwikigroups.add(xwikigroup);
 
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Groupmapping found: " + xwikigroup + " " + ldapgroup);
@@ -205,9 +214,9 @@ public final class XWikiLDAPConfig
      * @param context the XWiki context.
      * @return the mapping between XWiki groups and LDAP groups.
      */
-    public Map getUserMappings(List attrListToFill, XWikiContext context)
+    public Map<String, String> getUserMappings(List<String> attrListToFill, XWikiContext context)
     {
-        Map userMappings = new HashMap();
+        Map<String, String> userMappings = new HashMap<String, String>();
 
         String ldapFieldMapping = getLDAPParam("ldap_fields_mapping", null, context);
 

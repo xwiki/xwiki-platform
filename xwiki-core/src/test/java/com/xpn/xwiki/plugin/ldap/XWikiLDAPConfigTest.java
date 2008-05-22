@@ -21,9 +21,11 @@ package com.xpn.xwiki.plugin.ldap;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -44,15 +46,33 @@ public class XWikiLDAPConfigTest extends TestCase
 
     private XWikiContext cfgContext;
 
-    private static final Map PREFERENCES = new HashMap();
+    private static final String XADMINGROUP_FULLNAME = "XWiki.XWikiAdminGroup";
+
+    private static final String XADMINGROUP2_FULLNAME = "XWiki.XWikiAdminGroup2";
+
+    private static final String LDAPTITIGRP_DN = "cn=HMS Titi,ou=crews,ou=groups,o=sevenSeas";
+
+    private static final String LDAPTOTOGRP_DN = "cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas";
+
+    private static final String LDAPTITIGRP2_DN = "cn=HMS Titi,ou=crews,ou=groups,o=sevenSeas2";
+
+    private static final String LDAPTOTOGRP2_DN = "cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas2";
+
+    private static final Map<String, String> PREFERENCES = new HashMap<String, String>();
 
     private static final XWikiConfig CONFIG = new XWikiConfig();
-    
-    private static final Map RESULT_CFG_USERMAPPING = new Hashtable();
-    private static final Map RESULT_PREF_USERMAPPING = new Hashtable();
-    
-    private static final Map RESULT_CFG_GROUPMAPPING = new Hashtable();
-    private static final Map RESULT_PREF_GROUPMAPPING = new Hashtable();
+
+    private static final Map<String, String> RESULT_CFG_USERMAPPING =
+        new Hashtable<String, String>();
+
+    private static final Map<String, String> RESULT_PREF_USERMAPPING =
+        new Hashtable<String, String>();
+
+    private static final Map<String, Set<String>> RESULT_CFG_GROUPMAPPING =
+        new Hashtable<String, Set<String>>();
+
+    private static final Map<String, Set<String>> RESULT_PREF_GROUPMAPPING =
+        new Hashtable<String, Set<String>>();
 
     private static void addProperty(String prefName, String cfgName, String prefValue,
         String cfgValue)
@@ -87,20 +107,28 @@ public class XWikiLDAPConfigTest extends TestCase
 
         addProperty("ldap_fields_mapping", "xwiki.authentication.ldap.fields_mapping",
             "name=uid,last_name=sn", "name=uid2,last_name=sn2");
-        
+
         RESULT_PREF_USERMAPPING.put("uid", "name");
         RESULT_PREF_USERMAPPING.put("sn", "last_name");
         RESULT_CFG_USERMAPPING.put("uid2", "name");
         RESULT_CFG_USERMAPPING.put("sn2", "last_name");
-        
+
         addProperty("ldap_group_mapping", "xwiki.authentication.ldap.group_mapping",
-            "XWiki.XWikiAdminGroup=cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas|XWiki.XWikiAdminGroup=cn=HMS Titi,ou=crews,ou=groups,o=sevenSeas",
-            "XWiki.XWikiAdminGroup=cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas2|XWiki.XWikiAdminGroup=cn=HMS Titi,ou=crews,ou=groups,o=sevenSeas2");
-        
-        RESULT_PREF_GROUPMAPPING.put("cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas", "XWiki.XWikiAdminGroup");
-        RESULT_PREF_GROUPMAPPING.put("cn=HMS Titi,ou=crews,ou=groups,o=sevenSeas", "XWiki.XWikiAdminGroup");
-        RESULT_CFG_GROUPMAPPING.put("cn=HMS Toto,ou=crews,ou=groups,o=sevenSeas2", "XWiki.XWikiAdminGroup");
-        RESULT_CFG_GROUPMAPPING.put("cn=HMS Titi,ou=crews,ou=groups,o=sevenSeas2", "XWiki.XWikiAdminGroup");
+            XADMINGROUP_FULLNAME + "=" + LDAPTOTOGRP_DN + "|" + XADMINGROUP_FULLNAME + "="
+                + LDAPTITIGRP_DN + "|" + XADMINGROUP2_FULLNAME + "=" + LDAPTOTOGRP_DN + "|"
+                + XADMINGROUP2_FULLNAME + "=" + LDAPTITIGRP_DN, XADMINGROUP_FULLNAME + "="
+                + LDAPTOTOGRP2_DN + "|" + XADMINGROUP_FULLNAME + "=" + LDAPTITIGRP2_DN + "|"
+                + XADMINGROUP2_FULLNAME + "=" + LDAPTOTOGRP2_DN + "|" + XADMINGROUP2_FULLNAME
+                + "=" + LDAPTITIGRP2_DN);
+
+        Set<String> xgroups = new HashSet<String>();
+        xgroups.add(XADMINGROUP_FULLNAME);
+        xgroups.add(XADMINGROUP2_FULLNAME);
+
+        RESULT_PREF_GROUPMAPPING.put(LDAPTOTOGRP_DN, xgroups);
+        RESULT_PREF_GROUPMAPPING.put(LDAPTITIGRP_DN, xgroups);
+        RESULT_CFG_GROUPMAPPING.put(LDAPTOTOGRP2_DN, xgroups);
+        RESULT_CFG_GROUPMAPPING.put(LDAPTITIGRP2_DN, xgroups);
     }
 
     protected void setUp() throws XWikiException
@@ -119,7 +147,7 @@ public class XWikiLDAPConfigTest extends TestCase
             public String getXWikiPreference(String prefname, String default_value,
                 XWikiContext context)
             {
-                return PREFERENCES.get(prefname).toString();
+                return PREFERENCES.get(prefname);
             }
         };
 
@@ -175,35 +203,39 @@ public class XWikiLDAPConfigTest extends TestCase
 
     public void testGetGroupMappings()
     {
-        Map prefMapping = XWikiLDAPConfig.getInstance().getGroupMappings(prefContext);
-        
+        Map<String, Set<String>> prefMapping =
+            XWikiLDAPConfig.getInstance().getGroupMappings(prefContext);
+
         assertEquals(RESULT_PREF_GROUPMAPPING, prefMapping);
-        
-        Map cfgMapping = XWikiLDAPConfig.getInstance().getGroupMappings(cfgContext);
-        
+
+        Map<String, Set<String>> cfgMapping =
+            XWikiLDAPConfig.getInstance().getGroupMappings(cfgContext);
+
         assertEquals(RESULT_CFG_GROUPMAPPING, cfgMapping);
     }
 
     public void testGetUserMappings()
     {
-        List prefAttrList = new ArrayList();
+        List<String> prefAttrList = new ArrayList<String>();
 
-        Map prefMapping = XWikiLDAPConfig.getInstance().getUserMappings(prefAttrList, prefContext);
+        Map<String, String> prefMapping =
+            XWikiLDAPConfig.getInstance().getUserMappings(prefAttrList, prefContext);
 
         assertEquals("uid", (String) prefAttrList.get(0));
         assertEquals("sn", (String) prefAttrList.get(1));
-        
+
         assertEquals(RESULT_PREF_USERMAPPING, prefMapping);
-        
+
         // ///
 
-        List cfgAttrList = new ArrayList();
+        List<String> cfgAttrList = new ArrayList<String>();
 
-        Map cfgMapping = XWikiLDAPConfig.getInstance().getUserMappings(cfgAttrList, cfgContext);
+        Map<String, String> cfgMapping =
+            XWikiLDAPConfig.getInstance().getUserMappings(cfgAttrList, cfgContext);
 
         assertEquals("uid2", (String) cfgAttrList.get(0));
         assertEquals("sn2", (String) cfgAttrList.get(1));
-        
+
         assertEquals(RESULT_CFG_USERMAPPING, cfgMapping);
     }
 

@@ -24,7 +24,6 @@ package com.xpn.xwiki.plugin.ldap;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.io.UnsupportedEncodingException;
 
@@ -238,9 +237,11 @@ public class XWikiLDAPConnection
      * @param ldapScope {@link LDAPConnection#SCOPE_SUB} oder {@link LDAPConnection#SCOPE_BASE}.
      * @return the found LDAP attributes.
      */
-    public List searchLDAP(String baseDN, String query, String[] attr, int ldapScope)
+    public List<XWikiLDAPSearchAttribute> searchLDAP(String baseDN, String query, String[] attr,
+        int ldapScope)
     {
-        List searchAttributeList = new ArrayList();
+        List<XWikiLDAPSearchAttribute> searchAttributeList =
+            new ArrayList<XWikiLDAPSearchAttribute>();
 
         try {
             LDAPSearchConstraints cons = new LDAPSearchConstraints();
@@ -260,8 +261,8 @@ public class XWikiLDAPConnection
 
             LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
 
-            for (Iterator attributeIt = attributeSet.iterator(); attributeIt.hasNext();) {
-                LDAPAttribute attribute = (LDAPAttribute) attributeIt.next();
+            for (Object attributeItem : attributeSet) {
+                LDAPAttribute attribute = (LDAPAttribute) attributeItem;
                 String attributeName = attribute.getName();
 
                 Enumeration allValues = attribute.getStringValues();

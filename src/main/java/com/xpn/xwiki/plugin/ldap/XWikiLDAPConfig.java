@@ -1,5 +1,6 @@
 package com.xpn.xwiki.plugin.ldap;
 
+import java.security.Provider;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,6 +58,11 @@ public final class XWikiLDAPConfig
      * Logging tool.
      */
     private static final Log LOG = LogFactory.getLog(XWikiLDAPConfig.class);
+
+    /**
+     * The default secure provider to use for SSL.
+     */
+    private static final String DEFAULT_SECUREPROVIDER = "com.sun.net.ssl.internal.ssl.Provider";
 
     /**
      * Unique instance of {@link XWikiLDAPConfig}.
@@ -134,6 +140,28 @@ public final class XWikiLDAPConfig
 
     /**
      * @param context the XWiki context.
+     * @return the secure provider to use for SSL.
+     * @throws XWikiLDAPException error when trying to instantiate secure provider.
+     */
+    public Provider getSecureProvider(XWikiContext context) throws XWikiLDAPException
+    {
+        Provider provider;
+
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        String className =
+            getLDAPParam("ldap_ssl.secure_provider", DEFAULT_SECUREPROVIDER, context);
+
+        try {
+            provider = (java.security.Provider) cl.loadClass(className).newInstance();
+        } catch (Exception e) {
+            throw new XWikiLDAPException("Fail to load secure ssl provider.", e);
+        }
+
+        return provider;
+    }
+
+    /**
+     * @param context the XWiki context.
      * @return true if LDAP is enabled.
      */
     public boolean isLDAPEnabled(XWikiContext context)
@@ -189,12 +217,12 @@ public final class XWikiLDAPConfig
                     String ldapgroup = mapping.substring(splitIndex + 1);
 
                     Set<String> xwikigroups = groupMappings.get(ldapgroup);
-                    
+
                     if (xwikigroups == null) {
                         xwikigroups = new HashSet<String>();
                         groupMappings.put(ldapgroup, xwikigroups);
                     }
-                    
+
                     xwikigroups.add(xwikigroup);
 
                     if (LOG.isDebugEnabled()) {

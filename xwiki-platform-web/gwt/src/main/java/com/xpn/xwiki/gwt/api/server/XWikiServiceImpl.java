@@ -23,10 +23,7 @@
  */
 package com.xpn.xwiki.gwt.api.server;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
+import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -38,7 +35,6 @@ import com.xpn.xwiki.gwt.api.client.*;
 import com.xpn.xwiki.objects.*;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.render.XWikiVelocityRenderer;
 import com.xpn.xwiki.user.api.XWikiUser;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiEngineContext;
@@ -47,12 +43,16 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiServletContext;
 import com.xpn.xwiki.web.XWikiServletRequest;
+import com.xpn.xwiki.web.XWikiServletResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
-import com.xpn.xwiki.xmlrpc.XWikiXmlRpcResponse;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.container.Container;
+import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.container.servlet.ServletContainerFactory;
 
-import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -61,44 +61,48 @@ import java.util.Map;
 import java.util.Properties;
 import java.io.UnsupportedEncodingException;
 
+public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiService
+{
+    private static final Log LOG = LogFactory.getLog(XWiki.class);
 
-public class
-        XWikiServiceImpl extends RemoteServiceServlet implements XWikiService {
-    private static final Log log = LogFactory.getLog(XWiki.class);
+    private XWikiContext context;
 
-    XWikiEngineContext engine;
-
-    // Holding debug request and response objects
-    XWikiRequest request;
-    XWikiResponse response;
-
-    public XWikiServiceImpl() {
-        super();
-    }
-
-    public XWikiServiceImpl(XWikiRequest request, XWikiResponse response, XWikiEngineContext engine) {
-        this.request = request;
-        this.response = response;
-        this.engine = engine;
-    }
-
-    protected XWikiContext getXWikiContext() throws XWikiException {
-        if (this.engine==null) {
-            ServletContext sContext = null;
-            try {
-                sContext = getServletContext();
-            } catch (Exception ignore) { }
-            if (sContext != null) {
-                engine = new XWikiServletContext(sContext);
-            } else {
-                // use fake server context (created as dynamic proxy)
-                ServletContext contextDummy = (ServletContext)generateDummy(ServletContext.class);
-                engine = new XWikiServletContext(contextDummy);
+    /**
+     * We override the default processCall method in order to provide XWiki initialization before 
+     * we handle the request. This allows us to initialize the XWiki Context and the new Container
+     * Objects (which are using ThreadLocal variables).
+     * 
+     * @see RemoteServiceServlet#processCall(String)
+     */
+    @Override
+    public String processCall(String payload) throws SerializationException
+    {
+        String result;
+        
+        try {
+            initXWiki();
+            result = super.processCall(payload);
+        } catch (Exception e) {
+            throw new SerializationException("Failed to initialize XWiki GWT subsystem", e);
+        } finally {
+            // Perform cleanup here
+            if (getXWikiContext() != null) {
+                cleanupContainerComponent(getXWikiContext());
             }
         }
 
-        XWikiRequest  request = (this.request!=null) ? this.request : new XWikiServletRequest(getThreadLocalRequest()); // use fake request
-        XWikiResponse response = (this.response!=null) ? this.response : new XWikiXmlRpcResponse(getThreadLocalResponse()); // use fake response
+        return result;
+    }
+
+    /**
+     * Initialize XWiki Context and XWiki Container Objects.
+     */
+    private void initXWiki() throws Exception
+    {
+        XWikiEngineContext engine = new XWikiServletContext(getServletContext());
+        XWikiRequest request = new XWikiServletRequest(getThreadLocalRequest()); 
+        XWikiResponse response = new XWikiServletResponse(getThreadLocalResponse());
+
         XWikiContext context = Utils.prepareContext("", request, response, engine);
         context.setMode(XWikiContext.MODE_GWT);
         context.setDatabase("xwiki");
@@ -106,42 +110,74 @@ public class
         XWiki xwiki = XWiki.getXWiki(context);
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
-        XWikiVelocityRenderer.prepareContext(context);
+        
+        initializeContainerComponent(context);
+        
         xwiki.prepareResources(context);
 
         String username = "XWiki.XWikiGuest";
-        if (context.getMode() == XWikiContext.MODE_GWT_DEBUG)
+        if (context.getMode() == XWikiContext.MODE_GWT_DEBUG) {
             username = "XWiki.superadmin";
+        }
         XWikiUser user = context.getWiki().checkAuth(context);
-        if (user != null)
+        if (user != null) {
             username = user.getUser();
+        }
         context.setUser(username);        
 
-        if (context.getDoc() == null)
+        if (context.getDoc() == null) {
             context.setDoc(new XWikiDocument("Fake", "Document"));
+        }
 
         context.put("ajax", new Boolean(true));
-        return context;
-    }
-
-    private Object generateDummy(Class someClass)
-    {
-        ClassLoader loader = someClass.getClassLoader();
-        InvocationHandler handler = new InvocationHandler()
-        {
-            public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-            {
-                return null;
-            }
-        };
-        Class[] interfaces = new Class[] {someClass};
-        return Proxy.newProxyInstance(loader, interfaces, handler);
+        this.context = context;
     }
     
+    private void initializeContainerComponent(XWikiContext context)
+        throws ServletException
+    {
+        // Initialize the Container fields (request, response, session).
+        // Note that this is a bridge between the old core and the component architecture.
+        // In the new component architecture we use ThreadLocal to transport the request, 
+        // response and session to components which require them.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        ServletContainerFactory containerFactory =
+            (ServletContainerFactory) Utils.getComponent(ServletContainerFactory.ROLE, context);
+        try {
+            container.setRequest(containerFactory.createRequest(
+                context.getRequest().getHttpServletRequest()));
+            container.setResponse(containerFactory.createResponse(
+                context.getResponse().getHttpServletResponse()));
+            container.setSession(containerFactory.createSession(
+                context.getRequest().getHttpServletRequest()));
+        } catch (ServletContainerException e) {
+            throw new ServletException("Failed to initialize request/response or session", e);
+        }            
+    
+        // This is a bridge that we need for old code to play well with new components.
+        // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        container.getRequest().setProperty("xwikicontext", context);
+    }
+
+    private void cleanupContainerComponent(XWikiContext context)
+    {
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        // We must ensure we clean the ThreadLocal variables located in the Container 
+        // component as otherwise we will have a potential memory leak.
+        container.removeRequest();
+        container.removeResponse();
+        container.removeSession();
+    }    
+    
+    protected XWikiContext getXWikiContext()
+    {
+        return this.context;
+    }
+
     protected XWikiGWTException getXWikiGWTException(Exception e) {
         // let's make sure we are informed
-        if (log.isErrorEnabled()) {
-            log.error("Unhandled exception on the server", e);
+        if (LOG.isErrorEnabled()) {
+            LOG.error("Unhandled exception on the server", e);
         }
 
         if (e instanceof XWikiGWTException){
@@ -1043,7 +1079,7 @@ public class
     }
 
     public void logJSError(Map infos){
-        log.warn("[GWT-JS] useragent:" + infos.get("useragent") + "\n"
+        LOG.warn("[GWT-JS] useragent:" + infos.get("useragent") + "\n"
                 + "module:" + infos.get("module") + "\n");
                // + "stacktrace" + infos.get("stacktrace"));
     }

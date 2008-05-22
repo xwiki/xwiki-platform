@@ -22,11 +22,13 @@ package org.xwiki.velocity;
 
 /**
  * Any exception raised in the XWiki Velocity component must raise an exception of this type.
+ *
+ * @version $Id: $
  */
 public class XWikiVelocityException extends Exception
 {
     /**
-     * Provides an id for serialization
+     * Provides an id for serialization.
      */
     private static final long serialVersionUID = 2035182137507870523L;
 

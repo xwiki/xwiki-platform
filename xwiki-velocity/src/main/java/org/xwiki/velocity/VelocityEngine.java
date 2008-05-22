@@ -28,13 +28,15 @@ import java.util.Properties;
 
 /**
  * Initialize a Velocity Engine and make Velocity services available.
+ *
+ * @version $Id: $
  */
 public interface VelocityEngine
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    public static final String ROLE = VelocityEngine.class.getName();
+    String ROLE = VelocityEngine.class.getName();
 
     /**
      * Initializes the Velocity engine by setting its configuration both from the component's

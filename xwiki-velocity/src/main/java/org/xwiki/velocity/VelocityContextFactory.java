@@ -25,13 +25,15 @@ import org.apache.velocity.VelocityContext;
 /**
  * Creates Velocity Context instances which are pre-populated with the Velocity Tools listed 
  * in the component's configuration.
+ *
+ * @version $Id: $
  */
 public interface VelocityContextFactory
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    public static final String ROLE = VelocityContextFactory.class.getName();
+    String ROLE = VelocityContextFactory.class.getName();
 
     /**
      * @return a new Velocity Context pre-populated with the Velocity Tools listed in the 

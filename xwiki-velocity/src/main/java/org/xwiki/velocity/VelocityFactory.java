@@ -29,23 +29,27 @@ import java.util.Properties;
  * global templates is to use different Velocity engines. As an example we need this in XWiki since
  * we want to allow each Skin to provide its own global macros.
  *
- * @version $Id $
+ * @version $Id: $
  */
 public interface VelocityFactory
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = VelocityFactory.class.getName();
+    String ROLE = VelocityFactory.class.getName();
 
     /**
-     * @param key the key used to cache the Velocity engine instance to return
+     * @param key the key under which the Velocity engine has been saved in cache. This is the key
+     *        used when the Velocity engine was created using
+     *        {@link #createVelocityEngine(String, java.util.Properties)}
      * @return true if there is a cached Velocity Engine matching the passed key
      */
     boolean hasVelocityEngine(String key);
 
     /**
-     * @param key the key used to cache the Velocity engine instance to return
+     * @param key the key under which the Velocity engine has been saved in cache. This is the key
+     *        used when the Velocity engine was created using
+     *        {@link #createVelocityEngine(String, java.util.Properties)}
      * @return the cached Velocity engine instance corresponding to the passed or null if not found
      */
     VelocityEngine getVelocityEngine(String key);
@@ -55,6 +59,11 @@ public interface VelocityFactory
      * configuration. This is especially handy for having different sets of global Velocity
      * libraries (such as for different XWiki Skins for example).
      *
+     * @param key the key used to cache the Velocity engine instance to return
+     * @param properties the list of properties that will override the default properties when
+     *        creating the engine. For example it's possible to define a list of global
+     *        velocimacros by passing the RuntimeConstants.VM_LIBRARY property key.
+     * @return the newly create Velocity Engine
      * @throws XWikiVelocityException if the Velocity Engine cannot be initialized for some reason
      */
     VelocityEngine createVelocityEngine(String key, Properties properties)

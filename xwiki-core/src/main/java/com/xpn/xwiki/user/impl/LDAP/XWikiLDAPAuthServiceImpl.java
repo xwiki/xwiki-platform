@@ -214,7 +214,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
                     XWikiException.ERROR_XWIKI_USER_INIT,
                     "LDAP user {0} does not belong to LDAP group {1}.", null, new Object[] {
-                        userName, filterGroupDN});
+                    userName, filterGroupDN});
             }
         }
 
@@ -273,7 +273,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // ////////////////////////////////////////////////////////////////////
 
         if ("1".equals(config.getLDAPParam("ldap_validate_password", "0", context))) {
-            if (!connector.checkPassword(userDN, password)) {
+            String passwordField =
+                config.getLDAPParam("ldap_password_field", "userPassword", context);
+            if (!connector.checkPassword(userDN, password, passwordField)) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER,
                     XWikiException.ERROR_XWIKI_USER_INIT, "LDAP authentication failed:"
                         + " could not validate the password: wrong password for " + userDN);
@@ -570,7 +572,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Adding user {0} to xwiki group {1}", new Object[] {
-                    userName, groupName}));
+                userName, groupName}));
             }
 
             String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;
@@ -600,7 +602,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         } catch (Exception e) {
             LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new Object[] {
-                userName, groupName}), e);
+            userName, groupName}), e);
         }
     }
 

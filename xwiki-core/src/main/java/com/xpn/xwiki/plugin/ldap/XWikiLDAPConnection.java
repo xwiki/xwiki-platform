@@ -103,9 +103,9 @@ public class XWikiLDAPConnection
                 LOG.debug("Connecting to LDAP using SSL");
             }
 
-            bind = open(ldapHost, ldapPort, bindDN, bindPassword, keyStore, true);
+            bind = open(ldapHost, ldapPort, bindDN, bindPassword, keyStore, true, context);
         } else {
-            bind = open(ldapHost, ldapPort, bindDN, bindPassword, null, false);
+            bind = open(ldapHost, ldapPort, bindDN, bindPassword, null, false, context);
         }
 
         return bind;
@@ -120,11 +120,12 @@ public class XWikiLDAPConnection
      * @param password the password to connect to LDAP server.
      * @param pathToKeys the patch to SSL keystore to use.
      * @param ssl if true connect using SSL.
+     * @param context the XWiki context.
      * @return true if the connection succeed, false otherwise.
      * @throws XWikiLDAPException error when trying to open connection.
      */
     public boolean open(String ldapHost, int ldapPort, String loginDN, String password,
-        String pathToKeys, boolean ssl) throws XWikiLDAPException
+        String pathToKeys, boolean ssl, XWikiContext context) throws XWikiLDAPException
     {
         boolean succeed = false;
 
@@ -138,8 +139,10 @@ public class XWikiLDAPConnection
 
         try {
             if (ssl) {
+                XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
                 // Dynamically set JSSE as a security provider
-                Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+                Security.addProvider(config.getSecureProvider(context));
 
                 if (pathToKeys != null && pathToKeys.length() > 0) {
                     // Dynamically set the property that JSSE uses to identify
@@ -205,8 +208,21 @@ public class XWikiLDAPConnection
      */
     public boolean checkPassword(String userDN, String password)
     {
+        return checkPassword(userDN, password, "userPassword");
+    }
+
+    /**
+     * Check if provided password is correct provided users's password.
+     * 
+     * @param userDN the user.
+     * @param password the password.
+     * @param passwordField the name of the LDAP field containing the password.
+     * @return true if the password is valid, false otherwise.
+     */
+    public boolean checkPassword(String userDN, String password, String passwordField)
+    {
         try {
-            LDAPAttribute attribute = new LDAPAttribute("userPassword", password);
+            LDAPAttribute attribute = new LDAPAttribute(passwordField, password);
             return this.connection.compare(userDN, attribute);
         } catch (LDAPException e) {
             if (e.getResultCode() == LDAPException.NO_SUCH_OBJECT) {

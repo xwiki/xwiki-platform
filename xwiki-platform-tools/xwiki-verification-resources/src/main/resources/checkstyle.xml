@@ -236,7 +236,7 @@
     <module name="ModifierOrder"/>
 
     <module name="MultipleStringLiterals">
-      <property name="ignoreStringsRegexp" value='^("")|("[0-9]")|(" ")|("]")$'/>
+      <property name="ignoreStringsRegexp" value='^("")|("[0-9]")|(" ")|("]")|("] = [")$'/>
     </module>
 
     <module name="MultipleVariableDeclarations"/>

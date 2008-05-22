@@ -5,11 +5,11 @@ import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializer;
 
 /**
- * Allow registering the Velocity Context in the XWiki Request object since it's shared during the whole
- * request.
+ * Allow registering the Velocity Context in the XWiki Request object since it's shared during the
+ * whole request.
  *
- * @see RequestInitializer
  * @See RequestInitializerManager
+ * @see RequestInitializer
  */
 public class VelocityRequestInitializer implements RequestInitializer
 {
@@ -19,13 +19,14 @@ public class VelocityRequestInitializer implements RequestInitializer
     public static final String REQUEST_VELOCITY_CONTEXT = "velocityContext";
 
     /**
-     * The Velocity context factory component used for creating the Velocity Context
-     * (injected automatically by the Component subsystem).
+     * The Velocity context factory component used for creating the Velocity Context (injected
+     * automatically by the Component subsystem).
      */
     private VelocityContextFactory velocityContextFactory;
 
     /**
      * {@inheritDoc}
+     *
      * @see org.xwiki.container.RequestInitializer#initialize(org.xwiki.container.Request)
      */
     public void initialize(Request request)

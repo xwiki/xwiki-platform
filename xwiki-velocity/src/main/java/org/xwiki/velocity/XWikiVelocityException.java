@@ -21,28 +21,30 @@
 package org.xwiki.velocity;
 
 /**
- * Any exception raised in the XWiki Velocity component must raise an exception of this type. 
+ * Any exception raised in the XWiki Velocity component must raise an exception of this type.
  */
 public class XWikiVelocityException extends Exception
 {
-	/**
-	 * Provides an id for serialization 
-	 */
-	private static final long serialVersionUID = 2035182137507870523L;
+    /**
+     * Provides an id for serialization
+     */
+    private static final long serialVersionUID = 2035182137507870523L;
 
-	/**
-	 * {@inheritDoc}
-	 * @see Exception#Exception(String)
-	 */
-	public XWikiVelocityException(String message)
+    /**
+     * {@inheritDoc}
+     *
+     * @see Exception#Exception(String)
+     */
+    public XWikiVelocityException(String message)
     {
         super(message);
     }
 
-	/**
-	 * {@inheritDoc}
-	 * @see Exception#Exception(String, Throwable)
-	 */
+    /**
+     * {@inheritDoc}
+     *
+     * @see Exception#Exception(String, Throwable)
+     */
     public XWikiVelocityException(String message, Throwable throwable)
     {
         super(message, throwable);

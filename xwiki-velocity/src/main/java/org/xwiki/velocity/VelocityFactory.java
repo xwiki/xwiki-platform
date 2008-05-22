@@ -26,8 +26,8 @@ import java.util.Properties;
  * Allows creating different Velocity engine instances. This is useful when you need to have
  * different Velocity engines running in the same JVM but with different configurations. Since
  * global templates in Velocity are part of the configuration the only solution to use different
- * global templates is to use different Velocity engines. As an example we need this in XWiki
- * since we want to allow each Skin to provide its own global macros.
+ * global templates is to use different Velocity engines. As an example we need this in XWiki since
+ * we want to allow each Skin to provide its own global macros.
  */
 public interface VelocityFactory
 {
@@ -41,19 +41,20 @@ public interface VelocityFactory
      * @return true if there is a cached Velocity Engine matching the passed key
      */
     boolean hasVelocityEngine(String key);
-    
+
     /**
      * @param key the key used to cache the Velocity engine instance to return
-     * @return the cached Velocity engine instance corresponding to the passed or null if not found 
+     * @return the cached Velocity engine instance corresponding to the passed or null if not found
      */
     VelocityEngine getVelocityEngine(String key);
-    
+
     /**
-	 * Allow having different Velocity Engines so that each one can have its own special configuration.
-	 * This is especially handy for having different sets of global Velocity libraries (such as for 
-	 * different XWiki Skins for example).
-	 *
-	 * @throws XWikiVelocityException if the Velocity Engine cannot be initialized for some reason
-	 */
-	VelocityEngine createVelocityEngine(String key, Properties properties) throws XWikiVelocityException;
+     * Allow having different Velocity Engines so that each one can have its own special
+     * configuration. This is especially handy for having different sets of global Velocity
+     * libraries (such as for different XWiki Skins for example).
+     *
+     * @throws XWikiVelocityException if the Velocity Engine cannot be initialized for some reason
+     */
+    VelocityEngine createVelocityEngine(String key, Properties properties)
+        throws XWikiVelocityException;
 }

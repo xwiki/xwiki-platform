@@ -20,11 +20,11 @@
  */
 package org.xwiki.velocity;
 
-import java.io.Writer;
-import java.io.Reader;
-import java.util.Properties;
-
 import org.apache.velocity.context.Context;
+
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Properties;
 
 /**
  * Initialize a Velocity Engine and make Velocity services available.
@@ -34,15 +34,16 @@ public interface VelocityEngine
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = VelocityEngine.class.getName();
+    public static final String ROLE = VelocityEngine.class.getName();
 
     /**
-     * Initializes the Velocity engine by setting its configuration both from the component's configuration
-     * and from the passed properties. This method must be called before any other method from this class
-     * can be executed.
-     *   
-     * @param properties the properties that will override the static properties defined in the component's configuration 
-     * @throws XWikiVelocityException in case of error 
+     * Initializes the Velocity engine by setting its configuration both from the component's
+     * configuration and from the passed properties. This method must be called before any other
+     * method from this class can be executed.
+     *
+     * @param properties the properties that will override the static properties defined in the
+     * component's configuration
+     * @throws XWikiVelocityException in case of error
      */
     void initialize(Properties properties) throws XWikiVelocityException;
 

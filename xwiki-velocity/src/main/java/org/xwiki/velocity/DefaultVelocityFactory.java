@@ -20,71 +20,77 @@
  */
 package org.xwiki.velocity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 /**
- * Default implementation for {@link VelocityFactory}. 
+ * Default implementation for {@link VelocityFactory}.
+ *
  * @see VelocityFactory
  */
-public class DefaultVelocityFactory extends AbstractLogEnabled implements VelocityFactory, Composable
+public class DefaultVelocityFactory extends AbstractLogEnabled
+    implements VelocityFactory, Composable
 {
-	private ComponentManager componentManager;
-	
-	private Map<String, VelocityEngine> velocityEngines = new HashMap<String, VelocityEngine>();
+    private ComponentManager componentManager;
 
-	/**
-	 * {@inheritDoc}
-	 * @see Composable#compose(ComponentManager)
-	 */
-	public void compose(ComponentManager componentManager)
-	{
-		this.componentManager = componentManager;
-	}
+    private Map<String, VelocityEngine> velocityEngines = new HashMap<String, VelocityEngine>();
 
-	/**
-	 * {@inheritDoc}
-	 * @see VelocityFactory#hasVelocityEngine(String)
-	 */
-	public boolean hasVelocityEngine(String key)
-	{
-		return this.velocityEngines.containsKey(key);
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @see Composable#compose(ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+    }
 
-	/**
-	 * {@inheritDoc}
-	 * @see VelocityFactory#getVelocityEngine(String)
-	 */
-	public VelocityEngine getVelocityEngine(String key)
-	{
-		return this.velocityEngines.get(key);
-	}
-	
-	/**
-	 * {@inheritDoc}
-	 * @see VelocityFactory#createVelocityEngine(String, Properties)
-	 */
-	public VelocityEngine createVelocityEngine(String key, Properties properties)
-	    throws XWikiVelocityException
-	{
-		VelocityEngine engine;
-		if (this.velocityEngines.containsKey(key)) {
-			engine = this.velocityEngines.get(key);
-		} else {
-			try {
-				engine = (VelocityEngine) this.componentManager.lookup(VelocityEngine.ROLE);
-			} catch (ComponentLookupException e) {
-				throw new XWikiVelocityException("Failed to create Velocity Engine", e);
-			}
-			engine.initialize(properties);
-			this.velocityEngines.put(key, engine);
-		}
-		return engine;
-	}
+    /**
+     * {@inheritDoc}
+     *
+     * @see VelocityFactory#hasVelocityEngine(String)
+     */
+    public boolean hasVelocityEngine(String key)
+    {
+        return this.velocityEngines.containsKey(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see VelocityFactory#getVelocityEngine(String)
+     */
+    public VelocityEngine getVelocityEngine(String key)
+    {
+        return this.velocityEngines.get(key);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see VelocityFactory#createVelocityEngine(String, Properties)
+     */
+    public VelocityEngine createVelocityEngine(String key, Properties properties)
+        throws XWikiVelocityException
+    {
+        VelocityEngine engine;
+        if (this.velocityEngines.containsKey(key)) {
+            engine = this.velocityEngines.get(key);
+        } else {
+            try {
+                engine = (VelocityEngine) this.componentManager.lookup(VelocityEngine.ROLE);
+            } catch (ComponentLookupException e) {
+                throw new XWikiVelocityException("Failed to create Velocity Engine", e);
+            }
+            engine.initialize(properties);
+            this.velocityEngines.put(key, engine);
+        }
+        return engine;
+    }
 }

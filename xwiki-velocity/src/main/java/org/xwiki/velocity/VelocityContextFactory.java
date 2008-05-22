@@ -31,7 +31,7 @@ public interface VelocityContextFactory
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = VelocityContextFactory.class.getName();
+    public static final String ROLE = VelocityContextFactory.class.getName();
 
     /**
      * @return a new Velocity Context pre-populated with the Velocity Tools listed in the 

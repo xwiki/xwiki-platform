@@ -33,8 +33,7 @@ public class XWikiVelocityException extends Exception
     private static final long serialVersionUID = 2035182137507870523L;
 
     /**
-     * {@inheritDoc}
-     *
+     * @param message the exception message
      * @see Exception#Exception(String)
      */
     public XWikiVelocityException(String message)
@@ -43,8 +42,8 @@ public class XWikiVelocityException extends Exception
     }
 
     /**
-     * {@inheritDoc}
-     *
+     * @param message the exception message
+     * @param throwable the original exception to wrap
      * @see Exception#Exception(String, Throwable)
      */
     public XWikiVelocityException(String message, Throwable throwable)

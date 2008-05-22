@@ -24,9 +24,9 @@ package com.xpn.xwiki.user.impl.LDAP;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -231,7 +231,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             }
         }
 
-        List searchAttributes = null;
+        List<XWikiLDAPSearchAttribute> searchAttributes = null;
 
         // if we still don't have a dn, search for it. Also get the attributes, we might need
         // them
@@ -253,9 +253,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 connector.searchLDAP(baseDN, query, getAttributeNameTable(context),
                     LDAPConnection.SCOPE_SUB);
 
-            for (Iterator it = searchAttributes.iterator(); it.hasNext();) {
-                XWikiLDAPSearchAttribute searchAttribute = (XWikiLDAPSearchAttribute) it.next();
-
+            for (XWikiLDAPSearchAttribute searchAttribute : searchAttributes) {
                 if ("dn".equals(searchAttribute.name)) {
                     userDN = searchAttribute.value;
 
@@ -351,7 +349,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
-        List attributeNameList = new ArrayList();
+        List<String> attributeNameList = new ArrayList<String>();
         config.getUserMappings(attributeNameList, context);
 
         int lsize = attributeNameList.size();
@@ -373,8 +371,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @return indicate if XWiki user is created or update.
      * @throws XWikiException error when updating or creating XWiki user.
      */
-    protected boolean syncUser(String userName, String userDN, List searchAttributeListIn,
-        XWikiLDAPUtils ldapUtils, XWikiContext context) throws XWikiException
+    protected boolean syncUser(String userName, String userDN,
+        List<XWikiLDAPSearchAttribute> searchAttributeListIn, XWikiLDAPUtils ldapUtils,
+        XWikiContext context) throws XWikiException
     {
         // check if we have to create the user
         String xwikiUserName = findUser(userName, context);
@@ -388,7 +387,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 LOG.debug("LDAP attributes will be used to update XWiki attributes.");
             }
 
-            List searchAttributeList = searchAttributeListIn;
+            List<XWikiLDAPSearchAttribute> searchAttributeList = searchAttributeListIn;
 
             // get attributes from LDAP if we don't already have them
             if (searchAttributeList == null) {
@@ -437,7 +436,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
         // got valid group mappings
-        Map groupMappings = config.getGroupMappings(context);
+        Map<String, Set<String>> groupMappings = config.getGroupMappings(context);
 
         // update group membership, join and remove from given groups
         // sync group membership for this user
@@ -470,8 +469,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      * @throws XWikiException error when synchronizing user membership.
      */
-    protected void syncGroupsMembership(String userName, String userDN, Map groupMappings,
-        XWikiLDAPUtils ldapUtils, XWikiContext context) throws XWikiException
+    protected void syncGroupsMembership(String userName, String userDN,
+        Map<String, Set<String>> groupMappings, XWikiLDAPUtils ldapUtils, XWikiContext context)
+        throws XWikiException
     {
         if (LOG.isDebugEnabled()) {
             LOG.debug("Updating group membership for the user: " + userName);
@@ -480,49 +480,49 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // ASSUMING the implementation still returns the actual list. In this case
         // manipulations to the list are for real.
         // get the list of groups the user already belongs to
-        Collection userGroups =
+        Collection<String> userGroups =
             context.getWiki().getGroupService(context).getAllGroupsNamesForMember(userName, 0, 0,
                 context);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("The user belongs to following XWiki groups: ");
-            for (Iterator it = userGroups.iterator(); it.hasNext();) {
-                LOG.debug(it.next().toString());
+            for (String userGroupName : userGroups) {
+                LOG.debug(userGroupName);
             }
         }
 
         // retrieve list of all groups
-        List allxwikigroups =
-            context.getWiki().getGroupService(context).getAllMatchedGroups(null, false, 0, 0,
-                null, context);
+        List<String> allxwikigroups =
+            (List<String>) context.getWiki().getGroupService(context).getAllMatchedGroups(null,
+                false, 0, 0, null, context);
 
         if (LOG.isDebugEnabled()) {
             LOG.debug("All defined XWiki groups: ");
-            for (Iterator it = allxwikigroups.iterator(); it.hasNext();) {
-                LOG.debug(it.next().toString());
+            for (String xwikiGroupName : allxwikigroups) {
+                LOG.debug(xwikiGroupName);
             }
         }
 
         // go through mapped groups to locate the user
-        for (Iterator itGroupMap = groupMappings.entrySet().iterator(); itGroupMap.hasNext();) {
-            Map.Entry entry = (Map.Entry) itGroupMap.next();
+        for (Map.Entry<String, Set<String>> entry : groupMappings.entrySet()) {
+            String groupDN = entry.getKey();
+            Set<String> xwikiGroupNameSet = entry.getValue();
 
-            String groupDN = (String) entry.getKey();
-            String xwikiGroupName = (String) entry.getValue();
+            for (String xwikiGroupName : xwikiGroupNameSet) {
+                // check if group is in list of all groups
+                if (!allxwikigroups.contains(xwikiGroupName)) {
+                    if (LOG.isWarnEnabled()) {
+                        LOG.warn("XWiki group not found:" + xwikiGroupName);
+                    }
 
-            // check if group is in list of all groups
-            if (!allxwikigroups.contains(xwikiGroupName)) {
-                if (LOG.isWarnEnabled()) {
-                    LOG.warn("XWiki group not found:" + xwikiGroupName);
+                    continue;
                 }
 
-                continue;
+                Map<String, String> groupMembers = ldapUtils.getGroupMembers(groupDN, context);
+
+                syncGroupMembership(userName, userDN, xwikiGroupName, userGroups, groupMembers,
+                    context);
             }
-
-            Map groupMembers = ldapUtils.getGroupMembers(groupDN, context);
-
-            syncGroupMembership(userName, userDN, xwikiGroupName, userGroups, groupMembers,
-                context);
         }
     }
 
@@ -537,7 +537,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      */
     protected void syncGroupMembership(String userName, String userDN, String xwikiGroupName,
-        Collection userGroups, Map groupMembers, XWikiContext context)
+        Collection<String> userGroups, Map<String, String> groupMembers, XWikiContext context)
     {
         if (groupMembers.containsKey(userDN)) {
             // add to group if not there
@@ -582,7 +582,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             // Add a member object to document
             BaseObject memberObj = groupDoc.newObject(groupClass.getName(), context);
-            Map map = new HashMap();
+            Map<String, String> map = new HashMap<String, String>();
             map.put(XWIKI_GROUP_MEMBERFIELD, fullWikiUserName);
             groupClass.fromMap(map, memberObj);
 
@@ -695,22 +695,21 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      * @throws XWikiException error when updating XWiki user.
      */
-    protected void updateUserFromLDAP(String xwikiUserName, List searchAttributes,
-        XWikiContext context) throws XWikiException
+    protected void updateUserFromLDAP(String xwikiUserName,
+        List<XWikiLDAPSearchAttribute> searchAttributes, XWikiContext context)
+        throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
-        Map userMappings = config.getUserMappings(null, context);
+        Map<String, String> userMappings = config.getUserMappings(null, context);
 
         BaseClass userClass = context.getWiki().getUserClass(context);
 
         XWikiDocument userDoc = context.getWiki().getDocument(xwikiUserName, context);
         BaseObject userObj = userDoc.getObject(userClass.getName());
 
-        Map map = new HashMap();
-        for (Iterator it = searchAttributes.iterator(); it.hasNext();) {
-            XWikiLDAPSearchAttribute lattr = (XWikiLDAPSearchAttribute) it.next();
-
+        Map<String, String> map = new HashMap<String, String>();
+        for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
             String lval = lattr.value;
             String xattr = (String) userMappings.get(lattr.name);
             if (xattr == null) {
@@ -733,19 +732,18 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      * @throws XWikiException error when creating XWiki user.
      */
-    protected void createUserFromLDAP(String userName, List searchAttributes, XWikiContext context)
+    protected void createUserFromLDAP(String userName,
+        List<XWikiLDAPSearchAttribute> searchAttributes, XWikiContext context)
         throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
-        Map userMappings = config.getUserMappings(null, context);
+        Map<String, String> userMappings = config.getUserMappings(null, context);
 
         BaseClass userClass = context.getWiki().getUserClass(context);
 
-        Map map = new HashMap();
-        for (Iterator it = searchAttributes.iterator(); it.hasNext();) {
-            XWikiLDAPSearchAttribute lattr = (XWikiLDAPSearchAttribute) it.next();
-
+        Map<String, String> map = new HashMap<String, String>();
+        for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
             String lval = lattr.value;
             String xattr = (String) userMappings.get(lattr.name);
             if (xattr == null) {

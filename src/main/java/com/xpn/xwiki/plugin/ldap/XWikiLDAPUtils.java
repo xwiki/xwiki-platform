@@ -24,8 +24,6 @@ package com.xpn.xwiki.plugin.ldap;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -55,12 +53,12 @@ public class XWikiLDAPUtils
     /**
      * Different LDAP implementations groups classes name.
      */
-    private static final Set LDAP_GROUP_CLASS = new HashSet();
+    private static final Set<String> LDAP_GROUP_CLASS = new HashSet<String>();
 
     /**
      * Different LDAP implementations groups member property name.
      */
-    private static final Set LDAP_GROUP_MEMBER = new HashSet();
+    private static final Set<String> LDAP_GROUP_MEMBER = new HashSet<String>();
 
     /**
      * LDAP objectClass parameter.
@@ -80,7 +78,8 @@ public class XWikiLDAPUtils
     /**
      * Contains caches for each LDAP host:port.
      */
-    private static Map cachePool = new Hashtable();
+    private static Map<String, Map<String, XWikiCache>> cachePool =
+        new HashMap<String, Map<String, XWikiCache>>();
 
     /**
      * The LDAP connection.
@@ -146,12 +145,12 @@ public class XWikiLDAPUtils
             getUidAttributeName() + "." + connection.getConnection().getHost() + ":"
                 + connection.getConnection().getPort();
 
-        Map cacheMap;
+        Map<String, XWikiCache> cacheMap;
 
         if (cachePool.containsKey(cacheKey)) {
-            cacheMap = (Map) cachePool.get(cacheKey);
+            cacheMap = cachePool.get(cacheKey);
         } else {
-            cacheMap = new Hashtable();
+            cacheMap = new HashMap<String, XWikiCache>();
             cachePool.put(cacheKey, cacheMap);
         }
 
@@ -179,15 +178,15 @@ public class XWikiLDAPUtils
      * @param groupDN the group to retrieve the members of and scan for subgroups.
      * @return the LDAP search result.
      */
-    private List searchGroupsMembers(String groupDN)
+    private List<XWikiLDAPSearchAttribute> searchGroupsMembers(String groupDN)
     {
         String[] attrs = new String[2 + LDAP_GROUP_MEMBER.size()];
 
         int i = 0;
         attrs[i++] = LDAP_OBJECTCLASS;
         attrs[i++] = getUidAttributeName();
-        for (Iterator it = LDAP_GROUP_MEMBER.iterator(); it.hasNext();) {
-            attrs[i++] = (String) it.next();
+        for (String groupMember : LDAP_GROUP_MEMBER) {
+            attrs[i++] = groupMember;
         }
 
         return getConnection().searchLDAP(groupDN, null, attrs, LDAPConnection.SCOPE_BASE);
@@ -201,14 +200,10 @@ public class XWikiLDAPUtils
      * @param subgroups return all the subgroups identified.
      * @param context the XWiki context.
      */
-    private void getGroupMembers(List searchAttributeList, Map memberMap, List subgroups,
-        XWikiContext context)
+    private void getGroupMembers(List<XWikiLDAPSearchAttribute> searchAttributeList,
+        Map<String, String> memberMap, List<String> subgroups, XWikiContext context)
     {
-        for (Iterator searchAttributeIt = searchAttributeList.iterator(); searchAttributeIt
-            .hasNext();) {
-            XWikiLDAPSearchAttribute searchAttribute =
-                (XWikiLDAPSearchAttribute) searchAttributeIt.next();
-
+        for (XWikiLDAPSearchAttribute searchAttribute : searchAttributeList) {
             String key = searchAttribute.name;
             if (LDAP_GROUP_MEMBER.contains(key.toLowerCase())) {
 
@@ -233,18 +228,15 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @return whether the groupDN is actually a group.
      */
-    public boolean getGroupMembers(String groupDN, Map memberMap, List subgroups,
-        List searchAttributeList, XWikiContext context)
+    public boolean getGroupMembers(String groupDN, Map<String, String> memberMap,
+        List<String> subgroups, List<XWikiLDAPSearchAttribute> searchAttributeList,
+        XWikiContext context)
     {
         boolean isGroup = false;
 
         String id = null;
 
-        for (Iterator seachAttributeIt = searchAttributeList.iterator(); seachAttributeIt
-            .hasNext();) {
-            XWikiLDAPSearchAttribute searchAttribute =
-                (XWikiLDAPSearchAttribute) seachAttributeIt.next();
-
+        for (XWikiLDAPSearchAttribute searchAttribute : searchAttributeList) {
             String key = searchAttribute.name;
 
             if (key.equalsIgnoreCase(LDAP_OBJECTCLASS)) {
@@ -288,8 +280,8 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @return whether the groupDN is actually a group.
      */
-    public boolean getGroupMembers(String groupDN, Map memberMap, List subgroups,
-        XWikiContext context)
+    public boolean getGroupMembers(String groupDN, Map<String, String> memberMap,
+        List<String> subgroups, XWikiContext context)
     {
         boolean isGroup = false;
 
@@ -298,7 +290,7 @@ public class XWikiLDAPUtils
             return true;
         }
 
-        List searchAttributeList = searchGroupsMembers(groupDN);
+        List<XWikiLDAPSearchAttribute> searchAttributeList = searchGroupsMembers(groupDN);
 
         if (searchAttributeList != null) {
             isGroup =
@@ -316,9 +308,10 @@ public class XWikiLDAPUtils
      * @return the members of the group.
      * @throws XWikiException error when getting the group cache.
      */
-    public Map getGroupMembers(String groupDN, XWikiContext context) throws XWikiException
+    public Map<String, String> getGroupMembers(String groupDN, XWikiContext context)
+        throws XWikiException
     {
-        Map groupMembers = null;
+        Map<String, String> groupMembers = null;
 
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -327,7 +320,8 @@ public class XWikiLDAPUtils
         synchronized (cache) {
             try {
                 groupMembers =
-                    (Map) cache.getFromCache(groupDN, config.getCacheExpiration(context));
+                    (Map<String, String>) cache.getFromCache(groupDN, config
+                        .getCacheExpiration(context));
             } catch (XWikiCacheNeedsRefreshException e) {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Cache does not caontains group " + groupDN, e);
@@ -336,13 +330,13 @@ public class XWikiLDAPUtils
         }
 
         if (groupMembers == null) {
-            Map members = new HashMap();
+            Map<String, String> members = new HashMap<String, String>();
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Retrieving Members of the group: " + groupDN);
             }
 
-            boolean isGroup = getGroupMembers(groupDN, members, new ArrayList(), context);
+            boolean isGroup = getGroupMembers(groupDN, members, new ArrayList<String>(), context);
 
             if (isGroup) {
                 groupMembers = members;
@@ -364,18 +358,18 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @return the full user name.
      */
-    protected String findInGroup(String userName, Map groupMembers, XWikiContext context)
+    protected String findInGroup(String userName, Map<String, String> groupMembers,
+        XWikiContext context)
     {
         String result = null;
 
         String ldapuser = getUidAttributeName() + "=" + userName.toLowerCase();
 
-        for (Iterator it = groupMembers.keySet().iterator(); it.hasNext();) {
-            String u = (String) it.next();
+        for (Map.Entry<String, String> entry : groupMembers.entrySet()) {
             // implementing it case-insensitive for now
-            if (userName.equalsIgnoreCase((String) groupMembers.get(u))
-                || u.toLowerCase().startsWith(ldapuser)) {
-                return u;
+            if (userName.equalsIgnoreCase(entry.getValue())
+                || entry.getKey().startsWith(ldapuser)) {
+                return entry.getKey();
             }
         }
 
@@ -397,7 +391,7 @@ public class XWikiLDAPUtils
         String userDN = null;
 
         if (groupDN.length() > 0) {
-            Map groupMembers = getGroupMembers(groupDN, context);
+            Map<String, String> groupMembers = getGroupMembers(groupDN, context);
 
             // check if user is in the list
             userDN = findInGroup(userName, groupMembers, context);

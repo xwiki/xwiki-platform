@@ -32,7 +32,7 @@ import org.xwiki.component.phase.InitializationException;
 /**
  * Default implementation for {@link VelocityContextFactory}.
  *
- * version $Id: $
+ * @version $Id: $
  */
 public class DefaultVelocityContextFactory extends AbstractLogEnabled
     implements VelocityContextFactory, Initializable
@@ -59,7 +59,9 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
         
         // Instantiate Velocity tools
         if (this.properties != null) {
-            for (Enumeration<?> props = this.properties.propertyNames(); props.hasMoreElements();) {
+            for (Enumeration< ? > props = this.properties.propertyNames();
+                props.hasMoreElements();)
+            {
                 String key = props.nextElement().toString();
                 String value = this.properties.getProperty(key);
                 Object toolInstance;

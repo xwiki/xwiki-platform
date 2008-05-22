@@ -33,12 +33,21 @@ import java.util.Properties;
  * Default implementation for {@link VelocityFactory}.
  *
  * @see VelocityFactory
+ * @version $Id: $ 
  */
 public class DefaultVelocityFactory extends AbstractLogEnabled
     implements VelocityFactory, Composable
 {
+    /**
+     * The Component manager we use to lookup (and thus create since it's a singleton) the
+     * VelocityEngine component.
+     */
     private ComponentManager componentManager;
 
+    /**
+     * A cache of Velocity Engines. See {@link org.xwiki.velocity.VelocityFactory} for more details
+     * as to why we need this cache.
+     */
     private Map<String, VelocityEngine> velocityEngines = new HashMap<String, VelocityEngine>();
 
     /**

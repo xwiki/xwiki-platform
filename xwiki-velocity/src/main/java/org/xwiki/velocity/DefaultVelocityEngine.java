@@ -41,15 +41,32 @@ import java.io.Reader;
  * Default implementation of the Velocity service which initializes the Velocity system using
  * configuration values defined in the component's configuration. Note that the {@link #initialize}
  * method has to be executed before any other method can be called.
+ *
+ * @version $Id: $
  */
 public class DefaultVelocityEngine extends AbstractLogEnabled implements VelocityEngine, LogChute
 {
+    /**
+     * The Velocity engine we're wrapping.
+     */
     private org.apache.velocity.app.VelocityEngine engine;
 
+    /**
+     * The list of properties to set on the Velocity Engine. These are injected automatically
+     * by the Component subsystem.
+     */
     private Properties properties;
 
+    /**
+     * The Container component (Injected automatically by the Component subsystem). We need it
+     * in order to store a the servlet context as a property in the Application Context so that
+     * the Velocity Tools WebappLoader can find it.  
+     */
     private Container container;
 
+    /**
+     * See the comment in {@link #init(org.apache.velocity.runtime.RuntimeServices)}.
+     */
     private RuntimeServices rsvc;
 
     /**

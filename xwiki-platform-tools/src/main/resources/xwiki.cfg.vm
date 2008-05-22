@@ -27,8 +27,9 @@ xwiki.authentication.validationKey=totototototototototototototototo
 xwiki.authentication.encryptionKey=titititititititititititititititi
 xwiki.authentication.cookiedomains=xwiki.com,wiki.fr
 
-# Comment if you want to enable logout only for /bin/logout/XWiki/XWikiLogout
-xwiki.authentication.logoutpage=/[^/]+/logout/*
+# This allows logout to happen for any page going through the /logout/ action, regardless of the document or the servlet.
+# Comment-out if you want to enable logout only for /bin/logout/XWiki/XWikiLogout
+xwiki.authentication.logoutpage=(/[^/]+/|/)logout/*
 
 # Stats configuration allows to globally activate/deactivate stats module (launch storage thread, register events...)
 xwiki.stats=1

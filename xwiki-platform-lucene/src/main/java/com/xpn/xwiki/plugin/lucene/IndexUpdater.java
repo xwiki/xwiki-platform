@@ -52,8 +52,8 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 /**
  * @version $Id: $
  */
-public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterface,
-    XWikiActionNotificationInterface
+public class IndexUpdater extends AbstractXWikiRunnable 
+    implements XWikiDocChangeNotificationInterface, XWikiActionNotificationInterface
 {
     /** Logging helper. */
     private static final Log LOG = LogFactory.getLog(IndexUpdater.class);
@@ -109,6 +109,25 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
     {
         MDC.put("url", "Lucene index updating thread");
 
+        // Since this is where a new thread is created this is where we need to initialize the Container 
+        // ThreadLocal variables and not in the init() method. Otherwise we would simply overwrite the
+        // Container values for the main thread...
+        try {
+            initXWikiContainer(this.context);
+            runMainLoop();
+        } finally {
+            // Cleanup Container component (it has ThreadLocal variables)
+            cleanupXWikiContainer(this.context);
+            this.xwiki.getStore().cleanUp(this.context);
+            MDC.remove("url");
+        }
+    }
+
+    /**
+     * Main loop. Polls the queue for documents to be indexed.
+     */
+    private void runMainLoop()
+    {
         while (!this.exit) {
             if (this.queue.isEmpty()) {
                 if (LOG.isDebugEnabled()) {
@@ -230,9 +249,7 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        }
-        this.xwiki.getStore().cleanUp(this.context);
-        MDC.remove("url");
+        }        
     }
 
     private synchronized void closeSearcher()
@@ -423,10 +440,9 @@ public class IndexUpdater implements Runnable, XWikiDocChangeNotificationInterfa
             Integer.parseInt(config.getProperty(LucenePlugin.PROP_MAX_QUEUE_SIZE, "1000"));
 
         // Note: There's no need to open the Searcher here (with a call to
-        // openSearcher()) as each
-        // task needing it will open it itself.
+        // openSearcher()) as each task needing it will open it itself.
     }
-
+    
     public void cleanIndex()
     {
         if (LOG.isInfoEnabled()) {

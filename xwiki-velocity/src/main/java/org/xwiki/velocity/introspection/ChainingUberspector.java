@@ -55,16 +55,17 @@ import org.apache.velocity.util.introspection.UberspectLoggable;
  * 
  * @since 1.5M1
  * @see ChainableUberspector
+ * @version $Id: $
  */
 public class ChainingUberspector extends AbstractChainableUberspector implements Uberspect,
     RuntimeServicesAware, UberspectLoggable
 {
-    /** The runtime is needed for accessing the configuration. */
-    RuntimeServices runtime;
-
     /** The key of the parameter that allows defining the list of chained uberspectors. */
     public static final String UBERSPECT_CHAIN_CLASSNAMES =
         "runtime.introspector.uberspect.chainClasses";
+
+    /** The runtime is needed for accessing the configuration. */
+    private RuntimeServices runtime;
 
     /**
      * {@inheritDoc}
@@ -99,7 +100,7 @@ public class ChainingUberspector extends AbstractChainableUberspector implements
         if (inner == null) {
             log.error("No chained uberspectors defined! "
                 + "This uberspector is just a placeholder that relies on a real uberspector "
-                + "to actually allow method calls. Using SecureUberspect.");
+                + "to actually allow method calls. Using SecureUberspect instead as a fallback.");
             initializeUberspector(SecureUberspector.class.getCanonicalName());
         }
         // Initialize all the uberspectors in the chain

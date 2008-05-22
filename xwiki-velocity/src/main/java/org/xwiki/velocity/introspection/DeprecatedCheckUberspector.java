@@ -39,7 +39,7 @@ import org.apache.velocity.util.introspection.VelPropertySet;
  * @since 1.5M1
  * @see ChainableUberspector
  */
-public class DeprecatedCheckUberspector extends ChainableUberspectorBase implements Uberspect,
+public class DeprecatedCheckUberspector extends AbstractChainableUberspector implements Uberspect,
     ChainableUberspector, UberspectLoggable
 {
     /**
@@ -56,7 +56,7 @@ public class DeprecatedCheckUberspector extends ChainableUberspectorBase impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.velocity.introspection.ChainableUberspectorBase#getMethod(java.lang.Object,
+     * @see AbstractChainableUberspector#getMethod(java.lang.Object,
      *      java.lang.String, java.lang.Object[], org.apache.velocity.util.introspection.Info)
      */
     @Override
@@ -78,7 +78,7 @@ public class DeprecatedCheckUberspector extends ChainableUberspectorBase impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.velocity.introspection.ChainableUberspectorBase#getPropertyGet(java.lang.Object,
+     * @see AbstractChainableUberspector#getPropertyGet(java.lang.Object,
      *      java.lang.String, org.apache.velocity.util.introspection.Info)
      */
     @Override
@@ -101,7 +101,7 @@ public class DeprecatedCheckUberspector extends ChainableUberspectorBase impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.velocity.introspection.ChainableUberspectorBase#getPropertySet(java.lang.Object,
+     * @see AbstractChainableUberspector#getPropertySet(java.lang.Object,
      *      java.lang.String, java.lang.Object, org.apache.velocity.util.introspection.Info)
      */
     @Override

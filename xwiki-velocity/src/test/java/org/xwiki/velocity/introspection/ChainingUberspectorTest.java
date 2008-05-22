@@ -101,7 +101,7 @@ public class ChainingUberspectorTest extends AbstractXWikiComponentTestCase
         prop.setProperty(ChainingUberspector.UBERSPECT_CHAIN_CLASSNAMES, UberspectImpl.class
             .getCanonicalName()
             + ","
-            + ChainableUberspectorBase.class.getCanonicalName()
+            + AbstractChainableUberspector.class.getCanonicalName()
             + ","
             + InvalidUberspector.class.getCanonicalName()
             + ","

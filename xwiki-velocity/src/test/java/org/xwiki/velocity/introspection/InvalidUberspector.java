@@ -2,9 +2,8 @@ package org.xwiki.velocity.introspection;
 
 import org.apache.velocity.util.introspection.Info;
 import org.apache.velocity.util.introspection.VelMethod;
-import org.xwiki.velocity.introspection.ChainableUberspectorBase;
 
-public class InvalidUberspector extends ChainableUberspectorBase
+public class InvalidUberspector extends AbstractChainableUberspector
 {
     public static int methodCalls = 0;
 

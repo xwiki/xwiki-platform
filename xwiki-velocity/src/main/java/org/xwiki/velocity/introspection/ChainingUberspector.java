@@ -56,7 +56,7 @@ import org.apache.velocity.util.introspection.UberspectLoggable;
  * @since 1.5M1
  * @see ChainableUberspector
  */
-public class ChainingUberspector extends ChainableUberspectorBase implements Uberspect,
+public class ChainingUberspector extends AbstractChainableUberspector implements Uberspect,
     RuntimeServicesAware, UberspectLoggable
 {
     /** The runtime is needed for accessing the configuration. */

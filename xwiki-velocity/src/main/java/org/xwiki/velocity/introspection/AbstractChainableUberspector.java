@@ -37,7 +37,7 @@ import org.apache.velocity.util.introspection.VelPropertySet;
  * @since 1.5M1
  * @see ChainableUberspector
  */
-public abstract class ChainableUberspectorBase extends UberspectImpl implements
+public abstract class AbstractChainableUberspector extends UberspectImpl implements
     ChainableUberspector
 {
     /** The wrapped (decorated) uberspector. */

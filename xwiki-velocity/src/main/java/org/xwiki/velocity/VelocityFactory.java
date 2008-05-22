@@ -29,7 +29,7 @@ import java.util.Properties;
  * global templates is to use different Velocity engines. As an example we need this in XWiki since
  * we want to allow each Skin to provide its own global macros.
  *
- * @version $Id: $
+ * @version $Id $
  */
 public interface VelocityFactory
 {

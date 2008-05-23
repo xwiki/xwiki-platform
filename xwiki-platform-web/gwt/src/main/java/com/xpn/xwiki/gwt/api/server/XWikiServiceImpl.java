@@ -49,7 +49,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerFactory;
+import org.xwiki.container.servlet.ServletContainerInitializer;
 
 import javax.servlet.ServletException;
 
@@ -140,22 +140,19 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
         // Note that this is a bridge between the old core and the component architecture.
         // In the new component architecture we use ThreadLocal to transport the request, 
         // response and session to components which require them.
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        ServletContainerFactory containerFactory =
-            (ServletContainerFactory) Utils.getComponent(ServletContainerFactory.ROLE, context);
+        ServletContainerInitializer containerInitializer =
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE, context);
         try {
-            container.setRequest(containerFactory.createRequest(
-                context.getRequest().getHttpServletRequest()));
-            container.setResponse(containerFactory.createResponse(
-                context.getResponse().getHttpServletResponse()));
-            container.setSession(containerFactory.createSession(
-                context.getRequest().getHttpServletRequest()));
+            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest());
+            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize request/response or session", e);
         }            
     
         // This is a bridge that we need for old code to play well with new components.
         // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
         container.getRequest().setProperty("xwikicontext", context);
     }
 

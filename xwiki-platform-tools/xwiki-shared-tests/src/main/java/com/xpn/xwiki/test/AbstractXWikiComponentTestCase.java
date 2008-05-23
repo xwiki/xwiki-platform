@@ -23,7 +23,7 @@ package com.xpn.xwiki.test;
 import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.Container;
-import org.xwiki.container.daemon.DaemonContainerFactory;
+import org.xwiki.container.daemon.DaemonContainerInitializer;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.DefaultContainerConfiguration;
@@ -49,12 +49,13 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
         getContext().put(ComponentManager.class.getName(), getComponentManager());
 
         // Initialize the Container objects
-        DaemonContainerFactory dcf = (DaemonContainerFactory) getComponentManager().lookup(DaemonContainerFactory.ROLE);
-        Container container = (Container) getComponentManager().lookup(Container.ROLE);
-        container.setRequest(dcf.createRequest());
+        DaemonContainerInitializer dci = (DaemonContainerInitializer) getComponentManager().lookup(
+            DaemonContainerInitializer.ROLE);
+        dci.initializeRequest();
 
         // This is a bridge that we need for old code to play well with new components.
         // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        Container container = (Container) getComponentManager().lookup(Container.ROLE);
         container.getRequest().setProperty("xwikicontext", getContext());
     }
 

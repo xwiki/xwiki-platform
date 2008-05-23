@@ -44,6 +44,9 @@ import com.xpn.xwiki.web.Utils;
  * since we need to populate the Velocity Context with XWiki objects that are located in the
  * Core (such as the XWiki object for example) and since the Core needs to call the Velocity
  * module this would cause a circular dependency.
+ *
+ * @since 1.5M1
+ * @version $Id: $
  */
 public class DefaultVelocityManager implements VelocityManager, Composable
 {

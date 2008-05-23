@@ -38,7 +38,7 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerFactory;
+import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ActionExecutionEvent;
 
@@ -101,7 +101,7 @@ public abstract class XWikiAction extends Action
      * @throws ServletException if a servlet exception occurs
      */
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest req,
-        HttpServletResponse resp) throws Exception, ServletException
+        HttpServletResponse resp) throws Exception
     {
         ActionForward actionForward;
         XWikiContext context = null;
@@ -123,7 +123,7 @@ public abstract class XWikiAction extends Action
         return actionForward;
     }
     
-    public ActionForward execute(XWikiContext context) throws Exception, ServletException
+    public ActionForward execute(XWikiContext context) throws Exception
     {
         MonitorPlugin monitor = null;
         FileUploadPlugin fileupload = null;
@@ -174,7 +174,7 @@ public abstract class XWikiAction extends Action
             if (sajax != null && !sajax.trim().equals("") && !sajax.equals("0")) {
                 ajax = true;
             }
-            context.put("ajax", new Boolean(ajax));
+            context.put("ajax", ajax);
 
             // Any error before this will be treated using a redirection to an error page
 
@@ -188,7 +188,7 @@ public abstract class XWikiAction extends Action
             
             try {
                 // Prepare documents and put them in the context
-                if (xwiki.prepareDocuments(context.getRequest(), context, vcontext) == false) {
+                if (!xwiki.prepareDocuments(context.getRequest(), context, vcontext)) {
                     return null;
                 }
 
@@ -383,22 +383,19 @@ public abstract class XWikiAction extends Action
         // In the new component architecture we use ThreadLocal to transport the request, 
         // response and session to components which require them.
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        ServletContainerFactory containerFactory =
-            (ServletContainerFactory) Utils.getComponent(ServletContainerFactory.ROLE, context);
+        ServletContainerInitializer containerInitializer =
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE, context);
         try {
-            container.setRequest(containerFactory.createRequest(
-                context.getRequest().getHttpServletRequest()));
-            container.setResponse(containerFactory.createResponse(
-                context.getResponse().getHttpServletResponse()));
-            container.setSession(containerFactory.createSession(
-                context.getRequest().getHttpServletRequest()));
+            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest());
+            containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
+            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize request/response or session", e);
         }            
 
         // This is a bridge that we need for old code to play well with new components.
         // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
         container.getRequest().setProperty("xwikicontext", context);
     }
     
@@ -460,7 +457,6 @@ public abstract class XWikiAction extends Action
      * @param url      url of the request
      * @param context  the XWiki context
      * @return true if a redirection has been sent
-     * @throws Exception
      */
     protected boolean sendGlobalRedirect(XWikiResponse response, String url, XWikiContext context)
             throws Exception

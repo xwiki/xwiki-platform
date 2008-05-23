@@ -60,9 +60,6 @@ public abstract class AbstractChainableUberspector extends UberspectImpl impleme
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This implementation forwards the call to the wrapped uberspector, catching all exceptions.
-     * </p>
      * 
      * @see org.apache.velocity.util.introspection.UberspectImpl#init()
      */
@@ -80,9 +77,6 @@ public abstract class AbstractChainableUberspector extends UberspectImpl impleme
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This implementation forwards the call to the wrapped uberspector.
-     * </p>
      * 
      * @see org.apache.velocity.util.introspection.UberspectImpl#getIterator(java.lang.Object,
      *      org.apache.velocity.util.introspection.Info)
@@ -96,9 +90,6 @@ public abstract class AbstractChainableUberspector extends UberspectImpl impleme
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This implementation forwards the call to the wrapped uberspector.
-     * </p>
      * 
      * @see org.apache.velocity.util.introspection.UberspectImpl#getMethod(java.lang.Object,
      *      java.lang.String, java.lang.Object[], org.apache.velocity.util.introspection.Info)
@@ -112,9 +103,6 @@ public abstract class AbstractChainableUberspector extends UberspectImpl impleme
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This implementation forwards the call to the wrapped uberspector.
-     * </p>
      * 
      * @see org.apache.velocity.util.introspection.UberspectImpl#getPropertyGet(java.lang.Object,
      *      java.lang.String, org.apache.velocity.util.introspection.Info)
@@ -127,9 +115,6 @@ public abstract class AbstractChainableUberspector extends UberspectImpl impleme
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This implementation forwards the call to the wrapped uberspector.
-     * </p>
      * 
      * @see org.apache.velocity.util.introspection.UberspectImpl#getPropertySet(java.lang.Object,
      *      java.lang.String, java.lang.Object, org.apache.velocity.util.introspection.Info)

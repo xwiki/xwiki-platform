@@ -181,7 +181,9 @@ public final class XWikiLDAPConfig
             String[] table = param.split(DEFAULT_SEPARATOR);
 
             set = new HashSet<String>();
-            CollectionUtils.addAll(set, table);
+            for (String name : table) {
+                set.add(name.toLowerCase());
+            }
         } else {
             set = DEFAULT_GROUP_CLASSES;
         }
@@ -203,7 +205,9 @@ public final class XWikiLDAPConfig
             String[] table = param.split(DEFAULT_SEPARATOR);
 
             set = new HashSet<String>();
-            CollectionUtils.addAll(set, table);
+            for (String name : table) {
+                set.add(name.toLowerCase());
+            }
         } else {
             set = DEFAULT_GROUP_MEMBERFIELDS;
         }

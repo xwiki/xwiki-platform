@@ -108,13 +108,25 @@ xwiki.authentication.ldap.validate_password=0
 
 #-# only members of the following group will be verified in the LDAP
 # otherwise only users that are found after searching starting from the base_DN
-xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
+# xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
 
 #-# base DN for searches
 xwiki.authentication.ldap.base_DN=
 
-#-# specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
-xwiki.authentication.ldap.UID_attr=cn
+#-# Specifies the LDAP attribute containing the identifier to be used as the XWiki name (default=cn)
+# xwiki.authentication.ldap.UID_attr=cn
+
+#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# Specifies the LDAP attribute containing the password to be used "when xwiki.authentication.ldap.validate_password" is set to 1
+# xwiki.authentication.ldap.password_field=userPassword
+
+#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# The potential LDAP groups classes. Separated by commas.
+# xwiki.authentication.ldap.group_classes=group,groupOfNames,groupOfUniqueNames,dynamicGroup,dynamicGroupAux,groupWiseDistributionList
+
+#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# The potential names of the LDAP groups fields containings the members. Separated by commas. 
+# xwiki.authentication.ldap.group_memberfields=member,uniqueMember
 
 #-# retrieve the following fields from LDAP and store them in the XWiki user object (xwiki-attribute=ldap-attribute)
 #-# ldap_dn=dn  -- dn is set by class, caches dn in XWiki.user object for faster access
@@ -151,6 +163,10 @@ xwiki.authentication.ldap.trylocal=1
 #-# [SINCE 1.3M2, XWikiLDAPAuthServiceImpl]
 #-# The keystore file to use in SSL connection
 # xwiki.authentication.ldap.ssl.keystore=
+
+#-# [SINCE 1.5M1, XWikiLDAPAuthServiceImpl]
+#-# The java secure provider used in SSL connection
+# xwiki.authentication.ldap.ssl.secure_provider=com.sun.net.ssl.internal.ssl.Provider
 
 #-------------------------------------------------------------------------------------
 

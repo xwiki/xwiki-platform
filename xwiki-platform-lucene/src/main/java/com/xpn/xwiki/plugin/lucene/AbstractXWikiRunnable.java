@@ -44,7 +44,7 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
         try {
             // Initialize the Container objects
-            dci.initializeRequest();
+            dci.initializeRequest(context);
         } catch (DaemonContainerException e) {
             // Note: We should raise an exception here but we cannot since XWikiDefaultPlugin has overrident's 
             // XWikiPluginInterface's init() method without declaring a throw XWikiException...
@@ -52,11 +52,6 @@ public abstract class AbstractXWikiRunnable implements Runnable
                 + "instable. We recommend stopping the container, fixing the issue and "
                 + "restarting it.", e);
         }
-
-        // This is a bridge that we need for old code to play well with new components.
-        // Old code relies on the XWikiContext object whereas new code uses the Container component.
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        container.getRequest().setProperty("xwikicontext", context);
     }
     
     protected void cleanupXWikiContainer(XWikiContext context)

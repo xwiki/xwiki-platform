@@ -51,12 +51,7 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
         // Initialize the Container objects
         DaemonContainerInitializer dci = (DaemonContainerInitializer) getComponentManager().lookup(
             DaemonContainerInitializer.ROLE);
-        dci.initializeRequest();
-
-        // This is a bridge that we need for old code to play well with new components.
-        // Old code relies on the XWikiContext object whereas new code uses the Container component.
-        Container container = (Container) getComponentManager().lookup(Container.ROLE);
-        container.getRequest().setProperty("xwikicontext", getContext());
+        dci.initializeRequest(this.context);
     }
 
     protected void tearDown() throws Exception

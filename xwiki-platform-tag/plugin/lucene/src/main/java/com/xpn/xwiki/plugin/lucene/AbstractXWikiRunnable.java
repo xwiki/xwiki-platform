@@ -23,8 +23,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.container.Container;
 import org.xwiki.container.daemon.DaemonContainerException;
-import org.xwiki.container.daemon.DaemonContainerFactory;
-
+import org.xwiki.container.daemon.DaemonContainerInitializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -40,16 +39,12 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void initXWikiContainer(XWikiContext context)
     {
-        DaemonContainerFactory dcf = (DaemonContainerFactory) Utils.getComponent(DaemonContainerFactory.ROLE, context);
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        DaemonContainerInitializer dci = (DaemonContainerInitializer) Utils.getComponent(
+            DaemonContainerInitializer.ROLE, context);
 
         try {
             // Initialize the Container objects
-            container.setRequest(dcf.createRequest());
-
-            // This is a bridge that we need for old code to play well with new components.
-            // Old code relies on the XWikiContext object whereas new code uses the Container component.
-            container.getRequest().setProperty("xwikicontext", context);
+            dci.initializeRequest();
         } catch (DaemonContainerException e) {
             // Note: We should raise an exception here but we cannot since XWikiDefaultPlugin has overrident's 
             // XWikiPluginInterface's init() method without declaring a throw XWikiException...
@@ -57,6 +52,11 @@ public abstract class AbstractXWikiRunnable implements Runnable
                 + "instable. We recommend stopping the container, fixing the issue and "
                 + "restarting it.", e);
         }
+
+        // This is a bridge that we need for old code to play well with new components.
+        // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        container.getRequest().setProperty("xwikicontext", context);
     }
     
     protected void cleanupXWikiContainer(XWikiContext context)

@@ -20,14 +20,12 @@
  */
 package org.xwiki.container.daemon;
 
-import org.xwiki.container.Request;
-
-public interface DaemonContainerFactory
+public interface DaemonContainerInitializer
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = DaemonContainerFactory.class.getName();
+    String ROLE = DaemonContainerInitializer.class.getName();
 
-    Request createRequest() throws DaemonContainerException;
+    void initializeRequest() throws DaemonContainerException;
 }

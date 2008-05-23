@@ -33,7 +33,7 @@ import org.apache.struts.upload.MultipartRequestWrapper;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.portlet.PortletContainerException;
-import org.xwiki.container.portlet.PortletContainerFactory;
+import org.xwiki.container.portlet.PortletContainerInitializer;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -413,22 +413,23 @@ public class XWikiPortlet extends GenericPortlet
         // Note that this is a bridge between the old core and the component architecture.
         // In the new component architecture we use ThreadLocal to transport the request, 
         // response and session to components which require them.
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        PortletContainerFactory containerFactory =
-            (PortletContainerFactory) Utils.getComponent(PortletContainerFactory.ROLE, context);
+        PortletContainerInitializer containerInitializer =
+            (PortletContainerInitializer) Utils.getComponent(PortletContainerInitializer.ROLE,
+                context);
         try {
-            container.setRequest(containerFactory.createRequest(
-                ((XWikiPortletRequest) context.getRequest()).getPortletRequest()));
-            container.setResponse(containerFactory.createResponse(
-                ((XWikiPortletResponse) context.getResponse()).getPortletResponse()));
-            container.setSession(containerFactory.createSession(
-                ((XWikiPortletRequest) context.getRequest()).getPortletRequest()));
+            containerInitializer.initializeRequest(
+                ((XWikiPortletRequest) context.getRequest()).getPortletRequest());
+            containerInitializer.initializeResponse(
+                ((XWikiPortletResponse) context.getResponse()).getPortletResponse());
+            containerInitializer.initializeSession(
+                ((XWikiPortletRequest) context.getRequest()).getPortletRequest());
         } catch (PortletContainerException e) {
             throw new PortletException("Failed to initialize request/response or session", e);
         }            
     
         // This is a bridge that we need for old code to play well with new components.
         // Old code relies on the XWikiContext object whereas new code uses the Container component.
+        Container container = (Container) Utils.getComponent(Container.ROLE, context);
         container.getRequest().setProperty("xwikicontext", context);
     }    
 

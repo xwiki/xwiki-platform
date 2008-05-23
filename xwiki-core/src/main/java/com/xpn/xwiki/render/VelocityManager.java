@@ -24,6 +24,10 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.XWikiVelocityException;
 
+/**
+ * @since 1.5M1
+ * @version $Id: $
+ */
 public interface VelocityManager
 {
     /**

@@ -16,8 +16,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.daemon.DaemonContainerException;
-import org.xwiki.container.daemon.DaemonContainerFactory;
-
+import org.xwiki.container.daemon.DaemonContainerInitializer;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.Util;
@@ -141,7 +140,7 @@ public class HtmlPackager
      * Add rendered document to ZIP stream.
      * 
      * @param pageName the name (used with
-     *            {@link com.xpn.xwiki.XWiki.XWiki#getDocument(String, XWikiContext)}) of the page
+     *            {@link com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)}) of the page
      *            to render.
      * @param zos the ZIP output stream.
      * @param context the XWiki context.
@@ -185,7 +184,7 @@ public class HtmlPackager
      * 
      * @param zos the ZIP output stream.
      * @param tempdir the directory where to copy attached files.
-     * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory.XWikiURLFactory} used to render the
+     * @param urlf the {@link com.xpn.xwiki.web.XWikiURLFactory} used to render the
      *            documents.
      * @param context the XWiki context.
      * @throws XWikiException error when render documents.
@@ -199,13 +198,14 @@ public class HtmlPackager
         // The new request automatically gets initialized with a new Velocity Context by
         // the VelocityRequestInitializer class.
         Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        DaemonContainerFactory containerFactory =
-            (DaemonContainerFactory) Utils.getComponent(DaemonContainerFactory.ROLE, context);
+        DaemonContainerInitializer containerInitializer =
+            (DaemonContainerInitializer) Utils.getComponent(DaemonContainerInitializer.ROLE,
+                context);
 
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
         try {
-            container.pushRequest(containerFactory.createRequest());
+            containerInitializer.initializeRequest();
 
             XWikiContext renderContext = (XWikiContext) context.clone();
             renderContext.put("action", "view");

@@ -23,48 +23,42 @@ package org.xwiki.container.portlet;
 import javax.portlet.PortletContext;
 
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializerManager;
-import org.xwiki.container.Response;
-import org.xwiki.container.Session;
+import org.xwiki.container.Container;
 
-public class DefaultPortletContainerFactory implements PortletContainerFactory
+public class DefaultPortletContainerInitializer implements PortletContainerInitializer
 {
     private RequestInitializerManager requestInitializerManager;
-    
-    public ApplicationContext createApplicationContext(PortletContext portletContext)
+
+    private Container container;
+
+    public void initializeApplicationContext(PortletContext portletContext)
     {
-        return new PortletApplicationContext(portletContext);
+        this.container.setApplicationContext(new PortletApplicationContext(portletContext));
     }
 
-    public Request createRequest(javax.portlet.PortletRequest portletRequest)
+    public void initializeRequest(javax.portlet.PortletRequest portletRequest)
         throws PortletContainerException
     {
-        PortletRequest request = new PortletRequest(portletRequest);
+        // 1) Create an empty request. From this point forward request initializers can use the
+        // Container object to get any data they want from the Request.
+        this.container.setRequest(new PortletRequest(portletRequest));
 
-        // There's no Request URL when in Portlet mode since the request is handled by the Portal
-        // itself.
-        // TODO: Fix this. I think we need to move the fields in XWikiURL to the Request object somehow (action, document name, space name, etc)
-        request.setXWikiURL(null);
-
+        // 2) Call the request initializers to populate the Request.
         try {
-            this.requestInitializerManager.initializeRequest(request);
+            this.requestInitializerManager.initializeRequest(this.container.getRequest());
         } catch (ComponentLookupException e) {
             throw new PortletContainerException("Failed to initialize request", e);
         }
-
-        return request;        
     }
 
-    public Response createResponse(javax.portlet.PortletResponse portletResponse)
+    public void initializeResponse(javax.portlet.PortletResponse portletResponse)
     {
-        return new PortletResponse(portletResponse);
+        this.container.setResponse(new PortletResponse(portletResponse));
     }
 
-    public Session createSession(javax.portlet.PortletRequest portletRequest)
+    public void initializeSession(javax.portlet.PortletRequest portletRequest)
     {
-        return new PortletSession(portletRequest);
+        this.container.setSession(new PortletSession(portletRequest));
     }
-
 }

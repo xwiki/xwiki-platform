@@ -22,23 +22,18 @@ package org.xwiki.container.portlet;
 
 import javax.portlet.PortletContext;
 
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Request;
-import org.xwiki.container.Response;
-import org.xwiki.container.Session;
-
-public interface PortletContainerFactory
+public interface PortletContainerInitializer
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = PortletContainerFactory.class.getName();
+    String ROLE = PortletContainerInitializer.class.getName();
 
-    Request createRequest(javax.portlet.PortletRequest request) throws PortletContainerException;
-    
-    Response createResponse(javax.portlet.PortletResponse response);
-    
-    Session createSession(javax.portlet.PortletRequest request);
-    
-    ApplicationContext createApplicationContext(PortletContext servletContext);
+    void initializeRequest(javax.portlet.PortletRequest request) throws PortletContainerException;
+
+    void initializeResponse(javax.portlet.PortletResponse response);
+
+    void initializeSession(javax.portlet.PortletRequest request);
+
+    void initializeApplicationContext(PortletContext servletContext);
 }

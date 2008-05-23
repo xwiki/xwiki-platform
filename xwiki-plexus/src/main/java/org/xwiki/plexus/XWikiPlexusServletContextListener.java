@@ -24,8 +24,7 @@ import org.codehaus.plexus.servlet.PlexusServletContextListener;
 import org.codehaus.plexus.servlet.PlexusServletUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 import org.codehaus.plexus.PlexusContainer;
-import org.xwiki.container.Container;
-import org.xwiki.container.servlet.ServletContainerFactory;
+import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 
 import javax.servlet.ServletContextEvent;
@@ -40,13 +39,11 @@ public class XWikiPlexusServletContextListener extends PlexusServletContextListe
 
         // Initializes XWiki's Container with the Servlet Conetext.
         try {
-            Container container = (Container) PlexusServletUtils.lookup(
-                servletContextEvent.getServletContext(), Container.ROLE);
-            ServletContainerFactory containerFactory = 
-                (ServletContainerFactory) PlexusServletUtils.lookup(
-                    servletContextEvent.getServletContext(), ServletContainerFactory.ROLE);
-            container.setApplicationContext(containerFactory.createApplicationContext(
-                servletContextEvent.getServletContext()));
+            ServletContainerInitializer containerInitializer =
+                (ServletContainerInitializer) PlexusServletUtils.lookup(
+                    servletContextEvent.getServletContext(), ServletContainerInitializer.ROLE);
+            containerInitializer.initializeApplicationContext(
+                servletContextEvent.getServletContext());
         } catch (ServletException se) {
             throw new RuntimeException("Failed to initialize application contextt", se);
         }

@@ -1,12 +1,16 @@
 <component-set>
   <components>
     <component>
-      <role>org.xwiki.container.servlet.ServletContainerFactory</role>
+      <role>org.xwiki.container.servlet.ServletContainerInitializer</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.container.servlet.DefaultServletContainerFactory</implementation>
+      <implementation>org.xwiki.container.servlet.DefaultServletContainerInitializer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
+        <requirement>
+          <role>org.xwiki.container.Container</role>
+          <role-hint>default</role-hint>
+        </requirement>
         <requirement>
           <role>org.xwiki.container.RequestInitializerManager</role>
           <role-hint>default</role-hint>

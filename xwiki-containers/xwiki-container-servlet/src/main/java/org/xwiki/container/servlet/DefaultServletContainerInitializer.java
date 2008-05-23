@@ -25,43 +25,42 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializerManager;
-import org.xwiki.container.Response;
-import org.xwiki.container.Session;
+import org.xwiki.container.Container;
 
-public class DefaultServletContainerFactory implements ServletContainerFactory
+public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
     private RequestInitializerManager requestInitializerManager;
-    
-    public ApplicationContext createApplicationContext(ServletContext servletContext)
+
+    private Container container;
+
+    public void initializeApplicationContext(ServletContext servletContext)
     {
-        return new ServletApplicationContext(servletContext);
+        this.container.setApplicationContext(new ServletApplicationContext(servletContext));
     }
 
-    public Request createRequest(HttpServletRequest httpServletRequest)
+    public void initializeRequest(HttpServletRequest httpServletRequest)
         throws ServletContainerException
     {
-        ServletRequest request = new ServletRequest(httpServletRequest);
+        // 1) Create an empty request. From this point forward request initializers can use the
+        // Container object to get any data they want from the Request.
+        this.container.setRequest(new ServletRequest(httpServletRequest));
 
+        // 2) Call the request initializers to populate the Request.
         try {
-            this.requestInitializerManager.initializeRequest(request);
+            this.requestInitializerManager.initializeRequest(this.container.getRequest());
         } catch (ComponentLookupException e) {
             throw new ServletContainerException("Failed to initialize request", e);
         }
-
-        return request;        
     }
 
-    public Response createResponse(HttpServletResponse httpServletResponse)
+    public void initializeResponse(HttpServletResponse httpServletResponse)
     {
-        return new ServletResponse(httpServletResponse);
+        this.container.setResponse(new ServletResponse(httpServletResponse));
     }
 
-    public Session createSession(HttpServletRequest httpServletRequest)
+    public void initializeSession(HttpServletRequest httpServletRequest)
     {
-        return new ServletSession(httpServletRequest);
+        this.container.setSession(new ServletSession(httpServletRequest));
     }
-
 }

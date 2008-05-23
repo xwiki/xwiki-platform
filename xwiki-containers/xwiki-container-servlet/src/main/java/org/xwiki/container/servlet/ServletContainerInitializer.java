@@ -24,23 +24,18 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.xwiki.container.ApplicationContext;
-import org.xwiki.container.Request;
-import org.xwiki.container.Response;
-import org.xwiki.container.Session;
-
-public interface ServletContainerFactory
+public interface ServletContainerInitializer
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = ServletContainerFactory.class.getName();
+    String ROLE = ServletContainerInitializer.class.getName();
 
-    Request createRequest(HttpServletRequest request) throws ServletContainerException;
+    void initializeRequest(HttpServletRequest request) throws ServletContainerException;
     
-    Response createResponse(HttpServletResponse response);
+    void initializeResponse(HttpServletResponse response);
     
-    Session createSession(HttpServletRequest request);
+    void initializeSession(HttpServletRequest request);
     
-    ApplicationContext createApplicationContext(ServletContext servletContext);
+    void initializeApplicationContext(ServletContext servletContext);
 }

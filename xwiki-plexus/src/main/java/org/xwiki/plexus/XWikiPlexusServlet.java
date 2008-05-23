@@ -25,7 +25,7 @@ import org.xwiki.action.ActionException;
 import org.xwiki.action.ActionManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
-import org.xwiki.container.servlet.ServletContainerFactory;
+import org.xwiki.container.servlet.ServletContainerInitializer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -41,13 +41,12 @@ public class XWikiPlexusServlet extends PlexusServlet
 
         // Initializes XWiki's Container with the Servlet request/response/session so that
         // components needing them can depend on the Container component to get them.
-        Container container = (Container) lookup(Container.ROLE);
-        ServletContainerFactory containerFactory =
-            (ServletContainerFactory) lookup(ServletContainerFactory.ROLE);
+        ServletContainerInitializer containerInitializer =
+            (ServletContainerInitializer) lookup(ServletContainerInitializer.ROLE);
         try {
-            container.setRequest(containerFactory.createRequest(httpServletRequest));
-            container.setResponse(containerFactory.createResponse(httpServletResponse));
-            container.setSession(containerFactory.createSession(httpServletRequest));
+            containerInitializer.initializeRequest(httpServletRequest);
+            containerInitializer.initializeResponse(httpServletResponse);
+            containerInitializer.initializeSession(httpServletRequest);
         } catch (ServletContainerException e) {
             try {
                 // Call the error Action to handle the exception

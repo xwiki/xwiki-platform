@@ -21,23 +21,26 @@
 package org.xwiki.container.daemon;
 
 import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.container.Request;
 import org.xwiki.container.RequestInitializerManager;
+import org.xwiki.container.Container;
 
-public class DefaultDaemonContainerFactory implements DaemonContainerFactory
+public class DefaultDaemonContainerInitializer implements DaemonContainerInitializer
 {
     private RequestInitializerManager requestInitializerManager;
 
-    public Request createRequest() throws DaemonContainerException
-    {
-        DaemonRequest request = new DaemonRequest();
+    private Container container;
 
+    public void initializeRequest()throws DaemonContainerException
+    {
+        // 1) Create an empty request. From this point forward request initializers can use the
+        // Container object to get any data they want from the Request.
+        this.container.setRequest(new DaemonRequest());
+
+        // 2) Call the request initializers to populate the Request.
         try {
-            this.requestInitializerManager.initializeRequest(request);
+            this.requestInitializerManager.initializeRequest(this.container.getRequest());
         } catch (ComponentLookupException e) {
             throw new DaemonContainerException("Failed to initialize request", e);
         }
-        
-        return request;
     }
 }

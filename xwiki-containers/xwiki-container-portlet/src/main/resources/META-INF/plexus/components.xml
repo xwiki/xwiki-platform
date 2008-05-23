@@ -1,12 +1,16 @@
 <component-set>
   <components>
     <component>
-      <role>org.xwiki.container.portlet.PortletContainerFactory</role>
+      <role>org.xwiki.container.portlet.PortletContainerInitializer</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.container.portlet.DefaultPortletContainerFactory</implementation>
+      <implementation>org.xwiki.container.portlet.DefaultPortletContainerInitializer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
+        <requirement>
+          <role>org.xwiki.container.Container</role>
+          <role-hint>default</role-hint>
+        </requirement>
         <requirement>
           <role>org.xwiki.container.RequestInitializer</role>
           <role-hint>default</role-hint>

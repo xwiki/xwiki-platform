@@ -25,13 +25,9 @@ import java.io.ByteArrayInputStream;
 import javax.servlet.ServletContext;
 
 import org.jmock.Mock;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
-import org.xwiki.container.daemon.DaemonContainerFactory;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletContext;

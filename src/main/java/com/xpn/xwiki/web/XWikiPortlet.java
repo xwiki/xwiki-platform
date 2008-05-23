@@ -416,9 +416,10 @@ public class XWikiPortlet extends GenericPortlet
         PortletContainerInitializer containerInitializer =
             (PortletContainerInitializer) Utils.getComponent(PortletContainerInitializer.ROLE,
                 context);
+
         try {
             containerInitializer.initializeRequest(
-                ((XWikiPortletRequest) context.getRequest()).getPortletRequest());
+                ((XWikiPortletRequest) context.getRequest()).getPortletRequest(), context);
             containerInitializer.initializeResponse(
                 ((XWikiPortletResponse) context.getResponse()).getPortletResponse());
             containerInitializer.initializeSession(
@@ -426,11 +427,6 @@ public class XWikiPortlet extends GenericPortlet
         } catch (PortletContainerException e) {
             throw new PortletException("Failed to initialize request/response or session", e);
         }            
-    
-        // This is a bridge that we need for old code to play well with new components.
-        // Old code relies on the XWikiContext object whereas new code uses the Container component.
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        container.getRequest().setProperty("xwikicontext", context);
     }    
 
     protected void cleanupContainerComponent(XWikiContext context)

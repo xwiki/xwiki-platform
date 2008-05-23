@@ -385,18 +385,15 @@ public abstract class XWikiAction extends Action
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
         ServletContainerInitializer containerInitializer =
             (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE, context);
+
         try {
-            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest());
+            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
+                context);
             containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
             throw new ServletException("Failed to initialize request/response or session", e);
         }            
-
-        // This is a bridge that we need for old code to play well with new components.
-        // Old code relies on the XWikiContext object whereas new code uses the Container component.
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        container.getRequest().setProperty("xwikicontext", context);
     }
     
     protected void cleanupContainerComponent(XWikiContext context)

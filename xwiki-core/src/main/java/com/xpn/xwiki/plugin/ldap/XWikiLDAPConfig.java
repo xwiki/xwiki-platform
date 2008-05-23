@@ -1,12 +1,14 @@
 package com.xpn.xwiki.plugin.ldap;
 
 import java.security.Provider;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -19,6 +21,11 @@ import com.xpn.xwiki.XWikiContext;
  */
 public final class XWikiLDAPConfig
 {
+    /**
+     * Mapping fields separator.
+     */
+    public static final String DEFAULT_SEPARATOR = ",";
+
     /**
      * LDAP properties names suffix in xwiki.cfg.
      */
@@ -47,13 +54,23 @@ public final class XWikiLDAPConfig
     /**
      * Mapping fields separator.
      */
-    public static final String USERMAPPING_SEP = ",";
+    public static final String USERMAPPING_SEP = DEFAULT_SEPARATOR;
 
     /**
      * Character user to link XWiki field name and LDAP field name in user mappings property.
      */
     public static final String USERMAPPING_XWIKI_LDAP_LINK = "=";
 
+    /**
+     * Different LDAP implementations groups classes name.
+     */
+    public static final Set<String> DEFAULT_GROUP_CLASSES = new HashSet<String>();
+
+    /**
+     * Different LDAP implementations groups member property name.
+     */
+    public static final Set<String> DEFAULT_GROUP_MEMBERFIELDS = new HashSet<String>();
+    
     /**
      * Logging tool.
      */
@@ -63,6 +80,18 @@ public final class XWikiLDAPConfig
      * The default secure provider to use for SSL.
      */
     private static final String DEFAULT_SECUREPROVIDER = "com.sun.net.ssl.internal.ssl.Provider";
+
+    static {
+        DEFAULT_GROUP_CLASSES.add("group".toLowerCase());
+        DEFAULT_GROUP_CLASSES.add("groupOfNames".toLowerCase());
+        DEFAULT_GROUP_CLASSES.add("groupOfUniqueNames".toLowerCase());
+        DEFAULT_GROUP_CLASSES.add("dynamicGroup".toLowerCase());
+        DEFAULT_GROUP_CLASSES.add("dynamicGroupAux".toLowerCase());
+        DEFAULT_GROUP_CLASSES.add("groupWiseDistributionList".toLowerCase());
+
+        DEFAULT_GROUP_MEMBERFIELDS.add("member".toLowerCase());
+        DEFAULT_GROUP_MEMBERFIELDS.add("uniqueMember".toLowerCase());
+    }
 
     /**
      * Unique instance of {@link XWikiLDAPConfig}.
@@ -136,6 +165,50 @@ public final class XWikiLDAPConfig
     public String getLDAPParam(String name, String def, XWikiContext context)
     {
         return getLDAPParam(name, name.replace(PREF_LDAP_SUFFIX, CFG_LDAP_SUFFIX), def, context);
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the of the LDAP groups classes.
+     */
+    public Collection<String> getGroupClasses(XWikiContext context)
+    {
+        String param = getLDAPParam("ldap_group_classes", null, context);
+
+        Collection<String> set;
+
+        if (param != null) {
+            String[] table = param.split(DEFAULT_SEPARATOR);
+
+            set = new HashSet<String>();
+            CollectionUtils.addAll(set, table);
+        } else {
+            set = DEFAULT_GROUP_CLASSES;
+        }
+
+        return set;
+    }
+
+    /**
+     * @param context the XWiki context.
+     * @return the names of the fields for members of groups.
+     */
+    public Collection<String> getGroupMemberFields(XWikiContext context)
+    {
+        String param = getLDAPParam("ldap_group_memberfields", null, context);
+
+        Collection<String> set;
+
+        if (param != null) {
+            String[] table = param.split(DEFAULT_SEPARATOR);
+
+            set = new HashSet<String>();
+            CollectionUtils.addAll(set, table);
+        } else {
+            set = DEFAULT_GROUP_MEMBERFIELDS;
+        }
+
+        return set;
     }
 
     /**

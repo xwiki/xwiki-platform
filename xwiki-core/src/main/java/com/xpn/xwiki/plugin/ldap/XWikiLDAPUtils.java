@@ -22,11 +22,10 @@
 package com.xpn.xwiki.plugin.ldap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -49,16 +48,6 @@ public class XWikiLDAPUtils
      * Logging tool.
      */
     private static final Log LOG = LogFactory.getLog(XWikiLDAPUtils.class);
-
-    /**
-     * Different LDAP implementations groups classes name.
-     */
-    private static final Set<String> LDAP_GROUP_CLASS = new HashSet<String>();
-
-    /**
-     * Different LDAP implementations groups member property name.
-     */
-    private static final Set<String> LDAP_GROUP_MEMBER = new HashSet<String>();
 
     /**
      * LDAP objectClass parameter.
@@ -91,17 +80,15 @@ public class XWikiLDAPUtils
      */
     private String uidAttributeName = LDAP_DEFAULT_UID;
 
-    static {
-        LDAP_GROUP_CLASS.add("group".toLowerCase());
-        LDAP_GROUP_CLASS.add("groupOfNames".toLowerCase());
-        LDAP_GROUP_CLASS.add("groupOfUniqueNames".toLowerCase());
-        LDAP_GROUP_CLASS.add("dynamicGroup".toLowerCase());
-        LDAP_GROUP_CLASS.add("dynamicGroupAux".toLowerCase());
-        LDAP_GROUP_CLASS.add("groupWiseDistributionList".toLowerCase());
+    /**
+     * Different LDAP implementations groups classes names.
+     */
+    private Collection<String> groupClasses = XWikiLDAPConfig.DEFAULT_GROUP_CLASSES;
 
-        LDAP_GROUP_MEMBER.add("member".toLowerCase());
-        LDAP_GROUP_MEMBER.add("uniqueMember".toLowerCase());
-    }
+    /**
+     * Different LDAP implementations groups member property name.
+     */
+    private Collection<String> groupMemberFields = XWikiLDAPConfig.DEFAULT_GROUP_MEMBERFIELDS;
 
     /**
      * Create an instance of {@link XWikiLDAPUtils}.
@@ -127,6 +114,38 @@ public class XWikiLDAPUtils
     public String getUidAttributeName()
     {
         return uidAttributeName;
+    }
+
+    /**
+     * @param groupClasses the different LDAP implementations groups classes names.
+     */
+    public void setGroupClasses(Collection<String> groupClasses)
+    {
+        this.groupClasses = groupClasses;
+    }
+
+    /**
+     * @return the different LDAP implementations groups classes names.
+     */
+    public Collection<String> getGroupClasses()
+    {
+        return groupClasses;
+    }
+
+    /**
+     * @param groupMemberFields the different LDAP implementations groups member property name.
+     */
+    public void setGroupMemberFields(Collection<String> groupMemberFields)
+    {
+        this.groupMemberFields = groupMemberFields;
+    }
+
+    /**
+     * @return the different LDAP implementations groups member property name.
+     */
+    public Collection<String> getGroupMemberFields()
+    {
+        return groupMemberFields;
     }
 
     /**
@@ -180,12 +199,12 @@ public class XWikiLDAPUtils
      */
     private List<XWikiLDAPSearchAttribute> searchGroupsMembers(String groupDN)
     {
-        String[] attrs = new String[2 + LDAP_GROUP_MEMBER.size()];
+        String[] attrs = new String[2 + getGroupMemberFields().size()];
 
         int i = 0;
         attrs[i++] = LDAP_OBJECTCLASS;
         attrs[i++] = getUidAttributeName();
-        for (String groupMember : LDAP_GROUP_MEMBER) {
+        for (String groupMember : getGroupMemberFields()) {
             attrs[i++] = groupMember;
         }
 
@@ -205,7 +224,7 @@ public class XWikiLDAPUtils
     {
         for (XWikiLDAPSearchAttribute searchAttribute : searchAttributeList) {
             String key = searchAttribute.name;
-            if (LDAP_GROUP_MEMBER.contains(key.toLowerCase())) {
+            if (getGroupMemberFields().contains(key.toLowerCase())) {
 
                 // or subgroup
                 String member = searchAttribute.value;
@@ -241,7 +260,7 @@ public class XWikiLDAPUtils
 
             if (key.equalsIgnoreCase(LDAP_OBJECTCLASS)) {
                 String objectName = searchAttribute.value;
-                if (LDAP_GROUP_CLASS.contains(objectName.toLowerCase())) {
+                if (getGroupClasses().contains(objectName.toLowerCase())) {
                     isGroup = true;
                 }
             } else if (key.equalsIgnoreCase(getUidAttributeName())) {

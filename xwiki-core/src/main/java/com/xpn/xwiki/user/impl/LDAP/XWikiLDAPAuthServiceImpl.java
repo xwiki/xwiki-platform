@@ -162,6 +162,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         ldapUtils.setUidAttributeName(config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UID,
             LDAP_DEFAULT_UID, context));
+        ldapUtils.setGroupClasses(config.getGroupClasses(context));
+        ldapUtils.setGroupMemberFields(config.getGroupMemberFields(context));
 
         // ////////////////////////////////////////////////////////////////////
         // 1. Check for superadmin

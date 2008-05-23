@@ -20,6 +20,7 @@
 package com.xpn.xwiki.plugin.ldap;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -70,9 +71,17 @@ public class XWikiLDAPConfigTest extends TestCase
 
     private static final Map<String, Set<String>> RESULT_CFG_GROUPMAPPING =
         new Hashtable<String, Set<String>>();
-
+    
     private static final Map<String, Set<String>> RESULT_PREF_GROUPMAPPING =
         new Hashtable<String, Set<String>>();
+   
+    private static final Collection<String> RESULT_CFG_GROUPCLASSES = new HashSet<String>();
+    
+    private static final Collection<String> RESULT_PREF_GROUPCLASSES = new HashSet<String>();
+    
+    private static final Collection<String> RESULT_CFG_GROUPMEMBERFIELDS = new HashSet<String>();
+    
+    private static final Collection<String> RESULT_PREF_GROUPMEMBERFIELDS = new HashSet<String>();
 
     private static void addProperty(String prefName, String cfgName, String prefValue,
         String cfgValue)
@@ -129,6 +138,18 @@ public class XWikiLDAPConfigTest extends TestCase
         RESULT_PREF_GROUPMAPPING.put(LDAPTITIGRP_DN, xgroups);
         RESULT_CFG_GROUPMAPPING.put(LDAPTOTOGRP2_DN, xgroups);
         RESULT_CFG_GROUPMAPPING.put(LDAPTITIGRP2_DN, xgroups);
+        
+        RESULT_PREF_GROUPCLASSES.add("groupclass1");
+        RESULT_PREF_GROUPCLASSES.add("groupclass2");
+        RESULT_CFG_GROUPCLASSES.add("groupclass12");
+        
+        addProperty("ldap_group_classes", "xwiki.authentication.ldap.group_classes", "groupclass1,groupclass2", "groupclass12");
+        
+        RESULT_PREF_GROUPMEMBERFIELDS.add("groupmemberfield1");
+        RESULT_PREF_GROUPMEMBERFIELDS.add("groupmemberfield2");
+        RESULT_CFG_GROUPMEMBERFIELDS.add("groupmemberfield12");
+        
+        addProperty("ldap_group_memberfields", "xwiki.authentication.ldap.group_memberfields", "groupmemberfield1,groupmemberfield2", "groupmemberfield12");
     }
 
     protected void setUp() throws XWikiException
@@ -243,5 +264,17 @@ public class XWikiLDAPConfigTest extends TestCase
     {
         assertEquals(10000, XWikiLDAPConfig.getInstance().getCacheExpiration(prefContext));
         assertEquals(11111, XWikiLDAPConfig.getInstance().getCacheExpiration(cfgContext));
+    }
+
+    public void testGetGroupClasses()
+    {
+        assertEquals(RESULT_PREF_GROUPCLASSES, XWikiLDAPConfig.getInstance().getGroupClasses(prefContext));
+        assertEquals(RESULT_CFG_GROUPCLASSES, XWikiLDAPConfig.getInstance().getGroupClasses(cfgContext));
+    }
+
+    public void testGetGroupMemberFields()
+    {
+        assertEquals(RESULT_PREF_GROUPMEMBERFIELDS, XWikiLDAPConfig.getInstance().getGroupMemberFields(prefContext));
+        assertEquals(RESULT_CFG_GROUPMEMBERFIELDS, XWikiLDAPConfig.getInstance().getGroupMemberFields(cfgContext));
     }
 }

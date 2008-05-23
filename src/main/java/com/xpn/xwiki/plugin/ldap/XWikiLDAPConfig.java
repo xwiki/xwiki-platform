@@ -62,11 +62,15 @@ public final class XWikiLDAPConfig
 
     /**
      * Different LDAP implementations groups classes name.
+     * 
+     * @since 1.5M1
      */
     public static final Set<String> DEFAULT_GROUP_CLASSES = new HashSet<String>();
 
     /**
      * Different LDAP implementations groups member property name.
+     * 
+     * @since 1.5M1
      */
     public static final Set<String> DEFAULT_GROUP_MEMBERFIELDS = new HashSet<String>();
 
@@ -169,6 +173,7 @@ public final class XWikiLDAPConfig
     /**
      * @param context the XWiki context.
      * @return the of the LDAP groups classes.
+     * @since 1.5M1
      */
     public Collection<String> getGroupClasses(XWikiContext context)
     {
@@ -193,6 +198,7 @@ public final class XWikiLDAPConfig
     /**
      * @param context the XWiki context.
      * @return the names of the fields for members of groups.
+     * @since 1.5M1
      */
     public Collection<String> getGroupMemberFields(XWikiContext context)
     {
@@ -218,6 +224,7 @@ public final class XWikiLDAPConfig
      * @param context the XWiki context.
      * @return the secure provider to use for SSL.
      * @throws XWikiLDAPException error when trying to instantiate secure provider.
+     * @since 1.5M1
      */
     public Provider getSecureProvider(XWikiContext context) throws XWikiLDAPException
     {

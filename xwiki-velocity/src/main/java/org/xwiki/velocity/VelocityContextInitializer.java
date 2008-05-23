@@ -18,28 +18,25 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container.servlet;
+package org.xwiki.velocity;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.apache.velocity.VelocityContext;
 
-public interface ServletContainerInitializer
+/**
+ * @version $Id: $
+ * @since 1.5M1
+ */
+public interface VelocityContextInitializer
 {
     /**
      * This component's role, used when code needs to look it up.
      */
-    String ROLE = ServletContainerInitializer.class.getName();
+    String ROLE = VelocityContextInitializer.class.getName();
 
-    void initializeRequest(HttpServletRequest request, Object xwikiContext)
-        throws ServletContainerException;
-    
-    void initializeRequest(HttpServletRequest request)
-        throws ServletContainerException;
-
-    void initializeResponse(HttpServletResponse response);
-    
-    void initializeSession(HttpServletRequest request);
-    
-    void initializeApplicationContext(ServletContext servletContext);
+    /**
+     * Allow initializing the Velocity Context by ptting objects into it.
+     *
+     * @param context the Velocity context to initialize
+     */
+    void initialize(VelocityContext context);
 }

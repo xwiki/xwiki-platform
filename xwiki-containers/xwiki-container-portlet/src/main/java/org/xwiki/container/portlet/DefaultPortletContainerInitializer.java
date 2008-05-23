@@ -22,9 +22,9 @@ package org.xwiki.container.portlet;
 
 import javax.portlet.PortletContext;
 
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.container.Container;
+import org.xwiki.container.RequestInitializerException;
 
 public class DefaultPortletContainerInitializer implements PortletContainerInitializer
 {
@@ -37,17 +37,21 @@ public class DefaultPortletContainerInitializer implements PortletContainerIniti
         this.container.setApplicationContext(new PortletApplicationContext(portletContext));
     }
 
-    public void initializeRequest(javax.portlet.PortletRequest portletRequest)
+    public void initializeRequest(javax.portlet.PortletRequest portletRequest, Object xwikiContext)
         throws PortletContainerException
     {
         // 1) Create an empty request. From this point forward request initializers can use the
         // Container object to get any data they want from the Request.
         this.container.setRequest(new PortletRequest(portletRequest));
 
-        // 2) Call the request initializers to populate the Request.
+        // 2) Bridge with old code to play well with new components. Old code relies on the
+        // XWikiContext object whereas new code uses the Container component.
+        this.container.getRequest().setProperty("xwikicontext", xwikiContext);
+
+        // 3) Call the request initializers to populate the Request.
         try {
             this.requestInitializerManager.initializeRequest(this.container.getRequest());
-        } catch (ComponentLookupException e) {
+        } catch (RequestInitializerException e) {
             throw new PortletContainerException("Failed to initialize request", e);
         }
     }

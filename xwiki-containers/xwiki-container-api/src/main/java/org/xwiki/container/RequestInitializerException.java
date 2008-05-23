@@ -18,28 +18,21 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container.servlet;
+package org.xwiki.container;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-public interface ServletContainerInitializer
+/**
+ * @version $Id: $
+ * @since 1.5M1
+ */
+public class RequestInitializerException extends Exception
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = ServletContainerInitializer.class.getName();
+    public RequestInitializerException(String message)
+    {
+        super(message);
+    }
 
-    void initializeRequest(HttpServletRequest request, Object xwikiContext)
-        throws ServletContainerException;
-    
-    void initializeRequest(HttpServletRequest request)
-        throws ServletContainerException;
-
-    void initializeResponse(HttpServletResponse response);
-    
-    void initializeSession(HttpServletRequest request);
-    
-    void initializeApplicationContext(ServletContext servletContext);
+    public RequestInitializerException(String message, Throwable throwable)
+    {
+        super(message, throwable);
+    }
 }

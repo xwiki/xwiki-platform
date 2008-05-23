@@ -205,14 +205,10 @@ public class HtmlPackager
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
         try {
-            containerInitializer.initializeRequest();
-
             XWikiContext renderContext = (XWikiContext) context.clone();
             renderContext.put("action", "view");
 
-            // This is a bridge that we need for old code to play well with new components.
-            // Old code relies on the XWikiContext object whereas new code uses the Container component.
-            container.getRequest().setProperty("xwikicontext", renderContext);
+            containerInitializer.initializeRequest(renderContext);
 
             VelocityManager velocityManager = 
                 (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);

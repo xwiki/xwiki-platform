@@ -49,11 +49,15 @@ public class DefaultRequestInitializerManager implements RequestInitializerManag
      * {@inheritDoc}
      * @see org.xwiki.container.RequestInitializerManager#initializeRequest(Request)
      */
-    public void initializeRequest(Request request) throws ComponentLookupException
+    public void initializeRequest(Request request) throws RequestInitializerException
     {
         // Find all request interceptors and call them to initialize the Request
-        for (Object interceptor: this.componentManager.lookupList(RequestInitializer.ROLE)) {
-            ((RequestInitializer) interceptor).initialize(request);
+        try {
+            for (Object interceptor: this.componentManager.lookupList(RequestInitializer.ROLE)) {
+                ((RequestInitializer) interceptor).initialize(request);
+            }
+        } catch (ComponentLookupException e) {
+            throw new RequestInitializerException("Failed to initialize request", e);
         }
     }
 }

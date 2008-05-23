@@ -29,7 +29,8 @@ public interface PortletContainerInitializer
      */
     String ROLE = PortletContainerInitializer.class.getName();
 
-    void initializeRequest(javax.portlet.PortletRequest request) throws PortletContainerException;
+    void initializeRequest(javax.portlet.PortletRequest request, Object xwikiContext)
+        throws PortletContainerException;
 
     void initializeResponse(javax.portlet.PortletResponse response);
 

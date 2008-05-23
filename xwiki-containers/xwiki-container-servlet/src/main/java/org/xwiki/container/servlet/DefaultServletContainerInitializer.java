@@ -24,9 +24,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.container.Container;
+import org.xwiki.container.RequestInitializerException;
 
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
@@ -39,19 +39,31 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         this.container.setApplicationContext(new ServletApplicationContext(servletContext));
     }
 
-    public void initializeRequest(HttpServletRequest httpServletRequest)
+    public void initializeRequest(HttpServletRequest httpServletRequest, Object xwikiContext)
         throws ServletContainerException
     {
         // 1) Create an empty request. From this point forward request initializers can use the
         // Container object to get any data they want from the Request.
         this.container.setRequest(new ServletRequest(httpServletRequest));
 
-        // 2) Call the request initializers to populate the Request.
+        // 2) Bridge with old code to play well with new components. Old code relies on the
+        // XWikiContext object whereas new code uses the Container component.
+        if (xwikiContext != null) {
+            this.container.getRequest().setProperty("xwikicontext", xwikiContext);
+        }
+
+        // 3) Call the request initializers to populate the Request.
         try {
             this.requestInitializerManager.initializeRequest(this.container.getRequest());
-        } catch (ComponentLookupException e) {
+        } catch (RequestInitializerException e) {
             throw new ServletContainerException("Failed to initialize request", e);
         }
+    }
+
+    public void initializeRequest(HttpServletRequest httpServletRequest)
+        throws ServletContainerException
+    {
+        initializeRequest(httpServletRequest, null);
     }
 
     public void initializeResponse(HttpServletResponse httpServletResponse)

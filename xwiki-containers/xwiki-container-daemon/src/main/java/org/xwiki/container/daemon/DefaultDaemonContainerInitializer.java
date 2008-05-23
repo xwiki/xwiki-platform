@@ -20,9 +20,9 @@
  */
 package org.xwiki.container.daemon;
 
-import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.container.Container;
+import org.xwiki.container.RequestInitializerException;
 
 public class DefaultDaemonContainerInitializer implements DaemonContainerInitializer
 {
@@ -30,16 +30,20 @@ public class DefaultDaemonContainerInitializer implements DaemonContainerInitial
 
     private Container container;
 
-    public void initializeRequest()throws DaemonContainerException
+    public void initializeRequest(Object xwikiContext)throws DaemonContainerException
     {
         // 1) Create an empty request. From this point forward request initializers can use the
         // Container object to get any data they want from the Request.
         this.container.setRequest(new DaemonRequest());
 
-        // 2) Call the request initializers to populate the Request.
+        // 2) Bridge with old code to play well with new components. Old code relies on the
+        // XWikiContext object whereas new code uses the Container component.
+        this.container.getRequest().setProperty("xwikicontext", xwikiContext);
+
+        // 3) Call the request initializers to populate the Request.
         try {
             this.requestInitializerManager.initializeRequest(this.container.getRequest());
-        } catch (ComponentLookupException e) {
+        } catch (RequestInitializerException e) {
             throw new DaemonContainerException("Failed to initialize request", e);
         }
     }

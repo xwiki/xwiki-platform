@@ -20,8 +20,6 @@
  */
 package org.xwiki.container;
 
-import org.xwiki.component.manager.ComponentLookupException;
-
 /**
  * Manages initializations that have to be done when the XWiki Request object is initialized.
  */
@@ -37,8 +35,8 @@ public interface RequestInitializerManager
      * that they can each perform their own initializations.
      *
      * @param request the XWiki Request object
-     * @throws ComponentLookupException if a component implementing the {@link org.xwiki.container.RequestInitializer}
-     *         role cannot be located 
+     * @throws RequestInitializerException if the initialization fails. It's expected that the
+     *         application should stop if this happens.
      */
-    void initializeRequest(Request request) throws ComponentLookupException;
+    void initializeRequest(Request request) throws RequestInitializerException;
 }

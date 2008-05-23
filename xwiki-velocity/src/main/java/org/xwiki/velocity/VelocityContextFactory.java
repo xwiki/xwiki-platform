@@ -38,6 +38,7 @@ public interface VelocityContextFactory
     /**
      * @return a new Velocity Context pre-populated with the Velocity Tools listed in the 
      *         component's configuration
+     * @throws XWikiVelocityException if the context failed to be created or initialized properly
      */
-    VelocityContext createContext();
+    VelocityContext createContext() throws XWikiVelocityException;
 }

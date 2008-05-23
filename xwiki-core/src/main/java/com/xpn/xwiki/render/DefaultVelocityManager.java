@@ -80,15 +80,15 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         // Bridge. To be removed later.
         if (vcontext.get("util") == null) {
             XWikiContext xcontext = (XWikiContext) this.container.getRequest().getProperty("xwikicontext");
-            
+
             // Put the Util API in the Velocity context.
             vcontext.put("util", new com.xpn.xwiki.api.Util(xcontext.getWiki(), xcontext));
-        
+
             // We put the com.xpn.xwiki.api.XWiki object into the context and not the
             // com.xpn.xwiki.XWiki one which is for internal use only. In this manner we control what
             // the user can access.
             vcontext.put("xwiki", new XWiki(xcontext.getWiki(), xcontext));
-        
+
             vcontext.put("request", xcontext.getRequest());
             vcontext.put("response", xcontext.getResponse());
 
@@ -106,12 +106,12 @@ public class DefaultVelocityManager implements VelocityManager, Composable
                     vcontext.put("msg", msg);
                 }
             }
-            
+
             // Save the Velocity Context in the XWiki context so that users can access the objects
             // we've put in it (xwiki, request, response, etc).
             xcontext.put("vcontext", vcontext);
         }
-        
+
         return vcontext;
     }
 

@@ -30,12 +30,14 @@ public interface RequestInitializer
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = RequestInitializer.class.getName();
+    String ROLE = RequestInitializer.class.getName();
 
     /**
      * Perform initializations here, such as storing objects in the Request.
      * 
      * @param request the XWiki Request object
+     * @throws RequestInitializerException if the initialization fails. It's expected that the
+     *         application should stop if this happens.
      */
-    void initialize(Request request);
+    void initialize(Request request) throws RequestInitializerException;
 }

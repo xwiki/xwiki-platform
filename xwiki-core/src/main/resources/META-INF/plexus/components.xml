@@ -12,5 +12,17 @@
         </requirement>
       </requirements>
     </component>
+    <component>
+      <role>org.xwiki.velocity.VelocityContextInitializer</role>
+      <role-hint>default</role-hint>
+      <implementation>com.xpn.xwiki.render.XWikiVelocityContextInitializer</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.container.Container</role>
+        </requirement>
+      </requirements>
+    </component>
   </components>
 </component-set>

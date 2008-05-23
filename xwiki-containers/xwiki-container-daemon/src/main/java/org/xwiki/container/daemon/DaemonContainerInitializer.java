@@ -27,5 +27,5 @@ public interface DaemonContainerInitializer
      */
     String ROLE = DaemonContainerInitializer.class.getName();
 
-    void initializeRequest() throws DaemonContainerException;
+    void initializeRequest(Object xwikiContext) throws DaemonContainerException;
 }

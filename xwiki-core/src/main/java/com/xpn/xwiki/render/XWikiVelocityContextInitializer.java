@@ -18,28 +18,20 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container.servlet;
+package com.xpn.xwiki.render;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.xwiki.velocity.VelocityContextInitializer;
+import org.xwiki.container.Container;
+import org.apache.velocity.VelocityContext;
 
-public interface ServletContainerInitializer
+public class XWikiVelocityContextInitializer implements VelocityContextInitializer
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = ServletContainerInitializer.class.getName();
-
-    void initializeRequest(HttpServletRequest request, Object xwikiContext)
-        throws ServletContainerException;
+    private Container container;
     
-    void initializeRequest(HttpServletRequest request)
-        throws ServletContainerException;
-
-    void initializeResponse(HttpServletResponse response);
-    
-    void initializeSession(HttpServletRequest request);
-    
-    void initializeApplicationContext(ServletContext servletContext);
+    public void initialize(VelocityContext context)
+    {
+        // TODO: Move the Velocity Context initialization code currently located in
+        // VelocityManager.getVelocityContext() here. This requires some refactoring as
+        // it means the XWiki object must be initialized before this code is called.
+    }
 }

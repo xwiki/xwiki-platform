@@ -28,6 +28,9 @@ import org.apache.velocity.context.Context;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.component.phase.Composable;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.manager.ComponentLookupException;
 
 /**
  * Default implementation for {@link VelocityContextFactory}.
@@ -35,8 +38,14 @@ import org.xwiki.component.phase.InitializationException;
  * @version $Id: $
  */
 public class DefaultVelocityContextFactory extends AbstractLogEnabled
-    implements VelocityContextFactory, Initializable
+    implements VelocityContextFactory, Initializable, Composable
 {
+    /**
+     * The component manager we used to find all components implementing the
+     * {@link org.xwiki.velocity.VelocityContextInitializer} role.
+     */
+    private ComponentManager componentManager;
+
     /**
      * The Velocity tools coming from the component's configuration and injected
      * by the Component Manager.
@@ -48,7 +57,16 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
      * configuration. We reuse them across Contexts for better performance.
      */
     private Context toolsContext;
-    
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+    }
+
     /**
      * {@inheritDoc}
      * @see Initializable#initialize()
@@ -81,9 +99,23 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
      * {@inheritDoc}
      * @see VelocityContextFactory#createContext()
      */
-    public VelocityContext createContext()
+    public VelocityContext createContext() throws XWikiVelocityException
     {
         // Note: This constructor uses the passed context as an internal read-only context.
-        return new VelocityContext(this.toolsContext);
+        VelocityContext context = new VelocityContext(this.toolsContext);
+
+        // Call all components implementing the VelocityContextInitializer's role.
+        try {
+            for (Object interceptor
+                : this.componentManager.lookupList(VelocityContextInitializer.ROLE))
+            {
+                ((VelocityContextInitializer) interceptor).initialize(context);
+            }
+        } catch (ComponentLookupException e) {
+            throw new XWikiVelocityException("Failed to locate some Velocity Context initializers",
+                e);
+        }
+
+        return context;
     }
 }

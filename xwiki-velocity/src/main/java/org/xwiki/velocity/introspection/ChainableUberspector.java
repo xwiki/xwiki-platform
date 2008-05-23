@@ -26,6 +26,7 @@ import org.apache.velocity.util.introspection.Uberspect;
  * Interface that marks uberspectors as chainable, meaning that multiple uberspectors can be
  * combined in a chain (using the Decorator pattern).
  * 
+ * @version $Id: $
  * @since 1.5M1
  */
 public interface ChainableUberspector extends Uberspect

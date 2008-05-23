@@ -123,33 +123,10 @@ public class ChainingUberspector extends AbstractChainableUberspector implements
         // Avoids direct recursive calls
         if (!StringUtils.isEmpty(classname)
             && !classname.equals(this.getClass().getCanonicalName())) {
-            Object o = null;
-
-            try {
-                o = ClassUtils.getNewInstance(classname);
-            } catch (ClassNotFoundException cnfe) {
-                log.error("The specified class for Uberspect [" + classname
-                    + "] does not exist or is not accessible to the current classloader.");
-            } catch (IllegalAccessException e) {
-                log.error("The specified class for Uberspect [" + classname
-                    + "] does not have a public default constructor.");
-            } catch (InstantiationException e) {
-                log.error("The specified class for Uberspect [" + classname
-                    + "] cannot be instantiated.");
-            } catch (ExceptionInInitializerError e) {
-                log.error("Exception while instantiating the Uberspector [" + classname + "]: "
-                    + e.getMessage());
-            }
-
-            if (!(o instanceof Uberspect)) {
-                if (o != null) {
-                    log.error("The specified class for Uberspect [" + classname
-                        + "] does not implement " + Uberspect.class.getName());
-                }
+            Uberspect u = instantiateUberspector(classname);
+            if (u == null) {
                 return;
             }
-
-            Uberspect u = (Uberspect) o;
 
             // Set the log and runtime services, if applicable
             if (u instanceof UberspectLoggable) {
@@ -165,5 +142,43 @@ public class ChainingUberspector extends AbstractChainableUberspector implements
             }
             inner = u;
         }
+    }
+
+    /**
+     * Tries to create an uberspector instance using reflection.
+     * 
+     * @param classname The name of the uberspector class to instantiate.
+     * @return An instance of the specified Uberspector. If the class cannot be instantiated using
+     *         the default constructor, or does not implement {@link Uberspect}, <code>null</code>
+     *         is returned.
+     */
+    protected Uberspect instantiateUberspector(String classname)
+    {
+        Object o = null;
+        try {
+            o = ClassUtils.getNewInstance(classname);
+        } catch (ClassNotFoundException cnfe) {
+            log.warn(String.format("The specified uberspector [%s]"
+                + " does not exist or is not accessible to the current classloader.", classname));
+        } catch (IllegalAccessException e) {
+            log.warn(String.format(
+                "The specified uberspector [%s] does not have a public default constructor.",
+                classname));
+        } catch (InstantiationException e) {
+            log.warn(String.format("The specified uberspector [%s] cannot be instantiated.",
+                classname));
+        } catch (ExceptionInInitializerError e) {
+            log.warn(String.format("Exception while instantiating the Uberspector [%s]: %s",
+                classname, e.getMessage()));
+        }
+
+        if (!(o instanceof Uberspect)) {
+            if (o != null) {
+                log.warn("The specified class for Uberspect [" + classname
+                    + "] does not implement " + Uberspect.class.getName());
+            }
+            return null;
+        }
+        return (Uberspect) o;
     }
 }

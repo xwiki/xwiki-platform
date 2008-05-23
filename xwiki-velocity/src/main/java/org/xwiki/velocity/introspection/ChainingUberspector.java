@@ -70,7 +70,8 @@ public class ChainingUberspector extends AbstractChainableUberspector implements
     /**
      * {@inheritDoc}
      * 
-     * @see org.apache.velocity.util.RuntimeServicesAware#setRuntimeServices(org.apache.velocity.runtime.RuntimeServices)
+     * @see org.apache.velocity.util.RuntimeServicesAware#setRuntimeServices(
+     *      org.apache.velocity.runtime.RuntimeServices)
      */
     public void setRuntimeServices(RuntimeServices rs)
     {
@@ -83,7 +84,7 @@ public class ChainingUberspector extends AbstractChainableUberspector implements
      * This implementation initializes the uberspector chain.
      * </p>
      * 
-     * @see org.apache.velocity.util.introspection.UberspectImpl#init()
+     * @see org.apache.velocity.util.introspection.Uberspect#init()
      */
     @Override
     public void init()

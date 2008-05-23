@@ -46,9 +46,6 @@ public abstract class AbstractChainableUberspector extends UberspectImpl impleme
 
     /**
      * {@inheritDoc}
-     * <p>
-     * This implementation stores the wrapped uberspector in the protected {@link #inner} member.
-     * </p>
      * 
      * @see ChainableUberspector#wrap(org.apache.velocity.util.introspection.Uberspect)
      * @see #inner

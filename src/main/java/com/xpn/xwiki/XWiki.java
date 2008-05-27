@@ -737,11 +737,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void initXWiki(XWikiConfig config, XWikiContext context,
         XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
     {
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        Utils.setComponentManager((ComponentManager) context
-            .get(ComponentManager.class.getName()));
-
         setEngineContext(engine_context);
         context.setWiki(this);
 

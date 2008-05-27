@@ -276,6 +276,11 @@ public class Utils
             (ComponentManager) engine_context.getAttribute(ComponentManager.class.getName());
         context.put(ComponentManager.class.getName(), componentManager);
 
+        // Statically store the component manager in {@link Utils} to be able to access it without
+        // the context.
+        Utils.setComponentManager((ComponentManager) context
+            .get(ComponentManager.class.getName()));
+
         return context;
     }
 

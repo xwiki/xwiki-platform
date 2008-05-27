@@ -1136,7 +1136,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             try {
                 ObservationManager om =
-                    (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null);
+                    (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
                 // Notify listeners about the document change
                 // The first call is for the old notification mechanism. It is kept here because it
                 // is in a deprecation stage. It will be removed later.
@@ -3612,7 +3612,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // and there won't be a need for the context. The old version is available using
             // doc.getOriginalDocument()
             ObservationManager om =
-                (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null);
+                (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
             if (om != null) {
                 om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
             }

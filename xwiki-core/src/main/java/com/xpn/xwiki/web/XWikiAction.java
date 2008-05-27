@@ -320,7 +320,7 @@ public abstract class XWikiAction extends Action
                 // and there won't be a need for the context.
                 try {
                     ObservationManager om =
-                        (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null);
+                        (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
                     om.notify(new ActionExecutionEvent(context.getAction()), context.getDoc(), context);
                 } catch (Throwable ex) {
                     LOG.error("Cannot send action notifications for document [" + docName

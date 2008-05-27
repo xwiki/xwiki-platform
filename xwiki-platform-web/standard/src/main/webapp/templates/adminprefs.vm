@@ -6,7 +6,7 @@
 ## Define sections
 ##
 #set($sections = ["params", "skin", "presentation", "editing", "advanced", "registration"])
-#set($sectionitemsmap = $xwiki.hashMap)
+#set($sectionitemsmap = $util.hashMap)
 #set($sectionitemsmap.params = ["multilingual", "languages" , "default_language", "authenticate_view", "authenticate_edit", "auth_active_check" ])
 ## #set($sectionitemsmap.skin = ["skin", "stylesheet", "stylesheets", "leftPanels", "rightPanels", "showLeftPanels", "showRightPanels", "pageWidth"])
 #set($sectionitemsmap.skin = ["skin", "stylesheet", "leftPanels", "rightPanels", "showLeftPanels", "showRightPanels"])

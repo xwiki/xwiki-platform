@@ -11,25 +11,25 @@ $response.setContentType("application/x-json")
 #set( $keys = $params.keySet() )
 #set( $defaultKeys = ["xpage", "offset", "limit", "wiki", "reqNo"] )
 #set( $docProps = ["fullName", "name"] )
-#set( $filterMap = $xwiki.hashMap )
-#set( $orderList = $xwiki.arrayList )
+#set( $filterMap = $util.hashMap )
+#set( $orderList = $util.arrayList )
 
 #foreach( $key in $keys )
   #if(! $defaultKeys.contains( $key ) )
      ## build the filters map
      #foreach( $i in $params.get( $key ) ) #set( $value = $i ) #end
      #if( $docProps.contains( $key )) 
-        #set( $arr = $xwiki.arrayList )
+        #set( $arr = $util.arrayList )
         #set( $discard = $arr.add( null ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
         #set( $discard = $filterMap.put("$key", $arr))
         #set( $discard = $orderList.add( "$key" ))
      #else
-        #set( $arr = $xwiki.arrayList )
+        #set( $arr = $util.arrayList )
         #set( $discard = $arr.add( "StringProperty" ) ) ## this may be variable...
         #set( $discard = $arr.add( "$value" ) )
         #set( $discard = $filterMap.put("$key", $arr ))
-	#set( $arr2 = $xwiki.arrayList )
+        #set( $arr2 = $util.arrayList )
         #set( $discard = $arr2.add( "$key" ) )
         #set( $discard = $arr2.add( "StringProperty" ) )
         #set( $discard = $orderList.add( $arr2 ))

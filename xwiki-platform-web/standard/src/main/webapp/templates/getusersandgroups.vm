@@ -18,9 +18,9 @@ $response.setContentType("application/x-json")
 ## Params that should filter the document, not object properties
 #set($docProps = ["fullName", "name"])
 ## The filter being constructed. It will be passed to the rightsmanager API.
-#set($filterMap = $xwiki.hashMap)
+#set($filterMap = $util.hashMap)
 ## 
-#set($orderList = $xwiki.arrayList)
+#set($orderList = $util.arrayList)
 #foreach($key in $keys)
   ## foreach needed because request.getParameterMap returns a list of values for each parameter
   #foreach($i in $params.get($key)) #set($value = $i) #end
@@ -28,19 +28,19 @@ $response.setContentType("application/x-json")
     ## Put in the filters map
     #if($docProps.contains($key))
       ## Each filter is: key=>[propType, value], where propType is null for document properties
-      #set($arr = $xwiki.arrayList)
+      #set($arr = $util.arrayList)
       #set($discard = $arr.add(null)) ## null => document property
       #set($discard = $arr.add("$value"))
       #set($discard = $filterMap.put("$key", $arr))
 ## Question: Why do we order using the filter fields?
 ##      #set($discard = $orderList.add("$key"))
     #else
-      #set($arr = $xwiki.arrayList)
+      #set($arr = $util.arrayList)
       ## This may be variable... For the moment, assume it is a StringProperty
       #set($discard = $arr.add("StringProperty"))
       #set($discard = $arr.add("$value"))
       #set($discard = $filterMap.put("$key", $arr))
-##      #set($arr2 = $xwiki.arrayList)
+##      #set($arr2 = $util.arrayList)
 ##      #set($discard = $arr2.add("$key"))
 ##      #set($discard = $arr2.add("StringProperty"))
 ##      #set($discard = $orderList.add($arr2))
@@ -105,8 +105,8 @@ $response.setContentType("application/x-json")
   #else
     #set($username = $user.fullName)
   #end
-  #set($allows = $xwiki.hashMap)
-  #set($denys = $xwiki.hashMap)
+  #set($allows = $util.hashMap)
+  #set($denys = $util.hashMap)
   #if($velocityCount > 1) , #end
   ## Get the rights for that user or group
   #foreach($obj in $doc.getObjects($clsname)) ## $clsname = XWiki.XWikiGlobalRights or XWiki.XWikiRights

@@ -35,7 +35,7 @@ $response.sendRedirect($doc.getURL("objectadd", "classname=XWiki.XWikiPreference
 ##
 #set($class = $obj.xWikiClass)
 #set($sections = ["params", "skin", "presentation", "editing", "advanced"])
-#set($sectionitemsmap = $xwiki.hashMap)
+#set($sectionitemsmap = $util.hashMap)
 #set($sectionitemsmap.params = ["multilingual", "languages", "default_language", "authenticate_view", "authenticate_edit", "auth_active_check", "parent" ])
 #set($sectionitemsmap.skin = ["skin", "stylesheet", "stylesheets", "leftPanels", "rightPanels", "showLeftPanels", "showRightPanels", "pageWidth"])
 #set($sectionitemsmap.presentation = [ "title", "version", "webcopyright", "menu", "meta" ])

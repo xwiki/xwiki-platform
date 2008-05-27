@@ -8,7 +8,7 @@
 ########## display the new interface
 #if($interface == "new")
 #set($rightsLevels = {"view":0, "comment":1, "edit":2, "delete": 3, "admin": 4, "register": 5, "programming": 6})
-#set($levelsRights = $xwiki.hashMap)
+#set($levelsRights = $util.hashMap)
 #foreach($r in $rightsLevels.keySet())#set($discard = $levelsRights.put($rightsLevels.get($r), $r))#end
 #set($maxlevel = $rightsLevels.get("delete")) ## Default: view, comment, edit, delete
 #if($doc.fullName == "XWiki.XWikiPreferences")
@@ -38,7 +38,7 @@
 #set($saveUrl = $doc.getURL("edit", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
 
 ## get the rights for XWikiGuest
-#set($r = $xwiki.arrayList)
+#set($r = $util.arrayList)
 #foreach($i in [0..$maxlevel])#set($discard = $r.add(0))#end
 #set($guest = "XWiki.XWikiGuest")
 #foreach($obj in $doc.getObjects($clsname)) ## XWiki.XWikiGlobalRights or XWiki.XWikiRights

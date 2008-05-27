@@ -34,7 +34,7 @@
         #error("$msg.get('core.rename.alreadyExists', [$newFullName, $xwiki.getURL($newFullName)])")
         #template("renameStep1.vm")
       #else
-        #set($renamedBLs = $xwiki.arrayList)
+        #set($renamedBLs = $util.arrayList)
         #foreach($param in $request.parameterNames)
           #if($param.startsWith("backlink_"))
             #set($discard = $renamedBLs.add($param.substring(9)))

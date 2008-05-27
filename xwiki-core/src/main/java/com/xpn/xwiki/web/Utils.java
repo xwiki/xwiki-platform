@@ -46,6 +46,11 @@ import java.util.*;
 
 public class Utils
 {
+    /**
+     * The component manager used by {@link #getComponent(String)} and
+     * {@link #getComponent(String, String)}. It is useful for any non component code that need to
+     * initialize/access components.
+     */
     private static ComponentManager componentManager;
 
     public static void parseTemplate(String template, XWikiContext context) throws XWikiException

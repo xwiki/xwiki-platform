@@ -487,14 +487,14 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             for (int i = 0; i < subSpaces.length; i++) {
                 if (newPolicy.equals("closed")) {
                     addRightToGroup(subSpaces[i] + "_" + space.getSpaceName(),
-                        getMemberGroupName(space.getSpaceName()), "view", true, false, context);
+                        getMemberGroupName(space.getSpaceName()), "view", true, true, context);
                     addRightToGroup(subSpaces[i] + "_" + space.getSpaceName(),
-                        getMemberGroupName(space.getSpaceName()), "comment", true, false, context);
+                        getMemberGroupName(space.getSpaceName()), "comment", true, true, context);
                 } else if (newPolicy.equals("open")) {
                     removeRightFromGroup(subSpaces[i] + "_" + space.getSpaceName(),
-                        getMemberGroupName(space.getSpaceName()), "view", true, false, context);
+                        getMemberGroupName(space.getSpaceName()), "view", true, true, context);
                     removeRightFromGroup(subSpaces[i] + "_" + space.getSpaceName(),
-                        getMemberGroupName(space.getSpaceName()), "comment", true, false, context);
+                        getMemberGroupName(space.getSpaceName()), "comment", true, true, context);
                 }
             }
         } catch (XWikiException e) {
@@ -522,10 +522,10 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
 
                 if ("closed".equals(space.getPolicy())) {
                     addRightToGroup(subSpace + "_" + space.getSpaceName(),
-                        getMemberGroupName(space.getSpaceName()), "view", true, false, context);
+                        getMemberGroupName(space.getSpaceName()), "view", true, true, context);
                     addRightToGroup(subSpace + "_" + space.getSpaceName(),
-                        getMemberGroupName(space.getSpaceName()), "comment", true, false, context);
-                }
+                        getMemberGroupName(space.getSpaceName()), "comment", true, true, context);
+                } 
             }
         } catch (XWikiException e) {
             throw new SpaceManagerException(e);

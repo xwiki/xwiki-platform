@@ -113,7 +113,7 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
         // In the new component architecture we use ThreadLocal to transport the request, 
         // response and session to components which require them.
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE, context);
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE);
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
@@ -127,7 +127,7 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
 
     private void cleanupContainerComponent(XWikiContext context)
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        Container container = (Container) Utils.getComponent(Container.ROLE);
         // We must ensure we clean the ThreadLocal variables located in the Container 
         // component as otherwise we will have a potential memory leak.
         container.removeRequest();

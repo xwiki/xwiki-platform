@@ -60,7 +60,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         XWikiContext context)
     {
         VelocityManager velocityManager = (VelocityManager) Utils.getComponent(
-            VelocityManager.ROLE, context);
+            VelocityManager.ROLE);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         Document previousdoc = (Document) vcontext.get("doc");
 
@@ -103,7 +103,7 @@ public class XWikiVelocityRenderer implements XWikiRenderer, XWikiInterpreter
         StringWriter writer = new StringWriter();
         try {
             VelocityManager velocityManager =
-                (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+                (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
             velocityManager.getVelocityEngine().evaluate(vcontext, writer, name, content);
             return writer.toString();
         } catch (Exception e) {

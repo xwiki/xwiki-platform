@@ -46,6 +46,8 @@ import java.util.*;
 
 public class Utils
 {
+    private static ComponentManager componentManager;
+
     public static void parseTemplate(String template, XWikiContext context) throws XWikiException
     {
         parseTemplate(template, true, context);
@@ -64,23 +66,18 @@ public class Utils
         }
 
         String action = context.getAction();
-        if ((!"download".equals(action))
-            && (!"skin".equals(action)))
-        {
+        if ((!"download".equals(action)) && (!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
                 if (context.getWiki()
-                    .getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0)
-                {
+                    .getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0) {
                     if (context.getDoc() != null) {
-                        response
-                            .setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
+                        response.setDateHeader("Last-Modified", context.getDoc().getDate()
+                            .getTime());
                     }
                 }
                 // Set a nocache to make sure the page is reloaded after an edit
-                if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) !=
-                    0)
-                {
+                if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
                     response.setHeader("Pragma", "no-cache");
                     response.setHeader("Cache-Control", "no-cache");
                 }
@@ -90,15 +87,13 @@ public class Utils
                 if (expires == -1) {
                     response.setDateHeader("Expires", -1);
                 } else if (expires != 0) {
-                    response
-                        .setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
+                    response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600
+                        * 1000L);
                 }
             }
         }
 
-        if (("download".equals(action))
-            || ("skin".equals(action)))
-        {
+        if (("download".equals(action)) || ("skin".equals(action))) {
             // Set a nocache to make sure these files are not cached by proxies
             if (context.getWiki().getXWikiPreferenceAsLong("headers_nocache", 1, context) != 0) {
                 response.setHeader("Cache-Control", "no-cache");
@@ -130,7 +125,8 @@ public class Utils
             if (write) {
                 try {
                     try {
-                        response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));
+                        response.getOutputStream().write(
+                            content.getBytes(context.getWiki().getEncoding()));
                     } catch (IllegalStateException ex) {
                         response.getWriter().write(content);
                     }
@@ -242,7 +238,8 @@ public class Utils
         URL url = XWiki.getRequestURL(request);
         context.setURL(url);
 
-        // Push the URL into the Log4j MDC context so that we can display it in the generated logs using the
+        // Push the URL into the Log4j MDC context so that we can display it in the generated logs
+        // using the
         // %X{url} syntax.
         MDC.put("url", url);
 
@@ -278,18 +275,18 @@ public class Utils
     }
 
     /**
-     * Append request parameters from the specified String to the specified Map.  It is presumed
-     * that the specified Map is not accessed from any other thread, so no synchronization is
-     * performed. <p/> <strong>IMPLEMENTATION NOTE</strong>:  URL decoding is performed individually
-     * on the parsed name and value elements, rather than on the entire query string ahead of time,
-     * to properly deal with the case where the name or value includes an encoded "=" or "&"
-     * character that would otherwise be interpreted as a delimiter.
-     *
+     * Append request parameters from the specified String to the specified Map. It is presumed that
+     * the specified Map is not accessed from any other thread, so no synchronization is performed.
+     * <p/> <strong>IMPLEMENTATION NOTE</strong>: URL decoding is performed individually on the
+     * parsed name and value elements, rather than on the entire query string ahead of time, to
+     * properly deal with the case where the name or value includes an encoded "=" or "&" character
+     * that would otherwise be interpreted as a delimiter.
+     * 
      * @param data Input string containing request parameters
      * @throws IllegalArgumentException if the data is malformed <p/> Code borrowed from Apache
-     * Tomcat 5.0
+     *             Tomcat 5.0
      */
-    public static Map parseParameters(String data, String encoding)
+    public static Map<String, String[]> parseParameters(String data, String encoding)
         throws UnsupportedEncodingException
     {
         if ((data != null) && (data.length() > 0)) {
@@ -310,28 +307,27 @@ public class Utils
             return parseParameters(bytes, encoding);
         }
 
-        return new HashMap();
+        return Collections.emptyMap();
     }
 
     /**
-     * Append request parameters from the specified String to the specified Map.  It is presumed
-     * that the specified Map is not accessed from any other thread, so no synchronization is
-     * performed. <p/> <strong>IMPLEMENTATION NOTE</strong>:  URL decoding is performed individually
-     * on the parsed name and value elements, rather than on the entire query string ahead of time,
-     * to properly deal with the case where the name or value includes an encoded "=" or "&"
-     * character that would otherwise be interpreted as a delimiter. <p/> NOTE: byte array data is
-     * modified by this method.  Caller beware.
-     *
+     * Append request parameters from the specified String to the specified Map. It is presumed that
+     * the specified Map is not accessed from any other thread, so no synchronization is performed.
+     * <p/> <strong>IMPLEMENTATION NOTE</strong>: URL decoding is performed individually on the
+     * parsed name and value elements, rather than on the entire query string ahead of time, to
+     * properly deal with the case where the name or value includes an encoded "=" or "&" character
+     * that would otherwise be interpreted as a delimiter. <p/> NOTE: byte array data is modified by
+     * this method. Caller beware.
+     * 
      * @param data Input string containing request parameters
      * @param encoding Encoding to use for converting hex
      * @throws UnsupportedEncodingException if the data is malformed <p/> Code borrowed from Apache
-     * Tomcat 5.0
+     *             Tomcat 5.0
      */
-    public static Map parseParameters(byte[] data, String encoding)
+    public static Map<String, String[]> parseParameters(byte[] data, String encoding)
         throws UnsupportedEncodingException
     {
-
-        Map map = new HashMap();
+        Map<String, String[]> map = new HashMap<String, String[]>();
 
         if (data != null && data.length > 0) {
             int ix = 0;
@@ -341,7 +337,7 @@ public class Utils
             while (ix < data.length) {
                 byte c = data[ix++];
                 switch ((char) c) {
-                    case'&':
+                    case '&':
                         value = new String(data, 0, ox, encoding);
                         if (key != null) {
                             putMapEntry(map, key, value);
@@ -349,7 +345,7 @@ public class Utils
                         }
                         ox = 0;
                         break;
-                    case'=':
+                    case '=':
                         if (key == null) {
                             key = new String(data, 0, ox, encoding);
                             ox = 0;
@@ -357,18 +353,18 @@ public class Utils
                             data[ox++] = c;
                         }
                         break;
-                    case'+':
+                    case '+':
                         data[ox++] = (byte) ' ';
                         break;
-                    case'%':
-                        data[ox++] = (byte) ((convertHexDigit(data[ix++]) << 4)
-                            + convertHexDigit(data[ix++]));
+                    case '%':
+                        data[ox++] =
+                            (byte) ((convertHexDigit(data[ix++]) << 4) + convertHexDigit(data[ix++]));
                         break;
                     default:
                         data[ox++] = c;
                 }
             }
-            //The last value does not end in '&'.  So save it now.
+            // The last value does not end in '&'. So save it now.
             if (key != null) {
                 value = new String(data, 0, ox, encoding);
                 putMapEntry(map, key, value);
@@ -379,7 +375,7 @@ public class Utils
 
     /**
      * Convert a byte character value to hexidecimal digit value.
-     *
+     * 
      * @param b the character value byte <p/> Code borrowed from Apache Tomcat 5.0
      */
     private static byte convertHexDigit(byte b)
@@ -397,10 +393,10 @@ public class Utils
     }
 
     /**
-     * Put name value pair in map. <p/> Put name and value pair in map.  When name already exist,
-     * add value to array of values. <p/> Code borrowed from Apache Tomcat 5.0
+     * Put name value pair in map. <p/> Put name and value pair in map. When name already exist, add
+     * value to array of values. <p/> Code borrowed from Apache Tomcat 5.0
      */
-    private static void putMapEntry(Map map, String name, String value)
+    private static void putMapEntry(Map<String, String[]> map, String name, String value)
     {
         String[] newValues = null;
         String[] oldValues = (String[]) map.get(name);
@@ -468,7 +464,8 @@ public class Utils
         }
     }
 
-    public static FileUploadPlugin handleMultipart(HttpServletRequest request, XWikiContext context)
+    public static FileUploadPlugin handleMultipart(HttpServletRequest request,
+        XWikiContext context)
     {
         FileUploadPlugin fileupload = null;
         try {
@@ -487,12 +484,9 @@ public class Utils
                     }
                 }
             }
-        }
-        catch (Exception e) {
-            if ((e instanceof XWikiException) &&
-                (((XWikiException) e).getCode() == XWikiException
-                    .ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE))
-            {
+        } catch (Exception e) {
+            if ((e instanceof XWikiException)
+                && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE)) {
                 context.put("exception", e);
             } else {
                 e.printStackTrace();
@@ -502,38 +496,44 @@ public class Utils
     }
 
     /**
+     * @param componentManager the component manager used by {@link #getComponent(String)} and
+     *            {@link #getComponent(String, String)}
+     */
+    public static void setComponentManager(ComponentManager componentManager)
+    {
+        Utils.componentManager = componentManager;
+    }
+
+    /**
      * Lookup a XWiki component by role and hint.
-     *
+     * 
      * @param role the component's identity (usually the component's interface name as a String)
      * @param hint a value to differentiate different component implementations for the same role
-     * @param context the XWiki Context where the Component Manager is stored
      * @return the component's Object
      */
-    public static Object getComponent(String role, String hint, XWikiContext context)
+    public static Object getComponent(String role, String hint)
     {
-        ComponentManager componentManager =
-            (ComponentManager) context.get(ComponentManager.class.getName());
         Object component = null;
         if (componentManager != null) {
             try {
                 component = componentManager.lookup(role, hint);
             } catch (ComponentLookupException e) {
                 throw new RuntimeException("Failed to load component [" + role + "] for hint ["
-                    + "]", e);
+                    + hint + "]", e);
             }
         }
+
         return component;
     }
 
     /**
      * Lookup a XWiki component by role (uses the default hint).
-     *
+     * 
      * @param role the component's identity (usually the component's interface name as a String)
-     * @param context the XWiki Context where the Component Manager is stored
      * @return the component's Object
      */
-    public static Object getComponent(String role, XWikiContext context)
+    public static Object getComponent(String role)
     {
-        return getComponent(role, "default", context);
+        return getComponent(role, "default");
     }
 }

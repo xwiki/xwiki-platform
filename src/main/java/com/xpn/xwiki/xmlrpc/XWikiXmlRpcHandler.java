@@ -644,7 +644,7 @@ public class XWikiXmlRpcHandler
                 context.setDoc(baseDocument);
                 
                 VelocityManager velocityManager = 
-                    (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+                    (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
                 VelocityContext vcontext = velocityManager.getVelocityContext();
 
                 baseXWiki.prepareDocuments(context.getRequest(), context, vcontext);

@@ -197,10 +197,9 @@ public class HtmlPackager
         // main request to be used for rendering the HTML pages to export.
         // The new request automatically gets initialized with a new Velocity Context by
         // the VelocityRequestInitializer class.
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        Container container = (Container) Utils.getComponent(Container.ROLE);
         DaemonContainerInitializer containerInitializer =
-            (DaemonContainerInitializer) Utils.getComponent(DaemonContainerInitializer.ROLE,
-                context);
+            (DaemonContainerInitializer) Utils.getComponent(DaemonContainerInitializer.ROLE);
 
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
@@ -211,7 +210,7 @@ public class HtmlPackager
             containerInitializer.initializeRequest(renderContext);
 
             VelocityManager velocityManager = 
-                (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+                (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
 
             // At this stage we have a clean Velocity Context
             VelocityContext vcontext = velocityManager.getVelocityContext();

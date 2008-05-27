@@ -183,7 +183,7 @@ public abstract class XWikiAction extends Action
             }
 
             VelocityManager velocityManager = 
-                (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+                (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
             VelocityContext vcontext = velocityManager.getVelocityContext();
             
             try {
@@ -320,8 +320,7 @@ public abstract class XWikiAction extends Action
                 // and there won't be a need for the context.
                 try {
                     ObservationManager om =
-                        (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
-                            context);
+                        (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null);
                     om.notify(new ActionExecutionEvent(context.getAction()), context.getDoc(), context);
                 } catch (Throwable ex) {
                     LOG.error("Cannot send action notifications for document [" + docName
@@ -384,7 +383,7 @@ public abstract class XWikiAction extends Action
         // response and session to components which require them.
         // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
         ServletContainerInitializer containerInitializer =
-            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE, context);
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE);
 
         try {
             containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
@@ -398,7 +397,7 @@ public abstract class XWikiAction extends Action
     
     protected void cleanupContainerComponent(XWikiContext context)
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        Container container = (Container) Utils.getComponent(Container.ROLE);
         // We must ensure we clean the ThreadLocal variables located in the Container 
         // component as otherwise we will have a potential memory leak.
         container.removeRequest();

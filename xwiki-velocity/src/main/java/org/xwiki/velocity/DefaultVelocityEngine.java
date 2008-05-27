@@ -47,6 +47,12 @@ import java.io.Reader;
 public class DefaultVelocityEngine extends AbstractLogEnabled implements VelocityEngine, LogChute
 {
     /**
+     * The name of the Velocity configuration property that specifies the ResourceLoader that
+     * Velocity should use when locating velocimacros.
+     */
+    private static final String RESOURCE_LOADER = "resource.loader";
+
+    /**
      * The Velocity engine we're wrapping.
      */
     private org.apache.velocity.app.VelocityEngine engine;
@@ -78,18 +84,22 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     {
         this.engine = new org.apache.velocity.app.VelocityEngine();
 
-        // If the Velocity configuration uses the Velocity Tools
-        // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> class then we need to
-        // set the
-        // ServletContext object as a Velocity Application Attribute as it's used to load resources
-        // from the webapp directory in WebapLoader.
-        ApplicationContext context = this.container.getApplicationContext();
-        if (context instanceof ServletApplicationContext) {
-            getEngine().setApplicationAttribute("javax.servlet.ServletContext",
-                ((ServletApplicationContext) context).getServletContext());
+        // If the Velocity configuration uses the
+        // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> Velocity Tools class
+        // then we need to set the ServletContext object as a Velocity Application Attribute as
+        // it's used to load resources from the webapp directory in WebapLoader.
+        String resourceLoader = properties.getProperty(RESOURCE_LOADER,
+            this.properties.getProperty(RESOURCE_LOADER));
+        if (resourceLoader.equals("webapp")) {
+            ApplicationContext context = this.container.getApplicationContext();
+            if (context instanceof ServletApplicationContext) {
+                getEngine().setApplicationAttribute("javax.servlet.ServletContext",
+                    ((ServletApplicationContext) context).getServletContext());
+            }
         }
-
-        // Avoid "unable to find resource 'VM_global_library.vm' in any resource loader."
+        
+        // Avoid "unable to find resource 'VM_global_library.vm' in any resource loader." if no
+        // Velocimacro library is defined. This value is overriden below.
         getEngine().setProperty("velocimacro.library", "");
 
         getEngine().setProperty(RuntimeConstants.RUNTIME_LOG_LOGSYSTEM, this);
@@ -144,6 +154,12 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     public boolean evaluate(Context context, Writer out, String templateName, Reader source)
         throws XWikiVelocityException
     {
+        // Ensure that initialization has been called
+        if (this.engine == null) {
+            throw new XWikiVelocityException("This Velocity Engine has not yet been initialized. "
+                + " You must call its initialize() method before you can use it.");
+        }
+
         // We override the default implementation here. See #init(RuntimeServices)
         // for explanations.
         try {

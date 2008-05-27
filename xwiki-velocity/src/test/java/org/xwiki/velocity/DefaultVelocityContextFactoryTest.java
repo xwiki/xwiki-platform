@@ -62,11 +62,11 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
         
         assertEquals("org.apache.velocity.tools.generic.ListTool", 
             context.get("listtool").getClass().getName());
-        VelocityEngine manager = 
+        VelocityEngine engine = 
             (VelocityEngine) getComponentManager().lookup(VelocityEngine.ROLE);
-        manager.initialize(new Properties());
+        engine.initialize(new Properties());
         StringWriter writer = new StringWriter();
-        manager.evaluate(context, writer, "mytemplate",
+        engine.evaluate(context, writer, "mytemplate",
             "#set($list=[1, 2, 3])$listtool.get($list, 2)");
         assertEquals("3", writer.toString());
     }

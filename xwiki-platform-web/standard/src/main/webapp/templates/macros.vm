@@ -531,7 +531,7 @@ $xwiki.getUserName("xwiki:${username}")
 ###
 #macro(useravatar $username)
   #if(!$picturelist)
-    #set($picturelist = $xwiki.hashMap)
+    #set($picturelist = $util.hashMap)
   #end
   #if(!$picturelist.containsKey($username))
     #set($picture = "<img src='")
@@ -703,7 +703,7 @@ $fn
 ###
 #macro(footnote $text)
 #if(!$page_footnotes)
-#set($page_footnotes = $xwiki.arrayList)
+#set($page_footnotes = $util.arrayList)
 #set($footnote_group_id = 1)
 #end
 #set($discard = $page_footnotes.add($text))

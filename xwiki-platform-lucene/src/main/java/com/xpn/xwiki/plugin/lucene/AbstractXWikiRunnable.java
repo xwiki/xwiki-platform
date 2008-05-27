@@ -39,25 +39,26 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void initXWikiContainer(XWikiContext context)
     {
-        DaemonContainerInitializer dci = (DaemonContainerInitializer) Utils.getComponent(
-            DaemonContainerInitializer.ROLE, context);
+        DaemonContainerInitializer dci =
+            (DaemonContainerInitializer) Utils.getComponent(DaemonContainerInitializer.ROLE);
 
         try {
             // Initialize the Container objects
             dci.initializeRequest(context);
         } catch (DaemonContainerException e) {
-            // Note: We should raise an exception here but we cannot since XWikiDefaultPlugin has overrident's 
+            // Note: We should raise an exception here but we cannot since XWikiDefaultPlugin has
+            // overrident's
             // XWikiPluginInterface's init() method without declaring a throw XWikiException...
             LOG.error("Failed to initialize request. Behavior of the Lucene plugin could be "
                 + "instable. We recommend stopping the container, fixing the issue and "
                 + "restarting it.", e);
         }
     }
-    
+
     protected void cleanupXWikiContainer(XWikiContext context)
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        // We must ensure we clean the ThreadLocal variables located in the Container 
+        Container container = (Container) Utils.getComponent(Container.ROLE);
+        // We must ensure we clean the ThreadLocal variables located in the Container
         // component as otherwise we will have a potential memory leak.
         container.removeRequest();
     }

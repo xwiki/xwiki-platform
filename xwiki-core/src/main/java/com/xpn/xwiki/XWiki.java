@@ -78,6 +78,7 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
+import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
@@ -736,6 +737,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void initXWiki(XWikiConfig config, XWikiContext context,
         XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
     {
+        Utils.setComponentManager((ComponentManager) context
+            .get(ComponentManager.class.getName()));
+        
         setEngineContext(engine_context);
         context.setWiki(this);
 
@@ -1130,8 +1134,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             try {
                 ObservationManager om =
-                    (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null,
-                        context);
+                    (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null);
                 // Notify listeners about the document change
                 // The first call is for the old notification mechanism. It is kept here because it
                 // is in a deprecation stage. It will be removed later.
@@ -3606,7 +3609,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // and there won't be a need for the context. The old version is available using
             // doc.getOriginalDocument()
             ObservationManager om =
-                (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null, context);
+                (ObservationManager) Utils.getComponent(ObservationManager.ROLE, null);
             if (om != null) {
                 om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
             }

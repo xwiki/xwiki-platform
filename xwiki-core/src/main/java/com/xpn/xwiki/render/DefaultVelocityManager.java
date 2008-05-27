@@ -166,7 +166,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         
         // Get the Velocity Manager to use
         VelocityFactory velocityFactory =
-            (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE, xcontext);
+            (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE);
         VelocityEngine velocityEngine;
         if (velocityFactory.hasVelocityEngine(cacheKey)) {
             velocityEngine = velocityFactory.getVelocityEngine(cacheKey); 

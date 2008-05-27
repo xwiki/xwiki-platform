@@ -80,7 +80,7 @@ public class XWikiPortlet extends GenericPortlet
         context.setURLFactory(urlf);
 
         VelocityManager velocityManager = 
-            (VelocityManager) Utils.getComponent(VelocityManager.ROLE, context);
+            (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         
         return xwiki.prepareDocuments(request, context, vcontext);
@@ -414,8 +414,7 @@ public class XWikiPortlet extends GenericPortlet
         // In the new component architecture we use ThreadLocal to transport the request, 
         // response and session to components which require them.
         PortletContainerInitializer containerInitializer =
-            (PortletContainerInitializer) Utils.getComponent(PortletContainerInitializer.ROLE,
-                context);
+            (PortletContainerInitializer) Utils.getComponent(PortletContainerInitializer.ROLE);
 
         try {
             containerInitializer.initializeRequest(
@@ -431,7 +430,7 @@ public class XWikiPortlet extends GenericPortlet
 
     protected void cleanupContainerComponent(XWikiContext context)
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE, context);
+        Container container = (Container) Utils.getComponent(Container.ROLE);
         // We must ensure we clean the ThreadLocal variables located in the Container 
         // component as otherwise we will have a potential memory leak.
         container.removeRequest();

@@ -396,7 +396,8 @@ ASSFilter.prototype = {
       if (inputs[i].type == "text") {
         Event.observe(inputs[i], 'keyup', this.makeRefreshHandler(this));
       } else {
-        Event.observe(inputs[i], 'change', this.makeRefreshHandler(this));
+        //IE is buggy on "change" events for checkboxes and radios
+        Event.observe(inputs[i], 'click', this.makeRefreshHandler(this));
       }
     }
 

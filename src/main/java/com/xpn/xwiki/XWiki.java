@@ -737,9 +737,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void initXWiki(XWikiConfig config, XWikiContext context,
         XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
     {
+        // Statically store the component manager in {@link Utils} to be able to access it without
+        // the context.
         Utils.setComponentManager((ComponentManager) context
             .get(ComponentManager.class.getName()));
-        
+
         setEngineContext(engine_context);
         context.setWiki(this);
 
@@ -2810,7 +2812,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         if (needsUpdate)
             saveDocument(doc, context);
-        
+
         // Create the group template document and attach a XWiki.XWikiGroupClass object
         try {
             template = getDocument("XWiki.XWikiGroupTemplate", context);
@@ -2819,17 +2821,18 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             template.setSpace("XWiki");
             template.setName("XWikiGroupTemplate");
         } finally {
-            if(template.isNew()) {
+            if (template.isNew()) {
                 template.setContent("#includeForm(\"XWiki.XWikiGroupSheet\")");
                 template.createNewObject(bclass.getName(), context);
                 template.setCreator("XWiki.Admin");
                 template.setAuthor("XWiki.Admin");
                 List<String> args = new ArrayList<String>(1);
                 args.add("Group");
-                saveDocument(template, context.getMessageTool().get("core.comment.createdTemplate", args), context);                 
+                saveDocument(template, context.getMessageTool().get(
+                    "core.comment.createdTemplate", args), context);
             }
         }
-        
+
         return bclass;
     }
 

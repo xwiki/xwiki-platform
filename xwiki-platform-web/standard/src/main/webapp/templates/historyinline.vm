@@ -66,7 +66,7 @@
           <td><input type="radio" name="rev2" value="$version" /></td>
           <td><a href="$tdoc.getURL("viewrev","rev=$version")">$version</a></td>
           <td>$xwiki.getLocalUserName($revinfo.author)</td>
-          <td>$xwiki.formatDate($revinfo.date, "dd/MM/yyyy hh:mm")</td>
+          <td>$xwiki.formatDate($revinfo.date, "dd/MM/yyyy HH:mm")</td>
     #if($xwiki.hasEditComment())
           <td>$!{revinfo.comment}</td>
     #end

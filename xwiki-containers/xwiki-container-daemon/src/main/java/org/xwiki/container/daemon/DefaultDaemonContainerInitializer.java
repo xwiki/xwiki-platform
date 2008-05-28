@@ -30,11 +30,34 @@ public class DefaultDaemonContainerInitializer implements DaemonContainerInitial
 
     private Container container;
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.container.daemon.DaemonContainerInitializer#initializeRequest(Object)
+     */
     public void initializeRequest(Object xwikiContext)throws DaemonContainerException
     {
-        // 1) Create an empty request. From this point forward request initializers can use the
-        // Container object to get any data they want from the Request.
-        this.container.setRequest(new DaemonRequest());
+        initializeRequest(false, xwikiContext);        
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.container.daemon.DaemonContainerInitializer#pushRequest(Object)  
+     */
+    public void pushRequest(Object xwikiContext) throws DaemonContainerException
+    {
+        initializeRequest(true, xwikiContext);    
+    }
+
+    private void initializeRequest(boolean isPushedRequest, Object xwikiContext)throws DaemonContainerException
+    {
+        // 1) Create an empty request or push a new request depending on the isPushedRequest flag.
+        // From this point forward request initializers can use the Container object to get any data they want from
+        // the Request.
+        if (isPushedRequest) {
+            this.container.pushRequest(new DaemonRequest());
+        } else {
+            this.container.setRequest(new DaemonRequest());
+        }
 
         // 2) Bridge with old code to play well with new components. Old code relies on the
         // XWikiContext object whereas new code uses the Container component.

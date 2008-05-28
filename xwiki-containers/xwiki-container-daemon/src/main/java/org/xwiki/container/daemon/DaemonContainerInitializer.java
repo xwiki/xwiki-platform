@@ -27,5 +27,27 @@ public interface DaemonContainerInitializer
      */
     String ROLE = DaemonContainerInitializer.class.getName();
 
+    /**
+     * Automatically initializes the Container component with a new Daemon Request.
+     *
+     * @param xwikiContext the XWiki Context to save in the Request. Note that this is a bridge with the old
+     *        architecture so that new components can access the old XWiki Context. This will disappear when all old
+     *        code will have been moved to components.
+     * @throws DaemonContainerException if one of the {@link org.xwiki.container.RequestInitializer} fails to
+     *         initialize properly
+     */
     void initializeRequest(Object xwikiContext) throws DaemonContainerException;
+
+    /**
+     * Automatically initializes the Container component with a new Daemon Request which is pushed on top of the
+     * current Request. It's expected that the request will be popped later on so that the previous Request is
+     * made active again.
+     *
+     * @param xwikiContext the XWiki Context to save in the Request. Note that this is a bridge with the old
+     *        architecture so that new components can access the old XWiki Context. This will disappear when all old
+     *        code will have been moved to components.
+     * @throws DaemonContainerException if one of the {@link org.xwiki.container.RequestInitializer} fails to
+     *         initialize properly
+     */
+    void pushRequest(Object xwikiContext)throws DaemonContainerException;
 }

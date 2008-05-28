@@ -207,7 +207,8 @@ public class HtmlPackager
             XWikiContext renderContext = (XWikiContext) context.clone();
             renderContext.put("action", "view");
 
-            containerInitializer.initializeRequest(renderContext);
+            // We push the new request on top of the existing one and we pop it in the finally clause below.
+            containerInitializer.pushRequest(renderContext);
 
             VelocityManager velocityManager = 
                 (VelocityManager) Utils.getComponent(VelocityManager.ROLE);

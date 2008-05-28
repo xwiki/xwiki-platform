@@ -76,6 +76,6 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 <script type="text/javascript">
 var obj={div:'xwikiobjects', no:0};
 Event.observe(window,'load',createAccordion.bind(this,obj));
-#end
 </script>
+#end
 #end

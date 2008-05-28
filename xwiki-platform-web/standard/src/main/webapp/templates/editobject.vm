@@ -33,7 +33,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #set($first = 1)
 #set($nb = $doc.getObjectNumbers("${class.name}"))
 #if($hasCustomObject)
-#set($object = $doc.getObject($class.name, $xwiki.parseInt($request.nb)))
+#set($object = $doc.getObject($class.name, $util.parseInt($request.nb)))
 #if($object)
 #set($objects = [$object])
 #else

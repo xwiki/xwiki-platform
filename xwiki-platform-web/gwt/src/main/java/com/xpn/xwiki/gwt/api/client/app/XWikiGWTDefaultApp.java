@@ -184,6 +184,8 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
             if (GWT.isScript()) {
                 defaultXWikiService = XWikiGWTAppConstants.XWIKI_DEFAULT_BASE_URL + XWikiGWTAppConstants.XWIKI_DEFAULT_SERVICE;
             } else {
+                //Since GWT does not document the format of the URL returned by this function 
+                //and it seems to have changed from the last version, we do a test
                 String moduleBaseURL = GWT.getModuleBaseURL();
                 if (moduleBaseURL.endsWith("/")) {
                     moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 1);

@@ -18,7 +18,7 @@
   #if((!$step) || ($step == ""))
     #set($step = "1")
   #end
-  #set($step = $xwiki.parseInt("$step"))
+  #set($step = $util.parseInt("$step"))
   <div class="main layoutsubsection">
     #if($step == 1)
       ## Display the rename form

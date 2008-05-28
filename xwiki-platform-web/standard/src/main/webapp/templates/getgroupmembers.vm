@@ -1,7 +1,7 @@
 $response.setContentType("application/x-json")
-#set( $offset = $xwiki.parseInt( $request.get( "offset" ) ) )
+#set( $offset = $util.parseInt( $request.get( "offset" ) ) )
 #set( $off = $offset - 1 )
-#set( $limit = $xwiki.parseInt( $request.get( "limit" ) ) )
+#set( $limit = $util.parseInt( $request.get( "limit" ) ) )
 
 #set( $rm = $xwiki.rightsmanager )
 #set( $countm  = $rm.countAllMembersNamesForGroup($doc.fullName))

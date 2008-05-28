@@ -1,8 +1,8 @@
 $response.setContentType("application/x-json")
-#set( $offset = $xwiki.parseInt( $request.get( "offset" ) ) )
+#set( $offset = $util.parseInt( $request.get( "offset" ) ) )
 ## offset starts from 0 in velocity and 1 in javascript
 #set( $off = $offset - 1 )
-#set( $limit = $xwiki.parseInt( $request.get( "limit" ) ) )
+#set( $limit = $util.parseInt( $request.get( "limit" ) ) )
 
 #set( $rm = $xwiki.rightsmanager.usersApi )
 

@@ -18,10 +18,10 @@ $pdfdoc.use("XWiki.PDFClass")
    #set($pageDoc = $xwiki.getDocument($page))
    $pageDoc.getRenderedContent()
    #if($request.includechilds)
-    #set($clevel = $xwiki.parseInt($request.includechilds))
+    #set($clevel = $util.parseInt($request.includechilds))
     #includeChilds($page  $withPageBreaks)
    #elseif($request.includelinks)
-    #set($clevel = $xwiki.parseInt($request.includelinks))
+    #set($clevel = $util.parseInt($request.includelinks))
     #includeLinks($page $withPageBreaks)
    #end
  #end
@@ -30,10 +30,10 @@ $pdfdoc.use("XWiki.PDFClass")
 $cdoc.getRenderedContent()
 </div>
  #if($request.includechilds)
-  #set($clevel = $xwiki.parseInt($request.includechilds))
+  #set($clevel = $util.parseInt($request.includechilds))
   #includeChilds($cdoc.fullName $withPageBreaks)
  #elseif($request.includelinks)
-  #set($clevel = $xwiki.parseInt($request.includelinks))
+  #set($clevel = $util.parseInt($request.includelinks))
   #includeLinks($cdoc.fullName $withPageBreaks)
  #end
 #end

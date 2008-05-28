@@ -181,10 +181,15 @@ public class XWikiGWTDefaultApp  implements XWikiGWTApp {
         if (serviceInstance == null) {
             serviceInstance = (XWikiServiceAsync) GWT.create(XWikiService.class);
             String defaultXWikiService;
-            if (GWT.isScript())
+            if (GWT.isScript()) {
                 defaultXWikiService = XWikiGWTAppConstants.XWIKI_DEFAULT_BASE_URL + XWikiGWTAppConstants.XWIKI_DEFAULT_SERVICE;
-            else
-                defaultXWikiService = GWT.getModuleBaseURL() + XWikiGWTAppConstants.XWIKI_DEFAULT_SERVICE;
+            } else {
+                String moduleBaseURL = GWT.getModuleBaseURL();
+                if (moduleBaseURL.endsWith("/")) {
+                    moduleBaseURL = moduleBaseURL.substring(0, moduleBaseURL.length() - 1);
+                }
+                defaultXWikiService = moduleBaseURL + XWikiGWTAppConstants.XWIKI_DEFAULT_SERVICE;
+            }
             ((ServiceDefTarget) serviceInstance).setServiceEntryPoint(getParam("xwikiservice" , defaultXWikiService));
         }
         return serviceInstance;

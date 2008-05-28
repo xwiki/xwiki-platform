@@ -31,6 +31,8 @@ import com.xpn.xwiki.user.api.XWikiUser;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.securityfilter.config.SecurityConfig;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.realm.SimplePrincipal;
@@ -200,8 +202,66 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
         wrappedRequest.setUserPrincipal(null);
 
         try {
+            if (auth.processLogin(wrappedRequest, response, context)) {
+                return null;
+            }
 
-            // Process login out (this only works with FORMS
+            // TODO : This code need to be moved elsewhere (appropriately).
+            Principal user = wrappedRequest.getUserPrincipal();
+            if (context.getAction().equals("logout") && user != null) {
+                // Release all active locks on current wiki.
+                try {
+                    xwiki.getHibernateStore().beginTransaction(context);
+                    Session session = xwiki.getHibernateStore().getSession(context);
+                    String sql = "delete from XWikiLock as lock where lock.userName=:userName";
+                    Query query = session.createQuery(sql);
+                    query.setString("userName", user.getName());
+                    query.executeUpdate();
+                } catch (Exception e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                        XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_LOCK,
+                        "Error while deleting active locks held by logging out user.");
+                } finally {
+                    try {
+                        xwiki.getHibernateStore().endTransaction(context, true);
+                    } catch (Exception e) {
+
+                    }
+                }
+                // If we're in a non-main wiki & the user is global,
+                // switch to the global wiki and delete locks held there.
+                if (xwiki.isVirtualMode()
+                    && !context.getMainXWiki().equals(context.getDatabase())
+                    && user.getName().startsWith(context.getMainXWiki() + ":")) {
+                    String cdb = context.getDatabase();
+                    // switch to main wiki.
+                    context.setDatabase(context.getMainXWiki());
+                    try {
+                        xwiki.getHibernateStore().beginTransaction(context);
+                        Session session = xwiki.getHibernateStore().getSession(context);
+                        String sql =
+                            "delete from XWikiLock as lock where lock.userName=:userName";
+                        Query query = session.createQuery(sql);
+                        String localName = user.getName().substring(user.getName().indexOf(":") + 1);
+                        query.setString("userName", localName);
+                        query.executeUpdate();
+                    } catch (Exception e) {
+                        throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                            XWikiException.ERROR_XWIKI_STORE_HIBERNATE_DELETING_LOCK,
+                            "Error while deleting active locks held by logging out user.");
+                    } finally {
+                        try {
+                            xwiki.getHibernateStore().endTransaction(context, true);
+                        } catch (Exception e) {
+
+                        }
+                        // switch back to original wiki.
+                        context.setDatabase(cdb);
+                    }
+                }
+            }
+
+            // Process logout (this only works with Forms)
             if (auth.processLogout(wrappedRequest, response, xwiki.getUrlPatternMatcher())) {
                 if (log.isInfoEnabled()) {
                     log.info("User " + context.getUser() + " has been logged-out");
@@ -210,11 +270,6 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
                 return null;
             }
 
-            if (auth.processLogin(wrappedRequest, response, context)) {
-                return null;
-            }
-
-            Principal user = wrappedRequest.getUserPrincipal();
             if (log.isInfoEnabled()) {
                 if (user != null) {
                     log.info("User " + user.getName() + " is authentified");

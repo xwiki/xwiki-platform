@@ -27,6 +27,8 @@ import java.util.Map;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
+import org.xwiki.component.manager.ComponentManager;
+
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
@@ -35,6 +37,7 @@ import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
@@ -56,7 +59,14 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
+        // Statically store the component manager in {@link Utils} to be able to access it without
+        // the context.
+        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
+        // shared-tests will depends on core 1.5 branch
+        Utils.setComponentManager((ComponentManager) getContext().get(
+            ComponentManager.class.getName()));
+
         this.document = new XWikiDocument("MilkyWay", "Fidis");
         this.xwiki = new XWiki(new XWikiConfig(), getContext());
 
@@ -106,6 +116,22 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         this.document.setCreator("Condor");
         this.document.setAuthor("Albatross");
         this.xwiki.saveDocument(this.document, getContext());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#tearDown()
+     */
+    @Override
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+
+        // Makes sure tests are independents as Utils's ComponentManager is a static
+        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
+        // shared-tests will depends on core 1.5 branch
+        Utils.setComponentManager(null);
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException
@@ -200,40 +226,52 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         assertEquals(skin, xwiki.getDocument("XWiki.Skin", getContext()));
         assertEquals("parsing a field", xwiki.parseTemplate("template.vm", getContext()));
     }
-    
+
     public void testClearNameWithoutStripDotsWithoutAscii()
     {
-        assertEquals("ee{&.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, false, getContext()));
+        assertEquals("ee{&.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, false,
+            getContext()));
     }
 
     public void testClearNameWithoutStripDotsWithAscii()
     {
-        assertEquals("ee.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, true, getContext()));
+        assertEquals("ee.txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", false, true,
+            getContext()));
     }
 
     public void testClearNameWithStripDotsWithoutAscii()
     {
-        assertEquals("ee{&txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, false, getContext()));
+        assertEquals("ee{&txt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, false,
+            getContext()));
     }
 
     public void testClearNameWithStripDotsWithAscii()
     {
-        assertEquals("eetxt", this.xwiki.clearName("\u00E9\u00EA{&.txt", true, true, getContext()));
+        assertEquals("eetxt", this.xwiki
+            .clearName("\u00E9\u00EA{&.txt", true, true, getContext()));
     }
 
     public void testGetDocumentNameFromPath()
     {
         assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("", getContext()));
         assertEquals("Main.WebHome", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document", getContext()));
+        assertEquals("Main.Document", this.xwiki.getDocumentNameFromPath("/Document",
+            getContext()));
         assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/Space/Document", getContext()));
-        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/view/Space/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/", getContext()));
-        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document/attachment.pdf", getContext()));
-        assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Space", getContext()));
-        assertEquals("From.Space", this.xwiki.getDocumentNameFromPath("/Some:Document:From/Some:Other%3ASpace", getContext()));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/Space/Document",
+            getContext()));
+        assertEquals("Space.WebHome", this.xwiki.getDocumentNameFromPath("/view/Space/",
+            getContext()));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath("/view/Space/Document",
+            getContext()));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath(
+            "/view/Space/Document/", getContext()));
+        assertEquals("Space.Document", this.xwiki.getDocumentNameFromPath(
+            "/view/Space/Document/attachment.pdf", getContext()));
+        assertEquals("From.Space", this.xwiki.getDocumentNameFromPath(
+            "/Some:Document:From/Some:Space", getContext()));
+        assertEquals("From.Space", this.xwiki.getDocumentNameFromPath(
+            "/Some:Document:From/Some:Other%3ASpace", getContext()));
     }
 
     public void testGetDocumentNameFromPathUsesDefaultSpaceAndDocument()

@@ -20,8 +20,11 @@
 package com.xpn.xwiki.render;
 
 import org.jmock.Mock;
+import org.xwiki.component.manager.ComponentManager;
+
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.api.Document;
@@ -31,26 +34,44 @@ import java.util.Collections;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.render.XWikiVelocityRenderer}.
- *
+ * 
  * @version $Id: $
  */
 public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
 {
     private XWikiVelocityRenderer renderer;
+
     private Mock mockXWiki;
+
     private Mock mockDocument;
+
     private Mock mockContentDocument;
+
     private XWikiDocument document;
+
     private XWikiDocument contentDocument;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     */
     protected void setUp() throws Exception
     {
         super.setUp();
-        
+
+        // Statically store the component manager in {@link Utils} to be able to access it without
+        // the context.
+        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
+        // shared-tests will depends on core 1.5 branch
+        Utils.setComponentManager((ComponentManager) getContext().get(
+            ComponentManager.class.getName()));
+
         this.renderer = new XWikiVelocityRenderer();
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
-            new Object[] {new XWikiConfig(), getContext()});
+        this.mockXWiki =
+            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
+            new XWikiConfig(), getContext()});
         this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
         this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
         this.mockXWiki.stubs().method("getResourceContent").will(returnValue(null));
@@ -63,10 +84,27 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
         this.mockDocument = mock(XWikiDocument.class);
         this.document = (XWikiDocument) this.mockDocument.proxy();
 
-        Mock mockApiDocument = mock(Document.class,
-            new Class[] {XWikiDocument.class, XWikiContext.class},
-            new Object[] {this.document, getContext()});
-        this.mockDocument.stubs().method("newDocument").will(returnValue(mockApiDocument.proxy()));
+        Mock mockApiDocument =
+            mock(Document.class, new Class[] {XWikiDocument.class, XWikiContext.class},
+                new Object[] {this.document, getContext()});
+        this.mockDocument.stubs().method("newDocument")
+            .will(returnValue(mockApiDocument.proxy()));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#tearDown()
+     */
+    @Override
+    protected void tearDown() throws Exception
+    {
+        super.tearDown();
+
+        // Makes sure tests are independents as Utils's ComponentManager is a static
+        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
+        // shared-tests will depends on core 1.5 branch
+        Utils.setComponentManager(null);
     }
 
     public void testRenderWithSimpleText()
@@ -76,7 +114,8 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
         this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
 
-        String result = renderer.render("Simple content", contentDocument, document, getContext());
+        String result =
+            renderer.render("Simple content", contentDocument, document, getContext());
 
         assertEquals("Simple content", result);
     }
@@ -88,8 +127,9 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
         this.mockContentDocument.stubs().method("getSpace").will(returnValue("Space1"));
         this.mockDocument.stubs().method("getFullName").will(returnValue("Space2.Document"));
 
-        String result = renderer.render("#set ($test = \"hello\")\n$test world\n## comment",
-            contentDocument, document, getContext());
+        String result =
+            renderer.render("#set ($test = \"hello\")\n$test world\n## comment", contentDocument,
+                document, getContext());
 
         assertEquals("hello world\n", result);
     }

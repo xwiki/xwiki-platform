@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -78,7 +77,6 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
@@ -4348,33 +4346,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 if (path.indexOf(";jsessionid=") != -1) {
                     path = path.substring(0, path.indexOf(";jsessionid="));
                 }
-                // TODO: I think it's safe to remove the fixDecodedURI now that we're not using
-                // getPathInfo() and thus the container doesn't encode anything but I don't want
-                // to break anything at this late stage (we're releasing 1.0 RC2). Remove it when
-                // we start working on 1.1.
-                docname = getDocumentNameFromPath(fixDecodedURI(request, path), context);
+                docname = getDocumentNameFromPath(path, context);
             }
         }
         return (docname.indexOf(":") < 0) ? context.getDatabase() + ":" + docname : docname;
-    }
-
-    /**
-     * Tomcat does not properly handle URIs with non iso characters and thus this method does the
-     * decoding using the XWiki encoding or UTF-8 if no encoding has been specified in xwiki.cfg's
-     * xwiki.encoding property.
-     */
-    private String fixDecodedURI(XWikiRequest request, String uri)
-    {
-        String decodedURI = uri;
-        if (!request.getCharacterEncoding().equals("ISO-8859-1")) {
-            try {
-                byte[] urib = uri.getBytes("ISO-8859-1");
-                decodedURI = new String(urib, getConfig().getProperty("xwiki.encoding", "UTF-8"));
-            } catch (UnsupportedEncodingException e) {
-                LOG.error("Unsupported Encoding Exception received, check your xwiki config.", e);
-            }
-        }
-        return decodedURI;
     }
 
     public boolean prepareDocuments(XWikiRequest request, XWikiContext context,

@@ -1113,6 +1113,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // We need to save the original document since saveXWikiDoc() will reset it and we
             // need that original document for the notification below.
             XWikiDocument originalDocument = doc.getOriginalDocument();
+            // Always use an originalDocument, to provide a consistent behavior. The cases where
+            // originalDocument is null are rare (specifically when the XWikiDocument object is
+            // manually constructed, and not obtained using the API).
+            if (originalDocument == null) {
+                originalDocument = new XWikiDocument(doc.getSpace(), doc.getName());
+            }
 
             // Notify listeners about the document change
             if (originalDocument == null || originalDocument.isNew()) {

@@ -1121,7 +1121,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             }
 
             // Notify listeners about the document change
-            if (originalDocument == null || originalDocument.isNew()) {
+            if (originalDocument.isNew()) {
                 getNotificationManager().preverify(doc, originalDocument,
                     XWikiDocChangeNotificationInterface.EVENT_NEW, context);
             } else {
@@ -1131,7 +1131,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             getStore().saveXWikiDoc(doc, context);
 
+            // Since the store#saveXWikiDoc resets originalDocument, we need to temporarily put it
+            // back to send notifications.
+            XWikiDocument newOriginal = doc.getOriginalDocument();
             try {
+                doc.setOriginalDocument(originalDocument);
                 ObservationManager om =
                     (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
                 // Notify listeners about the document change
@@ -1143,7 +1147,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 // changed in the future, when the whole platform will be written using components
                 // and there won't be a need for the context. The old version is available using
                 // doc.getOriginalDocument()
-                if (originalDocument == null || originalDocument.isNew()) {
+                if (originalDocument.isNew()) {
                     getNotificationManager().verify(doc, originalDocument,
                         XWikiDocChangeNotificationInterface.EVENT_NEW, context);
                     if (om != null) {
@@ -1159,6 +1163,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             } catch (Exception ex) {
                 LOG.error("Failed to send document save notifications for document ["
                     + doc.getFullName() + "]", ex);
+            } finally {
+                doc.setOriginalDocument(newOriginal);
             }
         } finally {
             if ((server != null) && (database != null)) {
@@ -3611,7 +3617,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             ObservationManager om =
                 (ObservationManager) Utils.getComponent(ObservationManager.ROLE);
             if (om != null) {
-                om.notify(new DocumentDeleteEvent(doc.getFullName()), doc, context);
+                XWikiDocument blankDoc = new XWikiDocument(doc.getSpace(), doc.getName());
+                blankDoc.setOriginalDocument(doc);
+                om.notify(new DocumentDeleteEvent(doc.getFullName()), blankDoc, context);
             }
         } catch (Exception ex) {
             LOG.error("Failed to send document delete notifications for document ["

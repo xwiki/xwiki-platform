@@ -44,7 +44,7 @@ public class XWikiNotificationTest extends MockObjectTestCase
             int event, XWikiContext context)
         {
             assertEquals("Space.Page", newdoc.getFullName());
-            assertNull("Should have been null since the document was newly created", olddoc);
+            assertNotNull("Shouldn't have been null", olddoc);
             this.hasListenerBeenCalled = true;
         }
     }

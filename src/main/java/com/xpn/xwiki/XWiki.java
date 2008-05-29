@@ -3467,6 +3467,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return include(topic, isForm, context);
     }
 
+    @SuppressWarnings("unchecked")
     public String include(String topic, boolean isForm, XWikiContext context)
         throws XWikiException
     {
@@ -3677,7 +3678,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return callPrivateMethod(obj, methodName, null, null);
     }
 
-    public static Object callPrivateMethod(Object obj, String methodName, Class[] classes,
+    public static Object callPrivateMethod(Object obj, String methodName, Class< ? >[] classes,
         Object[] args)
     {
         try {

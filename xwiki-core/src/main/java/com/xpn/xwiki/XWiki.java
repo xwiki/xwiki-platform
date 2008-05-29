@@ -237,8 +237,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     private XWikiCache virtualWikiMap;
 
-    private static Map threadMap = new HashMap();
-
     private boolean isReadOnly = false;
 
     public static final String CFG_ENV_NAME = "XWikiConfig";
@@ -5044,16 +5042,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         if (plugin != null)
             return plugin.getPluginApi(plugin, context);
         return null;
-    }
-
-    public static Map getThreadMap()
-    {
-        return threadMap;
-    }
-
-    public static void setThreadMap(Map threadMap)
-    {
-        XWiki.threadMap = threadMap;
     }
 
     /*

@@ -411,6 +411,36 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         if (grouplist1 != null)
             grouplist.addAll(grouplist1);
+        
+        if (context.getWiki().isVirtualMode()) {
+            String database = context.getDatabase();
+            try {
+                shortname = Util.getName(name, context);
+
+                if (!database.equals(context.getDatabase())) {
+                    String key2 = context.getDatabase() + ":" + name;
+                    Collection grouplist2 = (Collection) grouplistcache.get(key2);
+
+                    if (grouplist2 == null) {
+                        Collection glist = groupService.listGroupsForUser(shortname, context);
+                        Iterator it = glist.iterator();
+                        while (it.hasNext()) {
+                            grouplist2.add(context.getDatabase() + ":" + it.next());
+                        }
+                        if (grouplist2 != null)
+                            grouplistcache.put(key2, grouplist2);
+                        else
+                            grouplistcache.put(key2, new ArrayList());
+                    }
+
+                    if (grouplist2 != null)
+                        grouplist.addAll(grouplist2);
+                }
+            } catch (Exception e) {
+            } finally {
+                context.setDatabase(database);
+            }
+        }
 
         if (log.isDebugEnabled())
             log.debug("Searching for matching rights for "

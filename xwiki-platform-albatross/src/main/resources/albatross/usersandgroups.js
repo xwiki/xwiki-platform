@@ -475,6 +475,15 @@ MSCheckbox.prototype = {
   {
     this.table = table;
     this.idx = idx;
+    if(this.table && this.idx && this.table.fetchedRows[this.idx]) {
+       this.currentUorG = this.table.fetchedRows[this.idx].fullname;
+       this.isUserInGroup = this.table.fetchedRows[this.idx].isuseringroup;
+    }
+    else {
+    	 // guest users
+       this.currentUorG = window.unregUser;
+       this.isUserInGroup = false;
+    }
     this.domNode = $(domNode);
     this.right = right;
     this.saveUrl = saveUrl;
@@ -521,31 +530,93 @@ MSCheckbox.prototype = {
     this.draw(this.state);
   },
 
+  /* Confirmation cases:
+   * 1. The current user is clearing / denying himself any right.
+   * 2. The current user is clearing / denying any rights for a group he belongs to.
+   * 3. The current user is is clearing / denying admin right for any user / group.
+   * User can clear it's own right after canceling the deny action and confirming the clear action.
+   */
   createClickHandler: function(self)
   {
     return function() {
       if (self.req) {
         return;
       }
-      // TODO: put $msg.get messages!!!
+      
+      var action = "";
       var nxtst = (self.state + 1) % self.nrstates;
-      if (self.right == "admin" && nxtst == 2) {
-        if (!confirm("You are about to deny the admin right for this user. Continue?")) {
-          return;
+
+      // 1. The current user is clearing / denying himself any right.
+      if(self.currentUorG == window.currentUser) {
+	       if (nxtst == 2) {
+	       	 var denymessage = "$msg.get('rightsmanager.denyrightforcurrentuser')".replace('__right__', self.right);
+           if (!confirm(denymessage)) {
+           	  var clearmessage = "$msg.get('rightsmanager.clearrightforcurrentuserinstead')".replace('__right__', self.right);
+           	  if(confirm(clearmessage)) {
+           	  	action = "clear";
+           	  	self.state = 2;
+           	  	nxtst = 0;
+           	  }
+           	  else return;
+           }
+	       }
+	       else if (nxtst == 0) {
+	          var clearmessage = "$msg.get('rightsmanager.clearrightforcurrentuser')".replace('__right__', self.right);
+	          if (!confirm(clearmessage)) {
+	           return;
+	          }
+	       }
+      } 
+      // 2. The current user is clearing / denying any rights for a group he belongs to.
+      else if(self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
+      	if (nxtst == 2) {
+           var denymessage = "$msg.get('rightsmanager.denyrightforgroup')".replace(/__right__/g, self.right);
+           denymessage = denymessage.replace('__name__', self.currentUorG);
+           if (!confirm(denymessage)) {
+           	var clearmessage = "$msg.get('rightsmanager.clearrightforgroupinstead')".replace(/__right__/g, self.right);
+           	clearmessage = clearmessage.replace('__name__', self.currentUorG);
+           	if(confirm(clearmessage)) {
+           		action = "clear";
+           		self.state = 2;
+           		nxtst = 0;
+           	}
+           	else return;
+           }
+         }
+         else if (nxtst == 0) {
+            var clearmessage = "$msg.get('rightsmanager.clearrightforgroup')".replace(/__right__/g, self.right);
+            clearmessage = clearmessage.replace('__name__', self.currentUorG);
+            if (!confirm(clearmessage)) {
+             return;
+            }
+         }
+      }
+      // 3. The current user is is clearing / denying admin right for any user / group.
+      else if(self.right == "admin") {
+      	if (nxtst == 2) {
+          var denymessage = "$msg.get('rightsmanager.denyrightforuorg')".replace('__right__', self.right);
+          denymessage = denymessage.replace('__name__', self.currentUorG);
+          if (!confirm(denymessage)) {
+            return;
+          }
         }
-      } else if (self.right == "admin" && nxtst == 0) {
-        if (!confirm("You are about to clear the admin right for this user. Continue?")) {
-          return;
+        else if (nxtst == 0) {
+          var clearmessage = "$msg.get('rightsmanager.clearrightforuorg')".replace('__right__', self.right);
+          clearmessage = clearmessage.replace('__name__', self.currentUorG);
+          if (!confirm(clearmessage)) {
+            return;
+          }
         }
       }
-
-      var action = "";
-      if (nxtst == 0) {
-        action = "clear";
-      } else if (nxtst == 1) {
-        action = "allow";
-      } else {
-        action = "deny";
+      
+      if(action == "") {
+        if (nxtst == 0) {
+          action = "clear";
+        } else if (nxtst == 1) {
+          action = "allow";
+        } else {
+          action = "deny";
+        }
       }
 
       // Compose the complete URI
@@ -554,8 +625,17 @@ MSCheckbox.prototype = {
       self.req = new Ajax.Request(url,
       {
         method: 'get',
-        onSuccess: function() {
-          self.next();
+        onSuccess: function(transport) {
+        	if(transport.responseText.strip() == "SUCCESS")
+            self.next();
+          else {
+          	//if an error occurred while trying to save a right rule, display an alert
+          	// and refresh the page, since probably the user does not have the right to perform
+          	// that action
+            alert("$msg.get('platform.core.rightsManagement.saveFailure')");
+            var rURL = unescape(window.location.pathname);
+            window.location.href = rURL;
+          }
         },
         onFailure: function() {
           alert("$msg.get('platform.core.rightsManagement.ajaxFailure')");

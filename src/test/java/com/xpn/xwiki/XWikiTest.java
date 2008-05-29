@@ -28,9 +28,14 @@ import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.observation.EventListener;
+import org.xwiki.observation.ObservationManager;
+import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
@@ -282,5 +287,44 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         xwiki.getConfig().setProperty("xwiki.defaultweb", "Content");
         assertEquals("Content.Default", this.xwiki.getDocumentNameFromPath("/", getContext()));
         assertEquals("Space.Default", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
+    }
+
+    /**
+     * We only verify here that the saveDocument API calls the new Observation component.
+     */
+    public void testSaveDocumentSendsObservationEvents() throws Exception
+    {
+        XWikiContext context = new XWikiContext();
+        XWiki wiki = new XWiki(new XWikiConfig(), context);
+        wiki.setNotificationManager(new XWikiNotificationManager());
+
+        Mock mockStore = mock(XWikiStoreInterface.class);
+        mockStore.expects(once()).method("saveXWikiDoc");
+        wiki.setStore((XWikiStoreInterface) mockStore.proxy());
+
+        TestEventListener listener = new TestEventListener();
+        ObservationManager om =
+            (ObservationManager) getComponentManager().lookup(ObservationManager.ROLE);
+        om.addListener(new DocumentSaveEvent("Some.Document"), listener);
+
+        XWikiDocument document = new XWikiDocument("Some", "Document");
+        document.setContent("the content");
+
+        wiki.saveDocument(document, context);
+        assertTrue("Listener not called", listener.hasListenerBeenCalled);
+    }
+
+    private static class TestEventListener implements EventListener
+    {
+        public boolean hasListenerBeenCalled = false;
+
+        public void onEvent(Event evt, Object source, Object data)
+        {
+            hasListenerBeenCalled = true;
+            assertTrue(source instanceof XWikiDocument);
+            XWikiDocument doc = (XWikiDocument) source;
+            assertTrue("originalDocument should have been new", doc.getOriginalDocument().isNew());
+            assertEquals("the content", doc.getContent());
+        }
     }
 }

@@ -36,6 +36,6 @@ public class HomePageRedirectServlet extends HttpServlet
     public void doGet(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
-        response.sendRedirect("bin/view/Main/WebHome");
+        response.sendRedirect("bin/view/Main/");
     }
 }

@@ -5,6 +5,7 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #set($saveaction = "save")
 #set($hasCustomClass = ($request.classname && (!$request.classname.trim().equals(""))))
 #set($hasCustomObject = ($hasCustomClass && $request.nb && (!$request.nb.trim().equals(""))))
+#set($hasCustomField = ($hasCustomClass && ("$!request.property.trim()" != "")))
 #if($hasCustomClass)
 #set($classes = [$xwiki.getDocument($request.classname).getxWikiClass()])
 #else
@@ -19,6 +20,9 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #set($q = "${q}&amp;classname=${request.classname}")
 #if($hasCustomObject)
 #set($q = "${q}&amp;nb=${request.nb}")
+#end
+#if($hasCustomField)
+#set($q = "${q}&amp;property=${request.property}")
 #end
 #end
 <div class="hidden"><input type="hidden" name="xcontinue" value="$doc.getURL($context.action, $q)"/></div>
@@ -56,7 +60,15 @@ $response.sendRedirect($doc.getURL($context.action, "editor=object"))
 #set($first = 0)
 #end
 <dl>
-#foreach($prop in $class.properties)
+#if($hasCustomField)
+  #set($properties = $util.arrayList)
+  #foreach($propName in $request.property.split(','))
+    #set($discard = $properties.add($class.get($propName)))
+  #end
+#else
+  #set($properties = $class.properties)
+#end
+#foreach($prop in $properties)
 <dt class="label"><label for="${class.name}_${obj.number}_$prop.name">$prop.prettyName:</label></dt>
 <dd>$doc.displayEdit($prop, "${class.name}_${obj.number}_" , $obj)</dd>
 #end

@@ -91,22 +91,9 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
         this.mockXWiki =
             mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
             new XWikiConfig(), context});
-        this.mockXWiki.stubs().method("isVirtualMode").will(
-            new CustomStub("Implements XWiki.isVirtualMode")
-            {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    return true;
-                }
-            });
-        this.mockXWiki.stubs().method("getGroupService").will(
-            new CustomStub("Implements XWiki.getGroupService")
-            {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    return mockAuthService.proxy();
-                }
-            });
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
+        this.mockXWiki.stubs().method("getGroupService").will(returnValue(mockAuthService.proxy()));
+        
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
 
@@ -121,48 +108,11 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
         doc.setName("Page");
 
         Mock mockGlobalRightObj = mock(BaseObject.class, new Class[] {}, new Object[] {});
-        mockGlobalRightObj.stubs().method("getStringValue").will(
-            new CustomStub("Implements BaseObject.getStringValue")
-            {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    String fieldName = (String) invocation.parameterValues.get(0);
-
-                    String value = null;
-                    if (fieldName.equals("levels")) {
-                        value = "view";
-                    } else if (fieldName.equals("groups")) {
-                        value = GLOBALGROUPNAME;
-                    } else if (fieldName.equals("users")) {
-                        value = "";
-                    }
-
-                    return value;
-                }
-            });
-        mockGlobalRightObj.stubs().method("getIntValue").will(
-            new CustomStub("Implements BaseObject.getIntValue")
-            {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    String fieldName = (String) invocation.parameterValues.get(0);
-
-                    int value = 0;
-                    if (fieldName.equals("allow")) {
-                        value = 1;
-                    }
-
-                    return value;
-                }
-            });
-        mockGlobalRightObj.stubs().method("setNumber").will(
-            new CustomStub("Implements BaseObject.setNumber")
-            {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    return null;
-                }
-            });
+        mockGlobalRightObj.stubs().method("getStringValue").with(eq("levels")).will(returnValue("view"));
+        mockGlobalRightObj.stubs().method("getStringValue").with(eq("groups")).will(returnValue(GLOBALGROUPNAME));
+        mockGlobalRightObj.stubs().method("getStringValue").with(eq("users")).will(returnValue(""));
+        mockGlobalRightObj.stubs().method("getIntValue").with(eq("allow")).will(returnValue(1));
+        mockGlobalRightObj.stubs().method("setNumber");
 
         doc.addObject("XWiki.XWikiGlobalRights", (BaseObject) mockGlobalRightObj.proxy());
 

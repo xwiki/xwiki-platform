@@ -24,6 +24,8 @@ import com.xpn.xwiki.XWiki;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
@@ -32,6 +34,8 @@ import java.net.URLEncoder;
  */
 public privileged aspect XWikiCompatibilityAspect
 {
+    private static Map XWiki.threadMap = new HashMap();
+
     /**
      * Transform a text in a URL compatible text
      *
@@ -57,5 +61,23 @@ public privileged aspect XWikiCompatibilityAspect
     public boolean XWiki.isVirtual()
     {
         return this.isVirtualMode();
+    }
+
+    /**
+     * @deprecated Removed since it isn't used; since 1.5M1.
+     */
+    @Deprecated
+    public static Map XWiki.getThreadMap()
+    {
+        return XWiki.threadMap;
+    }
+
+    /**
+     * @deprecated Removed since it isn't used; since 1.5M1.
+     */
+    @Deprecated
+    public static void XWiki.setThreadMap(Map threadMap)
+    {
+        XWiki.threadMap = threadMap;
     }
 }

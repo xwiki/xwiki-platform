@@ -54,7 +54,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
 
     private Mock mockXWikiVersioningStore;
 
-    private Map docs = new HashMap();
+    private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
     protected void setUp() throws Exception
     {
@@ -80,7 +80,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
                     if (docs.containsKey(shallowDoc.getName())) {
-                        return (XWikiDocument) docs.get(shallowDoc.getName());
+                        return docs.get(shallowDoc.getName());
                     } else {
                         return shallowDoc;
                     }

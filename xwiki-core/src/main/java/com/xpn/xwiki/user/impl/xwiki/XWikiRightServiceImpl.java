@@ -52,8 +52,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
     private static Map actionMap;
 
     private static List<String> allLevels =
-        Arrays.asList("admin", "view", "edit", "comment", "delete", "undelete",
-        "register", "programming");
+        Arrays.asList("admin", "view", "edit", "comment", "delete", "undelete", "register",
+            "programming");
 
     protected void logAllow(String username, String page, String action, String info)
     {
@@ -411,10 +411,11 @@ public class XWikiRightServiceImpl implements XWikiRightService
 
         if (grouplist1 != null)
             grouplist.addAll(grouplist1);
-        
+
         if (context.getWiki().isVirtualMode()) {
             String database = context.getDatabase();
             try {
+                // Utils.getName set context's database to name's wiki name (what is before ":")
                 shortname = Util.getName(name, context);
 
                 if (!database.equals(context.getDatabase())) {
@@ -424,17 +425,14 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     if (grouplist2 == null) {
                         Collection glist = groupService.listGroupsForUser(shortname, context);
                         Iterator it = glist.iterator();
+                        grouplist2 = new ArrayList();
                         while (it.hasNext()) {
                             grouplist2.add(context.getDatabase() + ":" + it.next());
                         }
-                        if (grouplist2 != null)
-                            grouplistcache.put(key2, grouplist2);
-                        else
-                            grouplistcache.put(key2, new ArrayList());
+                        grouplistcache.put(key2, grouplist2);
                     }
 
-                    if (grouplist2 != null)
-                        grouplist.addAll(grouplist2);
+                    grouplist.addAll(grouplist2);
                 }
             } catch (Exception e) {
             } finally {

@@ -578,25 +578,25 @@ public class SpaceManagerPluginApi extends PluginApi
         return getSpaceManager().isAdmin(spaceName, userName, context);
     }
 
-    public void updateSpaceRights(SpaceApi space, String oldPolicy, String newPolicy)
+    public void updateSpaceRights(Space space, String oldPolicy, String newPolicy)
         throws SpaceManagerException
     {
         if (hasProgrammingRights()) {
-            getSpaceManager().updateSpaceRights(space.getSpace(), oldPolicy, newPolicy, context);
+            getSpaceManager().updateSpaceRights(space, oldPolicy, newPolicy, context);
         }
     }
 
-    public void setSpaceRights(SpaceApi space) throws SpaceManagerException
+    public void setSpaceRights(Space space) throws SpaceManagerException
     {
         if (hasProgrammingRights()) {
-            getSpaceManager().setSpaceRights(space.getSpace(), context);
+            getSpaceManager().setSpaceRights(space, context);
         }
     }
 
-    public void setSubSpaceRights(SpaceApi space, String subSpace) throws SpaceManagerException
+    public void setSubSpaceRights(Space space, String subSpace) throws SpaceManagerException
     {
         if (hasProgrammingRights()) {
-            getSpaceManager().setSubSpaceRights(space.getSpace(), subSpace, context);
+            getSpaceManager().setSubSpaceRights(space, subSpace, context);
         }
     }
 

@@ -132,7 +132,8 @@ $response.setContentType("application/x-json")
   "wikiname"   : "$wikiname", 
   "userurl"    : "$xwiki.getURL($user.fullName)",
   "allows"     : "$allows.keySet()",
-  "denys"      : "$denys.keySet()"
+  "denys"      : "$denys.keySet()",
+  "isuseringroup" : #if($uorg == "groups") $xwiki.getUser().isUserInGroup($user.fullName) #else false #end
  }
 #end ## foreach user in users
 ]}

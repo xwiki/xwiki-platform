@@ -19,8 +19,8 @@
       #if($action == "allow")
         #if($levels.indexOf($right) == -1) ## the right is not in the allow list, add it
           #set($levels = $levels + "," + $right)
-
-1. person: $pers; rule: allow; action: allow; levels: $levels
+          
+##1. person: $pers; rule: allow; action: allow; levels: $levels
           $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
         #end
       #else ## deny or clean action
@@ -33,7 +33,7 @@
           #end
         #end
 
-2. person: $pers; rule: allow; action: deny/clean; levels: $levels
+##2. person: $pers; rule: allow; action: deny/clean; levels: $levels
         #if($levels != "")
           $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
         #else ## no other righs in the levels, remove the rule completely
@@ -49,7 +49,7 @@
         #if($levels.indexOf($right) == -1) ## the right is not in the allow list, add it
           #set($levels = $levels + "," + $right)
 
-3. person: $pers; rule: deny; action:deny; levels: $levels
+##3. person: $pers; rule: deny; action:deny; levels: $levels
           $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
         #end
       #else ## allow or clean action
@@ -62,7 +62,7 @@
           #end
         #end
 
-4. person: $pers; rule: deny; action: allow/clean; levels: $levels
+##4. person: $pers; rule: deny; action: allow/clean; levels: $levels
         #if($levels != "")
           $doc.getObject($clsname, $obj.number).set('levels', $levels) ## set the new levels
         #else ## no other righs in the levels, remove the rule completely
@@ -75,7 +75,7 @@
     #set($pers = $pers.replaceAll("(^|,)${fullname}(,|$)", "$2"))
     $doc.getObject($clsname, $obj.number).set($uorg, $pers)
 
-5. person: $pers
+##5. person: $pers
   #end
 #end ## end foreach existing rule
 
@@ -86,7 +86,7 @@
   $obj.set($uorg, $fullname)
   $obj.set('levels', $right)
 
-6. person: $fullname; rule: allow; action: allow; levels: $right
+##6. person: $fullname; rule: allow; action: allow; levels: $right
   $obj.set('allow', '1')
 #end
 #if(($foundd == false) && ($action == "deny"))
@@ -96,7 +96,8 @@
   $obj.set($uorg, $fullname)
   $obj.set('levels', $right)
 
-7. person: $fullname; rule: deny; action: deny; levels: $right
+##7. person: $fullname; rule: deny; action: deny; levels: $right
   $obj.set('allow', '0')
 #end
-#set($discard = $doc.save($msg.get("platform.core.rightsManagement.saveComment", [${action}, ${right}, ${fullname}]), true))
+$doc.save($msg.get("platform.core.rightsManagement.saveComment", [${action}, ${right}, ${fullname}]), true)
+SUCCESS

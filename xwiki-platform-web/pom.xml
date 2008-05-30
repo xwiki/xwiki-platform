@@ -29,14 +29,14 @@
     <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
-  <version>1.5-milestone-1</version>
+  <version>1.5-SNAPSHOT</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/tags/xwiki-web-1.5-milestone-1</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/tags/xwiki-web-1.5-milestone-1</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/tags/xwiki-web-1.5-milestone-1</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/trunk</url>
   </scm>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->

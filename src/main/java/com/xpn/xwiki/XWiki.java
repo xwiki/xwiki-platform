@@ -37,8 +37,10 @@ import java.net.URL;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -2057,19 +2059,54 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Then from the navigator language setting
         if (context.getRequest() != null) {
-            String accept = context.getRequest().getHeader("Accept-Language");
-            if ((accept != null) && (!accept.equals(""))) {
-                String[] alist = StringUtils.split(accept.toLowerCase(), ",;-_");
-                if ((alist != null) && !(alist.length == 0)) {
-                    context.setLanguage(alist[0]);
-                    return alist[0];
+            String acceptHeader = context.getRequest().getHeader("Accept-Language");
+            // If the client didn't specify some languages, skip this phase
+            if ((acceptHeader != null) && (!acceptHeader.equals(""))) {
+                List<String> acceptedLanguages = getAcceptedLanguages(context.getRequest());
+                // We can force one of the configured languages to be accepted
+                if (Param("xwiki.language.forceSupported", "0").equals("1")) {
+                    List<String> available =
+                        Arrays.asList(getXWikiPreference("languages", context).split(", |"));
+                    // Filter only configured languages
+                    acceptedLanguages.retainAll(available);
                 }
+                if (acceptedLanguages.size() > 0) {
+                    // Use the "most-preferred" language, as requested by the client.
+                    context.setLanguage(acceptedLanguages.get(0));
+                    return acceptedLanguages.get(0);
+                }
+                // If none of the languages requested by the client is acceptable, skip to next
+                // phase (use default language).
             }
         }
 
-        // Then from the global preference
+        // Finally, use the default language from the global preferences.
         context.setLanguage(defaultLanguage);
         return defaultLanguage;
+    }
+
+    /**
+     * Construct a list of language codes (ISO 639-1) from the Accept-Languages header. This method
+     * filters out some bugs in different browsers or containers, like returning '*' as a language
+     * (Jetty) or using '_' as a language--country delimiter (some versions of Opera).
+     * 
+     * @param request The client request.
+     * @return A list of language codes, in the client preference order; might be empty if the
+     *         header is not well formed.
+     */
+    @SuppressWarnings("unchecked")
+    private List<String> getAcceptedLanguages(XWikiRequest request)
+    {
+        List<String> result = new ArrayList<String>();
+        Enumeration<Locale> e = request.getLocales();
+        while (e.hasMoreElements()) {
+            String language = e.nextElement().getLanguage().toLowerCase();
+            // All language codes should have 2 letters.
+            if (StringUtils.isAlpha(language)) {
+                result.add(language);
+            }
+        }
+        return result;
     }
 
     public String getDefaultLanguage(XWikiContext context)

@@ -19,11 +19,17 @@
  */
 package com.xpn.xwiki;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.http.Cookie;
+
+import org.apache.commons.collections.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
@@ -44,6 +50,7 @@ import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
@@ -368,5 +375,35 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
             assertEquals("the content", doc.getOriginalDocument().getContent());
             assertEquals("\n", doc.getContent());
         }
+    }
+    
+    public void testLanguageSelection()
+    {
+        getContext().setRequest(new XWikiServletRequest(null) {
+            @Override
+            public Enumeration getLocales()
+            {
+                ArrayList<Locale> locales = new ArrayList<Locale>();
+                locales.add(new Locale("*"));
+                locales.add(new Locale("en_US"));
+                locales.add(new Locale("fr"));
+                locales.add(new Locale("de"));
+                return IteratorUtils.asEnumeration(locales.iterator());
+            }
+            @Override
+            public String getHeader(String s)
+            {
+                if ("language".equals(s)) {
+                    return null;
+                }
+                return "en";
+            }
+            @Override
+            public Cookie getCookie(String cookieName)
+            {
+                return null;
+            }
+        });
+        assertEquals("fr", xwiki.getLanguagePreference(getContext()));
     }
 }

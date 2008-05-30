@@ -695,8 +695,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      * @throws XWikiException error when updating XWiki user.
      */
-    protected void updateUserFromLDAP(String xwikiUserName, List searchAttributes,
-        XWikiContext context) throws XWikiException
+    protected void updateUserFromLDAP(String xwikiUserName,
+        List<XWikiLDAPSearchAttribute> searchAttributes, XWikiContext context)
+        throws XWikiException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -707,22 +708,25 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         XWikiDocument userDoc = context.getWiki().getDocument(xwikiUserName, context);
         BaseObject userObj = userDoc.getObject(userClass.getName());
 
-        Map map = new HashMap();
-        for (Iterator it = searchAttributes.iterator(); it.hasNext();) {
-            XWikiLDAPSearchAttribute lattr = (XWikiLDAPSearchAttribute) it.next();
-
-            String lval = lattr.value;
-            String xattr = (String) userMappings.get(lattr.name);
-            if (xattr == null) {
+        Map<String, String> map = new HashMap<String, String>();
+        for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
+            String key = (String) userMappings.get(lattr.name);
+            if (key == null) {
                 continue;
             }
+            String value = lattr.value;
 
-            map.put(xattr, lval);
+            String objValue = userObj.getStringValue(key);
+            if (objValue == null || !objValue.equals(value)) {
+                map.put(key, value);
+            }
         }
 
-        userClass.fromMap(map, userObj);
+        if (!map.isEmpty()) {
+            userClass.fromMap(map, userObj);
 
-        context.getWiki().saveDocument(userDoc, context);
+            context.getWiki().saveDocument(userDoc, context);
+        }
     }
 
     /**

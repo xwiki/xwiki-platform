@@ -13,6 +13,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public interface PatchCreator
 {
+    void init(XWikiContext context);
     /**
      * Create a {@link Patch} which, when applied on oldDoc, will result in newDoc.
      * 

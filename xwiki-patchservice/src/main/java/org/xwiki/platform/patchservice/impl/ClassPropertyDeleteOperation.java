@@ -14,7 +14,7 @@ import com.xpn.xwiki.objects.classes.PropertyClass;
 
 public class ClassPropertyDeleteOperation extends AbstractOperationImpl implements RWOperation
 {
-    private String propertyName;
+    private String typeName;
 
     private String className;
 
@@ -34,23 +34,23 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
     public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         BaseClass bclass = doc.getxWikiClass();
-        PropertyClass prop = (PropertyClass) bclass.get(propertyName);
+        PropertyClass prop = (PropertyClass) bclass.get(typeName);
         if (prop != null) {
-            bclass.removeField(propertyName);
+            bclass.removeField(typeName);
         } else {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
                 XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Invalid property name: " + this.propertyName);
+                "Invalid property name: " + this.typeName);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public boolean deleteType(String className, String propertyName)
+    public boolean deleteType(String className, String typeName)
     {
         this.className = className;
-        this.propertyName = propertyName;
+        this.typeName = typeName;
         return true;
     }
 
@@ -60,7 +60,7 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
     public void fromXml(Element e) throws XWikiException
     {
         this.className = getClassName(e);
-        this.propertyName = getPropertyName(getClassNode(e));
+        this.typeName = getPropertyName(getClassNode(e));
     }
 
     /**
@@ -70,7 +70,7 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
     {
         Element xmlNode = createOperationNode(doc);
         Element classNode = createClassNode(className, doc);
-        classNode.appendChild(createPropertyNode(propertyName, doc));
+        classNode.appendChild(createPropertyNode(typeName, doc));
         xmlNode.appendChild(classNode);
         return xmlNode;
     }
@@ -83,7 +83,7 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
         try {
             ClassPropertyDeleteOperation that = (ClassPropertyDeleteOperation) other;
             return this.className.equals(that.className)
-                && this.propertyName.equals(that.propertyName);
+                && this.typeName.equals(that.typeName);
         } catch (Exception e) {
             return false;
         }
@@ -94,7 +94,7 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
      */
     public int hashCode()
     {
-        return new HashCodeBuilder(13, 17).append(this.propertyName).toHashCode();
+        return new HashCodeBuilder(13, 17).append(this.typeName).toHashCode();
     }
 
     /**
@@ -102,6 +102,6 @@ public class ClassPropertyDeleteOperation extends AbstractOperationImpl implemen
      */
     public String toString()
     {
-        return this.getType() + ": [" + this.propertyName + "]";
+        return this.getType() + ": [" + this.typeName + "]";
     }
 }

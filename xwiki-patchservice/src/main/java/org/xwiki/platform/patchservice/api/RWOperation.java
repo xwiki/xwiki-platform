@@ -27,11 +27,11 @@ public interface RWOperation extends Operation
     boolean setProperty(String property, String value);
 
     /* Operations affeting the XObjectDefinition stored in a document */
-    boolean createType(String className, String propertyName, String propertyType, Map<String, ?> properties);
+    boolean createType(String className, String typeName, String typeType, Map<String, ?> typeConfig);
 
-    boolean modifyType(String className, String propertyName, Map<String, ?> properties);
+    boolean modifyType(String className, String typeName, Map<String, ?> typeConfig);
 
-    boolean deleteType(String className, String propertyName);
+    boolean deleteType(String className, String typeName);
 
     /* Operations affeting the document's objects */
     boolean addObject(String objectClass);

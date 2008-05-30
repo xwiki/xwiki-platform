@@ -49,7 +49,7 @@ public class LogicalTimeImpl implements LogicalTime, Serializable
     /**
      * {@inheritDoc}
      */
-    public int compareTo(Object other)
+    public int compareTo(LogicalTime other)
     {
         if (!(other instanceof LogicalTimeImpl)) {
             return -1;

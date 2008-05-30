@@ -1,7 +1,8 @@
 package org.xwiki.platform.patchservice.web;
 
 import java.io.StringReader;
-import java.util.List;
+
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
@@ -30,42 +31,40 @@ public class PatchServiceAction extends XWikiAction
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
+        response.setContentType("text/xml");
         PatchservicePlugin plugin =
             (PatchservicePlugin) context.getWiki().getPlugin("patchservice", context);
         String uri = request.getRequestURI();
         String paction = "patches/";
+        System.err.println("uri: " + uri);
         String action = uri.substring(uri.indexOf(paction) + paction.length());
-        if (action.equals("all")) {
+        if (action.startsWith("all")) {
+            System.err.println("generating all patches...");
             Document doc = createEmptyDocument();
             doc.appendChild(doc.createElement("patches"));
-            List<Patch> patches = plugin.getStorage().loadAllPatches();
-            for (Patch p : patches) {
+            for (Patch p : plugin.getAllPatches()) {
                 doc.getDocumentElement().appendChild(p.toXml(doc));
             }
             outputXml(doc, response);
-        } else if (action.equals("id")) {
+        } else if (action.startsWith("id")) {
             Document doc = createEmptyDocument();
             doc.appendChild(doc.createElement("patches"));
             PatchId id = new PatchIdImpl();
             id.fromXml(parseString(request.getParameter("patch_id")).getDocumentElement());
-            List<Patch> patches = plugin.getStorage().loadAllPatchesSince(id);
-            for (Patch p : patches) {
+            for (Patch p : plugin.getUpdatesFrom(id)) {
                 doc.getDocumentElement().appendChild(p.toXml(doc));
             }
             outputXml(doc, response);
-        } else if (action.equals("delta")) {
+        } else if (action.startsWith("delta")) {
             Document doc = createEmptyDocument();
             doc.appendChild(doc.createElement("patches"));
             PatchId startId = new PatchIdImpl();
-            startId.fromXml(parseString(request.getParameter("patch_id_from"))
-                .getDocumentElement());
+            startId
+                .fromXml(parseString(request.getParameter("patch_id_from")).getDocumentElement());
             PatchId endId = new PatchIdImpl();
             endId.fromXml(parseString(request.getParameter("patch_id_to")).getDocumentElement());
-            List<Patch> patches = plugin.getStorage().loadAllPatchesSince(startId);
-            for (Patch p : patches) {
-                if (p.getId().getTime().before(endId.getTime())) {
-                    doc.getDocumentElement().appendChild(p.toXml(doc));
-                }
+            for (Patch p : plugin.getDelta(startId, endId)) {
+                doc.getDocumentElement().appendChild(p.toXml(doc));
             }
             outputXml(doc, response);
         }
@@ -75,9 +74,10 @@ public class PatchServiceAction extends XWikiAction
     private Document createEmptyDocument()
     {
         try {
-            return (Document) DOMImplementationRegistry.newInstance().getDOMImplementation("")
-                .createDocument(null, null, null);
+            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            return doc;
         } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
     }
@@ -86,8 +86,8 @@ public class PatchServiceAction extends XWikiAction
     {
         try {
             DOMImplementationLS lsImpl =
-                (DOMImplementationLS) DOMImplementationRegistry.newInstance()
-                    .getDOMImplementation("LS 3.0");
+                (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation(
+                    "LS 3.0");
             LSInput input = lsImpl.createLSInput();
             input.setCharacterStream(new StringReader(content));
             LSParser p = lsImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null);

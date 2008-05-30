@@ -4,9 +4,6 @@ import java.util.Date;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
-import org.w3c.dom.Document;
-import org.w3c.dom.bootstrap.DOMImplementationRegistry;
-import org.w3c.dom.ls.DOMImplementationLS;
 import org.xwiki.platform.patchservice.hook.PatchCreator;
 import org.xwiki.platform.patchservice.impl.PatchImpl;
 

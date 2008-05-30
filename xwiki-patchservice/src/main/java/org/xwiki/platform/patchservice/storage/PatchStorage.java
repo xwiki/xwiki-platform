@@ -3,7 +3,6 @@ package org.xwiki.platform.patchservice.storage;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -38,7 +37,8 @@ public class PatchStorage
 
     private void init(XWikiContext context) throws XWikiException
     {
-        XWikiHibernateStore storage = ((XWikiHibernateStore) context.getWiki().getStore());
+        System.err.println("storage initializing");
+        XWikiHibernateStore storage = ((XWikiHibernateStore) context.getWiki().getNotCacheStore());
         Configuration config = storage.getConfiguration();
         try {
             // Make sure the schema is updated to include the Patch mapping
@@ -63,6 +63,7 @@ public class PatchStorage
                 "Cannot load Patch mapping file",
                 e);
         }
+        System.err.println("storage initialized");
     }
 
     public boolean storePatch(Patch p)
@@ -75,8 +76,21 @@ public class PatchStorage
             s.close();
             return true;
         } catch (Exception e) {
+            e.printStackTrace();
             return false;
         }
+    }
+
+    public Patch loadPatch(PatchId id)
+    {
+        List<Patch> patches =
+            loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '"
+                + id.getDocumentId() + "' and patch.id.time = '"
+                + DATE_FORMAT.format(id.getTime() + "'"));
+        if (patches.size() > 0) {
+            return patches.get(0);
+        }
+        return null;
     }
 
     public List<Patch> loadAllPatches()
@@ -104,14 +118,15 @@ public class PatchStorage
             + DATE_FORMAT.format(id.getTime()) + "'");
     }
 
+    @SuppressWarnings("unchecked")
     protected List<Patch> loadPatches(String query)
     {
         Session s = factory.openSession();
-        List contents = s.createQuery(query).list();
+        List<String> contents = s.createQuery(query).list();
         List<Patch> patches = new ArrayList<Patch>();
-        for (Iterator it = contents.iterator(); it.hasNext();) {
+        for (String patchXml : contents) {
             PatchImpl patch = new PatchImpl();
-            patch.setContent(it.next().toString());
+            patch.setContent(patchXml);
             patches.add(patch);
         }
         return patches;

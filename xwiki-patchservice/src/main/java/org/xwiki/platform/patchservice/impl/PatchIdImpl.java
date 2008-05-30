@@ -183,6 +183,7 @@ public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(Object other)
     {
         try {
@@ -197,6 +198,7 @@ public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder(37, 5).append(this.hostId).append(this.documentId).append(
@@ -206,6 +208,7 @@ public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString()
     {
         return "[" + this.documentId + "@" + this.hostId + " at " + this.time + " (" + logicalTime + ")]";

@@ -54,7 +54,7 @@ public class StorageTest extends MockObjectTestCase
             new XWikiConfig(), this.context});
         this.mockXWiki.stubs().method("Param").withAnyArguments().will(returnValue(null));
         this.mockXWiki.stubs().method("isMySQL").will(returnValue(false));
-        this.mockXWiki.stubs().method("isVirtual").will(returnValue(false));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("getPlugin").will(returnValue(null));
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
         this.mockEngineContext =
@@ -67,7 +67,7 @@ public class StorageTest extends MockObjectTestCase
         context.setDatabase("public");
         store = new XWikiHibernateStore(context);
         store.checkHibernate(context);
-        this.mockXWiki.stubs().method("getStore").will(returnValue(store));
+        this.mockXWiki.stubs().method("getNotCacheStore").will(returnValue(store));
 
         storage = new PatchStorage(context);
     }

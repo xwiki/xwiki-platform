@@ -18,13 +18,14 @@ public final class OperationFactoryImpl implements OperationFactory
 {
     private static final Log LOG = LogFactory.getLog(OperationFactoryImpl.class);
 
-    private static Map<String, Class> typeMap = new HashMap<String, Class>();
+    private static Map<String, Class<? extends RWOperation>> typeMap = new HashMap<String, Class<? extends RWOperation>>();
 
     private static class SingletonHolder
     {
         private static OperationFactoryImpl theInstance = new OperationFactoryImpl();
     }
 
+    @SuppressWarnings("unchecked")
     private OperationFactoryImpl()
     {
         for (Iterator<RWOperation> it = Service.providers(RWOperation.class); it.hasNext();) {
@@ -43,8 +44,8 @@ public final class OperationFactoryImpl implements OperationFactory
     {
         RWOperation op;
         try {
-            Class opClass = (Class) typeMap.get(type);
-            op = (RWOperation) opClass.newInstance();
+            Class<? extends RWOperation> opClass = typeMap.get(type);
+            op = opClass.newInstance();
         } catch (NullPointerException ex) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
                 XWikiException.ERROR_XWIKI_NOT_IMPLEMENTED,
@@ -70,12 +71,12 @@ public final class OperationFactoryImpl implements OperationFactory
         return op;
     }
 
-    public static void registerTypeProvider(String type, Class provider)
+    public static void registerTypeProvider(String type, Class<? extends RWOperation> provider)
     {
         typeMap.put(type, provider);
     }
 
-    public static void registerTypeProvider(String[] types, Class provider)
+    public static void registerTypeProvider(String[] types, Class<? extends RWOperation> provider)
     {
         for (int i = 0; i < types.length; ++i) {
             registerTypeProvider(types[i], provider);

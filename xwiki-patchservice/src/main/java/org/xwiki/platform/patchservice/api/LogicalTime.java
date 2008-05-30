@@ -7,6 +7,6 @@ package org.xwiki.platform.patchservice.api;
  * 
  * @version $Id: $
  */
-public interface LogicalTime extends Comparable, XmlSerializable
+public interface LogicalTime extends Comparable<LogicalTime>, XmlSerializable
 {
 }

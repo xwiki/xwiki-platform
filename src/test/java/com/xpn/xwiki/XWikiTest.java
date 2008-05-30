@@ -42,7 +42,6 @@ import org.xwiki.observation.event.Event;
 
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
@@ -376,10 +375,12 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
             assertEquals("\n", doc.getContent());
         }
     }
-    
+
     public void testLanguageSelection()
     {
-        getContext().setRequest(new XWikiServletRequest(null) {
+        getContext().setRequest(new XWikiServletRequest(null)
+        {
+            @SuppressWarnings("unchecked")
             @Override
             public Enumeration getLocales()
             {
@@ -390,6 +391,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
                 locales.add(new Locale("de"));
                 return IteratorUtils.asEnumeration(locales.iterator());
             }
+
             @Override
             public String getHeader(String s)
             {
@@ -398,6 +400,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
                 }
                 return "en";
             }
+
             @Override
             public Cookie getCookie(String cookieName)
             {

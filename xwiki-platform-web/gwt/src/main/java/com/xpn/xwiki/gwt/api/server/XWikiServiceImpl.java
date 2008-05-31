@@ -1086,8 +1086,8 @@ public class
 
     public Boolean hasAccessLevel(String level, String docName) throws XWikiGWTException
     {
-        XWikiContext context = getXWikiContext();
         try {
+            XWikiContext context = getXWikiContext();
             return Boolean.valueOf(context.getWiki().getRightService()
                 .hasAccessLevel(level, context.getUser(), docName, context));
         } catch (XWikiException e) {

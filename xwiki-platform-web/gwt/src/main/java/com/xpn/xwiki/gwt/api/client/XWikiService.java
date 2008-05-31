@@ -97,6 +97,30 @@ public interface XWikiService extends RemoteService {
 
     // get version history of a document
     public List getDocumentVersions(String pageName, int nb, int start) throws XWikiGWTException;
+    
+    /**
+     * Checks the access level for the current user on the specified document.
+     * 
+     * @param level level to verify access for, e.g.: "view", "edit"
+     * @param docName fullname of the document to check access level for, e.g. Main.WebHome
+     * @return true if current user has specified access level on the specified document, 
+     *         false otherwise
+     * @throws XWikiGWTException
+     */
+    public Boolean hasAccessLevel(String level, String docName) throws XWikiGWTException;
+    
+    /**
+     * Checks the access level for the user given by <tt>username</tt> on the specified document.
+     * 
+     * @param level level to verify access for, e.g.: "view", "edit"
+     * @param username fullname of the user to check access for, e.g. XWiki.User
+     * @param docName fullname of the document to check access level for, e.g. Main.WebHome 
+     * @return true if specified user has the access level on the specified document, 
+     *         false otherwise
+     * @throws XWikiGWTException
+     */
+    public Boolean hasAccessLevel(String level, String username, String docName) 
+            throws XWikiGWTException;
 
     public void logJSError(Map infos) throws XWikiGWTException;
 

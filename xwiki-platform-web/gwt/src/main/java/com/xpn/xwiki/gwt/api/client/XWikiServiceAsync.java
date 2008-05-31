@@ -122,4 +122,8 @@ public interface XWikiServiceAsync {
     void getTranslation(String translationPage, String local, AsyncCallback async);
 
     void getDocumentVersions(String pageName, int nb, int start, AsyncCallback async);
+    
+    void hasAccessLevel(String level, String docName, AsyncCallback async);
+    
+    void hasAccessLevel(String level, String username, String docName, AsyncCallback async);
 }

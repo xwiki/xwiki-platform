@@ -1083,4 +1083,26 @@ public class
             properties.setProperty(key, newvalue);
         }
     }
+
+    public Boolean hasAccessLevel(String level, String docName) throws XWikiGWTException
+    {
+        XWikiContext context = getXWikiContext();
+        try {
+            return Boolean.valueOf(context.getWiki().getRightService()
+                .hasAccessLevel(level, context.getUser(), docName, context));
+        } catch (XWikiException e) {
+            throw getXWikiGWTException(e);
+        }
+    }
+
+    public Boolean hasAccessLevel(String level, String username, String docName) 
+        throws XWikiGWTException
+    {
+        try {
+            return Boolean.valueOf(getXWikiContext().getWiki().getRightService()
+                .hasAccessLevel(level, username, docName, getXWikiContext()));
+        } catch (XWikiException e) {
+            throw getXWikiGWTException(e);
+        }
+    }
 }

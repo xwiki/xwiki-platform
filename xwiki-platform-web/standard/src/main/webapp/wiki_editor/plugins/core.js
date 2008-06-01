@@ -158,6 +158,37 @@ WikiEditor.prototype.convertStrikeTextInternal = function(regexp, result, conten
     return content.replace(regexp, str);
 }
 
+// UTF-8 decoding
+WikiEditor.prototype.utf8decode = function (utftext) {
+        var string = "";
+        var i = 0;
+        var c = c1 = c2 = 0;
+
+        while ( i < utftext.length ) {
+
+            c = utftext.charCodeAt(i);
+
+            if (c < 128) {
+                string += String.fromCharCode(c);
+                i++;
+            }
+            else if((c > 191) && (c < 224)) {
+                c2 = utftext.charCodeAt(i+1);
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                i += 2;
+            }
+            else {
+                c2 = utftext.charCodeAt(i+1);
+                c3 = utftext.charCodeAt(i+2);
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                i += 3;
+            }
+
+        }
+
+        return string;
+    }
+
 WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
     var txt;
     var str="";
@@ -175,6 +206,8 @@ WikiEditor.prototype.convertLinkInternal = function(regexp, result, content) {
                 href = this.trimString(att["title"]);
             }
             href = unescape(href);
+            // href is encoded in UTF.. we need to decode it
+            href = this.utf8decode(href);
             if ((href.toLowerCase() == txt.toLowerCase()) && (!att["target"] || (att["target"] == "_self"))) {
                 str = "[" + txt + "]";
             } else if(att["target"] && att["target"] != "_self") {
@@ -1122,7 +1155,7 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
     url = url.replace(/\&/g, '&amp;')
     var target = this.trimString(result[7]);
     var classname;
-	var str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
+    var str = "<a class=\"" + classname + "\" href=\"" + url + "\"";
     if(this.isExternalLink(url)) {
 		classname = this.LINK_EXTERNAL_CLASS_NAME;
         str += " title=\"" + url + "\"";
@@ -1136,7 +1169,7 @@ WikiEditor.prototype.convertLinkExternal = function(regexp, result, content) {
         str += " target=\"" + result[7] + "\"";
     }
     str += ">" + text + "<\/a>";
-	return content.replace(regexp, str);
+    return content.replace(regexp, str);
 }
 
 WikiEditor.prototype.convertTableExternal = function(regexp, result, content) {

@@ -55,11 +55,6 @@
       <artifactId>xwiki-core-plexus</artifactId>
       <version>1.5-SNAPSHOT</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-daemon</artifactId>
-      <version>1.5-SNAPSHOT</version>
-    </dependency>
     <!-- We need this dependency for now since we need to set up the XWikiContext
          for the tests. Since this means a circular dependency we have to use the
          latest released version of XWiki Core -->

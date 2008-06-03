@@ -15,6 +15,6 @@ public class LevelsMetaClass extends ListMetaClass
 
     public BaseCollection newObject(XWikiContext context)
     {
-        return new LevelsMetaClass();
+        return new LevelsClass();
     }
 }

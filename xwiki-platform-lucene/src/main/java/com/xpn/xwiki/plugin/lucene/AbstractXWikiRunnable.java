@@ -21,9 +21,10 @@ package com.xpn.xwiki.plugin.lucene;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.container.Container;
-import org.xwiki.container.daemon.DaemonContainerException;
-import org.xwiki.container.daemon.DaemonContainerInitializer;
+import org.xwiki.context.ExecutionContextInitializerManager;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContextInitializerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.web.Utils;
 
@@ -39,17 +40,22 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void initXWikiContainer(XWikiContext context)
     {
-        DaemonContainerInitializer dci =
-            (DaemonContainerInitializer) Utils.getComponent(DaemonContainerInitializer.ROLE);
+        ExecutionContextInitializerManager ecim =
+                (ExecutionContextInitializerManager) Utils.getComponent(ExecutionContextInitializerManager.ROLE);
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
 
         try {
-            // Initialize the Container objects
-            dci.initializeRequest(context);
-        } catch (DaemonContainerException e) {
+            ExecutionContext ec = new ExecutionContext();
+
+            // Bridge with old XWiki Context, required for old code.
+            ec.setProperty("xwikicontext", context);
+
+            ecim.initialize(ec);
+            execution.setContext(ec);
+        } catch (ExecutionContextInitializerException e) {
             // Note: We should raise an exception here but we cannot since XWikiDefaultPlugin has
-            // overrident's
-            // XWikiPluginInterface's init() method without declaring a throw XWikiException...
-            LOG.error("Failed to initialize request. Behavior of the Lucene plugin could be "
+            // overrident's XWikiPluginInterface's init() method without declaring a throw XWikiException...
+            LOG.error("Failed to initialize Execution Context. Behavior of the Lucene plugin could be "
                 + "instable. We recommend stopping the container, fixing the issue and "
                 + "restarting it.", e);
         }
@@ -57,9 +63,9 @@ public abstract class AbstractXWikiRunnable implements Runnable
 
     protected void cleanupXWikiContainer(XWikiContext context)
     {
-        Container container = (Container) Utils.getComponent(Container.ROLE);
-        // We must ensure we clean the ThreadLocal variables located in the Container
+        Execution ech = (Execution) Utils.getComponent(Execution.ROLE);
+        // We must ensure we clean the ThreadLocal variables located in the Execution
         // component as otherwise we will have a potential memory leak.
-        container.removeRequest();
+        ech.removeContext();
     }
 }

@@ -50,6 +50,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.context.Execution;
 
 import javax.servlet.ServletException;
 
@@ -155,11 +156,14 @@ public class XWikiServiceImpl extends RemoteServiceServlet implements XWikiServi
     private void cleanupContainerComponent(XWikiContext context)
     {
         Container container = (Container) Utils.getComponent(Container.ROLE, context);
-        // We must ensure we clean the ThreadLocal variables located in the Container 
-        // component as otherwise we will have a potential memory leak.
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+
+        // We must ensure we clean the ThreadLocal variables located in the Container and Execution
+        // components as otherwise we will have a potential memory leak.
         container.removeRequest();
         container.removeResponse();
         container.removeSession();
+        execution.removeContext();
     }    
     
     protected XWikiContext getXWikiContext()

@@ -24,6 +24,6 @@ public class GroupsMetaClass extends ListMetaClass
 
     public BaseCollection newObject(XWikiContext context)
     {
-        return new GroupsMetaClass();
+        return new GroupsClass();
     }
 }

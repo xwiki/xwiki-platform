@@ -31,6 +31,7 @@ import org.apache.xmlrpc.server.RequestProcessorFactoryFactory.RequestProcessorF
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.context.Execution;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -100,7 +101,7 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
         } finally {
             // Cleanup code
             if (context != null) {
-                cleanupContainerComponent(context);
+                cleanupComponents();
             }
         }
     }
@@ -125,13 +126,16 @@ public class XWikiReflectiveXmlRpcHandler extends ReflectiveXmlRpcHandler
         }            
     }
 
-    private void cleanupContainerComponent(XWikiContext context)
+    private void cleanupComponents()
     {
         Container container = (Container) Utils.getComponent(Container.ROLE);
-        // We must ensure we clean the ThreadLocal variables located in the Container 
-        // component as otherwise we will have a potential memory leak.
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+
+        // We must ensure we clean the ThreadLocal variables located in the Container and Execution
+        // components as otherwise we will have a potential memory leak.
         container.removeRequest();
         container.removeResponse();
         container.removeSession();
+        execution.removeContext();
     }
 }

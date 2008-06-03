@@ -34,6 +34,7 @@ import org.apache.velocity.VelocityContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.portlet.PortletContainerException;
 import org.xwiki.container.portlet.PortletContainerInitializer;
+import org.xwiki.context.Execution;
 
 import javax.portlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -167,7 +168,7 @@ public class XWikiPortlet extends GenericPortlet
                 throw new PortletException("Failed to initalize XWiki Context", e);
             } finally {
                 if (context != null) {
-                    cleanupContainerComponent(context);
+                    cleanupComponents();
                 }
             }
         }
@@ -276,10 +277,10 @@ public class XWikiPortlet extends GenericPortlet
             // From this line forward all information can be found in the XWiki Context.
             doView(context);
         } catch (XWikiException e) {
-            throw new PortletException("Failed to initalize XWiki Context", e);
+            throw new PortletException("Failed to initialize XWiki Context", e);
         } finally {
             if (context != null) {
-                cleanupContainerComponent(context);
+                cleanupComponents();
             }
         }
     }
@@ -428,13 +429,16 @@ public class XWikiPortlet extends GenericPortlet
         }            
     }    
 
-    protected void cleanupContainerComponent(XWikiContext context)
+    protected void cleanupComponents()
     {
         Container container = (Container) Utils.getComponent(Container.ROLE);
-        // We must ensure we clean the ThreadLocal variables located in the Container 
-        // component as otherwise we will have a potential memory leak.
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+
+        // We must ensure we clean the ThreadLocal variables located in the Container and Execution
+        // components as otherwise we will have a potential memory leak.
         container.removeRequest();
         container.removeResponse();
         container.removeSession();
+        execution.removeContext();
     }
 }

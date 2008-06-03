@@ -18,7 +18,6 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-
 package com.xpn.xwiki.web;
 
 import java.io.IOException;
@@ -41,6 +40,7 @@ import org.xwiki.container.servlet.ServletContainerException;
 import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.ActionExecutionEvent;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -116,7 +116,7 @@ public abstract class XWikiAction extends Action
             actionForward = execute(context);
         } finally {
             if (context != null) {
-                cleanupContainerComponent(context);
+                cleanupComponents();
             }
         }
 
@@ -391,18 +391,21 @@ public abstract class XWikiAction extends Action
             containerInitializer.initializeResponse(context.getResponse().getHttpServletResponse());
             containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
         } catch (ServletContainerException e) {
-            throw new ServletException("Failed to initialize request/response or session", e);
+            throw new ServletException("Failed to initialize Request/Response or Session", e);
         }            
     }
     
-    protected void cleanupContainerComponent(XWikiContext context)
+    protected void cleanupComponents()
     {
         Container container = (Container) Utils.getComponent(Container.ROLE);
-        // We must ensure we clean the ThreadLocal variables located in the Container 
-        // component as otherwise we will have a potential memory leak.
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+
+        // We must ensure we clean the ThreadLocal variables located in the Container and Execution
+        // components as otherwise we will have a potential memory leak.
         container.removeRequest();
         container.removeResponse();
         container.removeSession();
+        execution.removeContext();
     }
     
     public String getRealPath(String path)

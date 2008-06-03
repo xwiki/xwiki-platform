@@ -14,9 +14,10 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
-import org.xwiki.container.Container;
-import org.xwiki.container.daemon.DaemonContainerException;
-import org.xwiki.container.daemon.DaemonContainerInitializer;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextInitializerManager;
+import org.xwiki.context.ExecutionContextInitializerException;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.Util;
@@ -193,13 +194,9 @@ public class HtmlPackager
     private void renderDocuments(ZipOutputStream zos, File tempdir, ExportURLFactory urlf,
         XWikiContext context) throws XWikiException, IOException
     {
-        // Push a clean request in the Container since we don't want the
-        // main request to be used for rendering the HTML pages to export.
-        // The new request automatically gets initialized with a new Velocity Context by
-        // the VelocityRequestInitializer class.
-        Container container = (Container) Utils.getComponent(Container.ROLE);
-        DaemonContainerInitializer containerInitializer =
-            (DaemonContainerInitializer) Utils.getComponent(DaemonContainerInitializer.ROLE);
+        ExecutionContextInitializerManager ecim =
+            (ExecutionContextInitializerManager) Utils.getComponent(ExecutionContextInitializerManager.ROLE);
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
 
         VelocityContext oldVelocityContext = (VelocityContext) context.get("vcontext");
 
@@ -207,8 +204,18 @@ public class HtmlPackager
             XWikiContext renderContext = (XWikiContext) context.clone();
             renderContext.put("action", "view");
 
-            // We push the new request on top of the existing one and we pop it in the finally clause below.
-            containerInitializer.pushRequest(renderContext);
+            ExecutionContext ec = new ExecutionContext();
+
+            // Bridge with old XWiki Context, required for old code.
+            ec.setProperty("xwikicontext", renderContext);
+
+            ecim.initialize(ec);
+
+            // Push a clean new Execution Context since we don't want the main Execution Context to be used for
+            // rendering the HTML pages to export. It's cleaner to isolate it as we do. Note that the new
+            // Execution Context automatically gets initialized with a new Velocity Context by
+            // the VelocityRequestInitializer class.
+            execution.pushContext(ec);
 
             VelocityManager velocityManager = 
                 (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
@@ -222,13 +229,13 @@ public class HtmlPackager
             for (String pageName: this.pages) {
                 renderDocument(pageName, zos, renderContext, vcontext);
             }
-        } catch (DaemonContainerException e) {
+        } catch (ExecutionContextInitializerException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_EXPORT, 
-                XWikiException.ERROR_XWIKI_INIT_FAILED, "Failed to initialize request", e);
+                XWikiException.ERROR_XWIKI_INIT_FAILED, "Failed to initialize Execution Context", e);
         } finally {
             // We must ensure that the new request we've used is removed so that the current
-            // thread can continue to use its original request.
-            container.popRequest();
+            // thread can continue to use its original Execution Context.
+            execution.popContext();
             
             context.put("vcontext", oldVelocityContext);
         }

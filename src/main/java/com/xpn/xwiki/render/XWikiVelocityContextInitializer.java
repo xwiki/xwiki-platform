@@ -21,13 +21,13 @@
 package com.xpn.xwiki.render;
 
 import org.xwiki.velocity.VelocityContextInitializer;
-import org.xwiki.container.Container;
+import org.xwiki.context.Execution;
 import org.apache.velocity.VelocityContext;
 
 public class XWikiVelocityContextInitializer implements VelocityContextInitializer
 {
-    private Container container;
-    
+    private Execution execution;
+
     public void initialize(VelocityContext context)
     {
         // TODO: Move the Velocity Context initialization code currently located in

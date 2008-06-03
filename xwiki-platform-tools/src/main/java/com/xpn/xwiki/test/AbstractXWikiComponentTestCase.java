@@ -22,9 +22,10 @@ package com.xpn.xwiki.test;
 
 import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.container.Container;
-import org.xwiki.container.daemon.DaemonContainerInitializer;
 import org.xwiki.plexus.manager.PlexusComponentManager;
+import org.xwiki.context.ExecutionContextInitializerManager;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
@@ -48,18 +49,25 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
         // We need to initialize the Component Manager so that the components can be looked up
         getContext().put(ComponentManager.class.getName(), getComponentManager());
 
-        // Initialize the Container objects
-        DaemonContainerInitializer dci = (DaemonContainerInitializer) getComponentManager().lookup(
-            DaemonContainerInitializer.ROLE);
-        dci.initializeRequest(this.context);
+        // Initialize the Execution Context
+        ExecutionContextInitializerManager ecim =
+            (ExecutionContextInitializerManager) getComponentManager().lookup(ExecutionContextInitializerManager.ROLE);
+        Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
+
+        ExecutionContext ec = new ExecutionContext();
+
+        // Bridge with old XWiki Context, required for old code.
+        ec.setProperty("xwikicontext", this.context);
+
+        ecim.initialize(ec);
+        execution.setContext(ec);
     }
+    
 
     protected void tearDown() throws Exception
     {
-        Container container = (Container) getComponentManager().lookup(Container.ROLE);
-        container.removeRequest();
-        container.removeResponse();
-        container.removeSession();
+        Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
+        execution.removeContext();
     }
     
     public XWikiContext getContext()

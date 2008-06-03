@@ -301,6 +301,7 @@ public class LucenePluginApi extends PluginApi<LucenePlugin>
      * </p>
      * 
      * @param query query entered by the user
+     * @param sortField field to use to sort the results list (ex: date, author)
      * @param languages comma separated list of language codes to search in, may be null to search
      *            all languages. Language codes can be:
      *            <ul>

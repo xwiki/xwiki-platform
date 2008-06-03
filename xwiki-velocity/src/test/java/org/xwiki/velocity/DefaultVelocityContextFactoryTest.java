@@ -36,6 +36,7 @@ public class DefaultVelocityContextFactoryTest extends AbstractXWikiComponentTes
 
     protected void setUp() throws Exception
     {
+        super.setUp();
         this.factory = (VelocityContextFactory) getComponentManager().lookup(VelocityContextFactory.ROLE);
     }
 

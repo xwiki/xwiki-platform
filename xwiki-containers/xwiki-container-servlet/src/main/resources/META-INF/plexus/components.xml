@@ -15,6 +15,14 @@
           <role>org.xwiki.container.RequestInitializerManager</role>
           <role-hint>default</role-hint>
         </requirement>
+        <requirement>
+          <role>org.xwiki.context.Execution</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.context.ExecutionContextInitializerManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
       </requirements>
     </component>
   </components>

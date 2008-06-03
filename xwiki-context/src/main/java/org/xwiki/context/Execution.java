@@ -18,22 +18,24 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container.daemon;
+package org.xwiki.context;
 
-public class DaemonContainerException extends Exception
+/**
+ * Allows setting/retrieving the {@link ExecutionContext}.
+ *
+ * @version $Id: $
+ * @since 1.5M2
+ */
+public interface Execution
 {
     /**
-     * Provides an id for serialization 
+     * The role under which this component is saved in the Component Manager.
      */
-    private static final long serialVersionUID = 8783007491523719650L;
+    String ROLE = Execution.class.getName();
 
-    public DaemonContainerException(String message)
-    {
-        super(message);
-    }
-
-    public DaemonContainerException(String message, Throwable throwable)
-    {
-        super(message, throwable);
-    }
+    ExecutionContext getContext();
+    void setContext(ExecutionContext context);
+    void pushContext(ExecutionContext context);
+    void popContext();
+    void removeContext();
 }

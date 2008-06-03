@@ -8,7 +8,7 @@
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
-          <role>org.xwiki.container.Container</role>
+          <role>org.xwiki.context.Execution</role>
         </requirement>
       </requirements>
     </component>
@@ -20,7 +20,7 @@
       <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
-          <role>org.xwiki.container.Container</role>
+          <role>org.xwiki.context.Execution</role>
         </requirement>
       </requirements>
     </component>

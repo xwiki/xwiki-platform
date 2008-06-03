@@ -44,6 +44,7 @@ public class ChainingUberspectorTest extends AbstractXWikiComponentTestCase
 
     protected void setUp() throws Exception
     {
+        super.setUp();
         this.engine = (VelocityEngine) getComponentManager().lookup(VelocityEngine.ROLE);
     }
 

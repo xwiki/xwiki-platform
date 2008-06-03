@@ -18,20 +18,17 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package com.xpn.xwiki.render;
+package org.xwiki.context;
 
-import org.xwiki.velocity.VelocityContextInitializer;
-import org.xwiki.context.Execution;
-import org.apache.velocity.VelocityContext;
-
-public class XWikiVelocityContextInitializer implements VelocityContextInitializer
+public class ExecutionContextInitializerException extends Exception
 {
-    private Execution execution;
-
-    public void initialize(VelocityContext context)
+    public ExecutionContextInitializerException(String message)
     {
-        // TODO: Move the Velocity Context initialization code currently located in
-        // VelocityManager.getVelocityContext() here. This requires some refactoring as
-        // it means the XWiki object must be initialized before this code is called.
+        super(message);
+    }
+
+    public ExecutionContextInitializerException(String message, Throwable throwable)
+    {
+        super(message, throwable);
     }
 }

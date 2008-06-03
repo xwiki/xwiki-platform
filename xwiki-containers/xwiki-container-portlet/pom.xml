@@ -40,6 +40,11 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-context</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
       <groupId>portlet-api</groupId>
       <artifactId>portlet-api</artifactId>
       <version>1.0</version>

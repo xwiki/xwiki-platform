@@ -27,12 +27,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.xwiki.container.RequestInitializerManager;
 import org.xwiki.container.Container;
 import org.xwiki.container.RequestInitializerException;
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextInitializerManager;
+import org.xwiki.context.ExecutionContextInitializerException;
 
 public class DefaultServletContainerInitializer implements ServletContainerInitializer
 {
     private RequestInitializerManager requestInitializerManager;
 
+    private ExecutionContextInitializerManager executionContextInitializerManager;
+
     private Container container;
+
+    private Execution execution;
 
     public void initializeApplicationContext(ServletContext servletContext)
     {
@@ -43,20 +51,34 @@ public class DefaultServletContainerInitializer implements ServletContainerIniti
         throws ServletContainerException
     {
         // 1) Create an empty request. From this point forward request initializers can use the
-        // Container object to get any data they want from the Request.
+        //    Container object to get any data they want from the Request.
         this.container.setRequest(new ServletRequest(httpServletRequest));
 
-        // 2) Bridge with old code to play well with new components. Old code relies on the
-        // XWikiContext object whereas new code uses the Container component.
+        // 2) Create en empty Execution context so that the Container initializers can put things in the
+        //    execution context when they execute.
+        this.execution.setContext(new ExecutionContext());
+        
+        // 3) Bridge with old code to play well with new components. Old code relies on the
+        //    XWikiContext object whereas new code uses the Container component.
         if (xwikiContext != null) {
-            this.container.getRequest().setProperty("xwikicontext", xwikiContext);
+            this.execution.getContext().setProperty("xwikicontext", xwikiContext);
         }
 
-        // 3) Call the request initializers to populate the Request.
+        // 4) Call the request initializers to populate the Request.
+        // TODO: This is where the URL should be converted to a XWikiURL and the wiki, space,
+        // document, skin and possibly other parameters are put in the Execution Context by proper
+        // initializers.
         try {
             this.requestInitializerManager.initializeRequest(this.container.getRequest());
         } catch (RequestInitializerException e) {
             throw new ServletContainerException("Failed to initialize request", e);
+        }
+
+        // 5) Call Execution Context initializers to perform further Execution Context initializations
+        try {
+            this.executionContextInitializerManager.initialize(this.execution.getContext());
+        } catch (ExecutionContextInitializerException e) {
+            throw new ServletContainerException("Failed to initialize Execution Context", e);
         }
     }
 

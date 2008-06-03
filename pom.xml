@@ -58,6 +58,7 @@
     <module>xwiki-core</module>
     <module>xwiki-component</module>
     <module>xwiki-url</module>
+    <module>xwiki-context</module>
     <module>xwiki-containers</module>
     <module>xwiki-plexus</module>
     <module>xwiki-action</module>

@@ -18,42 +18,43 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.container.daemon;
+package org.xwiki.context;
 
-import java.util.HashMap;
 import java.util.Map;
-
-import org.xwiki.container.Request;
-import org.xwiki.url.XWikiURL;
+import java.util.HashMap;
 
 /**
- * Even though there's no real user request for in a Daemon we still consider there's a request
- * which corresponds to what triggered the Daemon. Also we need the request so that we can 
- * carry objects in it for the duration of the Daemon's execution. For example we need to store
- * the Velocity Context in the request so that Velocity templates executed during the Daemon's
- * existence can share it.
+ * Contains all state data related to the current user action. Note that the execution context is independent of the
+ * environment and all environment-dependent data are stored in the Container component instead.
+ *
+ * @version $Id: $ 
+ * @since 1.5M2
  */
-public class DaemonRequest implements Request
+public class ExecutionContext
 {
     private Map<String, Object> properties = new HashMap<String, Object>();
-    
+
+    /**
+     * @param key the key under which is stored the property to retrieve
+     * @return the property matching the passed key
+     */
     public Object getProperty(String key)
     {
         return this.properties.get(key);
     }
 
-    public XWikiURL getURL()
-    {
-        // Since there's no real request for a daemon there's no associated URL either and
-        // thus we return null.
-        return null;
-    }
-
+    /**
+     * @param key remove the property whose key matches the passed key
+     */
     public void removeProperty(String key)
     {
         this.properties.remove(key);
     }
 
+    /**
+     * @param key the key under which to save the passed property value
+     * @param value the value to set
+     */
     public void setProperty(String key, Object value)
     {
         this.properties.put(key, value);

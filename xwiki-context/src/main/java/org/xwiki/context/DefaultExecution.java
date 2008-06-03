@@ -1,0 +1,64 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
+package org.xwiki.context;
+
+import java.util.Stack;
+
+/**
+ * Holds the Execution Context object. Note that we require since we want to be able to pass the Execution Context to
+ * singleton components. Thus this holder is a singleton itself and the Execution Context is saved as a ThreadLocal
+ * variable. 
+ *
+ * @version $Id: $
+ * @since 1.5M2
+ */
+public class DefaultExecution implements Execution
+{
+    private ThreadLocal<Stack<ExecutionContext>> context =
+        new ThreadLocal<Stack<ExecutionContext>>();
+
+    public void pushContext(ExecutionContext context)
+    {
+        this.context.get().push(context);
+    }
+
+    public void popContext()
+    {
+        this.context.get().pop();
+    }
+
+    public ExecutionContext getContext()
+    {
+        return this.context.get().peek();
+    }
+
+    public void setContext(ExecutionContext context)
+    {
+        Stack<ExecutionContext> stack = new Stack<ExecutionContext>();
+        stack.push(context);
+        this.context.set(stack);
+    }
+
+    public void removeContext()
+    {
+        this.context.remove();
+    }
+}

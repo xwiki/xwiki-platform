@@ -81,14 +81,15 @@
 
     <module name="DefaultComesLast"/>
 
+    <!-- The default values for this one allow everything to pass. Unneeded.
     <module name="DescendantToken"/>
-
-    <module name="DoubleCheckedLocking"/>
+    -->
 
     <!--module name="DesignForExtension"/-->
 
+    <module name="DoubleCheckedLocking"/>
+
     <module name="EmptyBlock">
-      <property name="tokens" value="LITERAL_CATCH"/>
       <property name="option" value="text"/>
     </module>
 
@@ -131,11 +132,10 @@
     </module>
 
     <!-- No @author tags -->
-    <!-- We're commenting this out until we have sorted out if we want author tags or not.
     <module name="GenericIllegalRegexp">
       <property name="format" value="@author"/>
       <property name="message" value="No @author tag allowed"/>
-    </module>-->
+    </module>
 
     <!-- Need to put this back when we find a way of making it work
     <module name="Header">
@@ -144,7 +144,9 @@
     </module>
     -->
 
-    <!--module name="HiddenField"/-->
+    <module name="HiddenField">
+      <property name="tokens" value="VARIABLE_DEF"/>
+    </module>
 
     <module name="HideUtilityClassConstructor"/>
 
@@ -160,7 +162,7 @@
 
     <!--module name="IllegalToken"/-->
 
-    <module name="IllegalTokenText"/>
+    <!--module name="IllegalTokenText"/-->
 
     <module name="IllegalType"/>
 
@@ -182,7 +184,6 @@
     <module name="JavadocStyle"/>
 
     <module name="JavadocType">
-      <property name="scope" value="private"/>
       <property name="versionFormat" value="\$Id.*\$"/>
     </module>
 
@@ -236,7 +237,10 @@
     <module name="ModifierOrder"/>
 
     <module name="MultipleStringLiterals">
-      <property name="ignoreStringsRegexp" value='^("")|("[0-9]")|(" ")|("\]")|("\] = \[")$'/>
+      <property name="ignoreStringsRegexp" value='^("")|("[0-9]")|(" ")|("\]")|("\] = \[")|("unchecked")$'/>
+      <!--  Newer versions of the checkstyle plugin (not the one used by the maven plugin) allow to ignore annotations.
+      <property name="ignoreOccurrenceContext" value="ANNOTATION"/>
+      -->
     </module>
 
     <module name="MultipleVariableDeclarations"/>
@@ -273,11 +277,11 @@
 
     <module name="RedundantImport"/>
 
+    <module name="RedundantModifier"/>
+
     <module name="RedundantThrows">
       <property name="allowUnchecked" value="true"/>
     </module>
-
-    <module name="RedundantModifier"/>
 
     <!--module name="Regexp"/-->
 
@@ -293,7 +297,11 @@
 
     <!--module name="RequiredRegexp"/-->
 
-    <module name="ReturnCount"/>
+    <!-- Increasing the maximum number of allowed return statements, as otherwise
+         the code will simply use workarounds to hide the same amount of exit points. -->
+    <module name="ReturnCount">
+      <property name="max" value="5"/>
+    </module>
 
     <module name="RightCurly"/>
 
@@ -347,8 +355,8 @@
     <module name="WhitespaceAfter"/>
 
     <module name="WhitespaceAround">
-            <property name="tokens" value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,GE,GT,LAND,LCURLY,LE,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,RCURLY,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,LITERAL_ASSERT,TYPE_EXTENSION_AND,WILDCARD_TYPE"/>
-        </module>
+      <property name="tokens" value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,GE,GT,LAND,LCURLY,LE,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,RCURLY,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN,LITERAL_ASSERT,TYPE_EXTENSION_AND,WILDCARD_TYPE"/>
+    </module>
 
   </module>
   

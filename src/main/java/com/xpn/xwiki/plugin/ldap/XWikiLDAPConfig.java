@@ -361,7 +361,7 @@ public final class XWikiLDAPConfig
 
     /**
      * @param context the XWiki context.
-     * @return the time in ms until a entry in the cache is to expire.
+     * @return the time in seconds until a entry in the cache is to expire.
      */
     public int getCacheExpiration(XWikiContext context)
     {

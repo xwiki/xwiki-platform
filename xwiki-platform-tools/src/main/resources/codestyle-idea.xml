@@ -34,7 +34,7 @@
   <option name="BLANK_LINES_AROUND_FIELD" value="1" />
   <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
   <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="99" />
-  <option name="RIGHT_MARGIN" value="100" />
+  <option name="RIGHT_MARGIN" value="120" />
   <option name="CALL_PARAMETERS_WRAP" value="1" />
   <option name="METHOD_PARAMETERS_WRAP" value="1" />
   <option name="EXTENDS_LIST_WRAP" value="1" />

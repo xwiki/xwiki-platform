@@ -200,8 +200,8 @@
     </module>
 
     <module name="LineLength">
-      <property name="ignorePattern" value="(@version|@see|^import)"/>
-      <property name="max" value="100"/>
+      <property name="ignorePattern" value="(@version|@see|@link|^import)"/>
+      <property name="max" value="120"/>
     </module>
 
     <module name="LocalFinalVariableName"/>

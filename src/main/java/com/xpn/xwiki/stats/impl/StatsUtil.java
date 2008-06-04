@@ -69,8 +69,7 @@ public final class StatsUtil
     private static final String CFGPROP_STATS = "xwiki.stats";
 
     /**
-     * The name of the property in XWiki configuration file indicating if a virtual wiki store
-     * statistics by default.
+     * The name of the property in XWiki configuration file indicating if a virtual wiki store statistics by default.
      */
     private static final String CFGPROP_STATS_DEFAULT = "xwiki.stats.default";
 
@@ -85,8 +84,7 @@ public final class StatsUtil
     private static final String SESSPROP_VISITOBJECT = "visitObject";
 
     /**
-     * The name of the session property containing the size of the recent list of visit statistics
-     * actions.
+     * The name of the session property containing the size of the recent list of visit statistics actions.
      */
     private static final String PREFPROP_RECENT_VISITS_SIZE = "recent_visits_size";
 
@@ -188,8 +186,7 @@ public final class StatsUtil
         } else {
             // The first day of the month has value 1
             period =
-                cal.get(Calendar.YEAR) * 10000 + (cal.get(Calendar.MONTH) + 1) * 100
-                    + cal.get(Calendar.DAY_OF_MONTH);
+                cal.get(Calendar.YEAR) * 10000 + (cal.get(Calendar.MONTH) + 1) * 100 + cal.get(Calendar.DAY_OF_MONTH);
         }
 
         return period;
@@ -203,8 +200,7 @@ public final class StatsUtil
     public static String[] getCookieDomains(XWikiContext context)
     {
         if (cookieDomains == null) {
-            cookieDomains =
-                StringUtils.split(context.getWiki().Param(CFGPROP_COOKIEDOMAINS), ",");
+            cookieDomains = StringUtils.split(context.getWiki().Param(CFGPROP_COOKIEDOMAINS), ",");
         }
 
         return cookieDomains;
@@ -232,8 +228,7 @@ public final class StatsUtil
      */
     public static Collection< ? > getRecentActionFromSessions(XWikiContext context, String action)
     {
-        return (Collection< ? >) context.getRequest().getSession().getAttribute(
-            SESSPROP_RECENT_PREFFIX + action);
+        return (Collection< ? >) context.getRequest().getSession().getAttribute(SESSPROP_RECENT_PREFFIX + action);
     }
 
     /**
@@ -244,8 +239,7 @@ public final class StatsUtil
      * @param actions the actions.
      * @since 1.4M1
      */
-    public static void setRecentActionsFromSession(XWikiContext context, String action,
-        Collection< ? > actions)
+    public static void setRecentActionsFromSession(XWikiContext context, String action, Collection< ? > actions)
     {
         context.getRequest().getSession().setAttribute(SESSPROP_RECENT_PREFFIX + action, actions);
     }
@@ -257,8 +251,7 @@ public final class StatsUtil
      */
     public static int getRecentVisitSize(XWikiContext context)
     {
-        return context.getWiki()
-            .getXWikiPreferenceAsInt(PREFPROP_RECENT_VISITS_SIZE, 20, context);
+        return context.getWiki().getXWikiPreferenceAsInt(PREFPROP_RECENT_VISITS_SIZE, 20, context);
     }
 
     /**
@@ -301,16 +294,14 @@ public final class StatsUtil
     public static boolean isWikiStatsEnabled(XWikiContext context)
     {
         String statsdefault = context.getWiki().Param(CFGPROP_STATS_DEFAULT);
-        String statsactive =
-            context.getWiki().getXWikiPreference(PREFPROP_STATISTICS, "", context);
+        String statsactive = context.getWiki().getXWikiPreference(PREFPROP_STATISTICS, "", context);
 
-        return "1".equals(statsactive)
-            || (("".equals(statsactive)) && ("1".equals(statsdefault)));
+        return "1".equals(statsactive) || (("".equals(statsactive)) && ("1".equals(statsdefault)));
     }
 
     /**
-     * Try to find the visiting session of the current request, or create a new one if this request
-     * is not part of a visit. The session is searched in the following way:
+     * Try to find the visiting session of the current request, or create a new one if this request is not part of a
+     * visit. The session is searched in the following way:
      * <ol>
      * <li>the java session is searched for the visit object</li>
      * <li>try to find the stored session using the cookie</li>
@@ -359,8 +350,7 @@ public final class StatsUtil
                 }
             }
 
-            if ((!context.getUser().equals(GUEST_FULLNAME))
-                && (visitObject.getUser().equals(GUEST_FULLNAME))) {
+            if ((!context.getUser().equals(GUEST_FULLNAME)) && (visitObject.getUser().equals(GUEST_FULLNAME))) {
                 // The user has changed from guest to an authenticated user
                 // We want to record this
                 VisitStats newVisitObject = visitObject;
@@ -377,8 +367,7 @@ public final class StatsUtil
     }
 
     /**
-     * Try to find the visit object in the database from cookie if it's not a new cookie, search by
-     * unique id otherwise.
+     * Try to find the visit object in the database from cookie if it's not a new cookie, search by unique id otherwise.
      * 
      * @param context the XWiki context.
      * @return the visit statistics object found.
@@ -437,9 +426,8 @@ public final class StatsUtil
                 // Since the session is also maintained using a cookie
                 // then there is something wrong here
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug("Found visit with cookie " + visitObject.getCookie()
-                        + " in session " + session.getId() + " for request with cookie "
-                        + cookie.getValue());
+                    LOG.debug("Found visit with cookie " + visitObject.getCookie() + " in session " + session.getId()
+                        + " for request with cookie " + cookie.getValue());
                 }
 
                 valid = false;
@@ -492,9 +480,7 @@ public final class StatsUtil
             uniqueID = cookie.getValue();
         }
 
-        visitStats =
-            new VisitStats(context.getUser(), uniqueID, cookie.getValue(), ip, ua, nowDate,
-                PeriodType.MONTH);
+        visitStats = new VisitStats(context.getUser(), uniqueID, cookie.getValue(), ip, ua, nowDate, PeriodType.MONTH);
         visitStats.setEndDate(nowDate);
 
         return visitStats;
@@ -510,8 +496,8 @@ public final class StatsUtil
      * @throws XWikiException error when searching for visit object.
      * @since 1.4M1
      */
-    protected static VisitStats findVisitByField(String fieldName, String fieldValue,
-        XWikiContext context) throws XWikiException
+    protected static VisitStats findVisitByField(String fieldName, String fieldValue, XWikiContext context)
+        throws XWikiException
     {
         VisitStats visitStats = null;
 
@@ -523,8 +509,8 @@ public final class StatsUtil
             try {
                 QueryManager qm = store.getObjectQueryManager(context);
                 Filter filter =
-                    qm.createFilter(VisitStats.class).addEqualTo(fieldName, fieldValue)
-                        .addGreaterThan(VisitStats.Property.endDate.toString(), currentDate);
+                    qm.createFilter(VisitStats.class).addEqualTo(fieldName, fieldValue).addGreaterThan(
+                        VisitStats.Property.endDate.toString(), currentDate);
                 org.apache.portals.graffito.jcr.query.Query query = qm.createQuery(filter);
                 query.addOrderByDescending(VisitStats.Property.endDate.toString());
                 List< ? > solist = store.getObjects(query, context);
@@ -569,8 +555,7 @@ public final class StatsUtil
      * @throws XWikiException error when searching for visit object.
      * @since 1.4M1
      */
-    protected static VisitStats findVisitByCookie(String cookie, XWikiContext context)
-        throws XWikiException
+    protected static VisitStats findVisitByCookie(String cookie, XWikiContext context) throws XWikiException
     {
         return findVisitByField("cookie", cookie, context);
     }
@@ -584,8 +569,7 @@ public final class StatsUtil
      * @throws XWikiException error when searching for visit object.
      * @since 1.4M1
      */
-    protected static VisitStats findVisitByIPUA(String uniqueID, XWikiContext context)
-        throws XWikiException
+    protected static VisitStats findVisitByIPUA(String uniqueID, XWikiContext context) throws XWikiException
     {
         return findVisitByField("uniqueID", uniqueID, context);
     }
@@ -599,8 +583,7 @@ public final class StatsUtil
      */
     protected static Cookie addCookie(XWikiContext context)
     {
-        Cookie cookie =
-            new Cookie(COOKPROP_VISITID, RandomStringUtils.randomAlphanumeric(32).toUpperCase());
+        Cookie cookie = new Cookie(COOKPROP_VISITID, RandomStringUtils.randomAlphanumeric(32).toUpperCase());
         cookie.setPath("/");
 
         int time = (int) (getCookieExpirationDate().getTime() - (new Date()).getTime()) / 1000;
@@ -623,9 +606,8 @@ public final class StatsUtil
         }
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName()
-                + " with domain " + cookie.getDomain() + " and path " + cookie.getPath()
-                + " and maxage " + cookie.getMaxAge());
+            LOG.debug("Setting cookie " + cookie.getValue() + " for name " + cookie.getName() + " with domain "
+                + cookie.getDomain() + " and path " + cookie.getPath() + " and maxage " + cookie.getMaxAge());
         }
 
         context.getResponse().addCookie(cookie);

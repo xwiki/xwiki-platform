@@ -23,6 +23,8 @@ package org.xwiki.velocity;
 import org.apache.velocity.VelocityContext;
 
 /**
+ * Populates new Velocity contexts with custom entries.
+ * 
  * @version $Id: $
  * @since 1.5M1
  */
@@ -34,8 +36,8 @@ public interface VelocityContextInitializer
     String ROLE = VelocityContextInitializer.class.getName();
 
     /**
-     * Allow initializing the Velocity Context by ptting objects into it.
-     *
+     * Allow initializing the Velocity Context by putting objects into it.
+     * 
      * @param context the Velocity context to initialize
      */
     void initialize(VelocityContext context);

@@ -26,19 +26,19 @@ import java.util.Properties;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.context.Context;
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.phase.Composable;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.manager.ComponentLookupException;
 
 /**
  * Default implementation for {@link VelocityContextFactory}.
- *
+ * 
  * @version $Id: $
  */
-public class DefaultVelocityContextFactory extends AbstractLogEnabled
-    implements VelocityContextFactory, Initializable, Composable
+public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
+    VelocityContextFactory, Initializable, Composable
 {
     /**
      * The component manager we used to find all components implementing the
@@ -47,8 +47,7 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
     private ComponentManager componentManager;
 
     /**
-     * The Velocity tools coming from the component's configuration and injected
-     * by the Component Manager.
+     * Context configuration, injected by the Component Manager; holds the Velocity tools.
      */
     private Properties properties;
 
@@ -60,6 +59,7 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -69,34 +69,35 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
         this.toolsContext = new VelocityContext();
-        
+
         // Instantiate Velocity tools
         if (this.properties != null) {
-            for (Enumeration< ? > props = this.properties.propertyNames();
-                props.hasMoreElements();)
-            {
+            for (Enumeration< ? > props = this.properties.propertyNames(); props
+                .hasMoreElements();) {
                 String key = props.nextElement().toString();
                 String value = this.properties.getProperty(key);
                 Object toolInstance;
                 try {
                     toolInstance = Class.forName(value).newInstance();
                 } catch (Exception e) {
-                    throw new InitializationException("Failed to initialize tool [" 
-                        + value + "]", e);
+                    throw new InitializationException(
+                        "Failed to initialize tool [" + value + "]", e);
                 }
                 this.toolsContext.put(key, toolInstance);
                 getLogger().debug("Setting tool [" + key + "] = [" + value + "]");
             }
         }
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see VelocityContextFactory#createContext()
      */
     public VelocityContext createContext() throws XWikiVelocityException
@@ -106,14 +107,13 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled
 
         // Call all components implementing the VelocityContextInitializer's role.
         try {
-            for (Object interceptor
-                : this.componentManager.lookupList(VelocityContextInitializer.ROLE))
-            {
+            for (Object interceptor : this.componentManager
+                .lookupList(VelocityContextInitializer.ROLE)) {
                 ((VelocityContextInitializer) interceptor).initialize(context);
             }
         } catch (ComponentLookupException e) {
-            throw new XWikiVelocityException("Failed to locate some Velocity Context initializers",
-                e);
+            throw new XWikiVelocityException(
+                "Failed to locate some Velocity Context initializers", e);
         }
 
         return context;

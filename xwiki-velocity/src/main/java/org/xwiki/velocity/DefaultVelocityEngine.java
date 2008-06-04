@@ -20,6 +20,12 @@
  */
 package org.xwiki.velocity;
 
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.Writer;
+import java.util.Enumeration;
+import java.util.Properties;
+
 import org.apache.velocity.context.Context;
 import org.apache.velocity.context.InternalContextAdapterImpl;
 import org.apache.velocity.runtime.RuntimeConstants;
@@ -31,17 +37,11 @@ import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletApplicationContext;
 
-import java.util.Enumeration;
-import java.util.Properties;
-import java.io.StringReader;
-import java.io.Writer;
-import java.io.Reader;
-
 /**
  * Default implementation of the Velocity service which initializes the Velocity system using
  * configuration values defined in the component's configuration. Note that the {@link #initialize}
  * method has to be executed before any other method can be called.
- *
+ * 
  * @version $Id: $
  */
 public class DefaultVelocityEngine extends AbstractLogEnabled implements VelocityEngine, LogChute
@@ -58,15 +58,15 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     private org.apache.velocity.app.VelocityEngine engine;
 
     /**
-     * The list of properties to set on the Velocity Engine. These are injected automatically
-     * by the Component subsystem.
+     * The list of properties to set on the Velocity Engine. These are injected automatically by the
+     * Component subsystem.
      */
     private Properties properties;
 
     /**
-     * The Container component (Injected automatically by the Component subsystem). We need it
-     * in order to store a the servlet context as a property in the Application Context so that
-     * the Velocity Tools WebappLoader can find it.  
+     * The Container component (Injected automatically by the Component subsystem). We need it in
+     * order to store a the servlet context as a property in the Application Context so that the
+     * Velocity Tools WebappLoader can find it.
      */
     private Container container;
 
@@ -88,8 +88,8 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
         // <code>org.apache.velocity.tools.view.servlet.WebappLoader</code> Velocity Tools class
         // then we need to set the ServletContext object as a Velocity Application Attribute as
         // it's used to load resources from the webapp directory in WebapLoader.
-        String resourceLoader = properties.getProperty(RESOURCE_LOADER,
-            this.properties.getProperty(RESOURCE_LOADER));
+        String resourceLoader =
+            properties.getProperty(RESOURCE_LOADER, this.properties.getProperty(RESOURCE_LOADER));
         if (resourceLoader.equals("webapp")) {
             ApplicationContext context = this.container.getApplicationContext();
             if (context instanceof ServletApplicationContext) {
@@ -97,7 +97,7 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
                     ((ServletApplicationContext) context).getServletContext());
             }
         }
-        
+
         // Avoid "unable to find resource 'VM_global_library.vm' in any resource loader." if no
         // Velocimacro library is defined. This value is overriden below.
         getEngine().setProperty("velocimacro.library", "");
@@ -156,8 +156,9 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     {
         // Ensure that initialization has been called
         if (this.engine == null) {
-            throw new XWikiVelocityException("This Velocity Engine has not yet been initialized. "
-                + " You must call its initialize() method before you can use it.");
+            throw new XWikiVelocityException(
+                "This Velocity Engine has not yet been initialized. "
+                    + " You must call its initialize() method before you can use it.");
         }
 
         // We override the default implementation here. See #init(RuntimeServices)
@@ -192,7 +193,10 @@ public class DefaultVelocityEngine extends AbstractLogEnabled implements Velocit
     }
 
     /**
-     * @return the initialized Velocity engine which can be used to call all Velocity services
+     * Provides access to the {@link org.apache.velocity.app.VelocityEngine Velocity Engine}, which
+     * can be used to call all Velocity services.
+     * 
+     * @return the initialized Velocity engine
      */
     private org.apache.velocity.app.VelocityEngine getEngine()
     {

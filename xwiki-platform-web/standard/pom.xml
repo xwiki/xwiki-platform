@@ -170,6 +170,7 @@
             <configuration>
               <contextPath>/xwiki</contextPath>
               <classesDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF</classesDirectory>
+              <webAppSourceDirectory>${project.build.directory}/${project.build.finalName}/</webAppSourceDirectory>
               <scanIntervalSeconds>10</scanIntervalSeconds>
               <connectors>
                 <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">

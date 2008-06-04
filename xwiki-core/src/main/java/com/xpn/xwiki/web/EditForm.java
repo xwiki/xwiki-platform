@@ -56,6 +56,8 @@ public class EditForm extends XWikiForm
     private String tags;
 
     private boolean lockForce;
+
+    private String syntaxId;
     
     public void readRequest()
     {
@@ -74,6 +76,7 @@ public class EditForm extends XWikiForm
         setTags(request.getParameterValues("tags"));
         setLockForce("1".equals(request.getParameter("force")));
         setMinorEdit(request.getParameter("minor_edit")!=null);
+        setSyntaxId(request.getParameter("syntaxId"));
     }
 
     public void setTags(String[] parameter)
@@ -253,5 +256,15 @@ public class EditForm extends XWikiForm
     public void setLockForce(boolean lockForce)
     {
         this.lockForce = lockForce;
+    }
+
+    public String getSyntaxId()
+    {
+        return this.syntaxId;
+    }
+
+    public void setSyntaxId(String syntaxId)
+    {
+        this.syntaxId = syntaxId;
     }
 }

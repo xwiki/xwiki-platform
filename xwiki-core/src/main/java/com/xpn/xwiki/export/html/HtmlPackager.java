@@ -18,11 +18,11 @@ import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.VelocityManager;
 import com.xpn.xwiki.web.ExportURLFactory;
 import com.xpn.xwiki.web.Utils;
 

@@ -1,0 +1,23 @@
+beginParagraph
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+onSpecialSymbol: [<]
+onWord: [a]
+onSpace
+onWord: [href]
+onSpecialSymbol: [=]
+onSpecialSymbol: ["]
+onWord: [url]
+onSpecialSymbol: ["]
+onSpecialSymbol: [>]
+onWord: [some]
+onSpace
+onWord: [HTML]
+onSpecialSymbol: [<]
+onSpecialSymbol: [/]
+onWord: [a]
+onSpecialSymbol: [>]
+onSpecialSymbol: [.]
+endParagraph

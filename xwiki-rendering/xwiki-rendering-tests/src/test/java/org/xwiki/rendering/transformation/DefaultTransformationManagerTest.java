@@ -16,26 +16,24 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
-package com.xpn.xwiki.render;
+package org.xwiki.rendering.transformation;
 
-import org.apache.velocity.VelocityContext;
-import org.xwiki.velocity.VelocityEngine;
-import org.xwiki.velocity.XWikiVelocityException;
+import java.util.Collections;
 
-/**
- * @since 1.5M1
- * @version $Id: $
- */
-public interface VelocityManager
+import org.xwiki.rendering.AbstractRenderingTestCase;
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
+
+public class DefaultTransformationManagerTest extends AbstractRenderingTestCase
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    public final static String ROLE = VelocityManager.class.getName();
-
-    VelocityContext getVelocityContext();
-    
-    VelocityEngine getVelocityEngine() throws XWikiVelocityException;
+    public void testTransformations() throws Exception 
+    {
+        TransformationManager manager = 
+            (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
+         manager.performTransformations(new DOM(Collections.<Block>emptyList()),
+            new Syntax(SyntaxType.XWIKI, "2.0"));
+    }
 }

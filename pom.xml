@@ -64,5 +64,6 @@
     <module>xwiki-action</module>
     <module>xwiki-velocity</module>
     <module>xwiki-observation</module>
+    <module>xwiki-rendering</module>
   </modules>
 </project>

@@ -66,6 +66,11 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
@@ -97,10 +102,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
-import com.xpn.xwiki.web.EditForm;
-import com.xpn.xwiki.web.ObjectAddForm;
-import com.xpn.xwiki.web.XWikiMessageTool;
-import com.xpn.xwiki.web.XWikiRequest;
+import com.xpn.xwiki.web.*;
 
 public class XWikiDocument
 {
@@ -161,16 +163,34 @@ public class XWikiDocument
 
     private BaseObject tags;
 
-    // Comment on the latest modification
+    /**
+     * Comment on the latest modification.
+     */
     private String comment;
 
-    /** Is latest modification is minor edit */
+    /**
+     * Wiki syntax supported by this document. This is used to support different syntaxes
+     * inside the same wiki. For example a page can use the Confluence 2.0 syntax while
+     * another one uses the XWiki 1.0 syntax. In practice our first need is to support the
+     * new rendering component. To use the old rendering implementation specify a 
+     * "xwiki/1.0" syntaxId and use a "xwiki/2.0" syntaxId for using the new rendering
+     * component.
+     */
+    private String syntaxId;
+    
+    /**
+     * Is latest modification a minor edit
+     */
     private boolean isMinorEdit = false;
 
-    // Used to make sure the MetaData String is regenerated
+    /**
+     * Used to make sure the MetaData String is regenerated.
+     */
     private boolean isContentDirty = true;
 
-    // Used to make sure the MetaData String is regenerated
+    /**
+     * Used to make sure the MetaData String is regenerated
+     */
     private boolean isMetaDataDirty = true;
 
     public static final int HAS_ATTACHMENTS = 1;
@@ -345,6 +365,7 @@ public class XWikiDocument
         this.attachmentList = new ArrayList<XWikiAttachment>();
         this.customClass = "";
         this.comment = "";
+        this.syntaxId = "xwiki/1.0";
 
         // Note: As there's no notion of an Empty document we don't set the original document
         // field. Thus getOriginalDocument() may return null.
@@ -403,7 +424,27 @@ public class XWikiDocument
 
     public String getRenderedContent(XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getRenderingEngine().renderDocument(this, context);
+        String renderedContent;
+        // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
+        if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+            renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
+        } else {
+            StringWriter writer = new StringWriter();
+            TransformationManager transformations = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+            DOM dom;
+            try {
+                Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
+                dom = parser.parse(new StringReader(content));
+                SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+                transformations.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(getSyntaxId()));
+            } catch (Exception e) {
+                throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                    "Failed to render content using new rendering system", e);
+            }
+            dom.traverse(new XHTMLRenderer(writer));
+            renderedContent = writer.toString();
+        }
+        return renderedContent;
     }
 
     public String getRenderedContent(String text, XWikiContext context)
@@ -1639,6 +1680,12 @@ public class XWikiDocument
         if (tags != null) {
             setTags(tags, context);
         }
+
+        // Set the Syntax id if defined
+        String syntaxId = eform.getSyntaxId();
+        if (syntaxId != null) {
+            setSyntaxId(syntaxId);
+        }
     }
 
     /**
@@ -1857,6 +1904,8 @@ public class XWikiDocument
         setxWikiClassXML(document.getxWikiClassXML());
         setComment(document.getComment());
         setMinorEdit(document.isMinorEdit());
+        setSyntaxId(document.getSyntaxId());
+        setSyntaxId(document.getSyntaxId());
 
         clonexWikiObjects(document);
         copyAttachments(document);
@@ -1907,6 +1956,8 @@ public class XWikiDocument
             doc.setxWikiClassXML(getxWikiClassXML());
             doc.setComment(getComment());
             doc.setMinorEdit(isMinorEdit());
+            doc.setSyntaxId(getSyntaxId());
+
             doc.clonexWikiObjects(this);
             doc.copyAttachments(this);
             doc.elements = elements;
@@ -2030,6 +2081,10 @@ public class XWikiDocument
         }
 
         if (isMinorEdit() != doc.isMinorEdit()) {
+            return false;
+        }
+
+        if (!getSyntaxId().equals(doc.getSyntaxId())) {
             return false;
         }
 
@@ -2230,6 +2285,10 @@ public class XWikiDocument
 
         el = new DOMElement("minorEdit");
         el.addText(String.valueOf(isMinorEdit()));
+        docel.add(el);
+
+        el = new DOMElement("syntaxId");
+        el.addText(getSyntaxId());
         docel.add(el);
 
         for (XWikiAttachment attach : getAttachmentList()) {
@@ -2443,6 +2502,13 @@ public class XWikiDocument
         if (!scdate.equals("")) {
             Date cdate = new Date(Long.parseLong(scdate));
             setCreationDate(cdate);
+        }
+
+        String syntaxId = getElement(docel, "syntaxId");
+        if ((syntaxId == null) || (syntaxId.length() == 0)) {
+            setSyntaxId("xwiki/1.0");
+        } else {
+            setSyntaxId(syntaxId);
         }
 
         List atels = docel.elements("attachment");
@@ -3734,6 +3800,32 @@ public class XWikiDocument
         return getComments(true);
     }
 
+    /**
+     * @return the Syntax id representing the syntax used for the current document. For example "xwiki/1.0" represents
+     *         the first version XWiki syntax while "xwiki/2.0" represents version 2.0 of the XWiki Syntax.
+     */
+    public String getSyntaxId()
+    {
+        String result;
+
+        if ((this.syntaxId == null) || (this.syntaxId.length() == 0)) {
+            result = "xwiki/1.0";
+        } else {
+            result = this.syntaxId;
+        }
+
+        return result;
+    }
+
+    /**
+     * @param syntaxId the new syntax id to set (eg "xwiki/1.0", "xwiki/2.0", etc)
+     * @see #getSyntaxId()
+     */
+    public void setSyntaxId(String syntaxId)
+    {
+        this.syntaxId = syntaxId;
+    }
+    
     public Vector<BaseObject> getComments(boolean asc)
     {
         if (asc) {

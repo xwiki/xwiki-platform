@@ -33,6 +33,8 @@ import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityExecutionContextInitializer;
 import org.xwiki.velocity.VelocityFactory;
 import org.xwiki.velocity.XWikiVelocityException;
+import org.xwiki.velocity.VelocityManager;
+import org.xwiki.rendering.parser.SyntaxFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -91,6 +93,11 @@ public class DefaultVelocityManager implements VelocityManager, Composable
             // We put the com.xpn.xwiki.api.Context object into the context and not the com.xpn.xwiki.XWikiContext one
             // which is for internal use only. In this manner we control what the user can access.
             vcontext.put("context", new Context(xcontext));
+
+            // Make the Syntax Factory component available from Velocity.
+            // TODO: We need to decide how we want to expose components in general and how to protect users from
+            // "dangerous" apis.
+            vcontext.put("syntaxFactory", Utils.getComponent(SyntaxFactory.ROLE));
 
             // Ugly hack. The MessageTool object is created in xwiki.prepareResources(). It's also put in the
             // Velocity context there. However if we create a new Velocity context we need to populate it with

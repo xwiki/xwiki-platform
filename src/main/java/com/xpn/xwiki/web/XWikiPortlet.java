@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
-import com.xpn.xwiki.render.VelocityManager;
+import org.xwiki.velocity.VelocityManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.log4j.MDC;
@@ -80,7 +80,7 @@ public class XWikiPortlet extends GenericPortlet
         XWikiURLFactory urlf = xwiki.getURLFactoryService().createURLFactory(context.getMode(), context);
         context.setURLFactory(urlf);
 
-        VelocityManager velocityManager = 
+        VelocityManager velocityManager =
             (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
         VelocityContext vcontext = velocityManager.getVelocityContext();
         

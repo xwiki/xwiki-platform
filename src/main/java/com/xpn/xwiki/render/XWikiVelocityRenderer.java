@@ -29,7 +29,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.tools.VelocityFormatter;
+import org.xwiki.velocity.VelocityManager;
 
 import java.io.*;
 import java.util.ArrayList;

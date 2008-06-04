@@ -1,7 +1,7 @@
 <component-set>
   <components>
     <component>
-      <role>com.xpn.xwiki.render.VelocityManager</role>
+      <role>org.xwiki.velocity.VelocityManager</role>
       <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.render.DefaultVelocityManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

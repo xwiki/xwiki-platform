@@ -515,6 +515,14 @@ public class Utils
     }
 
     /**
+     * @return the component manager used by {@link #getComponent(String)} and {@link #getComponent(String, String)}
+     */
+    public static ComponentManager getComponentManager()
+    {
+        return Utils.componentManager;
+    }
+
+    /**
      * Lookup a XWiki component by role and hint.
      * 
      * @param role the component's identity (usually the component's interface name as a String)

@@ -39,14 +39,13 @@ import org.xwiki.xmlrpc.model.XWikiExtendedId;
 import org.xwiki.xmlrpc.model.XWikiObject;
 import org.xwiki.xmlrpc.model.XWikiPage;
 import org.xwiki.xmlrpc.model.XWikiPageSummary;
-
+import org.xwiki.velocity.VelocityManager;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.XWiki;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.render.VelocityManager;
 import com.xpn.xwiki.web.Utils;
 
 /**
@@ -643,7 +642,7 @@ public class XWikiXmlRpcHandler
                     baseXWiki.getDocument(extendedId.getBasePageId(), context);
                 context.setDoc(baseDocument);
                 
-                VelocityManager velocityManager = 
+                VelocityManager velocityManager =
                     (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
                 VelocityContext vcontext = velocityManager.getVelocityContext();
 

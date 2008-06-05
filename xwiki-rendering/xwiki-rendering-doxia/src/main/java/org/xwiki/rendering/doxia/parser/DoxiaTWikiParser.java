@@ -19,18 +19,17 @@
  */
 package org.xwiki.rendering.doxia.parser;
 
-import org.apache.maven.doxia.module.confluence.ConfluenceParser;
-import org.xwiki.rendering.parser.Parser;
+import org.apache.maven.doxia.module.twiki.TWikiParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
-public class DoxiaConfluenceParser extends AbstractDoxiaParser
+public class DoxiaTWikiParser extends AbstractDoxiaParser
 {
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.CONFLUENCE, "1.0");
+    private static final Syntax SYNTAX = new Syntax(SyntaxType.TWIKI, "1.0");
 
     /**
      * {@inheritDoc}
-     * @see Parser#getSyntax()
+     * @see org.xwiki.rendering.parser.Parser#getSyntax()
      */
     public Syntax getSyntax()
     {
@@ -39,10 +38,10 @@ public class DoxiaConfluenceParser extends AbstractDoxiaParser
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.doxia.parser.AbstractDoxiaParser#createDoxiaParser() 
+     * @see AbstractDoxiaParser#createDoxiaParser()
      */
     public org.apache.maven.doxia.parser.Parser createDoxiaParser()
     {
-        return new ConfluenceParser();
+        return new TWikiParser();
     }
 }

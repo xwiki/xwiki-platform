@@ -71,6 +71,8 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
             syntaxType = SyntaxType.JSPWIKI;
         } else if (syntaxId.equalsIgnoreCase(SyntaxType.MEDIAWIKI.toIdString())) {
             syntaxType = SyntaxType.MEDIAWIKI;
+        } else if (syntaxId.equalsIgnoreCase(SyntaxType.TWIKI.toIdString())) {
+            syntaxType = SyntaxType.TWIKI;
         } else {
             throw new ParseException("Unknown Syntax id [" + syntaxId + "]. Valid syntaxes are [xwiki] and "
                 + "[confluence]");

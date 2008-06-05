@@ -19,30 +19,28 @@
  */
 package org.xwiki.rendering.doxia.parser;
 
-import org.apache.maven.doxia.module.confluence.ConfluenceParser;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.doxia.internal.DocumentGeneratorSink;
 
-public class DoxiaConfluenceParser extends AbstractDoxiaParser
+import java.io.Reader;
+
+public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements Parser
 {
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.CONFLUENCE, "1.0");
+    public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
 
-    /**
-     * {@inheritDoc}
-     * @see Parser#getSyntax()
-     */
-    public Syntax getSyntax()
+    public DOM parse(Reader source) throws ParseException
     {
-        return SYNTAX;
-    }
+        org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
+        DocumentGeneratorSink sink = new DocumentGeneratorSink();
 
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.doxia.parser.AbstractDoxiaParser#createDoxiaParser() 
-     */
-    public org.apache.maven.doxia.parser.Parser createDoxiaParser()
-    {
-        return new ConfluenceParser();
+        try {
+            parser.parse(source, sink);
+        } catch (org.apache.maven.doxia.parser.ParseException e) {
+            throw new ParseException("Failed to parse input source", e);
+        }
+        return sink.getDOM();
     }
 }

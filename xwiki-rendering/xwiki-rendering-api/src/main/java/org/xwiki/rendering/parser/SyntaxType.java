@@ -25,7 +25,8 @@ public enum SyntaxType
     CONFLUENCE("Confluence"),
     MEDIAWIKI("MediaWiki"),
     CREOLE("Creole"),
-    JSPWIKI("JSPWiki");
+    JSPWIKI("JSPWiki"),
+    TWIKI("TWiki");
 
     private String id;
 

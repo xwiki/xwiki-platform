@@ -569,6 +569,11 @@
       <artifactId>xwiki-core-rendering-wikimodel</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering-doxia</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
 
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->

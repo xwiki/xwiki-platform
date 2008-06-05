@@ -21,7 +21,14 @@ package org.xwiki.rendering.listener;
 
 public enum SpecialSymbol
 {
-    LESSTHAN("<"), GREATERTHAN(">"), EQUAL("="), QUOTE("\""), SLASH("/"), DOT("."), DOLLAR("$");
+    LESSTHAN("<"),
+    GREATERTHAN(">"),
+    EQUAL("="),
+    QUOTE("\""),
+    SLASH("/"),
+    DOT("."),
+    DOLLAR("$"),
+    STAR("*");
     
     private String symbol;
     
@@ -39,20 +46,22 @@ public enum SpecialSymbol
     public static SpecialSymbol parseString(String symbol)
     {
         SpecialSymbol result;
-        if (symbol.equals("<")) {
+        if (symbol.equals(SpecialSymbol.LESSTHAN.toString())) {
             result = SpecialSymbol.LESSTHAN;
-        } else if (symbol.equals(">")) {
+        } else if (symbol.equals(SpecialSymbol.GREATERTHAN.toString())) {
             result = SpecialSymbol.GREATERTHAN;
-        } else if (symbol.equals("=")) {
+        } else if (symbol.equals(SpecialSymbol.EQUAL.toString())) {
             result = SpecialSymbol.EQUAL;
-        } else if (symbol.equals("\"")){
+        } else if (symbol.equals(SpecialSymbol.QUOTE.toString())){
             result = SpecialSymbol.QUOTE;
-        } else if (symbol.equals("/")) {
+        } else if (symbol.equals(SpecialSymbol.SLASH.toString())) {
             result = SpecialSymbol.SLASH;
-        } else if (symbol.equals(".")) {
+        } else if (symbol.equals(SpecialSymbol.DOT.toString())) {
             result = SpecialSymbol.DOT;
-        } else if (symbol.equals("$")) {
+        } else if (symbol.equals(SpecialSymbol.DOLLAR.toString())) {
             result = SpecialSymbol.DOLLAR;
+        } else if (symbol.equals(SpecialSymbol.STAR.toString())) {
+            result = SpecialSymbol.STAR;
         } else {
             throw new IllegalArgumentException("Unrecognized symbol [" + symbol + "]");
         }

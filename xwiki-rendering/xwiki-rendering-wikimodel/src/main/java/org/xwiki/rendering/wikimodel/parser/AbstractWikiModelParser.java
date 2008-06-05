@@ -19,31 +19,30 @@
  */
 package org.xwiki.rendering.wikimodel.parser;
 
-import org.wikimodel.wem.IWikiParser;
-import org.wikimodel.wem.xwiki.XWikiParser;
+import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.wikimodel.internal.DocumentGeneratorListener;
+import org.wikimodel.wem.WikiParserException;
+import org.wikimodel.wem.IWikiParser;
 
-public class WikiModelXWikiParser extends AbstractWikiModelParser
+import java.io.Reader;
+
+public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
 {
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
+    public abstract IWikiParser createWikiModelParser();
 
-    /**
-     * {@inheritDoc}
-     * @see Parser#getSyntax()
-     */
-    public Syntax getSyntax()
+    public DOM parse(Reader source) throws ParseException
     {
-        return SYNTAX;
-    }
+        IWikiParser parser = createWikiModelParser();
+        DocumentGeneratorListener listener = new DocumentGeneratorListener();
 
-    /**
-     * {@inheritDoc}
-     * @see AbstractWikiModelParser#createWikiModelParser()
-     */
-    public IWikiParser createWikiModelParser()
-    {
-        return new XWikiParser();
+        try {
+            parser.parse(source, listener);
+        } catch (WikiParserException e) {
+            throw new ParseException("Failed to parse input source", e);
+        }
+        return listener.getDocument();
     }
 }

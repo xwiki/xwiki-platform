@@ -10,7 +10,7 @@ public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
     {
         SyntaxFactory syntaxFactory = (SyntaxFactory) getComponentManager().lookup(SyntaxFactory.ROLE);
         List<Syntax> syntaxes = syntaxFactory.getAvailableSyntaxes();
-        assertEquals(1, syntaxes.size());
+        assertEquals(4, syntaxes.size());
     }
 
     public void testCreateSyntaxFromSyntaxIdString() throws Exception

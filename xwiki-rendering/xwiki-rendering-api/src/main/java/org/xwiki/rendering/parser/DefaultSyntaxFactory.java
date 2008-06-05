@@ -61,10 +61,16 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         String version = matcher.group(2);
 
         SyntaxType syntaxType;
-        if (syntaxId.equalsIgnoreCase("xwiki")) {
+        if (syntaxId.equalsIgnoreCase(SyntaxType.XWIKI.toIdString())) {
             syntaxType = SyntaxType.XWIKI;
-        } else if (syntaxId.equalsIgnoreCase("confluence")) {
+        } else if (syntaxId.equalsIgnoreCase(SyntaxType.CONFLUENCE.toIdString())) {
             syntaxType = SyntaxType.CONFLUENCE;
+        } else if (syntaxId.equalsIgnoreCase(SyntaxType.CREOLE.toIdString())) {
+            syntaxType = SyntaxType.CREOLE;
+        } else if (syntaxId.equalsIgnoreCase(SyntaxType.JSPWIKI.toIdString())) {
+            syntaxType = SyntaxType.JSPWIKI;
+        } else if (syntaxId.equalsIgnoreCase(SyntaxType.MEDIAWIKI.toIdString())) {
+            syntaxType = SyntaxType.MEDIAWIKI;
         } else {
             throw new ParseException("Unknown Syntax id [" + syntaxId + "]. Valid syntaxes are [xwiki] and "
                 + "[confluence]");

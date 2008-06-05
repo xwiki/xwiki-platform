@@ -20,6 +20,7 @@
 package org.xwiki.rendering.renderer;
 
 import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
+import org.xwiki.rendering.scaffolding.ParserListenerTester;
 import org.xwiki.rendering.wikimodel.parser.WikiModelXWikiParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -35,6 +36,11 @@ public class XWikiSyntaxRendererTestSuite extends TestCase
         ParserListenerTestSuite suite =
             new ParserListenerTestSuite("Test the XWiki Syntax Renderer");
         suite.addTestSuite(new WikiModelXWikiParser(), syntax, XWikiSyntaxRenderer.class);
+
+        // Add tests specific to the XWiki Parser
+        suite.addTest(new ParserListenerTester("macroxhtml", new WikiModelXWikiParser(), syntax,
+            XWikiSyntaxRenderer.class, true));
+
         return suite;
     }
 }

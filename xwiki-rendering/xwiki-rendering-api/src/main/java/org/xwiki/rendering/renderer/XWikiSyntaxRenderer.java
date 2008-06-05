@@ -36,6 +36,8 @@ public class XWikiSyntaxRenderer implements Renderer
     
     private boolean needsLineBreakForList = false;
 
+    private boolean isInsideMacroMarker = false;
+    
     /**
      * Record if we should start elements with a linebreak or not.
      */
@@ -204,19 +206,24 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        // TODO
+        // When we encounter a macro marker we ignore all other blocks inside since we're going to use the macro
+        // definition wrapped by the macro marker to construct the xwiki syntax.
+        this.isInsideMacroMarker = true;
     }
 
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        // TODO
+        this.isInsideMacroMarker = false;
+        onMacro(name, parameters, content);
     }
 
     private void write(String text)
     {
-        this.writer.write(text);
-        // The first text written shouldn't have a linebreak added.
-        this.needsLineBreakForList = true;
+        if (!this.isInsideMacroMarker) {
+            this.writer.write(text);
+            // The first text written shouldn't have a linebreak added.
+            this.needsLineBreakForList = true;
+        }
     }
     
     private void addLineBreak()

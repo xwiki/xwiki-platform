@@ -23,8 +23,8 @@ import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 
-import org.xwiki.rendering.AbstractRenderingTestCase;
-import org.xwiki.rendering.TestEventsListener;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.TestEventsListener;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.block.MacroBlock;
@@ -48,9 +48,11 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
      */
     public void testSimpleMacroTransform() throws Exception
     {
-        String expected = "beginParagraph\n"
+        String expected = "beginMacroMarker: [testsimplemacro] [] [null]\n"
+            + "beginParagraph\n"
             + "onWord: [simplemacro0]\n"
-            + "endParagraph\n";
+            + "endParagraph\n"
+            + "endMacroMarker: [testsimplemacro] [] [null]\n";
 
         DOM dom = new DOM(Arrays.asList((Block) new MacroBlock("testsimplemacro",
             Collections.<String, String>emptyMap())));
@@ -67,9 +69,11 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
      */
     public void testNestedMacroTransform() throws Exception
     {
-        String expected = "beginParagraph\n"
+        String expected = "beginMacroMarker: [testnestedmacro] [] [null]\n"
+            + "beginParagraph\n"
             + "onWord: [simplemacro0]\n"
-            + "endParagraph\n";
+            + "endParagraph\n"
+            + "endMacroMarker: [testnestedmacro] [] [null]\n";
 
         DOM dom = new DOM(Arrays.asList((Block) new MacroBlock("testnestedmacro",
             Collections.<String, String>emptyMap())));
@@ -86,7 +90,9 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
      */
     public void testInfiniteRecursionMacroTransform() throws Exception
     {
-        String expected = "onMacro: [testrecursivemacro] [] [null]\n";
+        String expected = "beginMacroMarker: [testrecursivemacro] [] [null]\n"
+            + "onMacro: [testrecursivemacro] [] [null]\n"
+            + "endMacroMarker: [testrecursivemacro] [] [null]\n";
         
         DOM dom = new DOM(Arrays.asList((Block) new MacroBlock("testrecursivemacro",
             Collections.<String, String>emptyMap())));
@@ -103,13 +109,17 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
      */
     public void testPrioritiesMacroTransform() throws Exception
     {
-        String expected = "beginParagraph\n"
+        String expected = "beginMacroMarker: [testsimplemacro] [] [null]\n"
+            + "beginParagraph\n"
             + "onWord: [simplemacro1]\n"
             + "endParagraph\n"
+            + "endMacroMarker: [testsimplemacro] [] [null]\n"
+            + "beginMacroMarker: [testprioritymacro] [] [null]\n"
             + "beginParagraph\n"
             + "onWord: [word]\n"
-            + "endParagraph\n";
-        
+            + "endParagraph\n"
+            + "endMacroMarker: [testprioritymacro] [] [null]\n";
+
         DOM dom = new DOM(Arrays.asList(
             (Block) new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap()),
             (Block) new MacroBlock("testprioritymacro", Collections.<String, String>emptyMap())));

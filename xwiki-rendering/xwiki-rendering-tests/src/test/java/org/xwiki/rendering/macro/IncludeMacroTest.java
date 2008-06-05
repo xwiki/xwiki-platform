@@ -1,6 +1,6 @@
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
 import org.xwiki.velocity.VelocityManager;
@@ -34,10 +34,12 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
     public void testIncludeMacroWithNewContext() throws Exception
     {
-        String expected = "beginParagraph\n" +
-            "onSpecialSymbol: [$]\n" +
-            "onWord: [myvar]\n" +
-            "endParagraph\n";
+        String expected = "beginMacroMarker: [velocity] [] [$myvar]\n"
+            + "beginParagraph\n"
+            + "onSpecialSymbol: [$]\n"
+            + "onWord: [myvar]\n"
+            + "endParagraph\n"
+            + "endMacroMarker: [velocity] [] [$myvar]\n";
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.

@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.renderer;
 
-import org.xwiki.rendering.ParserListenerTestSuite;
+import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.wikimodel.parser.WikiModelXWikiParser;
 

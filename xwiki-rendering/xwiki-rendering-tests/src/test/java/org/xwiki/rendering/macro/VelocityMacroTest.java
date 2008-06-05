@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
 

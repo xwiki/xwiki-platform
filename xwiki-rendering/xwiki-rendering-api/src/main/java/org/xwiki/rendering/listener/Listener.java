@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.listener;
 
+import org.xwiki.rendering.block.MacroBlock;
+
 import java.util.Map;
 
 
@@ -56,6 +58,10 @@ public interface Listener
     void beginXMLElement(String name, Map<String, String> attributes);
     
     void endXMLElement(String name, Map<String, String> attributes);
+
+    void beginMacroMarker(String name, Map<String, String> parameters, String content);
+
+    void endMacroMarker(String name, Map<String, String> parameters, String content);
     
     void onLineBreak();
 

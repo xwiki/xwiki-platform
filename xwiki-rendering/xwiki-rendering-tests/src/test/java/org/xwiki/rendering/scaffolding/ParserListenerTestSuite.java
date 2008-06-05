@@ -1,5 +1,4 @@
 /*
-
  * See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
  *
@@ -18,22 +17,26 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.wikimodel.parser;
+package org.xwiki.rendering.scaffolding;
 
-import org.xwiki.rendering.ParserListenerTestSuite;
-import org.xwiki.rendering.TestEventsListener;
-import org.xwiki.rendering.wikimodel.parser.WikiModelXWikiParser;
+import org.xwiki.rendering.parser.Parser;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
+import junit.framework.TestSuite;
 
-public class WikiModelXWikiParserTestSuite extends TestCase
+public class ParserListenerTestSuite extends TestSuite
 {
-    public static Test suite() throws Exception
+    public ParserListenerTestSuite(String name)
     {
-        ParserListenerTestSuite suite = 
-            new ParserListenerTestSuite("Test the WikiModel Parser for XWiki");
-        suite.addTestSuite(new WikiModelXWikiParser(), "xwiki", TestEventsListener.class);
-        return suite;
+        super(name);
+    }
+
+    public void addTestSuite(Parser parser, String syntaxName, Class listenerClass)
+        throws Exception
+    {
+        addTest(new ParserListenerTester("paragraph", parser, syntaxName, listenerClass));
+        addTest(new ParserListenerTester("section", parser, syntaxName, listenerClass));
+        addTest(new ParserListenerTester("macro", parser, syntaxName, listenerClass));
+        addTest(new ParserListenerTester("list", parser, syntaxName, listenerClass));
+        addTest(new ParserListenerTester("html", parser, syntaxName, listenerClass));
     }
 }

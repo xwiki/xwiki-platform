@@ -1,6 +1,6 @@
 package org.xwiki.rendering.parser;
 
-import org.xwiki.rendering.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 import java.util.List;
 

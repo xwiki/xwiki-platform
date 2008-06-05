@@ -192,14 +192,26 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
-        write("xxx");
+        // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
+        // any XML element events.
     }
 
     public void endXMLElement(String name, Map<String, String> attributes)
     {
-        write("/xxx");
+        // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
+        // any XML element events.
     }
-    
+
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        // TODO
+    }
+
+    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        // TODO
+    }
+
     private void write(String text)
     {
         this.writer.write(text);

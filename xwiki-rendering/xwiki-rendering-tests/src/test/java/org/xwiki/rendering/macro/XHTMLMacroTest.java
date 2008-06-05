@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro;
 import java.util.Collections;
 import java.util.List;
 
-import org.xwiki.rendering.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
 

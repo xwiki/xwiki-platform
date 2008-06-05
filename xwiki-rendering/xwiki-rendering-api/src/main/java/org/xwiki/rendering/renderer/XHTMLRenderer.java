@@ -148,6 +148,16 @@ public class XHTMLRenderer implements Renderer
         write("/xxx");
     }
 
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        // TODO
+    }
+
+    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        // TODO
+    }
+
     private void write(String text)
     {
         this.writer.write(text);

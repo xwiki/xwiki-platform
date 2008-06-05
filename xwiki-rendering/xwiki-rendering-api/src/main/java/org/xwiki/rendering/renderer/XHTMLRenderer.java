@@ -140,22 +140,26 @@ public class XHTMLRenderer implements Renderer
     
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
-        write("xxx");
+        write("<" + name);
+        for (String attributeName: attributes.keySet()) {
+            write(" " + attributeName + "=\"" + attributes.get(attributeName) + "\"");
+        }
+        write(">");
     }
 
     public void endXMLElement(String name, Map<String, String> attributes)
     {
-        write("/xxx");
+        write("</" + name + ">");
     }
 
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        // TODO
+        // Ignore macro markers, nothing to do.
     }
 
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        // TODO
+        // Ignore macro markers, nothing to do.
     }
 
     private void write(String text)

@@ -31,7 +31,7 @@ public class DoxiaConfluenceParserTestSuite extends TestCase
         // Find a way to run only some of the tests while waiting for the parser to be fixed.
         /*
         ParserListenerTestSuite suite = new ParserListenerTestSuite("Test the Doxia Parser for Confluence");
-        suite.addTestSuite(new DoxiaConfluenceParser(), "confluence", TestEventsListener.class);
+        suite.addTestSuite(new DoxiaConfluenceParser(), new Syntax(SyntaxType.CONFLUENCE, "1.0");, TestEventsListener.class);
         return suite;
         */
         return new TestSuite();

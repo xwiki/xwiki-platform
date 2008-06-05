@@ -21,7 +21,8 @@ package org.xwiki.rendering.renderer;
 
 import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
 import org.xwiki.rendering.wikimodel.parser.WikiModelXWikiParser;
-
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
@@ -29,9 +30,11 @@ public class XWikiSyntaxRendererTestSuite extends TestCase
 {
     public static Test suite() throws Exception
     {
-        ParserListenerTestSuite suite = 
+        Syntax syntax = new Syntax(SyntaxType.XWIKI, "2.0");
+
+        ParserListenerTestSuite suite =
             new ParserListenerTestSuite("Test the XWiki Syntax Renderer");
-        suite.addTestSuite(new WikiModelXWikiParser(), "xwiki", XWikiSyntaxRenderer.class);
+        suite.addTestSuite(new WikiModelXWikiParser(), syntax, XWikiSyntaxRenderer.class);
         return suite;
     }
 }

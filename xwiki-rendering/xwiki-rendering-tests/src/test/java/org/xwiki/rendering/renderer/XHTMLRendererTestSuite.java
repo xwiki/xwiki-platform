@@ -20,9 +20,12 @@
 package org.xwiki.rendering.renderer;
 
 import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
+import org.xwiki.rendering.scaffolding.ParserListenerTester;
+import org.xwiki.rendering.scaffolding.TestEventsListener;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
 import org.xwiki.rendering.wikimodel.parser.WikiModelXWikiParser;
-
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
@@ -30,8 +33,15 @@ public class XHTMLRendererTestSuite extends TestCase
 {
     public static Test suite() throws Exception
     {
+        Syntax syntax = new Syntax(SyntaxType.XWIKI, "2.0");
+
         ParserListenerTestSuite suite = new ParserListenerTestSuite("Test the XHTML Renderer");
-        suite.addTestSuite(new WikiModelXWikiParser(), "xwiki", XHTMLRenderer.class);
+        suite.addTestSuite(new WikiModelXWikiParser(), syntax, XHTMLRenderer.class);
+
+        // Add tests specific to the XWiki Parser
+        suite.addTest(new ParserListenerTester("macroxhtml", new WikiModelXWikiParser(), syntax,
+            XHTMLRenderer.class, true));
+
         return suite;
     }
 }

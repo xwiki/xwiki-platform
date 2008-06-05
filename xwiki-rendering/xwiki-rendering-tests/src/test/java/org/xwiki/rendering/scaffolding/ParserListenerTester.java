@@ -28,34 +28,45 @@ import java.io.Writer;
 import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.Parser;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.transformation.TransformationManager;
 
 public class ParserListenerTester extends AbstractRenderingTestCase
 {
     private Parser parser;
     private String testName;
-    private Class<Listener> listenerClass;
-    private String syntaxName;
+    private Class<? extends Listener> listenerClass;
+    private Syntax syntax;
+    private boolean runTransformations;
 
-    public ParserListenerTester(String testName, Parser parser, String syntaxName, Class<Listener> listenerClass)
+    public ParserListenerTester(String testName, Parser parser, Syntax syntax,
+        Class<? extends Listener> listenerClass, boolean runTransformations)
     {
         super(testName + " " + parser.getClass().getName() + "/" + listenerClass.getName());
         this.testName = testName;
         this.parser = parser;
         this.listenerClass = listenerClass;
-        this.syntaxName = syntaxName;
+        this.syntax = syntax;
+        this.runTransformations = runTransformations;
     }
 
     @Override
     protected void runTest() throws Throwable
     {
-        InputStream input = getClass().getResourceAsStream("/" + this.testName + "-" + this.syntaxName + ".input");
+        InputStream input = getClass().getResourceAsStream("/" + this.testName + "-"
+            + this.syntax.getType().toIdString() + "-" + this.syntax.getVersion() + ".input");
         DOM dom = this.parser.parse(new InputStreamReader(input));
+
+        if (this.runTransformations) {
+            TransformationManager transformationManager =
+                (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
+            transformationManager.performTransformations(dom, this.syntax);
+        }
 
         StringWriter sw = new StringWriter();
         String actual;
         try {
-            Listener listener = (Listener) this.listenerClass.getConstructor(new Class[] {Writer.class}).newInstance(new Object[]{sw});
+            Listener listener = (Listener) this.listenerClass.getConstructor(Writer.class).newInstance(sw);
             dom.traverse(listener);
             actual = sw.toString();
         } finally {

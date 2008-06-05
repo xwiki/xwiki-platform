@@ -20,7 +20,7 @@
 package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.rendering.parser.Parser;
-
+import org.xwiki.rendering.parser.Syntax;
 import junit.framework.TestSuite;
 
 public class ParserListenerTestSuite extends TestSuite
@@ -30,13 +30,13 @@ public class ParserListenerTestSuite extends TestSuite
         super(name);
     }
 
-    public void addTestSuite(Parser parser, String syntaxName, Class listenerClass)
+    public void addTestSuite(Parser parser, Syntax syntax, Class listenerClass)
         throws Exception
     {
-        addTest(new ParserListenerTester("paragraph", parser, syntaxName, listenerClass));
-        addTest(new ParserListenerTester("section", parser, syntaxName, listenerClass));
-        addTest(new ParserListenerTester("macro", parser, syntaxName, listenerClass));
-        addTest(new ParserListenerTester("list", parser, syntaxName, listenerClass));
-        addTest(new ParserListenerTester("html", parser, syntaxName, listenerClass));
+        addTest(new ParserListenerTester("paragraph", parser, syntax, listenerClass, false));
+        addTest(new ParserListenerTester("section", parser, syntax, listenerClass, false));
+        addTest(new ParserListenerTester("macro", parser, syntax, listenerClass, false));
+        addTest(new ParserListenerTester("list", parser, syntax, listenerClass, false));
+        addTest(new ParserListenerTester("html", parser, syntax, listenerClass, false));
     }
 }

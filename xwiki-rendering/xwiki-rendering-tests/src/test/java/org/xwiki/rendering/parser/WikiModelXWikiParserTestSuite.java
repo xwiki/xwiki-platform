@@ -30,9 +30,12 @@ public class WikiModelXWikiParserTestSuite extends TestCase
 {
     public static Test suite() throws Exception
     {
+        Syntax syntax = new Syntax(SyntaxType.XWIKI, "2.0");
+
         ParserListenerTestSuite suite = 
             new ParserListenerTestSuite("Test the WikiModel Parser for XWiki");
-        suite.addTestSuite(new WikiModelXWikiParser(), "xwiki", TestEventsListener.class);
+        suite.addTestSuite(new WikiModelXWikiParser(), syntax, TestEventsListener.class);
+
         return suite;
     }
 }

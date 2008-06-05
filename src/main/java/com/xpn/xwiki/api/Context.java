@@ -534,4 +534,16 @@ public class Context extends Api
     {
         return this.context.getUtil();
     }
+
+    /**
+     * Sets the default field display mode, when using {@link Document#display(String)} or
+     * {@link Document#display(String, Object)}. It is automatically set to "edit" when the action is "inline", and to
+     * "view" in all other cases.
+     * 
+     * @param mode the display mode, one of "view", "edit", "hidden", "search", "rendered".
+     */
+    public void setDisplayMode(String mode)
+    {
+        getXWikiContext().put("display", mode);
+    }
 }

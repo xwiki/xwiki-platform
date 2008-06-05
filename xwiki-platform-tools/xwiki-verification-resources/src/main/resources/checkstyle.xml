@@ -329,6 +329,7 @@
 
     <module name="TodoComment">
       <property name="severity" value="warning"/>
+      <property name="format" value="TODO"/>
     </module>
 
     <module name="TodoComment">

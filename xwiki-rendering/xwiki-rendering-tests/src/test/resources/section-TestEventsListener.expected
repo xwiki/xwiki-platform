@@ -5,3 +5,48 @@ onWord: [level]
 onSpace
 onWord: [1]
 endSection: [1]
+beginSection: [2]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [2]
+endSection: [2]
+beginSection: [3]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [3]
+endSection: [3]
+beginSection: [4]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [4]
+endSection: [4]
+beginSection: [5]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [5]
+endSection: [5]
+beginSection: [6]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [6]
+endSection: [6]
+beginSection: [6]
+onSpecialSymbol: [.]
+onWord: [1]
+onSpace
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [7]
+endSection: [6]

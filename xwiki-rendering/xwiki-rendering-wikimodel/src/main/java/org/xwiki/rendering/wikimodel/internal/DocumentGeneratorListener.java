@@ -95,7 +95,7 @@ public class DocumentGeneratorListener
 
     public void beginHeader(int level, WikiParameters params)
     {
-        // No need for a marker since we expect only a single TextBlock
+        this.stack.push(this.marker);
     }
 
     public void beginInfoBlock(char infoType, WikiParameters params)

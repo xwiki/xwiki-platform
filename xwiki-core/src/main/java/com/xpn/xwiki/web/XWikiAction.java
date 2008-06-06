@@ -117,6 +117,16 @@ public abstract class XWikiAction extends Action
                 Utils.prepareContext(mapping.getName(), request, response,
                     new XWikiServletContext(servlet.getServletContext()));
 
+            // This code is already called by struts.
+            // However struts will also set all the parameters of the form data
+            // directly from the request objects.
+            // However because of bug http://jira.xwiki.org/jira/browse/XWIKI-2422
+            // We need to perform encoding of windows-1252 chars in ISO mode
+            // So we need to make sure this code is called
+            if (form != null) {
+                form.reset(mapping, request);
+            }
+
             // Add the form to the context
             context.setForm((XWikiForm) form);
             XWiki xwiki = null;

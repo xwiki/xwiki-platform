@@ -26,7 +26,6 @@ import java.util.Map;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.listener.SpecialSymbol;
 
 public class XHTMLRenderer implements Renderer
 {
@@ -109,9 +108,9 @@ public class XHTMLRenderer implements Renderer
         write(" ");
     }
 
-    public void onSpecialSymbol(SpecialSymbol symbol)
+    public void onSpecialSymbol(String symbol)
     {
-        write(StringEscapeUtils.escapeHtml(symbol.toString()));
+        write(StringEscapeUtils.escapeHtml(symbol));
     }
 
     public void beginList(ListType listType)

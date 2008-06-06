@@ -20,18 +20,17 @@
 package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
-import org.xwiki.rendering.listener.SpecialSymbol;
 
 public class SpecialSymbolBlock extends AbstractBlock
 {
-    private SpecialSymbol symbol;
+    private String symbol;
     
-    public SpecialSymbolBlock(SpecialSymbol symbol)
+    public SpecialSymbolBlock(String symbol)
     {
         this.symbol = symbol;
     }
 
-    public SpecialSymbol getSymbol()
+    public String getSymbol()
     {
         return this.symbol;
     }

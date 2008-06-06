@@ -42,7 +42,6 @@ import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.listener.SpecialSymbol;
 
 public class DocumentGeneratorSink implements Sink
 {
@@ -50,7 +49,8 @@ public class DocumentGeneratorSink implements Sink
     
     private final MarkerBlock marker = new MarkerBlock();
     
-    private static final Pattern SPLIT_TEXT_PATTERN = Pattern.compile("(\\w+)?([ <>=.\"])?");
+    private static final Pattern SPLIT_TEXT_PATTERN =
+        Pattern.compile("(\\w+)?([ <>=.\"\\?\\*!#\\$%'\\(\\)\\+,/:;@\\[\\]\\\\^_`\\{\\}\\|~])?");
     
     private class MarkerBlock extends AbstractBlock
     {
@@ -567,7 +567,7 @@ public class DocumentGeneratorSink implements Sink
                 if (symbol.equals(" ")) {
                     this.stack.push(SpaceBlock.SPACE_BLOCK);
                 } else {
-                    this.stack.push(new SpecialSymbolBlock(SpecialSymbol.parseString(symbol)));
+                    this.stack.push(new SpecialSymbolBlock(symbol));
                 }
             }
         }

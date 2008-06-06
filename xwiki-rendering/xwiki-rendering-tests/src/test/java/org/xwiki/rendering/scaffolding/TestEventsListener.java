@@ -27,7 +27,6 @@ import java.util.Map;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.listener.SpecialSymbol;
 
 public class TestEventsListener implements Listener
 {
@@ -123,7 +122,7 @@ public class TestEventsListener implements Listener
         write("onSpace");
     }
 
-    public void onSpecialSymbol(SpecialSymbol symbol)
+    public void onSpecialSymbol(String symbol)
     {
         write("onSpecialSymbol: [" + symbol + "]");
     }

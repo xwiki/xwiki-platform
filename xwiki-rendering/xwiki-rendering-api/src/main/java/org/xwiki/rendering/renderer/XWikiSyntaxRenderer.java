@@ -26,7 +26,6 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.listener.SpecialSymbol;
 
 public class XWikiSyntaxRenderer implements Renderer
 {
@@ -37,11 +36,6 @@ public class XWikiSyntaxRenderer implements Renderer
     private boolean needsLineBreakForList = false;
 
     private boolean isInsideMacroMarker = false;
-    
-    /**
-     * Record if we should start elements with a linebreak or not.
-     */
-    private boolean shouldAddLinebreak = false;
     
     public XWikiSyntaxRenderer(Writer writer)
     {
@@ -144,9 +138,9 @@ public class XWikiSyntaxRenderer implements Renderer
         write(" ");
     }
 
-    public void onSpecialSymbol(SpecialSymbol symbol)
+    public void onSpecialSymbol(String symbol)
     {
-        write(symbol.toString());
+        write(symbol);
     }
 
     public void beginList(ListType listType)

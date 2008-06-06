@@ -49,7 +49,6 @@ import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.listener.SpecialSymbol;
 
 public class DocumentGeneratorListener 
     extends AbstractLogEnabled implements IWemListener
@@ -343,7 +342,7 @@ public class DocumentGeneratorListener
 
     public void onSpecialSymbol(String symbol)
     {
-        this.stack.push(new SpecialSymbolBlock(SpecialSymbol.parseString(symbol)));
+        this.stack.push(new SpecialSymbolBlock(symbol));
     }
 
     public void onTableCaption(String str)

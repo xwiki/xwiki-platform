@@ -73,5 +73,5 @@ public interface Listener
 
     void onSpace();
     
-    void onSpecialSymbol(SpecialSymbol symbol);
+    void onSpecialSymbol(String symbol);
 }

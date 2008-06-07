@@ -23,7 +23,7 @@ package org.xwiki.velocity;
 /**
  * Any exception raised in the XWiki Velocity component must raise an exception of this type.
  * 
- * @version $Id:$
+ * @version $Id$
  */
 public class XWikiVelocityException extends Exception
 {

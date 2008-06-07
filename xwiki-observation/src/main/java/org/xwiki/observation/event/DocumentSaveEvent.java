@@ -30,6 +30,16 @@ import org.xwiki.observation.event.filter.EventFilter;
 public class DocumentSaveEvent extends AbstractDocumentEvent
 {
     /**
+     * Constructor initializing the event filter with an
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
+     * other document save event.
+     */
+    public DocumentSaveEvent()
+    {
+        super();
+    }
+
+    /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
      * meaning that this event will match only save events affecting the same document.
      * 

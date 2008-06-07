@@ -30,6 +30,16 @@ import org.xwiki.observation.event.filter.EventFilter;
 public class DocumentUpdateEvent extends AbstractDocumentEvent
 {
     /**
+     * Constructor initializing the event filter with an
+     * {@link org.xwiki.observation.event.filter.AlwaysMatchingEventFilter}, meaning that this event will match any
+     * other document update event.
+     */
+    public DocumentUpdateEvent()
+    {
+        super();
+    }
+
+    /**
      * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
      * meaning that this event will match only update events affecting the same document.
      * 

@@ -20,6 +20,7 @@
  */
 package org.xwiki.observation.event;
 
+import org.xwiki.observation.event.filter.AlwaysMatchingEventFilter;
 import org.xwiki.observation.event.filter.EventFilter;
 import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
@@ -32,6 +33,15 @@ public abstract class AbstractDocumentEvent implements Event
 {
     /** A filter for comparing document names, used in {@link #matches(Object)}. */
     private EventFilter eventFilter;
+
+    /**
+     * Constructor initializing the event filter with an {@link AlwaysMatchingEventFilter}, meaning that this event
+     * will match any other document event of the same type.
+     */
+    public AbstractDocumentEvent()
+    {
+        this.eventFilter = new AlwaysMatchingEventFilter();
+    }
 
     /**
      * Constructor initializing the event filter with a {@link FixedNameEventFilter}, meaning that this event will

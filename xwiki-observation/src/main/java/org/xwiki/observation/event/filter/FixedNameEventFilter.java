@@ -20,20 +20,41 @@
  */
 package org.xwiki.observation.event.filter;
 
+/**
+ * An {@link EventFilter} that matches exactly one document name.
+ * 
+ * @version $Id$
+ */
 public class FixedNameEventFilter implements EventFilter
 {
+    /** The name of the matched document. */
     private String filter;
 
+    /**
+     * Constructor initializing this event filter with a document name that should be matched.
+     * 
+     * @param filter the name of the matched document
+     */
     public FixedNameEventFilter(String filter)
     {
         this.filter = filter;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see EventFilter#getFilter()
+     */
     public String getFilter()
     {
         return this.filter;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see EventFilter#getFilter()
+     */
     public boolean matches(EventFilter eventFilter)
     {
         return (getFilter().equals(eventFilter.getFilter()));

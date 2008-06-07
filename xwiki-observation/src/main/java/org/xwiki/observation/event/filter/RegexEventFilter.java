@@ -20,25 +20,48 @@
  */
 package org.xwiki.observation.event.filter;
 
-import java.util.regex.Pattern;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+/**
+ * An {@link EventFilter} that selects only events whose affected document name matches a regular expression.
+ * 
+ * @version $Id$
+ */
 public class RegexEventFilter implements EventFilter
 {
+    /** The regular expression, as a string. */
     private String filter;
+
+    /** The regular expression, as a regexp Pattern object. */
     private Pattern pattern;
 
+    /**
+     * Constructor initializing this event filter with a regular expression that should be matched.
+     * 
+     * @param filter the regular expression to check against document names
+     */
     public RegexEventFilter(String filter)
     {
         this.filter = filter;
         this.pattern = Pattern.compile(filter);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see EventFilter#getFilter()
+     */
     public String getFilter()
     {
         return this.filter;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see EventFilter#getFilter()
+     */
     public boolean matches(EventFilter eventFilter)
     {
         Matcher matcher = this.pattern.matcher(eventFilter.getFilter());

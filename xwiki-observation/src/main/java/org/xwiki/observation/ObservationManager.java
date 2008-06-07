@@ -23,55 +23,57 @@ package org.xwiki.observation;
 import org.xwiki.observation.event.Event;
 
 /**
- * The main orchestrator for event notification. You register {@link EventListener}s against this
- * manager. It's also used to notify event listeners when an event is triggered. 
+ * The main orchestrator for event notification. You register {@link EventListener}s against this manager, create
+ * {@link Event}s and pass them to this manager, and it notifies the right event listeners of the events they
+ * registered for.
+ * 
+ * @version $Id$
  */
 public interface ObservationManager
 {
-    /**
-     * The component role under which the implementations of this interface can be looked up.
-     */
+    /** The component role under which the implementations of this interface can be looked up. */
     String ROLE = ObservationManager.class.getName();
 
     /**
      * Add a listener.
-     *
-     * @param event the event to register the listener against
+     * 
+     * @param event the event to register the listener against; acts as a template that filters out only specific events
+     *            the istener is interested in
      * @param eventListener the listener to register
      */
     void addListener(Event event, EventListener eventListener);
 
     /**
      * Remove a listener from a specific event.
-     *
+     * 
      * @param event the event to remove the listener from.
      * @param eventListener the listener to remove.
      */
     void removeListener(Event event, EventListener eventListener);
 
     /**
-     * Remove a listener from all events it is registered by. Convenient way of cleaning up an
-     * listener object being destroyed.
-     *
+     * Remove a listener from all events it is registered by. Convenient way of cleaning up an listener object being
+     * destroyed.
+     * 
      * @param eventListener the listener to remove.
      */
     void removeListener(EventListener eventListener);
 
     /**
-     * Call the registered listeners. The definition of <em>source</em> and <em>data</em> is
-     * purely up to the communicating classes.
-     *
+     * Call the registered listeners. The definition of <em>source</em> and <em>data</em> is purely up to the
+     * communicating classes.
+     * 
      * @param event the event to pass to the registered listeners
-     * @param source the source of the event (or null)
-     * @param data the additional data related to the event (or null)
+     * @param source the source of the event (or <code>null</code>)
+     * @param data the additional data related to the event (or <code>null</code>)
      */
     void notify(Event event, Object source, Object data);
 
     /**
-     * Convenience front-end where the additional data parameter is null.
-     *
+     * Convenience front-end where the additional data parameter is <code>null</code>.
+     * 
      * @param event the event to pass to the registered listeners
-     * @param source the source of the event (or null)
+     * @param source the source of the event (or <code>null</code>)
      * @see #notify(org.xwiki.observation.event.Event, Object, Object)
      */
     void notify(Event event, Object source);

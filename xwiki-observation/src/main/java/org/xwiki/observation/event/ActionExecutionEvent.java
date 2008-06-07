@@ -71,6 +71,9 @@ public class ActionExecutionEvent implements Event
     @Override
     public boolean equals(Object object)
     {
+        if (object instanceof ActionExecutionEvent) {
+            return getActionName().equals(((ActionExecutionEvent) object).getActionName());
+        }
         return getActionName().equals(object);
     }
 
@@ -82,7 +85,7 @@ public class ActionExecutionEvent implements Event
     public boolean matches(Object otherEvent)
     {
         boolean isMatching = false;
-        if (ActionExecutionEvent.class.isAssignableFrom(otherEvent.getClass())) {
+        if (this.getClass().isAssignableFrom(otherEvent.getClass())) {
             ActionExecutionEvent actionEvent = (ActionExecutionEvent) otherEvent;
             isMatching = getActionName().equals(actionEvent.getActionName());
         }

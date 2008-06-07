@@ -34,7 +34,7 @@ import org.xwiki.observation.event.Event;
  * Default implementation of the {@link ObservationManager}.
  * 
  * @todo Check how threadsafe this implementation is...
- * @version $Id:$
+ * @version $Id$
  */
 public class DefaultObservationManager implements ObservationManager
 {
@@ -96,7 +96,13 @@ public class DefaultObservationManager implements ObservationManager
         for (Iterator<RegisteredListener> it = eventListeners.iterator(); it.hasNext();) {
             RegisteredListener pair = it.next();
             if (pair.listener == eventListener) {
-                return;
+                if (event == pair.event || pair.event != null && pair.event.matches(event)) {
+                    // Listener already registered for the same event, or for a more general one covering it.
+                    return;
+                } else if (event != null && event.matches(pair.event)) {
+                    // Replace the more specific event with the new one.
+                    it.remove();
+                }
             }
         }
 
@@ -125,9 +131,9 @@ public class DefaultObservationManager implements ObservationManager
         // Remove the listener
         for (Iterator<RegisteredListener> it = eventListeners.iterator(); it.hasNext();) {
             RegisteredListener pair = it.next();
-            if (pair.listener == eventListener) {
+            if (pair.listener == eventListener && (event == pair.event || event != null && event.matches(pair.event))) {
+                // Remove for the same event or for more specific events covered by it.
                 it.remove();
-                break;
             }
         }
 
@@ -145,14 +151,14 @@ public class DefaultObservationManager implements ObservationManager
     public void removeListener(EventListener eventListener)
     {
         // Loop over all registered events and remove the specified listener
-        // Loop over a copy in case the removeListener() call wants to
-        // remove the entire event from the map.
-        for (List<RegisteredListener> list : this.listeners.values()) {
-            for (RegisteredListener p : list) {
-                if (p.listener == eventListener) {
-                    // TODO This is not efficient. We already found the element to remove, why
-                    // search for it again?
-                    removeListener(p.event, eventListener);
+        for (Iterator<List<RegisteredListener>> it = this.listeners.values().iterator(); it.hasNext();) {
+            List<RegisteredListener> eventList = it.next();
+            for (Iterator<RegisteredListener> it2 = eventList.iterator(); it2.hasNext();) {
+                if (it2.next().listener == eventListener) {
+                    it2.remove();
+                    if (eventList.isEmpty()) {
+                        it.remove();
+                    }
                 }
             }
         }

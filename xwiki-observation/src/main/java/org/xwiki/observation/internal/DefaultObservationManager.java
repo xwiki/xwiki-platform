@@ -139,7 +139,7 @@ public class DefaultObservationManager implements ObservationManager
 
         // Remove the event-type list if this was the last listener for this event type
         if (eventListeners.isEmpty()) {
-            this.listeners.remove(event);
+            this.listeners.remove(event.getClass().getName());
         }
     }
 

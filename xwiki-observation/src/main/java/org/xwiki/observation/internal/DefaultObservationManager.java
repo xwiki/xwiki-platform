@@ -33,21 +33,19 @@ import org.xwiki.observation.event.Event;
 /**
  * Default implementation of the {@link ObservationManager}.
  * 
- * @version $Id$
+ * @todo Check how threadsafe this implementation is...
+ * @version $Id:$
  */
 public class DefaultObservationManager implements ObservationManager
 {
-    /**
-     * Internal class for holding an (Event, EventListener) pair. Too bad there's no simple Pair
-     * class in the JDK.
-     */
+    /** Internal class for holding an (Event, EventListener) pair. Too bad there's no simple Pair class in the JDK. */
     protected static class RegisteredListener
     {
-        /** The event for which this listener is registered. * */
-        Event event;
+        /** The event for which this listener is registered. */
+        private Event event;
 
-        /** The Event Listener. * */
-        EventListener listener;
+        /** The Event Listener. */
+        private EventListener listener;
 
         /**
          * Simple constructor, stores the passed Event and Listener.
@@ -57,17 +55,28 @@ public class DefaultObservationManager implements ObservationManager
          */
         RegisteredListener(Event e, EventListener l)
         {
-            event = e;
-            listener = l;
+            this.event = e;
+            this.listener = l;
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see Object#equals(Object)
+         */
+        @Override
+        public String toString()
+        {
+            return "{" + this.event + ", " + this.listener + "}";
         }
     }
 
     /**
-     * Registered listeners. The Map key is the Event class name and the value is a List with
-     * (Event, Listener) pairs.
+     * Registered listeners. The Map key is the Event class name and the value is a List with (Event, Listener) pairs.
+     * 
+     * @todo Should we allow event inheritance?
      */
-    private Map<String, List<RegisteredListener>> listeners =
-        new HashMap<String, List<RegisteredListener>>();
+    private Map<String, List<RegisteredListener>> listeners = new HashMap<String, List<RegisteredListener>>();
 
     /**
      * {@inheritDoc}
@@ -76,7 +85,7 @@ public class DefaultObservationManager implements ObservationManager
      */
     public void addListener(Event event, EventListener eventListener)
     {
-        // Check if this is a new Event not already registered
+        // Check if this is a new Event type not already registered
         List<RegisteredListener> eventListeners = this.listeners.get(event.getClass().getName());
         if (eventListeners == null) {
             eventListeners = new ArrayList<RegisteredListener>();
@@ -84,7 +93,8 @@ public class DefaultObservationManager implements ObservationManager
         }
 
         // Check to see if the event/listener pair is already there
-        for (RegisteredListener pair : eventListeners) {
+        for (Iterator<RegisteredListener> it = eventListeners.iterator(); it.hasNext();) {
+            RegisteredListener pair = it.next();
             if (pair.listener == eventListener) {
                 return;
             }
@@ -121,8 +131,8 @@ public class DefaultObservationManager implements ObservationManager
             }
         }
 
-        // Remove the event as such if this was the last listener for this event
-        if (eventListeners.size() == 0) {
+        // Remove the event-type list if this was the last listener for this event type
+        if (eventListeners.isEmpty()) {
             this.listeners.remove(event);
         }
     }
@@ -137,7 +147,7 @@ public class DefaultObservationManager implements ObservationManager
         // Loop over all registered events and remove the specified listener
         // Loop over a copy in case the removeListener() call wants to
         // remove the entire event from the map.
-        for (List<RegisteredListener> list : listeners.values()) {
+        for (List<RegisteredListener> list : this.listeners.values()) {
             for (RegisteredListener p : list) {
                 if (p.listener == eventListener) {
                     // TODO This is not efficient. We already found the element to remove, why

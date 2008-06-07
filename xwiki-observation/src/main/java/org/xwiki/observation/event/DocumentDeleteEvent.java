@@ -22,15 +22,31 @@ package org.xwiki.observation.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
+/**
+ * An event triggered when a document is deleted.
+ * 
+ * @version $Id$
+ */
 public class DocumentDeleteEvent extends AbstractDocumentEvent
 {
-    public DocumentDeleteEvent(EventFilter eventFilter)
-    {
-        super(eventFilter);
-    }
-
+    /**
+     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
+     * meaning that this event will match only delete events affecting the same document.
+     * 
+     * @param documentName the name of the deleted document to match
+     */
     public DocumentDeleteEvent(String documentName)
     {
         super(documentName);
+    }
+
+    /**
+     * Constructor using a custom {@link EventFilter}.
+     * 
+     * @param eventFilter the filter to use for matching events
+     */
+    public DocumentDeleteEvent(EventFilter eventFilter)
+    {
+        super(eventFilter);
     }
 }

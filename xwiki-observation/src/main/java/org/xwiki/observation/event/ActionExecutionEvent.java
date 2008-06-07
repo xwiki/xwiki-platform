@@ -21,32 +21,64 @@
 package org.xwiki.observation.event;
 
 /**
+ * An event triggered whenever a client request (action) is processed, like <tt>/upload/</tt> or <tt>/view/</tt>. A
+ * specific event corresponds to only one {@link #actionName action type}.
+ * 
  * @todo use the enumerated Action class when it's implemented...
+ * @version $Id$
  */
 public class ActionExecutionEvent implements Event
 {
+    /** The name of the executed action. */
     private String actionName;
 
+    /**
+     * Constructor initializing the action name of the event.
+     * 
+     * @param actionName the name of the executed action
+     */
     public ActionExecutionEvent(String actionName)
     {
         this.actionName = actionName;
     }
 
+    /**
+     * Gets the name of the action causing this event.
+     * 
+     * @return the action causing this event, like <code>upload</code> or <code>login</code>
+     */
     public String getActionName()
     {
         return this.actionName;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#hashCode()
+     */
+    @Override
     public int hashCode()
     {
         return getActionName().hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#equals(Object)
+     */
+    @Override
     public boolean equals(Object object)
     {
         return getActionName().equals(object);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Event#matches(Object)
+     */
     public boolean matches(Object otherEvent)
     {
         boolean isMatching = false;

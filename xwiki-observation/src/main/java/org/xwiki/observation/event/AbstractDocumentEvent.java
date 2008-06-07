@@ -23,25 +23,57 @@ package org.xwiki.observation.event;
 import org.xwiki.observation.event.filter.EventFilter;
 import org.xwiki.observation.event.filter.FixedNameEventFilter;
 
+/**
+ * Base class for all document {@link Event events}.
+ * 
+ * @version $Id$
+ */
 public abstract class AbstractDocumentEvent implements Event
 {
+    /** A filter for comparing document names, used in {@link #matches(Object)}. */
     private EventFilter eventFilter;
-    
+
+    /**
+     * Constructor initializing the event filter with a {@link FixedNameEventFilter}, meaning that this event will
+     * match only events of the same type affecting the same document.
+     * 
+     * @param documentName the name of the document related to this event
+     */
     public AbstractDocumentEvent(String documentName)
     {
         this.eventFilter = new FixedNameEventFilter(documentName);
     }
 
+    /**
+     * Constructor using a custom {@link EventFilter}.
+     * 
+     * @param eventFilter the filter to use for matching events
+     */
     public AbstractDocumentEvent(EventFilter eventFilter)
     {
         this.eventFilter = eventFilter;
     }
 
+    /**
+     * Retrieves the filter used to match this event agains other events, used in {@link #matches(Object)}.
+     * 
+     * @return the event's {@link #eventFilter filter}.
+     */
     public EventFilter getEventFilter()
     {
         return this.eventFilter;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This type of events match only events of the same type, and only if the internal {@link #eventFilter}s also
+     * {@link EventFilter#matches(EventFilter) match}.
+     * </p>
+     * 
+     * @see Event#matches(Object)
+     * @see EventFilter#matches(EventFilter)
+     */
     public boolean matches(Object otherEvent)
     {
         boolean isMatching = false;

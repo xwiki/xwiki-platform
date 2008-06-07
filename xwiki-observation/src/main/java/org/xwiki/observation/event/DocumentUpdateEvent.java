@@ -22,15 +22,31 @@ package org.xwiki.observation.event;
 
 import org.xwiki.observation.event.filter.EventFilter;
 
+/**
+ * An event triggered when an existing document is saved (updated).
+ * 
+ * @version $Id$
+ */
 public class DocumentUpdateEvent extends AbstractDocumentEvent
 {
-    public DocumentUpdateEvent(EventFilter eventFilter)
-    {
-        super(eventFilter);
-    }
-
+    /**
+     * Constructor initializing the event filter with a {@link org.xwiki.observation.event.filter.FixedNameEventFilter},
+     * meaning that this event will match only update events affecting the same document.
+     * 
+     * @param documentName the name of the updated document to match
+     */
     public DocumentUpdateEvent(String documentName)
     {
         super(documentName);
+    }
+
+    /**
+     * Constructor using a custom {@link EventFilter}.
+     * 
+     * @param eventFilter the filter to use for matching events
+     */
+    public DocumentUpdateEvent(EventFilter eventFilter)
+    {
+        super(eventFilter);
     }
 }

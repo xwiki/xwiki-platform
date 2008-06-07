@@ -22,17 +22,21 @@ package org.xwiki.observation.event;
 
 /**
  * All Event types must implement this interface.
+ * 
+ * @version $Id$
  */
 public interface Event
 {
     /**
-     * @param otherEvent
-     * @return true if the passed event matches the current event. The matching algorithm depends
-     *         on the event implementation. For example for Document events two events match
-     *         if they implement the same event class and if their
-     *         {@link org.xwiki.observation.event.filter.EventFilter} match. Note that the
-     *         implementation is left open in order to cater for all the possible ways this
-     *         Observation component can be used.
+     * Compares two events to see if they <em>match</em>, meaning that a listener that registered to receive
+     * notifications <em>like</em> <code>referenceEvent</code> will be notified of any occuring event for which
+     * <code>referenceEvent.matches(occuringEvent)</code> will return <code>true</code>. The matching algorithm
+     * depends on the event implementation. For example for Document events two events match if they implement the same
+     * event class and if their {@link org.xwiki.observation.event.filter.EventFilter} match. Note that the
+     * implementation is left open in order to cater for all the possible ways this Observation component can be used.
+     * 
+     * @param otherEvent the occuring event matched against the current object
+     * @return <code>true</code> if the passed event matches this event, <code>false</code> otherwise.
      */
     boolean matches(Object otherEvent);
 }

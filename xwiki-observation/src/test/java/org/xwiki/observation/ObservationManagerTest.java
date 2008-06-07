@@ -21,7 +21,9 @@
 package org.xwiki.observation;
 
 import junit.framework.TestCase;
+
 import org.xwiki.observation.event.DocumentSaveEvent;
+import org.xwiki.observation.event.DocumentUpdateEvent;
 import org.xwiki.observation.event.Event;
 import org.xwiki.observation.event.filter.RegexEventFilter;
 import org.xwiki.observation.internal.DefaultObservationManager;
@@ -29,11 +31,14 @@ import org.xwiki.observation.internal.DefaultObservationManager;
 public class ObservationManagerTest extends TestCase
 {
     private ObservationManager manager;
+
     private TestListener listener;
 
     public class TestListener implements EventListener
     {
         public boolean hasListenerBeenCalled = false;
+
+        public int listenerCalls = 0;
 
         public void onEvent(Event event, Object source, Object data)
         {
@@ -41,9 +46,11 @@ public class ObservationManagerTest extends TestCase
             assertEquals("some source", (String) source);
             assertEquals("some data", (String) data);
             this.hasListenerBeenCalled = true;
+            this.listenerCalls++;
         }
     }
 
+    @Override
     protected void setUp()
     {
         this.manager = new DefaultObservationManager();
@@ -52,17 +59,49 @@ public class ObservationManagerTest extends TestCase
 
     public void testNotifyWhenUsingDocumentSaveEvent()
     {
-        manager.addListener(new DocumentSaveEvent("SomeDocument"), listener);
-
-        manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
-        assertTrue("Listener has not been called", listener.hasListenerBeenCalled);
+        this.manager.addListener(new DocumentSaveEvent("SomeDocument"), this.listener);
+        this.manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
+        assertTrue("Listener has not been called", this.listener.hasListenerBeenCalled);
     }
 
-    public void testNotifyWhenUsingDocumentSaveEventWithFilter()
+    public void testNotifyWhenUsingDocumentSaveEventWithRegexFilter()
     {
-        manager.addListener(new DocumentSaveEvent(new RegexEventFilter(".*Doc.*")), listener);
+        this.manager.addListener(new DocumentSaveEvent(new RegexEventFilter(".*Doc.*")), this.listener);
 
-        manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
-        assertTrue("Listener has not been called", listener.hasListenerBeenCalled);
+        this.manager.notify(new DocumentSaveEvent("SomeDocument"), "some source", "some data");
+        assertTrue("Listener has not been called", this.listener.hasListenerBeenCalled);
+    }
+
+    public void testRemoveListener()
+    {
+        this.manager.addListener(new DocumentUpdateEvent(), this.listener);
+        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
+        this.manager.addListener(new DocumentSaveEvent("Another.Document"), this.listener);
+        this.manager.removeListener(this.listener);
+        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
+        assertFalse("Listener was not removed", this.listener.hasListenerBeenCalled);
+        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
+        this.manager.removeListener(new DocumentSaveEvent("Another.Document"), this.listener);
+        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
+        assertTrue("Listener was wrongly removed", this.listener.hasListenerBeenCalled);
+    }
+
+    public void testDoubleAdditionPrevented()
+    {
+        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
+        this.manager.addListener(new DocumentSaveEvent("Some.Document"), this.listener);
+        this.manager.addListener(new DocumentSaveEvent(), this.listener);
+        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
+        assertTrue("Listener was not called", this.listener.hasListenerBeenCalled);
+        assertEquals("Listener was called too many times", 1, this.listener.listenerCalls);
+    }
+
+    public void testAlwaysMatchingEvents()
+    {
+        this.manager.addListener(new DocumentSaveEvent(), this.listener);
+        this.manager.notify(new DocumentUpdateEvent("Some.Document"), "some source", "some data");
+        assertFalse("Listener was wrongly called", this.listener.hasListenerBeenCalled);
+        this.manager.notify(new DocumentSaveEvent("Some.Document"), "some source", "some data");
+        assertTrue("Listener was not called", this.listener.hasListenerBeenCalled);
     }
 }

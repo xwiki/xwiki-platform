@@ -24,6 +24,7 @@ import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
@@ -154,7 +155,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param start the offset to start retrieving spaces at
      * @return list of space objects
      */
-    public List getSpaces(int nb, int start, XWikiContext context) throws SpaceManagerException;
+    public List<Space> getSpaces(int nb, int start, XWikiContext context) throws SpaceManagerException;
 
     /**
      * Lists spaces in the wiki
@@ -164,7 +165,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param ordersql hibernate sql describing how to order the spaceobjects
      * @return list of space objects
      */
-    public List getSpaces(int nb, int start, String ordersql, XWikiContext context)
+    public List<Space> getSpaces(int nb, int start, String ordersql, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -174,7 +175,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param start the offset to start retrieving the names at
      * @return list of space names
      */
-    public List getSpaceNames(int nb, int start, XWikiContext context)
+    public List<String> getSpaceNames(int nb, int start, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -185,7 +186,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param ordersql hibernate sql describing how to order the names
      * @return list of space names
      */
-    public List getSpaceNames(int nb, int start, String ordersql, XWikiContext context)
+    public List<String> getSpaceNames(int nb, int start, String ordersql, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -194,7 +195,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @see #searchSpaceNames(String, String, int, int, XWikiContext) for parameters details.
      * @return list of space objects
      */
-    public List searchSpaces(String fromsql, String wheresql, int nb, int start,
+    public List<Space> searchSpaces(String fromsql, String wheresql, int nb, int start,
         XWikiContext context) throws SpaceManagerException;
 
     /**
@@ -204,7 +205,7 @@ public interface SpaceManager extends XWikiPluginInterface
      *      details.
      * @return list of space objects
      */
-    public List searchSpaces(String fromsql, String wheresql, String ordersql, int nb, int start,
+    public List<Space> searchSpaces(String fromsql, String wheresql, String ordersql, int nb, int start,
         XWikiContext context) throws SpaceManagerException;
 
     /**
@@ -219,7 +220,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param context
      * @return list of space names matching the generated query
      */
-    public List searchSpaceNames(String fromsql, String wheresql, int nb, int start,
+    public List<String> searchSpaceNames(String fromsql, String wheresql, int nb, int start,
         XWikiContext context) throws SpaceManagerException;
 
     /**
@@ -235,7 +236,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param context
      * @return list of space names matching the generated query
      */
-    public List searchSpaceNames(String fromsql, String wheresql, String ordersql, int nb,
+    public List<String> searchSpaceNames(String fromsql, String wheresql, String ordersql, int nb,
         int start, XWikiContext context) throws SpaceManagerException;
 
     /**
@@ -247,7 +248,7 @@ public interface SpaceManager extends XWikiPluginInterface
      *            where the user is in the member group
      * @return list of space objects
      */
-    public List getSpaces(String userName, String role, XWikiContext context)
+    public List<Space> getSpaces(String userName, String role, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -256,7 +257,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @see #getSpaces(String, String, XWikiContext) for parameters
      * @return list of space names
      */
-    public List getSpaceNames(String userName, String role, XWikiContext context)
+    public List<String> getSpaceNames(String userName, String role, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -299,9 +300,9 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param context The XWikiContext of the request
      * @param recursive Determines if the search is performed in the child spaces too
      * @param nb Number of documents to be retrieved
-     * @return start Pagination option saying at what document index to start the search
+     * @param start Pagination option saying at what document index to start the search
      */
-    public List getLastModifiedDocuments(String spaceName, XWikiContext context,
+    public List<XWikiDocument> getLastModifiedDocuments(String spaceName, XWikiContext context,
         boolean recursive, int nb, int start) throws SpaceManagerException;
 
     /**
@@ -312,7 +313,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param context
      * @return
      */
-    public List searchDocuments(String spaceName, String hql, XWikiContext context)
+    public List<XWikiDocument> searchDocuments(String spaceName, String hql, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -351,7 +352,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param spaceName the wiki name of the space to retrieve the members for
      * @throws SpaceManagerException
      */
-    public Collection getMembers(String spaceName, XWikiContext context)
+    public Collection<String> getMembers(String spaceName, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -370,7 +371,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param spaceName the wiki name of the space
      * @param usernames a list of wiki names of users to add as admins
      */
-    public void addAdmins(String spaceName, List usernames, XWikiContext context)
+    public void addAdmins(String spaceName, List<String> usernames, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -387,7 +388,7 @@ public interface SpaceManager extends XWikiPluginInterface
     /**
      * @return the list of all members of the space that are admins
      */
-    public Collection getAdmins(String spaceName, XWikiContext context)
+    public Collection<String> getAdmins(String spaceName, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -398,7 +399,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param roles
      * @param context
      */
-    public void addUserToRoles(String spaceName, String username, List roles, XWikiContext context)
+    public void addUserToRoles(String spaceName, String username, List<String> roles, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -409,7 +410,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param roles
      * @param context
      */
-    public void addUsersToRoles(String spaceName, List usernames, List roles, XWikiContext context)
+    public void addUsersToRoles(String spaceName, List<String> usernames, List<String> roles, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -421,7 +422,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param context
      * @throws SpaceManagerException
      */
-    void removeUserFromRoles(String spaceName, String userName, List roles, XWikiContext context)
+    void removeUserFromRoles(String spaceName, String userName, List<String> roles, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -432,7 +433,7 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param context
      * @return
      */
-    public Collection getUsersForRole(String spaceName, String role, XWikiContext context)
+    public Collection<String> getUsersForRole(String spaceName, String role, XWikiContext context)
         throws SpaceManagerException;
 
     /**
@@ -464,13 +465,13 @@ public interface SpaceManager extends XWikiPluginInterface
      * @param context
      * @return
      */
-    public Collection getRoles(String spaceName, XWikiContext context)
+    public Collection<String> getRoles(String spaceName, XWikiContext context)
         throws SpaceManagerException;
 
     /**
      * Returns the list of roles the specified user has as a member of the specified space
      */
-    public Collection getRoles(String spaceName, String userName, XWikiContext context)
+    public Collection<String> getRoles(String spaceName, String userName, XWikiContext context)
         throws SpaceManagerException;
 
     /**

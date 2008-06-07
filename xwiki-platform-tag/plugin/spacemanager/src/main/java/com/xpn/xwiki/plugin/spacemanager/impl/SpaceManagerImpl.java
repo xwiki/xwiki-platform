@@ -37,6 +37,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 import com.xpn.xwiki.plugin.mailsender.Mail;
@@ -327,23 +328,23 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             allowInt = 1;
         else
             allowInt = 0;
-        List objs = prefDoc.getObjects(rightsClass);
+        List<BaseObject> objs = prefDoc.getObjects(rightsClass);
         if (objs != null) {
             for (int i = 0; i < objs.size(); i++) {
-                BaseObject bobj = (BaseObject) objs.get(i);
+                BaseObject bobj = objs.get(i);
                 if (bobj == null)
                     continue;
                 String groups = bobj.getStringValue(groupsField);
                 String levels = bobj.getStringValue(levelsField);
                 int allowDeny = bobj.getIntValue(allowField);
                 boolean allowdeny = (bobj.getIntValue(allowField) == 1);
-                String[] levelsarray = levels.split(" ,|");
-                String[] groupsarray = groups.split(" ,|");
-                if (ArrayUtils.contains(groupsarray, groupName)) {
+                List<String> groupsList = ListClass.getListFromString(groups, " ,|", false);
+                List<String> levelsList = ListClass.getListFromString(levels, " ,|", false);
+                if (groupsList.contains(groupName)) {
                     exists = true;
                     if (!foundlevel)
                         indx = i;
-                    if (ArrayUtils.contains(levelsarray, level)) {
+                    if (levelsList.contains(level)) {
                         foundlevel = true;
                         if (allowInt == allowDeny) {
                             isUpdated = true;
@@ -374,10 +375,12 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                 BaseObject bobj = (BaseObject) objs.get(indx);
                 String groups = bobj.getStringValue(groupsField);
                 String levels = bobj.getStringValue(levelsField);
-                String[] levelsarray = levels.split(" ,|");
-                String[] groupsarray = groups.split(" ,|");
+                
+                List groupsList =  ListClass.getListFromString(groups, " ,|", false);
+                List levelsList =  ListClass.getListFromString(levels, " ,|", false);
 
-                if (levelsarray.length == 1 && groupsarray.length == 1 && levelsarray[0] == level) {
+
+                if (levelsList.size() == 1 && groupsList.size() == 1 && levelsList.get(0) == level) {
                     // if there is only this group and this level in the rule
                     // update this rule
                 } else {
@@ -423,7 +426,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             allowInt = 1;
         else
             allowInt = 0;
-        List objs = prefDoc.getObjects(rightsClass);
+        List<BaseObject> objs = prefDoc.getObjects(rightsClass);
         if (objs != null) {
             for (int i = 0; i < objs.size(); i++) {
                 BaseObject bobj = (BaseObject) objs.get(i);
@@ -433,11 +436,11 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                 String levels = bobj.getStringValue(levelsField);
                 int allowDeny = bobj.getIntValue(allowField);
                 boolean allowdeny = (bobj.getIntValue(allowField) == 1);
-                String[] levelsarray = levels.split(" ,|");
-                String[] groupsarray = groups.split(" ,|");
-                if (ArrayUtils.contains(groupsarray, groupName)) {
+                List levelsList = ListClass.getListFromString(levels, " ,|", false);
+                List groupsList = ListClass.getListFromString(groups, " ,|", false);
+                if (groupsList.contains(groupName)) {
                     if (!foundlevel)
-                        if (ArrayUtils.contains(levelsarray, level)) {
+                        if (levelsList.contains(level)) {
                             foundlevel = true;
                             if (allowInt == allowDeny) {
                                 prefDoc.removeObject(bobj);
@@ -677,11 +680,10 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         // Copy over template data over our current data
         if (templateSpaceName != null) {
             try {
-                List list =
+                List<String> list =
                     context.getWiki().getStore().searchDocumentsNames(
                         "where doc.web='" + templateSpaceName + "'", context);
-                for (Iterator it = list.iterator(); it.hasNext();) {
-                    String docname = (String) it.next();
+                for (String docname : list) {
                     XWikiDocument doc = context.getWiki().getDocument(docname, context);
                     context.getWiki().copyDocument(doc.getFullName(),
                         newspace.getSpaceName() + "." + doc.getName(), null, null, null, true,
@@ -744,9 +746,8 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                 // search for all documents in the space
                 String hql = "where doc.web = '" + space.getSpaceName() + "'";
                 try {
-                    List spaceDocs = context.getWiki().getStore().searchDocuments(hql, context);
-                    for (Iterator it = spaceDocs.iterator(); it.hasNext();) {
-                        XWikiDocument toBeDeleted = (XWikiDocument) it.next();
+                    List<XWikiDocument> spaceDocs = context.getWiki().getStore().searchDocuments(hql, context);
+                    for (XWikiDocument toBeDeleted : spaceDocs) {
                         context.getWiki().deleteDocument(toBeDeleted, context);
                     }
                     getSpaceManagerExtension().postDeleteSpace(space.getSpaceName(), true,
@@ -811,16 +812,16 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public List getSpaces(int nb, int start, XWikiContext context) throws SpaceManagerException
+    public List<Space> getSpaces(int nb, int start, XWikiContext context) throws SpaceManagerException
     {
-        List spaceNames = getSpaceNames(nb, start, context);
+        List<String> spaceNames = getSpaceNames(nb, start, context);
         return getSpaceObjects(spaceNames, context);
     }
 
-    public List getSpaces(int nb, int start, String ordersql, XWikiContext context)
+    public List<Space> getSpaces(int nb, int start, String ordersql, XWikiContext context)
         throws SpaceManagerException
     {
-        List spaceNames = getSpaceNames(nb, start, ordersql, context);
+        List<String> spaceNames = getSpaceNames(nb, start, ordersql, context);
         return getSpaceObjects(spaceNames, context);
     }
 
@@ -831,21 +832,20 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * @return list of Space objects
      * @throws SpaceManagerException
      */
-    protected List getSpaceObjects(List spaceNames, XWikiContext context)
+    protected List<Space> getSpaceObjects(List<String> spaceNames, XWikiContext context)
         throws SpaceManagerException
     {
         if (spaceNames == null)
             return null;
-        List spaceList = new ArrayList();
-        for (int i = 0; i < spaceNames.size(); i++) {
-            String spaceName = (String) spaceNames.get(i);
+        List<Space> spaceList = new ArrayList<Space>();
+        for (String spaceName : spaceNames) {
             Space space = getSpace(spaceName, context);
             spaceList.add(space);
         }
         return spaceList;
     }
 
-    public List getSpaceNames(int nb, int start, XWikiContext context)
+    public List<String> getSpaceNames(int nb, int start, XWikiContext context)
         throws SpaceManagerException
     {
         return getSpaceNames(nb, start, "", context);
@@ -854,7 +854,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public List getSpaceNames(int nb, int start, String ordersql, XWikiContext context)
+    public List<String> getSpaceNames(int nb, int start, String ordersql, XWikiContext context)
         throws SpaceManagerException
     {
         String type = getSpaceTypeName();
@@ -873,7 +873,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                     + "' and obj.id=typeprop.id.id and typeprop.id.name='type' and typeprop.value='"
                     + type + "'" + ordersql;
 
-        List spaceList = null;
+        List<String> spaceList = Collections.emptyList();
         try {
             spaceList = context.getWiki().getStore().search(sql, nb, start, context);
         } catch (XWikiException e) {
@@ -894,10 +894,10 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * @return A list with space objects matching the search
      * @throws SpaceManagerException
      */
-    public List searchSpaces(String fromsql, String wheresql, String ordersql, int nb, int start,
+    public List<Space> searchSpaces(String fromsql, String wheresql, String ordersql, int nb, int start,
         XWikiContext context) throws SpaceManagerException
     {
-        List spaceNames = searchSpaceNames(fromsql, wheresql, ordersql, nb, start, context);
+        List<String> spaceNames = searchSpaceNames(fromsql, wheresql, ordersql, nb, start, context);
         return getSpaceObjects(spaceNames, context);
     }
 
@@ -913,7 +913,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * @return A list with space objects matching the search
      * @throws SpaceManagerException
      */
-    public List searchSpaces(String fromsql, String wheresql, int nb, int start,
+    public List<Space> searchSpaces(String fromsql, String wheresql, int nb, int start,
         XWikiContext context) throws SpaceManagerException
     {
         return searchSpaces(fromsql, wheresql, "", nb, start, context);
@@ -931,7 +931,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * @return A list of strings representing the names of the spaces matching the search
      * @throws SpaceManagerException
      */
-    public List searchSpaceNames(String fromsql, String wheresql, String ordersql, int nb,
+    public List<String> searchSpaceNames(String fromsql, String wheresql, String ordersql, int nb,
         int start, XWikiContext context) throws SpaceManagerException
     {
         String type = getSpaceTypeName();
@@ -953,7 +953,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                     + "' and obj.id=typeprop.id.id and typeprop.id.name='type' and typeprop.value='"
                     + type + "'" + wheresql + ordersql;
 
-        List spaceList = null;
+        List<String> spaceList = Collections.emptyList();
         try {
             spaceList = context.getWiki().getStore().search(sql, nb, start, context);
         } catch (XWikiException e) {
@@ -974,7 +974,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * @return A list of strings representing the names of the spaces matching the search
      * @throws SpaceManagerException
      */
-    public List searchSpaceNames(String fromsql, String wheresql, int nb, int start,
+    public List<String> searchSpaceNames(String fromsql, String wheresql, int nb, int start,
         XWikiContext context) throws SpaceManagerException
     {
         return searchSpaceNames(fromsql, wheresql, "", nb, start, context);
@@ -983,17 +983,17 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public List getSpaces(String userName, String role, XWikiContext context)
+    public List<Space> getSpaces(String userName, String role, XWikiContext context)
         throws SpaceManagerException
     {
-        List spaceNames = getSpaceNames(userName, role, context);
+        List<String> spaceNames = getSpaceNames(userName, role, context);
         return getSpaceObjects(spaceNames, context);
     }
 
     /**
      * {@inheritDoc}
      */
-    public List getSpaceNames(String userName, String role, XWikiContext context)
+    public List<String> getSpaceNames(String userName, String role, XWikiContext context)
         throws SpaceManagerException
     {
         String sql;
@@ -1012,7 +1012,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                     + userName + "'";
 
         }
-        List spaceList = null;
+        List<String> spaceList = Collections.emptyList();
         try {
             spaceList = context.getWiki().getStore().search(sql, 0, 0, context);
         } catch (XWikiException e) {
@@ -1071,7 +1071,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public void addAdmins(String spaceName, List usernames, XWikiContext context)
+    public void addAdmins(String spaceName, List<String> usernames, XWikiContext context)
         throws SpaceManagerException
     {
         for (int i = 0; i < usernames.size(); i++) {
@@ -1082,7 +1082,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public Collection getAdmins(String spaceName, XWikiContext context)
+    public Collection<String> getAdmins(String spaceName, XWikiContext context)
         throws SpaceManagerException
     {
         try {
@@ -1137,18 +1137,18 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public void addUsersToRole(String spaceName, List usernames, String role, XWikiContext context)
+    public void addUsersToRole(String spaceName, List<String> userNames, String role, XWikiContext context)
         throws SpaceManagerException
     {
-        for (int i = 0; i < usernames.size(); i++) {
-            addUserToRole(spaceName, (String) usernames.get(i), role, context);
+        for (String userName : userNames) {
+            addUserToRole(spaceName, userName, role, context);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public Collection getUsersForRole(String spaceName, String role, XWikiContext context)
+    public Collection<String> getUsersForRole(String spaceName, String role, XWikiContext context)
         throws SpaceManagerException
     {
         try {
@@ -1175,7 +1175,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public void addUserToRoles(String spaceName, String username, List roles, XWikiContext context)
+    public void addUserToRoles(String spaceName, String username, List<String> roles, XWikiContext context)
         throws SpaceManagerException
     {
         for (int i = 0; i < roles.size(); i++) {
@@ -1186,7 +1186,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public void addUsersToRoles(String spaceName, List usernames, List roles, XWikiContext context)
+    public void addUsersToRoles(String spaceName, List<String> usernames, List<String> roles, XWikiContext context)
         throws SpaceManagerException
     {
         for (int i = 0; i < usernames.size(); i++) {
@@ -1199,7 +1199,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * 
      * @see SpaceManager#removeUserFromRoles(String, String, List, XWikiContext)
      */
-    public void removeUserFromRoles(String spaceName, String userName, List roles,
+    public void removeUserFromRoles(String spaceName, String userName, List<String> roles,
         XWikiContext context) throws SpaceManagerException
     {
         for (int i = 0; i < roles.size(); i++) {
@@ -1342,7 +1342,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * 
      * @see SpaceManager#getMembers(String, XWikiContext)
      */
-    public Collection getMembers(String spaceName, XWikiContext context)
+    public Collection<String> getMembers(String spaceName, XWikiContext context)
         throws SpaceManagerException
     {
         try {
@@ -1353,16 +1353,17 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         }
     }
 
-    private List sortUserNames(Collection collectionOfUsers, final XWikiContext context)
+    
+    private List<String> sortUserNames(Collection<String> collectionOfUsers, final XWikiContext context)
     {
-        List users = new ArrayList(collectionOfUsers);
-        Collections.sort(users, new Comparator()
+        List<String> users = new ArrayList<String>(collectionOfUsers);
+        Collections.sort(users, new Comparator<String>()
         {
-            public int compare(Object a, Object b)
+            public int compare(String a, String b)
             {
                 try {
-                    XWikiDocument aDoc = context.getWiki().getDocument((String) a, context);
-                    XWikiDocument bDoc = context.getWiki().getDocument((String) b, context);
+                    XWikiDocument aDoc = context.getWiki().getDocument(a, context);
+                    XWikiDocument bDoc = context.getWiki().getDocument(b, context);
                     String aFirstName =
                         aDoc.getObject("XWiki.XWikiUsers").getStringValue("first_name");
                     String bFirstName =
@@ -1452,14 +1453,14 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
     /**
      * {@inheritDoc}
      */
-    public Collection getRoles(String spaceName, XWikiContext context)
+    public Collection<String> getRoles(String spaceName, XWikiContext context)
         throws SpaceManagerException
     {
         // The roles notion is not natively implemented in the spacemanager plugin yet,
         // so we return a empty list. Plugins that extend the spacemanager plugin can overload this
         // method to implement roles, either by hardcoding or retrieving from DB the roles list.
         // @TODO Implement methods to set a list of roles for a space.
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**
@@ -1467,14 +1468,14 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
      * 
      * @see SpaceManager#getRoles(String, String, XWikiContext)
      */
-    public Collection getRoles(String spaceName, String memberName, XWikiContext context)
+    public Collection<String> getRoles(String spaceName, String memberName, XWikiContext context)
         throws SpaceManagerException
     {
         try {
-            Collection memberRoles =
+            Collection<String> memberRoles =
                 context.getWiki().getGroupService(context).getAllGroupsNamesForMember(memberName,
                     0, 0, context);
-            Collection spaceRoles = getRoles(spaceName, context);
+            Collection<String> spaceRoles = getRoles(spaceName, context);
             memberRoles.retainAll(spaceRoles);
             return memberRoles;
         } catch (XWikiException e) {
@@ -1579,7 +1580,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         String[] toUsers = new String[0];
         if (SpaceAction.CREATE.equals(action)) {
             // notify space administrators upon space creation
-            Collection admins = getAdmins(space.getSpaceName(), context);
+            Collection<String> admins = getAdmins(space.getSpaceName(), context);
             toUsers = (String[]) admins.toArray(new String[admins.size()]);
         } else if (SpaceAction.JOIN.equals(action)) {
             // send join group confirmation e-mail

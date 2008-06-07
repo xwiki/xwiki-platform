@@ -1,3 +1,22 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ * <p/>
+ * This is free software;you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation;either version2.1of
+ * the License,or(at your option)any later version.
+ * <p/>
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY;without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU
+ * Lesser General Public License for more details.
+ * <p/>
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software;if not,write to the Free
+ * Software Foundation,Inc.,51 Franklin St,Fifth Floor,Boston,MA
+ * 02110-1301 USA,or see the FSF site:http://www.fsf.org.
+ */
 package com.xpn.xwiki.plugin.spacemanager.impl;
 
 import java.util.ArrayList;
@@ -14,6 +33,7 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.plugin.spacemanager.api.Space;
@@ -35,9 +55,13 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
 
     private XWiki xwiki;
 
+    private XWikiConfig config;
+
     private Mock mockXWikiStore;
 
     private Mock mockXWikiVersioningStore;
+
+    private Mock mockGroupService;
 
     private Map docs = new HashMap();
 
@@ -47,6 +71,8 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
 
     private String spaceName = "mynicespacename";
 
+    private Map listGroupsForUserReturnValues = new HashMap();
+
     /**
      * Set up unit testing
      */
@@ -54,7 +80,12 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
     {
         this.context = new XWikiContext();
         this.context.setUser("XWiki.TestUser");
-        this.xwiki = new XWiki(new XWikiConfig(), this.context);
+        this.config = new XWikiConfig();
+
+        // for protected spaces test
+        config.put("xwiki.spacemanager.protectedsubspaces", "Documentation");
+
+        this.xwiki = new XWiki(config, this.context);
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
@@ -236,9 +267,9 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
     public void testCreateDeleteSpace2() throws SpaceManagerException
     {
         this.spaceManager.createSpace(displayTitle, context);
-        this.spaceManager.deleteSpace(displayTitle, false, context);
+        this.spaceManager.deleteSpace(spaceName, false, context);
 
-        Space space = this.spaceManager.getSpace(displayTitle, context);
+        Space space = this.spaceManager.getSpace(spaceName, context);
         assertTrue("Space should be marked deleted", space.isDeleted());
     }
 
@@ -279,10 +310,10 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
     public void testAddMember() throws SpaceManagerException
     {
         this.spaceManager.createSpace(displayTitle, context);
-        Space s1 = this.spaceManager.getSpace(displayTitle, context);
+        Space s1 = this.spaceManager.getSpace(spaceName, context);
         this.spaceManager.addMember(s1.getSpaceName(), "XWiki.cristi", context);
         List l = (List) this.spaceManager.getMembers(s1.getSpaceName(), context);
-        assertEquals(l.get(0), "XWiki.cristi");
+        assertEquals("XWiki.cristi",l.get(1));
 
         List newusers = new ArrayList();
         newusers.add("XWiki.testuser1");
@@ -290,6 +321,7 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
         this.spaceManager.addMembers(s1.getSpaceName(), newusers, context);
 
         List testlist = new ArrayList();
+        testlist.add("XWiki.NotAdmin");
         testlist.add("XWiki.cristi");
         testlist.add("XWiki.testuser1");
         testlist.add("XWiki.testuser2");
@@ -300,10 +332,10 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
     public void testAddAdmin() throws SpaceManagerException
     {
         this.spaceManager.createSpace(displayTitle, context);
-        Space s1 = this.spaceManager.getSpace(displayTitle, context);
+        Space s1 = this.spaceManager.getSpace(spaceName, context);
         this.spaceManager.addAdmin(s1.getSpaceName(), "XWiki.cristi", context);
         List l = (List) this.spaceManager.getAdmins(s1.getSpaceName(), context);
-        assertEquals(l.get(0), "XWiki.cristi");
+        assertEquals("XWiki.cristi",l.get(1));
 
         List newusers = new ArrayList();
         newusers.add("XWiki.testuser1");
@@ -311,11 +343,110 @@ public class SpaceManagerImplTest extends org.jmock.cglib.MockObjectTestCase
         this.spaceManager.addAdmins(s1.getSpaceName(), newusers, context);
 
         List testlist = new ArrayList();
+        testlist.add("XWiki.NotAdmin");
         testlist.add("XWiki.cristi");
         testlist.add("XWiki.testuser1");
         testlist.add("XWiki.testuser2");
         l = (List) this.spaceManager.getAdmins(s1.getSpaceName(), context);
         assertEquals(testlist, l);
+    }
+
+    public void testSubSpaceRights() throws SpaceManagerException, XWikiException
+    {
+        this.mockGroupService = mock(XWikiGroupService.class);
+        this.mockGroupService.stubs().method("listGroupsForUser").will(
+                new CustomStub("Implements XWikiGroupService.listGroupsForUser")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                  String user = (String) invocation.parameterValues.get(0);
+                  List list = (List) listGroupsForUserReturnValues.get(user);
+                  if (list==null)
+                    return new ArrayList();
+                  else
+                    return list;
+                }
+            });
+        this.mockGroupService.stubs().method("getAllGroupsNamesForMember").will(
+                new CustomStub("Implements XWikiGroupService.getAllGroupsNamesForMember")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                  String user = (String) invocation.parameterValues.get(0);
+                  List list = (List) listGroupsForUserReturnValues.get(user);
+                  if (list==null)
+                    return new ArrayList();
+                  else
+                    return list;
+                }
+            });
+        this.xwiki.setGroupService((XWikiGroupService) this.mockGroupService.proxy());
+
+        this.spaceManager.createSpace(displayTitle, context);
+        Space s1 = this.spaceManager.getSpace(spaceName, context);
+        this.spaceManager.addMember(s1.getSpaceName(), "XWiki.cristi", context);
+        List cristiGroups = new ArrayList();
+        cristiGroups.add("mynicespacename.MemberGroup");
+        listGroupsForUserReturnValues.put("XWiki.cristi", cristiGroups);
+        s1.setPolicy("open");
+        this.spaceManager.setSpaceRights(s1, context);
+        assertTrue("rights should be true for guest", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "Documentation_mynicespacename.WebHome", context));
+        assertTrue("rights should be true for cristi", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.cristi", "Documentation_mynicespacename.WebHome", context));
+        this.spaceManager.updateSpaceRights(s1, "open", "closed", context);
+        assertFalse("rights should be false for guest", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "Documentation_mynicespacename.WebHome", context));
+        assertTrue("rights should be true for cristi", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.cristi", "Documentation_mynicespacename.WebHome", context));
+        this.spaceManager.updateSpaceRights(s1, "closed", "open", context);
+        assertTrue("rights should be true for guest", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "Documentation_mynicespacename.WebHome", context));
+        assertTrue("rights should be true for cristi", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.cristi", "Documentation_mynicespacename.WebHome", context));
+    }
+
+    public void testSubSpaceRights2() throws SpaceManagerException, XWikiException
+    {
+        this.mockGroupService = mock(XWikiGroupService.class);
+        this.mockGroupService.stubs().method("listGroupsForUser").will(
+                new CustomStub("Implements XWikiGroupService.listGroupsForUser")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                  String user = (String) invocation.parameterValues.get(0);
+                  List list = (List) listGroupsForUserReturnValues.get(user);
+                  if (list==null)
+                    return new ArrayList();
+                  else
+                    return list;
+                }
+            });
+        this.mockGroupService.stubs().method("getAllGroupsNamesForMember").will(
+                new CustomStub("Implements XWikiGroupService.getAllGroupsNamesForMember")
+            {
+                public Object invoke(Invocation invocation) throws Throwable
+                {
+                  String user = (String) invocation.parameterValues.get(0);
+                  List list = (List) listGroupsForUserReturnValues.get(user);
+                  if (list==null)
+                    return new ArrayList();
+                  else
+                    return list;
+                }
+            });
+        this.xwiki.setGroupService((XWikiGroupService) this.mockGroupService.proxy());
+
+        this.spaceManager.createSpace(displayTitle, context);
+        Space s1 = this.spaceManager.getSpace(spaceName, context);
+        this.spaceManager.addMember(s1.getSpaceName(), "XWiki.cristi", context);
+        List cristiGroups = new ArrayList();
+        cristiGroups.add("mynicespacename.MemberGroup");
+        listGroupsForUserReturnValues.put("XWiki.cristi", cristiGroups);
+        s1.setPolicy("closed");
+        this.spaceManager.setSpaceRights(s1, context);
+        assertFalse("rights should be false for guest", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "Documentation_mynicespacename.WebHome", context));
+        assertTrue("rights should be true for cristi", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.cristi", "Documentation_mynicespacename.WebHome", context));
+        this.spaceManager.updateSpaceRights(s1, "closed", "open", context);
+        assertTrue("rights should be true for guest", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "Documentation_mynicespacename.WebHome", context));
+        assertTrue("rights should be true for cristi", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.cristi", "Documentation_mynicespacename.WebHome", context));
+        this.spaceManager.updateSpaceRights(s1, "open", "closed", context);
+        assertFalse("rights should be false for guest", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.XWikiGuest", "Documentation_mynicespacename.WebHome", context));
+        assertTrue("rights should be true for cristi", this.xwiki.getRightService().hasAccessLevel("view", "XWiki.cristi", "Documentation_mynicespacename.WebHome", context));
     }
 
 }

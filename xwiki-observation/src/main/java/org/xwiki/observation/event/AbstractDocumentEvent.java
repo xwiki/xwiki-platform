@@ -77,9 +77,8 @@ public abstract class AbstractDocumentEvent implements Event
     public boolean matches(Object otherEvent)
     {
         boolean isMatching = false;
-        if (AbstractDocumentEvent.class.isAssignableFrom(otherEvent.getClass())) {
-            AbstractDocumentEvent event = (AbstractDocumentEvent) otherEvent;
-            isMatching = getEventFilter().matches(event.getEventFilter());
+        if (this.getClass().isAssignableFrom(otherEvent.getClass())) {
+            isMatching = getEventFilter().matches(((AbstractDocumentEvent) otherEvent).getEventFilter());
         }
         return isMatching;
     }

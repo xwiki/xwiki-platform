@@ -27,6 +27,7 @@ import java.util.Map;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.Link;
 
 public class TestEventsListener implements Listener
 {
@@ -72,9 +73,9 @@ public class TestEventsListener implements Listener
         write("onLineBreak");
     }
 
-    public void onLink(String text)
+    public void onLink(Link link)
     {
-        write("onLink: [" + text + "]");
+        write("onLink: [" + link + "]");
     }
 
     public void onMacro(String name, Map<String, String> parameters, String content)

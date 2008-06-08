@@ -39,15 +39,18 @@ public class ParserListenerTester extends AbstractRenderingTestCase
     private Syntax syntax;
     private boolean runTransformations;
 
-    public ParserListenerTester(String testName, Parser parser, Syntax syntax,
-        Class<? extends Listener> listenerClass, boolean runTransformations)
+    public ParserListenerTester(String testName, Syntax syntax,
+        Class<? extends Listener> listenerClass, boolean runTransformations) throws Exception
     {
-        super(testName + " " + parser.getClass().getName() + "/" + listenerClass.getName());
+        super();
+
+        this.parser = (Parser) getComponentManager().lookup(Parser.ROLE, syntax.toIdString());
         this.testName = testName;
-        this.parser = parser;
         this.listenerClass = listenerClass;
         this.syntax = syntax;
         this.runTransformations = runTransformations;
+
+        setName(testName + " " +  this.parser.getClass().getName() + "/" + listenerClass.getName());
     }
 
     @Override

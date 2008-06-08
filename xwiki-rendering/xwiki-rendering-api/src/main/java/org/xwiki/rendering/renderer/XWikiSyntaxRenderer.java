@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.Link;
 
 public class XWikiSyntaxRenderer implements Renderer
 {
@@ -40,6 +41,11 @@ public class XWikiSyntaxRenderer implements Renderer
     public XWikiSyntaxRenderer(Writer writer)
     {
         this.writer = new PrintWriter(writer);
+    }
+
+    public void onLink(Link link)
+    {
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void beginBold()
@@ -76,11 +82,6 @@ public class XWikiSyntaxRenderer implements Renderer
     public void onLineBreak()
     {
         write("\n");
-    }
-
-    public void onLink(String text)
-    {
-        // TODO Auto-generated method stub
     }
 
     public void onMacro(String name, Map<String, String> parameters, String content)

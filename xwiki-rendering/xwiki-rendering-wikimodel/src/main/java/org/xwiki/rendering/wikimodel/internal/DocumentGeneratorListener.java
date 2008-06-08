@@ -31,39 +31,32 @@ import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
-import org.xwiki.component.logging.AbstractLogEnabled;
-import org.xwiki.rendering.block.AbstractBlock;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.BoldBlock;
-import org.xwiki.rendering.block.BulletedListBlock;
-import org.xwiki.rendering.block.DOM;
-import org.xwiki.rendering.block.ItalicBlock;
-import org.xwiki.rendering.block.ListBLock;
-import org.xwiki.rendering.block.ListItemBlock;
-import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.block.NumberedListBlock;
-import org.xwiki.rendering.block.ParagraphBlock;
-import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.block.SpaceBlock;
-import org.xwiki.rendering.block.SpecialSymbolBlock;
-import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.*;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.parser.LinkParser;
+import org.xwiki.rendering.parser.ParseException;
 
-public class DocumentGeneratorListener 
-    extends AbstractLogEnabled implements IWemListener
+public class DocumentGeneratorListener implements IWemListener
 {
     private Stack<Block> stack = new Stack<Block>();
     
     private final MarkerBlock marker = new MarkerBlock();
-    
+
+    private LinkParser linkParser;
+
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
         {
         }
     }
-    
+
+    public DocumentGeneratorListener(LinkParser linkParser)
+    {
+        this.linkParser = linkParser;
+    }
+
     public DOM getDocument()
     {
         return new DOM(generateListFromStack());
@@ -329,10 +322,13 @@ public class DocumentGeneratorListener
 
     }
 
-    public void onReference(String ref, boolean explicitLink)
+    public void onReference(String rawLink, boolean explicitLink)
     {
-        // TODO Auto-generated method stub
-
+        try {
+            this.stack.push(new LinkBlock(this.linkParser.parse(rawLink)));
+        } catch (ParseException e) {
+            throw new RuntimeException("Failed to parse link [" + rawLink + "]", e);
+        }
     }
 
     public void onSpace(String str)

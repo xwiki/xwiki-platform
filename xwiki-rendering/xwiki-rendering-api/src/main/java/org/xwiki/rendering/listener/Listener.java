@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.listener;
 
-import org.xwiki.rendering.block.MacroBlock;
-
 import java.util.Map;
 
 
@@ -65,7 +63,7 @@ public interface Listener
     
     void onLineBreak();
 
-    void onLink(String text);
+    void onLink(Link link);
 
     void onMacro(String name, Map<String, String> parameters, String content);
 

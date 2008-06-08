@@ -22,25 +22,29 @@ package org.xwiki.rendering.wikimodel.parser;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.wikimodel.internal.DocumentGeneratorListener;
-import org.wikimodel.wem.WikiParserException;
 import org.wikimodel.wem.IWikiParser;
 
 import java.io.Reader;
 
 public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
 {
+    private LinkParser linkParser;
+    
     public abstract IWikiParser createWikiModelParser();
 
     public DOM parse(Reader source) throws ParseException
     {
         IWikiParser parser = createWikiModelParser();
-        DocumentGeneratorListener listener = new DocumentGeneratorListener();
+
+        // We pass the LinkParser corresponding to the syntax.
+        DocumentGeneratorListener listener = new DocumentGeneratorListener(this.linkParser);
 
         try {
             parser.parse(source, listener);
-        } catch (WikiParserException e) {
+        } catch (Exception e) {
             throw new ParseException("Failed to parse input source", e);
         }
         return listener.getDocument();

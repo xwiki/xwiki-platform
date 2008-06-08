@@ -95,5 +95,12 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
+    <component>
+      <role>org.xwiki.rendering.parser.LinkParser</role>
+      <role-hint>xwiki/2.0</role-hint>
+      <implementation>org.xwiki.rendering.parser.XWikiLinkParser</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+    </component>
   </components>
 </component-set>

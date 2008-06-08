@@ -20,26 +20,24 @@
 package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
+import org.xwiki.rendering.listener.Link;
 
 public class LinkBlock extends AbstractBlock
 {
-    private String text;
+    private Link link;
 
-    public LinkBlock(String text) throws IllegalArgumentException
+    public LinkBlock(Link link) throws IllegalArgumentException
     {
-        if (text == null) {
-            throw new IllegalArgumentException("arguments can't be null");
-        }
-        this.text = text;
+        this.link = link;
     }
 
-    public String getText()
+    public Link getLink()
     {
-        return this.text;
+        return this.link;
     }
 
     public void traverse(Listener listener)
     {
-        listener.onLink(getText());
+        listener.onLink(getLink());
     }
 }

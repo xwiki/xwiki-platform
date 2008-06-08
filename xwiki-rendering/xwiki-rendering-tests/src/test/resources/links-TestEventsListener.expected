@@ -1,0 +1,5 @@
+beginParagraph
+onLink: [DocumentNameOrUri = [Space.Page]]
+onLink: [Label = [label] DocumentNameOrUri = [Space.Page]]
+onLink: [Label = [label] DocumentNameOrUri = [http://xwiki.org]]
+endParagraph

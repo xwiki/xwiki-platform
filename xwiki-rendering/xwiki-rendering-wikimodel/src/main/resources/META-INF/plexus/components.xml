@@ -6,6 +6,12 @@
       <implementation>org.xwiki.rendering.wikimodel.parser.WikiModelXWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.parser.LinkParser</role>
+          <role-hint>xwiki/2.0</role-hint>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>

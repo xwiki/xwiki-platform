@@ -27,7 +27,6 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
-import org.xwiki.rendering.scaffolding.TestEventsListener;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -49,32 +48,33 @@ public abstract class AbstractRenderingTestCase extends MockObjectTestCase
         super(name);        
     }
 
-    protected void setUp() throws Exception
+    protected ComponentManager getComponentManager() throws Exception
     {
-        DefaultContainerConfiguration configuration = new DefaultContainerConfiguration();
-        configuration.setContainerConfiguration("/plexus.xml");
-        DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
-        PlexusContainerLocator locator = new PlexusContainerLocator(container);
-        this.componentManager = new PlexusComponentManager(locator);
+        if (this.componentManager == null) {
+            DefaultContainerConfiguration configuration = new DefaultContainerConfiguration();
+            configuration.setContainerConfiguration("/plexus.xml");
+            DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
+            PlexusContainerLocator locator = new PlexusContainerLocator(container);
+            this.componentManager = new PlexusComponentManager(locator);
 
-        // Initialize the Execution Context
-        ExecutionContextInitializerManager ecim =
-            (ExecutionContextInitializerManager) getComponentManager().lookup(ExecutionContextInitializerManager.ROLE);
-        Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
-        ExecutionContext ec = new ExecutionContext();
-        ecim.initialize(ec);
-        execution.setContext(ec);
-    }
-
-    protected ComponentManager getComponentManager()
-    {
+            // Initialize the Execution Context
+            ExecutionContextInitializerManager ecim =
+                (ExecutionContextInitializerManager) getComponentManager().lookup(
+                    ExecutionContextInitializerManager.ROLE);
+            Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
+            ExecutionContext ec = new ExecutionContext();
+            ecim.initialize(ec);
+            execution.setContext(ec);
+        }
         return this.componentManager;
     }
 
     protected void tearDown() throws Exception
     {
-        Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
-        execution.removeContext();
+        if (this.componentManager != null) {
+            Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
+            execution.removeContext();
+        }
     }
 
     protected void assertBlocks(String expected, List<Block> blocks)

@@ -26,6 +26,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.Link;
 
 public class XHTMLRenderer implements Renderer
 {
@@ -72,10 +73,9 @@ public class XHTMLRenderer implements Renderer
 
     }
 
-    public void onLink(String text)
+    public void onLink(Link link)
     {
-        // TODO Auto-generated method stub
-
+        //To change body of implemented methods use File | Settings | File Templates.
     }
 
     public void onMacro(String name, Map<String, String> parameters, String content)

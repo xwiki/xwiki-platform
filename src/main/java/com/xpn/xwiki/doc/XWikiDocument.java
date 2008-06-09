@@ -66,7 +66,7 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
@@ -432,7 +432,7 @@ public class XWikiDocument
             StringWriter writer = new StringWriter();
             TransformationManager transformations =
                 (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
-            DOM dom;
+            XDOM dom;
             try {
                 Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
                 dom = parser.parse(new StringReader(this.content));

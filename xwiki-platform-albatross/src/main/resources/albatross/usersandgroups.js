@@ -9,9 +9,7 @@
   * @todo Separate table classes from our callbacks and from the TripleStateCheckbox.
   * @todo Add the right Copyright Notice.
   */
-var ASSTable = Class.create();
-
-ASSTable.prototype = {
+var ASSTable = Class.create({
   /**
     * @param url The base address for requesting the table data.
     * @param limit The maximum number of rows to display in the table at a moment.
@@ -247,13 +245,11 @@ ASSTable.prototype = {
     }
     this.scroller.refreshScrollbar();
   }
-}
+});
 
 ////////////////////////////////////////////////////////////////////////
 /* The class representing the dynamic scroller */
-ASSScroller = Class.create();
-
-ASSScroller.prototype = {
+ASSScroller = Class.create({
   /**
     * @param table The ASSTable instance this scrollbar belongs to.
     * @param domNode The node where the scrollbar should be placed, should be a <div> inside a <td>
@@ -364,13 +360,11 @@ ASSScroller.prototype = {
     }
     this.domNode.style.display = "block";
   }
-}
+});
 
 ////////////////////////////////////////////////////////////////////////
 /* the class that deals with the filtering in a table */
-ASSFilter = Class.create();
-
-ASSFilter.prototype = {
+ASSFilter = Class.create({
   initialize: function(table, filterNode)
   {
     this.table = table;
@@ -455,12 +449,10 @@ ASSFilter.prototype = {
     this.table.filters = newFilters;
     this.table.showRows(1, this.table.limit);
   }
-}
+});
 
 /* this represent a triple state checkbox */
-MSCheckbox = Class.create();
-
-MSCheckbox.prototype = {
+MSCheckbox = Class.create({
   /**
     * @todo Make confirmations generic.
     * @todo msg.get
@@ -651,7 +643,7 @@ MSCheckbox.prototype = {
   {
     Event.observe(this.domNode, 'click', this.createClickHandler(this));
   }
-}
+});
 
 /**
   * user list element creator. Used in adminusers.vm.

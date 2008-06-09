@@ -1,6 +1,4 @@
-Lightbox = Class.create();
-
-Lightbox.prototype =  {	
+Lightbox = Class.create({
   initialize: function(formUrl, saveUrl, redirectUrl) {
     this.formUrl = formUrl;
     this.saveUrl = saveUrl;
@@ -208,4 +206,4 @@ Lightbox.prototype =  {
     var str = '<a href="#" onclick="javascript:$(\'lb-content\').innerHTML =' + lbcontent +'; toggleClass($(\'lb-bg\'), \'hidden\'); toggleClass($(\'lb-align\'), \'hidden\');">' + linktext + '</a>';
     return str;
   }
-};
+});

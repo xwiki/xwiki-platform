@@ -25,7 +25,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki-web</artifactId>
-    <version>1.4-SNAPSHOT</version>
+    <version>1.4.1</version>
   </parent>
   <artifactId>xwiki-web-gwt</artifactId>
   <name>XWiki Platform - Web - GWT API</name>
@@ -68,10 +68,10 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-  <build>
+  <!--<build>
     <plugins>
-      <!-- We need to generate the source JAR as it'll be needed by the GWT module that depends
-           on this as the GWT compiler needs the sources to generate the JS files -->
+      We need to generate the source JAR as it'll be needed by the GWT module that depends
+           on this as the GWT compiler needs the sources to generate the JS files
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
@@ -85,7 +85,7 @@
         </executions>
       </plugin>
     </plugins>
-  </build>
+  </build>-->
   <repositories>
     <repository>
       <id>gwt-maven</id>

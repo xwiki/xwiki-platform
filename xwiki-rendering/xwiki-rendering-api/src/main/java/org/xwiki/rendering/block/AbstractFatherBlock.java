@@ -25,25 +25,55 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * A type of {@link Block} that has children. For example the Paragraph Block, the Bold Block, the List Block, etc.
+ *
  * @version $Id$
  * @since 1.5M2
  */
 public abstract class AbstractFatherBlock extends AbstractBlock
 {
+    /**
+     * Constructs a block with children blocks.
+     *
+     * @param childrenBlocks the list of children blocks of the block to construct
+     */
     public AbstractFatherBlock(List<Block> childrenBlocks)
     {
         addChildren(childrenBlocks);
     }
-    
+
+    /**
+     * Helper constructor to construct a block with a single child block.
+     *
+     * @param childBlock the single child block to add 
+     */
     public AbstractFatherBlock(Block childBlock)
     {
-        this(Arrays.asList(new Block[] {childBlock}));
+        this(Arrays.asList(childBlock));
     }
 
+    /**
+     * Send {@link Listener} events corresponding to the start of the father block. For example for a Bold block, this
+     * allows an XHTML Listener (aka a Renderer) to output <code>&lt;b&gt;</code>.
+     *
+     * @param listener the listener that will receive the events sent by the father block before the children blocks
+     *        have emitted their own events.
+     */
     public abstract void before(Listener listener);
 
+    /**
+     * Send {@link Listener} events corresponding to the end of the father block. For example for a Bold block, this
+     * allows an XHTML Listener (aka a Renderer) to output <code>&lt;/b&gt;</code>.
+     *
+     * @param listener the listener that will receive the events sent by the father block after the children blocks
+     *        have emitted their own events.
+     */
     public abstract void after(Listener listener);
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         before(listener);

@@ -39,13 +39,11 @@ public class ListItemBlock extends AbstractFatherBlock
         super(childrenBlock);
     }
 
-    @Override
     public void before(Listener listener)
     {
         listener.beginListItem();
     }
 
-    @Override
     public void after(Listener listener)
     {
         listener.endListItem();

@@ -35,13 +35,11 @@ public class NumberedListBlock extends AbstractListBlock
         super(childrenBlocks);
     }
 
-    @Override
     public void before(Listener listener)
     {
         listener.beginList(ListType.NUMBERED);
     }
 
-    @Override
     public void after(Listener listener)
     {
         listener.endList(ListType.NUMBERED);

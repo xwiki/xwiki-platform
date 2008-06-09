@@ -57,13 +57,11 @@ public class XMLBlock extends AbstractFatherBlock
         return this.attributes;
     }
     
-    @Override
     public void after(Listener listener)
     {
         listener.endXMLElement(getName(), getAttributes());
     }
 
-    @Override
     public void before(Listener listener)
     {
         listener.beginXMLElement(getName(), getAttributes());

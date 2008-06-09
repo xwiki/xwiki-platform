@@ -40,13 +40,11 @@ public class BulletedListBlock extends AbstractListBlock
         super(childrenBlock);
     }
 
-    @Override
     public void before(Listener listener)
     {
         listener.beginList(ListType.BULLETED);
     }
 
-    @Override
     public void after(Listener listener)
     {
         listener.endList(ListType.BULLETED);

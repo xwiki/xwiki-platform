@@ -21,49 +21,30 @@ package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
 
-import java.util.Arrays;
-import java.util.List;
-
 /**
- * Default implementation for {@link FatherBlock}.
+ * A type of {@link Block} that has children Blocks. For example the Paragraph Block, the Bold Block, the List Block,
+ * etc.
  *
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractFatherBlock extends AbstractBlock implements FatherBlock 
+public interface FatherBlock extends Block
 {
     /**
-     * Constructs a block with children blocks.
+     * Send {@link org.xwiki.rendering.listener.Listener} events corresponding to the start of the father block.
+     * For example for a Bold block, this allows an XHTML Listener (aka a Renderer) to output <code>&lt;b&gt;</code>.
      *
-     * @param childrenBlocks the list of children blocks of the block to construct
+     * @param listener the listener that will receive the events sent by the father block before the children blocks
+     *        have emitted their own events.
      */
-    public AbstractFatherBlock(List<Block> childrenBlocks)
-    {
-        addChildren(childrenBlocks);
-    }
+     void before(Listener listener);
 
     /**
-     * Helper constructor to construct a block with a single child block.
+     * Send {@link Listener} events corresponding to the end of the father block. For example for a Bold block, this
+     * allows an XHTML Listener (aka a Renderer) to output <code>&lt;/b&gt;</code>.
      *
-     * @param childBlock the single child block to add 
+     * @param listener the listener that will receive the events sent by the father block after the children blocks
+     *        have emitted their own events.
      */
-    public AbstractFatherBlock(Block childBlock)
-    {
-        this(Arrays.asList(childBlock));
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
-     */
-    public void traverse(Listener listener)
-    {
-        before(listener);
-
-        for (Block block: getChildren()) {
-            block.traverse(listener);
-        }
-
-        after(listener);
-    }
+     void after(Listener listener);
 }

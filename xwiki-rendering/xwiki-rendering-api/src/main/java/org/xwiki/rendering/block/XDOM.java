@@ -24,20 +24,34 @@ import org.xwiki.rendering.listener.Listener;
 import java.util.List;
 
 /**
+ * Contains the full tree of {@link Block} that represent a XWiki Document's content.
+ *  
  * @version $Id$
  * @since 1.5M2
  */
 public class XDOM extends AbstractFatherBlock
 {
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     */
     public XDOM(List<Block> childBlocks)
     {
         super(childBlocks);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)   
+     */
     public void after(Listener listener)
     {
     }

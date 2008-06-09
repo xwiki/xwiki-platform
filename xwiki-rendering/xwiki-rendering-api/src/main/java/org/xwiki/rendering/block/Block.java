@@ -24,6 +24,10 @@ import java.util.List;
 import org.xwiki.rendering.listener.Listener;
 
 /**
+ * Represents an element of a XWiki Document's content. For example there are Blocks for Paragraphs, Bold parts,
+ * Sections, Links, etc. A block has a parent and can have children too for Blocks which are wrapper around other
+ * blocks (e.g. Paragraph blocks, List blocks, Bold blocks).
+ *
  * @version $Id$
  * @since 1.5M2
  */

@@ -66,10 +66,10 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.XHTMLRenderer;
-import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.XWiki;
@@ -102,7 +102,11 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.validation.XWikiValidationInterface;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
-import com.xpn.xwiki.web.*;
+import com.xpn.xwiki.web.EditForm;
+import com.xpn.xwiki.web.ObjectAddForm;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.web.XWikiMessageTool;
+import com.xpn.xwiki.web.XWikiRequest;
 
 public class XWikiDocument
 {
@@ -169,15 +173,13 @@ public class XWikiDocument
     private String comment;
 
     /**
-     * Wiki syntax supported by this document. This is used to support different syntaxes
-     * inside the same wiki. For example a page can use the Confluence 2.0 syntax while
-     * another one uses the XWiki 1.0 syntax. In practice our first need is to support the
-     * new rendering component. To use the old rendering implementation specify a 
-     * "xwiki/1.0" syntaxId and use a "xwiki/2.0" syntaxId for using the new rendering
-     * component.
+     * Wiki syntax supported by this document. This is used to support different syntaxes inside the same wiki. For
+     * example a page can use the Confluence 2.0 syntax while another one uses the XWiki 1.0 syntax. In practice our
+     * first need is to support the new rendering component. To use the old rendering implementation specify a
+     * "xwiki/1.0" syntaxId and use a "xwiki/2.0" syntaxId for using the new rendering component.
      */
     private String syntaxId;
-    
+
     /**
      * Is latest modification a minor edit
      */
@@ -217,12 +219,11 @@ public class XWikiDocument
     private String xWikiClassXML;
 
     /**
-     * Map holding document objects grouped by classname (className -> Vector of objects). The map
-     * is not synchronized, and uses a TreeMap implementation to preserve className ordering
-     * (consistent sorted order for output to XML, rendering in velocity, etc.)
+     * Map holding document objects grouped by classname (className -> Vector of objects). The map is not synchronized,
+     * and uses a TreeMap implementation to preserve className ordering (consistent sorted order for output to XML,
+     * rendering in velocity, etc.)
      */
-    private Map<String, Vector<BaseObject>> xWikiObjects =
-        new TreeMap<String, Vector<BaseObject>>();
+    private Map<String, Vector<BaseObject>> xWikiObjects = new TreeMap<String, Vector<BaseObject>>();
 
     private List<XWikiAttachment> attachmentList;
 
@@ -246,10 +247,9 @@ public class XWikiDocument
     private XWikiStoreInterface store;
 
     /**
-     * This is a copy of this XWikiDocument before any modification was made to it. It is reset to
-     * the actual values when the document is saved in the database. This copy is used for finding
-     * out differences made to this document (useful for example to send the correct notifications
-     * to document change listeners).
+     * This is a copy of this XWikiDocument before any modification was made to it. It is reset to the actual values
+     * when the document is saved in the database. This copy is used for finding out differences made to this document
+     * (useful for example to send the correct notifications to document change listeners).
      */
     private XWikiDocument originalDocument;
 
@@ -280,15 +280,15 @@ public class XWikiDocument
 
     public long getId()
     {
-        if ((language == null) || language.trim().equals("")) {
-            id = getFullName().hashCode();
+        if ((this.language == null) || this.language.trim().equals("")) {
+            this.id = getFullName().hashCode();
         } else {
-            id = (getFullName() + ":" + language).hashCode();
+            this.id = (getFullName() + ":" + this.language).hashCode();
         }
 
         // if (log.isDebugEnabled())
         // log.debug("ID: " + getFullName() + " " + language + ": " + id);
-        return id;
+        return this.id;
     }
 
     public void setId(long id)
@@ -301,7 +301,7 @@ public class XWikiDocument
      */
     public String getSpace()
     {
-        return web;
+        return this.web;
     }
 
     public void setSpace(String space)
@@ -323,10 +323,10 @@ public class XWikiDocument
 
     public Version getRCSVersion()
     {
-        if (version == null) {
+        if (this.version == null) {
             return new Version("1.1");
         }
-        return version;
+        return this.version;
     }
 
     public void setRCSVersion(Version version)
@@ -351,11 +351,11 @@ public class XWikiDocument
             setName(name.substring(i1 + 1));
         }
         this.updateDate = new Date();
-        updateDate.setTime((updateDate.getTime() / 1000) * 1000);
+        this.updateDate.setTime((this.updateDate.getTime() / 1000) * 1000);
         this.contentUpdateDate = new Date();
-        contentUpdateDate.setTime((contentUpdateDate.getTime() / 1000) * 1000);
+        this.contentUpdateDate.setTime((this.contentUpdateDate.getTime() / 1000) * 1000);
         this.creationDate = new Date();
-        creationDate.setTime((creationDate.getTime() / 1000) * 1000);
+        this.creationDate.setTime((this.creationDate.getTime() / 1000) * 1000);
         this.parent = "";
         this.content = "\n";
         this.format = "";
@@ -381,8 +381,8 @@ public class XWikiDocument
     }
 
     /**
-     * @param originalDocument the original document representing this document instance before any
-     *            change was made to it, prior to the last time it was saved
+     * @param originalDocument the original document representing this document instance before any change was made to
+     *            it, prior to the last time it was saved
      * @see #originalDocument
      */
     public void setOriginalDocument(XWikiDocument originalDocument)
@@ -397,7 +397,7 @@ public class XWikiDocument
 
     public String getParent()
     {
-        return parent != null ? parent : "";
+        return this.parent != null ? this.parent : "";
     }
 
     public void setParent(String parent)
@@ -410,7 +410,7 @@ public class XWikiDocument
 
     public String getContent()
     {
-        return content;
+        return this.content;
     }
 
     public void setContent(String content)
@@ -430,11 +430,12 @@ public class XWikiDocument
             renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
         } else {
             StringWriter writer = new StringWriter();
-            TransformationManager transformations = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+            TransformationManager transformations =
+                (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
             DOM dom;
             try {
                 Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
-                dom = parser.parse(new StringReader(content));
+                dom = parser.parse(new StringReader(this.content));
                 SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
                 transformations.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(getSyntaxId()));
             } catch (Exception e) {
@@ -493,15 +494,14 @@ public class XWikiDocument
 
     public String getTitle()
     {
-        return (title != null) ? title : "";
+        return (this.title != null) ? this.title : "";
     }
 
     /**
      * @param context the XWiki context used to get acces to the XWikiRenderingEngine object
-     * @return the document title. If a title has not been provided, look for a section title in the
-     *         document's content and if not found return the page name. The returned title is also
-     *         interpreted which means it's allowed to use Velocity, Groovy, etc syntax within a
-     *         title.
+     * @return the document title. If a title has not been provided, look for a section title in the document's content
+     *         and if not found return the page name. The returned title is also interpreted which means it's allowed to
+     *         use Velocity, Groovy, etc syntax within a title.
      */
     public String getDisplayTitle(XWikiContext context)
     {
@@ -530,8 +530,7 @@ public class XWikiDocument
     }
 
     /**
-     * @return the first level 1 or level 1.1 title text in the document's content or "" if none are
-     *         found
+     * @return the first level 1 or level 1.1 title text in the document's content or "" if none are found
      * @todo this method has nothing to do in this class and should be moved elsewhere
      */
     public String extractTitle()
@@ -572,7 +571,7 @@ public class XWikiDocument
 
     public String getFormat()
     {
-        return format != null ? format : "";
+        return this.format != null ? this.format : "";
     }
 
     public void setFormat(String format)
@@ -585,12 +584,12 @@ public class XWikiDocument
 
     public String getAuthor()
     {
-        return author != null ? author.trim() : "";
+        return this.author != null ? this.author.trim() : "";
     }
 
     public String getContentAuthor()
     {
-        return contentAuthor != null ? contentAuthor.trim() : "";
+        return this.contentAuthor != null ? this.contentAuthor.trim() : "";
     }
 
     public void setAuthor(String author)
@@ -611,7 +610,7 @@ public class XWikiDocument
 
     public String getCreator()
     {
-        return creator != null ? creator.trim() : "";
+        return this.creator != null ? this.creator.trim() : "";
     }
 
     public void setCreator(String creator)
@@ -624,10 +623,10 @@ public class XWikiDocument
 
     public Date getDate()
     {
-        if (updateDate == null) {
+        if (this.updateDate == null) {
             return new Date();
         } else {
-            return updateDate;
+            return this.updateDate;
         }
     }
 
@@ -645,16 +644,16 @@ public class XWikiDocument
 
     public Date getCreationDate()
     {
-        if (creationDate == null) {
+        if (this.creationDate == null) {
             return new Date();
         } else {
-            return creationDate;
+            return this.creationDate;
         }
     }
 
     public void setCreationDate(Date date)
     {
-        if ((date != null) && (!date.equals(creationDate))) {
+        if ((date != null) && (!date.equals(this.creationDate))) {
             setMetaDataDirty(true);
         }
 
@@ -667,10 +666,10 @@ public class XWikiDocument
 
     public Date getContentUpdateDate()
     {
-        if (contentUpdateDate == null) {
+        if (this.contentUpdateDate == null) {
             return new Date();
         } else {
-            return contentUpdateDate;
+            return this.contentUpdateDate;
         }
     }
 
@@ -689,7 +688,7 @@ public class XWikiDocument
 
     public String getMeta()
     {
-        return meta;
+        return this.meta;
     }
 
     public void setMeta(String meta)
@@ -715,35 +714,35 @@ public class XWikiDocument
 
     public boolean isContentDirty()
     {
-        return isContentDirty;
+        return this.isContentDirty;
     }
 
     public void incrementVersion()
     {
-        if (version == null) {
-            version = new Version("1.1");
+        if (this.version == null) {
+            this.version = new Version("1.1");
         } else {
             if (isMinorEdit()) {
-                version = version.next();
+                this.version = this.version.next();
             } else {
-                version = version.getBranchPoint().next().newBranch(1);
+                this.version = this.version.getBranchPoint().next().newBranch(1);
             }
         }
     }
 
     public void setContentDirty(boolean contentDirty)
     {
-        isContentDirty = contentDirty;
+        this.isContentDirty = contentDirty;
     }
 
     public boolean isMetaDataDirty()
     {
-        return isMetaDataDirty;
+        return this.isMetaDataDirty;
     }
 
     public void setMetaDataDirty(boolean metaDataDirty)
     {
-        isMetaDataDirty = metaDataDirty;
+        this.isMetaDataDirty = metaDataDirty;
     }
 
     public String getAttachmentURL(String filename, XWikiContext context)
@@ -754,50 +753,47 @@ public class XWikiDocument
     public String getAttachmentURL(String filename, String action, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action,
-                null, getDatabase(), context);
+            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null, getDatabase(),
+                context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getExternalAttachmentURL(String filename, String action, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action,
-                null, getDatabase(), context);
+            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, null, getDatabase(),
+                context);
         return url.toString();
     }
 
-    public String getAttachmentURL(String filename, String action, String querystring,
-        XWikiContext context)
+    public String getAttachmentURL(String filename, String action, String querystring, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action,
-                querystring, getDatabase(), context);
+            context.getURLFactory().createAttachmentURL(filename, getSpace(), getName(), action, querystring,
+                getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getAttachmentRevisionURL(String filename, String revision, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(),
-                revision, null, getDatabase(), context);
+            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, null,
+                getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
-    public String getAttachmentRevisionURL(String filename, String revision, String querystring,
-        XWikiContext context)
+    public String getAttachmentRevisionURL(String filename, String revision, String querystring, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(),
-                revision, querystring, getDatabase(), context);
+            context.getURLFactory().createAttachmentRevisionURL(filename, getSpace(), getName(), revision, querystring,
+                getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getURL(String action, String params, boolean redirect, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createURL(getSpace(), getName(), action, params, null,
-                getDatabase(), context);
+            context.getURLFactory().createURL(getSpace(), getName(), action, params, null, getDatabase(), context);
         if (redirect) {
             if (url == null) {
                 return null;
@@ -822,24 +818,23 @@ public class XWikiDocument
     public String getURL(String action, String querystring, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createURL(getSpace(), getName(), action, querystring, null,
-                getDatabase(), context);
+            context.getURLFactory().createURL(getSpace(), getName(), action, querystring, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
     public String getExternalURL(String action, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createExternalURL(getSpace(), getName(), action, null, null,
-                getDatabase(), context);
+            context.getURLFactory()
+                .createExternalURL(getSpace(), getName(), action, null, null, getDatabase(), context);
         return url.toString();
     }
 
     public String getExternalURL(String action, String querystring, XWikiContext context)
     {
         URL url =
-            context.getURLFactory().createExternalURL(getSpace(), getName(), action, querystring,
-                null, getDatabase(), context);
+            context.getURLFactory().createExternalURL(getSpace(), getName(), action, querystring, null, getDatabase(),
+                context);
         return url.toString();
     }
 
@@ -848,8 +843,8 @@ public class XWikiDocument
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(getParent(), context);
         URL url =
-            context.getURLFactory().createURL(doc.getSpace(), doc.getName(), "view", null, null,
-                getDatabase(), context);
+            context.getURLFactory()
+                .createURL(doc.getSpace(), doc.getName(), "view", null, null, getDatabase(), context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -860,8 +855,8 @@ public class XWikiDocument
     }
 
     /**
-     * return a wrapped version of an XWikiDocument. Prefer this function instead of new
-     * Document(XWikiDocument, XWikiContext)
+     * return a wrapped version of an XWikiDocument. Prefer this function instead of new Document(XWikiDocument,
+     * XWikiContext)
      */
     public com.xpn.xwiki.api.Document newDocument(String customClassName, XWikiContext context)
     {
@@ -869,8 +864,8 @@ public class XWikiDocument
             try {
                 Class< ? >[] classes = new Class[] {XWikiDocument.class, XWikiContext.class};
                 Object[] args = new Object[] {this, context};
-                return (com.xpn.xwiki.api.Document) Class.forName(customClassName)
-                    .getConstructor(classes).newInstance(args);
+                return (com.xpn.xwiki.api.Document) Class.forName(customClassName).getConstructor(classes).newInstance(
+                    args);
             } catch (InstantiationException e) {
                 e.printStackTrace(); // To change body of catch statement use File | Settings |
                 // File Templates.
@@ -899,13 +894,12 @@ public class XWikiDocument
 
     public void loadArchive(XWikiContext context) throws XWikiException
     {
-        if (archive == null || archive.get() == null) {
-            XWikiDocumentArchive arch =
-                getVersioningStore(context).getXWikiDocumentArchive(this, context);
+        if (this.archive == null || this.archive.get() == null) {
+            XWikiDocumentArchive arch = getVersioningStore(context).getXWikiDocumentArchive(this, context);
             // We are using a SoftReference which will allow the archive to be
             // discarded by the Garbage collector as long as the context is closed (usually during
             // the request)
-            archive = new SoftReference<XWikiDocumentArchive>(arch);
+            this.archive = new SoftReference<XWikiDocumentArchive>(arch);
         }
     }
 
@@ -914,10 +908,10 @@ public class XWikiDocument
         // We are using a SoftReference which will allow the archive to be
         // discarded by the Garbage collector as long as the context is closed (usually during the
         // request)
-        if (archive == null) {
+        if (this.archive == null) {
             return null;
         } else {
-            return (XWikiDocumentArchive) archive.get();
+            return this.archive.get();
         }
     }
 
@@ -973,8 +967,7 @@ public class XWikiDocument
      * @param criteria criteria used to match versions
      * @return a list of matching versions
      */
-    public List<String> getRevisions(RevisionCriteria criteria, XWikiContext context)
-        throws XWikiException
+    public List<String> getRevisions(RevisionCriteria criteria, XWikiContext context) throws XWikiException
     {
         List<String> results = new ArrayList<String>();
 
@@ -993,11 +986,11 @@ public class XWikiDocument
             // Minor/Major version matching
             if (criteria.getIncludeMinorVersions() || !nextNodeinfo.isMinorEdit()) {
                 // Author matching
-                if (criteria.getAuthor().equals("")
-                    || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
+                if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
                     // Date range matching
                     if (nodeinfo.getDate().after(criteria.getMinDate())
-                        && nodeinfo.getDate().before(criteria.getMaxDate())) {
+                        && nodeinfo.getDate().before(criteria.getMaxDate()))
+                    {
                         results.add(nodeinfo.getVersion().toString());
                     }
                 }
@@ -1006,11 +999,10 @@ public class XWikiDocument
 
         nodeinfo = nextNodeinfo;
         if (nodeinfo != null) {
-            if (criteria.getAuthor().equals("")
-                || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
+            if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
                 // Date range matching
-                if (nodeinfo.getDate().after(criteria.getMinDate())
-                    && nodeinfo.getDate().before(criteria.getMaxDate())) {
+                if (nodeinfo.getDate().after(criteria.getMinDate()) && nodeinfo.getDate().before(criteria.getMaxDate()))
+                {
                     results.add(nodeinfo.getVersion().toString());
                 }
             }
@@ -1019,19 +1011,18 @@ public class XWikiDocument
         return criteria.getRange().subList(results);
     }
 
-    public XWikiRCSNodeInfo getRevisionInfo(String version, XWikiContext context)
-        throws XWikiException
+    public XWikiRCSNodeInfo getRevisionInfo(String version, XWikiContext context) throws XWikiException
     {
         return getDocumentArchive(context).getNode(new Version(version));
     }
 
     /**
-     * @return Is this version the most recent one. False if and only if there are newer versions of
-     *         this document in the database.
+     * @return Is this version the most recent one. False if and only if there are newer versions of this document in
+     *         the database.
      */
     public boolean isMostRecent()
     {
-        return mostRecent;
+        return this.mostRecent;
     }
 
     /**
@@ -1046,11 +1037,11 @@ public class XWikiDocument
 
     public BaseClass getxWikiClass()
     {
-        if (xWikiClass == null) {
-            xWikiClass = new BaseClass();
-            xWikiClass.setName(getFullName());
+        if (this.xWikiClass == null) {
+            this.xWikiClass = new BaseClass();
+            this.xWikiClass.setName(getFullName());
         }
-        return xWikiClass;
+        return this.xWikiClass;
     }
 
     public void setxWikiClass(BaseClass xWikiClass)
@@ -1060,7 +1051,7 @@ public class XWikiDocument
 
     public Map<String, Vector<BaseObject>> getxWikiObjects()
     {
-        return xWikiObjects;
+        return this.xWikiObjects;
     }
 
     public void setxWikiObjects(Map<String, Vector<BaseObject>> xWikiObjects)
@@ -1249,12 +1240,12 @@ public class XWikiDocument
      */
     public boolean isNew()
     {
-        return isNew;
+        return this.isNew;
     }
 
     public void setNew(boolean aNew)
     {
-        isNew = aNew;
+        this.isNew = aNew;
     }
 
     public void mergexWikiClass(XWikiDocument templatedoc)
@@ -1311,7 +1302,7 @@ public class XWikiDocument
 
     public String getTemplate()
     {
-        return StringUtils.defaultString(template);
+        return StringUtils.defaultString(this.template);
     }
 
     public void setTemplate(String template)
@@ -1330,8 +1321,7 @@ public class XWikiDocument
         return displayPrettyName(fieldname, false, true, context);
     }
 
-    public String displayPrettyName(String fieldname, boolean showMandatory, boolean before,
-        XWikiContext context)
+    public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, XWikiContext context)
     {
         try {
             BaseObject object = getxWikiObject();
@@ -1349,20 +1339,19 @@ public class XWikiDocument
         return displayPrettyName(fieldname, false, true, obj, context);
     }
 
-    public String displayPrettyName(String fieldname, boolean showMandatory, BaseObject obj,
-        XWikiContext context)
+    public String displayPrettyName(String fieldname, boolean showMandatory, BaseObject obj, XWikiContext context)
     {
         return displayPrettyName(fieldname, showMandatory, true, obj, context);
     }
 
-    public String displayPrettyName(String fieldname, boolean showMandatory, boolean before,
-        BaseObject obj, XWikiContext context)
+    public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, BaseObject obj,
+        XWikiContext context)
     {
         try {
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
             String dprettyName = "";
-            if ((showMandatory) && (pclass.getValidationRegExp() != null)
-                && (!pclass.getValidationRegExp().equals(""))) {
+            if ((showMandatory) && (pclass.getValidationRegExp() != null) && (!pclass.getValidationRegExp().equals("")))
+            {
                 dprettyName = context.getWiki().addMandatory(context);
             }
             if (before) {
@@ -1411,8 +1400,7 @@ public class XWikiDocument
         return display(fieldname, type, "", obj, context);
     }
 
-    public String display(String fieldname, String type, String pref, BaseObject obj,
-        XWikiContext context)
+    public String display(String fieldname, String type, String pref, BaseObject obj, XWikiContext context)
     {
         HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
@@ -1422,8 +1410,7 @@ public class XWikiDocument
             type = type.toLowerCase();
             StringBuffer result = new StringBuffer();
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
-            String prefix =
-                pref + obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
+            String prefix = pref + obj.getxWikiClass(context).getName() + "_" + obj.getNumber() + "_";
 
             if (pclass.isCustomDisplayed(context)) {
                 pclass.displayCustom(result, fieldname, prefix, type, obj, context);
@@ -1444,8 +1431,7 @@ public class XWikiDocument
             } else if (type.equals("search")) {
                 result.append("{pre}");
                 prefix = obj.getxWikiClass(context).getName() + "_";
-                pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context
-                    .get("query"), context);
+                pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
                 result.append("{/pre}");
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
@@ -1454,8 +1440,8 @@ public class XWikiDocument
         } catch (Exception ex) {
             // TODO: It would better to check if the field exists rather than catching an exception
             // raised by a NPE as this is currently the case here...
-            log.warn("Failed to display field [" + fieldname + "] in [" + type
-                + "] mode for Object [" + (obj == null ? "NULL" : obj.getName()) + "]");
+            log.warn("Failed to display field [" + fieldname + "] in [" + type + "] mode for Object ["
+                + (obj == null ? "NULL" : obj.getName()) + "]");
             return "";
         } finally {
             restoreContext(backup, context);
@@ -1515,8 +1501,7 @@ public class XWikiDocument
         return displayForm(className, header, format, true, context);
     }
 
-    public String displayForm(String className, String header, String format, boolean linebreak,
-        XWikiContext context)
+    public String displayForm(String className, String header, String format, boolean linebreak, XWikiContext context)
     {
         Vector<BaseObject> objects = getObjects(className);
         if (format.endsWith("\\n")) {
@@ -1545,8 +1530,7 @@ public class XWikiDocument
             PropertyClass pclass = (PropertyClass) it.next();
             vcontext.put(pclass.getName(), pclass.getPrettyName());
         }
-        result.append(XWikiVelocityRenderer.evaluate(header, context.getDoc().getFullName(),
-            vcontext, context));
+        result.append(XWikiVelocityRenderer.evaluate(header, context.getDoc().getFullName(), vcontext, context));
         if (linebreak) {
             result.append("\n");
         }
@@ -1554,14 +1538,14 @@ public class XWikiDocument
         // display each line
         for (int i = 0; i < objects.size(); i++) {
             vcontext.put("id", new Integer(i + 1));
-            BaseObject object = (BaseObject) objects.get(i);
+            BaseObject object = objects.get(i);
             if (object != null) {
                 for (Iterator it = bclass.getPropertyList().iterator(); it.hasNext();) {
                     String name = (String) it.next();
                     vcontext.put(name, display(name, object, context));
                 }
-                result.append(XWikiVelocityRenderer.evaluate(format, context.getDoc()
-                    .getFullName(), vcontext, context));
+                result
+                    .append(XWikiVelocityRenderer.evaluate(format, context.getDoc().getFullName(), vcontext, context));
                 if (linebreak) {
                     result.append("\n");
                 }
@@ -1607,7 +1591,7 @@ public class XWikiDocument
         }
         result.append("\n");
         for (int i = 0; i < objects.size(); i++) {
-            BaseObject object = (BaseObject) objects.get(i);
+            BaseObject object = objects.get(i);
             if (object != null) {
                 first = true;
                 for (Iterator it = bclass.getPropertyList().iterator(); it.hasNext();) {
@@ -1634,7 +1618,7 @@ public class XWikiDocument
 
     public boolean isFromCache()
     {
-        return fromCache;
+        return this.fromCache;
     }
 
     public void setFromCache(boolean fromCache)
@@ -1657,7 +1641,8 @@ public class XWikiDocument
         String creator = eform.getCreator();
         if ((creator != null) && (!creator.equals(getCreator()))) {
             if ((getCreator().equals(context.getUser()))
-                || (context.getWiki().getRightService().hasAdminRights(context))) {
+                || (context.getWiki().getRightService().hasAdminRights(context)))
+            {
                 setCreator(creator);
             }
         }
@@ -1696,8 +1681,7 @@ public class XWikiDocument
         loadTags(context);
 
         StaticListClass tagProp =
-            (StaticListClass) this.tags.getxWikiClass(context).getField(
-                XWikiConstant.TAG_CLASS_PROP_TAGS);
+            (StaticListClass) this.tags.getxWikiClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS);
         tagProp.fromString(tags);
         this.tags.safeput(XWikiConstant.TAG_CLASS_PROP_TAGS, tagProp.fromString(tags));
         setMetaDataDirty(true);
@@ -1741,22 +1725,20 @@ public class XWikiDocument
     {
         loadTags(context);
         String possibleValues =
-            ((StaticListClass) this.tags.getxWikiClass(context).getField(
-                XWikiConstant.TAG_CLASS_PROP_TAGS)).getValues();
+            ((StaticListClass) this.tags.getxWikiClass(context).getField(XWikiConstant.TAG_CLASS_PROP_TAGS))
+                .getValues();
         return ListClass.getListFromString(possibleValues);
         // ((BaseProperty) this.tags.safeget(XWikiConstant.TAG_CLASS_PROP_TAGS)).toString();
     }
 
-    public void readTranslationMetaFromForm(EditForm eform, XWikiContext context)
-        throws XWikiException
+    public void readTranslationMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         String content = eform.getContent();
         if ((content != null) && (!content.equals(""))) {
             // Cleanup in case we use HTMLAREA
             // content = context.getUtil().substitute("s/<br class=\\\"htmlarea\\\"\\/>/\\r\\n/g",
             // content);
-            content =
-                context.getUtil().substitute("s/<br class=\"htmlarea\" \\/>/\r\n/g", content);
+            content = context.getUtil().substitute("s/<br class=\"htmlarea\" \\/>/\r\n/g", content);
             setContent(content);
         }
         String title = eform.getTitle();
@@ -1776,8 +1758,7 @@ public class XWikiDocument
                 if (oldobject != null) {
                     BaseClass baseclass = oldobject.getxWikiClass(context);
                     BaseObject newobject =
-                        (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_"
-                            + i), oldobject);
+                        (BaseObject) baseclass.fromMap(eform.getObject(baseclass.getName() + "_" + i), oldobject);
                     newobject.setNumber(oldobject.getNumber());
                     newobject.setName(getFullName());
                     newObjects.set(newobject.getNumber(), newobject);
@@ -1809,9 +1790,7 @@ public class XWikiDocument
                 Object[] args = {getFullName()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                     XWikiException.ERROR_XWIKI_APP_DOCUMENT_NOT_EMPTY,
-                    "Cannot add a template to document {0} because it already has content",
-                    null,
-                    args);
+                    "Cannot add a template to document {0} because it already has content", null, args);
             } else {
                 if (template.indexOf('.') == -1) {
                     template = getSpace() + "." + template;
@@ -1822,9 +1801,7 @@ public class XWikiDocument
                     Object[] args = {template, getFullName()};
                     throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                         XWikiException.ERROR_XWIKI_APP_TEMPLATE_DOES_NOT_EXIST,
-                        "Template document {0} does not exist when adding to document {1}",
-                        null,
-                        args);
+                        "Template document {0} does not exist when adding to document {1}", null, args);
                 } else {
                     setTemplate(template);
                     setContent(templatedoc.getContent());
@@ -1852,8 +1829,8 @@ public class XWikiDocument
         setContentDirty(true);
     }
 
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
-        int event, XWikiContext context)
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
+        XWikiContext context)
     {
         // Do nothing for the moment..
         // A usefull thing here would be to look at any instances of a Notification Object
@@ -1909,17 +1886,18 @@ public class XWikiDocument
 
         clonexWikiObjects(document);
         copyAttachments(document);
-        elements = document.elements;
+        this.elements = document.elements;
 
         // Note: We don't set the original document as it's already been set in the constructor
         // when this object was instantiated.
     }
 
+    @Override
     public Object clone()
     {
         XWikiDocument doc = null;
         try {
-            doc = (XWikiDocument) getClass().newInstance();
+            doc = getClass().newInstance();
 
             doc.setDatabase(getDatabase());
             doc.setRCSVersion(getRCSVersion());
@@ -1960,12 +1938,11 @@ public class XWikiDocument
 
             doc.clonexWikiObjects(this);
             doc.copyAttachments(this);
-            doc.elements = elements;
+            doc.elements = this.elements;
 
             // Note: We don't set the original document in the clone since the clone has already
             // been instantiated (as it's passed as parameter) and thus its original document is
             // already set.
-
         } catch (Exception e) {
             // This should not happen
             log.error("Exception while doc.clone", e);
@@ -1997,6 +1974,7 @@ public class XWikiDocument
         }
     }
 
+    @Override
     public boolean equals(Object object)
     {
         XWikiDocument doc = (XWikiDocument) object;
@@ -2158,8 +2136,7 @@ public class XWikiDocument
         return toXML(true, false, true, true, context);
     }
 
-    public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context)
-        throws IOException
+    public void addToZip(ZipOutputStream zos, boolean withVersions, XWikiContext context) throws IOException
     {
         try {
             String zipname = getSpace() + "/" + getName();
@@ -2181,13 +2158,10 @@ public class XWikiDocument
         addToZip(zos, true, context);
     }
 
-    public String toXML(boolean bWithObjects, boolean bWithRendering,
-        boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
-        throws XWikiException
+    public String toXML(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
+        boolean bWithVersions, XWikiContext context) throws XWikiException
     {
-        Document doc =
-            toXMLDocument(bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions,
-                context);
+        Document doc = toXMLDocument(bWithObjects, bWithRendering, bWithAttachmentContent, bWithVersions, context);
         return toXML(doc, context);
     }
 
@@ -2196,9 +2170,8 @@ public class XWikiDocument
         return toXMLDocument(true, false, false, false, context);
     }
 
-    public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering,
-        boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
-        throws XWikiException
+    public Document toXMLDocument(boolean bWithObjects, boolean bWithRendering, boolean bWithAttachmentContent,
+        boolean bWithVersions, XWikiContext context) throws XWikiException
     {
         Document doc = new DOMDocument();
         Element docel = new DOMElement("xwikidoc");
@@ -2325,7 +2298,7 @@ public class XWikiDocument
         // Filter filter = new CharacterFilter();
         // String newcontent = filter.process(getContent());
         // String newcontent = encodedXMLStringAsUTF8(getContent());
-        String newcontent = content;
+        String newcontent = this.content;
         el.addText(newcontent);
         docel.add(el);
 
@@ -2428,11 +2401,8 @@ public class XWikiDocument
             StringReader in = new StringReader(xml);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml",
-                e,
-                null);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
         }
 
         fromXML(domdoc, withArchive);
@@ -2446,11 +2416,8 @@ public class XWikiDocument
         try {
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml",
-                e,
-                null);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
         }
 
         fromXML(domdoc, withArchive);
@@ -2467,8 +2434,9 @@ public class XWikiDocument
         setAuthor(getElement(docel, "author"));
         setCustomClass(getElement(docel, "customClass"));
         setContentAuthor(getElement(docel, "contentAuthor"));
-        if (docel.element("version") != null)
+        if (docel.element("version") != null) {
             setVersion(getElement(docel, "version"));
+        }
         setContent(getElement(docel, "content"));
         setLanguage(getElement(docel, "language"));
         setDefaultLanguage(getElement(docel, "defaultLanguage"));
@@ -2556,30 +2524,30 @@ public class XWikiDocument
 
     public void setAttachmentList(List<XWikiAttachment> list)
     {
-        attachmentList = list;
+        this.attachmentList = list;
     }
 
     public List<XWikiAttachment> getAttachmentList()
     {
-        return attachmentList;
+        return this.attachmentList;
     }
 
     public void saveAllAttachments(XWikiContext context) throws XWikiException
     {
-        for (int i = 0; i < attachmentList.size(); i++) {
-            saveAttachmentContent(attachmentList.get(i), context);
+        for (int i = 0; i < this.attachmentList.size(); i++) {
+            saveAttachmentContent(this.attachmentList.get(i), context);
         }
     }
 
-    public void saveAllAttachments(boolean updateParent, boolean transaction, XWikiContext context) throws XWikiException
-    {
-        for (int i = 0; i < attachmentList.size(); i++) {
-            saveAttachmentContent(attachmentList.get(i), updateParent, transaction, context);
-        }
-    }
-
-    public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiContext context)
+    public void saveAllAttachments(boolean updateParent, boolean transaction, XWikiContext context)
         throws XWikiException
+    {
+        for (int i = 0; i < this.attachmentList.size(); i++) {
+            saveAttachmentContent(this.attachmentList.get(i), updateParent, transaction, context);
+        }
+    }
+
+    public void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
         try {
@@ -2589,11 +2557,9 @@ public class XWikiDocument
                 context.setDatabase(getDatabase());
             }
 
-            context.getWiki().getAttachmentStore().saveAttachmentsContent(attachments, this,
-                true, context, true);
+            context.getWiki().getAttachmentStore().saveAttachmentsContent(attachments, this, true, context, true);
         } catch (java.lang.OutOfMemoryError e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
                 "Out Of Memory Exception");
         } finally {
             if (database != null) {
@@ -2602,14 +2568,13 @@ public class XWikiDocument
         }
     }
 
-    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context)
-        throws XWikiException
+    public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         saveAttachmentContent(attachment, true, true, context);
     }
 
-    protected void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate,
-        boolean bTransaction, XWikiContext context) throws XWikiException
+    protected void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, boolean bTransaction,
+        XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
         try {
@@ -2622,11 +2587,10 @@ public class XWikiDocument
             // We need to make sure there is a version upgrade
             setMetaDataDirty(true);
 
-            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment,
-                bParentUpdate, context, bTransaction);
+            context.getWiki().getAttachmentStore().saveAttachmentContent(attachment, bParentUpdate, context,
+                bTransaction);
         } catch (java.lang.OutOfMemoryError e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
                 "Out Of Memory Exception");
         } finally {
             if (database != null) {
@@ -2635,8 +2599,7 @@ public class XWikiDocument
         }
     }
 
-    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context)
-        throws XWikiException
+    public void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
         try {
@@ -2646,8 +2609,7 @@ public class XWikiDocument
                 context.setDatabase(getDatabase());
             }
 
-            context.getWiki().getAttachmentStore().loadAttachmentContent(attachment, context,
-                true);
+            context.getWiki().getAttachmentStore().loadAttachmentContent(attachment, context, true);
         } finally {
             if (database != null) {
                 context.setDatabase(database);
@@ -2655,14 +2617,13 @@ public class XWikiDocument
         }
     }
 
-    public void deleteAttachment(XWikiAttachment attachment, XWikiContext context)
-        throws XWikiException
+    public void deleteAttachment(XWikiAttachment attachment, XWikiContext context) throws XWikiException
     {
         deleteAttachment(attachment, true, context);
     }
 
-    public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin,
-        XWikiContext context) throws XWikiException
+    public void deleteAttachment(XWikiAttachment attachment, boolean toRecycleBin, XWikiContext context)
+        throws XWikiException
     {
         String database = context.getDatabase();
         try {
@@ -2675,15 +2636,13 @@ public class XWikiDocument
                 // We need to make sure there is a version upgrade
                 setMetaDataDirty(true);
                 if (toRecycleBin && context.getWiki().hasAttachmentRecycleBin(context)) {
-                    context.getWiki().getAttachmentRecycleBinStore().saveToRecycleBin(attachment,
-                        context.getUser(), new Date(), context, true);
+                    context.getWiki().getAttachmentRecycleBinStore().saveToRecycleBin(attachment, context.getUser(),
+                        new Date(), context, true);
                 }
-                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context,
-                    true);
+                context.getWiki().getAttachmentStore().deleteXWikiAttachment(attachment, context, true);
             } catch (java.lang.OutOfMemoryError e) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
-                    "Out Of Memory Exception");
+                    XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE, "Out Of Memory Exception");
             }
         } finally {
             if (database != null) {
@@ -2735,7 +2694,7 @@ public class XWikiDocument
 
     public ArrayList<BaseObject> getObjectsToRemove()
     {
-        return objectsToRemove;
+        return this.objectsToRemove;
     }
 
     public void setObjectsToRemove(ArrayList<BaseObject> objectsToRemove)
@@ -2747,8 +2706,7 @@ public class XWikiDocument
     public List<String> getIncludedPages(XWikiContext context)
     {
         try {
-            String pattern =
-                "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";
+            String pattern = "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";
             List<String> list = context.getUtil().getUniqueMatches(getContent(), pattern, 2);
             for (int i = 0; i < list.size(); i++) {
                 try {
@@ -2802,10 +2760,10 @@ public class XWikiDocument
                     }
 
                     // Let's get rid of anything that's not a real link
-                    if (name.trim().equals("") || (name.indexOf("$") != -1)
-                        || (name.indexOf("://") != -1) || (name.indexOf("\"") != -1)
-                        || (name.indexOf("\'") != -1) || (name.indexOf("..") != -1)
-                        || (name.indexOf(":") != -1) || (name.indexOf("=") != -1)) {
+                    if (name.trim().equals("") || (name.indexOf("$") != -1) || (name.indexOf("://") != -1)
+                        || (name.indexOf("\"") != -1) || (name.indexOf("\'") != -1) || (name.indexOf("..") != -1)
+                        || (name.indexOf(":") != -1) || (name.indexOf("=") != -1))
+                    {
                         continue;
                     }
 
@@ -2844,39 +2802,31 @@ public class XWikiDocument
         }
     }
 
-    public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object,
-        XWikiContext context) throws XWikiException
+    public String displayRendered(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
+        throws XWikiException
     {
         String result = pclass.displayView(pclass.getName(), prefix, object, context);
         return getRenderedContent(result, context);
     }
 
-    public String displayView(PropertyClass pclass, String prefix, BaseCollection object,
-        XWikiContext context)
+    public String displayView(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
     {
-        return (pclass == null) ? "" : pclass.displayView(pclass.getName(), prefix, object,
-            context);
+        return (pclass == null) ? "" : pclass.displayView(pclass.getName(), prefix, object, context);
     }
 
-    public String displayEdit(PropertyClass pclass, String prefix, BaseCollection object,
-        XWikiContext context)
+    public String displayEdit(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
     {
-        return (pclass == null) ? "" : pclass.displayEdit(pclass.getName(), prefix, object,
-            context);
+        return (pclass == null) ? "" : pclass.displayEdit(pclass.getName(), prefix, object, context);
     }
 
-    public String displayHidden(PropertyClass pclass, String prefix, BaseCollection object,
-        XWikiContext context)
+    public String displayHidden(PropertyClass pclass, String prefix, BaseCollection object, XWikiContext context)
     {
-        return (pclass == null) ? "" : pclass.displayHidden(pclass.getName(), prefix, object,
-            context);
+        return (pclass == null) ? "" : pclass.displayHidden(pclass.getName(), prefix, object, context);
     }
 
-    public String displaySearch(PropertyClass pclass, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    public String displaySearch(PropertyClass pclass, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
-        return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, criteria,
-            context);
+        return (pclass == null) ? "" : pclass.displaySearch(pclass.getName(), prefix, criteria, context);
     }
 
     public XWikiAttachment getAttachment(String filename)
@@ -3139,10 +3089,10 @@ public class XWikiDocument
 
     public String getLanguage()
     {
-        if (language == null) {
+        if (this.language == null) {
             return "";
         } else {
-            return language.trim();
+            return this.language.trim();
         }
     }
 
@@ -3153,10 +3103,10 @@ public class XWikiDocument
 
     public String getDefaultLanguage()
     {
-        if (defaultLanguage == null) {
+        if (this.defaultLanguage == null) {
             return "";
         } else {
-            return defaultLanguage.trim();
+            return this.defaultLanguage.trim();
         }
     }
 
@@ -3168,7 +3118,7 @@ public class XWikiDocument
 
     public int getTranslation()
     {
-        return translation;
+        return this.translation;
     }
 
     public void setTranslation(int translation)
@@ -3183,8 +3133,7 @@ public class XWikiDocument
         return getTranslatedContent(language, context);
     }
 
-    public String getTranslatedContent(String language, XWikiContext context)
-        throws XWikiException
+    public String getTranslatedContent(String language, XWikiContext context) throws XWikiException
     {
         XWikiDocument tdoc = getTranslatedDocument(language, context);
         String rev = (String) context.get("rev");
@@ -3202,12 +3151,11 @@ public class XWikiDocument
         return getTranslatedDocument(language, context);
     }
 
-    public XWikiDocument getTranslatedDocument(String language, XWikiContext context)
-        throws XWikiException
+    public XWikiDocument getTranslatedDocument(String language, XWikiContext context) throws XWikiException
     {
         XWikiDocument tdoc = this;
 
-        if (!((language == null) || (language.equals("")) || language.equals(defaultLanguage))) {
+        if (!((language == null) || (language.equals("")) || language.equals(this.defaultLanguage))) {
             tdoc = new XWikiDocument(getSpace(), getName());
             tdoc.setLanguage(language);
             String database = context.getDatabase();
@@ -3260,34 +3208,33 @@ public class XWikiDocument
     public List<Delta> getXMLDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
     {
-        return getDeltas(Diff.diff(ToString.stringToArray(fromDoc.toXML(context)), ToString
-            .stringToArray(toDoc.toXML(context))));
+        return getDeltas(Diff.diff(ToString.stringToArray(fromDoc.toXML(context)), ToString.stringToArray(toDoc
+            .toXML(context))));
     }
 
-    public List<Delta> getContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc,
-        XWikiContext context) throws XWikiException, DifferentiationFailedException
-    {
-        return getDeltas(Diff.diff(ToString.stringToArray(fromDoc.getContent()), ToString
-            .stringToArray(toDoc.getContent())));
-    }
-
-    public List<Delta> getContentDiff(String fromRev, String toRev, XWikiContext context)
+    public List<Delta> getContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
         throws XWikiException, DifferentiationFailedException
+    {
+        return getDeltas(Diff.diff(ToString.stringToArray(fromDoc.getContent()), ToString.stringToArray(toDoc
+            .getContent())));
+    }
+
+    public List<Delta> getContentDiff(String fromRev, String toRev, XWikiContext context) throws XWikiException,
+        DifferentiationFailedException
     {
         XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
         XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
         return getContentDiff(fromDoc, toDoc, context);
     }
 
-    public List<Delta> getContentDiff(String fromRev, XWikiContext context)
-        throws XWikiException, DifferentiationFailedException
+    public List<Delta> getContentDiff(String fromRev, XWikiContext context) throws XWikiException,
+        DifferentiationFailedException
     {
         XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
         return getContentDiff(revdoc, this, context);
     }
 
-    public List<Delta> getLastChanges(XWikiContext context) throws XWikiException,
-        DifferentiationFailedException
+    public List<Delta> getLastChanges(XWikiContext context) throws XWikiException, DifferentiationFailedException
     {
         Version version = getRCSVersion();
         try {
@@ -3301,19 +3248,15 @@ public class XWikiDocument
         return new ArrayList<Delta>();
     }
 
-    public List<Delta> getRenderedContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc,
-        XWikiContext context) throws XWikiException, DifferentiationFailedException
+    public List<Delta> getRenderedContentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
+        throws XWikiException, DifferentiationFailedException
     {
         String originalContent, newContent;
 
-        originalContent =
-            context.getWiki().getRenderingEngine().renderText(fromDoc.getContent(), fromDoc,
-                context);
-        newContent =
-            context.getWiki().getRenderingEngine().renderText(toDoc.getContent(), toDoc, context);
+        originalContent = context.getWiki().getRenderingEngine().renderText(fromDoc.getContent(), fromDoc, context);
+        newContent = context.getWiki().getRenderingEngine().renderText(toDoc.getContent(), toDoc, context);
 
-        return getDeltas(Diff.diff(ToString.stringToArray(originalContent), ToString
-            .stringToArray(newContent)));
+        return getDeltas(Diff.diff(ToString.stringToArray(originalContent), ToString.stringToArray(newContent)));
     }
 
     public List<Delta> getRenderedContentDiff(String fromRev, String toRev, XWikiContext context)
@@ -3324,8 +3267,8 @@ public class XWikiDocument
         return getRenderedContentDiff(fromDoc, toDoc, context);
     }
 
-    public List<Delta> getRenderedContentDiff(String fromRev, XWikiContext context)
-        throws XWikiException, DifferentiationFailedException
+    public List<Delta> getRenderedContentDiff(String fromRev, XWikiContext context) throws XWikiException,
+        DifferentiationFailedException
     {
         XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
         return getRenderedContentDiff(revdoc, this, context);
@@ -3340,23 +3283,21 @@ public class XWikiDocument
         return list;
     }
 
-    public List<MetaDataDiff> getMetaDataDiff(String fromRev, String toRev, XWikiContext context)
-        throws XWikiException
+    public List<MetaDataDiff> getMetaDataDiff(String fromRev, String toRev, XWikiContext context) throws XWikiException
     {
         XWikiDocument fromDoc = context.getWiki().getDocument(this, fromRev, context);
         XWikiDocument toDoc = context.getWiki().getDocument(this, toRev, context);
         return getMetaDataDiff(fromDoc, toDoc, context);
     }
 
-    public List<MetaDataDiff> getMetaDataDiff(String fromRev, XWikiContext context)
-        throws XWikiException
+    public List<MetaDataDiff> getMetaDataDiff(String fromRev, XWikiContext context) throws XWikiException
     {
         XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
         return getMetaDataDiff(revdoc, this, context);
     }
 
-    public List<MetaDataDiff> getMetaDataDiff(XWikiDocument fromDoc, XWikiDocument toDoc,
-        XWikiContext context) throws XWikiException
+    public List<MetaDataDiff> getMetaDataDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
+        throws XWikiException
     {
         List<MetaDataDiff> list = new ArrayList<MetaDataDiff>();
 
@@ -3380,8 +3321,7 @@ public class XWikiDocument
             list.add(new MetaDataDiff("language", fromDoc.getLanguage(), toDoc.getLanguage()));
         }
         if (!fromDoc.getDefaultLanguage().equals(toDoc.getDefaultLanguage())) {
-            list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(), toDoc
-                .getDefaultLanguage()));
+            list.add(new MetaDataDiff("defaultLanguage", fromDoc.getDefaultLanguage(), toDoc.getDefaultLanguage()));
         }
         return list;
     }
@@ -3394,30 +3334,27 @@ public class XWikiDocument
         return getObjectDiff(fromDoc, toDoc, context);
     }
 
-    public List<List<ObjectDiff>> getObjectDiff(String fromRev, XWikiContext context)
-        throws XWikiException
+    public List<List<ObjectDiff>> getObjectDiff(String fromRev, XWikiContext context) throws XWikiException
     {
         XWikiDocument revdoc = context.getWiki().getDocument(this, fromRev, context);
         return getObjectDiff(revdoc, this, context);
     }
 
     /**
-     * Return the object differences between two document versions. There is no hard requirement on
-     * the order of the two versions, but the results are semantically correct only if the two
-     * versions are given in the right order.
+     * Return the object differences between two document versions. There is no hard requirement on the order of the two
+     * versions, but the results are semantically correct only if the two versions are given in the right order.
      * 
      * @param fromDoc The old ('before') version of the document.
      * @param toDoc The new ('after') version of the document.
      * @param context The {@link com.xpn.xwiki.XWikiContext context}.
-     * @return The object differences. The returned list's elements are other lists, one for each
-     *         changed object. The inner lists contain {@link ObjectDiff} elements, one object for
-     *         each changed property of the object. Additionally, if the object was added or
-     *         removed, then the first entry in the list will be an "object-added" or
-     *         "object-removed" marker.
+     * @return The object differences. The returned list's elements are other lists, one for each changed object. The
+     *         inner lists contain {@link ObjectDiff} elements, one object for each changed property of the object.
+     *         Additionally, if the object was added or removed, then the first entry in the list will be an
+     *         "object-added" or "object-removed" marker.
      * @throws XWikiException If there's an error computing the differences.
      */
-    public List<List<ObjectDiff>> getObjectDiff(XWikiDocument fromDoc, XWikiDocument toDoc,
-        XWikiContext context) throws XWikiException
+    public List<List<ObjectDiff>> getObjectDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
+        throws XWikiException
     {
         ArrayList<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
         // Since objects could have been deleted or added, we iterate on both the old and the new
@@ -3428,19 +3365,14 @@ public class XWikiDocument
                 // This happens when objects are deleted, and the document is still in the cache
                 // storage.
                 if (originalObj != null) {
-                    BaseObject newObj =
-                        toDoc.getObject(originalObj.getClassName(), originalObj.getNumber());
+                    BaseObject newObj = toDoc.getObject(originalObj.getClassName(), originalObj.getNumber());
                     List<ObjectDiff> dlist;
                     if (newObj == null) {
                         // The object was deleted.
                         dlist = new BaseObject().getDiff(originalObj, context);
                         ObjectDiff deleteMarker =
-                            new ObjectDiff(originalObj.getClassName(),
-                                originalObj.getNumber(),
-                                "object-removed",
-                                "",
-                                "",
-                                "");
+                            new ObjectDiff(originalObj.getClassName(), originalObj.getNumber(), "object-removed", "",
+                                "", "");
                         dlist.add(0, deleteMarker);
                     } else {
                         // The object exists in both versions, but might have been changed.
@@ -3458,8 +3390,7 @@ public class XWikiDocument
                 // This happens when objects are deleted, and the document is still in the cache
                 // storage.
                 if (newObj != null) {
-                    BaseObject originalObj =
-                        fromDoc.getObject(newObj.getClassName(), newObj.getNumber());
+                    BaseObject originalObj = fromDoc.getObject(newObj.getClassName(), newObj.getNumber());
                     if (originalObj == null) {
                         // Only consider added objects, the other case was treated above.
                         originalObj = new BaseObject();
@@ -3467,12 +3398,7 @@ public class XWikiDocument
                         originalObj.setNumber(newObj.getNumber());
                         List<ObjectDiff> dlist = newObj.getDiff(originalObj, context);
                         ObjectDiff addMarker =
-                            new ObjectDiff(newObj.getClassName(),
-                                newObj.getNumber(),
-                                "object-added",
-                                "",
-                                "",
-                                "");
+                            new ObjectDiff(newObj.getClassName(), newObj.getNumber(), "object-added", "", "", "");
                         dlist.add(0, addMarker);
                         if (dlist.size() > 0) {
                             difflist.add(dlist);
@@ -3484,8 +3410,8 @@ public class XWikiDocument
         return difflist;
     }
 
-    public List<List<ObjectDiff>> getClassDiff(XWikiDocument fromDoc, XWikiDocument toDoc,
-        XWikiContext context) throws XWikiException
+    public List<List<ObjectDiff>> getClassDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
+        throws XWikiException
     {
         ArrayList<List<ObjectDiff>> difflist = new ArrayList<List<ObjectDiff>>();
         BaseClass oldClass = fromDoc.getxWikiClass();
@@ -3509,8 +3435,8 @@ public class XWikiDocument
      * @return
      * @throws XWikiException
      */
-    public List<AttachmentDiff> getAttachmentDiff(XWikiDocument fromDoc, XWikiDocument toDoc,
-        XWikiContext context) throws XWikiException
+    public List<AttachmentDiff> getAttachmentDiff(XWikiDocument fromDoc, XWikiDocument toDoc, XWikiContext context)
+        throws XWikiException
     {
         List<AttachmentDiff> difflist = new ArrayList<AttachmentDiff>();
         for (XWikiAttachment origAttach : fromDoc.getAttachmentList()) {
@@ -3519,9 +3445,9 @@ public class XWikiDocument
             if (newAttach == null) {
                 difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), null));
             } else {
-                if (!origAttach.getVersion().equals(newAttach.getVersion()))
-                    difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), newAttach
-                        .getVersion()));
+                if (!origAttach.getVersion().equals(newAttach.getVersion())) {
+                    difflist.add(new AttachmentDiff(fileName, origAttach.getVersion(), newAttach.getVersion()));
+                }
             }
         }
         for (XWikiAttachment newAttach : toDoc.getAttachmentList()) {
@@ -3538,8 +3464,7 @@ public class XWikiDocument
      * Rename the current document and all the backlinks leading to it. See
      * {@link #rename(String, java.util.List, com.xpn.xwiki.XWikiContext)} for more details.
      * 
-     * @param newDocumentName the new document name. If the space is not specified then defaults to
-     *            the current space.
+     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      */
@@ -3549,10 +3474,9 @@ public class XWikiDocument
     }
 
     /**
-     * Rename the current document and all the links pointing to it in the list of passed backlink
-     * documents. The renaming algorithm takes into account the fact that there are several ways to
-     * write a link to a given page and all those forms need to be renamed. For example the
-     * following links all point to the same page:
+     * Rename the current document and all the links pointing to it in the list of passed backlink documents. The
+     * renaming algorithm takes into account the fact that there are several ways to write a link to a given page and
+     * all those forms need to be renamed. For example the following links all point to the same page:
      * <ul>
      * <li>[Page]</li>
      * <li>[Page?param=1]</li>
@@ -3563,15 +3487,14 @@ public class XWikiDocument
      * Note: links without a space are renamed with the space added.
      * </p>
      * 
-     * @param newDocumentName the new document name. If the space is not specified then defaults to
-     *            the current space.
-     * @param backlinkDocumentNames the list of documents to parse and for which links will be
-     *            modified to point to the new renamed document.
+     * @param newDocumentName the new document name. If the space is not specified then defaults to the current space.
+     * @param backlinkDocumentNames the list of documents to parse and for which links will be modified to point to the
+     *            new renamed document.
      * @param context the ubiquitous XWiki Context
      * @throws XWikiException in case of an error
      */
-    public void rename(String newDocumentName, List<String> backlinkDocumentNames,
-        XWikiContext context) throws XWikiException
+    public void rename(String newDocumentName, List<String> backlinkDocumentNames, XWikiContext context)
+        throws XWikiException
     {
         // TODO: Do all this in a single DB transaction as otherwise the state will be unknown if
         // something fails in the middle...
@@ -3605,22 +3528,20 @@ public class XWikiDocument
         DocumentParser documentParser = new DocumentParser();
 
         for (String backlinkDocumentName : backlinkDocumentNames) {
-            XWikiDocument backlinkDocument =
-                context.getWiki().getDocument(backlinkDocumentName, context);
+            XWikiDocument backlinkDocument = context.getWiki().getDocument(backlinkDocumentName, context);
 
             // Note: Here we cannot do a simple search/replace as there are several ways to point
             // to the same document. For example [Page], [Page?param=1], [currentwiki:Page],
             // [CurrentSpace.Page] all point to the same document. Thus we have to parse the links
             // to recognize them and do the replace.
             ReplacementResultCollection result =
-                documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink,
-                    newLink, linkHandler, getSpace());
+                documentParser.parseLinksAndReplace(backlinkDocument.getContent(), oldLink, newLink, linkHandler,
+                    getSpace());
 
             backlinkDocument.setContent((String) result.getModifiedContent());
-            context.getWiki().saveDocument(
-                backlinkDocument,
-                context.getMessageTool().get("core.comment.renameLink",
-                    Arrays.asList(new String[] {newDocumentName})), true, context);
+            context.getWiki().saveDocument(backlinkDocument,
+                context.getMessageTool().get("core.comment.renameLink", Arrays.asList(new String[] {newDocumentName})),
+                true, context);
         }
 
         // Step 3: Delete the old document
@@ -3631,8 +3552,7 @@ public class XWikiDocument
         clone(context.getWiki().getDocument(newDocumentName, context));
     }
 
-    public XWikiDocument copyDocument(String newDocumentName, XWikiContext context)
-        throws XWikiException
+    public XWikiDocument copyDocument(String newDocumentName, XWikiContext context) throws XWikiException
     {
         String oldname = getFullName();
 
@@ -3654,8 +3574,9 @@ public class XWikiDocument
             }
         }
         XWikiDocumentArchive archive = newdoc.getDocumentArchive();
-        if (archive != null)
+        if (archive != null) {
             newdoc.setDocumentArchive(archive.clone(newdoc.getId(), context));
+        }
         return newdoc;
     }
 
@@ -3663,8 +3584,7 @@ public class XWikiDocument
     {
         XWikiLock theLock = getStore(context).loadLock(getId(), context, true);
         if (theLock != null) {
-            int timeout =
-                context.getWiki().getXWikiPreferenceAsInt("lock_Timeout", 30 * 60, context);
+            int timeout = context.getWiki().getXWikiPreferenceAsInt("lock_Timeout", 30 * 60, context);
             if (theLock.getDate().getTime() + timeout * 1000 < new Date().getTime()) {
                 getStore(context).deleteLock(theLock, context, true);
                 theLock = null;
@@ -3687,8 +3607,7 @@ public class XWikiDocument
         }
     }
 
-    public void insertText(String text, String marker, XWikiContext context)
-        throws XWikiException
+    public void insertText(String text, String marker, XWikiContext context) throws XWikiException
     {
         setContent(StringUtils.replaceOnce(getContent(), marker, text + marker));
         context.getWiki().saveDocument(this, context);
@@ -3696,7 +3615,7 @@ public class XWikiDocument
 
     public Object getWikiNode()
     {
-        return wikiNode;
+        return this.wikiNode;
     }
 
     public void setWikiNode(Object wikiNode)
@@ -3706,7 +3625,7 @@ public class XWikiDocument
 
     public String getxWikiClassXML()
     {
-        return xWikiClassXML;
+        return this.xWikiClassXML;
     }
 
     public void setxWikiClassXML(String xWikiClassXML)
@@ -3716,7 +3635,7 @@ public class XWikiDocument
 
     public int getElements()
     {
-        return elements;
+        return this.elements;
     }
 
     public void setElements(int elements)
@@ -3727,15 +3646,15 @@ public class XWikiDocument
     public void setElement(int element, boolean toggle)
     {
         if (toggle) {
-            elements = elements | element;
+            this.elements = this.elements | element;
         } else {
-            elements = elements & (~element);
+            this.elements = this.elements & (~element);
         }
     }
 
     public boolean hasElement(int element)
     {
-        return ((elements & element) == element);
+        return ((this.elements & element) == element);
     }
 
     public String getDefaultEditURL(XWikiContext context) throws XWikiException
@@ -3749,8 +3668,7 @@ public class XWikiDocument
         }
     }
 
-    public String getEditURL(String action, String mode, XWikiContext context)
-        throws XWikiException
+    public String getEditURL(String action, String mode, XWikiContext context) throws XWikiException
     {
         com.xpn.xwiki.XWiki xwiki = context.getWiki();
         String language = "";
@@ -3782,10 +3700,10 @@ public class XWikiDocument
 
     public String getDefaultTemplate()
     {
-        if (defaultTemplate == null) {
+        if (this.defaultTemplate == null) {
             return "";
         } else {
-            return defaultTemplate;
+            return this.defaultTemplate;
         }
     }
 
@@ -3825,7 +3743,7 @@ public class XWikiDocument
     {
         this.syntaxId = syntaxId;
     }
-    
+
     public Vector<BaseObject> getComments(boolean asc)
     {
         if (asc) {
@@ -3877,8 +3795,9 @@ public class XWikiDocument
     public void resetArchive(XWikiContext context) throws XWikiException
     {
         boolean hasVersioning = context.getWiki().hasVersioning(getFullName(), context);
-        if (hasVersioning)
+        if (hasVersioning) {
             getVersioningStore(context).resetRCSArchive(this, true, context);
+        }
     }
 
     // This functions adds an object from an new object creation form
@@ -3893,8 +3812,7 @@ public class XWikiDocument
         int nb = createNewObject(className, context);
         BaseObject oldobject = getObject(className, nb);
         BaseClass baseclass = oldobject.getxWikiClass(context);
-        BaseObject newobject =
-            (BaseObject) baseclass.fromMap(form.getObject(className), oldobject);
+        BaseObject newobject = (BaseObject) baseclass.fromMap(form.getObject(className), oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setName(getFullName());
         setObject(className, nb, newobject);
@@ -3902,29 +3820,26 @@ public class XWikiDocument
     }
 
     // This functions adds an object from an new object creation form
-    public BaseObject addObjectFromRequest(String className, XWikiContext context)
-        throws XWikiException
+    public BaseObject addObjectFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, "", 0, context);
     }
 
     // This functions adds an object from an new object creation form
-    public BaseObject addObjectFromRequest(String className, String prefix, XWikiContext context)
-        throws XWikiException
+    public BaseObject addObjectFromRequest(String className, String prefix, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, prefix, 0, context);
     }
 
     // This functions adds multiple objects from an new objects creation form
-    public List<BaseObject> addObjectsFromRequest(String className, XWikiContext context)
-        throws XWikiException
+    public List<BaseObject> addObjectsFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return addObjectsFromRequest(className, "", context);
     }
 
     // This functions adds multiple objects from an new objects creation form
-    public List<BaseObject> addObjectsFromRequest(String className, String pref,
-        XWikiContext context) throws XWikiException
+    public List<BaseObject> addObjectsFromRequest(String className, String pref, XWikiContext context)
+        throws XWikiException
     {
         Map map = context.getRequest().getParameterMap();
         List<Integer> objectsNumberDone = new ArrayList<Integer>();
@@ -3937,8 +3852,7 @@ public class XWikiDocument
             if (name.startsWith(start)) {
                 int pos = name.indexOf("_", start.length() + 1);
                 String prefix = name.substring(0, pos);
-                int num =
-                    Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
+                int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
                 if (!objectsNumberDone.contains(new Integer(num))) {
                     objectsNumberDone.add(new Integer(num));
                     objects.add(addObjectFromRequest(className, pref, num, context));
@@ -3949,22 +3863,21 @@ public class XWikiDocument
     }
 
     // This functions adds object from an new object creation form
-    public BaseObject addObjectFromRequest(String className, int num, XWikiContext context)
-        throws XWikiException
+    public BaseObject addObjectFromRequest(String className, int num, XWikiContext context) throws XWikiException
     {
         return addObjectFromRequest(className, "", num, context);
     }
 
     // This functions adds object from an new object creation form
-    public BaseObject addObjectFromRequest(String className, String prefix, int num,
-        XWikiContext context) throws XWikiException
+    public BaseObject addObjectFromRequest(String className, String prefix, int num, XWikiContext context)
+        throws XWikiException
     {
         int nb = createNewObject(className, context);
         BaseObject oldobject = getObject(className, nb);
         BaseClass baseclass = oldobject.getxWikiClass(context);
         BaseObject newobject =
-            (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix
-                + className + "_" + num), oldobject);
+            (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + num),
+                oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setName(getFullName());
         setObject(className, nb, newobject);
@@ -3972,22 +3885,21 @@ public class XWikiDocument
     }
 
     // This functions adds an object from an new object creation form
-    public BaseObject updateObjectFromRequest(String className, XWikiContext context)
-        throws XWikiException
+    public BaseObject updateObjectFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return updateObjectFromRequest(className, "", context);
     }
 
     // This functions adds an object from an new object creation form
-    public BaseObject updateObjectFromRequest(String className, String prefix,
-        XWikiContext context) throws XWikiException
+    public BaseObject updateObjectFromRequest(String className, String prefix, XWikiContext context)
+        throws XWikiException
     {
         return updateObjectFromRequest(className, prefix, 0, context);
     }
 
     // This functions adds an object from an new object creation form
-    public BaseObject updateObjectFromRequest(String className, String prefix, int num,
-        XWikiContext context) throws XWikiException
+    public BaseObject updateObjectFromRequest(String className, String prefix, int num, XWikiContext context)
+        throws XWikiException
     {
         int nb;
         BaseObject oldobject = getObject(className, num);
@@ -3999,8 +3911,8 @@ public class XWikiDocument
         }
         BaseClass baseclass = oldobject.getxWikiClass(context);
         BaseObject newobject =
-            (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix
-                + className + "_" + nb), oldobject);
+            (BaseObject) baseclass.fromMap(Util.getObject(context.getRequest(), prefix + className + "_" + nb),
+                oldobject);
         newobject.setNumber(oldobject.getNumber());
         newobject.setName(getFullName());
         setObject(className, nb, newobject);
@@ -4008,15 +3920,14 @@ public class XWikiDocument
     }
 
     // This functions adds an object from an new object creation form
-    public List updateObjectsFromRequest(String className, XWikiContext context)
-        throws XWikiException
+    public List updateObjectsFromRequest(String className, XWikiContext context) throws XWikiException
     {
         return updateObjectsFromRequest(className, "", context);
     }
 
     // This functions adds multiple objects from an new objects creation form
-    public List<BaseObject> updateObjectsFromRequest(String className, String pref,
-        XWikiContext context) throws XWikiException
+    public List<BaseObject> updateObjectsFromRequest(String className, String pref, XWikiContext context)
+        throws XWikiException
     {
         Map map = context.getRequest().getParameterMap();
         List<Integer> objectsNumberDone = new ArrayList<Integer>();
@@ -4029,8 +3940,7 @@ public class XWikiDocument
             if (name.startsWith(start)) {
                 int pos = name.indexOf("_", start.length() + 1);
                 String prefix = name.substring(0, pos);
-                int num =
-                    Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
+                int num = Integer.decode(prefix.substring(prefix.lastIndexOf("_") + 1)).intValue();
                 if (!objectsNumberDone.contains(new Integer(num))) {
                     objectsNumberDone.add(new Integer(num));
                     objects.add(updateObjectFromRequest(className, pref, num, context));
@@ -4043,9 +3953,9 @@ public class XWikiDocument
     public boolean isAdvancedContent()
     {
         String[] matches =
-            {"<%", "#set", "#include", "#if", "public class", "/* Advanced content */",
-            "## Advanced content", "/* Programmatic content */", "## Programmatic content"};
-        String content2 = content.toLowerCase();
+            {"<%", "#set", "#include", "#if", "public class", "/* Advanced content */", "## Advanced content",
+            "/* Programmatic content */", "## Programmatic content"};
+        String content2 = this.content.toLowerCase();
         for (int i = 0; i < matches.length; i++) {
             if (content2.indexOf(matches[i].toLowerCase()) != -1) {
                 return true;
@@ -4062,13 +3972,12 @@ public class XWikiDocument
     public boolean isProgrammaticContent()
     {
         String[] matches =
-            {"<%", "\\$xwiki.xWiki", "$context.context", "$doc.document", "$xwiki.getXWiki()",
-            "$context.getContext()", "$doc.getDocument()", "WithProgrammingRights(",
-            "/* Programmatic content */", "## Programmatic content", "$xwiki.search(",
-            "$xwiki.createUser", "$xwiki.createNewWiki", "$xwiki.addToAllGroup",
-            "$xwiki.sendMessage", "$xwiki.copyDocument", "$xwiki.copyWikiWeb",
-            "$xwiki.parseGroovyFromString", "$doc.toXML()", "$doc.toXMLDocument()",};
-        String content2 = content.toLowerCase();
+            {"<%", "\\$xwiki.xWiki", "$context.context", "$doc.document", "$xwiki.getXWiki()", "$context.getContext()",
+            "$doc.getDocument()", "WithProgrammingRights(", "/* Programmatic content */", "## Programmatic content",
+            "$xwiki.search(", "$xwiki.createUser", "$xwiki.createNewWiki", "$xwiki.addToAllGroup",
+            "$xwiki.sendMessage", "$xwiki.copyDocument", "$xwiki.copyWikiWeb", "$xwiki.parseGroovyFromString",
+            "$doc.toXML()", "$doc.toXMLDocument()",};
+        String content2 = this.content.toLowerCase();
         for (int i = 0; i < matches.length; i++) {
             if (content2.indexOf(matches[i].toLowerCase()) != -1) {
                 return true;
@@ -4118,8 +4027,7 @@ public class XWikiDocument
     public List<DocumentSection> getSplitSectionsAccordingToTitle() throws XWikiException
     {
         // Pattern to match the title. Matches only level 1 and level 2 headings.
-        Pattern headingPattern =
-            Pattern.compile("^[ \\t]*+(1(\\.1){0,1}+)[ \\t]++(.++)$", Pattern.MULTILINE);
+        Pattern headingPattern = Pattern.compile("^[ \\t]*+(1(\\.1){0,1}+)[ \\t]++(.++)$", Pattern.MULTILINE);
         Matcher matcher = headingPattern.matcher(getContent());
         List<DocumentSection> splitSections = new ArrayList<DocumentSection>();
         int sectionNumber = 0;
@@ -4130,8 +4038,7 @@ public class XWikiDocument
             String sectionTitle = matcher.group(3);
             int sectionIndex = matcher.start();
             // Initialize a documentSection object.
-            DocumentSection docSection =
-                new DocumentSection(sectionNumber, sectionIndex, sectionLevel, sectionTitle);
+            DocumentSection docSection = new DocumentSection(sectionNumber, sectionIndex, sectionLevel, sectionTitle);
             // Add the document section to list.
             splitSections.add(docSection);
         }
@@ -4177,8 +4084,7 @@ public class XWikiDocument
     }
 
     // This function to update a section content in document
-    public String updateDocumentSection(int sectionNumber, String newSectionContent)
-        throws XWikiException
+    public String updateDocumentSection(int sectionNumber, String newSectionContent) throws XWikiException
     {
         StringBuffer newContent = new StringBuffer();
         // get document section that will be edited
@@ -4211,24 +4117,20 @@ public class XWikiDocument
                 }
             }
             if (nextSectionIndex == 0) {// edit the last section
-                newContent =
-                    newContent.append(getContent().substring(0, indexSection)).append(
-                        newSectionContent);
+                newContent = newContent.append(getContent().substring(0, indexSection)).append(newSectionContent);
                 return newContent.toString();
             } else {
                 String contentAfter = getContent().substring(nextSectionIndex);
                 String contentBegin = getContent().substring(0, indexSection);
-                newContent =
-                    newContent.append(contentBegin).append(newSectionContent)
-                        .append(contentAfter);
+                newContent = newContent.append(contentBegin).append(newSectionContent).append(contentAfter);
             }
             return newContent.toString();
         }
     }
 
     /**
-     * Computes a document hash, taking into account all document data: content, objects,
-     * attachments, metadata... TODO: cache the hash value, update only on modification.
+     * Computes a document hash, taking into account all document data: content, objects, attachments, metadata... TODO:
+     * cache the hash value, update only on modification.
      */
     public String getVersionHashCode(XWikiContext context)
     {
@@ -4281,10 +4183,10 @@ public class XWikiDocument
 
     public String getCustomClass()
     {
-        if (customClass == null) {
+        if (this.customClass == null) {
             return "";
         }
-        return customClass;
+        return this.customClass;
     }
 
     public void setCustomClass(String customClass)
@@ -4301,19 +4203,19 @@ public class XWikiDocument
 
     public String getValidationScript()
     {
-        if (validationScript == null) {
+        if (this.validationScript == null) {
             return "";
         } else {
-            return validationScript;
+            return this.validationScript;
         }
     }
 
     public String getComment()
     {
-        if (comment == null) {
+        if (this.comment == null) {
             return "";
         }
-        return comment;
+        return this.comment;
     }
 
     public void setComment(String comment)
@@ -4323,7 +4225,7 @@ public class XWikiDocument
 
     public boolean isMinorEdit()
     {
-        return isMinorEdit;
+        return this.isMinorEdit;
     }
 
     public void setMinorEdit(boolean isMinor)
@@ -4339,12 +4241,12 @@ public class XWikiDocument
     // so we need convert Boolean to boolean
     protected Boolean getMinorEdit1()
     {
-        return Boolean.valueOf(isMinorEdit);
+        return Boolean.valueOf(this.isMinorEdit);
     }
 
     protected void setMinorEdit1(Boolean isMinor)
     {
-        isMinorEdit = (isMinor != null && isMinor.booleanValue());
+        this.isMinorEdit = (isMinor != null && isMinor.booleanValue());
     }
 
     public BaseObject newObject(String classname, XWikiContext context) throws XWikiException
@@ -4419,13 +4321,11 @@ public class XWikiDocument
         return isValid;
     }
 
-    private boolean executeValidationScript(XWikiContext context, String validationScript)
-        throws XWikiException
+    private boolean executeValidationScript(XWikiContext context, String validationScript) throws XWikiException
     {
         try {
             XWikiValidationInterface validObject =
-                (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(
-                    validationScript, context);
+                (XWikiValidationInterface) context.getWiki().parseGroovyFromPage(validationScript, context);
             return validObject.validateDocument(this, context);
         } catch (Throwable e) {
             XWikiValidationStatus.addExceptionToContext(getFullName(), "", e, context);
@@ -4502,9 +4402,10 @@ public class XWikiDocument
 
     public String getPreviousVersion()
     {
-        return getDocumentArchive().getPrevVersion(version).toString();
+        return getDocumentArchive().getPrevVersion(this.version).toString();
     }
 
+    @Override
     public String toString()
     {
         return getFullName();

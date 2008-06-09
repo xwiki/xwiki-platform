@@ -46,55 +46,51 @@ public class StorageTest extends MockObjectTestCase
 
     private XWikiHibernateStore store;
 
+    @Override
     protected void setUp() throws XWikiException
     {
-        context = new XWikiContext();
+        this.context = new XWikiContext();
         this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
-            new XWikiConfig(), this.context});
+            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {new XWikiConfig(),
+            this.context});
         this.mockXWiki.stubs().method("Param").withAnyArguments().will(returnValue(null));
         this.mockXWiki.stubs().method("isMySQL").will(returnValue(false));
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
         this.mockXWiki.stubs().method("getPlugin").will(returnValue(null));
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
         this.mockEngineContext =
-            mock(XWikiServletContext.class, new Class[] {ServletContext.class},
-                new Object[] {null});
+            mock(XWikiServletContext.class, new Class[] {ServletContext.class}, new Object[] {null});
         this.mockEngineContext.stubs().method("getResource").withAnyArguments().will(
             returnValue(getClass().getResource("/hibernate.cfg.xml")));
-        context.setEngineContext((XWikiEngineContext) mockEngineContext.proxy());
+        this.context.setEngineContext((XWikiEngineContext) this.mockEngineContext.proxy());
         // TODO This should be "xwiki", and XWikiHibernateBaseStore should transform it to "PUBLIC"
-        context.setDatabase("public");
-        store = new XWikiHibernateStore(context);
-        store.checkHibernate(context);
-        this.mockXWiki.stubs().method("getNotCacheStore").will(returnValue(store));
+        this.context.setDatabase("public");
+        this.store = new XWikiHibernateStore(this.context);
+        this.store.checkHibernate(this.context);
+        this.mockXWiki.stubs().method("getNotCacheStore").will(returnValue(this.store));
 
-        storage = new PatchStorage(context);
+        this.storage = new PatchStorage(this.context);
     }
 
     private void populate() throws XWikiException
     {
         try {
-            store.beginTransaction(context);
-            Session s = store.getSession(context);
+            this.store.beginTransaction(this.context);
+            Session s = this.store.getSession(this.context);
             Connection c = s.connection();
             c.createStatement().execute("DELETE FROM xwikipatches");
             c.createStatement().execute(
-                getQuery(Patch.DATE_FORMAT.parse("2008-01-01T12:00:00+0100"),
-                    "XWiki.Document", "www.host.org"));
+                getQuery(Patch.DATE_FORMAT.parse("2008-01-01T12:00:00+0100"), "XWiki.Document", "www.host.org"));
             c.createStatement().execute(
-                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:00:00+0100"),
-                    "XWiki.Document", "www.host.org"));
+                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:00:00+0100"), "XWiki.Document", "www.host.org"));
             c.createStatement().execute(
-                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:01:00+0100"),
-                    "XWiki.Document", "www.anotherhost.org"));
+                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:01:00+0100"), "XWiki.Document", "www.anotherhost.org"));
             c.createStatement().execute(
-                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:00:00+0100"),
-                    "XWiki.OtherDocument", "www.host.org"));
+                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:00:00+0100"), "XWiki.OtherDocument", "www.host.org"));
             c.createStatement().execute(
-                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:00:00+0200"),
-                    "XWiki.OtherDocument", "www.anotherhost.org"));
-            store.endTransaction(context, true);
+                getQuery(Patch.DATE_FORMAT.parse("2008-01-02T12:00:00+0200"), "XWiki.OtherDocument",
+                    "www.anotherhost.org"));
+            this.store.endTransaction(this.context, true);
         } catch (HibernateException e) {
             e.printStackTrace();
         } catch (ParseException e) {
@@ -106,21 +102,12 @@ public class StorageTest extends MockObjectTestCase
 
     private String getQuery(Date d, String doc, String host)
     {
-        return "INSERT INTO xwikipatches(XWP_DOCID, XWP_TIME, XWP_CONTENT, XWP_HOSTID) VALUES ('"
-            + doc
-            + "', '"
+        return "INSERT INTO xwikipatches(XWP_DOCID, XWP_TIME, XWP_CONTENT, XWP_HOSTID) VALUES ('" + doc + "', '"
             + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(d)
             + "', '<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
-            + "<patch description=\"\" version=\"1.0\"><id doc=\""
-            + doc
-            + "\" host=\""
-            + host
-            + "\" time=\""
-            + Patch.DATE_FORMAT.format(d)
-            + "\"><logicalTime/></id>"
-            + "<operation type=\"content-insert\">"
-            + "<text>lorem ipsum</text><position column=\"0\" row=\"0\"/></operation></patch>', '"
-            + host + "')";
+            + "<patch description=\"\" version=\"1.0\"><id doc=\"" + doc + "\" host=\"" + host + "\" time=\""
+            + Patch.DATE_FORMAT.format(d) + "\"><logicalTime/></id>" + "<operation type=\"content-insert\">"
+            + "<text>lorem ipsum</text><position column=\"0\" row=\"0\"/></operation></patch>', '" + host + "')";
     }
 
     public void testStore() throws XWikiException
@@ -132,19 +119,18 @@ public class StorageTest extends MockObjectTestCase
         pid.setTime(new Date());
         pid.setLogicalTime(new LogicalTimeImpl());
         p.setId(pid);
-        RWOperation o =
-            OperationFactoryImpl.getInstance().newOperation(Operation.TYPE_CONTENT_INSERT);
+        RWOperation o = OperationFactoryImpl.getInstance().newOperation(Operation.TYPE_CONTENT_INSERT);
         o.insert("asd", new PositionImpl());
         p.addOperation(o);
-        storage.storePatch(p);
+        this.storage.storePatch(p);
     }
 
     public void testLoadAllPatches() throws XWikiException
     {
         populate();
-        List storedPatches = storage.loadAllPatches();
+        List<Patch> storedPatches = this.storage.loadAllPatches();
         int i = 0;
-        for (Iterator it = storedPatches.iterator(); it.hasNext(); ++i) {
+        for (Iterator<Patch> it = storedPatches.iterator(); it.hasNext(); ++i) {
             assertTrue(it.next() instanceof Patch);
         }
         assertEquals(5, i);
@@ -153,16 +139,16 @@ public class StorageTest extends MockObjectTestCase
     public void testLoadAllPatchesForDocument() throws XWikiException
     {
         populate();
-        List storedPatches = storage.loadAllDocumentPatches("XWiki.Document");
+        List<Patch> storedPatches = this.storage.loadAllDocumentPatches("XWiki.Document");
         int i = 0;
-        for (Iterator it = storedPatches.iterator(); it.hasNext(); ++i) {
+        for (Iterator<Patch> it = storedPatches.iterator(); it.hasNext(); ++i) {
             assertTrue(it.next() instanceof Patch);
         }
         assertEquals(3, i);
 
-        storedPatches = storage.loadAllDocumentPatches("XWiki.OtherDocument");
+        storedPatches = this.storage.loadAllDocumentPatches("XWiki.OtherDocument");
         i = 0;
-        for (Iterator it = storedPatches.iterator(); it.hasNext(); ++i) {
+        for (Iterator<Patch> it = storedPatches.iterator(); it.hasNext(); ++i) {
             assertTrue(it.next() instanceof Patch);
         }
         assertEquals(2, i);
@@ -175,17 +161,17 @@ public class StorageTest extends MockObjectTestCase
         id.setDocumentId("XWiki.Document");
         id.setHostId("www.host.org");
         id.setTime(Patch.DATE_FORMAT.parse("2008-01-01T11:00:00-0400"));
-        List storedPatches = storage.loadAllDocumentPatchesSince(id);
+        List<Patch> storedPatches = this.storage.loadAllDocumentPatchesSince(id);
         int i = 0;
-        for (Iterator it = storedPatches.iterator(); it.hasNext(); ++i) {
+        for (Iterator<Patch> it = storedPatches.iterator(); it.hasNext(); ++i) {
             assertTrue(it.next() instanceof Patch);
         }
         assertEquals(2, i);
 
         id.setTime(Patch.DATE_FORMAT.parse("2009-01-01T11:00:00-0400"));
-        storedPatches = storage.loadAllDocumentPatchesSince(id);
+        storedPatches = this.storage.loadAllDocumentPatchesSince(id);
         i = 0;
-        for (Iterator it = storedPatches.iterator(); it.hasNext(); ++i) {
+        for (Iterator<Patch> it = storedPatches.iterator(); it.hasNext(); ++i) {
             assertTrue(it.next() instanceof Patch);
         }
         assertEquals(0, i);
@@ -198,17 +184,17 @@ public class StorageTest extends MockObjectTestCase
         id.setDocumentId("XWiki.Document");
         id.setHostId("www.host.org");
         id.setTime(Patch.DATE_FORMAT.parse("2008-01-01T11:00:00-0400"));
-        List storedPatches = storage.loadAllPatchesSince(id);
+        List<Patch> storedPatches = this.storage.loadAllPatchesSince(id);
         int i = 0;
-        for (Iterator it = storedPatches.iterator(); it.hasNext(); ++i) {
+        for (Iterator<Patch> it = storedPatches.iterator(); it.hasNext(); ++i) {
             assertTrue(it.next() instanceof Patch);
         }
         assertEquals(4, i);
 
         id.setTime(Patch.DATE_FORMAT.parse("2009-01-01T11:00:00-0400"));
-        storedPatches = storage.loadAllDocumentPatchesSince(id);
+        storedPatches = this.storage.loadAllDocumentPatchesSince(id);
         i = 0;
-        for (Iterator it = storedPatches.iterator(); it.hasNext(); ++i) {
+        for (Iterator<Patch> it = storedPatches.iterator(); it.hasNext(); ++i) {
             assertTrue(it.next() instanceof Patch);
         }
         assertEquals(0, i);

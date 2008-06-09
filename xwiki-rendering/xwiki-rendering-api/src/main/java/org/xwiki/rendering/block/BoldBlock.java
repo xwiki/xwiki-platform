@@ -23,6 +23,10 @@ import org.xwiki.rendering.listener.Listener;
 
 import java.util.List;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class BoldBlock extends AbstractFatherBlock
 {
     public BoldBlock(List<Block> childBlocks)

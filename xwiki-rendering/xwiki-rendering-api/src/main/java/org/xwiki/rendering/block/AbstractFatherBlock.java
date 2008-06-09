@@ -24,6 +24,10 @@ import org.xwiki.rendering.listener.Listener;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public abstract class AbstractFatherBlock extends AbstractBlock
 {
     public AbstractFatherBlock(List<Block> childrenBlocks)

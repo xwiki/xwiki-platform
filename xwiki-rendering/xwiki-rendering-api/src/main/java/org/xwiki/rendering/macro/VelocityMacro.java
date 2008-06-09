@@ -31,6 +31,10 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class VelocityMacro extends AbstractMacro
 {
     /**

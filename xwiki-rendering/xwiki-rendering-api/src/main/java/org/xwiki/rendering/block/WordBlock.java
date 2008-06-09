@@ -21,6 +21,10 @@ package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class WordBlock extends AbstractBlock
 {
     private String word;

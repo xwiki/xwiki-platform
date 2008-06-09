@@ -36,6 +36,10 @@ import java.util.List;
 import java.util.Map;
 import java.io.StringReader;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class IncludeMacro extends AbstractMacro implements Initializable
 {
     private static final String CONTEXT_NEW = "new";

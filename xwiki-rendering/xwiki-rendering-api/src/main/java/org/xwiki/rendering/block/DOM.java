@@ -23,6 +23,10 @@ import org.xwiki.rendering.listener.Listener;
 
 import java.util.List;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class DOM extends AbstractFatherBlock
 {
     public DOM(List<Block> childBlocks)

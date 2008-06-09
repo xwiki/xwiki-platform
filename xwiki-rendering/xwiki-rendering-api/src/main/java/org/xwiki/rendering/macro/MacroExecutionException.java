@@ -21,6 +21,9 @@ package org.xwiki.rendering.macro;
 
 /**
  * Encapsulate a rendering error.
+ * 
+ * @version $Id$
+ * @since 1.5M2
  */
 public class MacroExecutionException
     extends Exception

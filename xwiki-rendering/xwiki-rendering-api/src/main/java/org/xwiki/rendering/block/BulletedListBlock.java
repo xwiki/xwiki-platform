@@ -24,6 +24,10 @@ import java.util.List;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class BulletedListBlock extends AbstractListBlock
 {
     public BulletedListBlock(List<Block> childrenBlocks)

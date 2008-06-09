@@ -29,6 +29,10 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.parser.Syntax;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class DefaultMacroFactory implements MacroFactory, Composable, Initializable
 {
     private ComponentManager componentManager;

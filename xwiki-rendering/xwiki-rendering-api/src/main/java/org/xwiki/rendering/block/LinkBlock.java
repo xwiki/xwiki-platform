@@ -22,6 +22,10 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.Link;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class LinkBlock extends AbstractBlock
 {
     private Link link;

@@ -21,6 +21,10 @@ package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.parser.Syntax;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface MacroFactory
 {
     /**

@@ -30,6 +30,10 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.parser.Parser;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XHTMLMacro extends AbstractMacro
 {
     /**

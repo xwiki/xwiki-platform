@@ -21,6 +21,10 @@ package org.xwiki.rendering.macro;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public abstract class AbstractMacro extends AbstractLogEnabled implements Macro
 {
     /**

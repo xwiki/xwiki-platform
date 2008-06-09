@@ -21,6 +21,10 @@ package org.xwiki.rendering.macro;
 
 import org.xwiki.context.Execution;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class DefaultDocumentManager implements DocumentManager
 {
     private Execution execution;

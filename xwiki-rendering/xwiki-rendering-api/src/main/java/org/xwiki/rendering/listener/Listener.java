@@ -22,6 +22,10 @@ package org.xwiki.rendering.listener;
 import java.util.Map;
 
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface Listener
 {
     /**

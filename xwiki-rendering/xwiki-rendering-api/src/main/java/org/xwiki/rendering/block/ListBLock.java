@@ -19,6 +19,10 @@
  */
 package org.xwiki.rendering.block;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface ListBLock extends Block
 {
 

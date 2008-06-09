@@ -24,6 +24,10 @@ import java.util.List;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class SectionBlock extends AbstractFatherBlock
 {
     private SectionLevel level;

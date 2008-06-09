@@ -35,6 +35,10 @@ import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XMLBlockConverterHandler extends DefaultHandler
 {
     private Parser parser;

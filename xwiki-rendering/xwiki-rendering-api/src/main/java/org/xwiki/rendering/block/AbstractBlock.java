@@ -25,6 +25,10 @@ import java.util.List;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public abstract class AbstractBlock implements Block
 {
     private List<Block> childrenBlocks = new ArrayList<Block>();

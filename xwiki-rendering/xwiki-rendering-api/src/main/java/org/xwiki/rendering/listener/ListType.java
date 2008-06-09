@@ -19,6 +19,10 @@
  */
 package org.xwiki.rendering.listener;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public enum ListType
 {
     NUMBERED, BULLETED;

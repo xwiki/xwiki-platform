@@ -19,6 +19,10 @@
  */
 package org.xwiki.rendering.listener;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public enum SectionLevel
 {
     LEVEL1(1), LEVEL2(2), LEVEL3(3), LEVEL4(4), LEVEL5(5), LEVEL6(6);

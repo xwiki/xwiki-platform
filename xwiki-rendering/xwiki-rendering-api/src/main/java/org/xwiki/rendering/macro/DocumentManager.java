@@ -23,6 +23,9 @@ package org.xwiki.rendering.macro;
  * Exposes methods for managing Documents. We're creating this abstraction here in the rendering
  * component for now since there's now such abstraction in the core for the moment. When it exists
  * replace it. Note that its replacement might well be the Wiki class of the new Model.
+ * 
+ * @version $Id$
+ * @since 1.5M2
  */
 public interface DocumentManager
 {

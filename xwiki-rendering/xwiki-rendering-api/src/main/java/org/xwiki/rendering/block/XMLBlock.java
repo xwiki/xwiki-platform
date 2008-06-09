@@ -25,6 +25,10 @@ import java.util.Map;
 
 import org.xwiki.rendering.listener.Listener;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XMLBlock extends AbstractFatherBlock
 {
     private String name;

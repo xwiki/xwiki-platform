@@ -23,6 +23,10 @@ import org.xwiki.rendering.listener.Listener;
 
 import java.util.Map;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class MacroBlock extends AbstractBlock
 {
     private String name;

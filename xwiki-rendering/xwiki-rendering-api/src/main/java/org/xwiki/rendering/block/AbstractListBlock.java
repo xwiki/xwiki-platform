@@ -21,6 +21,10 @@ package org.xwiki.rendering.block;
 
 import java.util.List;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public abstract class AbstractListBlock extends AbstractFatherBlock implements ListBLock
 {
     public AbstractListBlock(List<Block> childrenBlocks)

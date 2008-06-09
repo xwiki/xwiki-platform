@@ -25,6 +25,10 @@ import java.util.Map;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface Macro extends Comparable<Macro>
 {
     /**

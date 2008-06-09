@@ -23,6 +23,10 @@ import org.xwiki.rendering.listener.Listener;
 
 import java.util.List;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class ParagraphBlock extends AbstractFatherBlock
 {
     public ParagraphBlock(List<Block> blocks) throws IllegalArgumentException

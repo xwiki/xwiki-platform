@@ -23,6 +23,10 @@ import java.util.List;
 
 import org.xwiki.rendering.listener.Listener;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface Block
 {
     void traverse(Listener listener);

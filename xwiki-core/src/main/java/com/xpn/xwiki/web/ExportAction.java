@@ -36,7 +36,7 @@ import java.util.Map;
 /**
  * Exports in XAR, PDF, RTF or HTML formats.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ExportAction extends XWikiAction
 {

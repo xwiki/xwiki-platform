@@ -21,7 +21,7 @@ import com.xpn.xwiki.util.Util;
  * Handle URL generation in rendered wiki pages. This implementation makes sure URL will be local
  * URL for exported content (like skin, attachment and pages).
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ExportURLFactory extends XWikiServletURLFactory
 {

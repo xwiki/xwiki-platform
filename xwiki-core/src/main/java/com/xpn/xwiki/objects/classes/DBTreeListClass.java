@@ -41,7 +41,7 @@ import com.xpn.xwiki.objects.ListProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class DBTreeListClass extends DBListClass
 {

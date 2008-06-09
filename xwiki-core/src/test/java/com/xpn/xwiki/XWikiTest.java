@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 /**
  * Unit tests for {@link com.xpn.xwiki.XWiki}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiTest extends AbstractXWikiComponentTestCase
 {

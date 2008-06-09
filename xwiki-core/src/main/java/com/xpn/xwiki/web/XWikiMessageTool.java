@@ -59,7 +59,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * documents containing the properties is modified, its content is cached again next time a key is
  * asked.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiMessageTool
 {

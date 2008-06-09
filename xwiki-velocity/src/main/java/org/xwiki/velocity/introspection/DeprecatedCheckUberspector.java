@@ -37,7 +37,7 @@ import org.apache.velocity.util.introspection.VelPropertySet;
  * might not be able to return a precise method name, or a method of the original target object.
  * 
  * @since 1.5M1
- * @version $Id: $
+ * @version $Id$
  * @see ChainableUberspector
  */
 public class DeprecatedCheckUberspector extends AbstractChainableUberspector implements Uberspect,

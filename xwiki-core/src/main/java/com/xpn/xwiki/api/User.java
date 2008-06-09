@@ -36,7 +36,7 @@ import com.xpn.xwiki.util.Programming;
  * only one method. In the future it should be extended to provide useful methods for working with
  * users.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since Platform-1.0
  */
 public class User extends Api

@@ -63,7 +63,7 @@ import java.net.URI;
  *   <li>Hello World?param1=1&param2=2</li>
  * </ul>
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class Link implements Cloneable
 {

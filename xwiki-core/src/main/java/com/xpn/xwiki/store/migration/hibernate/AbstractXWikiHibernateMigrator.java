@@ -28,7 +28,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 /**
  * Template for migrators of hibernate store
  * @see XWikiMigratorInterface
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractXWikiHibernateMigrator implements XWikiMigratorInterface
 {

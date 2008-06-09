@@ -32,7 +32,7 @@ import org.apache.commons.lang.StringUtils;
  * the logs). As this logs everything you'll need to control what is logged by tuning the Log4J
  * configuration file to log only what you want.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public aspect LogAspect
 {

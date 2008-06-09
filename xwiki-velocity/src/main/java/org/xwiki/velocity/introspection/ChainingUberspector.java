@@ -55,7 +55,7 @@ import org.apache.velocity.util.introspection.UberspectLoggable;
  * 
  * @since 1.5M1
  * @see ChainableUberspector
- * @version $Id: $
+ * @version $Id$
  */
 public class ChainingUberspector extends AbstractChainableUberspector implements Uberspect,
     RuntimeServicesAware, UberspectLoggable

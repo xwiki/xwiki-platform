@@ -39,14 +39,14 @@ import org.dom4j.dom.DOMElement;
 /**
  * Base class for all stored statistics object.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiStats extends BaseCollection
 {
     /**
      * The properties of statistics object.
      * 
-     * @version $Id: $
+     * @version $Id$
      */
     public enum Property
     {

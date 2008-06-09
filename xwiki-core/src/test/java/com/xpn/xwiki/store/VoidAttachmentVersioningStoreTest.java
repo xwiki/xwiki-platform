@@ -35,7 +35,7 @@ import junit.framework.TestCase;
 /**
  * Unit tests for {@link VoidAttachmentVersioningStore} and {@link VoidAttachmentArchive}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class VoidAttachmentVersioningStoreTest extends TestCase
 {

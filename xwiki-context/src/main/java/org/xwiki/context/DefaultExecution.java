@@ -27,7 +27,7 @@ import java.util.Stack;
  * singleton components. Thus this holder is a singleton itself and the Execution Context is saved as a ThreadLocal
  * variable. 
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.5M2
  */
 public class DefaultExecution implements Execution

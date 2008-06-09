@@ -12,7 +12,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 
 /**
  * Interface for manipulate document history.
- * @version $Id: $
+ * @version $Id$
  */
 public interface XWikiVersioningStoreInterface {
     public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException;

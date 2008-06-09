@@ -30,7 +30,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * </p>
  * 
  * @see RWOperation
- * @version $Id: $
+ * @version $Id$
  */
 public interface Operation extends XmlSerializable
 {

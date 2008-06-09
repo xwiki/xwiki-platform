@@ -30,7 +30,7 @@ import java.net.URL;
  * Parses wiki links in the format defined in {@link com.xpn.xwiki.content.Link}.
  *
  * @see com.xpn.xwiki.content.Link
- * @version $Id: $
+ * @version $Id$
  */
 public class LinkParser implements ContentParser
 {

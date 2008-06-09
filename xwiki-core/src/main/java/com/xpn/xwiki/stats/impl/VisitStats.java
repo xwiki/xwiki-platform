@@ -30,14 +30,14 @@ import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 /**
  * The visit statistics database object.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class VisitStats extends XWikiStats
 {
     /**
      * The properties of visit statistics object.
      * 
-     * @version $Id: $
+     * @version $Id$
      */
     public enum Property
     {

@@ -32,7 +32,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * 
  * @see org.xwiki.platform.patchservice.api.RWPatch
  * @see org.xwiki.platform.patchservice.api.Patch
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public class PatchImpl implements Patch, RWPatch, XmlSerializable

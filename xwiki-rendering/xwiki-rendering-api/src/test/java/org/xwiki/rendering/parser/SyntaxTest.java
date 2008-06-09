@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 /**
  * Unit tests for {@link Syntax}.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.5M2
  */
 public class SyntaxTest extends TestCase

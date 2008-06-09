@@ -29,7 +29,7 @@ import junit.framework.TestCase;
 /**
  * Verify the {@link XWikiNotificationManager}
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiNotificationManagerTest extends TestCase
 {

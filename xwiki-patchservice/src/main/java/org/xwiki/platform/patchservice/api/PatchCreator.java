@@ -8,7 +8,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * versions of a document, by comparing the document versions and splitting the differences into
  * basic {@link Operation operations}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface PatchCreator

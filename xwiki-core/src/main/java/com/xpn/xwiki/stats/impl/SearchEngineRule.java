@@ -24,7 +24,7 @@ package com.xpn.xwiki.stats.impl;
 /**
  * Matching tool able to find if a referer is a particular search engine.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class SearchEngineRule extends Object
 {

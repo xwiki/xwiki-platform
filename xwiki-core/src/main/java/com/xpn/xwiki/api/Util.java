@@ -38,7 +38,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Utility APIs, available from Velocity/Groovy scripting.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class Util extends Api
 {

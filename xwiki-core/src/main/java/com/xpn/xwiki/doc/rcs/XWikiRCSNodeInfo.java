@@ -31,7 +31,7 @@ import com.xpn.xwiki.util.AbstractSimpleClass;
 /**
  * Contains information about document version.
  * Mutable.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class XWikiRCSNodeInfo extends AbstractSimpleClass implements Comparable<XWikiRCSNodeInfo>

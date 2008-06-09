@@ -37,7 +37,7 @@ import com.xpn.xwiki.store.migration.XWikiMigratorInterface;
 
 /**
  * Migration manager for hibernate store.
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiHibernateMigrationManager extends AbstractXWikiMigrationManager
 {

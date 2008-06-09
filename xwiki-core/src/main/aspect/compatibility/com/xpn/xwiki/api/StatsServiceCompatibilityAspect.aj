@@ -29,7 +29,7 @@ import com.xpn.xwiki.stats.impl.DocumentStats;
 /**
  * Add a backward compatibility layer to the {@link StatsService} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public privileged aspect StatsServiceCompatibilityAspect
 {

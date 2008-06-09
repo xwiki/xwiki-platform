@@ -55,7 +55,7 @@ import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
  *   This is useful for templates, for example.</li>
  * </ul>
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class ImageMacro extends BaseLocaleMacro {
     public String getLocaleKey() {

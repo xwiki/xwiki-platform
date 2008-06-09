@@ -29,7 +29,7 @@ package com.xpn.xwiki.store;
  * tricks depend on the database. Hence the need to differentiate them and hence the need for this
  * class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class DatabaseProduct
 {

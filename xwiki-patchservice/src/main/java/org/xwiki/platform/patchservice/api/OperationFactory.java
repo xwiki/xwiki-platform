@@ -7,7 +7,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * A helper class for managing implementations for different {@link Operation} implementations.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface OperationFactory

@@ -11,7 +11,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * patchset must contain patches affecting only one document.
  * 
  * @see RWPatchSet
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface PatchSet extends XmlSerializable

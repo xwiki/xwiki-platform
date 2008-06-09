@@ -16,7 +16,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Access to LDAP configurations.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public final class XWikiLDAPConfig
 {

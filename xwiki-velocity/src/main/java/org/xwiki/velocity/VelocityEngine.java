@@ -29,7 +29,7 @@ import java.util.Properties;
 /**
  * Initialize a Velocity Engine and make Velocity services available.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public interface VelocityEngine
 {

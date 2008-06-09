@@ -5,7 +5,7 @@ package org.xwiki.platform.patchservice.api;
  * and the user who made those changes.
  * 
  * @see RWOriginator
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface Originator extends XmlSerializable

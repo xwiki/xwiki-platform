@@ -49,7 +49,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 
 /**
  * Class for String [de]serialization for {@link XWikiDocumentArchive}.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class XWikiRCSArchive extends Archive

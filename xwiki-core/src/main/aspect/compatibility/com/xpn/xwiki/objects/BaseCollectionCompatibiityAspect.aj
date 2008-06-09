@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.objects.BaseCollection} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public aspect BaseCollectionCompatibiityAspect
 {

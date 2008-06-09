@@ -28,7 +28,7 @@ import com.xpn.xwiki.util.AbstractSimpleClass;
 /**
  * Composite ID component used in {@link XWikiRCSNodeInfo} & {@link XWikiRCSNodeContent}.
  * Immutable.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class XWikiRCSNodeId extends AbstractSimpleClass implements Serializable, Cloneable

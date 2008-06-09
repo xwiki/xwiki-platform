@@ -30,7 +30,7 @@ import java.security.Principal;
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiAuthServiceImplTest extends MockObjectTestCase
 {

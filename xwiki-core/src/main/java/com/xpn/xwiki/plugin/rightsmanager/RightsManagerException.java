@@ -25,7 +25,7 @@ import com.xpn.xwiki.plugin.PluginException;
 /**
  * Rights Manager plugin base exception.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
 public class RightsManagerException extends PluginException

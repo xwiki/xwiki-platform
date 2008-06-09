@@ -3,7 +3,7 @@ package com.xpn.xwiki.plugin.rightsmanager.utils;
 /**
  * Contains all rights for a level right.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
 public class LevelTree

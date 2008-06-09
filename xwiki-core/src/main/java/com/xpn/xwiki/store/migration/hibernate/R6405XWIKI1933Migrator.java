@@ -31,7 +31,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * current migrator is because the old migrator was only executed in the main wiki, and there was
  * some code that inserted wrong data after the migration.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class R6405XWIKI1933Migrator extends R4340XWIKI883Migrator
 {

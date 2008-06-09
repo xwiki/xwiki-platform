@@ -36,7 +36,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
  * have a NOT NULL constraint. Also, Hibernate does not delete columns/tables that don't appear in
  * the mapping file, so the column must be manually dropped.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.3M2
  * @since 1.2.2
  */

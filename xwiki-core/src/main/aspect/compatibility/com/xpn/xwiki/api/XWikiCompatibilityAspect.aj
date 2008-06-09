@@ -32,7 +32,7 @@ import java.util.*;
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.api.XWiki} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public privileged aspect XWikiCompatibilityAspect
 {

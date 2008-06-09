@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Interface for migrators which migrate data.
  * New migrators should named like "R"+vernum+issuenumber+"Migrator" for prevent collisions. 
- * @version $Id: $
+ * @version $Id$
  */
 public interface XWikiMigratorInterface
 {

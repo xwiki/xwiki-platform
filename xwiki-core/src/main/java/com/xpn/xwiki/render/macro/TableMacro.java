@@ -37,7 +37,7 @@ import java.io.Writer;
  *
  * @author stephan
  * @team sonicteam
- * @version $Id: TableMacro.java,v 1.9 2004/04/27 19:30:38 leo Exp $
+ * @version $Id$
  */
 
 public class TableMacro extends BaseLocaleMacro {

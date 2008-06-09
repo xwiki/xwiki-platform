@@ -42,7 +42,7 @@ import org.xwiki.container.servlet.ServletApplicationContext;
  * configuration values defined in the component's configuration. Note that the {@link #initialize}
  * method has to be executed before any other method can be called.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultVelocityEngine extends AbstractLogEnabled implements VelocityEngine, LogChute
 {

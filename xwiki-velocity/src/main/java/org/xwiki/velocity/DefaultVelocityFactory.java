@@ -33,7 +33,7 @@ import java.util.Properties;
  * Default implementation for {@link VelocityFactory}.
  *
  * @see VelocityFactory
- * @version $Id: $ 
+ * @version $Id$ 
  */
 public class DefaultVelocityFactory extends AbstractLogEnabled
     implements VelocityFactory, Composable

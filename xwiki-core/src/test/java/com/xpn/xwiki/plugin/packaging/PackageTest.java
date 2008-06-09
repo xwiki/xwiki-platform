@@ -37,7 +37,7 @@ import java.util.zip.ZipOutputStream;
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.packaging.Package} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class PackageTest extends org.jmock.cglib.MockObjectTestCase
 {

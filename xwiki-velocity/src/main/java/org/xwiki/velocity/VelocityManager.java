@@ -26,7 +26,7 @@ import org.apache.velocity.VelocityContext;
  * Provides access to the main XWiki Velocity objects. 
  *
  * @since 1.5M2
- * @version $Id: $
+ * @version $Id$
  */
 public interface VelocityManager
 {

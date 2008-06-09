@@ -45,7 +45,7 @@ import java.util.Iterator;
  * database is in version < 4360). This is because this current migrator is because of a bug in R4359XWIKI1459 which
  * has now been fixed.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class R6079XWIKI1878Migrator extends AbstractXWikiHibernateMigrator
 {

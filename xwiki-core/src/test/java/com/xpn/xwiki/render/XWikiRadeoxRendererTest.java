@@ -34,7 +34,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 /**
  * Unit tests for {@link com.xpn.xwiki.render.XWikiRadeoxRenderer}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiRadeoxRendererTest extends MockObjectTestCase
 {

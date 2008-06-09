@@ -44,7 +44,7 @@ import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
  * Action for serving javascript skin extensions.
  * </p>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public class JsxAction extends XWikiAction

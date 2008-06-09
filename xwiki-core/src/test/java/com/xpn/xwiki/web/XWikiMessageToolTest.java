@@ -36,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Unit tests for the {@link com.xpn.xwiki.web.XWikiMessageTool} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiMessageToolTest extends MockObjectTestCase
 {

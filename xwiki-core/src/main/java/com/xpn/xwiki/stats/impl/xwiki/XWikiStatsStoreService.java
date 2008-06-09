@@ -42,7 +42,7 @@ import com.xpn.xwiki.web.ViewAction;
 /**
  * Back-end statistics storing service.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public class XWikiStatsStoreService implements Runnable
@@ -278,7 +278,7 @@ public class XWikiStatsStoreService implements Runnable
 /**
  * Item used to stop the statistics storing.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 class StopStatsRegisterObject implements XWikiStatsStoreItem
 {
@@ -305,7 +305,7 @@ class StopStatsRegisterObject implements XWikiStatsStoreItem
 /**
  * Used to order stopping storing thread.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 class StopStatsStoreException extends Exception
 {

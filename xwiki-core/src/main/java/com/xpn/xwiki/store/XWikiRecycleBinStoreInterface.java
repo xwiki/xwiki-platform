@@ -27,7 +27,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Interface for RecycleBin feature (XWIKI-543) store system.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public interface XWikiRecycleBinStoreInterface

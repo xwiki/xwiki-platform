@@ -24,7 +24,7 @@ import com.xpn.xwiki.XWikiException;
 
 /**
  * Interface for all migration managers.
- * @version $Id: $ 
+ * @version $Id$ 
  */
 public interface XWikiMigrationManagerInterface
 {

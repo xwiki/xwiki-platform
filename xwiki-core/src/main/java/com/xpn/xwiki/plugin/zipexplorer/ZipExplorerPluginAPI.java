@@ -38,7 +38,7 @@ import java.util.List;
  * named <code>SomeDirectory</code> inside a ZIP file named <code>zipfile.zip</code> and attached to
  * the document named <code>Document</code>.
  *
- * @version $Id: $
+ * @version $Id$
  * @see com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPlugin
  */
 public class ZipExplorerPluginAPI extends Api

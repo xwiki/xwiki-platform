@@ -29,7 +29,7 @@ import org.securityfilter.realm.SimplePrincipal;
 /**
  * Common methods useful to all Authentication services implementations.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractXWikiAuthService implements XWikiAuthService
 {

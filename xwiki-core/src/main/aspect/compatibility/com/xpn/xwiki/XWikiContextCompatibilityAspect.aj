@@ -25,7 +25,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWikiContext} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public privileged aspect XWikiContextCompatibilityAspect
 {

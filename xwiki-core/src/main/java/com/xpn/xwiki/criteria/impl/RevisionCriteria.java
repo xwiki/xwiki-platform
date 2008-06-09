@@ -24,7 +24,7 @@ import java.util.Date;
 /**
  * information about document versions used to retreive a set of document versions.
  *
- * @version $Id: $
+ * @version $Id$
  * @see com.xpn.xwiki.doc.XWikiDocument#getRevisions(RevisionCriteria, com.xpn.xwiki.XWikiContext)
  * @since 1.4M1
  */

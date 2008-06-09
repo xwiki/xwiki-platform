@@ -23,7 +23,7 @@ package org.xwiki.observation.event.filter;
 /**
  * An {@link EventFilter} that always matches another event filter.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class AlwaysMatchingEventFilter implements EventFilter
 {

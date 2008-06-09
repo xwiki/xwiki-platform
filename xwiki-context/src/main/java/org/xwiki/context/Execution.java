@@ -23,7 +23,7 @@ package org.xwiki.context;
 /**
  * Allows setting/retrieving the {@link ExecutionContext}.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.5M2
  */
 public interface Execution

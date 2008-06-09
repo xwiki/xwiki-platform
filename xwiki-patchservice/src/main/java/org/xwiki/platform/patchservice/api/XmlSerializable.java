@@ -8,7 +8,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Patch components can be serialized into XML documents, using the W3C DOM specification.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface XmlSerializable

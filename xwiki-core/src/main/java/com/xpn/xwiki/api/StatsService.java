@@ -35,7 +35,7 @@ import com.xpn.xwiki.stats.impl.StatsUtil;
 /**
  * Statistics api. The Statistics module needs to be activated (xwiki.stats=1 in xwiki.cfg).
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class StatsService extends Api
 {

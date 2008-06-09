@@ -5,7 +5,7 @@ package org.xwiki.platform.patchservice.api;
  * simple host time isn't enough for event ordering. The actual implementation is hidden, as all we
  * need to do is compare two logical timestamps.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface LogicalTime extends Comparable<LogicalTime>, XmlSerializable
 {

@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Action for delete document to recycle bin and for delete documents from recycle bin. 
- * @version $Id: $
+ * @version $Id$
  */
 public class DeleteAction extends XWikiAction
 {

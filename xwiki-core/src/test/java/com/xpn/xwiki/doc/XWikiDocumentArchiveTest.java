@@ -30,7 +30,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Unit tests for {@link XWikiDocumentArchive}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiDocumentArchiveTest extends MockObjectTestCase
 {

@@ -37,7 +37,7 @@ import com.xpn.xwiki.web.XWikiServletContext;
 /**
  * Unit tests for {@link DefaultXWikiRenderingEngine}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestCase
 {

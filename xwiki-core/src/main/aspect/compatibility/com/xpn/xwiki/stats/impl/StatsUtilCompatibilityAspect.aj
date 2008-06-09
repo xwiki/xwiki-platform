@@ -25,7 +25,7 @@ import java.util.Date;
 /**
  * Add a backward compatibility layer to the {@link StatsUtil} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public privileged aspect StatsUtilCompatibilityAspect
 {

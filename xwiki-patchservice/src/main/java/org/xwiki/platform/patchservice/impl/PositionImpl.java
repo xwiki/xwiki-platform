@@ -15,7 +15,7 @@ import com.xpn.xwiki.XWikiException;
  * optional context (text before and after the position).
  * 
  * @see org.xwiki.platform.patchservice.api.Position
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public class PositionImpl implements Position, XmlSerializable

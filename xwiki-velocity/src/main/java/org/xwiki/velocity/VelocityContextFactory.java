@@ -28,7 +28,7 @@ import org.apache.velocity.VelocityContext;
  * The returned context is supposed to be used only once, as otherwise data may leak between
  * different requests, and the parsing/rendering process would be affected by previous data.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface VelocityContextFactory
 {

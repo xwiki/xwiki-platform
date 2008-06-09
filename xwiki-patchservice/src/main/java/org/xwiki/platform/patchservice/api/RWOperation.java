@@ -7,7 +7,7 @@ import java.util.Map;
  * A read-write operation, or one that can be defined using method calls. The
  * 
  * @see Operation
- * @version $Id: $
+ * @version $Id$
  */
 public interface RWOperation extends Operation
 {

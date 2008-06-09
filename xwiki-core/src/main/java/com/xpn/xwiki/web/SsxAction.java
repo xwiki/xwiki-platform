@@ -42,7 +42,7 @@ import com.yahoo.platform.yui.compressor.CssCompressor;
  * Action for serving css skin extensions.
  * </p>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public class SsxAction extends XWikiAction

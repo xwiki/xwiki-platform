@@ -13,7 +13,7 @@ import com.xpn.xwiki.XWikiException;
  * 
  * @see org.xwiki.platform.patchservice.api.RWOriginator
  * @see org.xwiki.platform.patchservice.api.Originator
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public class OriginatorImpl implements Originator, RWOriginator, XmlSerializable

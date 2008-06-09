@@ -35,7 +35,7 @@ import java.util.Collections;
 /**
  * Unit tests for {@link com.xpn.xwiki.render.XWikiVelocityRenderer}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
 {

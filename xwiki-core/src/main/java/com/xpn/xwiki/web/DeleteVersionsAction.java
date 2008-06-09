@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocumentArchive;
 /**
  * Struts action for delete document versions.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DeleteVersionsAction extends XWikiAction
 {

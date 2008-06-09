@@ -35,7 +35,7 @@ import org.xwiki.component.phase.InitializationException;
 /**
  * Default implementation for {@link VelocityContextFactory}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
     VelocityContextFactory, Initializable, Composable

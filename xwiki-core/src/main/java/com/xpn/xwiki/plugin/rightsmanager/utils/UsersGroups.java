@@ -6,7 +6,7 @@ import java.util.HashSet;
 /**
  * Contains a collection of users and groups.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2
  */
 public class UsersGroups

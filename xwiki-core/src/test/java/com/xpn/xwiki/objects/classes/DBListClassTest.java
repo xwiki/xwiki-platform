@@ -29,7 +29,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Unit tests for {@link DBListClass}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DBListClassTest extends AbstractXWikiComponentTestCase
 {

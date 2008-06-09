@@ -12,7 +12,7 @@ import com.xpn.xwiki.XWikiException;
  * Default implementation for {@link LogicalTime}.
  * 
  * @see org.xwiki.platform.patchservice.api.LogicalTime
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public class LogicalTimeImpl implements LogicalTime, Serializable

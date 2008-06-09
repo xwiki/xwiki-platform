@@ -3,7 +3,7 @@ package org.xwiki.platform.patchservice.api;
 /**
  * A <tt>Position</tt> identifies a place inside a text field, where some changes occured.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface Position extends XmlSerializable

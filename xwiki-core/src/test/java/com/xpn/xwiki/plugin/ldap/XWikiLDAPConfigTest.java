@@ -39,7 +39,7 @@ import com.xpn.xwiki.web.XWikiEngineContext;
 /**
  * Test {@link XWikiLDAPConfig};
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiLDAPConfigTest extends TestCase
 {

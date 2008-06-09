@@ -27,7 +27,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 /**
  * Interface for storing attachment versions.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public interface AttachmentVersioningStore

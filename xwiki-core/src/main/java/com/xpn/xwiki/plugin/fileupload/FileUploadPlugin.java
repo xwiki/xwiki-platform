@@ -48,7 +48,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
  * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and
  * preserved as a list of {@link FileItem}s.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginInterface
 {

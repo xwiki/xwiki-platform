@@ -45,7 +45,7 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 /**
  * Unit tests for {@link com.xpn.xwiki.api.XWiki}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiTest extends MockObjectTestCase
 {

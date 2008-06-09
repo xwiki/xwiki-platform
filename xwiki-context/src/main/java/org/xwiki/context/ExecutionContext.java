@@ -27,7 +27,7 @@ import java.util.HashMap;
  * Contains all state data related to the current user action. Note that the execution context is independent of the
  * environment and all environment-dependent data are stored in the Container component instead.
  *
- * @version $Id: $ 
+ * @version $Id$ 
  * @since 1.5M2
  */
 public class ExecutionContext

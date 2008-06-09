@@ -28,7 +28,7 @@ import com.xpn.xwiki.api.Api;
  * and forward safe calls to that object.
  * 
  * @param <T> The type of the internal plugin.
- * @version $Id: $
+ * @version $Id$
  */
 public class PluginApi<T extends XWikiPluginInterface> extends Api
 {

@@ -11,7 +11,7 @@ import org.xwiki.context.ExecutionContextInitializerException;
  *
  * @see org.xwiki.context.ExecutionContextInitializer
  * @since 1.5M1
- * @version $Id: $
+ * @version $Id$
  */
 public class VelocityExecutionContextInitializer implements ExecutionContextInitializer
 {

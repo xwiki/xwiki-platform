@@ -31,7 +31,7 @@ import java.util.Vector;
 /**
  * Manages general and named notifications rules.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiNotificationManager
 {

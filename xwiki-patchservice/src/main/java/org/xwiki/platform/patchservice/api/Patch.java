@@ -26,7 +26,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * </p>
  * 
  * @see RWPatch
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface Patch extends XmlSerializable

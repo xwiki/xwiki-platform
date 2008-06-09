@@ -49,7 +49,7 @@ import com.xpn.xwiki.plugin.rightsmanager.utils.UsersGroups;
 /**
  * Hidden toolkit use by the plugin API that make all the plugin's actions.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWiki Core 1.1.2, XWiki Core 1.2M2 (public since 1.4M1)
  */
 public final class RightsManager implements XWikiDocChangeNotificationInterface

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Object containing statistics information to store.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public interface XWikiStatsStoreItem

@@ -55,7 +55,7 @@ import org.apache.commons.lang.NotImplementedException;
 /**
  * Default implementation of {@link XWikiGroupService} users and groups manager.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiGroupServiceImpl implements XWikiGroupService,
     XWikiDocChangeNotificationInterface

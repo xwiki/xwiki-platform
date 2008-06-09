@@ -28,7 +28,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 /**
  * API object for get info about some version of Document.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class RevisionInfo extends Api
 {

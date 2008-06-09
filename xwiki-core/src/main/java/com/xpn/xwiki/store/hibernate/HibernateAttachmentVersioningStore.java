@@ -35,7 +35,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
 /**
  * Realization of {@link AttachmentVersioningStore} for Hibernate-based storage.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements

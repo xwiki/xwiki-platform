@@ -21,7 +21,7 @@
 package org.xwiki.container;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.5M1
  */
 public class RequestInitializerException extends Exception

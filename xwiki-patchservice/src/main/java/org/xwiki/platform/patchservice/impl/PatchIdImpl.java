@@ -19,7 +19,7 @@ import com.xpn.xwiki.XWikiException;
  * 
  * @see org.xwiki.platform.patchservice.api.RWPatchId
  * @see org.xwiki.platform.patchservice.api.PatchId
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable

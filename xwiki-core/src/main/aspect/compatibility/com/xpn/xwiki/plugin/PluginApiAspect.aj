@@ -23,7 +23,7 @@ package com.xpn.xwiki.plugin;
 /**
  * Add a backward compatibility layer to the {@link PluginApi} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public privileged aspect PluginApiAspect
 {

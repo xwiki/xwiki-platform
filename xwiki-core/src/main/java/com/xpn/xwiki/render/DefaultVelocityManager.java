@@ -45,7 +45,7 @@ import java.util.Properties;
  * populate the Velocity Context with XWiki objects that are located in the Core (such as the XWiki object for example)
  * and since the Core needs to call the Velocity module this would cause a circular dependency.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.5M1
  */
 public class DefaultVelocityManager implements VelocityManager, Composable

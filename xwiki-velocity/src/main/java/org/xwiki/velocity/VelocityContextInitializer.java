@@ -25,7 +25,7 @@ import org.apache.velocity.VelocityContext;
 /**
  * Populates new Velocity contexts with custom entries.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.5M1
  */
 public interface VelocityContextInitializer

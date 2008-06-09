@@ -28,7 +28,7 @@ import java.util.Date;
 /**
  * Archive of deleted document, stored in {@link com.xpn.xwiki.store.XWikiRecycleBinStoreInterface}
  * Immutable, because we don't need modify deleted document.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class XWikiDeletedDocument extends AbstractSimpleClass

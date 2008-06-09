@@ -28,7 +28,7 @@ import java.util.Map;
  * A special block that Macro Blocks emits when they are executed so that it's possible to reconstruct
  * the initial syntax even after Macros have been executed.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.5M2
  */
 public class MacroMarkerBlock extends AbstractFatherBlock

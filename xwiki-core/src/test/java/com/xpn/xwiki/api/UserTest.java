@@ -15,7 +15,7 @@ import com.xpn.xwiki.user.api.XWikiUser;
 /**
  * Unit tests for {@link com.xpn.xwiki.api.User}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class UserTest extends MockObjectTestCase
 {

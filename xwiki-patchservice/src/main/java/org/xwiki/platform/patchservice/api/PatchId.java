@@ -9,7 +9,7 @@ import java.util.Date;
  * consistency among peers.
  * 
  * @see RWPatchId
- * @version $Id: $
+ * @version $Id$
  * @since XWikiPlatform 1.3
  */
 public interface PatchId extends XmlSerializable, Serializable

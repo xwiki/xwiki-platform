@@ -32,7 +32,7 @@ import org.jmock.MockObjectTestCase;
 /**
  * Verify that notifications are correctly sent in the {@link XWiki} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiNotificationTest extends MockObjectTestCase
 {

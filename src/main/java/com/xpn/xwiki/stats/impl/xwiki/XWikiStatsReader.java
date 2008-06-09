@@ -127,7 +127,7 @@ public class XWikiStatsReader
         String nameFilter;
 
         if (scope.getType() == Scope.SPACE_SCOPE && "".equals(scope.getName())) {
-            nameFilter = "name not like '%.%' and name <> ''";
+            nameFilter = "name not like '%.%' and name <> '' and name is not null";
         } else {
             nameFilter = "name like ?";
             paramList.add(scope.getPattern());

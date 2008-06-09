@@ -26,7 +26,7 @@ import org.jmock.MockObjectTestCase;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
@@ -81,7 +81,7 @@ public abstract class AbstractRenderingTestCase extends MockObjectTestCase
     {
         // Assert the result by parsing it through the TestEventsListener to generate easily
         // assertable events.
-        DOM dom = new DOM(blocks);
+        XDOM dom = new XDOM(blocks);
         StringWriter sw = new StringWriter();
         dom.traverse(new TestEventsListener(sw));
         assertEquals(expected, sw.toString());

@@ -57,9 +57,9 @@ public class DocumentGeneratorListener implements IWemListener
         this.linkParser = linkParser;
     }
 
-    public DOM getDocument()
+    public XDOM getDocument()
     {
-        return new DOM(generateListFromStack());
+        return new XDOM(generateListFromStack());
     }
 
     public void beginDefinitionDescription()

@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 
 /**
  * @version $Id$
@@ -38,6 +38,6 @@ public interface Macro extends Comparable<Macro>
     
     int getPriority();
     
-    List<Block> execute(Map<String, String> parameters, String content, final DOM dom)
+    List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
         throws MacroExecutionException;
 }

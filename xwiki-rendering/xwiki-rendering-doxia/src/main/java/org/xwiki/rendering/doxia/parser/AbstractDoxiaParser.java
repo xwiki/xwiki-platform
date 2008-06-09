@@ -22,7 +22,7 @@ package org.xwiki.rendering.doxia.parser;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.doxia.internal.DocumentGeneratorSink;
 
 import java.io.Reader;
@@ -35,7 +35,7 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
 {
     public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
 
-    public DOM parse(Reader source) throws ParseException
+    public XDOM parse(Reader source) throws ParseException
     {
         org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
         DocumentGeneratorSink sink = new DocumentGeneratorSink();

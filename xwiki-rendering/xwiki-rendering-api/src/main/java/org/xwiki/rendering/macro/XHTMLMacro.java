@@ -27,7 +27,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 
 /**
@@ -43,9 +43,9 @@ public class XHTMLMacro extends AbstractMacro
     
     /**
      * {@inheritDoc}
-     * @see Macro#execute(Map, String, org.xwiki.rendering.block.DOM)
+     * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, DOM dom)
+    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom)
         throws MacroExecutionException
     {
         // Parse the XHTML using an XML Parser and Wrap the XML elements in XMLBlock(s).

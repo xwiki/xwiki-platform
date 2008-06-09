@@ -53,10 +53,10 @@ public class MacroBlock extends AbstractBlock
         // Macro execution. This is because Macro execution is a complex process that involves:
         // * computing the order in which the macros should be evaluated. For example the TOC macro
         //   should evaluate last since other macros can contribute section blocks.
-        // * some macros need to modify blocks in the DOM object
+        // * some macros need to modify blocks in the XDOM object
         // * macro execution is a multi-pass process
         // In essence the Macro Transformer will replace all MacroBlock blocks with other Blocks
-        // generated from the execution of the Macros when DOM.traverse() is called there
+        // generated from the execution of the Macros when XDOM.traverse() is called there
         // won't be any MacroBlock.traverse() method called at all.
 
         // Note: We're calling the event to let other listener downstream decide what to do with it.

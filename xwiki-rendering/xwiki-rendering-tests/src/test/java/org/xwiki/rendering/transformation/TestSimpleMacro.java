@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -33,7 +33,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 public class TestSimpleMacro extends AbstractMacro
 {
     public List<Block> execute(Map<String, String> parameters, String content,
-        DOM dom) throws MacroExecutionException
+        XDOM dom) throws MacroExecutionException
     {
         int wordCount = dom.getChildrenByType(WordBlock.class).size();
         return Arrays.asList(new Block[] {new ParagraphBlock(new WordBlock("simplemacro" + wordCount))});

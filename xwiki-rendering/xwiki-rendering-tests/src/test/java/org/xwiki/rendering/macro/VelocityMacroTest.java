@@ -21,7 +21,7 @@ package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 
 import java.util.List;
 import java.util.Collections;
@@ -52,7 +52,7 @@ public class VelocityMacroTest extends AbstractRenderingTestCase
 
         Macro macro = (Macro) getComponentManager().lookup(VelocityMacro.ROLE, "velocity/xwiki");
         List<Block> blocks = macro.execute(Collections.EMPTY_MAP, content,
-            new DOM(Collections.EMPTY_LIST));
+            new XDOM(Collections.EMPTY_LIST));
 
         assertBlocks(expected, blocks);
     }

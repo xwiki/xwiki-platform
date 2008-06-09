@@ -27,7 +27,7 @@ import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
@@ -65,7 +65,7 @@ public class DefaultTransformationManager implements TransformationManager, Comp
         this.transformations = txs;
     }
     
-    public void performTransformations(DOM dom, Syntax syntax)
+    public void performTransformations(XDOM dom, Syntax syntax)
         throws TransformationException
     {
         for (Transformation transformation: this.transformations) {

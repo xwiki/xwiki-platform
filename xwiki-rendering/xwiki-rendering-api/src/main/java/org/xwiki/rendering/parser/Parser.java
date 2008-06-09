@@ -21,7 +21,7 @@ package org.xwiki.rendering.parser;
 
 import java.io.Reader;
 
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 
 /**
  * @version $Id$
@@ -39,5 +39,5 @@ public interface Parser
      */
     Syntax getSyntax();
     
-    DOM parse(Reader source) throws ParseException;
+    XDOM parse(Reader source) throws ParseException;
 }

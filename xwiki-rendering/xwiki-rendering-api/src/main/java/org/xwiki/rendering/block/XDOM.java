@@ -17,23 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.transformation;
+package org.xwiki.rendering.block;
 
-import java.util.Collections;
+import org.xwiki.rendering.listener.Listener;
 
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+import java.util.List;
 
-public class DefaultTransformationManagerTest extends AbstractRenderingTestCase
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
+public class XDOM extends AbstractFatherBlock
 {
-    public void testTransformations() throws Exception 
+    public XDOM(List<Block> childBlocks)
     {
-        TransformationManager manager = 
-            (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
-         manager.performTransformations(new XDOM(Collections.<Block>emptyList()),
-            new Syntax(SyntaxType.XWIKI, "2.0"));
+        super(childBlocks);
+    }
+
+    public void before(Listener listener)
+    {
+    }
+
+    public void after(Listener listener)
+    {
     }
 }

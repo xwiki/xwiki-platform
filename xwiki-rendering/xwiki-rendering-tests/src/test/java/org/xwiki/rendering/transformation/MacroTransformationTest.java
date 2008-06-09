@@ -26,7 +26,7 @@ import java.util.Collections;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.scaffolding.TestEventsListener;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -54,7 +54,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endParagraph\n"
             + "endMacroMarker: [testsimplemacro] [] [null]\n";
 
-        DOM dom = new DOM(Arrays.asList((Block) new MacroBlock("testsimplemacro",
+        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testsimplemacro",
             Collections.<String, String>emptyMap())));
         
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
@@ -75,7 +75,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endParagraph\n"
             + "endMacroMarker: [testnestedmacro] [] [null]\n";
 
-        DOM dom = new DOM(Arrays.asList((Block) new MacroBlock("testnestedmacro",
+        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testnestedmacro",
             Collections.<String, String>emptyMap())));
     
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
@@ -94,7 +94,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "onMacro: [testrecursivemacro] [] [null]\n"
             + "endMacroMarker: [testrecursivemacro] [] [null]\n";
         
-        DOM dom = new DOM(Arrays.asList((Block) new MacroBlock("testrecursivemacro",
+        XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testrecursivemacro",
             Collections.<String, String>emptyMap())));
     
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
@@ -120,7 +120,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "endParagraph\n"
             + "endMacroMarker: [testprioritymacro] [] [null]\n";
 
-        DOM dom = new DOM(Arrays.asList(
+        XDOM dom = new XDOM(Arrays.asList(
             (Block) new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap()),
             (Block) new MacroBlock("testprioritymacro", Collections.<String, String>emptyMap())));
 

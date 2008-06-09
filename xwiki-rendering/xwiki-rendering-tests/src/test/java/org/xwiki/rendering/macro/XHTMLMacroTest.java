@@ -24,7 +24,7 @@ import java.util.List;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.macro.XHTMLMacro}.
@@ -58,7 +58,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, 
-            new DOM(Collections.EMPTY_LIST));
+            new XDOM(Collections.EMPTY_LIST));
 
         assertBlocks(expected, blocks);
     }

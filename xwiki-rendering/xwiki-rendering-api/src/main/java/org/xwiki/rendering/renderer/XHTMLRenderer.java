@@ -29,6 +29,8 @@ import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 
 /**
+ * Generates XHTML from {@link org.xwiki.rendering.block.XDOM}.
+ *
  * @version $Id$
  * @since 1.5M2
  */

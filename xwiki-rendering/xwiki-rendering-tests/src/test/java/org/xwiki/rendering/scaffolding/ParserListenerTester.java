@@ -25,7 +25,7 @@ import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
@@ -58,7 +58,7 @@ public class ParserListenerTester extends AbstractRenderingTestCase
     {
         InputStream input = getClass().getResourceAsStream("/" + this.testName + "-"
             + this.syntax.getType().toIdString() + "-" + this.syntax.getVersion() + ".input");
-        DOM dom = this.parser.parse(new InputStreamReader(input));
+        XDOM dom = this.parser.parse(new InputStreamReader(input));
 
         if (this.runTransformations) {
             TransformationManager transformationManager =

@@ -23,7 +23,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.LinkParser;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.wikimodel.internal.DocumentGeneratorListener;
 import org.wikimodel.wem.IWikiParser;
 
@@ -35,7 +35,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
     
     public abstract IWikiParser createWikiModelParser();
 
-    public DOM parse(Reader source) throws ParseException
+    public XDOM parse(Reader source) throws ParseException
     {
         IWikiParser parser = createWikiModelParser();
 

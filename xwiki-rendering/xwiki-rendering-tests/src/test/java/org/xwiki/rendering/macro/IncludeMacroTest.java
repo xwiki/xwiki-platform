@@ -21,7 +21,7 @@ package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.velocity.VelocityManager;
 import org.jmock.Mock;
 
@@ -52,7 +52,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "current");
 
-        List<Block> blocks = macro.execute(properties, null, new DOM(Collections.EMPTY_LIST));
+        List<Block> blocks = macro.execute(properties, null, new XDOM(Collections.EMPTY_LIST));
 
         assertBlocks(expected, blocks);
     }
@@ -83,7 +83,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "new");
 
-        List<Block> blocks = macro.execute(properties, null, new DOM(Collections.EMPTY_LIST));
+        List<Block> blocks = macro.execute(properties, null, new XDOM(Collections.EMPTY_LIST));
 
         assertBlocks(expected, blocks);
     }

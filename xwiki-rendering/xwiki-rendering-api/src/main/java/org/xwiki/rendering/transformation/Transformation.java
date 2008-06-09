@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.transformation;
 
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
@@ -50,6 +50,6 @@ public interface Transformation extends Comparable<Transformation>
      *        registered against syntaxes. For example "xwiki/2.0", "confluence/1.0", etc.
      * @throws TransformationException if the transformation fails for any reason
      */
-    void transform(DOM dom, Syntax syntax)
+    void transform(XDOM dom, Syntax syntax)
         throws TransformationException;
 }

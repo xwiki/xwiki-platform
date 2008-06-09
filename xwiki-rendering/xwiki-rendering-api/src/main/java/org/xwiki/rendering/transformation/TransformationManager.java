@@ -19,7 +19,7 @@
  */
 package org.xwiki.rendering.transformation;
 
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
@@ -33,5 +33,5 @@ public interface TransformationManager
      */
     public final static String ROLE = TransformationManager.class.getName();
 
-    void performTransformations(DOM dom, Syntax syntax) throws TransformationException;
+    void performTransformations(XDOM dom, Syntax syntax) throws TransformationException;
 }

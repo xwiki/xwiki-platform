@@ -25,7 +25,7 @@ import java.io.StringWriter;
 import java.io.StringReader;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -49,9 +49,9 @@ public class VelocityMacro extends AbstractMacro
 
     /**
      * {@inheritDoc}
-     * @see Macro#execute(Map, String, org.xwiki.rendering.block.DOM)
+     * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, DOM dom)
+    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom)
         throws MacroExecutionException
     {
         // 1) Run Velocity on macro block content
@@ -69,7 +69,7 @@ public class VelocityMacro extends AbstractMacro
         String velocityResult = writer.toString();
 
         // 2) Run the wiki syntax parser on the velocity-rendered content
-        DOM parsedDom;
+        XDOM parsedDom;
         try {
             parsedDom = this.parser.parse(new StringReader(velocityResult));
         } catch (ParseException e) {

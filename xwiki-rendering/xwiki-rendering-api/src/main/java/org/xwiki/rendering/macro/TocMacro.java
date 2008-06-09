@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 
 /**
  * @version $Id$
@@ -33,7 +33,7 @@ public class TocMacro extends AbstractMacro
 {
     private boolean isNumbered;
     
-    public List<Block> execute(Map<String, String> parameters, String content, final DOM dom)
+    public List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
     {
         // Example:
         // 1 Section1

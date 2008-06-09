@@ -31,7 +31,7 @@ import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BoldBlock;
 import org.xwiki.rendering.block.BulletedListBlock;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.ItalicBlock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
@@ -63,9 +63,9 @@ public class DocumentGeneratorSink implements Sink
         }
     }
 
-    public DOM getDOM()
+    public XDOM getDOM()
     {
-        return new DOM(generateListFromStack());
+        return new XDOM(generateListFromStack());
     }
 
     public void anchor(String arg0)

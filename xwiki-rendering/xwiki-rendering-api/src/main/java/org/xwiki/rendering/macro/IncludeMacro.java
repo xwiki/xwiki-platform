@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.DOM;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -91,10 +91,10 @@ public class IncludeMacro extends AbstractMacro implements Initializable
 
     /**
      * {@inheritDoc}
-     * @see Macro#execute(Map, String, org.xwiki.rendering.block.DOM)
+     * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
     public List<Block> execute(Map<String, String> parameters, String content,
-        DOM dom) throws MacroExecutionException
+        XDOM dom) throws MacroExecutionException
     {
         List<Block> result;
 
@@ -185,7 +185,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
     private List<Block> generateIncludedPageDOM(String includedDocumentName, String includedContent,
         boolean runMacroTransformation) throws MacroExecutionException
     {
-        DOM includedDom;
+        XDOM includedDom;
         try {
             includedDom = this.parser.parse(new StringReader(includedContent));
 

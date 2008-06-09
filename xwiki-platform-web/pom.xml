@@ -29,14 +29,14 @@
     <relativePath>../xwiki-platform-pom</relativePath>
   </parent>
   <artifactId>xwiki-web</artifactId>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.4.1</version>
   <name>XWiki Platform - Web - Parent POM</name>
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/branches/xwiki-web-1.4</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/branches/xwiki-web-1.4</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/branches/xwiki-web-1.4</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/tags/xwiki-web-1.4.1</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/tags/xwiki-web-1.4.1</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/tags/xwiki-web-1.4.1</url>
   </scm>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->

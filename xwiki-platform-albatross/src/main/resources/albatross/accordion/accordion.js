@@ -16,9 +16,7 @@
 if (typeof Effect == 'undefined') 
 	throw("accordion.js requires including script.aculo.us' effects.js library!");
 
-var accordion = Class.create();
-accordion.prototype = {
-
+var accordion = Class.create({
 	//
 	//  Setup the Variables
 	//
@@ -198,5 +196,4 @@ accordion.prototype = {
 			}.bind(this)
 		});
 	}
-}
-	
+});

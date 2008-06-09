@@ -35,9 +35,7 @@ Ajax.XWikiRequest = Class.create(Ajax.Request, {
     }
 });
 
-var XWiki = Class.create();
-
-XWiki.prototype = {
+var XWiki = Class.create({
     initialize: function(wikiUrl){this.wikiUrl = wikiUrl;},
     getSpaces: function(callBack){
         var params = '';
@@ -48,7 +46,7 @@ XWiki.prototype = {
         var xml = ajaxResponse.responseXML;
 
     }
-}
+});
 
 function selectPackage(name)
 {

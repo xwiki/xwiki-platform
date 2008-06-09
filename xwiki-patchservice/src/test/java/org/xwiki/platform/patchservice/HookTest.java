@@ -142,6 +142,39 @@ public class HookTest extends MockObjectTestCase
         assertEquals(newDoc.getContent(), origDoc.getContent());
     }
 
+    public void testRemovingAllContent() throws XWikiException
+    {
+        XWikiDocument origDoc = new XWikiDocument("XWiki", "Document");
+        origDoc.setContent("First line\n");
+        XWikiDocument newDoc = (XWikiDocument) origDoc.clone();
+        newDoc.setContent("");
+        PatchImpl p = (PatchImpl) new PatchCreator().getPatch(origDoc, newDoc, null);
+        p.apply(origDoc, null);
+        assertEquals(newDoc.getContent(), origDoc.getContent());
+    }
+
+    public void testRemovingAllContentExceptNewLine() throws XWikiException
+    {
+        XWikiDocument origDoc = new XWikiDocument("XWiki", "Document");
+        origDoc.setContent("First line\n");
+        XWikiDocument newDoc = (XWikiDocument) origDoc.clone();
+        newDoc.setContent("\n");
+        PatchImpl p = (PatchImpl) new PatchCreator().getPatch(origDoc, newDoc, null);
+        p.apply(origDoc, null);
+        assertEquals(newDoc.getContent(), origDoc.getContent());
+    }
+
+    public void testReplacingContentWithNewLine() throws XWikiException
+    {
+        XWikiDocument origDoc = new XWikiDocument("XWiki", "Document");
+        origDoc.setContent("First line");
+        XWikiDocument newDoc = (XWikiDocument) origDoc.clone();
+        newDoc.setContent("\n");
+        PatchImpl p = (PatchImpl) new PatchCreator().getPatch(origDoc, newDoc, null);
+        p.apply(origDoc, null);
+        assertEquals(newDoc.getContent(), origDoc.getContent());
+    }
+
     public void testPropertyChanges() throws XWikiException
     {
         XWikiDocument origDoc = new XWikiDocument("XWiki", "Document");

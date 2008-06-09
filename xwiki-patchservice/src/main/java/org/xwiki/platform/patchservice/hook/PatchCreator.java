@@ -75,7 +75,10 @@ public class PatchCreator implements EventListener, org.xwiki.platform.patchserv
         System.out.println("Before: " + doc.getOriginalDocument().getContent());
         System.out.println("After: " + doc.getContent());
         Patch p = getPatch(doc.getOriginalDocument(), doc, (XWikiContext) data);
-        this.plugin.logPatch(p);
+        // Only log patches that change the document in some way
+        if (p.getOperations().size() > 0) {
+            this.plugin.logPatch(p);
+        }
     }
 
     public Patch getPatch(XWikiDocument oldDoc, XWikiDocument newDoc, XWikiContext context)
@@ -147,18 +150,21 @@ public class PatchCreator implements EventListener, org.xwiki.platform.patchserv
         // removed or added.
         String oldContent = oldDoc.getContent();
         String newContent = newDoc.getContent();
-        if (oldContent.charAt(oldContent.length() - 1) == '\n' && newContent.charAt(newContent.length() - 1) != '\n') {
+        if ("\n".equals(StringUtils.right(oldContent, 1)) && !"\n".equals(StringUtils.right(newContent, 1))) {
             RWOperation delete = OperationFactoryImpl.getInstance().newOperation(Operation.TYPE_CONTENT_DELETE);
             String[] lines = newContent.split("\n");
             Position p = new PositionImpl(lines.length - 1, lines[lines.length - 1].length());
             delete.delete("\n", p);
             patch.addOperation(delete);
-        } else if (oldContent.charAt(oldContent.length() - 1) != '\n'
-            && newContent.charAt(newContent.length() - 1) == '\n')
-        {
+        } else if (!"\n".equals(StringUtils.right(oldContent, 1)) && "\n".equals(StringUtils.right(newContent, 1))) {
             RWOperation insert = OperationFactoryImpl.getInstance().newOperation(Operation.TYPE_CONTENT_INSERT);
             String[] lines = newContent.split("\n");
-            Position p = new PositionImpl(lines.length - 1, lines[lines.length - 1].length());
+            Position p;
+            if (lines.length == 0) {
+                p = new PositionImpl(0, 0);
+            } else {
+                p = new PositionImpl(lines.length - 1, lines[lines.length - 1].length());
+            }
             insert.insert("\n", p);
             patch.addOperation(insert);
         }

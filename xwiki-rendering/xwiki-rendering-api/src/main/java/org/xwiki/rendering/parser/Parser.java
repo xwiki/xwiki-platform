@@ -23,6 +23,10 @@ import java.io.Reader;
 
 import org.xwiki.rendering.block.DOM;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface Parser
 {
     /**

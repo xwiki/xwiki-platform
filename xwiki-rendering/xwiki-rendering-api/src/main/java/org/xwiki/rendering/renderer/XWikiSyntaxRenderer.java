@@ -28,6 +28,10 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XWikiSyntaxRenderer implements Renderer
 {
     private PrintWriter writer;

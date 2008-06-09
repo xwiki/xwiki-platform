@@ -43,6 +43,10 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class DocumentGeneratorSink implements Sink
 {
     private Stack<Block> stack = new Stack<Block>();

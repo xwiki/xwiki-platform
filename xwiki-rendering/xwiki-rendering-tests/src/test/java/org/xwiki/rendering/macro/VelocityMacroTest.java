@@ -26,6 +26,12 @@ import org.xwiki.rendering.block.DOM;
 import java.util.List;
 import java.util.Collections;
 
+/**
+ * Unit tests for {@link org.xwiki.rendering.macro.VelocityMacro}.
+ *
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class VelocityMacroTest extends AbstractRenderingTestCase
 {
     public void testMacro() throws Exception

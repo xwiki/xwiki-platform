@@ -26,6 +26,12 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.DOM;
 
+/**
+ * Unit tests for {@link org.xwiki.rendering.macro.XHTMLMacro}.
+ * 
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XHTMLMacroTest extends AbstractRenderingTestCase
 {
     public void testMacro() throws Exception

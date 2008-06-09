@@ -22,6 +22,10 @@ package org.xwiki.rendering.transformation;
 import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.parser.Syntax;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface TransformationManager
 {
     /**
@@ -29,6 +33,5 @@ public interface TransformationManager
      */
     public final static String ROLE = TransformationManager.class.getName();
 
-    void performTransformations(DOM dom, Syntax syntax)
-        throws TransformationException;
+    void performTransformations(DOM dom, Syntax syntax) throws TransformationException;
 }

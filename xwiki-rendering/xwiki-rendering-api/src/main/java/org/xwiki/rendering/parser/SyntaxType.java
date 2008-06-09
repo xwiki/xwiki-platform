@@ -19,6 +19,10 @@
  */
 package org.xwiki.rendering.parser;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public enum SyntaxType
 {
     XWIKI("XWiki"),

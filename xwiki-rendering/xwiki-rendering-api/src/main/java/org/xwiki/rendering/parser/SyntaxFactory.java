@@ -21,6 +21,10 @@ package org.xwiki.rendering.parser;
 
 import java.util.List;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public interface SyntaxFactory
 {
     /**

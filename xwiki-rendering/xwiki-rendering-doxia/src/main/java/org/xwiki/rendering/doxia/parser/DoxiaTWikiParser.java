@@ -23,6 +23,10 @@ import org.apache.maven.doxia.module.twiki.TWikiParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class DoxiaTWikiParser extends AbstractDoxiaParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.TWIKI, "1.0");

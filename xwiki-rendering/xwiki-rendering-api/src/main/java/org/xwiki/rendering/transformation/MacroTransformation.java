@@ -41,6 +41,9 @@ import org.xwiki.rendering.parser.Syntax;
  *   <li>provide a hint specifying when they should run (priority)</li>
  *   <li>generate other Macros</li>
  * </ul>
+ *
+ * @version $Id$
+ * @since 1.5M2
  */
 public class MacroTransformation extends AbstractTransformation implements Composable
 {

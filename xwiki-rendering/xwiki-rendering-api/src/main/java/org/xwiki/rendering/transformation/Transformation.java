@@ -27,6 +27,9 @@ import org.xwiki.rendering.parser.Syntax;
  * This used for example for transforming Macro Blocks into other Blocks corresponding to the execution of the Macros.
  * Another example of transformation would be looking for all words that have an entry on Wikipedia and adding links
  * to them.
+ * 
+ * @version $Id$
+ * @since 1.5M2
  */
 public interface Transformation extends Comparable<Transformation>
 {

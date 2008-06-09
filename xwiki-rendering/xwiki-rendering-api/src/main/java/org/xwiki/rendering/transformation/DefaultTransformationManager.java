@@ -30,6 +30,10 @@ import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.DOM;
 import org.xwiki.rendering.parser.Syntax;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class DefaultTransformationManager implements TransformationManager, Composable, Initializable
 {
     private ComponentManager componentManager;

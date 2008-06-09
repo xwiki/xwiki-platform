@@ -23,6 +23,12 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
+/**
+ * Unit tests for {@link org.xwiki.rendering.macro.DefaultMacroFactory}.
+ *
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
 {
     public void testGetExistingMacro() throws Exception

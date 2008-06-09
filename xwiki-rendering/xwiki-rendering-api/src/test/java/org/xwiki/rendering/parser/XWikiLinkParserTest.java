@@ -22,6 +22,10 @@ package org.xwiki.rendering.parser;
 import junit.framework.TestCase;
 import org.xwiki.rendering.listener.Link;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XWikiLinkParserTest extends TestCase
 {
     public void testParseLinkWhenOnlyReferenceIsSpecified() throws Exception

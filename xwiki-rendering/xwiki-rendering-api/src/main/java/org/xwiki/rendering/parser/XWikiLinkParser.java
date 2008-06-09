@@ -27,6 +27,10 @@ import java.net.URL;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XWikiLinkParser implements LinkParser
 {
     // Implementation note: We're not using regex in general in order to provide better error

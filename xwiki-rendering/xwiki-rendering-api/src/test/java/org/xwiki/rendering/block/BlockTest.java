@@ -30,6 +30,10 @@ import org.xwiki.rendering.listener.SectionLevel;
 
 import junit.framework.TestCase;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class BlockTest extends TestCase
 {
     public void testGetBlocksByType()

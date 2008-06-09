@@ -27,6 +27,10 @@ import org.xwiki.rendering.doxia.internal.DocumentGeneratorSink;
 
 import java.io.Reader;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements Parser
 {
     public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();

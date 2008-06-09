@@ -48,7 +48,7 @@ import com.xpn.xwiki.plugin.XWikiPluginInterface;
 /**
  * See {@link com.xpn.xwiki.plugin.zipexplorer.ZipExplorerPluginAPI} for documentation.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class ZipExplorerPlugin extends XWikiDefaultPlugin
 {

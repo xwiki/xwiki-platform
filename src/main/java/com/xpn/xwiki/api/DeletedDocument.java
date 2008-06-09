@@ -31,7 +31,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Information about deleted document in recycle bin.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DeletedDocument extends Api
 {

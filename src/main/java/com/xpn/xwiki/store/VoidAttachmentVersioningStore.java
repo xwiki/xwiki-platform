@@ -36,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiAttachmentArchive;
  * It says what there is only one version of attachment - latest.
  * It doesn't store anything. It is safe to use with any stores.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public class VoidAttachmentVersioningStore implements AttachmentVersioningStore

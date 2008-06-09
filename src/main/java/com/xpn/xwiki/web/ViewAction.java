@@ -32,7 +32,7 @@ import java.io.IOException;
  * Action called when the request URL has the "/view/" string in its path (this is configured in
  * <code>struts-config.xml</code>. It means the request is to display a page in view mode.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ViewAction extends XWikiAction
 {

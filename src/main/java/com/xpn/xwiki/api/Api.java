@@ -26,7 +26,7 @@ import com.xpn.xwiki.XWikiException;
  * Base class for all API Objects. API Objects are the Java Objects that can be manipulated from
  * Velocity or Groovy in XWiki documents.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class Api
 {

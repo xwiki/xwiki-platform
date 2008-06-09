@@ -28,14 +28,14 @@ import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 /**
  * The document statistics database object.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DocumentStats extends XWikiStats
 {
     /**
      * The properties of document statistics object.
      * 
-     * @version $Id: $
+     * @version $Id$
      */
     public enum Property
     {

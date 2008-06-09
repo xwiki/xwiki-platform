@@ -30,7 +30,7 @@ import java.util.Map;
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public privileged aspect XWikiCompatibilityAspect
 {

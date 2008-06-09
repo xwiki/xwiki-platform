@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * Contains differences between revisions. One field (diff for xml or full xml) for now.
  * Created for easy migration to future XWikiPatch system.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class XWikiPatch

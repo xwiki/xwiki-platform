@@ -56,7 +56,7 @@ import java.util.HashMap;
  * if they have never logged in before and synchronizes membership to XWiki groups based on
  * membership to LDAP groups.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.3 M2
  */
 public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl

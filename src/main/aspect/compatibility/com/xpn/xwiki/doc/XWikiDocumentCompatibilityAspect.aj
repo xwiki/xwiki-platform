@@ -7,7 +7,7 @@ import com.xpn.xwiki.objects.BaseObject;
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.doc.XWikiDocument} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public aspect XWikiDocumentCompatibilityAspect
 {

@@ -49,7 +49,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 /**
  * Utility class for statistics.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public final class StatsUtil
 {
@@ -136,7 +136,7 @@ public final class StatsUtil
     /**
      * The type of the period.
      * 
-     * @version $Id: $
+     * @version $Id$
      * @since 1.4M1
      */
     public enum PeriodType

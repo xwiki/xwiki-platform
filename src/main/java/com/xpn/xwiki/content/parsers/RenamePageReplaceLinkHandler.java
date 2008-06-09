@@ -24,7 +24,7 @@ import com.xpn.xwiki.content.Link;
 /**
  * A replacement link handler used for renaming documents and backlinks pointing to them.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class RenamePageReplaceLinkHandler implements ReplaceLinkHandler
 {

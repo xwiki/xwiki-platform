@@ -27,7 +27,7 @@ import com.xpn.xwiki.XWikiContext;
  * XML, etc) like {@link XWikiRenderer} do. Example of Interpreters are Velocity and Groovy. An
  * example of a Renderers is Radeox.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public interface XWikiInterpreter
 {

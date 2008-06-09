@@ -23,7 +23,7 @@ package com.xpn.xwiki.store.migration;
  * This entity is store xwiki's data version in database. Used for migrations.
  * Data version is svn revision number from which data need migration.
  * Immutable.
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiDBVersion implements Comparable
 {

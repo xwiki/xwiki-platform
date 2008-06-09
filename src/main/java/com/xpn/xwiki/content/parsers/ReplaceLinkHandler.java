@@ -27,7 +27,7 @@ import com.xpn.xwiki.content.Link;
  * comparing links: for example are 2 links the same if they have different aliases or different
  * query strings?
  *
- * @version $Id: $
+ * @version $Id$
  */
 public interface ReplaceLinkHandler
 {

@@ -34,7 +34,7 @@ import org.apache.commons.lang.StringUtils;
  * <a href="http://wikimodel.sourceforge.net/">WikiModel</a>. In any case parsing should be done
  * with a proper parser, such as ANTLR, JavaCC, etc.</p> 
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class DocumentParser implements ContentParser
 {

@@ -26,7 +26,7 @@ import com.xpn.xwiki.util.AbstractSimpleClass;
 /**
  * Contains differences between document versions.
  * Mutable.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class XWikiRCSNodeContent extends AbstractSimpleClass 

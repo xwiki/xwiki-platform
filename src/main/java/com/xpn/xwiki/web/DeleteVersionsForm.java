@@ -23,7 +23,7 @@ import org.suigeneris.jrcs.rcs.Version;
 
 /**
  * Struts form for {@link DeleteVersionsAction}.
- * @version $Id: $
+ * @version $Id$
  */
 public class DeleteVersionsForm extends XWikiForm
 {

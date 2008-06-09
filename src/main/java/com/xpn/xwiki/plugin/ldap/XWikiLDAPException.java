@@ -5,7 +5,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * LDAP plugin base exception.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiLDAPException extends XWikiException
 {

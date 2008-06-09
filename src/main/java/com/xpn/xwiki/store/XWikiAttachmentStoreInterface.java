@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * Interface for Attachment store system.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface XWikiAttachmentStoreInterface {
     void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;

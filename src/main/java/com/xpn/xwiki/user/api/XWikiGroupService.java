@@ -31,7 +31,7 @@ import java.util.List;
 /**
  * Interface giving access to users and groups management.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface XWikiGroupService
 {

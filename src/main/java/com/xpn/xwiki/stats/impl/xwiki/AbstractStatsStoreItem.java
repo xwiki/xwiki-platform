@@ -30,7 +30,7 @@ import com.xpn.xwiki.stats.impl.StatsUtil.PeriodType;
 /**
  * Base class of interface {@link XWikiStatsStoreItem}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public abstract class AbstractStatsStoreItem implements XWikiStatsStoreItem

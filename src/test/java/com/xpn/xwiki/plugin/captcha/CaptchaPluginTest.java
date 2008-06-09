@@ -28,7 +28,7 @@ import org.jmock.Mock;
 /**
  * Unit tests for {@link CaptchaPlugin}
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
 {

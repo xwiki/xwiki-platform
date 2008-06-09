@@ -54,7 +54,7 @@ import org.securityfilter.filter.SecurityRequestWrapper;
  * xwiki.authentication.validationKey</dd>
  * </dl>
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class MyPersistentLoginManager extends DefaultPersistentLoginManager
 {

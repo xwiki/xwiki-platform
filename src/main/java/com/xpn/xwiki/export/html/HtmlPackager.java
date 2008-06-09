@@ -29,7 +29,7 @@ import com.xpn.xwiki.web.Utils;
 /**
  * Create a ZIP package containing a range of HTML pages with skin and attachment dependencies.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since XWiki Platform 1.3M1
  */
 public class HtmlPackager

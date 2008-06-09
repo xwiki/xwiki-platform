@@ -23,7 +23,7 @@ package com.xpn.xwiki.content.parsers;
  * Classes implementing this interface are used to parse document content. For example the
  * {@link LinkParser} class is used to parse wiki links ("[...]" syntax).
  *
- * @version $Id: $
+ * @version $Id$
  */
 public interface ContentParser
 {

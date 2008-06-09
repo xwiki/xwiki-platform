@@ -35,7 +35,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 /**
  * Unit tests for {@link XWikiDocument}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiDocumentTest extends MockObjectTestCase
 {

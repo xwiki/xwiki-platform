@@ -38,7 +38,7 @@ import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiRightServiceImplTest extends MockObjectTestCase
 {

@@ -25,7 +25,7 @@ import com.xpn.xwiki.api.Context;
 /**
  * Add a backward compatibility layer to the {@link Context} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public privileged aspect ContextCompatibilityAspect
 {

@@ -5,7 +5,7 @@ import com.xpn.xwiki.XWikiContext;
 /**
  * Add a backward compatibility layer to the {@link Utils} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public aspect UtilsCompatibilityAspect
 {

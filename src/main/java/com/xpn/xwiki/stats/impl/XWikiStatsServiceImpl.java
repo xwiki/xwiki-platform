@@ -51,7 +51,7 @@ import java.util.Set;
 /**
  * Store and retrieve statistics.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiStatsServiceImpl implements XWikiStatsService
 {

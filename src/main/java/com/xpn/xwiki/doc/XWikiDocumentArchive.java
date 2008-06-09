@@ -45,7 +45,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 /**
  * Contains document history. Allows to load any version of document.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiDocumentArchive
 {

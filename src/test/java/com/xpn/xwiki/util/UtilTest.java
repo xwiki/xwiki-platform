@@ -25,7 +25,7 @@ import junit.framework.TestCase;
 /**
  * Unit tests for {@link com.xpn.xwiki.util.Util}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class UtilTest extends TestCase
 {

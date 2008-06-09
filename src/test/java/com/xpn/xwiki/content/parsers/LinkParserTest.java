@@ -25,7 +25,7 @@ import com.xpn.xwiki.content.Link;
 /**
  * Unit tests for {@link com.xpn.xwiki.content.parsers.LinkParser}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class LinkParserTest extends TestCase
 {

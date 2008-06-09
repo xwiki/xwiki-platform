@@ -27,7 +27,7 @@ import java.util.Arrays;
 /**
  * Unit tests for {@link com.xpn.xwiki.criteria.impl.Range}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class RangeTest extends TestCase
 {

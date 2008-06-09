@@ -40,7 +40,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 /**
  * Migration for XWIKI1459: keep document history in a separate table
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class R4359XWIKI1459Migrator extends AbstractXWikiHibernateMigrator
 {

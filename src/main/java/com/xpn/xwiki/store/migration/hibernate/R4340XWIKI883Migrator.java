@@ -36,7 +36,7 @@ import com.xpn.xwiki.store.migration.XWikiDBVersion;
 
 /**
  * Migration for XWIKI-883: global access preferences cannot be updated
- * @version $Id: $
+ * @version $Id$
  */
 public class R4340XWIKI883Migrator extends AbstractXWikiHibernateMigrator
 {

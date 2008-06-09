@@ -24,7 +24,7 @@ import com.xpn.xwiki.XWikiException;
 /**
  * Exception raised by Content parsers when they fail to parse some content.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class ContentParserException extends XWikiException
 {

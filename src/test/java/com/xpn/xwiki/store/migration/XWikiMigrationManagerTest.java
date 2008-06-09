@@ -32,7 +32,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.XWikiEngineContext;
 /**
  * Test for {@link AbstractXWikiMigrationManager}
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiMigrationManagerTest extends TestCase
 {

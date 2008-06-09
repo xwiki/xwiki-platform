@@ -35,7 +35,7 @@ import org.suigeneris.jrcs.util.ToString;
 
 /**
  * diff & patch utility.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class XWikiPatchUtils

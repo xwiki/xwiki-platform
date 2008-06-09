@@ -36,7 +36,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * removed from the recycle bin using
  * {@link #deleteFromRecycleBin(XWikiAttachment, long, XWikiContext, boolean)}.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M1
  */
 public interface AttachmentRecycleBinStore

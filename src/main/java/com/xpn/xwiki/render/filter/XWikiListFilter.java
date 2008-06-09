@@ -50,7 +50,7 @@ import org.radeox.regex.MatchResult;
  * 
  * @credits nested list support by Davor Cubranic
  * @credits improved nested list support by Sergiu Dumitriu
- * @version $Id: XWikiListFilter.java,v 1.17 2007/01/02 13:56:14 sdumitriu Exp $
+ * @version $Id$
  */
 public class XWikiListFilter extends ListFilter implements CacheFilter
 {

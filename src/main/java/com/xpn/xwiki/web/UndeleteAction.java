@@ -30,7 +30,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Action for restore document from recycle bin.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public class UndeleteAction extends XWikiAction

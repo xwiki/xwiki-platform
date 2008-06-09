@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.ViewAction;
 /**
  * Reader statistics from XWiki database.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public class XWikiStatsReader

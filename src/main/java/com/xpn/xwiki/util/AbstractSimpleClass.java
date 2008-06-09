@@ -8,7 +8,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Class with {@link Object#equals(Object)}, {@link Object#hashCode()}
  *  and {@link Object#toString()} implemented via commons-lang builders.
  * Useful for extend simple POJO classes.
- * @version $Id: $
+ * @version $Id$
  * @since 1.2M1
  */
 public abstract class AbstractSimpleClass

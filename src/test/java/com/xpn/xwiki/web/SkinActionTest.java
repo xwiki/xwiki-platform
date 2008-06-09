@@ -26,7 +26,7 @@ import org.jmock.cglib.MockObjectTestCase;
 /**
  * Unit tests for the {@link com.xpn.xwiki.web.SkinAction} class.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class SkinActionTest extends MockObjectTestCase
 {

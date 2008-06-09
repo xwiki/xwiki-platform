@@ -43,7 +43,7 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
 /**
  * Realization of {@link XWikiVersioningStoreInterface} for Hibernate-based storage.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore implements
     XWikiVersioningStoreInterface

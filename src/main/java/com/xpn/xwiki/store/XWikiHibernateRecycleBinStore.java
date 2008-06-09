@@ -33,7 +33,7 @@ import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
 /**
  * Realization of {@link XWikiRecycleBinStoreInterface} for Hibernate store.
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore implements
     XWikiRecycleBinStoreInterface

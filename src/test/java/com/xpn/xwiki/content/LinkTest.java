@@ -26,7 +26,7 @@ import junit.framework.TestCase;
  * {@link com.xpn.xwiki.content.Link} are done in
  * {@link com.xpn.xwiki.content.parsers.LinkParserTest}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class LinkTest extends TestCase
 {

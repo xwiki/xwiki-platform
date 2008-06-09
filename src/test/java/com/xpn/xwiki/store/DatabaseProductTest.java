@@ -5,7 +5,7 @@ import junit.framework.TestCase;
 /**
  * Unit tests for {@link DatabaseProduct}.
  *
- * @version $Id: DeployableTypeTest.java 1160 2006-07-30 20:15:34Z vmassol $
+ * @version $Id$
  */
 public class DatabaseProductTest extends TestCase
 {

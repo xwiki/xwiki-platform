@@ -3,7 +3,7 @@ package com.xpn.xwiki.plugin.ldap;
 /**
  * Represent an LDAP attribute.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.3 M2
  */
 public class XWikiLDAPSearchAttribute

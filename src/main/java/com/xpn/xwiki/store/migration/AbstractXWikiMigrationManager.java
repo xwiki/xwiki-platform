@@ -30,7 +30,7 @@ import java.util.*;
 /**
  * Template for {@link XWikiMigrationManagerInterface}.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractXWikiMigrationManager implements XWikiMigrationManagerInterface
 {

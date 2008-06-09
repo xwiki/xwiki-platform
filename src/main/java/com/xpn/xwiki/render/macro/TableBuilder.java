@@ -26,7 +26,7 @@ import java.util.StringTokenizer;
  * Built a table from a string
  *
  * @author stephan
- * @version $Id: TableBuilder.java,v 1.3 2003/10/06 08:30:02 stephan Exp $
+ * @version $Id$
  */
 
 public class TableBuilder {

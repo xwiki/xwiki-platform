@@ -32,7 +32,7 @@ import java.util.List;
  * 
  * This is the wrapper accessible from in-document scripts.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class FileUploadPluginApi extends PluginApi<FileUploadPlugin>
 {

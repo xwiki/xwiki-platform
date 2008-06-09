@@ -36,7 +36,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 /**
  * Store referer statistics into the database.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M2
  */
 public class RefererStatsStoreItem extends AbstractStatsStoreItem

@@ -47,7 +47,7 @@ import com.xpn.xwiki.util.Util;
  * This action indicates that the results should be publicly cacheable for 30 days.
  * </p>
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.0
  */
 public class SkinAction extends XWikiAction

@@ -30,7 +30,7 @@ import com.xpn.xwiki.util.AbstractSimpleClass;
  * Archive of deleted attachment, stored in {@link com.xpn.xwiki.store.AttachmentRecycleBinStore}.
  * Immutable, because deleted attachments should not be modified.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.4M1
  */
 public class DeletedAttachment extends AbstractSimpleClass

@@ -29,7 +29,7 @@ import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 /**
  * Unit tests for {@link com.xpn.xwiki.objects.classes.DBTreeListClass}.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DBTreeListClassTest extends AbstractXWikiComponentTestCase
 {

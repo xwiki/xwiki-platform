@@ -38,7 +38,7 @@ import com.xpn.xwiki.criteria.impl.Scope;
 /**
  * Store and retrieve statistics.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface XWikiStatsService extends XWikiActionNotificationInterface
 {

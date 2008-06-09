@@ -24,7 +24,7 @@ import junit.framework.TestCase;
 /**
  * Unit tests for the {@link XWikiHibernateStore} class.
  *
- * @version $Id: $
+ * @version $Id$
  */
 public class XWikiHibernateStoreTest extends TestCase
 {

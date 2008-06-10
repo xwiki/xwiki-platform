@@ -1888,8 +1888,7 @@ public class XWikiDocument
         copyAttachments(document);
         this.elements = document.elements;
 
-        // Note: We don't set the original document as it's already been set in the constructor
-        // when this object was instantiated.
+        this.originalDocument = document.originalDocument;
     }
 
     @Override
@@ -1940,9 +1939,7 @@ public class XWikiDocument
             doc.copyAttachments(this);
             doc.elements = this.elements;
 
-            // Note: We don't set the original document in the clone since the clone has already
-            // been instantiated (as it's passed as parameter) and thus its original document is
-            // already set.
+            doc.originalDocument = this.originalDocument;
         } catch (Exception e) {
             // This should not happen
             log.error("Exception while doc.clone", e);
@@ -2507,8 +2504,8 @@ public class XWikiDocument
         setMetaDataDirty(false);
         setContentDirty(false);
 
-        // Note: We don't set the original document as it's already been set in the constructor
-        // when this object was instantiated.
+        // Note: We don't set the original document as that is not stored in the XML, and it doesn't make much sense to
+        // have an original document for a de-serialized object.
     }
 
     /**

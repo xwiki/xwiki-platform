@@ -83,7 +83,7 @@ public class EditForm extends XWikiForm
     public void setTags(String[] parameter)
     {
         if (parameter == null) {
-            this.tags = "";
+            this.tags = null;
             return;
         }
         StringBuffer tags = new StringBuffer();

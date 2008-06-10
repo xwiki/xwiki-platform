@@ -50,7 +50,7 @@ public class EditForm extends XWikiForm
     private String title;
 
     private String comment;
-    
+
     private boolean isMinorEdit = false;
 
     private String tags;
@@ -58,7 +58,8 @@ public class EditForm extends XWikiForm
     private boolean lockForce;
 
     private String syntaxId;
-    
+
+    @Override
     public void readRequest()
     {
         XWikiRequest request = getRequest();
@@ -75,7 +76,7 @@ public class EditForm extends XWikiForm
         setDefaultLanguage(request.getParameter("default_language"));
         setTags(request.getParameterValues("tags"));
         setLockForce("1".equals(request.getParameter("force")));
-        setMinorEdit(request.getParameter("minor_edit")!=null);
+        setMinorEdit(request.getParameter("minor_edit") != null);
         setSyntaxId(request.getParameter("syntaxId"));
     }
 
@@ -102,12 +103,12 @@ public class EditForm extends XWikiForm
 
     public String getTags()
     {
-        return tags;
+        return this.tags;
     }
 
     public String getContent()
     {
-        return content;
+        return this.content;
     }
 
     public void setContent(String content)
@@ -117,7 +118,7 @@ public class EditForm extends XWikiForm
 
     public String getWeb()
     {
-        return web;
+        return this.web;
     }
 
     public void setWeb(String web)
@@ -127,7 +128,7 @@ public class EditForm extends XWikiForm
 
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     public void setName(String name)
@@ -137,7 +138,7 @@ public class EditForm extends XWikiForm
 
     public String getLanguage()
     {
-        return language;
+        return this.language;
     }
 
     public void setLanguage(String language)
@@ -148,8 +149,9 @@ public class EditForm extends XWikiForm
     public int getObjectNumbers(String prefix)
     {
         String nb = getRequest().getParameter(prefix + "_nb");
-        if ((nb == null) || (nb.equals("")))
+        if ((nb == null) || (nb.equals(""))) {
             return 0;
+        }
         return Integer.parseInt(nb);
     }
 
@@ -170,7 +172,7 @@ public class EditForm extends XWikiForm
 
     public String getParent()
     {
-        return parent;
+        return this.parent;
     }
 
     public void setParent(String parent)
@@ -180,7 +182,7 @@ public class EditForm extends XWikiForm
 
     public String getCreator()
     {
-        return creator;
+        return this.creator;
     }
 
     public void setCreator(String creator)
@@ -190,7 +192,7 @@ public class EditForm extends XWikiForm
 
     public String getTemplate()
     {
-        return template;
+        return this.template;
     }
 
     public void setTemplate(String template)
@@ -200,7 +202,7 @@ public class EditForm extends XWikiForm
 
     public String getDefaultTemplate()
     {
-        return defaultTemplate;
+        return this.defaultTemplate;
     }
 
     public void setDefaultTemplate(String defaultTemplate)
@@ -210,7 +212,7 @@ public class EditForm extends XWikiForm
 
     public String getDefaultLanguage()
     {
-        return defaultLanguage;
+        return this.defaultLanguage;
     }
 
     public void setDefaultLanguage(String defaultLanguage)
@@ -220,7 +222,7 @@ public class EditForm extends XWikiForm
 
     public String getTitle()
     {
-        return title;
+        return this.title;
     }
 
     public void setTitle(String title)
@@ -230,19 +232,19 @@ public class EditForm extends XWikiForm
 
     public String getComment()
     {
-        return comment;
+        return this.comment;
     }
 
     public void setComment(String comment)
     {
         this.comment = comment;
     }
-    
+
     public boolean isMinorEdit()
     {
-        return isMinorEdit;
+        return this.isMinorEdit;
     }
-    
+
     public void setMinorEdit(boolean isMinorEdit)
     {
         this.isMinorEdit = isMinorEdit;
@@ -250,7 +252,7 @@ public class EditForm extends XWikiForm
 
     public boolean isLockForce()
     {
-        return lockForce;
+        return this.lockForce;
     }
 
     public void setLockForce(boolean lockForce)

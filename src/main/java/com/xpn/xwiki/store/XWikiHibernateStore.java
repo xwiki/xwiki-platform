@@ -2808,8 +2808,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     {
         String hql =
             "select doc.language from XWikiDocument as doc where doc.web = '"
-                + Utils.SQLFilter(doc.getSpace()) + "' and doc.name = '"
-                + Utils.SQLFilter(doc.getName()) + "' and doc.language <> '' and doc.language is not null";
+                + Utils.SQLFilter(doc.getSpace()) + "' and doc.name = '" + Utils.SQLFilter(doc.getName())
+                + "' and (doc.language <> '' or (doc.language is not null and '' is null))";
         List<String> list = context.getWiki().search(hql, context);
         return (list == null) ? new ArrayList<String>() : list;
     }

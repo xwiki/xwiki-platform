@@ -19,16 +19,13 @@
  */
 package com.xpn.xwiki.plugin.scheduler;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Api;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.objects.BaseObject;
-import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
-import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.web.XWikiServletRequest;
+import java.net.URL;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;
@@ -39,17 +36,20 @@ import org.quartz.SchedulerException;
 import org.quartz.Trigger;
 import org.quartz.impl.StdSchedulerFactory;
 
-import java.net.URL;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
+import com.xpn.xwiki.plugin.XWikiPluginInterface;
+import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
- *
+ * 
  * @version $Id: $
  */
 public class SchedulerPlugin extends XWikiDefaultPlugin
@@ -60,8 +60,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     private static final Log LOG = LogFactory.getLog(SchedulerPlugin.class);
 
     /**
-     * Fullname of the XWiki Scheduler Job Class representing a job that can be scheduled by this
-     * plugin.
+     * Fullname of the XWiki Scheduler Job Class representing a job that can be scheduled by this plugin.
      */
     public static final String XWIKI_JOB_CLASS = "XWiki.SchedulerJobClass";
 
@@ -71,26 +70,26 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     private Scheduler scheduler;
 
     /**
-     * {@inheritDoc}
-     *
+     * Default plugin constructor.
+     * 
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public SchedulerPlugin(String name, String className, XWikiContext context)
     {
-        super(name, className, context);        
+        super(name, className, context);
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiPluginInterface#init(com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public void init(XWikiContext context)
     {
         try {
-            String initialDb =
-                !context.getDatabase().equals("") ? context.getDatabase() : context.getMainXWiki();
-            List wikiServers = Collections.EMPTY_LIST;
+            String initialDb = !context.getDatabase().equals("") ? context.getDatabase() : context.getMainXWiki();
+            List<String> wikiServers = Collections.emptyList();
 
             if (context.getWiki().isVirtualMode()) {
                 try {
@@ -102,13 +101,13 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     LOG.error("error getting list of wiki servers!", e);
                 }
             } else {
-                wikiServers = new ArrayList();
+                wikiServers = new ArrayList<String>();
                 wikiServers.add(context.getMainXWiki());
             }
 
             try {
-                for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
-                    context.setDatabase((String) iter.next());
+                for (String wikiName : wikiServers) {
+                    context.setDatabase(wikiName);
                     updateSchedulerJobClass(context);
                 }
             } finally {
@@ -119,15 +118,15 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             // the JVM can exit properly.
             System.setProperty("org.quartz.scheduler.makeSchedulerThreadDaemon", "true");
             System.setProperty("org.quartz.threadPool.makeThreadsDaemons", "true");
-            
+
             setScheduler(getDefaultSchedulerInstance());
             setStatusListener();
             getScheduler().start();
 
             try {
                 // Iterate on all virtual wikis
-                for (Iterator iter = wikiServers.iterator(); iter.hasNext();) {
-                    context.setDatabase((String) iter.next());
+                for (String wikiName : wikiServers) {
+                    context.setDatabase(wikiName);
                     restoreExistingJobs(context);
                 }
             } finally {
@@ -143,28 +142,26 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
     }
 
     /**
-     * Create and feed a stub context for the job execution thread. Stub context data are retrieved
-     * from job object fields "contextUser", "contextLang", "contextDatabase". If one of this field
-     * is empty (this would typically happen on the first schedule operation), it is instead
-     * retrieved from the passed context, and the job object is updated with this value. This mean
-     * that this method may modify the passed object.
-     *
+     * Create and feed a stub context for the job execution thread. Stub context data are retrieved from job object
+     * fields "contextUser", "contextLang", "contextDatabase". If one of this field is empty (this would typically
+     * happen on the first schedule operation), it is instead retrieved from the passed context, and the job object is
+     * updated with this value. This mean that this method may modify the passed object.
+     * 
      * @param job the job for which the context will be prepared
-     * @param context the XWikiContext at preparation time. This is a real context associated with a
-     * servlet request
+     * @param context the XWikiContext at preparation time. This is a real context associated with a servlet request
      * @return the stub context prepared with job datas.
      */
-    private XWikiContext prepareJobStubContext(BaseObject job, XWikiContext context)
-        throws SchedulerPluginException
+    private XWikiContext prepareJobStubContext(BaseObject job, XWikiContext context) throws SchedulerPluginException
     {
         boolean jobNeedsUpdate = true;
         String cUser = job.getStringValue("contextUser");
@@ -193,23 +190,21 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             try {
                 context.setDatabase(cDb);
                 XWikiDocument jobHolder = context.getWiki().getDocument(job.getName(), context);
-                BaseObject jObj =
-                    jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, job.getNumber());
+                // TODO: Something is missing here. Review needed.
+                BaseObject jObj = jobHolder.getObject(SchedulerPlugin.XWIKI_JOB_CLASS, job.getNumber());
                 jobHolder.setMinorEdit(true);
                 context.getWiki().saveDocument(jobHolder, context);
-            }
-            catch (XWikiException e) {
+            } catch (XWikiException e) {
                 throw new SchedulerPluginException(
                     SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
-                    "Failed to prepare context for job with job name " +
-                        job.getStringValue("jobName"), e);
+                    "Failed to prepare context for job with job name " + job.getStringValue("jobName"), e);
             } finally {
                 context.setDatabase(iDb);
             }
         }
 
-        //lets now build the stub context        
-        XWikiContext scontext = (XWikiContext)context.clone();
+        // lets now build the stub context
+        XWikiContext scontext = (XWikiContext) context.clone();
         scontext.setWiki(context.getWiki());
 
         // We are sure the context request is a real servlet request
@@ -234,87 +229,76 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
         com.xpn.xwiki.web.XWikiURLFactory xurf = context.getURLFactory();
         if (xurf == null) {
-            xurf = context.getWiki().getURLFactoryService()
-                .createURLFactory(context.getMode(), context);
+            xurf = context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context);
         }
         scontext.setURLFactory(xurf);
 
         try {
             XWikiDocument cDoc = context.getWiki().getDocument(job.getName(), context);
             scontext.setDoc(cDoc);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new SchedulerPluginException(
                 SchedulerPluginException.ERROR_SCHEDULERPLUGIN_UNABLE_TO_PREPARE_JOB_CONTEXT,
-                "Failed to prepare context for job with job name " + job.getStringValue("jobName"),
-                e);
+                "Failed to prepare context for job with job name " + job.getStringValue("jobName"), e);
         }
 
         return scontext;
     }
 
     /**
-     * Restore the existing job, by looking up for such job in the database and re-scheduling those
-     * according to their stored status. If a Job is stored with the status "Normal", it is just
-     * scheduled If a Job is stored with the status "Paused", then it is both scheduled and paused
-     * Jobs with other status (None, Complete) are not rescheduled.
-     *
+     * Restore the existing job, by looking up for such job in the database and re-scheduling those according to their
+     * stored status. If a Job is stored with the status "Normal", it is just scheduled If a Job is stored with the
+     * status "Paused", then it is both scheduled and paused Jobs with other status (None, Complete) are not
+     * rescheduled.
+     * 
      * @param context The XWikiContext when initializing the plugin
      */
     private void restoreExistingJobs(XWikiContext context) throws SchedulerPluginException
     {
-        int retval = 0;
-
-        String hql = ", BaseObject as obj where doc.web='Scheduler'" +
-            " and obj.name=doc.fullName and obj.className='XWiki.SchedulerJobClass'";
+        String hql =
+            ", BaseObject as obj where doc.web='Scheduler' and obj.name=doc.fullName and "
+                + "obj.className='XWiki.SchedulerJobClass'";
         try {
-            List jobsDocsNames = context.getWiki().getStore().searchDocumentsNames(hql, context);
-            for (int i = 0; i < jobsDocsNames.size(); i++) {
-                XWikiDocument jobDoc =
-                    context.getWiki().getDocument((String) jobsDocsNames.get(i), context);
+            List<String> jobsDocsNames = context.getWiki().getStore().searchDocumentsNames(hql, context);
+            for (String docName : jobsDocsNames) {
+                XWikiDocument jobDoc = context.getWiki().getDocument(docName, context);
                 BaseObject jobObj = jobDoc.getObject(XWIKI_JOB_CLASS);
                 String jobName = jobObj.getStringValue("jobName");
                 try {
                     String status = jobObj.getStringValue("status");
-                    if (status.equals(JobState.STATE_NORMAL) ||
-                        status.equals(JobState.STATE_PAUSED))
-                    {
+                    if (status.equals(JobState.STATE_NORMAL) || status.equals(JobState.STATE_PAUSED)) {
                         this.scheduleJob(jobObj, context);
                     }
                     if (status.equals(JobState.STATE_PAUSED)) {
                         this.pauseJob(jobObj, context);
                     }
                 } catch (XWikiException e) {
-                    throw new SchedulerPluginException(
-                        SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_JOB,
+                    throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_JOB,
                         "Failed to restore job with job name " + jobName, e);
                 }
             }
         } catch (XWikiException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_EXISTING_JOBS,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESTORE_EXISTING_JOBS,
                 "Failed to restore existing scheduler jobs", e);
         }
     }
 
     /**
-     * Retrieve the job's status of a given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS}
-     * job XObject, by asking the actual job status to the quartz scheduler instance. It's the
-     * actual status, as the one stored in the XObject may be changed manually by users.
-     *
+     * Retrieve the job's status of a given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS} job
+     * XObject, by asking the actual job status to the quartz scheduler instance. It's the actual status, as the one
+     * stored in the XObject may be changed manually by users.
+     * 
      * @param object the XObject to give the status of
-     * @return the status of the Job inside the quartz scheduler, as {@link
-     *         com.xpn.xwiki.plugin.scheduler.JobState} instance
+     * @return the status of the Job inside the quartz scheduler, as {@link com.xpn.xwiki.plugin.scheduler.JobState}
+     *         instance
      */
     public JobState getJobStatus(BaseObject object, XWikiContext context) throws SchedulerException
     {
-        int state = getScheduler()
-            .getTriggerState(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
+        int state = getScheduler().getTriggerState(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
         return new JobState(state);
     }
 
-    public boolean scheduleJob(BaseObject object, XWikiContext context)
-        throws SchedulerPluginException
+    public boolean scheduleJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
         boolean scheduled = true;
         try {
@@ -323,11 +307,12 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             // compute the job unique Id
             String xjob = getObjectUniqueId(object, context);
 
-            JobDetail job = new JobDetail(xjob, Scheduler.DEFAULT_GROUP,
-                Class.forName(object.getStringValue("jobClass")));
+            JobDetail job =
+                new JobDetail(xjob, Scheduler.DEFAULT_GROUP, Class.forName(object.getStringValue("jobClass")));
 
-            Trigger trigger = new CronTrigger(xjob, Scheduler.DEFAULT_GROUP, xjob,
-                Scheduler.DEFAULT_GROUP, object.getStringValue("cron"));
+            Trigger trigger =
+                new CronTrigger(xjob, Scheduler.DEFAULT_GROUP, xjob, Scheduler.DEFAULT_GROUP, object
+                    .getStringValue("cron"));
 
             // Let's prepare an execution context...
             XWikiContext stubContext = prepareJobStubContext(object, context);
@@ -370,31 +355,24 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                     break;
             }
         } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SCHEDULE_JOB,
                 "Error while scheduling job " + object.getStringValue("jobName"), e);
         } catch (ParseException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_BAD_CRON_EXPRESSION,
-                "Error while parsing cron expression for job " + object.getStringValue("jobName"),
-                e);
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_BAD_CRON_EXPRESSION,
+                "Error while parsing cron expression for job " + object.getStringValue("jobName"), e);
         } catch (ClassNotFoundException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
-                "Error while loading job class for job : " + object.getStringValue("jobName"),
-                e);
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
+                "Error while loading job class for job : " + object.getStringValue("jobName"), e);
         } catch (XWikiException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
-                "Error while saving job status for job : " + object.getStringValue("jobName"),
-                e);
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
+                "Error while saving job status for job : " + object.getStringValue("jobName"), e);
         }
         return scheduled;
     }
 
     /**
      * Pause the job with the given name by pausing all of its current triggers.
-     *
+     * 
      * @param object the non-wrapped XObject Job to be paused
      */
     public void pauseJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -403,20 +381,17 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             getScheduler().pauseJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
             saveStatus("Paused", object, context);
         } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
                 "Error occured while trying to pause job " + object.getStringValue("jobName"), e);
         } catch (XWikiException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
-                "Error occured while trying to save status of job " +
-                    object.getStringValue("jobName"), e);
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_PAUSE_JOB,
+                "Error occured while trying to save status of job " + object.getStringValue("jobName"), e);
         }
     }
 
     /**
      * Resume the job with the given name (un-pause)
-     *
+     * 
      * @param object the non-wrapped XObject Job to be resumed
      */
     public void resumeJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -425,60 +400,51 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             getScheduler().resumeJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
             saveStatus("Normal", object, context);
         } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
                 "Error occured while trying to resume job " + object.getStringValue("jobName"), e);
         } catch (XWikiException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
-                "Error occured while trying to save status of job " +
-                    object.getStringValue("jobName"), e);
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_RESUME_JOB,
+                "Error occured while trying to save status of job " + object.getStringValue("jobName"), e);
         }
     }
 
     /**
      * Unschedule the given job
-     *
+     * 
      * @param object the unwrapped XObject job to be unscheduled
      */
-    public void unscheduleJob(BaseObject object, XWikiContext context)
-        throws SchedulerPluginException
+    public void unscheduleJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
         try {
             getScheduler().deleteJob(getObjectUniqueId(object, context), Scheduler.DEFAULT_GROUP);
             saveStatus("None", object, context);
         } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
                 "Error while unscheduling job " + object.getStringValue("jobName"), e);
         } catch (XWikiException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
                 "Error while saving status of job " + object.getStringValue("jobName"), e);
         }
     }
 
     /**
      * Get Trigger object of the given job
-     *
+     * 
      * @param object the unwrapped XObject to be retrieve the trigger for
      * @return the trigger object of the given job
      */
-    private Trigger getTrigger(BaseObject object, XWikiContext context)
-        throws SchedulerPluginException
+    private Trigger getTrigger(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
         String job = getObjectUniqueId(object, context);
         Trigger trigger;
         try {
             trigger = getScheduler().getTrigger(job, Scheduler.DEFAULT_GROUP);
         } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_XCLASS_NOT_FOUND,
                 "Error while getting trigger for job " + job, e);
         }
         if (trigger == null) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_DOES_NOT_EXITS,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_JOB_DOES_NOT_EXITS,
                 "Job does not exists");
         }
 
@@ -487,12 +453,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Get the next fire time for the given job name SchedulerJob
-     *
+     * 
      * @param object unwrapped XObject job for which the next fire time will be given
      * @return the next Date the job will be fired at
      */
-    public Date getNextFireTime(BaseObject object, XWikiContext context)
-        throws SchedulerPluginException
+    public Date getNextFireTime(BaseObject object, XWikiContext context) throws SchedulerPluginException
     {
         return getTrigger(object, context).getNextFireTime();
     }
@@ -500,6 +465,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new SchedulerPluginApi((SchedulerPlugin) plugin, context);
@@ -508,6 +474,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getName()
     {
         return "scheduler";
@@ -531,18 +498,16 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * @return the default Scheduler instance
-     * @throws SchedulerPluginException if the default Scheduler instance failed to be retrieved for
-     * any reason. Note that on the first call the default scheduler is also initialized.
+     * @throws SchedulerPluginException if the default Scheduler instance failed to be retrieved for any reason. Note
+     *             that on the first call the default scheduler is also initialized.
      */
-    private synchronized Scheduler getDefaultSchedulerInstance()
-        throws SchedulerPluginException
+    private synchronized Scheduler getDefaultSchedulerInstance() throws SchedulerPluginException
     {
         Scheduler scheduler;
         try {
             scheduler = StdSchedulerFactory.getDefaultScheduler();
         } catch (SchedulerException e) {
-            throw new SchedulerPluginException(
-                SchedulerPluginException.ERROR_SCHEDULERPLUGIN_GET_SCHEDULER,
+            throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_GET_SCHEDULER,
                 "Error getting default Scheduler instance", e);
         }
         return scheduler;
@@ -550,7 +515,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Associates the scheduler with a StatusListener
-     *
+     * 
      * @throws SchedulerPluginException if the status listener failed to be set properly
      */
     private void setStatusListener() throws SchedulerPluginException
@@ -566,8 +531,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         }
     }
 
-    private void saveStatus(String status, BaseObject object, XWikiContext context)
-        throws XWikiException
+    private void saveStatus(String status, BaseObject object, XWikiContext context) throws XWikiException
     {
         XWikiDocument jobHolder = context.getWiki().getDocument(object.getName(), context);
         object.setStringValue("status", status);
@@ -576,11 +540,10 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Compute a cross-document unique {@link com.xpn.xwiki.objects.BaseObject} id, by concatenating
-     * its name (it's document holder full name, such as "SomeSpace.SomeDoc") and it's instance
-     * number inside this document. <p/> The scheduler uses this unique object id to assure the
-     * unicity of jobs
-     *
+     * Compute a cross-document unique {@link com.xpn.xwiki.objects.BaseObject} id, by concatenating its name (it's
+     * document holder full name, such as "SomeSpace.SomeDoc") and it's instance number inside this document. <p/> The
+     * scheduler uses this unique object id to assure the unicity of jobs
+     * 
      * @return a unique String that can identify the object
      */
     private String getObjectUniqueId(BaseObject object, XWikiContext context)
@@ -589,9 +552,9 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     }
 
     /**
-     * Creates the XWiki SchedulerJob XClass if it does not exist in the wiki. Update it if it
-     * exists but is missing some properties.
-     *
+     * Creates the XWiki SchedulerJob XClass if it does not exist in the wiki. Update it if it exists but is missing
+     * some properties.
+     * 
      * @param context the XWiki context
      * @throws SchedulerPluginException if the updated SchedulerJob XClass failed to be saved
      */
@@ -625,10 +588,8 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             try {
                 xwiki.saveDocument(doc, context);
             } catch (XWikiException ex) {
-                throw new SchedulerPluginException(
-                    SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SAVE_JOB_CLASS,
-                    "Error while saving " + SchedulerPlugin.XWIKI_JOB_CLASS
-                        + " class document in XWiki", ex);
+                throw new SchedulerPluginException(SchedulerPluginException.ERROR_SCHEDULERPLUGIN_SAVE_JOB_CLASS,
+                    "Error while saving " + SchedulerPlugin.XWIKI_JOB_CLASS + " class document in XWiki", ex);
             }
         }
     }

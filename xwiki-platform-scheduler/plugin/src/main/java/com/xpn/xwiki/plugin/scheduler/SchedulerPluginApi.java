@@ -42,7 +42,7 @@ import com.xpn.xwiki.plugin.PluginApi;
  * with the job's program. <p/> The plugin offers a {@link GroovyJob} Groovy Job wrapper to execute groovy scripts
  * (typically for use inside the Wiki), but can also be used with any Java class implementing {@link org.quartz.Job}
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class SchedulerPluginApi extends PluginApi<SchedulerPlugin>
 {

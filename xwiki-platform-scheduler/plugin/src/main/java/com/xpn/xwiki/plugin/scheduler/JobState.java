@@ -22,8 +22,10 @@ package com.xpn.xwiki.plugin.scheduler;
 import org.quartz.Trigger;
 
 /**
- * Wrapper around the Quartz trigger's inner state of a Scheduler Job. This class allows to query
- * the actual status of a Job as a String, typically to be displayed inside the Wiki
+ * Wrapper around the Quartz trigger's inner state of a Scheduler Job. This class allows to query the actual status of a
+ * Job as a String, typically to be displayed inside the Wiki
+ * 
+ * @version $Id$
  */
 public class JobState
 {
@@ -53,12 +55,12 @@ public class JobState
 
     public int getState()
     {
-        return state;
+        return this.state;
     }
 
     public String getValue()
     {
-        switch (state) {
+        switch (this.state) {
             case Trigger.STATE_NORMAL:
                 return JobState.STATE_NORMAL;
             case Trigger.STATE_BLOCKED:

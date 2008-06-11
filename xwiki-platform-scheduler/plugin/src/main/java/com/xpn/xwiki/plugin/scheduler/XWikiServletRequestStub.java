@@ -25,6 +25,8 @@ import com.xpn.xwiki.web.XWikiRequest;
 /**
  * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
  * context. This trick is used in the Scheduler plugin to give the job execution thread access to the XWiki api.
+ * 
+ * @version $Id$
  */
 public class XWikiServletRequestStub implements XWikiRequest
 {

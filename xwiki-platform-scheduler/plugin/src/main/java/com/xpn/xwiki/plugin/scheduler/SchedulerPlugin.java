@@ -50,7 +50,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class SchedulerPlugin extends XWikiDefaultPlugin
 {

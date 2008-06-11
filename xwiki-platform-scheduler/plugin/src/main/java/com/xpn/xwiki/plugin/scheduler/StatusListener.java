@@ -29,7 +29,7 @@ import org.quartz.SchedulerListener;
 import org.quartz.Trigger;
 
 /**
- * @version $Id: $
+ * @version $Id$
  */
 public class StatusListener implements SchedulerListener, JobListener
 {

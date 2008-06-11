@@ -10,21 +10,6 @@
 <script type="text/javascript">
 // <![CDATA[
 function checkDocumentContent() {
-  if (document.forms.${formname}.content) { // There is a content editor
-    if (window.wikiEditor!=null) {
-      if (wikiEditor.getContent()=="") { // There is a wysiwyg editor, and it's content is empty
-        alert("$msg.get('wikicontentcannotbeempty')");
-        return false ;
-      }
-      return true; // There is a wysiwyg editor, with some content
-    }
-    var content = document.forms.${formname}.content.value;
-    if (content == null || content == "") { // There is only the wiki editor, and it's content is empty
-      alert("$msg.get('wikicontentcannotbeempty')");
-      return false ;
-    }
-  }
-
 #if($xwiki.isEditCommentSuggested()||$xwiki.isEditCommentMandatory())
  #if($xwiki.isEditCommentMandatory())
   var commentField = document.forms.${formname}.comment

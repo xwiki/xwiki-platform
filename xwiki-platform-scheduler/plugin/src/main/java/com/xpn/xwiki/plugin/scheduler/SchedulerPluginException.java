@@ -21,6 +21,11 @@ package com.xpn.xwiki.plugin.scheduler;
 
 import com.xpn.xwiki.plugin.PluginException;
 
+/**
+ * An exception that might be thrown when doing various tasks in the scheduler plugin.
+ * 
+ * @version $Id$
+ */
 public class SchedulerPluginException extends PluginException
 {
     protected static final int ERROR_SCHEDULERPLUGIN_SAVE_JOB_CLASS = 90000;

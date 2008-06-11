@@ -92,7 +92,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                 !context.getDatabase().equals("") ? context.getDatabase() : context.getMainXWiki();
             List wikiServers = Collections.EMPTY_LIST;
 
-            if (context.getWiki().isVirtual()) {
+            if (context.getWiki().isVirtualMode()) {
                 try {
                     wikiServers = context.getWiki().getVirtualWikisDatabaseNames(context);
                     if (!wikiServers.contains(context.getMainXWiki())) {
@@ -224,7 +224,6 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         scontext.setLanguage(cLang);
         scontext.setDatabase(cDb);
         scontext.setMainXWiki(context.getMainXWiki());
-        scontext.setVirtual(context.isVirtual());
         if (scontext.getURL() == null) {
             try {
                 scontext.setURL(new URL("http://www.mystuburl.com/"));

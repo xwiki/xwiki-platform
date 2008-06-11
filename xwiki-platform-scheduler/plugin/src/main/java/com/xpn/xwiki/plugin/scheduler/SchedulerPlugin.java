@@ -115,6 +115,11 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
                 context.setDatabase(initialDb);
             }
 
+            // Before we start the thread ensure that Quartz will create daemon threads so that
+            // the JVM can exit properly.
+            System.setProperty("org.quartz.scheduler.makeSchedulerThreadDaemon", "true");
+            System.setProperty("org.quartz.threadPool.makeThreadsDaemons", "true");
+            
             setScheduler(getDefaultSchedulerInstance());
             setStatusListener();
             getScheduler().start();
@@ -316,7 +321,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         try {
             JobDataMap data = new JobDataMap();
 
-// compute the job unique Id
+            // compute the job unique Id
             String xjob = getObjectUniqueId(object, context);
 
             JobDetail job = new JobDetail(xjob, Scheduler.DEFAULT_GROUP,
@@ -325,7 +330,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
             Trigger trigger = new CronTrigger(xjob, Scheduler.DEFAULT_GROUP, xjob,
                 Scheduler.DEFAULT_GROUP, object.getStringValue("cron"));
 
-// Let's prepare an execution context...
+            // Let's prepare an execution context...
             XWikiContext stubContext = prepareJobStubContext(object, context);
 
             data.put("context", stubContext);

@@ -42,9 +42,9 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>quartz</groupId>
+      <groupId>opensymphony</groupId>
       <artifactId>quartz</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.0</version>
       <exclusions>
         <exclusion>
           <groupId>commons-logging</groupId>

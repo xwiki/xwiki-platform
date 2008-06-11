@@ -21,40 +21,53 @@
 
 package com.xpn.xwiki.web;
 
-import org.apache.struts.upload.MultipartRequestWrapper;
-
-import javax.portlet.*;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletInputStream;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+import java.util.Map;
+
+import javax.portlet.PortalContext;
+import javax.portlet.PortletMode;
+import javax.portlet.PortletPreferences;
+import javax.portlet.PortletSession;
+import javax.portlet.WindowState;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletInputStream;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.struts.upload.MultipartRequestWrapper;
 
 import com.xpn.xwiki.util.Util;
 
-public class XWikiServletRequest implements XWikiRequest {
+public class XWikiServletRequest implements XWikiRequest
+{
     private HttpServletRequest request;
 
-    public XWikiServletRequest(HttpServletRequest request) {
+    public XWikiServletRequest(HttpServletRequest request)
+    {
         this.request = request;
     }
 
     /**
-     * Turn Windows CP1252 Characters to iso-8859-1 characters when possible, HTML entities when needed.
-     * This filtering works on Tomcat (not Jetty).
-     *
+     * Turn Windows CP1252 Characters to iso-8859-1 characters when possible, HTML entities when needed. This filtering
+     * works on Tomcat (not Jetty).
+     * 
      * @param text The text to filter
      * @return filtered text
      */
-    public String filterString(String text) {
-        if (text==null)
+    public String filterString(String text)
+    {
+        if (text == null) {
             return null;
+        }
 
         // In case we are running in ISO we need to take care or some windows-1252 characters
         // that are commonly copy pasted by users from web sites or desktop applications
@@ -63,7 +76,7 @@ public class XWikiServletRequest implements XWikiRequest {
         // This happens for example using MySQL both with tomcat and Jetty
         // See bug : http://jira.xwiki.org/jira/browse/XWIKI-2422
         // Source : http://www.microsoft.com/typography/unicode/1252.htm
-        if (request.getCharacterEncoding().startsWith("ISO-8859")) {
+        if (this.request.getCharacterEncoding().startsWith("ISO-8859")) {
             // EURO SIGN
             text = text.replaceAll("\u0080", "&euro;");
             // SINGLE LOW-9 QUOTATION MARK
@@ -123,331 +136,407 @@ public class XWikiServletRequest implements XWikiRequest {
         return text;
     }
 
-    public String[] filterStringArray(String[] text) {
-        if (text==null)
-         return null;
+    public String[] filterStringArray(String[] text)
+    {
+        if (text == null) {
+            return null;
+        }
 
-        for (int i=0;i<text.length;i++) {
+        for (int i = 0; i < text.length; i++) {
             text[i] = filterString(text[i]);
         }
         return text;
     }
 
-    public String get(String name) {
-        return filterString(request.getParameter(name));
+    public String get(String name)
+    {
+        return filterString(this.request.getParameter(name));
     }
 
-    public HttpServletRequest getHttpServletRequest() {
-        return request;
+    public HttpServletRequest getHttpServletRequest()
+    {
+        return this.request;
     }
 
-    public String getAuthType() {
-        return request.getAuthType();
+    public String getAuthType()
+    {
+        return this.request.getAuthType();
     }
 
-    public Cookie[] getCookies() {
-        return request.getCookies();
+    public Cookie[] getCookies()
+    {
+        return this.request.getCookies();
     }
 
-    public Cookie getCookie(String cookieName) {
+    public Cookie getCookie(String cookieName)
+    {
         return Util.getCookie(cookieName, this);
     }
 
-    public long getDateHeader(String s) {
-        return request.getDateHeader(s);
+    public long getDateHeader(String s)
+    {
+        return this.request.getDateHeader(s);
     }
 
-    public String getHeader(String s) {
-        return request.getHeader(s);
+    public String getHeader(String s)
+    {
+        return this.request.getHeader(s);
     }
 
-    public Enumeration getHeaders(String s) {
-        return request.getHeaders(s);
+    public Enumeration getHeaders(String s)
+    {
+        return this.request.getHeaders(s);
     }
 
-    public Enumeration getHeaderNames() {
-        return request.getHeaderNames();
+    public Enumeration getHeaderNames()
+    {
+        return this.request.getHeaderNames();
     }
 
-    public int getIntHeader(String s) {
-        return request.getIntHeader(s);
+    public int getIntHeader(String s)
+    {
+        return this.request.getIntHeader(s);
     }
 
-    public String getMethod() {
-        return request.getMethod();
+    public String getMethod()
+    {
+        return this.request.getMethod();
     }
 
-    public String getPathInfo() {
-        return request.getPathInfo();
+    public String getPathInfo()
+    {
+        return this.request.getPathInfo();
     }
 
-    public String getPathTranslated() {
-        return request.getPathTranslated();
+    public String getPathTranslated()
+    {
+        return this.request.getPathTranslated();
     }
 
-    public String getContextPath() {
-        return request.getContextPath();
+    public String getContextPath()
+    {
+        return this.request.getContextPath();
     }
 
-    public String getQueryString() {
-        return request.getQueryString();
+    public String getQueryString()
+    {
+        return this.request.getQueryString();
     }
 
-    public String getRemoteUser() {
-        return request.getRemoteUser();
+    public String getRemoteUser()
+    {
+        return this.request.getRemoteUser();
     }
 
-    public boolean isUserInRole(String s) {
-        return request.isUserInRole(s);
+    public boolean isUserInRole(String s)
+    {
+        return this.request.isUserInRole(s);
     }
 
-    public Principal getUserPrincipal() {
-        return request.getUserPrincipal();
+    public Principal getUserPrincipal()
+    {
+        return this.request.getUserPrincipal();
     }
 
-    public String getRequestedSessionId() {
-        return request.getRequestedSessionId();
+    public String getRequestedSessionId()
+    {
+        return this.request.getRequestedSessionId();
     }
 
-    public String getRequestURI() {
-        return request.getRequestURI();
+    public String getRequestURI()
+    {
+        return this.request.getRequestURI();
     }
 
-    public StringBuffer getRequestURL() {
-            StringBuffer requestURL = request.getRequestURL();
-            if ((requestURL==null)&&(request instanceof MultipartRequestWrapper))
-                requestURL = ((MultipartRequestWrapper) request).getRequest().getRequestURL();
-            return requestURL;
+    public StringBuffer getRequestURL()
+    {
+        StringBuffer requestURL = this.request.getRequestURL();
+        if ((requestURL == null) && (this.request instanceof MultipartRequestWrapper)) {
+            requestURL = ((MultipartRequestWrapper) this.request).getRequest().getRequestURL();
+        }
+        return requestURL;
     }
 
-    public String getServletPath() {
-        return request.getServletPath();
+    public String getServletPath()
+    {
+        return this.request.getServletPath();
     }
 
-    public HttpSession getSession(boolean b) {
-        return request.getSession(b);
+    public HttpSession getSession(boolean b)
+    {
+        return this.request.getSession(b);
     }
 
-    public HttpSession getSession() {
-        return request.getSession();
+    public HttpSession getSession()
+    {
+        return this.request.getSession();
     }
 
-    public boolean isRequestedSessionIdValid() {
-        return request.isRequestedSessionIdValid();
+    public boolean isRequestedSessionIdValid()
+    {
+        return this.request.isRequestedSessionIdValid();
     }
 
-
-    public boolean isRequestedSessionIdFromCookie() {
-        return request.isRequestedSessionIdFromCookie();
+    public boolean isRequestedSessionIdFromCookie()
+    {
+        return this.request.isRequestedSessionIdFromCookie();
     }
 
-    public boolean isRequestedSessionIdFromURL() {
-        return request.isRequestedSessionIdFromURL();
+    public boolean isRequestedSessionIdFromURL()
+    {
+        return this.request.isRequestedSessionIdFromURL();
     }
 
     /**
      * @deprecated
      */
-    public boolean isRequestedSessionIdFromUrl() {
-        return request.isRequestedSessionIdFromURL();
+    @Deprecated
+    public boolean isRequestedSessionIdFromUrl()
+    {
+        return this.request.isRequestedSessionIdFromURL();
     }
 
-    public Object getAttribute(String s) {
-        return request.getAttribute(s);
+    public Object getAttribute(String s)
+    {
+        return this.request.getAttribute(s);
     }
 
-    public Enumeration getAttributeNames() {
-        return request.getAttributeNames();
+    public Enumeration getAttributeNames()
+    {
+        return this.request.getAttributeNames();
     }
 
-    public String getCharacterEncoding() {
-        return request.getCharacterEncoding();
+    public String getCharacterEncoding()
+    {
+        return this.request.getCharacterEncoding();
     }
 
-    public void setCharacterEncoding(String s) throws UnsupportedEncodingException {
-        request.setCharacterEncoding(s);
+    public void setCharacterEncoding(String s) throws UnsupportedEncodingException
+    {
+        this.request.setCharacterEncoding(s);
     }
 
-    public int getContentLength() {
-        return request.getContentLength();
+    public int getContentLength()
+    {
+        return this.request.getContentLength();
     }
 
-    public String getContentType() {
-        return request.getContentType();
+    public String getContentType()
+    {
+        return this.request.getContentType();
     }
 
-    public ServletInputStream getInputStream() throws IOException {
-        return request.getInputStream();
+    public ServletInputStream getInputStream() throws IOException
+    {
+        return this.request.getInputStream();
     }
 
-    public String getParameter(String s) {
-        return filterString(request.getParameter(s));
+    public String getParameter(String s)
+    {
+        return filterString(this.request.getParameter(s));
     }
 
-    public Enumeration getParameterNames() {
-        return request.getParameterNames();
+    public Enumeration getParameterNames()
+    {
+        return this.request.getParameterNames();
     }
 
-    public String[] getParameterValues(String s) {
-        String[] origResult = request.getParameterValues(s);
+    public String[] getParameterValues(String s)
+    {
+        String[] origResult = this.request.getParameterValues(s);
         return filterStringArray(origResult);
     }
 
-    public Map getParameterMap() {
+    public Map getParameterMap()
+    {
         Map newMap = new HashMap();
-        Map map = request.getParameterMap();
+        Map map = this.request.getParameterMap();
         Iterator it = map.keySet().iterator();
         while (it.hasNext()) {
-           String key = (String) it.next();
-           Object value = map.get(key);
-           if (value instanceof String)
-             newMap.put(key, filterString((String) value));
-           else if (value instanceof String[])
-             newMap.put(key, filterStringArray((String[]) value));
-           else
-             newMap.put(key, value);
+            String key = (String) it.next();
+            Object value = map.get(key);
+            if (value instanceof String) {
+                newMap.put(key, filterString((String) value));
+            } else if (value instanceof String[]) {
+                newMap.put(key, filterStringArray((String[]) value));
+            } else {
+                newMap.put(key, value);
+            }
         }
         return map;
     }
 
-    public String getProtocol() {
-        return request.getProtocol();
+    public String getProtocol()
+    {
+        return this.request.getProtocol();
     }
 
-    public String getScheme() {
-        return request.getScheme();
+    public String getScheme()
+    {
+        return this.request.getScheme();
     }
 
-    public String getServerName() {
-        return request.getServerName();
+    public String getServerName()
+    {
+        return this.request.getServerName();
     }
 
-    public int getServerPort() {
-        return request.getServerPort();
+    public int getServerPort()
+    {
+        return this.request.getServerPort();
     }
 
-    public BufferedReader getReader() throws IOException {
-        return request.getReader();
+    public BufferedReader getReader() throws IOException
+    {
+        return this.request.getReader();
     }
 
-    public String getRemoteAddr() {
-	if (request.getHeader("x-forwarded-for") != null)
-	    return request.getHeader("x-forwarded-for");
-        return request.getRemoteAddr();
+    public String getRemoteAddr()
+    {
+        if (this.request.getHeader("x-forwarded-for") != null) {
+            return this.request.getHeader("x-forwarded-for");
+        }
+        return this.request.getRemoteAddr();
     }
 
-    public String getRemoteHost() {
-	if (request.getHeader("x-forwarded-for") != null)
-	    return request.getHeader("x-forwarded-for");
-        return request.getRemoteHost();
+    public String getRemoteHost()
+    {
+        if (this.request.getHeader("x-forwarded-for") != null) {
+            return this.request.getHeader("x-forwarded-for");
+        }
+        return this.request.getRemoteHost();
     }
 
-    public void setAttribute(String s, Object o) {
-        request.setAttribute(s, o);
+    public void setAttribute(String s, Object o)
+    {
+        this.request.setAttribute(s, o);
     }
 
-    public void removeAttribute(String s) {
-        request.removeAttribute(s);
+    public void removeAttribute(String s)
+    {
+        this.request.removeAttribute(s);
     }
 
-    public Locale getLocale() {
-        return request.getLocale();
+    public Locale getLocale()
+    {
+        return this.request.getLocale();
     }
 
-    public Enumeration getLocales() {
-        return request.getLocales();
+    public Enumeration getLocales()
+    {
+        return this.request.getLocales();
     }
 
-    public boolean isSecure() {
-        return request.isSecure();
+    public boolean isSecure()
+    {
+        return this.request.isSecure();
     }
 
-    public RequestDispatcher getRequestDispatcher(String s) {
-        return request.getRequestDispatcher(s);
+    public RequestDispatcher getRequestDispatcher(String s)
+    {
+        return this.request.getRequestDispatcher(s);
     }
 
     /**
      * @deprecated
      */
-    public String getRealPath(String s) {
-        return request.getRealPath(s);
+    @Deprecated
+    public String getRealPath(String s)
+    {
+        return this.request.getRealPath(s);
     }
 
-    public int getRemotePort() {
-        return request.getRemotePort();
+    public int getRemotePort()
+    {
+        return this.request.getRemotePort();
     }
 
-    public String getLocalName() {
-        return request.getLocalName();
+    public String getLocalName()
+    {
+        return this.request.getLocalName();
     }
 
-    public String getLocalAddr() {
-        return request.getLocalAddr();
+    public String getLocalAddr()
+    {
+        return this.request.getLocalAddr();
     }
 
-    public int getLocalPort() {
-        return request.getLocalPort();
+    public int getLocalPort()
+    {
+        return this.request.getLocalPort();
     }
 
     /*
-    * Portlet Functions. They do nothing in  the servlet environement
-    */
+     * Portlet Functions. They do nothing in the servlet environement
+     */
 
-    public boolean isWindowStateAllowed(WindowState windowState) {
+    public boolean isWindowStateAllowed(WindowState windowState)
+    {
         return false;
     }
 
-    public boolean isPortletModeAllowed(PortletMode portletMode) {
+    public boolean isPortletModeAllowed(PortletMode portletMode)
+    {
         return false;
     }
 
-    public PortletMode getPortletMode() {
+    public PortletMode getPortletMode()
+    {
         return null;
     }
 
-    public WindowState getWindowState() {
+    public WindowState getWindowState()
+    {
         return null;
     }
 
-    public PortletPreferences getPreferences() {
+    public PortletPreferences getPreferences()
+    {
         return null;
     }
 
-    public PortletSession getPortletSession() {
+    public PortletSession getPortletSession()
+    {
         return null;
     }
 
-    public PortletSession getPortletSession(boolean b) {
+    public PortletSession getPortletSession(boolean b)
+    {
         return null;
     }
 
-    public PortalContext getPortalContext() {
+    public PortalContext getPortalContext()
+    {
         return null;
     }
 
-    public String getProperty(String s) {
+    public String getProperty(String s)
+    {
         return null;
     }
 
-    public Enumeration getProperties(String s) {
+    public Enumeration getProperties(String s)
+    {
         return null;
     }
 
-    public Enumeration getPropertyNames() {
+    public Enumeration getPropertyNames()
+    {
         return null;
     }
 
-    public String getResponseContentType() {
+    public String getResponseContentType()
+    {
         return null;
     }
 
-    public Enumeration getResponseContentTypes() {
+    public Enumeration getResponseContentTypes()
+    {
         return null;
     }
 
-    public InputStream getPortletInputStream() throws IOException {
+    public InputStream getPortletInputStream() throws IOException
+    {
         return null;
     }
 }
-
-

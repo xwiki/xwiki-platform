@@ -69,6 +69,8 @@ public class OSCacheService implements XWikiCacheService, Runnable
         cacheProperties = loadProps(PROPS_FILENAME);
         localCacheProperties = loadProps(LOCAL_PROPS_FILENAME);
         Thread watcherThread = new Thread(this, "OSCacheService Cache Monitor");
+        // The JVM should be allowed to shutdown while this thread is running
+        watcherThread.setDaemon(true);
         watcherThread.start();
         log.info("Initialized OSCacheService");
     }

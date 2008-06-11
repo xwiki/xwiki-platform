@@ -607,7 +607,7 @@ public final class StatsUtil
         cookie.setMaxAge(time);
 
         String cookieDomain = null;
-        String[] cookieDomains = StatsUtil.getCookieDomains(context);
+        cookieDomains = StatsUtil.getCookieDomains(context);
         if (cookieDomains != null) {
             String servername = context.getRequest().getServerName();
             for (int i = 0; i < cookieDomains.length; i++) {

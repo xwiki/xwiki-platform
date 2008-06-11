@@ -1,6 +1,13 @@
 package com.xpn.xwiki.plugin.scheduler;
 
-import com.xpn.xwiki.web.XWikiRequest;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.Principal;
+import java.util.Enumeration;
+import java.util.Locale;
+import java.util.Map;
 
 import javax.portlet.PortalContext;
 import javax.portlet.PortletMode;
@@ -12,27 +19,18 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.security.Principal;
-import java.util.Enumeration;
-import java.util.Locale;
-import java.util.Map;
+
+import com.xpn.xwiki.web.XWikiRequest;
 
 /**
- * This stub is intended to simulate a servlet request in a daemon context, in order to be able to
- * create a custom XWiki context.
- *
- * This trick is used in the Scheduler plugin to give the job execution thread access to the XWiki
- * api.
+ * This stub is intended to simulate a servlet request in a daemon context, in order to be able to create a custom XWiki
+ * context. This trick is used in the Scheduler plugin to give the job execution thread access to the XWiki api.
  */
 public class XWikiServletRequestStub implements XWikiRequest
 {
     public XWikiServletRequestStub()
     {
-        host = new String();
+        this.host = new String();
     }
 
     private String host;
@@ -45,7 +43,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     public String getHeader(String s)
     {
         if (s.equals("x-forwarded-host")) {
-            return host;
+            return this.host;
         }
         return new String();
     }
@@ -248,6 +246,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     /**
      * @deprecated
      */
+    @Deprecated
     public boolean isRequestedSessionIdFromUrl()
     {
         return false;
@@ -381,6 +380,7 @@ public class XWikiServletRequestStub implements XWikiRequest
     /**
      * @deprecated
      */
+    @Deprecated
     public String getRealPath(String s)
     {
         return null;

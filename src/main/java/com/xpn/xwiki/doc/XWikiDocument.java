@@ -1734,7 +1734,7 @@ public class XWikiDocument
     public void readTranslationMetaFromForm(EditForm eform, XWikiContext context) throws XWikiException
     {
         String content = eform.getContent();
-        if ((content != null) && (!content.equals(""))) {
+        if (content != null) {
             // Cleanup in case we use HTMLAREA
             // content = context.getUtil().substitute("s/<br class=\\\"htmlarea\\\"\\/>/\\r\\n/g",
             // content);

@@ -80,6 +80,8 @@ public class XWikiStatsStoreService implements Runnable
     {
         if (thread == null) {
             thread = new Thread(this, "Statistics storing daemon");
+            // The JVM should be allowed to shutdown while this thread is running
+            thread.setDaemon(true);
             thread.start();
         }
     }

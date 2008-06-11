@@ -38,38 +38,47 @@ function checkDocumentContent() {
   }
  #end
 #end
- return true; // There is only the wiki editor, with some content
+ return true;
 }
 
 function cancelEdit() {
   document.forms.${formname}.action='$doc.getURL("cancel")';
-  if (document.forms.${formname}.onsubmit)
-    if (document.forms.${formname}.onsubmit() == false)
+  if (document.forms.${formname}.onsubmit) {
+    if (document.forms.${formname}.onsubmit() == false) {
       return false;
+    }
+  }
   document.forms.${formname}.submit();
 }
 
 function preview() {
   document.forms.${formname}.action='$doc.getURL("preview", $param)';
-  if (document.forms.${formname}.onsubmit)
+  if (document.forms.${formname}.onsubmit) {
     document.forms.${formname}.onsubmit();
-  if (checkDocumentContent())
+  }
+  if (checkDocumentContent()) {
     document.forms.${formname}.submit()
+  }
 }
 
 function saveAndContinue() {
   document.forms.${formname}.action='$doc.getURL("saveandcontinue", $param)';
-  if (document.forms.${formname}.onsubmit)
+  if (document.forms.${formname}.onsubmit) {
     document.forms.${formname}.onsubmit();
-  if (checkDocumentContent()) document.forms.${formname}.submit();
+  }
+  if (checkDocumentContent()) {
+    document.forms.${formname}.submit();
+  }
 }
 
 function saveAndView() {
   document.forms.${formname}.action='$doc.getURL("${saveaction}", $param)';
-  if (document.forms.${formname}.onsubmit)
+  if (document.forms.${formname}.onsubmit) {
     document.forms.${formname}.onsubmit();
-  if (checkDocumentContent())
+  }
+  if (checkDocumentContent()) {
     document.forms.${formname}.submit();
+  }
 }
 // ]]>
 </script>

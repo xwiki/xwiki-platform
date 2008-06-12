@@ -44,7 +44,7 @@ WikiEditor.prototype.convertImageInternal = function(regexp, result, content) {
         var contextPathImage = tinyMCE.getParam("wiki_images_path").toString();
         href = contextPathImage.substring(0, contextPathImage.indexOf("/",2)) +
                "/bin/" + href.substring(href.indexOf("/",3) + 1);
-        href = unescape(href);
+//        href = unescape(href);
         var imgname_reg = new RegExp(this.getImagePath() + "(.*)", "i");
         var r = imgname_reg.exec(href);
         if(r) {
@@ -82,7 +82,7 @@ WikiEditor.prototype.convertImageExternal = function(regexp, result, content) {
     if (halign != "") {
         str += "<div class=\"img" + halign + "\">"
     }
-    str += "<img id=\"" + result[1] + "\" class=\"" + this.IMAGE_CLASS_NAME + "\" src=\"" + this.getImagePath() + result[1] + "\" ";
+    str += "<img id=\"" + result[1] + "\" class=\"" + this.IMAGE_CLASS_NAME + "\" src=\"" + escape(this.getImagePath() + result[1]) + "\" ";
 	if( result[5] && (width = this.trimString(result[5])) != "") {
 		str += "width=\"" + width + "\" ";
 	}

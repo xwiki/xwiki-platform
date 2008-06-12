@@ -124,8 +124,7 @@ public class DomainObjectFactory
      * @return An XWikiPageSummary with the information.
      * @throws XWikiException If there is a problem getting page translations.
      */
-    public static XWikiPageSummary createXWikiPageSummary(Document document)
-        throws XWikiException
+    public static XWikiPageSummary createXWikiPageSummary(Document document) throws XWikiException
     {
         XWikiPageSummary result = new XWikiPageSummary();
 
@@ -145,16 +144,15 @@ public class DomainObjectFactory
     }
 
     /**
-     * Create a page description from an XWiki document.
+     * Create a page description from an XWiki document. The page title is the current title if the current title != "",
+     * otherwise it is set to the page name (i.e., the name part in the page Space.Name id)
      * 
-     * @param useExtendedPageId true if the id should contain additional information concerning the
-     *            version, language etc. In this case the pageId will be in the form
-     *            Space.Page?param=value&param=value&...
+     * @param useExtendedPageId true if the id should contain additional information concerning the version, language
+     *            etc. In this case the pageId will be in the form Space.Page?param=value&param=value&...
      * @return An XWikiPage object representing the page.
      * @throws XWikiException If there is a problem getting page translations.
      */
-    public static XWikiPage createXWikiPage(Document document, boolean useExtendedPageId)
-        throws XWikiException
+    public static XWikiPage createXWikiPage(Document document, boolean useExtendedPageId) throws XWikiException
     {
         XWikiPage result = new XWikiPage();
 
@@ -262,8 +260,7 @@ public class DomainObjectFactory
         result.setContentType(xwikiAttachment.getMimeType());
         result.setCreated(xwikiAttachment.getDate());
         result.setCreator(xwikiAttachment.getAuthor());
-        result.setUrl(xwikiAttachment.getDocument().getAttachmentURL(
-            xwikiAttachment.getFilename()));
+        result.setUrl(xwikiAttachment.getDocument().getAttachmentURL(xwikiAttachment.getFilename()));
         result.setComment(xwikiAttachment.getComment());
 
         return result;
@@ -289,15 +286,13 @@ public class DomainObjectFactory
      */
     public static XWikiClass createXWikiClass(com.xpn.xwiki.api.Class xwikiClass)
     {
-        Map<String, Map<String, Object>> userClassPropertyToAttributesMap =
-            new HashMap<String, Map<String, Object>>();
+        Map<String, Map<String, Object>> userClassPropertyToAttributesMap = new HashMap<String, Map<String, Object>>();
 
         for (Object o : xwikiClass.getProperties()) {
             PropertyClass userClassProperty = (PropertyClass) o;
 
             Map<String, Object> attributeToValueMap = new HashMap<String, Object>();
-            attributeToValueMap.put(XWikiClass.XWIKICLASS_ATTRIBUTE, userClassProperty
-                .getxWikiClass().getName());
+            attributeToValueMap.put(XWikiClass.XWIKICLASS_ATTRIBUTE, userClassProperty.getxWikiClass().getName());
             for (Object ucp : userClassProperty.getProperties()) {
                 Property property = (Property) ucp;
                 Object value = property.getValue();
@@ -307,8 +302,7 @@ public class DomainObjectFactory
                 }
             }
 
-            userClassPropertyToAttributesMap
-                .put(userClassProperty.getName(), attributeToValueMap);
+            userClassPropertyToAttributesMap.put(userClassProperty.getName(), attributeToValueMap);
         }
 
         XWikiClass result = new XWikiClass();
@@ -323,13 +317,11 @@ public class DomainObjectFactory
      * 
      * @return An XWikiObjectSummary object containing all the information.
      */
-    public static XWikiObjectSummary createXWikiObjectSummary(Document document,
-        com.xpn.xwiki.api.Object object)
+    public static XWikiObjectSummary createXWikiObjectSummary(Document document, com.xpn.xwiki.api.Object object)
     {
         String prettyName = object.getPrettyName();
         if (prettyName == null || prettyName.equals("")) {
-            prettyName =
-                String.format("%s[%d]", object.getxWikiClass().getName(), object.getNumber());
+            prettyName = String.format("%s[%d]", object.getxWikiClass().getName(), object.getNumber());
         }
 
         XWikiObjectSummary result = new XWikiObjectSummary();
@@ -362,8 +354,7 @@ public class DomainObjectFactory
 
         String prettyName = object.getPrettyName();
         if (prettyName == null || prettyName.equals("")) {
-            prettyName =
-                String.format("%s[%d]", object.getxWikiClass().getName(), object.getNumber());
+            prettyName = String.format("%s[%d]", object.getxWikiClass().getName(), object.getNumber());
         }
 
         XWikiObject result = new XWikiObject();

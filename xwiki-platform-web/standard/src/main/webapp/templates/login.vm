@@ -42,5 +42,11 @@ $response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 #xwikimessageboxend()
 </form>
 </div>
+## Ensure that the username field of the login form has the focus to make it easy for users to log in quickly
+<script type="text/javascript">
+//<![CDATA[
+  document.forms.loginForm.j_username.focus();
+//]]>
+</script>
 #template("endpage.vm")
 #end

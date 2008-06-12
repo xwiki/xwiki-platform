@@ -332,7 +332,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                             log.debug("Checking match: " + name + " in " + users);
                         }
 
-                        String[] userarray = (String[]) GroupsClass.getListFromString(users).toArray(new String[0]);
+                        String[] userarray = GroupsClass.getListFromString(users).toArray(new String[0]);
 
                         for (int ii = 0; ii < userarray.length; ii++) {
                             String value = userarray[ii];

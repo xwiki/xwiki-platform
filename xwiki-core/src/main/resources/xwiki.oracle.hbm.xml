@@ -60,7 +60,12 @@
             <column name="XWD_CREATOR" length="255"/>
         </property>
 
-        <property name="web" type="string">
+        <!-- This property is deprecated and should not be used anymore. Use .space instead. -->
+        <property name="web" type="string" update="false" insert="false" access="com.xpn.xwiki.store.hibernate.DocumentWebPropertyAccessor">
+            <column name="XWD_WEB" length="255" not-null="true"/>
+        </property>
+
+        <property name="space" type="string">
             <column name="XWD_WEB" length="255" not-null="true"/>
         </property>
 

@@ -69,6 +69,8 @@ public class InvitationManagerImpl implements InvitationManager
         String REJECT = "Reject";
     }
 
+    public static final String USER_PROFILES_DEFAULT = "1";
+
     public static final String SPACE_VELOCITY_KEY = "space";
 
     public static final String INVITATION_VELOCITY_KEY = "invitation";
@@ -92,15 +94,19 @@ public class InvitationManagerImpl implements InvitationManager
         try {
             Invitation invitation = getInvitation(space, email, context);
             if (code.equals(invitation.getCode())
-                && invitation.getStatus()== JoinRequestStatus.SENT ) {
+                && invitation.getStatus() == JoinRequestStatus.SENT) {
                 if (!invitation.isOpen()) {
                     invitation.setStatus(JoinRequestStatus.ACCEPTED);
                     invitation.setResponseDate(new Date());
                     invitation.setInvitee(context.getUser());
                     invitation.saveWithProgrammingRights();
                 }
-                // create and save a new space user profile based on the HTTP request
-                createSpaceUserProfile(space, context);
+
+                if (isWithUserProfiles(context)) {
+                    // create and save a new space user profile based on the HTTP request
+                    createSpaceUserProfile(space, context);
+                }
+
                 // update the list of space members and their roles
                 addMember(space, context.getUser(), invitation.getRoles(), context);
 
@@ -126,7 +132,7 @@ public class InvitationManagerImpl implements InvitationManager
         try {
             Invitation invitation = getInvitation(space, email, context);
             if (code.equals(invitation.getCode())
-                && invitation.getStatus() == JoinRequestStatus.SENT ) {
+                && invitation.getStatus() == JoinRequestStatus.SENT) {
                 return true;
             } else {
                 return false;
@@ -156,8 +162,12 @@ public class InvitationManagerImpl implements InvitationManager
                 // update the invitation object
                 invitation.setResponseDate(new Date());
                 invitation.setStatus(JoinRequestStatus.ACCEPTED);
-                // create and save a new space user profile based on the HTTP request
-                createSpaceUserProfile(space, context);
+
+                if (isWithUserProfiles(context)) {
+                    // create and save a new space user profile based on the HTTP request
+                    createSpaceUserProfile(space, context);
+                }
+
                 // update the list of members and their roles
                 addMember(space, context.getUser(), invitation.getRoles(), context);
                 // save the invitation status
@@ -181,7 +191,7 @@ public class InvitationManagerImpl implements InvitationManager
     {
         try {
             Invitation invitation = getInvitation(space, context.getUser(), context);
-            if ((invitation != null) && (invitation.getStatus()==JoinRequestStatus.SENT))
+            if ((invitation != null) && (invitation.getStatus() == JoinRequestStatus.SENT))
                 return true;
             else
                 return false;
@@ -642,7 +652,7 @@ public class InvitationManagerImpl implements InvitationManager
      * 
      * @see InvitationManager#getMembershipRequests(int, int, int, XWikiContext)
      */
-	public List getMembershipRequests(int status, int start, int count, XWikiContext context)
+    public List getMembershipRequests(int status, int start, int count, XWikiContext context)
     {
         try {
             MembershipRequest prototype =
@@ -930,8 +940,7 @@ public class InvitationManagerImpl implements InvitationManager
             if (!invitation.isNew()) {
                 int status = invitation.getStatus();
                 // maybe it's an old invitation
-                if (JoinRequestStatus.CREATED == status
-                    || JoinRequestStatus.SENT == status) {
+                if (JoinRequestStatus.CREATED == status || JoinRequestStatus.SENT == status) {
                     // is's a new one
                     addToAlreadyInvited(invitee, context);
                     throw new InvitationManagerException(InvitationManagerException.MODULE_PLUGIN_INVITATIONMANAGER,
@@ -1465,25 +1474,32 @@ public class InvitationManagerImpl implements InvitationManager
         String strToUsers = join(toUsers, ",");
 
         MailSenderPlugin mailSender = getMailSenderPlugin(context);
-		
-		//gets the demplae coc
+
+        // gets the template doc
         XWikiDocument mailDoc = context.getWiki().getDocument(templateDocFullName, context);
         XWikiDocument translatedMailDoc = mailDoc.getTranslatedDocument(context);
 
-		//puts some generic variables in the velocity rendering context so we can write the template doc almost as a normal document
-		vContext.put("xwiki", new XWiki(context.getWiki(), context));
+        // puts some generic variables in the velocity rendering context so we can write the
+        // template doc almost as a normal document
+        vContext.put("xwiki", new XWiki(context.getWiki(), context));
         vContext.put("context", new com.xpn.xwiki.api.Context(context));
-		vContext.put("doc", translatedMailDoc);
-        
-		//rendering the template document with the defined velocity context. the subject of the mail is the subject of the template doc and the content of the mail is the content of the doc
-        String mailSubject = XWikiVelocityRenderer.evaluate(translatedMailDoc.getTitle(), templateDocFullName, vContext, context);
-        String mailContent = XWikiVelocityRenderer.evaluate(translatedMailDoc.getContent(), templateDocFullName, vContext, context);
+        vContext.put("doc", translatedMailDoc);
 
-		//creates a new mail
+        // rendering the template document with the defined velocity context. the subject of the
+        // mail is the subject of the template doc and the content of the mail is the content of the
+        // doc
+        String mailSubject =
+            XWikiVelocityRenderer.evaluate(translatedMailDoc.getTitle(), templateDocFullName,
+                vContext, context);
+        String mailContent =
+            XWikiVelocityRenderer.evaluate(translatedMailDoc.getContent(), templateDocFullName,
+                vContext, context);
+
+        // creates a new mail
         Mail mail = new Mail(fromUser, strToUsers, null, null, mailSubject, mailContent, null);
 
         try {
-            mailSender.sendMail(mail,context);
+            mailSender.sendMail(mail, context);
         } catch (Exception e) {
             throw new InvitationManagerException(InvitationManagerException.MODULE_PLUGIN_INVITATIONMANAGER,
                 InvitationManagerException.ERROR_INVITATION_SENDING_EMAIL_FAILED,
@@ -1635,6 +1651,12 @@ public class InvitationManagerImpl implements InvitationManager
             new SpaceUserProfileImpl(context.getUser(), spaceName, spaceManager, context);
         profile.updateProfileFromRequest();
         profile.saveWithProgrammingRights();
+    }
+
+    public boolean isWithUserProfiles(XWikiContext context)
+    {
+        return context.getWiki().Param("xwiki.invitationmanager.userprofiles",
+            USER_PROFILES_DEFAULT).equals("0") ? false : true;
     }
 
     public boolean isMailNotification()

@@ -95,7 +95,7 @@ public class GroupsClass extends ListClass
             return list;
 
         value = StringUtils.replace(value, "\\,", "%SEP%");
-        String[] result = StringUtils.split(value, ", ");
+        String[] result = StringUtils.split(value, ",|");
         for (int i = 0; i < result.length; i++)
             list.add(StringUtils.replace(result[i], "%SEP%", ","));
         return list;

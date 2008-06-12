@@ -87,7 +87,7 @@ public class UsersClass extends ListClass {
             return list;
 
         String val = StringUtils.replace(value, "\\,", "%SEP%");
-        String[] result = StringUtils.split(val, ", ");
+        String[] result = StringUtils.split(val, ",|");
         for (int i = 0; i < result.length; i++)
             list.add(StringUtils.replace(result[i], "%SEP%", ","));
         return list;

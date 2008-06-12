@@ -49,8 +49,8 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.Utils;
 
 /**
- * The class containing the implementation of the XML-RPC API. Methods tagged with the ConfluenceAPI
- * are compatible with Confluence.
+ * The class containing the implementation of the XML-RPC API. Methods tagged with the ConfluenceAPI are compatible with
+ * Confluence.
  */
 public class XWikiXmlRpcHandler
 {
@@ -94,8 +94,7 @@ public class XWikiXmlRpcHandler
 
             return token;
         } else {
-            throw new XmlRpcException(String.format("[Authentication failed for user %s.]",
-                userName));
+            throw new XmlRpcException(String.format("[Authentication failed for user %s.]", userName));
         }
     }
 
@@ -143,8 +142,7 @@ public class XWikiXmlRpcHandler
                 serverInfo.setMajorVersion(majorVersion);
                 if (components[1].indexOf('-') != -1) {
                     // Removing possible suffixes (-SNAPSHOT for example)
-                    minorVersion =
-                        new Integer(components[1].substring(0, components[1].indexOf('-')));
+                    minorVersion = new Integer(components[1].substring(0, components[1].indexOf('-')));
                 } else {
                     minorVersion = new Integer(components[1]);
                 }
@@ -186,8 +184,7 @@ public class XWikiXmlRpcHandler
                 Document spaceWebHome = xwiki.getDocument(spaceWebHomeId);
 
                 /*
-                 * If doc is null, then we don't have the rights to access the document, and
-                 * therefore to the space.
+                 * If doc is null, then we don't have the rights to access the document, and therefore to the space.
                  */
                 if (spaceWebHome != null) {
                     result.add(DomainObjectFactory.createSpaceSummary(spaceWebHome).toRawMap());
@@ -201,8 +198,7 @@ public class XWikiXmlRpcHandler
     /**
      * @param token The authentication token.
      * @return A map representing a Space object.
-     * @throws XmlRpcException An invalid token is provided or the user doesn't have enough rights
-     *             to access the space.
+     * @throws XmlRpcException An invalid token is provided or the user doesn't have enough rights to access the space.
      * @category ConfluenceAPI
      */
     public Map getSpace(String token, String spaceKey) throws XWikiException, XmlRpcException
@@ -228,21 +224,18 @@ public class XWikiXmlRpcHandler
             if (spaceWebHome != null) {
                 return DomainObjectFactory.createSpace(spaceWebHome).toRawMap();
             } else {
-                throw new XmlRpcException(String.format("[Space '%s' cannot be accessed]",
-                    spaceKey));
+                throw new XmlRpcException(String.format("[Space '%s' cannot be accessed]", spaceKey));
             }
         }
     }
 
     /**
-     * Add a new space. It basically creates a SpaceKey.WebHome page with no content and the space
-     * title as its title.
+     * Add a new space. It basically creates a SpaceKey.WebHome page with no content and the space title as its title.
      * 
      * @param token The authentication token.
      * @param spaceMap The map representing a Space object.
      * @return The newly created space as a Space object.
-     * @throws XmlRpcException Space cannot be created or it already exists and the user has not the
-     *             rights to modify it
+     * @throws XmlRpcException Space cannot be created or it already exists and the user has not the rights to modify it
      * @category ConfluenceAPI
      */
     public Map addSpace(String token, Map spaceMap) throws XWikiException, XmlRpcException
@@ -255,8 +248,7 @@ public class XWikiXmlRpcHandler
         Space space = new Space(spaceMap);
 
         if (xwiki.getSpaces().contains(space.getKey())) {
-            throw new XmlRpcException(String
-                .format("[Space '%s' already exists]", space.getKey()));
+            throw new XmlRpcException(String.format("[Space '%s' already exists]", space.getKey()));
         }
 
         String spaceWebHomeId = String.format("%s.WebHome", space.getKey());
@@ -268,10 +260,9 @@ public class XWikiXmlRpcHandler
 
             return DomainObjectFactory.createSpace(spaceWebHome).toRawMap();
         } else {
-            throw new XmlRpcException(String
-                .format(
-                    "[Space cannot be created or it already exists and user '%s' has not the right to modify it]",
-                    user.getName()));
+            throw new XmlRpcException(String.format(
+                "[Space cannot be created or it already exists and user '%s' has not the right to modify it]", user
+                    .getName()));
         }
     }
 
@@ -282,8 +273,7 @@ public class XWikiXmlRpcHandler
      * @return True if the space has been successfully deleted.
      * @category ConfluenceAPI
      */
-    public Boolean removeSpace(String token, String spaceKey) throws XWikiException,
-        XmlRpcException
+    public Boolean removeSpace(String token, String spaceKey) throws XWikiException, XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -312,9 +302,8 @@ public class XWikiXmlRpcHandler
                         }
                     } catch (XWikiException e) {
                         /*
-                         * An exception here means that we haven't succeeded in deleting a page, so
-                         * there might be some pages that still belong to the space, so the space is
-                         * not fully deleted
+                         * An exception here means that we haven't succeeded in deleting a page, so there might be some
+                         * pages that still belong to the space, so the space is not fully deleted
                          */
                         System.out.format("%s\n", e.getMessage());
                         spaceDeleted = false;
@@ -346,16 +335,14 @@ public class XWikiXmlRpcHandler
             String pageFullName = String.format("%s.%s", spaceKey, pageName);
 
             if (!xwiki.exists(pageFullName)) {
-                LOG.warn(String.format(
-                    "[Page '%s' appears to be in space '%s' but no information is available.]",
+                LOG.warn(String.format("[Page '%s' appears to be in space '%s' but no information is available.]",
                     pageName));
             } else {
                 Document doc = xwiki.getDocument(pageFullName);
 
                 /* We only add pages we have the right to access */
                 if (doc != null) {
-                    XWikiPageSummary pageSummary =
-                        DomainObjectFactory.createXWikiPageSummary(doc);
+                    XWikiPageSummary pageSummary = DomainObjectFactory.createXWikiPageSummary(doc);
                     result.add(pageSummary.toRawMap());
                 }
             }
@@ -365,17 +352,17 @@ public class XWikiXmlRpcHandler
     }
 
     /**
-     * Retrieves a page.
+     * Retrieves a page. The page title is the current title if the current title != "", otherwise it is set to the page
+     * name (i.e., the name part in the page Space.Name id)
      * 
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @param language The language id for the translation
      * @param version The desired version. If version == 0 then the latest version is returned.
      * @param minorVersion The desired minor version (ignored if version == 0).
-     * @return A map representing a Page object containing information about the page at version
-     *         'version.minorVersion'
-     * @throws XmlRpcException If the user has not the right to access the page or the page does not
-     *             exist at version 'version.minorVersion'.
+     * @return A map representing a Page object containing information about the page at version 'version.minorVersion'
+     * @throws XmlRpcException If the user has not the right to access the page or the page does not exist at version
+     *             'version.minorVersion'.
      */
     public Map getPage(String token, String pageId) throws XWikiException, XmlRpcException
     {
@@ -390,13 +377,10 @@ public class XWikiXmlRpcHandler
         int version = versionString != null ? Integer.parseInt(versionString) : 0;
         String minorVersionString = extendedId.getParameter("minorVersion");
         int minorVersion = minorVersionString != null ? Integer.parseInt(minorVersionString) : 1;
-        String language =
-            extendedId.getParameter("language") != null ? extendedId.getParameter("language")
-                : "";
+        String language = extendedId.getParameter("language") != null ? extendedId.getParameter("language") : "";
 
         if (!xwiki.exists(extendedId.getBasePageId())) {
-            throw new XmlRpcException(String.format("Unable to get page %s", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Unable to get page %s", extendedId.getBasePageId()));
         }
 
         Document doc = xwiki.getDocument(extendedId.getBasePageId());
@@ -406,8 +390,8 @@ public class XWikiXmlRpcHandler
             }
 
             /*
-             * If version == 0 then don't get a specific version and keep the latest version
-             * returned by the previous call of getDocument().
+             * If version == 0 then don't get a specific version and keep the latest version returned by the previous
+             * call of getDocument().
              */
             if (version != 0) {
                 doc = xwiki.getDocument(doc, String.format("%d.%d", version, minorVersion));
@@ -419,31 +403,64 @@ public class XWikiXmlRpcHandler
                 if (doc != null) {
                     if (version != 0) {
                         /*
-                         * If a specific page version has been requested, encode it it the page id
-                         * using extended page id version
+                         * If a specific page version has been requested, encode it it the page id using extended page
+                         * id version
                          */
                         return DomainObjectFactory.createXWikiPage(doc, true).toRawMap();
                     } else {
                         return DomainObjectFactory.createXWikiPage(doc, false).toRawMap();
                     }
                 } else {
-                    throw new XmlRpcException(String.format(
-                        "Page '%s' does not have an '%s' translation",
-                        extendedId.getBasePageId(), language));
+                    throw new XmlRpcException(String.format("Page '%s' does not have an '%s' translation", extendedId
+                        .getBasePageId(), language));
                 }
             } else {
-                throw new XmlRpcException(String.format(
-                    "Page '%s' does not exist at version %d.%d", extendedId.getBasePageId(),
-                    version, minorVersion));
+                throw new XmlRpcException(String.format("Page '%s' does not exist at version %d.%d", extendedId
+                    .getBasePageId(), version, minorVersion));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
         }
     }
 
     /**
-     * Store a page or create it if it doesn't exist.
+     * Store or rename a page, or create it if it doesn't exist.
+     * <p>
+     * The way confluence clients rename pages is the following:
+     * </p>
+     * <code>
+     *   page = getPage(pageId); 
+     *   page.setSpace("New space"); 
+     *   page.setTitle("New title");
+     *   storePage(page);
+     * </code>
+     * <p>
+     * In XWiki in order to rename a page we need to change its ID, and no client written for confluence will do this.
+     * Currently the authoritative source for the page location is the ID (basically storePage ignores the space field)
+     * and changing the title will only affect the page title. However if we agree to assume that the when using XMLRPC
+     * the semantics of the page title is that of the page name in an XWiki ID, we will be able to be confluence
+     * compatible.
+     * </p>
+     * </p>
+     * There are three possible cases: Let P=(id, space, title) the definition of a page. Let CP be the current page and
+     * NP the page to be stored (i.e. the page passed to storePage):
+     * </p>
+     * <p>
+     * 1) CP=("Space.Name", "Space", "Title") NP=("Space.Name", "NewSpace", "Title") Here it is clear that the user
+     * wants to "rename" the page by moving it to another space. So we rename the page to ("NewSpace.Name", "NewSpace",
+     * "Title")
+     * </p>
+     * <p>
+     * 2) CP=("Space.Name", "Space", "Title") NP=("Space.Name", "NewSpace", "NewTitle"); Here it is also clear that we
+     * want to move the page to NewSpace but we have a problem about how to name the new page: NewSpace.Name or
+     * NewSpace.NewTitle? According to the assumption stated before, we rename the page and use NewTitle as the page
+     * name. The renamed page will have the NewSpace.NewTitle id. We also set the renamed page title to NewTitle.
+     * </p>
+     * <p>
+     * 3) CP=("Space.Name", "Space", "Title") NP=("Space.Name", "Space", "NewTitle"); Here we have an ambiguity. Does
+     * the user want to to rename the page or set its title? According to the assumption stated before we assume that
+     * the user wants to rename the page so we will rename the page to Space.NewTitle and set its title to NewTitle.
+     * </p>
      * 
      * @param token The authentication token.
      * @param pageMap A map representing the Page object to be stored.
@@ -460,16 +477,13 @@ public class XWikiXmlRpcHandler
         XWikiPage page = new XWikiPage(pageMap);
 
         /*
-         * Confluence semantics compatibility. In order to say to create a page, Confluence sets the
-         * id to null.
+         * Confluence semantics compatibility. In order to say to create a page, Confluence sets the id to null.
          */
         if (page.getId() == null) {
             if (page.getTitle() == null) {
-                throw new XmlRpcException(String
-                    .format("[Neither page title, nor page id is specified!]"));
+                throw new XmlRpcException(String.format("[Neither page title, nor page id is specified!]"));
             }
-            page
-                .setId(String.format("%s.%s", page.getSpace(), page.getTitle().replace(' ', '_')));
+            page.setId(String.format("%s.%s", page.getSpace(), page.getTitle().replace(' ', '_')));
         }
 
         if (page.getLanguage() == null) {
@@ -478,53 +492,124 @@ public class XWikiXmlRpcHandler
 
         XWikiExtendedId extendedId = new XWikiExtendedId(page.getId());
 
+        boolean pageAlreadyExists = xwiki.exists(extendedId.getBasePageId());
         Document doc = xwiki.getDocument(extendedId.getBasePageId());
 
         if (doc != null) {
             if (doc.getLocked()) {
-                throw new XmlRpcException(String.format(
-                    "Unable to store document. Document locked by %s", doc.getLockingUser()));
+                throw new XmlRpcException(String.format("Unable to store document. Document locked by %s", doc
+                    .getLockingUser()));
             }
 
-            if (!page.getLanguage().equals("")
-                && !page.getLanguage().equals(doc.getDefaultLanguage())) {
-                /*
-                 * Try to get the document in the translation specified in the page parameter...
-                 */
-                doc = doc.getTranslatedDocument(page.getLanguage());
+            /*
+             * Confluence semantics compatibility. Here we assume that the authoritative source for the page ID is the
+             * combination of the fields Space + Title as specified in the page structure passed to the function. If the
+             * title or the space (or both) are different from the current values then we must handle the request as a
+             * page rename.
+             */
+            boolean rename = false;
 
-                if (!doc.getLanguage().equals(page.getLanguage())) {
+            /* Check if the page already exists. If it doesn't this is surely not a rename request! */
+            if (pageAlreadyExists) {
+                /* The page already exists... check if we have received a rename request. */
+                if (!page.getTitle().equals(doc.getName())) {
                     /*
-                     * If we are here, then the document returned by getTranslatedDocument is the
-                     * same of the default translation, i.e., the page in the current translation
-                     * does not exist. So we have to create it. Here we have to use the low-level
-                     * XWiki API because it is not possible to set the language of a Document.
+                     * Here the title is different from the document name. This check is necessary because getPage sets
+                     * the title to the page name when the actual title is "". So when this is the case, even though the
+                     * document title is different from the page title, the caller might not have changed the title
+                     * field for renaming the page.
                      */
-                    XWikiDocument xwikiDocument =
-                        new XWikiDocument(page.getSpace(), extendedId.getBasePageId());
-                    xwikiDocument.setLanguage(page.getLanguage());
-                    doc = new Document(xwikiDocument, xwikiXmlRpcContext.getXWikiContext());
+
+                    if (!page.getTitle().equals(doc.getTitle())) {
+                        /*
+                         * Here the page already exists, titles are different and the passed title is different from the
+                         * page name. So the request is surely a rename request.
+                         */
+
+                        if (!page.getTitle().equals("")) {
+                            /*
+                             * Check a degenerate case where the user tries to rename the page to a page with an empty
+                             * name. If we are here, the new title (i.e., the new page name is valid).
+                             */
+                            rename = true;
+                        }
+                    }
+                }
+
+                /* Check also on the space side */
+                if (!doc.getSpace().equals(page.getSpace())) {
+                    /*
+                     * Here the document space and the space field of the page passed as parameter are different. So
+                     * this is surely a rename request.
+                     */
+                    if (!page.getSpace().equals("")) {
+                        /*
+                         * Check a degenerate case where the user tries to rename the page to a space with an empty
+                         * name. If we are here, the new space name is valid.
+                         */
+                        rename = true;
+                    }
                 }
             }
 
-            doc.setContent(page.getContent());
-            doc.setTitle(page.getTitle());
-            doc.setParent(page.getParentId()); /* Allow reparenting */
+            /*
+             * In order to rename a page we must rename the default language one. This simplifies the logic for handling
+             * the Confluence compatibility. In fact every page translation has its own title and we consider the
+             * default translation title as the page name when renaming.
+             */
+            if (rename && page.getLanguage().equals("")) {
+                /* This is a rename request */
 
-            doc.save();
+                /*
+                 * Given the conditions before, here we have that newSpace != "" AND newName != "", AND either newSpace !=
+                 * documentSpace OR newName != documentName.
+                 */
+                String newSpace = page.getSpace();
+                String newName = page.getTitle();
+
+                String newPageId = String.format("%s.%s", newSpace, newName);
+                xwiki.renamePage(doc, newPageId);
+                doc = xwiki.getDocument(newPageId);
+            } else {
+                /*
+                 * Normal document storage.
+                 */
+
+                if (!page.getLanguage().equals("") && !page.getLanguage().equals(doc.getDefaultLanguage())) {
+                    /*
+                     * Try to get the document in the translation specified in the page parameter...
+                     */
+                    doc = doc.getTranslatedDocument(page.getLanguage());
+
+                    if (!doc.getLanguage().equals(page.getLanguage())) {
+                        /*
+                         * If we are here, then the document returned by getTranslatedDocument is the same of the
+                         * default translation, i.e., the page in the current translation does not exist. So we have to
+                         * create it. Here we have to use the low-level XWiki API because it is not possible to set the
+                         * language of a Document.
+                         */
+                        XWikiDocument xwikiDocument = new XWikiDocument(page.getSpace(), extendedId.getBasePageId());
+                        xwikiDocument.setLanguage(page.getLanguage());
+                        doc = new Document(xwikiDocument, xwikiXmlRpcContext.getXWikiContext());
+                    }
+                }
+
+                doc.setContent(page.getContent());
+                doc.setTitle(page.getTitle());
+                doc.setParent(page.getParentId()); /* Allow reparenting */
+                doc.save();
+            }
 
             return DomainObjectFactory.createXWikiPage(doc, false).toRawMap();
         } else {
-            throw new XmlRpcException(String.format("Cannot get document for page '%s'",
-                extendedId.getBasePageId()));
+            throw new XmlRpcException(String.format("Cannot get document for page '%s'", extendedId.getBasePageId()));
         }
     }
 
     /**
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
     public Boolean removePage(String token, String pageId) throws XWikiException, XmlRpcException
@@ -541,18 +626,16 @@ public class XWikiXmlRpcHandler
             if (doc != null) {
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
-                        "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                            .getName(), doc.getLockingUser()));
+                        "Unable to remove attachment. Document '%s' locked by '%s'", doc.getName(), doc
+                            .getLockingUser()));
                 }
 
                 doc.delete();
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
 
         return true;
@@ -562,12 +645,10 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing PageHistorySummary objects.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
-    public List getPageHistory(String token, String pageId) throws XWikiException,
-        XmlRpcException
+    public List getPageHistory(String token, String pageId) throws XWikiException, XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -585,19 +666,16 @@ public class XWikiXmlRpcHandler
                     Document docRevision = xwiki.getDocument(doc, version.toString());
 
                     /*
-                     * The returned document has the right content but the wrong content update
-                     * date, that is always equals to the current date. Don't know why.
+                     * The returned document has the right content but the wrong content update date, that is always
+                     * equals to the current date. Don't know why.
                      */
-                    result.add(DomainObjectFactory.createXWikiPageHistorySummary(docRevision)
-                        .toRawMap());
+                    result.add(DomainObjectFactory.createXWikiPageHistorySummary(docRevision).toRawMap());
                 }
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
 
         return result;
@@ -609,15 +687,13 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param space Ignored
      * @param pageId The page id in the form of Space.Page
-     * @param content The content to be rendered. If content == "" then the page content is
-     *            rendered.
+     * @param content The content to be rendered. If content == "" then the page content is rendered.
      * @return The rendered content.
-     * @throws XmlRpcException XmlRpcException If the page does not exist or the user has not the
-     *             right to access it.
+     * @throws XmlRpcException XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
-    public String renderContent(String token, String space, String pageId, String content)
-        throws XWikiException, XmlRpcException
+    public String renderContent(String token, String space, String pageId, String content) throws XWikiException,
+        XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -631,19 +707,17 @@ public class XWikiXmlRpcHandler
             Document doc = xwiki.getDocument(extendedId.getBasePageId());
             if (doc != null) {
                 /*
-                 * This is the old implementation. TODO: Check if it can be made more lightweight...
-                 * xwiki.renderText() doesn't work fine as the following.
+                 * This is the old implementation. TODO: Check if it can be made more lightweight... xwiki.renderText()
+                 * doesn't work fine as the following.
                  */
                 XWikiContext context = xwikiXmlRpcContext.getXWikiContext();
                 com.xpn.xwiki.XWiki baseXWiki = context.getWiki();
                 context.setAction("view");
 
-                XWikiDocument baseDocument =
-                    baseXWiki.getDocument(extendedId.getBasePageId(), context);
+                XWikiDocument baseDocument = baseXWiki.getDocument(extendedId.getBasePageId(), context);
                 context.setDoc(baseDocument);
-                
-                VelocityManager velocityManager =
-                    (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
+
+                VelocityManager velocityManager = (VelocityManager) Utils.getComponent(VelocityManager.ROLE);
                 VelocityContext vcontext = velocityManager.getVelocityContext();
 
                 baseXWiki.prepareDocuments(context.getRequest(), context, vcontext);
@@ -654,12 +728,10 @@ public class XWikiXmlRpcHandler
                 }
                 return baseXWiki.getRenderingEngine().renderText(content, baseDocument, context);
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
     }
 
@@ -667,8 +739,7 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing Comment objects.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
     public List getComments(String token, String pageId) throws XWikiException, XmlRpcException
@@ -682,24 +753,23 @@ public class XWikiXmlRpcHandler
 
         List result = new ArrayList();
 
-        /* Here we are interested only in the page id without any extended information */
+        /*
+         * Here we are interested only in the page id without any extended information
+         */
         if (xwiki.exists(extendedId.getBasePageId())) {
             Document doc = xwiki.getDocument(extendedId.getBasePageId());
             if (doc != null) {
                 Vector<com.xpn.xwiki.api.Object> comments = doc.getComments();
                 if (comments != null) {
                     for (com.xpn.xwiki.api.Object commentObject : comments) {
-                        result.add(DomainObjectFactory.createComment(doc, commentObject)
-                            .toRawMap());
+                        result.add(DomainObjectFactory.createComment(doc, commentObject).toRawMap());
                     }
                 }
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
 
         return result;
@@ -720,21 +790,18 @@ public class XWikiXmlRpcHandler
             if (doc != null) {
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
-                        "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                            .getName(), doc.getLockingUser()));
+                        "Unable to remove attachment. Document '%s' locked by '%s'", doc.getName(), doc
+                            .getLockingUser()));
                 }
 
-                com.xpn.xwiki.api.Object commentObject =
-                    doc.getObject("XWiki.XWikiComments", commentNumericalId);
+                com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", commentNumericalId);
 
                 return DomainObjectFactory.createComment(doc, commentObject).toRawMap();
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
     }
 
@@ -743,8 +810,7 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @param commentMap A map representing a Comment object.
      * @return A map representing a Comment object with updated information.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
     public Map addComment(String token, Map commentMap) throws XWikiException, XmlRpcException
@@ -770,12 +836,10 @@ public class XWikiXmlRpcHandler
 
                 return DomainObjectFactory.createComment(doc, commentObject).toRawMap();
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
     }
 
@@ -783,12 +847,10 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return True if the comment has been successfully removed.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
-    public Boolean removeComment(String token, String commentId) throws XWikiException,
-        XmlRpcException
+    public Boolean removeComment(String token, String commentId) throws XWikiException, XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -803,21 +865,18 @@ public class XWikiXmlRpcHandler
             if (doc != null) {
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
-                        "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                            .getName(), doc.getLockingUser()));
+                        "Unable to remove attachment. Document '%s' locked by '%s'", doc.getName(), doc
+                            .getLockingUser()));
                 }
 
-                com.xpn.xwiki.api.Object commentObject =
-                    doc.getObject("XWiki.XWikiComments", commentNumericalId);
+                com.xpn.xwiki.api.Object commentObject = doc.getObject("XWiki.XWikiComments", commentNumericalId);
                 doc.removeObject(commentObject);
                 doc.save();
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
 
         return true;
@@ -827,12 +886,10 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing Attachment objects.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
-    public List getAttachments(String token, String pageId) throws XWikiException,
-        XmlRpcException
+    public List getAttachments(String token, String pageId) throws XWikiException, XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -850,12 +907,10 @@ public class XWikiXmlRpcHandler
                     result.add(DomainObjectFactory.createAttachment(xwikiAttachment).toRawMap());
                 }
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
 
         return result;
@@ -864,16 +919,14 @@ public class XWikiXmlRpcHandler
     /**
      * @param token The authentication token.
      * @param contentId Ignored
-     * @param attachment The Attachment object used to identify the page id, and attachment
-     *            metadata.
+     * @param attachment The Attachment object used to identify the page id, and attachment metadata.
      * @param attachmentData The actual attachment data.
      * @return An Attachment object describing the newly added attachment.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      * @category ConfluenceAPI
      */
-    public Map addAttachment(String token, Integer contentId, Map attachmentMap,
-        byte[] attachmentData) throws XWikiException, XmlRpcException
+    public Map addAttachment(String token, Integer contentId, Map attachmentMap, byte[] attachmentData)
+        throws XWikiException, XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -888,13 +941,13 @@ public class XWikiXmlRpcHandler
 
             if (doc != null) {
                 if (doc.getLocked()) {
-                    throw new XmlRpcException(String.format(
-                        "Unable to add attachment. Document locked by %s", doc.getLockingUser()));
+                    throw new XmlRpcException(String.format("Unable to add attachment. Document locked by %s", doc
+                        .getLockingUser()));
                 }
 
                 /*
-                 * Here we need to switch to the low-level API because the user's API support for
-                 * attachment is not very well understandable.
+                 * Here we need to switch to the low-level API because the user's API support for attachment is not very
+                 * well understandable.
                  */
 
                 /*
@@ -902,11 +955,9 @@ public class XWikiXmlRpcHandler
                  */
                 com.xpn.xwiki.XWiki baseXWiki = xwikiXmlRpcContext.getBaseXWiki();
                 XWikiDocument xwikiDocument =
-                    baseXWiki.getDocument(extendedId.getBasePageId(), xwikiXmlRpcContext
-                        .getXWikiContext());
+                    baseXWiki.getDocument(extendedId.getBasePageId(), xwikiXmlRpcContext.getXWikiContext());
 
-                XWikiAttachment xwikiBaseAttachment =
-                    xwikiDocument.getAttachment(attachment.getFileName());
+                XWikiAttachment xwikiBaseAttachment = xwikiDocument.getAttachment(attachment.getFileName());
                 if (xwikiBaseAttachment == null) {
                     xwikiBaseAttachment = new XWikiAttachment();
                     xwikiDocument.getAttachmentList().add(xwikiBaseAttachment);
@@ -916,23 +967,18 @@ public class XWikiXmlRpcHandler
                 xwikiBaseAttachment.setAuthor(user.getName());
 
                 xwikiBaseAttachment.setDoc(xwikiDocument);
-                xwikiDocument.saveAttachmentContent(xwikiBaseAttachment, xwikiXmlRpcContext
-                    .getXWikiContext());
+                xwikiDocument.saveAttachmentContent(xwikiBaseAttachment, xwikiXmlRpcContext.getXWikiContext());
 
-                xwikiXmlRpcContext.getBaseXWiki().saveDocument(xwikiDocument,
-                    xwikiXmlRpcContext.getXWikiContext());
+                xwikiXmlRpcContext.getBaseXWiki().saveDocument(xwikiDocument, xwikiXmlRpcContext.getXWikiContext());
 
-                com.xpn.xwiki.api.Attachment xwikiAttachment =
-                    doc.getAttachment(attachment.getFileName());
+                com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(attachment.getFileName());
 
                 return DomainObjectFactory.createAttachment(xwikiAttachment).toRawMap();
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
     }
 
@@ -941,12 +987,12 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @param versionNumber (Ignored)
      * @return An array of bytes with the actual attachment content.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     *             or the attachment with the given fileName does not exist on the given page.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it or the attachment
+     *             with the given fileName does not exist on the given page.
      * @category ConfluenceAPI
      */
-    public byte[] getAttachmentData(String token, String pageId, String fileName,
-        String versionNumber) throws XWikiException, XmlRpcException
+    public byte[] getAttachmentData(String token, String pageId, String fileName, String versionNumber)
+        throws XWikiException, XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -962,17 +1008,14 @@ public class XWikiXmlRpcHandler
                 if (xwikiAttachment != null) {
                     return xwikiAttachment.getContent();
                 } else {
-                    throw new XmlRpcException(String.format(
-                        "Attachment '%s' does not exist on page '%s'", fileName, extendedId
-                            .getBasePageId()));
+                    throw new XmlRpcException(String.format("Attachment '%s' does not exist on page '%s'", fileName,
+                        extendedId.getBasePageId()));
                 }
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
     }
 
@@ -980,12 +1023,12 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return True if the attachment has been removed.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     *             or the attachment with the given fileName does not exist on the given page.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it or the attachment
+     *             with the given fileName does not exist on the given page.
      * @category ConfluenceAPI
      */
-    public Boolean removeAttachment(String token, String pageId, String fileName)
-        throws XWikiException, XmlRpcException
+    public Boolean removeAttachment(String token, String pageId, String fileName) throws XWikiException,
+        XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -999,39 +1042,32 @@ public class XWikiXmlRpcHandler
             if (doc != null) {
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
-                        "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                            .getName(), doc.getLockingUser()));
+                        "Unable to remove attachment. Document '%s' locked by '%s'", doc.getName(), doc
+                            .getLockingUser()));
                 }
 
                 com.xpn.xwiki.api.Attachment xwikiAttachment = doc.getAttachment(fileName);
                 if (xwikiAttachment != null) {
                     /*
-                     * Here we must use low-level XWiki API because there is no way for removing an
-                     * attachment through the XWiki User's API. Basically we use the
-                     * com.xpn.xwiki.XWiki object to re-do all the steps that we have already done
-                     * so far by using the API. It is safe because if we are here, we know that
-                     * everything exists and we have the proper rights to do things. So nothing
-                     * should fail.
+                     * Here we must use low-level XWiki API because there is no way for removing an attachment through
+                     * the XWiki User's API. Basically we use the com.xpn.xwiki.XWiki object to re-do all the steps that
+                     * we have already done so far by using the API. It is safe because if we are here, we know that
+                     * everything exists and we have the proper rights to do things. So nothing should fail.
                      */
                     com.xpn.xwiki.XWiki baseXWiki = xwikiXmlRpcContext.getBaseXWiki();
                     XWikiContext xwikiContext = xwikiXmlRpcContext.getXWikiContext();
-                    XWikiDocument baseXWikiDocument =
-                        baseXWiki.getDocument(extendedId.getBasePageId(), xwikiContext);
-                    XWikiAttachment baseXWikiAttachment =
-                        baseXWikiDocument.getAttachment(fileName);
+                    XWikiDocument baseXWikiDocument = baseXWiki.getDocument(extendedId.getBasePageId(), xwikiContext);
+                    XWikiAttachment baseXWikiAttachment = baseXWikiDocument.getAttachment(fileName);
                     baseXWikiDocument.deleteAttachment(baseXWikiAttachment, xwikiContext);
                 } else {
-                    throw new XmlRpcException(String.format(
-                        "Attachment '%s' does not exist on page '%s'", fileName, extendedId
-                            .getBasePageId()));
+                    throw new XmlRpcException(String.format("Attachment '%s' does not exist on page '%s'", fileName,
+                        extendedId.getBasePageId()));
                 }
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
 
         return true;
@@ -1085,8 +1121,7 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @return A list of maps representing XWikiObject objects.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      */
     public List getObjects(String token, String pageId) throws XWikiException, XmlRpcException
     {
@@ -1103,44 +1138,39 @@ public class XWikiXmlRpcHandler
             if (doc != null) {
                 List result = new ArrayList();
 
-                Map<String, Vector<com.xpn.xwiki.api.Object>> classToObjectsMap =
-                    doc.getxWikiObjects();
+                Map<String, Vector<com.xpn.xwiki.api.Object>> classToObjectsMap = doc.getxWikiObjects();
 
                 for (String className : classToObjectsMap.keySet()) {
                     Vector<com.xpn.xwiki.api.Object> objects = classToObjectsMap.get(className);
                     for (com.xpn.xwiki.api.Object object : objects) {
-                        result.add(DomainObjectFactory.createXWikiObjectSummary(doc, object)
-                            .toRawMap());
+                        result.add(DomainObjectFactory.createXWikiObjectSummary(doc, object).toRawMap());
                     }
                 }
 
                 return result;
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Unable to get page %s", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Unable to get page %s", extendedId.getBasePageId()));
         }
     }
 
     /**
-     * The getObject function will return an XWikiObject where only non-null properties are included
-     * in the mapping 'field' -> 'value' In order to know all the available fields and their
-     * respective types and attributes, clients should refer to the object's class.
+     * The getObject function will return an XWikiObject where only non-null properties are included in the mapping
+     * 'field' -> 'value' In order to know all the available fields and their respective types and attributes, clients
+     * should refer to the object's class.
      * 
      * @param token The authentication token.
      * @param pageId The pageId in the 'Space.Page' format.
      * @param className The class of the object.
      * @param id The id (number) of the object.
-     * @return The XWikiObject containing the information about all the properties contained in the
-     *         selected object.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     *             or no object with the given id exist in the page.
+     * @return The XWikiObject containing the information about all the properties contained in the selected object.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it or no object with
+     *             the given id exist in the page.
      */
-    public Map getObject(String token, String pageId, String className, Integer id)
-        throws XWikiException, XmlRpcException
+    public Map getObject(String token, String pageId, String className, Integer id) throws XWikiException,
+        XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -1162,12 +1192,10 @@ public class XWikiXmlRpcHandler
                     throw new XmlRpcException(String.format("Unable to find object id %d", id));
                 }
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Unable to get page %s", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Unable to get page %s", extendedId.getBasePageId()));
         }
     }
 
@@ -1177,8 +1205,7 @@ public class XWikiXmlRpcHandler
      * @param token The authentication token.
      * @param objectMap A map representing the XWikiObject to be updated/created.
      * @return A map representing the XWikiObject with the updated information.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access
-     *             it.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it.
      */
     public Map storeObject(String token, Map objectMap) throws XWikiException, XmlRpcException
     {
@@ -1196,12 +1223,11 @@ public class XWikiXmlRpcHandler
 
             if (doc != null) {
                 if (doc.getLocked()) {
-                    throw new XmlRpcException(String.format(
-                        "Unable to store object. Document locked by %s", doc.getLockingUser()));
+                    throw new XmlRpcException(String.format("Unable to store object. Document locked by %s", doc
+                        .getLockingUser()));
                 }
 
-                com.xpn.xwiki.api.Object xwikiObject =
-                    doc.getObject(object.getClassName(), object.getId());
+                com.xpn.xwiki.api.Object xwikiObject = doc.getObject(object.getClassName(), object.getId());
 
                 /* If the object does not exist create it */
                 if (xwikiObject == null) {
@@ -1211,15 +1237,14 @@ public class XWikiXmlRpcHandler
                 }
 
                 /*
-                 * We iterate on the XWikiObject-passed-as-a-parameter's properties instead of the
-                 * one retrieved through the API because, a newly created object has no properties,
-                 * and they should be added via set. Apparently setting properties that do not
-                 * belong to the object's class is harmless.
+                 * We iterate on the XWikiObject-passed-as-a-parameter's properties instead of the one retrieved through
+                 * the API because, a newly created object has no properties, and they should be added via set.
+                 * Apparently setting properties that do not belong to the object's class is harmless.
                  */
                 for (String propertyName : object.getProperties()) {
                     /*
-                     * Object values are always sent as strings (or arrays/maps of strings)... let
-                     * the actual object perform the conversion
+                     * Object values are always sent as strings (or arrays/maps of strings)... let the actual object
+                     * perform the conversion
                      */
 
                     xwikiObject.set(propertyName, object.getProperty(propertyName));
@@ -1229,12 +1254,10 @@ public class XWikiXmlRpcHandler
 
                 return DomainObjectFactory.createXWikiObject(doc, xwikiObject).toRawMap();
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Unable to get page %s", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Unable to get page %s", extendedId.getBasePageId()));
         }
     }
 
@@ -1243,11 +1266,11 @@ public class XWikiXmlRpcHandler
      * @param pageId The pageId in the 'Space.Page' format.
      * @param id The object's id.
      * @return True if the object has been successfully deleted.
-     * @throws XmlRpcException If the page does not exist or the user has not the right to access it
-     *             or no object with the given id exist in the page.
+     * @throws XmlRpcException If the page does not exist or the user has not the right to access it or no object with
+     *             the given id exist in the page.
      */
-    public Boolean removeObject(String token, String pageId, String className, Integer id)
-        throws XWikiException, XmlRpcException
+    public Boolean removeObject(String token, String pageId, String className, Integer id) throws XWikiException,
+        XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -1261,8 +1284,8 @@ public class XWikiXmlRpcHandler
             if (doc != null) {
                 if (doc.getLocked()) {
                     throw new XmlRpcException(String.format(
-                        "Unable to remove attachment. Document '%s' locked by '%s'", doc
-                            .getName(), doc.getLockingUser()));
+                        "Unable to remove attachment. Document '%s' locked by '%s'", doc.getName(), doc
+                            .getLockingUser()));
                 }
 
                 com.xpn.xwiki.api.Object commentObject = doc.getObject(className, id);
@@ -1270,17 +1293,14 @@ public class XWikiXmlRpcHandler
                     doc.removeObject(commentObject);
                     doc.save();
                 } else {
-                    throw new XmlRpcException(String.format(
-                        "Object %s[%d] on page '%s' does not exist", className, id, extendedId
-                            .getBasePageId()));
+                    throw new XmlRpcException(String.format("Object %s[%d] on page '%s' does not exist", className, id,
+                        extendedId.getBasePageId()));
                 }
             } else {
-                throw new XmlRpcException(String.format("Page '%s' cannot be accessed",
-                    extendedId.getBasePageId()));
+                throw new XmlRpcException(String.format("Page '%s' cannot be accessed", extendedId.getBasePageId()));
             }
         } else {
-            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId
-                .getBasePageId()));
+            throw new XmlRpcException(String.format("Page '%s' doesn't exist", extendedId.getBasePageId()));
         }
 
         return true;
@@ -1288,12 +1308,11 @@ public class XWikiXmlRpcHandler
 
     /**
      * @param token The authentication token.
-     * @param query The string to be looked for. If it is "__ALL_PAGES__" the search will return all
-     *            the page ids available in the Wiki.
+     * @param query The string to be looked for. If it is "__ALL_PAGES__" the search will return all the page ids
+     *            available in the Wiki.
      * @return A list of SearchResults
      */
-    public List search(String token, String query, int maxResults) throws XWikiException,
-        XmlRpcException
+    public List search(String token, String query, int maxResults) throws XWikiException, XmlRpcException
     {
         XWikiXmlRpcContext xwikiXmlRpcContext = xwikiXmlRpcHttpRequestConfig.getXmlRpcContext();
         XWikiXmlRpcUser user = XWikiUtils.checkToken(token, xwikiXmlRpcContext.getXWikiContext());
@@ -1308,16 +1327,15 @@ public class XWikiXmlRpcHandler
             for (String spaceKey : spaceKeys) {
                 List<String> pageNames = xwiki.getSpaceDocsName(spaceKey);
                 for (String pageName : pageNames) {
-                    result.add(DomainObjectFactory.createSearchResult(
-                        String.format("%s.%s", spaceKey, pageName)).toMap());
+                    result.add(DomainObjectFactory.createSearchResult(String.format("%s.%s", spaceKey, pageName))
+                        .toMap());
                 }
             }
         } else {
             List<String> searchResults =
                 baseXWiki.getStore().searchDocumentsNames(
-                    "where doc.content like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query)
-                        + "%' or doc.name like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query)
-                        + "%'", xwikiXmlRpcContext.getXWikiContext());
+                    "where doc.content like '%" + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%' or doc.name like '%"
+                        + com.xpn.xwiki.web.Utils.SQLFilter(query) + "%'", xwikiXmlRpcContext.getXWikiContext());
             int i = 0;
             for (String pageId : searchResults) {
                 if (maxResults > 0 && i < maxResults) {

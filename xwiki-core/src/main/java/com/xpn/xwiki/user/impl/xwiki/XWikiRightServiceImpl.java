@@ -38,6 +38,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.classes.GroupsClass;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.api.XWikiRightNotFoundException;
 import com.xpn.xwiki.user.api.XWikiRightService;
@@ -331,7 +332,7 @@ public class XWikiRightServiceImpl implements XWikiRightService
                             log.debug("Checking match: " + name + " in " + users);
                         }
 
-                        String[] userarray = StringUtils.split(users, " ,|");
+                        String[] userarray = GroupsClass.getListFromString(users).toArray(new String[0]);
 
                         for (int ii = 0; ii < userarray.length; ii++) {
                             String value = userarray[ii];

@@ -85,8 +85,10 @@ public class UploadAction extends XWikiAction
         }
         filename = filename.replaceAll("\\+", " ");
 
-        // TODO : avoid name clearing when encoding problems will be solved
-        // JIRA : http://jira.xwiki.org/jira/browse/XWIKI-94
+        // Issues fixed by the clearName :
+        // 1) Attaching images with a name containing special characters (é & è à ...) generates bugs
+        //    (image are not displayed), XWIKI-2090.
+        // 2) Attached files that we can't delete or link in the Wiki pages, XWIKI-2087.
         filename = context.getWiki().clearName(filename, false, true, context);
 
         XWikiDocument olddoc = (XWikiDocument) doc.clone();

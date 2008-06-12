@@ -2492,6 +2492,11 @@ table.mceEditor textarea{ width :100%; height: 100%;}
 	z-index: 30002;
 }
 
+.mceEditor td {padding:0px;}
+form#inline textarea {width: 100%;}
+body.hideright #xwikimaincontainer {overflow-y: auto;}
+body.mceContentBody {min-width:100px;}
+
 #treeview table { margin: 0px;}
 #treeview table td{ text-align: left; padding: 0px;border: 0px;}
 

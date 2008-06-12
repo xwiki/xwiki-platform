@@ -483,7 +483,7 @@ public class XWikiXmlRpcHandler
             if (page.getTitle() == null) {
                 throw new XmlRpcException(String.format("[Neither page title, nor page id is specified!]"));
             }
-            page.setId(String.format("%s.%s", page.getSpace(), page.getTitle().replace(' ', '_')));
+            page.setId(String.format("%s.%s", page.getSpace(), page.getTitle()));
         }
 
         if (page.getLanguage() == null) {

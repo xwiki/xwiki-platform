@@ -520,7 +520,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
                 Map<String, String> groupMembers = ldapUtils.getGroupMembers(groupDN, context);
 
-                syncGroupMembership(xwikiUserName, userDN, xwikiGroupName, userGroups, groupMembers, context);
+                if (groupMembers != null) {
+                    syncGroupMembership(xwikiUserName, userDN, xwikiGroupName, userGroups, groupMembers, context);
+                }
             }
         }
     }

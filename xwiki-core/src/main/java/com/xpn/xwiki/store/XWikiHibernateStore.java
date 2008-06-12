@@ -1732,6 +1732,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             if (bTransaction) {
                 endTransaction(context, false, false);
+                bTransaction = false;
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
@@ -1792,7 +1793,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             Session session = getSession(context);
 
             // need to delete existing links before saving the page's one
-            // TODO: is there any faster way to do this?
             deleteLinks(doc.getId(), context, bTransaction);
 
             // necessary to blank links from doc
@@ -1860,17 +1860,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
             }
             Session session = getSession(context);
 
-            Query query = session.createQuery(" from XWikiLink as link where link.id.docId = :docId");
+            Query query = session.createQuery("delete from XWikiLink as link where link.id.docId = :docId");
             query.setLong("docId", docId);
-
-            List links = query.list();
-            for (int i = 0; i < links.size(); i++) {
-                XWikiLink link = (XWikiLink) links.get(i);
-                session.delete(link);
-            }
+            query.executeUpdate();
 
             if (bTransaction) {
                 endTransaction(context, true);
+                bTransaction = false;
             }
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,

@@ -123,7 +123,7 @@ public class XWikiDocument
 
     private String parent;
 
-    private String web;
+    private String space;
 
     private String name;
 
@@ -301,12 +301,12 @@ public class XWikiDocument
      */
     public String getSpace()
     {
-        return this.web;
+        return this.space;
     }
 
     public void setSpace(String space)
     {
-        this.web = space;
+        this.space = space;
     }
 
     public String getVersion()

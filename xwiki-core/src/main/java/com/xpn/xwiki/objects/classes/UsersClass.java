@@ -81,16 +81,8 @@ public class UsersClass extends ListClass {
         return context.getWiki().getUserName(value, null, false, context);
     }
 
-    public static List getListFromString(String value) {
-        List list = new ArrayList();
-        if (value == null)
-            return list;
-
-        String val = StringUtils.replace(value, "\\,", "%SEP%");
-        String[] result = StringUtils.split(val, ",|");
-        for (int i = 0; i < result.length; i++)
-            list.add(StringUtils.replace(result[i], "%SEP%", ","));
-        return list;
+    public static List<String> getListFromString(String value) {
+        return getListFromString(value, ",", false);
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {

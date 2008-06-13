@@ -89,19 +89,9 @@ public class LevelsClass extends ListClass
         return value;
     }
 
-    public static List getListFromString(String value)
+    public static List<String> getListFromString(String value)
     {
-        List list = new ArrayList();
-        if (value == null) {
-            return list;
-        }
-
-        String val = StringUtils.replace(value, "\\,", "%SEP%");
-        String[] result = StringUtils.split(val, ", ");
-        for (int i = 0; i < result.length; i++) {
-            list.add(StringUtils.replace(result[i], "%SEP%", ","));
-        }
-        return list;
+        return getListFromString(value, ",", false);        
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix,

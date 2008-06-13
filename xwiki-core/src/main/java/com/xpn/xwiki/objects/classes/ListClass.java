@@ -169,9 +169,9 @@ public abstract class ListClass extends PropertyClass
         return getListFromString(value, "|", true);
     }
 
-    public static List getListFromString(String value, String separators, boolean withMap)
+    public static List<String> getListFromString(String value, String separators, boolean withMap)
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         if (value == null) {
             return list;
         }

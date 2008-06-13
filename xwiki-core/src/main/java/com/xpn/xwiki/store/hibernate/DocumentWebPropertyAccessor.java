@@ -49,7 +49,7 @@ public class DocumentWebPropertyAccessor extends BasicPropertyAccessor implement
     @Override
     public Getter getGetter(Class theClass, String propertyName) throws PropertyNotFoundException
     {
-        LOG.warn("Deprecated usage of doc.web property in HQL query");
+        LOG.warn("Deprecated usage of doc.web property in HQL query (get). Use doc.space instead.");
         return super.getGetter(theClass, "space");
     }
 
@@ -62,7 +62,7 @@ public class DocumentWebPropertyAccessor extends BasicPropertyAccessor implement
     @Override
     public Setter getSetter(Class theClass, String propertyName) throws PropertyNotFoundException
     {
-        LOG.warn("Deprecated usage of doc.web property in HQL query");
+        LOG.warn("Deprecated usage of doc.web property in HQL query (set). Use doc.space instead.");
         return super.getSetter(theClass, "space");
     }
 

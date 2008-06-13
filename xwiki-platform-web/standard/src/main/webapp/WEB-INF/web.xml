@@ -70,6 +70,13 @@
   <servlet>
     <servlet-name>redirectHomeServlet</servlet-name>
     <servlet-class>com.xpn.xwiki.web.HomePageRedirectServlet</servlet-class>
+    <!-- Uncomment and edit this if you want to redirect to a different home page, or if you have different mappings
+    <init-param>
+      <param-name>homePage</param-name>
+      <param-value>bin/Main/</param-value>
+      <description>The address to redirect to when the client hits the root of the application.</description>
+    </init-param>
+    -->
   </servlet>
 
   <servlet>

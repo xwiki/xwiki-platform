@@ -122,7 +122,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * Separator symbols of the list fields for the {@link #RIGHTS_CLASS} and
      * {@link #GLOBAL_RIGHTS_CLASS} classes.
      */
-    private static final String RIGHTSLISTFIELD_SEP = " ,|";
+    private static final String RIGHTSLISTFIELD_SEP = ",|";
 
     /**
      * Join symbol of the list fields for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
@@ -1081,6 +1081,9 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         List<BaseObject> vobj = rightsDocument.getObjects(rightsClass);
         if (vobj != null) {
             for (BaseObject bobj : vobj) {
+                if (bobj == null) {
+                    continue;
+                }
                 needUpdate |=
                     removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace,
                         userOrGroupName, user, context);

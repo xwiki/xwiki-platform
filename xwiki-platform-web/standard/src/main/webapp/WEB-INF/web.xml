@@ -70,7 +70,9 @@
   <servlet>
     <servlet-name>redirectHomeServlet</servlet-name>
     <servlet-class>com.xpn.xwiki.web.HomePageRedirectServlet</servlet-class>
-    <!-- Uncomment and edit this if you want to redirect to a different home page, or if you have different mappings
+    <!-- Uncomment and edit this if you want to redirect to a different home page, or if you have different mappings.
+         Note: the URL should not start with /, because it allows the context name to be changed. If it starts with /,
+         then it should be an absolute URL, including the application context path.
     <init-param>
       <param-name>homePage</param-name>
       <param-value>bin/Main/</param-value>

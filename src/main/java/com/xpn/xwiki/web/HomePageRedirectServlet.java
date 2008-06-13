@@ -34,19 +34,33 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class HomePageRedirectServlet extends HttpServlet
 {
+    /** The address to use as a home page where the users are redirected. */
+    private String home = "bin/view/Main/";
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see javax.servlet.GenericServlet#init()
+     */
+    @Override
+    public void init() throws ServletException
+    {
+        super.init();
+        // TODO: we cannot use the XWiki API to determine the right URL, because this is a servlet and the core
+        // is reachable mainly from Struts. Getting access to the core requires too much duplication, so for the
+        // moment we're going the easy way: hardcoded values.
+        String homeParameter = getInitParameter("homePage");
+        if (homeParameter != null) {
+            this.home = homeParameter;
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
     {
-        String home = getInitParameter("homePage");
-        if (home == null) {
-            // TODO: we cannot use the XWiki API to determine the right URL, because this is a servlet and the core
-            // is reachable mainly from Struts. Getting access to the core requires too much duplication, so for the
-            // moment we're going the easy way: hardcoded values.
-            home = "bin/view/Main/";
-        }
-        response.sendRedirect(home);
+        response.sendRedirect(this.home);
     }
 }

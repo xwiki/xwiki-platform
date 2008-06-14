@@ -462,7 +462,7 @@ public class XWikiAuthServiceImpl extends AbstractXWikiAuthService
             // enter it exactly as they've created it.
             String sql = "select distinct doc.fullName from XWikiDocument as doc";
             Object[][] whereParameters =
-                new Object[][] { {"doc.web", "XWiki"}, {"doc.name", username}};
+                new Object[][] { {"doc.space", "XWiki"}, {"doc.name", username}};
 
             List list = context.getWiki().search(sql, whereParameters, context);
             if (list.size() == 0) {

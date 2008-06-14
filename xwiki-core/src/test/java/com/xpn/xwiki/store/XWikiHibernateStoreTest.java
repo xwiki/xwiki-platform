@@ -48,10 +48,10 @@ public class XWikiHibernateStoreTest extends TestCase
     public void testCreateSQLQuery()
     {
         XWikiHibernateStore store = new XWikiHibernateStore("whatever");
-        assertEquals("select distinct doc.web, doc.name from XWikiDocument as doc",
-            store.createSQLQuery("select distinct doc.web, doc.name", ""));
-        assertEquals("select distinct doc.web, doc.name, doc.date from XWikiDocument as doc "
+        assertEquals("select distinct doc.space, doc.name from XWikiDocument as doc",
+            store.createSQLQuery("select distinct doc.space, doc.name", ""));
+        assertEquals("select distinct doc.space, doc.name, doc.date from XWikiDocument as doc "
             + "where 1=1 order by doc.date desc", store.createSQLQuery(
-            "select distinct doc.web, doc.name", "where 1=1 order by doc.date desc"));
+            "select distinct doc.space, doc.name", "where 1=1 order by doc.date desc"));
     }
 }

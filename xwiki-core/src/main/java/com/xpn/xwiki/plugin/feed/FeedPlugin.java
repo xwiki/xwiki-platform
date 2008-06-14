@@ -305,7 +305,7 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         // Make sure we have this class
         getAggregatorURLClass(context);
 
-        String sql = ", BaseObject as obj where doc.fullName=obj.name and obj.className='XWiki.AggregatorURLClass' and doc.web='" + space + "'";
+        String sql = ", BaseObject as obj where doc.fullName=obj.name and obj.className='XWiki.AggregatorURLClass' and doc.space='" + space + "'";
         int total = 0;
         List feedDocList = context.getWiki().getStore().searchDocumentsNames(sql, context);
         if (feedDocList!=null) {

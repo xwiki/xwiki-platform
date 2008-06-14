@@ -3959,7 +3959,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         int nb = 0;
         String sql = "";
         if (web != null) {
-            sql = "where doc.web = '" + Utils.SQLFilter(web) + "'";
+            sql = "where doc.space = '" + Utils.SQLFilter(web) + "'";
         }
 
         if (clean) {
@@ -4807,9 +4807,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         if (this.fullNameSQL == null) {
             if (isMySQL()) {
-                this.fullNameSQL = "CONCAT(doc.web,'.',doc.name)";
+                this.fullNameSQL = "CONCAT(doc.space,'.',doc.name)";
             } else {
-                this.fullNameSQL = "doc.web||'.'||doc.name";
+                this.fullNameSQL = "doc.space||'.'||doc.name";
             }
         }
         return this.fullNameSQL;
@@ -5264,7 +5264,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         List<String> webs = null;
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
-            webs = this.search("select distinct doc.web from XWikiDocument doc", context);
+            webs = this.search("select distinct doc.space from XWikiDocument doc", context);
         } else if (getNotCacheStore() instanceof XWikiJcrStore) {
             webs = ((XWikiJcrStore) getNotCacheStore()).getSpaces(context);
         }
@@ -5276,7 +5276,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         List<String> docs = null;
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
             docs =
-                this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{"doc.web", spaceName}},
+                this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{"doc.space", spaceName}},
                     context);
         } else if (getNotCacheStore() instanceof XWikiJcrStore) {
             docs = ((XWikiJcrStore) getNotCacheStore()).getSpaceDocsName(spaceName, context);

@@ -16,6 +16,10 @@
       <param-name>encoding</param-name>
       <param-value>ISO-8859-1</param-value>
     </init-param>
+    <init-param>
+      <param-name>ignore</param-name>
+      <param-value>false</param-value>
+    </init-param>
   </filter>
 
   <filter-mapping>

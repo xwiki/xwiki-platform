@@ -291,11 +291,11 @@ public class DBTreeListClassTest extends AbstractXWikiComponentTestCase
         DBTreeListClass dbtlc = new DBTreeListClass();
         dbtlc.setIdField("doc.name");
         dbtlc.setValueField("doc.title");
-        dbtlc.setParentField("doc.web");
-        assertEquals("select distinct doc.name, doc.title, doc.web"
+        dbtlc.setParentField("doc.space");
+        assertEquals("select distinct doc.name, doc.title, doc.space"
             + " from XWikiDocument as doc", dbtlc.getQuery(getContext()));
         dbtlc.setValueField("obj.name");
-        assertEquals("select distinct doc.name, obj.name, doc.web"
+        assertEquals("select distinct doc.name, obj.name, doc.space"
             + " from XWikiDocument as doc, BaseObject as obj where doc.fullName=obj.name", dbtlc
             .getQuery(getContext()));
         dbtlc.setIdField("obj.className");

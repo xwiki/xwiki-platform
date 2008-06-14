@@ -336,7 +336,7 @@ public class XWiki extends Api
     /**
      * API allowing to search for document names matching a query. Examples:
      * <ul>
-     * <li>Query: <code>where doc.web='Main' order by doc.creationDate desc</code>. Result: All
+     * <li>Query: <code>where doc.space='Main' order by doc.creationDate desc</code>. Result: All
      * the documents in space 'Main' ordered by the creation date from the most recent</li>
      * <li>Query: <code>where doc.name like '%sport%' order by doc.name asc</code>. Result: All
      * the documents containing 'sport' in their name ordered by document name</li>
@@ -453,12 +453,12 @@ public class XWiki extends Api
      * 
      * <pre><code>
      * #set($orphans = $xwiki.searchDocuments(&quot; where doc.fullName &lt;&gt; ? and (doc.parent = ? or &quot;
-     *     + &quot;(doc.parent = ? and doc.web = ?))&quot;,
-     *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.web}]))
+     *     + &quot;(doc.parent = ? and doc.space = ?))&quot;,
+     *     [&quot;${doc.fullName}as&quot;, ${doc.fullName}, ${doc.name}, ${doc.space}]))
      * </code></pre>
      * 
      * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"</code>
+     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)
@@ -490,7 +490,7 @@ public class XWiki extends Api
      * 
      * @param wikiName the name of the wiki where to search.
      * @param parametrizedSqlClause the HQL where clause. For example <code>" where doc.fullName
-     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.web = ?))"</code>
+     *        <> ? and (doc.parent = ? or (doc.parent = ? and doc.space = ?))"</code>
      * @param nb the number of rows to return. If 0 then all rows are returned
      * @param start the number of rows to skip. If 0 don't skip any row
      * @param parameterValues the where clause values that replace the question marks (?)

@@ -1983,7 +1983,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start, List parameterValues,
         XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.web, doc.name", parametrizedSqlClause);
+        String sql = createSQLQuery("select distinct doc.space, doc.name", parametrizedSqlClause);
         return searchDocumentsNamesInternal(sql, nb, start, parameterValues, context);
     }
 
@@ -2177,7 +2177,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> searchDocumentsNames(String wheresql, int nb, int start, String selectColumns,
         XWikiContext context) throws XWikiException
     {
-        String sql = createSQLQuery("select distinct doc.web, doc.name", wheresql);
+        String sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
         return searchDocumentsNamesInternal(sql, nb, start, Collections.EMPTY_LIST, context);
     }
 
@@ -2258,9 +2258,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         try {
             String sql;
             if (distinctbylanguage) {
-                sql = createSQLQuery("select distinct doc.web, doc.name, doc.language", wheresql);
+                sql = createSQLQuery("select distinct doc.space, doc.name, doc.language", wheresql);
             } else {
-                sql = createSQLQuery("select distinct doc.web, doc.name", wheresql);
+                sql = createSQLQuery("select distinct doc.space, doc.name", wheresql);
             }
 
             // Start monitoring timer
@@ -2336,7 +2336,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     }
 
     /**
-     * @param queryPrefix the start of the SQL query (for example "select distinct doc.web, doc.name")
+     * @param queryPrefix the start of the SQL query (for example "select distinct doc.space, doc.name")
      * @param whereSQL the where clause to append
      * @return the full formed SQL query, to which the order by columns have been added as returned columns (this is
      *         required for example for HSQLDB).
@@ -2759,7 +2759,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     public List<String> getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String hql =
-            "select doc.language from XWikiDocument as doc where doc.web = '" + Utils.SQLFilter(doc.getSpace())
+            "select doc.language from XWikiDocument as doc where doc.space = '" + Utils.SQLFilter(doc.getSpace())
                 + "' and doc.name = '" + Utils.SQLFilter(doc.getName())
                 + "' and (doc.language <> '' or (doc.language is not null and '' is null))";
         List<String> list = context.getWiki().search(hql, context);

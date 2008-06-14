@@ -27,8 +27,6 @@ import org.hibernate.property.Getter;
 import org.hibernate.property.PropertyAccessor;
 import org.hibernate.property.Setter;
 
-import com.xpn.xwiki.web.XWikiAction;
-
 /**
  * Hibernate property accessor that allows using the deprecated <code>doc.web</code> in HQL queries, while using the
  * new <code>space</code> getter and setter for the actual object access.
@@ -38,7 +36,7 @@ import com.xpn.xwiki.web.XWikiAction;
 public class DocumentWebPropertyAccessor extends BasicPropertyAccessor implements PropertyAccessor
 {
     /** Logging helper object. */
-    private static final Log LOG = LogFactory.getLog(XWikiAction.class);
+    private static final Log LOG = LogFactory.getLog(DocumentWebPropertyAccessor.class);
 
     /**
      * {@inheritDoc}

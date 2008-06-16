@@ -36,7 +36,6 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPlugin;
 import com.xpn.xwiki.plugin.applicationmanager.ApplicationManagerPluginApi;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.plugin.XWikiPluginMessageTool;
 import com.xpn.xwiki.plugin.applicationmanager.doc.XWikiApplication;
@@ -102,19 +101,17 @@ final class WikiManager
     // Utils
 
     /**
-     * Encapsulate {@link com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)} adding wiki
-     * switch.
+     * Encapsulate {@link com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)} adding wiki switch.
      * 
      * @param wikiName the name of the wiki where to save the document.
      * @param doc the document to save.
      * @param comment the comment to use when saving document.
      * @param context the XWiki Context.
-     * @throws XWikiException error when calling
-     *             {@link XWiki#saveDocument(XWikiDocument, String, XWikiContext)}.
+     * @throws XWikiException error when calling {@link XWiki#saveDocument(XWikiDocument, String, XWikiContext)}.
      * @see com.xpn.xwiki.XWiki#saveDocument(XWikiDocument, XWikiContext)
      */
-    public void saveDocument(String wikiName, XWikiDocument doc, String comment,
-        XWikiContext context) throws XWikiException
+    public void saveDocument(String wikiName, XWikiDocument doc, String comment, XWikiContext context)
+        throws XWikiException
     {
         String database = context.getDatabase();
 
@@ -132,13 +129,12 @@ final class WikiManager
      * @param wikiName the name of the wiki where to get the document.
      * @param fullname the full name of the document to get.
      * @param context the XWiki context.
-     * @return the document with full name equals to <code>fullname</code> and wiki
-     *         <code>wikiName</code>. If it dos not exist return new XWikiDocument.
+     * @return the document with full name equals to <code>fullname</code> and wiki <code>wikiName</code>. If it
+     *         dos not exist return new XWikiDocument.
      * @throws XWikiException error when calling {@link XWiki#getDocument(String, XWikiContext)}}.
      * @see com.xpn.xwiki.XWiki#getDocument(String, XWikiContext)
      */
-    public XWikiDocument getDocument(String wikiName, String fullname, XWikiContext context)
-        throws XWikiException
+    public XWikiDocument getDocument(String wikiName, String fullname, XWikiContext context) throws XWikiException
     {
         String database = context.getDatabase();
 
@@ -151,20 +147,19 @@ final class WikiManager
     }
 
     /**
-     * Encapsulate
-     * {@link com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, XWikiContext)} adding
-     * wiki switch.
+     * Encapsulate {@link com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, XWikiContext)} adding wiki
+     * switch.
      * 
      * @param wikiName the name of the wiki where to search for documents.
      * @param wheresql the conditions to add to HQL request.
      * @param context the XWiki context.
-     * @return the list of documents that match the <code>wheresql</code> conditions. If nothing
-     *         found return empty List.
+     * @return the list of documents that match the <code>wheresql</code> conditions. If nothing found return empty
+     *         List.
      * @throws XWikiException error when searching for documents.
      * @see com.xpn.xwiki.store.XWikiStoreInterface#searchDocuments(String, XWikiContext)
      */
-    public List<XWikiDocument> searchDocuments(String wikiName, String wheresql,
-        XWikiContext context) throws XWikiException
+    public List<XWikiDocument> searchDocuments(String wikiName, String wheresql, XWikiContext context)
+        throws XWikiException
     {
         String database = context.getDatabase();
 
@@ -187,8 +182,7 @@ final class WikiManager
      * @return the {@link Wiki} object.
      * @throws XWikiException error when creating {@link Wiki} object.
      */
-    public Wiki getWikiFromDocument(XWikiDocument document, XWikiContext context)
-        throws XWikiException
+    public Wiki getWikiFromDocument(XWikiDocument document, XWikiContext context) throws XWikiException
     {
         return new Wiki(document, context);
     }
@@ -203,8 +197,8 @@ final class WikiManager
      */
     public Wiki getWikiFromName(String wikiName, XWikiContext context) throws XWikiException
     {
-        return getWikiFromDocumentName(XWikiServerClass.getInstance(context)
-            .getItemDocumentDefaultFullName(wikiName, context), context);
+        return getWikiFromDocumentName(XWikiServerClass.getInstance(context).getItemDocumentDefaultFullName(wikiName,
+            context), context);
     }
 
     /**
@@ -215,11 +209,9 @@ final class WikiManager
      * @return the {@link Wiki} object.
      * @throws XWikiException error when getting document.
      */
-    public Wiki getWikiFromDocumentName(String documentFullName, XWikiContext context)
-        throws XWikiException
+    public Wiki getWikiFromDocumentName(String documentFullName, XWikiContext context) throws XWikiException
     {
-        return getWikiFromDocument(context.getWiki().getDocument(documentFullName, context),
-            context);
+        return getWikiFromDocument(context.getWiki().getDocument(documentFullName, context), context);
     }
 
     /**
@@ -235,8 +227,7 @@ final class WikiManager
 
         List<Object> parameterValues = new ArrayList<Object>();
 
-        String wheresql =
-            XWikiServerClass.getInstance(context).createWhereClause(null, parameterValues);
+        String wheresql = XWikiServerClass.getInstance(context).createWhereClause(null, parameterValues);
         List<XWikiDocument> documents =
             context.getWiki().getStore().searchDocuments(wheresql, parameterValues, context);
 
@@ -248,23 +239,21 @@ final class WikiManager
     }
 
     /**
-     * Get the documents for which copied document content will be replace by an
-     * #includeInContext(SourceDocument) or #includeTopic(SourceDocument) macro call.
+     * Get the documents for which copied document content will be replace by an #includeInContext(SourceDocument) or
+     * #includeTopic(SourceDocument) macro call.
      * 
      * @param wiki the name of the wiki where to find the list of documents.
      * @param context the XWiki context.
      * @return a pair of list of documents names to include and list of documents names to link.
-     * @throws XWikiException error when getting Applications descriptors where searched documents
-     *             are listed.
+     * @throws XWikiException error when getting Applications descriptors where searched documents are listed.
      */
-    private Collection[] getDocsNames(String wiki, XWikiContext context) throws XWikiException
+    private Collection<String>[] getDocsNames(String wiki, XWikiContext context) throws XWikiException
     {
-        Collection[] docsNames = new Collection[2];
+        Collection<String>[] docsNames = new Collection[2];
 
         // Get applications manger
         ApplicationManagerPluginApi appmanager =
-            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(
-                ApplicationManagerPlugin.PLUGIN_NAME, context);
+            (ApplicationManagerPluginApi) context.getWiki().getPluginApi(ApplicationManagerPlugin.PLUGIN_NAME, context);
 
         if (appmanager == null) {
             return null;
@@ -284,7 +273,7 @@ final class WikiManager
                 docsNames[0] = rootApp.getDocsNameToInclude(true);
                 docsNames[1] = rootApp.getDocsNameToLink(true);
             } else {
-                Collection applications = appmanager.getApplicationDocumentList();
+                Collection<XWikiApplication> applications = appmanager.getApplicationDocumentList();
                 docsNames[0] = XWikiApplication.getDocsNameToInclude(applications);
                 docsNames[1] = XWikiApplication.getDocsNameToLink(applications);
             }
@@ -298,12 +287,11 @@ final class WikiManager
     /**
      * Copy all documents from <code>sourceWiki</code> wiki to <code>targetWiki</code> wiki.
      * <p>
-     * It also take care of ApplicationManager descriptors "documents to include" and "documents to
-     * link".
+     * It also take care of ApplicationManager descriptors "documents to include" and "documents to link".
      * </p>
      * 
-     * @param sourceWiki the wiki from where to copy documents and get lists of "document to link"
-     *            and "documents to copy".
+     * @param sourceWiki the wiki from where to copy documents and get lists of "document to link" and "documents to
+     *            copy".
      * @param targetWiki the wiki where to copy documents.
      * @param language the documents language to copy.
      * @param comment the comment to use when saving documents.
@@ -315,8 +303,8 @@ final class WikiManager
      *             <li>or getting documents to link.</li>
      *             </ul>
      */
-    private void copyWiki(String sourceWiki, String targetWiki, String language, String comment,
-        XWikiContext context) throws XWikiException
+    private void copyWiki(String sourceWiki, String targetWiki, String language, String comment, XWikiContext context)
+        throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -327,31 +315,26 @@ final class WikiManager
         try {
             context.setDatabase(targetWiki);
 
-            Collection[] docsNames = getDocsNames(sourceWiki, context);
+            Collection<String>[] docsNames = getDocsNames(sourceWiki, context);
 
-            Object[] includeFormatParams =
-                new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, null};
+            Object[] includeFormatParams = new Object[] {sourceWiki, XObjectDocument.WIKI_SPACE_SEPARATOR, null};
 
             // Replace documents contents to include
-            Collection docsNameToInclude = docsNames[0];
-            for (Object item : docsNameToInclude) {
+            for (Object item : docsNames[0]) {
                 String docFullName = (String) item;
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
                 includeFormatParams[2] = docFullName;
-                targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")",
-                    includeFormatParams));
+                targetDoc.setContent(MessageFormat.format("#includeInContext(\"{0}{1}{2}\")", includeFormatParams));
             }
 
             // Replace documents contents to link
-            Collection docsNameToLink = docsNames[1];
-            for (Object item : docsNameToLink) {
+            for (Object item : docsNames[1]) {
                 String docFullName = (String) item;
                 XWikiDocument targetDoc = xwiki.getDocument(docFullName, context);
 
                 includeFormatParams[2] = docFullName;
-                targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")",
-                    includeFormatParams));
+                targetDoc.setContent(MessageFormat.format("#includeTopic(\"{0}{1}{2}\")", includeFormatParams));
             }
         } finally {
             context.setDatabase(database);
@@ -361,11 +344,9 @@ final class WikiManager
     /**
      * Create a new virtual wiki. The new wiki is initialized with provided xar package.
      * 
-     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor
-     *            document will be created.
+     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor document will be created.
      * @param packageName the name of the attached XAR file to import in the new wiki.
-     * @param failOnExist if true throw exception when wiki already exist. If false overwrite
-     *            existing wiki.
+     * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
      * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @return the new wiki descriptor document.
@@ -373,24 +354,19 @@ final class WikiManager
      *             <ul>
      *             <li>getting unique instance of {@link XWikiServerClass}.</li>
      *             <li>or getting user documents.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL} : xwiki is not in
-     *             virtual mode.</li>
-     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user
-     *             does not exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_XWIKI_USER_INACTIVE}: provided user is
-     *             not active.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name
-     *             can't be used to create new wiki.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor
-     *             already exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when
-     *             updating database.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL} : xwiki is not in virtual mode.</li>
+     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does not exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_XWIKI_USER_INACTIVE}: provided user is not active.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name can't be used to
+     *             create new wiki.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *             </ul>
      * @see #createNewWiki(XWikiServer, boolean, String, XWikiContext)
      * @see #createNewWikiFromTemplate(XWikiServer, String, boolean, String, XWikiContext)
      */
-    public XWikiServer createNewWikiFromPackage(XWikiServer userWikiSuperDoc, String packageName,
-        boolean failOnExist, String comment, XWikiContext context) throws XWikiException
+    public XWikiServer createNewWikiFromPackage(XWikiServer userWikiSuperDoc, String packageName, boolean failOnExist,
+        String comment, XWikiContext context) throws XWikiException
     {
         return createNewWiki(userWikiSuperDoc, failOnExist, null, packageName, comment, context);
     }
@@ -398,11 +374,9 @@ final class WikiManager
     /**
      * Create a new virtual wiki. The new wiki is a copy of provided existing wiki.
      * 
-     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor
-     *            document will be created.
+     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor document will be created.
      * @param templateWikiName the of the wiki from where to copy document to the new wiki.
-     * @param failOnExist if true throw exception when wiki already exist. If false overwrite
-     *            existing wiki.
+     * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
      * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @return the new wiki descriptor document.
@@ -410,37 +384,28 @@ final class WikiManager
      *             <ul>
      *             <li>getting unique instance of {@link XWikiServerClass}.</li>
      *             <li>or getting user documents.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in
-     *             virtual mode.</li>
-     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user
-     *             does not exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_XWIKI_USER_INACTIVE}: provided user is
-     *             not active.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name
-     *             can't be used to create new wiki.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor
-     *             already exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when
-     *             updating database.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
+     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does not exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_XWIKI_USER_INACTIVE}: provided user is not active.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name can't be used to
+     *             create new wiki.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *             </ul>
      * @see #createNewWiki(XWikiServer, boolean, String, XWikiContext)
      * @see #createNewWikiFromPackage(XWikiServer, String, boolean, String, XWikiContext)
      */
-    public XWikiServer createNewWikiFromTemplate(XWikiServer userWikiSuperDoc,
-        String templateWikiName, boolean failOnExist, String comment, XWikiContext context)
-        throws XWikiException
+    public XWikiServer createNewWikiFromTemplate(XWikiServer userWikiSuperDoc, String templateWikiName,
+        boolean failOnExist, String comment, XWikiContext context) throws XWikiException
     {
-        return createNewWiki(userWikiSuperDoc, failOnExist, templateWikiName, null, comment,
-            context);
+        return createNewWiki(userWikiSuperDoc, failOnExist, templateWikiName, null, comment, context);
     }
 
     /**
      * Create a new empty virtual wiki.
      * 
-     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor
-     *            document will be created.
-     * @param failOnExist if true throw exception when wiki already exist. If false overwrite
-     *            existing wiki.
+     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor document will be created.
+     * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
      * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @return the new wiki descriptor document.
@@ -448,22 +413,17 @@ final class WikiManager
      *             <ul>
      *             <li>getting unique instance of {@link XWikiServerClass}.</li>
      *             <li>or getting user documents.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in
-     *             virtual mode.</li>
-     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user
-     *             does not exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_XWIKI_USER_INACTIVE}: provided user is
-     *             not active.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name
-     *             can't be used to create new wiki.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor
-     *             already exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when
-     *             updating database.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
+     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does not exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_XWIKI_USER_INACTIVE}: provided user is not active.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name can't be used to
+     *             create new wiki.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *             </ul>
      */
-    public XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist,
-        String comment, XWikiContext context) throws XWikiException
+    public XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist, String comment,
+        XWikiContext context) throws XWikiException
     {
         return createNewWiki(userWikiSuperDoc, failOnExist, null, null, comment, context);
     }
@@ -471,10 +431,8 @@ final class WikiManager
     /**
      * Create new wiki.
      * 
-     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor
-     *            document will be created.
-     * @param failOnExist if true throw exception when wiki already exist. If false overwrite
-     *            existing wiki.
+     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor document will be created.
+     * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
      * @param templateWikiName the name of the wiki from where to copy document to the new wiki.
      * @param packageName the name of the attached XAR file to import in the new wiki.
      * @param comment the comment to use when saving descriptor document.
@@ -484,27 +442,20 @@ final class WikiManager
      *             <ul>
      *             <li>getting unique instance of {@link XWikiServerClass}.</li>
      *             <li>or getting user descriptor documents.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in
-     *             virtual mode.</li>
-     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user
-     *             does not exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name
-     *             can't be used to create new wiki.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor
-     *             already exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when
-     *             updating database.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached
-     *             package does not exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading
+     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
+     *             <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does not exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name can't be used to
+     *             create new wiki.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
      *             failed.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package
-     *             insertion into database failed.</li>
      *             </ul>
      */
-    public XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist,
-        String templateWikiName, String packageName, String comment, XWikiContext context)
-        throws XWikiException
+    public XWikiServer createNewWiki(XWikiServer userWikiSuperDoc, boolean failOnExist, String templateWikiName,
+        String packageName, String comment, XWikiContext context) throws XWikiException
     {
         XWikiPluginMessageTool msg = getMessageTool(context);
 
@@ -523,26 +474,23 @@ final class WikiManager
             // Return to root database
             context.setDatabase(context.getMainXWiki());
 
-            XWikiDocument userdoc =
-                getDocument(xwiki.getDatabase(), userWikiSuperDoc.getOwner(), context);
+            XWikiDocument userdoc = getDocument(xwiki.getDatabase(), userWikiSuperDoc.getOwner(), context);
 
             // User does not exist
             if (userdoc.isNew()) {
-                throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USERDOESNOTEXIST,
-                    msg.get(WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, userWikiSuperDoc
-                        .getOwner()));
+                throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USERDOESNOTEXIST, msg.get(
+                    WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, userWikiSuperDoc.getOwner()));
             }
 
             // Wiki name forbidden
             String wikiForbiddenList = xwiki.Param("xwiki.virtual.reserved_wikis");
             if (Util.contains(newWikiName, wikiForbiddenList, ", ")) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN,
-                    msg.get(WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, newWikiName));
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN, msg.get(
+                    WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, newWikiName));
             }
 
             // Update or create wiki descriptor document that will be save at and of wiki creation.
-            XWikiServer wikiSuperDocToSave =
-                getWikiDescriptorToSave(userWikiSuperDoc, failOnExist, context);
+            XWikiServer wikiSuperDocToSave = getWikiDescriptorToSave(userWikiSuperDoc, failOnExist, context);
 
             // Create wiki database/schema
             createWikiDatabase(newWikiName, context);
@@ -577,50 +525,43 @@ final class WikiManager
     /**
      * Update or create new wiki description document without saving it.
      * 
-     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor
-     *            document will be created.
-     * @param failOnExist if true throw exception when wiki already exist. If false overwrite
-     *            existing wiki.
+     * @param userWikiSuperDoc a wiki descriptor document from which the new wiki descriptor document will be created.
+     * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
      * @param context the XWiki context.
      * @return the new wiki descriptor document to save.
      * @throws XWikiException
      *             <ul>
-     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor
-     *             already exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
      *             </ul>
      */
-    private XWikiServer getWikiDescriptorToSave(XWikiServer userWikiSuperDoc,
-        boolean failOnExist, XWikiContext context) throws XWikiException
+    private XWikiServer getWikiDescriptorToSave(XWikiServer userWikiSuperDoc, boolean failOnExist, XWikiContext context)
+        throws XWikiException
     {
         XWikiPluginMessageTool msg = getMessageTool(context);
 
         XWiki xwiki = context.getWiki();
 
-        XClassManager wikiClass = XWikiServerClass.getInstance(context);
+        XWikiServerClass wikiClass = XWikiServerClass.getInstance(context);
 
         XWikiServer wikiSuperDocToSave;
 
         // If modify existing document
         if (!userWikiSuperDoc.isFromCache()) {
             // Verify if server page already exist
-            XWikiDocument docToSave =
-                getDocument(context.getMainXWiki(), userWikiSuperDoc.getFullName(), context);
+            XWikiDocument docToSave = getDocument(context.getMainXWiki(), userWikiSuperDoc.getFullName(), context);
 
             if (!docToSave.isNew() && wikiClass.isInstance(docToSave)) {
                 // If we are not allowed to continue in case wiki descriptor page already
                 // exists.
                 if (failOnExist) {
-                    throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALREADYEXISTS,
-                        msg.get(WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS,
-                            userWikiSuperDoc.getFullName()));
+                    throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIALREADYEXISTS, msg.get(
+                        WikiManagerMessageTool.ERROR_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.getFullName()));
                 } else if (LOG.isWarnEnabled()) {
-                    LOG.warn(msg.get(WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS,
-                        userWikiSuperDoc.toString()));
+                    LOG.warn(msg.get(WikiManagerMessageTool.LOG_DESCRIPTORALREADYEXISTS, userWikiSuperDoc.toString()));
                 }
             }
 
-            wikiSuperDocToSave =
-                (XWikiServer) wikiClass.newXObjectDocument(docToSave, 0, context);
+            wikiSuperDocToSave = wikiClass.newXObjectDocument(docToSave, 0, context);
 
             // clear entry in virtual wiki cache
             if (!wikiSuperDocToSave.getServer().equals(userWikiSuperDoc.getServer())) {
@@ -642,14 +583,11 @@ final class WikiManager
      * @param context the Xwiki context.
      * @throws WikiManagerException
      *             <ul>
-     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in
-     *             virtual mode.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when
-     *             updating database.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *             </ul>
      */
-    private void createWikiDatabase(String targetWiki, XWikiContext context)
-        throws WikiManagerException
+    private void createWikiDatabase(String targetWiki, XWikiContext context) throws WikiManagerException
     {
         XWikiPluginMessageTool msg = getMessageTool(context);
 
@@ -664,9 +602,7 @@ final class WikiManager
         try {
             xwiki.getStore().createWiki(targetWiki, context);
         } catch (Exception e) {
-            LOG
-                .warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki),
-                    e);
+            LOG.warn(msg.get(WikiManagerMessageTool.LOG_DATABASECREATIONEXCEPTION, targetWiki), e);
         }
 
         // Init database/schema
@@ -682,23 +618,18 @@ final class WikiManager
      * Import XAR package into wiki.
      * 
      * @param packageName the name of the attached package file.
-     * @param targetWiki the name of the wiki where to install loaded {@link XWikiDocument} from XAR
-     *            package.
+     * @param targetWiki the name of the wiki where to install loaded {@link XWikiDocument} from XAR package.
      * @param context the XWiki context.
      * @throws XWikiException error when:
      *             <ul>
-     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in
-     *             virtual mode.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached
-     *             package does not exists.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading
+     *             <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
+     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
      *             failed.</li>
-     *             <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package
-     *             insertion into database failed.</li>
      *             </ul>
      */
-    public void importPackage(String packageName, String targetWiki, XWikiContext context)
-        throws XWikiException
+    public void importPackage(String packageName, String targetWiki, XWikiContext context) throws XWikiException
     {
         XWikiPluginMessageTool msg = getMessageTool(context);
 
@@ -715,8 +646,8 @@ final class WikiManager
         XWikiAttachment packFile = doc.getAttachment(packageName);
 
         if (packFile == null) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEDOESNOTEXISTS,
-                msg.get(WikiManagerMessageTool.ERROR_PACKAGEDOESNOTEXISTS, packageName));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEDOESNOTEXISTS, msg.get(
+                WikiManagerMessageTool.ERROR_PACKAGEDOESNOTEXISTS, packageName));
         }
 
         // Get packager plugin
@@ -731,14 +662,14 @@ final class WikiManager
             try {
                 importer.Import(packFile.getContent(context));
             } catch (IOException e) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg
-                    .get(WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEIMPORT, msg.get(
+                    WikiManagerMessageTool.ERROR_PACKAGEIMPORT, packageName), e);
             }
 
             // Install imported documents
             if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEINSTALL, msg
-                    .get(WikiManagerMessageTool.ERROR_PACKAGEINSTALL, packageName));
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_PACKAGEINSTALL, msg.get(
+                    WikiManagerMessageTool.ERROR_PACKAGEINSTALL, packageName));
             }
         } finally {
             context.setDatabase(database);
@@ -758,15 +689,13 @@ final class WikiManager
      *             </ul>
      * @since 1.1
      */
-    public void deleteWiki(String wikiNameToDelete, boolean deleteDatabase, XWikiContext context)
-        throws XWikiException
+    public void deleteWiki(String wikiNameToDelete, boolean deleteDatabase, XWikiContext context) throws XWikiException
     {
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
 
         if (!XWikiServerClass.getInstance(context).isInstance(wiki)) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                getMessageTool(context).get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS,
-                    wikiNameToDelete));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, getMessageTool(context)
+                .get(WikiManagerMessageTool.ERROR_WIKIDOESNOTEXISTS, wikiNameToDelete));
         }
 
         wiki.delete(deleteDatabase);
@@ -785,8 +714,7 @@ final class WikiManager
      *             </ul>
      * @since 1.1
      */
-    public void deleteWikiAlias(String wikiNameToDelete, int objectId, XWikiContext context)
-        throws XWikiException
+    public void deleteWikiAlias(String wikiNameToDelete, int objectId, XWikiContext context) throws XWikiException
     {
         Wiki wiki = getWikiFromName(wikiNameToDelete, context);
         XWikiServer alias = wiki.getWikiAlias(objectId);
@@ -805,19 +733,17 @@ final class WikiManager
      * @param objectId the id of the XWiki object included in the document to manage.
      * @param validate when wiki descriptor document does not exist :
      *            <ul>
-     *            <li> if true, throw an exception with code
-     *            {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
+     *            <li> if true, throw an exception with code {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
      *            <li> if false, return new document unsaved
      *            </ul>
      * @param context the XWiki context.
      * @return a wiki descriptor document.
      * @throws XWikiException error when getting wiki descriptor document.
      */
-    public XWikiServer getWikiAlias(String wikiName, int objectId, boolean validate,
-        XWikiContext context) throws XWikiException
+    public XWikiServer getWikiAlias(String wikiName, int objectId, boolean validate, XWikiContext context)
+        throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).getWikiAlias(wikiName, objectId, validate,
-            context);
+        return XWikiServerClass.getInstance(context).getWikiAlias(wikiName, objectId, validate, context);
     }
 
     /**
@@ -831,7 +757,7 @@ final class WikiManager
      *             <li>or getting {@link XWikiServerClass} unique instance.</li>
      *             </ul>
      */
-    public List getWikiAliasList(XWikiContext context) throws XWikiException
+    public List<XWikiServer> getWikiAliasList(XWikiContext context) throws XWikiException
     {
         return XWikiServerClass.getInstance(context).searchXObjectDocuments(context);
     }
@@ -859,49 +785,43 @@ final class WikiManager
     /**
      * Get template wiki descriptor document.
      * <p>
-     * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to
-     * "template".
+     * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to "template".
      * 
      * @param wikiName the name of the template wiki.
      * @param objectId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @param validate when wiki descriptor document does not exist :
      *            <ul>
-     *            <li> if true, throw an exception with code
-     *            {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
+     *            <li> if true, throw an exception with code {@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}
      *            <li> if false, return new document unsaved
      *            </ul>
      * @return a wiki descriptor document.
      * @throws XWikiException error when:
      *             <ul>
      *             <li>getting {@link XWikiServerClass} unique instance.</li>
-     *             <li>or when searching for wiki descriptor with "visibility" field equals to
-     *             "template".</li>
+     *             <li>or when searching for wiki descriptor with "visibility" field equals to "template".</li>
      *             </ul>
      */
-    public XWikiServer getWikiTemplateAlias(String wikiName, int objectId, XWikiContext context,
-        boolean validate) throws XWikiException
+    public XWikiServer getWikiTemplateAlias(String wikiName, int objectId, XWikiContext context, boolean validate)
+        throws XWikiException
     {
-        return XWikiServerClass.getInstance(context).getWikiTemplateAlias(wikiName, objectId,
-            validate, context);
+        return XWikiServerClass.getInstance(context).getWikiTemplateAlias(wikiName, objectId, validate, context);
     }
 
     /**
      * Get all the templates wikis descriptors documents.
      * <p>
-     * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to
-     * "template".
+     * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to "template".
      * 
      * @param context the XWiki context.
      * @return a list of {@link XWikiServer}.
      * @throws XWikiException eeor when:
      *             <ul>
      *             <li>getting {@link XWikiServerClass} unique instance.</li>
-     *             <li>or when searching for all wikis descriptors with "visibility" field equals
-     *             to "template".</li>
+     *             <li>or when searching for all wikis descriptors with "visibility" field equals to "template".</li>
      *             </ul>
      */
-    public List getWikiTemplateAliasList(XWikiContext context) throws XWikiException
+    public List<XWikiServer> getWikiTemplateAliasList(XWikiContext context) throws XWikiException
     {
         return XWikiServerClass.getInstance(context).searchXObjectDocumentsByField(
             XWikiServerClass.FIELD_ISWIKITEMPLATE, 1, "IntegerProperty", context);
@@ -910,18 +830,17 @@ final class WikiManager
     /**
      * Create a template wiki. The new template wiki is initialized with provided xar package.
      * <p>
-     * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to
-     * "template".
+     * A template wiki is a wiki which the XWiki.XWikiServerClass "visibility" field is set to "template".
      * 
-     * @param wikiXObjectDocument a wiki descriptor document from which the new template wiki
-     *            descriptor document will be created.
+     * @param wikiXObjectDocument a wiki descriptor document from which the new template wiki descriptor document will
+     *            be created.
      * @param packageName the name of the attached XAR file to import in the new template wiki.
      * @param comment the comment to use when saving descriptor document.
      * @param context the XWiki context.
      * @throws XWikiException error when creating new wiki from XAR package.
      */
-    public void createWikiTemplate(XWikiServer wikiXObjectDocument, String packageName,
-        String comment, XWikiContext context) throws XWikiException
+    public void createWikiTemplate(XWikiServer wikiXObjectDocument, String packageName, String comment,
+        XWikiContext context) throws XWikiException
     {
         wikiXObjectDocument.setIsWikiTemplate(true);
 

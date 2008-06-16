@@ -74,14 +74,12 @@ public class WikiManagerException extends PluginException
     public static final int ERROR_WM_PACKAGEDOESNOTEXISTS = 50038;
 
     /**
-     * Error when trying to load a XAR package file in a list of
-     * {@link com.xpn.xwiki.doc.XWikiDocument}.
+     * Error when trying to load a XAR package file in a list of {@link com.xpn.xwiki.doc.XWikiDocument}.
      */
     public static final int ERROR_WM_PACKAGEIMPORT = 50039;
 
     /**
-     * Error when trying to insert in wiki a loaded XAR package list of
-     * {@link com.xpn.xwiki.doc.XWikiDocument}.
+     * Error when trying to insert in wiki a loaded XAR package list of {@link com.xpn.xwiki.doc.XWikiDocument}.
      */
     public static final int ERROR_WM_PACKAGEINSTALL = 50040;
 
@@ -113,9 +111,8 @@ public class WikiManagerException extends PluginException
     }
 
     /**
-     * Create an WikiManagerException. Replace any parameters found in the <code>message</code> by
-     * the passed <code>args</code> parameters. The format is the one used by
-     * {@link java.text.MessageFormat}.
+     * Create an WikiManagerException. Replace any parameters found in the <code>message</code> by the passed
+     * <code>args</code> parameters. The format is the one used by {@link java.text.MessageFormat}.
      * 
      * @param code the error code.
      * @param message a literal message about this error.

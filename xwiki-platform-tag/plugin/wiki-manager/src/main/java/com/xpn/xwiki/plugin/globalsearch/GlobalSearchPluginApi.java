@@ -23,7 +23,7 @@ import com.xpn.xwiki.plugin.globalsearch.tools.GlobalSearchResult;
  * 
  * @version $Id: $
  */
-public class GlobalSearchPluginApi extends PluginApi
+public class GlobalSearchPluginApi extends PluginApi<GlobalSearchPlugin>
 {
     /**
      * Field name of the last error code inserted in context.

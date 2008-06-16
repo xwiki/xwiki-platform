@@ -1,0 +1,30 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.cache.CacheFactory</role>
+      <role-hint>oscache</role-hint>
+      <implementation>org.xwiki.cache.oscache.internal.OSCacheCacheFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.container.Container</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+    <component>
+      <role>org.xwiki.cache.CacheFactory</role>
+      <role-hint>oscache/local</role-hint>
+      <implementation>org.xwiki.cache.oscache.internal.OSCacheLocalCacheFactory</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.container.Container</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

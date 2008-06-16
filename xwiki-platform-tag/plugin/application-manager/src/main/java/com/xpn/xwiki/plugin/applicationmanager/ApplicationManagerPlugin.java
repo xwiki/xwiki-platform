@@ -74,6 +74,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public void init(XWikiContext context)
     {
         if (docChangeRule == null) {
@@ -85,8 +86,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
         String database = context.getDatabase();
         try {
             XWikiURLFactory urlf =
-                context.getWiki().getURLFactoryService().createURLFactory(context.getMode(),
-                    context);
+                context.getWiki().getURLFactoryService().createURLFactory(context.getMode(), context);
             context.setURLFactory(urlf);
             context.setDatabase(context.getMainXWiki());
             ApplicationManager.getInstance().updateAllApplicationTranslation(
@@ -105,6 +105,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#flushCache(com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public void flushCache(XWikiContext context)
     {
         context.getWiki().getNotificationManager().removeGeneralRule(docChangeRule);
@@ -115,6 +116,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
+    @Override
     public String getName()
     {
         return PLUGIN_NAME;
@@ -126,6 +128,7 @@ public class ApplicationManagerPlugin extends XWikiDefaultPlugin
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
      *      com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new ApplicationManagerPluginApi((ApplicationManagerPlugin) plugin, context);

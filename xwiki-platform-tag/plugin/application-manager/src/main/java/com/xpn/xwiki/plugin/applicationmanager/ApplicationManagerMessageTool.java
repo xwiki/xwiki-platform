@@ -45,20 +45,17 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     /**
      * Used as comment when creating a new application.
      */
-    public static final String COMMENT_CREATEAPPLICATION =
-        "applicationmanager.plugin.comment.createapplication";
+    public static final String COMMENT_CREATEAPPLICATION = "applicationmanager.plugin.comment.createapplication";
 
     /**
      * Used as comment when importing a new application.
      */
-    public static final String COMMENT_IMPORTAPPLICATION =
-        "applicationmanager.plugin.comment.importapplication";
+    public static final String COMMENT_IMPORTAPPLICATION = "applicationmanager.plugin.comment.importapplication";
 
     /**
      * Used as comment when reloading an application.
      */
-    public static final String COMMENT_RELOADAPPLICATION =
-        "applicationmanager.plugin.comment.reloadapplication";
+    public static final String COMMENT_RELOADAPPLICATION = "applicationmanager.plugin.comment.reloadapplication";
 
     /**
      * Used as comment when reloading all applications.
@@ -79,39 +76,34 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
         "applicationmanager.plugin.comment.refreshalltranslations";
 
     /**
-     * Used as {@link ApplicationManagerException} message when application default page name
-     * already exists.
+     * Used as {@link ApplicationManagerException} message when application default page name already exists.
      */
     public static final String ERROR_APPPAGEALREADYEXISTS =
         "applicationmanager.plugin.error.applicationpagealreadyexists";
 
     /**
-     * Used as {@link ApplicationManagerException} message when provided XAR package does not
-     * exists.
+     * Used as {@link ApplicationManagerException} message when provided XAR package does not exists.
      */
     public static final String ERROR_IMORT_PKGDOESNOTEXISTS =
         "applicationmanager.plugin.error.import.packagedoesnotexists";
 
     /**
-     * Used as {@link ApplicationManagerException} message when failed to load XAR package as list
-     * of {@link com.xpn.xwiki.doc.XWikiDocument}.
+     * Used as {@link ApplicationManagerException} message when failed to load XAR package as list of
+     * {@link com.xpn.xwiki.doc.XWikiDocument}.
      */
-    public static final String ERROR_IMORT_IMPORT =
-        "applicationmanager.plugin.error.import.import";
+    public static final String ERROR_IMORT_IMPORT = "applicationmanager.plugin.error.import.import";
 
     /**
      * Used as {@link ApplicationManagerException} message when failed to insert loaded
      * {@link com.xpn.xwiki.doc.XWikiDocument} from package into database.
      */
-    public static final String ERROR_IMORT_INSTALL =
-        "applicationmanager.plugin.error.import.install";
+    public static final String ERROR_IMORT_INSTALL = "applicationmanager.plugin.error.import.install";
 
     /**
-     * Used as {@link ApplicationManagerException} message when failed to find application from
-     * provided application name.
+     * Used as {@link ApplicationManagerException} message when failed to find application from provided application
+     * name.
      */
-    public static final String ERROR_APPDOESNOTEXISTS =
-        "applicationmanager.plugin.error.applicationdoesnotexists";
+    public static final String ERROR_APPDOESNOTEXISTS = "applicationmanager.plugin.error.applicationdoesnotexists";
 
     /**
      * Used as {@link org.apache.commons.logging.Log} log message when application creation failed.
@@ -124,15 +116,12 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     public static final String LOG_DELETEAPP = "applicationmanager.plugin.log.deleteapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting all application
-     * descriptors failed.
+     * Used as {@link org.apache.commons.logging.Log} log message when getting all application descriptors failed.
      */
-    public static final String LOG_GETALLAPPS =
-        "applicationmanager.plugin.log.getallapplications";
+    public static final String LOG_GETALLAPPS = "applicationmanager.plugin.log.getallapplications";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting application
-     * descriptor failed.
+     * Used as {@link org.apache.commons.logging.Log} log message when getting application descriptor failed.
      */
     public static final String LOG_GETAPP = "applicationmanager.plugin.log.getapplication";
 
@@ -152,61 +141,49 @@ public class ApplicationManagerMessageTool extends XWikiPluginMessageTool
     public static final String LOG_RELOADAPP = "applicationmanager.plugin.log.reloadapplication";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when reloading all applications
-     * failed.
+     * Used as {@link org.apache.commons.logging.Log} log message when reloading all applications failed.
      */
-    public static final String LOG_REALOADALLAPPS =
-        "applicationmanager.plugin.log.realoadallapplications";
+    public static final String LOG_REALOADALLAPPS = "applicationmanager.plugin.log.realoadallapplications";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when automatically updating
-     * application translations informations failed.
+     * Used as {@link org.apache.commons.logging.Log} log message when automatically updating application translations
+     * informations failed.
      */
-    public static final String LOG_AUTOUPDATETRANSLATIONS =
-        "applicationmanager.plugin.log.autoupdatetranslations";
+    public static final String LOG_AUTOUPDATETRANSLATIONS = "applicationmanager.plugin.log.autoupdatetranslations";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when refreshing all applications
-     * translations pages.
+     * Used as {@link org.apache.commons.logging.Log} log message when refreshing all applications translations pages.
      */
-    public static final String LOG_REFRESHALLTRANSLATIONS =
-        "applicationmanager.plugin.log.refreshalltranslations";
+    public static final String LOG_REFRESHALLTRANSLATIONS = "applicationmanager.plugin.log.refreshalltranslations";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when getting wiki root application
-     * failed.
+     * Used as {@link org.apache.commons.logging.Log} log message when getting wiki root application failed.
      */
-    public static final String LOG_GETROOTAPP =
-        "applicationmanager.plugin.log.getrootapplication";
+    public static final String LOG_GETROOTAPP = "applicationmanager.plugin.log.getrootapplication";
 
     /**
      * Default bundle manager where to find translated messages.
      */
-    private static final ApplicationManagerMessageTool DEFAULTMESSAGETOOL =
-        new ApplicationManagerMessageTool();
+    private static final ApplicationManagerMessageTool DEFAULTMESSAGETOOL = new ApplicationManagerMessageTool();
 
     /**
-     * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system
-     * {@link Locale}.
+     * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system {@link Locale}.
      */
     private ApplicationManagerMessageTool()
     {
-        super(ResourceBundle.getBundle(ApplicationManagerPlugin.PLUGIN_NAME
-            + "/ApplicationResources"));
+        super(ResourceBundle.getBundle(ApplicationManagerPlugin.PLUGIN_NAME + "/ApplicationResources"));
     }
 
     /**
-     * Call for {@link XWikiPluginMessageTool#XWikiPluginMessageTool(ResourceBundle, XWikiContext)}.
-     * Construct ResourceBundle based on {@link WikiManagerPlugin#PLUGIN_NAME} +
-     * "/ApplicationResources".
+     * Call for {@link XWikiPluginMessageTool#XWikiPluginMessageTool(ResourceBundle, XWikiContext)}. Construct
+     * ResourceBundle based on {@link WikiManagerPlugin#PLUGIN_NAME} + "/ApplicationResources".
      * 
      * @param locale the {@link Locale} used to load the {@link ResourceBundle}.
      * @param plugin the plugin.
-     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *            primitives for loading documents
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
+     *            documents
      */
-    ApplicationManagerMessageTool(Locale locale, ApplicationManagerPlugin plugin,
-        XWikiContext context)
+    ApplicationManagerMessageTool(Locale locale, ApplicationManagerPlugin plugin, XWikiContext context)
     {
         super(locale, plugin, context);
     }

@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.applicationmanager;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -121,26 +120,22 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int,
-     *      com.xpn.xwiki.XWikiContext)
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int, com.xpn.xwiki.XWikiContext)
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
-        int event, XWikiContext context)
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
+        XWikiContext context)
     {
         try {
             if (newdoc != null && XWikiApplicationClass.getInstance(context).isInstance(newdoc)) {
 
-                List appList =
-                    XWikiApplicationClass.getInstance(context).newXObjectDocumentList(newdoc,
-                        context);
+                List<XWikiApplication> appList =
+                    XWikiApplicationClass.getInstance(context).newXObjectDocumentList(newdoc, context);
                 updateApplicationsTranslation(appList, getMessageTool(context).get(
-                    ApplicationManagerMessageTool.COMMENT_AUTOUPDATETRANSLATIONS,
-                    newdoc.getFullName()), context);
+                    ApplicationManagerMessageTool.COMMENT_AUTOUPDATETRANSLATIONS, newdoc.getFullName()), context);
             }
         } catch (XWikiException e) {
-            LOG.error(getMessageTool(context).get(
-                ApplicationManagerMessageTool.LOG_AUTOUPDATETRANSLATIONS, newdoc.getFullName()),
-                e);
+            LOG.error(getMessageTool(context).get(ApplicationManagerMessageTool.LOG_AUTOUPDATETRANSLATIONS,
+                newdoc.getFullName()), e);
         }
     }
 
@@ -164,8 +159,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
             XWikiDocument doc = xwiki.getDocument(docFullName, context);
 
             if (!doc.isNew()) {
-                return (XWikiApplication) XWikiApplicationClass.getInstance(context)
-                    .newXObjectDocument(doc, 0, context);
+                return XWikiApplicationClass.getInstance(context).newXObjectDocument(doc, 0, context);
             }
         }
 
@@ -179,7 +173,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      * @return a list if {@link XWikiApplication}.
      * @throws XWikiException error when searching documents.
      */
-    public List getApplicationList(XWikiContext context) throws XWikiException
+    public List<XWikiApplication> getApplicationList(XWikiContext context) throws XWikiException
     {
         return XWikiApplicationClass.getInstance(context).searchXObjectDocuments(context);
     }
@@ -187,48 +181,43 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
     /**
      * Create a new application descriptor base on provided application descriptor.
      * 
-     * @param userAppSuperDoc appXObjectDocument the user application descriptor from which new
-     *            descriptor will be created.
+     * @param userAppSuperDoc appXObjectDocument the user application descriptor from which new descriptor will be
+     *            created.
      * @param failOnExist if true fail if the application descriptor to create already exists.
      * @param comment a comment used when saving application descriptor document.
      * @param context the XWiki Context.
      * @throws XWikiException error when calling for {@link XWiki#getDocument(String, XWikiContext)}
      */
-    public void createApplication(XWikiApplication userAppSuperDoc, boolean failOnExist,
-        String comment, XWikiContext context) throws XWikiException
+    public void createApplication(XWikiApplication userAppSuperDoc, boolean failOnExist, String comment,
+        XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
         XWikiApplicationClass appClass = XWikiApplicationClass.getInstance(context);
 
         // Verify is server page already exist
         XWikiDocument docToSave =
-            xwiki.getDocument(appClass.getItemDocumentDefaultFullName(userAppSuperDoc
-                .getAppName(), context), context);
+            xwiki.getDocument(appClass.getItemDocumentDefaultFullName(userAppSuperDoc.getAppName(), context), context);
 
         if (!docToSave.isNew() && appClass.isInstance(docToSave)) {
             // If we are not allowed to continue if server page already exists
             if (failOnExist) {
                 if (LOG.isErrorEnabled()) {
-                    LOG.error(getMessageTool(context).get(
-                        ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+                    LOG.error(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
                         userAppSuperDoc.getAppName()));
                 }
 
-                throw new ApplicationManagerException(
-                    ApplicationManagerException.ERROR_AM_APPDOCALREADYEXISTS, getMessageTool(
-                        context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
-                            userAppSuperDoc.getAppName()));
+                throw new ApplicationManagerException(ApplicationManagerException.ERROR_AM_APPDOCALREADYEXISTS,
+                    getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+                        userAppSuperDoc.getAppName()));
             } else if (LOG.isWarnEnabled()) {
-                LOG.warn(getMessageTool(context).get(
-                    ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
+                LOG.warn(getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_APPPAGEALREADYEXISTS,
                     userAppSuperDoc.getAppName()));
             }
 
         }
 
         XWikiApplication appSuperDocToSave =
-            (XWikiApplication) XWikiApplicationClass.getInstance(context).newXObjectDocument(
-                docToSave, 0, context);
+            XWikiApplicationClass.getInstance(context).newXObjectDocument(docToSave, 0, context);
 
         appSuperDocToSave.mergeObject(userAppSuperDoc);
 
@@ -257,16 +246,15 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      * 
      * @param appName the name of the application.
      * @param context the XWiki context.
-     * @param validate indicate if it return new XWikiDocument or throw exception if application
-     *            descriptor does not exist.
+     * @param validate indicate if it return new XWikiDocument or throw exception if application descriptor does not
+     *            exist.
      * @return the XWikiApplication representing application descriptor.
      * @throws XWikiException error when searching for application descriptor document.
      */
     public XWikiApplication getApplication(String appName, XWikiContext context, boolean validate)
         throws XWikiException
     {
-        return XWikiApplicationClass.getInstance(context).getApplication(appName, validate,
-            context);
+        return XWikiApplicationClass.getInstance(context).getApplication(appName, validate, context);
     }
 
     /**
@@ -284,8 +272,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      *             <li>or saving wiki preferences document.</li>
      *             </ul>
      */
-    public void reloadApplication(XWikiApplication app, String comment, XWikiContext context)
-        throws XWikiException
+    public void reloadApplication(XWikiApplication app, String comment, XWikiContext context) throws XWikiException
     {
         updateApplicationTranslation(app, comment, context);
     }
@@ -307,17 +294,16 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      */
     public void reloadAllApplications(String comment, XWikiContext context) throws XWikiException
     {
-        List applist = getApplicationList(context);
+        List<XWikiApplication> applist = getApplicationList(context);
 
-        for (Iterator it = applist.iterator(); it.hasNext();) {
-            XWikiApplication app = (XWikiApplication) it.next();
+        for (XWikiApplication app : applist) {
             ApplicationManager.getInstance().updateApplicationTranslation(app, comment, context);
         }
     }
 
     /**
-     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of all
-     * applications in the context's wiki.
+     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of all applications in the
+     * context's wiki.
      * 
      * @param applications the applications for which to update translations informations.
      * @param comment a comment used when saving XWiki.
@@ -329,7 +315,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      *             <li>or saving wiki preferences document.</li>
      *             </ul>
      */
-    public void updateApplicationsTranslation(Collection applications, String comment,
+    public void updateApplicationsTranslation(Collection<XWikiApplication> applications, String comment,
         XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -339,29 +325,26 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
 
         if (prefsObject != null) {
             String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
-            List translationPrefs =
-                ListClass.getListFromString(documentBundles,
-                    XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP, true);
+            List<String> translationPrefs =
+                ListClass.getListFromString(documentBundles, XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP, true);
 
             boolean updateprefs = false;
 
-            for (Iterator it = applications.iterator(); it.hasNext();) {
-                XWikiApplication app = (XWikiApplication) it.next();
-
+            for (XWikiApplication app : applications) {
                 updateprefs |= updateApplicationTranslation(translationPrefs, app);
             }
 
             if (updateprefs) {
-                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
-                    translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
+                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(translationPrefs
+                    .toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
                 xwiki.saveDocument(prefsDoc, comment, context);
             }
         }
     }
 
     /**
-     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of all
-     * applications in the context's wiki.
+     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of all applications in the
+     * context's wiki.
      * 
      * @param comment a comment used when saving XWiki.
      * @param context the XWiki context.
@@ -372,15 +355,13 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      *             <li>or saving wiki preferences document.</li>
      *             </ul>
      */
-    public void updateAllApplicationTranslation(String comment, XWikiContext context)
-        throws XWikiException
+    public void updateAllApplicationTranslation(String comment, XWikiContext context) throws XWikiException
     {
         updateApplicationsTranslation(getApplicationList(context), comment, context);
     }
 
     /**
-     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of the
-     * provided application.
+     * Insert in XWiki.XWikiPreferences "documentBundles" field the translation documents of the provided application.
      * 
      * @param app the application descriptor.
      * @param comment a comment used when saving XWiki.
@@ -391,8 +372,8 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      *             <li>or saving wiki preferences document.</li>
      *             </ul>
      */
-    public void updateApplicationTranslation(XWikiApplication app, String comment,
-        XWikiContext context) throws XWikiException
+    public void updateApplicationTranslation(XWikiApplication app, String comment, XWikiContext context)
+        throws XWikiException
     {
         XWiki xwiki = context.getWiki();
 
@@ -401,36 +382,32 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
 
         if (prefsObject != null) {
             String documentBundles = prefsObject.getStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES);
-            List translationPrefs =
-                ListClass.getListFromString(documentBundles,
-                    XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP, true);
+            List<String> translationPrefs =
+                ListClass.getListFromString(documentBundles, XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP, true);
 
             boolean updateprefs = updateApplicationTranslation(translationPrefs, app);
 
             if (updateprefs) {
-                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(
-                    translationPrefs.toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
+                prefsObject.setStringValue(XWIKIPREFERENCES_DOCUMENTBUNDLES, StringUtils.join(translationPrefs
+                    .toArray(), XWIKIPREFERENCES_DOCUMENTBUNDLES_SEP));
                 xwiki.saveDocument(prefsDoc, comment, context);
             }
         }
     }
 
     /**
-     * Insert in <code>translationPrefs</code> the translation documents of the provided
-     * application.
+     * Insert in <code>translationPrefs</code> the translation documents of the provided application.
      * 
      * @param translationPrefs the list of translation documents to complete.
      * @param app the application's descriptor.
      * @return true if at least one document has been inserted in <code>translationPrefs</code>.
      */
-    public boolean updateApplicationTranslation(List translationPrefs, XWikiApplication app)
+    public boolean updateApplicationTranslation(List<String> translationPrefs, XWikiApplication app)
     {
         boolean updateprefs = false;
 
-        List translationDocs = app.getTranslationDocs();
-        for (Iterator it2 = translationDocs.iterator(); it2.hasNext();) {
-            String translationDoc = (String) it2.next();
-
+        List<String> translationDocs = app.getTranslationDocs();
+        for (String translationDoc : translationDocs) {
             if (!translationPrefs.contains(translationDoc)) {
                 translationPrefs.add(translationDoc);
                 updateprefs = true;
@@ -455,20 +432,18 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      *             </ul>
      * @throws IOException error when apply export.
      */
-    public void exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory,
-        XWikiContext context) throws XWikiException, IOException
+    public void exportApplicationXAR(String appName, boolean recurse, boolean withDocHistory, XWikiContext context)
+        throws XWikiException, IOException
     {
-        XWikiApplication app =
-            ApplicationManager.getInstance().getApplication(appName, context, true);
+        XWikiApplication app = ApplicationManager.getInstance().getApplication(appName, context, true);
 
-        PackageAPI export =
-            ((PackageAPI) context.getWiki().getPluginApi(PACKAGEPLUGIN_NAME, context));
+        PackageAPI export = ((PackageAPI) context.getWiki().getPluginApi(PACKAGEPLUGIN_NAME, context));
 
         export.setName(app.getAppName() + "-" + app.getAppVersion());
 
-        Set documents = app.getDocumentsNames(recurse, true);
-        for (Iterator it = documents.iterator(); it.hasNext();) {
-            export.add((String) it.next(), DocumentInfo.ACTION_OVERWRITE);
+        Set<String> documents = app.getDocumentsNames(recurse, true);
+        for (String documentName : documents) {
+            export.add(documentName, DocumentInfo.ACTION_OVERWRITE);
         }
 
         export.setWithVersions(withDocHistory);
@@ -477,9 +452,8 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Import attached application XAR into current wiki and do all actions needed to installation
-     * an application. See {@link #reloadApplication(XWikiApplication, String, XWikiContext)} for
-     * more.
+     * Import attached application XAR into current wiki and do all actions needed to installation an application. See
+     * {@link #reloadApplication(XWikiApplication, String, XWikiContext)} for more.
      * 
      * @param packageDoc the document where package to import is attached.
      * @param packageName the name of the attached XAR file to import.
@@ -490,47 +464,41 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
      *             <li>getting attached package file.</li>
      *             <li>or load package in memory.</li>
      *             <li>or installing loaded document in database</li>
-     *             <li>or apply application initialization for each application descriptor
-     *             document.</li>
+     *             <li>or apply application initialization for each application descriptor document.</li>
      *             </ul>
      */
-    public void importApplication(XWikiDocument packageDoc, String packageName, String comment,
-        XWikiContext context) throws XWikiException
+    public void importApplication(XWikiDocument packageDoc, String packageName, String comment, XWikiContext context)
+        throws XWikiException
     {
         XWikiAttachment packFile = packageDoc.getAttachment(packageName);
 
         if (packFile == null) {
-            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                getMessageTool(context).get(
-                    ApplicationManagerMessageTool.ERROR_IMORT_PKGDOESNOTEXISTS, packageName));
+            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, getMessageTool(context).get(
+                ApplicationManagerMessageTool.ERROR_IMORT_PKGDOESNOTEXISTS, packageName));
         }
 
         // Import
-        PackageAPI importer =
-            ((PackageAPI) context.getWiki().getPluginApi(PACKAGEPLUGIN_NAME, context));
+        PackageAPI importer = ((PackageAPI) context.getWiki().getPluginApi(PACKAGEPLUGIN_NAME, context));
 
         try {
             importer.Import(packFile.getContent(context));
         } catch (IOException e) {
-            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_IMORT_IMPORT,
-                    packageName), e);
+            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, getMessageTool(context).get(
+                ApplicationManagerMessageTool.ERROR_IMORT_IMPORT, packageName), e);
         }
 
         if (importer.install() == DocumentInfo.INSTALL_IMPOSSIBLE) {
-            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN,
-                getMessageTool(context).get(ApplicationManagerMessageTool.ERROR_IMORT_INSTALL,
-                    packageName));
+            throw new ApplicationManagerException(XWikiException.ERROR_XWIKI_UNKNOWN, getMessageTool(context).get(
+                ApplicationManagerMessageTool.ERROR_IMORT_INSTALL, packageName));
         }
 
         // Apply applications installation
-        for (Iterator it = importer.getFiles().iterator(); it.hasNext();) {
-            DocumentInfoAPI docinfo = (DocumentInfoAPI) it.next();
+        for (DocumentInfoAPI docinfo : (List<DocumentInfoAPI>) importer.getFiles()) {
             XWikiDocument doc = docinfo.getDocInfo().getDoc();
 
             if (XWikiApplicationClass.getInstance(context).isInstance(doc)) {
-                reloadApplication((XWikiApplication) XWikiApplicationClass.getInstance(context)
-                    .newXObjectDocument(doc, 0, context), comment, context);
+                reloadApplication(XWikiApplicationClass.getInstance(context).newXObjectDocument(doc, 0, context),
+                    comment, context);
             }
         }
     }

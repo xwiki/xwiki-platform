@@ -140,7 +140,7 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
     }
 
     /**
-     * Validate soem basic cache use case without any constraints.
+     * Validate some basic cache use case without any constraints.
      * 
      * @throws Exception error.
      */
@@ -159,5 +159,45 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
         assertEquals(VALUE2, cache.get(KEY2));
 
         cache.dispose();
+    }
+    
+    /**
+     * Validate {@link Cache#remove(String)}.
+     * 
+     * @throws Exception error.
+     */
+    public void testRemove() throws Exception
+    {
+        CacheFactory factory = getCacheFactory();
+
+        Cache<Object> cache = factory.newCache(new CacheConfiguration());
+
+        cache.set(KEY, VALUE);
+        cache.set(KEY2, VALUE2);
+
+        cache.remove(KEY);
+
+        assertNull(cache.get(KEY));
+        assertEquals(VALUE2, cache.get(KEY2));
+    }
+
+    /**
+     * Validate {@link Cache#removeAll()}.
+     * 
+     * @throws Exception error.
+     */
+    public void testRemoveAll() throws Exception
+    {
+        CacheFactory factory = getCacheFactory();
+
+        Cache<Object> cache = factory.newCache(new CacheConfiguration());
+
+        cache.set(KEY, VALUE);
+        cache.set(KEY2, VALUE2);
+
+        cache.removeAll();
+
+        assertNull(cache.get(KEY));
+        assertNull(cache.get(KEY2));
     }
 }

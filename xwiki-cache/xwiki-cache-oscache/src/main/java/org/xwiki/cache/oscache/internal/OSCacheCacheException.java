@@ -19,19 +19,21 @@
  */
 package org.xwiki.cache.oscache.internal;
 
+import org.xwiki.cache.CacheException;
+
 /**
  * Exception raised when failed to load OSCache configuration.
  * 
  * @version $Id: $
  */
-public class PropertiesLoadingCacheException extends OSCacheCacheException
+public class OSCacheCacheException extends CacheException
 {
     /**
      * {@inheritDoc}
      * 
      * @see Exception#Exception(String)
      */
-    public PropertiesLoadingCacheException(String message)
+    public OSCacheCacheException(String message)
     {
         super(message);
     }
@@ -41,7 +43,7 @@ public class PropertiesLoadingCacheException extends OSCacheCacheException
      * 
      * @see Exception#Exception(String, Throwable)
      */
-    public PropertiesLoadingCacheException(String message, Throwable cause)
+    public OSCacheCacheException(String message, Throwable cause)
     {
         super(message, cause);
     }

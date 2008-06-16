@@ -68,11 +68,6 @@ public interface Cache<T>
     void removeAll();
 
     /**
-     * @return the number of entries this cache contains.
-     */
-    int getSize();
-
-    /**
      * Add the provided listener to the cache to catch events on entries like add, remove etc.
      * 
      * @param listener the implemented listener.

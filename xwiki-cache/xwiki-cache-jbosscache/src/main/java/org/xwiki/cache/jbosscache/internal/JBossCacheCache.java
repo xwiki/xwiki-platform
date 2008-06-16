@@ -143,16 +143,6 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.cache.Cache#getSize()
-     */
-    public int getSize()
-    {
-        return this.rootNode.getChildrenNames().size();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.xwiki.cache.Cache#removeAll()
      */
     public void removeAll()

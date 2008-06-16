@@ -163,19 +163,6 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Method called here is labeled "for test only" in OSCache JavaDoc, so don't call this a lot!
-     * </p>
-     * 
-     * @see org.xwiki.cache.Cache#getSize()
-     */
-    public int getSize()
-    {
-        return this.cacheAdmin.getCache().getSize();
-    }
-
-    /**
-     * {@inheritDoc}
      * 
      * @see org.xwiki.cache.util.AbstractCache#dispose()
      */

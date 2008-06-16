@@ -15,7 +15,7 @@
     </component>
     <component>
       <role>org.xwiki.cache.CacheFactory</role>
-      <role-hint>jbosscache-local</role-hint>
+      <role-hint>jbosscache/local</role-hint>
       <implementation>org.xwiki.cache.jbosscache.internal.JBossCacheLocalCacheFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>

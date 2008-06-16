@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.jboss.cache.notifications.annotation.CacheListener;
 import org.jboss.cache.notifications.annotation.NodeModified;
 import org.jboss.cache.notifications.event.NodeModifiedEvent;
 import org.jboss.cache.Cache;
@@ -42,6 +43,7 @@ import org.xwiki.container.Container;
  * @param <T> the class of the data stored in the cache.
  * @version $Id: $
  */
+@CacheListener
 public class JBossCacheCache<T> extends AbstractCache<T>
 {
     /**
@@ -100,7 +102,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
         CacheFactory<String, T> factory = new DefaultCacheFactory<String, T>();
         this.cache = factory.createCache(this.jbosscacheConfiguration.getJBossCacheConfiguration());
 
-        this.cache.addCacheListener(ROOT_FQN, this);
+        this.cache.addCacheListener(this);
 
         this.cache.create();
         this.cache.start();
@@ -115,7 +117,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     public void remove(String key)
     {
-        this.rootNode.removeChild(key);
+        this.cache.removeNode(new Fqn<String>(ROOT_FQN, key));
     }
 
     /**
@@ -125,7 +127,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     public void set(String key, T obj)
     {
-        this.rootNode.getChild(key).put(DATA_KEY, obj);
+        this.cache.put(new Fqn<String>(ROOT_FQN, key), DATA_KEY, obj);
     }
 
     /**
@@ -135,7 +137,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     public T get(String key)
     {
-        return this.rootNode.getChild(key).get(DATA_KEY);
+        return this.cache.get(new Fqn<String>(ROOT_FQN, key), DATA_KEY);
     }
 
     /**
@@ -145,7 +147,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     public int getSize()
     {
-        return this.rootNode.getChildren().size();
+        return this.rootNode.getChildrenNames().size();
     }
 
     /**
@@ -183,6 +185,14 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     @NodeModified
     public void nodeModified(NodeModifiedEvent event)
     {
+        if (!event.getFqn().isChildOf(ROOT_FQN)) {
+            return;
+        }
+
+        if (LOG.isInfoEnabled()) {
+            LOG.info("The node " + event.getFqn() + " that should not has bee updated");
+        }
+
         Map<String, T> data = event.getData();
 
         if (event.isPre()) {

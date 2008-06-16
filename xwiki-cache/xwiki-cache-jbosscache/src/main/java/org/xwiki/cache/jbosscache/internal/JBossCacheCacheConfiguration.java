@@ -21,7 +21,6 @@ package org.xwiki.cache.jbosscache.internal;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
@@ -119,11 +118,22 @@ public class JBossCacheCacheConfiguration
         this.jbossConfiguration = loadConfig(configuration.getConfigurationId());
 
         if (this.jbossConfiguration == null) {
+            this.jbossConfiguration = getDefaultConfig();
+
+            if (this.jbossConfiguration == null) {
+                this.jbossConfiguration = new Configuration();
+            }
+
             EntryEvictionConfiguration eec =
                 (EntryEvictionConfiguration) this.configuration.get(EntryEvictionConfiguration.CONFIGURATIONID);
 
             if (eec != null && eec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
                 EvictionConfig ec = this.jbossConfiguration.getEvictionConfig();
+
+                if (ec == null) {
+                    ec = new EvictionConfig();
+                    this.jbossConfiguration.setEvictionConfig(ec);
+                }
 
                 int maxEntries = ((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue();
 
@@ -183,13 +193,17 @@ public class JBossCacheCacheConfiguration
                         "/WEB-INF/" + PROPS_PATH + propertiesFilename);
             }
 
+            if (is == null) {
+                throw new PropertiesLoadingCacheException("Can't find any configuration file for" + propertiesId);
+            }
+
             XmlConfigurationParser parser = new XmlConfigurationParser();
             config = parser.parseStream(is);
 
             if (LOG.isInfoEnabled()) {
                 LOG.info("Properties loaded: " + propertiesFilename);
             }
-        } catch (FileNotFoundException e) {
+        } catch (Exception e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Failed to load configuration file " + propertiesId, e);
             }

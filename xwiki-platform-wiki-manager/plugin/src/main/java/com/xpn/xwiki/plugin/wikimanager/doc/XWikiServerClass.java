@@ -24,20 +24,19 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.AbstractXClassManager;
-import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocument;
 import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XObjectDocumentDoesNotExistException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerException;
 import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
 
 /**
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager}
- * implementation for XWiki.XWikiServerClass class.
+ * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
+ * XWiki.XWikiServerClass class.
  * 
  * @version $Id: $
  * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager
  */
-public class XWikiServerClass extends AbstractXClassManager
+public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
 {
     /**
      * Default list separators of XWiki.XWikiServerClass fields.
@@ -90,20 +89,17 @@ public class XWikiServerClass extends AbstractXClassManager
     public static final String FIELD_VISIBILITY = "visibility";
 
     /**
-     * First possible values for <code>visibility</code> for the XWiki class
-     * XWiki.XWikiServerClass.
+     * First possible values for <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDL_VISIBILITY_PUBLIC = "public";
 
     /**
-     * Second possible values for <code>visibility</code> for the XWiki class
-     * XWiki.XWikiServerClass.
+     * Second possible values for <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDL_VISIBILITY_PRIVATE = "private";
 
     /**
-     * List of possible values for <code>visibility</code> for the XWiki class
-     * XWiki.XWikiServerClass.
+     * List of possible values for <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDL_VISIBILITY =
         FIELDL_VISIBILITY_PUBLIC + DEFAULT_FIELDS + FIELDL_VISIBILITY_PRIVATE + DEFAULT_FIELDS;
@@ -137,8 +133,7 @@ public class XWikiServerClass extends AbstractXClassManager
      * List of possible values for <code>state</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDL_STATE =
-        FIELDL_STATE_ACTIVE + DEFAULT_FIELDS + FIELDL_STATE_INACTIVE + DEFAULT_FIELDS
-            + FIELDL_STATE_LOCKED;
+        FIELDL_STATE_ACTIVE + DEFAULT_FIELDS + FIELDL_STATE_INACTIVE + DEFAULT_FIELDS + FIELDL_STATE_LOCKED;
 
     /**
      * Pretty name of field <code>state</code> for the XWiki class XWiki.XWikiServerClass.
@@ -151,8 +146,7 @@ public class XWikiServerClass extends AbstractXClassManager
     public static final String FIELD_LANGUAGE = "language";
 
     /**
-     * List of possible values for <code>language</code> for the XWiki class
-     * XWiki.XWikiServerClass.
+     * List of possible values for <code>language</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDL_LANGUAGE = "en|fr";
 
@@ -274,16 +268,12 @@ public class XWikiServerClass extends AbstractXClassManager
         needsUpdate |= baseClass.addUsersField(FIELD_OWNER, FIELDPN_OWNER, false);
         needsUpdate |= baseClass.addTextAreaField(FIELD_DESCRIPTION, FIELDPN_DESCRIPTION, 40, 5);
         needsUpdate |= baseClass.addTextField(FIELD_SERVER, FIELDPN_SERVER, 30);
-        needsUpdate |=
-            baseClass.addStaticListField(FIELD_VISIBILITY, FIELDPN_VISIBILITY, FIELDL_VISIBILITY);
+        needsUpdate |= baseClass.addStaticListField(FIELD_VISIBILITY, FIELDPN_VISIBILITY, FIELDL_VISIBILITY);
         needsUpdate |= baseClass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
-        needsUpdate |=
-            baseClass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
+        needsUpdate |= baseClass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
         needsUpdate |= baseClass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE);
         needsUpdate |= baseClass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
-        needsUpdate |=
-            baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE,
-                FIELDDT_ISWIKITEMPLATE);
+        needsUpdate |= baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE);
 
         return needsUpdate;
     }
@@ -316,21 +306,20 @@ public class XWikiServerClass extends AbstractXClassManager
      * 
      * @param wikiName the name of the wiki.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @param validate indicate if it return new {@link XWikiServer} or throw exception if wiki
-     *            descriptor does not exist.
+     * @param validate indicate if it return new {@link XWikiServer} or throw exception if wiki descriptor does not
+     *            exist.
      * @param context the XWiki context.
      * @return the {@link XWikiServer} representing wiki descriptor.
      * @throws XWikiException error when searching for wiki descriptor document.
      */
-    public XWikiServer getWikiAlias(String wikiName, int objectId, boolean validate,
-        XWikiContext context) throws XWikiException
+    public XWikiServer getWikiAlias(String wikiName, int objectId, boolean validate, XWikiContext context)
+        throws XWikiException
     {
         try {
-            return (XWikiServer) getXObjectDocument(wikiName, objectId, validate, context);
+            return getXObjectDocument(wikiName, objectId, validate, context);
         } catch (XObjectDocumentDoesNotExistException e) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                WikiManagerMessageTool.getDefault(context).get(
-                    WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS, wikiName), e);
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, WikiManagerMessageTool
+                .getDefault(context).get(WikiManagerMessageTool.ERROR_WIKIALIASDOESNOTEXISTS, wikiName), e);
         }
     }
 
@@ -340,20 +329,19 @@ public class XWikiServerClass extends AbstractXClassManager
      * @param wikiName the name of the wiki.
      * @param objectId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
-     * @param validate indicate if it return new {@link XWikiServer} or throw exception if wiki
-     *            descriptor does not exist.
+     * @param validate indicate if it return new {@link XWikiServer} or throw exception if wiki descriptor does not
+     *            exist.
      * @return the {@link XWikiServer} representing wiki descriptor.
      * @throws XWikiException error when searching for wiki descriptor document.
      */
-    public XWikiServer getWikiTemplateAlias(String wikiName, int objectId, boolean validate,
-        XWikiContext context) throws XWikiException
+    public XWikiServer getWikiTemplateAlias(String wikiName, int objectId, boolean validate, XWikiContext context)
+        throws XWikiException
     {
         XWikiServer wiki = getWikiAlias(wikiName, objectId, validate, context);
 
         if (validate && !wiki.isWikiTemplate()) {
-            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS,
-                WikiManagerMessageTool.getDefault(context).get(
-                    WikiManagerMessageTool.ERROR_WIKITEMPLATEALIASDOESNOTEXISTS, wikiName));
+            throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKIDOESNOTEXISTS, WikiManagerMessageTool
+                .getDefault(context).get(WikiManagerMessageTool.ERROR_WIKITEMPLATEALIASDOESNOTEXISTS, wikiName));
         }
 
         return wiki;
@@ -368,8 +356,7 @@ public class XWikiServerClass extends AbstractXClassManager
      *      int, com.xpn.xwiki.XWikiContext)
      */
     @Override
-    public XObjectDocument newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
-        throws XWikiException
+    public XWikiServer newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context) throws XWikiException
     {
         return new XWikiServer(doc, objId, context);
     }

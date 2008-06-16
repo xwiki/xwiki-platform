@@ -28,8 +28,8 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultX
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * This class manage an XWiki document containing XWiki.XWikiServerClass object. It add some
- * specifics methods, getters and setters for this type of object and fields.
+ * This class manage an XWiki document containing XWiki.XWikiServerClass object. It add some specifics methods, getters
+ * and setters for this type of object and fields.
  * 
  * @version $Id: $
  */
@@ -52,8 +52,7 @@ public class XWikiServer extends DefaultXObjectDocument
      *             <li>or when calling {@link #reload(XWikiContext)}</li>
      *             </ul>
      */
-    public XWikiServer(XWikiDocument xdoc, int objectId, XWikiContext context)
-        throws XWikiException
+    public XWikiServer(XWikiDocument xdoc, int objectId, XWikiContext context) throws XWikiException
     {
         super(XWikiServerClass.getInstance(context), xdoc, objectId, context);
     }
@@ -225,8 +224,7 @@ public class XWikiServer extends DefaultXObjectDocument
     /**
      * Modify the secure mode of the wiki.
      * 
-     * @param secure true if wiki is in secure mode (https), false if in simple non-secure (http)
-     *            mode.
+     * @param secure true if wiki is in secure mode (https), false if in simple non-secure (http) mode.
      */
     public void setSecure(boolean secure)
     {
@@ -332,9 +330,7 @@ public class XWikiServer extends DefaultXObjectDocument
             // WikiManager plugin from core.
             url = context.getWiki().getServerURL(getWikiName(), context);
         } else {
-            url =
-                context.getURLFactory().createURL(spaceName, pageName, "view", null, null,
-                    getWikiName(), context);
+            url = context.getURLFactory().createURL(spaceName, pageName, "view", null, null, getWikiName(), context);
         }
 
         return url;

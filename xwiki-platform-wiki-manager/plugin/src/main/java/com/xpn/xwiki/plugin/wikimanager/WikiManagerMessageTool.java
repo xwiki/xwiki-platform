@@ -51,32 +51,28 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     /**
      * Used as comment when creating a new wiki from wiki template.
      */
-    public static final String COMMENT_CREATEWIKIFROMTEMPLATE =
-        "wikimanager.plugin.comment.createwikifromtemplate";
+    public static final String COMMENT_CREATEWIKIFROMTEMPLATE = "wikimanager.plugin.comment.createwikifromtemplate";
 
     /**
      * Used as comment when creating a new wiki from XAR package.
      */
-    public static final String COMMENT_CREATEWIKIFROMPACKAGE =
-        "wikimanager.plugin.comment.createwikifrompackage";
+    public static final String COMMENT_CREATEWIKIFROMPACKAGE = "wikimanager.plugin.comment.createwikifrompackage";
 
     /**
      * Used as comment when creating a new wiki template.
      */
-    public static final String COMMENT_CREATEWIKITEMPLATE =
-        "wikimanager.plugin.comment.createwikitemplate";
+    public static final String COMMENT_CREATEWIKITEMPLATE = "wikimanager.plugin.comment.createwikitemplate";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to make action that require virtual
-     * mode in a wiki not in virtual mode.
+     * Used as {@link WikiManagerException} message when trying to make action that require virtual mode in a wiki not
+     * in virtual mode.
      */
     public static final String ERROR_XWIKINOTVIRTUAL = "wikimanager.plugin.error.xwikinotvirtual";
 
     /**
      * Used as {@link WikiManagerException} message when provided user does not exists.
      */
-    public static final String ERROR_USERDOESNOTEXIST =
-        "wikimanager.plugin.error.userdoesnotexists";
+    public static final String ERROR_USERDOESNOTEXIST = "wikimanager.plugin.error.userdoesnotexists";
 
     /**
      * Used as {@link WikiManagerException} message when provided user is not active.
@@ -84,18 +80,15 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_USERNOTACTIVE = "wikimanager.plugin.error.usernotactive";
 
     /**
-     * Used as {@link WikiManagerException} message when tring to create a new wiki with a wiki name
-     * forbidden.
+     * Used as {@link WikiManagerException} message when tring to create a new wiki with a wiki name forbidden.
      */
-    public static final String ERROR_WIKINAMEFORBIDDEN =
-        "wikimanager.plugin.error.wikinameforbidden";
+    public static final String ERROR_WIKINAMEFORBIDDEN = "wikimanager.plugin.error.wikinameforbidden";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to create a new wiki with a wiki
-     * descriptor that already exist.
+     * Used as {@link WikiManagerException} message when trying to create a new wiki with a wiki descriptor that already
+     * exist.
      */
-    public static final String ERROR_DESCRIPTORALREADYEXISTS =
-        "wikimanager.plugin.error.descriptoralreadyexists";
+    public static final String ERROR_DESCRIPTORALREADYEXISTS = "wikimanager.plugin.error.descriptoralreadyexists";
 
     /**
      * Used as {@link WikiManagerException} message when call to
@@ -106,8 +99,7 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     /**
      * Used as {@link WikiManagerException} message when provided XAR package does not exists.
      */
-    public static final String ERROR_PACKAGEDOESNOTEXISTS =
-        "wikimanager.plugin.error.packagedoesnotexists";
+    public static final String ERROR_PACKAGEDOESNOTEXISTS = "wikimanager.plugin.error.packagedoesnotexists";
 
     /**
      * Used as {@link WikiManagerException} message when failed to load XAR package as list of
@@ -116,40 +108,34 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_PACKAGEIMPORT = "wikimanager.plugin.error.packageimport";
 
     /**
-     * Used as {@link WikiManagerException} message when failed to insert loaded
-     * {@link com.xpn.xwiki.doc.XWikiDocument} from package into database.
+     * Used as {@link WikiManagerException} message when failed to insert loaded {@link com.xpn.xwiki.doc.XWikiDocument}
+     * from package into database.
      */
     public static final String ERROR_PACKAGEINSTALL = "wikimanager.plugin.error.packageinstall";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to delete wiki with not
-     * administrator user.
+     * Used as {@link WikiManagerException} message when trying to delete wiki with not administrator user.
      * 
      * @since 1.1
      */
-    public static final String ERROR_RIGHTTODELETEWIKI =
-        "wikimanager.plugin.error.righttodeletewiki";
+    public static final String ERROR_RIGHTTODELETEWIKI = "wikimanager.plugin.error.righttodeletewiki";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to get a wiki alias which does not
-     * exists.
+     * Used as {@link WikiManagerException} message when trying to get a wiki alias which does not exists.
      * 
      * @since 1.1
      */
-    public static final String ERROR_WIKIALIASDOESNOTEXISTS =
-        "wikimanager.plugin.error.wikialiasdoesnotexists";
+    public static final String ERROR_WIKIALIASDOESNOTEXISTS = "wikimanager.plugin.error.wikialiasdoesnotexists";
 
     /**
      * Used as {@link WikiManagerException} message when trying to get a wiki which does not exists.
      * 
      * @since 1.1
      */
-    public static final String ERROR_WIKIDOESNOTEXISTS =
-        "wikimanager.plugin.error.wikidoesnotexists";
+    public static final String ERROR_WIKIDOESNOTEXISTS = "wikimanager.plugin.error.wikidoesnotexists";
 
     /**
-     * Used as {@link WikiManagerException} message when trying to delete wiki with not
-     * administrator user.
+     * Used as {@link WikiManagerException} message when trying to delete wiki with not administrator user.
      * 
      * @since 1.1
      */
@@ -164,29 +150,26 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String ERROR_DELETEMAINWIKI = "wikimanager.plugin.error.deletemainwiki";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new wiki
-     * with a wiki descriptor that already exist.
+     * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new wiki with a wiki
+     * descriptor that already exist.
      */
     public static final String LOG_DESCRIPTORALREADYEXISTS =
         "wikimanager.plugin.log.createwiki.descriptoralreadyexists";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new
-     * database/schema that already exists.
+     * Used as {@link org.apache.commons.logging.Log} log message when trying to create a new database/schema that
+     * already exists.
      */
-    public static final String LOG_DATABASEALREADYEXISTS =
-        "wikimanager.plugin.log.createwiki.databasealreadyexist";
+    public static final String LOG_DATABASEALREADYEXISTS = "wikimanager.plugin.log.createwiki.databasealreadyexist";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when database/schema creation
-     * failed.
+     * Used as {@link org.apache.commons.logging.Log} log message when database/schema creation failed.
      */
-    public static final String LOG_DATABASECREATION =
-        "wikimanager.plugin.log.createwiki.databasecreation";
+    public static final String LOG_DATABASECREATION = "wikimanager.plugin.log.createwiki.databasecreation";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when database/schema creation
-     * thrown unknown exception.
+     * Used as {@link org.apache.commons.logging.Log} log message when database/schema creation thrown unknown
+     * exception.
      */
     public static final String LOG_DATABASECREATIONEXCEPTION =
         "wikimanager.plugin.log.createwiki.databasecreationexception";
@@ -207,41 +190,37 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     public static final String LOG_WIKIGET = "wikimanager.plugin.log.wikiget";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki
-     * descriptor document.
+     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki descriptor document.
      */
     public static final String LOG_WIKIALIASGET = "wikimanager.plugin.log.wikialiasget";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis
-     * descriptors documents.
+     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis descriptors
+     * documents.
      */
     public static final String LOG_WIKIGETALL = "wikimanager.plugin.log.wikigetall";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis
-     * aliases.
+     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis aliases.
      */
     public static final String LOG_WIKIALIASGETALL = "wikimanager.plugin.log.wikialiasgetall";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when modification of the
-     * "visibility" field of a wiki descriptor failed.
+     * Used as {@link org.apache.commons.logging.Log} log message when modification of the "visibility" field of a wiki
+     * descriptor failed.
      */
     public static final String LOG_WIKISETVISIBILITY = "wikimanager.plugin.log.wikisetvisibility";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki template
-     * descriptor document.
+     * Used as {@link org.apache.commons.logging.Log} log message when failed to find wiki template descriptor document.
      */
     public static final String LOG_WIKITEMPLATEGET = "wikimanager.plugin.log.wikitemplateget";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis
-     * templates descriptors documents.
+     * Used as {@link org.apache.commons.logging.Log} log message when failed to find all the wikis templates
+     * descriptors documents.
      */
-    public static final String LOG_WIKITEMPLATEGETALL =
-        "wikimanager.plugin.log.wikitemplategetall";
+    public static final String LOG_WIKITEMPLATEGETALL = "wikimanager.plugin.log.wikitemplategetall";
 
     /**
      * Default bundle manager where to find translated messages.
@@ -251,8 +230,7 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     private static final WikiManagerMessageTool DEFAULTMESSAGETOOL = new WikiManagerMessageTool();
 
     /**
-     * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system
-     * {@link Locale}.
+     * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system {@link Locale}.
      */
     private WikiManagerMessageTool()
     {
@@ -260,14 +238,13 @@ public class WikiManagerMessageTool extends XWikiPluginMessageTool
     }
 
     /**
-     * Call for {@link XWikiPluginMessageTool#XWikiPluginMessageTool(ResourceBundle, XWikiContext)}.
-     * Construct ResourceBundle based on {@link WikiManagerPlugin#PLUGIN_NAME} +
-     * "/ApplicationResources".
+     * Call for {@link XWikiPluginMessageTool#XWikiPluginMessageTool(ResourceBundle, XWikiContext)}. Construct
+     * ResourceBundle based on {@link WikiManagerPlugin#PLUGIN_NAME} + "/ApplicationResources".
      * 
      * @param locale the {@link Locale} used to load the {@link ResourceBundle}.
      * @param plugin the plugin.
-     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *            primitives for loading documents
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
+     *            documents
      */
     WikiManagerMessageTool(Locale locale, WikiManagerPlugin plugin, XWikiContext context)
     {

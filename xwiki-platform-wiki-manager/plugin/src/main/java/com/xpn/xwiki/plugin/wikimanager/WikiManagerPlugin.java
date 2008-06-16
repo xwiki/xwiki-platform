@@ -80,8 +80,7 @@ public class WikiManagerPlugin extends XWikiDefaultPlugin
         searchPlugin = context.getWiki().getPlugin(GlobalSearchPlugin.PLUGIN_NAME, context);
         if (searchPlugin == null) {
             searchPlugin =
-                new GlobalSearchPlugin(GlobalSearchPlugin.PLUGIN_NAME, GlobalSearchPlugin.class
-                    .getName(), context);
+                new GlobalSearchPlugin(GlobalSearchPlugin.PLUGIN_NAME, GlobalSearchPlugin.class.getName(), context);
         }
     }
 

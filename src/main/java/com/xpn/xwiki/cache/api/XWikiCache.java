@@ -22,6 +22,7 @@
 package com.xpn.xwiki.cache.api;
 
 
+@Deprecated
 public interface XWikiCache {
     void setCapacity(int capacity);
     void flushEntry(String key);

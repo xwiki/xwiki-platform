@@ -30,7 +30,6 @@
  */
 package com.xpn.xwiki.render.groovy;
 
-import com.xpn.xwiki.cache.impl.XWikiCachedObject;
 import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import groovy.lang.MetaClassRegistry;
@@ -42,6 +41,7 @@ import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.codehaus.groovy.runtime.DefaultGroovyStaticMethods;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.xwiki.cache.DisposableCacheValue;
 
 import java.beans.Introspector;
 import java.io.BufferedReader;
@@ -53,17 +53,19 @@ import java.io.Writer;
 import java.util.Map;
 
 /**
- * This simple template engine uses JSP <% %> script and <%= %> expression syntax.  It also lets you
- * use normal groovy expressions in the template text much like the new JSP EL functionality.  The
- * variable 'out' is bound to the writer that the template is being written to.
+ * This simple template engine uses JSP <% %> script and <%= %> expression syntax. It also lets you use normal groovy
+ * expressions in the template text much like the new JSP EL functionality. The variable 'out' is bound to the writer
+ * that the template is being written to.
  */
 public class GroovyTemplateEngine extends TemplateEngine
 {
-    /* (non-Javadoc)
-    * @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
-    */
-    public Template createTemplate(Reader reader)
-        throws CompilationFailedException, ClassNotFoundException, IOException
+    /*
+     * (non-Javadoc)
+     * 
+     * @see groovy.util.TemplateEngine#createTemplate(java.io.Reader)
+     */
+    public Template createTemplate(Reader reader) throws CompilationFailedException, ClassNotFoundException,
+        IOException
     {
         com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate template =
             new com.xpn.xwiki.render.groovy.GroovyTemplateEngine.SimpleTemplate();
@@ -73,7 +75,7 @@ public class GroovyTemplateEngine extends TemplateEngine
         return template;
     }
 
-    private static class SimpleTemplate implements Template, XWikiCachedObject
+    private static class SimpleTemplate implements Template, DisposableCacheValue
     {
         private Script script;
 
@@ -81,21 +83,17 @@ public class GroovyTemplateEngine extends TemplateEngine
 
         private Map map;
 
-        public void finalize() throws Throwable
+        public void dispose() throws Exception
         {
-            try {
-                if (script != null) {
-                    InvokerHelper.removeClass(script.getClass());
-                    removeClass(script.getClass());
-                }
-            } finally {
-                super.finalize();
+            if (script != null) {
+                InvokerHelper.removeClass(script.getClass());
+                removeClass(script.getClass());
             }
         }
 
         /**
-         * Set the binding for the template.  Keys will be converted to Strings.
-         *
+         * Set the binding for the template. Keys will be converted to Strings.
+         * 
          * @see groovy.text.Template#setBinding(java.util.Map)
          */
         public void setBinding(final Map map)
@@ -106,7 +104,7 @@ public class GroovyTemplateEngine extends TemplateEngine
 
         /**
          * Write the template document with the set binding applied to the writer.
-         *
+         * 
          * @see groovy.lang.Writable#writeTo(java.io.Writer)
          */
         public Writer writeTo(Writer writer) throws IOException
@@ -124,7 +122,7 @@ public class GroovyTemplateEngine extends TemplateEngine
 
         /**
          * Convert the template and binding into a result String.
-         *
+         * 
          * @see java.lang.Object#toString()
          */
         public String toString()
@@ -139,8 +137,8 @@ public class GroovyTemplateEngine extends TemplateEngine
         }
 
         /**
-         * Parse the text document looking for <% or <%= and then call out to the appropriate handler,
-         * otherwise copy the text directly into the script while escaping quotes.
+         * Parse the text document looking for <% or <%= and then call out to the appropriate handler, otherwise copy
+         * the text directly into the script while escaping quotes.
          */
         private String parse(Reader reader) throws IOException
         {
@@ -179,7 +177,7 @@ public class GroovyTemplateEngine extends TemplateEngine
             }
             endScript(sw);
             String result = sw.toString();
-            //System.out.println( "source text:\n" + result );
+            // System.out.println( "source text:\n" + result );
             return result;
         }
 
@@ -195,8 +193,8 @@ public class GroovyTemplateEngine extends TemplateEngine
         }
 
         /**
-         * Closes the currently open write and writes out the following text as a GString expression
-         * until it reaches an end %>.
+         * Closes the currently open write and writes out the following text as a GString expression until it reaches an
+         * end %>.
          */
         private void groovyExpression(Reader reader, StringWriter sw) throws IOException
         {
@@ -217,8 +215,8 @@ public class GroovyTemplateEngine extends TemplateEngine
         }
 
         /**
-         * Closes the currently open write and writes the following text as normal Groovy script code
-         * until it reaches an end %>.
+         * Closes the currently open write and writes the following text as normal Groovy script code until it reaches
+         * an end %>.
          */
         private void groovySection(Reader reader, StringWriter sw) throws IOException
         {
@@ -249,7 +247,7 @@ public class GroovyTemplateEngine extends TemplateEngine
             {
                 /**
                  * Write the template document with the set binding applied to the writer.
-                 *
+                 * 
                  * @see groovy.lang.Writable#writeTo(java.io.Writer)
                  */
                 public Writer writeTo(Writer writer) throws IOException
@@ -270,7 +268,7 @@ public class GroovyTemplateEngine extends TemplateEngine
 
                 /**
                  * Convert the template and binding into a result String.
-                 *
+                 * 
                  * @see java.lang.Object#toString()
                  */
                 public String toString()

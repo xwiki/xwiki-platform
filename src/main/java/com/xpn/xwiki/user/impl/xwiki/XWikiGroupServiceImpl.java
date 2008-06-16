@@ -34,9 +34,6 @@ import org.apache.commons.lang.NotImplementedException;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.DocChangeRule;
 import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
@@ -51,6 +48,12 @@ import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
+
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
 /**
  * Default implementation of {@link XWikiGroupService} users and groups manager.
@@ -109,7 +112,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
 
-    protected XWikiCache groupCache;
+    protected Cache<List> groupCache;
 
     public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException
     {
@@ -132,14 +135,25 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
 
     public synchronized void initCache(int iCapacity, XWikiContext context) throws XWikiException
     {
-        XWikiCacheService cacheService = context.getWiki().getCacheService();
-        this.groupCache = cacheService.newCache("xwiki.authentication.group.cache", iCapacity);
+        CacheFactory cacheFactory = context.getWiki().getCacheFactory();
+        try {
+            CacheConfiguration configuration = new CacheConfiguration();
+            configuration.setConfigurationId("xwiki.plugin.image");
+            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+            lru.setMaxEntries(iCapacity);
+            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+            this.groupCache = cacheFactory.newCache(configuration);
+        } catch (CacheException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
+                "Failed to initialize cache", e);
+        }
     }
 
     public void flushCache()
     {
         if (this.groupCache != null) {
-            this.groupCache.flushAll();
+            this.groupCache.removeAll();
             this.groupCache = null;
         }
     }
@@ -147,6 +161,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException
     {
         List list = null;
+
         String database = context.getDatabase();
         try {
             String shortname = Util.getName(username);
@@ -156,11 +171,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 if (this.groupCache == null) {
                     initCache(context);
                 }
-                try {
-                    list = (List) this.groupCache.getFromCache(key);
-                } catch (XWikiCacheNeedsRefreshException e) {
-                    this.groupCache.cancelUpdate(key);
 
+                list = this.groupCache.get(key);
+
+                if (list == null) {
                     if (context.getWiki().getNotCacheStore() instanceof XWikiHibernateStore) {
                         list =
                             context.getWiki().getStore().searchDocumentsNames(
@@ -173,9 +187,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                         list =
                             ((XWikiJcrStore) context.getWiki().getNotCacheStore()).listGroupsForUser(username, context);
                     }
-                    this.groupCache.putInCache(key, list);
+                    this.groupCache.set(key, list);
                 }
             }
+
             return list;
         } finally {
             context.setDatabase(database);
@@ -189,20 +204,19 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         throws XWikiException
     {
         String shortname = Util.getName(username);
-        List list = null;
         String key = database + ":" + shortname;
+
         if (this.groupCache == null) {
             initCache(context);
         }
-        synchronized (key) {
-            try {
-                list = (List) this.groupCache.getFromCache(key);
-            } catch (XWikiCacheNeedsRefreshException e) {
-                this.groupCache.cancelUpdate(key);
-                list = new ArrayList();
-                this.groupCache.putInCache(key, list);
-            }
+
+        List list = this.groupCache.get(key);
+
+        if (list == null) {
+            list = new ArrayList();
+            this.groupCache.set(key, list);
         }
+
         list.add(group);
     }
 

@@ -21,28 +21,11 @@
 
 package com.xpn.xwiki.cache.api;
 
-import com.opensymphony.oscache.base.NeedsRefreshException;
-
-public class XWikiCacheNeedsRefreshException extends Exception {
-    protected Exception e;
-    protected Object expiredCacheContents;
-
-    public XWikiCacheNeedsRefreshException(NeedsRefreshException e) {
-        this.e = e;
-    }
-
-    public XWikiCacheNeedsRefreshException(NeedsRefreshException e, Object expiredCacheContents) {
-        this.e = e;
-        this.expiredCacheContents = expiredCacheContents;
-    }
-
-    /**
-     * Returns the detail message string of this throwable.
-     *
-     * @return the detail message string of this <tt>Throwable</tt> instance
-     *         (which may be <tt>null</tt>).
-     */
-    public String getMessage() {
-        return e.getMessage();
+@Deprecated
+public class XWikiCacheNeedsRefreshException extends Exception
+{
+    public XWikiCacheNeedsRefreshException()
+    {
+        
     }
 }

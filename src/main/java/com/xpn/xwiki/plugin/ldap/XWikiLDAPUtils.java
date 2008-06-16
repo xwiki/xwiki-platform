@@ -29,12 +29,14 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
 import com.novell.ldap.LDAPConnection;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
 
 /**
  * LDAP communication tool.
@@ -60,6 +62,11 @@ public class XWikiLDAPUtils
     private static final String CACHE_NAME_GROUPS = "groups";
 
     /**
+     * The configuration of the LDAP group cache.
+     */
+    private static CacheConfiguration cacheConfigurationGroups;
+
+    /**
      * Default unique user field name.
      */
     private static final String LDAP_DEFAULT_UID = "cn";
@@ -67,8 +74,8 @@ public class XWikiLDAPUtils
     /**
      * Contains caches for each LDAP host:port.
      */
-    private static Map<String, Map<String, XWikiCache>> cachePool =
-        new HashMap<String, Map<String, XWikiCache>>();
+    private static Map<String, Map<String, Cache<Map<String, String>>>> cachePool =
+        new HashMap<String, Map<String, Cache<Map<String, String>>>>();
 
     /**
      * The LDAP connection.
@@ -151,33 +158,34 @@ public class XWikiLDAPUtils
     /**
      * Get the cache with the provided name for a particular LDAP server.
      * 
-     * @param cacheName the name of the cache.
+     * @param configuration the configuration to use to create the cache and to find it if it's already created.
      * @param context the XWiki context.
      * @return the cache.
-     * @throws XWikiException error when creating the cache.
+     * @throws CacheException error when creating the cache.
      */
-    public XWikiCache getCache(String cacheName, XWikiContext context) throws XWikiException
+    public Cache<Map<String, String>> getCache(CacheConfiguration configuration, XWikiContext context)
+        throws CacheException
     {
-        XWikiCache cache;
+        Cache<Map<String, String>> cache;
 
         String cacheKey =
             getUidAttributeName() + "." + connection.getConnection().getHost() + ":"
                 + connection.getConnection().getPort();
 
-        Map<String, XWikiCache> cacheMap;
+        Map<String, Cache<Map<String, String>>> cacheMap;
 
         if (cachePool.containsKey(cacheKey)) {
             cacheMap = cachePool.get(cacheKey);
         } else {
-            cacheMap = new HashMap<String, XWikiCache>();
+            cacheMap = new HashMap<String, Cache<Map<String, String>>>();
             cachePool.put(cacheKey, cacheMap);
         }
 
-        if (cacheMap.containsKey(cacheName)) {
-            cache = (XWikiCache) cacheMap.get(cacheName);
-        } else {
-            cache = context.getWiki().getCacheService().newCache("ldap." + cacheName);
-            cacheMap.put(cacheName, cache);
+        cache = cacheMap.get(configuration.getConfigurationId());
+
+        if (cache == null) {
+            cache = context.getWiki().getCacheFactory().newCache(configuration);
+            cacheMap.put(configuration.getConfigurationId(), cache);
         }
 
         return cache;
@@ -219,8 +227,8 @@ public class XWikiLDAPUtils
      * @param subgroups return all the subgroups identified.
      * @param context the XWiki context.
      */
-    private void getGroupMembers(List<XWikiLDAPSearchAttribute> searchAttributeList,
-        Map<String, String> memberMap, List<String> subgroups, XWikiContext context)
+    private void getGroupMembers(List<XWikiLDAPSearchAttribute> searchAttributeList, Map<String, String> memberMap,
+        List<String> subgroups, XWikiContext context)
     {
         for (XWikiLDAPSearchAttribute searchAttribute : searchAttributeList) {
             String key = searchAttribute.name;
@@ -237,8 +245,8 @@ public class XWikiLDAPUtils
     }
 
     /**
-     * Get all members of a given group based on the groupDN. If the group contains subgroups get
-     * these members as well. Retrieve an identifier for each member.
+     * Get all members of a given group based on the groupDN. If the group contains subgroups get these members as well.
+     * Retrieve an identifier for each member.
      * 
      * @param groupDN the group to retrieve the members of and scan for subgroups.
      * @param memberMap the result: maps DN to member id.
@@ -247,9 +255,8 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @return whether the groupDN is actually a group.
      */
-    public boolean getGroupMembers(String groupDN, Map<String, String> memberMap,
-        List<String> subgroups, List<XWikiLDAPSearchAttribute> searchAttributeList,
-        XWikiContext context)
+    public boolean getGroupMembers(String groupDN, Map<String, String> memberMap, List<String> subgroups,
+        List<XWikiLDAPSearchAttribute> searchAttributeList, XWikiContext context)
     {
         boolean isGroup = false;
 
@@ -270,8 +277,7 @@ public class XWikiLDAPUtils
 
         if (!isGroup) {
             if (id == null) {
-                LOG.error("Could not find attribute " + getUidAttributeName() + " for LDAP dn "
-                    + groupDN);
+                LOG.error("Could not find attribute " + getUidAttributeName() + " for LDAP dn " + groupDN);
             }
 
             if (!memberMap.containsKey(groupDN)) {
@@ -290,8 +296,8 @@ public class XWikiLDAPUtils
     }
 
     /**
-     * Get all members of a given group based on the groupDN. If the group contains subgroups get
-     * these members as well. Retrieve an identifier for each member.
+     * Get all members of a given group based on the groupDN. If the group contains subgroups get these members as well.
+     * Retrieve an identifier for each member.
      * 
      * @param groupDN the group to retrieve the members of and scan for subgroups.
      * @param memberMap the result: maps DN to member id.
@@ -299,8 +305,8 @@ public class XWikiLDAPUtils
      * @param context the XWiki context.
      * @return whether the groupDN is actually a group.
      */
-    public boolean getGroupMembers(String groupDN, Map<String, String> memberMap,
-        List<String> subgroups, XWikiContext context)
+    public boolean getGroupMembers(String groupDN, Map<String, String> memberMap, List<String> subgroups,
+        XWikiContext context)
     {
         boolean isGroup = false;
 
@@ -312,8 +318,7 @@ public class XWikiLDAPUtils
         List<XWikiLDAPSearchAttribute> searchAttributeList = searchGroupsMembers(groupDN);
 
         if (searchAttributeList != null) {
-            isGroup =
-                getGroupMembers(groupDN, memberMap, subgroups, searchAttributeList, context);
+            isGroup = getGroupMembers(groupDN, memberMap, subgroups, searchAttributeList, context);
         }
 
         return isGroup;
@@ -327,58 +332,67 @@ public class XWikiLDAPUtils
      * @return the members of the group.
      * @throws XWikiException error when getting the group cache.
      */
-    public Map<String, String> getGroupMembers(String groupDN, XWikiContext context)
-        throws XWikiException
+    public Map<String, String> getGroupMembers(String groupDN, XWikiContext context) throws XWikiException
     {
         Map<String, String> groupMembers = null;
 
-        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+        Cache<Map<String, String>> cache;
+        try {
+            cache = getCache(getGroupCacheConfiguration(context), context);
 
-        XWikiCache cache = getCache(CACHE_NAME_GROUPS, context);
+            synchronized (cache) {
+                groupMembers = cache.get(groupDN);
 
-        synchronized (cache) {
-            try {
-                groupMembers =
-                    (Map<String, String>) cache.getFromCache(groupDN, config
-                        .getCacheExpiration(context));
-            } catch (XWikiCacheNeedsRefreshException e) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("Cache does not caontains group " + groupDN, e);
+                if (groupMembers == null) {
+                    Map<String, String> members = new HashMap<String, String>();
+
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Retrieving Members of the group: " + groupDN);
+                    }
+
+                    boolean isGroup = getGroupMembers(groupDN, members, new ArrayList<String>(), context);
+
+                    if (isGroup) {
+                        groupMembers = members;
+                        cache.set(groupDN, groupMembers);
+                    }
                 }
             }
-        }
-
-        if (groupMembers == null) {
-            Map<String, String> members = new HashMap<String, String>();
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Retrieving Members of the group: " + groupDN);
-            }
-
-            boolean isGroup = getGroupMembers(groupDN, members, new ArrayList<String>(), context);
-
-            if (isGroup) {
-                groupMembers = members;
-                synchronized (cache) {
-                    cache.putInCache(groupDN, groupMembers);
-                }
-            }
+        } catch (CacheException e) {
+            LOG.error("Unknown error with cache", e);
         }
 
         return groupMembers;
     }
 
     /**
-     * Locates the user in the Map: either the user is a value or the key starts with the LDAP
-     * syntax.
+     * @param context the XWiki context used to get cache configuration.
+     * @return the configuration for the LDAP groups cache.
+     */
+    public static CacheConfiguration getGroupCacheConfiguration(XWikiContext context)
+    {
+        if (cacheConfigurationGroups == null) {
+            XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
+
+            cacheConfigurationGroups = new CacheConfiguration();
+            cacheConfigurationGroups.setConfigurationId(CACHE_NAME_GROUPS);
+            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+            lru.setTimeToLive(config.getCacheExpiration(context));
+            cacheConfigurationGroups.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        }
+
+        return cacheConfigurationGroups;
+    }
+
+    /**
+     * Locates the user in the Map: either the user is a value or the key starts with the LDAP syntax.
      * 
      * @param userName the name of the user.
      * @param groupMembers the members of LDAP group.
      * @param context the XWiki context.
      * @return the full user name.
      */
-    protected String findInGroup(String userName, Map<String, String> groupMembers,
-        XWikiContext context)
+    protected String findInGroup(String userName, Map<String, String> groupMembers, XWikiContext context)
     {
         String result = null;
 
@@ -386,8 +400,7 @@ public class XWikiLDAPUtils
 
         for (Map.Entry<String, String> entry : groupMembers.entrySet()) {
             // implementing it case-insensitive for now
-            if (userName.equalsIgnoreCase(entry.getValue())
-                || entry.getKey().startsWith(ldapuser)) {
+            if (userName.equalsIgnoreCase(entry.getValue()) || entry.getKey().startsWith(ldapuser)) {
                 return entry.getKey();
             }
         }
@@ -404,8 +417,7 @@ public class XWikiLDAPUtils
      * @return user's DB if the user is in the LDAP group, null otherwise.
      * @throws XWikiException error when getting the group cache.
      */
-    public String isUserInGroup(String userName, String groupDN, XWikiContext context)
-        throws XWikiException
+    public String isUserInGroup(String userName, String groupDN, XWikiContext context) throws XWikiException
     {
         String userDN = null;
 

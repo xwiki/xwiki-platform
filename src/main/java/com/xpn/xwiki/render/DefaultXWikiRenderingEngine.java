@@ -24,9 +24,6 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.groovy.XWikiGroovyRenderer;
@@ -34,6 +31,10 @@ import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
 import java.util.*;
 
@@ -45,7 +46,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     private HashMap renderermap = new LinkedHashMap();
 
-    private XWikiCache cache;
+    private Cache<XWikiRenderingCache> cache;
 
     public DefaultXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException
     {
@@ -75,10 +76,11 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         initCache(context);
     }
 
-    public void virtualInit(XWikiContext context) {
+    public void virtualInit(XWikiContext context)
+    {
         XWikiMacrosMappingRenderer mmrendered = (XWikiMacrosMappingRenderer) getRenderer("mapping");
-        if (mmrendered!=null)
-         mmrendered.loadPreferences(context.getWiki(), context);
+        if (mmrendered != null)
+            mmrendered.loadPreferences(context.getWiki(), context);
     }
 
     public void initCache(XWikiContext context) throws XWikiException
@@ -96,11 +98,21 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     public void initCache(int iCapacity, XWikiContext context) throws XWikiException
     {
-        XWikiCacheService cacheService = context.getWiki().getCacheService();
-        cache = cacheService.newCache("xwiki.rendering.cache", iCapacity);
+        try {
+            CacheConfiguration configuration = new CacheConfiguration();
+            configuration.setConfigurationId("xwiki.renderingcache");
+            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+            lru.setMaxEntries(iCapacity);
+            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+            cache = context.getWiki().getCacheFactory().newCache(configuration);
+        } catch (CacheException e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE, XWikiException.ERROR_CACHE_INITIALIZING,
+                "Failed to create cache");
+        }
     }
 
-    public XWikiCache getCache()
+    public Cache<XWikiRenderingCache> getCache()
     {
         return cache;
     }
@@ -140,8 +152,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return renderText(doc.getTranslatedContent(context), doc, context);
     }
 
-    public String renderDocument(XWikiDocument doc, XWikiDocument includingdoc,
-        XWikiContext context) throws XWikiException
+    public String renderDocument(XWikiDocument doc, XWikiDocument includingdoc, XWikiContext context)
+        throws XWikiException
     {
         return renderText(doc.getTranslatedContent(context), includingdoc, context);
     }
@@ -176,14 +188,13 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         cached.add(key);
     }
 
-    public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
-        XWikiContext context)
+    public String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context)
     {
         return renderText(text, false, contentdoc, includingdoc, context);
     }
 
-    private String renderText(String text, boolean onlyInterpret, XWikiDocument contentdoc,
-        XWikiDocument includingdoc, XWikiContext context)
+    private String renderText(String text, boolean onlyInterpret, XWikiDocument contentdoc, XWikiDocument includingdoc,
+        XWikiContext context)
     {
         String key = getKey(text, contentdoc, includingdoc, context);
         int currentCacheDuration = context.getCacheDuration();
@@ -197,13 +208,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
         synchronized (key) {
             try {
-                XWikiRenderingCache cacheObject = null;
-                try {
-                    cacheObject =
-                        (cache != null) ? (XWikiRenderingCache) cache.getFromCache(key) : null;
-                } catch (XWikiCacheNeedsRefreshException e2) {
-                    cache.cancelUpdate(key);
-                }
+                XWikiRenderingCache cacheObject = (cache != null) ? cache.get(key) : null;
+
                 if (cacheObject != null) {
                     XWikiRequest request = context.getRequest();
                     boolean refresh =
@@ -250,12 +256,10 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                             if (onlyInterpret) {
                                 if (XWikiInterpreter.class.isAssignableFrom(renderer.getClass())) {
                                     XWikiInterpreter interpreter = (XWikiInterpreter) renderer;
-                                    content =
-                                        interpreter.interpret(content, includingdoc, context);
+                                    content = interpreter.interpret(content, includingdoc, context);
                                 }
                             } else {
-                                content =
-                                    renderer.render(content, contentdoc, includingdoc, context);
+                                content = renderer.render(content, contentdoc, includingdoc, context);
                             }
                         } else {
                             if (log.isDebugEnabled()) {
@@ -288,7 +292,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                     if (cacheDuration > 0) {
                         XWikiRenderingCache cacheObject =
                             new XWikiRenderingCache(key, content, cacheDuration, new Date());
-                        cache.putInCache(key, cacheObject);
+                        cache.set(key, cacheObject);
                     }
                 } catch (Exception e) {
                     log.error("cache exception", e);
@@ -327,30 +331,24 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         }
     }
 
-    private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
-        XWikiContext context)
+    private String getKey(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context)
     {
-        String qs =
-            ((context == null || context.getRequest() == null) ? "" : context.getRequest()
-                .getQueryString());
+        String qs = ((context == null || context.getRequest() == null) ? "" : context.getRequest().getQueryString());
         if (qs != null) {
             qs = qs.replaceAll("refresh=1&?", "");
             qs = qs.replaceAll("&?refresh=1", "");
         }
         String db = ((context == null) ? "xwiki" : context.getDatabase());
         String cdoc =
-            ((contentdoc == null) ? "" : contentdoc.getDatabase() + ":"
-                + contentdoc.getFullName() + ":" + contentdoc.getRealLanguage() + ":"
-                + contentdoc.getVersion());
+            ((contentdoc == null) ? "" : contentdoc.getDatabase() + ":" + contentdoc.getFullName() + ":"
+                + contentdoc.getRealLanguage() + ":" + contentdoc.getVersion());
         String idoc =
-            ((includingdoc == null) ? "" : includingdoc.getDatabase() + ":"
-                + includingdoc.getFullName() + ":" + includingdoc.getRealLanguage() + ":"
-                + includingdoc.getVersion());
+            ((includingdoc == null) ? "" : includingdoc.getDatabase() + ":" + includingdoc.getFullName() + ":"
+                + includingdoc.getRealLanguage() + ":" + includingdoc.getVersion());
         String action = ((context == null) ? "view" : context.getAction());
         String lang = ((context == null) ? "" : context.getLanguage());
         lang += ((contentdoc == null) ? "" : ":" + contentdoc.getRealLanguage());
-        return db + "-" + cdoc + "-" + idoc + "-" + qs + "-" + action + "-" + lang + "-"
-            + text.hashCode();
+        return db + "-" + cdoc + "-" + idoc + "-" + qs + "-" + action + "-" + lang + "-" + text.hashCode();
     }
 
     public void flushCache()
@@ -359,13 +357,13 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             ((XWikiRenderer) renderers.get(i)).flushCache();
         }
         if (cache != null) {
-            cache.flushAll();
+            cache.removeAll();
             cache = null;
         }
     }
 
-    public String convertMultiLine(String macroname, String params, String data,
-        String allcontent, XWikiVirtualMacro macro, XWikiContext context)
+    public String convertMultiLine(String macroname, String params, String data, String allcontent,
+        XWikiVirtualMacro macro, XWikiContext context)
     {
         String language = macro.getLanguage();
         XWikiRenderer renderer = (XWikiRenderer) renderermap.get(language);
@@ -376,8 +374,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         }
     }
 
-    public String convertSingleLine(String macroname, String params, String allcontent,
-        XWikiVirtualMacro macro, XWikiContext context)
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context)
     {
         String language = macro.getLanguage();
         XWikiRenderer renderer = (XWikiRenderer) renderermap.get(language);

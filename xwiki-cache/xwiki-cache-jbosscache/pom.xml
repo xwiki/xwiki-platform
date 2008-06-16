@@ -30,6 +30,13 @@
   <name>XWiki Platform - Core - Cache - JBossCache</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Cache - JBossCache</description>
+  <repositories>
+    <repository>
+      <id>JBoss</id>
+      <name>JBoss Maven2 Remote Repository</name>
+      <url>http://repository.jboss.org/maven2</url>
+    </repository>
+  </repositories>
   <dependencies>
     <dependency>
       <groupId>org.xwiki.platform</groupId>

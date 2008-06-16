@@ -31,7 +31,6 @@ import org.jboss.cache.Cache;
 import org.jboss.cache.CacheFactory;
 import org.jboss.cache.DefaultCacheFactory;
 import org.jboss.cache.Fqn;
-import org.jboss.cache.Node;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.jbosscache.internal.event.JBossCacheCacheEntryEvent;
 import org.xwiki.cache.util.AbstractCache;
@@ -77,11 +76,6 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     private Cache<String, T> cache;
 
     /**
-     * The root node in JBoss cache.
-     */
-    private Node<String, T> rootNode;
-
-    /**
      * The state of the node before modification.
      */
     private Map<String, T> preEventData;
@@ -106,8 +100,6 @@ public class JBossCacheCache<T> extends AbstractCache<T>
 
         this.cache.create();
         this.cache.start();
-
-        this.rootNode = this.cache.getNode(ROOT_FQN);
     }
 
     /**
@@ -148,7 +140,6 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     public void removeAll()
     {
         this.cache.removeNode(ROOT_FQN);
-        this.rootNode = cache.getNode(ROOT_FQN);
     }
 
     /**

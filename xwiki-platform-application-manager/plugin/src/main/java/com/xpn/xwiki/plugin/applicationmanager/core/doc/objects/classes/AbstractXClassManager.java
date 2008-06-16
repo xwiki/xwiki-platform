@@ -26,7 +26,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -44,15 +43,16 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * This class has to be extended with at least :
  * <ul>
  * <li>overload {@link #updateBaseClass(BaseClass)}
- * <li>in constructor call AbstractXClassManager constructor with a name that will be used to
- * generate all the documents and spaces needed.
+ * <li>in constructor call AbstractXClassManager constructor with a name that will be used to generate all the
+ * documents and spaces needed.
  * </ul>
  * 
+ * @param <T> the item class extending {@link XObjectDocument}.
  * @version $Id: $
  * @see XClassManager
  * @since Application Manager 1.0RC1
  */
-public abstract class AbstractXClassManager implements XClassManager
+public abstract class AbstractXClassManager<T extends XObjectDocument> implements XClassManager<T>
 {
     /**
      * FullName of the default parent page for a document containing xwiki class.
@@ -174,7 +174,7 @@ public abstract class AbstractXClassManager implements XClassManager
     /**
      * Store for any database name if documents used for manage this class has been checked.
      */
-    private final Set databasesInitedMap = new HashSet();
+    private final Set<String> databasesInitedMap = new HashSet<String>();
 
     /**
      * Constructor for AbstractXClassManager.
@@ -219,24 +219,18 @@ public abstract class AbstractXClassManager implements XClassManager
         className = classPrefix + XWIKI_CLASS_SUFFIX;
         classFullName = classSpace + XObjectDocument.SPACE_DOC_SEPARATOR + className;
 
-        classSheetSpace =
-            dispatch ? classSpacePrefix + XWIKI_CLASSSHEET_SPACE_SUFFIX : classSpacePrefix;
+        classSheetSpace = dispatch ? classSpacePrefix + XWIKI_CLASSSHEET_SPACE_SUFFIX : classSpacePrefix;
         classSheetName = classPrefix + XWIKI_CLASSSHEET_SUFFIX;
-        classSheetFullName =
-            classSheetSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classSheetName;
+        classSheetFullName = classSheetSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classSheetName;
 
-        classTemplateSpace =
-            dispatch ? classSpacePrefix + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : classSpacePrefix;
+        classTemplateSpace = dispatch ? classSpacePrefix + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : classSpacePrefix;
         classTemplateName = classPrefix + XWIKI_CLASSTEMPLATE_SUFFIX;
-        classTemplateFullName =
-            classTemplateSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classTemplateName;
+        classTemplateFullName = classTemplateSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classTemplateName;
 
         classSheetDefaultContent =
             "## you can modify this page to customize the presentation of your object\n\n"
-                + "1 Document $doc.name\n\n#set($class = $doc.getObject(\"" + classFullName
-                + "\").xWikiClass)\n" + "\n" + "<dl>\n"
-                + "  #foreach($prop in $class.properties)\n"
-                + "    <dt> ${prop.prettyName} </dt>\n"
+                + "1 Document $doc.name\n\n#set($class = $doc.getObject(\"" + classFullName + "\").xWikiClass)\n"
+                + "\n" + "<dl>\n" + "  #foreach($prop in $class.properties)\n" + "    <dt> ${prop.prettyName} </dt>\n"
                 + "    <dd>$doc.display($prop.getName())</dd>\n  #end\n" + "</dl>\n";
 
         classTemplateDefaultContent = "#includeForm(\"" + classSheetFullName + "\")\n";
@@ -353,8 +347,8 @@ public abstract class AbstractXClassManager implements XClassManager
     }
 
     /**
-     * Check if all necessary documents for manage this class in this context exists and update.
-     * Create if not exists. Thread safe.
+     * Check if all necessary documents for manage this class in this context exists and update. Create if not exists.
+     * Thread safe.
      * 
      * @param context the XWiki context.
      * @throws XWikiException error when saving documents.
@@ -516,8 +510,8 @@ public abstract class AbstractXClassManager implements XClassManager
 
         if (doc.isNew()) {
             String content =
-                getResourceDocumentContent(DOCUMENTCONTENT_TEMPLATE_PREFIX
-                    + getClassTemplateFullName() + DOCUMENTCONTENT_EXT);
+                getResourceDocumentContent(DOCUMENTCONTENT_TEMPLATE_PREFIX + getClassTemplateFullName()
+                    + DOCUMENTCONTENT_EXT);
             doc.setContent(content != null ? content : getClassTemplateDefaultContent());
 
             doc.setParent(getClassFullName());
@@ -595,8 +589,7 @@ public abstract class AbstractXClassManager implements XClassManager
     {
         check(context);
 
-        return context.getWiki().getDocument(getClassSheetFullName(), context).newDocument(
-            context);
+        return context.getWiki().getDocument(getClassSheetFullName(), context).newDocument(context);
     }
 
     /**
@@ -608,8 +601,7 @@ public abstract class AbstractXClassManager implements XClassManager
     {
         check(context);
 
-        return context.getWiki().getDocument(getClassTemplateFullName(), context).newDocument(
-            context);
+        return context.getWiki().getDocument(getClassTemplateFullName(), context).newDocument(context);
     }
 
     /**
@@ -641,8 +633,7 @@ public abstract class AbstractXClassManager implements XClassManager
     {
         String name = context.getWiki().clearName(itemName, true, true, context);
 
-        return getClassPrefix() + name.substring(0, 1).toUpperCase()
-            + name.substring(1).toLowerCase();
+        return getClassPrefix() + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
     }
 
     /**
@@ -664,8 +655,7 @@ public abstract class AbstractXClassManager implements XClassManager
     public String getItemDefaultName(String docFullName)
     {
         return docFullName.substring(
-            (getClassSpacePrefix() + XObjectDocument.SPACE_DOC_SEPARATOR + getClassPrefix())
-                .length()).toLowerCase();
+            (getClassSpacePrefix() + XObjectDocument.SPACE_DOC_SEPARATOR + getClassPrefix()).length()).toLowerCase();
     }
 
     /**
@@ -674,12 +664,10 @@ public abstract class AbstractXClassManager implements XClassManager
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#getXObjectDocument(java.lang.String,
      *      int, boolean, com.xpn.xwiki.XWikiContext)
      */
-    public XObjectDocument getXObjectDocument(String itemName, int objectId, boolean validate,
-        XWikiContext context) throws XWikiException
+    public T getXObjectDocument(String itemName, int objectId, boolean validate, XWikiContext context)
+        throws XWikiException
     {
-        XWikiDocument doc =
-            context.getWiki().getDocument(getItemDocumentDefaultFullName(itemName, context),
-                context);
+        XWikiDocument doc = context.getWiki().getDocument(getItemDocumentDefaultFullName(itemName, context), context);
 
         if (doc.isNew() || !isInstance(doc)) {
             throw new XObjectDocumentDoesNotExistException(itemName + " object does not exist");
@@ -689,21 +677,18 @@ public abstract class AbstractXClassManager implements XClassManager
     }
 
     /**
-     * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface}
-     * "searchDocuments" methods.
+     * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface} "searchDocuments" methods.
      * 
-     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
-     *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
+     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1, typeField1,
+     *            valueField1][fieldName2, typeField2, valueField2]].
      * @param parameterValues the where clause values that replace the question marks (?).
      * @return a HQL where clause.
      */
-    public String createWhereClause(Object[][] fieldDescriptors, List parameterValues)
+    public String createWhereClause(Object[][] fieldDescriptors, List<Object> parameterValues)
     {
         StringBuffer from = new StringBuffer(", BaseObject as obj");
 
-        StringBuffer where =
-            new StringBuffer(" where doc.fullName=obj.name and obj.className="
-                + HQL_PARAMETER_STRING);
+        StringBuffer where = new StringBuffer(" where doc.fullName=obj.name and obj.className=" + HQL_PARAMETER_STRING);
         parameterValues.add(getClassFullName());
 
         where.append(" and obj.name<>" + HQL_PARAMETER_STRING);
@@ -728,12 +713,10 @@ public abstract class AbstractXClassManager implements XClassManager
                     parameterValues.add(fieldName);
 
                     if (value instanceof String) {
-                        where.append(andSymbol + "lower(" + fieldPrefix + ".value)="
-                            + HQL_PARAMETER_STRING);
+                        where.append(andSymbol + "lower(" + fieldPrefix + ".value)=" + HQL_PARAMETER_STRING);
                         parameterValues.add(((String) value).toLowerCase());
                     } else {
-                        where.append(andSymbol + "" + fieldPrefix + ".value="
-                            + HQL_PARAMETER_STRING);
+                        where.append(andSymbol + "" + fieldPrefix + ".value=" + HQL_PARAMETER_STRING);
                         parameterValues.add(value);
                     }
                 } else {
@@ -759,7 +742,7 @@ public abstract class AbstractXClassManager implements XClassManager
      * @throws XWikiException error when searching for document in database.
      * @see #getClassFullName()
      */
-    public List searchXObjectDocuments(XWikiContext context) throws XWikiException
+    public List<T> searchXObjectDocuments(XWikiContext context) throws XWikiException
     {
         return searchXObjectDocumentsByFields(null, context);
     }
@@ -771,11 +754,11 @@ public abstract class AbstractXClassManager implements XClassManager
      * @param fieldValue the value of field.
      * @param fieldType the type of field.
      * @param context the XWiki context.
-     * @return the list of found {@link XObjectDocument}.
+     * @return the list of found {@link T}.
      * @throws XWikiException error when searching for documents from in database.
      */
-    public List searchXObjectDocumentsByField(String fieldName, Object fieldValue,
-        String fieldType, XWikiContext context) throws XWikiException
+    public List<T> searchXObjectDocumentsByField(String fieldName, Object fieldValue, String fieldType,
+        XWikiContext context) throws XWikiException
     {
         Object[][] fieldDescriptors = new Object[][] {{fieldName, fieldType, fieldValue}};
 
@@ -785,22 +768,22 @@ public abstract class AbstractXClassManager implements XClassManager
     /**
      * Search in instances of this document class.
      * 
-     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
-     *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
+     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1, typeField1,
+     *            valueField1][fieldName2, typeField2, valueField2]].
      * @param context the XWiki context.
      * @return the list of found {@link XObjectDocument}.
      * @throws XWikiException error when searching for documents from in database.
      */
-    public List searchXObjectDocumentsByFields(Object[][] fieldDescriptors, XWikiContext context)
+    public List<T> searchXObjectDocumentsByFields(Object[][] fieldDescriptors, XWikiContext context)
         throws XWikiException
     {
         check(context);
 
-        List parameterValues = new ArrayList();
+        List<Object> parameterValues = new ArrayList<Object>();
         String where = createWhereClause(fieldDescriptors, parameterValues);
 
-        return newXObjectDocumentList(context.getWiki().getStore().searchDocuments(where,
-            parameterValues, context), context);
+        return newXObjectDocumentList(context.getWiki().getStore().searchDocuments(where, parameterValues, context),
+            context);
     }
 
     /**
@@ -809,10 +792,9 @@ public abstract class AbstractXClassManager implements XClassManager
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocument(com.xpn.xwiki.doc.XWikiDocument,
      *      int, com.xpn.xwiki.XWikiContext)
      */
-    public XObjectDocument newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
-        throws XWikiException
+    public T newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context) throws XWikiException
     {
-        return new DefaultXObjectDocument(this, doc, objId, context);
+        return (T) new DefaultXObjectDocument(this, doc, objId, context);
     }
 
     /**
@@ -821,11 +803,9 @@ public abstract class AbstractXClassManager implements XClassManager
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocument(java.lang.String,
      *      int, com.xpn.xwiki.XWikiContext)
      */
-    public XObjectDocument newXObjectDocument(String docFullName, int objId, XWikiContext context)
-        throws XWikiException
+    public T newXObjectDocument(String docFullName, int objId, XWikiContext context) throws XWikiException
     {
-        return newXObjectDocument(context.getWiki().getDocument(docFullName, context), objId,
-            context);
+        return newXObjectDocument(context.getWiki().getDocument(docFullName, context), objId, context);
     }
 
     /**
@@ -833,7 +813,7 @@ public abstract class AbstractXClassManager implements XClassManager
      * 
      * @see XClassManager#newXObjectDocument(com.xpn.xwiki.XWikiContext)
      */
-    public XObjectDocument newXObjectDocument(XWikiContext context) throws XWikiException
+    public T newXObjectDocument(XWikiContext context) throws XWikiException
     {
         return newXObjectDocument(new XWikiDocument(), 0, context);
     }
@@ -844,10 +824,9 @@ public abstract class AbstractXClassManager implements XClassManager
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocumentList(com.xpn.xwiki.doc.XWikiDocument,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List newXObjectDocumentList(XWikiDocument document, XWikiContext context)
-        throws XWikiException
+    public List<T> newXObjectDocumentList(XWikiDocument document, XWikiContext context) throws XWikiException
     {
-        List documents = new ArrayList(1);
+        List<XWikiDocument> documents = new ArrayList<XWikiDocument>(1);
         documents.add(document);
 
         return newXObjectDocumentList(documents, context);
@@ -859,16 +838,14 @@ public abstract class AbstractXClassManager implements XClassManager
      * @see com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager#newXObjectDocumentList(java.util.List,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public List newXObjectDocumentList(List documents, XWikiContext context)
-        throws XWikiException
+    public List<T> newXObjectDocumentList(List<XWikiDocument> documents, XWikiContext context) throws XWikiException
     {
-        List list = new ArrayList(documents.size());
-        for (Iterator it = documents.iterator(); it.hasNext();) {
-            XWikiDocument doc = (XWikiDocument) it.next();
-            List objects = doc.getObjects(getClassFullName());
+        List<T> list = new ArrayList<T>(documents.size());
 
-            for (Iterator itObject = objects.iterator(); itObject.hasNext();) {
-                BaseObject bobject = (BaseObject) itObject.next();
+        for (XWikiDocument doc : documents) {
+            List<BaseObject> objects = doc.getObjects(getClassFullName());
+
+            for (BaseObject bobject : objects) {
                 if (bobject != null) {
                     list.add(newXObjectDocument(doc, bobject.getNumber(), context));
                 }

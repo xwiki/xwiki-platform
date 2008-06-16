@@ -20,7 +20,6 @@
 
 package com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes;
 
-import java.util.Iterator;
 import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
@@ -32,10 +31,10 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.PropertyInterface;
 
 /**
- * Default implementation of XObjectDocument. This class manage an XWiki document containing
- * provided XWiki class. It add some specifics methods, getters and setters for this type of object
- * and fields. It also override {@link Document} (and then {@link XWikiDocument}) isNew concept
- * considering as new a document that does not contains an XWiki object of the provided XWiki class.
+ * Default implementation of XObjectDocument. This class manage an XWiki document containing provided XWiki class. It
+ * add some specifics methods, getters and setters for this type of object and fields. It also override {@link Document}
+ * (and then {@link XWikiDocument}) isNew concept considering as new a document that does not contains an XWiki object
+ * of the provided XWiki class.
  * 
  * @version $Id: $
  * @see XObjectDocument
@@ -70,8 +69,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     protected int objectId;
 
     /**
-     * true if this is a new document of this class (this document can exist but does not contains
-     * object of this class).
+     * true if this is a new document of this class (this document can exist but does not contains object of this
+     * class).
      */
     protected boolean isNew;
 
@@ -84,7 +83,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
      * @param context the XWiki context.
      * @throws XWikiException error when calling {@link #reload(XWikiContext)}.
      */
-    public DefaultXObjectDocument(XClassManager sclass, XWikiDocument xdoc, int objectId,
+    public DefaultXObjectDocument(XClassManager< ? extends XObjectDocument> sclass, XWikiDocument xdoc, int objectId,
         XWikiContext context) throws XWikiException
     {
         super(xdoc, context);
@@ -112,15 +111,13 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     {
         if (this.getObjectNumbers(this.sclass.getClassFullName()) == 0) {
             if (this.objectId > 0) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                    XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
                     "Object od id " + this.objectId + "does not exist");
             }
 
             BaseObject object = getDoc().newObject(this.sclass.getClassFullName(), context);
 
-            XWikiDocument docTemplate =
-                context.getWiki().getDocument(this.sclass.getClassTemplateFullName(), context);
+            XWikiDocument docTemplate = context.getWiki().getDocument(this.sclass.getClassTemplateFullName(), context);
             BaseObject templateObject = docTemplate.getObject(this.sclass.getClassFullName());
 
             if (templateObject != null) {
@@ -188,8 +185,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     }
 
     /**
-     * Overwrite current BaseObject fields with provided one. Only provided non null fields are
-     * copied.
+     * Overwrite current BaseObject fields with provided one. Only provided non null fields are copied.
      * 
      * @param sdoc the document to merge.
      */
@@ -202,8 +198,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
         BaseObject obj1 = getBaseObject(true);
         BaseObject obj2 = sdoc.getBaseObject(false);
 
-        for (Iterator it = obj2.getPropertyList().iterator(); it.hasNext();) {
-            String fieldName = (String) it.next();
+        for (Object fieldNameObj : obj2.getPropertyList()) {
+            String fieldName = (String) fieldNameObj;
             Object fieldValue2 = obj2.safeget(fieldName);
 
             if (fieldValue2 != null) {
@@ -227,6 +223,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
      * 
      * @see XObjectDocument#isNew()
      */
+    @Override
     public boolean isNew()
     {
         return super.isNew() || this.isNew;
@@ -235,19 +232,21 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.api.Document#saveDocument(String)
+     * @see com.xpn.xwiki.api.Document#saveDocument(java.lang.String, boolean)
      */
-    protected void saveDocument(String comment) throws XWikiException
+    @Override
+    protected void saveDocument(String comment, boolean minorEdit) throws XWikiException
     {
-        super.saveDocument(comment);
+        super.saveDocument(comment, minorEdit);
         this.isNew = false;
     }
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.api.Document#delete()
      */
+    @Override
     public void delete() throws XWikiException
     {
         if (getObjectNumbers(sclass.getClassFullName()) == 1) {
@@ -256,17 +255,15 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
             doc.removeObject(getBaseObject(false));
             save();
         }
-        
+
         this.isNew = true;
     }
 
     /**
      * Get the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @return the value in {@link String} of the field <code>fieldName</code> of the managed
-     *         object's class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @return the value in {@link String} of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#getStringValue(java.lang.String)
      */
     public String getStringValue(String fieldName)
@@ -283,10 +280,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Modify the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @param value the new value of the field <code>fieldName</code> of the managed object's
-     *            class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @param value the new value of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#setStringValue(java.lang.String,java.lang.String,java.lang.String)
      */
     public void setStringValue(String fieldName, String value)
@@ -301,10 +296,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Get the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @return the value in {@link String} of the field <code>fieldName</code> of the managed
-     *         object's class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @return the value in {@link String} of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#getStringValue(java.lang.String)
      */
     public String getLargeStringValue(String fieldName)
@@ -321,10 +314,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Modify the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @param value the new value of the field <code>fieldName</code> of the managed object's
-     *            class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @param value the new value of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#setLargeStringValue(java.lang.String,java.lang.String,java.lang.String)
      */
     public void setLargeStringValue(String fieldName, String value)
@@ -339,13 +330,12 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Get the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @return the value in {@link List} of the field <code>fieldName</code> of the managed
-     *         object's class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @return the value in {@link List} of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#getListValue(java.lang.String)
+     * @since 1.4
      */
-    public List getListValue(String fieldName)
+    public List<String> getStringListValue(String fieldName)
     {
         BaseObject obj = getBaseObject(false);
 
@@ -359,13 +349,12 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Modify the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @param value the new value of the field <code>fieldName</code> of the managed object's
-     *            class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @param value the new value of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#setStringListValue(java.lang.String,java.lang.String,java.util.List)
+     * @since 1.4
      */
-    public void setListValue(String fieldName, List value)
+    public void setStringListValue(String fieldName, List<String> value)
     {
         BaseObject obj = getBaseObject(true);
 
@@ -377,8 +366,45 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Get the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @return the value in {@link List} of the field <code>fieldName</code> of the managed object's class.
+     * @see com.xpn.xwiki.doc.XWikiDocument#getListValue(java.lang.String)
+     * @deprecated Use {@link #getStringListValue(String)} instead. Since 1.4.
+     */
+    @Deprecated
+    public List getListValue2(String fieldName)
+    {
+        BaseObject obj = getBaseObject(false);
+
+        if (obj == null) {
+            return null;
+        }
+
+        return obj.getListValue(fieldName);
+    }
+
+    /**
+     * Modify the value of the field <code>fieldName</code> of the managed object's class.
+     * 
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @param value the new value of the field <code>fieldName</code> of the managed object's class.
+     * @see com.xpn.xwiki.doc.XWikiDocument#setStringListValue(java.lang.String,java.lang.String,java.util.List)
+     * @deprecated Use {@link #getStringListValue(String)} instead. Since 1.4.
+     */
+    @Deprecated
+    public void setListValue2(String fieldName, List value)
+    {
+        BaseObject obj = getBaseObject(true);
+
+        if (obj != null) {
+            obj.setStringListValue(fieldName, value);
+        }
+    }
+
+    /**
+     * Get the value of the field <code>fieldName</code> of the managed object's class.
+     * 
+     * @param fieldName the name of the field from the managed object's class where to find the value.
      * @return the value in int of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#getListValue(java.lang.String)
      */
@@ -396,10 +422,8 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Modify the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @param value the new value of the field <code>fieldName</code> of the managed object's
-     *            class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @param value the new value of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#setIntValue(String, String, int)
      */
     public void setIntValue(String fieldName, int value)
@@ -414,32 +438,27 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
     /**
      * Get the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @return the value in {@link Boolean} of the field <code>fieldName</code> of the managed
-     *         object's class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @return the value in {@link Boolean} of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#getListValue(java.lang.String)
      */
     public Boolean getBooleanValue(String fieldName)
     {
         int intValue = getIntValue(fieldName);
 
-        return intValue == BOOLEANFIELD_TRUE ? Boolean.TRUE : (intValue == BOOLEANFIELD_FALSE
-            ? Boolean.FALSE : null);
+        return intValue == BOOLEANFIELD_TRUE ? Boolean.TRUE : (intValue == BOOLEANFIELD_FALSE ? Boolean.FALSE : null);
     }
 
     /**
      * Modify the value of the field <code>fieldName</code> of the managed object's class.
      * 
-     * @param fieldName the name of the field from the managed object's class where to find the
-     *            value.
-     * @param value the new value of the field <code>fieldName</code> of the managed object's
-     *            class.
+     * @param fieldName the name of the field from the managed object's class where to find the value.
+     * @param value the new value of the field <code>fieldName</code> of the managed object's class.
      * @see com.xpn.xwiki.doc.XWikiDocument#setIntValue(String, String, int)
      */
     public void setBooleanValue(String fieldName, Boolean value)
     {
-        setIntValue(fieldName, value == null ? BOOLEANFIELD_MAYBE : (value.booleanValue()
-            ? BOOLEANFIELD_TRUE : BOOLEANFIELD_FALSE));
+        setIntValue(fieldName, value == null ? BOOLEANFIELD_MAYBE : (value.booleanValue() ? BOOLEANFIELD_TRUE
+            : BOOLEANFIELD_FALSE));
     }
 }

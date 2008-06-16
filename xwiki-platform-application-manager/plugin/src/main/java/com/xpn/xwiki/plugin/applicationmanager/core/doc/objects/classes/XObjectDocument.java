@@ -38,12 +38,12 @@ public interface XObjectDocument
      * The separator between space name and document name in document full name.
      */
     String SPACE_DOC_SEPARATOR = ".";
-    
+
     /**
      * The separator between wiki name and space name and document extended full name.
      */
     String WIKI_SPACE_SEPARATOR = ":";
-    
+
     /**
      * Reload XWiki document from database using Document full name.
      * 
@@ -55,11 +55,11 @@ public interface XObjectDocument
     /**
      * @return the class manager for this document.
      */
-    XClassManager getXClassManager();
+    XClassManager< ? extends XObjectDocument> getXClassManager();
 
     /**
-     * @return true if this is a new document of this class (this document can exist but does not
-     *         contains object of this class).
+     * @return true if this is a new document of this class (this document can exist but does not contains object of
+     *         this class).
      */
     boolean isNew();
 
@@ -67,12 +67,12 @@ public interface XObjectDocument
      * @return the document.
      */
     Document getDocumentApi();
-    
+
     /**
      * @return the managed XWiki object.
      */
     Object getObjectApi();
-    
+
     /**
      * @return the id of the managed XWiki object;
      */

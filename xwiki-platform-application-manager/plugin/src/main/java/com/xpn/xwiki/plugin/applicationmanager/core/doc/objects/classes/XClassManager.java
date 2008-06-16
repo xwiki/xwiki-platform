@@ -36,10 +36,11 @@ import com.xpn.xwiki.objects.classes.BaseClass;
  * <li>support the XWiki norm about spaces and documents naming
  * </ul>
  * 
+ * @param <T> the item class extending {@link XObjectDocument}.
  * @version $Id: $
  * @since Application Manager 1.0RC1
  */
-public interface XClassManager
+public interface XClassManager<T extends XObjectDocument>
 {
     /**
      * Default suffix for the document containing the class.
@@ -101,8 +102,7 @@ public interface XClassManager
     String getClassSpace();
 
     /**
-     * @return the name of the document containing the class. Usually class name is :
-     *         ClassPrefixXWIKI_CLASS_SUFFIX.
+     * @return the name of the document containing the class. Usually class name is : ClassPrefixXWIKI_CLASS_SUFFIX.
      * @see #getClassFullName()
      * @see #getClassPrefix()
      * @see #XWIKI_CLASS_SUFFIX
@@ -110,8 +110,7 @@ public interface XClassManager
     String getClassName();
 
     /**
-     * @return the full name of the document containing the class. Usually class full name is :
-     *         ClassSpace.ClassName.
+     * @return the full name of the document containing the class. Usually class full name is : ClassSpace.ClassName.
      * @see #getClassName()
      * @see #getClassSpace()
      */
@@ -120,16 +119,16 @@ public interface XClassManager
     // Templates
 
     /**
-     * @return the space name of the document containing the class template. Usually class template
-     *         space name is : ClassSpacePrefixXWIKI_CLASSTEMPLATE_SPACE_SUFFIX.
+     * @return the space name of the document containing the class template. Usually class template space name is :
+     *         ClassSpacePrefixXWIKI_CLASSTEMPLATE_SPACE_SUFFIX.
      * @see #getClassPrefix()
      * @see #XWIKI_CLASSTEMPLATE_SPACE_SUFFIX
      */
     String getClassTemplateSpace();
 
     /**
-     * @return the name of the document containing the class template. Usually class template name
-     *         is : ClassPrefixClassXWIKI_CLASSTEMPLATE_SUFFIX.
+     * @return the name of the document containing the class template. Usually class template name is :
+     *         ClassPrefixClassXWIKI_CLASSTEMPLATE_SUFFIX.
      * @see #getClassPrefix()
      * @see #getClassTemplateFullName()
      * @see #XWIKI_CLASSTEMPLATE_SUFFIX
@@ -137,8 +136,8 @@ public interface XClassManager
     String getClassTemplateName();
 
     /**
-     * @return the full name of the document containing the class template. Usually class template
-     *         full name is : ClassTemplateSpace.ClassTemplateName.
+     * @return the full name of the document containing the class template. Usually class template full name is :
+     *         ClassTemplateSpace.ClassTemplateName.
      * @see #getClassTemplateSpace()
      * @see #getClassTemplateName()
      */
@@ -147,8 +146,8 @@ public interface XClassManager
     // Sheets
 
     /**
-     * @return the space name of the document containing the class sheet. Usually class sheet space
-     *         name is : ClassSpacePrefixXWIKI_CLASSSHEET_SPACE_SUFFIX.
+     * @return the space name of the document containing the class sheet. Usually class sheet space name is :
+     *         ClassSpacePrefixXWIKI_CLASSSHEET_SPACE_SUFFIX.
      * @see #getClassSpacePrefix()
      * @see #XWIKI_CLASSSHEET_SPACE_SUFFIX
      */
@@ -164,8 +163,8 @@ public interface XClassManager
     String getClassSheetName();
 
     /**
-     * @return the full name of the document containing the class sheet. Usually class sheet full
-     *         name is : ClassSheetSpace.ClassSheetName.
+     * @return the full name of the document containing the class sheet. Usually class sheet full name is :
+     *         ClassSheetSpace.ClassSheetName.
      * @see #getClassSheetSpace()
      * @see #getClassSheetName()
      */
@@ -216,8 +215,7 @@ public interface XClassManager
     Document getClassTemplateDocument(XWikiContext context) throws XWikiException;
 
     /**
-     * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he
-     * contains class object).
+     * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he contains class object).
      * 
      * @param doc the XWikidocument to test.
      * @return true if <code>doc</code> support this class, false otherwise.
@@ -225,8 +223,7 @@ public interface XClassManager
     boolean isInstance(XWikiDocument doc);
 
     /**
-     * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he
-     * contains class object).
+     * Determines if the specified <code>doc</code> is compatible with this xwiki class (if he contains class object).
      * 
      * @param doc the XWikidocument to test.
      * @return true if <code>doc</code> support this class, false otherwise.
@@ -234,8 +231,7 @@ public interface XClassManager
     boolean isInstance(Document doc);
 
     /**
-     * Get document name from item name <code>item</code>. Usually a Document name is
-     * DocumentTypeItemName.
+     * Get document name from item name <code>item</code>. Usually a Document name is DocumentTypeItemName.
      * 
      * @param itemName the name of the item to find.
      * @param context the XWiki context.
@@ -258,8 +254,7 @@ public interface XClassManager
     String getItemDocumentDefaultFullName(String itemName, XWikiContext context);
 
     /**
-     * Get item name extracted from document full name. Usually a Document full name is
-     * Space.DocumentTypeItemName.
+     * Get item name extracted from document full name. Usually a Document full name is Space.DocumentTypeItemName.
      * 
      * @param docFullName the full name of the document.
      * @return the item name extracted from document name.
@@ -272,8 +267,7 @@ public interface XClassManager
      * 
      * @param itemName the full name of the item.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @param validate indicate if it return new {@link XObjectDocument} or throw exception if wiki
-     *            descriptor does not exist.
+     * @param validate indicate if it return new {@link T} or throw exception if wiki descriptor does not exist.
      * @param context the XWiki context.
      * @return the document.
      * @throws XWikiException error when getting document from the database.
@@ -281,24 +275,21 @@ public interface XClassManager
      * @see #getItemDocumentDefaultFullName(String, XWikiContext)
      * @future XA2 : rename to getDocumentObject.
      */
-    XObjectDocument getXObjectDocument(String itemName, int objectId, boolean validate,
-        XWikiContext context) throws XWikiException;
+    T getXObjectDocument(String itemName, int objectId, boolean validate, XWikiContext context) throws XWikiException;
 
     /**
-     * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface}
-     * "searchDocuments" methods.
+     * Construct HQL where clause to use with {@link com.xpn.xwiki.store.XWikiStoreInterface} "searchDocuments" methods.
      * 
-     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1,
-     *            typeField1, valueField1][fieldName2, typeField2, valueField2]].
-     * @param parameterValues the where clause values filled by the method that replace the question
-     *            marks (?).
+     * @param fieldDescriptors the list of fields name/value constraints. Format : [[fieldName1, typeField1,
+     *            valueField1][fieldName2, typeField2, valueField2]].
+     * @param parameterValues the where clause values filled by the method that replace the question marks (?).
      * @return a HQL where clause.
      */
-    String createWhereClause(Object[][] fieldDescriptors, List parameterValues);
+    String createWhereClause(Object[][] fieldDescriptors, List<Object> parameterValues);
 
     /**
-     * Create new super document containing object of class {@link #getClassFullName()}. If
-     * document already exist it is returned with new object if it does not contains any.
+     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it
+     * is returned with new object if it does not contains any.
      * 
      * @param doc the XWiki document to manage.
      * @param objId the id of the XWiki object included in the document to manage.
@@ -307,34 +298,32 @@ public interface XClassManager
      * @throws XWikiException error when calling XObjectDocument implementation constructor.
      * @future XA2 : rename to newDocumentObject.
      */
-    XObjectDocument newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context)
-        throws XWikiException;
+    T newXObjectDocument(XWikiDocument doc, int objId, XWikiContext context) throws XWikiException;
 
     /**
-     * Create new super document containing object of class {@link #getClassFullName()}. If
-     * document already exist it is returned with new object if it does not contains any.
+     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it
+     * is returned with new object if it does not contains any.
      * 
      * @param context the XWiki context.
-     * @return a new XObjectDocument instance.
-     * @throws XWikiException error when calling XObjectDocument implementation constructor.
+     * @return a new T instance.
+     * @throws XWikiException error when calling T constructor.
      * @future XA2 : rename to newDocumentObject.
      */
-    XObjectDocument newXObjectDocument(XWikiContext context) throws XWikiException;
+    T newXObjectDocument(XWikiContext context) throws XWikiException;
 
     /**
-     * Create new super document containing object of class {@link #getClassFullName()}. If
-     * document already exist it is returned with new object if it does not contains any.
+     * Create new super document containing object of class {@link #getClassFullName()}. If document already exist it
+     * is returned with new object if it does not contains any.
      * 
      * @param docFullName the full name of document to manage.
      * @param objId the id of the XWiki object included in the document to manage.
      * @param context the XWiki context.
      * @return a new XObjectDocument instance.
-     * @throws XWikiException error when calling XObjectDocument implementation constructor.
+     * @throws XWikiException error when calling T constructor.
      * @see #getClassFullName()
      * @future XA2 : rename to newDocumentObject.
      */
-    XObjectDocument newXObjectDocument(String docFullName, int objId, XWikiContext context)
-        throws XWikiException;
+    T newXObjectDocument(String docFullName, int objId, XWikiContext context) throws XWikiException;
 
     /**
      * Create new super documents for each object of class {@link #getClassFullName()} for provided
@@ -342,22 +331,21 @@ public interface XClassManager
      * 
      * @param documents the list of {@link XWikiDocument}.
      * @param context the XWiki context.
-     * @return the list of {@link XObjectDocument}.
+     * @return the list of {@link T}.
      * @throws XWikiException error when calling XObjectDocument implementation constructor.
      * @future XA2 : rename to newDocumentObjectList.
      */
-    List newXObjectDocumentList(XWikiDocument documents, XWikiContext context)
-        throws XWikiException;
+    List<T> newXObjectDocumentList(XWikiDocument documents, XWikiContext context) throws XWikiException;
 
     /**
-     * Create new super document for each object of class {@link #getClassFullName()} of each
-     * {@link XWikiDocument} in the list and return it.
+     * Create new super document for each object of class {@link #getClassFullName()} of each {@link XWikiDocument} in
+     * the list and return it.
      * 
      * @param documents the list of {@link XWikiDocument}.
      * @param context the XWiki context.
-     * @return the list of {@link XObjectDocument}.
+     * @return the list of {@link T}.
      * @throws XWikiException error when calling XObjectDocument implementation constructor.
      * @future XA2 : rename to newDocumentObjectList.
      */
-    List newXObjectDocumentList(List documents, XWikiContext context) throws XWikiException;
+    List<T> newXObjectDocumentList(List<XWikiDocument> documents, XWikiContext context) throws XWikiException;
 }

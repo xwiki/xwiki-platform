@@ -30,9 +30,6 @@ import com.xpn.xwiki.api.Api;
  * Permit to manipulate XWikiException in velocity code.
  * 
  * @version $Id: $
- * @todo See http://jira.xwiki.org/jira/browse/XWIKI-1571. If/When that issue is applied in XWiki
- *       Core and when this plugin moves to the version of XWiki Core where it was applied then
- *       remove this class.
  */
 public class XWikiExceptionApi extends Api
 {
@@ -70,6 +67,7 @@ public class XWikiExceptionApi extends Api
      * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         return this.exception.getMessage();

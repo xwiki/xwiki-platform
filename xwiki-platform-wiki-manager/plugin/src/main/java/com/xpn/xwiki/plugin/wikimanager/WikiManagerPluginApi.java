@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
  * @version $Id: $
  * @see com.xpn.xwiki.plugin.wikimanager.WikiManagerPlugin
  */
-public class WikiManagerPluginApi extends PluginApi
+public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
 {
     /**
      * Field name of the last error code inserted in context.
@@ -86,15 +86,14 @@ public class WikiManagerPluginApi extends PluginApi
     {
         super(plugin, context);
 
-        this.defaultException =
-            new XWikiExceptionApi(WikiManagerException.getDefaultException(), this.context);
+        this.defaultException = new XWikiExceptionApi(WikiManagerException.getDefaultException(), this.context);
 
         // Message Tool
         Locale locale = (Locale) context.get("locale");
         this.messageTool = new WikiManagerMessageTool(locale, plugin, context);
         context.put(WikiManagerMessageTool.MESSAGETOOL_CONTEXT_KEY, this.messageTool);
 
-        searchApi = plugin.getGlobalSearchApiPlugin(context);
+        this.searchApi = plugin.getGlobalSearchApiPlugin(context);
     }
 
     /**
@@ -130,36 +129,30 @@ public class WikiManagerPluginApi extends PluginApi
      * @param wikiname the name of the new wiki.
      * @param templateWiki the name of the wiki from where to copy document to the new wiki.
      * @param pkgName the name of the attached XAR file to import in the new wiki.
-     * @param wikiXObjectDocument a wiki descriptor document from which the new wiki descriptor
-     *            document will be created.
-     * @param failOnExist if true throw exception when wiki already exist. If false overwrite
-     *            existing wiki.
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @param wikiXObjectDocument a wiki descriptor document from which the new wiki descriptor document will be
+     *            created.
+     * @param failOnExist if true throw exception when wiki already exist. If false overwrite existing wiki.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual
-     *         mode.</li>
-     *         <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does
-     *         not exists.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name
-     *         can't be used to create new wiki.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor
-     *         already exists.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when
-     *         updating database.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package
-     *         does not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
+     *         <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name can't be used to create
+     *         new wiki.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion
-     *         into database failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
+     *         failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
-    public int createNewWiki(String wikiname, String templateWiki, String pkgName,
-        XWikiServer wikiXObjectDocument, boolean failOnExist) throws XWikiException
+    public int createNewWiki(String wikiname, String templateWiki, String pkgName, XWikiServer wikiXObjectDocument,
+        boolean failOnExist) throws XWikiException
     {
         if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
@@ -169,8 +162,8 @@ public class WikiManagerPluginApi extends PluginApi
 
         try {
             if (wikiname == null || wikiname.trim().equals("")) {
-                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN,
-                    messageTool.get(WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, wikiname));
+                throw new WikiManagerException(WikiManagerException.ERROR_WM_WIKINAMEFORBIDDEN, messageTool.get(
+                    WikiManagerMessageTool.ERROR_WIKINAMEFORBIDDEN, wikiname));
             }
 
             wikiXObjectDocument.setWikiName(wikiname);
@@ -182,11 +175,10 @@ public class WikiManagerPluginApi extends PluginApi
 
             String comment = WikiManagerMessageTool.COMMENT_CREATEEMPTYWIKI;
 
-            WikiManager.getInstance().createNewWiki(wikiXObjectDocument, failOnExist,
-                realTemplateWikiName, realPkgName, comment, this.context);
+            WikiManager.getInstance().createNewWiki(wikiXObjectDocument, failOnExist, realTemplateWikiName,
+                realPkgName, comment, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION,
-                wikiXObjectDocument.toString()), e);
+            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -202,16 +194,14 @@ public class WikiManagerPluginApi extends PluginApi
      * 
      * @param wikiName the name of the wiki to delete.
      * @param deleteDatabase if true wiki's database is also removed.
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
-     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
-     *         delete wiki.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to delete wiki.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      * @since 1.1
@@ -222,13 +212,13 @@ public class WikiManagerPluginApi extends PluginApi
 
         try {
             if (!hasAdminRights()) {
-                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                    messageTool.get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, this.messageTool.get(
+                    WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
             }
 
             WikiManager.getInstance().deleteWiki(wikiName, deleteDatabase, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
+            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -243,16 +233,14 @@ public class WikiManagerPluginApi extends PluginApi
      * Delete wiki descriptor document and wiki's database.
      * 
      * @param wikiName the name of the wiki to delete.
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
-     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
-     *         delete wiki.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to delete wiki.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -266,16 +254,14 @@ public class WikiManagerPluginApi extends PluginApi
      * 
      * @param wikiName the name of the wiki to delete.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
-     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
-     *         delete wiki.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to delete wiki.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      * @deprecated Use {@link #deleteWikiAlias(String, int)} since 1.1.
@@ -291,16 +277,14 @@ public class WikiManagerPluginApi extends PluginApi
      * 
      * @param wikiName the name of the wiki to delete.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
-     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to
-     *         delete wiki.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
+     *         <li>{@link XWikiException#ERROR_XWIKI_ACCESS_DENIED}: you don't have right to delete wiki.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      * @since 1.1
@@ -311,13 +295,13 @@ public class WikiManagerPluginApi extends PluginApi
 
         try {
             if (!hasAdminRights()) {
-                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
-                    messageTool.get(WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
+                throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, this.messageTool.get(
+                    WikiManagerMessageTool.ERROR_RIGHTTODELETEWIKI, wikiName));
             }
 
             WikiManager.getInstance().deleteWikiAlias(wikiName, objectId, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
+            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -342,7 +326,7 @@ public class WikiManagerPluginApi extends PluginApi
         try {
             doc = WikiManager.getInstance().getWikiFromName(wikiName, context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
+            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -362,7 +346,7 @@ public class WikiManagerPluginApi extends PluginApi
         try {
             wikiList = WikiManager.getInstance().getAllWikis(context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
+            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -383,9 +367,9 @@ public class WikiManagerPluginApi extends PluginApi
         Wiki doc = null;
 
         try {
-            doc = WikiManager.getInstance().getWikiFromDocumentName(documentFullName, context);
+            doc = WikiManager.getInstance().getWikiFromDocumentName(documentFullName, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
+            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -398,15 +382,13 @@ public class WikiManagerPluginApi extends PluginApi
      * Get wiki descriptor document corresponding to provided wiki name.
      * 
      * @param wikiName the name of the wiki.
-     * @return null if there is an error and add error code in context
-     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
-     *         {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return null if there is an error and add error code in context {@link #CONTEXT_LASTERRORCODE} field and
+     *         exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -420,15 +402,13 @@ public class WikiManagerPluginApi extends PluginApi
      * 
      * @param wikiName the name of the wiki.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @return null if there is an error and add error code in context
-     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
-     *         {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return null if there is an error and add error code in context {@link #CONTEXT_LASTERRORCODE} field and
+     *         exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -454,9 +434,9 @@ public class WikiManagerPluginApi extends PluginApi
      * @return the list {@link XWikiServer}.
      * @throws XWikiException critical error in xwiki engine.
      */
-    public List getWikiDocumentList() throws XWikiException
+    public List<XWikiServer> getWikiDocumentList() throws XWikiException
     {
-        List listDocument = Collections.emptyList();
+        List<XWikiServer> listDocument = Collections.emptyList();
 
         try {
             listDocument = WikiManager.getInstance().getWikiAliasList(this.context);
@@ -478,12 +458,12 @@ public class WikiManagerPluginApi extends PluginApi
      */
     public XWikiServer createWikiDocument() throws XWikiException
     {
-        return (XWikiServer) XWikiServerClass.getInstance(context).newXObjectDocument(context);
+        return XWikiServerClass.getInstance(this.context).newXObjectDocument(this.context);
     }
 
     /**
-     * Check if a Server of the given name exists in the master Wiki by checking if the
-     * "XWiki.XWikiServer{serverName}" document is new.
+     * Check if a Server of the given name exists in the master Wiki by checking if the "XWiki.XWikiServer{serverName}"
+     * document is new.
      * 
      * @param wikiName the name of the server to be checked
      * @return true if server exists, false otherwise
@@ -494,8 +474,8 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
-     * Check if a Server of the given name exists in the master Wiki by checking if the
-     * "XWiki.XWikiServer{serverName}" document is new.
+     * Check if a Server of the given name exists in the master Wiki by checking if the "XWiki.XWikiServer{serverName}"
+     * document is new.
      * 
      * @param wikiName the name of the server to be checked
      * @param objectId the id of the XWiki object included in the document to manage.
@@ -522,16 +502,14 @@ public class WikiManagerPluginApi extends PluginApi
      * Change the {@link XWikiServerClass} "visibility" field of a wiki descriptor document.
      * 
      * @param wikiName the name of the wiki descriptor.
-     * @param visibility the new value of "visibility" field. Can be "public", "private" or
-     *            "template".
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @param visibility the new value of "visibility" field. Can be "public", "private" or "template".
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -545,27 +523,23 @@ public class WikiManagerPluginApi extends PluginApi
      * 
      * @param wikiName the name of the wiki descriptor.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @param visibility the new value of "visibility" field. Can be "public", "private" or
-     *            "template".
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @param visibility the new value of "visibility" field. Can be "public", "private" or "template".
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
-    public int setWikiVisibility(String wikiName, int objectId, String visibility)
-        throws XWikiException
+    public int setWikiVisibility(String wikiName, int objectId, String visibility) throws XWikiException
     {
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            XWikiServer wikiAlias =
-                WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
+            XWikiServer wikiAlias = WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
             wikiAlias.setVisibility(visibility);
             wikiAlias.save();
         } catch (WikiManagerException e) {
@@ -588,14 +562,13 @@ public class WikiManagerPluginApi extends PluginApi
      * 
      * @param wikiName the name of the wiki descriptor.
      * @param isWikiTemplate true if it's a wiki template, false otherwise.
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -604,7 +577,7 @@ public class WikiManagerPluginApi extends PluginApi
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
         try {
-            Wiki wiki = WikiManager.getInstance().getWikiFromName(wikiName, context);
+            Wiki wiki = WikiManager.getInstance().getWikiFromName(wikiName, this.context);
             XWikiServer wikiAlias = wiki.getFirstWikiAlias();
             wikiAlias.setIsWikiTemplate(isWikiTemplate);
             wikiAlias.save();
@@ -626,32 +599,27 @@ public class WikiManagerPluginApi extends PluginApi
      * @param templateName the name of the new wiki template to create.
      * @param templateDescription the description of the new wiki template to create.
      * @param packageName the name of the attached XAR file to import in the new wiki.
-     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field
-     *         and exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return If there is error, it add error code in context {@link #CONTEXT_LASTERRORCODE} field and exception in
+     *         context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual
-     *         mode.</li>
-     *         <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does
-     *         not exists.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name
-     *         can't be used to create new wiki.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor
-     *         already exists.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when
-     *         updating database.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package
-     *         does not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_XWIKINOTVIRTUAL}: xwiki is not in virtual mode.</li>
+     *         <li>{@link WikiManagerException#ERROR_XWIKI_USERDOESNOTEXIST}: provided user does not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKINAMEFORBIDDEN}: provided wiki name can't be used to create
+     *         new wiki.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIALREADYEXISTS}: wiki descriptor already exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion
-     *         into database failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
+     *         failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
-    public int createWikiTemplate(String templateName, String templateDescription,
-        String packageName) throws XWikiException
+    public int createWikiTemplate(String templateName, String templateDescription, String packageName)
+        throws XWikiException
     {
         if (!hasAdminRights()) {
             return XWikiException.ERROR_XWIKI_ACCESS_DENIED;
@@ -659,8 +627,7 @@ public class WikiManagerPluginApi extends PluginApi
 
         int returncode = XWikiExceptionApi.ERROR_NOERROR;
 
-        XWikiServer wikiXObjectDocument =
-            (XWikiServer) XWikiServerClass.getInstance(context).newXObjectDocument(context);
+        XWikiServer wikiXObjectDocument = XWikiServerClass.getInstance(this.context).newXObjectDocument(this.context);
         wikiXObjectDocument.setWikiName(templateName);
         wikiXObjectDocument.setDescription(templateDescription);
 
@@ -673,11 +640,10 @@ public class WikiManagerPluginApi extends PluginApi
             WikiManager.getInstance().createWikiTemplate(
                 wikiXObjectDocument,
                 packageName,
-                this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE,
-                    new String[] {templateName, packageName}), this.context);
+                this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE, new String[] {templateName,
+                    packageName}), this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION,
-                wikiXObjectDocument.toString()), e);
+            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
             this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
             this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
@@ -689,19 +655,17 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
-     * Get wiki descriptor document corresponding to provided wiki name with
-     * {@link XWikiServerClass} "visibility" field set to "template".
+     * Get wiki descriptor document corresponding to provided wiki name with {@link XWikiServerClass} "visibility" field
+     * set to "template".
      * 
      * @param wikiName the name of the wiki template.
-     * @return null if there is an error and add error code in context
-     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
-     *         {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return null if there is an error and add error code in context {@link #CONTEXT_LASTERRORCODE} field and
+     *         exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -711,32 +675,27 @@ public class WikiManagerPluginApi extends PluginApi
     }
 
     /**
-     * Get wiki descriptor document corresponding to provided wiki name with
-     * {@link XWikiServerClass} "visibility" field set to "template".
+     * Get wiki descriptor document corresponding to provided wiki name with {@link XWikiServerClass} "visibility" field
+     * set to "template".
      * 
      * @param wikiName the name of the wiki template.
      * @param objectId the id of the XWiki object included in the document to manage.
-     * @return null if there is an error and add error code in context
-     *         {@link #CONTEXT_LASTERRORCODE} field and exception in context's
-     *         {@link #CONTEXT_LASTEXCEPTION} field.
+     * @return null if there is an error and add error code in context {@link #CONTEXT_LASTERRORCODE} field and
+     *         exception in context's {@link #CONTEXT_LASTEXCEPTION} field.
      *         <p>
      *         Error codes can be :
      *         <ul>
      *         <li>{@link XWikiExceptionApi#ERROR_NOERROR}: methods succeed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does
-     *         not exists.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_WIKIDOESNOTEXISTS}: wiki to delete does not exists.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
-    public XWikiServer getWikiTemplateDocument(String wikiName, int objectId)
-        throws XWikiException
+    public XWikiServer getWikiTemplateDocument(String wikiName, int objectId) throws XWikiException
     {
         XWikiServer doc = null;
 
         try {
-            doc =
-                WikiManager.getInstance().getWikiTemplateAlias(wikiName, objectId, this.context,
-                    true);
+            doc = WikiManager.getInstance().getWikiTemplateAlias(wikiName, objectId, this.context, true);
         } catch (WikiManagerException e) {
             LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
 
@@ -751,9 +710,9 @@ public class WikiManagerPluginApi extends PluginApi
      * @return all the template wiki. Wiki with "visibility" field equals to "template".
      * @throws XWikiException critical error in xwiki engine.
      */
-    public List getWikiTemplateList() throws XWikiException
+    public List<XWikiServer> getWikiTemplateList() throws XWikiException
     {
-        List listDocument = Collections.emptyList();
+        List<XWikiServer> listDocument = Collections.emptyList();
 
         try {
             listDocument = WikiManager.getInstance().getWikiTemplateAliasList(this.context);

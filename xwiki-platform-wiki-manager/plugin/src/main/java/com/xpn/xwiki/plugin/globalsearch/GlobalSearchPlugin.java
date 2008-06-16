@@ -66,6 +66,7 @@ public class GlobalSearchPlugin extends XWikiDefaultPlugin
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
      *      com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new GlobalSearchPluginApi((GlobalSearchPlugin) plugin, context);

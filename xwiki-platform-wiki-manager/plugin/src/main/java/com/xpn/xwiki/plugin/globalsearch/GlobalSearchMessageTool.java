@@ -20,19 +20,16 @@ public class GlobalSearchMessageTool extends XWikiPluginMessageTool
      * Key to use with {@link XWikiContext#get(Object)}.
      */
     public static final String MESSAGETOOL_CONTEXT_KEY = "globalsearchmessagetool";
-    
+
     /**
-     * Used as {@link GlobalSearchException} message when provided field does not exist in the
-     * document.
+     * Used as {@link GlobalSearchException} message when provided field does not exist in the document.
      */
-    public static final String ERROR_CANTACCESSFIELD =
-        "globalsearch.plugin.error.cantaccessdocfield";
+    public static final String ERROR_CANTACCESSFIELD = "globalsearch.plugin.error.cantaccessdocfield";
 
     /**
      * Used as {@link GlobalSearchException} message when failed to get document translations.
      */
-    public static final String ERROR_DOCUMENTTRANSLATIONS =
-        "globalsearch.plugin.error.documenttranslations";
+    public static final String ERROR_DOCUMENTTRANSLATIONS = "globalsearch.plugin.error.documenttranslations";
 
     /**
      * Used as {@link org.apache.commons.logging.Log} log message when trying to search documents.
@@ -40,11 +37,9 @@ public class GlobalSearchMessageTool extends XWikiPluginMessageTool
     public static final String LOG_SEARCHDOCUMENTS = "globalsearch.plugin.log.searchdocuments";
 
     /**
-     * Used as {@link org.apache.commons.logging.Log} log message when trying to get document from
-     * name.
+     * Used as {@link org.apache.commons.logging.Log} log message when trying to get document from name.
      */
-    public static final String LOG_GETDOCUMENTFROMNAME =
-        "globalsearch.plugin.log.getdocumentfromname";
+    public static final String LOG_GETDOCUMENTFROMNAME = "globalsearch.plugin.log.getdocumentfromname";
 
     /**
      * Default bundle manager where to find translated messages.
@@ -54,8 +49,7 @@ public class GlobalSearchMessageTool extends XWikiPluginMessageTool
     private static final GlobalSearchMessageTool DEFAULTMESSAGETOOL = new GlobalSearchMessageTool();
 
     /**
-     * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system
-     * {@link Locale}.
+     * Create default WikiManagerMessageTool. Only look at WikiManager properties file with system {@link Locale}.
      * 
      * @since 1.1
      */
@@ -63,22 +57,21 @@ public class GlobalSearchMessageTool extends XWikiPluginMessageTool
     {
         super(ResourceBundle.getBundle(GlobalSearchPlugin.PLUGIN_NAME + "/ApplicationResources"));
     }
-    
+
     /**
-     * Call for {@link XWikiPluginMessageTool#XWikiPluginMessageTool(ResourceBundle, XWikiContext)}.
-     * Construct ResourceBundle based on {@link GlobalSearchPlugin#PLUGIN_NAME} +
-     * "/ApplicationResources".
+     * Call for {@link XWikiPluginMessageTool#XWikiPluginMessageTool(ResourceBundle, XWikiContext)}. Construct
+     * ResourceBundle based on {@link GlobalSearchPlugin#PLUGIN_NAME} + "/ApplicationResources".
      * 
      * @param locale the {@link Locale} used to load the {@link ResourceBundle}.
      * @param plugin tyhe plugin.
-     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki
-     *            primitives for loading documents
+     * @param context the {@link com.xpn.xwiki.XWikiContext} object, used to get access to XWiki primitives for loading
+     *            documents
      */
     GlobalSearchMessageTool(Locale locale, GlobalSearchPlugin plugin, XWikiContext context)
     {
         super(locale, plugin, context);
     }
-    
+
     /**
      * Get Global Search message tool registered in XWiki context. If not return default.
      * 

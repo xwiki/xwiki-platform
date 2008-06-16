@@ -75,11 +75,9 @@ final class GlobalSearch
     private static final String SEARCHDOC_INITIAL_SELECT = "select distinct doc.web, doc.name";
 
     /**
-     * The searchDocument and searchDocumentsNames initial select query part when distinct documents
-     * by language.
+     * The searchDocument and searchDocumentsNames initial select query part when distinct documents by language.
      */
-    private static final String SEARCHDOC_INITIAL_SELECT_LANG =
-        "select distinct doc.web, doc.name, doc.language";
+    private static final String SEARCHDOC_INITIAL_SELECT_LANG = "select distinct doc.web, doc.name, doc.language";
 
     /**
      * The searchDocument and searchDocumentsNames initial from query part.
@@ -127,18 +125,16 @@ final class GlobalSearch
     }
 
     /**
-     * Execute query in all provided wikis and return list containing all results. Compared to XWiki
-     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming"
-     * since it issues one request per provided wiki.
+     * Execute query in all provided wikis and return list containing all results. Compared to XWiki Platform search,
+     * searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one request per
+     * provided wiki.
      * 
      * @param query the query parameters.
      * @param context the XWiki context.
-     * @return the search result as list of {@link GlobalSearchResult} containing all selected
-     *         fields values.
+     * @return the search result as list of {@link GlobalSearchResult} containing all selected fields values.
      * @throws XWikiException error when executing query.
      */
-    public Collection<GlobalSearchResult> search(GlobalSearchQuery query, XWikiContext context)
-        throws XWikiException
+    public Collection<GlobalSearchResult> search(GlobalSearchQuery query, XWikiContext context) throws XWikiException
     {
         List<GlobalSearchResult> resultList = Collections.emptyList();
 
@@ -155,9 +151,7 @@ final class GlobalSearch
             wikiNameList = Collections.singletonList(context.getMainXWiki());
         }
 
-        int max =
-            query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0)
-                : 0;
+        int max = query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0) : 0;
 
         String database = context.getDatabase();
         try {
@@ -167,11 +161,9 @@ final class GlobalSearch
                 context.setDatabase(wikiName);
 
                 List< ? > resultsTmp =
-                    context.getWiki().getStore().search(query.getHql(), max, 0,
-                        query.getParameterList(), context);
+                    context.getWiki().getStore().search(query.getHql(), max, 0, query.getParameterList(), context);
 
-                insertResults(wikiName, resultList, resultsTmp, query, selectColumns,
-                    orderColumns, context);
+                insertResults(wikiName, resultList, resultsTmp, query, selectColumns, orderColumns, context);
             }
         } finally {
             context.setDatabase(database);
@@ -179,8 +171,8 @@ final class GlobalSearch
 
         if (resultList.size() > max || query.getStart() > 0) {
             resultList =
-                resultList.subList(query.getStart() > 0 ? query.getStart() : 0,
-                    resultList.size() > max ? max : resultList.size());
+                resultList.subList(query.getStart() > 0 ? query.getStart() : 0, resultList.size() > max ? max
+                    : resultList.size());
         }
 
         return resultList;
@@ -197,9 +189,8 @@ final class GlobalSearch
      * @param orderColumns the fields to order.
      * @param context the XWiki context.
      */
-    private void insertResults(String wikiName, List<GlobalSearchResult> sortedList,
-        Collection< ? > list, GlobalSearchQuery query, List<String> selectColumns,
-        List<Object[]> orderColumns, XWikiContext context)
+    private void insertResults(String wikiName, List<GlobalSearchResult> sortedList, Collection< ? > list,
+        GlobalSearchQuery query, List<String> selectColumns, List<Object[]> orderColumns, XWikiContext context)
     {
         boolean sort = !sortedList.isEmpty();
 
@@ -226,13 +217,10 @@ final class GlobalSearch
      * @param orderColumns the fields to order.
      * @param context the XWiki context.
      */
-    private void insertResult(List<GlobalSearchResult> sortedList, GlobalSearchResult result,
-        GlobalSearchQuery query, List<String> selectColumns, List<Object[]> orderColumns,
-        XWikiContext context)
+    private void insertResult(List<GlobalSearchResult> sortedList, GlobalSearchResult result, GlobalSearchQuery query,
+        List<String> selectColumns, List<Object[]> orderColumns, XWikiContext context)
     {
-        int max =
-            query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0)
-                : -1;
+        int max = query.getMax() > 0 ? query.getMax() + (query.getStart() > 0 ? query.getStart() : 0) : -1;
 
         int index = 0;
         for (Iterator<GlobalSearchResult> itSorted = sortedList.iterator(); itSorted.hasNext()
@@ -255,11 +243,10 @@ final class GlobalSearch
      * @param result1 the first result to compare.
      * @param result2 the second result to compare.
      * @param orderColumns the list of order fields.
-     * @return a negative integer, zero, or a positive integer as <code>map1</code> is less than,
-     *         equal to, or greater than <code>map2</code>.
+     * @return a negative integer, zero, or a positive integer as <code>map1</code> is less than, equal to, or greater
+     *         than <code>map2</code>.
      */
-    private int compare(GlobalSearchResult result1, GlobalSearchResult result2,
-        List<Object[]> orderColumns)
+    private int compare(GlobalSearchResult result1, GlobalSearchResult result2, List<Object[]> orderColumns)
     {
         for (Object[] orderField : orderColumns) {
             int result = compare(result1, result2, orderField);
@@ -278,11 +265,10 @@ final class GlobalSearch
      * @param result1 the first result to compare.
      * @param result2 the second result to compare.
      * @param orderField the order fields.
-     * @return a negative integer, zero, or a positive integer as <code>map1</code> is less than,
-     *         equal to, or greater than <code>map2</code>.
+     * @return a negative integer, zero, or a positive integer as <code>map1</code> is less than, equal to, or greater
+     *         than <code>map2</code>.
      */
-    private int compare(GlobalSearchResult result1, GlobalSearchResult result2,
-        Object[] orderField)
+    private int compare(GlobalSearchResult result1, GlobalSearchResult result2, Object[] orderField)
     {
         int result = 0;
 
@@ -361,13 +347,12 @@ final class GlobalSearch
             String[] columnsTable = orderContent.split(FIELD_SEPARATOR);
             for (int i = 0; i < columnsTable.length; ++i) {
                 String orderField = columnsTable[i];
-                Object[] orderFieldTable = orderContent.split("\\s+");
+                String[] orderFieldTable = orderContent.split("\\s+");
 
-                orderField = (String) orderFieldTable[0];
+                orderField = orderFieldTable[0];
 
                 Boolean asc = Boolean.TRUE;
-                if (orderFieldTable.length > 1
-                    && ((String) orderFieldTable[1]).trim().toLowerCase().equals(ORDER_DESC)) {
+                if (orderFieldTable.length > 1 && orderFieldTable[1].trim().toLowerCase().equals(ORDER_DESC)) {
                     asc = Boolean.FALSE;
                 }
 
@@ -379,11 +364,10 @@ final class GlobalSearch
     }
 
     /**
-     * @param queryPrefix the start of the SQL query (for example "select distinct doc.web,
-     *            doc.name")
+     * @param queryPrefix the start of the SQL query (for example "select distinct doc.web, doc.name")
      * @param whereSQL the where clause to append
-     * @return the full formed SQL query, to which the order by columns have been added as returned
-     *         columns (this is required for example for HSQLDB).
+     * @return the full formed SQL query, to which the order by columns have been added as returned columns (this is
+     *         required for example for HSQLDB).
      */
     protected String createSearchDocumentsHQLQuery(String queryPrefix, String whereSQL)
     {
@@ -408,8 +392,7 @@ final class GlobalSearch
         hql.append(SEARCHDOC_INITIAL_FROM);
 
         if (normalizedWhereSQL.length() != 0) {
-            if ((!normalizedWhereSQL.startsWith(WHERE_KEYWORD))
-                && (!normalizedWhereSQL.startsWith(FIELD_SEPARATOR))) {
+            if ((!normalizedWhereSQL.startsWith(WHERE_KEYWORD)) && (!normalizedWhereSQL.startsWith(FIELD_SEPARATOR))) {
                 hql.append(" ");
                 hql.append(WHERE_KEYWORD);
                 hql.append(" ");
@@ -423,28 +406,25 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found
-     * {@link XWikiDocument}. Compared to XWiki Platform search, searchDocuments and
-     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
-     * provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
+     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
+     * one request per provided wiki.
      * 
      * @param query the query parameters.
-     * @param distinctbylanguage when a document has multiple version for each language it is
-     *            returned as one document a language.
+     * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
+     *            language.
      * @param customMapping inject custom mapping in session.
-     * @param checkRight if true check for each found document if context's user has "view" rights
-     *            for it.
+     * @param checkRight if true check for each found document if context's user has "view" rights for it.
      * @param context the XWiki context.
      * @return the found {@link XWikiDocument}.
      * @throws XWikiException error when searching for documents.
      */
     private Collection<GlobalSearchResult> searchDocumentsNamesInfos(GlobalSearchQuery query,
-        boolean distinctbylanguage, boolean customMapping, boolean checkRight,
-        XWikiContext context) throws XWikiException
+        boolean distinctbylanguage, boolean customMapping, boolean checkRight, XWikiContext context)
+        throws XWikiException
     {
         if (!query.getHql().toLowerCase().startsWith(SELECT_KEYWORD)) {
-            String select =
-                distinctbylanguage ? SEARCHDOC_INITIAL_SELECT_LANG : SEARCHDOC_INITIAL_SELECT;
+            String select = distinctbylanguage ? SEARCHDOC_INITIAL_SELECT_LANG : SEARCHDOC_INITIAL_SELECT;
 
             query.setHql(createSearchDocumentsHQLQuery(select, query.getHql()));
         }
@@ -453,28 +433,24 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found
-     * {@link XWikiDocument}. Compared to XWiki Platform search, searchDocuments and
-     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
-     * provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
+     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
+     * one request per provided wiki.
      * 
      * @param query the query parameters.
-     * @param distinctbylanguage when a document has multiple version for each language it is
-     *            returned as one document a language.
+     * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
+     *            language.
      * @param customMapping inject custom mapping in session.
-     * @param checkRight if true check for each found document if context's user has "view" rights
-     *            for it.
+     * @param checkRight if true check for each found document if context's user has "view" rights for it.
      * @param context the XWiki context.
      * @return the found {@link XWikiDocument}.
      * @throws XWikiException error when searching for documents.
      */
-    public Collection<XWikiDocument> searchDocuments(GlobalSearchQuery query,
-        boolean distinctbylanguage, boolean customMapping, boolean checkRight,
-        XWikiContext context) throws XWikiException
+    public Collection<XWikiDocument> searchDocuments(GlobalSearchQuery query, boolean distinctbylanguage,
+        boolean customMapping, boolean checkRight, XWikiContext context) throws XWikiException
     {
         Collection<GlobalSearchResult> results =
-            searchDocumentsNamesInfos(query, distinctbylanguage, customMapping, checkRight,
-                context);
+            searchDocumentsNamesInfos(query, distinctbylanguage, customMapping, checkRight, context);
 
         List<XWikiDocument> documents = new ArrayList<XWikiDocument>(results.size());
 
@@ -505,34 +481,29 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found
-     * {@link XWikiDocument}. Compared to XWiki Platform search, searchDocuments and
-     * searchDocumentsName it's potentially "time-consuming" since it issues one request per
-     * provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
+     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
+     * one request per provided wiki.
      * 
      * @param query the query parameters.
-     * @param distinctbylanguage when a document has multiple version for each language it is
-     *            returned as one document a language.
+     * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
+     *            language.
      * @param customMapping inject custom mapping in session.
-     * @param checkRight if true check for each found document if context's user has "view" rights
-     *            for it.
+     * @param checkRight if true check for each found document if context's user has "view" rights for it.
      * @param context the XWiki context.
      * @return the found {@link XWikiDocument}.
      * @throws XWikiException error when searching for documents.
      */
-    public Collection<String> searchDocumentsNames(GlobalSearchQuery query,
-        boolean distinctbylanguage, boolean customMapping, boolean checkRight,
-        XWikiContext context) throws XWikiException
+    public Collection<String> searchDocumentsNames(GlobalSearchQuery query, boolean distinctbylanguage,
+        boolean customMapping, boolean checkRight, XWikiContext context) throws XWikiException
     {
         Collection<GlobalSearchResult> results =
-            searchDocumentsNamesInfos(query, distinctbylanguage, customMapping, checkRight,
-                context);
+            searchDocumentsNamesInfos(query, distinctbylanguage, customMapping, checkRight, context);
 
         List<String> documentsNames = new ArrayList<String>(results.size());
 
         for (GlobalSearchResult result : results) {
-            documentsNames.add(result.getWikiName() + ":" + result.get(HQL_DOC_SPACE) + "."
-                + result.get(HQL_DOC_NAME));
+            documentsNames.add(result.getWikiName() + ":" + result.get(HQL_DOC_SPACE) + "." + result.get(HQL_DOC_NAME));
         }
 
         return documentsNames;

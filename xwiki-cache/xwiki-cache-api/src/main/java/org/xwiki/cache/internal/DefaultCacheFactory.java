@@ -16,20 +16,33 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
+package org.xwiki.cache.internal;
 
-package com.xpn.xwiki.cache.api;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.config.CacheConfiguration;
 
+/**
+ * DEfault implementation of {@link CacheFactory}.
+ * 
+ * @version $Id: $
+ */
+public class DefaultCacheFactory implements CacheFactory
+{
+    /**
+     * This component's role hint, used when code needs to look it up.
+     */
+    public static final String ROLEHINT = "default";
 
-@Deprecated
-public interface XWikiCache {
-    void setCapacity(int capacity);
-    void flushEntry(String key);
-    void putInCache(String key, Object obj);
-    Object getFromCache(String key) throws XWikiCacheNeedsRefreshException;
-    Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException;
-    int getNumberEntries();
-    void cancelUpdate(String key);
-    void flushAll();
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
+     */
+    public <T> Cache<T> newCache(CacheConfiguration config) throws CacheException
+    {
+        return new DefaultCache<T>();
+    }
 }

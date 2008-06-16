@@ -79,6 +79,11 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
 import org.xwiki.observation.event.DocumentSaveEvent;
@@ -88,10 +93,7 @@ import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
 import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.XWikiCacheNeedsRefreshException;
-import com.xpn.xwiki.cache.api.XWikiCacheService;
-import com.xpn.xwiki.cache.impl.OSCacheService;
-import com.xpn.xwiki.cache.impl.XWikiCacheListener;
+import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
@@ -204,8 +206,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     private XWikiURLFactoryService urlFactoryService;
 
-    private static XWikiCacheService cacheService;
-
     private XWikiCriteriaService criteriaService;
 
     private final Object AUTH_SERVICE_LOCK = new Object();
@@ -217,8 +217,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     private final Object STATS_SERVICE_LOCK = new Object();
 
     private final Object URLFACTORY_SERVICE_LOCK = new Object();
-
-    private static final Object CACHE_SERVICE_LOCK = new Object();
 
     private MetaClass metaclass = MetaClass.getMetaClass();
 
@@ -237,7 +235,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     // These are caches in order to improve finding virtual wikis
     private List<String> virtualWikiList = new ArrayList<String>();
 
-    private XWikiCache virtualWikiMap;
+    /**
+     * The cache containing the names of the wikis already initialized.
+     */
+    private Cache<String> virtualWikiMap;
 
     private boolean isReadOnly = false;
 
@@ -497,7 +498,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return databaseNames;
     }
 
-    public XWikiCache getVirtualWikiMap()
+    /**
+     * @return the cache containing the names of the wikis already initialized.
+     * @since 1.5M2.
+     */
+    public Cache<String> getVirtualWikiCache()
     {
         return this.virtualWikiMap;
     }
@@ -528,8 +533,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
                 XWikiURLFactory urlf = context.getURLFactory();
                 if ((urlf != null) && (urlf instanceof XWikiServletURLFactory)
-                    && ("".equals(((XWikiServletURLFactory) urlf).getContextPath())))
-                {
+                    && ("".equals(((XWikiServletURLFactory) urlf).getContextPath()))) {
                     appname = context.getMainXWiki();
                 } else {
                     appname = uri.substring(1, uri.indexOf("/", 2));
@@ -543,8 +547,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     // in that case that they're pointing to the main wiki.
                     if ((servername.equals("www"))
                         || (host.equals("localhost") || (context.getUtil().match(
-                            "m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host))))
-                    {
+                            "m|[0-9]+\\.|[0-9]+\\.[0-9]+\\.[0-9]|", host)))) {
                         if (appname.equals("xwiki")) {
                             return xwiki;
                         }
@@ -613,16 +616,24 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
                 } catch (Exception e) {
                 }
-                this.virtualWikiMap = getCacheService().newCache("xwiki.virtual.cache", iCapacity);
+                try {
+                    CacheConfiguration configuration = new CacheConfiguration();
+                    configuration.setConfigurationId("xwiki.virtualwikimap");
+                    LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+                    lru.setMaxEntries(iCapacity);
+                    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+                    this.virtualWikiMap = getCacheFactory().newCache(configuration);
+                } catch (CacheException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE,
+                        XWikiException.ERROR_CACHE_INITIALIZING, "Failed to create new cache", e);
+                }
             }
         }
         synchronized (host) {
-            String wikiserver = "";
-            try {
-                wikiserver = (String) this.virtualWikiMap.getFromCache(host);
-                return wikiserver;
-            } catch (XWikiCacheNeedsRefreshException e) {
-                this.virtualWikiMap.cancelUpdate(host);
+            String wikiserver = this.virtualWikiMap.get(host);
+
+            if (wikiserver == null) {
                 String hql =
                     ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
                         + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
@@ -635,12 +646,14 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                             wikiserver = docname.substring("XWiki.XWikiServer".length()).toLowerCase();
                         }
                     }
-                    this.virtualWikiMap.putInCache(host, wikiserver);
-                    return wikiserver;
+
+                    this.virtualWikiMap.set(host, wikiserver);
                 } catch (XWikiException e2) {
-                    return null;
+                    wikiserver = null;
                 }
             }
+
+            return wikiserver;
         }
     }
 
@@ -804,9 +817,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         getNotificationManager().addNamedRule("XWiki.XWikiPreferences",
             new PropertyChangedRule(this, "XWiki.XWikiPreferences", "plugin"));
 
-        // HACK: can anyone think of a better way to do this?
-        XWikiCacheListener.setXWiki(this);
-
         // Make sure these classes exists
         if (noupdate) {
             getPrefsClass(context);
@@ -819,8 +829,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             getGlobalRightsClass(context);
             getStatsService(context);
             if (context.getDatabase().equals(context.getMainXWiki())
-                && "1".equals(context.getWiki().Param("xwiki.preferences.redirect")))
-            {
+                && "1".equals(context.getWiki().Param("xwiki.preferences.redirect"))) {
                 getRedirectClass(context);
             }
         }
@@ -2029,8 +2038,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // If the default language is prefered, and since the user didn't explicitely ask for a
         // language already, then use the default wiki language.
         if (Param("xwiki.language.preferDefault", "0").equals("1")
-            || getWebPreference("preferDefaultLanguage", "0", context).equals("1"))
-        {
+            || getWebPreference("preferDefaultLanguage", "0", context).equals("1")) {
             language = defaultLanguage;
             context.setLanguage(language);
             return language;
@@ -2355,7 +2363,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         this.virtualWikiList = new ArrayList<String>();
         // We need to flush the server Cache
         if (this.virtualWikiMap != null) {
-            this.virtualWikiMap.flushAll();
+            this.virtualWikiMap.removeAll();
             this.virtualWikiMap = null;
         }
 
@@ -2484,13 +2492,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String host = bobj.getStringValue("server");
                     if ((host != null) && (!"".equals(host))) {
                         if (this.virtualWikiMap != null) {
-                            try {
-                                if (this.virtualWikiMap.getFromCache(host) != null) {
-                                    this.virtualWikiMap.flushEntry(host);
-                                }
-                            } catch (XWikiCacheNeedsRefreshException e) {
-                                this.virtualWikiMap.cancelUpdate(host);
-                            }
+                            if (this.virtualWikiMap.get(host) != null)
+                                this.virtualWikiMap.remove(host);
                         }
                     }
                 }
@@ -4043,7 +4046,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             XWikiDocument serverdoc = getDocument("XWiki", wikiServerPage, context);
             if (serverdoc.isNew()) {
                 // clear entry in virtual wiki cache
-                this.virtualWikiMap.flushEntry(wikiUrl);
+                this.virtualWikiMap.remove(wikiUrl);
 
                 // Create Wiki Server page
                 serverdoc.setStringValue("XWiki.XWikiServerClass", "server", wikiUrl);
@@ -4495,6 +4498,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                 }
                 this.groupService.init(this, context);
             }
+
             return this.groupService;
         }
     }
@@ -5070,23 +5074,26 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      * getRequestURL(context.getRequest())) } }
      */
 
-    public XWikiCacheService getCacheService()
+    /**
+     * @return the cache factory.
+     * @since 1.5M2.
+     */
+    public CacheFactory getCacheFactory()
     {
-        synchronized (CACHE_SERVICE_LOCK) {
-            if (cacheService == null) {
-                String cacheClass;
-                cacheClass = Param("xwiki.cache.cacheclass", "com.xpn.xwiki.cache.impl.OSCacheService");
+        String cacheHint = Param("xwiki.cache.cachefactory.hint", "default");
 
-                try {
-                    cacheService = (XWikiCacheService) Class.forName(cacheClass).newInstance();
-                    cacheService.init(this);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    cacheService = new OSCacheService();
-                }
-            }
-            return cacheService;
-        }
+        return (CacheFactory) Utils.getComponent(CacheFactory.ROLE, cacheHint);
+    }
+
+    /**
+     * @return the cache factory creating local caches.
+     * @since 1.5M2.
+     */
+    public CacheFactory getLocalCacheFactory()
+    {
+        String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", "default");
+
+        return (CacheFactory) Utils.getComponent(CacheFactory.ROLE, localCacheHint);
     }
 
     public int getHttpTimeout(XWikiContext context)
@@ -5276,8 +5283,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         List<String> docs = null;
         if (getNotCacheStore() instanceof XWikiHibernateStore) {
             docs =
-                this.search("select distinct doc.name from XWikiDocument doc", new Object[][] {{"doc.space", spaceName}},
-                    context);
+                this.search("select distinct doc.name from XWikiDocument doc",
+                    new Object[][] {{"doc.space", spaceName}}, context);
         } else if (getNotCacheStore() instanceof XWikiJcrStore) {
             docs = ((XWikiJcrStore) getNotCacheStore()).getSpaceDocsName(spaceName, context);
         }
@@ -5678,8 +5685,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public String getConvertingUserNameType(XWikiContext context)
     {
         if (context.getWiki().getXWikiPreference("convertmail", context) != null
-            && context.getWiki().getXWikiPreference("convertmail", context).length() > 0)
-        {
+            && context.getWiki().getXWikiPreference("convertmail", context).length() > 0) {
             return context.getWiki().getXWikiPreference("convertmail", "0", context);
         }
         return context.getWiki().Param("xwiki.authentication.convertemail", "0");

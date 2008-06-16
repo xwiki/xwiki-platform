@@ -37,7 +37,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.web.XWikiEngineContext;
 
 /**
- * Test {@link XWikiLDAPConfig};
+ * Test {@link XWikiLDAPConfig}.
  * 
  * @version $Id$
  */

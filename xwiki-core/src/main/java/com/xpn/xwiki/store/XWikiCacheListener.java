@@ -24,115 +24,105 @@
  *
  */
 
-package com.xpn.xwiki.cache.impl;
+package com.xpn.xwiki.store;
 
-import com.opensymphony.oscache.base.events.*;
-import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.cache.CacheEntry;
+import org.xwiki.cache.event.CacheEntryEvent;
+import org.xwiki.cache.event.CacheEntryListener;
 
-/**
- * Catch when a doc is flushed from the cache so we can send our own
- * event.
- *
- * This event is mostly called due to jgroups flushing items from the cache.
- *
- */
-public class XWikiCacheListener implements CacheEntryEventListener
+public class XWikiCacheListener implements CacheEntryListener<XWikiDocument>
 {
     private static final Log log = LogFactory.getLog(XWikiCacheListener.class);
-    
-    private static XWiki xwiki;
 
-    public static void setXWiki(XWiki xwiki)
+    private XWikiContext context;
+
+    public XWikiCacheListener(XWikiContext context)
     {
-        XWikiCacheListener.xwiki = xwiki;
+        this.context = (XWikiContext) context.clone();
     }
 
-    public void cacheEntryAdded(CacheEntryEvent event)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryAdded(org.xwiki.cache.event.CacheEntryEvent)
+     */
+    public void cacheEntryAdded(CacheEntryEvent<XWikiDocument> event)
     {
 
     }
 
-    public void cacheEntryFlushed(CacheEntryEvent event)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryRemoved(org.xwiki.cache.event.CacheEntryEvent)
+     */
+    public void cacheEntryRemoved(CacheEntryEvent<XWikiDocument> event)
     {
-        String sKey = event.getKey();
+        CacheEntry<XWikiDocument> entry = event.getEntry();
 
-        // HACK: Figure out a better way to get a handle on the Context and XWiki here.
-        
-        XWikiContext context = new XWikiContext();
-        context.setDatabase(xwiki.getDatabase());
-        context.setWiki(xwiki);
+        String key = entry.getKey();
+
         XWikiDocument doc = null;
-        try
-        {
+        try {
             doc = new XWikiDocument();
-            String[] parts = sKey.split(":\\.");
-            switch (parts.length)
-            {
+            String[] parts = key.split(":\\.");
+            switch (parts.length) {
                 case 4:
                     doc.setLanguage(parts[3]);
                 case 3:
                     doc.setDatabase(parts[0]);
                     doc.setSpace(parts[1]);
                     doc.setName(parts[2]);
-                    doc = xwiki.getStore().loadXWikiDoc(doc, context);
+                    doc = context.getWiki().getStore().loadXWikiDoc(doc, context);
                     break;
                 case 2:
                     doc.setSpace(parts[0]);
                     doc.setName(parts[1]);
-                    doc = xwiki.getStore().loadXWikiDoc(doc, context);
+                    doc = context.getWiki().getStore().loadXWikiDoc(doc, context);
                     break;
                 default:
-                    log.error("Failed to parse document id from cache key: " + sKey);
+                    log.error("Failed to parse document id from cache key: " + key);
                     break;
             }
-        }
-        catch (Exception e)
-        {
-            log.error("cacheEntryFlushedError for key " + sKey + ": ", e);
+        } catch (Exception e) {
+            log.error("cacheEntryFlushedError for key " + key + ": ", e);
         }
 
-        if (doc != null)
-        {
+        if (doc != null) {
             // TODO: need to create an xwiki event code for when a cluster
             // member receives a cache flush for an object so that plugins that
             // need to know a document has changed can update their state (e.g.
             // email notification, lucene plugin)
             //
             // This doesn't really work since the context may not have stuff like the request object
-            xwiki.getNotificationManager().verify(doc, "flush", context);
-        }
-        else
-        {
-            log.error("cannot send flush notification doc is null for key " + sKey);
+            context.getWiki().getNotificationManager().verify(doc, "flush", context);
+        } else {
+            log.error("cannot send flush notification doc is null for key " + key);
         }
 
-        log.info("entry flushed: " + sKey);
+        log.info("entry flushed: " + key);
     }
 
-    public void cacheEntryRemoved(CacheEntryEvent event)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryModified(org.xwiki.cache.event.CacheEntryEvent)
+     */
+    public void cacheEntryModified(CacheEntryEvent<XWikiDocument> event)
     {
 
     }
 
-    public void cacheEntryUpdated(CacheEntryEvent event)
-    {
-
-    }
-
-    public void cacheGroupFlushed(CacheGroupEvent event)
-    {
-    }
-
-    public void cachePatternFlushed(CachePatternEvent event)
-    {
-    }
-
-    public void cacheFlushed(CachewideEvent event)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryAccessed(org.xwiki.cache.event.CacheEntryEvent)
+     */
+    public void cacheEntryAccessed(CacheEntryEvent<XWikiDocument> event)
     {
     }
 }
-                   

@@ -18,18 +18,28 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+package org.xwiki.cache;
 
-package com.xpn.xwiki.cache.api;
+/**
+ * Represents a cache entry with it's key, value, etc.
+ * 
+ * @param <T> the class of the data stored in the cache.
+ * @version $Id: $
+ */
+public interface CacheEntry<T>
+{
+    /**
+     * @return the cache where this entry is stored.
+     */
+    Cache<T> getCache();
 
+    /**
+     * @return the associated key used to access the value in the cache.
+     */
+    String getKey();
 
-@Deprecated
-public interface XWikiCache {
-    void setCapacity(int capacity);
-    void flushEntry(String key);
-    void putInCache(String key, Object obj);
-    Object getFromCache(String key) throws XWikiCacheNeedsRefreshException;
-    Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException;
-    int getNumberEntries();
-    void cancelUpdate(String key);
-    void flushAll();
+    /**
+     * @return the value of this cache entry.
+     */
+    T getValue();
 }

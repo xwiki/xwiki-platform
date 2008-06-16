@@ -16,20 +16,22 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
- *
  */
+package org.xwiki.cache.event;
 
-package com.xpn.xwiki.cache.api;
+import org.xwiki.cache.CacheEntry;
 
-
-@Deprecated
-public interface XWikiCache {
-    void setCapacity(int capacity);
-    void flushEntry(String key);
-    void putInCache(String key, Object obj);
-    Object getFromCache(String key) throws XWikiCacheNeedsRefreshException;
-    Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException;
-    int getNumberEntries();
-    void cancelUpdate(String key);
-    void flushAll();
+/**
+ * Base object used to contains informations when sending cache entry events.
+ * 
+ * @param <T> the class of the data stored in the cache.
+ * @version $Id: $
+ * @see CacheEntryListener
+ */
+public interface CacheEntryEvent<T> extends CacheEvent<T>
+{
+    /**
+     * @return the cache entry containing, among other things, the value and the key.
+     */
+    CacheEntry<T> getEntry();
 }

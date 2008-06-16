@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWikiException;
 
 import java.util.Properties;
 
+@Deprecated
 public interface XWikiCacheService
 {
     /**

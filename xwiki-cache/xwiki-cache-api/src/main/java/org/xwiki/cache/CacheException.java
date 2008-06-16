@@ -18,18 +18,37 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+package org.xwiki.cache;
 
-package com.xpn.xwiki.cache.api;
+/**
+ * Any exception raised in the XWiki Cache component must raise an exception of this type.
+ * 
+ * @version $Id: $
+ */
+public class CacheException extends Exception
+{
+    /**
+     * Provides an id for serialization.
+     */
+    private static final long serialVersionUID = -8860020664723282003L;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Exception#Exception(String)
+     */
+    public CacheException(String message)
+    {
+        super(message);
+    }
 
-@Deprecated
-public interface XWikiCache {
-    void setCapacity(int capacity);
-    void flushEntry(String key);
-    void putInCache(String key, Object obj);
-    Object getFromCache(String key) throws XWikiCacheNeedsRefreshException;
-    Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException;
-    int getNumberEntries();
-    void cancelUpdate(String key);
-    void flushAll();
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Exception#Exception(String, Throwable)
+     */
+    public CacheException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

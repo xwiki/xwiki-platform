@@ -18,18 +18,18 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+package org.xwiki.cache;
 
-package com.xpn.xwiki.cache.api;
-
-
-@Deprecated
-public interface XWikiCache {
-    void setCapacity(int capacity);
-    void flushEntry(String key);
-    void putInCache(String key, Object obj);
-    Object getFromCache(String key) throws XWikiCacheNeedsRefreshException;
-    Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException;
-    int getNumberEntries();
-    void cancelUpdate(String key);
-    void flushAll();
+/**
+ * If the value inserted in the cache implement this interface, the {@link #dispose()} method will be called to release
+ * all resource used by this data when it is removed from the cache.
+ * 
+ * @version $Id: $
+ */
+public interface DisposableCacheValue
+{
+    /**
+     * @throws Exception error when releasing the resource of this data.
+     */
+    void dispose() throws Exception;
 }

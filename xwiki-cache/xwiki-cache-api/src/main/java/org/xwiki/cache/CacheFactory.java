@@ -18,18 +18,30 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
+package org.xwiki.cache;
 
-package com.xpn.xwiki.cache.api;
+import org.xwiki.cache.config.CacheConfiguration;
 
+/**
+ * This interface is implemented by a XWiki cache component implementation to provide cache creation. It's the entry
+ * point of the cache component.
+ * 
+ * @version $Id: $
+ */
+public interface CacheFactory
+{
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = CacheFactory.class.getName();
 
-@Deprecated
-public interface XWikiCache {
-    void setCapacity(int capacity);
-    void flushEntry(String key);
-    void putInCache(String key, Object obj);
-    Object getFromCache(String key) throws XWikiCacheNeedsRefreshException;
-    Object getFromCache(String key, int refeshPeriod) throws XWikiCacheNeedsRefreshException;
-    int getNumberEntries();
-    void cancelUpdate(String key);
-    void flushAll();
+    /**
+     * Create and return a custom cache.
+     * 
+     * @param <T> the class of the data stored in the cache.
+     * @param config the cache configuration.
+     * @return a new {@link Cache}.
+     * @throws CacheException error when creating the cache.
+     */
+    <T> Cache<T> newCache(CacheConfiguration config) throws CacheException;
 }

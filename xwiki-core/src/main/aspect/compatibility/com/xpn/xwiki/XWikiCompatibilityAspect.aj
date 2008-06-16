@@ -21,6 +21,11 @@
 package com.xpn.xwiki;
 
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.cache.api.XWikiCache;
+import com.xpn.xwiki.cache.api.XWikiCacheService;
+import com.xpn.xwiki.cache.api.internal.XWikiCacheServiceStub;
+import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -29,7 +34,7 @@ import java.util.Map;
 
 /**
  * Add a backward compatibility layer to the {@link com.xpn.xwiki.XWiki} class.
- *
+ * 
  * @version $Id$
  */
 public privileged aspect XWikiCompatibilityAspect
@@ -79,5 +84,25 @@ public privileged aspect XWikiCompatibilityAspect
     public static void XWiki.setThreadMap(Map threadMap)
     {
         XWiki.threadMap = threadMap;
+    }
+
+    /**
+     * @return the cache service.
+     * @deprecated replaced by {@link XWiki#getCacheFactory(XWikiContext)} or
+     *             {@link XWiki#getLocalCacheFactory(XWikiContext)} since 1.5M2.
+     */
+    @Deprecated
+    public XWikiCacheService XWiki.getCacheService()
+    {
+        return new XWikiCacheServiceStub(getCacheFactory(), getLocalCacheFactory());
+    }
+
+    /**
+     * @deprecated replaced by {@link XWiki#getVirtualWikiCache(XWikiContext)} since 1.5M2.
+     */
+    @Deprecated
+    public XWikiCache XWiki.getVirtualWikiMap()
+    {
+        return new XWikiCacheStub(this.virtualWikiMap);
     }
 }

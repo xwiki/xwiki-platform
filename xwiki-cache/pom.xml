@@ -43,9 +43,9 @@
   </dependencies>
   <modules>
     <module>xwiki-cache-api</module>
+    <module>xwiki-cache-tests</module>
     <module>xwiki-cache-oscache</module>
     <module>xwiki-cache-jbosscache</module>
-    <module>xwiki-cache-tests</module>
   </modules>
 </project>
        

@@ -19,12 +19,15 @@
  */
 package org.xwiki.cache.jbosscache.internal;
 
+import org.jboss.cache.notifications.annotation.CacheListener;
+
 /**
  * Local implementation of {@link org.xwiki.cache.Cache} based on JBossCache.
  * 
  * @param <T> the class of the data stored in the cache.
  * @version $Id: $
  */
+@CacheListener
 public class JBossCacheLocalCache<T> extends JBossCacheCache<T>
 {
     /**

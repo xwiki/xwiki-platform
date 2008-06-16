@@ -169,6 +169,20 @@ xwiki.authentication.ldap.trylocal=1
 # xwiki.authentication.ldap.ssl.secure_provider=com.sun.net.ssl.internal.ssl.Provider
 
 #-------------------------------------------------------------------------------------
+# Cache
+#-------------------------------------------------------------------------------------
+
+#-# [SINCE 1.5M2]
+#-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
+#-# cache component.
+xwiki.cache.cachefactory.hint=oscache
+
+#-# [SINCE 1.5M2]
+#-# The cache component to use as local cache component. 
+xwiki.cache.cachefactory.local.hint=oscache/local
+
+#-------------------------------------------------------------------------------------
+
 
 xwiki.authentication.unauthorized_code=200
 

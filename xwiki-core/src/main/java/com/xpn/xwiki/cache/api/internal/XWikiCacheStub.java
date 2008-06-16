@@ -70,7 +70,7 @@ public class XWikiCacheStub implements XWikiCache
 
     public int getNumberEntries()
     {
-        return this.cache.getSize();
+        return 0;
     }
 
     public void putInCache(String key, Object obj)

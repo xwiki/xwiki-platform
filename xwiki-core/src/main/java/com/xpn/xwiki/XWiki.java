@@ -380,133 +380,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return xwikicfgis;
     }
 
-    public XWikiStoreInterface getNotCacheStore()
-    {
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiCacheStoreInterface) {
-            store = ((XWikiCacheStoreInterface) store).getStore();
-        }
-        return store;
-    }
-
-    public XWikiHibernateStore getHibernateStore()
-    {
-        XWikiStoreInterface store = getStore();
-        if (store instanceof XWikiHibernateStore) {
-            return (XWikiHibernateStore) store;
-        } else if (store instanceof XWikiCacheStoreInterface) {
-            store = ((XWikiCacheStoreInterface) store).getStore();
-            if (store instanceof XWikiHibernateStore) {
-                return (XWikiHibernateStore) store;
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    public void updateDatabase(String appname, XWikiContext context) throws HibernateException, XWikiException
-    {
-        updateDatabase(appname, false, context);
-    }
-
-    public void updateDatabase(String appname, boolean force, XWikiContext context) throws HibernateException,
-        XWikiException
-    {
-        updateDatabase(appname, force, true, context);
-    }
-
-    public void updateDatabase(String appname, boolean force, boolean initClasses, XWikiContext context)
-        throws HibernateException, XWikiException
-    {
-        synchronized (appname) {
-            String database = context.getDatabase();
-
-            try {
-                List wikilist = getVirtualWikiList();
-                context.setDatabase(appname);
-                if (!wikilist.contains(appname)) {
-                    wikilist.add(appname);
-                    XWikiHibernateStore store = getHibernateStore();
-                    if (store != null) {
-                        store.updateSchema(context, force);
-                    }
-                }
-
-                // Make sure these classes exists
-                if (initClasses) {
-                    getPrefsClass(context);
-                    getUserClass(context);
-                    getGroupClass(context);
-                    getRightsClass(context);
-                    getCommentsClass(context);
-                    getSkinClass(context);
-                    getGlobalRightsClass(context);
-                    getTagClass(context);
-                    getPluginManager().virtualInit(context);
-                    getRenderingEngine().virtualInit(context);
-                }
-
-                // Add initdone which will allow to
-                // bypass some initializations
-                context.put("initdone", "1");
-            } finally {
-                context.setDatabase(database);
-            }
-        }
-    }
-
-    /**
-     * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a full
-     *         list of all virtual wikis database names use {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
-     */
-    public List<String> getVirtualWikiList()
-    {
-        return this.virtualWikiList;
-    }
-
-    /**
-     * @return the full list of all database names of all defined virtual wikis. The database names are computed from
-     *         the names of documents having a XWiki.XWikiServerClass object attached to them by removing the
-     *         "XWiki.XWikiServer" prefix and making it lower case. For example a page named
-     *         "XWiki.XWikiServerMyDatabase" would return "mydatabase" as the database name.
-     */
-    public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
-    {
-        List<String> databaseNames = new ArrayList<String>();
-
-        String database = context.getDatabase();
-        try {
-            context.setDatabase(context.getMainXWiki());
-
-            String hql =
-                ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                    + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
-                    + "and prop.id.id = obj.id ";
-            List<String> list = getStore().searchDocumentsNames(hql, context);
-
-            for (String docname : list) {
-                if (docname.startsWith("XWiki.XWikiServer")) {
-                    databaseNames.add(docname.substring("XWiki.XWikiServer".length()).toLowerCase());
-                }
-            }
-        } finally {
-            context.setDatabase(database);
-        }
-
-        return databaseNames;
-    }
-
-    /**
-     * @return the cache containing the names of the wikis already initialized.
-     * @since 1.5M2.
-     */
-    public Cache<String> getVirtualWikiCache()
-    {
-        return this.virtualWikiMap;
-    }
-
     public static XWiki getXWiki(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = getMainXWiki(context);
@@ -604,56 +477,80 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
-    private String findWikiServer(String host, XWikiContext context) throws XWikiException
+    public static Object callPrivateMethod(Object obj, String methodName)
     {
-        synchronized (this) {
-            if (this.virtualWikiMap == null) {
-                int iCapacity = 1000;
-                try {
-                    String capacity = Param("xwiki.virtual.cache.capacity");
-                    if (capacity != null) {
-                        iCapacity = Integer.parseInt(capacity);
-                    }
-                } catch (Exception e) {
-                }
-                try {
-                    CacheConfiguration configuration = new CacheConfiguration();
-                    configuration.setConfigurationId("xwiki.virtualwikimap");
-                    LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-                    lru.setMaxEntries(iCapacity);
-                    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+        return callPrivateMethod(obj, methodName, null, null);
+    }
 
-                    this.virtualWikiMap = getCacheFactory().newCache(configuration);
-                } catch (CacheException e) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE,
-                        XWikiException.ERROR_CACHE_INITIALIZING, "Failed to create new cache", e);
-                }
-            }
+    public static Object callPrivateMethod(Object obj, String methodName, Class< ? >[] classes, Object[] args)
+    {
+        try {
+            Method method = obj.getClass().getDeclaredMethod(methodName, classes);
+            method.setAccessible(true);
+            return method.invoke(obj, args);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } catch (NoSuchMethodException e) {
+            return null;
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
         }
-        synchronized (host) {
-            String wikiserver = this.virtualWikiMap.get(host);
+    }
 
-            if (wikiserver == null) {
-                String hql =
-                    ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
-                        + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
-                        + "and prop.id.name = 'server' and prop.value='" + host + "'";
-                try {
-                    List<String> list = context.getWiki().getStore().searchDocumentsNames(hql, context);
-                    if ((list != null) && (list.size() > 0)) {
-                        String docname = list.get(0);
-                        if (docname.startsWith("XWiki.XWikiServer")) {
-                            wikiserver = docname.substring("XWiki.XWikiServer".length()).toLowerCase();
-                        }
-                    }
+    public static String getFormEncoded(String content)
+    {
+        Filter filter = new CharacterFilter();
+        filter.removeAttribute("'");
+        String scontent = filter.process(content);
+        return scontent;
+    }
 
-                    this.virtualWikiMap.set(host, wikiserver);
-                } catch (XWikiException e2) {
-                    wikiserver = null;
-                }
+    public static HttpClient getHttpClient(int timeout, String userAgent)
+    {
+        HttpClient client = new HttpClient();
+
+        if (timeout != 0) {
+            client.getParams().setSoTimeout(timeout);
+            client.getParams().setParameter("http.connection.timeout", new Integer(timeout));
+        }
+
+        client.getParams().setParameter("http.useragent", userAgent);
+
+        String proxyHost = System.getProperty("http.proxyHost");
+        String proxyPort = System.getProperty("http.proxyPort");
+        if ((proxyHost != null) && (!proxyHost.equals(""))) {
+            int port = 3128;
+            if ((proxyPort != null) && (!proxyPort.equals(""))) {
+                port = Integer.parseInt(proxyPort);
             }
+            client.getHostConfiguration().setProxy(proxyHost, port);
+        }
 
-            return wikiserver;
+        String proxyUser = System.getProperty("http.proxyUser");
+        if ((proxyUser != null) && (!proxyUser.equals(""))) {
+            String proxyPassword = System.getProperty("http.proxyPassword");
+            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
+            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
+        }
+
+        return client;
+    }
+
+    public static Object getPrivateField(Object obj, String fieldName)
+    {
+        try {
+            Field field = obj.getClass().getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(obj);
+        } catch (NoSuchFieldException e) {
+            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        } finally {
         }
     }
 
@@ -662,35 +559,43 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return "XWiki.XWikiServer" + servername.substring(0, 1).toUpperCase() + servername.substring(1);
     }
 
-    public String getWikiOwner(String servername, XWikiContext context) throws XWikiException
+    public static String getXMLEncoded(String content)
     {
-        String wikiOwner = context.getWikiOwner();
+        Filter filter = new CharacterFilter();
+        String scontent = filter.process(content);
+        return scontent;
+    }
 
-        if (!context.isMainWiki(servername)) {
-            String serverwikipage = getServerWikiPage(servername);
+    public static String getTextArea(String content, XWikiContext context)
+    {
+        Filter filter = new CharacterFilter();
+        filter.removeAttribute("'");
+        String scontent = filter.process(content);
 
-            String currentdatabase = context.getDatabase();
+        textarea textarea = new textarea();
+        textarea.setFilter(filter);
 
-            try {
-                context.setDatabase(context.getMainXWiki());
-
-                XWikiDocument doc = getDocument(serverwikipage, context);
-
-                if (doc.isNew()) {
-                    throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
-                        "The wiki " + servername + " does not exist");
-                }
-
-                wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
-                if (wikiOwner.indexOf(":") == -1) {
-                    wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
-                }
-            } finally {
-                context.setDatabase(currentdatabase);
-            }
+        int rows = 25;
+        try {
+            rows = context.getWiki().getUserPreferenceAsInt("editbox_height", context);
+        } catch (Exception e) {
         }
+        textarea.setRows(rows);
 
-        return wikiOwner;
+        int cols = 80;
+        try {
+            cols = context.getWiki().getUserPreferenceAsInt("editbox_width", context);
+        } catch (Exception e) {
+        }
+        textarea.setCols(cols);
+        textarea.setName("content");
+        textarea.setID("content");
+        // Forcing a new line after the <textarea> tag, as
+        // http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 causes an empty line at the start
+        // of the document content to be trimmed.
+        textarea.addElement("\n" + scontent);
+
+        return textarea.toString();
     }
 
     public XWiki(XWikiConfig config, XWikiContext context) throws XWikiException
@@ -842,6 +747,217 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         String ro = Param("xwiki.readonly", "no");
         this.isReadOnly = ("yes".equalsIgnoreCase(ro) || "true".equalsIgnoreCase(ro) || "1".equalsIgnoreCase(ro));
+    }
+
+    public XWikiStoreInterface getNotCacheStore()
+    {
+        XWikiStoreInterface store = getStore();
+        if (store instanceof XWikiCacheStoreInterface) {
+            store = ((XWikiCacheStoreInterface) store).getStore();
+        }
+        return store;
+    }
+
+    public XWikiHibernateStore getHibernateStore()
+    {
+        XWikiStoreInterface store = getStore();
+        if (store instanceof XWikiHibernateStore) {
+            return (XWikiHibernateStore) store;
+        } else if (store instanceof XWikiCacheStoreInterface) {
+            store = ((XWikiCacheStoreInterface) store).getStore();
+            if (store instanceof XWikiHibernateStore) {
+                return (XWikiHibernateStore) store;
+            } else {
+                return null;
+            }
+        } else {
+            return null;
+        }
+    }
+
+    public void updateDatabase(String appname, XWikiContext context) throws HibernateException, XWikiException
+    {
+        updateDatabase(appname, false, context);
+    }
+
+    public void updateDatabase(String appname, boolean force, XWikiContext context) throws HibernateException,
+        XWikiException
+    {
+        updateDatabase(appname, force, true, context);
+    }
+
+    public void updateDatabase(String appname, boolean force, boolean initClasses, XWikiContext context)
+        throws HibernateException, XWikiException
+    {
+        synchronized (appname) {
+            String database = context.getDatabase();
+
+            try {
+                List wikilist = getVirtualWikiList();
+                context.setDatabase(appname);
+                if (!wikilist.contains(appname)) {
+                    wikilist.add(appname);
+                    XWikiHibernateStore store = getHibernateStore();
+                    if (store != null) {
+                        store.updateSchema(context, force);
+                    }
+                }
+
+                // Make sure these classes exists
+                if (initClasses) {
+                    getPrefsClass(context);
+                    getUserClass(context);
+                    getGroupClass(context);
+                    getRightsClass(context);
+                    getCommentsClass(context);
+                    getSkinClass(context);
+                    getGlobalRightsClass(context);
+                    getTagClass(context);
+                    getPluginManager().virtualInit(context);
+                    getRenderingEngine().virtualInit(context);
+                }
+
+                // Add initdone which will allow to
+                // bypass some initializations
+                context.put("initdone", "1");
+            } finally {
+                context.setDatabase(database);
+            }
+        }
+    }
+
+    /**
+     * @return a cached list of all active virtual wikis (i.e. wikis who have been hit by a user request). To get a full
+     *         list of all virtual wikis database names use {@link #getVirtualWikisDatabaseNames(XWikiContext)}.
+     */
+    public List<String> getVirtualWikiList()
+    {
+        return this.virtualWikiList;
+    }
+
+    /**
+     * @return the full list of all database names of all defined virtual wikis. The database names are computed from
+     *         the names of documents having a XWiki.XWikiServerClass object attached to them by removing the
+     *         "XWiki.XWikiServer" prefix and making it lower case. For example a page named
+     *         "XWiki.XWikiServerMyDatabase" would return "mydatabase" as the database name.
+     */
+    public List<String> getVirtualWikisDatabaseNames(XWikiContext context) throws XWikiException
+    {
+        List<String> databaseNames = new ArrayList<String>();
+
+        String database = context.getDatabase();
+        try {
+            context.setDatabase(context.getMainXWiki());
+
+            String hql =
+                ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
+                    + " and obj.name <> 'XWiki.XWikiServerClassTemplate' and obj.className='XWiki.XWikiServerClass' "
+                    + "and prop.id.id = obj.id ";
+            List<String> list = getStore().searchDocumentsNames(hql, context);
+
+            for (String docname : list) {
+                if (docname.startsWith("XWiki.XWikiServer")) {
+                    databaseNames.add(docname.substring("XWiki.XWikiServer".length()).toLowerCase());
+                }
+            }
+        } finally {
+            context.setDatabase(database);
+        }
+
+        return databaseNames;
+    }
+
+    /**
+     * @return the cache containing the names of the wikis already initialized.
+     * @since 1.5M2.
+     */
+    public Cache<String> getVirtualWikiCache()
+    {
+        return this.virtualWikiMap;
+    }
+
+    private String findWikiServer(String host, XWikiContext context) throws XWikiException
+    {
+        synchronized (this) {
+            if (this.virtualWikiMap == null) {
+                int iCapacity = 1000;
+                try {
+                    String capacity = Param("xwiki.virtual.cache.capacity");
+                    if (capacity != null) {
+                        iCapacity = Integer.parseInt(capacity);
+                    }
+                } catch (Exception e) {
+                }
+                try {
+                    CacheConfiguration configuration = new CacheConfiguration();
+                    configuration.setConfigurationId("xwiki.virtualwikimap");
+                    LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+                    lru.setMaxEntries(iCapacity);
+                    configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
+                    this.virtualWikiMap = getCacheFactory().newCache(configuration);
+                } catch (CacheException e) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI_CACHE,
+                        XWikiException.ERROR_CACHE_INITIALIZING, "Failed to create new cache", e);
+                }
+            }
+        }
+        synchronized (host) {
+            String wikiserver = this.virtualWikiMap.get(host);
+
+            if (wikiserver == null) {
+                String hql =
+                    ", BaseObject as obj, StringProperty as prop where obj.name=doc.fullName"
+                        + " and obj.className='XWiki.XWikiServerClass' and prop.id.id = obj.id "
+                        + "and prop.id.name = 'server' and prop.value='" + host + "'";
+                try {
+                    List<String> list = context.getWiki().getStore().searchDocumentsNames(hql, context);
+                    if ((list != null) && (list.size() > 0)) {
+                        String docname = list.get(0);
+                        if (docname.startsWith("XWiki.XWikiServer")) {
+                            wikiserver = docname.substring("XWiki.XWikiServer".length()).toLowerCase();
+                        }
+                    }
+
+                    this.virtualWikiMap.set(host, wikiserver);
+                } catch (XWikiException e2) {
+                    wikiserver = null;
+                }
+            }
+
+            return wikiserver;
+        }
+    }
+
+    public String getWikiOwner(String servername, XWikiContext context) throws XWikiException
+    {
+        String wikiOwner = context.getWikiOwner();
+
+        if (!context.isMainWiki(servername)) {
+            String serverwikipage = getServerWikiPage(servername);
+
+            String currentdatabase = context.getDatabase();
+
+            try {
+                context.setDatabase(context.getMainXWiki());
+
+                XWikiDocument doc = getDocument(serverwikipage, context);
+
+                if (doc.isNew()) {
+                    throw new XWikiException(XWikiException.MODULE_XWIKI, XWikiException.ERROR_XWIKI_DOES_NOT_EXIST,
+                        "The wiki " + servername + " does not exist");
+                }
+
+                wikiOwner = doc.getStringValue("XWiki.XWikiServerClass", "owner");
+                if (wikiOwner.indexOf(":") == -1) {
+                    wikiOwner = context.getMainXWiki() + ":" + wikiOwner;
+                }
+            } finally {
+                context.setDatabase(currentdatabase);
+            }
+        }
+
+        return wikiOwner;
     }
 
     protected Object createClassFromConfig(String param, String defClass, XWikiContext context) throws XWikiException
@@ -1344,52 +1460,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void setMetaclass(MetaClass metaclass)
     {
         this.metaclass = metaclass;
-    }
-
-    public static String getFormEncoded(String content)
-    {
-        Filter filter = new CharacterFilter();
-        filter.removeAttribute("'");
-        String scontent = filter.process(content);
-        return scontent;
-    }
-
-    public static String getXMLEncoded(String content)
-    {
-        Filter filter = new CharacterFilter();
-        String scontent = filter.process(content);
-        return scontent;
-    }
-
-    public static String getTextArea(String content, XWikiContext context)
-    {
-        Filter filter = new CharacterFilter();
-        filter.removeAttribute("'");
-        String scontent = filter.process(content);
-
-        textarea textarea = new textarea();
-        textarea.setFilter(filter);
-
-        int rows = 25;
-        try {
-            rows = context.getWiki().getUserPreferenceAsInt("editbox_height", context);
-        } catch (Exception e) {
-        }
-        textarea.setRows(rows);
-
-        int cols = 80;
-        try {
-            cols = context.getWiki().getUserPreferenceAsInt("editbox_width", context);
-        } catch (Exception e) {
-        }
-        textarea.setCols(cols);
-        textarea.setName("content");
-        textarea.setID("content");
-        // Forcing a new line after the <textarea> tag, as
-        // http://www.w3.org/TR/html4/appendix/notes.html#h-B.3.1 causes an empty line at the start
-        // of the document content to be trimmed.
-        textarea.addElement("\n" + scontent);
-        return textarea.toString();
     }
 
     public String getHTMLArea(String content, XWikiContext context)
@@ -3649,45 +3719,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return Runtime.getRuntime().maxMemory();
     }
 
-    public static Object getPrivateField(Object obj, String fieldName)
-    {
-        try {
-            Field field = obj.getClass().getDeclaredField(fieldName);
-            field.setAccessible(true);
-            return field.get(obj);
-        } catch (NoSuchFieldException e) {
-            return null;
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-        }
-    }
-
-    public static Object callPrivateMethod(Object obj, String methodName)
-    {
-        return callPrivateMethod(obj, methodName, null, null);
-    }
-
-    public static Object callPrivateMethod(Object obj, String methodName, Class< ? >[] classes, Object[] args)
-    {
-        try {
-            Method method = obj.getClass().getDeclaredMethod(methodName, classes);
-            method.setAccessible(true);
-            return method.invoke(obj, args);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return null;
-        } catch (NoSuchMethodException e) {
-            return null;
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            return null;
-        } finally {
-        }
-
-    }
-
     public String[] split(String str, String sep)
     {
         return StringUtils.split(str, sep);
@@ -5110,36 +5141,6 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         } else {
             return "XWikiBot/1.0";
         }
-    }
-
-    public static HttpClient getHttpClient(int timeout, String userAgent)
-    {
-        HttpClient client = new HttpClient();
-
-        if (timeout != 0) {
-            client.getParams().setSoTimeout(timeout);
-            client.getParams().setParameter("http.connection.timeout", new Integer(timeout));
-        }
-
-        client.getParams().setParameter("http.useragent", userAgent);
-
-        String proxyHost = System.getProperty("http.proxyHost");
-        String proxyPort = System.getProperty("http.proxyPort");
-        if ((proxyHost != null) && (!proxyHost.equals(""))) {
-            int port = 3128;
-            if ((proxyPort != null) && (!proxyPort.equals(""))) {
-                port = Integer.parseInt(proxyPort);
-            }
-            client.getHostConfiguration().setProxy(proxyHost, port);
-        }
-
-        String proxyUser = System.getProperty("http.proxyUser");
-        if ((proxyUser != null) && (!proxyUser.equals(""))) {
-            String proxyPassword = System.getProperty("http.proxyPassword");
-            Credentials defaultcreds = new UsernamePasswordCredentials(proxyUser, proxyPassword);
-            client.getState().setProxyCredentials(AuthScope.ANY, defaultcreds);
-        }
-        return client;
     }
 
     public String getURLContent(String surl, XWikiContext context) throws IOException

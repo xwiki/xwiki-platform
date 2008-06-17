@@ -32,6 +32,11 @@ import java.util.List;
  * @version $Id$
  */
 public interface XWikiAttachmentStoreInterface {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = XWikiAttachmentStoreInterface.class.getName();
+
     void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
     void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException;
     void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException;

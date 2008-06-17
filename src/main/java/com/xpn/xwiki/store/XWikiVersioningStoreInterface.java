@@ -15,6 +15,11 @@ import com.xpn.xwiki.doc.rcs.XWikiRCSNodeInfo;
  * @version $Id$
  */
 public interface XWikiVersioningStoreInterface {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = XWikiVersioningStoreInterface.class.getName();
+
     public void loadXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException;
     public void saveXWikiDocArchive(XWikiDocumentArchive archivedoc, boolean bTransaction, XWikiContext context) throws XWikiException;
     public void updateXWikiDocArchive(XWikiDocument doc, boolean bTransaction, XWikiContext context) throws XWikiException;

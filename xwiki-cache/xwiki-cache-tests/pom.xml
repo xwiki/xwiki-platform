@@ -51,6 +51,19 @@
       <artifactId>xwiki-core-plexus</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <!-- provide plexus.xml -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <artifactId>xwiki-shared-tests</artifactId>
+      <version>${platform.tool.test.version}</version>
+      <exclusions>
+        <exclusion>
+          <!-- old oscache conflicts with xwiki-cache-oscache -->
+          <groupId>opensymphony</groupId>
+          <artifactId>oscache</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

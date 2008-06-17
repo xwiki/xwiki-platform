@@ -24,11 +24,6 @@ import java.util.ArrayList;
 
 public class BoldTest extends AbstractSyntaxTest
 {
-    protected void setUp()
-    {
-        super.setUp();
-    }
-
     public void testNotTriggeredWithWhitespace()
     {
         ArrayList<String> tests = new ArrayList<String>();
@@ -75,8 +70,7 @@ public class BoldTest extends AbstractSyntaxTest
         ArrayList<String> tests = new ArrayList<String>();
         ArrayList<String> expects = new ArrayList<String>();
         tests.add("More *bolds* on a *line*");
-        expects
-            .add("More <strong>bolds</strong> on a <strong>line</strong>");
+        expects.add("More <strong>bolds</strong> on a <strong>line</strong>");
         test(tests, expects);
     }
 
@@ -105,11 +99,9 @@ public class BoldTest extends AbstractSyntaxTest
         ArrayList<String> tests = new ArrayList<String>();
         ArrayList<String> expects = new ArrayList<String>();
         tests.add("*Eeny*meeny*miny*moe*");
-        expects
-            .add("<strong>Eeny</strong>meeny<strong>miny</strong>moe*");
+        expects.add("<strong>Eeny</strong>meeny<strong>miny</strong>moe*");
         tests.add("* Eeny*meeny*miny*moe*");
-        expects
-            .add("...<li>Eeny<strong>meeny</strong>miny<strong>moe</strong></li>...");
+        expects.add("...<li>Eeny<strong>meeny</strong>miny<strong>moe</strong></li>...");
         test(tests, expects);
     }
 

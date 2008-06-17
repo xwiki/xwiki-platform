@@ -21,31 +21,31 @@ package com.xpn.xwiki.plugin.captcha;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.web.XWikiRequest;
 import org.jmock.Mock;
 
 /**
  * Unit tests for {@link CaptchaPlugin}
- *
+ * 
  * @version $Id$
  */
 public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
 {
     private Mock mockRequest;
+
     private XWikiContext context;
+
     private CaptchaPlugin plugin;
+
     private Mock mockXWiki;
 
     protected void setUp()
     {
         this.context = new XWikiContext();
-        XWikiConfig config = new XWikiConfig();
 
         this.mockRequest = mock(XWikiRequest.class);
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
-            new Object[] {config, this.context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
 
         this.context.setWiki((XWiki) mockXWiki.proxy());
         this.context.setRequest((XWikiRequest) this.mockRequest.proxy());
@@ -55,12 +55,10 @@ public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
 
     public void testVerifyCaptchaUsingTextWithValidAnswerAndAnonymousUser() throws Exception
     {
-        this.mockXWiki.stubs().method("getWebPreference").with(eq("register_anonymous"), ANYTHING)
-            .will(returnValue("text"));
-        this.mockRequest.stubs().method("getParameter").with(eq("sum_answer")).will(
-            returnValue("2"));
-        this.mockRequest.stubs().method("getParameter").with(eq("sum_result")).will(
-            returnValue("2"));
+        this.mockXWiki.stubs().method("getWebPreference").with(eq("register_anonymous"), ANYTHING).will(
+            returnValue("text"));
+        this.mockRequest.stubs().method("getParameter").with(eq("sum_answer")).will(returnValue("2"));
+        this.mockRequest.stubs().method("getParameter").with(eq("sum_result")).will(returnValue("2"));
 
         Boolean isValid = plugin.verifyCaptcha("register", this.context);
 
@@ -69,12 +67,10 @@ public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
 
     public void testVerifyCaptchaUsingTextWhenInvalidAnswerAndAnonymousUser() throws Exception
     {
-        this.mockXWiki.stubs().method("getWebPreference").with(eq("register_anonymous"), ANYTHING)
-            .will(returnValue("text"));
-        this.mockRequest.stubs().method("getParameter").with(eq("sum_answer")).will(
-            returnValue("2"));
-        this.mockRequest.stubs().method("getParameter").with(eq("sum_result")).will(
-            returnValue("1"));
+        this.mockXWiki.stubs().method("getWebPreference").with(eq("register_anonymous"), ANYTHING).will(
+            returnValue("text"));
+        this.mockRequest.stubs().method("getParameter").with(eq("sum_answer")).will(returnValue("2"));
+        this.mockRequest.stubs().method("getParameter").with(eq("sum_result")).will(returnValue("1"));
 
         Boolean isValid = plugin.verifyCaptcha("register", this.context);
 

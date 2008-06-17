@@ -29,13 +29,15 @@ import java.security.Principal;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl}.
- *
+ * 
  * @version $Id$
  */
 public class XWikiAuthServiceImplTest extends MockObjectTestCase
 {
     private XWikiAuthServiceImpl authService;
+
     private XWikiContext context;
+
     private Mock mockXWiki;
 
     protected void setUp()
@@ -43,45 +45,36 @@ public class XWikiAuthServiceImplTest extends MockObjectTestCase
         this.authService = new XWikiAuthServiceImpl();
         this.context = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
-            new Object[] {new XWikiConfig(), context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
 
     /**
-     * Test that it's not possible to log in with a "superadmin" user when the superadmin password
-     * configuration is turned off.
+     * Test that it's not possible to log in with a "superadmin" user when the superadmin password configuration is
+     * turned off.
      */
-    public void testAuthenticateWithSuperAdminWhenSuperAdminPasswordIsTurnedOff()
-        throws Exception
+    public void testAuthenticateWithSuperAdminWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
-        this.mockXWiki.expects(once()).method("Param").with(eq("xwiki.superadminpassword")).will(
-            returnValue(null));
+        this.mockXWiki.expects(once()).method("Param").with(eq("xwiki.superadminpassword")).will(returnValue(null));
         Principal principal = this.authService.authenticate("superadmin", "whatever", this.context);
         assertNull(principal);
     }
 
     /**
-     * Test that it's not possible to log in with a "superadmin" user when the superadmin password
-     * configuration is turned off.
+     * Test that it's not possible to log in with a "superadmin" user when the superadmin password configuration is
+     * turned off.
      */
-    public void testAuthenticateWithSuperAdminPrefixedWithXWikiWhenSuperAdminPasswordIsTurnedOff()
-        throws Exception
+    public void testAuthenticateWithSuperAdminPrefixedWithXWikiWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
-        this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(
-            returnValue(null));
-        Principal principal = this.authService.authenticate("XWiki.superadmin", "whatever",
-            this.context);
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(returnValue(null));
+        Principal principal = this.authService.authenticate("XWiki.superadmin", "whatever", this.context);
         assertNull(principal);
     }
 
-    public void testAuthenticateWithSuperAdminWithWhiteSpacesWhenSuperAdminPasswordIsTurnedOff()
-        throws Exception
+    public void testAuthenticateWithSuperAdminWithWhiteSpacesWhenSuperAdminPasswordIsTurnedOff() throws Exception
     {
-        this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(
-            returnValue(null));
-        Principal principal = this.authService.authenticate(" superadmin ", "whatever",
-            this.context);
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(returnValue(null));
+        Principal principal = this.authService.authenticate(" superadmin ", "whatever", this.context);
         assertNull(principal);
     }
 }

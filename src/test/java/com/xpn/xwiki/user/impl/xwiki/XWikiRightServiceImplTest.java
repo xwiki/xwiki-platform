@@ -27,7 +27,6 @@ import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -88,12 +87,10 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
                 }
             });
 
-        this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
-            new XWikiConfig(), context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWiki.stubs().method("getGroupService").will(returnValue(mockAuthService.proxy()));
-        
+
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
 
@@ -118,8 +115,7 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
 
         this.context.setDatabase("wiki2");
 
-        boolean result =
-            rightService.checkRight(GLOBALUSERNAME, doc, "view", true, true, true, context);
+        boolean result = rightService.checkRight(GLOBALUSERNAME, doc, "view", true, true, true, context);
 
         assertTrue(GLOBALUSERNAME + "does not have global view right on wiki2", result);
     }

@@ -24,7 +24,6 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.constraint.IsEqual;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -33,16 +32,13 @@ import com.xpn.xwiki.objects.classes.BaseClass;
 
 /**
  * Tests the {@link PropertyChangedRule} in the notification mechanism. <br />
- * The tests are done for the
- * {@link DocChangeRule#verify(XWikiDocument, XWikiDocument, XWikiContext)} function and, since this
- * function should be symmetric with respect to its two document parameters, all the tests are done
- * symmetric too: each test function contains two asserttions, one for the result of
- * <tt>verify(newdoc, olddoc, context)</tt> and the other one for
- * <tt>verify(olddoc, newdoc, context)</tt>; some tests cases might be duplicated by the
+ * The tests are done for the {@link DocChangeRule#verify(XWikiDocument, XWikiDocument, XWikiContext)} function and,
+ * since this function should be symmetric with respect to its two document parameters, all the tests are done symmetric
+ * too: each test function contains two asserttions, one for the result of <tt>verify(newdoc, olddoc, context)</tt>
+ * and the other one for <tt>verify(olddoc, newdoc, context)</tt>; some tests cases might be duplicated by the
  * symmetric call in another test function.
  */
-public class PropertyChangedRuleTest extends MockObjectTestCase implements
-    XWikiDocChangeNotificationInterface
+public class PropertyChangedRuleTest extends MockObjectTestCase implements XWikiDocChangeNotificationInterface
 {
     private PropertyChangedRule rule;
 
@@ -65,23 +61,23 @@ public class PropertyChangedRuleTest extends MockObjectTestCase implements
     private boolean passed;
 
     /**
-     * Creates 2 classes: one that would actually be used to create objects and check property
-     * changes and the other one to be able to test behaviour when the document contains more than
-     * one type of objects. Creates a xwiki mock that only returns the above mentioned classes on
-     * {@link XWiki#getClass(String, XWikiContext)}.
+     * Creates 2 classes: one that would actually be used to create objects and check property changes and the other one
+     * to be able to test behaviour when the document contains more than one type of objects. Creates a xwiki mock that
+     * only returns the above mentioned classes on {@link XWiki#getClass(String, XWikiContext)}.
      */
     protected void setUp() throws Exception
     {
         super.setUp();
+
         this.context = new XWikiContext();
 
-        this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
-            new XWikiConfig(), this.context});
-        this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.testClassName),
-            new IsEqual(this.context)).will(returnValue(this.testClass));
-        this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.otherClassName),
-            new IsEqual(this.context)).will(returnValue(this.otherClass));
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.testClassName), new IsEqual(this.context))
+            .will(returnValue(this.testClass));
+        this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.otherClassName), new IsEqual(this.context))
+            .will(returnValue(this.otherClass));
+
+        this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.classDoc = new XWikiDocument("Test", "TestClass");
         this.testClass = this.classDoc.getxWikiClass();
@@ -569,8 +565,8 @@ public class PropertyChangedRuleTest extends MockObjectTestCase implements
         assertTrue("My notification should have been called", this.passed);
     }
 
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
-        int event, XWikiContext context)
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
+        XWikiContext context)
     {
         this.passed = true;
     }

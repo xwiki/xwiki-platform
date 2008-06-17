@@ -24,11 +24,6 @@ import java.util.ArrayList;
 
 public class ItalicsTest extends AbstractSyntaxTest
 {
-    protected void setUp()
-    {
-        super.setUp();
-    }
-
     public void testNotTriggeredWithWhitespace()
     {
         ArrayList<String> tests = new ArrayList<String>();
@@ -75,8 +70,7 @@ public class ItalicsTest extends AbstractSyntaxTest
         ArrayList<String> tests = new ArrayList<String>();
         ArrayList<String> expects = new ArrayList<String>();
         tests.add("More ~~italics~~ on a ~~line~~");
-        expects
-            .add("More <em>italics</em> on a <em>line</em>");
+        expects.add("More <em>italics</em> on a <em>line</em>");
         test(tests, expects);
     }
 
@@ -105,11 +99,9 @@ public class ItalicsTest extends AbstractSyntaxTest
         ArrayList<String> tests = new ArrayList<String>();
         ArrayList<String> expects = new ArrayList<String>();
         tests.add("~~Eeny~~meeny~~miny~~moe~~");
-        expects
-            .add("<em>Eeny</em>meeny<em>miny</em>moe~~");
+        expects.add("<em>Eeny</em>meeny<em>miny</em>moe~~");
         tests.add("~~ Eeny~~meeny~~miny~~moe~~");
-        expects
-            .add("~~ Eeny<em>meeny</em>miny<em>moe</em>");
+        expects.add("~~ Eeny<em>meeny</em>miny<em>moe</em>");
         test(tests, expects);
     }
 

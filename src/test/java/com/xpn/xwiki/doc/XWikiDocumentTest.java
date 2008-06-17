@@ -26,7 +26,6 @@ import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.DocumentSection;
@@ -56,9 +55,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.context = new XWikiContext();
         this.document = new XWikiDocument("Space", "Page");
 
-        this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {new XWikiConfig(),
-            this.context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         this.mockXWiki.stubs().method("Param").will(returnValue(null));
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);

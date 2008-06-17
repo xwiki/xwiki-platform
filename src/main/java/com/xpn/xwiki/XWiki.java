@@ -92,8 +92,6 @@ import org.xwiki.observation.event.DocumentUpdateEvent;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.User;
-import com.xpn.xwiki.cache.api.XWikiCache;
-import com.xpn.xwiki.cache.api.internal.XWikiCacheStub;
 import com.xpn.xwiki.criteria.api.XWikiCriteriaService;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;

@@ -24,11 +24,6 @@ import java.util.ArrayList;
 
 public class StrikethroughTest extends AbstractSyntaxTest
 {
-    protected void setUp()
-    {
-        super.setUp();
-    }
-
     public void testNotTriggeredWithWhitespace()
     {
         ArrayList<String> tests = new ArrayList<String>();

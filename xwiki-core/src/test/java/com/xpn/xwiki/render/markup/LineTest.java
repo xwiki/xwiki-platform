@@ -24,11 +24,6 @@ import java.util.ArrayList;
 
 public class LineTest extends AbstractSyntaxTest
 {
-    protected void setUp()
-    {
-        super.setUp();
-    }
-
     public void testNotTriggeredWithLess()
     {
         ArrayList<String> tests = new ArrayList<String>();
@@ -108,15 +103,9 @@ public class LineTest extends AbstractSyntaxTest
     }
 
     /*
-    public void testSequence()
-    {
-        ArrayList<String> tests = new ArrayList<String>();
-        ArrayList<String> expects = new ArrayList<String>();
-        tests.add("---- ------   ----");
-        expects.add("<hr/> <hr/>   <hr/>");
-        test(tests, expects);
-    }
-    */
+     * public void testSequence() { ArrayList<String> tests = new ArrayList<String>(); ArrayList<String> expects =
+     * new ArrayList<String>(); tests.add("---- ------ ----"); expects.add("<hr/> <hr/> <hr/>"); test(tests, expects); }
+     */
 
     public void testXmlComments()
     {

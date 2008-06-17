@@ -26,10 +26,7 @@ public class UserTest extends MockObjectTestCase
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.mockXWiki =
-            mock(com.xpn.xwiki.XWiki.class, new java.lang.Class[] {
-            com.xpn.xwiki.XWikiConfig.class, XWikiContext.class}, new java.lang.Object[] {
-            new XWikiConfig(), context});
+        this.mockXWiki = mock(com.xpn.xwiki.XWiki.class, new java.lang.Class[] {}, new java.lang.Object[] {});
         context.setWiki((XWiki) mockXWiki.proxy());
         XWikiDocument doc = new XWikiDocument("XWiki", "Admin");
         BaseClass userClass = new BaseClass();

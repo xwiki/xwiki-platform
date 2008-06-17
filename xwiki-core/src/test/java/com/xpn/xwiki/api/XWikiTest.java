@@ -35,6 +35,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiDocumentArchive;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -70,12 +71,16 @@ public class XWikiTest extends MockObjectTestCase
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.xwiki = new com.xpn.xwiki.XWiki(new XWikiConfig(), this.context);
+        this.xwiki = new com.xpn.xwiki.XWiki();
+        this.context.setWiki(this.xwiki);
+        this.xwiki.setConfig(new XWikiConfig());
+        this.xwiki.setNotificationManager(new XWikiNotificationManager());
+
         this.apiXWiki = new XWiki(this.xwiki, this.context);
 
         this.mockXWikiStore =
-            mock(XWikiHibernateStore.class, new java.lang.Class[] {com.xpn.xwiki.XWiki.class,
-            XWikiContext.class}, new java.lang.Object[] {this.xwiki, this.context});
+            mock(XWikiHibernateStore.class, new java.lang.Class[] {com.xpn.xwiki.XWiki.class, XWikiContext.class},
+                new java.lang.Object[] {this.xwiki, this.context});
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
@@ -102,17 +107,14 @@ public class XWikiTest extends MockObjectTestCase
                     return null;
                 }
             });
-        this.mockXWikiStore.stubs().method("getTranslationList").will(
-            returnValue(Collections.EMPTY_LIST));
+        this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
 
         this.mockXWikiVersioningStore =
-            mock(XWikiHibernateVersioningStore.class, new java.lang.Class[] {
-            com.xpn.xwiki.XWiki.class, XWikiContext.class}, new java.lang.Object[] {this.xwiki,
-            this.context});
+            mock(XWikiHibernateVersioningStore.class, new java.lang.Class[] {com.xpn.xwiki.XWiki.class,
+            XWikiContext.class}, new java.lang.Object[] {this.xwiki, this.context});
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
             returnValue(new XWikiDocumentArchive()));
-        this.mockXWikiVersioningStore.stubs().method("saveXWikiDocArchive").will(
-            returnValue(null));
+        this.mockXWikiVersioningStore.stubs().method("saveXWikiDocArchive").will(returnValue(null));
 
         this.mockXWikiRightService =
             mock(XWikiRightServiceImpl.class, new java.lang.Class[] {}, new java.lang.Object[] {});
@@ -120,8 +122,7 @@ public class XWikiTest extends MockObjectTestCase
         this.mockXWikiRightService.stubs().method("hasProgrammingRights").will(returnValue(true));
 
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
-            .proxy());
+        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore.proxy());
         this.xwiki.setRightService((XWikiRightService) mockXWikiRightService.proxy());
 
         this.context.setUser("Redtail");

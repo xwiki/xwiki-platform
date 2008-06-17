@@ -20,7 +20,6 @@
 package com.xpn.xwiki.plugin.packaging;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -36,7 +35,7 @@ import java.util.zip.ZipOutputStream;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.plugin.packaging.Package} class.
- *
+ * 
  * @version $Id$
  */
 public class PackageTest extends org.jmock.cglib.MockObjectTestCase
@@ -52,18 +51,16 @@ public class PackageTest extends org.jmock.cglib.MockObjectTestCase
         this.pack = new Package();
         this.context = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class, new Class[]{XWikiConfig.class, XWikiContext.class},
-            new Object[]{new XWikiConfig(), this.context});
-        mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
-        mockXWiki.stubs().method("checkAccess").will(returnValue(true));
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
+        this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
 
     public void testImportWithHeterogeneousEncodingInFiles() throws Exception
     {
         String docTitle = "Un \u00e9t\u00e9 36";
-        String docContent =
-            "\u00e0\u00e7\u00e9\u00e8\u00c0\u00c7\u00c9\u00c8\u00ef\u00f6\u00eb\u00fc";
+        String docContent = "\u00e0\u00e7\u00e9\u00e8\u00c0\u00c7\u00c9\u00c8\u00ef\u00f6\u00eb\u00fc";
 
         XWikiDocument doc1 = new XWikiDocument("Main", "Document1");
         doc1.setTitle(docTitle);
@@ -75,14 +72,13 @@ public class PackageTest extends org.jmock.cglib.MockObjectTestCase
 
         XWikiDocument docs[] = {doc1, doc2};
 
-        this.pack.Import(this.createZipFile(docs, new String[] {"ISO-8859-1", "UTF-8"}),
-            this.context);
+        this.pack.Import(this.createZipFile(docs, new String[] {"ISO-8859-1", "UTF-8"}), this.context);
 
         assertEquals(2, this.pack.getFiles().size());
-        assertEquals(((DocumentInfo) this.pack.getFiles().get(0)).getDoc().getTitle(),
-            ((DocumentInfo) this.pack.getFiles().get(1)).getDoc().getTitle());
-        assertEquals(((DocumentInfo) this.pack.getFiles().get(0)).getDoc().getContent(),
-            ((DocumentInfo) this.pack.getFiles().get(1)).getDoc().getContent());
+        assertEquals(((DocumentInfo) this.pack.getFiles().get(0)).getDoc().getTitle(), ((DocumentInfo) this.pack
+            .getFiles().get(1)).getDoc().getTitle());
+        assertEquals(((DocumentInfo) this.pack.getFiles().get(0)).getDoc().getContent(), ((DocumentInfo) this.pack
+            .getFiles().get(1)).getDoc().getContent());
     }
 
     private String getPackageXML(XWikiDocument docs[])
@@ -98,8 +94,7 @@ public class PackageTest extends org.jmock.cglib.MockObjectTestCase
         sb.append("</infos>\n");
         sb.append("<files>\n");
         for (int i = 0; i < docs.length; i++) {
-            sb.append(
-                "<file defaultAction=\"0\" language=\"\">" + docs[i].getFullName() + "</file>\n");
+            sb.append("<file defaultAction=\"0\" language=\"\">" + docs[i].getFullName() + "</file>\n");
         }
         sb.append("</files></package>\n");
         return sb.toString();

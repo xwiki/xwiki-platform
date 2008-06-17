@@ -57,9 +57,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         this.renderer = new XWikiRadeoxRenderer();
         this.context = new XWikiContext();
 
-        this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
-            new XWikiConfig(), context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockContentDocument = mock(XWikiDocument.class);
@@ -87,33 +85,28 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
      */
     public void testRenderLinkToNewPage() throws Exception
     {
-        this.mockXWiki.expects(once()).method("exists").with(eq("Main.newlink"), ANYTHING).will(
-            returnValue(false));
-        this.mockXWiki.expects(once()).method("exists").with(eq("Main.new link"), ANYTHING).will(
-            returnValue(false));
+        this.mockXWiki.expects(once()).method("exists").with(eq("Main.newlink"), ANYTHING).will(returnValue(false));
+        this.mockXWiki.expects(once()).method("exists").with(eq("Main.new link"), ANYTHING).will(returnValue(false));
         this.mockXWiki.expects(once()).method("getEditorPreference").will(returnValue("text"));
 
         Mock mockUrlFactory = mock(XWikiURLFactory.class);
         mockUrlFactory.expects(once()).method("createURL").with(
-            new Constraint[] {eq("Main"), eq("new link"), eq("edit"), eq("parent=Main.WebHome"),
-            ANYTHING, ANYTHING}).will(returnValue(new URL("http://server.com/Main/new link")));
-        mockUrlFactory.expects(atLeastOnce()).method("getURL")
-            .will(returnValue("/Main/new link"));
+            new Constraint[] {eq("Main"), eq("new link"), eq("edit"), eq("parent=Main.WebHome"), ANYTHING, ANYTHING})
+            .will(returnValue(new URL("http://server.com/Main/new link")));
+        mockUrlFactory.expects(atLeastOnce()).method("getURL").will(returnValue("/Main/new link"));
         this.context.setURLFactory((XWikiURLFactory) mockUrlFactory.proxy());
 
-        String result =
-            renderer.render("This is a [new link]", contentDocument, document, context);
+        String result = renderer.render("This is a [new link]", contentDocument, document, context);
 
         assertEquals("This is a <a class=\"wikicreatelink\" href=\"/Main/new link\">"
-            + "<span class=\"wikicreatelinktext\">new link</span>"
-            + "<span class=\"wikicreatelinkqm\">?</span></a>", result);
+            + "<span class=\"wikicreatelinktext\">new link</span>" + "<span class=\"wikicreatelinkqm\">?</span></a>",
+            result);
     }
 
     public void testRenderStyleMacro() throws Exception
     {
         String result =
-            renderer.render("{style:type=div|align=justify}Hello{style}", contentDocument,
-                document, context);
+            renderer.render("{style:type=div|align=justify}Hello{style}", contentDocument, document, context);
         assertEquals("<div align=\"justify\" style=\"\" >Hello</div>", result);
     }
 

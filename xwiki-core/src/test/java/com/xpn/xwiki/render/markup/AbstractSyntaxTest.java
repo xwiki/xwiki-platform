@@ -26,7 +26,6 @@ import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
@@ -48,9 +47,7 @@ public abstract class AbstractSyntaxTest extends MockObjectTestCase
         this.renderer = new XWikiRadeoxRenderer();
         this.context = new XWikiContext();
 
-        this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
-            new XWikiConfig(), context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockDocument = mock(XWikiDocument.class);

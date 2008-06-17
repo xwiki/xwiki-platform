@@ -24,10 +24,6 @@ import java.util.ArrayList;
 
 public class UnderlineTest extends AbstractSyntaxTest
 {
-    protected void setUp()
-    {
-        super.setUp();
-    }
 
     public void testNotTriggeredWithWhitespace()
     {
@@ -75,8 +71,7 @@ public class UnderlineTest extends AbstractSyntaxTest
         ArrayList<String> tests = new ArrayList<String>();
         ArrayList<String> expects = new ArrayList<String>();
         tests.add("More __underlines__ on a __line__");
-        expects
-            .add("More <em class=\"underline\">underlines</em> on a <em class=\"underline\">line</em>");
+        expects.add("More <em class=\"underline\">underlines</em> on a <em class=\"underline\">line</em>");
         test(tests, expects);
     }
 
@@ -105,11 +100,9 @@ public class UnderlineTest extends AbstractSyntaxTest
         ArrayList<String> tests = new ArrayList<String>();
         ArrayList<String> expects = new ArrayList<String>();
         tests.add("__Eeny__meeny__miny__moe__");
-        expects
-            .add("<em class=\"underline\">Eeny</em>meeny<em class=\"underline\">miny</em>moe__");
+        expects.add("<em class=\"underline\">Eeny</em>meeny<em class=\"underline\">miny</em>moe__");
         tests.add("__ Eeny__meeny__miny__moe__");
-        expects
-            .add("__ Eeny<em class=\"underline\">meeny</em>miny<em class=\"underline\">moe</em>");
+        expects.add("__ Eeny<em class=\"underline\">meeny</em>miny<em class=\"underline\">moe</em>");
         test(tests, expects);
     }
 

@@ -29,19 +29,20 @@ import org.jmock.core.Invocation;
 import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Unit tests for the {@link com.xpn.xwiki.web.XWikiMessageTool} class.
- *
+ * 
  * @version $Id$
  */
 public class XWikiMessageToolTest extends MockObjectTestCase
 {
     private Mock mockXWiki;
+
     private XWikiMessageTool tool;
+
     private XWikiContext context;
 
     protected void setUp()
@@ -52,15 +53,13 @@ public class XWikiMessageToolTest extends MockObjectTestCase
 
     public class TestResources extends ListResourceBundle
     {
-        private final Object[][] contents = {
-            {"key", "value"}
-        };
+        private final Object[][] contents = {{"key", "value"}};
 
         public Object[][] getContents()
         {
-         return contents;
+            return contents;
         }
-     }
+    }
 
     /**
      * When no preference exist the returned value is the value of the key.
@@ -84,23 +83,22 @@ public class XWikiMessageToolTest extends MockObjectTestCase
     }
 
     /**
-     * When the key is null the returned value is null. 
+     * When the key is null the returned value is null.
      */
     public void testGetWhenKeyIsNull()
     {
         assertNull(this.tool.get(null));
-    } 
+    }
 
     public void testGetWhenInXWikiPreferences()
     {
         this.mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
-        this.mockXWiki.stubs().method("getXWikiPreference").will(
-            returnValue("Space1.Doc1, Space2.Doc2"));
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocument(111111L, "Space1.Doc1", "somekey=somevalue", false)));
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space2.Doc2"), ANYTHING)
-            .will(returnValue(createDocument(222222L, "Space2.Doc2", "someKey=someValue\n"
-                + "keyInXWikiPreferences=eureka", false)));
+        this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Space1.Doc1, Space2.Doc2"));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
+            returnValue(createDocument(111111L, "Space1.Doc1", "somekey=somevalue", false)));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space2.Doc2"), ANYTHING).will(
+            returnValue(createDocument(222222L, "Space2.Doc2", "someKey=someValue\n" + "keyInXWikiPreferences=eureka",
+                false)));
 
         assertEquals("eureka", this.tool.get("keyInXWikiPreferences"));
     }
@@ -110,9 +108,8 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue(null));
         this.mockXWiki.stubs().method("Param").will(returnValue("Space1.Doc1"));
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocument(111111L, "Space1.Doc1", "keyInXWikiCfg=gotcha",
-                false)));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
+            returnValue(createDocument(111111L, "Space1.Doc1", "keyInXWikiCfg=gotcha", false)));
 
         assertEquals("gotcha", this.tool.get("keyInXWikiCfg"));
     }
@@ -125,11 +122,11 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue(null));
         this.mockXWiki.stubs().method("Param").will(returnValue("Space1.Doc1"));
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocument(111111L, "Space1.Doc1",
-                "key=We have {0} new documents with {1} objects. {2}", false)));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
+            returnValue(createDocument(111111L, "Space1.Doc1", "key=We have {0} new documents with {1} objects. {2}",
+                false)));
 
-        List params = new ArrayList();
+        List<String> params = new ArrayList<String>();
         params.add("12");
         params.add("3");
 
@@ -137,15 +134,14 @@ public class XWikiMessageToolTest extends MockObjectTestCase
     }
 
     /**
-     * Verify that a document listed as a bundle document that doesn't exist is not returned as
-     * a bundle document. 
+     * Verify that a document listed as a bundle document that doesn't exist is not returned as a bundle document.
      */
     public void testGetDocumentBundlesWhenDocumentDoesNotExist()
     {
         this.mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
         this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Space1.Doc1"));
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocument(111111L, "Space1.Doc1", "", true)));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
+            returnValue(createDocument(111111L, "Space1.Doc1", "", true)));
         List docs = this.tool.getDocumentBundles();
         assertEquals(0, docs.size());
     }
@@ -157,8 +153,8 @@ public class XWikiMessageToolTest extends MockObjectTestCase
 
         Mock document = createMockDocument(11111L, "Space1.Doc1", "key=value", false);
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(document.proxy()));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
+            returnValue(document.proxy()));
 
         // After this call, the value should be in cache.
         this.tool.get("key");
@@ -176,8 +172,8 @@ public class XWikiMessageToolTest extends MockObjectTestCase
 
         Mock document = createMockDocument(11111L, "Space1.Doc1", "key=value", false);
 
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(document.proxy()));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
+            returnValue(document.proxy()));
 
         // First time get any key just to put the doc properties in cache
         assertEquals("modifiedKey", this.tool.get("modifiedKey"));
@@ -185,21 +181,19 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         // Now modify the document content to add a new key and change the document's date. We add
         // one second to ensure the new date is definitely newer than the old one.
         document.stubs().method("getContent").will(returnValue("modifiedKey=found"));
-        document.stubs().method("getDate").will(returnValue(
-            new Date(System.currentTimeMillis() + 1000L)));
+        document.stubs().method("getDate").will(returnValue(new Date(System.currentTimeMillis() + 1000L)));
 
         // Even though the document has been cached it's reloaded because its date has changed
         assertEquals("found", this.tool.get("modifiedKey"));
     }
-  
 
     public void testGetWhenWithTranslation()
     {
         this.mockXWiki.stubs().method("getDefaultLanguage").will(returnValue("en"));
-        this.mockXWiki.stubs().method("getXWikiPreference").will(
-            returnValue("Space1.Doc1"));
-        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING)
-            .will(returnValue(createDocumentWithTrans(111111L, "Space1.Doc1", "somekey=somevalue\nsomekey2=somevalue2" , "somekey=somevaluetrans", false)));
+        this.mockXWiki.stubs().method("getXWikiPreference").will(returnValue("Space1.Doc1"));
+        this.mockXWiki.stubs().method("getDocument").with(eq("Space1.Doc1"), ANYTHING).will(
+            returnValue(createDocumentWithTrans(111111L, "Space1.Doc1", "somekey=somevalue\nsomekey2=somevalue2",
+                "somekey=somevaluetrans", false)));
 
         this.context.setLanguage("en");
         assertEquals("somevalue", this.tool.get("somekey"));
@@ -211,7 +205,6 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         assertEquals("somevaluetrans", this.tool.get("somekey"));
         assertEquals("somevalue2", this.tool.get("somekey2"));
     }
-   
 
     private XWikiDocument createDocument(long id, String name, String content, boolean isNew)
     {
@@ -232,8 +225,8 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         return mockDocument;
     }
 
-
-    private XWikiDocument createDocumentWithTrans(long id, String name, String content,String transContent, boolean isNew)
+    private XWikiDocument createDocumentWithTrans(long id, String name, String content, String transContent,
+        boolean isNew)
     {
         return (XWikiDocument) createMockDocumentWithTrans(id, name, content, transContent, isNew).proxy();
     }
@@ -243,27 +236,26 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         Mock mockDocument = mock(XWikiDocument.class);
         final XWikiDocument document = (XWikiDocument) mockDocument.proxy();
         final XWikiDocument transdocument = createDocument(name, transContent, "fr", "", false);
-        mockDocument.stubs().method("getTranslatedDocument").will( new CustomStub("Implements getTranslatedDocument")
+        mockDocument.stubs().method("getTranslatedDocument").will(new CustomStub("Implements getTranslatedDocument")
+        {
+            public Object invoke(Invocation invocation) throws Throwable
             {
-                public Object invoke(Invocation invocation) throws Throwable
-                {
-                    if (invocation.parameterValues.size()==1) {
-                        XWikiContext context = (XWikiContext) invocation.parameterValues.get(0);
-                        String lang = context.getLanguage();
-                        if ("fr".equals(lang))
-                            return transdocument;
-                        else
-                            return document;
-                    }
-                    else {
-                        String lang = (String) invocation.parameterValues.get(0);
-                        if ("fr".equals(lang))
-                            return transdocument;
-                        else
-                            return document;
-                    }
+                if (invocation.parameterValues.size() == 1) {
+                    XWikiContext context = (XWikiContext) invocation.parameterValues.get(0);
+                    String lang = context.getLanguage();
+                    if ("fr".equals(lang))
+                        return transdocument;
+                    else
+                        return document;
+                } else {
+                    String lang = (String) invocation.parameterValues.get(0);
+                    if ("fr".equals(lang))
+                        return transdocument;
+                    else
+                        return document;
                 }
-            });
+            }
+        });
         mockDocument.stubs().method("isNew").will(returnValue(isNew));
         mockDocument.stubs().method("getId").will(returnValue(new Long(id)));
         mockDocument.stubs().method("getDate").will(returnValue(new Date()));
@@ -275,7 +267,8 @@ public class XWikiMessageToolTest extends MockObjectTestCase
         return mockDocument;
     }
 
-      private XWikiDocument createDocument(String name, String content, String language, String defaultLanguage, boolean isNew)
+    private XWikiDocument createDocument(String name, String content, String language, String defaultLanguage,
+        boolean isNew)
     {
         XWikiDocument doc = new XWikiDocument();
         doc.setFullName(name);
@@ -289,10 +282,9 @@ public class XWikiMessageToolTest extends MockObjectTestCase
     private XWikiContext createXWikiContext()
     {
         XWikiContext context = new XWikiContext();
-        XWikiConfig config = new XWikiConfig();
-        this.mockXWiki = mock(XWiki.class,
-            new Class[]{XWikiConfig.class, XWikiContext.class}, new Object[]{config, context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         context.setWiki((XWiki) this.mockXWiki.proxy());
+
         return context;
     }
 }

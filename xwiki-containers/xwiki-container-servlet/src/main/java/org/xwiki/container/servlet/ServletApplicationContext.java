@@ -24,6 +24,8 @@ import org.xwiki.container.ApplicationContext;
 
 import javax.servlet.ServletContext;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public class ServletApplicationContext implements ApplicationContext
 {
@@ -42,5 +44,10 @@ public class ServletApplicationContext implements ApplicationContext
     public InputStream getResourceAsStream(String resourceName)
     {
         return getServletContext().getResourceAsStream(resourceName);
+    }
+
+    public URL getResource(String resourceName) throws MalformedURLException
+    {
+        return getServletContext().getResource(resourceName);
     }
 }

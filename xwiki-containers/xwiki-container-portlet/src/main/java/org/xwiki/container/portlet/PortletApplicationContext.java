@@ -23,6 +23,8 @@ package org.xwiki.container.portlet;
 import org.xwiki.container.ApplicationContext;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.portlet.PortletContext;
 
@@ -43,5 +45,10 @@ public class PortletApplicationContext implements ApplicationContext
     public InputStream getResourceAsStream(String resourceName)
     {
         return getPortletContext().getResourceAsStream(resourceName);
+    }
+    
+    public URL getResource(String resourceName) throws MalformedURLException
+    {
+        return getPortletContext().getResource(resourceName);
     }
 }

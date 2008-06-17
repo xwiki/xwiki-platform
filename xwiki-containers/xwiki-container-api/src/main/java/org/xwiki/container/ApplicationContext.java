@@ -21,8 +21,11 @@
 package org.xwiki.container;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 public interface ApplicationContext
 {
     InputStream getResourceAsStream(String resourceName);
+    URL getResource(String resourceName) throws MalformedURLException;
 }

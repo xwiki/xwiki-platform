@@ -20,6 +20,8 @@
 package org.xwiki.cache.tests;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -107,6 +109,15 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
     public InputStream getResourceAsStream(String resourceName)
     {
         return getClass().getResourceAsStream(resourceName);
+    }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.container.ApplicationContext#getResource(java.lang.String)
+     */
+    public URL getResource(String resourceName) throws MalformedURLException
+    {
+        return getClass().getResource(resourceName);
     }
 
     /**

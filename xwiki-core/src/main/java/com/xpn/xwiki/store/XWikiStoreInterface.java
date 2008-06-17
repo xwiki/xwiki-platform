@@ -31,6 +31,11 @@ import java.util.List;
 
 public interface XWikiStoreInterface
 {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = XWikiStoreInterface.class.getName();
+
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction)

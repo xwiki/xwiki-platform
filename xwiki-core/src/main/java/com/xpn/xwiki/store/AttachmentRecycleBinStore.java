@@ -42,6 +42,11 @@ import com.xpn.xwiki.doc.XWikiDocument;
 public interface AttachmentRecycleBinStore
 {
     /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = AttachmentRecycleBinStore.class.getName();
+
+    /**
      * Save attachment to recycle bin, with full history.
      * 
      * @param attachment The attachment to save.

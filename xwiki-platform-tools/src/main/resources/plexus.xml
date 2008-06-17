@@ -23,6 +23,7 @@
         <end-segment/>
       </lifecycle-handler>
     </lifecycle-handlers>
+    <default-lifecycle-handler-id>xwiki</default-lifecycle-handler-id>
   </lifecycle-handler-manager>
 
   <components>

@@ -52,6 +52,13 @@
       <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- provide plexus.xml -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <artifactId>xwiki-shared-tests</artifactId>
+      <version>${platform.tool.test.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>jmock</groupId>
       <artifactId>jmock</artifactId>

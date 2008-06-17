@@ -1,30 +1,4 @@
-<!-- Plexus configuration for our Unit/Integation tests. This needs to be kept in sync
-     with the plexus.xml file in the Web Standard module. -->
-<plexus>
-
-  <!-- Configure Plexus to use XWiki's lifecycle and XWiki's own phases -->
-  <lifecycle-handler-manager implementation="org.codehaus.plexus.lifecycle.DefaultLifecycleHandlerManager">
-    <lifecycle-handlers>
-      <lifecycle-handler implementation="org.xwiki.plexus.lifecycle.XWikiLifecycleHandler">
-        <id>xwiki</id>
-        <name>XWiki Lifecycle Handler</name>
-        <begin-segment>
-          <!-- Let Plexus do the component injection -->
-          <phase implementation="org.xwiki.plexus.lifecycle.phase.LogEnablePhase"/>
-          <phase implementation="org.codehaus.plexus.personality.plexus.lifecycle.phase.CompositionPhase"/>
-          <phase implementation="org.codehaus.plexus.personality.plexus.lifecycle.phase.AutoConfigurePhase"/>
-          <!-- See the comment below to understand why this is commented out -->
-          <!--phase implementation="org.codehaus.plexus.registry.RegistryConfigurePhase"/-->
-          <phase implementation="org.xwiki.plexus.lifecycle.phase.ComposePhase"/>
-          <phase implementation="org.xwiki.plexus.lifecycle.phase.InitializePhase"/>
-        </begin-segment>
-        <suspend-segment/>
-        <resume-segment/>
-        <end-segment/>
-      </lifecycle-handler>
-    </lifecycle-handlers>
-  </lifecycle-handler-manager>
-
+<component-set>
   <components>
     <!-- The registry component allows using Jakarta Commons Configuration to store configuration
          data for XWiki components, in addition to using components.xml files. This allows storing
@@ -90,9 +64,5 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
-
   </components>
-
-</plexus>
-
-
+</component-set>

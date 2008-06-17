@@ -189,9 +189,10 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
                 log.debug("Cache: Trying to get doc " + key + " from cache");
             }
 
-            doc = getCache().get(key);
+            XWikiDocument cachedoc = getCache().get(key);
 
-            if (doc != null) {
+            if (cachedoc != null) {
+                doc = cachedoc;
                 doc.setFromCache(true);
 
                 if (log.isDebugEnabled()) {

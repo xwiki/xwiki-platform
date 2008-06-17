@@ -596,6 +596,11 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return textarea.toString();
     }
 
+    public XWiki()
+    {
+
+    }
+
     public XWiki(XWikiConfig config, XWikiContext context) throws XWikiException
     {
         this(config, context, null, false);

@@ -34,6 +34,8 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.container.Container;
 
 import com.opensymphony.oscache.base.algorithm.LRUCache;
+import com.opensymphony.oscache.plugins.diskpersistence.DiskPersistenceListener;
+import com.opensymphony.oscache.plugins.diskpersistence.HashDiskPersistenceListener;
 
 /**
  * Convert XWiki cache configuration into OSCache configuration.
@@ -56,6 +58,16 @@ public class OSCacheCacheConfiguration
      * The extension of OSCache properties files.
      */
     private static final String PROPS_EXT = ".properties";
+
+    /**
+     * The name of the cache.path property in OSCache configuration.
+     */
+    private static final String CONFOC_CACHE_PATH = "cache.path";
+
+    /**
+     * The name of the cache.path property in XWiki configuration.
+     */
+    private static final String CONFX_CACHE_PATH = CONFOC_CACHE_PATH;
 
     /**
      * The default configuration identifier used to load cache configuration file.
@@ -169,6 +181,37 @@ public class OSCacheCacheConfiguration
         if (this.name != null) {
             this.oscacheConfiguration.setProperty("cache.key", this.name);
         }
+
+        completePersistanceListenerConfiguration();
+    }
+
+    /**
+     * Add missing configuration needed by some OSCache PersistanceListener implementations.
+     */
+    private void completePersistanceListenerConfiguration()
+    {
+        String persistanceListener = this.oscacheConfiguration.getProperty("cache.persistence.class");
+        if (persistanceListener != null
+            && this.oscacheConfiguration.getProperty(CONFOC_CACHE_PATH) == null
+            && (HashDiskPersistenceListener.class.getName().equals(persistanceListener) || DiskPersistenceListener.class
+                .getName().equals(persistanceListener))) {
+
+            String path = (String) this.configuration.get(CONFX_CACHE_PATH);
+
+            if (path == null) {
+                path = System.getProperty("java.io.tmpdir") + File.separator + "xwiki";
+                if (this.configuration.getConfigurationId() == null) {
+                    path += File.separator + this.configuration.getConfigurationId() + File.separator;
+                }
+
+                File tempDir = new File(path);
+                if (!tempDir.exists()) {
+                    tempDir.mkdirs();
+                }
+            }
+
+            this.oscacheConfiguration.setProperty(CONFX_CACHE_PATH, path);
+        }
     }
 
     /**
@@ -243,8 +286,8 @@ public class OSCacheCacheConfiguration
                 LOG.info("Properties loaded: " + propertiesFilename);
             }
         } catch (Exception e) {
-            throw new PropertiesLoadingCacheException("Error when trying to load configuration file for"
-                + propertiesId);
+            throw new PropertiesLoadingCacheException("Error when trying to load configuration file for ["
+                + propertiesId + "]");
         } finally {
             if (is != null) {
                 try {

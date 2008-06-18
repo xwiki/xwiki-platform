@@ -1318,7 +1318,7 @@ public class XWikiDocument
 
     public String displayPrettyName(String fieldname, boolean showMandatory, XWikiContext context)
     {
-        return displayPrettyName(fieldname, false, true, context);
+        return displayPrettyName(fieldname, showMandatory, true, context);
     }
 
     public String displayPrettyName(String fieldname, boolean showMandatory, boolean before, XWikiContext context)
@@ -1350,8 +1350,7 @@ public class XWikiDocument
         try {
             PropertyClass pclass = (PropertyClass) obj.getxWikiClass(context).get(fieldname);
             String dprettyName = "";
-            if ((showMandatory) && (pclass.getValidationRegExp() != null) && (!pclass.getValidationRegExp().equals("")))
-            {
+            if (showMandatory) {
                 dprettyName = context.getWiki().addMandatory(context);
             }
             if (before) {
@@ -4284,7 +4283,6 @@ public class XWikiDocument
             for (String classname : getxWikiObjects().keySet()) {
                 BaseClass bclass = context.getWiki().getClass(classname, context);
                 Vector<BaseObject> objects = getObjects(classname);
-
                 for (BaseObject obj : objects) {
                     if (obj != null) {
                         isValid &= bclass.validateObject(obj, context);

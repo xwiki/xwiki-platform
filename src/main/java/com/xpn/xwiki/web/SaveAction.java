@@ -29,11 +29,18 @@ import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
 
 public class SaveAction extends PreviewAction
 {
-    /**
-     * The identifier of the save action.
-     */
+    /** The identifier of the save action. */
     public static final String ACTION_NAME = "save";
 
+    /**
+     * Saves the current document, updated according to the parameters sent in the request.
+     * 
+     * @param context The current request {@link XWikiContext context}.
+     * @return <code>true</code> if there was an error and the response needs to render an error page,
+     *         <code>false</code> if the document was correctly saved.
+     * @throws XWikiException If an error occured: cannot communicate with the storage module, or cannot update the
+     *             document because the request contains invalid parameters.
+     */
     public boolean save(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
@@ -140,6 +147,11 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#action(XWikiContext)
+     */
     @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
@@ -151,6 +163,11 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see XWikiAction#render(XWikiContext)
+     */
     @Override
     public String render(XWikiContext context) throws XWikiException
     {

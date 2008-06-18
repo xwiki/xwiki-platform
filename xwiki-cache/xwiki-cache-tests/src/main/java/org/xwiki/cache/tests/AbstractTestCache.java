@@ -23,24 +23,23 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
-import org.jmock.MockObjectTestCase;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.event.CacheEntryEvent;
+import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
-import org.xwiki.plexus.manager.PlexusComponentManager;
+
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Base class for testing cache component implementation.
  * 
  * @version $Id: $
  */
-public abstract class AbstractTestCache extends MockObjectTestCase implements ApplicationContext
+public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase implements ApplicationContext
 {
     /**
      * The first key.
@@ -68,9 +67,9 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
     protected String roleHint;
 
     /**
-     * The component manager to get a cache component.
+     * The container.
      */
-    private ComponentManager componentManager;
+    private Container container;
 
     /**
      * @param roleHint the role hint of the cache component implementation to test.
@@ -84,21 +83,17 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
      * @return the component manager to get a cache component.
      * @throws Exception error when initializing component manager.
      */
-    protected ComponentManager getComponentManager() throws Exception
+    public ComponentManager getComponentManager() throws Exception
     {
-        if (this.componentManager == null) {
-            DefaultContainerConfiguration configuration = new DefaultContainerConfiguration();
-            configuration.setContainerConfiguration("/plexus.xml");
-            DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
-            PlexusContainerLocator locator = new PlexusContainerLocator(container);
-            this.componentManager = new PlexusComponentManager(locator);
+        ComponentManager cm = getComponentManager();
 
+        if (this.container == null) {
             // Initialize the Container
-            Container c = (Container) getComponentManager().lookup(Container.ROLE);
+            Container c = (Container) cm.lookup(Container.ROLE);
             c.setApplicationContext(this);
         }
 
-        return this.componentManager;
+        return cm;
     }
 
     /**
@@ -110,6 +105,7 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
     {
         return getClass().getResourceAsStream(resourceName);
     }
+
     /**
      * {@inheritDoc}
      * 
@@ -126,7 +122,11 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
      */
     public CacheFactory getCacheFactory() throws Exception
     {
-        return (CacheFactory) getComponentManager().lookup(CacheFactory.ROLE, this.roleHint);
+        CacheFactory factory = (CacheFactory) getComponentManager().lookup(CacheFactory.ROLE, this.roleHint);
+
+        assertNotNull(factory);
+
+        return factory;
     }
 
     // ///////////////////////////////////////////////////////::
@@ -141,11 +141,7 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
     {
         CacheFactory factory = getCacheFactory();
 
-        assertNotNull(factory);
-
         CacheFactory factory2 = getCacheFactory();
-
-        assertNotNull(factory2);
 
         assertSame(factory, factory2);
     }
@@ -171,7 +167,7 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
 
         cache.dispose();
     }
-    
+
     /**
      * Validate {@link Cache#remove(String)}.
      * 
@@ -210,5 +206,120 @@ public abstract class AbstractTestCache extends MockObjectTestCase implements Ap
 
         assertNull(cache.get(KEY));
         assertNull(cache.get(KEY2));
+    }
+
+    /**
+     * Validate event management.
+     * 
+     * @throws Exception error.
+     */
+    public void testEvents() throws Exception
+    {
+        CacheFactory factory = getCacheFactory();
+
+        Cache<Object> cache = factory.newCache(new CacheConfiguration());
+
+        CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
+
+        cache.addCacheEntryListener(eventListener);
+
+        cache.set(KEY, VALUE);
+
+        assertNotNull(eventListener.getAddedEvent());
+        assertSame(cache, eventListener.getAddedEvent().getCache());
+        assertEquals(KEY, eventListener.getAddedEvent().getEntry().getKey());
+        assertEquals(VALUE, eventListener.getAddedEvent().getEntry().getValue());
+
+        cache.set(KEY, VALUE2);
+
+        assertNotNull(eventListener.getModifiedEvent());
+        assertSame(cache, eventListener.getModifiedEvent().getCache());
+        assertEquals(KEY, eventListener.getModifiedEvent().getEntry().getKey());
+        assertEquals(VALUE2, eventListener.getModifiedEvent().getEntry().getValue());
+
+        cache.remove(KEY);
+        cache.get(KEY);
+
+        assertNotNull(eventListener.getModifiedEvent());
+        assertSame(cache, eventListener.getModifiedEvent().getCache());
+        assertEquals(KEY, eventListener.getModifiedEvent().getEntry().getKey());
+        assertEquals(VALUE2, eventListener.getModifiedEvent().getEntry().getValue());
+    }
+}
+
+/**
+ * Class used to test cache event management.
+ * 
+ * @version $Id: $
+ */
+class CacheEntryListenerTest implements CacheEntryListener<Object>
+{
+    /**
+     * Event object received with last insertion.
+     */
+    private CacheEntryEvent<Object> addedEvent;
+
+    /**
+     * Event object received with last modification.
+     */
+    private CacheEntryEvent<Object> modifiedEvent;
+
+    /**
+     * Event object received with last remove.
+     */
+    private CacheEntryEvent<Object> removedEvent;
+
+    /**
+     * @return event object received with last insertion.
+     */
+    public CacheEntryEvent<Object> getAddedEvent()
+    {
+        return addedEvent;
+    }
+
+    /**
+     * @return event object received with last modification.
+     */
+    public CacheEntryEvent<Object> getModifiedEvent()
+    {
+        return modifiedEvent;
+    }
+
+    /**
+     * @return event object received with last remove.
+     */
+    public CacheEntryEvent<Object> getRemovedEvent()
+    {
+        return removedEvent;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryAdded(org.xwiki.cache.event.CacheEntryEvent)
+     */
+    public void cacheEntryAdded(CacheEntryEvent<Object> event)
+    {
+        this.addedEvent = event;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryModified(org.xwiki.cache.event.CacheEntryEvent)
+     */
+    public void cacheEntryModified(CacheEntryEvent<Object> event)
+    {
+        this.modifiedEvent = event;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryRemoved(org.xwiki.cache.event.CacheEntryEvent)
+     */
+    public void cacheEntryRemoved(CacheEntryEvent<Object> event)
+    {
+        this.removedEvent = event;
     }
 }

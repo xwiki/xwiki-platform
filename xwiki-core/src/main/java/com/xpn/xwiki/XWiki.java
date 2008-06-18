@@ -929,7 +929,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     }
 
                     this.virtualWikiMap.set(host, wikiserver);
-                } catch (XWikiException e2) {
+                } catch (XWikiException e) {
+                    LOG.warn("Failed to find wiki name", e);
+
                     wikiserver = null;
                 }
             }

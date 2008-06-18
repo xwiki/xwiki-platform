@@ -397,7 +397,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
             String appname = xwiki.findWikiServer(host, context);
 
-            if (appname.equals("")) {
+            if (appname == null) {
                 String uri = request.getRequestURI();
                 int i1 = host.indexOf(".");
                 String servername = (i1 != -1) ? host.substring(0, i1) : host;

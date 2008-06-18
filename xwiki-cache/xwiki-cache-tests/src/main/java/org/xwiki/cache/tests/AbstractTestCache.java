@@ -85,7 +85,7 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
      */
     public ComponentManager getComponentManager() throws Exception
     {
-        ComponentManager cm = getComponentManager();
+        ComponentManager cm = super.getComponentManager();
 
         if (this.container == null) {
             // Initialize the Container

@@ -22,7 +22,6 @@ package com.xpn.xwiki.plugin.mailsender;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import java.util.List;
@@ -33,39 +32,38 @@ import org.jmock.Mock;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 /**
- * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}. The tests start a
- * SMTP server.
+ * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}. The tests start a SMTP server.
  */
 public class MailSenderApiTest extends MockObjectTestCase
 {
     private XWikiContext context;
+
     private Mock mockXWiki;
+
     private XWiki xwiki;
+
     private MailSenderPluginApi api;
 
     protected void setUp()
     {
         this.context = new XWikiContext();
-        this.mockXWiki = mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class},
-            new Object[] {new XWikiConfig(), this.context});
+        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
         this.xwiki = (XWiki) this.mockXWiki.proxy();
         this.context.setWiki(this.xwiki);
 
         // The plugin init creates a XWiki.Mail document if it doesn't exist and ensure it has the correct
         // class properties.
-        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Mail"), ANYTHING).will(returnValue(
-            new XWikiDocument()));
+        this.mockXWiki.stubs().method("getDocument").with(eq("XWiki.Mail"), ANYTHING).will(
+            returnValue(new XWikiDocument()));
         this.mockXWiki.stubs().method("saveDocument");
 
         this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server"), ANYTHING).will(
             returnValue("myserver"));
-        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_from"), ANYTHING).will(
-            returnValue(""));
-        
-        MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy",  this.context);
+        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_from"), ANYTHING).will(returnValue(""));
+
+        MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", this.context);
         this.api = new MailSenderPluginApi(plugin, this.context);
 
         // Ensure that there are no messages in inbox
@@ -100,8 +98,8 @@ public class MailSenderApiTest extends MockObjectTestCase
         mail.setSubject("Test subject");
         mail.setTextPart("Text content");
 
-        MailConfiguration config = this.api.createMailConfiguration(
-            new com.xpn.xwiki.api.XWiki(this.xwiki, this.context));
+        MailConfiguration config =
+            this.api.createMailConfiguration(new com.xpn.xwiki.api.XWiki(this.xwiki, this.context));
         assertEquals(25, config.getPort());
         assertEquals("myserver", config.getHost());
         assertNull(config.getFrom());

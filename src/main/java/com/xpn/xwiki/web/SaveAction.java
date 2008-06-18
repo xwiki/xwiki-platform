@@ -20,9 +20,12 @@
  */
 package com.xpn.xwiki.web;
 
+import org.apache.velocity.VelocityContext;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.plugin.captcha.CaptchaPluginApi;
@@ -76,6 +79,10 @@ public class SaveAction extends PreviewAction
             sectionNumber = Integer.parseInt(request.getParameter("section"));
         }
         synchronized (doc) {
+            // We need to clone this document first, since a cached storage would return the same object for the
+            // following requests, so concurrent request might get a partially modified object, or worse, if an error
+            // occurs during the save, the cached object will not reflect the actual document at all.
+            doc = (XWikiDocument) doc.clone();
             String language = ((EditForm) form).getLanguage();
             // FIXME Which one should be used: doc.getDefaultLanguage or
             // form.getDefaultLanguage()?
@@ -93,6 +100,9 @@ public class SaveAction extends PreviewAction
                     tdoc = new XWikiDocument(doc.getSpace(), doc.getName());
                     tdoc.setLanguage(language);
                     tdoc.setStore(doc.getStore());
+                } else if (tdoc != doc) {
+                    // Same as above, clone the object retrieved from the store cache.
+                    tdoc = (XWikiDocument) tdoc.clone();
                 }
                 tdoc.setTranslation(1);
             }
@@ -136,6 +146,28 @@ public class SaveAction extends PreviewAction
             // Make sure we have at least the meta data dirty status
             tdoc.setMetaDataDirty(true);
 
+            // Validate the document if we have xvalidate=1 in the request
+            if ("1".equals(request.getParameter("xvalidate"))) {
+                boolean validationResult = tdoc.validate(context);
+                // if the validation fails we should show the inline action
+                if (validationResult == false) {
+                    // Set display context to 'edit'
+                    context.put("display", "edit");
+                    // Set the action to inline
+                    context.setAction("inline");
+                    // Set the document in the context
+                    VelocityContext vcontext = (VelocityContext) context.get("vcontext");
+                    context.put("doc", doc);
+                    context.put("cdoc", tdoc);
+                    context.put("tdoc", tdoc);
+                    Document vdoc = tdoc.newDocument(context);
+                    vcontext.put("doc", doc.newDocument(context));
+                    vcontext.put("cdoc", vdoc);
+                    vcontext.put("tdoc", vdoc);
+                    return true;
+                }
+            }
+
             // We get the comment to be used from the document
             // It was read using readFromForm
             xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
@@ -177,9 +209,14 @@ public class SaveAction extends PreviewAction
         } else if (e != null) {
             return "exception";
         } else {
-            // If captcha is not correct it will require to confirm again
-            context.put("recheckcaptcha", new Boolean(true));
-            return super.render(context);
+            // If display mode is edit we failed because of validation
+            if ("edit".equals(context.get("display"))) {
+                return "inline";
+            } else {
+                // If captcha is not correct it will require to confirm again
+                context.put("recheckcaptcha", new Boolean(true));
+                return super.render(context);
+            }
         }
     }
 }

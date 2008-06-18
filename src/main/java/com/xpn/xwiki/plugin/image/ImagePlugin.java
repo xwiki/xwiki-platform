@@ -123,7 +123,7 @@ public class ImagePlugin extends XWikiDefaultPlugin
         configuration.setConfigurationId("xwiki.plugin.image");
 
         // Set folder o store cache
-        File tempDir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
+        File tempDir = context.getWiki().getTempDirectory(context);
         File imgTempDir = new File(tempDir, configuration.getConfigurationId());
         try {
             imgTempDir.mkdirs();

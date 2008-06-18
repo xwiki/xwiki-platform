@@ -64,13 +64,13 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
         super.init(context);
     	log.info("Charting Plugin - init");
         
-        File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
+        File dir = context.getWiki().getTempDirectory(context);
         tempDir = new File(dir, "charts");
         try {
             tempDir.mkdirs();
         } catch (Exception e1) {
         	log.warn("Could not create charts temporary directory: "+tempDir, e1);
-            dir = (File) new File(context.getWiki().Param("xwiki.upload.tempdir"));
+            dir = new File(context.getWiki().Param("xwiki.upload.tempdir"));
             try {
             	tempDir = new File(dir, "charts");
             } catch (Exception e2) {

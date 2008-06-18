@@ -214,7 +214,7 @@ public class PdfExportImpl implements PdfExport
         // This could be improved by setting a specific context using the passed document but we
         // would also need to get the translations and set them too.
 
-        File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
+        File dir = context.getWiki().getTempDirectory(context);
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         tidy.setOutputEncoding(context.getWiki().getEncoding());
         tidy.setInputEncoding(context.getWiki().getEncoding());

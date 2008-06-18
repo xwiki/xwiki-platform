@@ -118,6 +118,24 @@ public class ImagePlugin extends XWikiDefaultPlugin
 
     public void initCache(XWikiContext context)
     {
+        CacheConfiguration configuration = new CacheConfiguration();
+
+        configuration.setConfigurationId("xwiki.plugin.image");
+
+        // Set folder o store cache
+        File tempDir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
+        File imgTempDir = new File(tempDir, configuration.getConfigurationId());
+        try {
+            imgTempDir.mkdirs();
+        } catch (Exception ex) {
+            LOG.warn("Cannot create temporary files", ex);
+        }
+        configuration.put("cache.path", imgTempDir.getAbsolutePath());
+
+        // Set cache constraints
+        LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
+        configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
+
         String capacityParam = "";
         try {
             capacityParam = context.getWiki().Param("xwiki.plugin.image.cache.capacity");
@@ -127,22 +145,9 @@ public class ImagePlugin extends XWikiDefaultPlugin
         } catch (NumberFormatException ex) {
             LOG.error("Error in ImagePlugin reading capacity: " + capacityParam, ex);
         }
-
-        File tempDir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
-        File imgTempDir = new File(tempDir, "img");
-        try {
-            imgTempDir.mkdirs();
-        } catch (Exception ex) {
-            LOG.warn("Cannot create temporary files", ex);
-        }
+        lru.setMaxEntries(capacity);
 
         try {
-            CacheConfiguration configuration = new CacheConfiguration();
-            configuration.setConfigurationId("xwiki.plugin.image");
-            LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
-            lru.setMaxEntries(capacity);
-            configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);
-
             imageCache = context.getWiki().getLocalCacheFactory().newCache(configuration);
         } catch (CacheException e) {
             LOG.error("Error initializing the image cache", e);

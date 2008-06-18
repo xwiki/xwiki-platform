@@ -59,7 +59,7 @@
       <artifactId>oscache</artifactId>
       <version>2.4</version>
       <exclusions>
-        <!-- This is needed only whith clustering and can be added only in that case. Plus itdisappeared from the maven central repository -->
+        <!-- This is needed only whith clustering and can be added only in that case -->
         <exclusion>
           <groupId>javax.jms</groupId>
           <artifactId>jms</artifactId>

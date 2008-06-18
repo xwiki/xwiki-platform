@@ -20,6 +20,8 @@
 package org.xwiki.cache.jbosscache.internal;
 
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -78,7 +80,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     /**
      * The state of the node before modification.
      */
-    private Map<String, T> preEventData;
+    private ConcurrentMap<String, Map<String, T>> preEventData = new ConcurrentHashMap<String, Map<String, T>>();
 
     /**
      * Create and initialize the cache.
@@ -170,17 +172,18 @@ public class JBossCacheCache<T> extends AbstractCache<T>
             if (LOG.isInfoEnabled()) {
                 LOG.info("The node " + event.getFqn() + " that should not has bee updated");
             }
-            
+
             return;
         }
 
         Map<String, T> data = event.getData();
 
+        String key = event.getFqn().getLastElementAsString();
+
         if (event.isPre()) {
-            this.preEventData = data;
+            this.preEventData.put(key, data);
         } else {
             if (data.containsKey(DATA_KEY)) {
-                String key = event.getFqn().getLastElementAsString();
                 T value = data.get(DATA_KEY);
 
                 if (event.getModificationType() == NodeModifiedEvent.ModificationType.REMOVE_DATA) {
@@ -190,7 +193,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
                 }
             }
 
-            this.preEventData = null;
+            this.preEventData.remove(key);
         }
     }
 
@@ -205,7 +208,9 @@ public class JBossCacheCache<T> extends AbstractCache<T>
         JBossCacheCacheEntryEvent<T> event =
             new JBossCacheCacheEntryEvent<T>(new JBossCacheCacheEntry<T>(this, key, value));
 
-        if (this.preEventData.containsKey(key)) {
+        Map<String, T> preMap = this.preEventData.get(key);
+
+        if (preMap.containsKey(DATA_KEY)) {
             sendEntryModifiedEvent(event);
         } else {
             sendEntryAddedEvent(event);

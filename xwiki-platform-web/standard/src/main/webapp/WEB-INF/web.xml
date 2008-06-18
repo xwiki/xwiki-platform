@@ -9,13 +9,23 @@
   <display-name>xwiki</display-name>
   <description>XWiki Application</description>
 
+  <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
+       the encoding used for submitting the request, so by default containers fall back to the
+       encoding globally configured in their settings. This allows XWiki to use a custom encoding,
+       without affecting the whole container (and the other applications hosted). -->
   <filter>
     <filter-name>Set Character Encoding</filter-name>
     <filter-class>com.xpn.xwiki.web.SetCharacterEncodingFilter</filter-class>
+    <!-- The encoding to use. This must be the same as the one in xwiki.cfg (hopefully only one
+         encoding will be used later). -->
     <init-param>
       <param-name>encoding</param-name>
       <param-value>ISO-8859-1</param-value>
     </init-param>
+    <!-- Whether to ignore and override the encoding specified by the client, when this actually
+         happens. For example, AJAX requests made through XmlHttpRequests specify UTF-8. When this
+         is set to false, the custom encoding is used only when there wasn't any encoding specified
+         by the client. -->
     <init-param>
       <param-name>ignore</param-name>
       <param-value>false</param-value>

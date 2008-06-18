@@ -1899,7 +1899,8 @@ public class XWikiDocument
             doc = getClass().newInstance();
 
             doc.setDatabase(getDatabase());
-            doc.setRCSVersion(getRCSVersion());
+            // use version field instead of getRCSVersion because it returns "1.1" if version==null.
+            doc.version = this.version;
             doc.setDocumentArchive(getDocumentArchive());
             doc.setAuthor(getAuthor());
             doc.setContentAuthor(getContentAuthor());

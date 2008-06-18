@@ -167,11 +167,11 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     public void nodeModified(NodeModifiedEvent event)
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info("The node " + event.getFqn() + " that should not has bee updated");
+            }
+            
             return;
-        }
-
-        if (LOG.isInfoEnabled()) {
-            LOG.info("The node " + event.getFqn() + " that should not has bee updated");
         }
 
         Map<String, T> data = event.getData();

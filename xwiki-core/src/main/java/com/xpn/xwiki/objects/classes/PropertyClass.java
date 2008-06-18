@@ -43,8 +43,7 @@ import com.xpn.xwiki.plugin.query.XWikiCriteria;
 import com.xpn.xwiki.plugin.query.XWikiQuery;
 import com.xpn.xwiki.validation.XWikiValidationStatus;
 
-public class PropertyClass extends BaseCollection implements PropertyClassInterface,
-    PropertyInterface
+public class PropertyClass extends BaseCollection implements PropertyClassInterface, PropertyInterface
 {
     private BaseClass object;
 
@@ -67,11 +66,11 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public BaseClass getxWikiClass()
     {
-        if (pMetaClass == null) {
+        if (this.pMetaClass == null) {
             MetaClass metaClass = MetaClass.getMetaClass();
-            pMetaClass = (PropertyMetaClass) metaClass.get(getClassType());
+            this.pMetaClass = (PropertyMetaClass) metaClass.get(getClassType());
         }
-        return pMetaClass;
+        return this.pMetaClass;
     }
 
     public void setxWikiClass(BaseClass xWikiClass)
@@ -81,7 +80,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public BaseCollection getObject()
     {
-        return object;
+        return this.object;
     }
 
     public void setObject(BaseCollection object)
@@ -97,28 +96,30 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return getObject().getName() + "_" + getName();
     }
 
+    @Override
     public int getId()
     {
         if (getObject() == null) {
-            return id;
+            return this.id;
         }
         return getObject().getId();
     }
 
+    @Override
     public void setId(int id)
     {
         this.id = id;
     }
 
+    @Override
     public void checkField(String name) throws XWikiException
     {
         // Let's stop checking
         /*
-         * if ((getxWikiClass(context).safeget(name)==null)&& (getxWikiClass(context).safeget("meta" +
-         * name)==null)){ Object[] args = { name, getxWikiClass(context).getName() }; throw new
-         * XWikiException( XWikiException.MODULE_XWIKI_CLASSES,
-         * XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST, "Field {0} does not exist in
-         * class {1}", null, args); }
+         * if ((getxWikiClass(context).safeget(name)==null)&& (getxWikiClass(context).safeget("meta" + name)==null)){
+         * Object[] args = { name, getxWikiClass(context).getName() }; throw new XWikiException(
+         * XWikiException.MODULE_XWIKI_CLASSES, XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST, "Field {0} does
+         * not exist in class {1}", null, args); }
          */
     }
 
@@ -138,8 +139,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return fromString(value);
     }
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayHidden(StringBuffer buffer, String name, String prefix, BaseCollection object,
+        XWikiContext context)
     {
         input input = new input();
         PropertyInterface prop = object.safeget(name);
@@ -153,8 +154,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         buffer.append(input.toString());
     }
 
-    public void displaySearch(StringBuffer buffer, String name, String prefix,
-        XWikiCriteria criteria, XWikiContext context)
+    public void displaySearch(StringBuffer buffer, String name, String prefix, XWikiCriteria criteria,
+        XWikiContext context)
     {
         input input = new input();
         input.setType("text");
@@ -169,8 +170,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         buffer.append(input.toString());
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         BaseProperty prop = (BaseProperty) object.safeget(name);
         if (prop != null) {
@@ -178,8 +178,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         }
     }
 
-    public void displayEdit(StringBuffer buffer, String name, String prefix,
-        BaseCollection object, XWikiContext context)
+    public void displayEdit(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
     {
         input input = new input();
 
@@ -194,8 +193,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         buffer.append(input.toString());
     }
 
-    public String displayHidden(String name, String prefix, BaseCollection object,
-        XWikiContext context)
+    public String displayHidden(String name, String prefix, BaseCollection object, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
         displayHidden(buffer, name, prefix, object, context);
@@ -207,8 +205,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return displayHidden(name, "", object, context);
     }
 
-    public String displaySearch(String name, String prefix, XWikiCriteria criteria,
-        XWikiContext context)
+    public String displaySearch(String name, String prefix, XWikiCriteria criteria, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
         displaySearch(buffer, name, prefix, criteria, context);
@@ -220,8 +217,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return displaySearch(name, "", criteria, context);
     }
 
-    public String displayView(String name, String prefix, BaseCollection object,
-        XWikiContext context)
+    public String displayView(String name, String prefix, BaseCollection object, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
         displayView(buffer, name, prefix, object, context);
@@ -233,8 +229,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return displayView(name, "", object, context);
     }
 
-    public String displayEdit(String name, String prefix, BaseCollection object,
-        XWikiContext context)
+    public String displayEdit(String name, String prefix, BaseCollection object, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
         displayEdit(buffer, name, prefix, object, context);
@@ -252,8 +247,8 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return disp != null && disp.length() > 0;
     }
 
-    public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type,
-        BaseObject object, XWikiContext context) throws XWikiException
+    public void displayCustom(StringBuffer buffer, String fieldName, String prefix, String type, BaseObject object,
+        XWikiContext context) throws XWikiException
     {
         String content = getCustomDisplay();
 
@@ -274,19 +269,19 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         } catch (Exception e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                 XWikiException.ERROR_XWIKI_CLASSES_CANNOT_PREPARE_CUSTOM_DISPLAY,
-                "Exception while preparing the custom display of " + fieldName,
-                e,
-                null);
+                "Exception while preparing the custom display of " + fieldName, e, null);
 
         }
         buffer.append(content);
     }
 
+    @Override
     public BaseClass getxWikiClass(XWikiContext context)
     {
         return getxWikiClass();
     }
 
+    @Override
     public String getClassName()
     {
         BaseClass bclass = getxWikiClass();
@@ -295,11 +290,13 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     // In property classes we need to store this info in the HashMap for fields
     // This way it is readable by the displayEdit/displayView functions..
+    @Override
     public String getName()
     {
         return getStringValue("name");
     }
 
+    @Override
     public void setName(String name)
     {
         setStringValue("name", name);
@@ -315,11 +312,13 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         setLargeStringValue("customDisplay", value);
     }
 
+    @Override
     public String getPrettyName()
     {
         return getStringValue("prettyName");
     }
 
+    @Override
     public void setPrettyName(String prettyName)
     {
         setStringValue("prettyName", prettyName);
@@ -332,6 +331,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     /**
      * Gets international tooltip
+     * 
      * @param context
      * @return
      */
@@ -341,11 +341,11 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         String tooltip = context.getWiki().getMessage(tooltipName, context);
         if (tooltipName.equals(tooltip)) {
             tooltipName = getLargeStringValue("tooltip");
-            if ((tooltipName!=null)&&(!tooltipName.trim().equals(""))) {
+            if ((tooltipName != null) && (!tooltipName.trim().equals(""))) {
                 tooltip = context.getWiki().getMessage(tooltipName, context);
             }
         }
-        return tooltip;           
+        return tooltip;
     }
 
     public void setTooltip(String tooltip)
@@ -355,7 +355,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
 
     public String getTranslatedPrettyName(XWikiContext context)
     {
-        String msgName = className + "_" + getName();
+        String msgName = this.className + "_" + getName();
         if ((context == null) || (context.getWiki() == null)) {
             return getPrettyName();
         }
@@ -367,11 +367,13 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return prettyName;
     }
 
+    @Override
     public int getNumber()
     {
         return getIntValue("number");
     }
 
+    @Override
     public void setNumber(int number)
     {
         setIntValue("number", number);
@@ -386,6 +388,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     {
     }
 
+    @Override
     public Object clone()
     {
         PropertyClass pclass = (PropertyClass) super.clone();
@@ -394,6 +397,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
         return pclass;
     }
 
+    @Override
     public Element toXML(BaseClass bclass)
     {
         return toXML();
@@ -403,7 +407,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
     {
         Element pel = new DOMElement(getName());
 
-        // Iterate over values sorted by field name so that the values are 
+        // Iterate over values sorted by field name so that the values are
         // exported to XML in a consistent order.
         Iterator it = getSortedIterator();
         while (it.hasNext()) {
@@ -428,9 +432,7 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
                 Object[] args = {getClass().getName()};
                 throw new XWikiException(XWikiException.MODULE_XWIKI_CLASSES,
                     XWikiException.ERROR_XWIKI_CLASSES_PROPERTY_CLASS_IN_METACLASS,
-                    "Cannot find property class {0} in MetaClass object",
-                    null,
-                    args);
+                    "Cannot find property class {0} in MetaClass object", null, args);
             }
             PropertyClass pclass = (PropertyClass) bclass.safeget(name);
             if (pclass != null) {
@@ -521,20 +523,16 @@ public class PropertyClass extends BaseCollection implements PropertyClassInterf
             return true;
         }
 
-        String value =
-            ((property == null) || (property.getValue() == null)) ? "" : property.getValue()
-                .toString();
+        String value = ((property == null) || (property.getValue() == null)) ? "" : property.getValue().toString();
         try {
             if (context.getUtil().match(regexp, value)) {
                 return true;
             }
-            XWikiValidationStatus.addErrorToContext((getObject() == null) ? "" : getObject()
-                .getClassName(), getName(), getTranslatedPrettyName(context),
-                getValidationMessage(), context);
+            XWikiValidationStatus.addErrorToContext((getObject() == null) ? "" : getObject().getClassName(), getName(),
+                getTranslatedPrettyName(context), getValidationMessage(), context);
             return false;
         } catch (Exception e) {
-            XWikiValidationStatus.addExceptionToContext(getObject().getClassName(), getName(), e,
-                context);
+            XWikiValidationStatus.addExceptionToContext(getObject().getClassName(), getName(), e, context);
             return false;
         }
     }

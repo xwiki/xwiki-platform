@@ -259,7 +259,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             DatabaseProduct databaseProduct = getDatabaseProductName(context);
             if (DatabaseProduct.ORACLE == databaseProduct) {
-                stmt.execute("DROP SCHEMA " + schema);
+                stmt.execute("DROP USER " + schema + " CASCADE");
             } else if (DatabaseProduct.DERBY == databaseProduct) {
                 stmt.execute("DROP SCHEMA " + schema);
             } else if (DatabaseProduct.HSQLDB == databaseProduct) {

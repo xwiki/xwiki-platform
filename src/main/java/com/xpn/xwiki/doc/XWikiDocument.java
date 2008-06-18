@@ -1354,9 +1354,9 @@ public class XWikiDocument
                 dprettyName = context.getWiki().addMandatory(context);
             }
             if (before) {
-                return dprettyName + pclass.getPrettyName();
+                return dprettyName + pclass.getPrettyName(context);
             } else {
-                return pclass.getPrettyName() + dprettyName;
+                return pclass.getPrettyName(context) + dprettyName;
             }
         } catch (Exception e) {
             return "";

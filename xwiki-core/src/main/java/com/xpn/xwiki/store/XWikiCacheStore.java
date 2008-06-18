@@ -50,8 +50,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
 
     private Cache<XWikiDocument> cache;
 
-    private XWikiCacheListener cacheListener;
-
     private Cache<Boolean> pageExistCache;
 
     private int cacheCapacity = 100;
@@ -60,8 +58,6 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
 
     public XWikiCacheStore(XWikiStoreInterface store, XWikiContext context) throws XWikiException
     {
-        this.cacheListener = new XWikiCacheListener(context);
-
         setStore(store);
         initCache(context);
     }
@@ -580,13 +576,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
 
     public void setCache(Cache<XWikiDocument> cache)
     {
-        if (this.cache != null) {
-            this.cache.removeCacheEntryListener(cacheListener);
-        }
-
         this.cache = cache;
-
-        this.cache.addCacheEntryListener(cacheListener);
     }
 
     public Cache<Boolean> getPageExistCache()

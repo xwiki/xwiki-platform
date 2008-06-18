@@ -1840,6 +1840,30 @@ public class Document extends Api
     }
 
     /**
+     * Retrieves the validation script associated with this document, a Velocity script that is executed when validating
+     * the document data.
+     * 
+     * @return A <code>String</code> representation of the validation script, or an empty string if there is no such
+     *         script.
+     */
+    public String getValidationScript()
+    {
+        return getDoc().getValidationScript();
+    }
+
+    /**
+     * Sets a new validation script for this document, a Velocity script that is executed when validating the document
+     * data.
+     * 
+     * @param validationScript The new validation script, which can be an empty string or <code>null</code> if the
+     *            script should be removed.
+     */
+    public void setValidationScript(String validationScript)
+    {
+        getDoc().setValidationScript(validationScript);
+    }
+
+    /**
      * @deprecated use {@link #rename(String)} instead
      */
     public void renameDocument(String newDocumentName) throws XWikiException

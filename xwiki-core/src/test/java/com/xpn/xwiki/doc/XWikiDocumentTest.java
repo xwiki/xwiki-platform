@@ -222,4 +222,12 @@ public class XWikiDocumentTest extends MockObjectTestCase
         assertEquals(80, sections.get(2).getSectionIndex());
         assertEquals("1 Section 3\nModified content of section 3", this.document.getContentOfSection(3));
     }
+
+    public void testCloneSaveVersions() {
+        XWikiDocument doc1 = new XWikiDocument("qwe", "qwe");
+        XWikiDocument doc2 = (XWikiDocument) doc1.clone();
+        doc1.incrementVersion();
+        doc2.incrementVersion();
+        assertEquals(doc1.getVersion(), doc2.getVersion());
+    }
 }

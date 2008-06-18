@@ -45,19 +45,20 @@ public class SaveAction extends PreviewAction
         Boolean isResponseCorrect = Boolean.TRUE;
         // If 'save' action after preview
         String isResponsePreviewCorrect = request.getParameter("isResponsePreviewCorrect");
-        if ((isResponsePreviewCorrect != null))
+        if ((isResponsePreviewCorrect != null)) {
             isResponseCorrect = Boolean.valueOf(isResponsePreviewCorrect);
-        else {
+        } else {
             if (xwiki.hasCaptcha(context)) {
-                CaptchaPluginApi captchaPluginApi =
-                    (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
-                if (captchaPluginApi != null)
+                CaptchaPluginApi captchaPluginApi = (CaptchaPluginApi) xwiki.getPluginApi("jcaptcha", context);
+                if (captchaPluginApi != null) {
                     isResponseCorrect = captchaPluginApi.verifyCaptcha("edit");
+                }
             }
         }
         // If captcha is not correct it will be required again
-        if (!isResponseCorrect.booleanValue())
+        if (!isResponseCorrect.booleanValue()) {
             return true;
+        }
 
         // This is pretty useless, since contexts aren't shared between threads.
         // It just slows down execution.
@@ -74,8 +75,9 @@ public class SaveAction extends PreviewAction
             // String defaultLanguage = ((EditForm) form).getDefaultLanguage();
             XWikiDocument tdoc;
 
-            if (doc.isNew() || (language == null) || (language.equals(""))
-                || (language.equals("default")) || (language.equals(doc.getDefaultLanguage()))) {
+            if (doc.isNew() || (language == null) || (language.equals("")) || (language.equals("default"))
+                || (language.equals(doc.getDefaultLanguage())))
+            {
                 // Need to save parent and defaultLanguage if they have changed
                 tdoc = doc;
             } else {
@@ -90,8 +92,9 @@ public class SaveAction extends PreviewAction
 
             if (doc.isNew()) {
                 doc.setLanguage("");
-                if ((doc.getDefaultLanguage() == null) || (doc.getDefaultLanguage().equals("")))
+                if ((doc.getDefaultLanguage() == null) || (doc.getDefaultLanguage().equals(""))) {
                     doc.setDefaultLanguage(context.getWiki().getLanguagePreference(context));
+                }
             }
 
             try {
@@ -119,8 +122,9 @@ public class SaveAction extends PreviewAction
             // TODO: handle Author
             String username = context.getUser();
             tdoc.setAuthor(username);
-            if (tdoc.isNew())
+            if (tdoc.isNew()) {
                 tdoc.setCreator(username);
+            }
 
             // Make sure we have at least the meta data dirty status
             tdoc.setMetaDataDirty(true);
@@ -129,12 +133,14 @@ public class SaveAction extends PreviewAction
             // It was read using readFromForm
             xwiki.saveDocument(tdoc, tdoc.getComment(), tdoc.isMinorEdit(), context);
             XWikiLock lock = tdoc.getLock(context);
-            if (lock != null)
+            if (lock != null) {
                 tdoc.removeLock(context);
+            }
         }
         return false;
     }
 
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         if (save(context)) {
@@ -145,6 +151,7 @@ public class SaveAction extends PreviewAction
         return false;
     }
 
+    @Override
     public String render(XWikiContext context) throws XWikiException
     {
         XWikiException e = (XWikiException) context.get("exception");

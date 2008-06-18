@@ -596,6 +596,12 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return textarea.toString();
     }
 
+    /**
+     * This provide a way to create an XWiki object without initializing the whole XWiki (including plugins, storage,
+     * etc.).
+     * <p>
+     * Needed for tools or tests which need XWiki because it is used everywhere in the API.
+     */
     public XWiki()
     {
 

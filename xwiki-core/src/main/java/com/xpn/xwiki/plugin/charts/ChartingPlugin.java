@@ -64,7 +64,7 @@ public class ChartingPlugin extends XWikiDefaultPlugin implements
         super.init(context);
     	log.info("Charting Plugin - init");
         
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         tempDir = new File(dir, "charts");
         try {
             tempDir.mkdirs();

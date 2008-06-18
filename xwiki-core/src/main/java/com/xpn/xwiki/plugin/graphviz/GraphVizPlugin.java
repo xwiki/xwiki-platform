@@ -66,7 +66,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
     public void init(XWikiContext context) {
         super.init(context);
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir = (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         tempDir = new File(dir, "dot");
         try {
             tempDir.mkdirs();

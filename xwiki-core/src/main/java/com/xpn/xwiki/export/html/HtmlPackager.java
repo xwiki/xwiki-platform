@@ -239,7 +239,8 @@ public class HtmlPackager
 
         ZipOutputStream zos = new ZipOutputStream(context.getResponse().getOutputStream());
 
-        File dir = context.getWiki().getTempDirectory(context);
+        File dir =
+            (File) context.getEngineContext().getAttribute("javax.servlet.context.tempdir");
         File tempdir = new File(dir, RandomStringUtils.randomAlphanumeric(8));
         tempdir.mkdirs();
         File attachmentDir = new File(tempdir, "attachment");

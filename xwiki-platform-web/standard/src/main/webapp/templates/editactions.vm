@@ -75,7 +75,7 @@ $msg.get("core.minoredit"): <input type="checkbox" name="minorEdit" />
 
 #if((!$commentFieldAdded)&&($xwiki.hasEditComment()))
 #set($commentFieldAdded = 1)
-#if($xwiki.isEditCommentHidden())
+#if($xwiki.isEditCommentFieldHidden())
 <input type="hidden" name="comment" value="" size="80" />
 #else
 $msg.get("core.comment"): <input type="text" name="comment" value="" size="80" />

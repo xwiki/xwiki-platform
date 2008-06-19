@@ -31,7 +31,7 @@
     <version>7</version>
   </parent>
   <artifactId>xwiki-plugin-invitationmanager</artifactId>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <name>XWiki Platform - Plugins - Invitation Manager</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Plugins - Invitation Manager</description>
@@ -67,10 +67,4 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-invitationmanager-1.0</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-invitationmanager-1.0</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/tags/xwiki-plugin-invitationmanager-1.0</url>
-  </scm>
 </project>      

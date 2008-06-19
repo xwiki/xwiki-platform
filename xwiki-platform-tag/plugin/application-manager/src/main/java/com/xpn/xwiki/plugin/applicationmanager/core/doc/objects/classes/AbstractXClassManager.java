@@ -36,6 +36,7 @@ import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.objects.classes.BooleanClass;
 
 /**
  * Abstract implementation of XClassManager.
@@ -212,28 +213,28 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     protected AbstractXClassManager(String spaceprefix, String prefix, boolean dispatch)
     {
-        classSpacePrefix = spaceprefix;
-        classPrefix = prefix;
+        this.classSpacePrefix = spaceprefix;
+        this.classPrefix = prefix;
 
-        classSpace = dispatch ? classSpacePrefix + XWIKI_CLASS_SPACE_SUFFIX : classSpacePrefix;
-        className = classPrefix + XWIKI_CLASS_SUFFIX;
-        classFullName = classSpace + XObjectDocument.SPACE_DOC_SEPARATOR + className;
+        this.classSpace = dispatch ? classSpacePrefix + XWIKI_CLASS_SPACE_SUFFIX : classSpacePrefix;
+        this.className = classPrefix + XWIKI_CLASS_SUFFIX;
+        this.classFullName = classSpace + XObjectDocument.SPACE_DOC_SEPARATOR + className;
 
-        classSheetSpace = dispatch ? classSpacePrefix + XWIKI_CLASSSHEET_SPACE_SUFFIX : classSpacePrefix;
-        classSheetName = classPrefix + XWIKI_CLASSSHEET_SUFFIX;
-        classSheetFullName = classSheetSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classSheetName;
+        this.classSheetSpace = dispatch ? classSpacePrefix + XWIKI_CLASSSHEET_SPACE_SUFFIX : classSpacePrefix;
+        this.classSheetName = classPrefix + XWIKI_CLASSSHEET_SUFFIX;
+        this.classSheetFullName = classSheetSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classSheetName;
 
-        classTemplateSpace = dispatch ? classSpacePrefix + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : classSpacePrefix;
-        classTemplateName = classPrefix + XWIKI_CLASSTEMPLATE_SUFFIX;
-        classTemplateFullName = classTemplateSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classTemplateName;
+        this.classTemplateSpace = dispatch ? classSpacePrefix + XWIKI_CLASSTEMPLATE_SPACE_SUFFIX : classSpacePrefix;
+        this.classTemplateName = classPrefix + XWIKI_CLASSTEMPLATE_SUFFIX;
+        this.classTemplateFullName = classTemplateSpace + XObjectDocument.SPACE_DOC_SEPARATOR + classTemplateName;
 
-        classSheetDefaultContent =
+        this.classSheetDefaultContent =
             "## you can modify this page to customize the presentation of your object\n\n"
                 + "1 Document $doc.name\n\n#set($class = $doc.getObject(\"" + classFullName + "\").xWikiClass)\n"
                 + "\n" + "<dl>\n" + "  #foreach($prop in $class.properties)\n" + "    <dt> ${prop.prettyName} </dt>\n"
                 + "    <dd>$doc.display($prop.getName())</dd>\n  #end\n" + "</dl>\n";
 
-        classTemplateDefaultContent = "#includeForm(\"" + classSheetFullName + "\")\n";
+        this.classTemplateDefaultContent = "#includeForm(\"" + classSheetFullName + "\")\n";
     }
 
     /**
@@ -243,7 +244,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassSpacePrefix()
     {
-        return classSpacePrefix;
+        return this.classSpacePrefix;
     }
 
     /**
@@ -253,7 +254,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassSpace()
     {
-        return classSpace;
+        return this.classSpace;
     }
 
     /**
@@ -263,7 +264,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassPrefix()
     {
-        return classPrefix;
+        return this.classPrefix;
     }
 
     /**
@@ -273,7 +274,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassName()
     {
-        return className;
+        return this.className;
     }
 
     /**
@@ -283,7 +284,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassFullName()
     {
-        return classFullName;
+        return this.classFullName;
     }
 
     /**
@@ -293,7 +294,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassTemplateSpace()
     {
-        return classTemplateSpace;
+        return this.classTemplateSpace;
     }
 
     /**
@@ -303,7 +304,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassTemplateName()
     {
-        return classTemplateName;
+        return this.classTemplateName;
     }
 
     /**
@@ -313,7 +314,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassTemplateFullName()
     {
-        return classTemplateFullName;
+        return this.classTemplateFullName;
     }
 
     /**
@@ -323,7 +324,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassSheetSpace()
     {
-        return classSheetSpace;
+        return this.classSheetSpace;
     }
 
     /**
@@ -333,7 +334,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassSheetName()
     {
-        return classSheetName;
+        return this.classSheetName;
     }
 
     /**
@@ -343,7 +344,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassSheetFullName()
     {
-        return classSheetFullName;
+        return this.classSheetFullName;
     }
 
     /**
@@ -405,7 +406,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassSheetDefaultContent()
     {
-        return classSheetDefaultContent;
+        return this.classSheetDefaultContent;
     }
 
     /**
@@ -460,9 +461,8 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         }
 
         if (doc.isNew()) {
-            String content =
-                getResourceDocumentContent(DOCUMENTCONTENT_SHEET_PREFIX + getClassSheetFullName()
-                    + DOCUMENTCONTENT_EXT);
+            String documentContentPath = DOCUMENTCONTENT_SHEET_PREFIX + getClassSheetFullName() + DOCUMENTCONTENT_EXT;
+            String content = getResourceDocumentContent(documentContentPath);
             doc.setContent(content != null ? content : getClassSheetDefaultContent());
         }
 
@@ -478,7 +478,7 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     public String getClassTemplateDefaultContent()
     {
-        return classTemplateDefaultContent;
+        return this.classTemplateDefaultContent;
     }
 
     /**
@@ -525,6 +525,15 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
     }
 
     /**
+     * @param value the {@link Boolean} value to convert.
+     * @return the converted <code>int</code> value.
+     */
+    protected int intFromBoolean(Boolean value)
+    {
+        return value == null ? -1 : (value.booleanValue() ? 1 : 0);
+    }
+
+    /**
      * Initialize template document with default content.
      * 
      * @param doc the class template document that will be saved.
@@ -533,6 +542,48 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
     protected boolean updateClassTemplateDocument(XWikiDocument doc)
     {
         return false;
+    }
+
+    /**
+     * Set the value of a boolean field in a document.
+     * 
+     * @param doc the document to modify.
+     * @param fieldName the name of the field.
+     * @param value the value.
+     * @return true if <code>doc</code> modified.
+     */
+    protected boolean updateDocStringValue(XWikiDocument doc, String fieldName, String value)
+    {
+        boolean needsUpdate = false;
+
+        if (value.equals(doc.getStringValue(getClassFullName(), fieldName))) {
+            doc.setStringValue(getClassFullName(), fieldName, value);
+            needsUpdate = true;
+        }
+
+        return needsUpdate;
+    }
+
+    /**
+     * Set the value of a boolean field in a document.
+     * 
+     * @param doc the document to modify.
+     * @param fieldName the name of the field.
+     * @param value the value.
+     * @return true if <code>doc</code> modified.
+     */
+    protected boolean updateDocBooleanValue(XWikiDocument doc, String fieldName, Boolean value)
+    {
+        boolean needsUpdate = false;
+
+        int intvalue = intFromBoolean(value);
+
+        if (intvalue != doc.getIntValue(getClassFullName(), fieldName)) {
+            doc.setIntValue(getClassFullName(), fieldName, intvalue);
+            needsUpdate = true;
+        }
+
+        return needsUpdate;
     }
 
     /**
@@ -551,6 +602,31 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
         }
 
         return needUpdate;
+    }
+
+    /**
+     * Set the default value of a boolean field of a XWiki class.
+     * 
+     * @param baseClass the XWiki class.
+     * @param fieldName the name of the field.
+     * @param value the default value.
+     * @return true if <code>baseClass</code> modified.
+     */
+    protected boolean updateBooleanClassDefaultValue(BaseClass baseClass, String fieldName, Boolean value)
+    {
+        boolean needsUpdate = false;
+
+        BooleanClass bc = (BooleanClass) baseClass.get(fieldName);
+
+        int old = bc.getDefaultValue();
+        int intvalue = intFromBoolean(value);
+
+        if (intvalue != old) {
+            bc.setDefaultValue(intvalue);
+            needsUpdate = true;
+        }
+
+        return needsUpdate;
     }
 
     /**

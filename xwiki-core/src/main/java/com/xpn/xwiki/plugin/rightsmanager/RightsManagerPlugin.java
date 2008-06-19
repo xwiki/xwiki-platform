@@ -84,16 +84,6 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
     /**
      * {@inheritDoc}
      *
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#flushCache(com.xpn.xwiki.XWikiContext)
-     */
-    public void flushCache(XWikiContext context)
-    {
-        context.getWiki().getNotificationManager().removeGeneralRule(docChangeRule);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, com.xpn.xwiki.XWikiContext)
      */
     public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)

@@ -302,10 +302,7 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
             needsUpdate = true;
         }
 
-        if (!DEFAULT_APPLICATION_VERSION.equals(doc.getStringValue(getClassFullName(), FIELD_APPVERSION))) {
-            doc.setStringValue(getClassFullName(), FIELD_APPVERSION, DEFAULT_APPLICATION_VERSION);
-            needsUpdate = true;
-        }
+        needsUpdate |= updateDocStringValue(doc, FIELD_APPVERSION, DEFAULT_APPLICATION_VERSION);
 
         return needsUpdate;
     }

@@ -22,6 +22,7 @@ package com.xpn.xwiki;
 
 import org.jmock.Mock;
 import org.jmock.MockObjectTestCase;
+import org.xwiki.component.manager.ComponentManager;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -30,14 +31,16 @@ import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.store.XWikiStoreInterface;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Verify that notifications are correctly sent in the {@link XWiki} class.
  * 
  * @version $Id$
  */
-public class XWikiNotificationTest extends MockObjectTestCase
+public class XWikiNotificationTest extends AbstractXWikiComponentTestCase
 {
     public class TestListener implements XWikiDocChangeNotificationInterface
     {
@@ -60,8 +63,16 @@ public class XWikiNotificationTest extends MockObjectTestCase
     XWiki xwiki;
 
     @Override
-    public void setUp() throws XWikiException
+    public void setUp() throws Exception
     {
+        super.setUp();
+
+        // Statically store the component manager in {@link Utils} to be able to access it without
+        // the context.
+        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
+        // shared-tests will depends on core 1.5 branch
+        Utils.setComponentManager((ComponentManager) getContext().get(ComponentManager.class.getName()));
+
         this.context = new XWikiContext();
         this.xwiki = new XWiki();
         this.context.setWiki(this.xwiki);

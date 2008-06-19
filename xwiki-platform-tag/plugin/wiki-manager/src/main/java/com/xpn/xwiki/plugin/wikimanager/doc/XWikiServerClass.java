@@ -156,54 +156,69 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
     public static final String FIELDPN_LANGUAGE = "Language";
 
     /**
-     * Name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
+     * Name of field <code>secure</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELD_SECURE = "secure";
 
     /**
-     * Pretty name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
+     * Pretty name of field <code>secure</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDPN_SECURE = "Secure";
 
     /**
-     * Display type of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
+     * Display type of field <code>secure</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDDT_SECURE = "checkbox";
 
     /**
-     * Name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
+     * Default value of field <code>secure</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final Boolean DEFAULT_SECURE = Boolean.FALSE;
+
+    /**
+     * Name of field <code>homepage</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELD_HOMEPAGE = "homepage";
 
     /**
-     * Pretty name of field <code>visibility</code> for the XWiki class XWiki.XWikiServerClass.
+     * Pretty name of field <code>homepage</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDPN_HOMEPAGE = "Home page";
+    
+    /**
+     * The full name of the default home page of a newly created wiki.
+     */
+    public static final String DEFAULT_HOMEPAGE = "Main.WebHome";
 
     /**
-     * Name of field <code>istemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     * Name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELD_ISWIKITEMPLATE = "iswikitemplate";
 
     /**
-     * Pretty name of field <code>istemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     * Pretty name of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDPN_ISWIKITEMPLATE = "Template";
 
     /**
-     * Display type of field <code>istemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     * Display type of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDDT_ISWIKITEMPLATE = FIELDDT_SECURE;
+
+    /**
+     * Default value of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final Boolean DEFAULT_ISWIKITEMPLATE = Boolean.FALSE;
+
+    /**
+     * Default value of field <code>iswikitemplate</code> for the XWiki class XWiki.XWikiServerClass.
+     */
+    public static final int FIELDDV_ISWIKITEMPLATE_INT = 0;
 
     /**
      * The full name of the default parent of a newly created document.
      */
     public static final String DEFAULT_PAGE_PARENT = "WikiManager.WebHome";
-
-    /**
-     * The full name of the default home page of a newly created wiki.
-     */
-    public static final String DEFAULT_WIKI_HOMEPAGE = "Main.WebHome";
 
     // ///
 
@@ -272,8 +287,10 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
         needsUpdate |= baseClass.addStaticListField(FIELD_STATE, FIELDPN_STATE, FIELDL_STATE);
         needsUpdate |= baseClass.addStaticListField(FIELD_LANGUAGE, FIELDPN_LANGUAGE, FIELDL_LANGUAGE);
         needsUpdate |= baseClass.addBooleanField(FIELD_SECURE, FIELDPN_SECURE, FIELDDT_SECURE);
+        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_SECURE, DEFAULT_SECURE);
         needsUpdate |= baseClass.addTextField(FIELD_HOMEPAGE, FIELDPN_HOMEPAGE, 30);
         needsUpdate |= baseClass.addBooleanField(FIELD_ISWIKITEMPLATE, FIELDPN_ISWIKITEMPLATE, FIELDDT_ISWIKITEMPLATE);
+        needsUpdate |= updateBooleanClassDefaultValue(baseClass, FIELD_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
 
         return needsUpdate;
     }
@@ -293,10 +310,11 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
             needsUpdate = true;
         }
 
-        if (!DEFAULT_WIKI_HOMEPAGE.equals(doc.getStringValue(getClassFullName(), FIELD_HOMEPAGE))) {
-            doc.setStringValue(getClassFullName(), FIELD_HOMEPAGE, DEFAULT_WIKI_HOMEPAGE);
-            needsUpdate = true;
-        }
+        needsUpdate |= updateDocStringValue(doc, FIELD_HOMEPAGE, DEFAULT_HOMEPAGE);
+
+        needsUpdate |= updateDocBooleanValue(doc, FIELD_SECURE, DEFAULT_SECURE);
+
+        needsUpdate |= updateDocBooleanValue(doc, FIELD_ISWIKITEMPLATE, DEFAULT_ISWIKITEMPLATE);
 
         return needsUpdate;
     }

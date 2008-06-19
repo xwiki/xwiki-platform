@@ -268,7 +268,7 @@ public class Utils
 
         // Statically store the component manager in {@link Utils} to be able to access it without
         // the context.
-        Utils.setComponentManager((ComponentManager) context.get(ComponentManager.class.getName()));
+        Utils.setComponentManager(componentManager);
 
         return context;
     }
@@ -393,7 +393,7 @@ public class Utils
     private static void putMapEntry(Map<String, String[]> map, String name, String value)
     {
         String[] newValues = null;
-        String[] oldValues = (String[]) map.get(name);
+        String[] oldValues = map.get(name);
         if (oldValues == null) {
             newValues = new String[1];
             newValues[0] = value;

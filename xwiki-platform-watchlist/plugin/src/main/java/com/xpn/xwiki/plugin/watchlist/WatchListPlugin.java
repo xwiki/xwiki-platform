@@ -322,9 +322,10 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      *
      * @param user XWiki User
      * @param context Context of the request
+     * @return the watchlist object that has been created
      * @throws XWikiException if the document cannot be saved
      */
-    public void createWatchListObject(String user, XWikiContext context) throws XWikiException
+    public BaseObject createWatchListObject(String user, XWikiContext context) throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
         int nb = userDocument.createNewObject(WATCHLIST_CLASS, context);
@@ -333,6 +334,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         context.getWiki()
             .saveDocument(userDocument, context.getMessageTool().get("watchlist.create.object"),
                 true, context);
+        return wObj;
     }
 
     /**
@@ -347,12 +349,13 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         throws XWikiException
     {
         XWikiDocument userDocument = context.getWiki().getDocument(user, context);
-        if (userDocument.getObjectNumbers(WATCHLIST_CLASS) == 0) {
-            this.createWatchListObject(user, context);
-            return this.getWatchListObject(user, context);
+        BaseObject obj = userDocument.getObject(WATCHLIST_CLASS);
+        if (obj == null) {
+            obj = this.createWatchListObject(user, context);
         }
-        return userDocument.getObject(WATCHLIST_CLASS);
+        return obj;
     }
+
 
     /**
      * Sets a largeString property in the user's WatchList Object, then saves the user's profile

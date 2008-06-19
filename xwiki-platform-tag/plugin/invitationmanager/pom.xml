@@ -29,7 +29,7 @@
   <parent>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
     <artifactId>xwiki-plugins</artifactId>
-    <version>8-SNAPSHOT</version>
+    <version>7</version>
   </parent>
   <artifactId>xwiki-plugin-invitationmanager</artifactId>
   <version>1.0-SNAPSHOT</version>

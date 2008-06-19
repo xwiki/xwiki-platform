@@ -12,15 +12,16 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1210777206000</date>
-<contentUpdateDate>1210777206000</contentUpdateDate>
-<version>83.1</version>
+<date>1213879900000</date>
+<contentUpdateDate>1213879900000</contentUpdateDate>
+<version>84.1</version>
 <title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
 <validationScript></validationScript>
 <comment></comment>
 <minorEdit>false</minorEdit>
+<syntaxId>xwiki/1.0</syntaxId>
 <object>
 <class>
 <name>XWiki.TagClass</name>
@@ -440,7 +441,7 @@
             &lt;dd&gt;&lt;input size="40" id="XWiki.XWikiServerClass_0_server" name="XWiki.XWikiServerClass_0_server" type="text" onchange="domainNameChanged();" /&gt;&lt;/dd&gt;
           &lt;/dl&gt;
         &lt;/td&gt;
-        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.server", [$DOMAINNAME])&lt;/td&gt; #end
+        #if ($documentation) &lt;td&gt;$msg.get("wikimanager.doc.createwiki.desc.server.creation", [$DOMAINNAME])&lt;/td&gt; #end
       &lt;/tr&gt;
       &lt;tr&gt;
         &lt;td&gt;

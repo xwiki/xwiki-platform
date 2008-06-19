@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1187881143000</creationDate>
-<date>1213886362000</date>
-<contentUpdateDate>1213886362000</contentUpdateDate>
-<version>23.1</version>
+<date>1213890037000</date>
+<contentUpdateDate>1213890037000</contentUpdateDate>
+<version>34.1</version>
 <title>XWikiServerClassSheet</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -106,36 +106,61 @@
     ##
       &lt;dl&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.wikiprettyname"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.wikiprettyname")
-          &lt;dd&gt;$doc.display("wikiprettyname", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;br /&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("wikiprettyname", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.wikiprettyname")
+            &lt;/p&gt;
+          &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.owner"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.owner")
-          &lt;dd&gt;$doc.display("owner", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;br /&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("owner", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.owner")
+            &lt;/p&gt;
+          &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.secure"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.secure")
-          &lt;dd&gt;$doc.display("secure", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;br /&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("secure", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.secure")
+            &lt;/p&gt;
+          &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.iswikitemplate"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.iswikitemplate")
-          &lt;dd&gt;$doc.display("iswikitemplate", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;br /&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("iswikitemplate", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.iswikitemplate")
+            &lt;/p&gt;
+          &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.language"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.language")
-          &lt;dd&gt;$doc.display("language", $firstalias.objectApi)&lt;/dd
-        &lt;br /&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("language", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.language")
+            &lt;/p&gt;
+          &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.server"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.server")
-          &lt;dd&gt;$doc.display("server", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;br /&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("server", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.server")
+            &lt;/p&gt;
+          &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.description"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.description")
-          &lt;dd&gt;$doc.display("description", $firstalias.objectApi)&lt;/dd&gt;
-        &lt;br /&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("description", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.description")
+            &lt;/p&gt;
+          &lt;/dd&gt;
         &lt;dt&gt;$msg.get("wikimanager.prop.wiki.homepage"):&lt;/dt&gt;
-          $msg.get("wikimanager.doc.createwiki.desc.homepage")
-          &lt;dd&gt;$doc.display("homepage", $firstalias.objectApi)&lt;/dd&gt;
+          &lt;dd&gt;
+            &lt;p&gt;
+              $doc.display("homepage", $firstalias.objectApi)\\
+              $msg.get("wikimanager.doc.createwiki.desc.homepage")
+            &lt;/p&gt;
+          &lt;/dd&gt;
       &lt;/dl&gt;
     #if ($context.action != "view")
       &lt;/fieldset&gt;
@@ -169,12 +194,19 @@
 	          &lt;br /&gt;
               &lt;dl&gt;
                 &lt;dt&gt;$msg.get("wikimanager.prop.alias.description"):&lt;/dt&gt;
-                  $msg.get("wikimanager.doc.createwiki.desc.description")
-                  &lt;dd&gt;$doc.display("description", $wikiAlias.objectApi)&lt;/dd&gt;
-                &lt;br /&gt;
+                  &lt;dd&gt;
+                    &lt;p&gt;
+                      $doc.display("description", $wikiAlias.objectApi)\\
+                      $msg.get("wikimanager.doc.createwiki.desc.description")
+                    &lt;/p&gt;
+                  &lt;/dd&gt;
                 &lt;dt&gt;$msg.get("wikimanager.prop.alias.homepage"):&lt;/dt&gt;
-                  $msg.get("wikimanager.doc.createwiki.desc.homepage")
-                  &lt;dd&gt;$doc.display("homepage", $wikiAlias.objectApi)&lt;/dd&gt;
+                  &lt;dd&gt;
+                    &lt;p&gt;
+                      $doc.display("homepage", $wikiAlias.objectApi)\\
+                      $msg.get("wikimanager.doc.createwiki.desc.homepage")
+                    &lt;/p&gt;
+                  &lt;/dd&gt;
               &lt;/dl&gt;
         #if ($context.action == "view")
   	          &lt;br /&gt;

@@ -47,9 +47,8 @@ import java.util.*;
 public class Utils
 {
     /**
-     * The component manager used by {@link #getComponent(String)} and
-     * {@link #getComponent(String, String)}. It is useful for any non component code that need to
-     * initialize/access components.
+     * The component manager used by {@link #getComponent(String)} and {@link #getComponent(String, String)}. It is
+     * useful for any non component code that need to initialize/access components.
      */
     private static ComponentManager componentManager;
 
@@ -58,8 +57,7 @@ public class Utils
         parseTemplate(template, true, context);
     }
 
-    public static void parseTemplate(String template, boolean write, XWikiContext context)
-        throws XWikiException
+    public static void parseTemplate(String template, boolean write, XWikiContext context) throws XWikiException
     {
         XWikiResponse response = context.getResponse();
 
@@ -74,11 +72,9 @@ public class Utils
         if ((!"download".equals(action)) && (!"skin".equals(action))) {
             if (context.getResponse() instanceof XWikiServletResponse) {
                 // Add a last modified to tell when the page was last updated
-                if (context.getWiki()
-                    .getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0) {
+                if (context.getWiki().getXWikiPreferenceAsLong("headers_lastmodified", 0, context) != 0) {
                     if (context.getDoc() != null) {
-                        response.setDateHeader("Last-Modified", context.getDoc().getDate()
-                            .getTime());
+                        response.setDateHeader("Last-Modified", context.getDoc().getDate().getTime());
                     }
                 }
                 // Set a nocache to make sure the page is reloaded after an edit
@@ -87,13 +83,11 @@ public class Utils
                     response.setHeader("Cache-Control", "no-cache");
                 }
                 // Set an expires in one month
-                long expires =
-                    context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
+                long expires = context.getWiki().getXWikiPreferenceAsLong("headers_expires", -1, context);
                 if (expires == -1) {
                     response.setDateHeader("Expires", -1);
                 } else if (expires != 0) {
-                    response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600
-                        * 1000L);
+                    response.setDateHeader("Expires", (new Date()).getTime() + 30 * 24 * 3600 * 1000L);
                 }
             }
         }
@@ -120,8 +114,7 @@ public class Utils
                 // Set the content length to the number of bytes, not the
                 // string length, so as to handle multi-byte encodings
                 try {
-                    response
-                        .setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
+                    response.setContentLength(content.getBytes(context.getWiki().getEncoding()).length);
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
                 }
@@ -130,15 +123,13 @@ public class Utils
             if (write) {
                 try {
                     try {
-                        response.getOutputStream().write(
-                            content.getBytes(context.getWiki().getEncoding()));
+                        response.getOutputStream().write(content.getBytes(context.getWiki().getEncoding()));
                     } catch (IllegalStateException ex) {
                         response.getWriter().write(content);
                     }
                 } catch (IOException e) {
                     throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION,
-                        "Exception while sending response", e);
+                        XWikiException.ERROR_XWIKI_APP_SEND_RESPONSE_EXCEPTION, "Exception while sending response", e);
                 }
             }
         }
@@ -229,14 +220,13 @@ public class Utils
             fileis.close();
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,
-                "Exception while reading uploaded parsed file", e);
+                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
         }
         return data;
     }
 
-    public static XWikiContext prepareContext(String action, XWikiRequest request,
-        XWikiResponse response, XWikiEngineContext engine_context) throws XWikiException
+    public static XWikiContext prepareContext(String action, XWikiRequest request, XWikiResponse response,
+        XWikiEngineContext engine_context) throws XWikiException
     {
         XWikiContext context = new XWikiContext();
         String dbname = "xwiki";
@@ -278,23 +268,20 @@ public class Utils
 
         // Statically store the component manager in {@link Utils} to be able to access it without
         // the context.
-        Utils.setComponentManager((ComponentManager) context
-            .get(ComponentManager.class.getName()));
+        Utils.setComponentManager((ComponentManager) context.get(ComponentManager.class.getName()));
 
         return context;
     }
 
     /**
-     * Append request parameters from the specified String to the specified Map. It is presumed that
-     * the specified Map is not accessed from any other thread, so no synchronization is performed.
-     * <p/> <strong>IMPLEMENTATION NOTE</strong>: URL decoding is performed individually on the
-     * parsed name and value elements, rather than on the entire query string ahead of time, to
-     * properly deal with the case where the name or value includes an encoded "=" or "&" character
-     * that would otherwise be interpreted as a delimiter.
+     * Append request parameters from the specified String to the specified Map. It is presumed that the specified Map
+     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION NOTE</strong>:
+     * URL decoding is performed individually on the parsed name and value elements, rather than on the entire query
+     * string ahead of time, to properly deal with the case where the name or value includes an encoded "=" or "&"
+     * character that would otherwise be interpreted as a delimiter.
      * 
      * @param data Input string containing request parameters
-     * @throws IllegalArgumentException if the data is malformed <p/> Code borrowed from Apache
-     *             Tomcat 5.0
+     * @throws IllegalArgumentException if the data is malformed <p/> Code borrowed from Apache Tomcat 5.0
      */
     public static Map<String, String[]> parseParameters(String data, String encoding)
         throws UnsupportedEncodingException
@@ -321,18 +308,16 @@ public class Utils
     }
 
     /**
-     * Append request parameters from the specified String to the specified Map. It is presumed that
-     * the specified Map is not accessed from any other thread, so no synchronization is performed.
-     * <p/> <strong>IMPLEMENTATION NOTE</strong>: URL decoding is performed individually on the
-     * parsed name and value elements, rather than on the entire query string ahead of time, to
-     * properly deal with the case where the name or value includes an encoded "=" or "&" character
-     * that would otherwise be interpreted as a delimiter. <p/> NOTE: byte array data is modified by
-     * this method. Caller beware.
+     * Append request parameters from the specified String to the specified Map. It is presumed that the specified Map
+     * is not accessed from any other thread, so no synchronization is performed. <p/> <strong>IMPLEMENTATION NOTE</strong>:
+     * URL decoding is performed individually on the parsed name and value elements, rather than on the entire query
+     * string ahead of time, to properly deal with the case where the name or value includes an encoded "=" or "&"
+     * character that would otherwise be interpreted as a delimiter. <p/> NOTE: byte array data is modified by this
+     * method. Caller beware.
      * 
      * @param data Input string containing request parameters
      * @param encoding Encoding to use for converting hex
-     * @throws UnsupportedEncodingException if the data is malformed <p/> Code borrowed from Apache
-     *             Tomcat 5.0
+     * @throws UnsupportedEncodingException if the data is malformed <p/> Code borrowed from Apache Tomcat 5.0
      */
     public static Map<String, String[]> parseParameters(byte[] data, String encoding)
         throws UnsupportedEncodingException
@@ -367,8 +352,7 @@ public class Utils
                         data[ox++] = (byte) ' ';
                         break;
                     case '%':
-                        data[ox++] =
-                            (byte) ((convertHexDigit(data[ix++]) << 4) + convertHexDigit(data[ix++]));
+                        data[ox++] = (byte) ((convertHexDigit(data[ix++]) << 4) + convertHexDigit(data[ix++]));
                         break;
                     default:
                         data[ox++] = c;
@@ -403,8 +387,8 @@ public class Utils
     }
 
     /**
-     * Put name value pair in map. <p/> Put name and value pair in map. When name already exist, add
-     * value to array of values. <p/> Code borrowed from Apache Tomcat 5.0
+     * Put name value pair in map. <p/> Put name and value pair in map. When name already exist, add value to array of
+     * values. <p/> Code borrowed from Apache Tomcat 5.0
      */
     private static void putMapEntry(Map<String, String[]> map, String name, String value)
     {
@@ -474,8 +458,7 @@ public class Utils
         }
     }
 
-    public static FileUploadPlugin handleMultipart(HttpServletRequest request,
-        XWikiContext context)
+    public static FileUploadPlugin handleMultipart(HttpServletRequest request, XWikiContext context)
     {
         FileUploadPlugin fileupload = null;
         try {
@@ -536,9 +519,11 @@ public class Utils
             try {
                 component = componentManager.lookup(role, hint);
             } catch (ComponentLookupException e) {
-                throw new RuntimeException("Failed to load component [" + role + "] for hint ["
-                    + hint + "]", e);
+                throw new RuntimeException("Failed to load component [" + role + "] for hint [" + hint + "]", e);
             }
+        } else {
+            throw new RuntimeException("Component manager has not been initialized before lookup for [" + role
+                + "] for hint [" + hint + "]");
         }
 
         return component;

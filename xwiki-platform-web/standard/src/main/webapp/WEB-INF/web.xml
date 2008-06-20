@@ -9,6 +9,15 @@
   <display-name>xwiki</display-name>
   <description>XWiki Application</description>
 
+  <!-- A filter that allows requests to be saved and reused later. For example when the current request contains an expired
+       authentication token, and the authorization module redirects to the login page, all the information sent by the
+       client would be lost; this filter allows to save all that information, and after a successful login, injects the
+       saved data in the new request. -->
+  <filter>
+    <filter-name>RequestRestorer</filter-name>
+    <filter-class>com.xpn.xwiki.web.SavedRequestRestorerFilter</filter-class>
+  </filter>
+
   <!-- Filter that sets a custom encoding to all requests, since usually clients don't specificy
        the encoding used for submitting the request, so by default containers fall back to the
        encoding globally configured in their settings. This allows XWiki to use a custom encoding,
@@ -32,6 +41,10 @@
     </init-param>
   </filter>
 
+  <filter-mapping>
+    <filter-name>RequestRestorer</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
     <url-pattern>/*</url-pattern>

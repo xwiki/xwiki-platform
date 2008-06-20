@@ -31,6 +31,7 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
@@ -48,6 +49,10 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 
         // We need to initialize the Component Manager so that the components can be looked up
         getContext().put(ComponentManager.class.getName(), getComponentManager());
+
+        // Statically store the component manager in {@link Utils} to be able to access it without
+        // the context.
+        Utils.setComponentManager(getComponentManager());
 
         // Initialize the Execution Context
         ExecutionContextInitializerManager ecim =
@@ -68,6 +73,8 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
     {
         Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
         execution.removeContext();
+
+        Utils.setComponentManager(null);
     }
     
     public XWikiContext getContext()

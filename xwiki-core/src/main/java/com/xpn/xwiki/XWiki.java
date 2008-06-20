@@ -1120,7 +1120,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String Param(String key)
     {
-        return getConfig().getProperty(key);
+        return Param(key, null);
     }
 
     public String ParamAsRealPath(String key)
@@ -1168,12 +1168,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public String Param(String key, String default_value)
     {
-        return getConfig().getProperty(key, default_value);
+        if (getConfig() != null) {
+            return getConfig().getProperty(key, default_value);
+        }
+        return default_value;
     }
 
     public long ParamAsLong(String key)
     {
-        String param = getConfig().getProperty(key);
+        String param = Param(key);
         return Long.parseLong(param);
     }
 

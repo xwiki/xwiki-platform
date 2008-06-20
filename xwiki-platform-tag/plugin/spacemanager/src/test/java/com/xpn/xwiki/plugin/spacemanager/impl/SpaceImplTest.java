@@ -15,16 +15,18 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
-/** 
+/**
  * @version $Id: $
  */
-public class SpaceImplTest extends org.jmock.cglib.MockObjectTestCase
+public class SpaceImplTest extends AbstractXWikiComponentTestCase
 {
 
     private XWikiContext context;
@@ -47,10 +49,18 @@ public class SpaceImplTest extends org.jmock.cglib.MockObjectTestCase
 
     private String spaceName = "mynicespacename";
 
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
-        this.context = new XWikiContext();
-        this.xwiki = new XWiki(new XWikiConfig(), this.context);
+        super.setUp();
+
+        this.context = getContext();
+
+        this.xwiki = new XWiki();
+
+        XWikiConfig config = new XWikiConfig();
+        xwiki.setConfig(config);
+
+        xwiki.setNotificationManager(new XWikiNotificationManager());
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
@@ -134,6 +144,7 @@ public class SpaceImplTest extends org.jmock.cglib.MockObjectTestCase
 
         XWikiDocument doc = new XWikiDocument("Main", "WebHome");
         doc.setAuthor("xwiki:XWiki.Admin");
+        doc.setContentAuthor("xwiki:XWiki.Admin");
         context.setDoc(doc);
 
         this.space = (SpaceImpl) this.spaceManager.createSpace(displayTitle, context);

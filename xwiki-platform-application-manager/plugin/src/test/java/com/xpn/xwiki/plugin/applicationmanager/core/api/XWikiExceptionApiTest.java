@@ -31,6 +31,7 @@ public class XWikiExceptionApiTest extends TestCase
 {
     /**
      * We only verify here we get the correct error code for some static error field name.
+     * 
      * @throws XWikiException error occurred.
      */
     public void testGetStaticErrorCode() throws XWikiException
@@ -39,12 +40,10 @@ public class XWikiExceptionApiTest extends TestCase
 
         assertEquals("Error code is incorrect", XWikiException.ERROR_XWIKI_UNKNOWN, exceptionapi
             .get("ERROR_XWIKI_UNKNOWN"));
-        assertEquals("Error code is incorrect",
-            XWikiException.ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND, exceptionapi
-                .get("ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND"));
-        assertEquals("Error code is incorrect",
-            XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI, exceptionapi
-                .get("ERROR_XWIKI_CONTENT_LINK_INVALID_URI"));
+        assertEquals("Error code is incorrect", XWikiException.ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND, exceptionapi
+            .get("ERROR_XWIKI_EXPORT_XSL_FILE_NOT_FOUND"));
+        assertEquals("Error code is incorrect", XWikiException.ERROR_XWIKI_CONTENT_LINK_INVALID_URI, exceptionapi
+            .get("ERROR_XWIKI_CONTENT_LINK_INVALID_URI"));
     }
 
     /**
@@ -56,11 +55,9 @@ public class XWikiExceptionApiTest extends TestCase
 
         try {
             exceptionapi.get("wrongerrorname");
-            fail("XWikiExceptionApi.get(String) did not throwed exception with \"wrongerrorname\" "
-                + "error name.");
+            fail("XWikiExceptionApi.get(String) did not throwed exception with \"wrongerrorname\" " + "error name.");
         } catch (XWikiException e) {
-            assertEquals("Wrong exception throwed.",
-                XWikiExceptionApi.ERROR_XWIKI_ERROR_DOES_NOT_EXIST, e.getCode());
+            assertEquals("Wrong exception throwed.", XWikiExceptionApi.ERROR_XWIKI_ERROR_DOES_NOT_EXIST, e.getCode());
         }
     }
 
@@ -86,24 +83,23 @@ public class XWikiExceptionApiTest extends TestCase
 
     /**
      * We only verify here we get the correct error code for some static error field name.
+     * 
      * @throws XWikiException error occurred.
      */
     public void testGetExtendedStaticErrorCode() throws XWikiException
     {
-        XWikiExceptionApi exceptionapi1 =
-            new XWikiExceptionApi(new SomeExtendedException(), null);
+        XWikiExceptionApi exceptionapi1 = new XWikiExceptionApi(new SomeExtendedException(), null);
 
-        assertEquals("Error code is incorrect", SomeExtendedException.ERROR_EXTENDED_ERROR1,
-            exceptionapi1.get("ERROR_EXTENDED_ERROR1"));
-        assertEquals("Error code is incorrect", SomeExtendedException.ERROR_EXTENDED_ERROR2,
-            exceptionapi1.get("ERROR_EXTENDED_ERROR2"));
+        assertEquals("Error code is incorrect", SomeExtendedException.ERROR_EXTENDED_ERROR1, exceptionapi1
+            .get("ERROR_EXTENDED_ERROR1"));
+        assertEquals("Error code is incorrect", SomeExtendedException.ERROR_EXTENDED_ERROR2, exceptionapi1
+            .get("ERROR_EXTENDED_ERROR2"));
 
-        XWikiExceptionApi exceptionapi2 =
-            new XWikiExceptionApi(new SomeOtherExtendedException(), null);
+        XWikiExceptionApi exceptionapi2 = new XWikiExceptionApi(new SomeOtherExtendedException(), null);
 
-        assertEquals("Error code is incorrect", SomeOtherExtendedException.ERROR_EXTENDED_ERROR1,
-            exceptionapi2.get("ERROR_EXTENDED_ERROR1"));
-        assertEquals("Error code is incorrect", SomeOtherExtendedException.ERROR_EXTENDED_ERROR2,
-            exceptionapi2.get("ERROR_EXTENDED_ERROR2"));
+        assertEquals("Error code is incorrect", SomeOtherExtendedException.ERROR_EXTENDED_ERROR1, exceptionapi2
+            .get("ERROR_EXTENDED_ERROR1"));
+        assertEquals("Error code is incorrect", SomeOtherExtendedException.ERROR_EXTENDED_ERROR2, exceptionapi2
+            .get("ERROR_EXTENDED_ERROR2"));
     }
 }

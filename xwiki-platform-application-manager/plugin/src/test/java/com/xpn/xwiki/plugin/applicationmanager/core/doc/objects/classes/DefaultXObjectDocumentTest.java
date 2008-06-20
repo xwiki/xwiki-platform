@@ -25,11 +25,13 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.user.api.XWikiRightService;
+import com.xpn.xwiki.web.XWikiEngineContext;
 
 import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
@@ -42,8 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Unit tests for
- * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument}.
+ * Unit tests for {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.DefaultXObjectDocument}.
  * 
  * @version $Id: $
  */
@@ -57,19 +58,30 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
 
     private Mock mockXWikiVersioningStore;
 
-    private Map documents = new HashMap();
+    private Map<String, XWikiDocument> documents = new HashMap<String, XWikiDocument>();
 
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.xwiki = new XWiki(new XWikiConfig(), this.context);
+        this.xwiki = new XWiki(new XWikiConfig(), this.context)
+        {
+            @Override
+            public void initXWiki(XWikiConfig config, XWikiContext context, XWikiEngineContext engine_context,
+                boolean noupdate) throws XWikiException
+            {
+                setConfig(config);
+                context.setWiki(this);
+
+                setNotificationManager(new XWikiNotificationManager());
+            }
+        };
 
         // //////////////////////////////////////////////////
         // XWikiHibernateStore
 
         this.mockXWikiStore =
-            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
-                new Object[] {this.xwiki, this.context});
+            mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {this.xwiki,
+            this.context});
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {
@@ -98,33 +110,29 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
                     return null;
                 }
             });
-        this.mockXWikiStore.stubs().method("getTranslationList").will(
-            returnValue(Collections.EMPTY_LIST));
+        this.mockXWikiStore.stubs().method("getTranslationList").will(returnValue(Collections.EMPTY_LIST));
 
         this.mockXWikiVersioningStore =
-            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class,
-            XWikiContext.class}, new Object[] {this.xwiki, this.context});
-        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(
-            returnValue(null));
+            mock(XWikiHibernateVersioningStore.class, new Class[] {XWiki.class, XWikiContext.class}, new Object[] {
+            this.xwiki, this.context});
+        this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
-            .proxy());
+        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore.proxy());
 
         // ////////////////////////////////////////////////////////////////////////////////
         // XWikiRightService
 
         this.xwiki.setRightService(new XWikiRightService()
         {
-            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context)
-                throws XWikiException
+            public boolean checkAccess(String action, XWikiDocument doc, XWikiContext context) throws XWikiException
             {
                 return true;
             }
 
-            public boolean hasAccessLevel(String right, String username, String docname,
-                XWikiContext context) throws XWikiException
+            public boolean hasAccessLevel(String right, String username, String docname, XWikiContext context)
+                throws XWikiException
             {
                 return true;
             }
@@ -218,27 +226,24 @@ public class DefaultXObjectDocumentTest extends MockObjectTestCase
         assertNotNull(obj);
         assertEquals(sdoc.getXClassManager(), sclass);
     }
-    
+
     public void testMergeObject() throws XWikiException
     {
         XClassManager sclass = TestAbstractXClassManagerTest.DispatchXClassManager.getInstance(context);
-        DefaultXObjectDocument sdoc1 =
-            (DefaultXObjectDocument) sclass.newXObjectDocument(context);
-        
-        DefaultXObjectDocument sdoc2 =
-            (DefaultXObjectDocument) sclass.newXObjectDocument(context);
-        
+        DefaultXObjectDocument sdoc1 = (DefaultXObjectDocument) sclass.newXObjectDocument(context);
+
+        DefaultXObjectDocument sdoc2 = (DefaultXObjectDocument) sclass.newXObjectDocument(context);
+
         sdoc1.setStringValue("field1", "valuesdoc1");
         sdoc1.setStringValue("field2", "value2sdoc1");
-        
+
         sdoc2.setStringValue("field1", "valuesdoc2");
         sdoc2.setIntValue("field3", 2);
-        
+
         sdoc1.mergeObject(sdoc2);
-        
+
         assertEquals("The field is not overwritten", sdoc1.getStringValue("field1"), sdoc2.getStringValue("field1"));
         assertEquals("The field is removed", "value2sdoc1", sdoc1.getStringValue("field2"));
-        assertEquals("The field is not added", sdoc1.getIntValue("field3"), sdoc1.getIntValue
-        ("field3"));
+        assertEquals("The field is not added", sdoc1.getIntValue("field3"), sdoc1.getIntValue("field3"));
     }
 }

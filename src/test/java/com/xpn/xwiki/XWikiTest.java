@@ -72,12 +72,6 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
     {
         super.setUp();
 
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
-        // shared-tests will depends on core 1.5 branch
-        Utils.setComponentManager((ComponentManager) getContext().get(ComponentManager.class.getName()));
-
         this.document = new XWikiDocument("MilkyWay", "Fidis");
         this.xwiki = new XWiki(new XWikiConfig(), getContext());
 
@@ -134,22 +128,6 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         this.document.setCreator("Condor");
         this.document.setAuthor("Albatross");
         this.xwiki.saveDocument(this.document, getContext());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-
-        // Makes sure tests are independents as Utils's ComponentManager is a static
-        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
-        // shared-tests will depends on core 1.5 branch
-        Utils.setComponentManager(null);
     }
 
     public void testAuthorAfterDocumentCopy() throws XWikiException

@@ -60,13 +60,6 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
     {
         super.setUp();
 
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
-        // shared-tests will depends on core 1.5 branch
-        Utils.setComponentManager((ComponentManager) getContext().get(
-            ComponentManager.class.getName()));
-
         this.renderer = new XWikiVelocityRenderer();
 
         this.mockXWiki = mock(XWiki.class);
@@ -87,22 +80,6 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
                 new Object[] {this.document, getContext()});
         this.mockDocument.stubs().method("newDocument")
             .will(returnValue(mockApiDocument.proxy()));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-
-        // Makes sure tests are independents as Utils's ComponentManager is a static
-        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
-        // shared-tests will depends on core 1.5 branch
-        Utils.setComponentManager(null);
     }
 
     public void testRenderWithSimpleText()

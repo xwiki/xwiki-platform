@@ -47,13 +47,6 @@ public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestC
     {
         super.setUp();
 
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
-        // shared-tests will depends on core 1.5 branch
-        Utils.setComponentManager((ComponentManager) getContext().get(
-            ComponentManager.class.getName()));
-
         XWikiConfig config = new XWikiConfig();
 
         Mock mockServletContext = mock(ServletContext.class);
@@ -79,22 +72,6 @@ public class DefaultXWikiRenderingEngineTest extends AbstractXWikiComponentTestC
         xwiki.setVersion("1.0");
 
         this.engine = (DefaultXWikiRenderingEngine) xwiki.getRenderingEngine();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#tearDown()
-     */
-    @Override
-    protected void tearDown() throws Exception
-    {
-        super.tearDown();
-
-        // Makes sure tests are independents as Utils's ComponentManager is a static
-        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
-        // shared-tests will depends on core 1.5 branch
-        Utils.setComponentManager(null);
     }
 
     public void testRenderTextWhenUsingCodeMacro() throws Exception

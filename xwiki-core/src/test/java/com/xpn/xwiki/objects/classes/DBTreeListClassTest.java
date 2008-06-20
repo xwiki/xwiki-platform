@@ -49,7 +49,8 @@ public class DBTreeListClassTest extends AbstractXWikiComponentTestCase
         getContext().setDoc(new XWikiDocument());
 
         XWikiHibernateStore store = new XWikiHibernateStore("dummy");
-        XWiki xwiki = new XWiki(new XWikiConfig(), getContext());
+        XWiki xwiki = new XWiki();
+        getContext().setWiki(xwiki);
         xwiki.setStore(store);
     }
 

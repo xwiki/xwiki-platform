@@ -45,7 +45,7 @@ public class XWikiAuthServiceImplTest extends MockObjectTestCase
         this.authService = new XWikiAuthServiceImpl();
         this.context = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
     }
 

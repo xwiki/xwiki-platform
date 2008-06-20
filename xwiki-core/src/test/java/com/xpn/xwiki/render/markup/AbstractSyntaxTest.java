@@ -47,7 +47,7 @@ public abstract class AbstractSyntaxTest extends MockObjectTestCase
         this.renderer = new XWikiRadeoxRenderer();
         this.context = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockDocument = mock(XWikiDocument.class);

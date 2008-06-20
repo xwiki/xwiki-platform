@@ -69,9 +69,7 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
 
         this.renderer = new XWikiVelocityRenderer();
 
-        this.mockXWiki =
-            mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {
-            new XWikiConfig(), getContext()});
+        this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("getSkin").will(returnValue("default"));
         this.mockXWiki.stubs().method("getSkinFile").will(returnValue(null));
         this.mockXWiki.stubs().method("getResourceContent").will(returnValue(null));

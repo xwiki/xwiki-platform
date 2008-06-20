@@ -55,7 +55,7 @@ public class XWikiDocumentTest extends MockObjectTestCase
         this.context = new XWikiContext();
         this.document = new XWikiDocument("Space", "Page");
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("Param").will(returnValue(null));
 
         this.mockXWikiRenderingEngine = mock(XWikiRenderingEngine.class);

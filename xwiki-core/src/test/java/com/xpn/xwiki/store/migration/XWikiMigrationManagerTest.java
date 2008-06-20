@@ -43,11 +43,7 @@ public class XWikiMigrationManagerTest extends TestCase
         super.setUp();
         context = new XWikiContext();
         XWikiConfig config = new XWikiConfig();
-        context.setWiki(new XWiki(config, context) {
-            public void initXWiki(XWikiConfig config, XWikiContext context,
-                XWikiEngineContext engine_context, boolean noupdate) throws XWikiException
-            {}
-        });
+        context.setWiki(new XWiki());
         context.getWiki().setConfig(config);
     }
     /** mocked migration manager */

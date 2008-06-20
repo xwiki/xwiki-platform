@@ -1484,22 +1484,10 @@ public class InvitationManagerImpl implements InvitationManager
         vContext.put("xwiki", new XWiki(context.getWiki(), context));
         vContext.put("context", new com.xpn.xwiki.api.Context(context));
         vContext.put("doc", translatedMailDoc);
-
-        // rendering the template document with the defined velocity context. the subject of the
-        // mail is the subject of the template doc and the content of the mail is the content of the
-        // doc
-        String mailSubject =
-            XWikiVelocityRenderer.evaluate(translatedMailDoc.getTitle(), templateDocFullName,
-                vContext, context);
-        String mailContent =
-            XWikiVelocityRenderer.evaluate(translatedMailDoc.getContent(), templateDocFullName,
-                vContext, context);
-
-        // creates a new mail
-        Mail mail = new Mail(fromUser, strToUsers, null, null, mailSubject, mailContent, null);
+        vContext.put("space", space);
 
         try {
-            mailSender.sendMail(mail, context);
+            mailSender.sendMailFromTemplate(templateDocFullName, fromUser, strToUsers, null, null, context.getLanguage(), vContext, context);
         } catch (Exception e) {
             throw new InvitationManagerException(InvitationManagerException.MODULE_PLUGIN_INVITATIONMANAGER,
                 InvitationManagerException.ERROR_INVITATION_SENDING_EMAIL_FAILED,

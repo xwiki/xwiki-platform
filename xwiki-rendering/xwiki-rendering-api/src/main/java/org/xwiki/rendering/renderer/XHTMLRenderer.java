@@ -135,7 +135,11 @@ public class XHTMLRenderer implements Renderer
 
     public void endList(ListType listType)
     {
-        write("</ul>");
+        if (listType == ListType.BULLETED) {
+            write("</ul>");
+        } else {
+            write("</ol>");
+        }
     }
 
     public void endListItem()

@@ -38,6 +38,13 @@ public interface Transformation extends Comparable<Transformation>
      */
     String ROLE = Transformation.class.getName();
 
+    /**
+     * The priority of execution relative to the other transformations. The lowest values have the highest priorities
+     * and execute first. For example a Transformation with a priority of 100 will execute before one with a priority
+     * of 500. 
+     *
+     * @return the execution priority
+     */
     int getPriority();
 
     /**

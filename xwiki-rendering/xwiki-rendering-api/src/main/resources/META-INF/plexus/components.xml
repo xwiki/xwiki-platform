@@ -83,10 +83,6 @@
       <implementation>org.xwiki.rendering.transformation.MacroTransformation</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
-      <configuration>
-        <priority>1000</priority>
-        <maxMacroExecutions>1000</maxMacroExecutions>
-      </configuration>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.SyntaxFactory</role>

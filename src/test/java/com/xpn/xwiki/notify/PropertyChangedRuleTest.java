@@ -71,7 +71,7 @@ public class PropertyChangedRuleTest extends MockObjectTestCase implements XWiki
 
         this.context = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.testClassName), new IsEqual(this.context))
             .will(returnValue(this.testClass));
         this.mockXWiki.stubs().method("getClass").with(new IsEqual(this.otherClassName), new IsEqual(this.context))

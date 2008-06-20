@@ -4,7 +4,6 @@ import org.jmock.Mock;
 import org.jmock.cglib.MockObjectTestCase;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -26,7 +25,7 @@ public class UserTest extends MockObjectTestCase
     protected void setUp() throws XWikiException
     {
         this.context = new XWikiContext();
-        this.mockXWiki = mock(com.xpn.xwiki.XWiki.class, new java.lang.Class[] {}, new java.lang.Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         context.setWiki((XWiki) mockXWiki.proxy());
         XWikiDocument doc = new XWikiDocument("XWiki", "Admin");
         BaseClass userClass = new BaseClass();

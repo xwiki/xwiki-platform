@@ -51,7 +51,7 @@ public class PackageTest extends org.jmock.cglib.MockObjectTestCase
         this.pack = new Package();
         this.context = new XWikiContext();
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
         this.mockXWiki.stubs().method("checkAccess").will(returnValue(true));
         this.context.setWiki((XWiki) this.mockXWiki.proxy());

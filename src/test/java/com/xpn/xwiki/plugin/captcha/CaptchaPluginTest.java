@@ -45,7 +45,7 @@ public class CaptchaPluginTest extends org.jmock.cglib.MockObjectTestCase
 
         this.mockRequest = mock(XWikiRequest.class);
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
 
         this.context.setWiki((XWiki) mockXWiki.proxy());
         this.context.setRequest((XWikiRequest) this.mockRequest.proxy());

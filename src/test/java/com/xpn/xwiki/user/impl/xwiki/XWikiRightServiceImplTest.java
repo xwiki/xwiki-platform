@@ -87,7 +87,7 @@ public class XWikiRightServiceImplTest extends MockObjectTestCase
                 }
             });
 
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(true));
         this.mockXWiki.stubs().method("getGroupService").will(returnValue(mockAuthService.proxy()));
 

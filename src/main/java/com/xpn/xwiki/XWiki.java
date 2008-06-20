@@ -4196,15 +4196,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     String server = serverobject.getStringValue("server");
                     if (server != null) {
                         int mode = serverobject.getIntValue("secure");
-                        int port = (context.getURL().getPort() == -1) ? 80 : context.getURL().getPort();
+                        int port = context.getURL().getPort();
                         if (mode == 1) {
-                            if (port != 443) {
+                            if (port != -1 && port != 443) {
                                 serverurl = "https://" + server + ":" + port + "/";
                             } else {
                                 serverurl = "https://" + server + "/";
                             }
                         } else {
-                            if (port != 80) {
+                            if (port != -1 && port != 80) {
                                 serverurl = "http://" + server + ":" + port + "/";
                             } else {
                                 serverurl = "http://" + server + "/";

@@ -372,7 +372,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
      * @deprecated Use {@link #getStringListValue(String)} instead. Since 1.4.
      */
     @Deprecated
-    public List getListValue2(String fieldName)
+    public List getListValue(String fieldName)
     {
         BaseObject obj = getBaseObject(false);
 
@@ -392,7 +392,7 @@ public class DefaultXObjectDocument extends Document implements XObjectDocument
      * @deprecated Use {@link #getStringListValue(String)} instead. Since 1.4.
      */
     @Deprecated
-    public void setListValue2(String fieldName, List value)
+    public void setListValue(String fieldName, List value)
     {
         BaseObject obj = getBaseObject(true);
 

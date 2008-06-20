@@ -23,7 +23,6 @@ package com.xpn.xwiki.plugin.packaging;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import com.xpn.xwiki.XWikiContext;
@@ -38,10 +37,12 @@ public class PackageAPI extends Api
     public PackageAPI(Package plugin, XWikiContext context) throws PackageException
     {
         super(context);
+
         if (!hasAdminRights()) {
             throw new PackageException(XWikiException.ERROR_XWIKI_ACCESS_DENIED,
                 "Admin right is needed to use this plugin");
         }
+
         setPlugin(plugin);
     }
 
@@ -52,137 +53,133 @@ public class PackageAPI extends Api
 
     public String getName()
     {
-        return plugin.getName();
+        return this.plugin.getName();
     }
 
     public void setName(String name)
     {
-        plugin.setName(name);
+        this.plugin.setName(name);
     }
 
     public Package getPackage()
     {
         if (hasProgrammingRights()) {
-            return plugin;
+            return this.plugin;
         }
         return null;
     }
 
     public String getDescription()
     {
-        return plugin.getDescription();
+        return this.plugin.getDescription();
     }
 
     public void setDescription(String description)
     {
-        plugin.setDescription(description);
+        this.plugin.setDescription(description);
     }
 
     public String getVersion()
     {
-        return plugin.getVersion();
+        return this.plugin.getVersion();
     }
 
     public void setVersion(String version)
     {
-        plugin.setVersion(version);
+        this.plugin.setVersion(version);
     }
 
     public String getLicence()
     {
-        return plugin.getLicence();
+        return this.plugin.getLicence();
     }
 
     public void setLicence(String licence)
     {
-        plugin.setLicence(licence);
+        this.plugin.setLicence(licence);
     }
 
     public String getAuthorName()
     {
-        return plugin.getAuthorName();
+        return this.plugin.getAuthorName();
     }
 
     public void setAuthorName(String authorName)
     {
-        plugin.setAuthorName(authorName);
+        this.plugin.setAuthorName(authorName);
     }
 
     public boolean isBackupPack()
     {
-        return plugin.isBackupPack();
+        return this.plugin.isBackupPack();
     }
 
     public void setBackupPack(boolean backupPack)
     {
-        plugin.setBackupPack(backupPack);
+        this.plugin.setBackupPack(backupPack);
     }
 
     public boolean isVersionPreserved()
     {
-        return plugin.isVersionPreserved();
+        return this.plugin.isVersionPreserved();
     }
 
     public void setPreserveVersion(boolean preserveVersion)
     {
-        plugin.setPreserveVersion(preserveVersion);
+        this.plugin.setPreserveVersion(preserveVersion);
     }
 
     public boolean isWithVersions()
     {
-        return plugin.isWithVersions();
+        return this.plugin.isWithVersions();
     }
 
     public void setWithVersions(boolean withVersions)
     {
-        plugin.setWithVersions(withVersions);
+        this.plugin.setWithVersions(withVersions);
     }
 
     public void addDocumentFilter(Object filter) throws PackageException
     {
-        plugin.addDocumentFilter(filter);
+        this.plugin.addDocumentFilter(filter);
     }
 
-    public List getFiles()
+    public List<DocumentInfoAPI> getFiles()
     {
-        List files = plugin.getFiles();
-        ArrayList APIfiles = new ArrayList(files.size());
+        List<DocumentInfo> files = this.plugin.getFiles();
+        ArrayList<DocumentInfoAPI> apiFiles = new ArrayList<DocumentInfoAPI>(files.size());
 
-        for (int i = 0; i < files.size(); i++) {
-            APIfiles.add(new DocumentInfoAPI((DocumentInfo) files.get(i), getXWikiContext()));
+        for (DocumentInfo docInfo : files) {
+            apiFiles.add(new DocumentInfoAPI(docInfo, getXWikiContext()));
         }
-        return APIfiles;
+
+        return apiFiles;
     }
 
     public boolean add(String docFullName, int DefaultAction) throws XWikiException
     {
-        return plugin.add(docFullName, DefaultAction, getXWikiContext());
+        return this.plugin.add(docFullName, DefaultAction, getXWikiContext());
     }
 
     public boolean add(String docFullName) throws XWikiException
     {
-        return plugin.add(docFullName, getXWikiContext());
+        return this.plugin.add(docFullName, getXWikiContext());
     }
 
     public void setDocumentAction(String docFullName, int action)
     {
-        Iterator it = plugin.getFiles().iterator();
-        while (it.hasNext()) {
-            DocumentInfo docInfos = (DocumentInfo) it.next();
-            if (docInfos.getFullName().compareTo(docFullName) == 0) {
-                docInfos.setAction(action);
+        for (DocumentInfo docInfo : this.plugin.getFiles()) {
+            if (docInfo.getFullName().compareTo(docFullName) == 0) {
+                docInfo.setAction(action);
             }
         }
     }
 
     public void setDocumentAction(String docFullName, String language, int action)
     {
-        Iterator it = plugin.getFiles().iterator();
-        while (it.hasNext()) {
-            DocumentInfo docInfos = (DocumentInfo) it.next();
-            if ((docInfos.getFullName().compareTo(docFullName) == 0)
-                && (language.equals(docInfos.getLanguage()))) {
-                docInfos.setAction(action);
+        for (DocumentInfo docInfo : this.plugin.getFiles()) {
+            if ((docInfo.getFullName().compareTo(docFullName) == 0) && (language.equals(docInfo.getLanguage()))) {
+                docInfo.setAction(action);
             }
         }
     }
@@ -193,58 +190,58 @@ public class PackageAPI extends Api
         getXWikiContext().getResponse().addHeader("Content-disposition",
             "attachment; filename=" + Util.encodeURI(plugin.getName(), context) + ".xar");
         getXWikiContext().setFinished(true);
-        return plugin
-            .export(getXWikiContext().getResponse().getOutputStream(), getXWikiContext());
+
+        return this.plugin.export(getXWikiContext().getResponse().getOutputStream(), getXWikiContext());
     }
 
     public String Import(byte file[]) throws IOException, XWikiException
     {
-        return plugin.Import(file, getXWikiContext());
+        return this.plugin.Import(file, getXWikiContext());
     }
 
     public int testInstall()
     {
-        return plugin.testInstall(false, getXWikiContext());
+        return this.plugin.testInstall(false, getXWikiContext());
     }
 
     public int testInstall(boolean isAdmin)
     {
-        return plugin.testInstall(isAdmin, getXWikiContext());
+        return this.plugin.testInstall(isAdmin, getXWikiContext());
     }
 
     public void backupWiki() throws XWikiException, IOException
     {
-        plugin.addAllWikiDocuments(getXWikiContext());
+        this.plugin.addAllWikiDocuments(getXWikiContext());
         this.export();
     }
 
     public String toXml()
     {
-        return plugin.toXml(getXWikiContext());
+        return this.plugin.toXml(getXWikiContext());
     }
 
     public int install() throws XWikiException
     {
-        return plugin.install(getXWikiContext());
+        return this.plugin.install(getXWikiContext());
     }
 
-    public List getErrors()
+    public List<String> getErrors()
     {
-        return plugin.getErrors(getXWikiContext());
+        return this.plugin.getErrors(getXWikiContext());
     }
 
-    public List getSkipped()
+    public List<String> getSkipped()
     {
-        return plugin.getSkipped(getXWikiContext());
+        return this.plugin.getSkipped(getXWikiContext());
     }
 
-    public List getInstalled()
+    public List<String> getInstalled()
     {
-        return plugin.getInstalled(getXWikiContext());
+        return this.plugin.getInstalled(getXWikiContext());
     }
 
     public int getStatus()
     {
-        return plugin.getStatus(getXWikiContext());
+        return this.plugin.getStatus(getXWikiContext());
     }
 }

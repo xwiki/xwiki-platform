@@ -49,7 +49,7 @@ public class MailSenderApiTest extends MockObjectTestCase
     protected void setUp()
     {
         this.context = new XWikiContext();
-        this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki = mock(XWiki.class);
         this.xwiki = (XWiki) this.mockXWiki.proxy();
         this.context.setWiki(this.xwiki);
 

@@ -40,12 +40,6 @@ public class DBListClassTest extends AbstractXWikiComponentTestCase
     {
         super.setUp();
         
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        // @FIXME : move this initialization in AbstractXWikiComponentTestCase.setUp() when
-        // shared-tests will depends on core 1.5 branch
-        Utils.setComponentManager((ComponentManager) getContext().get(ComponentManager.class.getName()));
-
         getContext().setDoc(new XWikiDocument());
 
         XWikiHibernateStore store = new XWikiHibernateStore("dummy");

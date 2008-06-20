@@ -101,6 +101,7 @@ public class PreviewAction extends XWikiAction {
 				doc2.readFromTemplate(((EditForm) form).getTemplate(), context);
 				doc2.readFromForm((EditForm) form, context);
                 doc2.setAuthor(context.getUser());
+                doc2.setContentAuthor(context.getUser());
                 if(doc2.isNew()){
                     doc2.setCreator(context.getUser());
                 }
@@ -116,6 +117,7 @@ public class PreviewAction extends XWikiAction {
 				tdoc2.readFromTemplate(((EditForm) form).getTemplate(), context);
 				tdoc2.readFromForm((EditForm) form, context);
                 tdoc2.setAuthor(context.getUser());
+                tdoc2.setContentAuthor(context.getUser());
                 if(tdoc2.isNew()){
                     tdoc2.setCreator(context.getUser());
                 }

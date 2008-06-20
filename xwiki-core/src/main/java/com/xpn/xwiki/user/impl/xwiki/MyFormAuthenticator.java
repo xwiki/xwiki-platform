@@ -27,16 +27,17 @@ import java.security.Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.securityfilter.authenticator.Authenticator;
 import org.securityfilter.authenticator.FormAuthenticator;
-import org.securityfilter.filter.SecurityFilter;
 import org.securityfilter.filter.SecurityRequestWrapper;
 import org.securityfilter.filter.URLPatternMatcher;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.web.SavedRequestRestorerFilter;
 
 public class MyFormAuthenticator extends FormAuthenticator implements Authenticator, XWikiAuthenticator
 {
@@ -60,6 +61,26 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
         } else {
             showLogin(request, response);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.securityfilter.authenticator.Authenticator#showLogin(HttpServletRequest, HttpServletResponse)
+     */
+    @Override
+    public void showLogin(HttpServletRequest request, HttpServletResponse response) throws IOException
+    {
+        String savedRequestId = request.getParameter(SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER);
+        if (StringUtils.isEmpty(savedRequestId)) {
+            // Save this request
+            savedRequestId = SavedRequestRestorerFilter.saveRequest(request);
+        }
+
+        // Redirect to login page
+        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + this.loginPage + "?"
+            + SavedRequestRestorerFilter.SAVED_REQUESTS_IDENTIFIER + "=" + savedRequestId));
+        return;
     }
 
     @Override
@@ -203,11 +224,11 @@ public class MyFormAuthenticator extends FormAuthenticator implements Authentica
     private String getContinueToURL(HttpServletRequest request)
     {
         String savedURL = request.getParameter("xredirect");
-        if ((savedURL == null) || (savedURL.trim().equals(""))) {
-            savedURL = SecurityFilter.getContinueToURL(request);
+        if (StringUtils.isEmpty(savedURL)) {
+            savedURL = SavedRequestRestorerFilter.getOriginalUrl(request);
         }
 
-        if (savedURL != null) {
+        if (!StringUtils.isEmpty(savedURL)) {
             return savedURL;
         }
         return request.getContextPath() + this.defaultPage;

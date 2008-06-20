@@ -34,5 +34,12 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
+    <component>
+      <role>org.xwiki.rendering.parser.Parser</role>
+      <role-hint>xhtml/1.0</role-hint>
+      <implementation>org.xwiki.rendering.wikimodel.parser.WikiModelXHTMLParser</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <lifecycle-handler>xwiki</lifecycle-handler>
+    </component>
   </components>
 </component-set>

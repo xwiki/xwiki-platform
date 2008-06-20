@@ -17,36 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.parser;
+package org.xwiki.rendering.wikimodel.parser;
+
+import org.wikimodel.wem.IWikiParser;
+import org.wikimodel.wem.xhtml.XhtmlParser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public enum SyntaxType
+public class WikiModelXHTMLParser extends AbstractWikiModelParser
 {
-    XWIKI("XWiki"),
-    CONFLUENCE("Confluence"),
-    MEDIAWIKI("MediaWiki"),
-    CREOLE("Creole"),
-    JSPWIKI("JSPWiki"),
-    TWIKI("TWiki"),
-    XHTML("XHTML");
+    private static final Syntax SYNTAX = new Syntax(SyntaxType.XHTML, "1.0");
 
-    private String id;
-
-    private SyntaxType(String id)
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.parser.Parser#getSyntax()
+     */
+    public Syntax getSyntax()
     {
-        this.id = id;
+        return SYNTAX;
     }
 
-    public String toString()
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.wikimodel.parser.AbstractWikiModelParser#createWikiModelParser()
+     */
+    public IWikiParser createWikiModelParser()
     {
-        return this.id;
-    }
-
-    public String toIdString()
-    {
-        return this.id.toLowerCase();
+        return new XhtmlParser();
     }
 }

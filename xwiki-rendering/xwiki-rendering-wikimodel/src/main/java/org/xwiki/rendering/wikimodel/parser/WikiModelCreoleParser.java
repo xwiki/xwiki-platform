@@ -24,6 +24,10 @@ import org.wikimodel.wem.creole.CreoleWikiParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class WikiModelCreoleParser extends AbstractWikiModelParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.CREOLE, "1.0");

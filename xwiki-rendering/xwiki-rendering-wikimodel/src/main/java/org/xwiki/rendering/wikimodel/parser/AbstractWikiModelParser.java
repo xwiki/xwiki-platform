@@ -29,6 +29,10 @@ import org.wikimodel.wem.IWikiParser;
 
 import java.io.Reader;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public abstract class AbstractWikiModelParser extends AbstractLogEnabled implements Parser
 {
     private LinkParser linkParser;

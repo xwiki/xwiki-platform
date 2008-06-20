@@ -96,9 +96,17 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
             syntaxType = SyntaxType.MEDIAWIKI;
         } else if (syntaxId.equalsIgnoreCase(SyntaxType.TWIKI.toIdString())) {
             syntaxType = SyntaxType.TWIKI;
+        } else if (syntaxId.equalsIgnoreCase(SyntaxType.XHTML.toIdString())) {
+            syntaxType = SyntaxType.XHTML;
         } else {
-            throw new ParseException("Unknown Syntax id [" + syntaxId + "]. Valid syntaxes are [xwiki] and "
-                + "[confluence]");
+            StringBuffer sb = new StringBuffer();
+            sb.append("Unknown Syntax id [").append(syntaxId).append("]. Valid syntaxes are [xwiki]");
+            for (SyntaxType type: SyntaxType.values()) {
+                if (type != SyntaxType.XWIKI) {
+                    sb.append(", [").append(type.toIdString()).append("]");
+                }
+            }
+            throw new ParseException(sb.toString());
         }
 
         return new Syntax(syntaxType, version);

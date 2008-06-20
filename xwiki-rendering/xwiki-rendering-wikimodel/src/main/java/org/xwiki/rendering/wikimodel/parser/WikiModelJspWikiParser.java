@@ -24,6 +24,10 @@ import org.wikimodel.wem.jspwiki.JspWikiParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class WikiModelJspWikiParser extends AbstractWikiModelParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.JSPWIKI, "1.0");

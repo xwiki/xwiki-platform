@@ -25,6 +25,10 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class WikiModelXWikiParser extends AbstractWikiModelParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");

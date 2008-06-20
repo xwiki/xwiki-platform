@@ -24,6 +24,10 @@ import org.wikimodel.wem.mediawiki.MediaWikiParser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class WikiModelMediaWikiParser extends AbstractWikiModelParser
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.MEDIAWIKI, "1.0");

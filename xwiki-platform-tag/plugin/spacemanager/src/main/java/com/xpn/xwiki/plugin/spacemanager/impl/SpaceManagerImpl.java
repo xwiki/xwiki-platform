@@ -1623,7 +1623,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
                 getTemplateMailPageName(space.getSpaceName(), action, context);
             XWikiDocument mailDoc = context.getWiki().getDocument(templateDocFullName, context);
             XWikiDocument translatedMailDoc = mailDoc.getTranslatedDocument(context);
-            mailSender.prepareVelocityContext(fromUser, strToUsers, "", vContext, context);
+            mailSender.prepareVelocityContext(fromUser, strToUsers, null, null, vContext, context);
             vContext.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));
             vContext.put("context", new com.xpn.xwiki.api.Context(context));
             String mailSubject =

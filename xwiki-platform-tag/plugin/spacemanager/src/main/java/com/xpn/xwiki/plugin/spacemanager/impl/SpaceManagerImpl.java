@@ -682,7 +682,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             try {
                 List<String> list =
                     context.getWiki().getStore().searchDocumentsNames(
-                        "where doc.web='" + templateSpaceName + "'", context);
+                        "where doc.space='" + templateSpaceName + "'", context);
                 for (String docname : list) {
                     XWikiDocument doc = context.getWiki().getDocument(docname, context);
                     context.getWiki().copyDocument(doc.getFullName(),
@@ -744,7 +744,7 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             if (getSpaceManagerExtension().preDeleteSpace(space.getSpaceName(), true,
                 context)) {
                 // search for all documents in the space
-                String hql = "where doc.web = '" + space.getSpaceName() + "'";
+                String hql = "where doc.space = '" + space.getSpaceName() + "'";
                 try {
                     List<XWikiDocument> spaceDocs = context.getWiki().getStore().searchDocuments(hql, context);
                     for (XWikiDocument toBeDeleted : spaceDocs) {
@@ -862,13 +862,13 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         String sql;
         if (hasCustomMapping())
             sql =
-                "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, "
+                "select distinct doc.space from XWikiDocument as doc, BaseObject as obj, "
                     + className + " as space where doc.fullName = obj.name and obj.className='"
                     + className + "' and obj.id = space.id and space.type='" + type + "'"
                     + ordersql;
         else
             sql =
-                "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, StringProperty typeprop where doc.fullName=obj.name and obj.className = '"
+                "select distinct doc.space from XWikiDocument as doc, BaseObject as obj, StringProperty typeprop where doc.fullName=obj.name and obj.className = '"
                     + className
                     + "' and obj.id=typeprop.id.id and typeprop.id.name='type' and typeprop.value='"
                     + type + "'" + ordersql;
@@ -939,14 +939,14 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         String sql;
         if (hasCustomMapping())
             sql =
-                "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, "
+                "select distinct doc.space from XWikiDocument as doc, BaseObject as obj, "
                     + className + " as space" + fromsql
                     + " where doc.fullName = obj.name and obj.className='" + className
                     + "' and obj.id = space.id and space.type='" + type + "'" + wheresql
                     + ordersql;
         else
             sql =
-                "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, StringProperty as typeprop"
+                "select distinct doc.space from XWikiDocument as doc, BaseObject as obj, StringProperty as typeprop"
                     + fromsql
                     + " where doc.fullName=obj.name and obj.className = '"
                     + className
@@ -999,13 +999,13 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         String sql;
         if (role == null)
             sql =
-                "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, StringProperty as memberprop where doc.name='MemberGroup' and doc.fullName=obj.name and obj.className = 'XWiki.XWikiGroups'"
+                "select distinct doc.space from XWikiDocument as doc, BaseObject as obj, StringProperty as memberprop where doc.name='MemberGroup' and doc.fullName=obj.name and obj.className = 'XWiki.XWikiGroups'"
                     + " and obj.id=memberprop.id.id and memberprop.id.name='member' and memberprop.value='"
                     + userName + "'";
         else {
             String roleGroupName = getRoleGroupName("", role).substring(1);
             sql =
-                "select distinct doc.web from XWikiDocument as doc, BaseObject as obj, StringProperty as memberprop where doc.name='"
+                "select distinct doc.space from XWikiDocument as doc, BaseObject as obj, StringProperty as memberprop where doc.name='"
                     + roleGroupName
                     + "' and doc.fullName=obj.name and obj.className = 'XWiki.XWikiGroups'"
                     + " and obj.id=memberprop.id.id and memberprop.id.name='member' and memberprop.value='"

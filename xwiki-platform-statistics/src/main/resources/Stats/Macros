@@ -71,8 +71,8 @@ $!xwiki.ssx.use("Stats.Style")
 #set($title = $docStats.displayTitle)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;[$docStats.name&amp;gt;${docStats.web}.$docStats.name.replaceAll("@","%40")]#if ($title != $docStats.name) - &lt;em&gt;$title&lt;/em&gt;#end&lt;/td&gt;
-&lt;td&gt;[$docStats.web&amp;gt;${docStats.web}.WebHome]&lt;/td&gt;
+&lt;td&gt;[$docStats.name&amp;gt;${docStats.space}.$docStats.name.replaceAll("@","%40")]#if ($title != $docStats.name) - &lt;em&gt;$title&lt;/em&gt;#end&lt;/td&gt;
+&lt;td&gt;[$docStats.space&amp;gt;${docStats.space}.WebHome]&lt;/td&gt;
 &lt;/tr&gt;
 #end
 #end

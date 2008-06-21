@@ -21,8 +21,6 @@
 package com.xpn.xwiki;
 
 import org.jmock.Mock;
-import org.jmock.MockObjectTestCase;
-import org.xwiki.component.manager.ComponentManager;
 
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
@@ -33,7 +31,6 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * Verify that notifications are correctly sent in the {@link XWiki} class.

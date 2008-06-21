@@ -135,9 +135,9 @@
 <category>Navigation</category>
 </property>
 <property>
-<content>#panelheader($doc.web)
-#foreach($subdoc in $xwiki.getSpaceDocsName("$doc.web"))
-- [${doc.web}.${subdoc}]
+<content>#panelheader($doc.space)
+#foreach($subdoc in $xwiki.getSpaceDocsName("$doc.space"))
+- [${doc.space}.${subdoc}]
 #end
 #panelfooter()</content>
 </property>

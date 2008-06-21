@@ -140,7 +140,7 @@
 #foreach ($item in $xwiki.searchDocuments("${query}"))
 #if ($xwiki.hasAccessLevel("view", $context.user, "${context.database}:${item}"))
 #set($bentrydoc = $xwiki.getDocument($item))
-* [${bentrydoc.web}.$bentrydoc.name]
+* [${bentrydoc.fullName}]
 #end
 #end
 #panelfooter()</content>

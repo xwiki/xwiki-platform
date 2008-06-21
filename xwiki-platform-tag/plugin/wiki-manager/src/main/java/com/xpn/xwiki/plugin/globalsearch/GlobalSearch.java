@@ -62,7 +62,7 @@ final class GlobalSearch
     /**
      * Name of the field containing document space in the HQL query.
      */
-    private static final String HQL_DOC_SPACE = "doc.web";
+    private static final String HQL_DOC_SPACE = "doc.space";
 
     /**
      * Name of the field containing document name in the HQL query.
@@ -72,12 +72,12 @@ final class GlobalSearch
     /**
      * The searchDocument and searchDocumentsNames initial select query part.
      */
-    private static final String SEARCHDOC_INITIAL_SELECT = "select distinct doc.web, doc.name";
+    private static final String SEARCHDOC_INITIAL_SELECT = "select distinct doc.space, doc.name";
 
     /**
      * The searchDocument and searchDocumentsNames initial select query part when distinct documents by language.
      */
-    private static final String SEARCHDOC_INITIAL_SELECT_LANG = "select distinct doc.web, doc.name, doc.language";
+    private static final String SEARCHDOC_INITIAL_SELECT_LANG = "select distinct doc.space, doc.name, doc.language";
 
     /**
      * The searchDocument and searchDocumentsNames initial from query part.
@@ -364,7 +364,7 @@ final class GlobalSearch
     }
 
     /**
-     * @param queryPrefix the start of the SQL query (for example "select distinct doc.web, doc.name")
+     * @param queryPrefix the start of the SQL query (for example "select distinct doc.space, doc.name")
      * @param whereSQL the where clause to append
      * @return the full formed SQL query, to which the order by columns have been added as returned columns (this is
      *         required for example for HSQLDB).

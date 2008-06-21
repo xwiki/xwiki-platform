@@ -48,9 +48,9 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 {
     private static final Log log = LogFactory.getLog(XWikiRenderingEngine.class);
 
-    private List renderers = new ArrayList();
+    private List<XWikiRenderer> renderers = new ArrayList<XWikiRenderer>();
 
-    private HashMap renderermap = new LinkedHashMap();
+    private HashMap<String, XWikiRenderer> renderermap = new LinkedHashMap<String, XWikiRenderer>();
 
     private Cache<XWikiRenderingCache> cache;
 
@@ -132,22 +132,22 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     public XWikiRenderer getRenderer(String name)
     {
-        return (XWikiRenderer) this.renderermap.get(name);
+        return this.renderermap.get(name);
     }
 
-    public List getRendererList()
+    public List<XWikiRenderer> getRendererList()
     {
-        return (List) ((ArrayList) this.renderers).clone();
+        return new ArrayList<XWikiRenderer>(this.renderers);
     }
 
-    public List getRendererNames()
+    public List<String> getRendererNames()
     {
-        return new LinkedList(this.renderermap.keySet());
+        return new LinkedList<String>(this.renderermap.keySet());
     }
 
     protected XWikiRenderer removeRenderer(String name)
     {
-        XWikiRenderer result = (XWikiRenderer) this.renderermap.remove(name);
+        XWikiRenderer result = this.renderermap.remove(name);
         if (result != null) {
             this.renderers.remove(result);
         }
@@ -175,21 +175,23 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return renderText(text, true, includingdoc, includingdoc, context);
     }
 
+    @SuppressWarnings("unchecked")
     public void addToCached(String key, XWikiContext context)
     {
-        List cached = (ArrayList) context.get("render_cached");
+        List<String> cached = (ArrayList<String>) context.get("render_cached");
         if (cached == null) {
-            cached = new ArrayList();
+            cached = new ArrayList<String>();
             context.put("render_cached", cached);
         }
         cached.add(key);
     }
 
+    @SuppressWarnings("unchecked")
     public void addToRefreshed(String key, XWikiContext context)
     {
-        List cached = (ArrayList) context.get("render_refreshed");
+        List<String> cached = (ArrayList<String>) context.get("render_refreshed");
         if (cached == null) {
-            cached = new ArrayList();
+            cached = new ArrayList<String>();
             context.put("render_refreshed", cached);
         }
         cached.add(key);
@@ -257,7 +259,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
                 try {
                     for (int i = 0; i < this.renderers.size(); i++) {
-                        XWikiRenderer renderer = ((XWikiRenderer) this.renderers.get(i));
+                        XWikiRenderer renderer = (this.renderers.get(i));
                         String rendererName = renderer.getClass().getName();
                         if (shouldRender(contentdoc, rendererName, context)) {
                             // Check if only XWikiInterpreter should be executed
@@ -362,7 +364,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
     public void flushCache()
     {
         for (int i = 0; i < this.renderers.size(); i++) {
-            ((XWikiRenderer) this.renderers.get(i)).flushCache();
+            (this.renderers.get(i)).flushCache();
         }
         if (this.cache != null) {
             this.cache.removeAll();
@@ -374,7 +376,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         XWikiVirtualMacro macro, XWikiContext context)
     {
         String language = macro.getLanguage();
-        XWikiRenderer renderer = (XWikiRenderer) this.renderermap.get(language);
+        XWikiRenderer renderer = this.renderermap.get(language);
         if (renderer == null) {
             return allcontent;
         } else {
@@ -386,7 +388,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         XWikiContext context)
     {
         String language = macro.getLanguage();
-        XWikiRenderer renderer = (XWikiRenderer) this.renderermap.get(language);
+        XWikiRenderer renderer = this.renderermap.get(language);
         if (renderer == null) {
             return allcontent;
         } else {

@@ -16,47 +16,44 @@
  *  limitations under the License.
  */
 
-
 package com.xpn.xwiki.render.macro;
+
+import java.io.IOException;
+import java.io.Writer;
 
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
 import org.radeox.macro.table.Table;
 
-import java.io.IOException;
-import java.io.Writer;
-
 /*
- * Macro for defining and displaying tables. The rows of the table are
- * devided by newlins and the columns are divided by pipe symbols "|".
- * The first line of the table is rendered as column headers.
- * {table}
- *  A|B|C
- *  1|2|3
- * {table}
- *
- * @author stephan
- * @team sonicteam
+ * Macro for defining and displaying tables. The rows of the table are devided by newlins and the columns are divided by
+ * pipe symbols "|". The first line of the table is rendered as column headers. {table} A|B|C 1|2|3 {table} @author
+ * stephan @team sonicteam
+ * 
  * @version $Id$
  */
+public class TableMacro extends BaseLocaleMacro
+{
+    public String getLocaleKey()
+    {
+        return "macro.table";
+    }
 
-public class TableMacro extends BaseLocaleMacro {
-  public String getLocaleKey() {
-    return "macro.table";
-  }
+    @Override
+    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
+    {
 
-  public void execute(Writer writer, MacroParameter params)
-      throws IllegalArgumentException, IOException {
+        String content = params.getContent();
 
-    String content = params.getContent();
+        if (null == content) {
+            throw new IllegalArgumentException("TableMacro: missing table content");
+        }
 
-    if (null == content) throw new IllegalArgumentException("TableMacro: missing table content");
+        content = content.trim() + "\n";
 
-    content = content.trim() + "\n";
-
-    Table table = TableBuilder.build(content);
-    table.calc(); // calculate macros like =SUM(A1:A3)
-    table.appendTo(writer);
-    return;
-  }
+        Table table = TableBuilder.build(content);
+        table.calc(); // calculate macros like =SUM(A1:A3)
+        table.appendTo(writer);
+        return;
+    }
 }

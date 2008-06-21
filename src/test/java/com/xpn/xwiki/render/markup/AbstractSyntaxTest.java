@@ -20,6 +20,7 @@
  */
 package com.xpn.xwiki.render.markup;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 import org.jmock.Mock;
@@ -29,42 +30,51 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderer;
+import com.xpn.xwiki.web.XWikiServletURLFactory;
 
 public abstract class AbstractSyntaxTest extends MockObjectTestCase
 {
-    private XWikiContext context;
+    protected XWikiContext context;
 
-    private XWikiRadeoxRenderer renderer;
+    protected XWikiRadeoxRenderer renderer;
 
     private Mock mockXWiki;
 
-    private Mock mockDocument;
+    protected XWikiDocument document;
 
-    private XWikiDocument document;
-
-    protected void setUp()
+    @Override
+    protected void setUp() throws Exception
     {
         this.renderer = new XWikiRadeoxRenderer();
         this.context = new XWikiContext();
 
         this.mockXWiki = mock(XWiki.class);
+        // These are needed by the Link filter
+        this.mockXWiki.stubs().method("exists").will(returnValue(true));
+        this.mockXWiki.stubs().method("showViewAction").will(returnValue(true));
+        this.mockXWiki.stubs().method("useDefaultWeb").will(returnValue(true));
+        this.mockXWiki.stubs().method("useDefaultAction").will(returnValue(true));
+        this.mockXWiki.stubs().method("getDefaultWeb").will(returnValue("Main"));
+        this.mockXWiki.stubs().method("getEncoding").will(returnValue("UTF-8"));
+
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
-        this.mockDocument = mock(XWikiDocument.class);
-        this.document = (XWikiDocument) this.mockDocument.proxy();
+        this.context.setURLFactory(new XWikiServletURLFactory(new URL("http://localhost/"), "xwiki/", "bin/"));
 
-        this.context.setDoc(document);
+        this.document = new XWikiDocument("Main", "WebHome");
+
+        this.context.setDoc(this.document);
     }
 
     protected void test(ArrayList<String> tests, ArrayList<String> expects)
     {
         for (int i = 0; i < tests.size(); ++i) {
-            String result = renderer.render(tests.get(i).toString(), document, document, context);
+            String result = this.renderer.render(tests.get(i).toString(), this.document, this.document, this.context);
             String expected = expects.get(i).toString();
             if (expected.startsWith("...")) {
                 assertTrue(result.indexOf(expected.substring(3, expected.length() - 3)) > 0);
             } else {
-                assertEquals(expects.get(i).toString(), result);
+                assertEquals(expected, result);
             }
         }
     }

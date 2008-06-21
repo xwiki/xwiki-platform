@@ -24,7 +24,6 @@ import java.util.ArrayList;
 
 public class UnderlineTest extends AbstractSyntaxTest
 {
-
     public void testNotTriggeredWithWhitespace()
     {
         ArrayList<String> tests = new ArrayList<String>();
@@ -152,5 +151,12 @@ public class UnderlineTest extends AbstractSyntaxTest
         // Even on very slow systems this should not take more than one second. Putting 10 seconds,
         // just to be sure we don't get false test errors.
         assertTrue(System.currentTimeMillis() - startTime < 10000);
+    }
+
+    public void testLinkTargetHasPriority()
+    {
+        String testString = "[link>Main.WebHome>_blank] and [another link>Main.WebHome>_blank]";
+        String result = this.renderer.render(testString, this.document, this.document, this.context);
+        assertTrue(result.indexOf("em") == -1);
     }
 }

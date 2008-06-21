@@ -33,7 +33,6 @@ import org.apache.commons.collections.IteratorUtils;
 import org.jmock.Mock;
 import org.jmock.core.Invocation;
 import org.jmock.core.stub.CustomStub;
-import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.observation.EventListener;
 import org.xwiki.observation.ObservationManager;
 import org.xwiki.observation.event.DocumentDeleteEvent;
@@ -48,7 +47,6 @@ import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
-import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
@@ -68,6 +66,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
 
     private Map<String, XWikiDocument> docs = new HashMap<String, XWikiDocument>();
 
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();
@@ -84,8 +83,8 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument shallowDoc = (XWikiDocument) invocation.parameterValues.get(0);
-                    if (docs.containsKey(shallowDoc.getName())) {
-                        return docs.get(shallowDoc.getName());
+                    if (XWikiTest.this.docs.containsKey(shallowDoc.getName())) {
+                        return XWikiTest.this.docs.get(shallowDoc.getName());
                     } else {
                         return shallowDoc;
                     }
@@ -98,8 +97,8 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
                     document.setNew(false);
-                    document.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-                    docs.put(document.getName(), document);
+                    document.setStore((XWikiStoreInterface) XWikiTest.this.mockXWikiStore.proxy());
+                    XWikiTest.this.docs.put(document.getName(), document);
                     return null;
                 }
             });
@@ -109,7 +108,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
                 public Object invoke(Invocation invocation) throws Throwable
                 {
                     XWikiDocument document = (XWikiDocument) invocation.parameterValues.get(0);
-                    docs.remove(document.getName());
+                    XWikiTest.this.docs.remove(document.getName());
                     return null;
                 }
             });
@@ -121,8 +120,8 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         this.mockXWikiVersioningStore.stubs().method("getXWikiDocumentArchive").will(returnValue(null));
         this.mockXWikiVersioningStore.stubs().method("resetRCSArchive").will(returnValue(null));
 
-        this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
-        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore.proxy());
+        this.xwiki.setStore((XWikiStoreInterface) this.mockXWikiStore.proxy());
+        this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) this.mockXWikiVersioningStore.proxy());
         this.xwiki.saveDocument(this.document, getContext());
 
         this.document.setCreator("Condor");
@@ -165,16 +164,16 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
     {
         XWikiDocument skinClass = new XWikiDocument("XWiki", "XWikiSkins");
         skinClass.getxWikiClass().addTextAreaField("template.vm", "template", 80, 20);
-        xwiki.saveDocument(skinClass, getContext());
+        this.xwiki.saveDocument(skinClass, getContext());
         XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
         BaseObject obj = skin.newObject("XWiki.XWikiSkins", getContext());
         obj.setLargeStringValue("template.vm", "parsing a field");
-        xwiki.saveDocument(skin, getContext());
+        this.xwiki.saveDocument(skin, getContext());
         getContext().put("skin", "XWiki.Skin");
-        assertEquals("XWiki.Skin", xwiki.getSkin(getContext()));
-        assertFalse(xwiki.getDocument("XWiki.Skin", getContext()).isNew());
-        assertEquals(skin, xwiki.getDocument("XWiki.Skin", getContext()));
-        assertEquals("parsing a field", xwiki.parseTemplate("template.vm", getContext()));
+        assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
+        assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
+        assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));
+        assertEquals("parsing a field", this.xwiki.parseTemplate("template.vm", getContext()));
     }
 
     /**
@@ -188,12 +187,12 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         attachment.setContent("parsing an attachment".getBytes());
         attachment.setFilename("template.vm");
         attachment.setDoc(skin);
-        xwiki.saveDocument(skin, getContext());
+        this.xwiki.saveDocument(skin, getContext());
         getContext().put("skin", "XWiki.Skin");
-        assertEquals("XWiki.Skin", xwiki.getSkin(getContext()));
-        assertFalse(xwiki.getDocument("XWiki.Skin", getContext()).isNew());
-        assertEquals(skin, xwiki.getDocument("XWiki.Skin", getContext()));
-        assertEquals("parsing an attachment", xwiki.parseTemplate("template.vm", getContext()));
+        assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
+        assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
+        assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));
+        assertEquals("parsing an attachment", this.xwiki.parseTemplate("template.vm", getContext()));
     }
 
     /**
@@ -203,7 +202,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
     {
         XWikiDocument skinClass = new XWikiDocument("XWiki", "XWikiSkins");
         skinClass.getxWikiClass().addTextAreaField("template.vm", "template", 80, 20);
-        xwiki.saveDocument(skinClass, getContext());
+        this.xwiki.saveDocument(skinClass, getContext());
         XWikiDocument skin = new XWikiDocument("XWiki", "Skin");
         BaseObject obj = skin.newObject("XWiki.XWikiSkins", getContext());
         obj.setLargeStringValue("template.vm", "parsing a field");
@@ -212,12 +211,12 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         attachment.setContent("parsing an attachment".getBytes());
         attachment.setFilename("template.vm");
         attachment.setDoc(skin);
-        xwiki.saveDocument(skin, getContext());
+        this.xwiki.saveDocument(skin, getContext());
         getContext().put("skin", "XWiki.Skin");
-        assertEquals("XWiki.Skin", xwiki.getSkin(getContext()));
-        assertFalse(xwiki.getDocument("XWiki.Skin", getContext()).isNew());
-        assertEquals(skin, xwiki.getDocument("XWiki.Skin", getContext()));
-        assertEquals("parsing a field", xwiki.parseTemplate("template.vm", getContext()));
+        assertEquals("XWiki.Skin", this.xwiki.getSkin(getContext()));
+        assertFalse(this.xwiki.getDocument("XWiki.Skin", getContext()).isNew());
+        assertEquals(skin, this.xwiki.getDocument("XWiki.Skin", getContext()));
+        assertEquals("parsing a field", this.xwiki.parseTemplate("template.vm", getContext()));
     }
 
     public void testClearNameWithoutStripDotsWithoutAscii()
@@ -259,10 +258,10 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
 
     public void testGetDocumentNameFromPathUsesDefaultSpaceAndDocument()
     {
-        xwiki.getDefaultPage(getContext());
-        xwiki.getConfig().setProperty("xwiki.defaultpage", "Default");
+        this.xwiki.getDefaultPage(getContext());
+        this.xwiki.getConfig().setProperty("xwiki.defaultpage", "Default");
         assertEquals("Main.Default", this.xwiki.getDocumentNameFromPath("/", getContext()));
-        xwiki.getConfig().setProperty("xwiki.defaultweb", "Content");
+        this.xwiki.getConfig().setProperty("xwiki.defaultweb", "Content");
         assertEquals("Content.Default", this.xwiki.getDocumentNameFromPath("/", getContext()));
         assertEquals("Space.Default", this.xwiki.getDocumentNameFromPath("/Space/", getContext()));
     }
@@ -296,11 +295,11 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
         XWikiDocument document = new XWikiDocument("Another", "Document");
         document.setContent("the content");
 
-        xwiki.saveDocument(document, getContext());
+        this.xwiki.saveDocument(document, getContext());
         assertFalse(document.isNew());
         assertFalse("Listener called for wrong event", listener.hasListenerBeenCalled);
 
-        xwiki.deleteDocument(document, false, getContext());
+        this.xwiki.deleteDocument(document, false, getContext());
         assertTrue("Listener not called", listener.hasListenerBeenCalled);
     }
 
@@ -310,7 +309,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
 
         public void onEvent(Event evt, Object source, Object data)
         {
-            hasListenerBeenCalled = true;
+            this.hasListenerBeenCalled = true;
             assertTrue(source instanceof XWikiDocument);
             XWikiDocument doc = (XWikiDocument) source;
             assertTrue("originalDocument should have been new", doc.getOriginalDocument().isNew());
@@ -324,7 +323,7 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
 
         public void onEvent(Event evt, Object source, Object data)
         {
-            hasListenerBeenCalled = true;
+            this.hasListenerBeenCalled = true;
             assertTrue(source instanceof XWikiDocument);
             XWikiDocument doc = (XWikiDocument) source;
             assertTrue("New document should have been new", doc.isNew());
@@ -365,6 +364,6 @@ public class XWikiTest extends AbstractXWikiComponentTestCase
                 return null;
             }
         });
-        assertEquals("fr", xwiki.getLanguagePreference(getContext()));
+        assertEquals("fr", this.xwiki.getLanguagePreference(getContext()));
     }
 }

@@ -14,7 +14,7 @@
 
     <p style="font-weight:bold"> $msg.get("listofresultspages") : </p>
 
-    #set($sql = "where doc.web like '%$space%' and doc.name like '%$page%' order by doc.date desc")
+    #set($sql = "where doc.space like '%$space%' and doc.name like '%$page%' order by doc.date desc")
     #set ($start = 0)
     #set ($nb = 50)
 

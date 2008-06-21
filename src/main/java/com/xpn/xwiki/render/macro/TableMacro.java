@@ -42,14 +42,20 @@ public class TableMacro extends BaseLocaleMacro
     @Override
     public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
     {
-
         String content = params.getContent();
 
         if (null == content) {
             throw new IllegalArgumentException("TableMacro: missing table content");
         }
 
-        content = content.trim() + "\n";
+        // We need to check for \\ at the end of a line and preserve the white space otherwise we will fail to render
+        // the table properly
+        if (content.endsWith("\\\\ \n")) {
+            content = content.trim() + " ";
+        } else {
+            content = content.trim();
+        }
+        content = content + "\n";
 
         Table table = TableBuilder.build(content);
         table.calc(); // calculate macros like =SUM(A1:A3)

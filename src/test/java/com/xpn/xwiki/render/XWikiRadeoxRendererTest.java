@@ -223,4 +223,35 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         String result = renderer.render("\\[NotALink\\]", contentDocument, document, context);
         assertEquals("&#91;NotALink&#93;", result);
     }
+
+    public void testTable() throws Exception
+    {
+        String result = renderer.render("{table}\nA\n{table}", contentDocument, document, context);
+        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A</th></tr></table>", result);
+    }
+
+    public void testTableEmptyTable() throws Exception
+    {
+        String result = renderer.render("{table}\n{table}", contentDocument, document, context);
+        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr></tr></table>", result);
+    }
+
+    public void testTableWithCR() throws Exception
+    {
+        String result = renderer.render("{table}\nA\\\\B\n{table}", contentDocument, document, context);
+        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/>B</th></tr></table>", result);
+    }
+
+    public void testTableWithCRWithSpace() throws Exception
+    {
+        String result = renderer.render("{table}\nA\\\\ \n{table}", contentDocument, document, context);
+        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/></th></tr></table>", result);
+    }
+
+    public void testTableWithCRWithoutSpace() throws Exception
+    {
+        String result = renderer.render("{table}\nA\\\\\n{table}", contentDocument, document, context);
+        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/></th></tr></table>", result);
+    }
+
 }

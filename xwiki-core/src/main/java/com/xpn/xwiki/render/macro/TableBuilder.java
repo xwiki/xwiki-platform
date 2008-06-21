@@ -18,60 +18,85 @@
 
 package com.xpn.xwiki.render.macro;
 
-import org.radeox.macro.table.Table;
-
 import java.util.StringTokenizer;
+
+import org.radeox.macro.table.Table;
 
 /**
  * Built a table from a string
- *
+ * 
  * @author stephan
- * @version $Id: TableBuilder.java,v 1.3 2003/10/06 08:30:02 stephan Exp $
+ * @version $Id: TableBuilder.java 10549 2008-06-21 03:31:03Z sdumitriu $
  */
-
-public class TableBuilder {
-    public static Table build(String content) {
+public class TableBuilder
+{
+    public static Table build(String content)
+    {
         Table table = new Table();
         StringTokenizer tokenizer = new StringTokenizer(content, "|\n", true);
         String lastToken = null;
+        boolean firstCell = true;
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
-            String linkToken = "";
-            if(token.indexOf('[') != -1 && token.indexOf(']') == -1) {
-                while(token.indexOf(']') == -1 && tokenizer.hasMoreTokens()) {
+            // If a token contains [, then all tokens up to one containing a ] are concatenated. Kind of a block marker.
+            if (token.indexOf('[') != -1 && token.indexOf(']') == -1) {
+                String linkToken = "";
+                while (token.indexOf(']') == -1 && tokenizer.hasMoreTokens()) {
                     linkToken += token;
                     token = tokenizer.nextToken();
                 }
                 token = linkToken + token;
             }
             if ("\n".equals(token)) {
-                // Handles "\n" - "|\n"
-                lastToken = lastToken.trim();
+                // New line: either new row, or a literal newline.
+                lastToken = (lastToken == null) ? "" : lastToken;
                 if (!lastToken.endsWith("\\")) {
-                    if (null == lastToken || "|".equals(lastToken)) {
+                    // A new row, not a literal newline.
+                    // If the last cell didn't contain any data, then it was skipped. Add a blank cell to compensate.
+                    if (("".equals(lastToken) || "|".equals(lastToken)) && !firstCell) {
                         table.addCell(" ");
                     }
                     table.newRow();
                 } else {
+                    // A continued row, with a literal newline.
                     String cell = lastToken;
-                    while (cell.trim().endsWith("\\")) {
+                    // Keep concatenating while the cell data ends with \\
+                    while (cell.endsWith("\\") && tokenizer.hasMoreTokens()) {
                         token = tokenizer.nextToken();
-                        if (!"|".equals(token))  {
-                            cell = cell.trim() + token;
-                        } else break;
+                        if (!"|".equals(token)) {
+                            cell = cell + token;
+                        } else {
+                            break;
+                        }
                     }
+                    firstCell = false;
                     table.addCell(cell);
+                    if (!tokenizer.hasMoreTokens()) {
+                        table.newRow();
+                    }
                 }
             } else if (!"|".equals(token)) {
-                if (!token.trim().endsWith("\\")) {
+                // Cell data
+                if (!token.endsWith("\\")) {
+                    // If the cell data ends with \\, then it will be continued. Current data is stored in lastToken.
+                    table.addCell(token);
+                    firstCell = false;
+                } else if (!tokenizer.hasMoreTokens()) {
+                    while (token.endsWith("\\")) {
+                        token = token.substring(0, token.length() - 1);
+                    }
                     table.addCell(token);
                 }
             } else if ("|".equals(token)) {
-                if (null == lastToken || "|".equals(lastToken)) {
-                    // Handles "|" "||"
+                // Cell delimiter
+                if ((null == lastToken || "".equals(lastToken)) && !firstCell || "|".equals(lastToken)) {
+                    // If the last cell didn't contain any data, then it was skipped. Add a blank cell to compensate.
                     table.addCell(" ");
-                } else if (lastToken.trim().endsWith("\\")){
-                     table.addCell(lastToken);
+                    firstCell = false;
+                } else if (lastToken.endsWith("\\")) {
+                    // The last cell wasn't added because it ended with a continuation mark (\\). Add it now.
+                    table.addCell(lastToken);
+                    firstCell = false;
                 }
             }
             lastToken = token;

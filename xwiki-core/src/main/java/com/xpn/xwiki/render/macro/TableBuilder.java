@@ -18,27 +18,28 @@
 
 package com.xpn.xwiki.render.macro;
 
-import org.radeox.macro.table.Table;
-
 import java.util.StringTokenizer;
+
+import org.radeox.macro.table.Table;
 
 /**
  * Built a table from a string
- *
+ * 
  * @author stephan
  * @version $Id$
  */
-
-public class TableBuilder {
-    public static Table build(String content) {
+public class TableBuilder
+{
+    public static Table build(String content)
+    {
         Table table = new Table();
         StringTokenizer tokenizer = new StringTokenizer(content, "|\n", true);
         String lastToken = null;
         while (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
             String linkToken = "";
-            if(token.indexOf('[') != -1 && token.indexOf(']') == -1) {
-                while(token.indexOf(']') == -1 && tokenizer.hasMoreTokens()) {
+            if (token.indexOf('[') != -1 && token.indexOf(']') == -1) {
+                while (token.indexOf(']') == -1 && tokenizer.hasMoreTokens()) {
                     linkToken += token;
                     token = tokenizer.nextToken();
                 }
@@ -56,9 +57,11 @@ public class TableBuilder {
                     String cell = lastToken;
                     while (cell.trim().endsWith("\\")) {
                         token = tokenizer.nextToken();
-                        if (!"|".equals(token))  {
+                        if (!"|".equals(token)) {
                             cell = cell.trim() + token;
-                        } else break;
+                        } else {
+                            break;
+                        }
                     }
                     table.addCell(cell);
                 }
@@ -70,8 +73,8 @@ public class TableBuilder {
                 if (null == lastToken || "|".equals(lastToken)) {
                     // Handles "|" "||"
                     table.addCell(" ");
-                } else if (lastToken.trim().endsWith("\\")){
-                     table.addCell(lastToken);
+                } else if (lastToken.trim().endsWith("\\")) {
+                    table.addCell(lastToken);
                 }
             }
             lastToken = token;

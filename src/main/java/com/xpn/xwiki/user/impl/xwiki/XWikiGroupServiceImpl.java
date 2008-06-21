@@ -138,7 +138,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         CacheFactory cacheFactory = context.getWiki().getCacheFactory();
         try {
             CacheConfiguration configuration = new CacheConfiguration();
-            configuration.setConfigurationId("xwiki.plugin.image");
+            configuration.setConfigurationId("xwiki.groupservice.usergroups");
             LRUEvictionConfiguration lru = new LRUEvictionConfiguration();
             lru.setMaxEntries(iCapacity);
             configuration.put(LRUEvictionConfiguration.CONFIGURATIONID, lru);

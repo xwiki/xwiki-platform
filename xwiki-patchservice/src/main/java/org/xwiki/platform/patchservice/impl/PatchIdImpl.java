@@ -1,3 +1,23 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
 package org.xwiki.platform.patchservice.impl;
 
 import java.util.Date;
@@ -169,14 +189,10 @@ public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable
             this.hostId = e.getAttribute(HOSTID_ATTRIBUTE_NAME);
             String timeText = e.getAttribute(TIME_ATTRIBUTE_NAME);
             this.time = Patch.DATE_FORMAT.parse(timeText);
-            this.logicalTime =
-                new LogicalTimeImpl((Element) e.getElementsByTagName(LogicalTimeImpl.NODE_NAME)
-                    .item(0));
+            this.logicalTime = new LogicalTimeImpl((Element) e.getElementsByTagName(LogicalTimeImpl.NODE_NAME).item(0));
         } catch (Exception ex) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                XWikiException.ERROR_DOC_XML_PARSING,
-                "Invalid Patch XML",
-                ex);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_DOC_XML_PARSING,
+                "Invalid Patch XML", ex);
         }
     }
 
@@ -201,8 +217,8 @@ public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable
     @Override
     public int hashCode()
     {
-        return new HashCodeBuilder(37, 5).append(this.hostId).append(this.documentId).append(
-            this.time).append(this.logicalTime).toHashCode();
+        return new HashCodeBuilder(37, 5).append(this.hostId).append(this.documentId).append(this.time).append(
+            this.logicalTime).toHashCode();
     }
 
     /**
@@ -211,6 +227,6 @@ public class PatchIdImpl implements PatchId, RWPatchId, XmlSerializable
     @Override
     public String toString()
     {
-        return "[" + this.documentId + "@" + this.hostId + " at " + this.time + " (" + logicalTime + ")]";
+        return "[" + this.documentId + "@" + this.hostId + " at " + this.time + " (" + this.logicalTime + ")]";
     }
 }

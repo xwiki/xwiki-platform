@@ -1,3 +1,23 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
 package org.xwiki.platform.patchservice.impl;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -11,8 +31,8 @@ import org.xwiki.platform.patchservice.api.XmlSerializable;
 import com.xpn.xwiki.XWikiException;
 
 /**
- * Default implementation for {@link Position}. It uses a [row, column] position mark, with an
- * optional context (text before and after the position).
+ * Default implementation for {@link Position}. It uses a [row, column] position mark, with an optional context (text
+ * before and after the position).
  * 
  * @see org.xwiki.platform.patchservice.api.Position
  * @version $Id$
@@ -87,12 +107,13 @@ public class PositionImpl implements Position, XmlSerializable
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
         if (rows != null
-            && ((rows.length > row && rows[row].length() >= column) || (rows.length == row && column == 0))) {
-            return (StringUtils.isEmpty(before) || getTextBeforePosition(text).endsWith(before))
-                && (StringUtils.isEmpty(after) || getTextAfterPosition(text).startsWith(after));
+            && ((rows.length > this.row && rows[this.row].length() >= this.column) || (rows.length == this.row && this.column == 0)))
+        {
+            return (StringUtils.isEmpty(this.before) || getTextBeforePosition(text).endsWith(this.before))
+                && (StringUtils.isEmpty(this.after) || getTextAfterPosition(text).startsWith(this.after));
         }
-        return (row == 0 || row == 1) && column == 0 && StringUtils.isEmpty(before)
-            && StringUtils.isEmpty(after);
+        return (this.row == 0 || this.row == 1) && this.column == 0 && StringUtils.isEmpty(this.before)
+            && StringUtils.isEmpty(this.after);
     }
 
     /**
@@ -101,11 +122,11 @@ public class PositionImpl implements Position, XmlSerializable
     public String getTextBeforePosition(String text)
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
-        if (ArrayUtils.getLength(rows) <= row) {
-            return StringUtils.defaultString(StringUtils.join(rows, SEPARATOR)) + (row == 0 ? "" : "\n");
+        if (ArrayUtils.getLength(rows) <= this.row) {
+            return StringUtils.defaultString(StringUtils.join(rows, SEPARATOR)) + (this.row == 0 ? "" : "\n");
         }
-        return StringUtils.join(ArrayUtils.subarray(rows, 0, row), SEPARATOR)
-            + ((row > 0) ? SEPARATOR : "") + StringUtils.substring(rows[row], 0, column);
+        return StringUtils.join(ArrayUtils.subarray(rows, 0, this.row), SEPARATOR) + ((this.row > 0) ? SEPARATOR : "")
+            + StringUtils.substring(rows[this.row], 0, this.column);
     }
 
     /**
@@ -114,13 +135,13 @@ public class PositionImpl implements Position, XmlSerializable
     public String getTextAfterPosition(String text)
     {
         String[] rows = StringUtils.splitPreserveAllTokens(text, SEPARATOR);
-        if (ArrayUtils.getLength(rows) <= row) {
+        if (ArrayUtils.getLength(rows) <= this.row) {
             return "";
         }
         String textAfter =
-            StringUtils.substring(rows[row], column) + ((row + 1 < rows.length) ? SEPARATOR : "")
-                + StringUtils.join(ArrayUtils.subarray(rows, row + 1, rows.length), SEPARATOR);
-        return (span <= 0) ? textAfter : StringUtils.substring(textAfter, span);
+            StringUtils.substring(rows[this.row], this.column) + ((this.row + 1 < rows.length) ? SEPARATOR : "")
+                + StringUtils.join(ArrayUtils.subarray(rows, this.row + 1, rows.length), SEPARATOR);
+        return (this.span <= 0) ? textAfter : StringUtils.substring(textAfter, this.span);
     }
 
     /**
@@ -147,16 +168,16 @@ public class PositionImpl implements Position, XmlSerializable
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = doc.createElement(NODE_NAME);
-        xmlNode.setAttribute(ROW_ATTRIBUTE_NAME, row + "");
-        xmlNode.setAttribute(COLUMN_ATTRIBUTE_NAME, column + "");
-        if (!StringUtils.isEmpty(before)) {
-            xmlNode.setAttribute(BEFORE_ATTRIBUTE_NAME, before);
+        xmlNode.setAttribute(ROW_ATTRIBUTE_NAME, this.row + "");
+        xmlNode.setAttribute(COLUMN_ATTRIBUTE_NAME, this.column + "");
+        if (!StringUtils.isEmpty(this.before)) {
+            xmlNode.setAttribute(BEFORE_ATTRIBUTE_NAME, this.before);
         }
-        if (!StringUtils.isEmpty(after)) {
-            xmlNode.setAttribute(AFTER_ATTRIBUTE_NAME, after);
+        if (!StringUtils.isEmpty(this.after)) {
+            xmlNode.setAttribute(AFTER_ATTRIBUTE_NAME, this.after);
         }
-        if (span >= 0) {
-            xmlNode.setAttribute(SPAN_ATTRIBUTE_NAME, span + "");
+        if (this.span >= 0) {
+            xmlNode.setAttribute(SPAN_ATTRIBUTE_NAME, this.span + "");
         }
         return xmlNode;
     }
@@ -164,15 +185,14 @@ public class PositionImpl implements Position, XmlSerializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(Object other)
     {
         try {
             PositionImpl that = (PositionImpl) other;
-            return (that.row == this.row)
-                && that.column == this.column
-                && StringUtils.defaultString(that.before).equals(
-                    StringUtils.defaultString(before))
-                && StringUtils.defaultString(that.after).equals(StringUtils.defaultString(after))
+            return (that.row == this.row) && that.column == this.column
+                && StringUtils.defaultString(that.before).equals(StringUtils.defaultString(this.before))
+                && StringUtils.defaultString(that.after).equals(StringUtils.defaultString(this.after))
                 && (that.span == this.span);
         } catch (Exception e) {
             return false;
@@ -182,19 +202,19 @@ public class PositionImpl implements Position, XmlSerializable
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder(5, 47).append(this.row).append(this.column).append(
-            StringUtils.defaultString(before)).append(StringUtils.defaultString(after))
-            .toHashCode();
+            StringUtils.defaultString(this.before)).append(StringUtils.defaultString(this.after)).toHashCode();
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString()
     {
-        return "@" + this.row + "," + this.column + ": << [" + this.before + "] >> ["
-            + this.after + "]";
+        return "@" + this.row + "," + this.column + ": << [" + this.before + "] >> [" + this.after + "]";
     }
 }

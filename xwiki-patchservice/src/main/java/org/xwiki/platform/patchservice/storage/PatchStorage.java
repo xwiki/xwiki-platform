@@ -1,3 +1,23 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
 package org.xwiki.platform.patchservice.storage;
 
 import java.io.IOException;
@@ -27,8 +47,7 @@ public class PatchStorage
 
     private SessionFactory factory;
 
-    private static final SimpleDateFormat DATE_FORMAT =
-        new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
     public PatchStorage(XWikiContext context) throws XWikiException
     {
@@ -43,25 +62,18 @@ public class PatchStorage
         try {
             // Make sure the schema is updated to include the Patch mapping
             config.setProperty("hibernate.hbm2ddl.auto", "update");
-            factory =
-                config.addXML(
-                    IOUtils.toString(this.getClass().getResourceAsStream(MAPPING_FILENAME)))
+            this.factory =
+                config.addXML(IOUtils.toString(this.getClass().getResourceAsStream(MAPPING_FILENAME)))
                     .buildSessionFactory();
         } catch (MappingException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING,
-                "Invalid Patch mapping file",
-                e);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Patch mapping file", e);
         } catch (HibernateException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Unknown error initializing the Patch storage",
-                e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Unknown error initializing the Patch storage", e);
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
-                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING,
-                "Cannot load Patch mapping file",
-                e);
+                XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Cannot load Patch mapping file", e);
         }
         System.err.println("storage initialized");
     }
@@ -69,7 +81,7 @@ public class PatchStorage
     public boolean storePatch(Patch p)
     {
         try {
-            Session s = factory.openSession();
+            Session s = this.factory.openSession();
             Transaction t = s.beginTransaction();
             s.save(p);
             t.commit();
@@ -84,9 +96,8 @@ public class PatchStorage
     public Patch loadPatch(PatchId id)
     {
         List<Patch> patches =
-            loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '"
-                + id.getDocumentId() + "' and patch.id.time = '"
-                + DATE_FORMAT.format(id.getTime() + "'"));
+            loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '" + id.getDocumentId()
+                + "' and patch.id.time = '" + DATE_FORMAT.format(id.getTime() + "'"));
         if (patches.size() > 0) {
             return patches.get(0);
         }
@@ -100,15 +111,13 @@ public class PatchStorage
 
     public List<Patch> loadAllDocumentPatches(String documentId)
     {
-        return loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '"
-            + documentId + "'");
+        return loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '" + documentId + "'");
     }
 
     public List<Patch> loadAllDocumentPatchesSince(PatchId id)
     {
         return loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '"
-            + StringEscapeUtils.escapeSql(id.getDocumentId())
-            + "' and patch.id.time > '"
+            + StringEscapeUtils.escapeSql(id.getDocumentId()) + "' and patch.id.time > '"
             + DATE_FORMAT.format(id.getTime()) + "'");
     }
 
@@ -121,7 +130,7 @@ public class PatchStorage
     @SuppressWarnings("unchecked")
     protected List<Patch> loadPatches(String query)
     {
-        Session s = factory.openSession();
+        Session s = this.factory.openSession();
         List<String> contents = s.createQuery(query).list();
         List<Patch> patches = new ArrayList<Patch>();
         for (String patchXml : contents) {

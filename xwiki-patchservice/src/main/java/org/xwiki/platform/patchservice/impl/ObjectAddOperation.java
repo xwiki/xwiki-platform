@@ -1,3 +1,23 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
 package org.xwiki.platform.patchservice.impl;
 
 import org.apache.commons.lang.builder.HashCodeBuilder;
@@ -16,8 +36,7 @@ public class ObjectAddOperation extends AbstractOperationImpl implements RWOpera
     private String className;
 
     static {
-        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_OBJECT_ADD,
-            ObjectAddOperation.class);
+        OperationFactoryImpl.registerTypeProvider(Operation.TYPE_OBJECT_ADD, ObjectAddOperation.class);
     }
 
     public ObjectAddOperation()
@@ -32,8 +51,7 @@ public class ObjectAddOperation extends AbstractOperationImpl implements RWOpera
     {
         BaseObject obj = doc.newObject(this.className, context);
         if (obj == null) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Invalid class name: " + this.className);
         }
     }
@@ -41,6 +59,7 @@ public class ObjectAddOperation extends AbstractOperationImpl implements RWOpera
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean addObject(String objectClass)
     {
         this.className = objectClass;
@@ -61,19 +80,19 @@ public class ObjectAddOperation extends AbstractOperationImpl implements RWOpera
     public Element toXml(Document doc) throws XWikiException
     {
         Element xmlNode = createOperationNode(doc);
-        xmlNode.appendChild(createObjectNode(className, doc));
+        xmlNode.appendChild(createObjectNode(this.className, doc));
         return xmlNode;
     }
 
     /**
      * {@inheritDoc}
      */
+    @Override
     public boolean equals(Object other)
     {
         try {
             ObjectAddOperation otherOperation = (ObjectAddOperation) other;
-            return otherOperation.getType().equals(this.getType())
-                && otherOperation.className.equals(this.className);
+            return otherOperation.getType().equals(this.getType()) && otherOperation.className.equals(this.className);
         } catch (Exception e) {
             return false;
         }
@@ -82,6 +101,7 @@ public class ObjectAddOperation extends AbstractOperationImpl implements RWOpera
     /**
      * {@inheritDoc}
      */
+    @Override
     public int hashCode()
     {
         return new HashCodeBuilder(17, 19).append(this.className).toHashCode();
@@ -90,6 +110,7 @@ public class ObjectAddOperation extends AbstractOperationImpl implements RWOpera
     /**
      * {@inheritDoc}
      */
+    @Override
     public String toString()
     {
         return this.getType() + ": [" + this.className + "]";

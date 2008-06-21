@@ -1,3 +1,23 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
 package org.xwiki.platform.patchservice.impl;
 
 import java.io.InputStream;
@@ -74,8 +94,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean createType(String className, String typeName, String typeType,
-        Map<String, ?> typeConfig)
+    public boolean createType(String className, String typeName, String typeType, Map<String, ? > typeConfig)
     {
         return false;
     }
@@ -83,7 +102,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean modifyType(String className, String typeName, Map<String, ?> typeConfig)
+    public boolean modifyType(String className, String typeName, Map<String, ? > typeConfig)
     {
         return false;
     }
@@ -115,8 +134,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean setObjectProperty(String objectClass, int index, String propertyName,
-        String value)
+    public boolean setObjectProperty(String objectClass, int index, String propertyName, String value)
     {
         return false;
     }
@@ -124,8 +142,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean insertInProperty(String objectClass, int index, String property, String text,
-        Position position)
+    public boolean insertInProperty(String objectClass, int index, String property, String text, Position position)
     {
         return false;
     }
@@ -133,8 +150,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     /**
      * {@inheritDoc}
      */
-    public boolean deleteFromProperty(String objectClass, int index, String property,
-        String text, Position position)
+    public boolean deleteFromProperty(String objectClass, int index, String property, String text, Position position)
     {
         return false;
     }
@@ -283,8 +299,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     public String getPropertyValue(Element e)
     {
         Element propertyNode = getPropertyNode(e);
-        return (propertyNode != null) ? propertyNode.getAttribute(PROPERTY_VALUE_ATTRIBUTE_NAME)
-            : null;
+        return (propertyNode != null) ? propertyNode.getAttribute(PROPERTY_VALUE_ATTRIBUTE_NAME) : null;
     }
 
     public Element createClassNode(String className, Document doc)
@@ -309,8 +324,7 @@ public abstract class AbstractOperationImpl implements RWOperation
         return createAttachmentNode(null, filename, null, doc);
     }
 
-    public Element createAttachmentNode(byte[] content, String filename, String author,
-        Document doc)
+    public Element createAttachmentNode(byte[] content, String filename, String author, Document doc)
     {
         Element xmlNode = doc.createElement(ATTACHMENT_NODE_NAME);
         xmlNode.setAttribute(ATTACHMENT_FILANAME_ATTRIBUTE_NAME, filename);
@@ -331,8 +345,7 @@ public abstract class AbstractOperationImpl implements RWOperation
     public byte[] getAttachmentContent(Element e)
     {
         try {
-            return Base64.decodeBase64(getAttachmentNode(e).getTextContent().getBytes(
-                "ISO-8859-1"));
+            return Base64.decodeBase64(getAttachmentNode(e).getTextContent().getBytes("ISO-8859-1"));
         } catch (UnsupportedEncodingException e1) {
         } catch (DOMException e1) {
         }

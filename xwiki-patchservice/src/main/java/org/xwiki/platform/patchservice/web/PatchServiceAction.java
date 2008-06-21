@@ -1,3 +1,23 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
 package org.xwiki.platform.patchservice.web;
 
 import java.io.StringReader;
@@ -24,16 +44,14 @@ public class PatchServiceAction extends XWikiAction
 {
     /**
      * {@inheritDoc}
-     * 
-     * @todo Write me!
      */
+    @Override
     public boolean action(XWikiContext context) throws XWikiException
     {
         XWikiRequest request = context.getRequest();
         XWikiResponse response = context.getResponse();
         response.setContentType("text/xml");
-        PatchservicePlugin plugin =
-            (PatchservicePlugin) context.getWiki().getPlugin("patchservice", context);
+        PatchservicePlugin plugin = (PatchservicePlugin) context.getWiki().getPlugin("patchservice", context);
         String uri = request.getRequestURI();
         String paction = "patches/";
         System.err.println("uri: " + uri);
@@ -59,8 +77,7 @@ public class PatchServiceAction extends XWikiAction
             Document doc = createEmptyDocument();
             doc.appendChild(doc.createElement("patches"));
             PatchId startId = new PatchIdImpl();
-            startId
-                .fromXml(parseString(request.getParameter("patch_id_from")).getDocumentElement());
+            startId.fromXml(parseString(request.getParameter("patch_id_from")).getDocumentElement());
             PatchId endId = new PatchIdImpl();
             endId.fromXml(parseString(request.getParameter("patch_id_to")).getDocumentElement());
             for (Patch p : plugin.getDelta(startId, endId)) {
@@ -86,8 +103,7 @@ public class PatchServiceAction extends XWikiAction
     {
         try {
             DOMImplementationLS lsImpl =
-                (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation(
-                    "LS 3.0");
+                (DOMImplementationLS) DOMImplementationRegistry.newInstance().getDOMImplementation("LS 3.0");
             LSInput input = lsImpl.createLSInput();
             input.setCharacterStream(new StringReader(content));
             LSParser p = lsImpl.createLSParser(DOMImplementationLS.MODE_SYNCHRONOUS, null);

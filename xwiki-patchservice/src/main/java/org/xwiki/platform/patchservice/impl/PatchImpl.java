@@ -1,3 +1,23 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
+ */
 package org.xwiki.platform.patchservice.impl;
 
 import java.io.ByteArrayInputStream;
@@ -101,7 +121,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      */
     public String getSpecVersion()
     {
-        return specVersion;
+        return this.specVersion;
     }
 
     /**
@@ -117,7 +137,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      */
     public PatchId getId()
     {
-        return id;
+        return this.id;
     }
 
     /**
@@ -133,7 +153,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      */
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 
     /**
@@ -149,7 +169,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      */
     public Originator getOriginator()
     {
-        return originator;
+        return this.originator;
     }
 
     /**
@@ -165,7 +185,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      */
     public List<Operation> getOperations()
     {
-        return operations;
+        return this.operations;
     }
 
     /**
@@ -198,7 +218,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
      */
     public void apply(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
-        for (Operation op : operations) {
+        for (Operation op : this.operations) {
             op.apply(doc, context);
         }
     }
@@ -210,23 +230,21 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
     {
         try {
             Element xmlNode = doc.createElement(NODE_NAME);
-            xmlNode.setAttribute(SPEC_VERSION_ATTRIBUTE_NAME, specVersion);
-            xmlNode.setAttribute(DESCRIPTION_ATTRIBUTE_NAME, description);
-            if (id != null) {
-                xmlNode.appendChild(id.toXml(doc));
+            xmlNode.setAttribute(SPEC_VERSION_ATTRIBUTE_NAME, this.specVersion);
+            xmlNode.setAttribute(DESCRIPTION_ATTRIBUTE_NAME, this.description);
+            if (this.id != null) {
+                xmlNode.appendChild(this.id.toXml(doc));
             }
-            if (originator != null) {
-                xmlNode.appendChild(originator.toXml(doc));
+            if (this.originator != null) {
+                xmlNode.appendChild(this.originator.toXml(doc));
             }
-            for (Operation op : operations) {
+            for (Operation op : this.operations) {
                 xmlNode.appendChild(op.toXml(doc));
             }
             return xmlNode;
         } catch (RuntimeException ex) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to export patch to XML",
-                ex);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to export patch to XML", ex);
         }
     }
 
@@ -236,34 +254,29 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
     public void fromXml(Element e) throws XWikiException
     {
         try {
-            specVersion = e.getAttribute(SPEC_VERSION_ATTRIBUTE_NAME);
-            description = e.getAttribute(DESCRIPTION_ATTRIBUTE_NAME);
+            this.specVersion = e.getAttribute(SPEC_VERSION_ATTRIBUTE_NAME);
+            this.description = e.getAttribute(DESCRIPTION_ATTRIBUTE_NAME);
             Element idElement = (Element) e.getElementsByTagName(PatchIdImpl.NODE_NAME).item(0);
             if (idElement != null) {
-                id = new PatchIdImpl();
-                id.fromXml(idElement);
+                this.id = new PatchIdImpl();
+                this.id.fromXml(idElement);
             }
             NodeList operationNodes = e.getElementsByTagName(AbstractOperationImpl.NODE_NAME);
             clearOperations();
             for (int i = 0; i < operationNodes.getLength(); ++i) {
-                Operation o =
-                    OperationFactoryImpl.getInstance().loadOperation(
-                        (Element) operationNodes.item(i));
-                operations.add(o);
+                Operation o = OperationFactoryImpl.getInstance().loadOperation((Element) operationNodes.item(i));
+                this.operations.add(o);
             }
         } catch (RuntimeException ex) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS,
-                XWikiException.ERROR_XWIKI_UNKNOWN,
-                "Failed to load patch from XML",
-                ex);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to load patch from XML", ex);
         }
     }
 
     public String getContent()
     {
         try {
-            Document doc =
-                DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
             doc.appendChild(toXml(doc));
             DOMImplementationLS ls = (DOMImplementationLS) doc.getImplementation();
 
@@ -289,7 +302,7 @@ public class PatchImpl implements Patch, RWPatch, XmlSerializable
             Document doc =
                 DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
                     new ByteArrayInputStream(content.getBytes()));
-            this.fromXml((Element) doc.getDocumentElement());
+            this.fromXml(doc.getDocumentElement());
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {

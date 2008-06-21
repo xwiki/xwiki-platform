@@ -146,7 +146,7 @@
 &lt;div id="xwikinav" class="accordion"&gt;
 #foreach($space in $spaces)
 #if (!$hiddenSpaces.contains($space) || ($hiddenSpaces.contains($space) &amp;&amp; $xwiki.hasAdminRights()))
-#if ($doc.web == $space)
+#if ($doc.space == $space)
 #set ($spacecount = $i)
 #end
 #set($i = $i + 1)
@@ -154,7 +154,7 @@
 &lt;div id="xwikinav${space}Header" class="accordionTabTitleBar"&gt;&lt;h6&gt;$space&lt;/h6&gt;&lt;/div&gt;
 &lt;div id="xwikinav${space}Content" class="accordionTabContentBox"&gt;
 #set ($escapedSpace = $space.replaceAll("'", "''"))
-#set($hql = $xwiki.searchDocuments("doc.web='$escapedSpace' order by doc.name"))
+#set($hql = $xwiki.searchDocuments("doc.space='$escapedSpace' order by doc.name"))
 #foreach($page in $hql)
 #if (!$hiddenPages.contains($page) || ($hiddenPages.contains($page) &amp;&amp; $xwiki.hasAdminRights()))
 #set($dotIndex = $page.indexOf(".")+1)

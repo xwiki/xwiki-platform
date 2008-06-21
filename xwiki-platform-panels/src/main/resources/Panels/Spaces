@@ -108,7 +108,7 @@
 #else
 &lt;span class="pitemseparator"&gt;|&lt;/span&gt;
 #end
-#if($space == $doc.web)
+#if($space == $doc.space)
 &lt;span class="panelitem currentspace"&gt;[$space&gt;${space}.WebHome]&lt;/span&gt;
 #else
 &lt;span class="panelitem"&gt;[$space&gt;${space}.WebHome]&lt;/span&gt;

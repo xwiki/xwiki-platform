@@ -512,7 +512,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             String watchedSpaces =
                 watchListObject.getLargeStringValue("spaces").trim().replaceFirst("^,", "")
                     .replaceAll("[^\\.,:]+:", "").replaceAll(",", "','");
-            String request = "select doc.fullName from XWikiDocument as doc where doc.web in ('" +
+            String request = "select doc.fullName from XWikiDocument as doc where doc.space in ('" +
                 watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
                 "order by doc.date desc";
             return context.getWiki().getStore().search(request, 20, 0, context);

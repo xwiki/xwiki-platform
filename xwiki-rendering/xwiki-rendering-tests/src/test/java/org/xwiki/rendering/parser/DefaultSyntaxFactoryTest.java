@@ -29,7 +29,13 @@ public class DefaultSyntaxFactoryTest extends AbstractRenderingTestCase
     {
         SyntaxFactory syntaxFactory = (SyntaxFactory) getComponentManager().lookup(SyntaxFactory.ROLE);
         List<Syntax> syntaxes = syntaxFactory.getAvailableSyntaxes();
-        assertEquals(7, syntaxes.size());
+        assertTrue("XWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.XWIKI, "2.0")));
+        assertTrue("Confluence syntax not found", syntaxes.contains(new Syntax(SyntaxType.CONFLUENCE, "1.0")));
+        assertTrue("Creole syntax not found", syntaxes.contains(new Syntax(SyntaxType.CREOLE, "1.0")));
+        assertTrue("JspWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.JSPWIKI, "1.0")));
+        assertTrue("MediaWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.MEDIAWIKI, "1.0")));
+        assertTrue("TWiki syntax not found", syntaxes.contains(new Syntax(SyntaxType.TWIKI, "1.0")));
+        assertTrue("XHTML syntax not found", syntaxes.contains(new Syntax(SyntaxType.XHTML, "1.0")));
     }
 
     public void testCreateSyntaxFromSyntaxIdString() throws Exception

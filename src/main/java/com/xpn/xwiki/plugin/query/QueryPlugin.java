@@ -122,7 +122,7 @@ public class QueryPlugin extends XWikiDefaultPlugin implements IQueryFactory {
         return null;
     }
     /** create query for docs
-     * @param web, docname - document.web & .name. it may consist xpath []-selection. if any - *
+     * @param web, docname - document.space & .name. it may consist xpath []-selection. if any - *
      * @param prop - return property, start with @, if null - return document
      * @param order - properties for sort, separated by ','; order: ascending/descending after prop. name, or +/- before. if null - not sort
      * @throws XWikiException

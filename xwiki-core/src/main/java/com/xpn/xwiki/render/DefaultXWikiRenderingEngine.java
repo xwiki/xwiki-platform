@@ -235,7 +235,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
                 // We need to make sure we don't use the cache duretion currently in the system
-                context.setCacheDuration(0);
+                context
+                    .setCacheDuration((int) context.getWiki().ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
                 // Start monitoring timer
                 if (monitor != null) {
                     monitor.startTimer("rendering");

@@ -5,14 +5,14 @@
 @import "suggest/ajaxSuggest.css";
 @import "rss.css";
 /* @group RESET */
-/* -------------------------------------------------------------- 
-  
+/* --------------------------------------------------------------
+
    Reset.css
    * Resets default browser CSS styles.
-   
+
    Created by Erik Meyer:
    * meyerweb.com/eric/thoughts/2007/05/01/reset-reloaded/
-   
+
 -------------------------------------------------------------- */
 html, body{height:100%;}
 html, body,div, span, applet, object, iframe,
@@ -112,7 +112,7 @@ strong, .strong {font-weight: bold;}
   border-bottom: 1px solid #ccc;
 }
 .heading-1 span span, .heading-1-1 span span,
-.heading-1-1-1 span span, .heading-1-1-1-1 span span { 
+.heading-1-1-1 span span, .heading-1-1-1-1 span span {
 	display: inline;
 	color: #000;
   background-color: inherit;
@@ -262,7 +262,7 @@ table td{
 .mceContentBody table tr td em,
 .main table tr td em{font-size: 0.9em; font-style: italic; }
 .mceContentBody tr.odd td,
-.main tr.odd td	{ background:#f7fbff }	
+.main tr.odd td	{ background:#f7fbff }
 .mceContentBody td,
 .main td {
  color: #4e6172;
@@ -270,7 +270,7 @@ table td{
  padding: 3px 4px;
  border-width: 1px;
  border-style: solid;
- }				
+ }
 .mceContentBody tr.table-head td,
 .main th {
  border-color: #e5eff8;
@@ -281,17 +281,17 @@ table td{
  color:#66a3d3;
   border-width: 1px;
  border-style: solid;
- }	
+ }
  table.xwikilogintable th {background-color: transparent;}
 .main tfoot th {
  text-align:center;
  background:#f4f9fe;
- }	
+ }
 .main tfoot th strong {
  font:bold 1.2em "Century Gothic","Trebuchet MS",Arial,Helvetica,sans-serif;
  margin:.5em .5em .5em 0;
  color:#66a3d3;
- 	}		
+ 	}
 .main tfoot th em {
  color:#f03b58;
  font-weight: bold;
@@ -310,7 +310,7 @@ table#memberstable td {border: none;}
 .main ol, .main ul {
 		line-height : 1.4em;
 		margin-top: 1em;
-		margin-bottom:1em; 
+		margin-bottom:1em;
 		list-style-position: inside;
 		}
 .main ol ol, .main ul ul {
@@ -566,7 +566,7 @@ body{
   font-size: 87.5%; /* 10px */
   font-family: sans-serif;
   color: #222;
-  width: 100%; 
+  width: 100%;
   padding: 0;
   margin: 0 ;
   min-width: 970px;
@@ -648,7 +648,7 @@ body#body.editbody #globallinks,
   line-height: 1.2em;
   width: 220px;
   margin-left: -220px;
-  height:  100px;
+  height:  80px;
   background-image: url( images/colors/gray/bgx-GRAY.png );
   background-position: top left;
 }
@@ -732,7 +732,7 @@ body#body.adminbody #footerglobal{
 }
 
 div#panelwizardcontainer {
-padding: -30px -250px;	
+padding: -30px -250px;
 }
 
 
@@ -745,7 +745,7 @@ body.hideleft #contentcolumn .main{
 
 body.hideright #contentcolumn .main{
 	margin:0 0 0 220px;
-	
+
 	}
 
 body.hidelefthideright #contentcolumn .main{
@@ -760,7 +760,7 @@ body.content #contentcolumn .main{
 	 overflow-y:hidden;
 	 padding: 0;
 	 position: relative;
-	 } 
+	 }
 
 
 html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
@@ -776,22 +776,22 @@ html > body .minwidth, html > body .minwidthb, html > body .minwidthc{
 .layoutsection{clear: both;}
 #contentcontainer{height:1%;}
 
-#rightPanels{ 
+#rightPanels{
   position: relative;
-float: right; 
+float: right;
 width: 220px;
 margin-top: -25px;
 margin-left: -220px;
 height: auto !important;
 height: 400px;
-min-height: 400px; 
+min-height: 400px;
 background-image: url( images/colors/gray/bgx-GRAY.png );
-background-position:left -100px;
+background-position:left -80px;
 background-repeat: no-repeat;
 padding-bottom: 100px;
  }
 
-#leftPanels { 
+#leftPanels {
 position: relative;
 float: left;
 width:  220px;
@@ -803,18 +803,18 @@ body.adminbody #editPanels.panels {	display: none;}
 
 
 
-#editPanels.panels{ 
+#editPanels.panels{
   position: relative;
-float: left; 
+float: left;
 width: 220px;
 margin-left: -220px;
 margin-top: -26px;
 padding-top: 25px;
 height: auto !important;
 height: 600px;
-min-height: 600px; 
+min-height: 600px;
 background-image: url( images/colors/gray/bgx-GRAY.png );
-background-position:left -100px;
+background-position:left -79px;
 background-repeat: no-repeat;
 }
 
@@ -850,7 +850,7 @@ Global header
   position: relative;
   float: left;
   width: 100%;
-  height: 100px;
+  height: 80px;
   z-index: 1;
 }
 #globallinks {}
@@ -861,7 +861,7 @@ Global header
   line-height: 1.1em;
 }
 body#body.editbody #globallinks #globalmenu .glink,
-#globalmenu .glink { 
+#globalmenu .glink {
 display: block;
 background-color: transparent;
 font-size: 1em;
@@ -874,7 +874,7 @@ text-decoration: none;
 #globalmenu #headerlanguages a{ text-transform: capitalize;}
 #globalmenu span { display: none;}
 #company{
-  height: 100px;
+  height: 80px;
   position: relative;
   float: left;
   width: 100%;
@@ -887,12 +887,12 @@ background-repeat: no-repeat;
 padding: 0;
 background-color: #FFF;
 margin-right: 220px;
-height: 100px;
+height: 80px;
 }
 #companylogo a {
 	display: block;
-	height:  100px;
-	width: 300px;
+	height:  80px;
+	width: 220px;
 	text-decoration: none;
 }
 
@@ -902,8 +902,8 @@ height: 100px;
 }
 
 #companylogo a img {
-	height: 100px;
-	width: 300px;
+	height: 80px;
+	width: 220px;
 }
  #companylogo a img {position: relative; float: left;}/*IE*/
 
@@ -1042,7 +1042,7 @@ fieldset.xwikimessage .buttons a {
 /* @group Comments, attachments, History...  */
 /*
 ---------------------------------------
-Zone for Comments, attachments, History... 
+Zone for Comments, attachments, History...
 ---------------------------------------
 */
 #xwikidata{
@@ -1181,8 +1181,8 @@ Menu
 ---------------------------------------
 */
 #actionmenu {
-  	position: absolute;   	
- 	 width: expression(body.scrollLeft + document.body.clientWidth  + "px");  
+  	position: absolute;
+ 	 width: expression(body.scrollLeft + document.body.clientWidth  + "px");
   	height: 20px !important;
   	top: 0;
   	left: 0;
@@ -1205,12 +1205,12 @@ html > body #actionmenu{
 #actionmenu a{
 	text-decoration: none;
 	color: #444;
-	text-decoration:none; 
+	text-decoration:none;
 	display: block;
 	width: 70px;
 	height: 20px;
  	float: left;
-  	border:1px solid  #444; 
+  	border:1px solid  #444;
  	border-width:0 1px;
  	margin-right: -1px;
   	text-align: center;
@@ -1224,7 +1224,7 @@ html > body #actionmenu{
 	display: inline;
 	height: 20px;
  	float: none;
-  	border:1px solid  #444; 
+  	border:1px solid  #444;
  	border-width:0 ;
   	text-align: center;
   	line-height:20px;
@@ -1251,6 +1251,9 @@ html > body #actionmenu{
 #actionmenu .rightmenu a {
 	width:  100px;
 }
+#actionmenu .leftmenu #tmDoc {
+    width:  20px;
+}
 .leftmenu{
   position: absolute;
   left: 25px;
@@ -1258,6 +1261,11 @@ html > body #actionmenu{
 .topmenuentry{
   display: block;
   float: left;
+}
+.rightmenu .topmenuentry {
+  float: right;
+}
+.topmenuentry {
 }
 #tmWatched a.tme{
 	color: #4cad1b;
@@ -1281,8 +1289,8 @@ float: none;
 width: 100%;
 font-size:0.8em;
 font-weight: bold;
-text-decoration:none; 
-height:auto; 
+text-decoration:none;
+height:auto;
 padding:2px 0 0 0;
 line-height:1.2em;
 border: 0;
@@ -1652,8 +1660,8 @@ span.panelitem{  display: block;}
   opacity:  .1;
 }
 html > body #dragbox {width: 198px !important;}
-#xwikinavcontainer{ 
-  margin : 0 0 0; 
+#xwikinavcontainer{
+  margin : 0 0 0;
   border: 1px solid #999;
   border-width: 0 0 1px 0;
 }
@@ -2111,7 +2119,7 @@ div#attachments .odd {
 #xwikieditorinner {
 	/*float: left;
 	width: 100%;*/
-	
+
 		}
 .editbody #globallinks{
   width: 200px;
@@ -2158,7 +2166,7 @@ div#xwikiclassproperties.accordion input[type=text],
 div#xwikiobjects.accordion input[type=text] {
 	width:  98%;
 }
-div#xwikiclassproperties.accordion 
+div#xwikiclassproperties.accordion
 
 #xwikidoctitleinput{
   width: 40%;
@@ -2252,7 +2260,7 @@ margin-left:2em;
 .buttonwrapper {
 background:transparent;
 display: inline-block;
-display:inline; 
+display:inline;
 margin:10px 0px 10px 10px;
 padding-top: 10px;
 }
@@ -2313,7 +2321,7 @@ table#searchTableUnique {width: 99.8%;}
 table#searchTableUnique td span.wikilink {
 
 }
-table#searchTableUnique td.actions a{ 
+table#searchTableUnique td.actions a{
 	 position: relative;
 float: left;
 width: 16px;
@@ -2476,7 +2484,7 @@ fieldset.floatinginfobox ul
 	padding-top: 20px ;
 }
 
-	
+
 
 
 /* @end */
@@ -2484,7 +2492,7 @@ table.mceEditor{ width :100%;}
 table.mceEditor textarea{ width :100%; height: 100%;}
 .mceEditorContainer {
 	display: block;
-	height: 100% !important;	
+	height: 100% !important;
 	position: relative;
 	width:100%;
 }
@@ -2516,9 +2524,9 @@ body.mceContentBody {min-width:100px;}
 	background:transparent url(images/rounded.png ) no-repeat top left;
 	margin: 0;
 	padding: 10px 10px 5px;
-	color: white; 
-	font-weight: bold; 
-	font-size: 1.2em; 
+	color: white;
+	font-weight: bold;
+	font-size: 1.2em;
 	line-height: 1em;
 }
 .roundedbody {

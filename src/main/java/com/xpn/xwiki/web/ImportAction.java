@@ -29,7 +29,7 @@ public class ImportAction extends XWikiAction
             }
 
             if (name == null) {
-                return "import";
+                return "admin";
             }
 
             PackageAPI importer =
@@ -87,7 +87,7 @@ public class ImportAction extends XWikiAction
                     String withVersions = request.get("withversions");
                     importer.setWithVersions("1".equals(withVersions));
                     importer.install();
-                    return "import";
+                    return "admin";
                 }
             }
         } catch (Exception e) {

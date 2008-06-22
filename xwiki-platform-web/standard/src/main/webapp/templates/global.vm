@@ -51,9 +51,6 @@
 #set($regurl = $xwiki.getURL("XWiki.Register", "register"))
       <a class="glink" href="$!regurl" id="headerregister">$!msg.get("core.register")</a>#sep()
 #end
-#if($hasAdmin)
-      <a class="glink" href="$!xwiki.getURL("XWiki.XWikiPreferences","admin")" id="headeradmin">$!msg.get("admin")</a> #sep()
-#end
 #if($xwiki.isMultiLingual())
   <span class="glink" id="headerlanguages">
   <a href="$!doc.getURL("view", "language=$doc.getDefaultLanguage()")">$!doc.getDefaultLanguage()</a>

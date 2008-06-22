@@ -1,4 +1,4 @@
-<h3 class="heading-1-1">$msg.get("export")</h3>
+<p class="legend">$msg.get("export")</p>
 <form action="" method="post">
 <div>
 <dl>

@@ -72,7 +72,7 @@ $response.setContentType("application/x-json")
     "userurl"       : "$xwiki.getURL($group.fullName)",
     "usersaveurl"   : "$group.getURL('save')",
     "userinlineurl" : "$group.getURL("inline", "xpage=editgroup")",
-    "docurl"        : "$xwiki.getURL("XWiki.XWikiGroups", "admin", "editor=groups&space=XWiki")"
+    "docurl"        : "$xwiki.getURL("XWiki.XWikiPreferences", "admin", "section=Groups")"
   }
 #end
 ]}

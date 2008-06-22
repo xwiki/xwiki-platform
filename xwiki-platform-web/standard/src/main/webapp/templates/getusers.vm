@@ -78,7 +78,7 @@ $response.setContentType("application/x-json")
     "userurl"       : "$xwiki.getURL($user.fullName)",
     "usersaveurl"   : "$user.getURL("save")",
     "userinlineurl" : "$user.getURL("inline", "xpage=edituser")",
-    "docurl"        : "$xwiki.getURL("XWiki.XWikiUsers", "admin", "editor=users&space=XWiki")",
+    "docurl"        : "$xwiki.getURL("XWiki.XWikiPreferences", "admin", "section=Users")",
     "grayed"        : "$grayed"
   }
 #end

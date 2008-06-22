@@ -145,9 +145,6 @@
 * [Sandbox&gt;Sandbox.WebHome]
 * [Tags&gt;Main.Tags]
 #if ($xwiki.hasAdminRights())
-For Admins:
-* [Admin Center&gt;XWiki.WebHome]
-
 &lt;p style="font-size:0.75em;padding-left:8px;"&gt;&lt;a href="$xwiki.getDocument("Panels.QuickLinks").getURL("inline")"&gt;(Edit this panel)&lt;/a&gt;&lt;/p&gt;
 #end
 #panelfooter()</content>

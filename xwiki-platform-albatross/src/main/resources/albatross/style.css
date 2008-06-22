@@ -170,3 +170,151 @@ div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutconta
 	{
 	color: #fff;
 }
+
+/* temporary styles for administration */
+
+
+#admin-page-header {
+  color: #FFF;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  background-color: #384554;
+  height: 60px;
+}
+
+#admin-header {
+  margin-left: 20px;
+  font-size: 1.5em;
+  font-weight: bold;
+  width: 300px;
+  float: left;
+}
+
+#change-context {
+  display: inline;
+  margin-right: 20px;
+  float: right;
+}
+
+#change-context-select {
+  background-color: #808085;
+  width: 150px;
+}
+
+#change-context-select a.tme {
+  color: #FFF;
+  padding: 2px;
+  width: 100%;
+}
+
+#change-context-select strong {
+  font-weight: normal;
+}
+
+#goto-globaladmin a {
+  color: #FFF;
+  font-weight: bold;
+}
+
+#show-all {
+  float:left;
+  width: 100px;
+}
+
+#show-all a {
+  color: #FFF;
+  line-height: 50px;
+  background-color: #808085;
+  padding: 2px;
+  font-weight: bold;
+}
+
+#admin-icons li {
+  list-style-type: none;
+  width: 124px;
+  float: left;
+  margin: 20px;
+  text-align: center;
+}
+
+#admin-icons li a {
+	display:  block;
+  background-position: 50% 0%;
+  background-repeat: no-repeat;
+  width: 124px;
+  padding-top: 87px;
+  font-weight: bold;
+  color: #808085;
+}
+#admin-icons li.General a{ background-image: url("icons/administration/global.png");}
+#admin-icons li.Presentation a{ background-image: url("icons/administration/presentation.png");}
+#admin-icons li.Programming a{ background-image: url("icons/administration/programing.png");}
+#admin-icons li.Import a{ background-image: url("icons/administration/import.png");}
+#admin-icons li.Export a{ background-image: url("icons/administration/export.png");}
+#admin-icons li.Rights a{ background-image: url("icons/administration/rights.png");}
+#admin-icons li.Registration a{ background-image: url("icons/administration/registration.png");}
+#admin-icons li.Users a{ background-image: url("icons/administration/users.png");}
+#admin-icons li.Groups a{ background-image: url("icons/administration/groups.png");}
+#admin-icons li.Blog a{ background-image: url("icons/administration/blog.png");}
+#admin-icons li.Photos a{ background-image: url("icons/administration/photos.png");}
+#admin-icons li.Panels a{ background-image: url("icons/administration/panels.png");}
+
+#admin-page {
+	width: 100%;
+}
+
+#admin-page-content {
+	background-color: #EFEFEF;
+	margin: 0px auto;
+  margin-top: 10px;
+  padding: 20px;
+}
+
+#admin-page-content fieldset {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+#admin-page-content fieldset p {
+  width: 80%;
+  display: block;
+  margin-bottom: 10px;
+}
+
+#admin-page-content fieldset legend {
+  color: #606B72;
+  font-size: 1.5em;
+  font-weight: bold;
+}
+
+.legend {
+  width: auto !important;
+  padding: 0px;
+  margin: 0px;
+  color: #606B72;
+  font-size: 1.5em;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#admin-page-content fieldset p label {
+  width: 25% !important;
+  float: left;
+  color: #4A4A4B;
+  font-weight: bold;
+}
+
+#admin-page-content fieldset p input, #admin-page-content fieldset p textarea  {
+  width: 65%;
+  margin-left: 10px;
+}
+
+#admin-page-content fieldset p select {
+  width: 30%;
+  margin-left: 10px;
+}
+
+#go-to-space {
+  cursor: pointer;
+  color: #000;
+}

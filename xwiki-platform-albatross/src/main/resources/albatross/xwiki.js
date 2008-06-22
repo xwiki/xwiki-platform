@@ -34,7 +34,11 @@ function showsubmenu(element){
       }
     }
     var coords = Position.positionedOffset(element);
-    element.lastChild.style.left = (coords[0]  - 10) + "px";
+    if (element.getStyle("float") == "left") {
+	  element.lastChild.style.left = (coords[0]  - 10) + "px";
+    } else {
+	  element.lastChild.style.left = (coords[0]  - 70) + "px";
+    }
     element.lastChild.style.top = (coords[1] + element.offsetHeight) + "px";
     element.lastChild.className = element.lastChild.className.replace("hidden", "visible");
   }
@@ -114,7 +118,7 @@ function rmClass(o, className){
 }
 
 function openURL(url) {
-  win = open( url, "win", "titlebar=0,width=750,height=480,resizable,scrollbars");
+  win = open( url, "win", "titlebar=0,width=990,height=500,resizable,scrollbars");
   if( win ) {
     win.focus();
   }
@@ -175,7 +179,7 @@ var XWikiAjax = {
     var req = this.requests.pop();
     while (req) {
       if (req.type=='set') {
-        ajaxEngine.sendRequest ('setValue', 'status='+this.status.id, 'doc='+req.document, 
+        ajaxEngine.sendRequest ('setValue', 'status='+this.status.id, 'doc='+req.document,
 	    'typedoc='+req.className, 'field='+req.field, 'value='+req.value);
       };
 	req = this.requests.pop();
@@ -306,7 +310,7 @@ function externalLinks() {
   var anchors = document.getElementsByTagName("a");
   for (var i=0; i<anchors.length; i++) {
     var anchor = anchors[i];
-    if (anchor.getAttribute("href") && anchor.getAttribute("rel")) { 
+    if (anchor.getAttribute("href") && anchor.getAttribute("rel")) {
       // Since the rel attribute can have other values we need to only take into account the ones
       // starting with "_"
       var values = anchor.getAttribute("rel").split(" ");
@@ -325,7 +329,7 @@ function externalLinks() {
 
 function createAccordion(params)
 {
-    var acc = new accordion(params.div, { 
+    var acc = new accordion(params.div, {
       resizeSpeed:10,
       classNames: {
       toggle: "accordionTabTitleBar",

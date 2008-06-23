@@ -60,7 +60,7 @@ public class OSCacheCacheFactory implements CacheFactory
         }
 
         OSCacheCache<T> cache = new OSCacheCache<T>();
-        cache.initialize(configuration, this.container);
+        cache.initialize(new OSCacheCacheConfiguration(this.container, configuration, "default"));
 
         if (LOG.isInfoEnabled()) {
             LOG.info("End OScache cache initialisation");

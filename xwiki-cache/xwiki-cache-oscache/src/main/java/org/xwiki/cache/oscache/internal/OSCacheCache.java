@@ -21,10 +21,8 @@ package org.xwiki.cache.oscache.internal;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.oscache.internal.event.OSCacheCacheEntryEvent;
 import org.xwiki.cache.util.AbstractCache;
-import org.xwiki.container.Container;
 
 import com.opensymphony.oscache.base.NeedsRefreshException;
 import com.opensymphony.oscache.base.events.CacheEntryEvent;
@@ -48,11 +46,6 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
     private static final Log LOG = LogFactory.getLog(OSCacheCache.class);
 
     /**
-     * The default configuration identifier used to load cache configuration file.
-     */
-    protected String defaultPropsId = "default";
-
-    /**
      * The OSCache cache configuration.
      */
     private OSCacheCacheConfiguration oscacheConfiguration;
@@ -65,14 +58,13 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
     /**
      * Create and initialize the cache.
      * 
-     * @param configuration the configuration to use to create the cache.
-     * @param container the container used to access configuration files.
+     * @param oscacheConfiguration the configuration to use to create the cache.
      */
-    public void initialize(CacheConfiguration configuration, Container container)
+    public void initialize(OSCacheCacheConfiguration oscacheConfiguration)
     {
-        this.configuration = configuration;
+        this.oscacheConfiguration = oscacheConfiguration;
 
-        this.oscacheConfiguration = new OSCacheCacheConfiguration(container, this.configuration, this.defaultPropsId);
+        this.configuration = this.oscacheConfiguration.getCacheConfiguration();
 
         this.cacheAdmin = new GeneralCacheAdministrator(this.oscacheConfiguration.getOSCacheProperties());
 
@@ -89,6 +81,7 @@ public class OSCacheCache<T> extends AbstractCache<T> implements CacheEntryEvent
 
     /**
      * Get the real cache key from the API cache key.
+     * 
      * @param apiKey the API cache key.
      * @return the real cache.
      */

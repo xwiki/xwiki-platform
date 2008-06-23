@@ -61,8 +61,8 @@ public class OSCacheLocalCacheFactory implements CacheFactory
             LOG.info("Start OSCache local cache initialisation");
         }
 
-        OSCacheLocalCache<T> cache = new OSCacheLocalCache<T>();
-        cache.initialize(configuration, container);
+        OSCacheCache<T> cache = new OSCacheCache<T>();
+        cache.initialize(new OSCacheCacheConfiguration(this.container, configuration, "default-local"));
 
         if (LOG.isInfoEnabled()) {
             LOG.info("End OSCache local cache initialisation");

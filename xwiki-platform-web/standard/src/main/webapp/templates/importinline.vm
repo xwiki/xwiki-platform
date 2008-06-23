@@ -82,7 +82,7 @@
     <a href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get("all")</a>
   </span>
 
-  <form action="$doc.getURL("import")" method="post">
+  <form action="" method="post">
       <div><input type="hidden" name="action" value="import" /></div>
       ## Placeholder for adding the documents as checkbox input types.
       ## WARNING: Do NOT try to change <div id="..."></div> below to

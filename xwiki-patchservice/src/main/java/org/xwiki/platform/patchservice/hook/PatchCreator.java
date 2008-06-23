@@ -128,7 +128,8 @@ public class PatchCreator implements EventListener, org.xwiki.platform.patchserv
         PatchIdImpl pid = new PatchIdImpl();
         pid.setDocumentId(documentId);
         pid.setHostId(hostId);
-        pid.setTime(new Date());
+        // Get rid of milliseconds, as they cause a lot of trouble with queries
+        pid.setTime(new Date((new Date().getTime() / 1000) * 1000));
         pid.setLogicalTime(new LogicalTimeImpl());
         return pid;
     }

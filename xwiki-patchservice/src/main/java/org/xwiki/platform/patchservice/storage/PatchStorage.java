@@ -49,6 +49,8 @@ public class PatchStorage
 
     private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
+    private static final SimpleDateFormat TIME_FORMAT = new SimpleDateFormat("HH:mm:ss");
+
     public PatchStorage(XWikiContext context) throws XWikiException
     {
         init(context);
@@ -95,9 +97,19 @@ public class PatchStorage
 
     public Patch loadPatch(PatchId id)
     {
-        List<Patch> patches =
-            loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '" + id.getDocumentId()
-                + "' and patch.id.time = '" + DATE_FORMAT.format(id.getTime() + "'"));
+        String date = "'" + DATE_FORMAT.format(id.getTime()) + "'";
+        String time = "'" + TIME_FORMAT.format(id.getTime()) + "'";
+        String query =
+            "select patch.content from PatchImpl patch where patch.id.documentId = '" + id.getDocumentId()
+                + "' and patch.id.time = " + date;
+        // String query =
+        // "select patch.content from PatchImpl patch where patch.id.documentId = '" + id.getDocumentId()
+        // + "' and (year(patch.id.time) = year(" + date + ") and dayofyear(patch.id.time) = dayofyear(" + date
+        // + ") and hour(patch.id.time) = hour(" + time + ") and minute(patch.id.time) = minute(" + time
+        // + ") and second(patch.id.time) = second(" + time + "))";
+        System.out.println("QUERY: " + query);
+        List<Patch> patches = loadPatches(query);
+        System.out.println("RESULTS: " + patches.size());
         if (patches.size() > 0) {
             return patches.get(0);
         }
@@ -117,13 +129,13 @@ public class PatchStorage
     public List<Patch> loadAllDocumentPatchesSince(PatchId id)
     {
         return loadPatches("select patch.content from PatchImpl patch where patch.id.documentId = '"
-            + StringEscapeUtils.escapeSql(id.getDocumentId()) + "' and patch.id.time > '"
+            + StringEscapeUtils.escapeSql(id.getDocumentId()) + "' and patch.id.time >= '"
             + DATE_FORMAT.format(id.getTime()) + "'");
     }
 
     public List<Patch> loadAllPatchesSince(PatchId id)
     {
-        return loadPatches("select patch.content from PatchImpl patch where patch.id.time > '"
+        return loadPatches("select patch.content from PatchImpl patch where patch.id.time >= '"
             + DATE_FORMAT.format(id.getTime()) + "'");
     }
 

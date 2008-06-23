@@ -115,6 +115,15 @@ public class PatchservicePlugin extends XWikiDefaultPlugin implements XWikiPlugi
         return getStorage().loadAllPatchesSince(from);
     }
 
+    /**
+     * Retrieves the set of patches that occurred on this host after the patch "from" was applied. This method is
+     * inclusive: the from Patch is in the returned list.
+     */
+    public List<Patch> getDocumentUpdatesFrom(PatchId from)
+    {
+        return getStorage().loadAllDocumentPatchesSince(from);
+    }
+
     public List<Patch> getAllPatches()
     {
         return getStorage().loadAllPatches();

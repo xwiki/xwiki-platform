@@ -13,7 +13,6 @@ import javax.servlet.ServletContext;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.jmock.Mock;
-import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.platform.patchservice.api.Operation;
 import org.xwiki.platform.patchservice.api.Patch;
 import org.xwiki.platform.patchservice.api.RWOperation;
@@ -31,10 +30,11 @@ import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiEngineContext;
 import com.xpn.xwiki.web.XWikiServletContext;
 
-public class StorageTest extends MockObjectTestCase
+public class StorageTest extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;
 
@@ -47,8 +47,9 @@ public class StorageTest extends MockObjectTestCase
     private XWikiHibernateStore store;
 
     @Override
-    protected void setUp() throws XWikiException
+    protected void setUp() throws Exception
     {
+        super.setUp();
         this.context = new XWikiContext();
         this.mockXWiki =
             mock(XWiki.class, new Class[] {XWikiConfig.class, XWikiContext.class}, new Object[] {new XWikiConfig(),

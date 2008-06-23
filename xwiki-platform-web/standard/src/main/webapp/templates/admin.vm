@@ -35,7 +35,7 @@
 #end
 #set($section = "$!{request.section}")
 ##-------------------------------------------------
-##  Start page 
+##  Start page
 ##-------------------------------------------------
 #template("startpage.vm")
 ##-------------------------------------------------
@@ -79,13 +79,13 @@
         <h1 id="admin-header">$msg.get("admin.import")</h1>
       </div> ## admin-page-header
       <div id="admin-page-content">
-        #tempplate("importinline.vm")
+        #template("importinline.vm")
       </div> ## admin-page-menu
-  </div>  ## admin-page  
-   #end       
+  </div>  ## admin-page
+   #end
  #end
 </div>
 ##-------------------------------------------------
-##  End page 
+##  End page
 ##-------------------------------------------------
 #template("endpage.vm")

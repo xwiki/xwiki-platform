@@ -26,7 +26,7 @@ import org.radeox.macro.table.Table;
  * Built a table from a string
  * 
  * @author stephan
- * @version $Id: TableBuilder.java 10549 2008-06-21 03:31:03Z sdumitriu $
+ * @version $Id: $
  */
 public class TableBuilder
 {
@@ -70,7 +70,7 @@ public class TableBuilder
                         }
                     }
                     firstCell = false;
-                    table.addCell(cell);
+                    table.addCell(cell.trim());
                     if (!tokenizer.hasMoreTokens()) {
                         table.newRow();
                     }
@@ -79,13 +79,14 @@ public class TableBuilder
                 // Cell data
                 if (!token.endsWith("\\")) {
                     // If the cell data ends with \\, then it will be continued. Current data is stored in lastToken.
-                    table.addCell(token);
+                    table.addCell(token.trim());
                     firstCell = false;
                 } else if (!tokenizer.hasMoreTokens()) {
+                    // Remove backslashes from the end
                     while (token.endsWith("\\")) {
                         token = token.substring(0, token.length() - 1);
                     }
-                    table.addCell(token);
+                    table.addCell(token.trim());
                 }
             } else if ("|".equals(token)) {
                 // Cell delimiter
@@ -95,7 +96,7 @@ public class TableBuilder
                     firstCell = false;
                 } else if (lastToken.endsWith("\\")) {
                     // The last cell wasn't added because it ended with a continuation mark (\\). Add it now.
-                    table.addCell(lastToken);
+                    table.addCell(lastToken.trim());
                     firstCell = false;
                 }
             }

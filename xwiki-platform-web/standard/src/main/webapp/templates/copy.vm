@@ -1,0 +1,64 @@
+###
+### Copy document template
+###
+#if(!$xwiki.hasAccessLevel("edit"))
+  #template("accessdenied.vm")
+#elseif($doc.isNew())
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+    #error("$msg.get('core.rename.nonexistingDocument')")
+  </div>
+  #template("endpage.vm")
+#else
+  #template("startpage.vm")
+  <div class="main layoutsubsection">
+	<h1>$msg.get("core.copy.copydoc")</h1>
+	#set($sourcedoc = "$!{request.sourcedoc}")
+    #set($targetdoc = "$!{request.targetdoc}")
+    #if("$!request.language" != "")
+      #set($language = $request.language)
+    #end
+    #set($sourcewiki = $context.database)
+    #set($targetwiki = $context.database)
+    #if($targetdoc != "")
+    #set($ok = $xwiki.copyDocument($sourcedoc, $targetdoc, $sourcewiki, $targetwiki, $language, false, true))
+	#if($language)
+	 #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}", "language=${language}"))
+	 #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}", "language=${language}"))
+	#else
+	 #set($fromurl = $xwiki.getURL("${sourcewiki}:${sourcedoc}"))
+	 #set($tourl = $xwiki.getURL("${targetwiki}:${targetdoc}"))
+    #end
+    #set($sourcelink = "<a href='${fromurl}'>#if($sourcewiki!='xwiki')$sourcewiki:#end$sourcedoc #if($language)($language)#end</a>")
+    #set($targetlink = "<a href='${tourl}'>#if($targetwiki!='xwiki')$targetwiki:#end$targetdoc</a>")
+    #info("$msg.get('core.copy.copyingdoc', [$sourcelink, $targetlink])")
+    #else
+    <form action="">
+	<div><input type="hidden" name="xpage" value="copy" /></div>
+    <table>
+    <tr><td>$msg.get("core.copy.sourcedoc"):</td>
+    <td>$doc.fullName <input type="hidden" name="sourcedoc" value="$doc.fullName" size="60"/></td></tr>
+    #set ($docTranslations = $doc.getTranslationList())
+    #if ($docTranslations.size() > 0)
+    <tr>
+      <td>$msg.get("language"):</td>
+      <td>
+        <select name="language">
+        #foreach ($docTranslation in $docTranslations)
+          <option #if($docTranslation == "$!{context.language}")selected="selected"#end>$docTranslation</option>
+        #end
+        </select>
+      </td>
+    </tr>
+    #end
+    <tr><td>$msg.get("core.copy.targetdoc"):</td>
+    <td><input type="text" name="targetdoc" value="$!{request.targetdoc}" size="60" /></td></tr>
+    <tr><td><input type="submit" value="Copy" />
+    </td></tr>
+    </table>
+    </form>
+    #end
+    <div class="clearfloats"></div>
+  </div>
+#template("endpage.vm")
+#end

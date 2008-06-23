@@ -24,7 +24,6 @@ package com.xpn.xwiki.user.impl.xwiki;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -112,7 +111,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      */
     private static final String HQLLIKE_ALL_SYMBOL = "%";
 
-    protected Cache<List> groupCache;
+    protected Cache<List<String>> groupCache;
 
     public synchronized void init(XWiki xwiki, XWikiContext context) throws XWikiException
     {
@@ -157,9 +156,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         }
     }
 
-    public Collection listGroupsForUser(String username, XWikiContext context) throws XWikiException
+    public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException
     {
-        List list = null;
+        List<String> list = null;
 
         String database = context.getDatabase();
         try {
@@ -209,10 +208,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
             initCache(context);
         }
 
-        List list = this.groupCache.get(key);
+        List<String> list = this.groupCache.get(key);
 
         if (list == null) {
-            list = new ArrayList();
+            list = new ArrayList<String>();
             this.groupCache.set(key, list);
         }
 
@@ -268,11 +267,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     {
         boolean needUpdate = false;
 
-        Vector groupVector = groupDocument.getObjects(CLASS_XWIKIGROUPS);
+        Vector<BaseObject> groupVector = groupDocument.getObjects(CLASS_XWIKIGROUPS);
 
         if (groupVector != null) {
-            for (Iterator itGroups = groupVector.iterator(); itGroups.hasNext();) {
-                BaseObject bobj = (BaseObject) itGroups.next();
+            for (BaseObject bobj : groupVector) {
                 if (bobj != null) {
                     String member = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
 
@@ -295,7 +293,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     public void removeUserOrGroupFromAllGroups(String memberWiki, String memberSpace, String memberName,
         XWikiContext context) throws XWikiException
     {
-        List parameterValues = new ArrayList();
+        List<Object> parameterValues = new ArrayList<Object>();
 
         StringBuffer where =
             new StringBuffer(
@@ -319,10 +317,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
             parameterValues.add(HQLLIKE_ALL_SYMBOL + memberWiki + WIKI_FULLNAME_SEP + memberName + HQLLIKE_ALL_SYMBOL);
         }
 
-        List documentList = context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);
+        List<XWikiDocument> documentList =
+            context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);
 
-        for (Iterator it = documentList.iterator(); it.hasNext();) {
-            XWikiDocument groupDocument = (XWikiDocument) it.next();
+        for (XWikiDocument groupDocument : documentList) {
             if (removeUserOrGroupFromGroup(groupDocument, memberWiki, memberSpace, memberName, context)) {
                 context.getWiki().saveDocument(groupDocument, context);
             }
@@ -333,9 +331,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
      */
     @Deprecated
-    public List listMemberForGroup(String group, XWikiContext context) throws XWikiException
+    public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
-        List list = new ArrayList();
+        List<String> list = new ArrayList<String>();
         String sql = "";
 
         try {
@@ -354,10 +352,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 String gshortname = Util.getName(group, context);
                 XWikiDocument docgroup = context.getWiki().getDocument(gshortname, context);
 
-                Vector groups = docgroup.getObjects("XWiki.XWikiGroups");
+                Vector<BaseObject> groups = docgroup.getObjects("XWiki.XWikiGroups");
                 if (groups != null) {
-                    for (Iterator itGroups = groups.iterator(); itGroups.hasNext();) {
-                        BaseObject bobj = (BaseObject) itGroups.next();
+                    for (BaseObject bobj : groups) {
                         if (bobj != null) {
                             String members = bobj.getStringValue(FIELD_XWIKIGROUPS_MEMBER);
                             if (members.length() > 0) {
@@ -461,7 +458,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      * @param parameterValues the list of values to fill for use with HQL named request.
      * @return the formated HQL named request.
      */
-    protected String createWhereClause(boolean user, Object[][] matchFields, Object[][] order, List parameterValues)
+    protected String createWhereClause(boolean user, Object[][] matchFields, Object[][] order,
+        List<Object> parameterValues)
     {
         String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
         String classtemplate = user ? CLASSTEMPLATE_XWIKIUSERS : CLASSTEMPLATE_XWIKIGROUPS;
@@ -472,7 +470,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         parameterValues.add(classtemplate);
         parameterValues.add("XWiki." + documentClass);
 
-        Map fieldMap = new HashMap();
+        Map<String, String> fieldMap = new HashMap<String, String>();
         int fieldIndex = 0;
 
         // Manage object match strings
@@ -494,7 +492,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                         parameterValues.add(fieldName);
                         ++fieldIndex;
                     } else {
-                        fieldPrefix = (String) fieldMap.get(fieldName);
+                        fieldPrefix = fieldMap.get(fieldName);
                     }
 
                     where.append(" and lower(" + fieldPrefix + ".value) like ?");
@@ -535,7 +533,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                         parameterValues.add(fieldName);
                         ++fieldIndex;
                     } else {
-                        fieldPrefix = (String) fieldMap.get(fieldName);
+                        fieldPrefix = fieldMap.get(fieldName);
                     }
 
                     orderString.append(" " + fieldPrefix + ".value");
@@ -581,7 +579,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         List groups = null;
 
         if (context.getWiki().getHibernateStore() != null) {
-            List parameterValues = new ArrayList();
+            List<Object> parameterValues = new ArrayList<Object>();
             String where = createWhereClause(user, matchFields, order, parameterValues);
 
             if (withdetails) {
@@ -635,7 +633,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     protected int countAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
         throws XWikiException
     {
-        List parameterValues = new ArrayList();
+        List<Object> parameterValues = new ArrayList<Object>();
         String where = createWhereClause(user, matchFields, null, parameterValues);
 
         String sql = "select count(distinct doc) from XWikiDocument doc" + where;
@@ -677,12 +675,12 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      * @see com.xpn.xwiki.user.api.XWikiGroupService#getAllGroupsNamesForMember(java.lang.String, int, int,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public Collection getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
+    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         // TODO: improve using real request
         // TODO: Use a cache mechanism.
-        List groupNameList = new ArrayList(listGroupsForUser(member, context));
+        List<String> groupNameList = new ArrayList<String>(listGroupsForUser(member, context));
 
         if (start <= 0 && (nb <= 0 || nb >= groupNameList.size())) {
             return groupNameList;
@@ -701,11 +699,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      * @see com.xpn.xwiki.user.api.XWikiGroupService#getAllMembersNamesForGroup(java.lang.String, int, int,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public Collection getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
+    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
         throws XWikiException
     {
         // TODO: improve using real request
-        List userNameList = listMemberForGroup(group, context);
+        List<String> userNameList = listMemberForGroup(group, context);
 
         if (nb == 0 && start == 0) {
             return userNameList;

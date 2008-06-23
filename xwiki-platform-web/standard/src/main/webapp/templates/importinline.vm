@@ -53,7 +53,7 @@
         <col class="attachmentdelete"/>
         #foreach ($attach in $attachments)
           <tr class="row#if($velocityCount % 2 == 0) even #else odd #end">
-            <td><a href="javascript:void()" title="$msg.get("choosethispackage")" onclick="selectPackage('$attach.filename'); return false;">#packName($attach.filename)</a></td>
+            <td><a href="javascript:void()" title="$msg.get("choosethispackage")" onclick="selectPackage('$doc.space', '$doc.name', '$attach.filename'); return false;">#packName($attach.filename)</a></td>
             <td>$xwiki.getLocalUserName($attach.author)</td>
             <td><a href="$doc.getAttachmentURL("${attach.filename}", "viewattachrev")" title="$msg.get("viewattachmenthistory")">$attach.version</a></td>
             <td>$!xwiki.formatDate($attach.date, "dd/MM/yyyy")</td>

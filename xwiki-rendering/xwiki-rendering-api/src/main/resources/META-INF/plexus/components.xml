@@ -5,21 +5,18 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.macro.DefaultMacroFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.transformation.TransformationManager</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.transformation.DefaultTransformationManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>xhtml/xwiki</role-hint>
       <implementation>org.xwiki.rendering.macro.XHTMLMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.rendering.parser.Parser</role>
@@ -35,7 +32,6 @@
       <role-hint>velocity/xwiki</role-hint>
       <implementation>org.xwiki.rendering.macro.VelocityMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.velocity.VelocityManager</role>
@@ -54,7 +50,6 @@
       <role-hint>include/xwiki</role-hint>
       <implementation>org.xwiki.rendering.macro.IncludeMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.context.Execution</role>
@@ -82,21 +77,18 @@
       <role-hint>macro</role-hint>
       <implementation>org.xwiki.rendering.transformation.MacroTransformation</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.SyntaxFactory</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.parser.DefaultSyntaxFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.LinkParser</role>
       <role-hint>xwiki/2.0</role-hint>
       <implementation>org.xwiki.rendering.parser.XWikiLinkParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
   </components>
 </component-set>

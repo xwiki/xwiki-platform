@@ -5,7 +5,6 @@
       <role-hint>xwiki/2.0</role-hint>
       <implementation>org.xwiki.rendering.wikimodel.parser.WikiModelXWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.rendering.parser.LinkParser</role>
@@ -18,28 +17,24 @@
       <role-hint>mediawiki/1.0</role-hint>
       <implementation>org.xwiki.rendering.wikimodel.parser.WikiModelMediaWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>creole/1.0</role-hint>
       <implementation>org.xwiki.rendering.wikimodel.parser.WikiModelCreoleParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>jspwiki/1.0</role-hint>
       <implementation>org.xwiki.rendering.wikimodel.parser.WikiModelJspWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>xhtml/1.0</role-hint>
       <implementation>org.xwiki.rendering.wikimodel.parser.WikiModelXHTMLParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
   </components>
 </component-set>

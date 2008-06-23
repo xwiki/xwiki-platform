@@ -5,14 +5,12 @@
       <role-hint>confluence/1.0</role-hint>
       <implementation>org.xwiki.rendering.doxia.parser.DoxiaConfluenceParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.rendering.parser.Parser</role>
       <role-hint>twiki/1.0</role-hint>
       <implementation>org.xwiki.rendering.doxia.parser.DoxiaTWikiParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
   </components>
 </component-set>

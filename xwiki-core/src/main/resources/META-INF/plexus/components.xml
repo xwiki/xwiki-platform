@@ -5,7 +5,6 @@
       <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.render.DefaultVelocityManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.context.Execution</role>
@@ -17,7 +16,6 @@
       <role-hint>default</role-hint>
       <implementation>com.xpn.xwiki.render.XWikiVelocityContextInitializer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.context.Execution</role>

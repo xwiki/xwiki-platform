@@ -5,7 +5,6 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.url.DefaultURLFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <!-- The configuration below allows customizing the XWiki URL format to any syntax the user
            wants -->
       <configuration>

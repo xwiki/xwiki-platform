@@ -5,14 +5,12 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.context.DefaultExecution</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.context.ExecutionContextInitializerManager</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.context.DefaultExecutionContextInitializerManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
   </components>
 </component-set>

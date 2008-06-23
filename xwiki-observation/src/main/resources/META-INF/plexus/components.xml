@@ -4,7 +4,6 @@
       <role>org.xwiki.observation.ObservationManager</role>
       <implementation>org.xwiki.observation.internal.DefaultObservationManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
   </components>
 </component-set>

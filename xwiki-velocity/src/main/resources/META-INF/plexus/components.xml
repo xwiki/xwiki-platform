@@ -5,14 +5,12 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.velocity.DefaultVelocityFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
     </component>
     <component>
       <role>org.xwiki.context.ExecutionContextInitializer</role>
       <role-hint>default</role-hint>
       <implementation>org.xwiki.velocity.VelocityExecutionContextInitializer</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.velocity.VelocityContextFactory</role>
@@ -25,7 +23,6 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.velocity.DefaultVelocityEngine</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <requirements>
         <requirement>
           <role>org.xwiki.container.Container</role>
@@ -70,7 +67,6 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.velocity.DefaultVelocityContextFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
-      <lifecycle-handler>xwiki</lifecycle-handler>
       <configuration>
         <properties>
           <property>

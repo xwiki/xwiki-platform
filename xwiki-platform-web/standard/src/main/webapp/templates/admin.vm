@@ -58,9 +58,9 @@
     #set($discard = $doc.save())
   #end
 #end
-##-------------------------------------------------
-##  Content (if empty wiki display Import & Export)
-##-------------------------------------------------
+##-----------------------------------------
+##  Content (if empty wiki display Import)
+##-----------------------------------------
 <div class="main layoutsubsection">
 #set($force = $!request.get("force"))
 #if(!$hasAdmin)
@@ -73,37 +73,14 @@
 #else 
   #if($xwiki.exists("XWiki.AdminSheet"))
     $xwiki.getDocument("XWiki.AdminSheet").getTranslatedDocument().getRenderedContent()
-  #else ## empty wiki, display only Import and Export
+  #else ## empty wiki, display only Import
     <div id="admin-page">
       <div id="admin-page-header">
-        <h1 id="admin-header">#if($section == "")$msg.get("admin.${editor}")#else$msg.get("admin.${section.toLowerCase()}")#end</h1>
-	    #if($section != "")<div id="show-all"><a href="$xwiki.getURL($currentDoc, "admin")">$msg.get("admin.showall")</a></div>#end
-        <div id="change-context">
-        #if("$!{editor}" == "globaladmin")<span class="admin-a-space">$msg.get("admin.adminspace")</span>
-        #else
-          <span class="go-to-globaladmin"><a href="$xwiki.getURL("XWiki.XWikiPreferences","admin")">$msg.get("admin.gotoglobaladmin")</a></span><br /><span class="admin-another-space">$msg.get("admin.adminotherspace")</span> 
-        #end
-        #xwikitopmenuentrystart("#" $msg.get("admin.selectspace") "change-context-select")
-        #foreach($spaceitem in $xwiki.spaces)
-          #submenuitem($xwiki.getURL("${spaceitem}.WebPreferences", "admin") $spaceitem)
-        #end
-        #xwikitopmenuentryend()
-      </div> ## change-context
-    </div> ## admin-page-header
-	#if($section == "")
-      <div id="admin-page-menu">
-        <ul id="admin-icons">
-         <li class="Import"><a href="$xwiki.getURL("XWiki.Import", "import", "editor=globaladmin&amp;section=Import&amp;space=XWiki")"><span>$msg.get("admin.import")</span></a></li>
-         #if($hasGlobalAdmin)
-         <li class="Export"><a href="$xwiki.getURL("XWiki.Export", "export", "editor=globaladmin&amp;section=Export&amp;space=XWiki")"><span>$msg.get("admin.export")</span></a></li>
-         #end
-        </ul>
-      </div> ## admin-page-menu
-	#else
+        <h1 id="admin-header">$msg.get("admin.import")</h1>
+      </div> ## admin-page-header
       <div id="admin-page-content">
-       #template("${request.section.toLowerCase()}inline.vm")
-      </div>
-    #end
+        #tempplate("importinline.vm")
+      </div> ## admin-page-menu
   </div>  ## admin-page  
    #end       
  #end

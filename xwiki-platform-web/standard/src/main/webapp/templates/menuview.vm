@@ -7,15 +7,20 @@
 #if($hasAdminWikiRights || $hasAdminSpaceRights)
   #set ($adminwikiaction = $!xwiki.getURL("XWiki.XWikiPreferences","admin"))
   #set ($adminspaceaction = $!xwiki.getURL("${doc.web}.WebPreferences","admin"))
-  #if(!$hasAdminWikiRights)
+  #set ($adminapppresent = $xwiki.exists("XWiki.AdminSheet"))
+  #if(!$hasAdminWikiRights && $adminapppresent)
     #xwikitopmenuentrystart($adminspaceaction $msg.get("core.menu.admin") "tmAdmin")
     #submenuitem($adminspaceaction $msg.get("core.menu.admin.space", [$doc.space]))    
     #xwikitopmenuentryend()
   #else
-    #xwikitopmenuentrystart($adminwikiaction $msg.get("core.menu.admin") "tmAdmin")
-    #submenuitem($adminwikiaction $msg.get("core.menu.admin.wiki"))
-    #submenuitem($adminspaceaction $msg.get("core.menu.admin.space", [$doc.space]))
-    #xwikitopmenuentryend()
+    #if ($adminapppresent)
+      #xwikitopmenuentrystart($adminwikiaction $msg.get("core.menu.admin") "tmAdmin")
+      #submenuitem($adminwikiaction $msg.get("core.menu.admin.wiki"))
+      #submenuitem($adminspaceaction $msg.get("core.menu.admin.space", [$doc.space]))
+      #xwikitopmenuentryend()
+    #else
+      #xwikitopmenuentry($adminwikiaction $msg.get("core.menu.admin") "tmAdmin")
+    #end
   #end
 #end
 </div>

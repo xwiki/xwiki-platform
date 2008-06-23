@@ -630,11 +630,5 @@
       </build>
     </profile>
   </profiles>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/branches/xwiki-core-1.3-curriki</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/branches/xwiki-core-1.3-curriki</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/branches/xwiki-core-1.3-curriki</url>
-  </scm>
 </project>
 

@@ -43,7 +43,6 @@ import com.xpn.xwiki.plugin.ldap.XWikiLDAPConfig;
 import com.xpn.xwiki.plugin.ldap.XWikiLDAPConnection;
 import com.xpn.xwiki.plugin.ldap.XWikiLDAPSearchAttribute;
 import com.xpn.xwiki.plugin.ldap.XWikiLDAPUtils;
-import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl;
 
 import java.io.UnsupportedEncodingException;

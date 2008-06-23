@@ -22,7 +22,7 @@ package org.xwiki.rendering.listener;
 /**
  * Represents a link. Note that this representation is independent of any wiki syntax.
  *
- * @version $Id$
+ * @version $Id: Link.java 10608 2008-06-23 12:25:23Z vmassol $
  * @since 1.5M2
  */
 public class Link
@@ -182,6 +182,14 @@ public class Link
     public void setAnchor(String anchor)
     {
         this.anchor = anchor;
+    }
+
+    /**
+     * @return true if the link points to an external link (ie if it's a URI or an Interwiki link) or false otherwise
+     */
+    public boolean isExternalLink()
+    {
+        return (getType() == LinkType.INTERWIKI) || (getType() == LinkType.URI);   
     }
 
     /**

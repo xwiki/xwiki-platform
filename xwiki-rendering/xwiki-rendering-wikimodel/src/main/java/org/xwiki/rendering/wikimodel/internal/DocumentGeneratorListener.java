@@ -113,67 +113,66 @@ public class DocumentGeneratorListener implements IWemListener
     public void beginPropertyBlock(String propertyUri, boolean doc)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("beginPropertyBlock");
     }
 
     public void beginPropertyInline(String str)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("beginPropertyInline");
     }
 
     public void beginQuotation(WikiParameters params)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("beginQuotation");
     }
 
     public void beginQuotationLine()
     {
         // TODO Auto-generated method stub
-
+        System.out.println("beginQuotationLine");
     }
 
     public void beginTable(WikiParameters params)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("beginTable");
     }
 
     public void beginTableCell(boolean tableHead, WikiParameters params)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("beginTableCell");
     }
 
     public void beginTableRow(WikiParameters params)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("beginTableRow");
     }
 
     public void endDefinitionDescription()
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endDefinitionDescription");
     }
 
     public void endDefinitionList(WikiParameters params)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endDefinitionList");
     }
 
     public void endDefinitionTerm()
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endDefinitionTerm");
     }
 
     public void endDocument()
     {
-        // TODO Auto-generated method stub
-
+        // Voluntarily don't do anything here for now.
     }
 
     public void endFormat(WikiFormat format)
@@ -199,7 +198,7 @@ public class DocumentGeneratorListener implements IWemListener
     public void endInfoBlock(char infoType, WikiParameters params)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endInfoBlock");
     }
 
     public void endList(WikiParameters params, boolean ordered)
@@ -227,25 +226,25 @@ public class DocumentGeneratorListener implements IWemListener
     public void endPropertyBlock(String propertyUri, boolean doc)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endPropertyBlock");
     }
 
     public void endPropertyInline(String inlineProperty)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endPropertyInline");
     }
 
     public void endQuotation(WikiParameters params)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endQuotation");
     }
 
     public void endQuotationLine()
     {
         // TODO Auto-generated method stub
-
+        System.out.println("endQuotationLine");
     }
 
     public void endTable(WikiParameters params)
@@ -275,7 +274,7 @@ public class DocumentGeneratorListener implements IWemListener
     public void onEscape(String str)
     {
         // TODO Auto-generated method stub
-
+        System.out.println("onEscape");
     }
 
     public void onExtensionBlock(String extensionName, WikiParameters params)
@@ -296,9 +295,12 @@ public class DocumentGeneratorListener implements IWemListener
 
     }
 
+    /**
+     * Explicit line breaks. For example in XWiki syntax that would be "\\".
+     */
     public void onLineBreak()
     {
-        // TODO Auto-generated method stub
+        this.stack.push(new LineBreakBlock());
     }
 
     public void onMacroBlock(String macroName, WikiParameters params, String content)
@@ -316,10 +318,12 @@ public class DocumentGeneratorListener implements IWemListener
         onMacroBlock(macroName, params, content);
     }
 
+    /**
+     * "\n" character.
+     */
     public void onNewLine()
     {
-        // TODO Auto-generated method stub
-
+        this.stack.push(new NewLineBlock());
     }
 
     public void onReference(String rawLink, boolean explicitLink)
@@ -327,6 +331,7 @@ public class DocumentGeneratorListener implements IWemListener
         try {
             this.stack.push(new LinkBlock(this.linkParser.parse(rawLink)));
         } catch (ParseException e) {
+            // TODO: Should we instead generate ErrorBlocks?
             throw new RuntimeException("Failed to parse link [" + rawLink + "]", e);
         }
     }

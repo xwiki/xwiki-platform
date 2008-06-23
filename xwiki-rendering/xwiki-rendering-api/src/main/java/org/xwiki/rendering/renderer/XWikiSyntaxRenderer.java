@@ -93,15 +93,20 @@ public class XWikiSyntaxRenderer implements Renderer
         write("\n");
     }
 
+    public void onNewLine()
+    {
+        write("\\");
+    }
+
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
         StringBuffer buffer = new StringBuffer();
-        buffer.append("{" + name);
+        buffer.append("{").append(name);
         if (!parameters.isEmpty()) {
             buffer.append(':');
             for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
                 String paramName = paramsIt.next();
-                buffer.append(paramName + "=" + parameters.get(paramName));
+                buffer.append(paramName).append("=").append(parameters.get(paramName));
                 if (paramsIt.hasNext()) {
                     buffer.append("|");
                 }
@@ -112,7 +117,7 @@ public class XWikiSyntaxRenderer implements Renderer
         } else {
             buffer.append('}');
             buffer.append(content);
-            buffer.append("{/" + name + "}");
+            buffer.append("{/").append(name).append("}");
         }
         write(buffer.toString());
     }

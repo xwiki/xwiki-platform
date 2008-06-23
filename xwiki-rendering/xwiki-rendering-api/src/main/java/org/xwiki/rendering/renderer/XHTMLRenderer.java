@@ -27,6 +27,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
 
 /**
  * Generates XHTML from {@link org.xwiki.rendering.block.XDOM}.
@@ -75,13 +76,35 @@ public class XHTMLRenderer implements Renderer
 
     public void onLineBreak()
     {
-        // TODO Auto-generated method stub
+        write("<br/>");
+    }
 
+    public void onNewLine()
+    {
+        // Voluntarily do nothing since we want the same behavior as HTML.
     }
 
     public void onLink(Link link)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        if (link.isExternalLink()) {
+            write("<span class=\"wikiexternallink\">");
+            write("<a href=\"");
+            if (link.getType() == LinkType.INTERWIKI) {
+                // TODO: Resolve the Interwiki link
+            } else {
+                write(link.getReference());
+            }
+            write("\">");
+            if (link.getLabel() != null) {
+                write(link.getLabel());
+            } else {
+                write(link.getReference());
+            }
+            write("</a></span>");
+        } else {
+            // TODO: Verify if the document exists and if not use a different HTML class
+            // Get the document's URL
+        }
     }
 
     public void onMacro(String name, Map<String, String> parameters, String content)

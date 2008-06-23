@@ -73,6 +73,11 @@ public class TestEventsListener implements Listener
         write("onLineBreak");
     }
 
+    public void onNewLine()
+    {
+        write("onNewLine");
+    }
+
     public void onLink(Link link)
     {
         write("onLink: [" + link + "]");
@@ -153,7 +158,7 @@ public class TestEventsListener implements Listener
         StringBuffer buffer = new StringBuffer();
         for (Iterator<String> it = attributes.keySet().iterator(); it.hasNext();) {
             String attributeName = it.next();
-            buffer.append(attributeName + "=" + attributes.get(attributeName));
+            buffer.append(attributeName).append("=").append(attributes.get(attributeName));
             if (it.hasNext()) {
                 buffer.append(",");
             }
@@ -171,7 +176,7 @@ public class TestEventsListener implements Listener
         StringBuffer buffer = new StringBuffer();
         for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
             String paramName = paramsIt.next();
-            buffer.append(paramName + "=" + parameters.get(paramName));
+            buffer.append(paramName).append("=").append(parameters.get(paramName));
             if (paramsIt.hasNext()) {
                 buffer.append("|");
             }

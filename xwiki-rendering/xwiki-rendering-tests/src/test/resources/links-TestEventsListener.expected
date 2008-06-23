@@ -1,5 +1,9 @@
 beginParagraph
 onLink: [Reference = [Space.Page]]
+onLineBreak
 onLink: [Label = [label] Reference = [Space.Page]]
+onLineBreak
 onLink: [Label = [label] Reference = [http://xwiki.org]]
+onLineBreak
+onLink: [Reference = [mailto:john@doe.com]]
 endParagraph

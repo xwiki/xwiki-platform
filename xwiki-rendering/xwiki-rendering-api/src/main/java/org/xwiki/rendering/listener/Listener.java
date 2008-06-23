@@ -63,9 +63,21 @@ public interface Listener
     void beginMacroMarker(String name, Map<String, String> parameters, String content);
 
     void endMacroMarker(String name, Map<String, String> parameters, String content);
-    
+
+    /**
+     * Represents an explicit line break specified in the wiki syntax. For example for XWiki this
+     * would be "\\". Note that this is different from a new line which is triggered when the new
+     * line character is found ("\n") and which generates an onNewLine() event.
+     */
     void onLineBreak();
 
+    /**
+     * Represents an implicit new line triggered when the new line character is found ("\n"). Note
+     * that this is different from a line break which is explicitely specified in wiki syntax, and
+     * which generates a onLineBreak() event.
+     */
+    void onNewLine();
+    
     void onLink(Link link);
 
     void onMacro(String name, Map<String, String> parameters, String content);

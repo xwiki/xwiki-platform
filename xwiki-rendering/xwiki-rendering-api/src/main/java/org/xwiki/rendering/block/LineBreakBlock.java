@@ -22,8 +22,12 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 /**
+ * Represents an explicit line break specified in the wiki syntax. For example for XWiki this would be "\\".
+ * Note that this is different from a new line which is triggered when the new line character is found ("\n").
+ *
  * @version $Id$
  * @since 1.5M2
+ * @see org.xwiki.rendering.block.NewLineBlock
  */
 public class LineBreakBlock extends AbstractBlock
 {

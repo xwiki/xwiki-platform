@@ -16,47 +16,49 @@
  *  limitations under the License.
  */
 
-
 package com.xpn.xwiki.render.macro;
+
+import java.io.IOException;
+import java.io.Writer;
 
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
 import org.radeox.macro.table.Table;
 
-import java.io.IOException;
-import java.io.Writer;
-
 /*
- * Macro for defining and displaying tables. The rows of the table are
- * devided by newlins and the columns are divided by pipe symbols "|".
- * The first line of the table is rendered as column headers.
- * {table}
- *  A|B|C
- *  1|2|3
- * {table}
- *
- * @author stephan
- * @team sonicteam
- * @version $Id: TableMacro.java,v 1.9 2004/04/27 19:30:38 leo Exp $
+ * Macro for defining and displaying tables. The rows of the table are devided by newlins and the columns are divided by
+ * pipe symbols "|". The first line of the table is rendered as column headers. {table} A|B|C 1|2|3 {table} @author
+ * stephan @team sonicteam
+ * 
+ * @version $Id: TableMacro.java 10549 2008-06-21 03:31:03Z sdumitriu $
  */
+public class TableMacro extends BaseLocaleMacro
+{
+    public String getLocaleKey()
+    {
+        return "macro.table";
+    }
 
-public class TableMacro extends BaseLocaleMacro {
-  public String getLocaleKey() {
-    return "macro.table";
-  }
+    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
+    {
+        String content = params.getContent();
 
-  public void execute(Writer writer, MacroParameter params)
-      throws IllegalArgumentException, IOException {
+        if (null == content) {
+            throw new IllegalArgumentException("TableMacro: missing table content");
+        }
 
-    String content = params.getContent();
+        // We need to check for \\ at the end of a line and preserve the white space otherwise we will fail to render
+        // the table properly
+        if (content.endsWith("\\\\ \n")) {
+            content = content.trim() + " ";
+        } else {
+            content = content.trim();
+        }
+        content = content + "\n";
 
-    if (null == content) throw new IllegalArgumentException("TableMacro: missing table content");
-
-    content = content.trim() + "\n";
-
-    Table table = TableBuilder.build(content);
-    table.calc(); // calculate macros like =SUM(A1:A3)
-    table.appendTo(writer);
-    return;
-  }
+        Table table = TableBuilder.build(content);
+        table.calc(); // calculate macros like =SUM(A1:A3)
+        table.appendTo(writer);
+        return;
+    }
 }

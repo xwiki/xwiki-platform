@@ -1,5 +1,5 @@
 beginParagraph
-onLink: [DocumentNameOrUri = [Space.Page]]
-onLink: [Label = [label] DocumentNameOrUri = [Space.Page]]
-onLink: [Label = [label] DocumentNameOrUri = [http://xwiki.org]]
+onLink: [Reference = [Space.Page]]
+onLink: [Label = [label] Reference = [Space.Page]]
+onLink: [Label = [label] Reference = [http://xwiki.org]]
 endParagraph

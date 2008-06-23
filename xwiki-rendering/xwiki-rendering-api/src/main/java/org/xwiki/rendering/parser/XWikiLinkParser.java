@@ -20,6 +20,7 @@
 package org.xwiki.rendering.parser;
 
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.LinkType;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,6 +29,47 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /**
+ * Parses the content of XWiki links. The format is as follows:
+ * <code>(alias[|>])(link)(@interWikiAlias)(|target)</code>, where:
+ * <ul>
+ *   <li><code>alias</code>: An optional string which will be displayed to the user as the link
+ *       name when rendered. Example: "My Page".</li>
+ *   <li><code>link</code>: The full link reference using the following syntax:
+ *       <code>(virtualWikiAlias:)(space.)(reference)(?queryString)(#anchor)</code>, where:
+ *       <ul>
+ *         <li><code>virtualWikiAlias</code>: An optional string containing the name of a virtual
+ *             wiki. The link will point to a page inside that virtual wiki. Example: "mywiki".</li>
+ *         <li><code>space</code>: An optional Wiki Space name. Example: "Main".</li>
+ *         <li><code>reference</code>: The link reference. This can be either a URI in the form
+ *             <code>protocol:path</code> (example: "http://xwiki.org", "mailto:john@smith.com) or
+ *             a wiki page name (example: "WebHome").</li>
+ *         <li><code>queryString</code>: An optional query string for specifying parameters that
+ *             will be used in the rendered URL. Example: "mydata1=5&mydata2=Hello".</li>
+ *         <li><code>anchor</code>: An optional anchor name pointing to an anchor defined in the
+ *             referenced link. Note that in XWiki anchors are automatically created for titles.
+ *             Example: "TableOfContentAnchor".</li>
+ *       </ul>
+ *       Either the <code>link</code> or the <code>alias</code> must be specified.</li>
+ *   <li><code>interWikiAlias</code>: An optional
+ *       <a href="http://en.wikipedia.org/wiki/InterWiki">Inter Wiki</a> alias as defined in the
+ *       InterWiki Map. Example: "wikipedia"</li>
+ *   <li><code>target</code>: An optional string corresponding to the HTML <code>target</code>
+ *       attribute for a <code>a</code> element. This element is used when rendering the link. It
+ *       defaults to opening the link in the current page. Example: "_self", "_blank"</li>
+ * </ul>
+ * Examples of valid wiki links:
+ * <ul>
+ *   <li>Hello World</li>
+ *   <li>Hello World>HelloWorld</li>
+ *   <li>Hello World>HelloWorld>_blank</li>
+ *   <li>Hello World>http://myserver.com/HelloWorld</li>
+ *   <li>Hello World>HelloWorld#Anchor</li>
+ *   <li>http://myserver.com</li>
+ *   <li>Hello World@Wikipedia</li>
+ *   <li>mywiki:HelloWorld</li>
+ *   <li>Hello World?param1=1&param2=2</li>
+ * </ul>
+ * 
  * @version $Id$
  * @since 1.5M2
  */
@@ -61,6 +103,10 @@ public class XWikiLinkParser implements LinkParser
 
         Link link = new Link();
 
+        // Let's default the link to be a document link. If instead it's a link to a URI or to
+        // an interwiki location it'll be overriden.
+        link.setType(LinkType.DOCUMENT);
+
         // Note: It's important to parse the label and the target in that order. See
         // {@link #parseLabel} for more details as to why.
         link.setLabel(parseLabel(content));
@@ -69,27 +115,34 @@ public class XWikiLinkParser implements LinkParser
         // Parse the link reference itself.
         String uri = parseURI(content);
         if (uri != null) {
-            link.setDocumentNameOrUri(uri);
-            link.setContainsDocumentName(false);
+            link.setReference(uri);
+            link.setType(LinkType.URI);
         } else {
             // Note: the order here is also very important.
             // We parse the query string early as it can contain our special delimiter characters
             // (like "."). Note: This means that "@" characters are forbidden in the query string...
-            link.setInterWikiAlias(parseElementAfterString(content, "@"));
+
+            String interwikiAlias = parseElementAfterString(content, "@");
+            if (interwikiAlias != null) {
+                link.setInterWikiAlias(interwikiAlias);
+                link.setType(LinkType.INTERWIKI);
+            }
+
             link.setQueryString(parseElementAfterString(content, "?"));
         }
 
         link.setAnchor(parseElementAfterString(content, "#"));
 
-        // What remains in the content buffer is the page name if any. If the content is empty then
-        // it means no page was specified. This is allowed and in that case when the link is
-        // rendered it'll be pointing to WebHome.
-        if (content.length() > 0) {
+        // What remains in the content buffer is the page name or the interwiki reference if any.
+        // If the content is empty then it means no page was specified. This is allowed and in that
+        // case when the link is rendered it'll be pointing to WebHome.
 
-            // TODO: Check for invalid characters in a page
+        // TODO: Check for invalid characters in a page
 
-            link.setDocumentNameOrUri(content.toString());
-            link.setContainsDocumentName(true);
+        if (link.getReference() == null) {
+            link.setReference(content.toString());
+        } else if (content.length() > 0) {
+            throw new ParseException("Invalid link format [" + rawLink + "]");
         }
 
         return link;

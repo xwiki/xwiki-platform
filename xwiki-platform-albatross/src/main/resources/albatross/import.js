@@ -48,12 +48,17 @@ var XWiki = Class.create({
     }
 });
 
-function selectPackage(name)
+function selectPackage(attachmentName)
 {
-    var str = "<input type=\"hidden\" name=\"name\" value=\"" +  name +  "\" />";
+    selectPackage("XWiki", "Import", attachmentName);
+}
+
+function selectPackage(space, page, attachmentName)
+{
+    var str = "<input type=\"hidden\" name=\"name\" value=\"" +  attachmentName +  "\" />";
     $('importDocName').innerHTML = str;
-    var pars = "action=getPackageInfos&name="+name+"&xpage=plain";
-    var myAjax = new Ajax.XWikiRequest( "XWiki", "Import", {method: 'get', parameters: pars, onComplete: showPackageInfos} , "import");
+    var pars = "action=getPackageInfos&name="+attachmentName+"&xpage=plain";
+    var myAjax = new Ajax.XWikiRequest(space, page, {method: 'get', parameters: pars, onComplete: showPackageInfos} , "import");
 }
 
 function show(name)

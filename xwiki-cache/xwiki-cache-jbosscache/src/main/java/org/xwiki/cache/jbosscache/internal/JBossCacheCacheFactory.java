@@ -53,14 +53,14 @@ public class JBossCacheCacheFactory implements CacheFactory
      * 
      * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
      */
-    public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration config) throws CacheException
+    public <T> org.xwiki.cache.Cache<T> newCache(CacheConfiguration configuration) throws CacheException
     {
         if (LOG.isInfoEnabled()) {
             LOG.info("Start JBoss cache initialisation");
         }
 
         JBossCacheCache<T> cache = new JBossCacheCache<T>();
-        cache.initialize(config, container);
+        cache.initialize(new JBossCacheCacheConfiguration(this.container, configuration, "default-local"));
 
         if (LOG.isInfoEnabled()) {
             LOG.info("End JBoss cache initialisation");

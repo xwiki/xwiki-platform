@@ -33,10 +33,8 @@ import org.jboss.cache.Cache;
 import org.jboss.cache.CacheFactory;
 import org.jboss.cache.DefaultCacheFactory;
 import org.jboss.cache.Fqn;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.jbosscache.internal.event.JBossCacheCacheEntryEvent;
 import org.xwiki.cache.util.AbstractCache;
-import org.xwiki.container.Container;
 
 /**
  * Implements {@link org.xwiki.cache.Cache} based on JBossCache.
@@ -63,11 +61,6 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     private static final String DATA_KEY = "data";
 
     /**
-     * The default configuration identifier used to load cache configuration file.
-     */
-    protected String defaultPropsId = "default";
-
-    /**
      * The JBossCache cache configuration.
      */
     private JBossCacheCacheConfiguration jbosscacheConfiguration;
@@ -85,15 +78,13 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     /**
      * Create and initialize the cache.
      * 
-     * @param configuration the configuration to use to create the cache.
-     * @param container the container used to access configuration files.
+     * @param jbosscacheConfiguration the configuration to use to create the cache.
      */
-    public void initialize(CacheConfiguration configuration, Container container)
+    public void initialize(JBossCacheCacheConfiguration jbosscacheConfiguration)
     {
-        this.configuration = configuration;
+        this.jbosscacheConfiguration = jbosscacheConfiguration;
 
-        this.jbosscacheConfiguration =
-            new JBossCacheCacheConfiguration(container, this.configuration, this.defaultPropsId);
+        this.configuration = jbosscacheConfiguration.getCacheConfiguration();
 
         CacheFactory<String, T> factory = new DefaultCacheFactory<String, T>();
         this.cache = factory.createCache(this.jbosscacheConfiguration.getJBossCacheConfiguration());

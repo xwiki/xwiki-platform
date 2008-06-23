@@ -450,12 +450,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             if ((syncmode.equalsIgnoreCase("create") && createuser) || syncmode.equalsIgnoreCase("always")) {
                 syncGroupsMembership(xwikiUserName, userDN, groupMappings, ldapUtils, context);
-
-                /*
-                 * This may not be necessary, but the group service does have a cache, and I've found that adding or
-                 * removing entries sometimes don't take effect if I don't do this.
-                 */
-                context.getWiki().getGroupService(context).flushCache();
             }
 
         }
@@ -548,7 +542,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         } else {
             // remove from group if there
             if (userGroups.contains(xwikiGroupName)) {
-                removeUserFromGroup(xwikiUserName, xwikiGroupName, context);
+                removeUserFromXWikiGroup(xwikiUserName, xwikiGroupName, context);
 
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Finished removing xwiki group " + xwikiGroupName + " from user " + xwikiUserName);
@@ -588,10 +582,6 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             // Save modifications
             context.getWiki().saveDocument(groupDoc, context);
 
-            // Update group cache
-            XWikiGroupService gservice = context.getWiki().getGroupService(context);
-            gservice.addUserToGroup(fullWikiUserName, context.getDatabase(), groupName, context);
-
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Finished adding user {0} to xwiki group {1}", new Object[] {userName,
                 groupName}));
@@ -611,7 +601,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      */
     // TODO move this methods in a toolkit for all platform.
-    protected void removeUserFromGroup(String userName, String groupName, XWikiContext context)
+    protected void removeUserFromXWikiGroup(String userName, String groupName, XWikiContext context)
     {
         try {
             String fullWikiUserName = XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP + userName;

@@ -32,17 +32,16 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
- * Holds all data but the content of an attachment to be indexed. The content is retrieved at
- * indexing time, which should save us some memory especially when rebuilding an index for a big
- * wiki.
+ * Holds all data but the content of an attachment to be indexed. The content is retrieved at indexing time, which
+ * should save us some memory especially when rebuilding an index for a big wiki.
  * 
  * @version $Id: $
  */
 public class AttachmentData extends IndexData
 {
     /**
-     * Mapping from common file name endings to mime types. This is uses as a fallback when text
-     * extraction by using the mime type delivered by xwiki doesn't work.
+     * Mapping from common file name endings to mime types. This is uses as a fallback when text extraction by using the
+     * mime type delivered by xwiki doesn't work.
      */
     static final Map<String, String> MIMETYPES = new HashMap<String, String>();
 
@@ -66,8 +65,7 @@ public class AttachmentData extends IndexData
      * @param attachment
      * @param context
      */
-    public AttachmentData(final XWikiDocument document, final XWikiAttachment attachment,
-        final XWikiContext context)
+    public AttachmentData(final XWikiDocument document, final XWikiAttachment attachment, final XWikiContext context)
     {
         super(attachment.getDoc(), context);
 
@@ -77,15 +75,11 @@ public class AttachmentData extends IndexData
         setFilename(attachment.getFilename());
     }
 
-    public void addDataToLuceneDocument(Document luceneDoc, XWikiDocument doc,
-        XWikiContext context)
+    public void addDataToLuceneDocument(Document luceneDoc, XWikiDocument doc, XWikiContext context)
     {
         super.addDataToLuceneDocument(luceneDoc, doc, context);
         if (filename != null) {
-            luceneDoc.add(new Field(IndexFields.FILENAME,
-                filename,
-                Field.Store.YES,
-                Field.Index.TOKENIZED));
+            luceneDoc.add(new Field(IndexFields.FILENAME, filename, Field.Store.YES, Field.Index.TOKENIZED));
         }
     }
 
@@ -132,8 +126,8 @@ public class AttachmentData extends IndexData
     }
 
     /**
-     * @return a string containing the result of {@link IndexData#getFullText} plus the full text
-     *         content of this attachment, as far as it could be extracted.
+     * @return a string containing the result of {@link IndexData#getFullText} plus the full text content of this
+     *         attachment, as far as it could be extracted.
      */
     public String getFullText(XWikiDocument doc, XWikiContext context)
     {
@@ -161,8 +155,7 @@ public class AttachmentData extends IndexData
                 String[] nameParts = filename.split("\\.");
                 if (nameParts.length > 1) {
                     contentText =
-                        TextExtractor.getText(content, (String) MIMETYPES
-                            .get(nameParts[nameParts.length - 1].toLowerCase()));
+                        TextExtractor.getText(content, MIMETYPES.get(nameParts[nameParts.length - 1].toLowerCase()));
                 }
             }
         } catch (Exception e) {

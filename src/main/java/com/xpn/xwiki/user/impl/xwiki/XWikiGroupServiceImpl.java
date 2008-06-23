@@ -154,7 +154,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     {
         if (this.groupCache != null) {
             this.groupCache.removeAll();
-            this.groupCache = null;
         }
     }
 

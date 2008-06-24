@@ -21,59 +21,71 @@
 
 package com.xpn.xwiki.plugin.graphviz;
 
+import java.io.IOException;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
 
-import java.io.IOException;
-
-public class GraphVizPluginApi extends Api {
+public class GraphVizPluginApi extends Api
+{
     private GraphVizPlugin plugin;
 
-    public GraphVizPluginApi(GraphVizPlugin plugin, XWikiContext context) {
-            super(context);
-            setPlugin(plugin);
-        }
+    public GraphVizPluginApi(GraphVizPlugin plugin, XWikiContext context)
+    {
+        super(context);
+        setPlugin(plugin);
+    }
 
-    public GraphVizPlugin getPlugin() {
+    public GraphVizPlugin getPlugin()
+    {
         if (hasProgrammingRights()) {
-            return plugin;
+            return this.plugin;
         }
         return null;
     }
 
-    public void setPlugin(GraphVizPlugin plugin) {
+    public void setPlugin(GraphVizPlugin plugin)
+    {
         this.plugin = plugin;
     }
 
-    public byte[] getDotImage(String content, boolean dot) throws IOException {
-        return plugin.getDotImage(content, "gif", dot);
+    public byte[] getDotImage(String content, boolean dot) throws IOException
+    {
+        return this.plugin.getDotImage(content, "gif", dot);
     }
 
-    public byte[] getDotImage(String content, String extension, boolean dot) throws IOException {
-        return plugin.getDotImage(content, extension, dot);
+    public byte[] getDotImage(String content, String extension, boolean dot) throws IOException
+    {
+        return this.plugin.getDotImage(content, extension, dot);
     }
 
-    public String getDotImageURL(String content, boolean dot) throws IOException {
-        return plugin.getDotImageURL(content, dot, getXWikiContext());
+    public String getDotImageURL(String content, boolean dot) throws IOException
+    {
+        return this.plugin.getDotImageURL(content, dot, getXWikiContext());
     }
 
-    public String writeDotImage(String content, boolean dot) throws IOException {
-        return plugin.writeDotImage(content, "gif", dot);
+    public String writeDotImage(String content, boolean dot) throws IOException
+    {
+        return this.plugin.writeDotImage(content, "gif", dot);
     }
 
-    public String writeDotImage(String content, String extension, boolean dot) throws IOException {
-        return plugin.writeDotImage(content, extension, dot);
+    public String writeDotImage(String content, String extension, boolean dot) throws IOException
+    {
+        return this.plugin.writeDotImage(content, extension, dot);
     }
 
-    public void outputDotImage(String content, boolean dot) throws IOException {
-        plugin.outputDotImage(content, "gif", dot, getXWikiContext());
+    public void outputDotImage(String content, boolean dot) throws IOException
+    {
+        this.plugin.outputDotImage(content, "gif", dot, getXWikiContext());
     }
 
-    public void outputDotImage(String content, String extension, boolean dot) throws IOException {
-        plugin.outputDotImage(content, extension, dot, getXWikiContext());
+    public void outputDotImage(String content, String extension, boolean dot) throws IOException
+    {
+        this.plugin.outputDotImage(content, extension, dot, getXWikiContext());
     }
 
-    public void flushCache() {
-        plugin.flushCache();
+    public void flushCache()
+    {
+        this.plugin.flushCache();
     }
 }

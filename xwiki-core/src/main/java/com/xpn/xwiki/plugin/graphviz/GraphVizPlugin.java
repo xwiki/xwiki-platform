@@ -121,7 +121,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     public byte[] getDotImage(String content, boolean dot) throws IOException
     {
-        return getDotImage(content, "gif", dot);
+        return getDotImage(content, "png", dot);
     }
 
     public byte[] getDotImage(String content, String extension, boolean dot) throws IOException
@@ -196,7 +196,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     public String writeDotImage(String content, boolean dot) throws IOException
     {
-        return writeDotImage(content, "gif", dot);
+        return writeDotImage(content, "png", dot);
     }
 
     public String writeDotImage(String content, String extension, boolean dot) throws IOException
@@ -209,7 +209,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     public void outputDotImage(String content, boolean dot, XWikiContext context) throws IOException
     {
-        outputDotImage(content, "gif", dot, context);
+        outputDotImage(content, "png", dot, context);
     }
 
     public void outputDotImage(String content, String extension, boolean dot, XWikiContext context) throws IOException
@@ -250,7 +250,7 @@ public class GraphVizPlugin extends XWikiDefaultPlugin implements XWikiPluginInt
 
     public String getDotImageURL(String content, boolean dot, XWikiContext context) throws IOException
     {
-        String filename = writeDotImage(content, "gif", dot);
+        String filename = writeDotImage(content, "png", dot);
         return context.getDoc().getAttachmentURL(filename, "dot", context);
     }
 }

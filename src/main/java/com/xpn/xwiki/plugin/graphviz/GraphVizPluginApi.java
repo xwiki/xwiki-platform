@@ -51,7 +51,7 @@ public class GraphVizPluginApi extends Api
 
     public byte[] getDotImage(String content, boolean dot) throws IOException
     {
-        return this.plugin.getDotImage(content, "gif", dot);
+        return this.plugin.getDotImage(content, "png", dot);
     }
 
     public byte[] getDotImage(String content, String extension, boolean dot) throws IOException
@@ -66,7 +66,7 @@ public class GraphVizPluginApi extends Api
 
     public String writeDotImage(String content, boolean dot) throws IOException
     {
-        return this.plugin.writeDotImage(content, "gif", dot);
+        return this.plugin.writeDotImage(content, "png", dot);
     }
 
     public String writeDotImage(String content, String extension, boolean dot) throws IOException
@@ -76,7 +76,7 @@ public class GraphVizPluginApi extends Api
 
     public void outputDotImage(String content, boolean dot) throws IOException
     {
-        this.plugin.outputDotImage(content, "gif", dot, getXWikiContext());
+        this.plugin.outputDotImage(content, "png", dot, getXWikiContext());
     }
 
     public void outputDotImage(String content, String extension, boolean dot) throws IOException

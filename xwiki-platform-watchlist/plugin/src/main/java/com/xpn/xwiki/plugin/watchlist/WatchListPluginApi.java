@@ -27,10 +27,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages
- * and spaces they want to follow. At a frequency choosen by the user XWiki will send an email
- * notification to him with a list of the elements that has been modified since the last
- * notification.
+ * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they
+ * want to follow. At a frequency choosen by the user XWiki will send an email notification to him with a list of the
+ * elements that has been modified since the last notification.
  *
  * This is the wrapper accessible from in-document scripts.
  *
@@ -180,7 +179,7 @@ public class WatchListPluginApi extends PluginApi
     public boolean removeSpace(String wSpace) throws XWikiException
     {
         return getWatchListPlugin().removeWatchedElement(getXWikiContext().getUser(),
-           wSpace, true, getXWikiContext());
+            wSpace, true, getXWikiContext());
     }
 
     /**
@@ -238,11 +237,10 @@ public class WatchListPluginApi extends PluginApi
      * Get the list of the elements watched by user ordered by last modification date, descending
      *
      * @param user XWiki User
-     * @return the list of the elements watched by user ordered by last modification date,
-     *         descending
+     * @return the list of the elements watched by user ordered by last modification date, descending
      * @throws XWikiException If the search request fails
      */
-    public List getWatchListWhatsNew(String user) throws XWikiException
+    public List getWatchListWhatsNew(String user) throws Exception
     {
         return getWatchListPlugin().getWatchListWhatsNew(user, context);
     }

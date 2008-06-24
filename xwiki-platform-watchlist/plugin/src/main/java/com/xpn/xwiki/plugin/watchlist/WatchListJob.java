@@ -47,11 +47,11 @@ import java.util.List;
 /**
  * WatchList implementation of Quartz's Job
  *
- * This class behaves as follow when the execute method is called: 1) it selects the persons who
- * have requested a notification matching the frequency of this Job and returns Set1 2) if Set1 is
- * not void, then it selects the documents that have changed during the last period and stores them
- * in Set2 3) if Set2 is not void, then for each person Pi in Set1, it intersects the following
- * sets: Set2, matching criteria of Pi, documents that can be read by Pi 4) it sends an email to Pi
+ * This class behaves as follow when the execute method is called: 1) it selects the persons who have requested a
+ * notification matching the frequency of this Job and returns Set1 2) if Set1 is not void, then it selects the
+ * documents that have changed during the last period and stores them in Set2 3) if Set2 is not void, then for each
+ * person Pi in Set1, it intersects the following sets: Set2, matching criteria of Pi, documents that can be read by Pi
+ * 4) it sends an email to Pi
  */
 public class WatchListJob implements Job
 {
@@ -220,9 +220,8 @@ public class WatchListJob implements Job
     }
 
     /**
-     * Retrieves all the XWiki.XWikiUsers who have requested to be notified by changes, i.e. who
-     * have an Object of class WATCHLIST_CLASS attached AND who have choosen the current interval
-     * (ex:hourly).
+     * Retrieves all the XWiki.XWikiUsers who have requested to be notified by changes, i.e. who have an Object of class
+     * WATCHLIST_CLASS attached AND who have choosen the current interval (ex:hourly).
      *
      * @return a collection of document names pointing to the XWikiUsers wishing to get notified.
      */

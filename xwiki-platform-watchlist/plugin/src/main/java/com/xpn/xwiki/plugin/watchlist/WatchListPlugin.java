@@ -22,40 +22,30 @@ package com.xpn.xwiki.plugin.watchlist;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.*;
-import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
-import com.xpn.xwiki.plugin.mailsender.MailSenderPlugin;
-import com.xpn.xwiki.plugin.mailsender.MailSenderPluginApi;
+import com.xpn.xwiki.plugin.lucene.LucenePlugin;
+import com.xpn.xwiki.plugin.lucene.SearchResult;
 import com.xpn.xwiki.plugin.scheduler.SchedulerPlugin;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.commons.lang.StringUtils;
-import org.apache.velocity.VelocityContext;
-import org.joda.time.DateTime;
-import org.joda.time.Hours;
-import org.joda.time.Days;
-import org.joda.time.Weeks;
-import org.joda.time.Months;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
 /**
- * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages
- * and spaces they want to follow. At a frequency choosen by the user XWiki will send an email
- * notification to him with a list of the elements that has been modified since the last
- * notification.
+ * Plugin that offers WatchList features to XWiki. These feature allow users to build lists of pages and spaces they
+ * want to follow. At a frequency choosen by the user XWiki will send an email notification to him with a list of the
+ * elements that has been modified since the last notification.
  *
  * @version $Id: $
  */
@@ -133,8 +123,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     /**
      * {@inheritDoc}
      *
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface,
-     *      XWikiContext)
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface, XWikiContext)
      */
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
@@ -219,7 +208,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * @param context Context of the request
      */
     protected void initWatchListJob(int interval, String name, String description, String cron,
-                                    XWikiContext context) throws XWikiException {
+        XWikiContext context) throws XWikiException
+    {
         XWikiDocument doc;
         boolean needsUpdate = false;
         String jobClass = "com.xpn.xwiki.plugin.watchlist.WatchListJob";
@@ -356,7 +346,6 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         return obj;
     }
 
-
     /**
      * Sets a largeString property in the user's WatchList Object, then saves the user's profile
      *
@@ -407,8 +396,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
-     * Add the specified element (document or space) to the corresponding list in the user's
-     * WatchList
+     * Add the specified element (document or space) to the corresponding list in the user's WatchList
      *
      * @param user XWikiUser
      * @param newWatchedElement The name of the element to add (document of space)
@@ -448,17 +436,14 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
-     * Remove the specified element (document or space) from the corresponding list in the user's
-     * WatchList
+     * Remove the specified element (document or space) from the corresponding list in the user's WatchList
      *
      * @param user XWiki User
      * @param watchedElement The name of the element to remove (document or space)
      * @param isSpace True if the element is a space, false if it's a document
      * @param context Context of the request
-     * @return True if the element was in list and has been removed, false if the element was'nt in
-     *         the list
-     * @throws XWikiException If the WatchList Object cannot be retreived or if the user's profile
-     * cannot be saved
+     * @return True if the element was in list and has been removed, false if the element was'nt in the list
+     * @throws XWikiException If the WatchList Object cannot be retreived or if the user's profile cannot be saved
      */
     public boolean removeWatchedElement(String user, String watchedElement,
         boolean isSpace, XWikiContext context) throws XWikiException
@@ -498,14 +483,40 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      * @return The list of the watched elements ordered by last modification date, descending
      * @throws XWikiException If the search request fails
      */
-    public List getWatchListWhatsNew(String user, XWikiContext context) throws XWikiException
+    public List getWatchListWhatsNew(String user, XWikiContext context) throws Exception
     {
+        List<String> results = new ArrayList<String>();
         BaseObject watchListObject = this.getWatchListObject(user, context);
 
         if (context.getWiki().isVirtualMode()) {
-            // TODO : code getWatchListWhatsNew for virtual mode using LucenePlugin
-            return new ArrayList();
+            // In virtual mode RSS feeds are generated from a Lucene query
+            String watchedDocuments = watchListObject.getLargeStringValue("documents").trim()
+                .replaceFirst("^,", "").replaceFirst("^(.*):(.*)", "(wiki:$1 AND fullname:$2)")
+                .replaceAll(",(.*):(.*)", " OR (wiki:$1 AND fullname:$2)");
+            String watchedSpaces = watchListObject.getLargeStringValue("spaces").trim()
+                .replaceFirst("^,", "").replaceFirst("^(.*):(.*)", "(wiki:$1 AND web:$2)")
+                .replaceAll(",(.*):(.*)", " OR (wiki:$1 AND web:$2)");
+            String request = null;
+            if (!StringUtils.isBlank(watchedSpaces) && !StringUtils.isBlank(watchedDocuments)) {
+                request = "(" + watchedSpaces + " OR " + watchedDocuments + ") AND type:wikipage";
+            } else if (StringUtils.isBlank(watchedSpaces) && !StringUtils.isBlank(watchedDocuments)) {
+                request = watchedDocuments + " AND type:wikipage";
+            } else if (!StringUtils.isBlank(watchedSpaces) && StringUtils.isBlank(watchedDocuments)) {
+                request = watchedSpaces + " AND type:wikipage";
+            }
+
+            if (!StringUtils.isBlank(request)) {
+                String language = StringUtils.isBlank(context.getLanguage()) ? "default" : context.getLanguage();
+                LucenePlugin lucene = (LucenePlugin) context.getWiki().getPlugin("lucene", context);
+                List<SearchResult> luceneResults =
+                    lucene.getSearchResults(request, "-date", null, language, context).getResults(0, 20);
+
+                for (SearchResult result : luceneResults) {
+                    results.add(result.getWiki() + ":" + result.getFullName());
+                }
+            }
         } else {
+            // In simple mode RSS feeds are generated from a HSQL query
             String watchedDocuments =
                 watchListObject.getLargeStringValue("documents").trim().replaceFirst("^,", "")
                     .replaceAll("[^\\.,:]+:", "").replaceAll(",", "','");
@@ -515,8 +526,9 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             String request = "select doc.fullName from XWikiDocument as doc where doc.space in ('" +
                 watchedSpaces + "') or doc.fullName in ('" + watchedDocuments + "') " +
                 "order by doc.date desc";
-            return context.getWiki().getStore().search(request, 20, 0, context);
+            results.addAll(context.getWiki().getStore().search(request, 20, 0, context));
         }
+        return results;
     }
 
     /**
@@ -524,8 +536,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
      *
      * @param request the HQL where clause.
      * @param values the where clause values that replace the question marks (?)
-     * @return a list of document names prefixed with the wiki they come from ex :
-     *         xwiki:Main.WebHome
+     * @return a list of document names prefixed with the wiki they come from ex : xwiki:Main.WebHome
      */
     protected List globalSearchDocuments(String request, int nb, int start, List values,
         XWikiContext context)
@@ -573,8 +584,8 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
-     * Loop over all the watchlists stored in all the wikis. Verify if the database prefix is
-     * present on all the watchlist items, if not adds MainWiki as prefix.
+     * Loop over all the watchlists stored in all the wikis. Verify if the database prefix is present on all the
+     * watchlist items, if not adds MainWiki as prefix.
      */
     protected void sanitizeWatchlists(XWikiContext context)
     {

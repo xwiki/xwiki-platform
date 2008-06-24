@@ -17,6 +17,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
@@ -60,8 +62,16 @@ public class SpaceImplTest extends AbstractXWikiComponentTestCase
         XWikiConfig config = new XWikiConfig();
         xwiki.setConfig(config);
 
+        this.context.setWiki(xwiki);
+        this.context.setDatabase("xwiki");
+        this.context.setMainXWiki("xwiki");
+        this.context.setUser("XWiki.Admin");
+        
         xwiki.setNotificationManager(new XWikiNotificationManager());
-
+        
+        xwiki.setPluginManager(new XWikiPluginManager());
+        xwiki.getPluginManager().addPlugin("rightsmanager",RightsManagerPlugin.class.getName(),context);
+        
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {this.xwiki, this.context});
@@ -121,10 +131,6 @@ public class SpaceImplTest extends AbstractXWikiComponentTestCase
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
             .proxy());
-        this.context.setWiki(xwiki);
-        this.context.setDatabase("xwiki");
-        this.context.setMainXWiki("xwiki");
-        this.context.setUser("XWiki.Admin");
 
         this.spaceManager =
             new SpaceManagerImpl("spacemanager", SpaceManagerImpl.class.toString(), context);
@@ -135,9 +141,9 @@ public class SpaceImplTest extends AbstractXWikiComponentTestCase
         BaseObject obj = new BaseObject();
         obj.setName("XWiki.XWikiPreferences");
         obj.setClassName("XWiki.XWikiGlobalRights");
-        obj.setStringValue("users", "XWiki.Admin");
-        obj.setStringValue("groups", "");
-        obj.setStringValue("levels", "admin,programming");
+        obj.setLargeStringValue("users", "XWiki.Admin");
+        obj.setLargeStringValue("groups", "");
+        obj.setLargeStringValue("levels", "admin,programming");
         obj.setIntValue("allow", 1);
         prefdoc.addObject("XWiki.XWikiGlobalRights", obj);
         this.xwiki.saveDocument(prefdoc, context);

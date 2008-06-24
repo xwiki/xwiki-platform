@@ -40,6 +40,8 @@ import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.plugin.XWikiPluginManager;
+import com.xpn.xwiki.plugin.rightsmanager.RightsManagerPlugin;
 import com.xpn.xwiki.plugin.spacemanager.api.Space;
 import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagerException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
@@ -91,11 +93,21 @@ public class SpaceManagerImplTest extends AbstractXWikiComponentTestCase
         this.context.setUser("XWiki.TestUser");
         this.config = new XWikiConfig();
 
+        this.xwiki.setDatabase("xwiki");
+
+        this.context.setWiki(xwiki);
+        this.context.setUser("XWiki.NotAdmin");
+        this.context.setDatabase("xwiki");
+        this.context.setMainXWiki("xwiki");
+        
         // for protected spaces test
         config.put("xwiki.spacemanager.protectedsubspaces", "Documentation");
 
         xwiki.setConfig(config);
         xwiki.setNotificationManager(new XWikiNotificationManager());
+        
+        xwiki.setPluginManager(new XWikiPluginManager());
+        xwiki.getPluginManager().addPlugin("rightsmanager",RightsManagerPlugin.class.getName(),context);
 
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
@@ -160,12 +172,6 @@ public class SpaceManagerImplTest extends AbstractXWikiComponentTestCase
         this.xwiki.setStore((XWikiStoreInterface) mockXWikiStore.proxy());
         this.xwiki.setVersioningStore((XWikiVersioningStoreInterface) mockXWikiVersioningStore
             .proxy());
-        this.xwiki.setDatabase("xwiki");
-
-        this.context.setWiki(xwiki);
-        this.context.setUser("XWiki.NotAdmin");
-        this.context.setDatabase("xwiki");
-        this.context.setMainXWiki("xwiki");
 
         this.spaceManager =
             new SpaceManagerImpl("spacemanager", SpaceManagerImpl.class.toString(), context);
@@ -176,9 +182,9 @@ public class SpaceManagerImplTest extends AbstractXWikiComponentTestCase
         BaseObject obj = new BaseObject();
         obj.setName("XWiki.XWikiPreferences");
         obj.setClassName("XWiki.XWikiGlobalRights");
-        obj.setStringValue("users", "XWiki.Admin");
-        obj.setStringValue("groups", "");
-        obj.setStringValue("levels", "admin,programming");
+        obj.setLargeStringValue("users", "XWiki.Admin");
+        obj.setLargeStringValue("groups", "");
+        obj.setLargeStringValue("levels", "admin,programming");
         obj.setIntValue("allow", 1);
         prefdoc.addObject("XWiki.XWikiGlobalRights", obj);
         this.xwiki.saveDocument(prefdoc, context);

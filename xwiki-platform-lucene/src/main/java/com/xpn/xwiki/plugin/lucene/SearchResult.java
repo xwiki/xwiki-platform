@@ -19,16 +19,17 @@
  */
 package com.xpn.xwiki.plugin.lucene;
 
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.api.Document;
+import java.util.Date;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.Date;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.api.Document;
 
 /**
  * Result of a search. The Plugin will return a collection of these for display on the search page.
- *
+ * 
  * @version $Id: $
  */
 public class SearchResult
@@ -38,7 +39,7 @@ public class SearchResult
     private float score;
 
     private String title;
-    
+
     private String name;
 
     private String wiki;
@@ -64,38 +65,35 @@ public class SearchResult
     private static final Log LOG = LogFactory.getLog(SearchResult.class);
 
     /**
-     * @todo add fallback for unknown index field names (read values into a map accessible from
-     * search results page) This would be useful for integration of external indexes where the field
-     * names dont match ours.
-     * @todo TODO: to be more flexible make a factory to construct different kinds of searchresults,
-     * esp. for external indexes and custom implementations of searchresults
+     * @todo add fallback for unknown index field names (read values into a map accessible from search results page)
+     *       This would be useful for integration of external indexes where the field names dont match ours.
+     * @todo TODO: to be more flexible make a factory to construct different kinds of searchresults, esp. for external
+     *       indexes and custom implementations of searchresults
      */
-    public SearchResult(org.apache.lucene.document.Document doc, float score,
-        com.xpn.xwiki.api.XWiki xwiki)
+    public SearchResult(org.apache.lucene.document.Document doc, float score, com.xpn.xwiki.api.XWiki xwiki)
     {
         this.score = score;
-        id = doc.get(IndexFields.DOCUMENT_ID);
-        title = doc.get(IndexFields.DOCUMENT_TITLE);
-        name = doc.get(IndexFields.DOCUMENT_NAME);
-        web = doc.get(IndexFields.DOCUMENT_WEB);
-        wiki = doc.get(IndexFields.DOCUMENT_WIKI);
-        type = doc.get(IndexFields.DOCUMENT_TYPE);
-        author = doc.get(IndexFields.DOCUMENT_AUTHOR);
-        creator = doc.get(IndexFields.DOCUMENT_CREATOR);
-        language = doc.get(IndexFields.DOCUMENT_LANGUAGE);
-        date = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_DATE));
-        creationDate = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_CREATIONDATE));
-        if (LucenePlugin.DOCTYPE_ATTACHMENT.equals(type)) {
-            filename = doc.get(IndexFields.FILENAME);
+        this.id = doc.get(IndexFields.DOCUMENT_ID);
+        this.title = doc.get(IndexFields.DOCUMENT_TITLE);
+        this.name = doc.get(IndexFields.DOCUMENT_NAME);
+        this.web = doc.get(IndexFields.DOCUMENT_WEB);
+        this.wiki = doc.get(IndexFields.DOCUMENT_WIKI);
+        this.type = doc.get(IndexFields.DOCUMENT_TYPE);
+        this.author = doc.get(IndexFields.DOCUMENT_AUTHOR);
+        this.creator = doc.get(IndexFields.DOCUMENT_CREATOR);
+        this.language = doc.get(IndexFields.DOCUMENT_LANGUAGE);
+        this.date = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_DATE));
+        this.creationDate = IndexFields.stringToDate(doc.get(IndexFields.DOCUMENT_CREATIONDATE));
+        if (LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type)) {
+            this.filename = doc.get(IndexFields.FILENAME);
             Document document;
-            final String fullDocName = new StringBuffer(wiki).append(":").append(web).append(".")
-                .append(name).toString();
+            final String fullDocName =
+                new StringBuffer(this.wiki).append(":").append(this.web).append(".").append(this.name).toString();
             try {
                 document = xwiki.getDocument(fullDocName);
-                url = document.getAttachmentURL(filename, "download");
+                this.url = document.getAttachmentURL(this.filename, "download");
             } catch (XWikiException e) {
-                LOG.error("error retrieving url for attachment " + filename + " of document " +
-                    fullDocName);
+                LOG.error("error retrieving url for attachment " + this.filename + " of document " + fullDocName);
                 e.printStackTrace();
             }
         }
@@ -104,8 +102,9 @@ public class SearchResult
     /**
      * @return the document id as indexed
      */
-    public String getId() {
-        return id;
+    public String getId()
+    {
+        return this.id;
     }
 
     /**
@@ -113,7 +112,7 @@ public class SearchResult
      */
     public String getAuthor()
     {
-        return author;
+        return this.author;
     }
 
     /**
@@ -121,7 +120,7 @@ public class SearchResult
      */
     public Date getDate()
     {
-        return date;
+        return this.date;
     }
 
     /**
@@ -129,7 +128,7 @@ public class SearchResult
      */
     public String getFilename()
     {
-        return filename;
+        return this.filename;
     }
 
     /**
@@ -137,24 +136,23 @@ public class SearchResult
      */
     public String getTitle()
     {
-        return title;
-    }    
-    
+        return this.title;
+    }
+
     /**
      * @return Returns the name of the document.
      */
     public String getName()
     {
-        return name;
+        return this.name;
     }
 
     /**
-     * @return Returns the score of this search result as computed by lucene. Is a float between
-     *         zero and 1.
+     * @return Returns the score of this search result as computed by lucene. Is a float between zero and 1.
      */
     public float getScore()
     {
-        return score;
+        return this.score;
     }
 
     /**
@@ -163,7 +161,7 @@ public class SearchResult
      */
     public String getType()
     {
-        return type;
+        return this.type;
     }
 
     /**
@@ -171,7 +169,7 @@ public class SearchResult
      */
     public String getUrl()
     {
-        return url;
+        return this.url;
     }
 
     /**
@@ -179,16 +177,16 @@ public class SearchResult
      */
     public String getWeb()
     {
-        return web;
+        return this.web;
     }
 
     /**
-     * @return the language of the Document, i.e. <code>de</code> or <code>en</code>,<code>default</code>
-     *         if no language was set at indexing time.
+     * @return the language of the Document, i.e. <code>de</code> or <code>en</code>,<code>default</code> if no
+     *         language was set at indexing time.
      */
     public String getLanguage()
     {
-        return language;
+        return this.language;
     }
 
     /**
@@ -196,7 +194,7 @@ public class SearchResult
      */
     public Date getCreationDate()
     {
-        return creationDate;
+        return this.creationDate;
     }
 
     /**
@@ -204,7 +202,7 @@ public class SearchResult
      */
     public String getCreator()
     {
-        return creator;
+        return this.creator;
     }
 
     public void setUrl(String url)
@@ -214,7 +212,7 @@ public class SearchResult
 
     public String getWiki()
     {
-        return wiki;
+        return this.wiki;
     }
 
     /**
@@ -222,9 +220,8 @@ public class SearchResult
      */
     public boolean isWikiContent()
     {
-        return (LucenePlugin.DOCTYPE_WIKIPAGE.equals(type) ||
-            LucenePlugin.DOCTYPE_ATTACHMENT.equals(type) ||
-            LucenePlugin.DOCTYPE_OBJECTS.equals(type));
+        return (LucenePlugin.DOCTYPE_WIKIPAGE.equals(this.type) || LucenePlugin.DOCTYPE_ATTACHMENT.equals(this.type) || LucenePlugin.DOCTYPE_OBJECTS
+            .equals(this.type));
     }
 
 }

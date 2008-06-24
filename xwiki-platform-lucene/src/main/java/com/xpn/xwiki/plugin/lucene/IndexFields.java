@@ -25,16 +25,16 @@ import java.util.Date;
 import org.apache.commons.lang.time.FastDateFormat;
 
 /**
- * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for
- * proper handling of special field values like dates.
- * 
+ * Contains constants naming the Lucene index fields used by this Plugin and some helper methods for proper handling of
+ * special field values like dates.
+ *
  * @version $Id: $
  */
 public abstract class IndexFields
 {
     /**
-     * Keyword field, holds a string uniquely identifying a document across the index. this is used
-     * for finding old versions of a document to be indexed.
+     * Keyword field, holds a string uniquely identifying a document across the index. this is used for finding old
+     * versions of a document to be indexed.
      */
     public static final String DOCUMENT_ID = "_docid";
 
@@ -59,13 +59,18 @@ public abstract class IndexFields
     public static final String DOCUMENT_WEB = "web";
 
     /**
+     * FullName of the document (example : Main.WebHome)
+     */
+    public static final String DOCUMENT_FULLNAME = "fullname";
+
+    /**
      * Language of the document
      */
     public static final String DOCUMENT_LANGUAGE = "lang";
 
     /**
-     * Type of a document, "attachment", "wikipage" or "objects", used to control presentation of
-     * searchresults. See {@link SearchResult}and xdocs/searchResult.vm.
+     * Type of a document, "attachment", "wikipage" or "objects", used to control presentation of searchresults. See
+     * {@link SearchResult}and xdocs/searchResult.vm.
      */
     public static final String DOCUMENT_TYPE = "type";
 
@@ -73,6 +78,11 @@ public abstract class IndexFields
      * Filename, only used for attachments
      */
     public static final String FILENAME = "filename";
+
+    /**
+     * XWiki object type, only used for objects
+     */
+    public static final String OBJECT = "object";
 
     /**
      * Last modifier
@@ -105,8 +115,7 @@ public abstract class IndexFields
     public static final String KEYWORDS = "kw";
 
     /**
-     * Format for date storage in the index, and therefore the format which has to be used for
-     * date-queries.
+     * Format for date storage in the index, and therefore the format which has to be used for date-queries.
      */
     public static final String DATE_FORMAT = "yyyyMMddHHmm";
 

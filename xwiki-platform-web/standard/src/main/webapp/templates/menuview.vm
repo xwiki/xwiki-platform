@@ -2,12 +2,12 @@
 <div id="actionmenu" class="layoutsubsection">
 <h3 id="xwikimenutitle" class="hidden">$msg.get("menu")</h3>
 <div class="rightmenu">
-#set ($hasAdminSpaceRights = $xwiki.hasAccessLevel("admin", "${doc.web}.XWikiPreferences"))
+#set ($hasAdminSpaceRights = $xwiki.hasAccessLevel("admin", "${doc.space}.XWikiPreferences"))
 #set ($hasAdminWikiRights = $xwiki.hasAccessLevel("admin", "XWiki.XWikiPreferences"))
 #if($hasAdminWikiRights || $hasAdminSpaceRights)
   #set ($adminwikiaction = $!xwiki.getURL("XWiki.XWikiPreferences","admin"))
   #set ($importaction = $!xwiki.getURL("XWiki.XWikiPreferences","import"))
-  #set ($adminspaceaction = $!xwiki.getURL("${doc.web}.WebPreferences","admin"))
+  #set ($adminspaceaction = $!xwiki.getURL("${doc.space}.WebPreferences","admin"))
   #set ($adminapppresent = $xwiki.exists("XWiki.AdminSheet"))
   #if(!$hasAdminWikiRights && $adminapppresent)
     #xwikitopmenuentrystart($adminspaceaction $msg.get("core.menu.admin") "tmAdmin")

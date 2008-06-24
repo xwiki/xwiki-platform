@@ -21,34 +21,38 @@
 
 package com.xpn.xwiki.plugin.graphviz;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import java.io.IOException;
+import java.io.Writer;
+
 import org.radeox.api.engine.RenderEngine;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.macro.BaseLocaleMacro;
 import org.radeox.macro.parameter.MacroParameter;
 
-import java.io.IOException;
-import java.io.Writer;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 
-public class GraphVizMacro  extends BaseLocaleMacro {
-  public String getLocaleKey() {
-    return "macro.graphviz";
-  }
+public class GraphVizMacro extends BaseLocaleMacro
+{
+    public String getLocaleKey()
+    {
+        return "macro.graphviz";
+    }
 
-    public void execute(Writer writer, MacroParameter params)
-            throws IllegalArgumentException, IOException {
+    @Override
+    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
+    {
 
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();
 
-        XWikiContext xcontext = ((XWikiRadeoxRenderEngine)engine).getXWikiContext();
+        XWikiContext xcontext = ((XWikiRadeoxRenderEngine) engine).getXWikiContext();
         XWiki xwiki = xcontext.getWiki();
 
         GraphVizPlugin plugin = (GraphVizPlugin) xwiki.getPlugin("graphviz", xcontext);
         // If the plugin is not loaded
-        if (plugin==null) {
+        if (plugin == null) {
             writer.write("Plugin not loaded");
             return;
         }
@@ -63,10 +67,12 @@ public class GraphVizMacro  extends BaseLocaleMacro {
         str.append("<img src=\"");
         str.append(plugin.getDotImageURL(dottext, dot, xcontext));
         str.append("\" ");
-        if ((!"none".equals(height))&&(height!=null))
+        if ((!"none".equals(height)) && (height != null)) {
             str.append("height=\"" + height + "\" ");
-        if ((!"none".equals(width))&&(width!=null))
+        }
+        if ((!"none".equals(width)) && (width != null)) {
             str.append("width=\"" + width + "\" ");
+        }
         str.append("alt=\"");
         str.append(img);
         str.append("\" />");

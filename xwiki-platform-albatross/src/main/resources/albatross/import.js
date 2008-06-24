@@ -48,13 +48,13 @@ var XWiki = Class.create({
     }
 });
 
-function selectPackage(attachmentName)
-{
-    selectPackage("XWiki", "Import", attachmentName);
-}
-
 function selectPackage(space, page, attachmentName)
 {
+    if (arguments.length == 1) {
+        attachmentName = space;
+        space = "XWiki";
+        page = "Import";
+    }
     var str = "<input type=\"hidden\" name=\"name\" value=\"" +  attachmentName +  "\" />";
     $('importDocName').innerHTML = str;
     var pars = "action=getPackageInfos&name="+attachmentName+"&xpage=plain";

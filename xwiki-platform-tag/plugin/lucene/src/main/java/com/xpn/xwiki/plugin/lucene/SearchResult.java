@@ -44,7 +44,7 @@ public class SearchResult
 
     private String wiki;
 
-    private String web;
+    private String space;
 
     private String url;
 
@@ -76,7 +76,7 @@ public class SearchResult
         this.id = doc.get(IndexFields.DOCUMENT_ID);
         this.title = doc.get(IndexFields.DOCUMENT_TITLE);
         this.name = doc.get(IndexFields.DOCUMENT_NAME);
-        this.web = doc.get(IndexFields.DOCUMENT_WEB);
+        this.space = doc.get(IndexFields.DOCUMENT_WEB);
         this.wiki = doc.get(IndexFields.DOCUMENT_WIKI);
         this.type = doc.get(IndexFields.DOCUMENT_TYPE);
         this.author = doc.get(IndexFields.DOCUMENT_AUTHOR);
@@ -88,7 +88,7 @@ public class SearchResult
             this.filename = doc.get(IndexFields.FILENAME);
             Document document;
             final String fullDocName =
-                new StringBuffer(this.wiki).append(":").append(this.web).append(".").append(this.name).toString();
+                new StringBuffer(this.wiki).append(":").append(this.space).append(".").append(this.name).toString();
             try {
                 document = xwiki.getDocument(fullDocName);
                 this.url = document.getAttachmentURL(this.filename, "download");
@@ -173,11 +173,21 @@ public class SearchResult
     }
 
     /**
-     * @return Returns the web the document belongs to.
+     * @return Returns the space the document belongs to.
+     * @deprecated Use {@link #getSpace} instead.
      */
+    @Deprecated
     public String getWeb()
     {
-        return this.web;
+        return this.space;
+    }
+
+    /**
+     * @return Returns the space the document belongs to.
+     */
+    public String getSpace()
+    {
+        return this.space;
     }
 
     /**

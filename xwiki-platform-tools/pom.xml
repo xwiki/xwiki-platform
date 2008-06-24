@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-shared-tests</artifactId>
   <name>XWiki Platform - Tools - Build - Shared Test</name>
-  <version>1.11-SNAPSHOT</version>
+  <version>1.11</version>
   <packaging>jar</packaging>
   <description>Test framework classes shared between functional test modules</description>
   <dependencies>

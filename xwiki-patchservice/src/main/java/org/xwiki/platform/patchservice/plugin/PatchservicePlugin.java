@@ -156,9 +156,11 @@ public class PatchservicePlugin extends XWikiDefaultPlugin implements XWikiPlugi
     public boolean applyPatch(Patch p, PatchId latestPatch, XWikiContext context)
     {
         try {
-            p.apply(context.getWiki().getDocument(p.getId().getDocumentId(), context), context);
+            XWikiDocument doc = context.getWiki().getDocument(p.getId().getDocumentId(), context);
+            p.apply(doc, context);
+            context.getWiki().getStore().saveXWikiDoc(doc, context);
         } catch (Exception ex) {
-            // log.warn(ex.getMessage());
+            LOG.warn(ex.getMessage(), ex);
             // TODO is return false enough?
             return false;
         }

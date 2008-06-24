@@ -40,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.bootstrap.DOMImplementationRegistry;
 import org.w3c.dom.ls.DOMImplementationLS;
 import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSOutput;
 import org.w3c.dom.ls.LSParser;
 import org.xwiki.container.Container;
 import org.xwiki.container.servlet.ServletContainerException;
@@ -404,7 +405,9 @@ public class PatchServiceServlet extends HttpServlet implements Servlet
         response.setContentType("text/xml");
         DOMImplementationLS ls = (DOMImplementationLS) doc.getImplementation();
         try {
-            response.getWriter().write(ls.createLSSerializer().writeToString(doc));
+            LSOutput o = ls.createLSOutput();
+            o.setByteStream(response.getOutputStream());
+            ls.createLSSerializer().write(doc, o);
         } catch (Exception e) {
         }
     }

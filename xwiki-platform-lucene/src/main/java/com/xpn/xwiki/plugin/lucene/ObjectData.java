@@ -66,10 +66,9 @@ public class ObjectData extends IndexData
     }
 
     /**
-     * @return a string containing the result of
-     *         {@link IndexData#getFullText(XWikiDocument,XWikiContext)}plus the full text content
-     *         (values of title,category,content and extract ) XWiki.ArticleClass Object, as far as
-     *         it could be extracted.
+     * @return a string containing the result of {@link IndexData#getFullText(XWikiDocument,XWikiContext)}plus the full
+     *         text content (values of title,category,content and extract ) XWiki.ArticleClass Object, as far as it
+     *         could be extracted.
      */
     public String getFullText(XWikiDocument doc, XWikiContext context)
     {
@@ -129,6 +128,8 @@ public class ObjectData extends IndexData
         for (String className : doc.getxWikiObjects().keySet()) {
             for (BaseObject obj : doc.getObjects(className)) {
                 if (obj != null) {
+                    luceneDoc.add(new Field(IndexFields.OBJECT, obj.getClassName(), Field.Store.YES,
+                        Field.Index.TOKENIZED));
                     Object[] propertyNames = obj.getPropertyNames();
                     for (int i = 0; i < propertyNames.length; i++) {
                         try {

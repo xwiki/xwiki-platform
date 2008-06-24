@@ -29,7 +29,7 @@ import com.xpn.xwiki.api.Document;
 
 /**
  * Result of a search. The Plugin will return a collection of these for display on the search page.
- * 
+ *
  * @version $Id: $
  */
 public class SearchResult
@@ -46,9 +46,13 @@ public class SearchResult
 
     private String space;
 
+    private String fullName;
+
     private String url;
 
     private String filename;
+
+    private String[] objects;
 
     private String type;
 
@@ -78,6 +82,7 @@ public class SearchResult
         this.name = doc.get(IndexFields.DOCUMENT_NAME);
         this.space = doc.get(IndexFields.DOCUMENT_WEB);
         this.wiki = doc.get(IndexFields.DOCUMENT_WIKI);
+        this.fullName = doc.get(IndexFields.DOCUMENT_FULLNAME);
         this.type = doc.get(IndexFields.DOCUMENT_TYPE);
         this.author = doc.get(IndexFields.DOCUMENT_AUTHOR);
         this.creator = doc.get(IndexFields.DOCUMENT_CREATOR);
@@ -96,6 +101,8 @@ public class SearchResult
                 LOG.error("error retrieving url for attachment " + this.filename + " of document " + fullDocName);
                 e.printStackTrace();
             }
+        } else if (LucenePlugin.DOCTYPE_OBJECTS.equals(type)) {
+            objects = doc.getValues("object");
         }
     }
 
@@ -223,6 +230,15 @@ public class SearchResult
     public String getWiki()
     {
         return this.wiki;
+    }
+
+    public String getFullName()
+    {
+        return this.fullName;
+    }
+
+    public String[] getObjects() {
+        return this.objects;
     }
 
     /**

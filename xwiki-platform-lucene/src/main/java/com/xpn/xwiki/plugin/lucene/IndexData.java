@@ -44,6 +44,8 @@ public abstract class IndexData
 
     private String documentWeb;
 
+    private String documentFullName;
+
     private String fullName;
 
     private String author;
@@ -66,6 +68,7 @@ public abstract class IndexData
         setDocumentName(doc.getName());
         setDocumentTitle(doc.getDisplayTitle(context));
         setDocumentWeb(doc.getSpace());
+        setDocumentFullName(doc.getFullName());
         setWiki(doc.getDatabase() == null ? context.getDatabase() : doc.getDatabase());
         setFullName(new StringBuffer(wiki).append(":").append(documentWeb).append(".").append(
             documentName).toString());
@@ -73,29 +76,20 @@ public abstract class IndexData
     }
 
     /**
-     * Adds this documents data to a lucene Document instance for indexing.
-     * <p>
-     * <strong>Short introduction to Lucene field types </strong>
-     * </p>
-     * <p>
-     * Which type of Lucene field is used determines what Lucene does with data and how we can use
-     * it for searching and showing search results:
-     * </p>
-     * <ul>
-     * <li>Keyword fields don't get tokenized, but are searchable and stored in the index. This is
-     * perfect for fields you want to search in programmatically (like ids and such), and date
-     * fields. Since all user-entered queries are tokenized, letting the user search these fields
-     * makes almost no sense, except of queries for date fields, where tokenization is useless.</li>
-     * <li>the stored text fields are used for short texts which should be searchable by the user,
-     * and stored in the index for reconstruction. Perfect for document names, titles, abstracts.</li>
-     * <li>the unstored field takes the biggest part of the content - the full text. It is
-     * tokenized and indexed, but not stored in the index. This makes sense, since when the user
-     * wants to see the full content, he clicks the link to vie the full version of a document,
-     * which is then delivered by xwiki.</li>
-     * </ul>
-     * 
-     * @param luceneDoc if not null, this controls which translated version of the content will be
-     *            indexed. If null, the content in the default language will be used.
+     * Adds this documents data to a lucene Document instance for indexing. <p> <strong>Short introduction to Lucene
+     * field types </strong> </p> <p> Which type of Lucene field is used determines what Lucene does with data and how
+     * we can use it for searching and showing search results: </p> <ul> <li>Keyword fields don't get tokenized, but are
+     * searchable and stored in the index. This is perfect for fields you want to search in programmatically (like ids
+     * and such), and date fields. Since all user-entered queries are tokenized, letting the user search these fields
+     * makes almost no sense, except of queries for date fields, where tokenization is useless.</li> <li>the stored text
+     * fields are used for short texts which should be searchable by the user, and stored in the index for
+     * reconstruction. Perfect for document names, titles, abstracts.</li> <li>the unstored field takes the biggest part
+     * of the content - the full text. It is tokenized and indexed, but not stored in the index. This makes sense, since
+     * when the user wants to see the full content, he clicks the link to vie the full version of a document, which is
+     * then delivered by xwiki.</li> </ul>
+     *
+     * @param luceneDoc if not null, this controls which translated version of the content will be indexed. If null, the
+     * content in the default language will be used.
      */
     public void addDataToLuceneDocument(org.apache.lucene.document.Document luceneDoc,
         XWikiDocument doc, XWikiContext context)
@@ -146,6 +140,10 @@ public abstract class IndexData
             documentWeb,
             Field.Store.YES,
             Field.Index.TOKENIZED));
+        luceneDoc.add(new Field(IndexFields.DOCUMENT_FULLNAME,
+            documentFullName,
+            Field.Store.YES,
+            Field.Index.TOKENIZED));
         if (author != null) {
             luceneDoc.add(new Field(IndexFields.DOCUMENT_AUTHOR,
                 author,
@@ -175,9 +173,9 @@ public abstract class IndexData
     }
 
     /**
-     * Builds a Lucene query matching only the document this instance represents. This is used for
-     * removing old versions of a document from the index before adding a new one.
-     * 
+     * Builds a Lucene query matching only the document this instance represents. This is used for removing old versions
+     * of a document from the index before adding a new one.
+     *
      * @return a query matching the field DOCUMENT_ID to the value of #getId()
      */
     public Query buildQuery()
@@ -251,6 +249,14 @@ public abstract class IndexData
     }
 
     /**
+     * @param documentFullName The documentFullName to set.
+     */
+    public void setDocumentFullName(String documentFullName)
+    {
+        this.documentFullName = documentFullName;
+    }
+
+    /**
      * @param modificationDate The modificationDate to set.
      */
     public void setModificationDate(Date modificationDate)
@@ -271,6 +277,11 @@ public abstract class IndexData
     public String getDocumentWeb()
     {
         return documentWeb;
+    }
+
+    public String getDocumentFullName()
+    {
+        return documentFullName;
     }
 
     public String getWiki()
@@ -303,9 +314,6 @@ public abstract class IndexData
         this.creator = creator;
     }
 
-    /**
-     * @return
-     */
     public String getFullName()
     {
         return fullName;

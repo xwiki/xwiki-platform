@@ -623,7 +623,6 @@ public class Utils
             key = "KEY" + RandomStringUtils.randomAlphanumeric(10) + "KEY";
         } while (renderingKeys.containsKey(key));
         renderingKeys.put(key, value);
-        System.out.println("replaced: " + value);
         return key;
     }
 
@@ -644,7 +643,6 @@ public class Utils
         Map<String, String> renderingKeys = (Map<String, String>) context.get(PLACEHOLDERS_CONTEXT_KEY);
         for (Entry<String, String> e : renderingKeys.entrySet()) {
             result = result.replace(e.getKey(), e.getValue());
-            System.out.println("restoring: " + e.getValue());
         }
         return result;
     }

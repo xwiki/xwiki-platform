@@ -26,6 +26,7 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.pdf.api.PdfExport;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 import info.informatica.doc.dom4j.CSSStylableElement;
 import info.informatica.doc.dom4j.XHTMLDocument;
@@ -221,7 +222,15 @@ public class PdfExportImpl implements PdfExport
         try {
             tempdir.mkdirs();
             context.put("pdfexportdir", tempdir);
+            boolean useLocalPlaceholders = !Utils.arePlaceholdersEnabled(context);
+            if (useLocalPlaceholders) {
+                Utils.enablePlaceholders(context);
+            }
             String content = context.getWiki().parseTemplate("pdf.vm", context);
+            if (useLocalPlaceholders) {
+                content = Utils.replacePlaceholders(content, context);
+                Utils.disablePlaceholders(context);
+            }
             exportHtml(content, out, type, context);
         } finally {
             File[] filelist = tempdir.listFiles();

@@ -66,6 +66,7 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
+import org.xwiki.context.Execution;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
@@ -442,7 +443,8 @@ public class XWikiDocument
                 throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                     "Failed to render content using new rendering system", e);
             }
-            dom.traverse(new XHTMLRenderer(writer));
+            dom.traverse(new XHTMLRenderer(writer, new DefaultDocumentManager((Execution) Utils
+                .getComponent(Execution.ROLE))));
             renderedContent = writer.toString();
         }
         return renderedContent;

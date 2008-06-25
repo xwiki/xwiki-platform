@@ -605,7 +605,7 @@
         </property>
 
         <property name="referer" type="string">
-            <column name="XWR_REFERER" not-null="true" length="8192"/>
+            <column name="XWR_REFERER" not-null="true" length="8192" sql-type="clob" />
         </property>
 
         <property name="pageViews" type="integer">

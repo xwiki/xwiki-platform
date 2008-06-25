@@ -20,29 +20,36 @@
  */
 package com.xpn.xwiki.web;
 
-import com.novell.ldap.util.Base64;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
-import com.xpn.xwiki.xmlrpc.XWikiXmlRpcRequest;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.lang.StringUtils;
-import org.apache.ecs.Filter;
-import org.apache.ecs.filter.CharacterFilter;
-import org.apache.log4j.MDC;
-import org.apache.struts.upload.MultipartRequestWrapper;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.manager.ComponentLookupException;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.*;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.StringUtils;
+import org.apache.ecs.Filter;
+import org.apache.ecs.filter.CharacterFilter;
+import org.apache.log4j.MDC;
+import org.apache.struts.upload.MultipartRequestWrapper;
+import org.xwiki.component.manager.ComponentLookupException;
+import org.xwiki.component.manager.ComponentManager;
+
+import com.novell.ldap.util.Base64;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.plugin.fileupload.FileUploadPlugin;
+import com.xpn.xwiki.xmlrpc.XWikiXmlRpcRequest;
 
 public class Utils
 {
@@ -426,6 +433,7 @@ public class Utils
     /**
      * @deprecated replaced by Util#encodeURI since 1.3M2
      */
+    @Deprecated
     public static String encode(String name, XWikiContext context)
     {
         try {
@@ -439,6 +447,7 @@ public class Utils
     /**
      * @deprecated replaced by Util#decodeURI since 1.3M2
      */
+    @Deprecated
     public static String decode(String name, XWikiContext context)
     {
         try {
@@ -479,7 +488,8 @@ public class Utils
             }
         } catch (Exception e) {
             if ((e instanceof XWikiException)
-                && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE)) {
+                && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE))
+            {
                 context.put("exception", e);
             } else {
                 e.printStackTrace();

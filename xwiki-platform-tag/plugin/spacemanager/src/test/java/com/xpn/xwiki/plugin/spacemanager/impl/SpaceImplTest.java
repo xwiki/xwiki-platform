@@ -75,6 +75,7 @@ public class SpaceImplTest extends AbstractXWikiComponentTestCase
         this.mockXWikiStore =
             mock(XWikiHibernateStore.class, new Class[] {XWiki.class, XWikiContext.class},
                 new Object[] {this.xwiki, this.context});
+        this.mockXWikiStore.expects(once()).method("executeWrite");
         this.mockXWikiStore.stubs().method("loadXWikiDoc").will(
             new CustomStub("Implements XWikiStoreInterface.loadXWikiDoc")
             {

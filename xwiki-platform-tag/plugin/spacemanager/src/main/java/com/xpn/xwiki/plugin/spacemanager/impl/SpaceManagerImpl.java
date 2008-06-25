@@ -28,7 +28,12 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.velocity.VelocityContext;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -36,6 +41,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseObject;
+import com.xpn.xwiki.objects.LargeStringProperty;
+import com.xpn.xwiki.objects.StringProperty;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
@@ -51,6 +58,7 @@ import com.xpn.xwiki.plugin.spacemanager.api.SpaceManagers;
 import com.xpn.xwiki.plugin.spacemanager.api.SpaceUserProfile;
 import com.xpn.xwiki.plugin.spacemanager.plugin.SpaceManagerPluginApi;
 import com.xpn.xwiki.render.XWikiVelocityRenderer;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 
 /**
@@ -72,6 +80,11 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         "org.xwiki.plugin.spacemanager.impl.SpaceManagerExtensionImpl";
 
     public final static String SPACEMANAGER_DEFAULT_MAIL_NOTIFICATION = "1";
+    
+    /**
+     * Log object to log messages in this class.
+     */
+    private static final Log LOG = LogFactory.getLog(SpaceManagerImpl.class);
 
     /**
      * The extension that defines specific functions for this space manager
@@ -188,8 +201,10 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
             SpaceManagers.addSpaceManager(this);
             getSpaceClass(context);
             SpaceUserProfileImpl.getSpaceUserProfileClass(context);
+            // Dirty migration of spaces potential corrupted XWiki.XWikiGlobalRights objects.
+            migrateSpaceCorruptedRightsData(context);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Error initializing plugin for main database", e);
         }
     }
 
@@ -201,11 +216,57 @@ public class SpaceManagerImpl extends XWikiDefaultPlugin implements SpaceManager
         try {
             getSpaceClass(context);
             getSpaceManagerExtension().virtualInit(this, context);
+            // Dirty migration of spaces potential corrupted XWiki.XWikiGlobalRights objects.
+            migrateSpaceCorruptedRightsData(context);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error("Error initializing plugin for database [" + context.getDatabase() + "]", e);
         }
     }
 
+    /**
+     * Migrate wrong data created by spacemanager plugin versions < 1.0.2 or 1.1.1 or 1.2
+     * The plugin used to create users and groups properties of XWiki.XWikiGlobalRights objects as
+     * StringProperty instead of LargeStringProperty, thus making it impossible to save
+     * a Space WebPreferences document from the object editor (see http://jira.xwiki.org/jira/browse/XPSM-12)
+     * 
+     * @since 1.0.2
+     * @since 1.1.1
+     * @since 1.2
+     * @param context
+     * @throws SpaceManagerException
+     */
+    private void migrateSpaceCorruptedRightsData(XWikiContext context) throws SpaceManagerException
+    {
+        try {
+            context.getWiki().getHibernateStore().executeWrite(context, true, new HibernateCallback() {
+                public Object doInHibernate(Session session) throws HibernateException
+                {
+                    Query q = session.createQuery("select s from BaseObject o, StringProperty s where o.className like 'XWiki.XWiki%Rights' and o.id=s.id and (s.name='users' or s.name='groups')");
+                    List lst = q.list();
+                    if (lst.size()==0)
+                        return null;
+                    LOG.warn("[Migrating corrupted rights properties (see http://jira.xwiki.org/jira/browse/XPSM-12)");
+                    List lst2 = new ArrayList(lst.size());
+                    for (Iterator it=lst.iterator(); it.hasNext(); ) {
+                        StringProperty sp = (StringProperty) it.next();
+                        LargeStringProperty lsp = new LargeStringProperty();
+                        lsp.setId(sp.getId());
+                        lsp.setName(sp.getName());
+                        lsp.setValue(sp.getValue());
+                        lst2.add(lsp);
+                    }
+                    for (Iterator it=lst.iterator(); it.hasNext(); )
+                        session.delete(it.next());
+                    for (Iterator it=lst2.iterator(); it.hasNext(); )
+                        session.save(it.next());
+                    return null;
+                }
+            });
+        } catch (XWikiException e) {
+            throw new SpaceManagerException(e);
+        }
+    }
+    
     /**
      * {@inheritDoc}
      */

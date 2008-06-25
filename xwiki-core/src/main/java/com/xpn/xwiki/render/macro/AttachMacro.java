@@ -32,6 +32,7 @@ import org.radeox.util.Encoder;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Macro that outputs links to document attachments. Syntax: {attach:text|file|document|title|rel|id|fromIncludingDoc}
@@ -121,21 +122,23 @@ public class AttachMacro extends BaseLocaleMacro
 
         // Create the link code
         StringBuffer str = new StringBuffer();
+        String url;
         str.append("<a href=\"");
         if (filename.indexOf("tp://") != -1) {
-            str.append(filename);
+            url = filename;
         } else {
-            str.append(doc.getAttachmentURL(filename, "download", xcontext));
+            url = doc.getAttachmentURL(filename, "download", xcontext);
         }
+        str.append(Utils.createPlaceholder(url, xcontext));
         str.append("\"");
         if (rel != null) {
-            str.append(" rel=\"" + rel + "\"");
+            str.append(" rel=\"" + Utils.createPlaceholder(rel, xcontext) + "\"");
         }
         if (title != null) {
-            str.append(" title=\"" + title + "\"");
+            str.append(" title=\"" + Utils.createPlaceholder(title, xcontext) + "\"");
         }
         if (id != null) {
-            str.append(" id=\"" + id + "\"");
+            str.append(" id=\"" + Utils.createPlaceholder(id, xcontext) + "\"");
         }
         str.append(">");
         str.append(text);

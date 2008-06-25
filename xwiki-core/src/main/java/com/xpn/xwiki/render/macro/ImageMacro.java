@@ -30,6 +30,7 @@ import org.radeox.macro.parameter.MacroParameter;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Macro that displays images. Syntax:
@@ -157,11 +158,14 @@ public class ImageMacro extends BaseLocaleMacro
         }
         str.append("<img src=\"");
 
+        String url;
         if (img.indexOf("tp://") != -1) {
-            str.append(img);
+            url = img;
         } else {
-            str.append(doc.getAttachmentURL(img, "download", downloadParams, xcontext));
+            url = doc.getAttachmentURL(img, "download", downloadParams, xcontext);
         }
+        str.append(Utils.createPlaceholder(url, xcontext));
+
         str.append("\" ");
         if (heightSpecified) {
             str.append("height=\"" + height.trim() + "\" ");
@@ -173,9 +177,9 @@ public class ImageMacro extends BaseLocaleMacro
             str.append("align=\"" + align.trim() + "\" ");
         }
         str.append("alt=\"");
-        str.append(alt);
+        str.append(Utils.createPlaceholder(alt, xcontext));
         str.append("\" title=\"");
-        str.append(title);
+        str.append(Utils.createPlaceholder(title, xcontext));
         str.append("\"/>");
         if (link != null) {
             str.append("</a>");

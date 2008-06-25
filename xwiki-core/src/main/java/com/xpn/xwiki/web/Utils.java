@@ -32,10 +32,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.Filter;
 import org.apache.ecs.filter.CharacterFilter;
@@ -53,6 +55,9 @@ import com.xpn.xwiki.xmlrpc.XWikiXmlRpcRequest;
 
 public class Utils
 {
+    /** A key that used for placing a map of replaced (for protection) strings in the context. */
+    private static final String REPLACED_STRINGS_CONTEXT_KEY = Utils.class.getCanonicalName() + "_keys";
+
     /**
      * The component manager used by {@link #getComponent(String)} and {@link #getComponent(String, String)}. It is
      * useful for any non component code that need to initialize/access components.
@@ -107,7 +112,16 @@ public class Utils
         }
 
         context.getWiki().getPluginManager().beginParsing(context);
+        // This class allows various components in the rendering chain to use placeholders for some fragile data. For
+        // example, the URL generated for the image macro should not be further rendered, as it might get broken by wiki
+        // filters. For this to work, keep a map of used placeholders -> values in the context, and replace them when
+        // the content is fully rendered. The rendering code can use Utils.createPlaceholder.
+        // Initialize the placeholder map
+        context.put(REPLACED_STRINGS_CONTEXT_KEY, new HashMap<String, String>());
         String content = context.getWiki().parseTemplate(template + ".vm", context);
+        // Replace all placeholders with the protected values
+        content = replacePlaceholders(content, context);
+        context.remove(REPLACED_STRINGS_CONTEXT_KEY);
         content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
 
         if (content.equals("")) {
@@ -548,5 +562,44 @@ public class Utils
     public static Object getComponent(String role)
     {
         return getComponent(role, "default");
+    }
+
+    /**
+     * Create a placeholder key for a string that should be protected from further processing. The value is stored in
+     * the context, and the returned key can be used by the calling code as many times in the rendering result. At the
+     * end of the rendering process all placeholder keys are replaced with the values they replace.
+     * 
+     * @param value The string to hide.
+     * @param context The current context.
+     * @return The key to be used instead of the value.
+     */
+    @SuppressWarnings("unchecked")
+    public static String createPlaceholder(String value, XWikiContext context)
+    {
+        Map<String, String> renderingKeys = (Map<String, String>) context.get(REPLACED_STRINGS_CONTEXT_KEY);
+        String key;
+        do {
+            key = "KEY" + RandomStringUtils.randomAlphanumeric(10) + "KEY";
+        } while (renderingKeys.containsKey(key));
+        renderingKeys.put(key, value);
+        return key;
+    }
+
+    /**
+     * Insert back the replaced strings.
+     * 
+     * @param content The rendered content, with placeholders.
+     * @param context The current context.
+     * @return The content with all placeholders replaced with the real values.
+     */
+    @SuppressWarnings("unchecked")
+    private static String replacePlaceholders(String content, XWikiContext context)
+    {
+        String result = content;
+        Map<String, String> renderingKeys = (Map<String, String>) context.get(REPLACED_STRINGS_CONTEXT_KEY);
+        for (Entry<String, String> e : renderingKeys.entrySet()) {
+            result = result.replace(e.getKey(), e.getValue());
+        }
+        return result;
     }
 }

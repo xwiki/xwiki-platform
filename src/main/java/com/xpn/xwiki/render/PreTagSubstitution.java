@@ -19,58 +19,72 @@
  *
  */
 
-
 package com.xpn.xwiki.render;
-
-import org.apache.commons.lang.StringUtils;
-import org.apache.oro.text.regex.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+import org.apache.oro.text.regex.MatchResult;
+import org.apache.oro.text.regex.Pattern;
+import org.apache.oro.text.regex.PatternMatcher;
+import org.apache.oro.text.regex.PatternMatcherInput;
+import org.apache.oro.text.regex.Perl5Compiler;
 
-public class PreTagSubstitution extends WikiSubstitution {
+public class PreTagSubstitution extends WikiSubstitution
+{
     private int counter = 0;
-    private List list = new ArrayList();
+
+    private List<String> list = new ArrayList<String>();
+
     private boolean removePre = false;
 
-    public PreTagSubstitution(com.xpn.xwiki.util.Util util, boolean removepre) {
+    public PreTagSubstitution(com.xpn.xwiki.util.Util util, boolean removepre)
+    {
         super(util);
         setPattern("{pre}.*?{/pre}", Perl5Compiler.CASE_INSENSITIVE_MASK | Perl5Compiler.SINGLELINE_MASK);
         setRemovePre(removepre);
     }
 
-    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i, PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern) {
+    @Override
+    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,
+        PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern)
+    {
         String content = matchResult.group(0);
         if (isRemovePre()) {
-           content = getUtil().substitute("s/{pre}//ig", content);
-           content = getUtil().substitute("s/{\\/pre}//ig", content);
+            content = getUtil().substitute("s/{pre}//ig", content);
+            content = getUtil().substitute("s/{\\/pre}//ig", content);
         }
         getList().add(content);
-        stringBuffer.append("%_" + counter + "_%");
-        counter++;
+        stringBuffer.append("%_" + this.counter + "_%");
+        this.counter++;
     }
 
-    public List getList() {
-        return list;
+    public List<String> getList()
+    {
+        return this.list;
     }
 
-    public void setList(List list) {
+    public void setList(List<String> list)
+    {
         this.list = list;
     }
 
-    public String insertNonWikiText(String content) {
-        for (int i=0;i<list.size();i++)
-            content = StringUtils.replace(content, "%_" + i + "_%", (String) list.get(i));
-         return content;
+    public String insertNonWikiText(String content)
+    {
+        for (int i = 0; i < this.list.size(); i++) {
+            content = StringUtils.replace(content, "%_" + i + "_%", this.list.get(i));
+        }
+        return content;
     }
 
-    public boolean isRemovePre() {
-        return removePre;
+    public boolean isRemovePre()
+    {
+        return this.removePre;
     }
 
-    public void setRemovePre(boolean remove) {
+    public void setRemovePre(boolean remove)
+    {
         this.removePre = remove;
     }
-
 }

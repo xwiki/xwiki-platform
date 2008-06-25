@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.DocumentManager;
 import org.xwiki.velocity.VelocityManager;
 import org.jmock.Mock;
 

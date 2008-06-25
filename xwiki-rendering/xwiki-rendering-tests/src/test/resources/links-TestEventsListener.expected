@@ -1,7 +1,7 @@
 beginParagraph
-onLink: [Reference = [Space.Page]]
+onLink: [Reference = [Space.ExistingPage]]
 onLineBreak
-onLink: [Label = [label] Reference = [Space.Page]]
+onLink: [Label = [label] Reference = [Space.UnknownPage]]
 onLineBreak
 onLink: [Label = [label] Reference = [http://xwiki.org]]
 onLineBreak

@@ -17,11 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package com.xpn.xwiki.doc;
 
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.DocumentManager;
+import com.xpn.xwiki.XWikiContext;
 
 /**
+ * Temporary class used as a bridge between the old architecture and the new component-based and
+ * module-separated one. This is temporary till we remodel the Model classes and the Document
+ * services. It's used by the Rendering module.
+ *
  * @version $Id$
  * @since 1.5M2
  */
@@ -36,19 +42,20 @@ public class DefaultDocumentManager implements DocumentManager
 
     public String getDocumentContent(String documentName) throws Exception
     {
-        // We use reflection so that we don't draw any dependency on XWiki Core since otherwise
-        // we would create a circular dependency. Here's the version without reflection:
-        //
-        // XWikiContext xcontext =
-        //    (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-        // return xcontext.getWiki().getDocument(documentName, xcontext).getContent();
+        XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        return xcontext.getWiki().getDocument(documentName, xcontext).getContent();
+    }
 
-        Object xcontext = this.execution.getContext().getProperty("xwikicontext");
+    public boolean exists(String documentName) throws Exception
+    {
+        XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        XWikiDocument doc = xcontext.getWiki().getDocument(documentName, xcontext);
+        return !doc.isNew();
+    }
 
-        Object xwiki = xcontext.getClass().getMethod("getWiki").invoke(xcontext);
-        Object document = xwiki.getClass().getMethod("getDocument", String.class, Object.class)
-            .invoke(xwiki, documentName, xcontext);
-
-        return (String) document.getClass().getMethod("getContent").invoke(document);
+    public String getURL(String documentName, String action) throws Exception
+    {
+        XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
+        return xcontext.getWiki().getDocument(documentName, xcontext).getURL(action, xcontext);
     }
 }

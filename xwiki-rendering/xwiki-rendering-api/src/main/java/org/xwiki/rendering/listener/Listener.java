@@ -27,11 +27,6 @@ import java.util.Map;
  */
 public interface Listener
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    public final static String ROLE = Listener.class.getName();
-
     void beginBold();
 
     void endBold();

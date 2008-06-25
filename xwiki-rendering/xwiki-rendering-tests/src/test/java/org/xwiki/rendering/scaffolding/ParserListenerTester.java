@@ -23,7 +23,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
-import java.io.Writer;
+import java.lang.reflect.Constructor;
 
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.listener.Listener;
@@ -38,9 +38,11 @@ public class ParserListenerTester extends AbstractRenderingTestCase
     private Class<? extends Listener> listenerClass;
     private Syntax syntax;
     private boolean runTransformations;
+    private Object[] listenerClassObjects;
 
     public ParserListenerTester(String testName, Syntax syntax,
-        Class<? extends Listener> listenerClass, boolean runTransformations) throws Exception
+        Class<? extends Listener> listenerClass, boolean runTransformations, Object... listenerClassObjects)
+        throws Exception
     {
         super();
 
@@ -49,6 +51,7 @@ public class ParserListenerTester extends AbstractRenderingTestCase
         this.listenerClass = listenerClass;
         this.syntax = syntax;
         this.runTransformations = runTransformations;
+        this.listenerClassObjects = listenerClassObjects;
 
         setName(testName + " " +  this.parser.getClass().getName() + "/" + listenerClass.getName());
     }
@@ -69,7 +72,21 @@ public class ParserListenerTester extends AbstractRenderingTestCase
         StringWriter sw = new StringWriter();
         String actual;
         try {
-            Listener listener = (Listener) this.listenerClass.getConstructor(Writer.class).newInstance(sw);
+            Constructor listenerConstructor = this.listenerClass.getConstructors()[0];
+
+            // TODO: Find a better way to do this...            
+            Object[] objects = new Object[this.listenerClassObjects.length + 1];
+            objects[0] = sw;
+            for (int i = 0; i < this.listenerClassObjects.length; i++) {
+                objects[i + 1] = this.listenerClassObjects[i];
+            }
+
+            Listener listener;
+            if (this.listenerClassObjects.length > 0) {
+                listener = (Listener) listenerConstructor.newInstance(objects);
+            } else {
+                listener = (Listener) listenerConstructor.newInstance(sw);
+            }
             dom.traverse(listener);
             actual = sw.toString();
         } finally {

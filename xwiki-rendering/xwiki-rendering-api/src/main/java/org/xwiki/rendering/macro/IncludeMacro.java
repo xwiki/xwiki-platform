@@ -25,12 +25,11 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.transformation.Transformation;
+import org.xwiki.rendering.DocumentManager;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.Execution;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ import java.io.StringReader;
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacro extends AbstractMacro implements Initializable
+public class IncludeMacro extends AbstractMacro
 {
     private static final String CONTEXT_NEW = "new";
 
@@ -69,15 +68,6 @@ public class IncludeMacro extends AbstractMacro implements Initializable
     private ExecutionContextInitializerManager executionContextInitializerManager;
 
     private DocumentManager documentManager;
-
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.component.phase.Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        this.documentManager = new DefaultDocumentManager(this.execution);
-    }
 
     /**
      * Allows overriding the Document Manager used (useful for unit tests).

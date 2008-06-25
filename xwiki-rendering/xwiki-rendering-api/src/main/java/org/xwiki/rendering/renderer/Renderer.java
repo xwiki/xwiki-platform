@@ -30,8 +30,4 @@ import org.xwiki.rendering.listener.Listener;
  */
 public interface Renderer extends Listener
 {
-    /**
-     * This component's role, used when code needs to look it up.
-     */
-    public final static String ROLE = Renderer.class.getName();
 }

@@ -29,13 +29,13 @@ public class ParserListenerTestSuite extends TestSuite
         super(name);
     }
 
-    public void addTestSuite(Syntax syntax, Class listenerClass)
+    public void addTestSuite(Syntax syntax, Class listenerClass, Object... listenerClassObjects)
         throws Exception
     {
-        addTest(new ParserListenerTester("paragraph", syntax, listenerClass, false));
-        addTest(new ParserListenerTester("section", syntax, listenerClass, false));
-        addTest(new ParserListenerTester("macro", syntax, listenerClass, false));
-        addTest(new ParserListenerTester("list", syntax, listenerClass, false));
-        addTest(new ParserListenerTester("html", syntax, listenerClass, false));
+        addTest(new ParserListenerTester("paragraph", syntax, listenerClass, false, listenerClassObjects));
+        addTest(new ParserListenerTester("section", syntax, listenerClass, false, listenerClassObjects));
+        addTest(new ParserListenerTester("macro", syntax, listenerClass, false, listenerClassObjects));
+        addTest(new ParserListenerTester("list", syntax, listenerClass, false, listenerClassObjects));
+        addTest(new ParserListenerTester("html", syntax, listenerClass, false, listenerClassObjects));
     }
 }

@@ -23,6 +23,7 @@ import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
 import org.xwiki.rendering.scaffolding.ParserListenerTester;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.DocumentManager;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
@@ -33,10 +34,30 @@ public class XHTMLRendererTestSuite extends TestCase
         Syntax syntax = new Syntax(SyntaxType.XWIKI, "2.0");
 
         ParserListenerTestSuite suite = new ParserListenerTestSuite("Test the XHTML Renderer");
-        suite.addTestSuite(syntax, XHTMLRenderer.class);
+        DocumentManager dm = new DocumentManager() {
+            public String getDocumentContent(String documentName) throws Exception
+            {
+                return "Some content";
+            }
+
+            public boolean exists(String documentName) throws Exception
+            {
+                return documentName.equals("Space.ExistingPage");
+            }
+
+            public String getURL(String documentName, String action) throws Exception
+            {
+                return "/xwiki/bin/view/Space/ExistingPage";
+            }
+        };
+        suite.addTestSuite(syntax, XHTMLRenderer.class, dm);
 
         // Add tests specific to the XWiki Parser
-        suite.addTest(new ParserListenerTester("macroxhtml", syntax, XHTMLRenderer.class, true));
+
+        suite.addTest(new ParserListenerTester("macroxhtml", syntax, XHTMLRenderer.class, true, dm));
+
+        // TODO: Move this test to ParserListenerTestSuite once it passes with the XWiki Syntax renderers.
+        suite.addTest(new ParserListenerTester("links", syntax, XHTMLRenderer.class, false, dm));
 
         return suite;
     }

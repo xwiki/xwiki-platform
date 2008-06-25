@@ -17,12 +17,13 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering;
 
 /**
  * Exposes methods for managing Documents. We're creating this abstraction here in the rendering
  * component for now since there's now such abstraction in the core for the moment. When it exists
- * replace it. Note that its replacement might well be the Wiki class of the new Model.
+ * replace it. Note that its replacement might well be the Wiki class of the new Model or spread
+ * over several classes.
  * 
  * @version $Id$
  * @since 1.5M2
@@ -30,4 +31,8 @@ package org.xwiki.rendering.macro;
 public interface DocumentManager
 {
     String getDocumentContent(String documentName) throws Exception;
+
+    boolean exists(String documentName) throws Exception;
+
+    String getURL(String documentName, String action) throws Exception;
 }

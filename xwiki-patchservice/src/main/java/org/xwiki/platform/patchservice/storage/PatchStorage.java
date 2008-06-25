@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.hibernate.DuplicateMappingException;
 import org.hibernate.HibernateException;
 import org.hibernate.MappingException;
 import org.hibernate.Session;
@@ -64,9 +65,11 @@ public class PatchStorage
         try {
             // Make sure the schema is updated to include the Patch mapping
             config.setProperty("hibernate.hbm2ddl.auto", "update");
-            this.factory =
-                config.addXML(IOUtils.toString(this.getClass().getResourceAsStream(MAPPING_FILENAME)))
-                    .buildSessionFactory();
+            try {
+                config.addXML(IOUtils.toString(this.getClass().getResourceAsStream(MAPPING_FILENAME)));
+            } catch (DuplicateMappingException e) {
+            }
+            this.factory = config.buildSessionFactory();
         } catch (MappingException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_INVALID_MAPPING, "Invalid Patch mapping file", e);

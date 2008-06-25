@@ -41,10 +41,12 @@
     <filter-class>com.xpn.xwiki.web.SavedRequestRestorerFilter</filter-class>
   </filter>
 
+  <!-- The encoding filter MUST always be the first one, as setting the encoding does not work after accessing the request data. -->
   <filter-mapping>
     <filter-name>Set Character Encoding</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
+
   <filter-mapping>
     <filter-name>RequestRestorer</filter-name>
     <url-pattern>/*</url-pattern>

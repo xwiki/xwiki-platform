@@ -43,6 +43,7 @@ import com.xpn.xwiki.util.Util;
 
 public class XWikiRadeoxRenderer implements XWikiRenderer
 {
+    /** Logging helper object. */
     private static final Log LOG = LogFactory.getLog(XWikiRadeoxRenderer.class);
 
     private boolean removePre = true;
@@ -111,15 +112,14 @@ public class XWikiRadeoxRenderer implements XWikiRenderer
         RenderContext rcontext = (RenderContext) context.get("rcontext");
         if (rcontext == null) {
             rcontext = new BaseRenderContext();
+            // This is needed as otherwise some macros throw exceptions
             rcontext.setParameters(new HashMap());
             rcontext.set("xcontext", context);
         }
         if (rcontext.getRenderEngine() == null) {
-
             XWikiRadeoxRenderEngine radeoxengine =
                 new XWikiRadeoxRenderEngine(this.initialRenderContext, this.filterPipe, context);
             rcontext.setRenderEngine(radeoxengine);
-
         }
         String result = rcontext.getRenderEngine().render(content, rcontext);
         return preTagSubst.insertNonWikiText(result);

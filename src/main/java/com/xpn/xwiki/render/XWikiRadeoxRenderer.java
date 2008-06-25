@@ -19,13 +19,12 @@
  *
  */
 
-
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.render.filter.XWikiFilter;
-import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.Util;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -33,26 +32,32 @@ import org.radeox.api.engine.context.InitialRenderContext;
 import org.radeox.api.engine.context.RenderContext;
 import org.radeox.engine.context.BaseInitialRenderContext;
 import org.radeox.engine.context.BaseRenderContext;
-import org.radeox.filter.FilterPipe;
 import org.radeox.filter.Filter;
+import org.radeox.filter.FilterPipe;
 import org.radeox.util.Service;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Iterator;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.render.filter.XWikiFilter;
+import com.xpn.xwiki.util.Util;
 
-
-public class XWikiRadeoxRenderer  implements XWikiRenderer {
+public class XWikiRadeoxRenderer implements XWikiRenderer
+{
     private static final Log LOG = LogFactory.getLog(XWikiRadeoxRenderer.class);
+
     private boolean removePre = true;
+
     private InitialRenderContext initialRenderContext;
+
     private FilterPipe filterPipe;
 
-    public XWikiRadeoxRenderer() {
+    public XWikiRadeoxRenderer()
+    {
         initRadeoxEngine();
     }
 
-    public XWikiRadeoxRenderer(boolean removePre) {
+    public XWikiRadeoxRenderer(boolean removePre)
+    {
         this();
         setRemovePre(removePre);
     }
@@ -72,8 +77,8 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
     }
 
     /**
-     * We override this method from {@link org.radeox.engine.BaseRenderEngine} in order to provide our own initialization of Filters.
-     * In this manner we can load our filter definition from the
+     * We override this method from {@link org.radeox.engine.BaseRenderEngine} in order to provide our own
+     * initialization of Filters. In this manner we can load our filter definition from the
      * META-INF/services/com.xpn.xwiki.render.filter.XWikiFilter file.
      */
     private FilterPipe initFilterPipe(InitialRenderContext initialRenderContext)
@@ -96,19 +101,20 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         return fp;
     }
 
-    public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context) {
+    public String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context)
+    {
         Util util = context.getUtil();
         // Remove the content that is inside "{pre}"
         PreTagSubstitution preTagSubst = new PreTagSubstitution(util, isRemovePre());
         content = preTagSubst.substitute(content);
 
         RenderContext rcontext = (RenderContext) context.get("rcontext");
-        if (rcontext==null) {
+        if (rcontext == null) {
             rcontext = new BaseRenderContext();
             rcontext.setParameters(new HashMap());
             rcontext.set("xcontext", context);
         }
-        if (rcontext.getRenderEngine()==null) {
+        if (rcontext.getRenderEngine() == null) {
 
             XWikiRadeoxRenderEngine radeoxengine =
                 new XWikiRadeoxRenderEngine(this.initialRenderContext, this.filterPipe, context);
@@ -119,19 +125,23 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         return preTagSubst.insertNonWikiText(result);
     }
 
-    public void flushCache() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void flushCache()
+    {
+        // No need to flush anything yet
     }
 
-    public boolean isRemovePre() {
-        return removePre;
+    public boolean isRemovePre()
+    {
+        return this.removePre;
     }
 
-    public void setRemovePre(boolean removePre) {
+    public void setRemovePre(boolean removePre)
+    {
         this.removePre = removePre;
     }
 
-    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context)
+    public String convertMultiLine(String macroname, String params, String data, String allcontent,
+        XWikiVirtualMacro macro, XWikiContext context)
     {
         String result;
 
@@ -154,7 +164,8 @@ public class XWikiRadeoxRenderer  implements XWikiRenderer {
         return result;
     }
 
-    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context)
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context)
     {
         // Do not render anything here as otherwise the Radeox renderer will be executed twice.
         return allcontent;

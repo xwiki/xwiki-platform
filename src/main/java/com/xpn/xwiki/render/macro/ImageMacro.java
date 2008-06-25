@@ -32,37 +32,35 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 
 /**
- * Macro that displays images.
- * 
- * Syntax: {image:text|height|width|align|halign|float|document|alt|title|link|fromIncludingDoc}
+ * Macro that displays images. Syntax:
+ * {image:text|height|width|align|halign|float|document|alt|title|link|fromIncludingDoc}
  * <ul>
  * <li>text: The target filename.</li>
  * <li>height: The height attribute of the img.</li>
  * <li>width: The width attribute of the img.</li>
  * <li>align: The align attribute of the img.</li>
- * <li>halign: Horizontal alignment for the image. If missing, 
- *   the image is displayed inline. Accepted values:
- *   floatleft, left, center, right, floatright</li>
- * <li>document: The document to which the file is attached. If missing, 
- *   the current document is used.</li>
- * <li>alt: The alt attribute of the image. If missing, title is used.
- *   If both are missing, use the filename.</li>
- * <li>title: The title attribute of the image. If missing, alt is used.
- *   If both are missing, use the filename.</li>
+ * <li>halign: Horizontal alignment for the image. If missing, the image is displayed inline. Accepted values:
+ * floatleft, left, center, right, floatright</li>
+ * <li>document: The document to which the file is attached. If missing, the current document is used.</li>
+ * <li>alt: The alt attribute of the image. If missing, title is used. If both are missing, use the filename.</li>
+ * <li>title: The title attribute of the image. If missing, alt is used. If both are missing, use the filename.</li>
  * <li>link: Also link to the image.</li>
- * <li>fromIncludingDoc: If present, when the current document is included using 
- *   #include*, use the top level document instead of the included one.
- *   This is useful for templates, for example.</li>
+ * <li>fromIncludingDoc: If present, when the current document is included using #include*, use the top level document
+ * instead of the included one. This is useful for templates, for example.</li>
  * </ul>
- *
+ * 
  * @version $Id$
  */
-public class ImageMacro extends BaseLocaleMacro {
-    public String getLocaleKey() {
+public class ImageMacro extends BaseLocaleMacro
+{
+    public String getLocaleKey()
+    {
         return "macro.image";
     }
 
-    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException {
+    @Override
+    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
+    {
 
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();
@@ -151,7 +149,7 @@ public class ImageMacro extends BaseLocaleMacro {
 
         // Create the img code
         StringBuffer str = new StringBuffer();
-        if (halign != null && !halign.equals("none")){
+        if (halign != null && !halign.equals("none")) {
             str.append("<div class=\"img" + halign.trim() + "\">");
         }
         if (link != null) {
@@ -182,7 +180,7 @@ public class ImageMacro extends BaseLocaleMacro {
         if (link != null) {
             str.append("</a>");
         }
-        if (halign != null && !halign.equals("none")){
+        if (halign != null && !halign.equals("none")) {
             str.append("</div>");
         }
         // All done, flush the StringBufer

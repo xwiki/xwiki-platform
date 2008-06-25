@@ -34,28 +34,28 @@ import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.XWikiRadeoxRenderEngine;
 
 /**
- * Macro that outputs links to document attachments.
- * 
- * Syntax: {attach:text|file|document|title|rel|id|fromIncludingDoc}
+ * Macro that outputs links to document attachments. Syntax: {attach:text|file|document|title|rel|id|fromIncludingDoc}
  * <ul>
  * <li>text: The link text. If missing, the file name is used.</li>
  * <li>file: The target filename. If missing, the link text is used.</li>
- * <li>document: The document to which the file is attached. If missing, 
- *   the current document is used.</li>
+ * <li>document: The document to which the file is attached. If missing, the current document is used.</li>
  * <li>title: The title attribute of the link. If missing, no title.</li>
  * <li>rel: The rel attribute of the link. If missing, no rel.</li>
  * <li>id: The id attribute of the link. If missing, no id.</li>
- * <li>fromIncludingDoc: If present, when the current document is included using 
- *   #include*, use the top level document instead of the included one.
- *   This is useful for templates, for example.</li>
+ * <li>fromIncludingDoc: If present, when the current document is included using #include*, use the top level document
+ * instead of the included one. This is useful for templates, for example.</li>
  * </ul>
  */
-public class AttachMacro extends BaseLocaleMacro {
-    public String getLocaleKey() {
+public class AttachMacro extends BaseLocaleMacro
+{
+    public String getLocaleKey()
+    {
         return "macro.attach";
     }
 
-    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException {
+    @Override
+    public void execute(Writer writer, MacroParameter params) throws IllegalArgumentException, IOException
+    {
 
         RenderContext context = params.getContext();
         RenderEngine engine = context.getRenderEngine();

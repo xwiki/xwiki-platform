@@ -55,8 +55,12 @@ import com.xpn.xwiki.xmlrpc.XWikiXmlRpcRequest;
 
 public class Utils
 {
-    /** A key that used for placing a map of replaced (for protection) strings in the context. */
-    private static final String REPLACED_STRINGS_CONTEXT_KEY = Utils.class.getCanonicalName() + "_keys";
+    /** A key that is used for placing a map of replaced (for protection) strings in the context. */
+    private static final String PLACEHOLDERS_CONTEXT_KEY = Utils.class.getCanonicalName() + "_placeholders";
+
+    /** Whether placeholders are enabled or not. */
+    private static final String PLACEHOLDERS_ENABLED_CONTEXT_KEY =
+        Utils.class.getCanonicalName() + "_placeholders_enabled";
 
     /**
      * The component manager used by {@link #getComponent(String)} and {@link #getComponent(String, String)}. It is
@@ -117,11 +121,11 @@ public class Utils
         // filters. For this to work, keep a map of used placeholders -> values in the context, and replace them when
         // the content is fully rendered. The rendering code can use Utils.createPlaceholder.
         // Initialize the placeholder map
-        context.put(REPLACED_STRINGS_CONTEXT_KEY, new HashMap<String, String>());
+        enablePlaceholders(context);
         String content = context.getWiki().parseTemplate(template + ".vm", context);
         // Replace all placeholders with the protected values
         content = replacePlaceholders(content, context);
-        context.remove(REPLACED_STRINGS_CONTEXT_KEY);
+        disablePlaceholders(context);
         content = context.getWiki().getPluginManager().endParsing(content.trim(), context);
 
         if (content.equals("")) {
@@ -565,6 +569,40 @@ public class Utils
     }
 
     /**
+     * Check if placeholders are enabled in the current context.
+     * 
+     * @param context The current context.
+     * @return <code>true</code> if placeholders can be used, <code>false</code> otherwise.
+     */
+    public static boolean arePlaceholdersEnabled(XWikiContext context)
+    {
+        Boolean enabled = (Boolean) context.get(PLACEHOLDERS_ENABLED_CONTEXT_KEY);
+        return enabled != null && enabled.booleanValue();
+    }
+
+    /**
+     * Enable placeholder support in the current request context.
+     * 
+     * @param context The current context.
+     */
+    public static void enablePlaceholders(XWikiContext context)
+    {
+        context.put(PLACEHOLDERS_CONTEXT_KEY, new HashMap<String, String>());
+        context.put(PLACEHOLDERS_ENABLED_CONTEXT_KEY, new Boolean(true));
+    }
+
+    /**
+     * Disable placeholder support in the current request context.
+     * 
+     * @param context The current context.
+     */
+    public static void disablePlaceholders(XWikiContext context)
+    {
+        context.remove(PLACEHOLDERS_CONTEXT_KEY);
+        context.remove(PLACEHOLDERS_ENABLED_CONTEXT_KEY);
+    }
+
+    /**
      * Create a placeholder key for a string that should be protected from further processing. The value is stored in
      * the context, and the returned key can be used by the calling code as many times in the rendering result. At the
      * end of the rendering process all placeholder keys are replaced with the values they replace.
@@ -576,12 +614,16 @@ public class Utils
     @SuppressWarnings("unchecked")
     public static String createPlaceholder(String value, XWikiContext context)
     {
-        Map<String, String> renderingKeys = (Map<String, String>) context.get(REPLACED_STRINGS_CONTEXT_KEY);
+        if (!arePlaceholdersEnabled(context)) {
+            return value;
+        }
+        Map<String, String> renderingKeys = (Map<String, String>) context.get(PLACEHOLDERS_CONTEXT_KEY);
         String key;
         do {
             key = "KEY" + RandomStringUtils.randomAlphanumeric(10) + "KEY";
         } while (renderingKeys.containsKey(key));
         renderingKeys.put(key, value);
+        System.out.println("replaced: " + value);
         return key;
     }
 
@@ -593,12 +635,16 @@ public class Utils
      * @return The content with all placeholders replaced with the real values.
      */
     @SuppressWarnings("unchecked")
-    private static String replacePlaceholders(String content, XWikiContext context)
+    public static String replacePlaceholders(String content, XWikiContext context)
     {
+        if (!arePlaceholdersEnabled(context)) {
+            return content;
+        }
         String result = content;
-        Map<String, String> renderingKeys = (Map<String, String>) context.get(REPLACED_STRINGS_CONTEXT_KEY);
+        Map<String, String> renderingKeys = (Map<String, String>) context.get(PLACEHOLDERS_CONTEXT_KEY);
         for (Entry<String, String> e : renderingKeys.entrySet()) {
             result = result.replace(e.getKey(), e.getValue());
+            System.out.println("restoring: " + e.getValue());
         }
         return result;
     }

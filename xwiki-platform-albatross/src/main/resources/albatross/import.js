@@ -120,7 +120,8 @@ function showPackageInfos(res)
 function insertNewDoc(id, value, language)
 {
     var str = "<div class='importDoc'>";
-    str += "<input type='checkBox' name='pages' value='" + value + "' class='selCheckedDoc' id='sel_" + value + "' checked />";
+    value = value.replace("\"", "&quot;");
+    str += "<input type='checkBox' name='pages' value=\"" + value + "\" class='selCheckedDoc' id=\"sel_" + value + "\" checked />";
 
     // Add language
     var sLanguage = "";

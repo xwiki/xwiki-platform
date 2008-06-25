@@ -40,6 +40,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.render.filter.XWikiFilter;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 public class XWikiRadeoxRenderer implements XWikiRenderer
 {
@@ -121,7 +122,16 @@ public class XWikiRadeoxRenderer implements XWikiRenderer
                 new XWikiRadeoxRenderEngine(this.initialRenderContext, this.filterPipe, context);
             rcontext.setRenderEngine(radeoxengine);
         }
+        // If global placeholders are not enabled, then use local placeholders.
+        boolean useLocalPlaceholders = !Utils.arePlaceholdersEnabled(context);
+        if (useLocalPlaceholders) {
+            Utils.enablePlaceholders(context);
+        }
         String result = rcontext.getRenderEngine().render(content, rcontext);
+        if (useLocalPlaceholders) {
+            result = Utils.replacePlaceholders(result, context);
+            Utils.disablePlaceholders(context);
+        }
         return preTagSubst.insertNonWikiText(result);
     }
 

@@ -823,6 +823,13 @@ public class XWikiDocument
         return context.getURLFactory().getURL(url, context);
     }
 
+    public String getURL(String action, String querystring, String anchor, XWikiContext context)
+    {
+        URL url = context.getURLFactory().createURL(getSpace(), getName(), action, querystring, anchor, getDatabase(),
+            context);
+        return context.getURLFactory().getURL(url, context);
+    }
+
     public String getExternalURL(String action, XWikiContext context)
     {
         URL url =

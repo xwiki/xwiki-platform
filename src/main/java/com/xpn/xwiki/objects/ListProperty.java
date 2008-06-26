@@ -156,6 +156,13 @@ public class ListProperty extends BaseProperty
             this.list = new ArrayList();
         } else {
             this.list = list;
+            // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
+            // safe to assume that a retrieved NULL value should actually be an empty string.
+            for (int i = 0; i < list.size(); ++i) {
+                if (list.get(i) == null) {
+                    list.remove(i--);
+                }
+            }
         }
     }
 

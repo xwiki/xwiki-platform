@@ -21,6 +21,9 @@
 
 package com.xpn.xwiki.render.filter;
 
+import java.io.IOException;
+import java.io.Writer;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.radeox.api.engine.RenderEngine;
@@ -31,40 +34,38 @@ import org.radeox.filter.regex.LocaleRegexTokenFilter;
 import org.radeox.util.Encoder;
 import org.radeox.util.StringBufferWriter;
 
-import java.io.IOException;
-import java.io.Writer;
-
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.util.Util;
 
 /**
- * XWikiLinkFilter finds [text] in its input and transforms this
- * to <a href="text">...</a> if the wiki page exists. If not
- * it adds a [create text] to the output.
+ * XWikiLinkFilter finds [text] in its input and transforms this to <a href="text">...</a> if the wiki page exists. If
+ * not it adds a [create text] to the output.
  */
 public class XWikiLinkFilter extends LocaleRegexTokenFilter
 {
     private static Log log = LogFactory.getLog(XWikiLinkFilter.class);
 
     /**
-     * The regular expression for detecting WikiLinks.
-     * Overwrite in subclass to support other link styles like
-     * OldAndUglyWikiLinking :-)
-     *
-     * /[A-Z][a-z]+([A-Z][a-z]+)+/
-     * wikiPattern = "\\[(.*?)\\]";
+     * The regular expression for detecting WikiLinks. Overwrite in subclass to support other link styles like
+     * OldAndUglyWikiLinking :-) /[A-Z][a-z]+([A-Z][a-z]+)+/ wikiPattern = "\\[(.*?)\\]";
      */
 
-    protected String getLocaleKey() {
+    @Override
+    protected String getLocaleKey()
+    {
         return "filter.link";
     }
 
-    protected void setUp(FilterContext context) {
+    @Override
+    protected void setUp(FilterContext context)
+    {
         context.getRenderContext().setCacheable(true);
     }
 
-    public void handleMatch(StringBuffer buffer, org.radeox.regex.MatchResult result, FilterContext context) {
+    @Override
+    public void handleMatch(StringBuffer buffer, org.radeox.regex.MatchResult result, FilterContext context)
+    {
         RenderEngine engine = context.getRenderContext().getRenderEngine();
 
         if (engine instanceof WikiRenderEngine) {
@@ -73,7 +74,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
 
             String str = result.group(1);
             if (str != null) {
-            	// TODO: This line creates bug XWIKI-188. The encoder seems to be broken. Fix this!
+                // TODO: This line creates bug XWIKI-188. The encoder seems to be broken. Fix this!
                 // The only unescaping done should be %xx => char,
                 // since &#nnn; must be preserved (the active encoding cannot handle the character)
                 // and + should be preserved (for "Doc.C++ examples").
@@ -87,10 +88,10 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 // Is there an alias like [alias|link] ?
                 int pipeIndex = str.indexOf('|');
                 int pipeLength = 1;
-                if (pipeIndex==-1) {
+                if (pipeIndex == -1) {
                     pipeIndex = str.indexOf('>');
                 }
-                if (pipeIndex==-1) {
+                if (pipeIndex == -1) {
                     pipeIndex = str.indexOf("&gt;");
                     pipeLength = 4;
                 }
@@ -103,10 +104,10 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 // Is there a target like [alias|link|target] ?
                 pipeIndex = str.indexOf('|');
                 pipeLength = 1;
-                if (pipeIndex==-1) {
+                if (pipeIndex == -1) {
                     pipeIndex = str.indexOf('>');
                 }
-                if (pipeIndex==-1) {
+                if (pipeIndex == -1) {
                     pipeIndex = str.indexOf("&gt;");
                     pipeLength = 4;
                 }
@@ -123,18 +124,17 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 }
                 // Done, now print the link
 
+                XWikiContext xcontext = (XWikiContext) context.getRenderContext().get("xcontext");
                 // Determine target type: external, interwiki, internal
                 int protocolIndex = href.indexOf("://");
-                if (((protocolIndex>=0)&&(protocolIndex<10))
-                    ||(href.indexOf("mailto:")==0)) {
+                if (((protocolIndex >= 0) && (protocolIndex < 10)) || (href.indexOf("mailto:") == 0)) {
                     // External link
                     buffer.append("<span class=\"wikiexternallink\"><a href=\"");
                     buffer.append(Util.escapeURL(href));
                     buffer.append("\"");
-                    if(target != null){
+                    if (target != null) {
                         buffer.append(" " + constructRelAttribute(target));
                     } else {
-                        XWikiContext xcontext = (XWikiContext)context.getRenderContext().get("xcontext");
                         XWiki xwiki = xcontext.getWiki();
                         String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "");
                         if (!defaulttarget.equals("")) {
@@ -150,16 +150,16 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 int hashIndex = href.lastIndexOf('#');
                 String hash = "";
 
-                if (-1 != hashIndex && hashIndex != href.length() -1) {
+                if (-1 != hashIndex && hashIndex != href.length() - 1) {
                     hash = href.substring(hashIndex + 1);
                     href = href.substring(0, hashIndex);
                 }
-                if(href.trim().equals("")) {
+                if (href.trim().equals("")) {
                     // Internal (anchor) link
                     buffer.append("<span class=\"wikilink\"><a href=\"#");
                     buffer.append(hash);
                     buffer.append("\">");
-                    if(!specificText || text.length() == 0) {
+                    if (!specificText || text.length() == 0) {
                         text = Encoder.unescape(hash);
                     }
                     buffer.append(cleanText(text));
@@ -168,14 +168,9 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 }
 
                 /*
-                // We need to keep this in XWiki
-                int colonIndex = name.indexOf(':');
-                // typed link ?
-                if (-1 != colonIndex) {
-                    // for now throw away the type information
-                    name = name.substring(colonIndex + 1);
-                }
-                */
+                 * // We need to keep this in XWiki int colonIndex = name.indexOf(':'); // typed link ? if (-1 !=
+                 * colonIndex) { // for now throw away the type information name = name.substring(colonIndex + 1); }
+                 */
 
                 int atIndex = href.lastIndexOf('@');
                 // InterWiki link
@@ -202,14 +197,14 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 } else {
                     // internal link
                     if (wikiEngine.exists(href)) {
-                        if(specificText == false) {
+                        if (specificText == false) {
                             text = getWikiView(href);
                             wikiEngine.appendLink(buffer, href, text, hash);
                         } else {
                             wikiEngine.appendLink(buffer, href, text, hash);
                         }
                     } else if (wikiEngine.showCreate()) {
-                        if(specificText == false) {
+                        if (specificText == false) {
                             text = getWikiView(href);
                         }
                         wikiEngine.appendCreateLink(buffer, href, text);
@@ -220,9 +215,9 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                         // cannot display/create wiki, so just display the text
                         buffer.append(text);
                     }
-                    if(target != null){
+                    if (target != null) {
                         int where = buffer.lastIndexOf(" href=\"");
-                        if(where >= 0) {
+                        if (where >= 0) {
                             buffer.insert(where, " " + constructRelAttribute(target));
                         }
                     }
@@ -235,26 +230,28 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
 
     /**
      * Clean the text so that it won't be interpreted by radeox simple syntax
+     * 
      * @param text
      * @return
      */
-    private String cleanText(String text) {
+    private String cleanText(String text)
+    {
         return Util.escapeText(text);
     }
 
     /**
-     * Returns the view of the wiki name that is shown to the
-     * user. Overwrite to support other views for example
-     * transform "WikiLinking" to "Wiki Linking".
-     * Does nothing by default.
-     *
+     * Returns the view of the wiki name that is shown to the user. Overwrite to support other views for example
+     * transform "WikiLinking" to "Wiki Linking". Does nothing by default.
+     * 
      * @return view The view of the wiki name
      */
-    protected String getWikiView(String name) {
+    protected String getWikiView(String name)
+    {
         return convertWikiWords(name);
     }
 
-    public static String convertWikiWords(String name) {
+    public static String convertWikiWords(String name)
+    {
         try {
             name = name.substring(name.indexOf(".") + 1);
             return name.replaceAll("([a-z])([A-Z])", "$1 $2");

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 
 import com.xpn.xwiki.XWiki;
@@ -257,14 +258,12 @@ public class CalendarData
         StringBuffer result = new StringBuffer();
         for (Iterator it = getCalendarData(tddate).iterator(); it.hasNext();) {
             CalendarEvent event = (CalendarEvent) it.next();
-            String user = event.getUser().trim();
-            if ((filteredUser != null) && (!filteredUser.trim().equals("")) && (!filteredUser.trim().equals(user))) {
+            String user = event.getUser();
+            if (!StringUtils.isBlank(filteredUser) && (!filteredUser.trim().equals(user))) {
                 continue;
             }
-            String location = event.getLocation().trim();
-            if ((filteredLocation != null) && (!filteredLocation.trim().equals(""))
-                && (!filteredLocation.trim().equals(location)))
-            {
+            String location = event.getLocation();
+            if (!StringUtils.isBlank(filteredLocation) && (!filteredLocation.trim().equals(location))) {
                 continue;
             }
             List categories;
@@ -276,7 +275,7 @@ public class CalendarData
                 }
             }
             categories = event.getCategory();
-            String title = event.getTitle().trim();
+            String title = event.getTitle();
             String url = event.getUrl();
             result.append("<div class=\"event");
             if (categories != null && categories.size() > 0) {
@@ -285,18 +284,18 @@ public class CalendarData
                 }
             }
             result.append("\">");
-            if ((user != null) && (!user.equals(""))) {
+            if (!StringUtils.isBlank(user)) {
                 result.append("<span class=\"username\">"
                     + context.getWiki().getLocalUserName(event.getUser(), context) + "</span>");
             }
-            if ((user != null) && (!user.equals("")) && (title != null) && (!title.trim().equals(""))) {
+            if (!StringUtils.isBlank(user) && !StringUtils.isBlank(title)) {
                 result.append(": ");
             }
-            if (url != null && !url.equals("")) {
+            if (!StringUtils.isBlank(url)) {
                 result.append("<a href=\"" + url + "\">");
             }
             result.append(title);
-            if (url != null && !url.equals("")) {
+            if (!StringUtils.isBlank(url)) {
                 result.append("</a>");
             }
             result.append("</div>");

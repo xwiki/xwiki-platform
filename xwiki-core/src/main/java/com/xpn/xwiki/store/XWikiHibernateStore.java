@@ -63,6 +63,7 @@ import com.xpn.xwiki.objects.BaseCollection;
 import com.xpn.xwiki.objects.BaseElement;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.BaseStringProperty;
 import com.xpn.xwiki.objects.DBStringListProperty;
 import com.xpn.xwiki.objects.DoubleProperty;
 import com.xpn.xwiki.objects.FloatProperty;
@@ -1210,6 +1211,14 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
 
             try {
                 session.load(property, (Serializable) property);
+                // In Oracle, empty string are converted to NULL. Since an undefined property is not found at all, it is
+                // safe to assume that a retrieved NULL value should actually be an empty string.
+                if (property instanceof BaseStringProperty) {
+                    BaseStringProperty stringProperty = (BaseStringProperty) property;
+                    if (stringProperty.getValue() == null) {
+                        stringProperty.setValue("");
+                    }
+                }
             } catch (ObjectNotFoundException e) {
                 // Let's accept that there is no data in property tables
                 // but log it

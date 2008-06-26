@@ -39,7 +39,7 @@ public class ListProperty extends BaseProperty
 
     public String getFormStringSeparator()
     {
-        return formStringSeparator;
+        return this.formStringSeparator;
     }
 
     public void setFormStringSeparator(String formStringSeparator)
@@ -47,11 +47,13 @@ public class ListProperty extends BaseProperty
         this.formStringSeparator = formStringSeparator;
     }
 
+    @Override
     public Object getValue()
     {
         return getList();
     }
 
+    @Override
     public void setValue(Object value)
     {
         this.setList((List) value);
@@ -62,10 +64,10 @@ public class ListProperty extends BaseProperty
         return toFormString();
     }
 
+    @Override
     public String toText()
     {
-        if ((getList() instanceof PersistentCollection)
-            && (!((PersistentCollection) getList()).wasInitialized())) {
+        if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
             return "";
         }
         return StringUtils.join(getList().toArray(), " ");
@@ -76,10 +78,11 @@ public class ListProperty extends BaseProperty
         return super.toFormString();
     }
 
+    @Override
     public String toFormString()
     {
         CharacterFilter filter = new CharacterFilter();
-        filter.addAttribute(formStringSeparator, "\\" + formStringSeparator);
+        filter.addAttribute(this.formStringSeparator, "\\" + this.formStringSeparator);
 
         List list = getList();
         Iterator it = list.iterator();
@@ -89,12 +92,13 @@ public class ListProperty extends BaseProperty
         StringBuffer result = new StringBuffer();
         result.append(it.next());
         while (it.hasNext()) {
-            result.append(formStringSeparator);
+            result.append(this.formStringSeparator);
             result.append(filter.process((String) it.next()));
         }
         return result.toString();
     }
 
+    @Override
     public boolean equals(Object obj)
     {
         if (!super.equals(obj)) {
@@ -106,13 +110,11 @@ public class ListProperty extends BaseProperty
 
         // If the collection was not yet initialized by Hibernate
         // Let's use the super result..
-        if ((list1 instanceof PersistentCollection)
-            && (!((PersistentCollection) list1).wasInitialized())) {
+        if ((list1 instanceof PersistentCollection) && (!((PersistentCollection) list1).wasInitialized())) {
             return true;
         }
 
-        if ((list2 instanceof PersistentCollection)
-            && (!((PersistentCollection) list2).wasInitialized())) {
+        if ((list2 instanceof PersistentCollection) && (!((PersistentCollection) list2).wasInitialized())) {
             return true;
         }
 
@@ -131,6 +133,7 @@ public class ListProperty extends BaseProperty
         return true;
     }
 
+    @Override
     public Object clone()
     {
         ListProperty property = (ListProperty) super.clone();
@@ -144,7 +147,7 @@ public class ListProperty extends BaseProperty
 
     public List getList()
     {
-        return list;
+        return this.list;
     }
 
     public void setList(List list)
@@ -156,13 +159,14 @@ public class ListProperty extends BaseProperty
         }
     }
 
+    @Override
     public Element toXML()
     {
         Element el = new DOMElement(getName());
         List list = (List) getValue();
         for (int i = 0; i < list.size(); i++) {
             Object obj = list.get(i);
-            if (obj!=null) {
+            if (obj != null) {
                 String value = obj.toString();
                 Element vel = new DOMElement("value");
                 vel.setText((value == null) ? "" : value.toString());
@@ -173,10 +177,10 @@ public class ListProperty extends BaseProperty
     }
 
     // This is important.. Otherwise we can get a stackoverflow calling toXML()
+    @Override
     public String toString()
     {
-        if ((getList() instanceof PersistentCollection)
-            && (!((PersistentCollection) getList()).wasInitialized())) {
+        if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
             return "";
         }
         return toXMLString();

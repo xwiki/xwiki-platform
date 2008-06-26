@@ -21,21 +21,20 @@
 package org.xwiki.rendering.parser;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
 import junit.framework.Test;
-import junit.framework.TestSuite;
 
 public class WikiModelXHTMLParserTestSuite extends AbstractRenderingTestCase
 {
     public static Test suite() throws Exception
     {
-        // TODO: Right now all tests are failing because the XHTML parser is buggy.
-        /*
         Syntax syntax = new Syntax(SyntaxType.XHTML, "1.0");
 
         ParserListenerTestSuite suite =
             new ParserListenerTestSuite("Test the WikiModel Parser for XHTML");
-        suite.addTestSuite(syntax, TestEventsListener.class);
-        */
-        return new TestSuite();
+        // TODO: Right now all tests are failing because the XHTML parser is buggy.
+        // suite.addTestSuite(syntax, TestEventsListener.class);
+
+        return suite;
     }
 }

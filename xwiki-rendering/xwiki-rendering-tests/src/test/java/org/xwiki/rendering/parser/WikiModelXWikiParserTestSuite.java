@@ -23,7 +23,6 @@ package org.xwiki.rendering.parser;
 import org.xwiki.rendering.scaffolding.TestEventsListener;
 import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
-import org.xwiki.rendering.scaffolding.ParserListenerTester;
 import junit.framework.Test;
 
 public class WikiModelXWikiParserTestSuite extends AbstractRenderingTestCase
@@ -35,12 +34,6 @@ public class WikiModelXWikiParserTestSuite extends AbstractRenderingTestCase
         ParserListenerTestSuite suite = 
             new ParserListenerTestSuite("Test the WikiModel Parser for XWiki");
         suite.addTestSuite(syntax, TestEventsListener.class);
-
-        // Add tests specific to the XWiki Parser
-
-        // TODO: Move this test to ParserListenerTestSuite once it passes with the XHTL and
-        // XWiki Syntax renderers.
-        suite.addTest(new ParserListenerTester("links", syntax, TestEventsListener.class, false));
 
         return suite;
     }

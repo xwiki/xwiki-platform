@@ -54,7 +54,29 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onLink(Link link)
     {
-        //To change body of implemented methods use File | Settings | File Templates.
+        write("[");
+        if (link.getLabel() != null) {
+            write(link.getLabel());
+            write(">");
+        }
+        write(link.getReference());
+        if (link.getAnchor() != null) {
+            write("#");
+            write(link.getAnchor());
+        }
+        if (link.getQueryString() != null) {
+            write("?");
+            write(link.getQueryString());
+        }
+        if (link.getInterWikiAlias() != null) {
+            write("@");
+            write(link.getInterWikiAlias());
+        }
+        if (link.getTarget() != null) {
+            write(">");
+            write(link.getTarget());
+        }
+        write("]");
     }
 
     public void beginBold()

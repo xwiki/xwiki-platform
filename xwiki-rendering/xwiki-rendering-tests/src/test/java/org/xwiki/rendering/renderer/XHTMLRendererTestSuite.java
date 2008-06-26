@@ -60,11 +60,7 @@ public class XHTMLRendererTestSuite extends TestCase
         suite.addTestSuite(syntax, XHTMLRenderer.class, dm);
 
         // Add tests specific to the XWiki Parser
-
         suite.addTest(new ParserListenerTester("macroxhtml", syntax, XHTMLRenderer.class, true, dm));
-
-        // TODO: Move this test to ParserListenerTestSuite once it passes with the XWiki Syntax renderers.
-        suite.addTest(new ParserListenerTester("links", syntax, XHTMLRenderer.class, false, dm));
 
         return suite;
     }

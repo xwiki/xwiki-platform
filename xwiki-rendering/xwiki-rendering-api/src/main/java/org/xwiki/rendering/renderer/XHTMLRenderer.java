@@ -27,7 +27,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.DocumentManager;
 
 /**
@@ -41,11 +40,14 @@ public class XHTMLRenderer implements Renderer
     private PrintWriter writer;
 
     private DocumentManager documentManager;
-    
+
+    private XHTMLLinkRenderer linkRenderer;
+
     public XHTMLRenderer(Writer writer, DocumentManager documentManager)
     {
         this.writer = new PrintWriter(writer);
         this.documentManager = documentManager;
+        this.linkRenderer = new XHTMLLinkRenderer(documentManager);
     }
 
     public void beginBold()
@@ -90,52 +92,9 @@ public class XHTMLRenderer implements Renderer
 
     public void onLink(Link link)
     {
-        if (link.isExternalLink()) {
-            write("<span class=\"wikiexternallink\">");
-            write("<a href=\"");
-            if (link.getType() == LinkType.INTERWIKI) {
-                // TODO: Resolve the Interwiki link
-            } else {
-                write(link.getReference());
-            }
-            write("\">");
-            write(getLinkLabelToPrint(link));
-            write("</a></span>");
-        } else {
-            // This is a document link. Check for document existence.
-            try {
-                if (this.documentManager.exists(link.getReference())) {
-                    write("<span class=\"wikilink\">");
-                    write("<a href=\"" + this.documentManager.getURL(link.getReference(), "view") + "\">");
-                    write(getLinkLabelToPrint(link));
-                    write("</a></span>");
-                } else {
-                    write("<a class=\"wikicreatelink\" href=\""
-                        + this.documentManager.getURL(link.getReference(), "edit") + "\">");
-                    write("<span class=\"wikicreatelinktext\">");
-                    write(getLinkLabelToPrint(link));
-                    write("</span><span class=\"wikicreatelinkqm\">?</span></a>");
-                }
-            } catch (Exception e) {
-                // An exception occurred, don't render any XHTML but raise an error in the logs
-                // TODO: Log error
-            }
-        }
+        write(this.linkRenderer.renderLink(link));
     }
 
-    private String getLinkLabelToPrint(Link link)
-    {
-        String labelToPrint;
-
-        if (link.getLabel() != null) {
-            labelToPrint = link.getLabel();
-        } else {
-            labelToPrint = link.getReference();
-        }
-
-        return labelToPrint;
-    }
-    
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
         // Do nothing since macro output depends on Macro execution which transforms the macro

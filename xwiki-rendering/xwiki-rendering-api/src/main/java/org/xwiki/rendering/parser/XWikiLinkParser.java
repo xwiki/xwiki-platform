@@ -35,19 +35,16 @@ import java.util.regex.Matcher;
  *   <li><code>alias</code>: An optional string which will be displayed to the user as the link
  *       name when rendered. Example: "My Page".</li>
  *   <li><code>link</code>: The full link reference using the following syntax:
- *       <code>(virtualWikiAlias:)(space.)(reference)(?queryString)(#anchor)</code>, where:
+ *       <code>(reference)(#anchor)(?queryString)</code>, where:
  *       <ul>
- *         <li><code>virtualWikiAlias</code>: An optional string containing the name of a virtual
- *             wiki. The link will point to a page inside that virtual wiki. Example: "mywiki".</li>
- *         <li><code>space</code>: An optional Wiki Space name. Example: "Main".</li>
  *         <li><code>reference</code>: The link reference. This can be either a URI in the form
  *             <code>protocol:path</code> (example: "http://xwiki.org", "mailto:john@smith.com) or
- *             a wiki page name (example: "WebHome").</li>
- *         <li><code>queryString</code>: An optional query string for specifying parameters that
- *             will be used in the rendered URL. Example: "mydata1=5&mydata2=Hello".</li>
+ *             a wiki page name (example: "wiki.Space.WebHome").</li>
  *         <li><code>anchor</code>: An optional anchor name pointing to an anchor defined in the
  *             referenced link. Note that in XWiki anchors are automatically created for titles.
  *             Example: "TableOfContentAnchor".</li>
+ *         <li><code>queryString</code>: An optional query string for specifying parameters that
+ *             will be used in the rendered URL. Example: "mydata1=5&mydata2=Hello".</li>
  *       </ul>
  *       Either the <code>link</code> or the <code>alias</code> must be specified.</li>
  *   <li><code>interWikiAlias</code>: An optional

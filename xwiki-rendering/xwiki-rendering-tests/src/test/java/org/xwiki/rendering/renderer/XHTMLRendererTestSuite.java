@@ -45,9 +45,16 @@ public class XHTMLRendererTestSuite extends TestCase
                 return documentName.equals("Space.ExistingPage");
             }
 
-            public String getURL(String documentName, String action) throws Exception
+            public String getURL(String documentName, String action, String queryString, String anchor) throws Exception
             {
-                return "/xwiki/bin/view/Space/ExistingPage";
+                String result = "/xwiki/bin/view/" + documentName.replace(".", "/");
+                if (anchor != null) {
+                    result = result + "#" + anchor;
+                }
+                if (queryString != null) {
+                    result = result + "?" + queryString;
+                }
+                return result;
             }
         };
         suite.addTestSuite(syntax, XHTMLRenderer.class, dm);

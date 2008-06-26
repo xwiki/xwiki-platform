@@ -39,5 +39,5 @@ public interface DocumentManager
 
     boolean exists(String documentName) throws Exception;
 
-    String getURL(String documentName, String action) throws Exception;
+    String getURL(String documentName, String action, String queryString, String anchor) throws Exception;
 }

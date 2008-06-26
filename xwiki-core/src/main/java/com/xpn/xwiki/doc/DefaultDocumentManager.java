@@ -48,9 +48,9 @@ public class DefaultDocumentManager implements DocumentManager
         return !doc.isNew();
     }
 
-    public String getURL(String documentName, String action) throws Exception
+    public String getURL(String documentName, String action, String queryString, String anchor) throws Exception
     {
         XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-        return xcontext.getWiki().getDocument(documentName, xcontext).getURL(action, xcontext);
+        return xcontext.getWiki().getDocument(documentName, xcontext).getURL(action, queryString, anchor, xcontext);
     }
 }

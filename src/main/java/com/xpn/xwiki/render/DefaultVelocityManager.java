@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.manager.ComponentManager;
@@ -128,7 +129,8 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         // We need the path relative to the webapp's home folder so we need to remove all path before
         // the skins/ directory. This is a bit of a hack and should be improved with a proper api.
         String skinMacros = context.getWiki().getSkinFile("macros.vm", skin, context);
-        String cacheKey;
+        // If we can't reach a filesystem based macros.vm with the current skin, then use a "default" cache id
+        String cacheKey = "default";
         if (skinMacros != null) {
             // We're only using the path starting with the skin name since sometimes we'll
             // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...",
@@ -142,11 +144,18 @@ public class DefaultVelocityManager implements VelocityManager, Composable
                 // a XWikiSkins object) then we use the parent skin's macros.vm since we
                 // currently don't support having global velocimacros defined in wiki pages.
                 String baseSkin = context.getWiki().getBaseSkin(context);
-                cacheKey = getVelocityEngineCacheKey(baseSkin, context);
+                // Avoid plain recursive calls
+                if (StringUtils.equals(baseSkin, skin)) {
+                    baseSkin = context.getWiki().getDefaultBaseSkin(context);
+                }
+                if (!StringUtils.equals(baseSkin, skin)) {
+                    try {
+                        cacheKey = getVelocityEngineCacheKey(baseSkin, context);
+                    } catch (StackOverflowError ex) {
+                        // Circular dependency, just return the default key
+                    }
+                }
             }
-        } else {
-            // If no skin macros.vm file exists then use a "default" cache id
-            cacheKey = "default";
         }
 
         return cacheKey;

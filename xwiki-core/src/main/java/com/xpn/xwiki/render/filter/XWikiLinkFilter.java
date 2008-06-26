@@ -37,6 +37,7 @@ import org.radeox.util.StringBufferWriter;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * XWikiLinkFilter finds [text] in its input and transforms this to <a href="text">...</a> if the wiki page exists. If
@@ -72,6 +73,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
             WikiRenderEngine wikiEngine = (WikiRenderEngine) engine;
             Writer writer = new StringBufferWriter(buffer);
 
+            XWikiContext xcontext = (XWikiContext) context.getRenderContext().get("xcontext");
             String str = result.group(1);
             if (str != null) {
                 // TODO: This line creates bug XWIKI-188. The encoder seems to be broken. Fix this!
@@ -124,25 +126,24 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                 }
                 // Done, now print the link
 
-                XWikiContext xcontext = (XWikiContext) context.getRenderContext().get("xcontext");
                 // Determine target type: external, interwiki, internal
                 int protocolIndex = href.indexOf("://");
                 if (((protocolIndex >= 0) && (protocolIndex < 10)) || (href.indexOf("mailto:") == 0)) {
                     // External link
                     buffer.append("<span class=\"wikiexternallink\"><a href=\"");
-                    buffer.append(Util.escapeURL(href));
+                    buffer.append(Utils.createPlaceholder(Util.escapeURL(href), xcontext));
                     buffer.append("\"");
                     if (target != null) {
-                        buffer.append(" " + constructRelAttribute(target));
+                        buffer.append(" " + constructRelAttribute(target, xcontext));
                     } else {
                         XWiki xwiki = xcontext.getWiki();
                         String defaulttarget = xwiki.Param("xwiki.render.externallinks.defaulttarget", "");
                         if (!defaulttarget.equals("")) {
-                            buffer.append(" " + constructRelAttribute(defaulttarget));
+                            buffer.append(" " + constructRelAttribute(defaulttarget, xcontext));
                         }
                     }
                     buffer.append(">");
-                    buffer.append(cleanText(text));
+                    buffer.append(Utils.createPlaceholder(cleanText(text), xcontext));
                     buffer.append("</a></span>");
                     return;
                 }
@@ -218,7 +219,7 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
                     if (target != null) {
                         int where = buffer.lastIndexOf(" href=\"");
                         if (where >= 0) {
-                            buffer.insert(where, " " + constructRelAttribute(target));
+                            buffer.insert(where, " " + constructRelAttribute(target, xcontext));
                         }
                     }
                 }
@@ -260,10 +261,10 @@ public class XWikiLinkFilter extends LocaleRegexTokenFilter
         }
     }
 
-    private String constructRelAttribute(String target)
+    private String constructRelAttribute(String target, XWikiContext context)
     {
         // We prefix with "_" since a target can be any token and we need to
         // differentiate with other valid rel tokens.
-        return "rel=\"_" + target + "\"";
+        return "rel=\"_" + Utils.createPlaceholder(target, context) + "\"";
     }
 }

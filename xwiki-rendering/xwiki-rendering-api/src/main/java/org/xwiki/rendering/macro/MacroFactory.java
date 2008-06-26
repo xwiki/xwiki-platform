@@ -30,7 +30,7 @@ public interface MacroFactory
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = MacroFactory.class.getName();
+    String ROLE = MacroFactory.class.getName();
     
     /**
      * Look up for a Macro component matching the macro name passed as a parameter +

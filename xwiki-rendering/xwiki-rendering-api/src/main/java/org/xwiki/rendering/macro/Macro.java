@@ -34,7 +34,7 @@ public interface Macro extends Comparable<Macro>
     /**
      * This component's role, used when code needs to look it up.
      */
-    public final static String ROLE = Macro.class.getName();
+    String ROLE = Macro.class.getName();
     
     int getPriority();
     

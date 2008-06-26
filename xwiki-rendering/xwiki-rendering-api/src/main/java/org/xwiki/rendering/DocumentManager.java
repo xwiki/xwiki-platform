@@ -30,6 +30,11 @@ package org.xwiki.rendering;
  */
 public interface DocumentManager
 {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
+    String ROLE = DocumentManager.class.getName();
+
     String getDocumentContent(String documentName) throws Exception;
 
     boolean exists(String documentName) throws Exception;

@@ -35,11 +35,6 @@ public class DefaultDocumentManager implements DocumentManager
 {
     private Execution execution;
 
-    public DefaultDocumentManager(Execution execution)
-    {
-        this.execution = execution;
-    }
-
     public String getDocumentContent(String documentName) throws Exception
     {
         XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");

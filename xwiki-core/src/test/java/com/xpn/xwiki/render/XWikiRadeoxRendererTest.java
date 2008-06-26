@@ -58,6 +58,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         this.context = new XWikiContext();
 
         this.mockXWiki = mock(XWiki.class, new Class[] {}, new Object[] {});
+        this.mockXWiki.stubs().method("Param").will(returnValue(""));
         this.context.setWiki((XWiki) this.mockXWiki.proxy());
 
         this.mockContentDocument = mock(XWikiDocument.class);
@@ -281,5 +282,16 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
             this.renderer.render("{attach:this *is* __underlined__|http://www.some.server/__not__underlined.png}",
                 this.contentDocument, this.document, this.context);
         assertTrue(result.indexOf("<strong>is</strong>") != -1);
+    }
+
+    public void testUrlsWithWikiMarkup() throws Exception
+    {
+        String result =
+            this.renderer
+                .render("http://www.xwiki.org/__some__URL~~with~~markup\n"
+                    + "[http://www.xwiki.org/__some__URL~~with~~markup]", this.contentDocument, this.document,
+                    this.context);
+        assertTrue(result.indexOf("<em>") == -1);
+        assertTrue(result.indexOf("wikiexternallink") != -1);
     }
 }

@@ -56,26 +56,25 @@ public class CalendarEvent
         this(dateStart, dateEnd, user, description, description, null, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
-        String title)
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title)
     {
         this(dateStart, dateEnd, user, description, title, null, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
-        String title, List category)
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title,
+        List category)
     {
         this(dateStart, dateEnd, user, description, title, category, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
-        String title, List category, String url)
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title,
+        List category, String url)
     {
         this(dateStart, dateEnd, user, description, title, category, url, "");
     }
 
-    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description,
-        String title, List category, String url, String location)
+    public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title,
+        List category, String url, String location)
     {
         this.dateStart = dateStart;
         this.dateEnd = dateEnd;
@@ -89,7 +88,7 @@ public class CalendarEvent
 
     public Calendar getDateStart()
     {
-        return dateStart;
+        return this.dateStart;
     }
 
     public void setDateStart(Calendar dateStart)
@@ -99,7 +98,7 @@ public class CalendarEvent
 
     public Calendar getDateEnd()
     {
-        return dateEnd;
+        return this.dateEnd;
     }
 
     public void setDateEnd(Calendar dateEnd)
@@ -109,7 +108,7 @@ public class CalendarEvent
 
     public String getUser()
     {
-        return user;
+        return this.user;
     }
 
     public void setUser(String user)
@@ -119,7 +118,7 @@ public class CalendarEvent
 
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description)
@@ -129,7 +128,7 @@ public class CalendarEvent
 
     public String getTitle()
     {
-        return title;
+        return this.title;
     }
 
     public void setTitle(String title)
@@ -139,7 +138,7 @@ public class CalendarEvent
 
     public List getCategory()
     {
-        return category;
+        return this.category;
     }
 
     public void setCategory(List category)
@@ -149,7 +148,7 @@ public class CalendarEvent
 
     public String getUrl()
     {
-        return url;
+        return this.url;
     }
 
     public void setUrl(String url)
@@ -159,7 +158,7 @@ public class CalendarEvent
 
     public String getLocation()
     {
-        return location;
+        return this.location;
     }
 
     public void setLocation(String location)

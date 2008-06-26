@@ -167,5 +167,8 @@ public class XWikiLinkParserTest extends TestCase
         assertEquals("Hello", link.getReference());
         assertEquals("anchor", link.getAnchor());
         assertEquals("Reference = [Hello] Anchor = [anchor]", link.toString());
+
+        link = parser.parse("[label]>Doc");
+        assertEquals("[label]", link.getLabel());
     }
 }

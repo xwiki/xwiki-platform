@@ -18,7 +18,15 @@
     <dependency>
       <groupId>org.wikimodel</groupId>
       <artifactId>wem</artifactId>
-      <version>2.0.3-20080320</version>
+      <version>2.0.6</version>
     </dependency>
   </dependencies>
+  <repositories>
+    <!-- Repository hosting wikimodel jars -->
+    <repository>
+      <id>semweb4j</id>
+      <name>Semweb4j.org Maven Remote Repository</name>
+      <url>http://semweb4j.org/repo</url>
+    </repository>
+  </repositories>
 </project>

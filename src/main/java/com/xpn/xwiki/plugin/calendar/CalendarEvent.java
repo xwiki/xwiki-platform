@@ -24,6 +24,8 @@ package com.xpn.xwiki.plugin.calendar;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 public class CalendarEvent
 {
     private Calendar dateStart;
@@ -76,14 +78,14 @@ public class CalendarEvent
     public CalendarEvent(Calendar dateStart, Calendar dateEnd, String user, String description, String title,
         List category, String url, String location)
     {
-        this.dateStart = dateStart;
-        this.dateEnd = dateEnd;
-        this.user = user;
-        this.description = description;
-        this.title = title;
-        this.category = category;
-        this.url = url;
-        this.location = location;
+        setDateStart(dateStart);
+        setDateEnd(dateEnd);
+        setUser(user);
+        setDescription(description);
+        setTitle(title);
+        setCategory(category);
+        setUrl(url);
+        setLocation(location);
     }
 
     public Calendar getDateStart()
@@ -113,7 +115,7 @@ public class CalendarEvent
 
     public void setUser(String user)
     {
-        this.user = user;
+        this.user = StringUtils.trimToEmpty(user);
     }
 
     public String getDescription()
@@ -123,7 +125,7 @@ public class CalendarEvent
 
     public void setDescription(String description)
     {
-        this.description = description;
+        this.description = StringUtils.trimToEmpty(description);
     }
 
     public String getTitle()
@@ -133,7 +135,7 @@ public class CalendarEvent
 
     public void setTitle(String title)
     {
-        this.title = title;
+        this.title = StringUtils.trimToEmpty(title);
     }
 
     public List getCategory()
@@ -153,7 +155,7 @@ public class CalendarEvent
 
     public void setUrl(String url)
     {
-        this.url = url;
+        this.url = StringUtils.trimToEmpty(url);
     }
 
     public String getLocation()
@@ -163,6 +165,6 @@ public class CalendarEvent
 
     public void setLocation(String location)
     {
-        this.location = location;
+        this.location = StringUtils.trimToEmpty(location);
     }
 }

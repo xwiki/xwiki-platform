@@ -26,7 +26,6 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.core.Constraint;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.web.XWikiURLFactory;
@@ -52,6 +51,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
 
     private XWikiDocument contentDocument;
 
+    @Override
     protected void setUp()
     {
         this.renderer = new XWikiRadeoxRenderer();
@@ -75,7 +75,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
 
     public void testRenderWithSimpleText()
     {
-        String result = renderer.render("Simple content", contentDocument, document, context);
+        String result = this.renderer.render("Simple content", this.contentDocument, this.document, this.context);
 
         assertEquals("Simple content", result);
     }
@@ -96,7 +96,7 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
         mockUrlFactory.expects(atLeastOnce()).method("getURL").will(returnValue("/Main/new link"));
         this.context.setURLFactory((XWikiURLFactory) mockUrlFactory.proxy());
 
-        String result = renderer.render("This is a [new link]", contentDocument, document, context);
+        String result = this.renderer.render("This is a [new link]", this.contentDocument, this.document, this.context);
 
         assertEquals("This is a <a class=\"wikicreatelink\" href=\"/Main/new link\">"
             + "<span class=\"wikicreatelinktext\">new link</span>" + "<span class=\"wikicreatelinkqm\">?</span></a>",
@@ -106,17 +106,18 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
     public void testRenderStyleMacro() throws Exception
     {
         String result =
-            renderer.render("{style:type=div|align=justify}Hello{style}", contentDocument, document, context);
+            this.renderer.render("{style:type=div|align=justify}Hello{style}", this.contentDocument, this.document,
+                this.context);
         assertEquals("<div align=\"justify\" style=\"\" >Hello</div>", result);
     }
 
     public void testRenderStyleMacroNotImbricated() throws Exception
     {
         String result =
-            renderer
+            this.renderer
                 .render(
                     "{style:type=span|font-size=24px}One font{style} and {style:type=span|font-size=22px}another font size{style}. How fun.",
-                    contentDocument, document, context);
+                    this.contentDocument, this.document, this.context);
         assertEquals(
             "<span style=\"font-size:24px; \" >One font</span> and <span style=\"font-size:22px; \" >another font size</span>. How fun.",
             result);
@@ -125,10 +126,10 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
     public void testRenderStyleMacroNotImbricatedInImbricated() throws Exception
     {
         String result =
-            renderer
+            this.renderer
                 .render(
                     "{style:type=div|align=justify}{style:type=span|font-size=24px}One font{style} and {style:type=span|font-size=22px}another font size{style}.{style} How fun.",
-                    contentDocument, document, context);
+                    this.contentDocument, this.document, this.context);
         assertEquals(
             "<div align=\"justify\" style=\"\" ><span style=\"font-size:24px; \" >One font</span> and <span style=\"font-size:22px; \" >another font size</span>.</div> How fun.",
             result);
@@ -137,10 +138,10 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
     public void testRenderStyleMacroImbricated() throws Exception
     {
         String result =
-            renderer
+            this.renderer
                 .render(
                     "{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style}",
-                    contentDocument, document, context);
+                    this.contentDocument, this.document, this.context);
         assertEquals(
             "<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside</span> the paragraph.</div>",
             result);
@@ -149,10 +150,10 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
     public void testRenderStyleMacroImbricated2() throws Exception
     {
         String result =
-            renderer
+            this.renderer
                 .render(
                     "{style:type=div|align=justify}Hello with {style:type=span|font-size=24px}style inside{style} the paragraph.{style} and this is very fun {style}",
-                    contentDocument, document, context);
+                    this.contentDocument, this.document, this.context);
         assertEquals(
             "<div align=\"justify\" style=\"\" >Hello with <span style=\"font-size:24px; \" >style inside</span> the paragraph.</div> and this is very fun <span style=\"\" ></span>",
             result);
@@ -160,98 +161,109 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
 
     public void testRenderParagraph() throws Exception
     {
-        String result = renderer.render("a\n\nb", contentDocument, document, context);
+        String result = this.renderer.render("a\n\nb", this.contentDocument, this.document, this.context);
         assertEquals("a<p/>\nb", result);
     }
 
     public void testRenderOneParagraphForSeveralNewlines() throws Exception
     {
-        String result = renderer.render("a\n\n\n\n\nb", contentDocument, document, context);
+        String result = this.renderer.render("a\n\n\n\n\nb", this.contentDocument, this.document, this.context);
         assertEquals("a<p/>\nb", result);
     }
 
     public void testRenderParagraphIgnoresSpaces() throws Exception
     {
-        String result = renderer.render("a\n  \t\n  b", contentDocument, document, context);
+        String result = this.renderer.render("a\n  \t\n  b", this.contentDocument, this.document, this.context);
         assertEquals("a<p/>\n  b", result);
     }
 
     public void testRenderParagraphWithBr() throws Exception
     {
-        String result = renderer.render("a\\\\\n\n\nb", contentDocument, document, context);
+        String result = this.renderer.render("a\\\\\n\n\nb", this.contentDocument, this.document, this.context);
         assertEquals("a<br/><p/>\nb", result);
     }
 
     public void testRenderNewline() throws Exception
     {
-        String result = renderer.render("a\\\\b", contentDocument, document, context);
+        String result = this.renderer.render("a\\\\b", this.contentDocument, this.document, this.context);
         assertEquals("a<br/>b", result);
     }
 
     public void testRenderNewlineWithCarriageReturn() throws Exception
     {
-        String result = renderer.render("a\\\\\nb", contentDocument, document, context);
+        String result = this.renderer.render("a\\\\\nb", this.contentDocument, this.document, this.context);
         assertEquals("a<br/>b", result);
     }
 
     public void testRenderTwoNewline() throws Exception
     {
-        String result = renderer.render("a\\\\\\\\b", contentDocument, document, context);
+        String result = this.renderer.render("a\\\\\\\\b", this.contentDocument, this.document, this.context);
         assertEquals("a<br/><br/>b", result);
     }
 
     public void testRenderTwoNewlineWithCarriageReturn() throws Exception
     {
-        String result = renderer.render("a\\\\\\\\\nb", contentDocument, document, context);
+        String result = this.renderer.render("a\\\\\\\\\nb", this.contentDocument, this.document, this.context);
         assertEquals("a<br/><br/>b", result);
     }
 
     public void testRenderThreeNewline() throws Exception
     {
-        String result = renderer.render("a\\\\\\\\\\\\b", contentDocument, document, context);
+        String result = this.renderer.render("a\\\\\\\\\\\\b", this.contentDocument, this.document, this.context);
         assertEquals("a<br/><br/><br/>b", result);
     }
 
     public void testRenderEncodedBackslash() throws Exception
     {
-        String result = renderer.render("\\\\\\", contentDocument, document, context);
+        String result = this.renderer.render("\\\\\\", this.contentDocument, this.document, this.context);
         assertEquals("&#92;", result);
     }
 
     public void testRenderEscapedCharacters() throws Exception
     {
-        String result = renderer.render("\\[NotALink\\]", contentDocument, document, context);
+        String result = this.renderer.render("\\[NotALink\\]", this.contentDocument, this.document, this.context);
         assertEquals("&#91;NotALink&#93;", result);
     }
 
     public void testTable() throws Exception
     {
-        String result = renderer.render("{table}\nA\n{table}", contentDocument, document, context);
-        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A</th></tr></table>", result);
+        String result = this.renderer.render("{table}\nA\n{table}", this.contentDocument, this.document, this.context);
+        assertEquals(
+            "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A</th></tr></table>",
+            result);
     }
 
     public void testTableEmptyTable() throws Exception
     {
-        String result = renderer.render("{table}\n{table}", contentDocument, document, context);
-        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr></tr></table>", result);
+        String result = this.renderer.render("{table}\n{table}", this.contentDocument, this.document, this.context);
+        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr></tr></table>",
+            result);
     }
 
     public void testTableWithCR() throws Exception
     {
-        String result = renderer.render("{table}\nA\\\\B\n{table}", contentDocument, document, context);
-        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/>B</th></tr></table>", result);
+        String result =
+            this.renderer.render("{table}\nA\\\\B\n{table}", this.contentDocument, this.document, this.context);
+        assertEquals(
+            "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/>B</th></tr></table>",
+            result);
     }
 
     public void testTableWithCRWithSpace() throws Exception
     {
-        String result = renderer.render("{table}\nA\\\\ \n{table}", contentDocument, document, context);
-        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/></th></tr></table>", result);
+        String result =
+            this.renderer.render("{table}\nA\\\\ \n{table}", this.contentDocument, this.document, this.context);
+        assertEquals(
+            "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/></th></tr></table>",
+            result);
     }
 
     public void testTableWithCRWithoutSpace() throws Exception
     {
-        String result = renderer.render("{table}\nA\\\\\n{table}", contentDocument, document, context);
-        assertEquals("<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/></th></tr></table>", result);
+        String result =
+            this.renderer.render("{table}\nA\\\\\n{table}", this.contentDocument, this.document, this.context);
+        assertEquals(
+            "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/></th></tr></table>",
+            result);
     }
-
 }

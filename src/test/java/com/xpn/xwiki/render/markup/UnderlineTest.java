@@ -153,7 +153,7 @@ public class UnderlineTest extends AbstractSyntaxTest
         assertTrue(System.currentTimeMillis() - startTime < 10000);
     }
 
-    public void testLinkTargetHasPriority()
+    public void testLinkTargetDoesNotTriggerUnderline()
     {
         String testString = "[link>Main.WebHome>_blank] and [another link>Main.WebHome>_blank]";
         String result = this.renderer.render(testString, this.document, this.document, this.context);

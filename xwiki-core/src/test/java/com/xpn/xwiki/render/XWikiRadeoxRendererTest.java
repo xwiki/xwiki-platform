@@ -266,4 +266,20 @@ public class XWikiRadeoxRendererTest extends MockObjectTestCase
             "<table class=\"wiki-table\" cellpadding=\"0\" cellspacing=\"0\" border=\"0\"><tr><th>A<br/></th></tr></table>",
             result);
     }
+
+    public void testMacrosWithWikiMarkupInUrl() throws Exception
+    {
+        String result =
+            this.renderer.render("{image:http://www.some.server/__not__underlined.png}", this.contentDocument,
+                this.document, this.context);
+        assertTrue(result.indexOf("<em") == -1);
+        result =
+            this.renderer.render("{attach:http://www.some.server/__not__underlined.png}", this.contentDocument,
+                this.document, this.context);
+        assertTrue(result.indexOf("a href=\"http://www.some.server/__not__underlined.png") != -1);
+        result =
+            this.renderer.render("{attach:this *is* __underlined__|http://www.some.server/__not__underlined.png}",
+                this.contentDocument, this.document, this.context);
+        assertTrue(result.indexOf("<strong>is</strong>") != -1);
+    }
 }

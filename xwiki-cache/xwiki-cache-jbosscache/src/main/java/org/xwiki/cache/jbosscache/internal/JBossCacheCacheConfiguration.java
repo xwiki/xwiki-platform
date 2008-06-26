@@ -24,6 +24,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +47,11 @@ import org.xwiki.container.Container;
 public class JBossCacheCacheConfiguration
 {
     /**
+     * The name of the field containing the wakeup interval to set to {@link EvictionConfig}.
+     */
+    public static final String CONFX_EVICTION_WAKEUPINTERVAL = "wakeupinterval";
+
+    /**
      * the logging tool.
      */
     private static final Log LOG = LogFactory.getLog(JBossCacheCacheConfiguration.class);
@@ -59,6 +65,11 @@ public class JBossCacheCacheConfiguration
      * The extension of JBossCache properties files.
      */
     private static final String PROPS_EXT = ".xml";
+
+    /**
+     * The default value of the wakeup interval to set to {@link EvictionConfig}.
+     */
+    private static final int DEFAULT_WAKEUPINTERVAL = 5;
 
     /**
      * The default configuration identifier used to load cache configuration file.
@@ -135,29 +146,58 @@ public class JBossCacheCacheConfiguration
                     this.jbossConfiguration.setEvictionConfig(ec);
                 }
 
-                int maxEntries = ((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue();
-
                 ec.setDefaultEvictionPolicyClass(LRUPolicy.class.getName());
 
-                LRUConfiguration lru = new LRUConfiguration();
-
-                lru.setMaxNodes(maxEntries);
-
-                if (eec.getTimeToLive() > 0) {
-                    lru.setTimeToLiveSeconds(eec.getTimeToLive());
+                if (eec.containsKey(CONFX_EVICTION_WAKEUPINTERVAL)) {
+                    ec.setWakeupIntervalSeconds(((Number) eec.get(CONFX_EVICTION_WAKEUPINTERVAL)).intValue());
+                } else {
+                    ec.setWakeupIntervalSeconds(DEFAULT_WAKEUPINTERVAL);
                 }
 
-                EvictionRegionConfig erc = new EvictionRegionConfig();
+                List<EvictionRegionConfig> ercList = ec.getEvictionRegionConfigs();
 
+                EvictionRegionConfig erc = null;
+                if (ercList != null && ercList.size() > 0) {
+                    erc = ercList.get(0);
+                } else {
+                    erc = new EvictionRegionConfig();
+                    ec.setEvictionRegionConfigs(Collections.singletonList(erc));
+                }
                 erc.setRegionFqn(JBossCacheCache.ROOT_FQN);
 
-                erc.setEvictionPolicyConfig(lru);
-
-                ec.setEvictionRegionConfigs(Collections.singletonList(erc));
+                setLRUConfiguration(erc, eec);
             }
         }
 
         this.jbossConfiguration.setClusterName(this.configuration.getConfigurationId());
+    }
+
+    /**
+     * Add or update the {@link LRUConfiguration}.
+     * 
+     * @param erc the JBoss eviction configuration.
+     * @param eec the XWiki eviction configuration.
+     */
+    private void setLRUConfiguration(EvictionRegionConfig erc, EntryEvictionConfiguration eec)
+    {
+        LRUConfiguration lru = null;
+
+        if (erc.getEvictionPolicyConfig() instanceof LRUConfiguration) {
+            lru = (LRUConfiguration) erc.getEvictionPolicyConfig();
+        } else {
+            lru = new LRUConfiguration();
+            lru.setTimeToLiveSeconds(0);
+        }
+
+        if (eec.containsKey(LRUEvictionConfiguration.MAXENTRIES_ID)) {
+            lru.setMaxNodes(((Number) eec.get(LRUEvictionConfiguration.MAXENTRIES_ID)).intValue());
+        }
+
+        if (eec.getTimeToLive() > 0) {
+            lru.setTimeToLiveSeconds(eec.getTimeToLive());
+        }
+
+        erc.setEvictionPolicyConfig(lru);
     }
 
     /**

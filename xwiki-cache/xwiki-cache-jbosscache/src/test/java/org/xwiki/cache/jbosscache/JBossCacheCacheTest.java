@@ -4,6 +4,7 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.jbosscache.internal.JBossCacheCacheConfiguration;
 import org.xwiki.cache.tests.AbstractTestCache;
 import org.xwiki.component.manager.ComponentLookupException;
 
@@ -19,11 +20,13 @@ public class JBossCacheCacheTest extends AbstractTestCache
 
     public void testCreateAndDestroyCacheLRUMaxEntries() throws ComponentLookupException, Exception
     {
-        /*CacheFactory factory = getCacheFactory();
+        CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setMaxEntries(1);
+        // Force JBoss eviction interval to the minimum
+        lec.put(JBossCacheCacheConfiguration.CONFX_EVICTION_WAKEUPINTERVAL, 1);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
@@ -36,19 +39,24 @@ public class JBossCacheCacheTest extends AbstractTestCache
 
         cache.set("key2", 2);
 
+        // Wait for the JBoss Eviction policy to be called
+        Thread.sleep(1000);
+
         assertNull(cache.get("key"));
         assertEquals(2, cache.get("key2"));
 
-        cache.dispose();*/
+        cache.dispose();
     }
 
     public void testCreateAndDestroyCacheLRUTimeToLive() throws ComponentLookupException, Exception
     {
-        /*CacheFactory factory = getCacheFactory();
+        CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setTimeToLive(1);
+        // Force JBoss eviction interval to the minimum
+        lec.put(JBossCacheCacheConfiguration.CONFX_EVICTION_WAKEUPINTERVAL, 1);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
@@ -59,41 +67,11 @@ public class JBossCacheCacheTest extends AbstractTestCache
 
         assertEquals("value", cache.get("key"));
 
-        Thread.sleep(1000);
+        // Wait for the JBoss Eviction policy to be called
+        Thread.sleep(3000);
 
         assertNull(cache.get("key"));
 
-        cache.dispose();*/
-    }
-
-    public void testCreateAndDestroyCacheLRUAll() throws ComponentLookupException, Exception
-    {
-        /*CacheFactory factory = getCacheFactory();
-
-        CacheConfiguration conf = new CacheConfiguration();
-        LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
-        lec.setMaxEntries(1);
-        lec.setTimeToLive(1);
-        conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
-
-        Cache<Object> cache = factory.newCache(conf);
-
-        assertNotNull(cache);
-
-        cache.set("key", "value");
-
-        assertEquals("value", cache.get("key"));
-
-        cache.set("key2", 2);
-
-        assertNull(cache.get("key"));
-        assertEquals(2, cache.get("key2"));
-
-        Thread.sleep(1000);
-
-        assertNull(cache.get("key"));
-        assertNull(cache.get("key2"));
-
-        cache.dispose();*/
+        cache.dispose();
     }
 }

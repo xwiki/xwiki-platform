@@ -20,31 +20,32 @@
  */
 package com.xpn.xwiki.render;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.api.Context;
-import com.xpn.xwiki.api.XWiki;
-import com.xpn.xwiki.web.Utils;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.runtime.RuntimeConstants;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.context.Execution;
+import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.velocity.VelocityEngine;
 import org.xwiki.velocity.VelocityExecutionContextInitializer;
 import org.xwiki.velocity.VelocityFactory;
-import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
-import org.xwiki.rendering.parser.SyntaxFactory;
+import org.xwiki.velocity.XWikiVelocityException;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.api.Context;
+import com.xpn.xwiki.api.XWiki;
+import com.xpn.xwiki.web.Utils;
 
 /**
  * Note: This class should be moved to the Velocity module. However this is not possible right now since we need to
  * populate the Velocity Context with XWiki objects that are located in the Core (such as the XWiki object for example)
  * and since the Core needs to call the Velocity module this would cause a circular dependency.
- *
+ * 
  * @version $Id$
  * @since 1.5M1
  */
@@ -61,7 +62,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Composable#compose(ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -73,8 +74,9 @@ public class DefaultVelocityManager implements VelocityManager, Composable
     {
         // The Velocity Context is set in VelocityRequestInterceptor, when the XWiki Request is initialized so we are
         // guaranteed it is defined when this method is called.
-        VelocityContext vcontext = (VelocityContext) this.execution.getContext().getProperty(
-            VelocityExecutionContextInitializer.REQUEST_VELOCITY_CONTEXT);
+        VelocityContext vcontext =
+            (VelocityContext) this.execution.getContext().getProperty(
+                VelocityExecutionContextInitializer.REQUEST_VELOCITY_CONTEXT);
 
         // Bridge. To be removed later.
         if (vcontext.get("util") == null) {
@@ -129,7 +131,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         String cacheKey;
         if (skinMacros != null) {
             // We're only using the path starting with the skin name since sometimes we'll
-            // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...", 
+            // get ".../skins/skins/<skinname>/...", sometimes we get ".../skins/<skinname>/...",
             // sometimes we get "skins/<skinname>/..." and if the skin is done in wiki pages
             // we get ".../skin/...".
             int pos = skinMacros.indexOf("skins/");
@@ -137,7 +139,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
                 cacheKey = skinMacros.substring(pos);
             } else {
                 // If the macros.vm file is stored in a wiki page (in a macros.vm property in
-                // a XWikiSkins object) then we use the parent skin's macros.vm since we 
+                // a XWikiSkins object) then we use the parent skin's macros.vm since we
                 // currently don't support having global velocimacros defined in wiki pages.
                 String baseSkin = context.getWiki().getBaseSkin(context);
                 cacheKey = getVelocityEngineCacheKey(baseSkin, context);
@@ -152,7 +154,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
 
     public VelocityEngine getVelocityEngine() throws XWikiVelocityException
     {
-        // Note: For improved performance we cache the Velocity Managers in order not to 
+        // Note: For improved performance we cache the Velocity Managers in order not to
         // recreate them all the time. The key we use is the location to the skin's macro.vm
         // file since caching on the skin would create more Managers than needed (some skins
         // don't have a macros.vm file and some skins inherit from others).
@@ -171,7 +173,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         if (velocityFactory.hasVelocityEngine(cacheKey)) {
             velocityEngine = velocityFactory.getVelocityEngine(cacheKey);
         } else {
-            // Gather the global Velocity macros that we want to have. These are skin dependent. 
+            // Gather the global Velocity macros that we want to have. These are skin dependent.
             Properties properties = new Properties();
             String macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey);
             properties.put(RuntimeConstants.VM_LIBRARY, macroList);

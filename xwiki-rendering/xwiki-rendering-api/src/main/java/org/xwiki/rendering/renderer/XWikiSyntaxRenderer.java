@@ -180,6 +180,11 @@ public class XWikiSyntaxRenderer implements Renderer
         write(symbol);
     }
 
+    public void onEscape(String escapedString)
+    {
+        write("\\" + escapedString);
+    }
+
     public void beginList(ListType listType)
     {
         if (this.needsLineBreakForList) {

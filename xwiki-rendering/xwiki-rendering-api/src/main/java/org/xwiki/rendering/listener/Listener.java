@@ -82,4 +82,13 @@ public interface Listener
     void onSpace();
     
     void onSpecialSymbol(String symbol);
+
+    /**
+     * Represents a string that is escaped, ie which contains special characters that should not be
+     * transformed.
+     *
+     * @param escapedString the string to keep as is
+     * @since 1.5RC1
+     */
+    void onEscape(String escapedString);
 }

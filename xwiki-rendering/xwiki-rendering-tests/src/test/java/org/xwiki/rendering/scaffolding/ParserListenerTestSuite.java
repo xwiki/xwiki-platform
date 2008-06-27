@@ -38,5 +38,6 @@ public class ParserListenerTestSuite extends TestSuite
         addTest(new ParserListenerTester("list", syntax, listenerClass, false, listenerClassObjects));
         addTest(new ParserListenerTester("html", syntax, listenerClass, false, listenerClassObjects));
         addTest(new ParserListenerTester("links", syntax, listenerClass, false, listenerClassObjects));
+        addTest(new ParserListenerTester("escape", syntax, listenerClass, false, listenerClassObjects));
     }
 }

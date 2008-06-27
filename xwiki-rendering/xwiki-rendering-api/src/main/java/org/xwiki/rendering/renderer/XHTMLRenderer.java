@@ -130,6 +130,15 @@ public class XHTMLRenderer implements Renderer
         write(StringEscapeUtils.escapeHtml(symbol));
     }
 
+    public void onEscape(String escapedString)
+    {
+        // Note: for single character escaped it would have been nicer to use XML entites. However
+        // Wikimodel doesn't support that since its XHTML parser uses a XML parser and entities are
+        // resolved internally by XML parsers so there's no way for wikimodel to know about them.
+        // TODO: The syntax below is yet to be confirmed and should be considered temporary for now
+        write("<pre><![CDATA[" + escapedString + "]]></pre>");
+    }
+
     public void beginList(ListType listType)
     {
         if (listType == ListType.BULLETED) {

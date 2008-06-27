@@ -273,8 +273,7 @@ public class DocumentGeneratorListener implements IWemListener
 
     public void onEscape(String str)
     {
-        // TODO Auto-generated method stub
-        System.out.println("onEscape");
+        this.stack.push(new EscapeBlock(str));
     }
 
     public void onExtensionBlock(String extensionName, WikiParameters params)

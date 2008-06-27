@@ -1,0 +1,5 @@
+beginParagraph
+onEscape: [*]
+onWord: [hello]
+onEscape: [*]
+endParagraph

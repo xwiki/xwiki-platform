@@ -133,6 +133,11 @@ public class TestEventsListener implements Listener
         write("onSpecialSymbol: [" + symbol + "]");
     }
 
+    public void onEscape(String escapedString)
+    {
+        write("onEscape: [" + escapedString + "]");
+    }
+
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
         write("beginXMLElement: [" + name + "] [" + toStringXMLElement(attributes) + "]");

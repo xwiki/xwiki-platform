@@ -162,8 +162,8 @@ $xwiki.invokeServletAndReturnAsString($url)
 ## Displays the status for the given AIM id 
 ##
 #macro(aim $id)
-#set($onurl = "http://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
-#set($offurl = "http://${request.serverName}${xwiki.getSkinFile('aimoffline.gif')}")
+#set($onurl = "${request.scheme}://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
+#set($offurl = "${request.scheme}://${request.serverName}${xwiki.getSkinFile('aimoffline.gif')}")
 <img border="0" src="http://big.oscar.aol.com/nvludo?on_url=${onurl}&off_url=${offurl}" alt="Online detector"></a>
 #end
 ##

@@ -11,7 +11,12 @@ public class OSCacheLocalCacheTest extends AbstractTestCache
 {
     public OSCacheLocalCacheTest()
     {
-        super("oscache/local");
+        this("oscache/local");
+    }
+
+    protected OSCacheLocalCacheTest(String roleHint)
+    {
+        super(roleHint);
     }
 
     // ///////////////////////////////////////////////////////::

@@ -4,29 +4,42 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.jbosscache.internal.JBossCacheCacheConfiguration;
 import org.xwiki.cache.tests.AbstractTestCache;
+import org.xwiki.cache.tests.CacheEntryListenerTest;
+import org.xwiki.cache.tests.CacheEntryListenerTest.EventType;
 import org.xwiki.component.manager.ComponentLookupException;
 
 public class JBossCacheLocalCacheTest extends AbstractTestCache
 {
     public JBossCacheLocalCacheTest()
     {
-        super("jbosscache/local");
+        this("jbosscache/local");
+    }
+
+    protected JBossCacheLocalCacheTest(String roleHint)
+    {
+        super(roleHint);
     }
 
     // ///////////////////////////////////////////////////////::
     // Tests
 
-    public void testCreateAndDestroyCacheLRUMaxEntries() throws ComponentLookupException, Exception
+    /*public void testCreateAndDestroyCacheLRUMaxEntries() throws ComponentLookupException, Exception
     {
-        /*CacheFactory factory = getCacheFactory();
+        CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setMaxEntries(1);
+        // Force JBoss eviction interval to the minimum
+        lec.put(JBossCacheCacheConfiguration.CONFX_EVICTION_WAKEUPINTERVAL, 1);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
+
+        CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
+        cache.addCacheEntryListener(eventListener);
 
         assertNotNull(cache);
 
@@ -36,22 +49,30 @@ public class JBossCacheLocalCacheTest extends AbstractTestCache
 
         cache.set("key2", 2);
 
+        // Wait for the JBoss Eviction policy to be called
+        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
+
         assertNull(cache.get("key"));
         assertEquals(2, cache.get("key2"));
 
-        cache.dispose();*/
-    }
+        cache.dispose();
+    }*/
 
     public void testCreateAndDestroyCacheLRUTimeToLive() throws ComponentLookupException, Exception
     {
-        /*CacheFactory factory = getCacheFactory();
+        CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setTimeToLive(1);
+        // Force JBoss eviction interval to the minimum
+        lec.put(JBossCacheCacheConfiguration.CONFX_EVICTION_WAKEUPINTERVAL, 1);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
+        
+        CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
+        cache.addCacheEntryListener(eventListener);
 
         assertNotNull(cache);
 
@@ -59,16 +80,17 @@ public class JBossCacheLocalCacheTest extends AbstractTestCache
 
         assertEquals("value", cache.get("key"));
 
-        Thread.sleep(1000);
+        // Wait for the JBoss Eviction policy to be called
+        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
 
         assertNull(cache.get("key"));
 
-        cache.dispose();*/
+        cache.dispose();
     }
 
-    public void testCreateAndDestroyCacheLRUAll() throws ComponentLookupException, Exception
+    /*public void testCreateAndDestroyCacheLRUAll() throws ComponentLookupException, Exception
     {
-        /*CacheFactory factory = getCacheFactory();
+        CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
@@ -94,6 +116,6 @@ public class JBossCacheLocalCacheTest extends AbstractTestCache
         assertNull(cache.get("key"));
         assertNull(cache.get("key2"));
 
-        cache.dispose();*/
-    }
+        cache.dispose();
+    }*/
 }

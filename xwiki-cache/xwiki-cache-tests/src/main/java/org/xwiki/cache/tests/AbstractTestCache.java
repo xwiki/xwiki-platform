@@ -26,8 +26,6 @@ import java.net.URL;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.event.CacheEntryEvent;
-import org.xwiki.cache.event.CacheEntryListener;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -244,82 +242,5 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
         assertSame(cache, eventListener.getModifiedEvent().getCache());
         assertEquals(KEY, eventListener.getModifiedEvent().getEntry().getKey());
         assertEquals(VALUE2, eventListener.getModifiedEvent().getEntry().getValue());
-    }
-}
-
-/**
- * Class used to test cache event management.
- * 
- * @version $Id: $
- */
-class CacheEntryListenerTest implements CacheEntryListener<Object>
-{
-    /**
-     * Event object received with last insertion.
-     */
-    private CacheEntryEvent<Object> addedEvent;
-
-    /**
-     * Event object received with last modification.
-     */
-    private CacheEntryEvent<Object> modifiedEvent;
-
-    /**
-     * Event object received with last remove.
-     */
-    private CacheEntryEvent<Object> removedEvent;
-
-    /**
-     * @return event object received with last insertion.
-     */
-    public CacheEntryEvent<Object> getAddedEvent()
-    {
-        return addedEvent;
-    }
-
-    /**
-     * @return event object received with last modification.
-     */
-    public CacheEntryEvent<Object> getModifiedEvent()
-    {
-        return modifiedEvent;
-    }
-
-    /**
-     * @return event object received with last remove.
-     */
-    public CacheEntryEvent<Object> getRemovedEvent()
-    {
-        return removedEvent;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryAdded(org.xwiki.cache.event.CacheEntryEvent)
-     */
-    public void cacheEntryAdded(CacheEntryEvent<Object> event)
-    {
-        this.addedEvent = event;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryModified(org.xwiki.cache.event.CacheEntryEvent)
-     */
-    public void cacheEntryModified(CacheEntryEvent<Object> event)
-    {
-        this.modifiedEvent = event;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.cache.event.CacheEntryListener#cacheEntryRemoved(org.xwiki.cache.event.CacheEntryEvent)
-     */
-    public void cacheEntryRemoved(CacheEntryEvent<Object> event)
-    {
-        this.removedEvent = event;
     }
 }

@@ -19,6 +19,7 @@
  */
 package org.xwiki.cache.jbosscache.internal;
 
+import java.text.MessageFormat;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -27,7 +28,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.jboss.cache.notifications.annotation.CacheListener;
+import org.jboss.cache.notifications.annotation.NodeEvicted;
 import org.jboss.cache.notifications.annotation.NodeModified;
+import org.jboss.cache.notifications.event.NodeEvictedEvent;
 import org.jboss.cache.notifications.event.NodeModifiedEvent;
 import org.jboss.cache.Cache;
 import org.jboss.cache.CacheFactory;
@@ -74,6 +77,11 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      * The state of the node before modification.
      */
     private ConcurrentMap<String, Map<String, T>> preEventData = new ConcurrentHashMap<String, Map<String, T>>();
+
+    /**
+     * The state of the value before its eviction from the cache.
+     */
+    private T preEvictionData;
 
     /**
      * Create and initialize the cache.
@@ -154,6 +162,32 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     // ////////////////////////////////////////////////////////////////
 
     /**
+     * @param event the eviction event.
+     */
+    @NodeEvicted
+    public void nodeEvicted(NodeEvictedEvent event)
+    {
+        if (!event.getFqn().isChildOf(ROOT_FQN)) {
+            if (LOG.isInfoEnabled()) {
+                LOG.info(MessageFormat.format("The node {0} should not has been evicted", event.getFqn()));
+            }
+
+            return;
+        }
+
+        String key = event.getFqn().getLastElementAsString();
+
+        event.getType();
+
+        if (event.isPre()) {
+            this.preEvictionData = get(key);
+        } else {
+            cacheEntryRemoved(key, this.preEvictionData);
+            this.preEvictionData = null;
+        }
+    }
+
+    /**
      * @param event the modification event.
      */
     @NodeModified
@@ -161,7 +195,7 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     {
         if (!event.getFqn().isChildOf(ROOT_FQN)) {
             if (LOG.isInfoEnabled()) {
-                LOG.info("The node " + event.getFqn() + " that should not has bee updated");
+                LOG.info(MessageFormat.format("The node {0} should not has been modified", event.getFqn()));
             }
 
             return;
@@ -175,12 +209,10 @@ public class JBossCacheCache<T> extends AbstractCache<T>
             this.preEventData.put(key, data);
         } else {
             if (data.containsKey(DATA_KEY)) {
-                T value = data.get(DATA_KEY);
-
                 if (event.getModificationType() == NodeModifiedEvent.ModificationType.REMOVE_DATA) {
-                    cacheEntryRemoved(key, value);
+                    cacheEntryRemoved(key, this.preEventData.get(key).get(DATA_KEY));
                 } else {
-                    cacheEntryInserted(key, value);
+                    cacheEntryInserted(key, data.get(DATA_KEY));
                 }
             }
 

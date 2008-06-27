@@ -174,6 +174,12 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
                 if (event != null) {
                     break;
                 }
+
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    // ignore
+                }
             }
         }
     }

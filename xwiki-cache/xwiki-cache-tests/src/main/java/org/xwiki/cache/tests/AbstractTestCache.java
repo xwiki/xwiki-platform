@@ -42,22 +42,22 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
     /**
      * The first key.
      */
-    private static final String KEY = "key";
+    protected static final String KEY = "key";
 
     /**
      * The second key.
      */
-    private static final String KEY2 = "key2";
+    protected static final String KEY2 = "key2";
 
     /**
      * The value of the first key.
      */
-    private static final String VALUE = "value";
+    protected static final String VALUE = "value";
 
     /**
      * The value of the second key.
      */
-    private static final int VALUE2 = 2;
+    protected static final int VALUE2 = 2;
 
     /**
      * The role hint of the cache component implementation to test.

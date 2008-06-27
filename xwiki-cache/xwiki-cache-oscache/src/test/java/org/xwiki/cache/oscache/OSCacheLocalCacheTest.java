@@ -35,14 +35,14 @@ public class OSCacheLocalCacheTest extends AbstractTestCache
 
         assertNotNull(cache);
 
-        cache.set("key", "value");
+        cache.set(KEY, VALUE);
 
-        assertEquals("value", cache.get("key"));
+        assertEquals(VALUE, cache.get(KEY));
 
-        cache.set("key2", 2);
+        cache.set(KEY2, VALUE2);
 
-        assertNull(cache.get("key"));
-        assertEquals(2, cache.get("key2"));
+        assertNull(cache.get(KEY));
+        assertEquals(VALUE2, cache.get(KEY2));
 
         cache.dispose();
     }
@@ -60,13 +60,13 @@ public class OSCacheLocalCacheTest extends AbstractTestCache
 
         assertNotNull(cache);
 
-        cache.set("key", "value");
+        cache.set(KEY, VALUE);
 
-        assertEquals("value", cache.get("key"));
+        assertEquals(VALUE, cache.get(KEY));
 
         Thread.sleep(1000);
 
-        assertNull(cache.get("key"));
+        assertNull(cache.get(KEY));
 
         cache.dispose();
     }
@@ -85,19 +85,19 @@ public class OSCacheLocalCacheTest extends AbstractTestCache
 
         assertNotNull(cache);
 
-        cache.set("key", "value");
+        cache.set(KEY, VALUE);
 
-        assertEquals("value", cache.get("key"));
+        assertEquals(VALUE, cache.get(KEY));
 
-        cache.set("key2", 2);
+        cache.set(KEY2, VALUE2);
 
-        assertNull(cache.get("key"));
-        assertEquals(2, cache.get("key2"));
+        assertNull(cache.get(KEY));
+        assertEquals(VALUE2, cache.get(KEY2));
 
         Thread.sleep(1000);
 
-        assertNull(cache.get("key"));
-        assertNull(cache.get("key2"));
+        assertNull(cache.get(KEY));
+        assertNull(cache.get(KEY2));
 
         cache.dispose();
     }

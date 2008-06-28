@@ -24,7 +24,7 @@ import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.wikimodel.internal.DocumentGeneratorListener;
+import org.xwiki.rendering.wikimodel.internal.XDOMGeneratorListener;
 import org.wikimodel.wem.IWikiParser;
 
 import java.io.Reader;
@@ -44,7 +44,7 @@ public abstract class AbstractWikiModelParser extends AbstractLogEnabled impleme
         IWikiParser parser = createWikiModelParser();
 
         // We pass the LinkParser corresponding to the syntax.
-        DocumentGeneratorListener listener = new DocumentGeneratorListener(this.linkParser);
+        XDOMGeneratorListener listener = new XDOMGeneratorListener(this.linkParser);
 
         try {
             parser.parse(source, listener);

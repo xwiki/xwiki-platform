@@ -37,7 +37,7 @@ import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 
-public class DocumentGeneratorListener implements IWemListener
+public class XDOMGeneratorListener implements IWemListener
 {
     private Stack<Block> stack = new Stack<Block>();
     
@@ -52,7 +52,7 @@ public class DocumentGeneratorListener implements IWemListener
         }
     }
 
-    public DocumentGeneratorListener(LinkParser linkParser)
+    public XDOMGeneratorListener(LinkParser linkParser)
     {
         this.linkParser = linkParser;
     }

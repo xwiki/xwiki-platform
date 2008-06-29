@@ -30,7 +30,7 @@ import com.xpn.xwiki.api.XWiki;
  * attachments. Also support XWiki page templates and allows sending a collection of emails
  * in one call.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public interface MailSender
 {

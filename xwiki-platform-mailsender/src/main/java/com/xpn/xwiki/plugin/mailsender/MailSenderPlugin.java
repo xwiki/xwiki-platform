@@ -71,7 +71,7 @@ import com.xpn.xwiki.render.XWikiVelocityRenderer;
  * Plugin that brings powerful mailing capabilities.
  * 
  * @see MailSender
- * @version $Id: $
+ * @version $Id$
  */
 public class MailSenderPlugin extends XWikiDefaultPlugin
 {

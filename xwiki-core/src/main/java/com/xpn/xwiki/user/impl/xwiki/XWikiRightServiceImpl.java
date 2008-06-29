@@ -549,8 +549,8 @@ public class XWikiRightServiceImpl implements XWikiRightService
                     }
                 } catch (XWikiRightNotFoundException e) {
                 }
-                logDeny(name, resourceKey, accessLevel, "register level (no right found)");
-                return false;
+                logAllow(name, resourceKey, accessLevel, "register level (no right found)");
+                return true;
             }
 
             int maxRecursiveSpaceChecks = context.getWiki().getMaxRecursiveSpaceChecks(context);

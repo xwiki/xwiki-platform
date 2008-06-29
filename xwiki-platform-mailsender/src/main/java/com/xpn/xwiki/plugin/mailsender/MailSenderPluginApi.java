@@ -34,7 +34,7 @@ import java.util.List;
  * This is the wrapper accessible from in-document scripts.
  *
  * @see MailSender
- * @version $Id: $
+ * @version $Id$
  */
 public class MailSenderPluginApi extends PluginApi implements MailSender
 {

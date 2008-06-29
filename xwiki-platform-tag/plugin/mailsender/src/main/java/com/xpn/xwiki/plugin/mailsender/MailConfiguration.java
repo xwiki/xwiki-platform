@@ -23,6 +23,8 @@ import com.xpn.xwiki.api.XWiki;
 
 /**
  * Represents a Mail Server configuration.
+ * 
+ * @version $Id$
  */
 public class MailConfiguration
 {

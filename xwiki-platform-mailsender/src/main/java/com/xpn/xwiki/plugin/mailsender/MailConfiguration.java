@@ -59,12 +59,12 @@ public class MailConfiguration
         this();
 
         String smtpServer = xwiki.getXWikiPreference("smtp_server");
-        if (smtpServer.length() > 0) {
+        if (!StringUtils.isBlank(smtpServer)) {
             setHost(smtpServer);
         }
 
         String from = xwiki.getXWikiPreference("smtp_from");
-        if (from.length() > 0) {
+        if (!StringUtils.isBlank(from)) {
             setFrom(from);
         }
 

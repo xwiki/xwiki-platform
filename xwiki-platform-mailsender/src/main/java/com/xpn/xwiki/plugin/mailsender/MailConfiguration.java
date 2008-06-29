@@ -27,7 +27,9 @@ import com.xpn.xwiki.api.XWiki;
 public class MailConfiguration
 {
     private int port;
+
     private String host;
+
     private String from;
 
     public MailConfiguration()
@@ -60,7 +62,7 @@ public class MailConfiguration
     {
         return this.host;
     }
-    
+
     public void setPort(int port)
     {
         this.port = port;
@@ -81,6 +83,7 @@ public class MailConfiguration
         return this.from;
     }
 
+    @Override
     public String toString()
     {
         StringBuffer buffer = new StringBuffer();

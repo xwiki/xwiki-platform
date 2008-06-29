@@ -19,6 +19,14 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang.StringUtils;
+
 import com.xpn.xwiki.api.XWiki;
 
 /**
@@ -33,6 +41,12 @@ public class MailConfiguration
     private String host;
 
     private String from;
+
+    private String smtpUsername;
+
+    private String smtpPassword;
+
+    private Properties extraProperties;
 
     public MailConfiguration()
     {
@@ -52,6 +66,18 @@ public class MailConfiguration
         String from = xwiki.getXWikiPreference("smtp_from");
         if (from.length() > 0) {
             setFrom(from);
+        }
+
+        String smtpServerUsername = xwiki.getXWikiPreference("smtp_server_username");
+        String smtpServerPassword = xwiki.getXWikiPreference("smtp_server_password");
+        if (!StringUtils.isEmpty(smtpServerUsername) && !StringUtils.isEmpty(smtpServerPassword)) {
+            setSmtpUsername(smtpServerUsername);
+            setSmtpPassword(smtpServerPassword);
+        }
+
+        String javaMailExtraProps = xwiki.getXWikiPreference("javamail_extra_props");
+        if (!StringUtils.isEmpty(javaMailExtraProps)) {
+            setExtraProperties(javaMailExtraProps);
         }
     }
 
@@ -85,6 +111,71 @@ public class MailConfiguration
         return this.from;
     }
 
+    public void setSmtpUsername(String smtpUsername)
+    {
+        this.smtpUsername = smtpUsername;
+    }
+
+    public String getSmtpUsername()
+    {
+        return this.smtpUsername;
+    }
+
+    public void setSmtpPassword(String smtpPassword)
+    {
+        this.smtpPassword = smtpPassword;
+    }
+
+    public String getSmtpPassword()
+    {
+        return this.smtpPassword;
+    }
+
+    public boolean usesAuthentication()
+    {
+        return !StringUtils.isEmpty(getSmtpUsername()) && !StringUtils.isEmpty(getSmtpPassword());
+    }
+
+    public void setExtraProperties(String extraPropertiesString)
+    {
+        if (StringUtils.isEmpty(extraPropertiesString)) {
+            this.extraProperties = null;
+        } else {
+            InputStream is = new ByteArrayInputStream(extraPropertiesString.getBytes());
+            this.extraProperties = new Properties();
+            try {
+                this.extraProperties.load(is);
+            } catch (IOException e) {
+                // Shouldn't ever occur...
+                throw new RuntimeException("Error configuring mail connection.", e);
+            }
+        }
+    }
+
+    /**
+     * Add extraProperties to an external Properties object
+     * 
+     * @param externalProperties
+     * @param overwrite
+     */
+    public void appendExtraPropertiesTo(Properties externalProperties, boolean overwrite)
+    {
+        // sanity check
+        if (externalProperties == null) {
+            throw new IllegalArgumentException("externalProperties can't be null");
+        }
+
+        if (this.extraProperties != null && this.extraProperties.size() > 0) {
+            for (Entry<Object, Object> e : this.extraProperties.entrySet()) {
+                String propName = (String) e.getKey();
+                String propValue = (String) e.getValue();
+                if (overwrite || externalProperties.getProperty(propName) == null) {
+                    externalProperties.setProperty(propName, propValue);
+                }
+            }
+        }
+    }
+
     @Override
     public String toString()
     {
@@ -99,6 +190,11 @@ public class MailConfiguration
         }
 
         buffer.append(", Port [" + getPort() + "]");
+
+        if (usesAuthentication()) {
+            buffer.append(", Username [" + getSmtpUsername() + "]");
+            buffer.append(", Password [*****]");
+        }
 
         return buffer.toString();
     }

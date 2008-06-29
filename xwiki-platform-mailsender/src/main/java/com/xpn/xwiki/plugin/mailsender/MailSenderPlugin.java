@@ -432,6 +432,12 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
             properties.put("mail.smtp.from", mailConfiguration.getFrom());
         }
 
+        if (mailConfiguration.usesAuthentication()) {
+            properties.put("mail.smtp.auth", "true");
+        }
+
+        mailConfiguration.appendExtraPropertiesTo(properties, true);
+
         return properties;
     }
 
@@ -553,10 +559,17 @@ public class MailSenderPlugin extends XWikiDefaultPlugin
                 LOG.info("Sending email: " + mail.toString());
 
                 if ((transport == null) || (session == null)) {
+                    // initialize JavaMail Session and Transport
                     Properties props = initProperties(mailConfiguration);
                     session = Session.getDefaultInstance(props, null);
                     transport = session.getTransport("smtp");
-                    transport.connect();
+                    if (!mailConfiguration.usesAuthentication()) {
+                        // no auth info - typical 127.0.0.1 open relay scenario
+                        transport.connect();
+                    } else {
+                        // auth info present - typical with external smtp server
+                        transport.connect(mailConfiguration.getSmtpUsername(), mailConfiguration.getSmtpPassword());
+                    }
                 }
 
                 try {

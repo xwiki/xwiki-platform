@@ -20,18 +20,18 @@
  */
 package com.xpn.xwiki.plugin.mailsender;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.doc.XWikiDocument;
-
 import java.util.List;
-
-import org.jvnet.mock_javamail.Mailbox;
-import org.jmock.cglib.MockObjectTestCase;
-import org.jmock.Mock;
 
 import javax.mail.Message;
 import javax.mail.internet.InternetAddress;
+
+import org.jmock.Mock;
+import org.jmock.cglib.MockObjectTestCase;
+import org.jvnet.mock_javamail.Mailbox;
+
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.doc.XWikiDocument;
 
 /**
  * Integration tests for {@link com.xpn.xwiki.plugin.mailsender.Mail}. The tests start a SMTP server.
@@ -46,6 +46,7 @@ public class MailSenderApiTest extends MockObjectTestCase
 
     private MailSenderPluginApi api;
 
+    @Override
     protected void setUp()
     {
         this.context = new XWikiContext();

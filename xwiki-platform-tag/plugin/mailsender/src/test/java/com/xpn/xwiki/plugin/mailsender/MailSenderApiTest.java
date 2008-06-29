@@ -63,6 +63,12 @@ public class MailSenderApiTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server"), ANYTHING).will(
             returnValue("myserver"));
         this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_from"), ANYTHING).will(returnValue(""));
+        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server_username"), ANYTHING).will(
+            returnValue(""));
+        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("smtp_server_password"), ANYTHING).will(
+            returnValue(""));
+        this.mockXWiki.stubs().method("getXWikiPreference").with(eq("javamail_extra_props"), ANYTHING).will(
+            returnValue(""));
 
         MailSenderPlugin plugin = new MailSenderPlugin("dummy", "dummy", this.context);
         this.api = new MailSenderPluginApi(plugin, this.context);

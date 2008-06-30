@@ -23,10 +23,10 @@ package org.xwiki.velocity;
 import org.apache.velocity.VelocityContext;
 
 /**
- * Creates Velocity Context instances, pre-populated with the Velocity Tools enabled in the
- * component's configuration, and by all the enabled {@link VelocityContextInitializer} components.
- * The returned context is supposed to be used only once, as otherwise data may leak between
- * different requests, and the parsing/rendering process would be affected by previous data.
+ * Creates Velocity Context instances, pre-populated with the Velocity Tools enabled in the component's configuration,
+ * and by all the enabled {@link VelocityContextInitializer} components. The returned context is supposed to be used
+ * only once, as otherwise data may leak between different requests, and the parsing/rendering process would be affected
+ * by previous data.
  * 
  * @version $Id$
  */
@@ -40,8 +40,7 @@ public interface VelocityContextFactory
     /**
      * Creates and initializes a new Velocity Context.
      * 
-     * @return a new Velocity Context, populated with Tools and data pushed by
-     *         {@link VelocityContextInitializer}s
+     * @return a new Velocity Context, populated with Tools and data pushed by {@link VelocityContextInitializer}s
      * @throws XWikiVelocityException if the context failed to be created or initialized properly
      */
     VelocityContext createContext() throws XWikiVelocityException;

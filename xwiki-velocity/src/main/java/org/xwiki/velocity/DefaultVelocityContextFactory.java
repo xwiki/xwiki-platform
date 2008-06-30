@@ -37,8 +37,8 @@ import org.xwiki.component.phase.InitializationException;
  * 
  * @version $Id$
  */
-public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
-    VelocityContextFactory, Initializable, Composable
+public class DefaultVelocityContextFactory extends AbstractLogEnabled implements VelocityContextFactory, Initializable,
+    Composable
 {
     /**
      * The component manager we used to find all components implementing the
@@ -52,8 +52,8 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
     private Properties properties;
 
     /**
-     * An internal read-only Velocity Context containing the Tools defined in the component's
-     * configuration. We reuse them across Contexts for better performance.
+     * An internal read-only Velocity Context containing the Tools defined in the component's configuration. We reuse
+     * them across Contexts for better performance.
      */
     private Context toolsContext;
 
@@ -78,16 +78,14 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
 
         // Instantiate Velocity tools
         if (this.properties != null) {
-            for (Enumeration< ? > props = this.properties.propertyNames(); props
-                .hasMoreElements();) {
+            for (Enumeration< ? > props = this.properties.propertyNames(); props.hasMoreElements();) {
                 String key = props.nextElement().toString();
                 String value = this.properties.getProperty(key);
                 Object toolInstance;
                 try {
                     toolInstance = Class.forName(value).newInstance();
                 } catch (Exception e) {
-                    throw new InitializationException(
-                        "Failed to initialize tool [" + value + "]", e);
+                    throw new InitializationException("Failed to initialize tool [" + value + "]", e);
                 }
                 this.toolsContext.put(key, toolInstance);
                 getLogger().debug("Setting tool [" + key + "] = [" + value + "]");
@@ -107,13 +105,11 @@ public class DefaultVelocityContextFactory extends AbstractLogEnabled implements
 
         // Call all components implementing the VelocityContextInitializer's role.
         try {
-            for (Object interceptor : this.componentManager
-                .lookupList(VelocityContextInitializer.ROLE)) {
+            for (Object interceptor : this.componentManager.lookupList(VelocityContextInitializer.ROLE)) {
                 ((VelocityContextInitializer) interceptor).initialize(context);
             }
         } catch (ComponentLookupException e) {
-            throw new XWikiVelocityException(
-                "Failed to locate some Velocity Context initializers", e);
+            throw new XWikiVelocityException("Failed to locate some Velocity Context initializers", e);
         }
 
         return context;

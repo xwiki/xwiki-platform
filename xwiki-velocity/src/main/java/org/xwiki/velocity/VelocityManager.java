@@ -23,8 +23,8 @@ package org.xwiki.velocity;
 import org.apache.velocity.VelocityContext;
 
 /**
- * Provides access to the main XWiki Velocity objects. 
- *
+ * Provides access to the main XWiki Velocity objects.
+ * 
  * @since 1.5M2
  * @version $Id$
  */
@@ -39,14 +39,14 @@ public interface VelocityManager
      * @return the current Velocity Context retrieved from the Execution Context
      */
     VelocityContext getVelocityContext();
-    
+
     /**
      * Get the current Velocity Engine or create one if none has been created.
-     *
+     * 
      * @return the current Velocity Engine retrieved from the Execution Context
      * @throws XWikiVelocityException if the Velocity Engine cannot be created
-     * @todo Move the engine creation to some initialization method instead and remove the need
-     *       for throwing an exception
+     * @todo Move the engine creation to some initialization method instead and remove the need for throwing an
+     *       exception
      */
     VelocityEngine getVelocityEngine() throws XWikiVelocityException;
 }

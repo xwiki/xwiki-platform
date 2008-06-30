@@ -20,39 +20,37 @@
  */
 package org.xwiki.velocity;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-
 /**
  * Default implementation for {@link VelocityFactory}.
- *
+ * 
  * @see VelocityFactory
- * @version $Id$ 
+ * @version $Id$
  */
-public class DefaultVelocityFactory extends AbstractLogEnabled
-    implements VelocityFactory, Composable
+public class DefaultVelocityFactory extends AbstractLogEnabled implements VelocityFactory, Composable
 {
     /**
-     * The Component manager we use to lookup (and thus create since it's a singleton) the
-     * VelocityEngine component.
+     * The Component manager we use to lookup (and thus create since it's a singleton) the VelocityEngine component.
      */
     private ComponentManager componentManager;
 
     /**
-     * A cache of Velocity Engines. See {@link org.xwiki.velocity.VelocityFactory} for more details
-     * as to why we need this cache.
+     * A cache of Velocity Engines. See {@link org.xwiki.velocity.VelocityFactory} for more details as to why we need
+     * this cache.
      */
     private Map<String, VelocityEngine> velocityEngines = new HashMap<String, VelocityEngine>();
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see Composable#compose(ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -62,7 +60,7 @@ public class DefaultVelocityFactory extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see VelocityFactory#hasVelocityEngine(String)
      */
     public boolean hasVelocityEngine(String key)
@@ -72,7 +70,7 @@ public class DefaultVelocityFactory extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see VelocityFactory#getVelocityEngine(String)
      */
     public VelocityEngine getVelocityEngine(String key)
@@ -82,11 +80,10 @@ public class DefaultVelocityFactory extends AbstractLogEnabled
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see VelocityFactory#createVelocityEngine(String, Properties)
      */
-    public VelocityEngine createVelocityEngine(String key, Properties properties)
-        throws XWikiVelocityException
+    public VelocityEngine createVelocityEngine(String key, Properties properties) throws XWikiVelocityException
     {
         VelocityEngine engine;
         if (this.velocityEngines.containsKey(key)) {

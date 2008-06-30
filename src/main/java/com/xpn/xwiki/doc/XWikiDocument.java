@@ -863,34 +863,49 @@ public class XWikiDocument
     }
 
     /**
-     * return a wrapped version of an XWikiDocument. Prefer this function instead of new Document(XWikiDocument,
-     * XWikiContext)
+     * Create a new protected {@link com.xpn.xwiki.api.Document} public API to access page information and actions from
+     * scripting.
+     * 
+     * @param customClassName the name of the custom {@link com.xpn.xwiki.api.Document} class of the object to create.
+     * @param context the XWiki context.
+     * @return a wrapped version of an XWikiDocument. Prefer this function instead of new Document(XWikiDocument,
+     *         XWikiContext)
      */
     public com.xpn.xwiki.api.Document newDocument(String customClassName, XWikiContext context)
     {
         if (!((customClassName == null) || (customClassName.equals("")))) {
             try {
-                Class< ? >[] classes = new Class[] {XWikiDocument.class, XWikiContext.class};
-                Object[] args = new Object[] {this, context};
-                return (com.xpn.xwiki.api.Document) Class.forName(customClassName).getConstructor(classes).newInstance(
-                    args);
-            } catch (InstantiationException e) {
-                e.printStackTrace(); // To change body of catch statement use File | Settings |
-                // File Templates.
-            } catch (IllegalAccessException e) {
-                e.printStackTrace(); // To change body of catch statement use File | Settings |
-                // File Templates.
+                return newDocument(Class.forName(customClassName), context);
             } catch (ClassNotFoundException e) {
-                e.printStackTrace(); // To change body of catch statement use File | Settings |
-                // File Templates.
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace(); // To change body of catch statement use File | Settings |
-                // File Templates.
-            } catch (InvocationTargetException e) {
-                e.printStackTrace(); // To change body of catch statement use File | Settings |
-                // File Templates.
+                log.error("Failed to get java Class object from class name", e);
             }
         }
+
+        return new com.xpn.xwiki.api.Document(this, context);
+    }
+
+    /**
+     * Create a new protected {@link com.xpn.xwiki.api.Document} public API to access page information and actions from
+     * scripting.
+     * 
+     * @param customClass the custom {@link com.xpn.xwiki.api.Document} class the object to create.
+     * @param context the XWiki context.
+     * @return a wrapped version of an XWikiDocument. Prefer this function instead of new Document(XWikiDocument,
+     *         XWikiContext)
+     */
+    public com.xpn.xwiki.api.Document newDocument(Class< ? > customClass, XWikiContext context)
+    {
+        if (customClass != null) {
+            try {
+                Class< ? >[] classes = new Class[] {XWikiDocument.class, XWikiContext.class};
+                Object[] args = new Object[] {this, context};
+
+                return (com.xpn.xwiki.api.Document) customClass.getConstructor(classes).newInstance(args);
+            } catch (Exception e) {
+                log.error("Failed to create a custom Document object", e);
+            }
+        }
+
         return new com.xpn.xwiki.api.Document(this, context);
     }
 
@@ -997,8 +1012,7 @@ public class XWikiDocument
                 if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
                     // Date range matching
                     if (nodeinfo.getDate().after(criteria.getMinDate())
-                        && nodeinfo.getDate().before(criteria.getMaxDate()))
-                    {
+                        && nodeinfo.getDate().before(criteria.getMaxDate())) {
                         results.add(nodeinfo.getVersion().toString());
                     }
                 }

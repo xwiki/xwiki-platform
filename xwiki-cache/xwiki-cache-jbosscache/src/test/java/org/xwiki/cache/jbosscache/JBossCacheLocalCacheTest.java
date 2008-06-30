@@ -21,10 +21,10 @@ public class JBossCacheLocalCacheTest extends AbstractTestCache
     {
         super(roleHint);
     }
-    
+
     // ///////////////////////////////////////////////////////::
     // Tests
-    
+
     /**
      * Validate the maximum time to live constraint.
      * 
@@ -60,11 +60,12 @@ public class JBossCacheLocalCacheTest extends AbstractTestCache
         cache.dispose();
     }
 
-    /*public void testCreateAndDestroyCacheLRUMaxEntries() throws ComponentLookupException, Exception
+    public void testCreateAndDestroyCacheLRUMaxEntries() throws Exception
     {
         CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
+        conf.setConfigurationId("unit-test");
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setMaxEntries(1);
         // Force JBoss eviction interval to the minimum
@@ -91,19 +92,22 @@ public class JBossCacheLocalCacheTest extends AbstractTestCache
         assertEquals(2, cache.get("key2"));
 
         cache.dispose();
-    }*/
+    }
 
-    /*public void testCreateAndDestroyCacheLRUAll() throws ComponentLookupException, Exception
+    public void testCreateAndDestroyCacheLRUAll() throws Exception
     {
         CacheFactory factory = getCacheFactory();
 
         CacheConfiguration conf = new CacheConfiguration();
         LRUEvictionConfiguration lec = new LRUEvictionConfiguration();
         lec.setMaxEntries(1);
-        lec.setTimeToLive(1);
+        lec.setTimeToLive(2);
         conf.put(LRUEvictionConfiguration.CONFIGURATIONID, lec);
 
         Cache<Object> cache = factory.newCache(conf);
+
+        CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
+        cache.addCacheEntryListener(eventListener);
 
         assertNotNull(cache);
 
@@ -113,14 +117,19 @@ public class JBossCacheLocalCacheTest extends AbstractTestCache
 
         cache.set("key2", 2);
 
+        // Wait for the JBoss Eviction policy to be called
+        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
+        eventListener.reinitRemovedEvent();
+
         assertNull(cache.get("key"));
         assertEquals(2, cache.get("key2"));
 
-        Thread.sleep(1000);
+        // Wait for the JBoss Eviction policy to be called
+        assertTrue("No value has been evicted from the cache", eventListener.waitForEntryEvent(EventType.REMOVE));
 
         assertNull(cache.get("key"));
         assertNull(cache.get("key2"));
 
         cache.dispose();
-    }*/
+    }
 }

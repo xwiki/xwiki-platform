@@ -79,11 +79,6 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     private ConcurrentMap<String, Map<String, T>> preEventData = new ConcurrentHashMap<String, Map<String, T>>();
 
     /**
-     * The state of the value before its eviction from the cache.
-     */
-    private T preEvictionData;
-
-    /**
      * Create and initialize the cache.
      * 
      * @param jbosscacheConfiguration the configuration to use to create the cache.
@@ -177,13 +172,9 @@ public class JBossCacheCache<T> extends AbstractCache<T>
 
         String key = event.getFqn().getLastElementAsString();
 
-        event.getType();
-
-        if (event.isPre()) {
-            this.preEvictionData = get(key);
-        } else {
-            cacheEntryRemoved(key, this.preEvictionData);
-            this.preEvictionData = null;
+        if (!event.isPre()) {
+            // Trying to get the evicted value disrupt eviction process
+            cacheEntryRemoved(key, null);
         }
     }
 

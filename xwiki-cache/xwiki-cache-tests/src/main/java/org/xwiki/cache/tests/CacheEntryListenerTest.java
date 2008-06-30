@@ -51,7 +51,15 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
      */
     public CacheEntryEvent<Object> getAddedEvent()
     {
-        return addedEvent;
+        return this.addedEvent;
+    }
+
+    /**
+     * Set add event to null.
+     */
+    public void reinitAddEvent()
+    {
+        this.addedEvent = null;
     }
 
     /**
@@ -59,7 +67,15 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
      */
     public CacheEntryEvent<Object> getModifiedEvent()
     {
-        return modifiedEvent;
+        return this.modifiedEvent;
+    }
+
+    /**
+     * Set modified event to null.
+     */
+    public void reinitModifiedEvent()
+    {
+        this.modifiedEvent = null;
     }
 
     /**
@@ -67,7 +83,15 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
      */
     public CacheEntryEvent<Object> getRemovedEvent()
     {
-        return removedEvent;
+        return this.removedEvent;
+    }
+
+    /**
+     * Set removed event to null.
+     */
+    public void reinitRemovedEvent()
+    {
+        this.removedEvent = null;
     }
 
     /**
@@ -111,7 +135,7 @@ public class CacheEntryListenerTest implements CacheEntryListener<Object>
 
         Thread thread = new Thread(eventWaiter);
         thread.start();
-        thread.join(10000);
+        thread.join(100000);
 
         if (thread.isAlive()) {
             eventWaiter.stop();

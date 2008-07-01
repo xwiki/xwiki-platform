@@ -23,7 +23,7 @@ import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.doxia.internal.DocumentGeneratorSink;
+import org.xwiki.rendering.doxia.internal.XDOMGeneratorSink;
 
 import java.io.Reader;
 
@@ -38,7 +38,7 @@ public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements 
     public XDOM parse(Reader source) throws ParseException
     {
         org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
-        DocumentGeneratorSink sink = new DocumentGeneratorSink();
+        XDOMGeneratorSink sink = new XDOMGeneratorSink();
 
         try {
             parser.parse(source, sink);

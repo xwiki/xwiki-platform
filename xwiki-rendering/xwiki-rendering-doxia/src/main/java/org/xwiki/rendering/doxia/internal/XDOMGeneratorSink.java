@@ -47,7 +47,7 @@ import org.xwiki.rendering.listener.SectionLevel;
  * @version $Id$
  * @since 1.5M2
  */
-public class DocumentGeneratorSink implements Sink
+public class XDOMGeneratorSink implements Sink
 {
     private Stack<Block> stack = new Stack<Block>();
     

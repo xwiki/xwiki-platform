@@ -65,8 +65,16 @@ public interface Listener
     
     void endXMLElement(String name, Map<String, String> attributes);
 
+    /**
+     * A special event that Macro Blocks emits when they are executed so that it's possible to reconstruct
+     * the initial syntax even after Macros have been executed.
+     */
     void beginMacroMarker(String name, Map<String, String> parameters, String content);
 
+    /**
+     * A special event that Macro Blocks emits when they are executed so that it's possible to reconstruct
+     * the initial syntax even after Macros have been executed.
+     */
     void endMacroMarker(String name, Map<String, String> parameters, String content);
 
     /**

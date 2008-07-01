@@ -21,9 +21,9 @@ package org.xwiki.rendering.renderer;
 
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.util.Iterator;
 import java.util.Map;
 
+import org.xwiki.rendering.internal.XWikiMacroPrinter;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
@@ -47,9 +47,12 @@ public class XWikiSyntaxRenderer implements Renderer
 
     private boolean isInsideMacroMarker = false;
     
+    private XWikiMacroPrinter macroPrinter;
+    
     public XWikiSyntaxRenderer(Writer writer)
     {
         this.writer = new PrintWriter(writer);
+        this.macroPrinter = new XWikiMacroPrinter();
     }
 
     public void beginDocument()
@@ -132,26 +135,7 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("{").append(name);
-        if (!parameters.isEmpty()) {
-            buffer.append(':');
-            for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
-                String paramName = paramsIt.next();
-                buffer.append(paramName).append("=").append(parameters.get(paramName));
-                if (paramsIt.hasNext()) {
-                    buffer.append("|");
-                }
-            }
-        }
-        if (content == null) {
-            buffer.append("/}");
-        } else {
-            buffer.append('}');
-            buffer.append(content);
-            buffer.append("{/").append(name).append("}");
-        }
-        write(buffer.toString());
+    	write(this.macroPrinter.print(name, parameters, content));
     }
 
     public void beginSection(SectionLevel level)

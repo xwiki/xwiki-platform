@@ -110,10 +110,17 @@ public class MacroTransformation extends AbstractTransformation implements Compo
                 Macro macro = (Macro) this.componentManager.lookup(Macro.ROLE, hintName);
                 macroHolders.add(new MacroHolder(macro, macroBlock));
             } catch (ComponentLookupException e) {
+            	// TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load it again
+            	// and 2) the user can clearly see that it failed to be executed.
                 getLogger().warn("Failed to find macro [" + macroBlock.getName() + "] for hint [" + hintName
                     + "]. Ignoring it");
             }
         }
+        // If no macros were found, return with no changes. This can happen if the macros fail to be found.
+        if (macroHolders.isEmpty()) {
+        	return;
+        }
+        // Sort the Macros by priority
         Collections.sort(macroHolders);
         
         // 2) Execute the highest priority macro

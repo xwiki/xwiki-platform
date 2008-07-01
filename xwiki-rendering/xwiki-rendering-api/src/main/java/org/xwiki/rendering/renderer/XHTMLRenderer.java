@@ -201,7 +201,7 @@ public class XHTMLRenderer implements Renderer
         // Ignore macro markers, nothing to do.
     }
 
-    private void write(String text)
+    protected void write(String text)
     {
         this.writer.write(text);
     }

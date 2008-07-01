@@ -27,6 +27,10 @@ import org.xwiki.rendering.DocumentManager;
 import junit.framework.Test;
 import junit.framework.TestCase;
 
+/**
+ * @version $Id$
+ * @since 1.5M2
+ */
 public class XHTMLRendererTestSuite extends TestCase
 {
     public static Test suite() throws Exception

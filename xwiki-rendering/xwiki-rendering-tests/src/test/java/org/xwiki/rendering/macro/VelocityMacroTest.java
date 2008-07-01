@@ -41,14 +41,16 @@ public class VelocityMacroTest extends AbstractRenderingTestCase
             + "* $item\n"
             + "#end";
         
-        String expected = "beginList: [BULLETED]\n" +
-            "beginListItem\n" +
-            "onWord: [one]\n" +
-            "endListItem\n" +
-            "beginListItem\n" +
-            "onWord: [two]\n" +
-            "endListItem\n" +
-            "endList: [BULLETED]\n";
+        String expected = "beginDocument\n"
+        	+ "beginList: [BULLETED]\n"
+            + "beginListItem\n"
+            + "onWord: [one]\n"
+            + "endListItem\n"
+            + "beginListItem\n"
+            + "onWord: [two]\n"
+            + "endListItem\n"
+            + "endList: [BULLETED]\n"
+            + "endDocument\n";
 
         Macro macro = (Macro) getComponentManager().lookup(VelocityMacro.ROLE, "velocity/xwiki");
         List<Block> blocks = macro.execute(Collections.EMPTY_MAP, content,

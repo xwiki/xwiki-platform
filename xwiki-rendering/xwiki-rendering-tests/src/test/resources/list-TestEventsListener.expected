@@ -1,3 +1,4 @@
+beginDocument
 beginList: [NUMBERED]
 beginListItem
 onWord: [Item]
@@ -65,3 +66,4 @@ onSpace
 onWord: [6]
 endListItem
 endList: [BULLETED]
+endDocument

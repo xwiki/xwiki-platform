@@ -1,3 +1,4 @@
+beginDocument
 beginParagraph
 onWord: [hello]
 onSpace
@@ -9,3 +10,4 @@ beginBold
 onWord: [world]
 endBold
 endParagraph
+endDocument

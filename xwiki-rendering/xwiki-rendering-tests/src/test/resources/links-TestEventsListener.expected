@@ -1,3 +1,4 @@
+beginDocument
 beginParagraph
 onLink: [Reference = [Space.ExistingPage]]
 onLineBreak
@@ -11,3 +12,4 @@ onLink: [Reference = [mailto:john@doe.com]]
 onLineBreak
 onLink: [Reference = [{macro}]]
 endParagraph
+endDocument

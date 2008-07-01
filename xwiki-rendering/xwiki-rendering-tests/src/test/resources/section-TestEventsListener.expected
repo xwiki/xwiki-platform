@@ -1,3 +1,4 @@
+beginDocument
 beginSection: [1]
 onWord: [Title]
 onSpace
@@ -50,3 +51,4 @@ onWord: [level]
 onSpace
 onWord: [7]
 endSection: [6]
+endDocument

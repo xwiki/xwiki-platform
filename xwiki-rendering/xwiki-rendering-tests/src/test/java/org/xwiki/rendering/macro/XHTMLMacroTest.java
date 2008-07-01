@@ -44,7 +44,8 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "</tr>\n"
             + "</table>";
 
-        String expected = "beginXMLElement: [table] [border=1]\n"
+        String expected = "beginDocument\n"
+        	+ "beginXMLElement: [table] [border=1]\n"
             + "beginXMLElement: [tr] []\n"
             + "beginXMLElement: [td] []\n"
             + "beginList: [BULLETED]\n"
@@ -54,7 +55,8 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endList: [BULLETED]\n"
             + "endXMLElement: [td] []\n"
             + "endXMLElement: [tr] []\n"
-            + "endXMLElement: [table] [border=1]\n";
+            + "endXMLElement: [table] [border=1]\n"
+            + "endDocument\n";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, 

@@ -30,7 +30,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -421,10 +420,9 @@ public class Package
         Element docFiles = xml.getRootElement();
         Element infosFiles = docFiles.element("files");
 
-        List fileList = infosFiles.elements("file");
+        List<Element> fileList = infosFiles.elements("file");
 
-        for (Iterator it = fileList.iterator(); it.hasNext();) {
-            Element el = (Element) it.next();
+        for (Element el : fileList) {
             String tmpDocName = el.getStringValue();
             if (tmpDocName.compareTo(docName) != 0) {
                 continue;
@@ -446,9 +444,8 @@ public class Package
         Element docFiles = xml.getRootElement();
         Element infosFiles = docFiles.element("files");
 
-        List fileList = infosFiles.elements("file");
-        for (int i = 0; i < fileList.size(); i++) {
-            Element el = (Element) fileList.get(i);
+        List<Element> fileList = infosFiles.elements("file");
+        for (Element el : fileList) {
             String defaultAction = el.attributeValue("defaultAction");
             String language = el.attributeValue("language");
             if (language == null) {
@@ -634,6 +631,7 @@ public class Package
     private List<String> getStringList(String name, XWikiContext context)
     {
         List<String> list = (List<String>) context.get(name);
+
         if (list == null) {
             list = new ArrayList<String>();
             context.put(name, list);
@@ -703,9 +701,9 @@ public class Package
     {
         ByteArrayOutputStream baos = new ByteArrayOutputStream((size > 0) ? (int) size : 4096);
         byte[] data = new byte[4096];
-        int Cnt;
-        while ((Cnt = zin.read(data, 0, 4096)) != -1) {
-            baos.write(data, 0, Cnt);
+        int cnt;
+        while ((cnt = zin.read(data, 0, 4096)) != -1) {
+            baos.write(data, 0, cnt);
         }
 
         return new ByteArrayInputStream(baos.toByteArray());

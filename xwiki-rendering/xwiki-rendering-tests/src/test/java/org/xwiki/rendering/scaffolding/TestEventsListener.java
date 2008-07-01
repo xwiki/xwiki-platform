@@ -38,7 +38,17 @@ public class TestEventsListener implements Listener
         this.writer = new PrintWriter(writer);
     }
 
-    public void beginBold()
+    public void beginDocument()
+    {
+    	write("beginDocument");
+	}
+
+	public void endDocument()
+	{
+		write("endDocument");
+	}
+
+	public void beginBold()
     {
         write("beginBold");
     }

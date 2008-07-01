@@ -50,7 +50,17 @@ public class XHTMLRenderer implements Renderer
         this.linkRenderer = new XHTMLLinkRenderer(documentManager);
     }
 
-    public void beginBold()
+    public void beginDocument()
+    {
+    	// Don't do anything
+	}
+
+	public void endDocument()
+	{
+    	// Don't do anything
+	}
+
+	public void beginBold()
     {
         write("<strong>");
     }

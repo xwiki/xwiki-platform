@@ -46,6 +46,7 @@ public class XDOM extends AbstractFatherBlock
      */
     public void before(Listener listener)
     {
+    	listener.beginDocument();
     }
 
     /**
@@ -54,5 +55,6 @@ public class XDOM extends AbstractFatherBlock
      */
     public void after(Listener listener)
     {
+    	listener.endDocument();
     }
 }

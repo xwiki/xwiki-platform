@@ -27,6 +27,16 @@ import java.util.Map;
  */
 public interface Listener
 {
+	/**
+	 * First event generated representing the start of the document.
+	 */
+	void beginDocument();
+
+	/**
+	 * Last event generated representing the end of the document.
+	 */
+	void endDocument();
+	
     void beginBold();
 
     void endBold();

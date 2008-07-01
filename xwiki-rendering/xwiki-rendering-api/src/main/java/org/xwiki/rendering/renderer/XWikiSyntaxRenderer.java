@@ -52,6 +52,16 @@ public class XWikiSyntaxRenderer implements Renderer
         this.writer = new PrintWriter(writer);
     }
 
+    public void beginDocument()
+    {
+    	// Don't do anything
+	}
+
+	public void endDocument()
+	{
+    	// Don't do anything
+	}
+    
     public void onLink(Link link)
     {
         write("[");

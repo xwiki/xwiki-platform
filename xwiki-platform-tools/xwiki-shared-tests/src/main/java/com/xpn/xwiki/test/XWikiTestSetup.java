@@ -101,19 +101,30 @@ public class XWikiTestSetup extends TestSetup
 
     private void startXWiki() throws Exception
     {
-        ExecTask execTask = (ExecTask) this.project.createTask("exec");
-        execTask.setDir(new File(EXECUTION_DIRECTORY));
-        Commandline commandLine = new Commandline(START_COMMAND);
-        execTask.setCommand(commandLine);
-        execTask.execute();
+        File dir = new File(EXECUTION_DIRECTORY);
+        if (dir.exists()) {
+            ExecTask execTask = (ExecTask) this.project.createTask("exec");
+            execTask.setDir(new File(EXECUTION_DIRECTORY));
+            Commandline commandLine = new Commandline(START_COMMAND);
+            execTask.setCommand(commandLine);
+            execTask.execute();
+        } else {
+            throw new Exception("Invalid directory from where to start XWiki [" + EXECUTION_DIRECTORY + "]");
+        }
     }
 
-    private Task createStopTask()
+    private Task createStopTask() throws Exception
     {
-        ExecTask execTask = (ExecTask) this.project.createTask("exec");
-        execTask.setDir(new File(EXECUTION_DIRECTORY));
-        Commandline commandLine = new Commandline(STOP_COMMAND);
-        execTask.setCommand(commandLine);
+        ExecTask execTask;
+        File dir = new File(EXECUTION_DIRECTORY);
+        if (dir.exists()) {
+            execTask = (ExecTask) this.project.createTask("exec");
+            execTask.setDir(new File(EXECUTION_DIRECTORY));
+            Commandline commandLine = new Commandline(STOP_COMMAND);
+            execTask.setCommand(commandLine);
+        } else {
+            throw new Exception("Invalid directory from where to stop XWiki [" + EXECUTION_DIRECTORY + "]");
+        }
         return execTask;
     }
 

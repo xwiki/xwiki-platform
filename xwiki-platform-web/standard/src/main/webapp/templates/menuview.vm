@@ -11,7 +11,7 @@
   #set ($adminapppresent = $xwiki.exists("XWiki.AdminSheet"))
   #if(!$hasAdminWikiRights && $adminapppresent)
     #xwikitopmenuentrystart($adminspaceaction $msg.get("core.menu.admin") "tmAdmin")
-    #submenuitem($adminspaceaction $msg.get("core.menu.admin.space", [$doc.space]))    
+    #submenuitem($adminspaceaction $msg.get("core.menu.admin.space", [$doc.space]))
     #xwikitopmenuentryend()
   #else
     #if ($adminapppresent)
@@ -145,19 +145,6 @@
 #if ($xwiki.watchlist && $context.user != "XWiki.XWikiGuest" && !$doc.isNew() && $xwiki.exists("XWiki.WatchListManager"))
 <script type="text/javascript">
 //<![CDATA[
-function reloadActionMenu()
-{
-  var id = 'menuview';
-  var surl = '$doc.getURL("view", "xpage=xpart&vm=menuview.vm")';
-  var myAjax = new Ajax.Updater(
-    id,
-    surl,
-    {
-      method: 'get',
-      evalScripts: true,
-      onComplete: function() {}
-    });
-}
 function watchlist(action)
 {
   var surl = '$doc.getURL("view", "xpage=watch&do=")' + action;
@@ -165,10 +152,18 @@ function watchlist(action)
     surl,
     {
       method: 'get',
-      onComplete: reloadActionMenu()
+      onComplete: function() {
+          new Ajax.Updater(
+          'menuview',
+          '$doc.getURL("view", "xpage=xpart&vm=menuview.vm")',
+          {
+            method: 'get',
+            evalScripts: true
+          })
+        }
     });
 }
-//]]>              
+//]]>
 </script>
   #set ($isDocWatched = $xwiki.watchlist.isDocumentWatched())
   #set ($isSpaceWatched = $xwiki.watchlist.isSpaceWatched())

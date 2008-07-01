@@ -19,9 +19,12 @@
  */
 package org.xwiki.rendering.macro;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 
@@ -31,8 +34,42 @@ import org.xwiki.rendering.block.XDOM;
  */
 public class TocMacro extends AbstractMacro
 {
+    private static final String DESCRIPTION = "Generates a Table Of Contents.";
+
     private boolean isNumbered;
+
+    private Map<String, String> allowedParameters;
     
+	/**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+		// TODO: Use an I8N service to translate the descriptions in several languages
+		this.allowedParameters = new HashMap<String, String>();
+	}
+
+	/**
+     * {@inheritDoc}
+     * @see Macro#getDescription()
+     */
+	public String getDescription()
+	{
+		// TODO: Use an I8N service to translate the description in several languages
+		return DESCRIPTION;
+	}
+
+    /**
+     * {@inheritDoc}
+     * @see Macro#getAllowedParameters()
+     */
+	public Map<String, String> getAllowedParameters()
+	{
+		// We send a copy of the map and not our map since we don't want it to be modified.
+		return new HashMap<String, String>(this.allowedParameters);
+	}
+	
     public List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
     {
         // Example:

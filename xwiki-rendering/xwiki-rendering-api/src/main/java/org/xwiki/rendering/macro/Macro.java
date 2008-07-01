@@ -35,8 +35,25 @@ public interface Macro extends Comparable<Macro>
      * This component's role, used when code needs to look it up.
      */
     String ROLE = Macro.class.getName();
-    
+
+    /**
+     * The priority of execution relative to the other MAcros. The lowest values have the highest priorities
+     * and execute first. For example a MAcro with a priority of 100 will execute before one with a priority
+     * of 500. 
+     *
+     * @return the execution priority
+     */
     int getPriority();
+
+    /**
+     * @return the Macro's description
+     */
+    String getDescription();
+
+    /**
+     * @return the Macro's allowed parameter names and their descriptions
+     */
+    Map<String, String> getAllowedParameters();
     
     List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
         throws MacroExecutionException;

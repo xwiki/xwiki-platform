@@ -26,11 +26,14 @@ import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.DocumentManager;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.Execution;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.io.StringReader;
@@ -39,13 +42,15 @@ import java.io.StringReader;
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacro extends AbstractMacro
+public class IncludeMacro extends AbstractMacro implements Initializable
 {
     private static final String CONTEXT_NEW = "new";
 
     private static final String CONTEXT_CURRENT = "current";
 
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
+
+    private static final String DESCRIPTION = "Include other pages into the current page.";
     
     /**
      * Injected by the Component Manager.
@@ -69,7 +74,45 @@ public class IncludeMacro extends AbstractMacro
 
     private DocumentManager documentManager;
 
+    private Map<String, String> allowedParameters;
+    
+	/**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+		// TODO: Use an I8N service to translate the descriptions in several languages
+		this.allowedParameters = new HashMap<String, String>();
+		this.allowedParameters.put("document", "The name of the document to include. For example: \"Space.Page\".");
+		this.allowedParameters.put("context", "Defines whether the included page is executed in its separated "
+            + "execution context or whether it's executed in the contex of the current page. If the value is \""
+            + CONTEXT_NEW + "\" then it's executed in its own context. If the value is \"" + CONTEXT_CURRENT 
+            + "\" it's executed in the context of the current page. This affects for example whether the Velocity "
+            + "variables of the current page will be visible in the included page or not.");
+	}
+
+	/**
+     * {@inheritDoc}
+     * @see Macro#getDescription()
+     */
+	public String getDescription()
+	{
+		// TODO: Use an I8N service to translate the description in several languages
+		return DESCRIPTION;
+	}
+
     /**
+     * {@inheritDoc}
+     * @see Macro#getAllowedParameters()
+     */
+	public Map<String, String> getAllowedParameters()
+	{
+		// We send a copy of the map and not our map since we don't want it to be modified.
+		return new HashMap<String, String>(this.allowedParameters);
+	}
+
+	/**
      * Allows overriding the Document Manager used (useful for unit tests).
      *
      * @param documentManager the new Document Manager to use

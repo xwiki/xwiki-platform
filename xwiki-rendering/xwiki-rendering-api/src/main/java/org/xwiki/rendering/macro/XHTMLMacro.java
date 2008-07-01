@@ -20,12 +20,15 @@
 package org.xwiki.rendering.macro;
 
 import java.io.StringReader;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -34,13 +37,47 @@ import org.xwiki.rendering.parser.Parser;
  * @version $Id$
  * @since 1.5M2
  */
-public class XHTMLMacro extends AbstractMacro
+public class XHTMLMacro extends AbstractMacro implements Initializable
 {
+    private static final String DESCRIPTION = "Inserts XHTML code into the page.";
+
     /**
      * Injected by the Component Manager.
      */
     private Parser parser;
+
+    private Map<String, String> allowedParameters;
     
+	/**
+     * {@inheritDoc}
+     * @see Initializable#initialize()
+     */
+    public void initialize() throws InitializationException
+    {
+		// TODO: Use an I8N service to translate the descriptions in several languages
+		this.allowedParameters = new HashMap<String, String>();
+	}
+
+	/**
+     * {@inheritDoc}
+     * @see Macro#getDescription()
+     */
+	public String getDescription()
+	{
+		// TODO: Use an I8N service to translate the description in several languages
+		return DESCRIPTION;
+	}
+
+    /**
+     * {@inheritDoc}
+     * @see Macro#getAllowedParameters()
+     */
+	public Map<String, String> getAllowedParameters()
+	{
+		// We send a copy of the map and not our map since we don't want it to be modified.
+		return new HashMap<String, String>(this.allowedParameters);
+	}
+	
     /**
      * {@inheritDoc}
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)

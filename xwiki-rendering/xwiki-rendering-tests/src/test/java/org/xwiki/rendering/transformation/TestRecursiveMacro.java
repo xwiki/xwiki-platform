@@ -21,6 +21,7 @@ package org.xwiki.rendering.transformation;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,17 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 
 public class TestRecursiveMacro extends AbstractMacro
 {
-    public List<Block> execute(Map<String, String> parameters, String content,
+    public Map<String, String> getAllowedParameters()
+    {
+		return new HashMap<String, String>();
+	}
+
+	public String getDescription()
+	{
+		return "Recursive Macro";
+	}
+
+	public List<Block> execute(Map<String, String> parameters, String content,
         XDOM dom) throws MacroExecutionException
     {
         return Arrays.asList((Block) new MacroBlock("testrecursivemacro", 

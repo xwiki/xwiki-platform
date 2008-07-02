@@ -49,6 +49,7 @@ import org.dom4j.io.XMLWriter;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.classes.BaseClass;
 
@@ -595,6 +596,10 @@ public class Package
                 // So we need to cancel the dirty status
                 doc.getDoc().setContentDirty(false);
                 doc.getDoc().setMetaDataDirty(false);
+                for (XWikiAttachment xa : doc.getDoc().getAttachmentList()) {
+                    xa.setMetaDataDirty(false);
+                    xa.getAttachment_content().setContentDirty(false);
+                }
 
                 context.getWiki().saveDocument(doc.getDoc(), context);
                 doc.getDoc().saveAllAttachments(false, true, context);

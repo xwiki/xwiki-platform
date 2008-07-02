@@ -88,6 +88,9 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
                     session.update(content);
                 }
 
+                if (attachment.getAttachment_archive()==null) {
+                    attachment.loadArchive(context);
+                }
                 context.getWiki().getAttachmentVersioningStore()
                     .saveArchive(attachment.getAttachment_archive(), context, false);
                 

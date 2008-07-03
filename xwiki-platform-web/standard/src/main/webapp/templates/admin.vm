@@ -74,6 +74,7 @@
   #if($xwiki.exists("XWiki.AdminSheet"))
     $xwiki.getDocument("XWiki.AdminSheet").getTranslatedDocument().getRenderedContent()
   #else ## empty wiki, display only Import
+    #warning($msg.get("admin.adminappnotinstalled", ["<a href='http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication'>http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication</a>"]))
     <div id="admin-page">
       <div id="admin-page-header">
         <h1 id="admin-header">$msg.get("admin.import")</h1>

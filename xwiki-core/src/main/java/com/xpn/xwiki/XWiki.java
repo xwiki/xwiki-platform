@@ -5126,7 +5126,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public CacheFactory getCacheFactory()
     {
-        String cacheHint = Param("xwiki.cache.cachefactory.hint", "default");
+        String cacheHint = Param("xwiki.cache.cachefactory.hint", "oscache");
 
         return (CacheFactory) Utils.getComponent(CacheFactory.ROLE, cacheHint);
     }
@@ -5137,7 +5137,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
      */
     public CacheFactory getLocalCacheFactory()
     {
-        String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", "default");
+        String localCacheHint = Param("xwiki.cache.cachefactory.local.hint", "oscache/local");
 
         return (CacheFactory) Utils.getComponent(CacheFactory.ROLE, localCacheHint);
     }

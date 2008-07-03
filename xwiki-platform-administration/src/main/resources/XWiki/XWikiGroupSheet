@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<xwikidoc>
+<web>XWiki</web>
+<name>XWikiGroupSheet</name>
+<language></language>
+<defaultLanguage>en</defaultLanguage>
+<translation>0</translation>
+<parent>XWiki.XWikiGroups</parent>
+<customClass></customClass>
+<title></title>
+<template></template>
+<defaultTemplate></defaultTemplate>
+<validationScript></validationScript>
+<comment></comment>
+<minorEdit>false</minorEdit>
+<object>
+<class>
+<name>XWiki.TagClass</name>
+<customClass></customClass>
+<customMapping></customMapping>
+<defaultViewSheet></defaultViewSheet>
+<defaultEditSheet></defaultEditSheet>
+<defaultWeb></defaultWeb>
+<nameField></nameField>
+<validationScript></validationScript>
+<tags>
+<cache>0</cache>
+<displayType>input</displayType>
+<multiSelect>1</multiSelect>
+<name>tags</name>
+<number>1</number>
+<prettyName>Tags</prettyName>
+<relationalStorage>1</relationalStorage>
+<separator> </separator>
+<separators> ,|</separators>
+<size>30</size>
+<unmodifiable>0</unmodifiable>
+<values></values>
+<classType>com.xpn.xwiki.objects.classes.StaticListClass</classType>
+</tags>
+</class>
+<name>XWiki.XWikiGroupSheet</name>
+<number>0</number>
+<className>XWiki.TagClass</className>
+<property>
+<tags/>
+</property>
+</object>
+<content>#set($interface = $xwiki.rightsmanager.defaultUi)
+## display the new interface
+#if($interface == "new") 
+&lt;div id="ajax-loader"&gt;$msg.get("ui.ajaxTable.loading")&lt;br /&gt;
+  &lt;img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." /&gt;
+&lt;/div&gt;
+&lt;div id="showLimits"&gt;&lt;/div&gt;
+&lt;table id="memberstable" cellspacing="0"&gt;
+&lt;tr&gt;&lt;td&gt;
+       &lt;table class="display"&gt;
+       &lt;thead class="theader"&gt;
+        &lt;tr&gt;
+        &lt;td&gt;$msg.get("rightsmanager.members")&lt;/td&gt;
+        #if($context.action == "inline")&lt;td class="hmanage"&gt;$msg.get("rightsmanager.manage")&lt;/td&gt;#end
+        &lt;/tr&gt;
+       &lt;/thead&gt;
+       &lt;tbody id="display1"&gt;&lt;tr&gt;&lt;td&gt;&amp;nbsp;&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;
+      &lt;/table&gt;
+    &lt;/td&gt;
+    &lt;td valign="top"&gt;
+      &lt;div id="scrollbar1" class="scrollbar"&gt;&lt;div class="inscrollbar"&gt;&amp;nbsp;&lt;/div&gt;&lt;/div&gt;
+    &lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+#set($mainwk = false)
+#if($context.database == "xwiki") #set($mainwk = true) #end
+#if($context.action == "inline")
+ &lt;div id="addNewMember"&gt;
+     &lt;table&gt;
+     &lt;tr&gt;&lt;td class="addlabel"&gt;$msg.get("rightsmanager.addnewuser") #if(!$mainwk)&lt;/td&gt;
+         &lt;td&gt;&lt;select name="wiki" onchange="changeWiki(this);"&gt;
+               &lt;option value="local" selected="selected"&gt;$msg.get("rightsmanager.local")&lt;/option&gt;
+               &lt;option value="global"&gt;$msg.get("rightsmanager.global")&lt;/option&gt;
+             &lt;/select&gt;&lt;/td&gt;
+         #else &lt;input type="hidden" name="wiki" value="local" /&gt;&lt;/td&gt; #end
+       &lt;td&gt;
+          &lt;input id="userSuggest" type="text" size="30" name="newMember" autocomplete="off" onfocus="createSuggest(this, 'user');"/&gt;
+       &lt;/td&gt;
+       &lt;td&gt;
+          &lt;input type="button" id="addNewUser" class="button" value="$msg.get('add')" onclick="addNewMember('user', $('userSuggest').value);"/&gt;
+       &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+       &lt;td class="addlabel"&gt;$msg.get("rightsmanager.addnewgroup") #if(!$mainwk)&lt;/td&gt;
+         &lt;td&gt;&lt;select name="wiki" onchange="changeWiki(this);"&gt;
+              &lt;option value="local" selected="selected"&gt;$msg.get("rightsmanager.local")&lt;/option&gt;
+              &lt;option value="global"&gt;$msg.get("rightsmanager.global")&lt;/option&gt;
+             &lt;/select&gt;&lt;/td&gt;
+         #else &lt;input type="hidden" name="wiki" value="local" /&gt;&lt;/td&gt; #end
+       &lt;td&gt;
+           &lt;input id="groupSuggest" type="text" size="30" name="newMember" autocomplete="off" onfocus="createSuggest(this, 'group');"/&gt;
+       &lt;/td&gt;
+       &lt;td&gt;
+           &lt;input type="button" id="addNewGroup" class="button" value="$msg.get('add')" onclick="addNewMember('group', $('groupSuggest').value);"/&gt;
+  &lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;&lt;td colspan="3" id="errMsg"&gt;&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;
+&lt;/div&gt;
+#end
+#set($url = $doc.getURL("view", "xpage=getgroupmembers"))
+#set($du = $msg.get("rightsmanager.duplicateuser"))
+{pre}
+&lt;script type="text/javascript"&gt; 
+//&lt;![CDATA[
+  window.tabl = new ASSTable("$url", 15, "display1", "scrollbar1", "memberstable", displayMembers, true, "$context.action");
+   
+  //create new ajax suggest
+   suggesturl = "$doc.getURL()" + "?xpage=uorgsuggest" + "&amp;" + "classname=XWiki.XWikiUsers" + "&amp;" + "wiki=local";
+   
+  //create a new suggest depending on the wiki, user or group and matching string params
+   window.createSuggest = function(input, uorg)
+   {
+     if(suggesturl.indexOf("&amp;" + "uorg=") &gt; 0) suggesturl = suggesturl.substring(0, suggesturl.indexOf("&amp;" + "uorg="));
+     if(uorg == "user") 
+            suggesturl += "&amp;" + "uorg=user" + "&amp;";
+     else 
+            suggesturl += "&amp;" + "uorg=group" + "&amp;";
+        
+     //clear the errors
+        $('errMsg').innerHTML = "";
+     return new ajaxSuggest(input, { script: suggesturl, varname:'input' } );
+}
+
+window.addNewMember = function(uorg, name)
+{
+     //url = adduorg
+     if(name) 
+     {
+             var url = "$doc.getURL("view")" + "?xpage=adduorg" + "&amp;" + "uorg=" + uorg + "&amp;" + "name=" + name;
+             new Ajax.Request(url, 
+             {
+               method: 'get',
+                       onSuccess: function(transport) {
+                         $('userSuggest').value = "";
+                         $('groupSuggest').value = "";
+                                    
+                         var nr = parseInt(transport.responseText);  
+                         if(nr == 0) $('errMsg').innerHTML = "$du";
+                         else {
+                                var end = window.tabl.totalRows + nr;       
+                                var start = end - window.tabl.limit + 1;
+                                if(start &lt; 1)  start = 1;
+                                window.tabl.showRows(start, end); 
+                                window.tabl.refreshScrollbar();
+                         }                   
+                       }
+             });
+     }
+}
+ 
+window.changeWiki = function(obj)
+{
+     if(suggesturl.indexOf("&amp;" + "wiki=") &gt;= 0)
+            suggesturl = suggesturl.substring(0, suggesturl.indexOf("&amp;" + "wiki="));
+     suggesturl += "&amp;" + "wiki=" + trim(obj.value);
+        // clear errors messages
+        $('errMsg').innerHTML = "";
+}
+//]]&gt;>
+&lt;/script&gt;
+{/pre}
+#else ## stable interface
+1 $doc.name
+
+#set($allObjects = $doc.getObjects("XWiki.XWikiGroups"))
+#set($itemsPerPage = 50)
+#if($request.ipp)
+#set($itemsPerPage = $util.parseInt($request.ipp))
+#end
+#set($pageNumber = 0)
+#if($request.page)
+#set($pageNumber = $util.parseInt($request.page))
+#end
+#set($startAt = $itemsPerPage * $pageNumber)
+#if($startAt &lt; 0)
+#set($startAt = 0)
+#end
+#set($endAt = $itemsPerPage * ($pageNumber + 1))
+#if($endAt &gt; $allObjects.size())
+#set($endAt = $allObjects.size())
+#end
+#if($startAt &gt; $endAt)
+#set($startAt = $endAt)
+#end
+#set($totalPages = ($allObjects.size() - 1) / $itemsPerPage)
+#set($crtPageNumber = $startAt / $itemsPerPage)
+#set($objects = $allObjects.subList($startAt, $endAt))
+#if($context.action == "inline")
+#warning($msg.get("userdeletioncannotbecanceled"))
+#set($redirect = $xwiki.getRequestURL())
+{table}
+&lt;span class="floatleft"&gt;Members&lt;/span&gt; &lt;a id="adduser" href="$doc.getURL("objectadd","classname=XWiki.XWikiGroups&amp;amp;xredirect=$redirect")" title="$msg.get("addusertogroup")"&gt;&lt;span class="hidden"&gt;($msg.get("add"))&lt;/span&gt;&lt;/a&gt; | 
+#foreach($obj in $objects)
+$doc.display("member", $obj) | &lt;a class="deletelink" href="$doc.getURL("objectremove", "classname=XWiki.XWikiGroups&amp;amp;classid=${obj.number}&amp;amp;xredirect=${doc.getURL('inline')}")" title="$msg.get("removethisuserfromgroup")"&gt;$msg.get("delete")&lt;/a&gt;
+#end ##foreach
+{table}
+#else ## inline
+{table}
+&lt;span class="floatleft"&gt;Members&lt;/span&gt; #if($hasedit)&lt;a id="modifygroup" href="$doc.getURL("inline")"&gt;&lt;span class="hidden"&gt;($msg.get("edit"))&lt;/span&gt;&lt;/a&gt;
+#else
+#end
+#foreach($obj in $objects)
+$xwiki.getUserName($obj.getProperty("member").value)
+#end ## foreach
+{table}
+#end ## inline
+#pagedViewLinks($itemsPerPage $totalPages $crtPageNumber)
+#end
+</content></xwikidoc>

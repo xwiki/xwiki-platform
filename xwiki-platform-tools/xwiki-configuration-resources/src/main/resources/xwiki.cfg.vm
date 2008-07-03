@@ -107,8 +107,12 @@ xwiki.authentication.ldap.bind_pass={1}
 xwiki.authentication.ldap.validate_password=0
 
 #-# only members of the following group will be verified in the LDAP
-# otherwise only users that are found after searching starting from the base_DN
+#-# otherwise only users that are found after searching starting from the base_DN
 # xwiki.authentication.ldap.user_group=cn=developers,ou=groups,o=MegaNova,c=US
+
+#-# [SINCE 1.5RC1, XWikiLDAPAuthServiceImpl]
+#-# only users not member of the following group can autheticate
+# xwiki.authentication.ldap.exclude_group=cn=admin,ou=groups,o=MegaNova,c=US
 
 #-# base DN for searches
 xwiki.authentication.ldap.base_DN=

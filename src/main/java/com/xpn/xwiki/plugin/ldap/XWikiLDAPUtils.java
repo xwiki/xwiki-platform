@@ -394,8 +394,6 @@ public class XWikiLDAPUtils
      */
     protected String findInGroup(String userName, Map<String, String> groupMembers, XWikiContext context)
     {
-        String result = null;
-
         String ldapuser = getUidAttributeName() + "=" + userName.toLowerCase();
 
         for (Map.Entry<String, String> entry : groupMembers.entrySet()) {
@@ -405,7 +403,7 @@ public class XWikiLDAPUtils
             }
         }
 
-        return result;
+        return null;
     }
 
     /**
@@ -422,24 +420,25 @@ public class XWikiLDAPUtils
         String userDN = null;
 
         if (groupDN.length() > 0) {
-            Map<String, String> groupMembers = getGroupMembers(groupDN, context);
+            Map<String, String> groupMembers = null;
 
-            // check if user is in the list
-            userDN = findInGroup(userName, groupMembers, context);
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Found user dn in user group:" + userDN);
+            try {
+                groupMembers = getGroupMembers(groupDN, context);
+            } catch (Exception e) {
+                // Ignore exception to allow negative match for exclusion
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Unable to retrieve group members of group:" + groupDN, e);
+                }
             }
 
-            // if a usergroup is specified THEN the user MUST be in the group to validate in
-            // LDAP
-            if (userDN == null) {
-                if (LOG.isDebugEnabled()) {
-                    LOG.debug("LDAP authentication failed: user not in LDAP user group");
-                }
+            // no match when a user does not have access to the group
+            if (groupMembers != null) {
+                // check if user is in the list
+                userDN = findInGroup(userName, groupMembers, context);
 
-                // no valid LDAP user from the group
-                return null;
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("Found user dn in user group:" + userDN);
+                }
             }
         }
 

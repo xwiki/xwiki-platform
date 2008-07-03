@@ -2828,6 +2828,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         needsUpdate |= bclass.addTextField("ldap_bind_pass", "Ldap password matching", 60);
         needsUpdate |= bclass.addBooleanField("ldap_validate_password", "Validate Ldap user/password", "yesno");
         needsUpdate |= bclass.addTextField("ldap_user_group", "Ldap group filter", 60);
+        needsUpdate |= bclass.addTextField("ldap_exclude_group", "Ldap group to exclude", 60);
         needsUpdate |= bclass.addTextField("ldap_base_DN", "Ldap base DN", 60);
         needsUpdate |= bclass.addTextField("ldap_UID_attr", "Ldap UID attribute name", 60);
         needsUpdate |= bclass.addTextField("ldap_fields_mapping", "Ldap user fiels mapping", 60);

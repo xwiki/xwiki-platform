@@ -90,7 +90,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#authenticate(java.lang.String, java.lang.String,
      *      com.xpn.xwiki.XWikiContext)
      */
-    public Principal authenticate(String username, String password, XWikiContext context) throws XWikiException
+    public Principal authenticate(String login, String password, XWikiContext context) throws XWikiException
     {
         /*
          * TODO: Put the next 4 following "if" in common with XWikiAuthService to ensure coherence This method was
@@ -98,13 +98,13 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
          * given as argument. However, the right way to do this would probably be to throw XWikiException-s.
          */
 
-        if (username == null) {
+        if (login == null) {
             // If we can't find the username field then we are probably on the login screen
             return null;
         }
 
         // Check for empty usernames
-        if (username.equals("")) {
+        if (login.equals("")) {
             context.put("message", "nousername");
 
             return null;
@@ -117,7 +117,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         }
 
         // Check for superadmin
-        if (isSuperAdmin(username)) {
+        if (isSuperAdmin(login)) {
             return authenticateSuperAdmin(password, context);
         }
 
@@ -127,11 +127,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         Principal principal = null;
 
         // Try authentication against ldap
-        principal = ldapAuthenticate(username, password, context);
+        principal = ldapAuthenticate(login, password, context);
 
         if (principal == null) {
             // Fallback to local DB only if trylocal is true
-            principal = xwikiAuthenticate(username, password, context);
+            principal = xwikiAuthenticate(login, password, context);
         }
 
         return principal;

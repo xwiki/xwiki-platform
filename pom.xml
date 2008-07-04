@@ -395,6 +395,11 @@
       <artifactId>fop</artifactId>
       <version>0.95beta-1</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.avalon.framework</groupId>
+      <artifactId>avalon-framework-impl</artifactId>
+      <version>4.3.1</version>
+    </dependency>
     <!-- fop depends on batik 1.7, but the batik folks forgot to release the rasterizer module
          for this version, which we need. Since the 1.6 and 1.7 releases are fairly compatible,
          but use different groupId names, we can use all twe modules from 1.7, and exclude all

@@ -49,6 +49,8 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.avalon.framework.configuration.Configuration;
+import org.apache.avalon.framework.configuration.DefaultConfigurationBuilder;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,6 +67,7 @@ import org.dom4j.io.XMLWriter;
 import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 import org.xml.sax.InputSource;
+import org.xwiki.container.Container;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
@@ -88,6 +91,31 @@ public class PdfExportImpl implements PdfExport
     public static final int PDF = 0;
 
     public static final int RTF = 1;
+
+    private static FopFactory fopFactory;
+
+    static {
+        fopFactory = FopFactory.newInstance();
+        try {
+            fopFactory.setFontBaseURL(((Container) Utils.getComponent(Container.ROLE)).getApplicationContext()
+                .getResource("/WEB-INF/fonts/").getPath());
+        } catch (Throwable ex) {
+            log.warn("Starting with 1.5, XWiki uses the WEB-INF/fonts/ directory as the font directory, "
+                + "and it should contain the FreeFont (http://savannah.gnu.org/projects/freefont/) fonts. "
+                + "FOP cannot access this directory. If this is an upgrade from a previous version, "
+                + "make sure you also copy the WEB-INF/fonts directory from the new distribution package.");
+        }
+        if (PdfExportImpl.class.getResource("/fop-config.xml") != null) {
+            DefaultConfigurationBuilder cfgBuilder = new DefaultConfigurationBuilder();
+            Configuration cfg;
+            try {
+                cfg = cfgBuilder.build(PdfExportImpl.class.getResourceAsStream("/fop-config.xml"));
+                fopFactory.setUserConfig(cfg);
+            } catch (Exception ex) {
+                log.warn("Wrong FOP configuration: " + ex.getMessage());
+            }
+        }
+    }
 
     public PdfExportImpl()
     {
@@ -141,7 +169,6 @@ public class PdfExportImpl implements PdfExport
         // XSL Transformation to XML-FO
 
         try {
-            FopFactory fopFactory = FopFactory.newInstance();
             FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
             // configure foUserAgent as desired
 

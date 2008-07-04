@@ -138,7 +138,7 @@
   #end
   #foreach($olang in $xwiki.getXWikiPreference("languages").split("[|, ]"))
     #if(($elangs.indexOf(",$olang,") == -1) &amp;&amp; ($olang != $doc.defaultLanguage) &amp;&amp; ($olang != $forcetrans))
-      &lt;a href="$doc.getURL("edit", "language=${olang}")"&gt;$olang&lt;/a&gt;
+      &lt;a href="$doc.getURL("edit", "editor=${editor}&amp;amp;language=${olang}")"&gt;$olang&lt;/a&gt;
     #end
   #end
   &lt;/div&gt;

@@ -1,0 +1,26 @@
+<fop version="1.0">
+  <!-- Strict user configuration -->
+  <strict-configuration>true</strict-configuration>
+  <!-- Strict FO validation -->
+  <strict-validation>true</strict-validation>
+
+  <!-- Source resolution in dpi (dots/pixels per inch) for determining the size of pixels in SVG and bitmap images, default: 72dpi
+  <source-resolution>72</source-resolution> -->
+  <!-- Target resolution in dpi (dots/pixels per inch) for specifying the target resolution for generated bitmaps, default: 72dpi
+  <target-resolution>72</target-resolution> -->
+
+  <!-- default page-height and page-width, in case value is specified as auto -->
+  <default-page-settings height="29.7cm" width="21cm"/>
+  <renderers>
+    <renderer mime="application/pdf">
+      <filterList>
+        <!-- provides compression using zlib flate (default is on) -->
+        <value>flate</value>
+      </filterList>
+      <fonts>
+        <!-- This allows all fonts in the WEB-INF/fonts/ directory to be indexed -->
+        <auto-detect/>
+      </fonts>
+    </renderer>
+  </renderers>
+</fop>

@@ -1,6 +1,8 @@
 package org.xwiki.cache.jbosscache;
 
-public class JBossCacheCacheTest extends JBossCacheLocalCacheTest
+import org.xwiki.cache.tests.AbstractTestCache;
+
+public class JBossCacheCacheTest extends AbstractTestCache
 {
     public JBossCacheCacheTest()
     {

@@ -53,6 +53,7 @@
         <xsl:attribute name="writing-mode"><xsl:value-of select="$writing-mode"/></xsl:attribute>
         <xsl:attribute name="hyphenate"><xsl:value-of select="$hyphenate"/></xsl:attribute>
         <xsl:attribute name="text-align"><xsl:value-of select="$text-align"/></xsl:attribute>
+        <xsl:attribute name="font-family">FreeSans,sans-serif</xsl:attribute>
         <!-- specified on fo:root to change the properties' initial values -->
     </xsl:attribute-set>
 
@@ -177,7 +178,7 @@
 
     <xsl:attribute-set name="pre">
         <xsl:attribute name="font-size">0.83em</xsl:attribute>
-        <xsl:attribute name="font-family">monospace</xsl:attribute>
+        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
         <xsl:attribute name="white-space">pre</xsl:attribute>
         <xsl:attribute name="space-before">1em</xsl:attribute>
         <xsl:attribute name="space-after">1em</xsl:attribute>
@@ -373,16 +374,16 @@
     </xsl:attribute-set>
 
     <xsl:attribute-set name="tt">
-        <xsl:attribute name="font-family">monospace</xsl:attribute>
+        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="code">
-        <xsl:attribute name="font-family">monospace</xsl:attribute>
+        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="kbd">
-        <xsl:attribute name="font-family">monospace</xsl:attribute>
+        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
     </xsl:attribute-set>
     <xsl:attribute-set name="samp">
-        <xsl:attribute name="font-family">monospace</xsl:attribute>
+        <xsl:attribute name="font-family">FreeMono,monospace</xsl:attribute>
     </xsl:attribute-set>
 
     <xsl:attribute-set name="big">

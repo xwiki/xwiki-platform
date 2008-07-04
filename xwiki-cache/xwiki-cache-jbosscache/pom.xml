@@ -49,7 +49,8 @@
   <build>
     <plugins>
       <plugin>
-        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file -->
+        <!-- Apply the Checkstyle configurations defined in the top level pom.xml file
+-->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
         <dependencies>
@@ -62,4 +63,25 @@
       </plugin>
     </plugins>
   </build>
+    <profiles>
+    <profile>
+      <id>ci</id>
+      <activation>
+        <!-- This property is automatically defined by the Maven release plugin when executing
+             a release. Thus this profile will be automatically enabled when releasing
+-->
+        <property>
+          <name>performRelease</name>
+        </property>
+      </activation>
+      <build>
+      	<plugins>
+      		<plugin>
+          		<groupId>org.apache.maven.plugins</groupId>
+          		<artifactId>maven-surefire-plugin</artifactId>
+      		</plugin>
+      	</plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

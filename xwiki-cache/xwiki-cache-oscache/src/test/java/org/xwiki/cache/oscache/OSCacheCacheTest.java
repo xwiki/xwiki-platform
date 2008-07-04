@@ -1,8 +1,8 @@
 package org.xwiki.cache.oscache;
 
-import org.xwiki.cache.tests.AbstractTestCache;
+import org.xwiki.cache.tests.AbstractGenericTestCache;
 
-public class OSCacheCacheTest extends AbstractTestCache
+public class OSCacheCacheTest extends AbstractGenericTestCache
 {
     public OSCacheCacheTest()
     {

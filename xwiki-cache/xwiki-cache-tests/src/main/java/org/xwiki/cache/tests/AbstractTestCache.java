@@ -23,9 +23,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.container.ApplicationContext;
 import org.xwiki.container.Container;
@@ -125,122 +123,5 @@ public abstract class AbstractTestCache extends AbstractXWikiComponentTestCase i
         assertNotNull(factory);
 
         return factory;
-    }
-
-    // ///////////////////////////////////////////////////////::
-    // Tests
-
-    /**
-     * Validate factory initialization.
-     * 
-     * @throws Exception error.
-     */
-    public void testGetFactory() throws Exception
-    {
-        CacheFactory factory = getCacheFactory();
-
-        CacheFactory factory2 = getCacheFactory();
-
-        assertSame(factory, factory2);
-    }
-
-    /**
-     * Validate some basic cache use case without any constraints.
-     * 
-     * @throws Exception error.
-     */
-    public void testCreateAndDestroyCacheSimple() throws Exception
-    {
-        CacheFactory factory = getCacheFactory();
-
-        Cache<Object> cache = factory.newCache(new CacheConfiguration());
-
-        assertNotNull(cache);
-
-        cache.set(KEY, VALUE);
-        cache.set(KEY2, VALUE2);
-
-        assertEquals(VALUE, cache.get(KEY));
-        assertEquals(VALUE2, cache.get(KEY2));
-
-        cache.dispose();
-    }
-
-    /**
-     * Validate {@link Cache#remove(String)}.
-     * 
-     * @throws Exception error.
-     */
-    public void testRemove() throws Exception
-    {
-        CacheFactory factory = getCacheFactory();
-
-        Cache<Object> cache = factory.newCache(new CacheConfiguration());
-
-        cache.set(KEY, VALUE);
-        cache.set(KEY2, VALUE2);
-
-        cache.remove(KEY);
-
-        assertNull(cache.get(KEY));
-        assertEquals(VALUE2, cache.get(KEY2));
-    }
-
-    /**
-     * Validate {@link Cache#removeAll()}.
-     * 
-     * @throws Exception error.
-     */
-    public void testRemoveAll() throws Exception
-    {
-        CacheFactory factory = getCacheFactory();
-
-        Cache<Object> cache = factory.newCache(new CacheConfiguration());
-
-        cache.set(KEY, VALUE);
-        cache.set(KEY2, VALUE2);
-
-        cache.removeAll();
-
-        assertNull(cache.get(KEY));
-        assertNull(cache.get(KEY2));
-    }
-
-    /**
-     * Validate event management.
-     * 
-     * @throws Exception error.
-     */
-    public void testEvents() throws Exception
-    {
-        CacheFactory factory = getCacheFactory();
-
-        Cache<Object> cache = factory.newCache(new CacheConfiguration());
-
-        CacheEntryListenerTest eventListener = new CacheEntryListenerTest();
-
-        cache.addCacheEntryListener(eventListener);
-
-        cache.set(KEY, VALUE);
-
-        assertNotNull(eventListener.getAddedEvent());
-        assertSame(cache, eventListener.getAddedEvent().getCache());
-        assertEquals(KEY, eventListener.getAddedEvent().getEntry().getKey());
-        assertEquals(VALUE, eventListener.getAddedEvent().getEntry().getValue());
-
-        cache.set(KEY, VALUE2);
-
-        assertNotNull(eventListener.getModifiedEvent());
-        assertSame(cache, eventListener.getModifiedEvent().getCache());
-        assertEquals(KEY, eventListener.getModifiedEvent().getEntry().getKey());
-        assertEquals(VALUE2, eventListener.getModifiedEvent().getEntry().getValue());
-
-        cache.remove(KEY);
-        cache.get(KEY);
-
-        assertNotNull(eventListener.getModifiedEvent());
-        assertSame(cache, eventListener.getModifiedEvent().getCache());
-        assertEquals(KEY, eventListener.getModifiedEvent().getEntry().getKey());
-        assertEquals(VALUE2, eventListener.getModifiedEvent().getEntry().getValue());
     }
 }

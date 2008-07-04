@@ -4,10 +4,10 @@ import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-import org.xwiki.cache.tests.AbstractTestCache;
+import org.xwiki.cache.tests.AbstractGenericTestCache;
 import org.xwiki.component.manager.ComponentLookupException;
 
-public class OSCacheLocalCacheTest extends AbstractTestCache
+public class OSCacheLocalCacheTest extends AbstractGenericTestCache
 {
     public OSCacheLocalCacheTest()
     {

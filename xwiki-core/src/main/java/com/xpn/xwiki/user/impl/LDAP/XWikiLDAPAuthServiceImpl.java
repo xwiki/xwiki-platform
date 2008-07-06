@@ -399,7 +399,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // 7. sync groups membership
         // ////////////////////////////////////////////////////////////////////
 
-        syncGroupsMembership(validXWikiUserName, userDN, createuser, ldapUtils, context);
+        try {
+            syncGroupsMembership(validXWikiUserName, userDN, createuser, ldapUtils, context);
+        } catch (XWikiException e) {
+            LOG.error("Failed to synchronise user's groups membership", e);
+        }
 
         return principal;
     }
@@ -476,7 +480,11 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                     LOG.debug("Updating existing user with LDAP attribues located at " + userDN);
                 }
 
-                updateUserFromLDAP(xwikiUserName, searchAttributeList, context);
+                try {
+                    updateUserFromLDAP(xwikiUserName, searchAttributeList, context);
+                } catch (XWikiException e) {
+                    LOG.error("Failed to synchronise user's informations", e);
+                }
             }
         }
 

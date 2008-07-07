@@ -738,7 +738,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         Map<String, String> map = new HashMap<String, String>();
         for (XWikiLDAPSearchAttribute lattr : searchAttributes) {
             String key = (String) userMappings.get(lattr.name);
-            if (key == null) {
+            if (key == null || userClass.get(key) == null) {
                 continue;
             }
             String value = lattr.value;

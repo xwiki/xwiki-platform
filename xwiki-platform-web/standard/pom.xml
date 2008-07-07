@@ -27,11 +27,6 @@
       <artifactId>xwiki-core-plexus</artifactId>
       <version>${platform.core.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-cache-oscache</artifactId>
-      <version>${platform.core.version}</version>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

@@ -24,7 +24,8 @@
 <syntaxId>xwiki/1.0</syntaxId>
 <content>###----------------------------------
 ## modified version of editinline.vm
-###---------------------------------- 
+###----------------------------------
+#if ($doc.fullName != "XWiki.AdminInlineSheet") ## Prevents infinite loops
 #set($formname = "inline")
 #set($saveaction = "save")
 #set($previewenabled = true)
@@ -64,5 +65,6 @@
     #end
   &lt;/div&gt; ## form
 &lt;/form&gt;
-#template("textarea_wysiwyg.vm")</content>
+#template("textarea_wysiwyg.vm")
+#end</content>
 </xwikidoc>

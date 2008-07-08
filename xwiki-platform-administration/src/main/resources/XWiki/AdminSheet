@@ -834,6 +834,7 @@ p.legend {
 
 #goto-select {
   clear:both;
+  width:290px;
 }
 
 #goto-select optgroup {

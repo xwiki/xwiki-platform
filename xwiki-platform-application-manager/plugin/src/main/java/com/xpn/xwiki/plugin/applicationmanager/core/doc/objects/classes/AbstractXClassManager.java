@@ -25,9 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -44,8 +42,8 @@ import com.xpn.xwiki.objects.classes.BooleanClass;
  * This class has to be extended with at least :
  * <ul>
  * <li>overload {@link #updateBaseClass(BaseClass)}
- * <li>in constructor call AbstractXClassManager constructor with a name that will be used to generate all the
- * documents and spaces needed.
+ * <li>in constructor call AbstractXClassManager constructor with a name that will be used to generate all the documents
+ * and spaces needed.
  * </ul>
  * 
  * @param <T> the item class extending {@link XObjectDocument}.
@@ -171,11 +169,6 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      * Base class managed.
      */
     private BaseClass baseClass;
-
-    /**
-     * Store for any database name if documents used for manage this class has been checked.
-     */
-    private final Set<String> databasesInitedMap = new HashSet<String>();
 
     /**
      * Constructor for AbstractXClassManager.
@@ -357,15 +350,9 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
      */
     protected void check(XWikiContext context) throws XWikiException
     {
-        synchronized (databasesInitedMap) {
-            if (!this.databasesInitedMap.contains(context.getDatabase())) {
-                this.databasesInitedMap.add(context.getDatabase());
-
-                checkClassDocument(context);
-                checkClassSheetDocument(context);
-                checkClassTemplateDocument(context);
-            }
-        }
+        checkClassDocument(context);
+        checkClassSheetDocument(context);
+        checkClassTemplateDocument(context);
     }
 
     /**

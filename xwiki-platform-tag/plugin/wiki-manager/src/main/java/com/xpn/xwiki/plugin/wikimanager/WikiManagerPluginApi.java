@@ -120,6 +120,20 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         return this.searchApi;
     }
 
+    /**
+     * Log error and store details in the context.
+     * 
+     * @param errorMessage error message.
+     * @param e the catched exception.
+     */
+    public void logError(String errorMessage, XWikiException e)
+    {
+        LOG.error(errorMessage, e);
+
+        context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
+        context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+    }
+
     // ////////////////////////////////////////////////////////////////////////////
     // Wikis management
 
@@ -146,8 +160,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
-     *         failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -178,10 +191,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
             WikiManager.getInstance().createNewWiki(wikiXObjectDocument, failOnExist, realTemplateWikiName,
                 realPkgName, comment, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
             returncode = e.getCode();
         }
@@ -218,10 +228,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
 
             WikiManager.getInstance().deleteWiki(wikiName, deleteDatabase, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -301,10 +308,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
 
             WikiManager.getInstance().deleteWikiAlias(wikiName, objectId, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIDELETION, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -326,10 +330,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = WikiManager.getInstance().getWikiFromName(wikiName, context);
         } catch (WikiManagerException e) {
-            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, wikiName), e);
         }
 
         return doc;
@@ -346,10 +347,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             wikiList = WikiManager.getInstance().getAllWikis(context);
         } catch (WikiManagerException e) {
-            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGETALL), e);
         }
 
         return wikiList;
@@ -369,10 +367,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = WikiManager.getInstance().getWikiFromDocumentName(documentFullName, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIGET, documentFullName), e);
         }
 
         return doc;
@@ -419,10 +414,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = WikiManager.getInstance().getWikiAlias(wikiName, objectId, true, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGET, wikiName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGET, wikiName), e);
         }
 
         return doc;
@@ -441,10 +433,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             listDocument = WikiManager.getInstance().getWikiAliasList(this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGETALL), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKIALIASGETALL), e);
         }
 
         return listDocument;
@@ -543,10 +532,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
             wikiAlias.setVisibility(visibility);
             wikiAlias.save();
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -582,10 +568,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
             wikiAlias.setIsWikiTemplate(isWikiTemplate);
             wikiAlias.save();
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKISETVISIBILITY, wikiName), e);
 
             returncode = e.getCode();
         }
@@ -613,8 +596,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
-     *         failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -637,16 +619,11 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         wikiXObjectDocument.setOwner(this.context.getUser());
 
         try {
-            WikiManager.getInstance().createWikiTemplate(
-                wikiXObjectDocument,
-                packageName,
-                this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE, new String[] {templateName,
-                    packageName}), this.context);
+            String[] params = new String[] {templateName, packageName};
+            String message = this.messageTool.get(WikiManagerMessageTool.COMMENT_CREATEWIKITEMPLATE, params);
+            WikiManager.getInstance().createWikiTemplate(wikiXObjectDocument, packageName, message, this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKICREATION, wikiXObjectDocument.toString()), e);
 
             returncode = e.getCode();
         }
@@ -697,10 +674,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             doc = WikiManager.getInstance().getWikiTemplateAlias(wikiName, objectId, this.context, true);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGET, wikiName), e);
         }
 
         return doc;
@@ -717,10 +691,7 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
         try {
             listDocument = WikiManager.getInstance().getWikiTemplateAliasList(this.context);
         } catch (WikiManagerException e) {
-            LOG.error(messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
-
-            this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            this.context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, this.context));
+            logError(this.messageTool.get(WikiManagerMessageTool.LOG_WIKITEMPLATEGETALL), e);
         }
 
         return listDocument;

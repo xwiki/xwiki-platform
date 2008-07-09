@@ -383,7 +383,7 @@ final class GlobalSearch
         Collection<Object[]> orderColumns = parseOrderColumns(normalizedWhereSQL);
 
         for (Object[] orderField : orderColumns) {
-            if (!orderField.equals(HQL_DOC_SPACE) && !orderField.equals(HQL_DOC_NAME)) {
+            if (!orderField[0].equals(HQL_DOC_SPACE) && !orderField[0].equals(HQL_DOC_NAME)) {
                 hql.append(FIELD_SEPARATOR);
                 hql.append(orderField[0]);
             }
@@ -406,9 +406,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -433,9 +433,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a
@@ -481,9 +481,9 @@ final class GlobalSearch
     }
 
     /**
-     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to
-     * XWiki Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues
-     * one request per provided wiki.
+     * Search wiki pages in all provided wikis and return list containing found {@link XWikiDocument}. Compared to XWiki
+     * Platform search, searchDocuments and searchDocumentsName it's potentially "time-consuming" since it issues one
+     * request per provided wiki.
      * 
      * @param query the query parameters.
      * @param distinctbylanguage when a document has multiple version for each language it is returned as one document a

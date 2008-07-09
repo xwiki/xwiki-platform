@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676868000</creationDate>
-<date>1208861244000</date>
-<contentUpdateDate>1209394153000</contentUpdateDate>
-<version>1.1</version>
+<date>1215606991000</date>
+<contentUpdateDate>1215606991000</contentUpdateDate>
+<version>8.1</version>
 <title></title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -55,7 +55,11 @@
 <tags/>
 </property>
 </object>
-<content>#set($WikiManager = $xwiki.wikimanager)
+<content>1 $msg.get("wikimanager.wikimanager")
+##
+#############################################################################
+##
+#set($WikiManager = $xwiki.wikimanager)
 #if(!$WikiManager)
   #error($msg.get("wikimanager.pluginnotenabled"))
 #end
@@ -93,16 +97,18 @@
 ##
 #############################################################################
 ##
-1 $msg.get("wikimanager.wikimanager")
-##
-#############################################################################
-##
 #set($wikiList = $WikiManager.getAllWikis())
 $msg.get("wikimanager.totalnumberofwiki") : $wikiList.size()
+#############################################################################
 #if($hasadmin)
+  #if($xwiki.isVirtual())
 \\
-  [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki?stepbystep=0&amp;amp;doc=1]
+    [$msg.get("wikimanager.createwiki")&gt;WikiManager.CreateNewWiki?stepbystep=0&amp;amp;doc=1]    
+  #else
+    #warning($msg.get("wikimanager.notinvirtualmode"))
+  #end
 #end
+#############################################################################
 ##
 #if($wikiList.size()!=0)
   &lt;table id="wikiTable" class="grid sortable filterable doOddEven"&gt;

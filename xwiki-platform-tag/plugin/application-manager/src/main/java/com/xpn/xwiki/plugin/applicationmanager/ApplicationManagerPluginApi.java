@@ -105,6 +105,20 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         return this.messageTool;
     }
 
+    /**
+     * Log error and store details in the context.
+     * 
+     * @param errorMessage error message.
+     * @param e the catched exception.
+     */
+    public void logError(String errorMessage, XWikiException e)
+    {
+        LOG.error(errorMessage, e);
+
+        context.put(CONTEXT_LASTERRORCODE, Integer.valueOf(e.getCode()));
+        context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+    }
+
     // ////////////////////////////////////////////////////////////////////////////
     // Applications management
 
@@ -148,11 +162,8 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
                 this.messageTool.get(ApplicationManagerMessageTool.COMMENT_CREATEAPPLICATION, appXObjectDocument
                     .toString()), context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_CREATEAPP, appXObjectDocument.toString()),
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_CREATEAPP, appXObjectDocument.toString()),
                 e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
 
             returncode = e.getCode();
         }
@@ -183,10 +194,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             ApplicationManager.getInstance().deleteApplication(appName, context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_DELETEAPP, appName), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_DELETEAPP, appName), e);
 
             returncode = e.getCode();
         }
@@ -207,10 +215,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             listDocument = ApplicationManager.getInstance().getApplicationList(this.context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETALLAPPS), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETALLAPPS), e);
         }
 
         return listDocument;
@@ -235,10 +240,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             app = ApplicationManager.getInstance().getApplication(appName, context, true);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETAPP, appName), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETAPP, appName), e);
         }
 
         return app;
@@ -289,10 +291,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             ApplicationManager.getInstance().exportApplicationXAR(appName, recurse, withDocHistory, context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_EXPORTAPP, appName), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_EXPORTAPP, appName), e);
 
             returncode = e.getCode();
         }
@@ -329,10 +328,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
             ApplicationManager.getInstance().importApplication(context.getDoc(), packageName,
                 this.messageTool.get(ApplicationManagerMessageTool.COMMENT_IMPORTAPPLICATION, packageName), context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_IMPORTAPP, packageName), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_IMPORTAPP, packageName), e);
 
             returncode = e.getCode();
         }
@@ -373,10 +369,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
                 this.messageTool.get(ApplicationManagerMessageTool.COMMENT_RELOADAPPLICATION, app.getAppName()),
                 context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_RELOADAPP, appName), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_RELOADAPP, appName), e);
 
             returncode = e.getCode();
         }
@@ -389,9 +382,8 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
      * 
      * @return error code.
      *         <ul>
-     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error.
-     *         <li> {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have rights to do this
-     *         action.
+     *         <li> {@link XWikiExceptionApi#ERROR_NOERROR} : action finished with no error. <li>
+     *         {@link XWikiException#ERROR_XWIKI_ACCESS_DENIED} : context's user don't have rights to do this action.
      *         </ul>
      * @throws XWikiException all error that does not caused by user of this method.
      */
@@ -407,10 +399,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
             ApplicationManager.getInstance().reloadAllApplications(
                 this.messageTool.get(ApplicationManagerMessageTool.COMMENT_RELOADALLAPPLICATIONS), context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_REALOADALLAPPS), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_REALOADALLAPPS), e);
 
             returncode = e.getCode();
         }
@@ -431,10 +420,7 @@ public class ApplicationManagerPluginApi extends PluginApi<ApplicationManagerPlu
         try {
             app = ApplicationManager.getInstance().getRootApplication(context);
         } catch (ApplicationManagerException e) {
-            LOG.error(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETROOTAPP), e);
-
-            context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
-            context.put(CONTEXT_LASTEXCEPTION, new XWikiExceptionApi(e, context));
+            logError(this.messageTool.get(ApplicationManagerMessageTool.LOG_GETROOTAPP), e);
         }
 
         return app;

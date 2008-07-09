@@ -34,6 +34,8 @@ import com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.Abstract
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jfree.util.Log;
+
 /**
  * {@link com.xpn.xwiki.plugin.applicationmanager.core.doc.objects.classes.XClassManager} implementation for
  * XAppClasses.XWikiApplicationClass class.
@@ -55,8 +57,8 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     public static final String DEFAULT_FIELDS = "|";
 
     /**
-     * Name of field <code>appname</code> for the XWiki class XAppClasses.XWikiApplicationClass. The unique name of
-     * the application.
+     * Name of field <code>appname</code> for the XWiki class XAppClasses.XWikiApplicationClass. The unique name of the
+     * application.
      */
     public static final String FIELD_APPNAME = "appname";
 
@@ -77,8 +79,8 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     public static final String FIELDPN_APPPRETTYNAME = "Application Pretty Name";
 
     /**
-     * Name of field <code>description</code> for the XWiki class XAppClasses.XWikiApplicationClass. The description
-     * of the application.
+     * Name of field <code>description</code> for the XWiki class XAppClasses.XWikiApplicationClass. The description of
+     * the application.
      */
     public static final String FIELD_DESCRIPTION = "description";
 
@@ -110,8 +112,8 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     public static final String FIELDPN_APPAUTHORS = "Authors";
 
     /**
-     * Name of field <code>license</code> for the XWiki class XAppClasses.XWikiApplicationClass. The description of
-     * the application.
+     * Name of field <code>license</code> for the XWiki class XAppClasses.XWikiApplicationClass. The description of the
+     * application.
      */
     public static final String FIELD_LICENSE = "license";
 
@@ -132,8 +134,8 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     public static final String FIELDPN_DEPENDENCIES = "Dependencies";
 
     /**
-     * Name of field <code>applications</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of
-     * other applications on which current application depends.
+     * Name of field <code>applications</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of other
+     * applications on which current application depends.
      */
     public static final String FIELD_APPLICATIONS = "applications";
 
@@ -143,8 +145,8 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     public static final String FIELDPN_APPLICATIONS = "Applications";
 
     /**
-     * Name of field <code>documents</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of
-     * documents application contains.
+     * Name of field <code>documents</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of documents
+     * application contains.
      */
     public static final String FIELD_DOCUMENTS = "documents";
 
@@ -165,8 +167,8 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     public static final String FIELDPN_DOCSTOINCLUDE = "Documents to include";
 
     /**
-     * Name of field <code>docstolink</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of
-     * document application contains that will be linked in place of copy from wiki template.
+     * Name of field <code>docstolink</code> for the XWiki class XAppClasses.XWikiApplicationClass. The list of document
+     * application contains that will be linked in place of copy from wiki template.
      */
     public static final String FIELD_DOCSTOLINK = "docstolink";
 
@@ -213,11 +215,36 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
     private static XWikiApplicationClass instance;
 
     /**
-     * Construct the overload of AbstractXClassManager with spaceprefix={@link #CLASS_SPACE_PREFIX} and prefix={@link #CLASS_PREFIX}.
+     * Construct the overload of AbstractXClassManager with spaceprefix={@link #CLASS_SPACE_PREFIX} and prefix=
+     * {@link #CLASS_PREFIX}.
      */
     protected XWikiApplicationClass()
     {
         super(CLASS_SPACE_PREFIX, CLASS_PREFIX);
+    }
+
+    /**
+     * Return unique instance of XWikiApplicationClass and update documents for this context. It also check if the
+     * corresponding Xwiki class/template/sheet exist in context's database and create it if not.
+     * 
+     * @param context the XWiki context.
+     * @param check indicate if class existance has to be checked in the wiki.
+     * @return a unique instance of XWikiApplicationClass.
+     * @throws XWikiException error when checking for class, class template and class sheet.
+     */
+    protected static XWikiApplicationClass getInstance(XWikiContext context, boolean check) throws XWikiException
+    {
+        synchronized (XWikiApplicationClass.class) {
+            if (instance == null) {
+                instance = new XWikiApplicationClass();
+            }
+        }
+
+        if (check) {
+            instance.check(context);
+        }
+
+        return instance;
     }
 
     /**
@@ -230,15 +257,27 @@ public class XWikiApplicationClass extends AbstractXClassManager<XWikiApplicatio
      */
     public static XWikiApplicationClass getInstance(XWikiContext context) throws XWikiException
     {
-        synchronized (XWikiApplicationClass.class) {
-            if (instance == null) {
-                instance = new XWikiApplicationClass();
-            }
+        return getInstance(context, true);
+    }
+
+    /**
+     * Indicate if the provided document contains application descriptor.
+     * 
+     * @param doc the document.
+     * @return true if the document contains an application descriptor, false otherwise.
+     */
+    public static boolean isApplication(XWikiDocument doc)
+    {
+        boolean isApplication = false;
+
+        try {
+            XWikiApplicationClass xclass = getInstance(null, false);
+            isApplication = xclass.isInstance(doc);
+        } catch (XWikiException e) {
+            Log.error("Fail to get unique instance of " + XWikiApplicationClass.class.getName(), e);
         }
 
-        instance.check(context);
-
-        return instance;
+        return isApplication;
     }
 
     /**

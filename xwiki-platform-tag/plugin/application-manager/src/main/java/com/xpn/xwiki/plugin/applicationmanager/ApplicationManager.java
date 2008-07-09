@@ -126,7 +126,7 @@ final class ApplicationManager implements XWikiDocChangeNotificationInterface
         XWikiContext context)
     {
         try {
-            if (newdoc != null && XWikiApplicationClass.getInstance(context).isInstance(newdoc)) {
+            if (newdoc != null && XWikiApplicationClass.isApplication(newdoc)) {
 
                 List<XWikiApplication> appList =
                     XWikiApplicationClass.getInstance(context).newXObjectDocumentList(newdoc, context);

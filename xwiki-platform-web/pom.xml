@@ -34,15 +34,15 @@
   <packaging>pom</packaging>
   <description>Common web resources for all XWiki WARs</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/branches/xwiki-web-1.5</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/branches/xwiki-web-1.5</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/web/branches/xwiki-web-1.5</url>
   </scm>
   <properties>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.15-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>1.5-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.9-SNAPSHOT</platform.skin.albatross.version>
+    <platform.skin.albatross.version>1.10-SNAPSHOT</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.7-SNAPSHOT</platform.skin.toucan.version>
   </properties>
   <profiles>

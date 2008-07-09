@@ -59,7 +59,7 @@
 {pre}
 #set($redirecturl = "")
 #if($xwiki.exists("XWiki.AdminSheet"))
-   #set($requestquery = $request.queryString + "&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant")
+   #set($requestquery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant")
    #set($redirecturl = $doc.getURL("admin", $requestquery))
 #else ## no admin application
   #set($redirecturl = $doc.getURL("view", "forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant"))

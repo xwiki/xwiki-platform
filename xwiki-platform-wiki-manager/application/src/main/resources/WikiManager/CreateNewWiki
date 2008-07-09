@@ -12,9 +12,9 @@
 <customClass></customClass>
 <contentAuthor>XWiki.Admin</contentAuthor>
 <creationDate>1186676964000</creationDate>
-<date>1213879900000</date>
-<contentUpdateDate>1213879900000</contentUpdateDate>
-<version>84.1</version>
+<date>1215607242000</date>
+<contentUpdateDate>1215607242000</contentUpdateDate>
+<version>87.1</version>
 <title>CreateNewWiki</title>
 <template></template>
 <defaultTemplate></defaultTemplate>
@@ -74,6 +74,9 @@
 #end
 #if (!$xwiki.applicationmanager)
   #error($msg.get("xapp.pluginnotenabled"))
+#end
+#if(!$xwiki.isVirtual())
+  #error($msg.get("wikimanager.notinvirtualmode"))
 #end
 ############################################################################################
 ## MACROS

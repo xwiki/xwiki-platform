@@ -14,7 +14,7 @@
     #foreach($r in $rightsLevels.keySet())#set($discard = $levelsRights.put($rightsLevels.get($r), $r))#end
     #set($maxlevel = $rightsLevels.get("delete")) ## Default: view, comment, edit, delete
     #if($doc.fullName == "XWiki.XWikiPreferences")
-      #if(($request.editor && $request.editor == "globaladmin") || $editor == "globaladmin")
+      #if(("$!request.editor" == "globaladmin") || "$!editor" == "globaladmin")
         #set($clsname = "XWiki.XWikiGlobalRights")
         #if($context.database == 'xwiki')
           #set($maxlevel = $rightsLevels.get("programming")) ## base + admin, register, programming
@@ -63,7 +63,7 @@
         <div id="ajax-loader">$msg.get("ui.ajaxTable.loading")<br />
           <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="$msg.get('ui.ajaxTable.loading')" title="" />
         </div>
-        #if($editor == "spacerights")
+        #if("$!editor" == "spacerights")
             <div class="spaceName">$msg.get("platform.core.rightsManagement.editRightsForSpace", [$space])&nbsp;&nbsp;
                 <select name="space" style="width: 130px;" class="filter" onchange="location='?editor=spacerights&amp;global=1&amp;space='+this.value;">
                   <option value="" label="">---</option>

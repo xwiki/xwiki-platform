@@ -435,10 +435,15 @@ public abstract class AbstractXClassManager<T extends XObjectDocument> implement
             try {
                 StringBuffer content = new StringBuffer(in.available());
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-                for (String str = reader.readLine(); str != null; str = reader.readLine()) {
-                    content.append(str);
-                    content.append('\n');
+                InputStreamReader isr = new InputStreamReader(in);
+                try {
+                    BufferedReader reader = new BufferedReader(isr);
+                    for (String str = reader.readLine(); str != null; str = reader.readLine()) {
+                        content.append(str);
+                        content.append('\n');
+                    }
+                } finally {
+                    isr.close();
                 }
 
                 return content.toString();

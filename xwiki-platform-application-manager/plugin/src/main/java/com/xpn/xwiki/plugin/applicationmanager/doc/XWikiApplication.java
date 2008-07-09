@@ -392,7 +392,7 @@ public class XWikiApplication extends DefaultXObjectDocument
                 getAppName() == null ? ((XWikiApplication) object).getAppName() == null : getAppName()
                     .equalsIgnoreCase(((XWikiApplication) object).getAppName());
         } else if (object instanceof String) {
-            equals = getAppName() == null ? object == null : getAppName().equalsIgnoreCase((String) object);
+            equals = getAppName() == null ? false : getAppName().equalsIgnoreCase((String) object);
         }
 
         return equals;

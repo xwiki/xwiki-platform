@@ -23,8 +23,8 @@ package com.xpn.xwiki.plugin;
 
 import java.util.Vector;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.ecs.filter.CharacterFilter;
-import org.apache.tools.ant.util.StringUtils;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;

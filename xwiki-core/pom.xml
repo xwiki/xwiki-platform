@@ -582,12 +582,6 @@
       <version>${platform.tool.test.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- Not used by XWiki directly, we should see who exactly depends on it -->
-    <dependency>
-      <groupId>ant</groupId>
-      <artifactId>ant</artifactId>
-      <version>1.6.5</version>
-    </dependency>
 
     <!-- Things that should probably be removed -->
     <!--

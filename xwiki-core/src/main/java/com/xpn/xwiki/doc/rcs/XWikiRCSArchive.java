@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.doc.rcs;
 
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -30,7 +31,6 @@ import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.net.URLCodec;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.tools.ant.filters.StringInputStream;
 import org.suigeneris.jrcs.diff.PatchFailedException;
 import org.suigeneris.jrcs.rcs.Archive;
 import org.suigeneris.jrcs.rcs.InvalidFileFormatException;
@@ -100,7 +100,7 @@ public class XWikiRCSArchive extends Archive
      */
     public XWikiRCSArchive(String archiveText) throws ParseException
     {
-        super("", new StringInputStream(archiveText));
+        super("", new StringReader(archiveText));
     }
     /**
      * Helper class for convert from {@link XWikiRCSNodeInfo} to JRCS {@link Node}.

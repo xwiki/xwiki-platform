@@ -76,7 +76,7 @@
                 </select>
             </div>
         #end ## editor = spacerights
-        <table id="usersandgroupstable" class="$!editor">
+        <table id="usersandgroupstable" #if("$!editor"!="")class="$editor"#end>
             <tr>
                 <td style="width:100%" colspan="3">
                     <table id="specialusersandgroups">

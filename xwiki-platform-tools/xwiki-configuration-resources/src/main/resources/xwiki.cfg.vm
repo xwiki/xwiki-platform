@@ -229,7 +229,7 @@ xwiki.defaultbaseskin=$xwikiCfgDefaultBaseSkin
 # xwiki.plugins.lucene.indexinterval=20
 
 #-# [SINCE 1.6M1]
-#-# Overlap the database name for the main wiki in virtual mode and for the wiki itself in non virtual mode 
+#-# Force the database name for the main wiki in virtual mode and for the wiki itself in non virtual mode 
 # xwiki.db=xwiki
 
 #-# [SINCE 1.6M1]

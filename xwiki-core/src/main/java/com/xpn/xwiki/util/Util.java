@@ -66,12 +66,14 @@ import org.dom4j.DocumentException;
 import org.dom4j.io.SAXReader;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xwiki.container.Container;
 
 import com.novell.ldap.util.Base64;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.render.WikiSubstitution;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiRequest;
 
 public class Util
@@ -849,5 +851,37 @@ public class Util
             return false;
         }
         return true;
+    }
+
+    /**
+     * Load resources from:
+     * 1. FileSystem
+     * 2. ServletContext
+     * 3. ClassPath
+     * in this order.
+     * @param resource resource path to load
+     * @return InputStream of resource.
+     */
+    public static InputStream getResourceAsStream(String resource)
+    {
+        File file = new File(resource);
+        try {
+            if (file.exists()) {
+                return new FileInputStream(file);
+            }
+        } catch (Exception e) {
+            // Probably running under -security, which prevents calling File.exists()
+            log.debug("Failed load resource ["+resource+"] using a file path");
+        }
+        try {
+            Container container = (Container) Utils.getComponent(Container.ROLE);
+            InputStream res = container.getApplicationContext().getResourceAsStream(resource);
+            if (res!=null) {
+                return res;
+            }
+        } catch (Exception e) {
+            log.debug("Failed load resource ["+resource+"] using a application context");
+        }
+        return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
     }
 }

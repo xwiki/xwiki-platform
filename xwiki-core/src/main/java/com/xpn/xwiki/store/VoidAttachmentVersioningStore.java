@@ -45,8 +45,15 @@ public class VoidAttachmentVersioningStore implements AttachmentVersioningStore
      * Constructor used by {@link XWiki} during storage initialization.
      * 
      * @param context The current context.
+     * @deprecated 1.6M1
      */
     public VoidAttachmentVersioningStore(XWikiContext context)
+    { }
+
+    /**
+     * Empty constructor needed for component manager.
+     */
+    public VoidAttachmentVersioningStore()
     { }
 
     /**

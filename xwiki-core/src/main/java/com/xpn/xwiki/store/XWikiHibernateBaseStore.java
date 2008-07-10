@@ -1,8 +1,7 @@
 package com.xpn.xwiki.store;
 
-import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Proxy;
-import java.net.URL;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.util.Iterator;
@@ -45,9 +44,7 @@ public class XWikiHibernateBaseStore
 
     private Configuration configuration;
 
-    private String hibpath;
-
-    private URL hiburl;
+    private String hibpath = "/WEB-INF/hibernate.cfg.xml";
 
     /**
      * THis allows to initialize our storage engine. The hibernate config file path is taken from
@@ -55,46 +52,32 @@ public class XWikiHibernateBaseStore
      * 
      * @param xwiki
      * @param context
+     * @deprecated
      */
     public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context)
     {
         String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
         log.debug("Hibernate configuration file: [" + path + "]");
-        try {
-            if ((path != null)
-                && ((new File(path).exists() || context.getEngineContext() == null))) {
-                setPath(path);
-                return;
-            }
-        } catch (Exception ex) {
-            // Probably running under -security, which prevents calling File.exists()
-            log.info("Failed setting the Hibernate configuration path using a path string");
-        }
-        try {
-            setHibUrl(context.getEngineContext().getResource(path));
-        } catch (Exception ex) {
-            log.info("Failed setting the Hibernate configuration path using getResource");
-            try {
-                setHibUrl(XWiki.class.getClassLoader().getResource(path));
-            } catch (Exception ex2) {
-                log
-                    .error(
-                        "Failed setting the Hibernate configuration file with any method, storage cannot be configured",
-                        ex2);
-            }
-        }
+        setPath(path);        
     }
 
     /**
      * Initialize the storage engine with a specific path This is used for tests.
      * 
      * @param hibpath
+     * @deprecated
      */
     public XWikiHibernateBaseStore(String hibpath)
     {
         setPath(hibpath);
     }
-
+    
+    /**
+     * Empty constructor needed for component manager.
+     */
+    public XWikiHibernateBaseStore()
+    { }
+    
     /**
      * Allows to get the current hibernate config file path
      * 
@@ -113,26 +96,6 @@ public class XWikiHibernateBaseStore
     public void setPath(String hibpath)
     {
         this.hibpath = hibpath;
-    }
-
-    /**
-     * Get's the hibernate config path as an URL
-     * 
-     * @return
-     */
-    public URL getHibUrl()
-    {
-        return hiburl;
-    }
-
-    /**
-     * Set the hibernate config path as an URL
-     * 
-     * @param hiburl
-     */
-    public void setHibUrl(URL hiburl)
-    {
-        this.hiburl = hiburl;
     }
 
     /**
@@ -156,17 +119,17 @@ public class XWikiHibernateBaseStore
      */
     private void initHibernate() throws HibernateException
     {
-        // Load Configuration and build SessionFactory
-        String path = getPath();
-        if (path != null)
-            setConfiguration((new Configuration()).configure(new File(path)));
-        else {
-            URL hiburl = getHibUrl();
-            if (hiburl != null)
-                setConfiguration(new Configuration().configure(hiburl));
-            else
-                setConfiguration(new Configuration().configure());
-        }
+        // there is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
+        setConfiguration(new Configuration() {
+            private static final long serialVersionUID = 1L;
+            @Override
+            protected InputStream getConfigurationInputStream(String resource)
+                throws HibernateException
+            {
+                return Util.getResourceAsStream(resource);
+            }
+        });
+        setConfiguration(getConfiguration().configure(getPath()));
 
         setSessionFactory(getConfiguration().buildSessionFactory());
     }

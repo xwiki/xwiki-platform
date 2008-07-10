@@ -26,6 +26,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
      * 
      * @param xwiki
      * @param context
+     * @deprecated 1.6M1
      */
     public XWikiHibernateAttachmentStore(XWiki xwiki, XWikiContext context)
     {
@@ -34,6 +35,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     /**
      * @see #XWikiHibernateAttachmentStore(XWiki, XWikiContext)
+     * @deprecated 1.6M1
      */
     public XWikiHibernateAttachmentStore(XWikiContext context)
     {
@@ -44,11 +46,18 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
      * Initialize the storage engine with a specific path This is used for tests.
      * 
      * @param hibpath
+     * @deprecated 1.6M1
      */
     public XWikiHibernateAttachmentStore(String hibpath)
     {
         super(hibpath);
     }
+
+    /**
+     * Empty constructor needed for component manager.
+     */
+    public XWikiHibernateAttachmentStore()
+    { }
 
     public void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context,
         boolean bTransaction) throws XWikiException

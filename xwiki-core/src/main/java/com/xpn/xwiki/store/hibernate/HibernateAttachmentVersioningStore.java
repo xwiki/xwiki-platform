@@ -46,11 +46,18 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
 
     /**
      * {@inheritDoc}
+     * @deprecated 1.6M1
      */
     public HibernateAttachmentVersioningStore(XWikiContext context)
     {
         super(context.getWiki(), context);
     }
+
+    /**
+     * Empty constructor needed for component manager.
+     */
+    public HibernateAttachmentVersioningStore()
+    { }
 
     /**
      * {@inheritDoc}

@@ -34,5 +34,35 @@
         </requirement>
       </requirements>
     </component>
+    <!-- store components -->
+    <component>
+      <role>com.xpn.xwiki.store.XWikiStoreInterface</role>
+      <implementation>com.xpn.xwiki.store.XWikiHibernateStore</implementation>
+    </component>
+    <component>
+      <role>com.xpn.xwiki.store.XWikiVersioningStoreInterface</role>
+      <implementation>com.xpn.xwiki.store.XWikiHibernateVersioningStore</implementation>
+    </component>
+    <component>
+      <role>com.xpn.xwiki.store.XWikiAttachmentStoreInterface</role>
+      <implementation>com.xpn.xwiki.store.XWikiHibernateAttachmentStore</implementation>
+    </component>
+    <component>
+      <role>com.xpn.xwiki.store.AttachmentVersioningStore</role>
+      <implementation>com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore</implementation>
+    </component>
+    <component>
+      <role>com.xpn.xwiki.store.AttachmentVersioningStore</role>
+      <role-hint>void</role-hint>
+      <implementation>com.xpn.xwiki.store.VoidAttachmentVersioningStore</implementation>
+    </component>
+    <component>
+      <role>com.xpn.xwiki.store.XWikiRecycleBinStoreInterface</role>
+      <implementation>com.xpn.xwiki.store.XWikiHibernateRecycleBinStore</implementation>
+    </component>
+    <component>
+      <role>com.xpn.xwiki.store.AttachmentRecycleBinStore</role>
+      <implementation>com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore</implementation>
+    </component>
   </components>
 </component-set>

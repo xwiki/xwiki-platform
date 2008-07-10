@@ -79,9 +79,9 @@ import org.exoplatform.container.PortalContainer;
 import org.exoplatform.container.RootContainer;
 import org.hibernate.HibernateException;
 import org.securityfilter.filter.URLPatternMatcher;
-import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import org.xwiki.observation.ObservationManager;
@@ -131,7 +131,6 @@ import com.xpn.xwiki.stats.impl.SearchEngineRule;
 import com.xpn.xwiki.stats.impl.XWikiStatsServiceImpl;
 import com.xpn.xwiki.store.AttachmentRecycleBinStore;
 import com.xpn.xwiki.store.AttachmentVersioningStore;
-import com.xpn.xwiki.store.VoidAttachmentVersioningStore;
 import com.xpn.xwiki.store.XWikiAttachmentStoreInterface;
 import com.xpn.xwiki.store.XWikiCacheStore;
 import com.xpn.xwiki.store.XWikiCacheStoreInterface;
@@ -139,7 +138,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore;
 import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
 import com.xpn.xwiki.user.api.XWikiAuthService;
@@ -666,9 +664,10 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         // Prepare the store
         setConfig(config);
-        XWikiStoreInterface basestore =
-            (XWikiStoreInterface) createClassFromConfig("xwiki.store.class", "com.xpn.xwiki.store.XWikiHibernateStore",
-                context);
+
+        XWikiStoreInterface basestore = (XWikiStoreInterface) Utils.getComponent(XWikiStoreInterface.ROLE,
+            Param("xwiki.store.main.hint"));
+
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
         if (!nocache) {
@@ -681,28 +680,23 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         setCriteriaService((XWikiCriteriaService) createClassFromConfig("xwiki.criteria.class",
             "com.xpn.xwiki.criteria.impl.XWikiCriteriaServiceImpl", context));
 
-        setAttachmentStore((XWikiAttachmentStoreInterface) createClassFromConfig("xwiki.store.attachment.class",
-            "com.xpn.xwiki.store.XWikiHibernateAttachmentStore", context));
+        setAttachmentStore((XWikiAttachmentStoreInterface) Utils.getComponent(XWikiAttachmentStoreInterface.ROLE,
+            Param("xwiki.store.attachment.hint")));
 
-        if (hasVersioning(null, context)) {
-            setVersioningStore((XWikiVersioningStoreInterface) createClassFromConfig("xwiki.store.versioning.class",
-                "com.xpn.xwiki.store.XWikiHibernateVersioningStore", context));
-        }
+        setVersioningStore((XWikiVersioningStoreInterface) Utils.getComponent(XWikiVersioningStoreInterface.ROLE,
+            Param("xwiki.store.versioning.hint")));
 
-        setAttachmentVersioningStore((AttachmentVersioningStore) createClassFromConfig(
-            "xwiki.store.attachment.versioning.class", hasAttachmentVersioning(context)
-                ? HibernateAttachmentVersioningStore.class.getName() : VoidAttachmentVersioningStore.class.getName(),
-            context));
+        setAttachmentVersioningStore((AttachmentVersioningStore) Utils.getComponent(AttachmentVersioningStore.ROLE,
+            hasAttachmentVersioning(context) ? Param("xwiki.store.attachment.versioning.hint") : "void"));
 
         if (hasRecycleBin(context)) {
-            setRecycleBinStore((XWikiRecycleBinStoreInterface) createClassFromConfig("xwiki.store.recyclebin.class",
-                "com.xpn.xwiki.store.XWikiHibernateRecycleBinStore", context));
+            setRecycleBinStore((XWikiRecycleBinStoreInterface) Utils.getComponent(XWikiRecycleBinStoreInterface.ROLE,
+                Param("xwiki.store.recyclebin.hint")));
         }
 
         if (hasAttachmentRecycleBin(context)) {
-            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) createClassFromConfig(
-                "storage.attachment.recyclebin.class",
-                "com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore", context));
+            setAttachmentRecycleBinStore((AttachmentRecycleBinStore) Utils.getComponent(AttachmentRecycleBinStore.ROLE,
+                Param("xwiki.store.attachment.recyclebin.hint")));
         }
 
         // Run migrations

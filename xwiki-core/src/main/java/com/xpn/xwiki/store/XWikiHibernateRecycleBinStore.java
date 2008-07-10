@@ -40,11 +40,19 @@ public class XWikiHibernateRecycleBinStore extends XWikiHibernateBaseStore imple
 {
     /**
      * @param context used for environment
+     * @deprecated 1.6M1
      */
     public XWikiHibernateRecycleBinStore(XWikiContext context)
     {
         super(context.getWiki(), context);
     }
+
+    /**
+     * Empty constructor needed for component manager.
+     */
+    public XWikiHibernateRecycleBinStore()
+    { }
+
     /**
      * {@inheritDoc}
      */

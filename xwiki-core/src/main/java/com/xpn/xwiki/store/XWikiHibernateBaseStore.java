@@ -30,6 +30,7 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
 
 public class XWikiHibernateBaseStore
@@ -40,9 +41,7 @@ public class XWikiHibernateBaseStore
 
     private int nbConnections = 0;
 
-    private SessionFactory sessionFactory;
-
-    private Configuration configuration;
+    private HibernateSessionFactory sessionFactory;
 
     private String hibpath = "/WEB-INF/hibernate.cfg.xml";
 
@@ -920,22 +919,22 @@ public class XWikiHibernateBaseStore
 
     public SessionFactory getSessionFactory()
     {
-        return sessionFactory;
+        return sessionFactory.getSessionFactory();
     }
 
     public void setSessionFactory(SessionFactory sessionFactory)
     {
-        this.sessionFactory = sessionFactory;
+        this.sessionFactory.setSessionFactory(sessionFactory);
     }
 
     public Configuration getConfiguration()
     {
-        return configuration;
+        return sessionFactory.getConfiguration();
     }
 
     public void setConfiguration(Configuration configuration)
     {
-        this.configuration = configuration;
+        this.sessionFactory.setConfiguration(configuration);
     }
 
     public Map<String, String> getConnections()

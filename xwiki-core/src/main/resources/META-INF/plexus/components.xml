@@ -36,20 +36,44 @@
     </component>
     <!-- store components -->
     <component>
+      <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+      <implementation>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</implementation>
+    </component>
+    <component>
       <role>com.xpn.xwiki.store.XWikiStoreInterface</role>
       <implementation>com.xpn.xwiki.store.XWikiHibernateStore</implementation>
+      <requirements>
+        <requirement>
+          <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>com.xpn.xwiki.store.XWikiVersioningStoreInterface</role>
       <implementation>com.xpn.xwiki.store.XWikiHibernateVersioningStore</implementation>
+      <requirements>
+        <requirement>
+          <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>com.xpn.xwiki.store.XWikiAttachmentStoreInterface</role>
       <implementation>com.xpn.xwiki.store.XWikiHibernateAttachmentStore</implementation>
+      <requirements>
+        <requirement>
+          <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>com.xpn.xwiki.store.AttachmentVersioningStore</role>
       <implementation>com.xpn.xwiki.store.hibernate.HibernateAttachmentVersioningStore</implementation>
+      <requirements>
+        <requirement>
+          <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>com.xpn.xwiki.store.AttachmentVersioningStore</role>
@@ -59,10 +83,20 @@
     <component>
       <role>com.xpn.xwiki.store.XWikiRecycleBinStoreInterface</role>
       <implementation>com.xpn.xwiki.store.XWikiHibernateRecycleBinStore</implementation>
+      <requirements>
+        <requirement>
+          <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+        </requirement>
+      </requirements>
     </component>
     <component>
       <role>com.xpn.xwiki.store.AttachmentRecycleBinStore</role>
       <implementation>com.xpn.xwiki.store.hibernate.HibernateAttachmentRecycleBinStore</implementation>
+      <requirements>
+        <requirement>
+          <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
+        </requirement>
+      </requirements>
     </component>
   </components>
 </component-set>

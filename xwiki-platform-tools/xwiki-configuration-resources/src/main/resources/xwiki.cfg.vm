@@ -228,4 +228,12 @@ xwiki.defaultbaseskin=$xwikiCfgDefaultBaseSkin
 # xwiki.plugins.lucene.analyzer=org.apache.lucene.analysis.standard.StandardAnalyzer
 # xwiki.plugins.lucene.indexinterval=20
 
+#-# [SINCE 1.6M1]
+#-# Overlap the database name for the main wiki in virtual mode and for the wiki itself in non virtual mode 
+# xwiki.db=xwiki
+
+#-# [SINCE 1.6M1]
+#-# Add a prefix to all databases names of the wikis in virtual mode and to the wiki name in non virtual mode
+# xwiki.db.prefix=
+
 $!xwikiCfgAdditionalProperties

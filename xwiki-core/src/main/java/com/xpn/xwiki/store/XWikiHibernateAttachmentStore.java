@@ -26,7 +26,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
      * 
      * @param xwiki
      * @param context
-     * @deprecated 1.6M1
+     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.ROLE) instead.
      */
     public XWikiHibernateAttachmentStore(XWiki xwiki, XWikiContext context)
     {
@@ -35,7 +35,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
 
     /**
      * @see #XWikiHibernateAttachmentStore(XWiki, XWikiContext)
-     * @deprecated 1.6M1
+     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.ROLE) instead.
      */
     public XWikiHibernateAttachmentStore(XWikiContext context)
     {
@@ -46,7 +46,7 @@ public class XWikiHibernateAttachmentStore extends XWikiHibernateBaseStore imple
      * Initialize the storage engine with a specific path This is used for tests.
      * 
      * @param hibpath
-     * @deprecated 1.6M1
+     * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiAttachmentStoreInterface.ROLE) instead.
      */
     public XWikiHibernateAttachmentStore(String hibpath)
     {

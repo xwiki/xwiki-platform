@@ -59,7 +59,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
      * 
      * @param xwiki The xwiki object
      * @param context The current context
-     * @deprecated 1.6M1
+     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.ROLE) instead.
      */
     public XWikiHibernateVersioningStore(XWiki xwiki, XWikiContext context)
     {
@@ -70,7 +70,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
      * Initialize the storage engine with a specific path This is used for tests.
      * 
      * @param hibpath path to hibernate.hbm.xml file
-     * @deprecated 1.6M1
+     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.ROLE) instead.
      */
     public XWikiHibernateVersioningStore(String hibpath)
     {
@@ -80,7 +80,7 @@ public class XWikiHibernateVersioningStore extends XWikiHibernateBaseStore imple
     /**
      * @see #XWikiHibernateVersioningStore(XWiki, XWikiContext)
      * @param context The current context
-     * @deprecated 1.6M1
+     * @deprecated 1.6M1. use ComponentManager.lookup(XWikiVersioningStoreInterface.ROLE) instead.
      */
     public XWikiHibernateVersioningStore(XWikiContext context)
     {

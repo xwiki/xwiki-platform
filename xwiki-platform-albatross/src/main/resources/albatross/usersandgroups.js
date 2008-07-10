@@ -534,7 +534,7 @@ MSCheckbox = Class.create({
       if (self.req) {
         return;
       }
-      
+
       var action = "";
       var nxtst = (self.state + 1) % self.nrstates;
 
@@ -558,7 +558,7 @@ MSCheckbox = Class.create({
 	           return;
 	          }
 	       }
-      } 
+      }
       // 2. The current user is clearing / denying any rights for a group he belongs to.
       else if(self.isUserInGroup || (window.currentUser == "XWiki.XWikiGuest" && self.currentUorG == "XWiki.XWikiAllGroup")) {
       	if (nxtst == 2) {
@@ -600,7 +600,7 @@ MSCheckbox = Class.create({
           }
         }
       }
-      
+
       if(action == "") {
         if (nxtst == 0) {
           action = "clear";
@@ -690,7 +690,7 @@ function displayUsers(row, i, table)
     //edit user
     var edit = document.createElement('img');
     edit.src = '$xwiki.getSkinFile("icons/rights-manager/edit.png")';
-    edit.title = '$msg.get("edit")';
+    edit.title = "$msg.get('edit')";
     Event.observe(edit, 'click', editUserOrGroup(userinlineurl, usersaveurl, docurl));
     edit.className = 'icon-manage';
     manage.appendChild(edit);
@@ -706,7 +706,7 @@ function displayUsers(row, i, table)
       Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "user"));
       del.className = 'icon-manage';
     }
-    del.title = '$msg.get("delete")';
+    del.title = "$msg.get('delete')";
     manage.appendChild(del);
   }
 
@@ -758,14 +758,14 @@ function displayGroups(row, i, table)
     //delete group
     var del = document.createElement('img');
     del.src = '$xwiki.getSkinFile("icons/rights-manager/clear.png")';
-    del.title = '$msg.get("delete")';
+    del.title = "$msg.get('delete')";
     Event.observe(del, 'click', deleteUserOrGroup(i, table, row.fullname, "group"));
     del.className = 'icon-manage';
 
     //edit user
     var edit = document.createElement('img');
     edit.src = '$xwiki.getSkinFile("icons/rights-manager/edit.png")';
-    edit.title = '$msg.get("edit")';
+    edit.title = "$msg.get('edit')";
     Event.observe(edit, 'click', editUserOrGroup(userinlineurl, usersaveurl, docurl));
     edit.className = 'icon-manage';
 
@@ -797,13 +797,13 @@ function displayMembers(row, i, table)
   }
   membername.className="username";
   tr.appendChild(membername);
-  
+
   /* do not allow to delete users from a group when not in inline mode */
   if(table.action == "inline")
   {
     var membermanage = document.createElement("td");
     membermanage.className = "manage";
-  
+
     var del = document.createElement('img');
 
     if (row.grayed == "true") {
@@ -814,7 +814,7 @@ function displayMembers(row, i, table)
        Event.observe(del, 'click', deleteMember(i, table, row.fullname, row.docurl));
        del.className = 'icon-manage';
     }
-    del.title = '$msg.get("delete")';
+    del.title = "$msg.get('delete')";
     membermanage.appendChild(del);
     tr.appendChild(membermanage);
   }
@@ -890,7 +890,7 @@ function deleteUserOrGroup(i, table, docname, uorg)
   return function() {
     var url = "?xpage=deleteuorg&docname=" + docname;
     if(uorg == "user") {
-      if (confirm('$msg.get("rightsmanager.confirmdeleteuser")'.replace('__name__', docname))) {
+      if (confirm("$msg.get('rightsmanager.confirmdeleteuser')".replace('__name__', docname))) {
         new Ajax.Request(url, {
             method: 'get',
             onSuccess: function(transport) {
@@ -900,7 +900,7 @@ function deleteUserOrGroup(i, table, docname, uorg)
       }
     }
     else {
-      if (confirm('$msg.get("rightsmanager.confirmdeletegroup")'.replace('__name__', docname))) {
+      if (confirm("$msg.get('rightsmanager.confirmdeletegroup')".replace('__name__', docname))) {
         new Ajax.Request(url, {
             method: 'get',
             onSuccess: function(transport) {
@@ -917,7 +917,7 @@ function deleteMember(i, table, docname, docurl)
 {
   return function() {
     var url = docurl + "?xpage=deletegroupmember&fullname=" + docname;
-    if (confirm('$msg.get("rightsmanager.confirmdeletemember")')) {
+    if (confirm("$msg.get('rightsmanager.confirmdeletemember')")) {
       new Ajax.Request(url, {
         method: 'get',
         onSuccess: function(transport) {

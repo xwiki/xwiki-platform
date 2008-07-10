@@ -26,7 +26,7 @@ import org.hibernate.cfg.Configuration;
  * Class used by hibernate stores for obtain sessions.
  * Simple holder for real sessionFactory and configuration for now.
  * 
- * @version $Id
+ * @version $Id$
  * @since 1.6M1
  */
 public class HibernateSessionFactory

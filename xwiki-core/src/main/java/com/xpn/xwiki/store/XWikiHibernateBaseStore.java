@@ -117,10 +117,10 @@ public class XWikiHibernateBaseStore
      * 
      * @throws org.hibernate.HibernateException
      */
-    private void initHibernate() throws HibernateException
+    private void initHibernate(XWikiContext context) throws HibernateException
     {
         // there is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
-        setConfiguration(new Configuration() {
+        Configuration cfg = new Configuration() {
             private static final long serialVersionUID = 1L;
             @Override
             protected InputStream getConfigurationInputStream(String resource)
@@ -128,10 +128,30 @@ public class XWikiHibernateBaseStore
             {
                 return Util.getResourceAsStream(resource);
             }
-        });
-        setConfiguration(getConfiguration().configure(getPath()));
+        };
+        cfg.configure(getPath());
 
-        setSessionFactory(getConfiguration().buildSessionFactory());
+        XWiki wiki = context.getWiki();
+        if (wiki != null && wiki.Param("xwiki.db") != null && !wiki.isVirtualMode()) {
+            // substitute default db name to configured.
+            // note, that we can't call getSchemaFromWikiName() here,
+            // because it ask getDatabaseProduct() which use connection
+            // which must be opened. But here (before connection init)
+            // we have no opened connections yet.
+            String schemaName = getSchemaFromWikiName(context.getDatabase(), null, context);
+
+            System.out.println(schemaName);
+            
+            String dialect = cfg.getProperty(Environment.DIALECT);
+            if ("org.hibernate.dialect.MySQLDialect".equals(dialect)) {
+                cfg.setProperty(Environment.DEFAULT_CATALOG, schemaName);
+            } else {
+                cfg.setProperty(Environment.DEFAULT_SCHEMA, schemaName);
+            }
+        }
+        setConfiguration(cfg);
+
+        setSessionFactory(cfg.buildSessionFactory());
     }
 
     /**
@@ -282,6 +302,49 @@ public class XWikiHibernateBaseStore
      * Convert wiki name in database/schema name.
      * 
      * @param wikiName the wiki name to convert.
+     * @param databaseProduct the database engine type.
+     * @param context the XWiki context.
+     * @return the database/schema name.
+     * @since XWiki Core 1.1.2, XWiki Core 1.2M2
+     */
+    protected String getSchemaFromWikiName(String wikiName, DatabaseProduct databaseProduct, XWikiContext context)
+    {
+        if (wikiName == null) {
+            return null;
+        }
+
+        XWiki wiki = context.getWiki();
+
+        String schema;
+        if (context.isMainWiki(wikiName)) {
+            schema = wiki.Param("xwiki.db");
+            if (schema == null) {
+                if (databaseProduct == DatabaseProduct.DERBY) {
+                    schema = "APP";
+                } else if (databaseProduct == DatabaseProduct.HSQLDB) {
+                    schema = "PUBLIC";
+                } else {
+                    schema = wikiName.replace('-', '_');
+                }
+            }
+        } else {
+            // virtual
+            schema = wikiName.replace('-', '_');
+        }
+
+        // Apply prefix
+        String prefix = wiki.Param("xwiki.db.prefix", "");
+        schema = prefix + schema;
+
+        return schema;
+    }
+
+    /**
+     * Convert wiki name in database/schema name.
+     * <p>
+     * Need hibernate to be initialized.
+     * 
+     * @param wikiName the wiki name to convert.
      * @param context the XWiki context.
      * @return the database/schema name.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
@@ -294,16 +357,15 @@ public class XWikiHibernateBaseStore
 
         DatabaseProduct databaseProduct = getDatabaseProductName(context);
 
-        if (databaseProduct == DatabaseProduct.DERBY) {
-            return context.isMainWiki(wikiName) ? "APP" : wikiName.replace('-', '_');
-        } else if (databaseProduct == DatabaseProduct.HSQLDB) {
-            return context.isMainWiki(wikiName) ? "PUBLIC" : wikiName.replace('-', '_');
-        } else
-            return wikiName.replace('-', '_');
+        String schema = getSchemaFromWikiName(wikiName, databaseProduct, context);
+
+        return schema;
     }
 
     /**
      * Convert context's database in real database/schema name.
+     * <p>
+     * Need hibernate to be initialized.
      * 
      * @param context the XWiki context.
      * @return the database/schema name.
@@ -477,7 +539,7 @@ public class XWikiHibernateBaseStore
             synchronized (this) {
                 if (getSessionFactory() == null) {
 
-                    initHibernate();
+                    initHibernate(context);
                     /* Check Schema */
                     if (getSessionFactory() != null) {
                         updateSchema(context);

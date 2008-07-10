@@ -59,6 +59,8 @@ public class Package
 
     public static final int Right = 1;
 
+    public static final String DEFAULT_FILEEXT = "xml";
+
     public static final String DefaultPackageFileName = "package.xml";
 
     public static final String DefaultPluginName = "package";
@@ -841,15 +843,45 @@ public class Package
         }
     }
 
+    /**
+     * Generate a relative path based on provided document.
+     * 
+     * @param doc the document to export.
+     * @return the corresponding path.
+     */
+    public String getPathFromDocument(XWikiDocument doc, XWikiContext context)
+    {
+        return doc.getSpace() + "/" + getFileNameFromDocument(doc, context);
+    }
+
+    /**
+     * Generate a file name based on provided document.
+     * 
+     * @param doc the document to export.
+     * @return the corresponding file name.
+     */
+    public String getFileNameFromDocument(XWikiDocument doc, XWikiContext context)
+    {
+        StringBuffer fileName = new StringBuffer(doc.getName());
+
+        // Add language
+        String language = doc.getLanguage();
+        if ((language != null) && (!language.equals(""))) {
+            fileName.append(".");
+            fileName.append(language);
+        }
+
+        // Add extension
+        fileName.append('.').append(DEFAULT_FILEEXT);
+
+        return fileName.toString();
+    }
+
     public void addToZip(XWikiDocument doc, ZipOutputStream zos, boolean withVersions, XWikiContext context)
         throws IOException
     {
         try {
-            String zipname = doc.getSpace() + "/" + doc.getName();
-            String language = doc.getLanguage();
-            if ((language != null) && (!language.equals(""))) {
-                zipname += "." + language;
-            }
+            String zipname = getPathFromDocument(doc, context);
             ZipEntry zipentry = new ZipEntry(zipname);
             zos.putNextEntry(zipentry);
             String docXml = doc.toXML(true, false, true, withVersions, context);
@@ -884,11 +916,7 @@ public class Package
                         "Error creating directory {0}", null, args);
                 }
             }
-            String filename = doc.getName();
-            String language = doc.getLanguage();
-            if ((language != null) && (!language.equals(""))) {
-                filename += "." + language;
-            }
+            String filename = getFileNameFromDocument(doc, context);
             File file = new File(spacedir, filename);
             String xml = doc.toXML(true, false, true, withVersions, context);
             if (!context.getWiki().getRightService().hasAdminRights(context)) {

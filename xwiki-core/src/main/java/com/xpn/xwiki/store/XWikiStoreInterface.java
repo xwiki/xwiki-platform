@@ -36,25 +36,25 @@ public interface XWikiStoreInterface
      */
     String ROLE = XWikiStoreInterface.class.getName();
 
-    public void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    void saveXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
-    public void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction)
+    void saveXWikiDoc(XWikiDocument doc, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
-    public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context)
+    XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context)
         throws XWikiException;
 
-    public void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    void deleteXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
-    public List<String> getClassList(XWikiContext context) throws XWikiException;
+    List<String> getClassList(XWikiContext context) throws XWikiException;
 
-    public List<String> searchDocumentsNames(String wheresql, XWikiContext context)
+    List<String> searchDocumentsNames(String wheresql, XWikiContext context)
         throws XWikiException;
 
-    public List<String> searchDocumentsNames(String wheresql, int nb, int start,
+    List<String> searchDocumentsNames(String wheresql, int nb, int start,
         XWikiContext context) throws XWikiException;
 
-    public List<String> searchDocumentsNames(String wheresql, int nb, int start,
+    List<String> searchDocumentsNames(String wheresql, int nb, int start,
         String selectColumns, XWikiContext context) throws XWikiException;
 
     /**
@@ -82,7 +82,7 @@ public interface XWikiStoreInterface
      * @return a list of document names
      * @throws XWikiException in case of error while performing the query
      */
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
+    List<String> searchDocumentsNames(String parametrizedSqlClause, int nb, int start,
         List parameterValues, XWikiContext context) throws XWikiException;
 
     /**
@@ -91,7 +91,7 @@ public interface XWikiStoreInterface
      * 
      * @see #searchDocumentsNames(String, int, int, java.util.List, com.xpn.xwiki.XWikiContext)
      */
-    public List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
+    List<String> searchDocumentsNames(String parametrizedSqlClause, List parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -106,7 +106,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -121,7 +121,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start,
+    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -137,7 +137,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         boolean customMapping, XWikiContext context) throws XWikiException;
 
     /**
@@ -154,7 +154,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         int nb, int start, XWikiContext context) throws XWikiException;
 
     /**
@@ -173,7 +173,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         int nb, int start, List parameterValues, XWikiContext context) throws XWikiException;
 
     /**
@@ -191,7 +191,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         boolean customMapping, int nb, int start, XWikiContext context) throws XWikiException;
 
     /**
@@ -204,7 +204,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, XWikiContext context)
+    List<XWikiDocument> searchDocuments(String wheresql, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -224,7 +224,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         boolean customMapping, boolean checkRight, int nb, int start, XWikiContext context)
         throws XWikiException;
 
@@ -246,7 +246,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, List parameterValues,
+    List<XWikiDocument> searchDocuments(String wheresql, List parameterValues,
         XWikiContext context) throws XWikiException;
 
     /**
@@ -272,7 +272,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         boolean customMapping, int nb, int start, List parameterValues, XWikiContext context)
         throws XWikiException;
 
@@ -296,7 +296,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, int nb, int start,
+    List<XWikiDocument> searchDocuments(String wheresql, int nb, int start,
         List parameterValues, XWikiContext context) throws XWikiException;
 
     /**
@@ -324,29 +324,29 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
+    List<XWikiDocument> searchDocuments(String wheresql, boolean distinctbylanguage,
         boolean customMapping, boolean checkRight, int nb, int start, List parameterValues,
         XWikiContext context) throws XWikiException;
 
-    public XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction)
+    XWikiLock loadLock(long docId, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
-    public void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction)
+    void saveLock(XWikiLock lock, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
-    public void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction)
+    void deleteLock(XWikiLock lock, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
-    public List loadLinks(long docId, XWikiContext context, boolean bTransaction)
+    List loadLinks(long docId, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
-    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
+    List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
-    public void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction)
+    void saveLinks(XWikiDocument doc, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
-    public void deleteLinks(long docId, XWikiContext context, boolean bTransaction)
+    void deleteLinks(long docId, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
     /**
@@ -361,7 +361,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
+    List search(String sql, int nb, int start, XWikiContext context) throws XWikiException;
 
     /**
      * Execute a reading request with parameters and return result.
@@ -382,7 +382,7 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public List search(String sql, int nb, int start, List parameterValues, XWikiContext context)
+    List search(String sql, int nb, int start, List parameterValues, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -398,7 +398,7 @@ public interface XWikiStoreInterface
      * @return a list of XWikiDocument.
      * @throws XWikiException in case of error while performing the query.
      */
-    public List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
+    List search(String sql, int nb, int start, Object[][] whereParams, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -422,10 +422,10 @@ public interface XWikiStoreInterface
      * @throws XWikiException in case of error while performing the query.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public List search(String sql, int nb, int start, Object[][] whereParams,
+    List search(String sql, int nb, int start, Object[][] whereParams,
         List parameterValues, XWikiContext context) throws XWikiException;
 
-    public void cleanUp(XWikiContext context);
+    void cleanUp(XWikiContext context);
 
     /**
      * Indicate if the provided wiki name could be used to create a new wiki.
@@ -435,7 +435,7 @@ public interface XWikiStoreInterface
      * @return true if the name is already used, false otherwise.
      * @throws XWikiException error when looking if wiki name already used.
      */
-    public boolean isWikiNameAvailable(String wikiName, XWikiContext context)
+    boolean isWikiNameAvailable(String wikiName, XWikiContext context)
         throws XWikiException;
 
     /**
@@ -445,7 +445,7 @@ public interface XWikiStoreInterface
      * @param context the XWiki context.
      * @throws XWikiException error when creating new wiki.
      */
-    public void createWiki(String wikiName, XWikiContext context) throws XWikiException;
+    void createWiki(String wikiName, XWikiContext context) throws XWikiException;
 
     /**
      * Delete a wiki database.
@@ -454,24 +454,24 @@ public interface XWikiStoreInterface
      * @param context the XWiki context.
      * @throws XWikiException error when deleting wiki database.
      */
-    public void deleteWiki(String wikiName, XWikiContext context) throws XWikiException;
+    void deleteWiki(String wikiName, XWikiContext context) throws XWikiException;
 
-    public boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    boolean exists(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
-    public boolean isCustomMappingValid(BaseClass bclass, String custommapping1,
+    boolean isCustomMappingValid(BaseClass bclass, String custommapping1,
         XWikiContext context) throws XWikiException;
 
-    public boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext)
+    boolean injectCustomMapping(BaseClass doc1class, XWikiContext xWikiContext)
         throws XWikiException;
 
-    public boolean injectCustomMappings(XWikiDocument doc, XWikiContext context)
+    boolean injectCustomMappings(XWikiDocument doc, XWikiContext context)
         throws XWikiException;
 
-    public List getCustomMappingPropertyList(BaseClass bclass);
+    List getCustomMappingPropertyList(BaseClass bclass);
 
-    public void injectCustomMappings(XWikiContext context) throws XWikiException;
+    void injectCustomMappings(XWikiContext context) throws XWikiException;
 
-    public void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
+    void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
 
-    public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException;
+    List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException;
 }

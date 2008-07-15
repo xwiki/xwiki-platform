@@ -34,11 +34,11 @@
     #else
       #set($clsname = "XWiki.XWikiRights")
     #end
-    
+
     ## url to take the users and groups to display in the ajax-based table
     #set($url = "?xpage=getusersandgroups")
     #set($saveUrl = $doc.getURL("edit", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
-    
+
     ## get the rights for XWikiGuest
     #set($r = $util.arrayList)
     #foreach($i in [0..$maxlevel])#set($discard = $r.add(0))#end
@@ -95,9 +95,15 @@
                           <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
                           #end
                       </tr>
+                      <tr id="unregistered">
+                        <td id="unreguser">$msg.get("rightsmanager.unregisteredusers")</td>
+                        #foreach($i in [0..$maxlevel])
+                        <td class="rights" id="td${levelsRights.get($i)}"></td>
+                        #end
+                      </tr>
                       <tr id="table-filters">
                           <td>
-                            <input name="name" type="text" style="width:65%"/>
+                            $msg.get("rightsmanager.searchfilter") <input name="name" type="text" style="width:65%"/>
                             #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
                             #if(!$mainwk) ## display the combobox only in a local wiki
                             <select name="wiki" style="margin-left:10px;">
@@ -109,12 +115,6 @@
                             #set($colsp = $maxlevel + 1)
                             </td><td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
                       </tr>
-					  <tr id="unregistered">   
-                        <td id="unreguser">$msg.get("rightsmanager.unregisteredusers")</td>
-                        #foreach($i in [0..$maxlevel])
-                        <td class="rights" id="td${levelsRights.get($i)}"></td>
-                        #end
-                    </tr>
                   </thead>
                   <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
                  </table>
@@ -165,7 +165,7 @@
 		   $('unregistered').addClassName('hidden');
 		 else if($('uorgu').checked && $('unregistered').hasClassName('hidden'))
 		   $('unregistered').removeClassName('hidden');
-		}); 
+		});
 		Event.observe($('allowguestview'), 'click', setGuestExtendedRights($('allowguestview')));
 		Event.observe($('allowguestedit'), 'click', setGuestExtendedRights($('allowguestedit')));
         //]]>

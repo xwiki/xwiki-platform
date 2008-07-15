@@ -35,12 +35,13 @@ public class GroupsClass extends ListClass
         this(null);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<String> getList(XWikiContext context)
     {
         List<String> list;
         try {
-            list = context.getWiki().getGroupService(context).listAllGroups(context);
+            list = (List<String>) context.getWiki().getGroupService(context).getAllMatchedGroups(null, false, 0, 0, null, context);
         } catch (XWikiException e) {
             // TODO add log exception
             list = new ArrayList<String>();

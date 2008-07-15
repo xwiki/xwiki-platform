@@ -131,7 +131,7 @@ Lightbox = Class.create({
     } else if(lbtype == "rounded") {
       str += this.roundedtop(lbbgcolor, lbbordercolor);
     } else {
-      str += '<div class="lb-squarred" style="backgrounddee:' + lbbgcolor + '; border-color:' + lbbordercolor + '"></div></div>';
+      str += '<div class="lb-squarred" style="background:' + lbbgcolor + '; border-color:' + lbbordercolor + '"></div></div>';
     }
 
     str += '</div><div class="lb-content" style="background:' +  lbbgcolor + '; border-color:' + lbbordercolor + '; color:' + lbfontcolor + '" id="lb-content">Lightbox Content</div>';

@@ -139,7 +139,11 @@ public class XWikiHibernateBaseStore implements Initializable
             protected InputStream getConfigurationInputStream(String resource)
                 throws HibernateException
             {
-                return Util.getResourceAsStream(resource);
+                InputStream stream = Util.getResourceAsStream(resource);
+                if (stream==null) {
+                    throw new HibernateException("Can't find ["+resource+"] for hibernate configuration");
+                }
+                return stream;
             }
         };
         cfg.configure(getPath());

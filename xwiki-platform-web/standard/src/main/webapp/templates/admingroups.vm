@@ -10,7 +10,7 @@
 #if($interface == "new")
 ## url to get the groups for displaying them in the ajax-based table
 #set($url = "?xpage=getgroups")
-<div id="ajax-loader">Loading...<br />
+<div id="ajax-loader">$msg.get("ui.ajaxTable.loading")<br />
   <img src="$xwiki.getSkinFile('icons/ajax-loader.gif')" alt="Loading..." title="Loading..." />
 </div>
 <table id="groupstable">
@@ -19,7 +19,7 @@
       <table class="display" cellpadding="3">
        <thead class="theader">
           <tr>
-              <td>Group Name</td><td>Members</td><td>Manage</td>
+              <td>$msg.get("rightsmanager.groupname")</td><td>$msg.get("rightsmanager.members")</td><td>$msg.get("rightsmanager.manage")</td>
           </tr>
           <tr id="table-filters">
               <td><input name="name" type="text" class="filter"/></td>
@@ -28,9 +28,9 @@
                 #if($context.database != "xwiki") #set($mainwk = false) #else #set($mainwk = true) #end
                 #if(!$mainwk) ## display the combobox only in a local wiki
                 <select name="wiki" class="filter">
-                  <option value="local" selected="selected">Local</option>
-                  <option value="global">Global</option>
-                  <option value="both">Both</option>
+                  <option value="local" selected="selected">$msg.get("rightsmanager.local")</option>
+                  <option value="global">$msg.get("rightsmanager.global")</option>
+                  <option value="both">$msg.get("rightsmanager.both")</option>
                 </select>
                 #else <input type="hidden" value="local" name="wiki" /> #end
               </td>

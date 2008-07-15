@@ -58,13 +58,5 @@
 <content>### Administrate the rights in a wiki (globally or per space).
 {pre}
 #template("rightsUI.vm")
-{/pre}
-#if("$!{editor}" == "globaladmin")
- #set($legend = ["authentification"])
- #set($params = $util.hashMap)
- #set($params.authentification = ["authenticate_view", "authenticate_edit"])
- #set($classname = "XWiki.XWikiPreferences")
- &lt;br/&gt;
- #includeForm("XWiki.AdminFieldsDisplaySheet")
-#end
-</content></xwikidoc>
+{/pre}</content>
+</xwikidoc>

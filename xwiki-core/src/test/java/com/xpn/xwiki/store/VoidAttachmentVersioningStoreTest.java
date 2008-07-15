@@ -22,38 +22,31 @@ package com.xpn.xwiki.store;
 import org.suigeneris.jrcs.rcs.Version;
 
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
-import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.VoidAttachmentVersioningStore.VoidAttachmentArchive;
-
-import junit.framework.TestCase;
+import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link VoidAttachmentVersioningStore} and {@link VoidAttachmentArchive}.
  * 
  * @version $Id$
  */
-public class VoidAttachmentVersioningStoreTest extends TestCase
+public class VoidAttachmentVersioningStoreTest extends AbstractXWikiComponentTestCase
 {
-    XWikiContext context = new XWikiContext();
-
-    XWiki xwiki;
-
     AttachmentVersioningStore store;
 
     @Override
     protected void setUp() throws Exception
     {
-        XWikiConfig config = new XWikiConfig();
-        config.setProperty("xwiki.store.attachment.versioning", "0");
-        this.xwiki = new XWiki();
-        this.context.setWiki(this.xwiki);
-        this.store = new VoidAttachmentVersioningStore(this.context);
-        this.xwiki.setAttachmentVersioningStore(this.store);
+        super.setUp();
+        XWiki xwiki = new XWiki();
+        getContext().setWiki(xwiki);
+        
+        store = (AttachmentVersioningStore) getComponentManager().lookup(AttachmentVersioningStore.ROLE, "void");
+        xwiki.setAttachmentVersioningStore(store);
     }
 
     public void testStore() throws XWikiException
@@ -64,15 +57,15 @@ public class VoidAttachmentVersioningStoreTest extends TestCase
         XWikiDocument doc = new XWikiDocument("Main", "Test");
         XWikiAttachment attachment = new XWikiAttachment(doc, "filename");
         attachment.setContent(new byte[] {1});
-        attachment.updateContentArchive(context);
+        attachment.updateContentArchive(getContext());
         // is archive correctly inited and cloneable?
-        this.store.saveArchive(attachment.getAttachment_archive(), this.context, true);
-        XWikiAttachmentArchive archive = this.store.loadArchive(attachment, this.context, false);
+        this.store.saveArchive(attachment.getAttachment_archive(), this.getContext(), true);
+        XWikiAttachmentArchive archive = this.store.loadArchive(attachment, this.getContext(), false);
         assertEquals(VoidAttachmentArchive.class, archive.getClass());
         assertEquals(VoidAttachmentArchive.class, archive.clone().getClass());
-        assertEquals(archive, this.store.loadArchive(attachment, this.context, true));
+        assertEquals(archive, this.store.loadArchive(attachment, this.getContext(), true));
 
-        this.store.deleteArchive(attachment, context, true);
+        this.store.deleteArchive(attachment, getContext(), true);
     }
 
     public void testHistory() throws XWikiException
@@ -81,15 +74,15 @@ public class VoidAttachmentVersioningStoreTest extends TestCase
         XWikiAttachment attachment = new XWikiAttachment(doc, "filename");
         // 1.1
         attachment.setContent(new byte[] {1});
-        attachment.updateContentArchive(this.context);
-        assertEquals(attachment, attachment.getAttachmentRevision("1.1", this.context));
+        attachment.updateContentArchive(this.getContext());
+        assertEquals(attachment, attachment.getAttachmentRevision("1.1", this.getContext()));
         // 1.2
         attachment.setContent(new byte[] {2});
-        attachment.updateContentArchive(this.context);
-        assertEquals(attachment, attachment.getAttachmentRevision("1.2", this.context));
+        attachment.updateContentArchive(this.getContext());
+        assertEquals(attachment, attachment.getAttachmentRevision("1.2", this.getContext()));
         // there should be only 1.2 version.
-        assertNull(attachment.getAttachmentRevision("1.1", this.context));
-        assertNull(attachment.getAttachmentRevision("1.3", this.context));
+        assertNull(attachment.getAttachmentRevision("1.1", this.getContext()));
+        assertNull(attachment.getAttachmentRevision("1.3", this.getContext()));
         assertEquals(1, attachment.getVersions().length);
         assertEquals(new Version(1, 2), attachment.getVersions()[0]);
     }

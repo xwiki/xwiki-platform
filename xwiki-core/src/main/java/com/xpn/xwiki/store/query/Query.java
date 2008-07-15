@@ -65,13 +65,13 @@ public interface Query
     Query bindValue(String var, Object val);
 
     /**
-     * @param limit limit of result list to set
+     * @param limit limit of result list to set (so {@link #execute()}.size() will be <= limit).
      * @return this query.
      */
     Query setLimit(int limit);
 
     /**
-     * @param offset offset of query result to set.
+     * @param offset offset of query result to set (skip first "offset" rows).
      * @return this query.
      */
     Query setOffset(int offset);

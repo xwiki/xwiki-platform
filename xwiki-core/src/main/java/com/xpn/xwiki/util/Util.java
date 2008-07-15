@@ -860,7 +860,7 @@ public class Util
      * 3. ClassPath
      * in this order.
      * @param resource resource path to load
-     * @return InputStream of resource.
+     * @return InputStream of resource or null if not found
      */
     public static InputStream getResourceAsStream(String resource)
     {

@@ -34,11 +34,11 @@
     #else
       #set($clsname = "XWiki.XWikiRights")
     #end
-    
+
     ## url to take the users and groups to display in the ajax-based table
     #set($url = "?xpage=getusersandgroups")
     #set($saveUrl = $doc.getURL("edit", "xpage=saverights&clsname=${clsname}&fullname=XWiki.XWikiGuest&uorg=users"))
-    
+
     ## get the rights for XWikiGuest
     #set($r = $util.arrayList)
     #foreach($i in [0..$maxlevel])#set($discard = $r.add(0))#end
@@ -76,40 +76,30 @@
                 </select>
             </div>
         #end ## editor = spacerights
-        <table id="usersandgroupstable" class="$!editor">
-            <tr>
-                <td style="width:100%" colspan="3">
-                    <table id="specialusersandgroups">
-                      <thead class="theader"><tr>
-                        <td class="usersorgroupsnames">$msg.get("rightsmanager.specialusers")</td>
-                        #foreach($i in [0..$maxlevel])
-                        <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
-                        #end
-                      </tr></thead>
-                      <tbody><tr id="XWikiGuestSpecial">
-                        <td class="suorg">$msg.get("rightsmanager.unregisteredusers")</td>
-                        #foreach($i in [0..$maxlevel])
-                        <td class="rights" id="td${levelsRights.get($i)}"></td>
-                        #end
-                      </tr></tbody>
-                    </table>
-                </td>
-            </tr>
+        <table id="usersandgroupstable" #if("$!editor"!="")class="$editor"#end>
             <tr>
                 <td colspan="3" style="padding-top:10px;">
                   <span id="showLimits"></span>
                 </td>
             </tr>
-            <tr><td style="width:100%">
+            <tr>
+				<td style="width:100%">
                   <table class="display">
                    <thead class="theader">
-                      <tr><td class="usersorgroupsnames">
-                      <input type="radio" name="uorg" value="groups" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
-                        <input type="radio" name="uorg" value="users"/>$msg.get("Users")
-                        </td>
-                      #foreach($i in [0..$maxlevel])
-                        <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
-                      #end
+                      <tr>
+						  <td class="usersorgroupsnames">
+                          <input type="radio" id="uorgg" name="uorg" value="groups" onclick="if(!$('unregistered').hasClassName('hidden')) $('unregistered').addClassName('hidden');" checked="checked" />$msg.get("Groups")&nbsp;&nbsp;
+                          <input type="radio" id="uorgu" name="uorg" value="users" onclick="if($('unregistered').hasClassName('hidden')) $('unregistered').removeClassName('hidden');" />$msg.get("Users")
+                          </td>
+                          #foreach($i in [0..$maxlevel])
+                          <td class="rights">$msg.get("rightsmanager.${levelsRights.get($i)}")</td>
+                          #end
+                      </tr>
+                      <tr id="unregistered">
+                        <td id="unreguser">$msg.get("rightsmanager.unregisteredusers")</td>
+                        #foreach($i in [0..$maxlevel])
+                        <td class="rights" id="td${levelsRights.get($i)}"></td>
+                        #end
                       </tr>
                       <tr id="table-filters">
                           <td>
@@ -122,19 +112,42 @@
                               <option value="both">$msg.get("rightsmanager.both")</option>
                             </select>
                             #else<input type="hidden" name="wiki" value="local"/>#end
-                            </td><td>
-                            <input type="hidden" name="clsname" value="$clsname" />
-                          </td>
-                          <td colspan="$maxlevel"></td>
-                          </tr>
-                   </thead>
-                   <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
-                  </table></td>
-                <td valign="top">
+                            #set($colsp = $maxlevel + 1)
+                            </td><td colspan="$colsp"><input type="hidden" name="clsname" value="$clsname" /></td>
+                      </tr>
+                  </thead>
+                  <tbody id="display1"><tr><td>&nbsp;</td></tr></tbody>
+                 </table>
+			   </td>
+               <td valign="top">
                   <div id="scrollbar1" class="scrollbar"><div class="inscrollbar">&nbsp;</div></div>
-                </td>
-                <td id="buff"></td>
+               </td>
+               <td id="buff"></td>
             </tr>
+			<tr>
+				<td>
+					<table>
+                        #set($auth_view = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_view"))
+                        #set($auth_edit = $doc.getObject("XWiki.XWikiPreferences").get("authenticate_edit"))
+                        #if($auth_view == "Yes")
+                            #set($view_icon = $xwiki.getSkinFile('icons/rights-manager/allow-black.png'))
+                            #set($view_alt = "yes")
+                        #elseif($auth_view == "No" || $auth_view == "---")
+                            #set($view_icon = $xwiki.getSkinFile('icons/rights-manager/none.png'))
+                            #set($view_alt = "no")
+                        #end
+                        #if($auth_edit == "Yes")
+                            #set($edit_icon = $xwiki.getSkinFile('icons/rights-manager/allow-black.png'))
+                            #set($edit_alt = "yes")
+                        #elseif($auth_edit == "No" || $auth_edit == "---")
+                            #set($edit_icon = $xwiki.getSkinFile('icons/rights-manager/none.png'))
+                            #set($edit_alt = "no")
+                        #end
+						<tr><td>$msg.get("authenticate_view")</td><td><img id="allowguestview" alt="$view_alt" src="${view_icon}" /></td></tr>
+						<tr><td>$msg.get("authenticate_edit")</td><td><img id="allowguestedit" alt="$edit_alt" src="${edit_icon}" /></td></tr>
+					</table>
+				</td>
+		    </tr>
         </table>
         <script type="text/javascript">
         //<![CDATA[
@@ -147,6 +160,14 @@
         #foreach($i in [0..$maxlevel])
         var chbx${i} = new MSCheckbox($("td${levelsRights.get($i)}"), "${levelsRights.get($i)}", saveUrl, "${r.get($i)}");
         #end
+        Event.observe(window, 'load', function() {
+		 if($('uorgg').checked && !$('unregistered').hasClassName('hidden'))
+		   $('unregistered').addClassName('hidden');
+		 else if($('uorgu').checked && $('unregistered').hasClassName('hidden'))
+		   $('unregistered').removeClassName('hidden');
+		});
+		Event.observe($('allowguestview'), 'click', setGuestExtendedRights($('allowguestview')));
+		Event.observe($('allowguestedit'), 'click', setGuestExtendedRights($('allowguestedit')));
         //]]>
         </script>
     </div> ## xwikieditcontent

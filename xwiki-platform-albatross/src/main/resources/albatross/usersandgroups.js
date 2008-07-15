@@ -140,8 +140,9 @@ var ASSTable = Class.create({
     var f = offset + limit - 1;
     if (f > this.totalRows) f = this.totalRows;
     var off = (this.totalRows > 0) ? offset : 0;
-    // TODO: msg.get
-    $('showLimits').innerHTML = "Displaying rows from <strong>" + off + "</strong> to <strong>" + f + "</strong> out of <strong>" + this.totalRows + "</strong>";
+    var msg = "$msg.get('from') <strong>" + off + "</strong> $msg.get('to') <strong>" + f + "</strong> $msg.get('ui.ajaxTable.outof') <strong>" + this.totalRows + "</strong>";
+    var msg = msg.toLowerCase();
+    $('showLimits').innerHTML = "$msg.get('rightsmanager.displayrows') " + msg;
 
     this.clearDisplay();
 
@@ -934,3 +935,25 @@ function makeAddHandler(url, saveurl, redirecturl)
     window.lb = new Lightbox(url, saveurl, redirecturl);
   }
 }
+
+function setGuestExtendedRights(self)
+{
+  return function() { 
+      var url = '$xwiki.getURL("XWiki.XWikiPreferences", "save")';
+      var pivot = self;
+      if(self.getAttribute('alt') == "yes")
+      {
+        if(self.id.indexOf('view') > 0)
+           new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "0"}, onSuccess: function() { pivot.alt = "no"; pivot.src = "$xwiki.getSkinFile('icons/rights-manager/none.png')"; }  }); 
+        else
+           new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "0"}, onSuccess: function() { pivot.alt = "no"; pivot.src = "$xwiki.getSkinFile('icons/rights-manager/none.png')"; }  });
+      }
+      else {
+           if(self.id.indexOf('view') > 0)
+             new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_view" : "1"}, onSuccess: function() { pivot.alt = "yes"; pivot.src = "$xwiki.getSkinFile('icons/rights-manager/allow-black.png')"; }  }); 
+           else
+             new Ajax.Request(url, {method: 'post', parameters: {"XWiki.XWikiPreferences_0_authenticate_edit" : "1"}, onSuccess: function() { pivot.alt = "yes"; pivot.src = "$xwiki.getSkinFile('icons/rights-manager/allow-black.png')"; }  });
+      }  	
+  }
+}
+

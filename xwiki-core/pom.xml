@@ -660,7 +660,8 @@
               **/plugin/ldap/XWikiLDAP*.java,
               **/*AttachmentVersioningStore.java,
               **/api/StatsService.java,
-              **/stats/**/*.java
+              **/stats/**/*.java,
+              **/store/query/Query*.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,

@@ -24,6 +24,9 @@ import org.hibernate.jdbc.BorrowedConnectionProxy;
 import org.hibernate.jdbc.ConnectionManager;
 import org.hibernate.mapping.Table;
 import org.hibernate.tool.hbm2ddl.DatabaseMetadata;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -32,8 +35,9 @@ import com.xpn.xwiki.monitor.api.MonitorPlugin;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.util.Util;
+import com.xpn.xwiki.web.Utils;
 
-public class XWikiHibernateBaseStore
+public class XWikiHibernateBaseStore implements Initializable
 {
     private static final Log log = LogFactory.getLog(XWikiHibernateBaseStore.class);
 
@@ -51,20 +55,20 @@ public class XWikiHibernateBaseStore
      * 
      * @param xwiki
      * @param context
-     * @deprecated
+     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
      */
     public XWikiHibernateBaseStore(XWiki xwiki, XWikiContext context)
     {
         String path = xwiki.Param("xwiki.store.hibernate.path", "/WEB-INF/hibernate.cfg.xml");
         log.debug("Hibernate configuration file: [" + path + "]");
-        setPath(path);        
+        setPath(path);
     }
 
     /**
      * Initialize the storage engine with a specific path This is used for tests.
      * 
      * @param hibpath
-     * @deprecated
+     * @deprecated 1.6M1. Use ComponentManager.lookup(String) instead.
      */
     public XWikiHibernateBaseStore(String hibpath)
     {
@@ -76,7 +80,17 @@ public class XWikiHibernateBaseStore
      */
     public XWikiHibernateBaseStore()
     { }
-    
+
+    /**
+     * {@inheritDoc}
+     */
+    public void initialize() throws InitializationException
+    {
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+        XWikiContext context = (XWikiContext) execution.getContext().getProperty("xwikicontext");
+        setPath(context.getWiki().getConfig().getProperty("xwiki.store.hibernate.path", getPath()));
+    }
+
     /**
      * Allows to get the current hibernate config file path
      * 
@@ -147,6 +161,9 @@ public class XWikiHibernateBaseStore
             } else {
                 cfg.setProperty(Environment.DEFAULT_SCHEMA, schemaName);
             }
+        }
+        if (sessionFactory==null) {
+            sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.ROLE);
         }
         setConfiguration(cfg);
 

@@ -12,7 +12,7 @@ addButton('$xwiki.getSkinFile("ed_link.gif")','$msg.get("ilink")','[',']','$msg.
 // addButton('$xwiki.getSkinFile("ed_extlink.gif")','$msg.get("elink")','[',']','$msg.get("elinktext")');
 addButton('$xwiki.getSkinFile("ed_hr.gif")','$msg.get("hr")','\n----\n','','$msg.get("hrtext")');
 addButton('$xwiki.getSkinFile("ed_image.gif")','$msg.get("img")','{image:','}','$msg.get("imgtext")');
-addButton('$xwiki.getSkinFile("ed_about.gif")','$msg.get("sig")','\#sign("$context.user")','','$msg.get("sigtext")');
+addButton('$xwiki.getSkinFile("ed_about.gif")','$msg.get("sign")','\#sign("$context.user")','','$msg.get("signtext")');
 //addInfobox('$msg.get("simpleedittoolbardesc")','$msg.get("simpleedittoolbardesc2")');
 // document.writeln("<" + "/div>");
 document.writeln("<" + "/div>");

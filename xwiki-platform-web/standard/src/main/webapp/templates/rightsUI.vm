@@ -124,6 +124,7 @@
                </td>
                <td id="buff"></td>
             </tr>
+            #if($editor == "globaladmin")
 			<tr>
 				<td>
 					<table>
@@ -148,6 +149,7 @@
 					</table>
 				</td>
 		    </tr>
+           #end
         </table>
         <script type="text/javascript">
         //<![CDATA[
@@ -166,8 +168,10 @@
 		 else if($('uorgu').checked && $('unregistered').hasClassName('hidden'))
 		   $('unregistered').removeClassName('hidden');
 		});
+        #if($editor == "globaladmin")
 		Event.observe($('allowguestview'), 'click', setGuestExtendedRights($('allowguestview')));
 		Event.observe($('allowguestedit'), 'click', setGuestExtendedRights($('allowguestedit')));
+        #end
         //]]>
         </script>
     </div> ## xwikieditcontent

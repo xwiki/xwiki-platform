@@ -933,6 +933,14 @@ b.ts1{border-width: 0 2px}</code>
     ##----------------------------------------------------------------------------
     #set($globalAppAdmin = ["Panels.PanelWizard", "Blog.Categories", "Photos.Links"])
     #set($spaceAppAdmin = ["Panels.PanelWizard"])
+    ##-----------------------------------------------------------------------------
+    ## some applications at space level (like Panel Wizard) might require a different type of
+    ## integration to allow users with space admin rights to use them, so they will have  a 
+    ## "/xwiki/bin/Space/WebPreferences?section=application" type of url, while some at global level
+    ## need to use a "/xwiki/admin/Blog/Categories?" type of url, to be edited inline 
+    ## inside the administration application UI.
+    ##------------------------------------------------------------------------------
+    #set($hasAdminActionUrl = ["Blog.Categories", "Photos.Links"])
     #set($section = "$!{request.section}")
     ##-------------------------------------
     ## determine the displayed sections
@@ -963,11 +971,11 @@ b.ts1{border-width: 0 2px}</code>
         &lt;div id="change-context"&gt;
           &lt;select id="goto-select"&gt;
             #if ($xwiki.hasAccessLevel("admin", $context.user, "XWiki.XWikiPreferences"))
-	      &lt;optgroup label="$msg.get("admin.gotoglobaladministration")"&gt;
-		  &lt;option value="$xwiki.getURL("XWiki.XWikiPreferences", "admin")" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get("admin.globaladministration")&lt;/option&gt;
-	      &lt;/optgroup&gt;
+              &lt;optgroup label="$msg.get("admin.gotoglobaladministration")"&gt;
+              &lt;option value="$xwiki.getURL("XWiki.XWikiPreferences", "admin")" #if("$!{editor}"=="globaladmin")selected="selected"#end&gt;$msg.get("admin.globaladministration")&lt;/option&gt;
+              &lt;/optgroup&gt;
             #end
- 	    &lt;optgroup label="$msg.get("admin.gotospaceadministration")"&gt;
+            &lt;optgroup label="$msg.get("admin.gotospaceadministration")"&gt;
               #foreach($spaceitem in $xwiki.spaces)
                 #if ($xwiki.hasAccessLevel("admin", $context.user, "${spaceitem}.WebPreferences"))
                   &lt;option value="$xwiki.getURL("${spaceitem}.WebPreferences", "admin")" #if("$!{currentSpace}"==${spaceitem} &amp;&amp; "$!{editor}"!="globaladmin")selected="selected"#end&gt;$spaceitem&lt;/option&gt;
@@ -999,9 +1007,13 @@ b.ts1{border-width: 0 2px}</code>
            #includeForm("XWiki.Admin${section}Sheet")
          #elseif ($xwiki.exists($section))
            ## Application section
-           {pre}
-           $xwiki.getDocument($section).getTranslatedDocument().getRenderedContent()
-           {/pre}
+           #if($hasAdminActionUrl.contains($section))
+            {pre}
+            $xwiki.getDocument($section).getTranslatedDocument().getRenderedContent()
+            {/pre}
+           #else
+            #includeForm($section)
+           #end
          #end
        #end
      &lt;/div&gt; ## admin-page-content
@@ -1031,7 +1043,11 @@ b.ts1{border-width: 0 2px}</code>
             #elseif($xwiki.exists("XWiki.Admin${asection}Sheet"))
              #set($url = $xwiki.getURL($currentDoc, "admin", $query))
             #elseif($xwiki.exists($asection))
-             #set($url = $xwiki.getURL($asection, "admin", $query))
+             #if($hasAdminActionUrl.contains($asection))
+               #set($url = $xwiki.getURL($asection, "admin", $query))
+             #else
+               #set($url = $xwiki.getURL($currentDoc, "admin", $query))
+             #end
             #end
             &lt;li class="${name}"&gt;&lt;a href="$url" #if("$!aiconurl"!="")style="background:url($aiconurl) no-repeat;"#end&gt;&lt;span&gt;#if("$!atitle"!="")$atitle#else$name#end&lt;/span&gt;&lt;/a&gt;&lt;/li&gt;
           #end

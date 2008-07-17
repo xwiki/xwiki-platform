@@ -70,11 +70,28 @@
   #xwikimessageboxstart($msg.get("notice") "$msg.get('doclockedby') $xwiki.getLocalUserName($doc.getLockingUser())")
   <a href="$doc.getURL($context.action, "$!{request.getQueryString().replaceAll('&', '&amp;').replaceAll('&amp;amp;', '&amp;')}&amp;force=1")">$msg.get("forcelock")</a>
   #xwikimessageboxend()
-#else 
+#else
   #if($xwiki.exists("XWiki.AdminSheet"))
     $xwiki.getDocument("XWiki.AdminSheet").getTranslatedDocument().getRenderedContent()
-  #else ## empty wiki, display only Import
-    #warning($msg.get("admin.adminappnotinstalled", ["<a href='http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication'>http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication</a>"]))
+  #else
+    ## Admin app not installed, display only Import
+    #if ($xwiki.searchDocuments("1=1").size() < 40)
+      ## Less than 40 pages in the wiki, probably a fresh install (16/07/08 : XWiki creates 21 pages at startup)
+      #set ($rawVersion = $xwiki.getVersion())
+      #set ($URLhost = "http://maven.xwiki.org")
+      #set ($URLgroup = "com/xpn/xwiki/products")
+      #set ($URLartifact = "xwiki-enterprise-wiki")
+      #set ($URLversion = $rawVersion.substring(0, $rawVersion.lastIndexOf(".")))
+      #if ($URLversion.endsWith("-SNAPSHOT"))
+        #set ($URL = "${URLhost}/snapshots/${URLgroup}/${URLartifact}/$URLversion/")
+      #else
+        #set ($URL = "${URLhost}/releases/${URLgroup}/${URLartifact}/$URLversion/${URLartifact}-${URLversion}.xar")
+      #end
+      #warning($msg.get("admin.defaultwikinotinstalled", ["<a href='$URL'>$URL</a>"]))
+    #else
+      ## More than 40 pages and Admin app not installed, probably an upgrade.
+      #warning($msg.get("admin.adminappnotinstalled", ["<a href='http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication'>http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication</a>"]))
+    #end
     <div id="admin-page">
       <div id="admin-page-header">
         <h1 id="admin-header">$msg.get("admin.import")</h1>
@@ -82,9 +99,9 @@
       <div id="admin-page-content">
         #template("importinline.vm")
       </div> ## admin-page-menu
-  </div>  ## admin-page
-   #end
- #end
+    </div>  ## admin-page
+  #end
+#end
 </div>
 ##-------------------------------------------------
 ##  End page

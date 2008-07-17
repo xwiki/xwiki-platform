@@ -55,12 +55,15 @@
 <tags/>
 </property>
 </object>
-<content>
-{pre}
+<content>{pre}
+##
+## Redirect to force right and left panels layout
+##
 #set($redirecturl = "")
 #if($xwiki.exists("XWiki.AdminSheet"))
    #set($requestquery = "$!{request.queryString}&amp;forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant")
    #set($redirecturl = $doc.getURL("admin", $requestquery))
+   #set($currSpace = $request.getParameter("space"))
 #else ## no admin application
   #set($redirecturl = $doc.getURL("view", "forceLeftPanels=1&amp;forceRightPanels=1&amp;$docvariant"))
 #end
@@ -69,17 +72,25 @@
 #end
 #set($showdata = 0)
 #set($showEmptyPanels = 1)
-#if($xwiki.hasAdminRights())
-  &lt;p class="legend"&gt;$msg.get("panels.panelwizard")&lt;/p&gt;
+#if("$!{currSpace}" != "")
+    #set($accessLevel = $xwiki.hasAccessLevel("admin", $context.user, "${currSpace}.WebPreferences"))
+#else
+    #set($accessLevel = $xwiki.hasAdminRights())
+#end
+##
+## Check for admin right for the current preferences document (XWiki.XWikiPreferences or Space.WebPreferences)
+##
+#if($accessLevel)
+  &lt;p class="legend"&gt;$msg.get("panelwizard.panelwizard")&lt;/p&gt;
   &lt;div class="floatcontainer"&gt;
     &lt;ul class="xwikitabbar" id="panelEditorSteps"&gt;
-      &lt;li id="firstwtab" class="active" onclick="switchToWizardPage(this, 'PanelListSection'); return false;"&gt;&lt;a href="#PanelListSection"&gt;Panel List&lt;/a&gt;&lt;/li&gt;
-      &lt;li onclick="switchToWizardPage(this, 'PageLayoutSection'); return false;"&gt;&lt;a href="#PageLayoutSection"&gt;Page Layout&lt;/a&gt;&lt;/li&gt;
+      &lt;li id="firstwtab" class="active" onclick="switchToWizardPage(this, 'PanelListSection'); return false;"&gt;&lt;a href="#PanelListSection"&gt;$msg.get("panelwizard.panellist")&lt;/a&gt;&lt;/li&gt;
+      &lt;li onclick="switchToWizardPage(this, 'PageLayoutSection'); return false;"&gt;&lt;a href="#PageLayoutSection"&gt;$msg.get("panelwizard.pagelayout")&lt;/a&gt;&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/div&gt;
   &lt;div id="xwikieditcontent" class="clear"&gt;
     &lt;div id="PanelListSection"&gt;
-      &lt;span class="hastooltip" onmouseover="if(window.isDraggingPanel) return; showtip(this, 'To drag a panel, use your mouse and click on the header of the panel. Keep your left mouse button down while you move your mouse and the panel at the same time. While you move the panel you will see in real-time where the panel will be dropped when you release your left mouse button.', 300)"&gt;Drag and drop&lt;/span&gt; panels to rearrange them inside a column or between columns. To add or remove panels, drag them from the list of available panels to one of the columns or from the column into the list, respectively.
+      &lt;span class="hastooltip" onmouseover="if(window.isDraggingPanel) return; showtip(this, '$msg.get("panelwizard.tip")', 300)"&gt;$msg.get("panelwizard.draganddrop")
       #set($panelClass = $xwiki.getDocument("Panels.PanelClass").xWikiClass)
       #set($categoryList = $panelClass.category.getProperty("values").value.split("[|]"))
       #set($sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='Panels.PanelClass' and doc.fullName!='Panels.PanelTemplate'")
@@ -89,12 +100,15 @@
         $!categoryMap.put($category, $util.getArrayList())
       #end
       #foreach ($item in $panelsList)
-        #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
-        #if($obj.type == 'view')
-          #set($arrayList = $categoryMap.get($obj.category))
-          #if($arrayList)
-            #set($discard = $categoryMap.get($obj.category).add($item))
-            ## TODO: uncategorized?
+        ## stats panels can't be seen by non global admins
+        #if($xwiki.hasAccessLevel("view", $context.user, $item))
+          #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
+          #if($obj.type == 'view')
+            #set($arrayList = $categoryMap.get($obj.category))
+            #if($arrayList)
+              #set($discard = $categoryMap.get($obj.category).add($item))
+              ## TODO: uncategorized?
+            #end
           #end
         #end
       #end
@@ -169,7 +183,7 @@
               &lt;div class="accordionTabContentBox"&gt;
                 #set($categPanels = $categoryMap.get($category))
                 #if($categPanels.size() == 0)
-                  There are no panels from this category.
+                  $msg.get("panelwizard.nopanels")
                 #else
                   #foreach ($item in $categPanels)
                     #set($obj = $xwiki.getDocument($item).getObject("Panels.PanelClass"))
@@ -186,7 +200,7 @@
        &lt;/div&gt;   ## end of allpanels div
      &lt;/div&gt;      ## end of PanelsListSection
      &lt;div id="PageLayoutSection"&gt;
-    Choose a page layout:
+    $msg.get("panelwizard.choosepagelayout")
 
     #set($crtlayout = 0)
     #if($showLeftPanels and $showLeftPanels == "1")
@@ -203,7 +217,7 @@
             #if($crtlayout == 0)id="selectedoption" #end 
             class="pagelayoutoption" onclick="changePreviewLayout(this, 0)"&gt;
               ##&lt;input type="radio" name="pagelayout" value="nosidecol" checked="cheched" /&gt;
-              &lt;label&gt;No side column&lt;/label&gt;
+              &lt;label&gt;$msg.get("panelwizard.nosidecolumn")&lt;/label&gt;
               &lt;div id="nosidecolumn" class="layoutmaquette"&gt;
                 &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
               &lt;/div&gt;
@@ -214,7 +228,7 @@
             #if($crtlayout == 1)id="selectedoption" #end
             class="pagelayoutoption" onclick="changePreviewLayout(this, 1)"&gt;
               ##&lt;input type="radio" name="pagelayout" value="leftcol" "/&gt;
-              &lt;label&gt;Left column&lt;/label&gt;
+              &lt;label&gt;$msg.get("panelwizard.leftcolumn")&lt;/label&gt;
               &lt;div id="leftcolumn" class="layoutmaquette"&gt;
                 &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
                 &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
@@ -226,7 +240,7 @@
             #if($crtlayout == 2)id="selectedoption" #end
             class="pagelayoutoption" onclick="changePreviewLayout(this, 2)"&gt;
               ##&lt;input type="radio" name="pagelayout" value="rightcol" /&gt;
-              &lt;label&gt;Right column&lt;/label&gt;
+              &lt;label&gt;$msg.get("panelwizard.rightcolumn")&lt;/label&gt;
               &lt;div id="rightcolumn" class="layoutmaquette"&gt;
                 &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
                 &lt;div class="lmcontentcolumn"&gt;&lt;/div&gt;
@@ -237,7 +251,7 @@
             &lt;div 
             #if($crtlayout == 3)id="selectedoption" #end
             class="pagelayoutoption" onclick="changePreviewLayout(this, 3)"&gt;
-              &lt;label&gt;Both columns&lt;/label&gt;
+              &lt;label&gt;$msg.get("panelwizard.bothcolumns")&lt;/label&gt;
               &lt;div  id="bothcolumns" class="layoutmaquette"&gt;
                 &lt;div class="lmleftcolumn"&gt;&lt;/div&gt;
                 &lt;div class="lmrightcolumn"&gt;&lt;/div&gt;
@@ -258,8 +272,8 @@
     &lt;/span&gt;
   &lt;/div&gt;
 #else
-  #xwikimessageboxstart("Panel Editor" "")
-  You need to have administrative rights to use the Panel Wizard.
+  #xwikimessageboxstart("$msg.get('panelwizard.paneleditor')" "")
+  $msg.get("panelwizard.needadminright")
   #xwikimessageboxend()
 #end
 {/pre}</content>

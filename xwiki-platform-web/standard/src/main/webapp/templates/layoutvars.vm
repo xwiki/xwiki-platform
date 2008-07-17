@@ -30,16 +30,10 @@
 #set($spaceprefs = "")
 #set($globalprefs = false)
 
-#if($doc.fullName == "Panels.PanelWizard" && "$!{request.space}" != "") ## global or space administration
-    #if($request.space == "XWiki" && $request.editor == "globaladmin") ## global administration
-      #set($globalprefs = true)
-      #set($showLeftPanels = $xwiki.getXWikiPreference("showLeftPanels"))
-      #set($showRightPanels = $xwiki.getXWikiPreference("showRightPanels"))
-    #else ## space administration, including separate layout for XWiki space
-      #set($spaceprefs = $request.space)
-      #set($showLeftPanels =  $xwiki.getWebPreferenceFor("showLeftPanels", $request.space))
-      #set($showRightPanels = $xwiki.getWebPreferenceFor("showRightPanels", $request.space))
-    #end
+#if($doc.name == "WebPreferences" && "$!{request.space}" != "") ## space administration
+  #set($spaceprefs = $request.space)
+  #set($showLeftPanels =  $xwiki.getWebPreferenceFor("showLeftPanels", $request.space))
+  #set($showRightPanels = $xwiki.getWebPreferenceFor("showRightPanels", $request.space))
 #elseif($doc.fullName == "XWiki.XWikiPreferences" || "$!request.editor" == "globaladmin")
 	 #set($globalprefs = true)
      #set($showLeftPanels = $xwiki.getXWikiPreference("showLeftPanels"))

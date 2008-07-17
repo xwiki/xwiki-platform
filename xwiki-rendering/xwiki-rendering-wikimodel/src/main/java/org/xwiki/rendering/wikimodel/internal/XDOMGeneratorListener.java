@@ -31,7 +31,9 @@ import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiFormat;
 import org.wikimodel.wem.WikiParameter;
 import org.wikimodel.wem.WikiParameters;
+import org.wikimodel.wem.WikiReference;
 import org.xwiki.rendering.block.*;
+import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.parser.LinkParser;
@@ -325,17 +327,48 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(new NewLineBlock());
     }
 
-    public void onReference(String rawLink, boolean explicitLink)
+    /**
+     * Called when WikiModel finds an inline reference such as a URI located directly in the
+     * text, as opposed to a link inside wiki link syntax delimiters.
+     */
+    public void onReference(String ref)
     {
-        try {
-            this.stack.push(new LinkBlock(this.linkParser.parse(rawLink)));
-        } catch (ParseException e) {
-            // TODO: Should we instead generate ErrorBlocks?
-            throw new RuntimeException("Failed to parse link [" + rawLink + "]", e);
+        // If there's no link parser defined, don't handle links...
+        // TODO: Generate some output log
+        if (this.linkParser != null) {
+            try {
+                this.stack.push(new LinkBlock(this.linkParser.parse(ref)));
+            } catch (ParseException e) {
+                // TODO: Should we instead generate ErrorBlocks?
+                throw new RuntimeException("Failed to parse link [" + ref + "]", e);
+            }
         }
     }
 
-    public void onSpace(String str)
+	public void onReference(WikiReference ref)
+	{
+        // If there's no link parser defined, don't handle links...
+        // TODO: Generate some output log
+        if (this.linkParser != null) {
+            Link link;
+            try {
+                link = this.linkParser.parse(ref.getLink());
+            } catch (ParseException e) {
+                // TODO: Should we instead generate ErrorBlocks?
+                throw new RuntimeException("Failed to parse link [" + ref.getLink() + "]", e);
+            }
+            link.setLabel(ref.getLabel());
+
+            // Right now WikiModel puts any target element as the first element of the WikiParameters
+            if (ref.getParameters().getSize() > 0) {
+                link.setTarget(ref.getParameters().getParameter(0).getKey());
+            }
+
+            this.stack.push(new LinkBlock(link));
+        }
+    }
+
+	public void onSpace(String str)
     {
         this.stack.push(SpaceBlock.SPACE_BLOCK);
     }

@@ -17,8 +17,8 @@
     </dependency>
     <dependency>
       <groupId>org.wikimodel</groupId>
-      <artifactId>wem</artifactId>
-      <version>2.0.6</version>
+      <artifactId>org.wikimodel.wem</artifactId>
+      <version>2.0.7-SNAPSHOT</version>
     </dependency>
   </dependencies>
   <repositories>

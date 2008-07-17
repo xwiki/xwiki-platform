@@ -19,11 +19,16 @@
  */
 package org.xwiki.rendering.wikimodel.internal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.wikimodel.wem.IWemConstants;
 import org.wikimodel.wem.IWemListener;
 import org.wikimodel.wem.WikiFormat;
+import org.wikimodel.wem.WikiParameter;
+import org.wikimodel.wem.WikiParameters;
+import org.wikimodel.wem.WikiReference;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
@@ -148,14 +153,12 @@ public class WikiModelGeneratorListener implements Listener
 
 	public void onLink(Link link)
 	{
-		String linkAsString;
-		if (link.getLabel() != null) {
-			linkAsString = link.getLabel();
-		} else {
-			linkAsString = link.getReference();
-		}
+		List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
+		wikiParams.add(new WikiParameter("", ""));
+		WikiParameters linkParameters = new WikiParameters(wikiParams);
 		
-		this.wikimodelListener.onReference(linkAsString, false);
+		WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(), linkParameters);
+		this.wikimodelListener.onReference(wikiReference);
 	}
 
 	public void onMacro(String name, Map<String, String> parameters, String content)

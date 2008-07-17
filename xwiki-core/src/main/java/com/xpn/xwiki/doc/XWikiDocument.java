@@ -24,7 +24,6 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.ref.SoftReference;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -429,38 +428,77 @@ public class XWikiDocument
         if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
             renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
         } else {
-            StringWriter writer = new StringWriter();
-            TransformationManager transformations =
-                (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
-            XDOM dom;
-            try {
-                Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
-                dom = parser.parse(new StringReader(this.content));
-                SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
-                transformations.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(getSyntaxId()));
-            } catch (Exception e) {
-                throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
-                    "Failed to render content using new rendering system", e);
-            }
-            DocumentManager documentManager = (DocumentManager) Utils.getComponent(DocumentManager.ROLE);
-            dom.traverse(new XHTMLRenderer(writer, documentManager));
-            renderedContent = writer.toString();
+        	renderedContent = getRenderedContentUsingNewRenderingModule(this.content);
         }
         return renderedContent;
     }
 
-    public String getRenderedContent(String text, XWikiContext context)
+
+    /**
+     * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @param context the XWiki Context object
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 1.6M1
+     */
+    public String getRenderedContent(String text, String syntaxId, XWikiContext context)
     {
         String result;
         HashMap<String, Object> backup = new HashMap<String, Object>();
         try {
             backupContext(backup, context);
             setAsContextDoc(context);
-            result = context.getWiki().getRenderingEngine().renderText(text, this, context);
+            // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
+            if (syntaxId.equalsIgnoreCase("xwiki/1.0")) {
+            	result = context.getWiki().getRenderingEngine().renderText(text, this, context);
+            } else {
+            	result = getRenderedContentUsingNewRenderingModule(text);
+            }
+        } catch (XWikiException e) {
+        	// Failed to render for some reason. This method should normally throw an exception but this
+        	// requires changing the signature of calling methods too.
+        	log.warn(e);
+        	result = "";
         } finally {
             restoreContext(backup, context);
         }
         return result;
+    }
+
+    /**
+     * @param text the text to render
+     * @param context the XWiki Context object
+     * @return the given text rendered in the context of this document
+     * @deprecated since 1.6M1 use {@link #getRenderedContent(String, String, com.xpn.xwiki.XWikiContext)}
+     */
+    public String getRenderedContent(String text, XWikiContext context)
+    {
+        return getRenderedContent(text, "xwiki/1.0", context);
+    }
+
+    /**
+     * Renders the passed content using the new Rendering architecture.
+     */
+    private String getRenderedContentUsingNewRenderingModule(String content)
+    	throws XWikiException
+    {
+        StringWriter writer = new StringWriter();
+        TransformationManager transformations =
+            (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+        XDOM dom;
+        try {
+            Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
+            dom = parser.parse(new StringReader(content));
+            SyntaxFactory syntaxFactory = (SyntaxFactory) Utils.getComponent(SyntaxFactory.ROLE);
+            transformations.performTransformations(dom, syntaxFactory.createSyntaxFromIdString(getSyntaxId()));
+        } catch (Exception e) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
+                "Failed to render content using new rendering system", e);
+        }
+        DocumentManager documentManager = (DocumentManager) Utils.getComponent(DocumentManager.ROLE);
+        dom.traverse(new XHTMLRenderer(writer, documentManager));
+
+        return writer.toString();
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException
@@ -3537,7 +3575,7 @@ public class XWikiDocument
             return;
         }
 
-        // Step 1: Copy the document under a new name
+        // Step 1: Copy the document and all its translations under a new name
         context.getWiki().copyDocument(getFullName(), newDocumentName, false, context);
 
         // Step 2: For each backlink to rename, parse the backlink document and replace the links

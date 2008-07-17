@@ -372,11 +372,25 @@ public class Document extends Api
     }
 
     /**
-     * return the given text rendered in the context of this document
+     * @param text the text to render
+     * @return the given text rendered in the context of this document
+     * @deprecated since 1.6M1 use {@link #getRenderedContent(String, String)}
      */
     public String getRenderedContent(String text) throws XWikiException
     {
         return doc.getRenderedContent(text, getXWikiContext());
+    }
+
+    /**
+     * @param text the text to render
+     * @param syntaxId the id of the Syntax used by the passed text (for example: "xwiki/1.0")
+     * @return the given text rendered in the context of this document using the passed Syntax
+     * @since 1.6M1
+     */
+    public String getRenderedContent(String text, String syntaxId)
+        throws XWikiException
+    {
+        return doc.getRenderedContent(text, syntaxId, getXWikiContext());        
     }
 
     /**

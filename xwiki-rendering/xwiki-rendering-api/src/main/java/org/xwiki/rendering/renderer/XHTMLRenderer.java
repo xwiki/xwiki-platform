@@ -30,7 +30,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.DocumentManager;
 
 /**
- * Generates XHTML from {@link org.xwiki.rendering.block.XDOM}.
+ * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
  *
  * @version $Id$
  * @since 1.5M2
@@ -41,8 +41,19 @@ public class XHTMLRenderer implements Renderer
 
     private DocumentManager documentManager;
 
+    /**
+     * A temporary service offering methods manipulating XWiki Documents that are needed to output the 
+     * correct XHTML. For example this is used to verify if a document exists when computing the HREF 
+     * attribute for a link. It's temporary because the current Document services have not yet been 
+     * rewritten with the new architecture. This bridge allows us to be independent of the XWiki Core 
+     * module, thus preventing a cyclic dependency.
+     */
     private XHTMLLinkRenderer linkRenderer;
 
+    /**
+     * @param writer the stream to write the XHTML output to
+     * @param documentManager see {@link #documentManager}
+     */
     public XHTMLRenderer(Writer writer, DocumentManager documentManager)
     {
         this.writer = new PrintWriter(writer);
@@ -50,56 +61,100 @@ public class XHTMLRenderer implements Renderer
         this.linkRenderer = new XHTMLLinkRenderer(documentManager);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#beginDocument()
+     */
     public void beginDocument()
     {
     	// Don't do anything
 	}
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#endDocument()
+     */
 	public void endDocument()
 	{
     	// Don't do anything
 	}
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#beginBold()
+     */
 	public void beginBold()
     {
         write("<strong>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#beginItalic()
+     */
     public void beginItalic()
     {
         write("<em class=\"italic\">");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#beginParagraph()
+     */
     public void beginParagraph()
     {
         write("<p>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#endBold()
+     */
     public void endBold()
     {
         write("</strong>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#endItalic()
+     */
     public void endItalic()
     {
         write("</em>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#endParagraph()
+     */
     public void endParagraph()
     {
         write("</p>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#onLineBreak()
+     */
     public void onLineBreak()
     {
         write("<br/>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#onNewLine()
+     */
     public void onNewLine()
     {
         // Voluntarily do nothing since we want the same behavior as HTML.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see Renderer#onLink(Link)
+     */
     public void onLink(Link link)
     {
         write(this.linkRenderer.renderLink(link));

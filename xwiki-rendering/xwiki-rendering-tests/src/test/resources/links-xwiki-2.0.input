@@ -2,5 +2,6 @@
 [Space.ExistingPage#anchor?param=value]
 [label>Space.UnknownPage]
 [label>http://xwiki.org]
+[label>Space.ExistingPage>_target]
 [mailto:john@doe.com]
 [{macro}]

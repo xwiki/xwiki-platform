@@ -457,6 +457,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <!-- fop gets us batik but not batik-codec and we need this one for SVGPlugin -->
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-codec</artifactId>
+      <version>1.7</version>
+    </dependency>
 
 
     <!-- Misc -->

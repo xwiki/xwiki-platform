@@ -20,11 +20,17 @@
  */
 package com.xpn.xwiki.store.jcr;
 
+import java.io.IOException;
+
 import org.apache.jackrabbit.util.ISO9075;
+
+import com.xpn.xwiki.util.Util;
 
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
+import javax.jcr.PropertyType;
 import javax.jcr.RepositoryException;
+import javax.jcr.Value;
 
 public class JcrUtil {
 	public static Node getOrCreateSubNode(Node root, String subnodename, String subnodetype) throws RepositoryException {
@@ -34,5 +40,16 @@ public class JcrUtil {
 		} catch (PathNotFoundException e) {
 			return root.addNode(subnodename, subnodetype);
 		}
+	}
+	
+	public static Object fromValue(Value v) throws IllegalStateException, IOException, RepositoryException {
+	    switch (v.getType()) {
+	        case PropertyType.BINARY: return Util.getFileContentAsBytes(v.getStream());
+	        case PropertyType.BOOLEAN: return v.getBoolean();
+	        case PropertyType.DATE: return v.getDate();
+	        case PropertyType.DOUBLE: return v.getDouble();
+	        case PropertyType.LONG: return v.getLong();
+	        default: return v.getString();
+	    }
 	}
 }

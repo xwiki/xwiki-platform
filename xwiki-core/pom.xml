@@ -667,7 +667,8 @@
               **/*AttachmentVersioningStore.java,
               **/api/StatsService.java,
               **/stats/**/*.java,
-              **/store/query/Query*.java
+              **/store/query/*.java,
+              **/store/hibernate/query/*.java
           </includes>
           <excludes>
               **/RenamePageReplaceLinkHandler.java,

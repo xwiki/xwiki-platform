@@ -26,6 +26,8 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.query.QueryManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xwiki.cache.CacheFactory;
@@ -607,5 +609,13 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
     public List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         return store.getTranslationList(doc, context);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public QueryManager getQueryManager()
+    {
+        return getStore().getQueryManager();
     }
 }

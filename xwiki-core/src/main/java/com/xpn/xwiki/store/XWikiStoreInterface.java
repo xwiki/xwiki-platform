@@ -26,6 +26,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
+import com.xpn.xwiki.store.query.QueryManager;
 
 import java.util.List;
 
@@ -474,4 +475,9 @@ public interface XWikiStoreInterface
     void injectUpdatedCustomMappings(XWikiContext context) throws XWikiException;
 
     List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException;
+
+    /**
+     * @return QueryManager for this store.
+     */
+    QueryManager getQueryManager();
 }

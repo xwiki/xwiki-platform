@@ -80,6 +80,12 @@ import com.xpn.xwiki.util.Util;
 
 /** XWikiJCRStore - XWiki Store System backend to JCR */
 public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterface {
+    /**
+     * QueryManager for this store.
+     * Injected via component manager.
+     */
+    com.xpn.xwiki.store.query.QueryManager queryManager;
+
 	public XWikiJcrStore(XWiki xwiki, XWikiContext context) throws SecurityException, IllegalArgumentException, NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException, InvocationTargetException, XWikiException {
 		super(xwiki, context);
 		// create default wiki
@@ -889,7 +895,15 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
 		}
 		return result;
 	}
-	
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public com.xpn.xwiki.store.query.QueryManager getQueryManager()
+	{
+	    return queryManager;
+	}
+
 	public void notSupportedCall() {
 		new NotSupportedException().printStackTrace();
 	}
@@ -1138,5 +1152,5 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
     {
         notSupportedCall();
         return null;
-    }
+    }    
 }

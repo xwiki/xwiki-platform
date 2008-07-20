@@ -84,6 +84,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
+import com.xpn.xwiki.store.query.QueryManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 
@@ -93,6 +94,12 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private static final Log log = LogFactory.getLog(XWikiHibernateStore.class);
 
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
+    
+    /**
+     * QueryManager for this store.
+     * Injected via component manager.
+     */
+    QueryManager queryManager;
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly
@@ -2784,5 +2791,13 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                 + "' and (doc.language <> '' or (doc.language is not null and '' is null))";
         List<String> list = context.getWiki().search(hql, context);
         return (list == null) ? new ArrayList<String>() : list;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public QueryManager getQueryManager()
+    {
+        return queryManager;
     }
 }

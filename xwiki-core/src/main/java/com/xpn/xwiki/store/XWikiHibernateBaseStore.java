@@ -132,21 +132,7 @@ public class XWikiHibernateBaseStore implements Initializable
      */
     private void initHibernate(XWikiContext context) throws HibernateException
     {
-        // there is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
-        Configuration cfg = new Configuration() {
-            private static final long serialVersionUID = 1L;
-            @Override
-            protected InputStream getConfigurationInputStream(String resource)
-                throws HibernateException
-            {
-                InputStream stream = Util.getResourceAsStream(resource);
-                if (stream==null) {
-                    throw new HibernateException("Can't find ["+resource+"] for hibernate configuration");
-                }
-                return stream;
-            }
-        };
-        cfg.configure(getPath());
+        getConfiguration().configure(getPath());
 
         XWiki wiki = context.getWiki();
         if (wiki != null && wiki.Param("xwiki.db") != null && !wiki.isVirtualMode()) {
@@ -159,19 +145,18 @@ public class XWikiHibernateBaseStore implements Initializable
 
             System.out.println(schemaName);
             
-            String dialect = cfg.getProperty(Environment.DIALECT);
+            String dialect = getConfiguration().getProperty(Environment.DIALECT);
             if ("org.hibernate.dialect.MySQLDialect".equals(dialect)) {
-                cfg.setProperty(Environment.DEFAULT_CATALOG, schemaName);
+                getConfiguration().setProperty(Environment.DEFAULT_CATALOG, schemaName);
             } else {
-                cfg.setProperty(Environment.DEFAULT_SCHEMA, schemaName);
+                getConfiguration().setProperty(Environment.DEFAULT_SCHEMA, schemaName);
             }
         }
         if (sessionFactory==null) {
             sessionFactory = (HibernateSessionFactory) Utils.getComponent(HibernateSessionFactory.ROLE);
         }
-        setConfiguration(cfg);
 
-        setSessionFactory(cfg.buildSessionFactory());
+        setSessionFactory(getConfiguration().buildSessionFactory());
     }
 
     /**
@@ -951,11 +936,6 @@ public class XWikiHibernateBaseStore implements Initializable
     public Configuration getConfiguration()
     {
         return sessionFactory.getConfiguration();
-    }
-
-    public void setConfiguration(Configuration configuration)
-    {
-        this.sessionFactory.setConfiguration(configuration);
     }
 
     public Map<String, String> getConnections()

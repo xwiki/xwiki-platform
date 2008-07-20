@@ -5279,26 +5279,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public List<String> getSpaces(XWikiContext context) throws XWikiException
     {
-        List<String> webs = null;
-        if (getNotCacheStore() instanceof XWikiHibernateStore) {
-            webs = this.search("select distinct doc.space from XWikiDocument doc", context);
-        } else if (getNotCacheStore() instanceof XWikiJcrStore) {
-            webs = ((XWikiJcrStore) getNotCacheStore()).getSpaces(context);
-        }
-        return webs;
+        return getStore().getQueryManager().getNamedQuery("getSpaces").execute();
     }
 
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
-        List<String> docs = null;
-        if (getNotCacheStore() instanceof XWikiHibernateStore) {
-            docs =
-                this.search("select distinct doc.name from XWikiDocument doc",
-                    new Object[][] {{"doc.space", spaceName}}, context);
-        } else if (getNotCacheStore() instanceof XWikiJcrStore) {
-            docs = ((XWikiJcrStore) getNotCacheStore()).getSpaceDocsName(spaceName, context);
-        }
-        return docs;
+        return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
+            .bindValue("space", spaceName).execute();
     }
 
     public List<String> getIncludedMacros(String defaultweb, String content, XWikiContext context)
@@ -5378,14 +5365,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     public void refreshLinks(XWikiContext context) throws XWikiException
     {
         // refreshes all Links of each doc of the wiki
-        List<String> docs = null;
-        if (getNotCacheStore() instanceof XWikiHibernateStore) {
-            docs = this.search("select doc.fullName from XWikiDocument as doc", context);
-        } else if (getNotCacheStore() instanceof XWikiJcrStore) {
-            docs = ((XWikiJcrStore) getNotCacheStore()).getAllDocuments(context);
-        } else {
-            return;
-        }
+        List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments").execute();
         for (int i = 0; i < docs.size(); i++) {
             XWikiDocument myDoc = this.getDocument(docs.get(i), context);
             myDoc.getStore().saveLinks(myDoc, context, true);

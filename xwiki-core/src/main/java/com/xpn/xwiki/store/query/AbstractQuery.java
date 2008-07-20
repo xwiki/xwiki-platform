@@ -75,7 +75,7 @@ public abstract class AbstractQuery implements Query
      * Setter for query statement used by {@link AbstractQueryManager}.
      * @param statement query statement.
      */
-    void setStatement(String statement)
+    public void setStatement(String statement)
     {
         this.statement = statement;
     }
@@ -84,7 +84,7 @@ public abstract class AbstractQuery implements Query
      * Setter for query language used by {@link AbstractQueryManager}.
      * @param language query language
      */
-    void setLanguage(String language)
+    public void setLanguage(String language)
     {
         this.language = language;
     }

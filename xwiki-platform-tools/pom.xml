@@ -53,7 +53,7 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-plexus</artifactId>
-      <version>1.5-SNAPSHOT</version>
+      <version>1.6-SNAPSHOT</version>
     </dependency>
     <!-- We need this dependency for now since we need to set up the XWikiContext
          for the tests. Since this means a circular dependency we have to use the
@@ -61,7 +61,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.5-milestone-2</version>
+      <version>1.6-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
@@ -69,10 +69,4 @@
       <version>1.7.0</version>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-shared-tests-1.11</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-shared-tests-1.11</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/tags/xwiki-shared-tests-1.11</url>
-  </scm>
 </project>

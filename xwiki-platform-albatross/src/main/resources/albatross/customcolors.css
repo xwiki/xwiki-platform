@@ -4,7 +4,7 @@ body#body{
 #csscolorproperty("color" "textcolor")
 }
 
-.heading-1, .heading-1-1, .heading-1-1-1, .heading-1-1-1-1 {
+h1, h2, h3, h4 {
 #csscolorproperty("color" "titlescolor")
 }
 

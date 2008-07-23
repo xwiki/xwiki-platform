@@ -3,7 +3,7 @@ body#body{
   color: #000;
 }
 
-.heading-1, .heading-1-1, .heading-1-1-1, .heading-1-1-1-1 {
+h1, h2, h3, h4 {
   color: #000;
 }
 

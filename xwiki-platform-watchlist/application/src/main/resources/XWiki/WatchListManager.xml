@@ -72,7 +72,7 @@
   #set ($isMyProfile = true)
 #end
 #if ($profileDoc)
-&lt;h5 class="heading-1"&gt;$msg.get("watchlist.title", [$xwiki.getUserName($profileDoc.fullName, false)])&lt;/h5&gt;
+1 $msg.get("watchlist.title", [$xwiki.getUserName($profileDoc.fullName, false)])
 &lt;br/&gt;
 #if ($request.removedocument || $request.removespace)
   #set ($el = "")
@@ -103,13 +103,13 @@
     ##
     ## Info
     ##
-    &lt;h2 class="heading-1-1"&gt;$msg.get("watchlist.staytuned")&lt;/h2&gt;
+    1.1 $msg.get("watchlist.staytuned")
     ##
     ## Notifications
     ##
     &lt;div class="padded"&gt;
         &lt;div style="width:48%;float:left;"&gt;
-        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.staytuned.email")&lt;/h5&gt;
+        &lt;h3&gt;$msg.get("watchlist.staytuned.email")&lt;/h3&gt;
         $msg.get("watchlist.staytuned.email.info")&lt;br/&gt;
         &lt;br/&gt;
         &lt;form action="$profileDoc.getURL("save")" method="post"&gt;
@@ -128,7 +128,7 @@
         &lt;/div&gt;
         &lt;/form&gt;
         &lt;div style="width:48%;float:right;"&gt;
-        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.staytuned.rss")&lt;/h5&gt;
+        &lt;h3&gt;$msg.get("watchlist.staytuned.rss")&lt;/h3&gt;
         &lt;a target="_blank" href="$profileDoc.getURL("view", "xpage=watchlistrss")" style="padding-left:16px;background:url($xwiki.getSkinFile("icons/black-rss-mini2.png")) left no-repeat;font-weight:bold;"&gt;$msg.get("watchlist.staytuned.rss.info")&lt;/a&gt;&lt;br/&gt;
         &lt;br/&gt;
         &lt;/div&gt;
@@ -141,8 +141,8 @@
         ##
         ## Pages
         ##
-        &lt;h5 class="heading-1-1"&gt;$msg.get("watchlist.elements")&lt;/h5&gt;
-        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.pages")&lt;/h5&gt;
+        1.1 $msg.get("watchlist.elements")
+        &lt;h3&gt;$msg.get("watchlist.pages")&lt;/h3&gt;
         &lt;table id="searchTable" class="grid sortable filterable doOddEven"&gt;
         &lt;tr class="sortHeader"&gt;
             &lt;th&gt;$msg.get("watchlist.page")&lt;/th&gt;
@@ -172,7 +172,7 @@
         ##
         ## Spaces
         ##
-        &lt;h5 class="heading-1-1-1"&gt;$msg.get("watchlist.spaces")&lt;/h5&gt;
+        &lt;h3&gt;$msg.get("watchlist.spaces")&lt;/h3&gt;
         &lt;table id="searchTable" class="grid sortable doOddEven"&gt;
         &lt;tr class=""&gt;
             &lt;th&gt;$msg.get("watchlist.space")&lt;/th&gt;

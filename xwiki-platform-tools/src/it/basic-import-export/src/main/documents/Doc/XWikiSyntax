@@ -38,8 +38,8 @@ This document briefly explains the wiki syntax.
 &lt;/pre&gt;
 &lt;/td&gt;
 &lt;td&gt;
-&lt;h3 class="heading-1"&gt;Title 1&lt;/h3&gt;
-&lt;h3 class="heading-1-1"&gt;Title 2&lt;/h3&gt;
+&lt;h1&gt;Title 1&lt;/h1&gt;
+&lt;h2&gt;Title 2&lt;/h2&gt;
 &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;

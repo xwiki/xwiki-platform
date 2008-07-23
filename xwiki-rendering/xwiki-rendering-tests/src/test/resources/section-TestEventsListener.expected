@@ -42,6 +42,13 @@ onSpace
 onWord: [6]
 endSection: [6]
 beginSection: [6]
+onWord: [Title]
+onSpace
+onWord: [level]
+onSpace
+onWord: [6]
+endSection: [6]
+beginSection: [6]
 onSpecialSymbol: [.]
 onWord: [1]
 onSpace

@@ -17,9 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.renderer.xhtml;
 
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Map;
 
@@ -27,6 +28,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.DocumentManager;
 
 /**
@@ -50,6 +52,22 @@ public class XHTMLRenderer implements Renderer
      */
     private XHTMLLinkRenderer linkRenderer;
 
+    private XHTMLIdGenerator idGenerator;
+    
+    /**
+     * Used to save the original Writer when we redirect all outputs to a new writer to compute a 
+     * section title. We need to do this since the XHTML we generate for a section title contains
+     * a unique id that we generate based on the section title and the events for the section
+     * title are generated after the beginSection() event.
+     */
+    private PrintWriter originalWriter;
+
+    /**
+     * The temporary writer used to redirect all outputs when computing the section title.
+     * @see #originalWriter
+     */
+    private Writer sectionTitleWriter;
+    
     /**
      * @param writer the stream to write the XHTML output to
      * @param documentManager see {@link #documentManager}
@@ -67,7 +85,9 @@ public class XHTMLRenderer implements Renderer
      */
     public void beginDocument()
     {
-    	// Don't do anything
+    	// Use a new generator for each document being processed since the id generator is stateful and 
+    	// remembers the generated ids.
+        this.idGenerator = new XHTMLIdGenerator();
 	}
 
     /**
@@ -168,21 +188,40 @@ public class XHTMLRenderer implements Renderer
 
     public void beginSection(SectionLevel level)
     {
+    	// Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
+    	// Thus we're doing the output in the endSection() event.
+
+    	// Redirect all output to our writer
+    	this.originalWriter = getWriter();
+    	this.sectionTitleWriter = new StringWriter();
+    	this.setWriter(new PrintWriter(this.sectionTitleWriter));
+    }
+    
+    private void processBeginSection(SectionLevel level, String sectionTitle)
+    {
         int levelAsInt = level.getAsInt();
-        write("<h" + (levelAsInt + 1) + " class=\"heading-" + levelAsInt + "\" id=\"HSectionlevel" + levelAsInt + "\">");
+        write("<h" + levelAsInt + " id=\"" + this.idGenerator.generateUniqueId(sectionTitle) + "\">");
+        // We generate a span so that CSS rules have a hook to perform some magic that wouldn't work on just a H
+        // element. Like some IE6 magic and others.
         write("<span>");
     }
 
     public void endSection(SectionLevel level)
     {
-        int levelAsInt = level.getAsInt();
+    	String sectionTitle = this.sectionTitleWriter.toString();
+    	getWriter().close();
+    	setWriter(this.originalWriter);
+    	processBeginSection(level, sectionTitle);
+    	write(sectionTitle);
+
+    	int levelAsInt = level.getAsInt();
         write("</span>");
-        write("</h" + (levelAsInt + 1) + ">");
+        write("</h" + levelAsInt + ">");
     }
 
     public void onWord(String word)
     {
-        write(word);
+		write(word);
     }
 
     public void onSpace()
@@ -260,4 +299,15 @@ public class XHTMLRenderer implements Renderer
     {
         this.writer.write(text);
     }
+
+    private PrintWriter getWriter()
+    {
+    	return this.writer;
+    }
+    
+    private void setWriter(PrintWriter writer)
+    {
+    	this.writer = writer;
+    }
+    
 }

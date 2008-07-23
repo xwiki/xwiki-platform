@@ -724,43 +724,37 @@
     Block-level
     =-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-->
 
-    <xsl:template match="html:h2[@class='heading-1']">
+    <xsl:template match="html:h1">
         <fo:block xsl:use-attribute-sets="h1">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h3[@class='heading-1-1']">
+    <xsl:template match="html:h2">
         <fo:block xsl:use-attribute-sets="h2">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h4[@class='heading-1-1-1']">
+    <xsl:template match="html:h3">
         <fo:block xsl:use-attribute-sets="h3">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h5[@class='heading-1-1-1-1']">
+    <xsl:template match="html:h4">
         <fo:block xsl:use-attribute-sets="h4">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h6[@class='heading-1-1-1-1-1']">
+    <xsl:template match="html:h5">
         <fo:block xsl:use-attribute-sets="h5">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>
     </xsl:template>
 
-    <xsl:template match="html:h6[@class='heading-1-1-1-1-1-1']">
-        <fo:block xsl:use-attribute-sets="h6">
-            <xsl:call-template name="process-common-attributes-and-children"/>
-        </fo:block>
-    </xsl:template>
-
-    <xsl:template match="html:h6[@class='heading-1-1-1-1-1-1-1']">
+    <xsl:template match="html:h6">
         <fo:block xsl:use-attribute-sets="h6">
             <xsl:call-template name="process-common-attributes-and-children"/>
         </fo:block>

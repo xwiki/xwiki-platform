@@ -25,6 +25,7 @@ import junit.framework.TestCase;
 import org.xwiki.rendering.DocumentManager;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
 import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
 import org.xwiki.rendering.scaffolding.ParserListenerTester;
 

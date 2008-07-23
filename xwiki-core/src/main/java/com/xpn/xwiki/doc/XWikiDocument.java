@@ -68,7 +68,7 @@ import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.renderer.XHTMLRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.DocumentManager;
 import com.xpn.xwiki.XWiki;

@@ -78,7 +78,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
         String id = null;
         String title = result.group(0);
         String level = result.group(1);
-        int level_i = (level.length() + 3) / 2;
+        int level_i = (level.length() + 1) / 2;
         String hlevel = (level_i <= 6 ? level_i : 6) + "";
         String text = result.group(3);
         String numbering = "";
@@ -124,9 +124,7 @@ public class XWikiHeadingFilter extends LocaleRegexTokenFilter implements CacheF
             }
         }
 
-        String heading =
-            formatter.format(new Object[] {id, level.replaceAll("\\.", "-"), numbering, text,
-                hlevel});
+        String heading = formatter.format(new Object[] {id, numbering, text, hlevel});
 
         // Only show the section edit button for view action and when the user has edit rights on
         // the current document

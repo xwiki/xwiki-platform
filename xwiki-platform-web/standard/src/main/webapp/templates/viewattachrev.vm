@@ -1,6 +1,6 @@
 #template("startpage.vm")
 <div class="main layoutsubsection">
-<h4 class="heading-1-1-1">$xwiki.parseMessage("availableversionsattachment")</h4>
+<h3>$xwiki.parseMessage("availableversionsattachment")</h3>
 #if ($tdoc.realLanguage!="")
 #set($lang = "&language=${tdoc.realLanguage}")
 #else

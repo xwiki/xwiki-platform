@@ -11,7 +11,7 @@
 #if($context.user == $doc.fullName || $hasAdmin)
   <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post" onsubmit="if(this.filepath.value == ''){ return false; }">
 <div>
-<h2 class="heading-1">$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h2>
+<h1>$msg.get("changephoto", [$xwiki.getUserName($doc.fullName, false)])</h1>
     <input type="hidden" name="xredirect" value="$doc.getURL("view", "xpage=changeavatar")"/>
     <div><label id="xwikiuploadfilelabel" for="xwikiuploadfile">$msg.get("uploadavatarfile"):</label></div>
     <div><input id="xwikiuploadfile" type="file" name="filepath" value="" size="40"/></div>

@@ -1,4 +1,4 @@
-<h2>$xwiki.parseMessage("viewattributestitle")</h2>
+<h1><span>$xwiki.parseMessage("viewattributestitle")</span></h1>
 
 <ul>
 <li>$msg.get("titlefield"): $doc.displayTitle</li>

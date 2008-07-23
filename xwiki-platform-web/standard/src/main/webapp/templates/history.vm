@@ -1,2 +1,2 @@
-<h2>$xwiki.parseMessage("viewhistorytitle")</h2>
+<h1><span>$xwiki.parseMessage("viewhistorytitle")</span></h1>
 #template("historyinline.vm")

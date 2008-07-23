@@ -13,7 +13,7 @@ WikiEditor.prototype.initCorePlugin = function() {
     this.addInternalProcessor(/<div\s*([^>]*)(class=\"code\")\s*([^>]*)>\s*<pre>([\s\S]+?)<\/pre>\s*<\/div>/i, 'convertCodeMacroInternal');
 
     this.addExternalProcessor((/^\s*(1(\.1)*)\s+([^\r\n]*)$/im), 'convertHeadingExternal');
-	this.addInternalProcessor((/<h[1-7]\s*(([^>]*)class=\"heading([^>]*))>([\s\S]+?)<\/h[1-7]>/i), 'convertHeadingInternal');
+	this.addInternalProcessor((/<h([1-7])\s*[^>]*?>\s*<span>([\s\S]+?)<\/span><\/h[1-7]>/i), 'convertHeadingInternal');
 
     this.addInternalProcessor((/<p[^>]*>&nbsp;?<\/p>/gi), "\\\\\r\n");
 
@@ -257,18 +257,12 @@ WikiEditor.prototype.convertTableInternal = function(regexp, result, content) {
 WikiEditor.prototype.convertHeadingInternal = function(regexp, result, content) {
 	var str = "";
 	var txt;
-	var headr = /heading((-1)+)/i;
-	if( (txt = this.trimString(result[4])) != "") {
-		var att = this.readAttributes(result[1]);
-		if(att && att["class"]) {
-			var r = headr.exec(att["class"]);
-            if(r) {
-				var n = r[1].split("-").length-1;
-				str = "\r\n1";
-				str += this.buildString(".1", n-1);
-				str += " " + txt;
-			}
-		}
+	if( (txt = this.trimString(result[2])) != "") {
+		// result[1] is the heading level.
+		var n = result[1];
+        str = "\r\n1";
+		str += this.buildString(".1", n-1);
+		str += " " + txt;
 	}
     str += "\r\n";
     return content.replace(regexp, str);
@@ -300,18 +294,6 @@ WikiEditor.prototype.fixTitle = function(editor_id, node) {
     } else {
         value = "<h" + this._titleChangeValue + ">";
         this.core.execInstanceCommand(editor_id, "FormatBlock", false, value);
-        var childs = tinyMCE.selectedInstance.contentDocument.body.childNodes;
-        if (childs) {
-         for( var x = 0; childs[x]; x++ ) {
-            var child = childs[x];
-            var nn = child.nodeName;
-            if ((nn.length == 2) && (nn.charAt(0) == "H")) {
-                 var level = parseInt(nn.charAt(1));
-                 var cn = "heading" + this.buildString("-1", level);
-                 child.className = cn;
-            }
-         }
-        }
     }
     tinyMCE.triggerNodeChange();
 }
@@ -1234,7 +1216,7 @@ WikiEditor.prototype.isExternalLink = function(url) {
 
 WikiEditor.prototype.convertHeadingExternal = function(regexp, result, content) {
 	var n = result[1].split(".").length;
-	var str = '\r\n<h' + n + ' class="heading' + this.buildString("-1", n) + '">' + this.trimString(result[3]) + '<\/h' + n + '>';
+	var str = '\r\n<h' + n + '><span>' + this.trimString(result[3]) + '</span><\/h' + n + '>';
 	return content.substring(0, result["index"]) + str + content.substring(result["index"] + result[0].length, content.length);
 }
 

@@ -12,7 +12,7 @@
 #else
   #template("startpage.vm")
   <div class="main layoutsubsection">
-	<h1>$msg.get("core.copy.copydoc")</h1>
+	<h1><span>$msg.get("core.copy.copydoc")</span></h1>
 	#set($sourcedoc = "$!{request.sourcedoc}")
     #set($targetdoc = "$!{request.targetdoc}")
     #if("$!request.language" != "")

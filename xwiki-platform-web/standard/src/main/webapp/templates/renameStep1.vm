@@ -2,11 +2,11 @@
 ### Rename document template, step 1: choose new name + updated backlinks
 ###
 ## TODO: check if this information should be displayed?
-<h2 class="heading-1">$msg.get('core.rename.title', [$doc.fullName])</h2>
+<h1><span>$msg.get('core.rename.title', [$doc.fullName])</span></h1>
 #set($newname = $msg.get("core.rename.inputPrompt"))
 <form action="?xpage=rename&amp;step=2" method="post"
     onsubmit="if(this.newPageName.value=='${newname}') this.newPageName.value=''">
-  <h3 class="heading-1-1">$msg.get("core.rename.title.newName")</h3>
+  <h2><span>$msg.get("core.rename.title.newName")</span></h2>
   #set($pweb = $doc.space)
   <div class="padded">
     <table border="0">
@@ -37,7 +37,7 @@
   </div>
   #set($backlinks = $doc.getBacklinks())
   #if($backlinks.size() > 0)
-    <h3 class="heading-1-1">$msg.get("core.rename.title.updateDocs")</h3>
+    <h2><span>$msg.get("core.rename.title.updateDocs")</span></h2>
     #foreach($backlink in $backlinks)
       #if(!$xwiki.hasAccessLevel("edit", $context.user, $backlink))
         #set ($alink = "<a href='$xwiki.getURL($backlink)' target='_blank' style='color: #999;'>$backlink</a>")

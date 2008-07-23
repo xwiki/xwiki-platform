@@ -27,7 +27,7 @@
   <parent>
     <groupId>org.xwiki.platform</groupId>
     <artifactId>xwiki-core-rendering</artifactId>
-    <version>1.5-SNAPSHOT</version>
+    <version>1.5</version>
   </parent>
   <artifactId>xwiki-core-rendering-doxia</artifactId>
   <name>XWiki Platform - Core - Rendering - Doxia</name>

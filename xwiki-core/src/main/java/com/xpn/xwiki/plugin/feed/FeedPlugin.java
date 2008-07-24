@@ -22,8 +22,19 @@
 package com.xpn.xwiki.plugin.feed;
 
 import java.io.IOException;
+import java.io.StringWriter;
+import java.lang.reflect.Constructor;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Vector;
 
 import org.xwiki.cache.Cache;
 import org.xwiki.cache.CacheException;
@@ -33,8 +44,12 @@ import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 import com.sun.syndication.feed.synd.SyndCategory;
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndEntry;
+import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
 import com.sun.syndication.feed.synd.SyndFeedImpl;
+import com.sun.syndication.feed.synd.SyndImage;
+import com.sun.syndication.feed.synd.SyndImageImpl;
+import com.sun.syndication.io.SyndFeedOutput;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
@@ -782,4 +797,151 @@ public class FeedPlugin extends XWikiDefaultPlugin implements XWikiPluginInterfa
         return null;
     }
 
+    /**
+     * @see FeedPluginApi#getSyndEntrySource(String, Map)
+     */
+    public SyndEntrySource getSyndEntrySource(String className, Map params, XWikiContext context) throws XWikiException
+    {
+        try {
+            Class sesc = Class.forName(className).asSubclass(SyndEntrySource.class);
+            Constructor ctor = null;
+            if (params != null) {
+                try {
+                    ctor = sesc.getConstructor(new Class[] {Map.class});
+                    return (SyndEntrySource) ctor.newInstance(new Object[] {params});
+                } catch (Throwable t) {
+                }
+            }
+            ctor = sesc.getConstructor(new Class[] {});
+            return (SyndEntrySource) ctor.newInstance(new Object[] {});
+        } catch (Throwable t) {
+            throw new XWikiException(XWikiException.MODULE_XWIKI_PLUGINS, XWikiException.ERROR_XWIKI_UNKNOWN, "", t);
+        }
+    }
+
+    /**
+     * @see FeedPluginApi#getFeedEntry()
+     */
+    public SyndEntry getFeedEntry(XWikiContext context)
+    {
+        return new SyndEntryImpl();
+    }
+
+    /**
+     * @see FeedPluginApi#getFeedImage()
+     */
+    public SyndImage getFeedImage(XWikiContext context)
+    {
+        return new SyndImageImpl();
+    }
+
+    /**
+     * @see FeedPluginApi#getFeed()
+     */
+    public SyndFeed getFeed(XWikiContext context)
+    {
+        return new SyndFeedImpl();
+    }
+
+    /**
+     * @see FeedPluginApi#getFeed(List, SyndEntrySourceApi, Map)
+     */
+    public SyndFeed getFeed(List list, SyndEntrySource source, Map sourceParams, XWikiContext context)
+        throws XWikiException
+    {
+        SyndFeed feed = getFeed(context);
+        List entries = new ArrayList();
+        for (int i = 0; i < list.size(); i++) {
+            SyndEntry entry = getFeedEntry(context);
+            try {
+                source.source(entry, list.get(i), sourceParams, context);
+                entries.add(entry);
+            } catch (Throwable t) {
+                // skip this entry
+            }
+        }
+        feed.setEntries(entries);
+        return feed;
+    }
+
+    /**
+     * @see FeedPluginApi#getFeed(String, int, int, SyndEntrySourceApi, Map)
+     */
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source, Map sourceParams,
+        XWikiContext context) throws XWikiException
+    {
+        List entries = context.getWiki().getStore().searchDocumentsNames(query, count, start, context);
+        return getFeed(entries, source, sourceParams, context);
+    }
+
+    /**
+     * @see FeedPluginApi#getFeed(List, SyndEntrySourceApi, Map, Map)
+     */
+    public SyndFeed getFeed(List list, SyndEntrySource source, Map sourceParams, Map metadata, XWikiContext context)
+        throws XWikiException
+    {
+        SyndFeed feed = getFeed(list, source, sourceParams, context);
+        fillFeedMetadata(feed, metadata);
+        return feed;
+    }
+
+    /**
+     * @see FeedPluginApi#getFeed(String, int, int, SyndEntrySourceApi, Map, Map)
+     */
+    public SyndFeed getFeed(String query, int count, int start, SyndEntrySource source, Map sourceParams, Map metadata,
+        XWikiContext context) throws XWikiException
+    {
+        SyndFeed feed = getFeed(query, count, start, source, sourceParams, context);
+        fillFeedMetadata(feed, metadata);
+        return feed;
+    }
+
+    private void fillFeedMetadata(SyndFeed feed, Map metadata)
+    {
+        feed.setAuthor(String.valueOf(metadata.get("author")));
+        feed.setDescription(String.valueOf(metadata.get("description")));
+        feed.setCopyright(String.valueOf(metadata.get("copyright")));
+        feed.setEncoding(String.valueOf(metadata.get("encoding")));
+        feed.setLink(String.valueOf(metadata.get("url")));
+        feed.setTitle(String.valueOf(metadata.get("title")));
+        feed.setLanguage(String.valueOf(metadata.get("language")));
+    }
+
+    /**
+     * @see FeedPluginApi#getFeedOutput(SyndFeed, String)
+     */
+    public String getFeedOutput(SyndFeed feed, String type, XWikiContext context)
+    {
+        feed.setFeedType(type);
+        StringWriter writer = new StringWriter();
+        SyndFeedOutput output = new SyndFeedOutput();
+        try {
+            output.output(feed, writer);
+            writer.close();
+            return writer.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+    /**
+     * @see FeedPluginApi#getFeedOutput(List, SyndEntrySourceApi, Map, Map, String)
+     */
+    public String getFeedOutput(List list, SyndEntrySource source, Map sourceParams, Map metadata, String type,
+        XWikiContext context) throws XWikiException
+    {
+        SyndFeed feed = getFeed(list, source, sourceParams, metadata, context);
+        return getFeedOutput(feed, type, context);
+    }
+
+    /**
+     * @see FeedPluginApi#getFeedOutput(String, int, int, SyndEntrySourceApi, Map, Map, String)
+     */
+    public String getFeedOutput(String query, int count, int start, SyndEntrySource source, Map sourceParams,
+        Map metadata, String type, XWikiContext context) throws XWikiException
+    {
+        SyndFeed feed = getFeed(query, count, start, source, sourceParams, metadata, context);
+        return getFeedOutput(feed, type, context);
+    }
 }

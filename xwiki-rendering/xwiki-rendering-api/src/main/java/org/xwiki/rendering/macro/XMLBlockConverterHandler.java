@@ -50,7 +50,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
     /**
      * SAX parsers are allowed to call the characters() method several times in a row.
      * Some parsers have a buffer of 8K (Crimson), others of 16K (Xerces) and others can
-     * even call onCharacters() for every single characters! Thus we need to accumulate
+     * even call characters() for every single character! Thus we need to accumulate
      * the characters in a buffer before we process them.
      */
     private StringBuffer accumulationBuffer;
@@ -84,6 +84,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
         }
 
         // Remove any paragraph that might have been added since we don't want paragraphs.
+        // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
         List<Block> children = dom.getChildren();
         if (children.size() > 0) {
             if (ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {

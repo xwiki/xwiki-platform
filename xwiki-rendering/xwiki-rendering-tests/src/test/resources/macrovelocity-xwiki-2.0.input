@@ -7,7 +7,7 @@
     #foreach ($item in $list)
       <tr>
         <td>
-* item
+          * item
         </td>
       </tr>
     #end

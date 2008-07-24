@@ -665,8 +665,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         // Prepare the store
         setConfig(config);
 
-        XWikiStoreInterface basestore = (XWikiStoreInterface) Utils.getComponent(XWikiStoreInterface.ROLE,
-            Param("xwiki.store.main.hint"));
+        XWikiStoreInterface basestore =
+            (XWikiStoreInterface) Utils.getComponent(XWikiStoreInterface.ROLE, Param("xwiki.store.main.hint"));
 
         // Check if we need to use the cache store..
         boolean nocache = "0".equals(Param("xwiki.store.cache", "1"));
@@ -1914,7 +1914,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         return getXWikiPreference(prefname, "", context);
     }
 
-    public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
+    /**
+     * Obtain a preference value for the wiki, looking up first in the XWiki.XWikiPreferences document, then fallbacking
+     * on a config parameter when the first lookup gives an empty string, then returning the default value if the config
+     * parameter returned itself an empty string.
+     * 
+     * @param prefname the parameter to look for in the XWiki.XWikiPreferences object corresponding to the context's
+     *            language in the XWiki.XWikiPreferences document of the wiki (or the first XWiki.XWikiPreferences
+     *            object contained, if the one for the context'ds language could not be found).
+     * @param fallback_param the parameter in xwiki.cfg to fallback on, in case the XWiki.XWikiPreferences object gave
+     *            no result
+     * @param default_value the default value to fallback on, in case both XWiki.XWikiPreferences and the fallback
+     *            xwiki.cfg parameter gave no result
+     */
+    public String getXWikiPreference(String prefname, String fallback_param, String default_value, XWikiContext context)
     {
         try {
             XWikiDocument doc = getDocument("XWiki.XWikiPreferences", context);
@@ -1935,9 +1948,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             if (!result.equals("")) {
                 return result;
             }
+
         } catch (Exception e) {
         }
-        return default_value;
+        return Param(fallback_param, default_value);
+    }
+
+    public String getXWikiPreference(String prefname, String default_value, XWikiContext context)
+    {
+        return getXWikiPreference(prefname, "", default_value, context);
     }
 
     public String getWebPreference(String prefname, XWikiContext context)
@@ -2383,6 +2402,16 @@ public class XWiki implements XWikiDocChangeNotificationInterface
         }
     }
 
+    public long getXWikiPreferenceAsLong(String prefname, String fallback_param, long default_value,
+        XWikiContext context)
+    {
+        try {
+            return Long.parseLong(getXWikiPreference(prefname, fallback_param, "", context));
+        } catch (NumberFormatException e) {
+            return default_value;
+        }
+    }
+
     public long getWebPreferenceAsLong(String prefname, long default_value, XWikiContext context)
     {
         try {
@@ -2411,6 +2440,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     {
         try {
             return Integer.parseInt(getXWikiPreference(prefname, context));
+        } catch (NumberFormatException e) {
+            return default_value;
+        }
+    }
+
+    public int getXWikiPreferenceAsInt(String prefname, String fallback_param, int default_value, XWikiContext context)
+    {
+        try {
+            return Integer.parseInt(getXWikiPreference(prefname, fallback_param, "", context));
         } catch (NumberFormatException e) {
             return default_value;
         }
@@ -5710,7 +5748,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public boolean hasCaptcha(XWikiContext context)
     {
-        return (context.getWiki().ParamAsLong("xwiki.plugin.captcha", 0) == 1);
+        return (getXWikiPreferenceAsInt("captcha_enabled", "xwiki.plugin.captcha", 0, context) == 1);
     }
 
     public String getWysiwygToolbars(XWikiContext context)

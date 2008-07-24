@@ -32,6 +32,8 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.XMLBlock;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 
@@ -45,6 +47,14 @@ public class XMLBlockConverterHandler extends DefaultHandler
     
     private Stack<XMLBlock> stack = new Stack<XMLBlock>();
     
+    /**
+     * SAX parsers are allowed to call the characters() method several times in a row.
+     * Some parsers have a buffer of 8K (Crimson), others of 16K (Xerces) and others can
+     * even call onCharacters() for every single characters! Thus we need to accumulate
+     * the characters in a buffer before we process them.
+     */
+    private StringBuffer accumulationBuffer;
+
     public XMLBlockConverterHandler(Parser parser)
     {
         this.parser = parser;
@@ -56,18 +66,14 @@ public class XMLBlockConverterHandler extends DefaultHandler
     }
     
     @Override
-    public void startElement(String uri, String localName, String name, Attributes attributes)
-        throws SAXException
+    public void characters(char[] ch, int start, int length) throws SAXException
     {
-        Map<String, String> map = new HashMap<String, String>();
-        for (int i = 0; i < attributes.getLength(); i++) {
-            map.put(attributes.getQName(i), attributes.getValue(i));
+        if (accumulationBuffer != null) {
+            accumulationBuffer.append(ch, start, length);
         }
-        this.stack.push(new XMLBlock(name, map));
     }
 
-    @Override
-    public void characters(char[] ch, int start, int length) throws SAXException
+    private void processCharacters(char[] ch, int start, int length) throws SAXException
     {
         XDOM dom;
         String content = new String(ch, start, length);
@@ -76,12 +82,42 @@ public class XMLBlockConverterHandler extends DefaultHandler
         } catch (ParseException e) {
             throw new SAXException("Failed to parse [" + content + "]", e);
         }
+
+        // Remove any paragraph that might have been added since we don't want paragraphs.
+        List<Block> children = dom.getChildren();
+        if (children.size() > 0) {
+            if (ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {
+                dom = new XDOM(children.get(0).getChildren());
+            }
+        }
+        
         this.stack.peek().addChildren(dom.getChildren());
+    }
+
+    @Override
+    public void startElement(String uri, String localName, String name, Attributes attributes)
+        throws SAXException
+    {
+        if (accumulationBuffer != null && accumulationBuffer.length() > 0) {
+            processCharacters(accumulationBuffer.toString().toCharArray(), 0, accumulationBuffer.length());
+        }
+        accumulationBuffer = new StringBuffer();
+
+        Map<String, String> map = new HashMap<String, String>();
+        for (int i = 0; i < attributes.getLength(); i++) {
+            map.put(attributes.getQName(i), attributes.getValue(i));
+        }
+        this.stack.push(new XMLBlock(name, map));
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException
     {
+        if (accumulationBuffer != null && accumulationBuffer.length() > 0) {
+            processCharacters(accumulationBuffer.toString().toCharArray(), 0, accumulationBuffer.length());
+            accumulationBuffer.setLength(0);
+        }
+
         // Pop the stack until we reach a matching Block element
         List<XMLBlock> blocks = new ArrayList<XMLBlock>();
         while (!this.stack.peek().getName().equals(name)) {

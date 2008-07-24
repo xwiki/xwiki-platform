@@ -66,6 +66,7 @@ public class XHTMLRendererTestSuite extends TestCase
 
         // Add tests specific to the XWiki Parser
         suite.addTest(new ParserListenerTester("macroxhtml", syntax, XHTMLRenderer.class, true, dm));
+        suite.addTest(new ParserListenerTester("macrovelocity", syntax, XHTMLRenderer.class, true, dm));
 
         return suite;
     }

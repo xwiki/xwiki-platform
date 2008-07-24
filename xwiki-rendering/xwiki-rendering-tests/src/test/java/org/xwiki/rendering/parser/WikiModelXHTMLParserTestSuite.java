@@ -22,6 +22,8 @@ package org.xwiki.rendering.parser;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
+import org.xwiki.rendering.scaffolding.TestEventsListener;
+import org.xwiki.rendering.scaffolding.ParserListenerTester;
 import junit.framework.Test;
 
 public class WikiModelXHTMLParserTestSuite extends AbstractRenderingTestCase
@@ -32,8 +34,18 @@ public class WikiModelXHTMLParserTestSuite extends AbstractRenderingTestCase
 
         ParserListenerTestSuite suite =
             new ParserListenerTestSuite("Test the WikiModel Parser for XHTML");
-        // TODO: Right now all tests are failing because the XHTML parser is buggy.
-        // suite.addTestSuite(syntax, TestEventsListener.class);
+
+        // TODO: Right now some of the basic tests are failing because the XHTML parser is buggy so
+        // we only include the tests that pass. When all pass remove the individual tests and
+        // instead use:
+        //  suite.addTestSuite(syntax, TestEventsListener.class);
+        suite.addTest(new ParserListenerTester("paragraph", syntax, TestEventsListener.class, false));
+        suite.addTest(new ParserListenerTester("section", syntax, TestEventsListener.class, false));
+        //suite.addTest(new ParserListenerTester("macro", syntax, TestEventsListener.class, false));
+        //suite.addTest(new ParserListenerTester("list", syntax, TestEventsListener.class, false));
+        //suite.addTest(new ParserListenerTester("html", syntax, TestEventsListener.class, false));
+        //suite.addTest(new ParserListenerTester("links", syntax, TestEventsListener.class, false));
+        //suite.addTest(new ParserListenerTester("escape", syntax, TestEventsListener.class, false));
 
         return suite;
     }

@@ -58,6 +58,9 @@
           <role>org.xwiki.context.ExecutionContextInitializerManager</role>
         </requirement>
         <requirement>
+          <role>org.xwiki.rendering.DocumentManager</role>
+        </requirement>
+        <requirement>
           <role>org.xwiki.rendering.parser.Parser</role>
           <role-hint>xwiki/2.0</role-hint>
         </requirement>

@@ -21,6 +21,8 @@ package org.xwiki.rendering.macro;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.block.Block;
@@ -64,5 +66,20 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
 
         assertBlocks(expected, blocks);
     }
-    
+
+    public void testMacroEscapeWikiSyntax() throws Exception
+    {
+        String html = "*escaped*";
+
+        String expected = "beginDocument\n"
+            + "onEscape: [*escaped*]\n"
+            + "endDocument\n";
+
+        Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
+        Map<String, String> parameters = new HashMap<String, String>();
+        parameters.put("escapeWikiSyntax", "true");
+        List<Block> blocks = macro.execute(parameters, html, new XDOM(Collections.EMPTY_LIST));
+
+        assertBlocks(expected, blocks);
+    }
 }

@@ -41,6 +41,8 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
 {
     private static final String DESCRIPTION = "Inserts XHTML code into the page.";
 
+    private static final String PARAMETER_ESCAPE_WIKI_SYNTAX = "escapeWikiSyntax";
+    
     /**
      * Injected by the Component Manager.
      */
@@ -56,6 +58,8 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     {
 		// TODO: Use an I8N service to translate the descriptions in several languages
 		this.allowedParameters = new HashMap<String, String>();
+        this.allowedParameters.put("escapeWikiSyntax", "If true then the XHTML element contents won't be rendered "
+            + "even if they contain valid wiki syntax.");
 	}
 
 	/**
@@ -87,11 +91,17 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     {
         // Parse the XHTML using an XML Parser and Wrap the XML elements in XMLBlock(s).
         // For each XML element's text, run it through the main Parser.
-        
+
+        // Check if the user has asked to escape wiki syntax or not
+        boolean escapeWikiSyntax = false;
+        if (parameters.containsKey(PARAMETER_ESCAPE_WIKI_SYNTAX)) {
+            escapeWikiSyntax = Boolean.parseBoolean(parameters.get(PARAMETER_ESCAPE_WIKI_SYNTAX));
+        }
+
         XMLBlockConverterHandler handler;
         try {
             XMLReader xr = XMLReaderFactory.createXMLReader();
-            handler = new XMLBlockConverterHandler(this.parser);
+            handler = new XMLBlockConverterHandler(this.parser, escapeWikiSyntax);
             xr.setContentHandler(handler);
             xr.setErrorHandler(handler);
             

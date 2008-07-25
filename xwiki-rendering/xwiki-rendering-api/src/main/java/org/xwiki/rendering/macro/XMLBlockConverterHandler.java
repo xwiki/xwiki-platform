@@ -34,6 +34,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.EscapeBlock;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 
@@ -44,6 +45,8 @@ import org.xwiki.rendering.parser.Parser;
 public class XMLBlockConverterHandler extends DefaultHandler
 {
     private Parser parser;
+
+    private boolean escapeWikiSyntax;
     
     private Stack<XMLBlock> stack = new Stack<XMLBlock>();
     
@@ -55,9 +58,10 @@ public class XMLBlockConverterHandler extends DefaultHandler
      */
     private StringBuffer accumulationBuffer;
 
-    public XMLBlockConverterHandler(Parser parser)
+    public XMLBlockConverterHandler(Parser parser, boolean escapeWikiSyntax)
     {
         this.parser = parser;
+        this.escapeWikiSyntax = escapeWikiSyntax;
     }
     
     public XMLBlock getRootBlock()
@@ -75,24 +79,31 @@ public class XMLBlockConverterHandler extends DefaultHandler
 
     private void processCharacters(char[] ch, int start, int length) throws SAXException
     {
-        XDOM dom;
         String content = new String(ch, start, length);
-        try {
-            dom = this.parser.parse(new StringReader(content));
-        } catch (ParseException e) {
-            throw new SAXException("Failed to parse [" + content + "]", e);
-        }
 
-        // Remove any paragraph that might have been added since we don't want paragraphs.
-        // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
-        List<Block> children = dom.getChildren();
-        if (children.size() > 0) {
-            if (ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {
-                dom = new XDOM(children.get(0).getChildren());
+        // If we've been told by the user to not render wiki syntax we escape it.
+        if (this.escapeWikiSyntax) {
+            this.stack.peek().addChild(new EscapeBlock(content));
+        } else {
+
+            XDOM dom;
+            try {
+                dom = this.parser.parse(new StringReader(content));
+            } catch (ParseException e) {
+                throw new SAXException("Failed to parse [" + content + "]", e);
             }
+
+            // Remove any paragraph that might have been added since we don't want paragraphs.
+            // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
+            List<Block> children = dom.getChildren();
+            if (children.size() > 0) {
+                if (ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {
+                    dom = new XDOM(children.get(0).getChildren());
+                }
+            }
+
+            this.stack.peek().addChildren(dom.getChildren());
         }
-        
-        this.stack.peek().addChildren(dom.getChildren());
     }
 
     @Override

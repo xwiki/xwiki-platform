@@ -163,9 +163,9 @@ public class DefaultVelocityManager implements VelocityManager, Composable
 
     public VelocityEngine getVelocityEngine() throws XWikiVelocityException
     {
-        // Note: For improved performance we cache the Velocity Managers in order not to
+        // Note: For improved performance we cache the Velocity Engines in order not to
         // recreate them all the time. The key we use is the location to the skin's macro.vm
-        // file since caching on the skin would create more Managers than needed (some skins
+        // file since caching on the skin would create more Engines than needed (some skins
         // don't have a macros.vm file and some skins inherit from others).
 
         // Create a Velocity context using the Velocity Manager associated to the current skin's
@@ -176,7 +176,7 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         String skin = xcontext.getWiki().getSkin(xcontext);
         String cacheKey = getVelocityEngineCacheKey(skin, xcontext);
 
-        // Get the Velocity Manager to use
+        // Get the Velocity Engine to use
         VelocityFactory velocityFactory = (VelocityFactory) Utils.getComponent(VelocityFactory.ROLE);
         VelocityEngine velocityEngine;
         if (velocityFactory.hasVelocityEngine(cacheKey)) {

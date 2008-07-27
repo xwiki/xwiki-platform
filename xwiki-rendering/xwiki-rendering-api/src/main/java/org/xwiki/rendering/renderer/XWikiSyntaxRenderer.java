@@ -176,7 +176,16 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onEscape(String escapedString)
     {
-        write("\\" + escapedString);
+        // Note: If an EscapeBlock was found inside a Macro Marker block then the code below will not
+        // generate any output since it'll be the beginMacroMarker that'll generate the original macro content.
+
+        // For single char escapes use the "\" notation and for more than 1 char use the
+        // nowiki macro.
+        if (escapedString.length() == 1) {
+            write("\\" + escapedString);
+        } else {
+            write("{nowiki}" + escapedString + "{/nowiki}");
+        }
     }
 
     public void beginList(ListType listType)

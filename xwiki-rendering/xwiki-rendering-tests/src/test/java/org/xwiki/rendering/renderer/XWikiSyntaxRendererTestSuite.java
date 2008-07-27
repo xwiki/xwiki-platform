@@ -38,6 +38,7 @@ public class XWikiSyntaxRendererTestSuite extends TestCase
 
         // Add tests specific to the XWiki Parser
         suite.addTest(new ParserListenerTester("macroxhtml", syntax, XWikiSyntaxRenderer.class, true));
+        suite.addTest(new ParserListenerTester("macronowiki", syntax, XWikiSyntaxRenderer.class, true));
 
         return suite;
     }

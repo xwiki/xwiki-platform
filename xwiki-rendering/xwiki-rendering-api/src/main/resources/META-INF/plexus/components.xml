@@ -76,6 +76,12 @@
       </configuration>
     </component>
     <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>nowiki/xwiki</role-hint>
+      <implementation>org.xwiki.rendering.macro.NoWikiMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
       <role>org.xwiki.rendering.transformation.Transformation</role>
       <role-hint>macro</role-hint>
       <implementation>org.xwiki.rendering.transformation.MacroTransformation</implementation>

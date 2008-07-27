@@ -48,7 +48,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
         Mock mockDocumentManager = mock(DocumentManager.class);
-        mockDocumentManager.expects(once()).method("getDocumentContent").will(returnValue("{someMacro/}"));
+        mockDocumentManager.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
         macro.setDocumentManager((DocumentManager) mockDocumentManager.proxy());
 
         Map<String, String> properties = new HashMap<String, String>();
@@ -81,7 +81,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
         Mock mockDocumentManager = mock(DocumentManager.class);
         mockDocumentManager.expects(once()).method("getDocumentContent").will(
-            returnValue("{velocity}$myvar{/velocity}"));
+            returnValue("{{velocity}}$myvar{{/velocity}}"));
         macro.setDocumentManager((DocumentManager) mockDocumentManager.proxy());
 
         Map<String, String> properties = new HashMap<String, String>();

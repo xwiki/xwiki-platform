@@ -38,10 +38,7 @@ public class XWikiSyntaxRendererTestSuite extends TestCase
 
         // Add tests specific to the XWiki Parser
         suite.addTest(new ParserListenerTester("macroxhtml", syntax, XWikiSyntaxRenderer.class, true));
-        // TODO: Uncomment when the following wikimodel bugs are fixed:
-        // - http://code.google.com/p/wikimodel/issues/detail?id=28
-        // - http://code.google.com/p/wikimodel/issues/detail?id=29
-        //suite.addTest(new ParserListenerTester("macronowiki", syntax, XWikiSyntaxRenderer.class, true));
+        suite.addTest(new ParserListenerTester("macronowiki", syntax, XWikiSyntaxRenderer.class, true));
 
         return suite;
     }

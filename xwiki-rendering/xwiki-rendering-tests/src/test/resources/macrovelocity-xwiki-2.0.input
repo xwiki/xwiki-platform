@@ -1,4 +1,4 @@
-{velocity}{xhtml}
+{{velocity}}{{xhtml}}
 <div>
   #set ($name = "John")
   #set ($list = ['one', 'two'])
@@ -13,4 +13,4 @@
     #end
   </table>
 </div>
-{/xhtml}{/velocity}
+{{/xhtml}}{{/velocity}}

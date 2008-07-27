@@ -12,6 +12,6 @@ onLink: [Label = [label] Reference = [Space.ExistingPage] Target = [_target]]
 onLineBreak
 onLink: [Reference = [mailto:john@doe.com]]
 onLineBreak
-onLink: [Reference = [{macro}]]
+onLink: [Reference = [{{macro}}]]
 endParagraph
 endDocument

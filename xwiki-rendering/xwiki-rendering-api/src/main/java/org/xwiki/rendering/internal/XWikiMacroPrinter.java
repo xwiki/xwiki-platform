@@ -33,7 +33,7 @@ public class XWikiMacroPrinter
 	public String print(String name, Map<String, String> parameters, String content)
 	{
         StringBuffer buffer = new StringBuffer();
-        buffer.append("{").append(name);
+        buffer.append("{{").append(name);
         if (!parameters.isEmpty()) {
             buffer.append(':');
             for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
@@ -45,11 +45,11 @@ public class XWikiMacroPrinter
             }
         }
         if (content == null) {
-            buffer.append("/}");
+            buffer.append("/}}");
         } else {
-            buffer.append('}');
+            buffer.append("}}");
             buffer.append(content);
-            buffer.append("{/").append(name).append("}");
+            buffer.append("{{/").append(name).append("}}");
         }
         
         return buffer.toString();

@@ -67,7 +67,7 @@ public class XWikiSyntaxRenderer implements Renderer
     
     public void onLink(Link link)
     {
-        write("[");
+        write("[[");
         if (link.getLabel() != null) {
             write(link.getLabel());
             write(">");
@@ -89,12 +89,12 @@ public class XWikiSyntaxRenderer implements Renderer
             write(">");
             write(link.getTarget());
         }
-        write("]");
+        write("]]");
     }
 
     public void beginBold()
     {
-        write("*");
+        write("**");
     }
 
     public void beginItalic()
@@ -110,7 +110,7 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void endBold()
     {
-        write("*");
+        write("**");
     }
 
     public void endItalic()
@@ -184,7 +184,7 @@ public class XWikiSyntaxRenderer implements Renderer
         if (escapedString.length() == 1) {
             write("\\" + escapedString);
         } else {
-            write("{nowiki}" + escapedString + "{/nowiki}");
+            write("{{nowiki}}" + escapedString + "{{/nowiki}}");
         }
     }
 

@@ -124,7 +124,7 @@ public class DefaultChartParams2 extends ChartParams {
 	}
 
 	void setAxis(String prefix) throws ParamException {
-		set(prefix+AXIS_VISIBLE_SUFIX, new Boolean(Axis.DEFAULT_AXIS_VISIBLE));
+		set(prefix+AXIS_VISIBLE_SUFIX, Axis.DEFAULT_AXIS_VISIBLE);
 		
 		set(prefix+AXIS_LINE_VISIBLE_SUFFIX, Boolean.TRUE);
 		set(prefix+AXIS_LINE_COLOR_SUFFIX, Axis.DEFAULT_AXIS_LINE_PAINT);

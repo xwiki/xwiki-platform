@@ -21,30 +21,43 @@
 
 package com.xpn.xwiki.doc;
 
-public class XWikiAttachmentContent {
-
+public class XWikiAttachmentContent implements Cloneable
+{
     private XWikiAttachment attachment;
+
     private byte[] content;
 
     private boolean isContentDirty = false;
 
-    public XWikiAttachmentContent(XWikiAttachment attachment) {
+    public XWikiAttachmentContent(XWikiAttachment attachment)
+    {
         this();
+
         setAttachment(attachment);
     }
 
-    public XWikiAttachmentContent() {
-        content = new byte[0];
+    public XWikiAttachmentContent()
+    {
+        this.content = new byte[0];
     }
 
-    public long getId() {
-        return attachment.getId();
+    public long getId()
+    {
+        return this.attachment.getId();
     }
 
-    public void setId(long id) {
+    public void setId(long id)
+    {
     }
 
-    public Object clone() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public Object clone()
+    {
         XWikiAttachmentContent attachmentcontent = null;
         try {
             attachmentcontent = (XWikiAttachmentContent) getClass().newInstance();
@@ -54,40 +67,49 @@ public class XWikiAttachmentContent {
 
         attachmentcontent.setAttachment(getAttachment());
         attachmentcontent.setContent(getContent());
+
         return attachmentcontent;
     }
 
-    public byte[] getContent() {
-        if (content==null)
+    public byte[] getContent()
+    {
+        if (this.content == null) {
             return new byte[0];
-        else
-            return content;
-    }
-
-    public void setContent(byte[] content) {
-        if (content==null)
-         this.content = null;
-        else {
-            if (!content.equals(this.content))
-                setContentDirty(true);
-            this.content = content;
-            attachment.setFilesize(content.length);
+        } else {
+            return this.content;
         }
     }
 
-    public XWikiAttachment getAttachment() {
-        return attachment;
+    public void setContent(byte[] content)
+    {
+        if (content == null) {
+            this.content = null;
+        } else {
+            if (!content.equals(this.content)) {
+                setContentDirty(true);
+            }
+            this.content = content;
+            this.attachment.setFilesize(content.length);
+        }
     }
 
-    public void setAttachment(XWikiAttachment attachment) {
+    public XWikiAttachment getAttachment()
+    {
+        return this.attachment;
+    }
+
+    public void setAttachment(XWikiAttachment attachment)
+    {
         this.attachment = attachment;
     }
 
-    public boolean isContentDirty() {
-        return isContentDirty;
+    public boolean isContentDirty()
+    {
+        return this.isContentDirty;
     }
 
-    public void setContentDirty(boolean contentDirty) {
-        isContentDirty = contentDirty;
+    public void setContentDirty(boolean contentDirty)
+    {
+        this.isContentDirty = contentDirty;
     }
 }

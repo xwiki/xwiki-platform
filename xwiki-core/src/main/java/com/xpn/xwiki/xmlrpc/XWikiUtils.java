@@ -27,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,13 +36,12 @@ import org.apache.xmlrpc.XmlRpcException;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * This is an helper class containing some utility method for handling and setting up the XWiki and
- * XMLRPC data objects needed to serve XMLRPC requests.
+ * This is an helper class containing some utility method for handling and setting up the XWiki and XMLRPC data objects
+ * needed to serve XMLRPC requests.
  */
 public class XWikiUtils
 {
-    private static final SimpleDateFormat dateFormat =
-        new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
+    private static final SimpleDateFormat dateFormat = new SimpleDateFormat("EEE MMM d HH:mm:ss z yyyy", Locale.US);
 
     public static Object mock(Class someClass)
     {
@@ -72,8 +70,7 @@ public class XWikiUtils
         return tokens;
     }
 
-    public static XWikiXmlRpcUser checkToken(String token, XWikiContext context)
-        throws XmlRpcException
+    public static XWikiXmlRpcUser checkToken(String token, XWikiContext context) throws XmlRpcException
     {
         XWikiXmlRpcUser user = null;
         String ip = context.getRequest().getRemoteAddr();
@@ -87,8 +84,8 @@ public class XWikiUtils
         }
 
         if ((user == null) || (!user.getRemoteIp().equals(ip))) {
-            throw new XmlRpcException(String.format(
-                "[Access Denied: authentication token '%s' for IP %s is invalid]", token, ip));
+            throw new XmlRpcException(String.format("[Access Denied: authentication token '%s' for IP %s is invalid]",
+                token, ip));
         }
 
         context.setUser(user.getName());
@@ -121,11 +118,9 @@ public class XWikiUtils
         } else if (object instanceof Map) {
             Map map = (Map) object;
             Map result = new HashMap();
-            Iterator i = map.keySet().iterator();
-            while (i.hasNext()) {
-                Object key = i.next();
-                Object value = map.get(key);
-                result.put(key, xmlRpcConvert(value));
+            for (Object objEntry : map.entrySet()) {
+                Map.Entry entry = (Map.Entry) objEntry;
+                result.put(entry.getKey(), xmlRpcConvert(entry.getValue()));
             }
 
             return result;

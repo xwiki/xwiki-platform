@@ -31,6 +31,6 @@ public class BooleanChartParam extends AbstractChartParam {
 	}
 
 	public Object convert(String value) {
-		return new Boolean(value);
+		return value;
 	}
 }

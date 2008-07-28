@@ -34,19 +34,29 @@ import org.suigeneris.jrcs.util.ToString;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class XWikiAttachmentArchive {
+public class XWikiAttachmentArchive implements Cloneable
+{
     private static final Log LOG = LogFactory.getLog(XWikiAttachmentArchive.class);
 
     private XWikiAttachment attachment;
 
-    public long getId() {
-        return attachment.getId();
+    public long getId()
+    {
+        return this.attachment.getId();
     }
 
-    public void setId(long id) {
+    public void setId(long id)
+    {
     }
 
-    public Object clone() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#clone()
+     */
+    @Override
+    public Object clone()
+    {
         XWikiAttachmentArchive attachmentarchive = null;
         try {
             attachmentarchive = (XWikiAttachmentArchive) getClass().newInstance();
@@ -57,94 +67,104 @@ public class XWikiAttachmentArchive {
 
         attachmentarchive.setAttachment(getAttachment());
         attachmentarchive.setRCSArchive(getRCSArchive());
+
         return attachmentarchive;
     }
 
     // Document Archive
     private Archive archive;
 
-    public Archive getRCSArchive() {
-        return archive;
+    public Archive getRCSArchive()
+    {
+        return this.archive;
     }
 
-    public void setRCSArchive(Archive archive) {
+    public void setRCSArchive(Archive archive)
+    {
         this.archive = archive;
     }
 
-    public byte[] getArchive() throws XWikiException {
-     return getArchive(null);      
+    public byte[] getArchive() throws XWikiException
+    {
+        return getArchive(null);
     }
 
-    public byte[] getArchive(XWikiContext context) throws XWikiException {
-        if (archive==null) {
-            if (context!=null)
-                updateArchive(attachment.getContent(context), context);
+    public byte[] getArchive(XWikiContext context) throws XWikiException
+    {
+        if (this.archive == null) {
+            if (context != null)
+                updateArchive(this.attachment.getContent(context), context);
         }
-        if (archive==null)
+        if (this.archive == null) {
             return new byte[0];
-        else {
-            return archive.toByteArray();
+        } else {
+            return this.archive.toByteArray();
         }
     }
 
-    public void setArchive(byte[] data) throws XWikiException {
-        if ((data==null)||(data.length==0)) {
-            archive = null;
-
+    public void setArchive(byte[] data) throws XWikiException
+    {
+        if ((data == null) || (data.length == 0)) {
+            this.archive = null;
         } else {
             try {
-                //attachment.fromXML(data.toString());
+                // attachment.fromXML(data.toString());
                 ByteArrayInputStream is = new ByteArrayInputStream(data);
-                archive = new Archive(getAttachment().getFilename(), is);
+                this.archive = new Archive(getAttachment().getFilename(), is);
 
-            }
-            catch (Exception e) {
-                Object[] args = { getAttachment().getFilename() };
-                throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                        "Exception while manipulating the archive for file {0}", e, args);
+            } catch (Exception e) {
+                Object[] args = {getAttachment().getFilename()};
+                throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                    XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
+                    "Exception while manipulating the archive for file {0}", e, args);
             }
         }
     }
 
-    public void updateArchive(byte[] data, XWikiContext context) throws XWikiException {
+    public void updateArchive(byte[] data, XWikiContext context) throws XWikiException
+    {
         try {
-            attachment.incrementVersion();
-            attachment.setDate(new Date());
-            String sdata = attachment.toStringXML(true, false, context);
+            this.attachment.incrementVersion();
+            this.attachment.setDate(new Date());
+            String sdata = this.attachment.toStringXML(true, false, context);
             Object[] lines = ToString.stringToArray(sdata);
 
-            if (archive!=null) {
-                archive.addRevision(lines,"");
+            if (this.archive != null) {
+                this.archive.addRevision(lines, "");
+            } else {
+                this.archive = new Archive(lines, getAttachment().getFilename(), getAttachment().getVersion());
             }
-            else
-                archive = new Archive(lines,getAttachment().getFilename(),getAttachment().getVersion());
-        }
-        catch (Exception e) {
-            Object[] args = { getAttachment().getFilename() };
-            throw new XWikiException( XWikiException.MODULE_XWIKI_STORE, XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                    "Exception while manipulating the archive for file {0}", e, args);
+        } catch (Exception e) {
+            Object[] args = {getAttachment().getFilename()};
+            throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
+                XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
+                "Exception while manipulating the archive for file {0}", e, args);
         }
     }
 
-    public XWikiAttachment getAttachment() {
-        return attachment;
+    public XWikiAttachment getAttachment()
+    {
+        return this.attachment;
     }
 
-    public void setAttachment(XWikiAttachment attachment) {
+    public void setAttachment(XWikiAttachment attachment)
+    {
         this.attachment = attachment;
     }
-    
-    public Version[] getVersions() {
+
+    public Version[] getVersions()
+    {
         Node[] nodes = getRCSArchive().changeLog();
         Version[] versions = new Version[nodes.length];
         for (int i = 0; i < nodes.length; i++) {
             versions[i] = nodes[i].getVersion();
         }
+
         return versions;
     }
-    
-    public XWikiAttachment getRevision(XWikiAttachment attachment, String rev, 
-        XWikiContext context) throws XWikiException
+
+    public XWikiAttachment getRevision(XWikiAttachment attachment, String rev, XWikiContext context)
+        throws XWikiException
     {
         try {
             Archive archive = getRCSArchive();
@@ -173,11 +193,10 @@ public class XWikiAttachmentArchive {
             revattach.setVersion(rev);
             return revattach;
         } catch (Exception e) {
-            Object[] args = { attachment.getFilename() };
+            Object[] args = {attachment.getFilename()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_ATTACHMENT_ARCHIVEFORMAT,
-                "Exception while manipulating the archive for file {0}",
-                e, args);
+                "Exception while manipulating the archive for file {0}", e, args);
         }
     }
 }

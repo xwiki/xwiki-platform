@@ -2754,9 +2754,9 @@ public class XWiki implements XWikiDocChangeNotificationInterface
     }
 
     /**
-     * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the required
-     * configuration properties to make XWiki work properly. If some properties are missing they are created and saved
-     * in the database.
+     * Verify if the <code>XWiki.XWikiPreferences</code> page exists and that it contains all the required configuration
+     * properties to make XWiki work properly. If some properties are missing they are created and saved in the
+     * database.
      * 
      * @param context the XWiki Context
      * @return the XWiki Base Class object containing the properties
@@ -3036,7 +3036,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
         bclass.setName("XWiki.XWikiComments");
         /*
-         * if (!"internal".equals(bclass.getCustomMapping())) { needsUpdate = true; bclass.setCustomMapping("internal"); }
+         * if (!"internal".equals(bclass.getCustomMapping())) { needsUpdate = true; bclass.setCustomMapping("internal");
+         * }
          */
         needsUpdate |= bclass.addTextField("author", "Author", 30);
         needsUpdate |= bclass.addTextAreaField("highlight", "Highlighted Text", 40, 2);
@@ -5322,8 +5323,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
-        return getStore().getQueryManager().getNamedQuery("getSpaceDocsName")
-            .bindValue("space", spaceName).execute();
+        return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).execute();
     }
 
     public List<String> getIncludedMacros(String defaultweb, String content, XWikiContext context)
@@ -6317,13 +6317,13 @@ public class XWiki implements XWikiDocChangeNotificationInterface
             // now we have the list of attachments to rollback.. let's do it
             // if this fails we might have saved some attachments without saving the document itself
             int attachmentTreated = 0;
-            for (String fileName : toRollbackMap.keySet()) {
-                XWikiAttachment newAttach = toRollbackMap.get(fileName);
+            for (Map.Entry<String, XWikiAttachment> entry : toRollbackMap.entrySet()) {
+                XWikiAttachment newAttach = entry.getValue();
                 try {
                     context.getWiki().getAttachmentStore().saveAttachmentContent(newAttach, false, context, true);
                     attachmentTreated++;
                 } catch (XWikiException e) {
-                    LOG.error("Error rolling back attachment " + fileName + " in document rollback for document "
+                    LOG.error("Error rolling back attachment " + entry.getKey() + " in document rollback for document "
                         + tdoc.getFullName());
                     // If we have already treated an attachment it's better to continue and leave
                     // only one attachment in bad state

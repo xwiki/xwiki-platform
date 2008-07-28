@@ -48,7 +48,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable
+public abstract class BaseCollection extends BaseElement implements ObjectInterface, Serializable, Cloneable
 {
     protected String className;
 
@@ -63,6 +63,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
     public int hashCode()
     {
         return (getName() + getClassName()).hashCode();
@@ -74,7 +80,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public int getNumber()
     {
-        return number;
+        return this.number;
     }
 
     public void setNumber(int number)
@@ -89,36 +95,50 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public String getClassName()
     {
-        return (className == null) ? "" : className;
+        return (this.className == null) ? "" : this.className;
     }
 
     public void setClassName(String name)
     {
-        className = name;
+        this.className = name;
     }
 
     public void checkField(String name) throws XWikiException
     {
         /*
-         * // Let's stop checking.. This is a pain if (getxWikiClass(context).safeget(name)==null) {
-         * Object[] args = { name, getxWikiClass(context).getName() }; throw new XWikiException(
-         * XWikiException.MODULE_XWIKI_CLASSES,
-         * XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST, "Field {0} does not exist in
-         * class {1}", null, args); }
+         * // Let's stop checking.. This is a pain if (getxWikiClass(context).safeget(name)==null) { Object[] args = {
+         * name, getxWikiClass(context).getName() }; throw new XWikiException( XWikiException.MODULE_XWIKI_CLASSES,
+         * XWikiException.ERROR_XWIKI_CLASSES_FIELD_DOES_NOT_EXIST, "Field {0} does not exist in class {1}", null,
+         * args); }
          */
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ObjectInterface#safeget(java.lang.String)
+     */
     public PropertyInterface safeget(String name)
     {
         return (PropertyInterface) getFields().get(name);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ObjectInterface#get(java.lang.String)
+     */
     public PropertyInterface get(String name) throws XWikiException
     {
         checkField(name);
         return safeget(name);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ObjectInterface#safeput(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
+     */
     public void safeput(String name, PropertyInterface property)
     {
         addField(name, property);
@@ -128,6 +148,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ObjectInterface#put(java.lang.String, com.xpn.xwiki.objects.PropertyInterface)
+     */
     public void put(String name, PropertyInterface property) throws XWikiException
     {
         // TODO: order?
@@ -145,15 +170,18 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         if ((context == null) || (context.getWiki() == null)) {
             return null;
         }
+
         String name = getClassName();
         String wiki = getWiki();
 
         String database = context.getDatabase();
         try {
             context.setDatabase(wiki);
+
             return context.getWiki().getClass(name, context);
         } catch (Exception e) {
             e.printStackTrace();
+
             return null;
         } finally {
             context.setDatabase(database);
@@ -163,10 +191,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public String getStringValue(String name)
     {
         BaseProperty prop = (BaseProperty) safeget(name);
-        if (prop == null || prop.getValue() == null)
+        if (prop == null || prop.getValue() == null) {
             return "";
-        else
+        } else {
             return prop.getValue().toString();
+        }
     }
 
     public String getLargeStringValue(String name)
@@ -188,8 +217,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public void setLargeStringValue(String name, String value)
     {
         BaseStringProperty property = (BaseStringProperty) safeget(name);
-        if (property == null)
+        if (property == null) {
             property = new LargeStringProperty();
+        }
         property.setName(name);
         property.setValue(value);
         safeput(name, property);
@@ -204,10 +234,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
-            if (prop == null)
+            if (prop == null) {
                 return default_value;
-            else
+            } else {
                 return ((Number) prop.getValue()).intValue();
+            }
         } catch (Exception e) {
             return default_value;
         }
@@ -217,7 +248,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         NumberProperty property = new IntegerProperty();
         property.setName(name);
-        property.setValue(new Integer(value));
+        property.setValue(value);
         safeput(name, property);
     }
 
@@ -225,10 +256,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
-            if (prop == null)
+            if (prop == null) {
                 return 0;
-            else
+            } else {
                 return ((Number) prop.getValue()).longValue();
+            }
         } catch (Exception e) {
             return 0;
         }
@@ -238,7 +270,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         NumberProperty property = new LongProperty();
         property.setName(name);
-        property.setValue(new Long(value));
+        property.setValue(value);
         safeput(name, property);
     }
 
@@ -246,10 +278,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
-            if (prop == null)
+            if (prop == null) {
                 return 0;
-            else
+            } else {
                 return ((Number) prop.getValue()).floatValue();
+            }
         } catch (Exception e) {
             return 0;
         }
@@ -267,10 +300,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         try {
             NumberProperty prop = (NumberProperty) safeget(name);
-            if (prop == null)
+            if (prop == null) {
                 return 0;
-            else
+            } else {
                 return ((Number) prop.getValue()).doubleValue();
+            }
         } catch (Exception e) {
             return 0;
         }
@@ -288,10 +322,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     {
         try {
             DateProperty prop = (DateProperty) safeget(name);
-            if (prop == null)
+            if (prop == null) {
                 return null;
-            else
+            } else {
                 return (Date) prop.getValue();
+            }
         } catch (Exception e) {
             return null;
         }
@@ -305,17 +340,17 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         safeput(name, property);
     }
 
-    public Set getSetValue(String name)
+    public Set< ? > getSetValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
-        if (prop == null)
-            return new HashSet();
-        else {
-            return new HashSet((Collection) prop.getValue());
+        if (prop == null) {
+            return new HashSet<Object>();
+        } else {
+            return new HashSet<Object>((Collection< ? >) prop.getValue());
         }
     }
 
-    public void setSetValue(String name, Set value)
+    public void setSetValue(String name, Set< ? > value)
     {
         ListProperty property = new ListProperty();
         property.setValue(value);
@@ -325,9 +360,9 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     public List getListValue(String name)
     {
         ListProperty prop = (ListProperty) safeget(name);
-        if (prop == null)
+        if (prop == null) {
             return new ArrayList();
-        else {
+        } else {
             return (List) prop.getValue();
         }
     }
@@ -354,7 +389,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     // but instead our own implementation
     private Map getFields()
     {
-        return fields;
+        return this.fields;
     }
 
     public void setFields(Map fields)
@@ -364,31 +399,31 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public PropertyInterface getField(String name)
     {
-        return (PropertyInterface) fields.get(name);
+        return (PropertyInterface) this.fields.get(name);
     }
 
     public void addField(String name, PropertyInterface element)
     {
-        fields.put(name, element);
+        this.fields.put(name, element);
     }
 
     public void removeField(String name)
     {
         Object field = safeget(name);
         if (field != null) {
-            fields.remove(name);
-            fieldsToRemove.add(field);
+            this.fields.remove(name);
+            this.fieldsToRemove.add(field);
         }
     }
 
     public Collection getFieldList()
     {
-        return fields.values();
+        return this.fields.values();
     }
 
     public Set getPropertyList()
     {
-        return fields.keySet();
+        return this.fields.keySet();
     }
 
     public Object[] getProperties()
@@ -404,8 +439,8 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
     }
 
     /**
-     * Return an iterator that will operate on a collection of values (as would be returned by
-     * getProperties or getFieldList) sorted by their name (ElementInterface.getName()).
+     * Return an iterator that will operate on a collection of values (as would be returned by getProperties or
+     * getFieldList) sorted by their name (ElementInterface.getName()).
      */
     public Iterator getSortedIterator()
     {
@@ -428,6 +463,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return it;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#equals(java.lang.Object)
+     */
+    @Override
     public boolean equals(Object coll)
     {
         if (!super.equals(coll))
@@ -454,6 +495,12 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#clone()
+     */
+    @Override
     public Object clone()
     {
         BaseCollection collection = (BaseCollection) super.clone();
@@ -461,14 +508,14 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         collection.setNumber(getNumber());
         Map fields = getFields();
         Map cfields = new HashMap();
-        Iterator itfields = fields.keySet().iterator();
-        while (itfields.hasNext()) {
-            String name = (String) itfields.next();
-            PropertyInterface prop = (PropertyInterface) ((BaseElement) fields.get(name)).clone();
+        for (Object objEntry : fields.entrySet()) {
+            Map.Entry entry = (Map.Entry) objEntry;
+            PropertyInterface prop = (PropertyInterface) ((BaseElement) entry.getValue()).clone();
             prop.setObject(collection);
-            cfields.put(name, prop);
+            cfields.put(entry.getKey(), prop);
         }
         collection.setFields(cfields);
+
         return collection;
     }
 
@@ -497,43 +544,29 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                 if ((newProperty != null) && (!newProperty.toText().equals(""))) {
                     String newPropertyValue =
                         (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : ((PropertyClass) getxWikiClass(context).getField(propertyName))
-                                .displayView(propertyName, this, context);
-                    difflist.add(new ObjectDiff(getClassName(),
-                        getNumber(),
-                        "added",
-                        propertyName,
-                        "",
+                            : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(propertyName,
+                                this, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "added", propertyName, "",
                         newPropertyValue));
                 }
-            } else if (!oldProperty.toText().equals(
-                ((newProperty == null) ? "" : newProperty.toText()))) {
+            } else if (!oldProperty.toText().equals(((newProperty == null) ? "" : newProperty.toText()))) {
                 // The property exists in both objects and is different
                 BaseClass bclass = getxWikiClass(context);
-                PropertyClass pclass =
-                    (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+                PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
                 if (pclass != null) {
                     // Put the values as they would be displayed in the interface
                     String newPropertyValue =
-                        (newProperty.getValue() instanceof String) ? newProperty.toText()
-                            : pclass.displayView(propertyName, this, context);
+                        (newProperty.getValue() instanceof String) ? newProperty.toText() : pclass.displayView(
+                            propertyName, this, context);
                     String oldPropertyValue =
-                        (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                            : pclass.displayView(propertyName, oldCollection, context);
-                    difflist.add(new ObjectDiff(getClassName(),
-                        getNumber(),
-                        "changed",
-                        propertyName,
-                        oldPropertyValue,
+                        (oldProperty.getValue() instanceof String) ? oldProperty.toText() : pclass.displayView(
+                            propertyName, oldCollection, context);
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed", propertyName, oldPropertyValue,
                         newPropertyValue));
                 } else {
                     // Cannot get property definition, so use the plain value
-                    difflist.add(new ObjectDiff(getClassName(),
-                        getNumber(),
-                        "changed",
-                        propertyName,
-                        oldProperty.toText(),
-                        newProperty.toText()));
+                    difflist.add(new ObjectDiff(getClassName(), getNumber(), "changed", propertyName, oldProperty
+                        .toText(), newProperty.toText()));
                 }
             }
         }
@@ -548,28 +581,19 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
                 // The property exists in the old object, but not in the new one
                 if ((oldProperty != null) && (!oldProperty.toText().equals(""))) {
                     BaseClass bclass = getxWikiClass(context);
-                    PropertyClass pclass =
-                        (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
+                    PropertyClass pclass = (PropertyClass) ((bclass == null) ? null : bclass.getField(propertyName));
                     if (pclass != null) {
                         // Put the values as they would be displayed in the interface
                         String oldPropertyValue =
                             (oldProperty.getValue() instanceof String) ? oldProperty.toText()
-                                : ((PropertyClass) getxWikiClass(context).getField(propertyName))
-                                    .displayView(propertyName, oldCollection, context);
-                        difflist.add(new ObjectDiff(getClassName(),
-                            getNumber(),
-                            "removed",
-                            propertyName,
-                            oldPropertyValue,
-                            ""));
+                                : ((PropertyClass) getxWikiClass(context).getField(propertyName)).displayView(
+                                    propertyName, oldCollection, context);
+                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed", propertyName,
+                            oldPropertyValue, ""));
                     } else {
                         // Cannot get property definition, so use the plain value
-                        difflist.add(new ObjectDiff(getClassName(),
-                            getNumber(),
-                            "removed",
-                            propertyName,
-                            oldProperty.toText(),
-                            ""));
+                        difflist.add(new ObjectDiff(getClassName(), getNumber(), "removed", propertyName, oldProperty
+                            .toText(), ""));
                     }
                 }
             }
@@ -580,7 +604,7 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
 
     public List getFieldsToRemove()
     {
-        return fieldsToRemove;
+        return this.fieldsToRemove;
     }
 
     public void setFieldsToRemove(List fieldsToRemove)
@@ -588,6 +612,11 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
         this.fieldsToRemove = fieldsToRemove;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.ObjectInterface#toXML(com.xpn.xwiki.objects.classes.BaseClass)
+     */
     public abstract Element toXML(BaseClass bclass);
 
     public String toXMLString()
@@ -602,24 +631,31 @@ public abstract class BaseCollection extends BaseElement implements ObjectInterf
             return out.toString();
         } catch (IOException e) {
             e.printStackTrace();
+
             return "";
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
     public String toString()
     {
         return toXMLString();
     }
 
-    public Map getCustomMappingMap() throws XWikiException
+    public Map<String, Object> getCustomMappingMap() throws XWikiException
     {
-        Map map = new HashMap();
-        for (Iterator it = fields.keySet().iterator(); it.hasNext();) {
-            String name = (String) it.next();
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (String name : (Set<String>) this.fields.keySet()) {
             BaseProperty property = (BaseProperty) get(name);
             map.put(name, property.getCustomMappingValue());
         }
-        map.put("id", new Integer(getId()));
+        map.put("id", getId());
+
         return map;
     }
 }

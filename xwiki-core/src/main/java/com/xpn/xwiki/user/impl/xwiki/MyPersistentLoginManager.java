@@ -308,7 +308,7 @@ public class MyPersistentLoginManager extends DefaultPersistentLoginManager
         try {
             md5 = MessageDigest.getInstance("MD5");
 
-            sbValueBeforeMD5.append(username.toString());
+            sbValueBeforeMD5.append(username);
             sbValueBeforeMD5.append(FIELD_SEPARATOR);
             sbValueBeforeMD5.append(password.toString());
             sbValueBeforeMD5.append(FIELD_SEPARATOR);

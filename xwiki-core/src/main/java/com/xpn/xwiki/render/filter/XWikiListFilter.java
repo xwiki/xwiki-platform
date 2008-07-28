@@ -62,12 +62,12 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
     /**
      * Maps a wiki character (bullet) to the html markup printed at the start of the list.
      */
-    private static final Map OPEN_LIST = new HashMap();
+    private static final Map<Character, String> OPEN_LIST = new HashMap<Character, String>();
 
     /**
      * Maps a wiki character (bullet) to the HTML markup printed at the end of the list.
      */
-    private static final Map CLOSE_LIST = new HashMap();
+    private static final Map<Character, String> CLOSE_LIST = new HashMap<Character, String>();
 
     /**
      * HTML markup for unordered list close.
@@ -101,36 +101,35 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
      */
     public XWikiListFilter()
     {
-        super();
-        OPEN_LIST.put(new Character('-'), "<ul class=\"minus\">\n");
-        OPEN_LIST.put(new Character('*'), "<ul class=\"star\">\n");
-        OPEN_LIST.put(new Character('#'), OL_OPEN);
-        OPEN_LIST.put(new Character('i'), "<ol class=\"roman\">\n");
-        OPEN_LIST.put(new Character('I'), "<ol class=\"ROMAN\">\n");
-        OPEN_LIST.put(new Character('a'), "<ol class=\"alpha\">\n");
-        OPEN_LIST.put(new Character('A'), "<ol class=\"ALPHA\">\n");
-        OPEN_LIST.put(new Character('g'), "<ol class=\"greek\">\n");
-        OPEN_LIST.put(new Character('h'), "<ol class=\"hiragana\">\n");
-        OPEN_LIST.put(new Character('H'), "<ol class=\"HIRAGANA\">\n");
-        OPEN_LIST.put(new Character('k'), "<ol class=\"katakana\">\n");
-        OPEN_LIST.put(new Character('K'), "<ol class=\"KATAKANA\">\n");
-        OPEN_LIST.put(new Character('j'), "<ol class=\"HEBREW\">\n");
-        OPEN_LIST.put(new Character('1'), OL_OPEN);
-        CLOSE_LIST.put(new Character('-'), UL_CLOSE);
-        CLOSE_LIST.put(new Character('*'), UL_CLOSE);
-        CLOSE_LIST.put(new Character('#'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('i'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('I'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('a'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('A'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('1'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('g'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('G'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('h'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('H'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('k'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('K'), OL_CLOSE);
-        CLOSE_LIST.put(new Character('j'), OL_CLOSE);
+        OPEN_LIST.put('-', "<ul class=\"minus\">\n");
+        OPEN_LIST.put('*', "<ul class=\"star\">\n");
+        OPEN_LIST.put('#', OL_OPEN);
+        OPEN_LIST.put('i', "<ol class=\"roman\">\n");
+        OPEN_LIST.put('I', "<ol class=\"ROMAN\">\n");
+        OPEN_LIST.put('a', "<ol class=\"alpha\">\n");
+        OPEN_LIST.put('A', "<ol class=\"ALPHA\">\n");
+        OPEN_LIST.put('g', "<ol class=\"greek\">\n");
+        OPEN_LIST.put('h', "<ol class=\"hiragana\">\n");
+        OPEN_LIST.put('H', "<ol class=\"HIRAGANA\">\n");
+        OPEN_LIST.put('k', "<ol class=\"katakana\">\n");
+        OPEN_LIST.put('K', "<ol class=\"KATAKANA\">\n");
+        OPEN_LIST.put('j', "<ol class=\"HEBREW\">\n");
+        OPEN_LIST.put('1', OL_OPEN);
+        CLOSE_LIST.put('-', UL_CLOSE);
+        CLOSE_LIST.put('*', UL_CLOSE);
+        CLOSE_LIST.put('#', OL_CLOSE);
+        CLOSE_LIST.put('i', OL_CLOSE);
+        CLOSE_LIST.put('I', OL_CLOSE);
+        CLOSE_LIST.put('a', OL_CLOSE);
+        CLOSE_LIST.put('A', OL_CLOSE);
+        CLOSE_LIST.put('1', OL_CLOSE);
+        CLOSE_LIST.put('g', OL_CLOSE);
+        CLOSE_LIST.put('G', OL_CLOSE);
+        CLOSE_LIST.put('h', OL_CLOSE);
+        CLOSE_LIST.put('H', OL_CLOSE);
+        CLOSE_LIST.put('k', OL_CLOSE);
+        CLOSE_LIST.put('K', OL_CLOSE);
+        CLOSE_LIST.put('j', OL_CLOSE);
     }
 
     /**
@@ -142,6 +141,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
      * @param context The FilterContext object, used to get access to the Rendering context.
      * @see ListFilter#handleMatch(StringBuffer, org.radeox.regex.MatchResult, org.radeox.filter.context.FilterContext) 
      */
+    @Override
     public void handleMatch(StringBuffer buffer, MatchResult result, FilterContext context)
     {
         try {
@@ -222,7 +222,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
     private void openList(StringBuffer buffer, char type)
     {
         log.debug("opening " + type);
-        buffer.append(OPEN_LIST.get(new Character(type)));
+        buffer.append(OPEN_LIST.get(type));
     }
 
     /**
@@ -234,7 +234,7 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
     private void closeList(StringBuffer buffer, char type)
     {
         log.debug("closing " + type);
-        buffer.append(CLOSE_LIST.get(new Character(type)));
+        buffer.append(CLOSE_LIST.get(type));
     }
 
     /**

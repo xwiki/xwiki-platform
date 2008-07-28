@@ -31,7 +31,7 @@ import org.dom4j.Element;
 import org.dom4j.dom.DOMElement;
 import org.hibernate.collection.PersistentCollection;
 
-public class ListProperty extends BaseProperty
+public class ListProperty extends BaseProperty implements Cloneable
 {
     protected List list = new ArrayList();
 
@@ -47,12 +47,22 @@ public class ListProperty extends BaseProperty
         this.formStringSeparator = formStringSeparator;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#getValue()
+     */
     @Override
     public Object getValue()
     {
         return getList();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#setValue(java.lang.Object)
+     */
     @Override
     public void setValue(Object value)
     {
@@ -70,6 +80,7 @@ public class ListProperty extends BaseProperty
         if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
             return "";
         }
+
         return StringUtils.join(getList().toArray(), " ");
     }
 
@@ -78,6 +89,11 @@ public class ListProperty extends BaseProperty
         return super.toFormString();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#toFormString()
+     */
     @Override
     public String toFormString()
     {
@@ -95,9 +111,15 @@ public class ListProperty extends BaseProperty
             result.append(this.formStringSeparator);
             result.append(filter.process((String) it.next()));
         }
+
         return result.toString();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#equals(java.lang.Object)
+     */
     @Override
     public boolean equals(Object obj)
     {
@@ -130,9 +152,15 @@ public class ListProperty extends BaseProperty
                 return false;
             }
         }
+
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#clone()
+     */
     @Override
     public Object clone()
     {
@@ -142,6 +170,7 @@ public class ListProperty extends BaseProperty
             list.add(it.next());
         }
         property.setValue(list);
+
         return property;
     }
 
@@ -166,6 +195,11 @@ public class ListProperty extends BaseProperty
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#toXML()
+     */
     @Override
     public Element toXML()
     {
@@ -176,20 +210,28 @@ public class ListProperty extends BaseProperty
             if (obj != null) {
                 String value = obj.toString();
                 Element vel = new DOMElement("value");
-                vel.setText((value == null) ? "" : value.toString());
+                vel.setText((value == null) ? "" : value);
                 el.add(vel);
             }
         }
+
         return el;
     }
 
-    // This is important.. Otherwise we can get a stackoverflow calling toXML()
+    /**
+     * {@inheritDoc}
+     * <p>
+     * This is important.. Otherwise we can get a stackoverflow calling toXML()
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#toString()
+     */
     @Override
     public String toString()
     {
         if ((getList() instanceof PersistentCollection) && (!((PersistentCollection) getList()).wasInitialized())) {
             return "";
         }
+
         return toXMLString();
     }
 }

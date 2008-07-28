@@ -21,7 +21,7 @@
 
 package com.xpn.xwiki.objects;
 
-public class BaseStringProperty extends BaseProperty
+public class BaseStringProperty extends BaseProperty implements Cloneable
 {
     private String value;
 
@@ -29,25 +29,46 @@ public class BaseStringProperty extends BaseProperty
     {
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#getValue()
+     */
     public Object getValue()
     {
-        return value;
+        return this.value;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#setValue(java.lang.Object)
+     */
     public void setValue(Object value)
     {
         this.value = (String) value;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#toText()
+     */
     public String toText()
     {
         String value = (String) getValue();
         if (value != null) {
             return value;
         }
+
         return "";
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#equals(java.lang.Object)
+     */
     public boolean equals(Object obj)
     {
         if (!super.equals(obj)) {
@@ -61,10 +82,16 @@ public class BaseStringProperty extends BaseProperty
         return getValue().equals(((BaseStringProperty) obj).getValue());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseProperty#clone()
+     */
     public Object clone()
     {
         BaseStringProperty property = (BaseStringProperty) super.clone();
         property.setValue(getValue());
+
         return property;
     }
 }

@@ -35,108 +35,177 @@ import java.io.StringWriter;
 
 // TODO: shouldn't this be abstract? toFormString and toText
 // will never work unless getValue is overriden
-public class BaseProperty extends BaseElement implements PropertyInterface, Serializable {
+public class BaseProperty extends BaseElement implements PropertyInterface, Serializable, Cloneable
+{
     private BaseCollection object;
+
     private int id;
 
-    public BaseCollection getObject() {
-        return object;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.PropertyInterface#getObject()
+     */
+    public BaseCollection getObject()
+    {
+        return this.object;
     }
 
-    public void setObject(BaseCollection object) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.PropertyInterface#setObject(com.xpn.xwiki.objects.BaseCollection)
+     */
+    public void setObject(BaseCollection object)
+    {
         this.object = object;
     }
 
-    public boolean equals(Object el) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#equals(java.lang.Object)
+     */
+    public boolean equals(Object el)
+    {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
-        if ((object==null)||((BaseProperty)el).getObject()==null) {
-            return (hashCode()==el.hashCode());
+        if ((this.object == null) || ((BaseProperty) el).getObject() == null) {
+            return (hashCode() == el.hashCode());
         }
 
         if (!super.equals(el))
             return false;
 
-        return (getId()==((BaseProperty)el).getId());
+        return (getId() == ((BaseProperty) el).getId());
     }
 
-    public int getId() {
+    public int getId()
+    {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
-        if (object==null)
-          return id;
-        else
-         return getObject().getId();
+        if (this.object == null) {
+            return this.id;
+        } else {
+            return getObject().getId();
+        }
     }
 
-    public void setId(int id) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.PropertyInterface#setId(int)
+     */
+    public void setId(int id)
+    {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
         this.id = id;
     }
 
-    public int hashCode() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
         // I hate this.. needed for hibernate to find the object
         // when loading the collections..
-       return ("" + getId() + getName()).hashCode();
+        return ("" + getId() + getName()).hashCode();
     }
-    
-    public String getClassType() {
+
+    public String getClassType()
+    {
         return getClass().getName();
     }
 
-    public void setClassType(String type) {
+    public void setClassType(String type)
+    {
     }
 
-    public Object clone() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseElement#clone()
+     */
+    public Object clone()
+    {
         BaseProperty property = (BaseProperty) super.clone();
         property.setObject(getObject());
         return property;
     }
 
-    public Object getValue() {
+    public Object getValue()
+    {
         return null;
     }
 
-    public void setValue(Object value) {
+    public void setValue(Object value)
+    {
     }
 
-    public Element toXML() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.PropertyInterface#toXML()
+     */
+    public Element toXML()
+    {
         Element el = new DOMElement(getName());
         Object value = getValue();
-        el.setText( (value==null) ? "" : value.toString());
+        el.setText((value == null) ? "" : value.toString());
+
         return el;
     }
 
-    public String toFormString() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.PropertyInterface#toFormString()
+     */
+    public String toFormString()
+    {
         return Utils.formEncode(toText());
     }
 
-    public String toText() {
+    public String toText()
+    {
         Object value = getValue();
-        return (value==null) ? "" : value.toString();
+
+        return (value == null) ? "" : value.toString();
     }
 
-    public String toXMLString() {
+    public String toXMLString()
+    {
         Document doc = new DOMDocument();
         doc.setRootElement(toXML());
         OutputFormat outputFormat = new OutputFormat("", true);
         StringWriter out = new StringWriter();
-        XMLWriter writer = new XMLWriter( out, outputFormat );
+        XMLWriter writer = new XMLWriter(out, outputFormat);
         try {
             writer.write(doc);
+
             return out.toString();
         } catch (IOException e) {
             e.printStackTrace();
+
             return "";
         }
     }
 
-    public String toString() {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#toString()
+     */
+    public String toString()
+    {
         return toXMLString();
     }
 
-    public Object getCustomMappingValue() {
+    public Object getCustomMappingValue()
+    {
         return getValue();
     }
 }

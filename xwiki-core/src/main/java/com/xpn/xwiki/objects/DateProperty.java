@@ -27,54 +27,65 @@ import org.dom4j.dom.DOMElement;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
-public class DateProperty extends BaseProperty {
+public class DateProperty extends BaseProperty implements Cloneable
+{
     private Date value;
 
-    public DateProperty() {
+    public DateProperty()
+    {
     }
 
-    public Object getValue() {
+    public Object getValue()
+    {
         return value;
     }
 
-    public Element toXML() {
+    public Element toXML()
+    {
         Element el = new DOMElement(getName());
         el.setText(toXMLString());
         return el;
     }
 
-    public String toXMLString() {
+    public String toXMLString()
+    {
         try {
-         return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")).format(getValue());
+            return (new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.S")).format(getValue());
         } catch (Exception e) {
             return "";
         }
     }
 
-    public void setValue(Object value) {
-        this.value = (Date)value;
+    public void setValue(Object value)
+    {
+        this.value = (Date) value;
     }
 
-    public String toText() {
-        Date d = (Date)getValue();
-        return (d==null) ? "" : d.toString();
+    public String toText()
+    {
+        Date d = (Date) getValue();
+
+        return (d == null) ? "" : d.toString();
     }
 
-    public boolean equals(Object obj) {
-        if (!super.equals(obj))
-         return false;
+    public boolean equals(Object obj)
+    {
+        if (!super.equals(obj)) {
+            return false;
+        }
 
-       if ((getValue()==null)
-            && (((DateProperty)obj).getValue()==null))
-         return true;
+        if ((getValue() == null) && (((DateProperty) obj).getValue() == null)) {
+            return true;
+        }
 
-       return getValue().equals(((DateProperty)obj).getValue());
+        return getValue().equals(((DateProperty) obj).getValue());
     }
 
-    public Object clone() {
+    public Object clone()
+    {
         DateProperty property = (DateProperty) super.clone();
         property.setValue(getValue());
+
         return property;
     }
 

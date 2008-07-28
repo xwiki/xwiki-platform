@@ -46,7 +46,7 @@ import org.suigeneris.jrcs.rcs.Version;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public class XWikiAttachment
+public class XWikiAttachment implements Cloneable
 {
     private static final Log LOG = LogFactory.getLog(XWikiAttachment.class);
 
@@ -79,19 +79,20 @@ public class XWikiAttachment
 
     public XWikiAttachment()
     {
-        filesize = 0;
-        filename = "";
-        author = "";
-        comment = "";
-        date = new Date();
+        this.filesize = 0;
+        this.filename = "";
+        this.author = "";
+        this.comment = "";
+        this.date = new Date();
     }
 
     public long getId()
     {
-        if (doc == null)
-            return filename.hashCode();
-        else
-            return (doc.getFullName() + "/" + filename).hashCode();
+        if (this.doc == null) {
+            return this.filename.hashCode();
+        } else {
+            return (this.doc.getFullName() + "/" + this.filename).hashCode();
+        }
     }
 
     public void setDocId(long id)
@@ -100,13 +101,18 @@ public class XWikiAttachment
 
     public long getDocId()
     {
-        return doc.getId();
+        return this.doc.getId();
     }
 
     public void setId(long id)
     {
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Object#clone()
+     */
     public Object clone()
     {
         XWikiAttachment attachment = null;
@@ -125,21 +131,20 @@ public class XWikiAttachment
         attachment.setFilesize(getFilesize());
         attachment.setRCSVersion(getRCSVersion());
         if (getAttachment_content() != null) {
-            attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content()
-                .clone());
+            attachment.setAttachment_content((XWikiAttachmentContent) getAttachment_content().clone());
             attachment.getAttachment_content().setAttachment(attachment);
         }
         if (getAttachment_archive() != null) {
-            attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive()
-                .clone());
+            attachment.setAttachment_archive((XWikiAttachmentArchive) getAttachment_archive().clone());
             attachment.getAttachment_archive().setAttachment(attachment);
         }
+
         return attachment;
     }
 
     public int getFilesize()
     {
-        return filesize;
+        return this.filesize;
     }
 
     public void setFilesize(int filesize)
@@ -147,12 +152,13 @@ public class XWikiAttachment
         if (filesize != this.filesize) {
             setMetaDataDirty(true);
         }
+
         this.filesize = filesize;
     }
 
     public String getFilename()
     {
-        return filename;
+        return this.filename;
     }
 
     public void setFilename(String filename)
@@ -166,7 +172,7 @@ public class XWikiAttachment
 
     public String getAuthor()
     {
-        return author;
+        return this.author;
     }
 
     public void setAuthor(String author)
@@ -174,6 +180,7 @@ public class XWikiAttachment
         if (!author.equals(this.author)) {
             setMetaDataDirty(true);
         }
+
         this.author = author;
     }
 
@@ -189,18 +196,20 @@ public class XWikiAttachment
 
     public String getNextVersion()
     {
-        if (version == null)
+        if (this.version == null) {
             return "1.1";
-        else
-            return ((Version) version.clone()).next().toString();
+        } else {
+            return ((Version) this.version.clone()).next().toString();
+        }
     }
 
     public Version getRCSVersion()
     {
-        if (version == null) {
+        if (this.version == null) {
             return new Version("1.1");
         }
-        return (Version) version.clone();
+
+        return (Version) this.version.clone();
     }
 
     public void setRCSVersion(Version version)
@@ -210,7 +219,7 @@ public class XWikiAttachment
 
     public String getComment()
     {
-        return comment != null ? comment : "";
+        return this.comment != null ? this.comment : "";
     }
 
     public void setComment(String comment)
@@ -218,12 +227,13 @@ public class XWikiAttachment
         if (!getComment().equals(comment)) {
             setMetaDataDirty(true);
         }
+
         this.comment = comment;
     }
 
     public XWikiDocument getDoc()
     {
-        return doc;
+        return this.doc;
     }
 
     public void setDoc(XWikiDocument doc)
@@ -233,46 +243,48 @@ public class XWikiAttachment
 
     public Date getDate()
     {
-        return date;
+        return this.date;
     }
 
     public void setDate(Date date)
     {
         // Make sure we drop milliseconds for consistency with the database
-        if (date != null)
+        if (date != null) {
             date.setTime((date.getTime() / 1000) * 1000);
+        }
+
         this.date = date;
     }
 
     public boolean isContentDirty()
     {
-        if (attachment_content == null)
+        if (this.attachment_content == null)
             return false;
         else
-            return attachment_content.isContentDirty();
+            return this.attachment_content.isContentDirty();
     }
 
     public void incrementVersion()
     {
-        if (version == null)
-            version = new Version("1.1");
-        else {
-            version = version.next();
+        if (this.version == null) {
+            this.version = new Version("1.1");
+        } else {
+            this.version = this.version.next();
         }
     }
 
     public boolean isMetaDataDirty()
     {
-        return isMetaDataDirty;
+        return this.isMetaDataDirty;
     }
 
     public void setMetaDataDirty(boolean metaDataDirty)
     {
-        isMetaDataDirty = metaDataDirty;
+        this.isMetaDataDirty = metaDataDirty;
     }
 
-    public String toStringXML(boolean bWithAttachmentContent, boolean bWithVersions,
-        XWikiContext context) throws XWikiException
+    public String toStringXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
+        throws XWikiException
     {
         // implement
         Element ele = toXML(bWithAttachmentContent, bWithVersions, context);
@@ -300,8 +312,8 @@ public class XWikiAttachment
         return toXML(false, false, context);
     }
 
-    public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions,
-        XWikiContext context) throws XWikiException
+    public Element toXML(boolean bWithAttachmentContent, boolean bWithVersions, XWikiContext context)
+        throws XWikiException
     {
         Element docel = new DOMElement("attachment");
         Element el = new DOMElement("filename");
@@ -357,6 +369,7 @@ public class XWikiAttachment
                 docel.add(el);
             }
         }
+
         return docel;
     }
 
@@ -368,11 +381,8 @@ public class XWikiAttachment
             StringReader in = new StringReader(data);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC,
-                XWikiException.ERROR_DOC_XML_PARSING,
-                "Error parsing xml",
-                e,
-                null);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_DOC, XWikiException.ERROR_DOC_XML_PARSING,
+                "Error parsing xml", e, null);
         }
         Element docel = domdoc.getRootElement();
         fromXML(docel);
@@ -405,7 +415,7 @@ public class XWikiAttachment
 
     public XWikiAttachmentContent getAttachment_content()
     {
-        return attachment_content;
+        return this.attachment_content;
     }
 
     public void setAttachment_content(XWikiAttachmentContent attachment_content)
@@ -415,7 +425,7 @@ public class XWikiAttachment
 
     public XWikiAttachmentArchive getAttachment_archive()
     {
-        return attachment_archive;
+        return this.attachment_archive;
     }
 
     public void setAttachment_archive(XWikiAttachmentArchive attachment_archive)
@@ -425,37 +435,40 @@ public class XWikiAttachment
 
     public byte[] getContent(XWikiContext context) throws XWikiException
     {
-        if (attachment_content == null) {
-            doc.loadAttachmentContent(this, context);
+        if (this.attachment_content == null) {
+            this.doc.loadAttachmentContent(this, context);
         }
 
-        return attachment_content.getContent();
+        return this.attachment_content.getContent();
     }
 
     public Archive getArchive()
     {
-        if (attachment_archive == null)
+        if (this.attachment_archive == null) {
             return null;
-        else
-            return attachment_archive.getRCSArchive();
+        } else {
+            return this.attachment_archive.getRCSArchive();
+        }
     }
 
     public void setArchive(Archive archive)
     {
-        if (attachment_archive == null) {
-            attachment_archive = new XWikiAttachmentArchive();
-            attachment_archive.setAttachment(this);
+        if (this.attachment_archive == null) {
+            this.attachment_archive = new XWikiAttachmentArchive();
+            this.attachment_archive.setAttachment(this);
         }
-        attachment_archive.setRCSArchive(archive);
+
+        this.attachment_archive.setRCSArchive(archive);
     }
 
     public void setArchive(String data) throws XWikiException
     {
-        if (attachment_archive == null) {
-            attachment_archive = new XWikiAttachmentArchive();
-            attachment_archive.setAttachment(this);
+        if (this.attachment_archive == null) {
+            this.attachment_archive = new XWikiAttachmentArchive();
+            this.attachment_archive.setAttachment(this);
         }
-        attachment_archive.setArchive(data.getBytes());
+
+        this.attachment_archive.setArchive(data.getBytes());
     }
 
     public synchronized Version[] getVersions()
@@ -463,8 +476,9 @@ public class XWikiAttachment
         try {
             return getAttachment_archive().getVersions();
         } catch (Exception ex) {
-            LOG.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s",
-                getFilename(), getDoc().getFullName(), ex.getMessage()));
+            LOG.warn(String.format("Cannot retrieve versions of attachment [%s@%s]: %s", getFilename(), getDoc()
+                .getFullName(), ex.getMessage()));
+
             return new Version[] {new Version(this.getVersion())};
         }
     }
@@ -482,53 +496,54 @@ public class XWikiAttachment
             }
             v.next();
         }
+
         return list;
     }
 
     public void setContent(byte[] data)
     {
-        if (attachment_content == null) {
-            attachment_content = new XWikiAttachmentContent();
-            attachment_content.setAttachment(this);
+        if (this.attachment_content == null) {
+            this.attachment_content = new XWikiAttachmentContent();
+            this.attachment_content.setAttachment(this);
         }
-        attachment_content.setContent(data);
+
+        this.attachment_content.setContent(data);
     }
 
     public void loadContent(XWikiContext context) throws XWikiException
     {
-        if (attachment_content == null) {
+        if (this.attachment_content == null) {
             try {
                 context.getWiki().getAttachmentStore().loadAttachmentContent(this, context, true);
             } catch (Exception ex) {
                 LOG.warn(String.format("Failed to load content for attachment [%s@%s]. "
-                    + "This attachment is broken, please consider re-uploading it. "
-                    + "Internal error: %s", getFilename(), (doc != null) ? doc.getFullName()
-                    : "<unknown>", ex.getMessage()));
+                    + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
+                    getFilename(), (doc != null) ? doc.getFullName() : "<unknown>", ex.getMessage()));
             }
         }
     }
 
     public XWikiAttachmentArchive loadArchive(XWikiContext context) throws XWikiException
     {
-        if (attachment_archive == null) {
+        if (this.attachment_archive == null) {
             try {
-                attachment_archive =
-                    context.getWiki().getAttachmentVersioningStore().loadArchive(this, context,
-                        true);
+                this.attachment_archive =
+                    context.getWiki().getAttachmentVersioningStore().loadArchive(this, context, true);
             } catch (Exception ex) {
                 LOG.warn(String.format("Failed to load archive for attachment [%s@%s]. "
-                    + "This attachment is broken, please consider re-uploading it. "
-                    + "Internal error: %s", getFilename(), (doc != null) ? doc.getFullName()
-                    : "<unknown>", ex.getMessage()));
+                    + "This attachment is broken, please consider re-uploading it. " + "Internal error: %s",
+                    getFilename(), (doc != null) ? doc.getFullName() : "<unknown>", ex.getMessage()));
             }
         }
-        return attachment_archive;
+
+        return this.attachment_archive;
     }
 
     public void updateContentArchive(XWikiContext context) throws XWikiException
     {
-        if (attachment_content == null)
+        if (this.attachment_content == null) {
             return;
+        }
 
         loadArchive(context).updateArchive(getContent(context), context);
     }
@@ -537,27 +552,29 @@ public class XWikiAttachment
     {
         // Choose the right content type
         String mimetype = context.getEngineContext().getMimeType(getFilename().toLowerCase());
-        if (mimetype != null)
+        if (mimetype != null) {
             return mimetype;
-        else
+        } else {
             return "application/octet-stream";
+        }
     }
 
     public boolean isImage(XWikiContext context)
     {
         String contenttype = getMimeType(context);
-        if (contenttype.startsWith("image/"))
+        if (contenttype.startsWith("image/")) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
-    public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context)
-        throws XWikiException
+    public XWikiAttachment getAttachmentRevision(String rev, XWikiContext context) throws XWikiException
     {
         if (StringUtils.equals(rev, this.getVersion())) {
             return this;
         }
+
         return loadArchive(context).getRevision(this, rev, context);
     }
 

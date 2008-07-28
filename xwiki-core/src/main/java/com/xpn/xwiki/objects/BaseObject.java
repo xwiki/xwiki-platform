@@ -34,62 +34,69 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.PropertyClass;
 
-public class BaseObject extends BaseCollection implements ObjectInterface, Serializable
+public class BaseObject extends BaseCollection implements ObjectInterface, Serializable, Cloneable
 {
-
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#hashCode()
+     */
     public int hashCode()
     {
         String str = getName() + getClassName();
         int nb = getNumber();
-        if (nb > 0)
+        if (nb > 0) {
             str += "_" + nb;
+        }
+
         return str.hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#setId(int)
+     */
     public void setId(int id)
     {
     }
 
-    public void displayHidden(StringBuffer buffer, String name, String prefix,
-        XWikiContext context)
+    public void displayHidden(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
-        ((PropertyClass) getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix,
-            this, context);
+        ((PropertyClass) getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
     }
 
     public void displayView(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
-        ((PropertyClass) getxWikiClass(context).get(name)).displayView(buffer, name, prefix,
-            this, context);
+        ((PropertyClass) getxWikiClass(context).get(name)).displayView(buffer, name, prefix, this, context);
     }
 
     public void displayEdit(StringBuffer buffer, String name, String prefix, XWikiContext context)
     {
-        ((PropertyClass) getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix,
-            this, context);
+        ((PropertyClass) getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
     }
 
     public String displayHidden(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix,
-            this, context);
+        ((PropertyClass) getxWikiClass(context).get(name)).displayHidden(buffer, name, prefix, this, context);
+
         return buffer.toString();
     }
 
     public String displayView(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getxWikiClass(context).get(name)).displayView(buffer, name, prefix,
-            this, context);
+        ((PropertyClass) getxWikiClass(context).get(name)).displayView(buffer, name, prefix, this, context);
+
         return buffer.toString();
     }
 
     public String displayEdit(String name, String prefix, XWikiContext context)
     {
         StringBuffer buffer = new StringBuffer();
-        ((PropertyClass) getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix,
-            this, context);
+        ((PropertyClass) getxWikiClass(context).get(name)).displayEdit(buffer, name, prefix, this, context);
+
         return buffer.toString();
     }
 
@@ -108,23 +115,41 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         return displayEdit(name, "", context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#clone()
+     */
     public Object clone()
     {
         BaseObject object = (BaseObject) super.clone();
+
         return object;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#equals(java.lang.Object)
+     */
     public boolean equals(Object obj)
     {
-        if (!super.equals(obj))
+        if (!super.equals(obj)) {
             return false;
+        }
 
-        if (getNumber() != ((BaseObject) obj).getNumber())
+        if (getNumber() != ((BaseObject) obj).getNumber()) {
             return false;
+        }
 
         return true;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.objects.BaseCollection#toXML(com.xpn.xwiki.objects.classes.BaseClass)
+     */
     public Element toXML(BaseClass bclass)
     {
         Element oel = new DOMElement("object");
@@ -150,7 +175,7 @@ public class BaseObject extends BaseCollection implements ObjectInterface, Seria
         el.addText(getClassName());
         oel.add(el);
 
-        // Iterate over values/properties sorted by field name so that the values are 
+        // Iterate over values/properties sorted by field name so that the values are
         // exported to XML in a consistent order.
         Iterator it = getSortedIterator();
         while (it.hasNext()) {

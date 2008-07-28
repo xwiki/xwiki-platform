@@ -34,7 +34,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.EscapeBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 
@@ -81,9 +81,9 @@ public class XMLBlockConverterHandler extends DefaultHandler
     {
         String content = new String(ch, start, length);
 
-        // If we've been told by the user to not render wiki syntax we escape it.
+        // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
         if (this.escapeWikiSyntax) {
-            this.stack.peek().addChild(new EscapeBlock(content));
+            this.stack.peek().addChild(new WordBlock(content));
         } else {
 
             XDOM dom;

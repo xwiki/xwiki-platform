@@ -69,10 +69,10 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
 
     public void testMacroEscapeWikiSyntax() throws Exception
     {
-        String html = "**escaped**";
+        String html = "**some escaped text**";
 
         String expected = "beginDocument\n"
-            + "onEscape: [**escaped**]\n"
+            + "onWord: [**some escaped text**]\n"
             + "endDocument\n";
 
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");

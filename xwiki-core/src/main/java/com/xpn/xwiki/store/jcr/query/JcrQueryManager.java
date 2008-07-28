@@ -44,7 +44,7 @@ public class JcrQueryManager extends AbstractQueryManager implements Initializab
      */
     public void initialize() throws InitializationException
     {
-        queriesBundle = ResourceBundle.getBundle("JcrQueries");
+        this.queriesBundle = ResourceBundle.getBundle("JcrQueries");
     }
 
     /**
@@ -52,7 +52,7 @@ public class JcrQueryManager extends AbstractQueryManager implements Initializab
      */
     public Query getNamedQuery(String queryName)
     {
-        String statement = queriesBundle.getString(queryName);
+        String statement = this.queriesBundle.getString(queryName);
         return createQuery(statement, Query.XPATH);
     }
 }

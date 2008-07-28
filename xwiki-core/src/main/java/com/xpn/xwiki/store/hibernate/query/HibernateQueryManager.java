@@ -52,7 +52,7 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
      */
     public HibernateQueryManager()
     {
-        languages.add(Query.HQL);
+        this.languages.add(Query.HQL);
     }
 
     /**
@@ -60,7 +60,7 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
      */
     public void initialize() throws InitializationException
     {
-        sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(mappingPath));
+        this.sessionFactory.getConfiguration().addInputStream(Util.getResourceAsStream(this.mappingPath));
     }
 
     /**

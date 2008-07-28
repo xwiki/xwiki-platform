@@ -26,33 +26,43 @@ import java.util.Set;
 
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
+import org.xwiki.component.phase.Composable;
 
 /**
  * This is abstract QueryManager implementation.
  * It uses ComponentManager for create Queries by hint=language.
  * Named queries are not implemented here because they are storage-specific.
+ * 
  * @version $Id$
  * @since 1.6M1
  */
-public abstract class AbstractQueryManager implements QueryManager
+public abstract class AbstractQueryManager implements QueryManager, Composable
 {
     /**
-     * field for supported languages.
+     * Field for supported languages.
      */
     protected Set<String> languages = new HashSet<String>();
 
     /**
      * Component manager used for creating queries as components.
-     * Injected.
      */
     protected ComponentManager componentManager;
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
+     */
+    public void compose(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+    }
 
     /**
      * {@inheritDoc}
      */
     public Collection<String> getLanguages()
     {
-        return Collections.unmodifiableCollection(languages);
+        return Collections.unmodifiableCollection(this.languages);
     }
 
     /**
@@ -60,7 +70,7 @@ public abstract class AbstractQueryManager implements QueryManager
      */
     public boolean hasLanguage(String language)
     {
-        return languages.contains(language);
+        return this.languages.contains(language);
     }
 
     /**
@@ -70,7 +80,7 @@ public abstract class AbstractQueryManager implements QueryManager
     {
         Query query;
         try {
-            query = (Query) componentManager.lookup(Query.ROLE, language);
+            query = (Query) this.componentManager.lookup(Query.ROLE, language);
         } catch (ComponentLookupException e) {
             throw new RuntimeException(e);
         }

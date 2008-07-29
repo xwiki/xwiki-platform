@@ -28,7 +28,7 @@
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
     <version>18-SNAPSHOT</version>
-    <relativePath>../xwiki-platform-pom</relativePath>
+    <relativePath>../pom</relativePath>
   </parent>
   <artifactId>xwiki-core-parent</artifactId>
   <name>XWiki Platform - Core - Parent POM</name>
@@ -36,9 +36,9 @@
   <version>1.6-SNAPSHOT</version>
   <description>XWiki Platform - Core - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/trunk</url>
   </scm>
   <dependencies>
     <dependency>

@@ -21,9 +21,6 @@ package com.xpn.xwiki.store.jcr.query;
 
 import java.util.ResourceBundle;
 
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
-
 import com.xpn.xwiki.store.query.AbstractQueryManager;
 import com.xpn.xwiki.store.query.Query;
 
@@ -32,20 +29,12 @@ import com.xpn.xwiki.store.query.Query;
  * @version $Id$
  * @since 1.6M1
  */
-public class JcrQueryManager extends AbstractQueryManager implements Initializable
+public class JcrQueryManager extends AbstractQueryManager
 {
     /**
      * Used for get named queries.
      */
-    ResourceBundle queriesBundle;
-
-    /**
-     * {@inheritDoc}
-     */
-    public void initialize() throws InitializationException
-    {
-        this.queriesBundle = ResourceBundle.getBundle("JcrQueries");
-    }
+    ResourceBundle queriesBundle = ResourceBundle.getBundle("JcrQueries");
 
     /**
      * {@inheritDoc}

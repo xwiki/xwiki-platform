@@ -477,7 +477,9 @@ public interface XWikiStoreInterface
     List getTranslationList(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
     /**
-     * @return QueryManager for this store.
+     * @return QueryManager used for creating queries to store.
+     * Use QueryManager instead of #search* methods because it is more abstract from store implementation 
+     *  and support multiple query languages.
      */
     QueryManager getQueryManager();
 }

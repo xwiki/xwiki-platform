@@ -19,6 +19,7 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
+import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 
@@ -26,7 +27,6 @@ import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.query.AbstractQueryManager;
 import com.xpn.xwiki.store.query.Query;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
 
 /**
  * QueryManager implementation for Hibernate Store.
@@ -68,8 +68,13 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
      */
     public Query getNamedQuery(String queryName)
     {
-        HibernateNamedQuery query = (HibernateNamedQuery) Utils.getComponent(Query.ROLE, HibernateNamedQuery.hint);
-        query.setStatement(queryName);
-        return query;
+        try {
+            HibernateNamedQuery query = (HibernateNamedQuery) this.componentManager
+                .lookup(Query.ROLE, HibernateNamedQuery.hint);
+            query.setStatement(queryName);
+            return query;
+        } catch (ComponentLookupException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -28,7 +28,7 @@
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
     <version>18-SNAPSHOT</version>
-    <relativePath>../xwiki-platform-pom</relativePath>
+    <relativePath>../pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform.tools</groupId>
   <artifactId>xwiki-tools</artifactId>
@@ -37,9 +37,9 @@
   <packaging>pom</packaging>
   <description>XWiki Tools</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-tools/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</url>
   </scm>
   <modules>
     <module>xwiki-license-resources</module>

@@ -503,30 +503,33 @@ public final class StatsUtil
 
         QueryManager qm = context.getWiki().getStore().getQueryManager();
         List<VisitStats> solist = null;
+        final String sfieldValue = "fieldValue";
+        final String sdate = "date";
         if (qm.hasLanguage(Query.XPATH)) {
             try {
-                solist = qm.createQuery("//element(*, xwiki:object)[@:{fieldName}=:{fieldValue}" +
-                    " and @endDate>:{date}]  order by @endDate descending", Query.XPATH)
+                solist = qm.createQuery("//element(*, xwiki:object)[@:{fieldName}=:{fieldValue}"
+                    + " and @endDate>:{date}]  order by @endDate descending", Query.XPATH)
                     .bindValue("fieldName", fieldName)
-                    .bindValue("fieldValue", fieldValue)
-                    .bindValue("date", currentDate)
-                    .execute();                
+                    .bindValue(sfieldValue, fieldValue)
+                    .bindValue(sdate, currentDate)
+                    .execute();
             } catch (Exception e) {
                 LOG.error("Failed to search visit object in the jcr store from cookie name", e);
             }
-        } else if (qm.hasLanguage(Query.HQL)){
+        } else if (qm.hasLanguage(Query.HQL)) {
             try {
-                solist = qm.createQuery("from VisitStats as obj " +
-                    "where obj." + fieldName + "=:fieldValue and obj.endDate > :date" +
-                    " order by obj.endDate desc", Query.HQL)
-                    .bindValue("fieldValue", fieldValue)
-                    .bindValue("date", currentDate)
+                solist = qm.createQuery("from VisitStats as obj "
+                    + "where obj." + fieldName + "=:fieldValue and obj.endDate > :date"
+                    + " order by obj.endDate desc", Query.HQL)
+                    .bindValue(sfieldValue, fieldValue)
+                    .bindValue(sdate, currentDate)
                     .execute();
             } catch (Exception e) {
                 LOG.error("Failed to search visit object in the database from " + fieldName, e);
             }
-        } else
+        } else {
             throw new NotImplementedException();
+        }
         if (solist != null && solist.size() > 0) {
             visitStats = (VisitStats) solist.get(0);
         }

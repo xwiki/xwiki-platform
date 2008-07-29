@@ -30,10 +30,10 @@ import org.xwiki.context.Execution;
  * the new Execution Context and the old XWikiContext. This allows code that uses XWikiContext to be
  * tested using this Test Case class.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1 
  */
-public class AbstractBridgedXWikiComponentTestCase extends AbstractXWikiComponentTestCase
+public abstract class AbstractBridgedXWikiComponentTestCase extends AbstractXWikiComponentTestCase
 {
     private XWikiContext context;
 

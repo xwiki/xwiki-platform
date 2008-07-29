@@ -28,7 +28,7 @@
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
     <version>18-SNAPSHOT</version>
-    <relativePath>../xwiki-platform-pom</relativePath>
+    <relativePath>../pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform.plugins</groupId>
   <artifactId>xwiki-plugins</artifactId>
@@ -37,9 +37,9 @@
   <version>9-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - Parent POM</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/xwiki-plugins/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/trunk</url>
   </scm>
   <profiles>
     <profile>

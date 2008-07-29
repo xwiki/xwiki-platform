@@ -67,24 +67,24 @@ public class XWikiDocument
 
         Element docel = domdoc.getRootElement();
 
-        Element name = docel.element("name");
-        if (name != null) {
-            this.name = name.getText();
+        Element elementName = docel.element("name");
+        if (elementName != null) {
+            this.name = elementName.getText();
         }
 
-        Element space = docel.element("web");
-        if (space != null) {
-            this.space = space.getText();
+        Element elementSpace = docel.element("web");
+        if (elementSpace != null) {
+            this.space = elementSpace.getText();
         }
 
-        Element language = docel.element("language");
-        if (language != null) {
-            this.language = language.getText();
+        Element elementLanguage = docel.element("elementLanguage");
+        if (elementLanguage != null) {
+            this.language = elementLanguage.getText();
         }
 
-        Element defaultLanguage = docel.element("defaultLanguage");
-        if (defaultLanguage != null) {
-            this.defaultLanguage = defaultLanguage.getText();
+        Element elementDefaultLanguage = docel.element("elementDefaultLanguage");
+        if (elementDefaultLanguage != null) {
+            this.defaultLanguage = elementDefaultLanguage.getText();
         }
     }
 

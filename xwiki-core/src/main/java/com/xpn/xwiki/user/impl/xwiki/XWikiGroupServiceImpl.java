@@ -29,6 +29,11 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.commons.lang.NotImplementedException;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiContext;
@@ -40,19 +45,10 @@ import com.xpn.xwiki.notify.XWikiNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.ListClass;
-import com.xpn.xwiki.plugin.query.QueryPlugin;
-import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
+import com.xpn.xwiki.store.query.Query;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.web.Utils;
-
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
 
 /**
  * Default implementation of {@link XWikiGroupService} users and groups manager.
@@ -173,18 +169,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 list = this.groupCache.get(key);
 
                 if (list == null) {
-                    if (context.getWiki().getNotCacheStore() instanceof XWikiHibernateStore) {
-                        list =
-                            context.getWiki().getStore().searchDocumentsNames(
-                                ", BaseObject as obj, StringProperty as prop " + "where obj.name="
-                                    + context.getWiki().getFullNameSQL() + " and obj.className='XWiki.XWikiGroups' "
-                                    + "and obj.id = prop.id.id and prop.id.name='member' " + "and (prop.value='"
-                                    + Utils.SQLFilter(username) + "' or prop.value='" + Utils.SQLFilter(shortname)
-                                    + "' or prop.value='" + Utils.SQLFilter(veryshortname) + "')", context);
-                    } else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
-                        list =
-                            ((XWikiJcrStore) context.getWiki().getNotCacheStore()).listGroupsForUser(username, context);
-                    }
+                    list = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
+                        .bindValue("username", username)
+                        .bindValue("shortname", shortname)
+                        .bindValue("veryshortname", veryshortname)
+                        .execute();
                     this.groupCache.set(key, list);
                 }
             }
@@ -338,16 +327,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
 
         try {
             if (group == null) {
-                if (context.getWiki().getHibernateStore() != null) {
-                    sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiUsers'";
-                    return context.getWiki().getStore().searchDocumentsNames(sql, context);
-                } else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
-                    String xpath = "/*/*/obj/XWiki/XWikiUsers/jcr:deref(@doc, '*')/@fullName";
-                    QueryPlugin qp = (QueryPlugin) context.getWiki().getPlugin("query", context);
-                    return qp.xpath(xpath).list();
-                } else {
-                    return list;
-                }
+                return context.getWiki().getStore().getQueryManager().getNamedQuery("getAllUsers").execute();
             } else {
                 String gshortname = Util.getName(group, context);
                 XWikiDocument docgroup = context.getWiki().getDocument(gshortname, context);
@@ -383,10 +363,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         if (context.getWiki().getHibernateStore() != null) {
             String sql = ", BaseObject as obj where obj.name=doc.fullName and obj.className='XWiki.XWikiGroups'";
             return context.getWiki().getStore().searchDocumentsNames(sql, context);
-        } else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
-            String xpath = "/*/*/obj/XWiki/XWikiGroups/jcr:deref(@doc, '*')/@fullName";
-            QueryPlugin qp = (QueryPlugin) context.getWiki().getPlugin("query", context);
-            return qp.xpath(xpath).list();
         } else {
             return null;
         }
@@ -587,27 +563,18 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
             } else {
                 groups = context.getWiki().getStore().searchDocumentsNames(where, nb, start, parameterValues, context);
             }
-        } else if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
+        } else if (context.getWiki().getStore().getQueryManager().hasLanguage(Query.XPATH)) {
             // TODO : fully implement this methods for XPATH platform
 
             if ((matchFields != null && matchFields.length > 0) || withdetails) {
                 throw new NotImplementedException();
             }
 
-            String xpath =
-                "/*/*/obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS)
-                    + "/jcr:deref(@doc, '*')/@fullName";
-            QueryPlugin qp = (QueryPlugin) context.getWiki().getPlugin("query", context);
-            List list = qp.xpath(xpath).list();
-
-            if (nb > 0 || start > 0) {
-                int fromIndex = start < 0 ? 0 : start;
-                int toIndex = fromIndex + (nb <= 0 ? list.size() - 1 : nb);
-
-                list = list.subList(fromIndex, toIndex);
-            }
-
-            groups = list;
+            groups = context.getWiki().getStore().getQueryManager().createQuery(
+                "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS) + "]/@fullName", 
+                Query.XPATH)
+                    .setLimit(nb).setOffset(start)
+                    .execute();
         }
 
         return groups;

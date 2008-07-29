@@ -23,7 +23,6 @@ package com.xpn.xwiki.stats.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -32,17 +31,16 @@ import java.util.List;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.NotImplementedException;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.portals.graffito.jcr.query.Filter;
-import org.apache.portals.graffito.jcr.query.QueryManager;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
+import com.xpn.xwiki.store.query.Query;
+import com.xpn.xwiki.store.query.QueryManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 
@@ -503,44 +501,34 @@ public final class StatsUtil
 
         Date currentDate = new Date(new Date().getTime() - 30 * 60 * 1000);
 
-        if (context.getWiki().getNotCacheStore() instanceof XWikiJcrStore) {
-            XWikiJcrStore store = (XWikiJcrStore) context.getWiki().getNotCacheStore();
-
+        QueryManager qm = context.getWiki().getStore().getQueryManager();
+        List<VisitStats> solist = null;
+        if (qm.hasLanguage(Query.XPATH)) {
             try {
-                QueryManager qm = store.getObjectQueryManager(context);
-                Filter filter =
-                    qm.createFilter(VisitStats.class).addEqualTo(fieldName, fieldValue).addGreaterThan(
-                        VisitStats.Property.endDate.toString(), currentDate);
-                org.apache.portals.graffito.jcr.query.Query query = qm.createQuery(filter);
-                query.addOrderByDescending(VisitStats.Property.endDate.toString());
-                List< ? > solist = store.getObjects(query, context);
-                if (solist.size() > 0) {
-                    visitStats = (VisitStats) solist.get(0);
-                }
+                solist = qm.createQuery("//element(*, xwiki:object)[@:{fieldName}=:{fieldValue}" +
+                    " and @endDate>:{date}]  order by @endDate descending", Query.XPATH)
+                    .bindValue("fieldName", fieldName)
+                    .bindValue("fieldValue", fieldValue)
+                    .bindValue("date", currentDate)
+                    .execute();                
             } catch (Exception e) {
                 LOG.error("Failed to search visit object in the jcr store from cookie name", e);
             }
-        } else {
-            XWikiHibernateStore store = context.getWiki().getHibernateStore();
-
+        } else if (qm.hasLanguage(Query.HQL)){
             try {
-                List<Object> paramList = new ArrayList<Object>(2);
-
-                String query =
-                    "from VisitStats as obj where obj." + fieldName + "=? and obj.endDate > ?"
-                        + " order by obj.endDate desc";
-
-                paramList.add(fieldValue);
-                paramList.add(currentDate);
-
-                List< ? > solist = store.search(query, 0, 0, paramList, context);
-
-                if (solist.size() > 0) {
-                    visitStats = (VisitStats) solist.get(0);
-                }
+                solist = qm.createQuery("from VisitStats as obj " +
+                    "where obj." + fieldName + "=:fieldValue and obj.endDate > :date" +
+                    " order by obj.endDate desc", Query.HQL)
+                    .bindValue("fieldValue", fieldValue)
+                    .bindValue("date", currentDate)
+                    .execute();
             } catch (Exception e) {
                 LOG.error("Failed to search visit object in the database from " + fieldName, e);
             }
+        } else
+            throw new NotImplementedException();
+        if (solist != null && solist.size() > 0) {
+            visitStats = (VisitStats) solist.get(0);
         }
 
         return visitStats;

@@ -35,8 +35,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  * @see SuperDocument
  * @see SuperClass
  * @future XA2 : rename to DefaultDocumentObject.
- * @deprecated Use {@link DefaultXObjectDocument}
+ * @deprecated Use {@link DefaultXObjectDocument} since 1.0 RC1
  */
+@Deprecated
 public class DefaultSuperDocument extends DefaultXObjectDocument implements SuperDocument
 {
     /**

@@ -31,8 +31,9 @@ import com.xpn.xwiki.api.Object;
  * @version $Id: $
  * @see SuperClass
  * @future XA2 : rename to DocumentObject.
- * @deprecated Use {@link XObjectDocument}
+ * @deprecated Use {@link XObjectDocument} since 1.0 RC1
  */
+@Deprecated
 public interface SuperDocument extends XObjectDocument
 {
     /**

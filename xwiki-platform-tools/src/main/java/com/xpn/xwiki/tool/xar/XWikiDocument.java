@@ -77,12 +77,12 @@ public class XWikiDocument
             this.space = elementSpace.getText();
         }
 
-        Element elementLanguage = docel.element("elementLanguage");
+        Element elementLanguage = docel.element("language");
         if (elementLanguage != null) {
             this.language = elementLanguage.getText();
         }
 
-        Element elementDefaultLanguage = docel.element("elementDefaultLanguage");
+        Element elementDefaultLanguage = docel.element("defaultLanguage");
         if (elementDefaultLanguage != null) {
             this.defaultLanguage = elementDefaultLanguage.getText();
         }

@@ -30,9 +30,6 @@ import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.web.Utils;
-
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
  * available.
@@ -41,19 +38,8 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 {
     private ComponentManager componentManager;
     
-    private XWikiContext context;
-    
     protected void setUp() throws Exception
     {
-        this.context = new XWikiContext();
-
-        // We need to initialize the Component Manager so that the components can be looked up
-        getContext().put(ComponentManager.class.getName(), getComponentManager());
-
-        // Statically store the component manager in {@link Utils} to be able to access it without
-        // the context.
-        Utils.setComponentManager(getComponentManager());
-
         // Initialize the Execution Context
         ExecutionContextInitializerManager ecim =
             (ExecutionContextInitializerManager) getComponentManager().lookup(ExecutionContextInitializerManager.ROLE);
@@ -61,27 +47,16 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 
         ExecutionContext ec = new ExecutionContext();
 
-        // Bridge with old XWiki Context, required for old code.
-        ec.setProperty("xwikicontext", this.context);
-
         ecim.initialize(ec);
         execution.setContext(ec);
     }
-    
 
     protected void tearDown() throws Exception
     {
         Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
         execution.removeContext();
-
-        Utils.setComponentManager(null);
     }
     
-    public XWikiContext getContext()
-    {
-        return this.context;
-    }
-
     /**
      * @return a configured Component Manager (which uses the plexus.xml file in the test resources directory) 
      *         which can then be put in the XWiki Context for testing.

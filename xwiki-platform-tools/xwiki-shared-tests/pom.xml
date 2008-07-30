@@ -55,14 +55,6 @@
       <artifactId>xwiki-core-plexus</artifactId>
       <version>1.6-SNAPSHOT</version>
     </dependency>
-    <!-- We need this dependency for now since we need to set up the XWikiContext
-         for the tests. Since this means a circular dependency we have to use the
-         latest released version of XWiki Core -->
-    <dependency>
-      <groupId>com.xpn.xwiki.platform</groupId>
-      <artifactId>xwiki-core</artifactId>
-      <version>1.5</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.ant</groupId>
       <artifactId>ant</artifactId>

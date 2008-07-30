@@ -168,7 +168,7 @@
 		 else if($('uorgu').checked && $('unregistered').hasClassName('hidden'))
 		   $('unregistered').removeClassName('hidden');
 		});
-        #if($editor == "globaladmin")
+        #if("$!editor" == "globaladmin")
 		Event.observe($('allowguestview'), 'click', setGuestExtendedRights($('allowguestview')));
 		Event.observe($('allowguestedit'), 'click', setGuestExtendedRights($('allowguestedit')));
         #end

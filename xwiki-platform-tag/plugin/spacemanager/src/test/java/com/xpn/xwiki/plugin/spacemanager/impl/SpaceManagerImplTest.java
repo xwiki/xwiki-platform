@@ -33,10 +33,8 @@ import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiGroupService;
-import com.xpn.xwiki.user.api.XWikiRightService;
-import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
@@ -52,7 +50,7 @@ import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
 /**
  * @version $Id: $
  */
-public class SpaceManagerImplTest extends AbstractXWikiComponentTestCase
+public class SpaceManagerImplTest extends AbstractBridgedXWikiComponentTestCase
 {
 
     private XWikiContext context;

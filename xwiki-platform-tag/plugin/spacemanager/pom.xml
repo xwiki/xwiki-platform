@@ -55,9 +55,16 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>1.6-SNAPSHOT</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
-      <version>1.11-SNAPSHOT</version>
+      <version>1.12-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>

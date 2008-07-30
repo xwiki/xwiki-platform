@@ -13,7 +13,6 @@ import org.jmock.core.stub.CustomStub;
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.objects.BaseObject;
@@ -23,14 +22,13 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * @version $Id: $
  */
-public class SpaceImplTest extends AbstractXWikiComponentTestCase
+public class SpaceImplTest extends AbstractBridgedXWikiComponentTestCase
 {
-
     private XWikiContext context;
 
     private SpaceManagerImpl spaceManager;

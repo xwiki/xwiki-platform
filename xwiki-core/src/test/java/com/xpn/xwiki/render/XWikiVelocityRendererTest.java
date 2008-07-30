@@ -20,13 +20,10 @@
 package com.xpn.xwiki.render;
 
 import org.jmock.Mock;
-import org.xwiki.component.manager.ComponentManager;
 
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.XWiki;
 
@@ -37,7 +34,7 @@ import java.util.Collections;
  * 
  * @version $Id$
  */
-public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
+public class XWikiVelocityRendererTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiVelocityRenderer renderer;
 
@@ -54,7 +51,7 @@ public class XWikiVelocityRendererTest extends AbstractXWikiComponentTestCase
     /**
      * {@inheritDoc}
      * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     * @see com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase#setUp()
      */
     protected void setUp() throws Exception
     {

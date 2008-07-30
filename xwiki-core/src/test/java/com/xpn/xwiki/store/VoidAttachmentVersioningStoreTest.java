@@ -27,14 +27,14 @@ import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiAttachmentArchive;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.VoidAttachmentVersioningStore.VoidAttachmentArchive;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link VoidAttachmentVersioningStore} and {@link VoidAttachmentArchive}.
  * 
  * @version $Id$
  */
-public class VoidAttachmentVersioningStoreTest extends AbstractXWikiComponentTestCase
+public class VoidAttachmentVersioningStoreTest extends AbstractBridgedXWikiComponentTestCase
 {
     AttachmentVersioningStore store;
 

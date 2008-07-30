@@ -20,21 +20,17 @@
  */
 package com.xpn.xwiki.objects.classes;
 
-import org.xwiki.component.manager.ComponentManager;
-
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.store.XWikiHibernateStore;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
-import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
 /**
  * Unit tests for {@link com.xpn.xwiki.objects.classes.DBTreeListClass}.
  * 
  * @version $Id$
  */
-public class DBTreeListClassTest extends AbstractXWikiComponentTestCase
+public class DBTreeListClassTest extends AbstractBridgedXWikiComponentTestCase
 {
     protected void setUp() throws Exception
     {

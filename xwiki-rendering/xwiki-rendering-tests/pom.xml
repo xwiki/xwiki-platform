@@ -52,6 +52,21 @@
       <version>${pom.version}</version>
       <scope>test</scope>
     </dependency>
+    <!-- Needed since the DocumentManager is implemented in xwiki-core -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${pom.version}</version>
+      <classifier>tests</classifier>
+      <scope>test</scope>
+    </dependency>
+    <!-- Needed since the DocumentManager is implemented in xwiki-core -->
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${pom.version}</version>
+      <scope>runtime</scope>
+    </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>

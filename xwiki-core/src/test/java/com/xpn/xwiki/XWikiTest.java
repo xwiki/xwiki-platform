@@ -46,7 +46,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
@@ -54,7 +54,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
  * 
  * @version $Id$
  */
-public class XWikiTest extends AbstractXWikiComponentTestCase
+public class XWikiTest extends AbstractBridgedXWikiComponentTestCase
 {
     private XWikiDocument document;
 

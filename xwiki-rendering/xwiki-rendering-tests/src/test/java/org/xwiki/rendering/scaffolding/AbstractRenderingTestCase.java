@@ -25,9 +25,9 @@ import org.xwiki.rendering.block.XDOM;
 import java.util.List;
 import java.io.StringWriter;
 
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 
-public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTestCase
+public abstract class AbstractRenderingTestCase extends AbstractBridgedXWikiComponentTestCase
 {
     protected void assertBlocks(String expected, List<Block> blocks)
     {

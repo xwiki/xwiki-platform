@@ -43,7 +43,7 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateVersioningStore;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 import com.xpn.xwiki.user.impl.xwiki.XWikiRightServiceImpl;
 import com.xpn.xwiki.web.XWikiServletURLFactory;
@@ -51,7 +51,7 @@ import com.xpn.xwiki.web.XWikiServletURLFactory;
 /**
  * Unit tests for {@link SyndEntryDocumentSource}.
  */
-public class SyndEntryDocumentSourceTest extends AbstractXWikiComponentTestCase
+public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTestCase
 {
     public static final String INCONSISTENCY = "Inconsistency!";
 

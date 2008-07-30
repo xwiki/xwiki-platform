@@ -29,7 +29,7 @@ import com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface;
 import com.xpn.xwiki.notify.XWikiNotificationManager;
 import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
+import com.xpn.xwiki.test.AbstractBridgedXWikiComponentTestCase;
 import com.xpn.xwiki.user.api.XWikiRightService;
 
 /**
@@ -37,7 +37,7 @@ import com.xpn.xwiki.user.api.XWikiRightService;
  * 
  * @version $Id$
  */
-public class XWikiNotificationTest extends AbstractXWikiComponentTestCase
+public class XWikiNotificationTest extends AbstractBridgedXWikiComponentTestCase
 {
     public class TestListener implements XWikiDocChangeNotificationInterface
     {

@@ -72,9 +72,11 @@
   #xwikimessageboxend()
 #else
   #if($xwiki.exists("XWiki.AdminSheet"))
+    #set($importaction = "")
     $xwiki.getDocument("XWiki.AdminSheet").getTranslatedDocument().getRenderedContent()
   #else
     ## Admin app not installed, display only Import
+    #set($importaction = $doc.getURL("import"))
     #if ($xwiki.searchDocuments("1=1").size() < 40)
       ## Less than 40 pages in the wiki, probably a fresh install (16/07/08 : XWiki creates 21 pages at startup)
       #set ($rawVersion = $xwiki.getVersion())
@@ -87,7 +89,7 @@
       #else
         #set ($URL = "${URLhost}/releases/${URLgroup}/${URLartifact}/$URLversion/${URLartifact}-${URLversion}.xar")
       #end
-      #warning($msg.get("admin.defaultwikinotinstalled", ["<a href='$URL'>$URL</a>"]))      
+      #warning($msg.get("admin.defaultwikinotinstalled", ["<a href='$URL'>$URL</a>"]))
     #else
       ## More than 40 pages and Admin app not installed, probably an upgrade.
       #warning($msg.get("admin.adminappnotinstalled", ["<a href='http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication'>http://code.xwiki.org/xwiki/bin/view/Applications/AdministrationApplication</a>"]))

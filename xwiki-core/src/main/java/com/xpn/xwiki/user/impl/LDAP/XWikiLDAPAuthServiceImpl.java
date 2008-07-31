@@ -90,6 +90,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @see com.xpn.xwiki.user.impl.xwiki.XWikiAuthServiceImpl#authenticate(java.lang.String, java.lang.String,
      *      com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public Principal authenticate(String login, String password, XWikiContext context) throws XWikiException
     {
         /*
@@ -163,7 +164,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
         // Remove XWiki. prefix - not sure this is really a good idea or the right way to do it
         String ldapUserName = cannonicalUsername;
-        int i = cannonicalUsername.indexOf(XWIKI_SPACE_NAME_SEP);
+        int i = cannonicalUsername.indexOf(XWIKI_USER_SPACE + XWIKI_SPACE_NAME_SEP);
         if (i != -1) {
             ldapUserName = cannonicalUsername.substring(i + 1);
         }

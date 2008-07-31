@@ -82,7 +82,10 @@
     <a href="javascript:void()" onclick="selectItems('selCheckedDoc', true); return false;" class="Exportlink">$msg.get("all")</a>
   </span>
 
-  <form action="" method="post">
+  ## The form action cannot be $doc.getURL("import") here.
+  ## With the Administration application installed it must be left blank, without it $doc.getURL("import")
+  ## That's why we set it at the upper level (admin.vm)
+  <form action="$!{importaction}" method="post">
       <div><input type="hidden" name="action" value="import" /></div>
       ## Placeholder for adding the documents as checkbox input types.
       ## WARNING: Do NOT try to change <div id="..."></div> below to

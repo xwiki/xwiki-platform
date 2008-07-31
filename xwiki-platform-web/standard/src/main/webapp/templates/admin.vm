@@ -72,9 +72,11 @@
   #xwikimessageboxend()
 #else
   #if($xwiki.exists("XWiki.AdminSheet"))
+    #set($importaction = "")
     $xwiki.getDocument("XWiki.AdminSheet").getTranslatedDocument().getRenderedContent()
   #else
     ## Admin app not installed, display only Import
+    #set($importaction = $doc.getURL("import"))
     #if ($xwiki.searchDocuments("1=1").size() < 40)
       ## Less than 40 pages in the wiki, probably a fresh install (16/07/08 : XWiki creates 21 pages at startup)
       #set ($rawVersion = $xwiki.getVersion())

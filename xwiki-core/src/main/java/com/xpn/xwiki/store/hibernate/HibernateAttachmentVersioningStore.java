@@ -45,7 +45,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
     private static final Log LOG = LogFactory.getLog(HibernateAttachmentVersioningStore.class);
 
     /**
-     * {@inheritDoc}
+     * @param context The current context.
      */
     public HibernateAttachmentVersioningStore(XWikiContext context)
     {

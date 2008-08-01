@@ -29,6 +29,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.renderer.Renderer;
+import org.xwiki.rendering.utils.AnchorIdGenerator;
 import org.xwiki.rendering.DocumentManager;
 
 /**
@@ -52,7 +53,7 @@ public class XHTMLRenderer implements Renderer
      */
     private XHTMLLinkRenderer linkRenderer;
 
-    private XHTMLIdGenerator idGenerator;
+    private AnchorIdGenerator idGenerator;
     
     /**
      * Used to save the original Writer when we redirect all outputs to a new writer to compute a 
@@ -87,7 +88,7 @@ public class XHTMLRenderer implements Renderer
     {
     	// Use a new generator for each document being processed since the id generator is stateful and 
     	// remembers the generated ids.
-        this.idGenerator = new XHTMLIdGenerator();
+        this.idGenerator = new AnchorIdGenerator();
 	}
 
     /**

@@ -17,24 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer.xhtml;
+package org.xwiki.rendering.utils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Stateful generator of XHTML id attributes. It's stateful since it remembers the generated ids. Thus a new instance
+ * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance
  * of it should be used for each document.
  * 
  * @version $Id: $
  * @since 1.6M1
  */
-public class XHTMLIdGenerator
+public class AnchorIdGenerator
 {
 	private List<String> generatedIds = new ArrayList<String>();
 	
     /**
-     * Generate a unique XHTML id attribute using the passed text as the seed value. The generated id complies
+     * Generate a unique id attribute using the passed text as the seed value. The generated id complies
      * with the XHTML specification.
      * Extract from <a href="http://www.devguru.com/technologies/xhtml/QuickRef/xhtml_attribute_id.html">DevGuru</a>:
      * <p><quote> 

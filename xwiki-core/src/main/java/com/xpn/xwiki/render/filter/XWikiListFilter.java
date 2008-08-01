@@ -147,6 +147,9 @@ public class XWikiListFilter extends ListFilter implements CacheFilter
         try {
             BufferedReader reader = new BufferedReader(new StringReader(result.group(0)));
             addList(buffer, reader);
+            // Since this filter consumes all newlines before the next piece of text, add one back to ensure the
+            // following text begins on a new line, and not right after the closing list tag.
+            buffer.append("\n");
         } catch (Exception e) {
             log.warn("ListFilter: unable to get list content", e);
         }

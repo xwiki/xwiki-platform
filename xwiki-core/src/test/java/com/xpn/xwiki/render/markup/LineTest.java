@@ -102,6 +102,15 @@ public class LineTest extends AbstractSyntaxTest
         test(tests, expects);
     }
 
+    public void testLineAfterList()
+    {
+        ArrayList<String> tests = new ArrayList<String>();
+        ArrayList<String> expects = new ArrayList<String>();
+        tests.add("* this is a list item\n----");
+        expects.add("...<hr/>...");
+        test(tests, expects);
+    }
+
     /*
      * public void testSequence() { ArrayList<String> tests = new ArrayList<String>(); ArrayList<String> expects =
      * new ArrayList<String>(); tests.add("---- ------ ----"); expects.add("<hr/> <hr/> <hr/>"); test(tests, expects); }

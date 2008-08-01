@@ -19,9 +19,10 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
-import org.xwiki.component.manager.ComponentLookupException;
+import org.apache.commons.lang.NotImplementedException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
+import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.query.AbstractQueryManager;
@@ -48,6 +49,12 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
     private String mappingPath = "queries.hbm.xml";
 
     /**
+     * Used for access to store system
+     * Injected via component manager.
+     */
+    private Execution execution;
+
+    /**
      * Default constructor.
      */
     public HibernateQueryManager()
@@ -64,17 +71,30 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
     }
 
     /**
+     * @return Execution object for access to environment
+     */
+    protected Execution getExecution()
+    {
+        return execution;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Query createQuery(String statement, String language)
+    {
+        if (Query.HQL.equals(language)) {
+            return new HqlQuery(statement, getExecution());
+        } else {
+            throw new NotImplementedException();
+        }
+    }
+
+    /**
      * {@inheritDoc}
      */
     public Query getNamedQuery(String queryName)
     {
-        try {
-            HibernateNamedQuery query = (HibernateNamedQuery) this.componentManager
-                .lookup(Query.ROLE, HibernateNamedQuery.hint);
-            query.setStatement(queryName);
-            return query;
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException(e);
-        }
+        return new HibernateNamedQuery(queryName, getExecution());
     }
 }

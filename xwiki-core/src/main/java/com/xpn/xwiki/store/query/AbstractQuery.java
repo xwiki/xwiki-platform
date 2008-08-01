@@ -24,7 +24,6 @@ import java.util.Map;
 
 /**
  * AbstractQuery stores all information needed for execute a query.
- * Any Query implementation must extend this AbstractQuery.
  * @version $Id$
  * @since 1.6M1
  */
@@ -56,6 +55,16 @@ public abstract class AbstractQuery implements Query
     private int offset;
 
     /**
+     * @param statement query statement
+     * @param language query language
+     */
+    public AbstractQuery(String statement, String language)
+    {
+        this.statement = statement;
+        this.language = language;
+    }
+
+    /**
      * {@inheritDoc}
      */
     public String getStatement()
@@ -69,24 +78,6 @@ public abstract class AbstractQuery implements Query
     public String getLanguage()
     {
         return language;
-    }
-
-    /**
-     * Setter for query statement used by {@link AbstractQueryManager}.
-     * @param statement query statement.
-     */
-    public void setStatement(String statement)
-    {
-        this.statement = statement;
-    }
-
-    /**
-     * Setter for query language used by {@link AbstractQueryManager}.
-     * @param language query language
-     */
-    public void setLanguage(String language)
-    {
-        this.language = language;
     }
 
     /**

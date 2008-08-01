@@ -24,38 +24,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.xwiki.component.manager.ComponentLookupException;
-import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.component.phase.Composable;
-
 /**
  * This is abstract QueryManager implementation.
- * It uses ComponentManager for create Queries by hint=language.
  * Named queries are not implemented here because they are storage-specific.
  * 
  * @version $Id$
  * @since 1.6M1
  */
-public abstract class AbstractQueryManager implements QueryManager, Composable
+public abstract class AbstractQueryManager implements QueryManager
 {
     /**
      * Field for supported languages.
      */
     protected Set<String> languages = new HashSet<String>();
-
-    /**
-     * Component manager used for creating queries as components.
-     */
-    protected ComponentManager componentManager;
-
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.component.phase.Composable#compose(org.xwiki.component.manager.ComponentManager)
-     */
-    public void compose(ComponentManager componentManager)
-    {
-        this.componentManager = componentManager;
-    }
 
     /**
      * {@inheritDoc}
@@ -71,21 +52,5 @@ public abstract class AbstractQueryManager implements QueryManager, Composable
     public boolean hasLanguage(String language)
     {
         return this.languages.contains(language);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public Query createQuery(String statement, String language)
-    {
-        Query query;
-        try {
-            query = (Query) this.componentManager.lookup(Query.ROLE, language);
-        } catch (ComponentLookupException e) {
-            throw new RuntimeException(e);
-        }
-        ((AbstractQuery) query).setStatement(statement);
-        ((AbstractQuery) query).setLanguage(language);
-        return query;
     }
 }

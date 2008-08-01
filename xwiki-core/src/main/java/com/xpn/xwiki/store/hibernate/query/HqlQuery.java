@@ -31,6 +31,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.query.AbstractQuery;
+import com.xpn.xwiki.store.query.Query;
 
 /**
  * Query implementation for Hibernate Query Language.
@@ -40,19 +41,37 @@ import com.xpn.xwiki.store.query.AbstractQuery;
 public class HqlQuery extends AbstractQuery
 {
     /**
-     * It is used for access to environment.
-     * Injected via component manager.
+     * Used for access to store system.
      */
     private Execution execution;
-    
+
     /**
-     * @return Execution for access to environment
+     * @param statement query statement
+     * @param execution Execution object for access to store system
+     */
+    public HqlQuery(String statement, Execution execution)
+    {
+        super(statement, Query.HQL);
+        this.execution = execution;
+    }
+
+    /**
+     * @return Execution object for access to store system.
      */
     protected Execution getExecution()
     {
         return execution;
     }
-    
+
+    /**
+     * @param session Hibernate Session
+     * @return Hibernate Query object
+     */
+    protected org.hibernate.Query createQuery(Session session) 
+    {
+        return session.createQuery(getStatement());
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -77,14 +96,5 @@ public class HqlQuery extends AbstractQuery
                 return query.list();
             }
         });
-    }
-
-    /**
-     * @param session Hibernate Session
-     * @return Hibernate Query object
-     */
-    protected org.hibernate.Query createQuery(Session session) 
-    {
-        return session.createQuery(getStatement());
     }
 }

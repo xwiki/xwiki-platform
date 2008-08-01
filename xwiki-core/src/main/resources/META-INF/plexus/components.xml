@@ -46,25 +46,6 @@
         <requirement>
           <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
         </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>com.xpn.xwiki.store.query.Query</role>
-      <role-hint>hql</role-hint>
-      <implementation>com.xpn.xwiki.store.hibernate.query.HqlQuery</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
-      <requirements>
-        <requirement>
-          <role>org.xwiki.context.Execution</role>
-        </requirement>
-      </requirements>
-    </component>
-    <component>
-      <role>com.xpn.xwiki.store.query.Query</role>
-      <role-hint>hibernateNamed</role-hint>
-      <implementation>com.xpn.xwiki.store.hibernate.query.HibernateNamedQuery</implementation>
-      <instantiation-strategy>per-lookup</instantiation-strategy>
-      <requirements>
         <requirement>
           <role>org.xwiki.context.Execution</role>
         </requirement>

@@ -21,7 +21,7 @@ package com.xpn.xwiki.store.hibernate.query;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
-
+import org.xwiki.context.Execution;
 
 /**
  * Query implementation for named queries in Hibernate Store.
@@ -31,9 +31,13 @@ import org.hibernate.Session;
 public class HibernateNamedQuery extends HqlQuery
 {
     /**
-     * Hint for this component.
+     * @param queryName name of named query
+     * @param execution Executon object for access to store system
      */
-    public static String hint = "hibernateNamed";
+    public HibernateNamedQuery(String queryName, Execution execution)
+    {
+        super(queryName, execution);
+    }
 
     /**
      * {@inheritDoc}

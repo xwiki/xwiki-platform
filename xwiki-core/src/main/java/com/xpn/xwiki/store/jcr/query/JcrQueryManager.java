@@ -21,6 +21,9 @@ package com.xpn.xwiki.store.jcr.query;
 
 import java.util.ResourceBundle;
 
+import org.apache.commons.lang.NotImplementedException;
+import org.xwiki.context.Execution;
+
 import com.xpn.xwiki.store.query.AbstractQueryManager;
 import com.xpn.xwiki.store.query.Query;
 
@@ -35,6 +38,39 @@ public class JcrQueryManager extends AbstractQueryManager
      * Used for get named queries.
      */
     ResourceBundle queriesBundle = ResourceBundle.getBundle("JcrQueries");
+
+    /**
+     * Used for creating JcrQuery.
+     */
+    Execution execution;
+
+    /**
+     * @return Execution object, used for access to store system.
+     */
+    protected Execution getExecution()
+    {
+        return execution;
+    }
+
+    /**
+     * Default constructor.
+     */
+    public JcrQueryManager()
+    {
+        languages.add(Query.XPATH);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Query createQuery(String statement, String language)
+    {
+        if (hasLanguage(language)) {
+            return new JcrQuery(statement, language, getExecution());
+        } else {
+            throw new NotImplementedException();
+        }
+    }
 
     /**
      * {@inheritDoc}

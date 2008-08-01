@@ -49,16 +49,32 @@ import com.xpn.xwiki.store.query.AbstractQuery;
 public class JcrQuery extends AbstractQuery
 {
     /**
-     * It is used for access to environment.
-     * Injected via component manager.
+     * Used for access to store system.
      */
     private Execution execution;
 
+    /**
+     * @param statement query statement
+     * @param language language of the query
+     * @param execution Execution object for access to store system
+     */
+    public JcrQuery(String statement, String language, Execution execution)
+    {
+        super(statement, language);
+        this.execution = execution;
+    }
+
+    /**
+     * @return Execution object for access to store system.
+     */
     protected Execution getExecution()
     {
         return execution;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @SuppressWarnings("unchecked")
     public <T> List<T> execute() throws XWikiException
     {

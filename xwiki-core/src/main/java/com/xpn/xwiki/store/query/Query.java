@@ -32,11 +32,6 @@ import com.xpn.xwiki.XWikiException;
 public interface Query
 {
     /**
-     * This component's role, used when code needs to look it up.
-     */
-    String ROLE = Query.class.getName();
-
-    /**
      * Indicator for Hibernate Query Language.
      */
     String HQL   = "hql";

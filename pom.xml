@@ -56,6 +56,7 @@
   <modules>
     <module>xwiki-xmlrpc</module>
     <module>xwiki-cache</module>
+    <module>xwiki-xml</module>
     <module>xwiki-core</module>
     <module>xwiki-component</module>
     <module>xwiki-url</module>

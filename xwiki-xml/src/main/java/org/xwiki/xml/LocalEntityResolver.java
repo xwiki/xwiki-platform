@@ -18,13 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package com.xpn.xwiki.pdf.impl;
+package org.xwiki.xml;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
+import org.xwiki.component.logging.AbstractLogEnabled;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,19 +31,22 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class XWikiURIResolver implements EntityResolver
+public class LocalEntityResolver extends AbstractLogEnabled implements EntityResolver
 {
-    private static final Log LOG = LogFactory.getLog(XWikiURIResolver.class);
-
     /**
-     * Allow the application to resolve external entities. <p/> <p>The Parser will call this method before opening any
-     * external entity except the top-level document entity (including the external DTD subset, external entities
-     * referenced within the DTD, and external entities referenced within the document element): the application may
-     * request that the parser resolve the entity itself, that it use an alternative URI, or that it use an entirely
-     * different input source.</p> <p/> <p>Application writers can use this method to redirect external system
-     * identifiers to secure and/or local URIs, to look up public identifiers in a catalogue, or to read an entity from
-     * a database or other input source (including, for example, a dialog box).</p> <p/> <p>If the system identifier is
-     * a URL, the SAX parser must resolve it fully before reporting it to the application.</p>
+     * Allow the application to resolve external entities.
+     * <p/>
+     * <p>The Parser will call this method before opening any external entity except the top-level document entity
+     * including the external DTD subset, external entities referenced within the DTD, and external entities referenced
+     * within the document element): the application may request that the parser resolve the entity itself, that it use
+     * an alternative URI, or that it use an entirely different input source.</p>
+     * <p/>
+     * <p>Application writers can use this method to redirect external system identifiers to secure and/or local URIs,
+     * to look up public identifiers in a catalogue, or to read an entity from a database or other input source
+     * (including, for example, a dialog box).</p>
+     * <p/>
+     * <p>If the system identifier is a URL, the SAX parser must resolve it fully before reporting it to the
+     * application.</p>
      *
      * @param publicId The public identifier of the external entity being referenced, or null if none was supplied.
      * @param systemId The system identifier of the external entity being referenced.
@@ -68,7 +70,7 @@ public class XWikiURIResolver implements EntityResolver
                 if (istream != null) {
                     source = new InputSource(istream);
                 } else {
-                    LOG.warn("Failed to load resource [" + filename
+                    getLogger().warn("Failed to load resource [" + filename
                         + "] locally. Will try to get it online at [" + systemId + "]");
                 }
             } else {
@@ -79,18 +81,18 @@ public class XWikiURIResolver implements EntityResolver
                 // xhtml1-symbol.ent relatively. Normally these relative declarations generate a
                 // URL with a "file" scheme but apparently there are some cases when the raw
                 // entity file names is passed to this resolveEntity method...
-                LOG.debug("Unknown URI scheme [" + uri.getScheme() + "] for entity ["
+                getLogger().debug("Unknown URI scheme [" + uri.getScheme() + "] for entity ["
                     + systemId + "]. Assuming the entity is already resolved and looking for it "
                     + "in the file system.");
                 InputStream istream = getClass().getClassLoader().getResourceAsStream(systemId);
                 if (istream != null) {
                     source = new InputSource(istream);
                 } else {
-                    LOG.warn("Failed to load resource [" + systemId + "] locally.");
+                    getLogger().warn("Failed to load resource [" + systemId + "] locally.");
                 }
             }
         } catch (URISyntaxException e) {
-            LOG.warn("Invalid URI [" + systemId + "].", e);
+            getLogger().warn("Invalid URI [" + systemId + "].", e);
         }
         // Returning null causes the caller to try accessing the entity online
         return source;

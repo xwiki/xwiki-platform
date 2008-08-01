@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
+import org.xml.sax.EntityResolver;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
@@ -48,6 +49,12 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
      */
     private Parser parser;
 
+    /**
+     * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally.
+     * Injected by the Component Manager.
+     */
+    private EntityResolver entityResolver;
+    
     private Map<String, String> allowedParameters;
 
     /**
@@ -104,7 +111,8 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
             handler = new XMLBlockConverterHandler(this.parser, escapeWikiSyntax);
             xr.setContentHandler(handler);
             xr.setErrorHandler(handler);
-            
+            xr.setEntityResolver(this.entityResolver);
+
             // Since XML can only have a single root node and since we want to allow users to put
             // content such as the following, we need to wrap the content in a root node:
             //   <tag1>

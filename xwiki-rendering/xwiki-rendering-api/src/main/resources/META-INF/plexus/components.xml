@@ -22,6 +22,9 @@
           <role>org.xwiki.rendering.parser.Parser</role>
           <role-hint>xwiki/2.0</role-hint>
         </requirement>
+        <requirement>
+          <role>org.xml.sax.EntityResolver</role>
+        </requirement>
       </requirements>
       <configuration>
         <priority>1000</priority>

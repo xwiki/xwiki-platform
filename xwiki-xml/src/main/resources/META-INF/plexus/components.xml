@@ -1,0 +1,10 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xml.sax.EntityResolver</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.xml.LocalEntityResolver</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+  </components>
+</component-set>

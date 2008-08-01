@@ -574,6 +574,11 @@
       <artifactId>xwiki-core-cache-oscache</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-xml</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
 
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->

@@ -29,6 +29,7 @@ import java.util.Stack;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
+import org.xml.sax.ext.Attributes2;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.XMLBlock;
@@ -117,7 +118,21 @@ public class XMLBlockConverterHandler extends DefaultHandler
 
         Map<String, String> map = new HashMap<String, String>();
         for (int i = 0; i < attributes.getLength(); i++) {
-            map.put(attributes.getQName(i), attributes.getValue(i));
+            // The XHTML DTD specifies some default value for some attributes. For example for a TD element
+            // it defines colspan=1 and rowspan=1. Thus we'll get a colspan and rowspan attribute passed to
+            // the current method even though they are not defined in the source XHTML content.
+            // However with SAX2 it's possible to check if an attribute is defined in the source or not using
+            // the Attributes2 class.
+            // See http://www.saxproject.org/apidoc/org/xml/sax/package-summary.html#package_description
+            if (attributes instanceof Attributes2) {
+                Attributes2 attribute2 = (Attributes2) attributes;
+                // present in XHTML source file
+                if (attribute2.isSpecified(i)) {
+                    map.put(attributes.getQName(i), attributes.getValue(i));
+                }
+            } else {
+                map.put(attributes.getQName(i), attributes.getValue(i));
+            }
         }
         this.stack.push(new XMLBlock(name, map));
     }

@@ -66,6 +66,20 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
         assertBlocks(expected, blocks);
     }
 
+    public void testMacroWithEntities() throws Exception
+    {
+        String html = "&nbsp;";
+
+        String expected = "beginDocument\n"
+            + "onWord: [Ê]\n"
+            + "endDocument\n";
+        
+        Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
+        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, XDOM.EMPTY);
+
+        assertBlocks(expected, blocks);
+    }
+
     public void testMacroEscapeWikiSyntax() throws Exception
     {
         String html = "**some escaped text**";

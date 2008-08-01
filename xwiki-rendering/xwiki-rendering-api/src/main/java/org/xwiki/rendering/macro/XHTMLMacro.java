@@ -49,8 +49,8 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     private Parser parser;
 
     private Map<String, String> allowedParameters;
-    
-	/**
+
+    /**
      * {@inheritDoc}
      * @see Initializable#initialize()
      */
@@ -112,8 +112,10 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
             //   </tag1>
             //   <tag2>
             //   </tag2>
-            String normalizedContent = "<root>" + content + "</root>";
-            
+            String normalizedContent = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
+                + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
+                + "<root>" + content + "</root>";
+
             xr.parse(new InputSource(new StringReader(normalizedContent)));
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to parse content as XML ["

@@ -33,7 +33,6 @@ public class DefaultTransformationManagerTest extends AbstractRenderingTestCase
     {
         TransformationManager manager = 
             (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
-         manager.performTransformations(new XDOM(Collections.<Block>emptyList()),
-            new Syntax(SyntaxType.XWIKI, "2.0"));
+         manager.performTransformations(XDOM.EMPTY, new Syntax(SyntaxType.XWIKI, "2.0"));
     }
 }

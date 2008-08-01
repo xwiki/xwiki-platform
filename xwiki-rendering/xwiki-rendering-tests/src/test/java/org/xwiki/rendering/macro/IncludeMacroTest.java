@@ -55,7 +55,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "current");
 
-        List<Block> blocks = macro.execute(properties, null, new XDOM(Collections.EMPTY_LIST));
+        List<Block> blocks = macro.execute(properties, null, XDOM.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -88,7 +88,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "new");
 
-        List<Block> blocks = macro.execute(properties, null, new XDOM(Collections.EMPTY_LIST));
+        List<Block> blocks = macro.execute(properties, null, XDOM.EMPTY);
 
         assertBlocks(expected, blocks);
     }

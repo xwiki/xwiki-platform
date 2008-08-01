@@ -37,8 +37,8 @@ public interface Macro extends Comparable<Macro>
     String ROLE = Macro.class.getName();
 
     /**
-     * The priority of execution relative to the other MAcros. The lowest values have the highest priorities
-     * and execute first. For example a MAcro with a priority of 100 will execute before one with a priority
+     * The priority of execution relative to the other Macros. The lowest values have the highest priorities
+     * and execute first. For example a Macro with a priority of 100 will execute before one with a priority
      * of 500. 
      *
      * @return the execution priority

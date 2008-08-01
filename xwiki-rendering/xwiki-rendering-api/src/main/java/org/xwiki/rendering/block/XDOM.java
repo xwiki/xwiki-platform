@@ -22,6 +22,7 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Contains the full tree of {@link Block} that represent a XWiki Document's content.
@@ -31,6 +32,12 @@ import java.util.List;
  */
 public class XDOM extends AbstractFatherBlock
 {
+    /**
+     * Constructs an empty XDOM. Useful for example when calling a macro that doesn't use the XDOM parameter
+     * passed to it.
+     */
+    public static final XDOM EMPTY = new XDOM(Collections.<Block>emptyList());
+
     /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)

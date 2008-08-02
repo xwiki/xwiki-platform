@@ -66,6 +66,9 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
         assertBlocks(expected, blocks);
     }
 
+    /**
+     * Verify that XHTML entities are supported and can be parsed.
+     */
     public void testMacroWithEntities() throws Exception
     {
         String html = "&nbsp;";
@@ -80,6 +83,9 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
         assertBlocks(expected, blocks);
     }
 
+    /**
+     * Verify that the escapeWikiSyntax parameter works and escapes wiki syntax.
+     */
     public void testMacroEscapeWikiSyntax() throws Exception
     {
         String html = "**some escaped text**";
@@ -98,7 +104,6 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
 
     /**
      * Verify that if there's a space before an XML element it's correctly preserved.
-     * @throws Exception
      */
     public void testMacroWhenWhiteSpaces() throws Exception
     {

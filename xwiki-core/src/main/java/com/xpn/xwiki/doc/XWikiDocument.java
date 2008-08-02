@@ -39,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -66,6 +67,7 @@ import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
@@ -1477,21 +1479,50 @@ public class XWikiDocument
                 pclass.displayView(result, fieldname, prefix, obj, context);
             } else if (type.equals("rendered")) {
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
-                result.append(getRenderedContent(fcontent, context));
+                // TODO: There's a problem in that the TextAreaClass does rendering in its displayView method
+                // and thus if we render again here then the text is going to be rendered twice. This was working ok
+                // with the 1.0 syntac but it's not with the 2.0 syntax thus make sure to render only once with the
+                // 2.0 syntax.
+                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                    result.append(getRenderedContent(fcontent, getSyntaxId(), context));
+                } else {
+                    result.append(fcontent);
+                }
             } else if (type.equals("edit")) {
                 context.addDisplayedField(fieldname);
-                result.append("{pre}");
+                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
+                // rendering using the pre macro. In the new rendering system it's the user who decides what he wants
+                // by using either the nowiki macro or the xhtml macro with escapeWikiSyntax set to true or false.
+                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                    result.append("{pre}");
+                }
                 pclass.displayEdit(result, fieldname, prefix, obj, context);
-                result.append("{/pre}");
+                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                    result.append("{/pre}");
+                }
             } else if (type.equals("hidden")) {
-                result.append("{pre}");
+                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
+                // rendering using the pre macro. In the new rendering system it's the user who decides what he wants
+                // by using either the nowiki macro or the xhtml macro with escapeWikiSyntax set to true or false.
+                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                    result.append("{pre}");
+                }
                 pclass.displayHidden(result, fieldname, prefix, obj, context);
-                result.append("{/pre}");
+                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                    result.append("{/pre}");
+                }
             } else if (type.equals("search")) {
-                result.append("{pre}");
+                // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
+                // rendering using the pre macro. In the new rendering system it's the user who decides what he wants
+                // by using either the nowiki macro or the xhtml macro with escapeWikiSyntax set to true or false.
+                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                    result.append("{pre}");
+                }
                 prefix = obj.getxWikiClass(context).getName() + "_";
                 pclass.displaySearch(result, fieldname, prefix, (XWikiCriteria) context.get("query"), context);
-                result.append("{/pre}");
+                if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+                    result.append("{/pre}");
+                }
             } else {
                 pclass.displayView(result, fieldname, prefix, obj, context);
             }
@@ -2761,6 +2792,36 @@ public class XWikiDocument
     }
 
     public List<String> getIncludedPages(XWikiContext context)
+    {
+        if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
+            return getIncludedPagesForXWiki10Syntax(context);
+        } else {
+            // Find all include macros listed on the page
+            XDOM dom;
+            try {
+                Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
+                dom = parser.parse(new StringReader(getContent()));
+            } catch (Exception e) {
+                log.error("Failed to find included pages for [" + getFullName() + "]", e);
+                return Collections.EMPTY_LIST;
+            }
+
+            List<String> result = new ArrayList<String>();
+            for (MacroBlock macroBlock: dom.getChildrenByType(MacroBlock.class)) {
+                if (macroBlock.getName().equalsIgnoreCase("include")) {
+                    String documentName = macroBlock.getParameters().get("document");
+                    if (documentName.indexOf(".") == -1) {
+                        documentName = getSpace() + "." + documentName;
+                    }
+                    result.add(documentName);
+                }
+            }
+
+            return result;
+        }
+    }
+
+    private List<String> getIncludedPagesForXWiki10Syntax(XWikiContext context)
     {
         try {
             String pattern = "#include(Topic|InContext|Form|Macros|parseGroovyFromPage)\\([\"'](.*?)[\"']\\)";

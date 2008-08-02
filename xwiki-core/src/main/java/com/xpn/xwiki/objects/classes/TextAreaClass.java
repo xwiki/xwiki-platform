@@ -23,7 +23,8 @@ package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
-
+import org.apache.commons.logging.LogFactory;
+import org.apache.commons.logging.Log;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -31,7 +32,10 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.LargeStringProperty;
 import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
-public class TextAreaClass extends StringClass {
+public class TextAreaClass extends StringClass
+{
+    private static final Log LOG = LogFactory.getLog(TextAreaClass.class);
+
     public TextAreaClass(PropertyMetaClass wclass) {
         super("textarea", "Text Area", wclass);
         setSize(40);
@@ -160,7 +164,15 @@ public class TextAreaClass extends StringClass {
             StringBuffer sbuf = new StringBuffer();
             super.displayView(sbuf, name, prefix, object, context);
             if (doc != null) {
-                buffer.append(doc.getRenderedContent(sbuf.toString(), context));
+                String syntaxId;
+                try {
+                    syntaxId = context.getWiki().getDocument(object.getName(), context).getSyntaxId();
+                } catch (Exception e) {
+                    LOG.warn("Error while getting the syntax corresponding to object [" + object.getClassName()
+                        + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
+                    syntaxId = "xwiki/1.0";
+                }
+                buffer.append(doc.getRenderedContent(sbuf.toString(), syntaxId, context));
             } else {
                 buffer.append(sbuf.toString());
             }

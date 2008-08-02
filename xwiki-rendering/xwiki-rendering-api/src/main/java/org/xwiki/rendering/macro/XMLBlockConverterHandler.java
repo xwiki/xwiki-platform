@@ -36,8 +36,10 @@ import org.xwiki.rendering.block.XMLBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.listener.Listener;
 
 /**
  * @version $Id$
@@ -49,7 +51,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
 
     private boolean escapeWikiSyntax;
     
-    private Stack<XMLBlock> stack = new Stack<XMLBlock>();
+    private Stack<Block> stack = new Stack<Block>();
     
     /**
      * SAX parsers are allowed to call the characters() method several times in a row.
@@ -57,7 +59,16 @@ public class XMLBlockConverterHandler extends DefaultHandler
      * even call characters() for every single character! Thus we need to accumulate
      * the characters in a buffer before we process them.
      */
-    private StringBuffer accumulationBuffer;
+    private StringBuffer accumulationBuffer = new StringBuffer();
+
+    private final MarkerBlock marker = new MarkerBlock();
+
+    private class MarkerBlock extends AbstractBlock
+    {
+        public void traverse(Listener listener)
+        {
+        }
+    }
 
     public XMLBlockConverterHandler(Parser parser, boolean escapeWikiSyntax)
     {
@@ -65,7 +76,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
         this.escapeWikiSyntax = escapeWikiSyntax;
     }
     
-    public XMLBlock getRootBlock()
+    public Block getRootBlock()
     {
         return this.stack.peek();
     }
@@ -73,37 +84,41 @@ public class XMLBlockConverterHandler extends DefaultHandler
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException
     {
-        if (accumulationBuffer != null) {
-            accumulationBuffer.append(ch, start, length);
-        }
+        this.accumulationBuffer.append(ch, start, length);
     }
 
     private void processCharacters(char[] ch, int start, int length) throws SAXException
     {
-        String content = new String(ch, start, length);
+        // Ignore white space/new lines characters between XHTML elements and remove whitespaces at beginning
+        // and end of elements. We do this since this is the HTML behavior.
+        String content = new String(ch, start, length).trim();
 
-        // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
-        if (this.escapeWikiSyntax) {
-            this.stack.peek().addChild(new WordBlock(content));
-        } else {
+        if (content.length() > 0) {
+            // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is
+            if (this.escapeWikiSyntax) {
+                this.stack.push(new WordBlock(content));
+            } else {
 
-            XDOM dom;
-            try {
-                dom = this.parser.parse(new StringReader(content));
-            } catch (ParseException e) {
-                throw new SAXException("Failed to parse [" + content + "]", e);
-            }
+                XDOM dom;
+                try {
+                    dom = this.parser.parse(new StringReader(content));
+                } catch (ParseException e) {
+                    throw new SAXException("Failed to parse [" + content + "]", e);
+                }
 
-            // Remove any paragraph that might have been added since we don't want paragraphs.
-            // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
-            List<Block> children = dom.getChildren();
-            if (children.size() > 0) {
-                if (ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {
-                    dom = new XDOM(children.get(0).getChildren());
+                // Remove any paragraph that might have been added since we don't want paragraphs.
+                // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
+                List<Block> children = dom.getChildren();
+                if (children.size() > 0) {
+                    if (ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {
+                        dom = new XDOM(children.get(0).getChildren());
+                    }
+                }
+
+                for (Block block: dom.getChildren()) {
+                    this.stack.push(block);
                 }
             }
-
-            this.stack.peek().addChildren(dom.getChildren());
         }
     }
 
@@ -111,10 +126,10 @@ public class XMLBlockConverterHandler extends DefaultHandler
     public void startElement(String uri, String localName, String name, Attributes attributes)
         throws SAXException
     {
-        if (accumulationBuffer != null && accumulationBuffer.length() > 0) {
-            processCharacters(accumulationBuffer.toString().toCharArray(), 0, accumulationBuffer.length());
+        if (this.accumulationBuffer.length() > 0) {
+            processCharacters(this.accumulationBuffer.toString().toCharArray(), 0, this.accumulationBuffer.length());
+            this.accumulationBuffer.delete(0, this.accumulationBuffer.length());
         }
-        accumulationBuffer = new StringBuffer();
 
         Map<String, String> map = new HashMap<String, String>();
         for (int i = 0; i < attributes.getLength(); i++) {
@@ -135,22 +150,35 @@ public class XMLBlockConverterHandler extends DefaultHandler
             }
         }
         this.stack.push(new XMLBlock(name, map));
+        this.stack.push(this.marker);
     }
 
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException
     {
-        if (accumulationBuffer != null && accumulationBuffer.length() > 0) {
-            processCharacters(accumulationBuffer.toString().toCharArray(), 0, accumulationBuffer.length());
-            accumulationBuffer.setLength(0);
+        if (accumulationBuffer.length() > 0) {
+            processCharacters(this.accumulationBuffer.toString().toCharArray(), 0, this.accumulationBuffer.length());
+            this.accumulationBuffer.delete(0, this.accumulationBuffer.length());
         }
 
-        // Pop the stack until we reach a matching Block element
-        List<XMLBlock> blocks = new ArrayList<XMLBlock>();
-        while (!this.stack.peek().getName().equals(name)) {
-            blocks.add(this.stack.pop());
+        // Pop the stack until we reach a marker block
+        List<Block> nestedBlocks = generateListFromStack();
+        this.stack.peek().addChildren(nestedBlocks);
+    }
+
+    private List<Block> generateListFromStack()
+    {
+        List<Block> blocks = new ArrayList<Block>();
+        while (!this.stack.empty()) {
+            if (this.stack.peek() != this.marker) {
+                blocks.add(this.stack.pop());
+            } else {
+                this.stack.pop();
+                break;
+            }
         }
         Collections.reverse(blocks);
-        this.stack.peek().addChildren(blocks);
+        return blocks;
     }
+
 }

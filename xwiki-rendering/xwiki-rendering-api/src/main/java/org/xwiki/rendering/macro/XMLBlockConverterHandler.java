@@ -40,6 +40,7 @@ import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.listener.Listener;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @version $Id$
@@ -89,9 +90,9 @@ public class XMLBlockConverterHandler extends DefaultHandler
 
     private void processCharacters(char[] ch, int start, int length) throws SAXException
     {
-        // Ignore white space/new lines characters between XHTML elements and remove whitespaces at beginning
-        // and end of elements. We do this since this is the HTML behavior.
-        String content = new String(ch, start, length).trim();
+        // Strip all new lines characters. We do this since this is the standard HTML behavior and otherwise this
+        // will generate NewLineBlocks.
+        String content = StringUtils.strip(new String(ch, start, length), "\n\r\t");
 
         if (content.length() > 0) {
             // If we've been told by the user to not render wiki syntax we simply pass the text as a Word block as is

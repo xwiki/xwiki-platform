@@ -95,4 +95,28 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
 
         assertBlocks(expected, blocks);
     }
+
+    /**
+     * Verify that if there's a space before an XML element it's correctly preserved.
+     * @throws Exception
+     */
+    public void testMacroWhenWhiteSpaces() throws Exception
+    {
+        String html = "<p>Some <span>text</span></p>";
+
+        String expected = "beginDocument\n"
+            + "beginXMLElement: [p] []\n"
+            + "onWord: [Some]\n"
+            + "onSpace\n"
+            + "beginXMLElement: [span] []\n"
+            + "onWord: [text]\n"
+            + "endXMLElement: [span] []\n"
+            + "endXMLElement: [p] []\n"
+            + "endDocument\n";
+
+        Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
+        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, XDOM.EMPTY);
+
+        assertBlocks(expected, blocks);
+    }
 }

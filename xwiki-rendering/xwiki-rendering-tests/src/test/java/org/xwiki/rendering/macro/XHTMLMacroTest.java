@@ -74,7 +74,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
         String html = "&nbsp;";
 
         String expected = "beginDocument\n"
-            + "onWord: [Ê]\n"
+            + "onWord: [" + ((char) 160) + "]\n"
             + "endDocument\n";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");

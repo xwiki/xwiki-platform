@@ -22,7 +22,6 @@ package com.xpn.xwiki.store.hibernate.query;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.xwiki.context.Execution;
 
@@ -77,24 +76,31 @@ public class HqlQuery extends AbstractQuery
      */
     public <T> List<T> execute() throws XWikiException
     {
-        XWikiContext context = (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
-        XWikiHibernateStore store = (XWikiHibernateStore) context.getWiki().getNotCacheStore();
-        return store.executeRead(context, true, new HibernateCallback<List<T>>() {
-            @SuppressWarnings("unchecked")
-            public List<T> doInHibernate(Session session) throws HibernateException, XWikiException
-            {
-                org.hibernate.Query query = createQuery(session);
-                if (getOffset() > 0) {
-                    query.setFirstResult(getOffset());
-                }
-                if (getLimit() > 0) {
-                    query.setMaxResults(getLimit());
-                }
-                for (Entry<String, Object> e : getParameters().entrySet()) {
-                    query.setParameter(e.getKey(), e.getValue());
-                }
-                return query.list();
+        final XWikiContext context = (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
+        final XWikiHibernateStore store = (XWikiHibernateStore) context.getWiki().getNotCacheStore();
+        String olddatabase = context.getDatabase();        
+        try {
+            if (getWiki() != null) {
+                context.setDatabase(getWiki());
             }
-        });
+            return store.executeRead(context, true, new HibernateCallback<List<T>>() {
+                @SuppressWarnings("unchecked")
+                public List<T> doInHibernate(Session session) throws XWikiException {
+                    org.hibernate.Query query = createQuery(session);
+                    if (getOffset() > 0) {
+                        query.setFirstResult(getOffset());
+                    }
+                    if (getLimit() > 0) {
+                        query.setMaxResults(getLimit());
+                    }
+                    for (Entry<String, Object> e : getParameters().entrySet()) {
+                        query.setParameter(e.getKey(), e.getValue());
+                    }
+                    return query.list();                
+                }
+            });
+        } finally {
+            context.setDatabase(olddatabase);
+        }
     }
 }

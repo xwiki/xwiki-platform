@@ -52,6 +52,11 @@ public interface Query
     String getLanguage();
 
     /**
+     * @param wiki virtual wiki to run the query. null is current wiki.
+     */
+    void setWiki(String wiki);
+
+    /**
      * Bind named parameter var with value val in query statement.
      * @param var variable in query statement (:var).
      * @param val value of the variable.

@@ -99,7 +99,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * QueryManager for this store.
      * Injected via component manager.
      */
-    QueryManager queryManager;
+    private QueryManager queryManager;
 
     /**
      * This allows to initialize our storage engine. The hibernate config file path is taken from xwiki.cfg or directly

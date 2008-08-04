@@ -630,6 +630,7 @@ public class XWikiHibernateBaseStore implements Initializable
                         if (!schemaName.equals(catalog))
                             session.connection().setCatalog(schemaName);
                     }
+                    context.setOriginalDatabase(context.getDatabase());
                 }
             } catch (Exception e) {
                 Object[] args = {context.getDatabase()};
@@ -1019,6 +1020,10 @@ public class XWikiHibernateBaseStore implements Initializable
             if (bTransaction) {
                 checkHibernate(context);
                 bTransaction = beginTransaction(context);
+            }
+
+            if (context.getDatabase()!=null && !context.getDatabase().equals(context.getOriginalDatabase())) {
+                setDatabase(getSession(context), context);
             }
 
             return cb.doInHibernate(getSession(context));

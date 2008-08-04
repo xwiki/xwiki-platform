@@ -80,40 +80,41 @@ public class JcrQuery extends AbstractQuery
     {
         XWikiContext context = (XWikiContext) getExecution().getContext().getProperty("xwikicontext");
         XWikiJcrStore store = (XWikiJcrStore) context.getWiki().getNotCacheStore();
+        String olddatabase = context.getDatabase();
         try {
+            if (getWiki()!=null) {
+                context.setDatabase(getWiki());
+            }
             return (List<T>) store.executeRead(context, new JcrCallBack() {
                 public Object doInJcr(XWikiJcrSession session) throws Exception
                 {
                     Query query = createQuery(session.getJcrSession());
                     RowIterator ri = query.execute().getRows();
-                    // Emulate offset and limit
-                    int skip = getOffset();
+                    if (getOffset()>0)
+                        ri.skip(getOffset());
                     int size = getLimit() > 0 ? getLimit() : Integer.MAX_VALUE;
                     List<T> result = new ArrayList<T>();
-                    while (ri.hasNext()) {
+                    while (ri.hasNext() && size > 0) {
                         Row row = ri.nextRow();
-                        if (skip>0) {
-                            skip--;
-                        } else {
-                            if (size<=0) break;
-                            Value[] values = row.getValues();
-                            Object[] el = new Object[values.length]; 
-                            for (int i=0; i<values.length; i++) {
-                                el[i] = JcrUtil.fromValue( values[i] );
-                            }
-                            if (values.length==1) {
-                                result.add((T) el[0]);
-                            } else {
-                                result.add((T) el);
-                            }
-                            size--;
+                        Value[] values = row.getValues();
+                        Object[] el = new Object[values.length]; 
+                        for (int i=0; i<values.length; i++) {
+                            el[i] = JcrUtil.fromValue( values[i] );
                         }
+                        if (values.length==1) {
+                            result.add((T) el[0]);
+                        } else {
+                            result.add((T) el);
+                        }
+                        size--;
                     }
                     return result;
                 }
             });
         } catch (Exception e) {
             throw new XWikiException(0, 0, e.getLocalizedMessage(), e);
+        } finally {
+            context.setDatabase(olddatabase);
         }
     }
 
@@ -136,7 +137,7 @@ public class JcrQuery extends AbstractQuery
     }
 
     protected String getValueAsString(Object val) {
-        return val.toString();
+        return "'"+val.toString()+"'";
     }
 
     protected Query createQuery(Session session) throws RepositoryException

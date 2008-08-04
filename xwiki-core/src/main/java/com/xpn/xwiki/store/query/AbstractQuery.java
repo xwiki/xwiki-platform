@@ -40,6 +40,11 @@ public abstract class AbstractQuery implements Query
     private String language;
 
     /**
+     * virtual wiki to run the query.
+     */
+    private String wiki;
+
+    /**
      * map from query parameters to values.
      */
     private Map<String, Object> parameters = new HashMap<String, Object>();
@@ -78,6 +83,14 @@ public abstract class AbstractQuery implements Query
     public String getLanguage()
     {
         return language;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void setWiki(String wiki)
+    {
+        this.wiki = wiki;
     }
 
     /**
@@ -131,5 +144,13 @@ public abstract class AbstractQuery implements Query
     protected Map<String, Object> getParameters()
     {
         return parameters;
+    }
+    
+    /**
+     * @return virtual wiki to run the query. null is current wiki.
+     */
+    protected String getWiki()
+    {
+        return wiki;
     }
 }

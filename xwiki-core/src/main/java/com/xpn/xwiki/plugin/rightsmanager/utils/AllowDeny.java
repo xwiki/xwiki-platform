@@ -20,26 +20,27 @@ public class AllowDeny
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
 
-        String allowString = allow.toString();
+        String allowString = this.allow.toString();
         if (allowString.length() > 0) {
             sb.append('{');
             sb.append("allow : ");
-            sb.append(allow);
+            sb.append(this.allow);
             sb.append('}');
         }
 
-        String denyString = deny.toString();
+        String denyString = this.deny.toString();
         if (denyString.length() > 0) {
             sb.append('{');
             sb.append("deny : ");
-            sb.append(deny);
+            sb.append(this.deny);
             sb.append('}');
         }
 

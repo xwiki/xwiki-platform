@@ -34,7 +34,7 @@ public class RightsManagerException extends PluginException
      * The default RightsManagerException.
      */
     private static final RightsManagerException DEFAULT_EXCEPTION = new RightsManagerException();
-    
+
     // //////
 
     /**
@@ -49,9 +49,8 @@ public class RightsManagerException extends PluginException
     }
 
     /**
-     * Create an RightsManagerException. Replace any parameters found in the <code>message</code> by
-     * the passed <code>args</code> parameters. The format is the one used by
-     * {@link java.text.MessageFormat}.
+     * Create an RightsManagerException. Replace any parameters found in the <code>message</code> by the passed
+     * <code>args</code> parameters. The format is the one used by {@link java.text.MessageFormat}.
      * 
      * @param code the error code.
      * @param message a literal message about this error.

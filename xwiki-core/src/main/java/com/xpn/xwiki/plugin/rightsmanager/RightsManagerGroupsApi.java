@@ -21,9 +21,7 @@
 package com.xpn.xwiki.plugin.rightsmanager;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 
@@ -47,14 +46,12 @@ public class RightsManagerGroupsApi extends Api
     /**
      * Field name of the last error code inserted in context.
      */
-    public static final String CONTEXT_LASTERRORCODE =
-        RightsManagerPluginApi.CONTEXT_LASTERRORCODE;
+    public static final String CONTEXT_LASTERRORCODE = RightsManagerPluginApi.CONTEXT_LASTERRORCODE;
 
     /**
      * Field name of the last api exception inserted in context.
      */
-    public static final String CONTEXT_LASTEXCEPTION =
-        RightsManagerPluginApi.CONTEXT_LASTEXCEPTION;
+    public static final String CONTEXT_LASTEXCEPTION = RightsManagerPluginApi.CONTEXT_LASTEXCEPTION;
 
     /**
      * The logging toolkit.
@@ -105,7 +102,7 @@ public class RightsManagerGroupsApi extends Api
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of groups.
      */
-    public int countAllMatchedGroups(Map matchFields) throws XWikiException
+    public int countAllMatchedGroups(Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -144,7 +141,7 @@ public class RightsManagerGroupsApi extends Api
      * @return the number of groups in the provided wiki.
      * @throws XWikiException error when getting number of groups.
      */
-    public int countAllMatchedWikiGroups(String wikiName, Map matchFields) throws XWikiException
+    public int countAllMatchedWikiGroups(String wikiName, Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -153,8 +150,7 @@ public class RightsManagerGroupsApi extends Api
                 RightsManager.getInstance().countAllWikiUsersOrGroups(false, wikiName,
                     RightsManagerPluginApi.createMatchingTable(matchFields), this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to count all groups in wiki [{0}]",
-                new Object[] {wikiName}), e);
+            logError(MessageFormat.format("Try to count all groups in wiki [{0}]", new Object[] {wikiName}), e);
         }
 
         return count;
@@ -178,7 +174,7 @@ public class RightsManagerGroupsApi extends Api
      * @return the number of groups in the main wiki.
      * @throws XWikiException error when getting number of groups.
      */
-    public int countAllMatchedGlobalGroups(Map matchFields) throws XWikiException
+    public int countAllMatchedGlobalGroups(Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -211,7 +207,7 @@ public class RightsManagerGroupsApi extends Api
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of groups.
      */
-    public int countAllMatchedLocalGroups(Map matchFields) throws XWikiException
+    public int countAllMatchedLocalGroups(Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -234,7 +230,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGroupsNames(int nb, int start) throws XWikiException
+    public List<String> getAllGroupsNames(int nb, int start) throws XWikiException
     {
         return getAllMatchedGroupsNames(null, nb, start);
     }
@@ -245,7 +241,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGroupsNames() throws XWikiException
+    public List<String> getAllGroupsNames() throws XWikiException
     {
         return getAllMatchedGroupsNames(null);
     }
@@ -261,7 +257,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGroupsNames(Map matchFields) throws XWikiException
+    public List<String> getAllMatchedGroupsNames(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedGroupsNames(matchFields, 0, 0, null);
     }
@@ -279,8 +275,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGroupsNames(Map matchFields, int nb, int start)
-        throws XWikiException
+    public List<String> getAllMatchedGroupsNames(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedGroupsNames(matchFields, nb, start, null);
     }
@@ -303,19 +298,20 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGroupsNames(Map matchFields, int nb, int start, List order)
+    public List<String> getAllMatchedGroupsNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
+        List<String> groupList;
 
         try {
             groupList =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups names", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;
@@ -329,7 +325,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGlobalGroupsNames(int nb, int start) throws XWikiException
+    public List<String> getAllGlobalGroupsNames(int nb, int start) throws XWikiException
     {
         return getAllMatchedGlobalGroupsNames(null, nb, start);
     }
@@ -340,7 +336,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGlobalGroupsNames() throws XWikiException
+    public List<String> getAllGlobalGroupsNames() throws XWikiException
     {
         return getAllMatchedGlobalGroupsNames(null);
     }
@@ -356,7 +352,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGlobalGroupsNames(Map matchFields) throws XWikiException
+    public List<String> getAllMatchedGlobalGroupsNames(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedGlobalGroupsNames(matchFields, 0, 0, null);
     }
@@ -374,7 +370,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGlobalGroupsNames(Map matchFields, int nb, int start)
+    public List<String> getAllMatchedGlobalGroupsNames(Map< ? , ? > matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedGlobalGroupsNames(matchFields, nb, start, null);
@@ -398,19 +394,20 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGlobalGroupsNames(Map matchFields, int nb, int start, List order)
+    public List<String> getAllMatchedGlobalGroupsNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
+        List<String> groupList;
 
         try {
             groupList =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups names from global wiki", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;
@@ -425,7 +422,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllWikiGroupsNames(String wikiName, int nb, int start) throws XWikiException
+    public List<String> getAllWikiGroupsNames(String wikiName, int nb, int start) throws XWikiException
     {
         return getAllMatchedWikiGroupsNames(wikiName, null, nb, start);
     }
@@ -437,7 +434,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllWikiGroupsNames(String wikiName) throws XWikiException
+    public List<String> getAllWikiGroupsNames(String wikiName) throws XWikiException
     {
         return getAllMatchedWikiGroupsNames(wikiName, null);
     }
@@ -454,8 +451,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields)
-        throws XWikiException
+    public List<String> getAllMatchedWikiGroupsNames(String wikiName, Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedWikiGroupsNames(wikiName, matchFields, 0, 0, null);
     }
@@ -474,7 +470,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields, int nb, int start)
+    public List<String> getAllMatchedWikiGroupsNames(String wikiName, Map< ? , ? > matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedWikiGroupsNames(wikiName, matchFields, nb, start, null);
@@ -499,19 +495,20 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedWikiGroupsNames(String wikiName, Map matchFields, int nb, int start,
-        List order) throws XWikiException
+    public List<String> getAllMatchedWikiGroupsNames(String wikiName, Map< ? , ? > matchFields, int nb, int start,
+        List< ? > order) throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
+        List<String> groupList;
 
         try {
             groupList =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups names from provided wiki", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;
@@ -525,7 +522,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllLocalGroupsNames(int nb, int start) throws XWikiException
+    public List<String> getAllLocalGroupsNames(int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalGroupsNames(null, nb, start);
     }
@@ -536,7 +533,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllLocalGroupsNames() throws XWikiException
+    public List<String> getAllLocalGroupsNames() throws XWikiException
     {
         return getAllMatchedLocalGroupsNames(null);
     }
@@ -552,7 +549,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedLocalGroupsNames(Map matchFields) throws XWikiException
+    public List<String> getAllMatchedLocalGroupsNames(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedLocalGroupsNames(matchFields, 0, 0, null);
     }
@@ -570,7 +567,7 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedLocalGroupsNames(Map matchFields, int nb, int start)
+    public List<String> getAllMatchedLocalGroupsNames(Map< ? , ? > matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedLocalGroupsNames(matchFields, nb, start, null);
@@ -594,19 +591,20 @@ public class RightsManagerGroupsApi extends Api
      * @return a {@link List} of {@link String} containing group names.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedLocalGroupsNames(Map matchFields, int nb, int start, List order)
+    public List<String> getAllMatchedLocalGroupsNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List groupList = Collections.EMPTY_LIST;
+        List<String> groupList;
 
         try {
             groupList =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups names from local wiki", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;
@@ -617,10 +615,10 @@ public class RightsManagerGroupsApi extends Api
      * 
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGroups(int nb, int start) throws XWikiException
+    public List<Document> getAllGroups(int nb, int start) throws XWikiException
     {
         return getAllMatchedGroups(null, nb, start);
     }
@@ -628,10 +626,10 @@ public class RightsManagerGroupsApi extends Api
     /**
      * Get all groups in the main wiki and the current wiki.
      * 
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGroups() throws XWikiException
+    public List<Document> getAllGroups() throws XWikiException
     {
         return getAllMatchedGroups(null);
     }
@@ -644,10 +642,10 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGroups(Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedGroups(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedGroups(matchFields, 0, 0, null);
     }
@@ -662,10 +660,10 @@ public class RightsManagerGroupsApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGroups(Map matchFields, int nb, int start) throws XWikiException
+    public List<Document> getAllMatchedGroups(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedGroups(matchFields, nb, start, null);
     }
@@ -685,26 +683,25 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGroups(Map matchFields, int nb, int start, List order)
+    public List<Document> getAllMatchedGroups(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List groupList = new ArrayList();
+        List<Document> groupList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            groupList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups documents", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;
@@ -715,10 +712,10 @@ public class RightsManagerGroupsApi extends Api
      * 
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGlobalGroups(int nb, int start) throws XWikiException
+    public List<Document> getAllGlobalGroups(int nb, int start) throws XWikiException
     {
         return getAllMatchedGlobalGroups(null, nb, start);
     }
@@ -726,10 +723,10 @@ public class RightsManagerGroupsApi extends Api
     /**
      * Get all groups in the main wiki.
      * 
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllGlobalGroups() throws XWikiException
+    public List<Document> getAllGlobalGroups() throws XWikiException
     {
         return getAllMatchedGlobalGroups(null);
     }
@@ -742,10 +739,10 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGlobalGroups(Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedGlobalGroups(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedGlobalGroups(matchFields, 0, 0, null);
     }
@@ -760,11 +757,10 @@ public class RightsManagerGroupsApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGlobalGroups(Map matchFields, int nb, int start)
-        throws XWikiException
+    public List<Document> getAllMatchedGlobalGroups(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedGlobalGroups(matchFields, nb, start, null);
     }
@@ -784,26 +780,25 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedGlobalGroups(Map matchFields, int nb, int start, List order)
+    public List<Document> getAllMatchedGlobalGroups(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List groupList = new ArrayList();
+        List<Document> groupList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            groupList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups documents from global wiki", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;
@@ -815,10 +810,10 @@ public class RightsManagerGroupsApi extends Api
      * @param wikiName the name of the wiki where to search.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllWikiGroups(String wikiName, int nb, int start) throws XWikiException
+    public List<Document> getAllWikiGroups(String wikiName, int nb, int start) throws XWikiException
     {
         return getAllMatchedWikiGroups(wikiName, null, nb, start);
     }
@@ -827,10 +822,10 @@ public class RightsManagerGroupsApi extends Api
      * Get all groups in the provided wiki.
      * 
      * @param wikiName the name of the wiki where to search.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllWikiGroups(String wikiName) throws XWikiException
+    public List<Document> getAllWikiGroups(String wikiName) throws XWikiException
     {
         return getAllMatchedWikiGroups(wikiName, null);
     }
@@ -844,10 +839,10 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedWikiGroups(String wikiName, Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedWikiGroups(String wikiName, Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedWikiGroups(wikiName, matchFields, 0, 0, null);
     }
@@ -863,10 +858,10 @@ public class RightsManagerGroupsApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedWikiGroups(String wikiName, Map matchFields, int nb, int start)
+    public List<Document> getAllMatchedWikiGroups(String wikiName, Map< ? , ? > matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedWikiGroups(wikiName, matchFields, nb, start, null);
@@ -888,26 +883,25 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedWikiGroups(String wikiName, Map matchFields, int nb, int start,
-        List order) throws XWikiException
+    public List<Document> getAllMatchedWikiGroups(String wikiName, Map< ? , ? > matchFields, int nb, int start,
+        List< ? > order) throws XWikiException
     {
-        List groupList = new ArrayList();
+        List<Document> groupList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(false, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            groupList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups documents from provided wiki", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;
@@ -918,10 +912,10 @@ public class RightsManagerGroupsApi extends Api
      * 
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllLocalGroups(int nb, int start) throws XWikiException
+    public List<Document> getAllLocalGroups(int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalGroups(null, nb, start);
     }
@@ -929,10 +923,10 @@ public class RightsManagerGroupsApi extends Api
     /**
      * Get all groups in the current wiki.
      * 
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllLocalGroups() throws XWikiException
+    public List<Document> getAllLocalGroups() throws XWikiException
     {
         return getAllMatchedLocalGroups(null);
     }
@@ -945,10 +939,10 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedLocalGroups(Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedLocalGroups(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedLocalGroups(matchFields, 0, 0, null);
     }
@@ -963,11 +957,10 @@ public class RightsManagerGroupsApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found group to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedLocalGroups(Map matchFields, int nb, int start)
-        throws XWikiException
+    public List<Document> getAllMatchedLocalGroups(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalGroups(matchFields, nb, start, null);
     }
@@ -987,26 +980,25 @@ public class RightsManagerGroupsApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing group.
+     * @return a {@link List} of {@link Document} containing group.
      * @throws XWikiException error when searching for groups.
      */
-    public List getAllMatchedLocalGroups(Map matchFields, int nb, int start, List order)
+    public List<Document> getAllMatchedLocalGroups(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List groupList = new ArrayList();
+        List<Document> groupList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(false,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                groupList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            groupList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched groups documents from local wiki", e);
+
+            groupList = Collections.emptyList();
         }
 
         return groupList;

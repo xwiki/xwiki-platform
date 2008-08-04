@@ -69,9 +69,10 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public void init(XWikiContext context)
     {
         if (docChangeRule == null) {
@@ -83,9 +84,11 @@ public class RightsManagerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     *
-     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface, com.xpn.xwiki.XWikiContext)
+     * 
+     * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(com.xpn.xwiki.plugin.XWikiPluginInterface,
+     *      com.xpn.xwiki.XWikiContext)
      */
+    @Override
     public com.xpn.xwiki.api.Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new RightsManagerPluginApi((RightsManagerPlugin) plugin, context);

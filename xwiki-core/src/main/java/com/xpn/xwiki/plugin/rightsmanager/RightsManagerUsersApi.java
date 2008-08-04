@@ -21,9 +21,7 @@
 package com.xpn.xwiki.plugin.rightsmanager;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.plugin.rightsmanager.utils.RequestLimit;
 
@@ -47,14 +46,12 @@ public class RightsManagerUsersApi extends Api
     /**
      * Field name of the last error code inserted in context.
      */
-    public static final String CONTEXT_LASTERRORCODE =
-        RightsManagerPluginApi.CONTEXT_LASTERRORCODE;
+    public static final String CONTEXT_LASTERRORCODE = RightsManagerPluginApi.CONTEXT_LASTERRORCODE;
 
     /**
      * Field name of the last api exception inserted in context.
      */
-    public static final String CONTEXT_LASTEXCEPTION =
-        RightsManagerPluginApi.CONTEXT_LASTEXCEPTION;
+    public static final String CONTEXT_LASTEXCEPTION = RightsManagerPluginApi.CONTEXT_LASTEXCEPTION;
 
     /**
      * The logging toolkit.
@@ -105,7 +102,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the current wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedUsers(Map matchFields) throws XWikiException
+    public int countAllMatchedUsers(Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -144,7 +141,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the provided wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedWikiUsers(String wikiName, Map matchFields) throws XWikiException
+    public int countAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -153,8 +150,7 @@ public class RightsManagerUsersApi extends Api
                 RightsManager.getInstance().countAllWikiUsersOrGroups(true, wikiName,
                     RightsManagerPluginApi.createMatchingTable(matchFields), this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to count all users in wiki [{0}]",
-                new Object[] {wikiName}), e);
+            logError(MessageFormat.format("Try to count all users in wiki [{0}]", new Object[] {wikiName}), e);
         }
 
         return count;
@@ -178,7 +174,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the main wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedGlobalUsers(Map matchFields) throws XWikiException
+    public int countAllMatchedGlobalUsers(Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -211,7 +207,7 @@ public class RightsManagerUsersApi extends Api
      * @return the number of users in the current wiki.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllMatchedLocalUsers(Map matchFields) throws XWikiException
+    public int countAllMatchedLocalUsers(Map< ? , ? > matchFields) throws XWikiException
     {
         int count = 0;
 
@@ -234,7 +230,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllUsersNames(int nb, int start) throws XWikiException
+    public List<String> getAllUsersNames(int nb, int start) throws XWikiException
     {
         return getAllMatchedUsersNames(null, nb, start);
     }
@@ -245,7 +241,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllUsersNames() throws XWikiException
+    public List<String> getAllUsersNames() throws XWikiException
     {
         return getAllMatchedUsersNames(null);
     }
@@ -261,7 +257,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedUsersNames(Map matchFields) throws XWikiException
+    public List<String> getAllMatchedUsersNames(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedUsersNames(matchFields, 0, 0, null);
     }
@@ -279,7 +275,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedUsersNames(Map matchFields, int nb, int start) throws XWikiException
+    public List<String> getAllMatchedUsersNames(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedUsersNames(matchFields, nb, start, null);
     }
@@ -302,19 +298,20 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedUsersNames(Map matchFields, int nb, int start, List order)
+    public List<String> getAllMatchedUsersNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
+        List<String> userList;
 
         try {
             userList =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users names", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;
@@ -328,7 +325,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllGlobalUsersNames(int nb, int start) throws XWikiException
+    public List<String> getAllGlobalUsersNames(int nb, int start) throws XWikiException
     {
         return getAllMatchedGlobalUsersNames(null, nb, start);
     }
@@ -339,7 +336,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllGlobalUsersNames() throws XWikiException
+    public List<String> getAllGlobalUsersNames() throws XWikiException
     {
         return getAllMatchedGlobalUsersNames(null);
     }
@@ -355,7 +352,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedGlobalUsersNames(Map matchFields) throws XWikiException
+    public List<String> getAllMatchedGlobalUsersNames(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedGlobalUsersNames(matchFields, 0, 0, null);
     }
@@ -373,7 +370,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedGlobalUsersNames(Map matchFields, int nb, int start)
+    public List<String> getAllMatchedGlobalUsersNames(Map< ? , ? > matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedGlobalUsersNames(matchFields, nb, start, null);
@@ -397,19 +394,20 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedGlobalUsersNames(Map matchFields, int nb, int start, List order)
+    public List<String> getAllMatchedGlobalUsersNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
+        List<String> userList;
 
         try {
             userList =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users names from global wiki", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;
@@ -424,7 +422,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllWikiUsersNames(String wikiName, int nb, int start) throws XWikiException
+    public List<String> getAllWikiUsersNames(String wikiName, int nb, int start) throws XWikiException
     {
         return getAllMatchedWikiUsersNames(wikiName, null, nb, start);
     }
@@ -436,7 +434,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllWikiUsersNames(String wikiName) throws XWikiException
+    public List<String> getAllWikiUsersNames(String wikiName) throws XWikiException
     {
         return getAllMatchedWikiUsersNames(wikiName, null);
     }
@@ -453,8 +451,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields)
-        throws XWikiException
+    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedWikiUsersNames(wikiName, matchFields, 0, 0, null);
     }
@@ -473,7 +470,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields, int nb, int start)
+    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map< ? , ? > matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedWikiUsersNames(wikiName, matchFields, nb, start, null);
@@ -498,19 +495,20 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedWikiUsersNames(String wikiName, Map matchFields, int nb, int start,
-        List order) throws XWikiException
+    public List<String> getAllMatchedWikiUsersNames(String wikiName, Map< ? , ? > matchFields, int nb, int start,
+        List< ? > order) throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
+        List<String> userList;
 
         try {
             userList =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users names from provided wiki", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;
@@ -524,7 +522,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllLocalUsersNames(int nb, int start) throws XWikiException
+    public List<String> getAllLocalUsersNames(int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalUsersNames(null, nb, start);
     }
@@ -535,7 +533,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllLocalUsersNames() throws XWikiException
+    public List<String> getAllLocalUsersNames() throws XWikiException
     {
         return getAllMatchedLocalUsersNames(null);
     }
@@ -551,7 +549,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedLocalUsersNames(Map matchFields) throws XWikiException
+    public List<String> getAllMatchedLocalUsersNames(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedLocalUsersNames(matchFields, 0, 0, null);
     }
@@ -569,8 +567,7 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedLocalUsersNames(Map matchFields, int nb, int start)
-        throws XWikiException
+    public List<String> getAllMatchedLocalUsersNames(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalUsersNames(matchFields, nb, start, null);
     }
@@ -594,19 +591,20 @@ public class RightsManagerUsersApi extends Api
      * @return a {@link List} of {@link String} containing user names.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedLocalUsersNames(Map matchFields, int nb, int start, List order)
+    public List<String> getAllMatchedLocalUsersNames(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List userList = Collections.EMPTY_LIST;
+        List<String> userList;
 
         try {
             userList =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), false,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+                (List<String>) RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), false, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users names from local wiki", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;
@@ -617,10 +615,10 @@ public class RightsManagerUsersApi extends Api
      * 
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllUsers(int nb, int start) throws XWikiException
+    public List<Document> getAllUsers(int nb, int start) throws XWikiException
     {
         return getAllMatchedUsers(null, nb, start);
     }
@@ -628,10 +626,10 @@ public class RightsManagerUsersApi extends Api
     /**
      * Get all users in the main wiki and the current wiki.
      * 
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllUsers() throws XWikiException
+    public List<Document> getAllUsers() throws XWikiException
     {
         return getAllMatchedUsers(null);
     }
@@ -644,10 +642,10 @@ public class RightsManagerUsersApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedUsers(Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedUsers(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedUsers(matchFields, 0, 0, null);
     }
@@ -662,10 +660,10 @@ public class RightsManagerUsersApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedUsers(Map matchFields, int nb, int start) throws XWikiException
+    public List<Document> getAllMatchedUsers(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedUsers(matchFields, nb, start, null);
     }
@@ -685,26 +683,25 @@ public class RightsManagerUsersApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedUsers(Map matchFields, int nb, int start, List order)
+    public List<Document> getAllMatchedUsers(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List userList = new ArrayList();
+        List<Document> userList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            userList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;
@@ -715,10 +712,10 @@ public class RightsManagerUsersApi extends Api
      * 
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllGlobalUsers(int nb, int start) throws XWikiException
+    public List<Document> getAllGlobalUsers(int nb, int start) throws XWikiException
     {
         return getAllMatchedGlobalUsers(null, nb, start);
     }
@@ -726,10 +723,10 @@ public class RightsManagerUsersApi extends Api
     /**
      * Get all users in the main wiki.
      * 
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllGlobalUsers() throws XWikiException
+    public List<Document> getAllGlobalUsers() throws XWikiException
     {
         return getAllMatchedGlobalUsers(null);
     }
@@ -742,10 +739,10 @@ public class RightsManagerUsersApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedGlobalUsers(Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedGlobalUsers(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedGlobalUsers(matchFields, 0, 0, null);
     }
@@ -760,11 +757,10 @@ public class RightsManagerUsersApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedGlobalUsers(Map matchFields, int nb, int start)
-        throws XWikiException
+    public List<Document> getAllMatchedGlobalUsers(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedGlobalUsers(matchFields, nb, start, null);
     }
@@ -784,26 +780,25 @@ public class RightsManagerUsersApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedGlobalUsers(Map matchFields, int nb, int start, List order)
+    public List<Document> getAllMatchedGlobalUsers(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List userList = new ArrayList();
+        List<Document> userList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedGlobalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            userList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users from global wiki", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;
@@ -815,10 +810,10 @@ public class RightsManagerUsersApi extends Api
      * @param wikiName the wiki where to search for users.
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllWikiUsers(String wikiName, int nb, int start) throws XWikiException
+    public List<Document> getAllWikiUsers(String wikiName, int nb, int start) throws XWikiException
     {
         return getAllMatchedWikiUsers(wikiName, null, nb, start);
     }
@@ -827,10 +822,10 @@ public class RightsManagerUsersApi extends Api
      * Get all users in the provided wiki.
      * 
      * @param wikiName the wiki where to search for users.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllWikiUsers(String wikiName) throws XWikiException
+    public List<Document> getAllWikiUsers(String wikiName) throws XWikiException
     {
         return getAllMatchedWikiUsers(wikiName, null);
     }
@@ -844,10 +839,10 @@ public class RightsManagerUsersApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedWikiUsers(String wikiName, Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedWikiUsers(wikiName, matchFields, 0, 0, null);
     }
@@ -863,10 +858,10 @@ public class RightsManagerUsersApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedWikiUsers(String wikiName, Map matchFields, int nb, int start)
+    public List<Document> getAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields, int nb, int start)
         throws XWikiException
     {
         return getAllMatchedWikiUsers(wikiName, matchFields, nb, start, null);
@@ -888,26 +883,25 @@ public class RightsManagerUsersApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedWikiUsers(String wikiName, Map matchFields, int nb, int start,
-        List order) throws XWikiException
+    public List<Document> getAllMatchedWikiUsers(String wikiName, Map< ? , ? > matchFields, int nb, int start,
+        List< ? > order) throws XWikiException
     {
-        List userList = new ArrayList();
+        List<Document> userList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedWikiUsersOrGroups(true, wikiName,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            userList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users from provided wiki", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;
@@ -918,10 +912,10 @@ public class RightsManagerUsersApi extends Api
      * 
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllLocalUsers(int nb, int start) throws XWikiException
+    public List<Document> getAllLocalUsers(int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalUsers(null, nb, start);
     }
@@ -929,10 +923,10 @@ public class RightsManagerUsersApi extends Api
     /**
      * Get all users in the current wiki.
      * 
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllLocalUsers() throws XWikiException
+    public List<Document> getAllLocalUsers() throws XWikiException
     {
         return getAllMatchedLocalUsers(null);
     }
@@ -945,10 +939,10 @@ public class RightsManagerUsersApi extends Api
      *            <li>"matching string" for document fields</li>
      *            <li>or ["field type", "matching string"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedLocalUsers(Map matchFields) throws XWikiException
+    public List<Document> getAllMatchedLocalUsers(Map< ? , ? > matchFields) throws XWikiException
     {
         return getAllMatchedLocalUsers(matchFields, 0, 0, null);
     }
@@ -963,10 +957,10 @@ public class RightsManagerUsersApi extends Api
      *            </ul>
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedLocalUsers(Map matchFields, int nb, int start) throws XWikiException
+    public List<Document> getAllMatchedLocalUsers(Map< ? , ? > matchFields, int nb, int start) throws XWikiException
     {
         return getAllMatchedLocalUsers(matchFields, nb, start, null);
     }
@@ -986,26 +980,25 @@ public class RightsManagerUsersApi extends Api
      *            <li>"field name" for document fields</li>
      *            <li>or ["filed name", "field type"] for object fields</li>
      *            </ul>
-     * @return a {@link List} of {@link com.xpn.xwiki.api.Document} containing user.
+     * @return a {@link List} of {@link Document} containing user.
      * @throws XWikiException error when searching for users.
      */
-    public List getAllMatchedLocalUsers(Map matchFields, int nb, int start, List order)
+    public List<Document> getAllMatchedLocalUsers(Map< ? , ? > matchFields, int nb, int start, List< ? > order)
         throws XWikiException
     {
-        List userList = new ArrayList();
+        List<Document> userList;
 
         try {
-            List list =
-                RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
-                    RightsManagerPluginApi.createMatchingTable(matchFields), true,
-                    new RequestLimit(nb, start), RightsManagerPluginApi.createOrderTable(order),
-                    this.context);
+            List<XWikiDocument> xdocList =
+                (List<XWikiDocument>) RightsManager.getInstance().getAllMatchedLocalUsersOrGroups(true,
+                    RightsManagerPluginApi.createMatchingTable(matchFields), true, new RequestLimit(nb, start),
+                    RightsManagerPluginApi.createOrderTable(order), this.context);
 
-            for (Iterator it = list.iterator(); it.hasNext();) {
-                userList.add(((XWikiDocument) it.next()).newDocument(context));
-            }
+            userList = convert(xdocList);
         } catch (RightsManagerException e) {
             logError("Try to get all matched users from local wiki", e);
+
+            userList = Collections.emptyList();
         }
 
         return userList;

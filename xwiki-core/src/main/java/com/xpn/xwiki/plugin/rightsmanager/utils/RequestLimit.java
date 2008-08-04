@@ -43,7 +43,7 @@ public class RequestLimit
      */
     public int getNb()
     {
-        return nb;
+        return this.nb;
     }
 
     /**
@@ -59,6 +59,6 @@ public class RequestLimit
      */
     public int getStart()
     {
-        return start;
+        return this.start;
     }
 }

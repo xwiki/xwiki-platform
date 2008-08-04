@@ -48,12 +48,12 @@ public class RightsManagerRightsApi extends Api
      * Field name of the last api exception inserted in context.
      */
     public static final String CONTEXT_LASTEXCEPTION = RightsManagerPluginApi.CONTEXT_LASTEXCEPTION;
-       
+
     /**
      * The logging toolkit.
      */
     protected static final Log LOG = LogFactory.getLog(RightsManagerRightsApi.class);
-    
+
     /**
      * Create an instance of RightsManageRightsApi.
      * 
@@ -77,9 +77,9 @@ public class RightsManagerRightsApi extends Api
         this.context.put(CONTEXT_LASTERRORCODE, new Integer(e.getCode()));
         this.context.put(CONTEXT_LASTEXCEPTION, e);
     }
-    
+
     // Inheritance
-    
+
     /**
      * Get the document containing inherited rights of provided document.
      * 
@@ -92,15 +92,12 @@ public class RightsManagerRightsApi extends Api
         Document parent = null;
 
         try {
-            XWikiDocument xdoc =
-                RightsManager.getInstance().getParentPreference(spaceOrPage, context);
+            XWikiDocument xdoc = RightsManager.getInstance().getParentPreference(spaceOrPage, context);
 
-            if (xdoc != null) {
-                parent = xdoc.newDocument(context);
-            }
+            parent = convert(xdoc);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get parent rights preference for [{0}]",
-                new Object[] {spaceOrPage}), e);
+            logError(MessageFormat.format("Try to get parent rights preference for [{0}]", new Object[] {spaceOrPage}),
+                e);
         }
 
         return parent;

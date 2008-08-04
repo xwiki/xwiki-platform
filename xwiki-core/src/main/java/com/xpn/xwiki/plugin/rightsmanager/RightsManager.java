@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -95,38 +94,32 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
     private static final String GLOBAL_RIGHTS_CLASS = "XWiki.XWikiGlobalRights";
 
     /**
-     * Name of the "levels" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
-     * classes.
+     * Name of the "levels" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
      */
     private static final String RIGHTSFIELD_LEVELS = "levels";
 
     /**
-     * Name of the "users" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
-     * classes.
+     * Name of the "users" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
      */
     private static final String RIGHTSFIELD_USERS = "users";
 
     /**
-     * Name of the "groups" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
-     * classes.
+     * Name of the "groups" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
      */
     private static final String RIGHTSFIELD_GROUPS = "groups";
 
     /**
-     * Name of the "allow" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
-     * classes.
+     * Name of the "allow" field for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
      */
     private static final String RIGHTSFIELD_ALLOW = "allow";
 
     /**
-     * Separator symbols of the list fields for the {@link #RIGHTS_CLASS} and
-     * {@link #GLOBAL_RIGHTS_CLASS} classes.
+     * Separator symbols of the list fields for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
      */
     private static final String RIGHTSLISTFIELD_SEP = ",|";
 
     /**
-     * Join symbol of the list fields for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS}
-     * classes.
+     * Join symbol of the list fields for the {@link #RIGHTS_CLASS} and {@link #GLOBAL_RIGHTS_CLASS} classes.
      */
     private static final String RIGHTSLISTFIELD_JOIN = "|";
 
@@ -173,14 +166,12 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @throws XWikiException error when browsing groups or rights.
      */
-    private void cleanDeletedUserOrGroupInLocalWiki(String userOrGroupWiki,
-        String userOrGroupSpace, String userOrGroupName, boolean user, XWikiContext context)
-        throws XWikiException
+    private void cleanDeletedUserOrGroupInLocalWiki(String userOrGroupWiki, String userOrGroupSpace,
+        String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
     {
-        removeUserOrGroupFromAllRights(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
-            context);
-        context.getWiki().getGroupService(context).removeUserOrGroupFromAllGroups(
-            userOrGroupWiki, userOrGroupSpace, userOrGroupName, context);
+        removeUserOrGroupFromAllRights(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
+        context.getWiki().getGroupService(context).removeUserOrGroupFromAllGroups(userOrGroupWiki, userOrGroupSpace,
+            userOrGroupName, context);
     }
 
     /**
@@ -193,12 +184,11 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @throws XWikiException error when browsing groups or rights.
      */
-    private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace,
-        String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
+    private void cleanDeletedUserOrGroup(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
+        boolean user, XWikiContext context) throws XWikiException
     {
         if (!context.getWiki().isVirtualMode()) {
-            cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
-                userOrGroupName, user, context);
+            cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
         } else {
             List<String> wikiList = context.getWiki().getVirtualWikisDatabaseNames(context);
 
@@ -212,14 +202,14 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                     }
 
                     context.setDatabase(wikiName);
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
-                        userOrGroupName, user, context);
+                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
+                        context);
                 }
 
                 if (!foundMainWiki) {
                     context.setDatabase(context.getMainXWiki());
-                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace,
-                        userOrGroupName, user, context);
+                    cleanDeletedUserOrGroupInLocalWiki(userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
+                        context);
                 }
             } finally {
                 context.setDatabase(database);
@@ -231,11 +221,10 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * {@inheritDoc}
      * 
      * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
-     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int,
-     *      com.xpn.xwiki.XWikiContext)
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int, com.xpn.xwiki.XWikiContext)
      */
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc,
-        int event, XWikiContext context)
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
+        XWikiContext context)
     {
         if (newdoc == null || newdoc.isNew()) {
             String userOrGroupWiki = olddoc.getDatabase();
@@ -244,15 +233,13 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
             if (olddoc.getObject("XWiki.XWikiUsers") != null) {
                 try {
-                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName,
-                        true, context);
+                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, true, context);
                 } catch (XWikiException e) {
                     LOG.warn("Error when cleaning for deleted user", e);
                 }
             } else if (olddoc.getObject("XWiki.XWikiGroups") != null) {
                 try {
-                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName,
-                        false, context);
+                    cleanDeletedUserOrGroup(userOrGroupWiki, userOrGroupSpace, userOrGroupName, false, context);
                 } catch (XWikiException e) {
                     LOG.warn("Error when cleaning for deleted group", e);
                 }
@@ -270,16 +257,14 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the main wiki and the current wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
-        throws XWikiException
+    public int countAllUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context) throws XWikiException
     {
         if (context.isMainWiki()) {
             return countAllLocalUsersOrGroups(user, matchFields, context);
@@ -297,16 +282,15 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the provided wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields,
-        XWikiContext context) throws XWikiException
+    public int countAllWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
         if (context.isMainWiki()) {
             return countAllLocalUsersOrGroups(user, matchFields, context);
@@ -329,16 +313,15 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the main wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllGlobalUsersOrGroups(boolean user, Object[][] matchFields,
-        XWikiContext context) throws XWikiException
+    public int countAllGlobalUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
         if (context.isMainWiki()) {
             return countAllLocalUsersOrGroups(user, matchFields, context);
@@ -354,23 +337,20 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
      * @param context the XWiki context.
      * @return the number of groups in the current wiki.
      * @throws XWikiException error when getting number of users or groups.
      */
-    public int countAllLocalUsersOrGroups(boolean user, Object[][] matchFields,
-        XWikiContext context) throws XWikiException
+    public int countAllLocalUsersOrGroups(boolean user, Object[][] matchFields, XWikiContext context)
+        throws XWikiException
     {
         if (user) {
-            return context.getWiki().getGroupService(context).countAllMatchedUsers(matchFields,
-                context);
+            return context.getWiki().getGroupService(context).countAllMatchedUsers(matchFields, context);
         } else {
-            return context.getWiki().getGroupService(context).countAllMatchedGroups(matchFields,
-                context);
+            return context.getWiki().getGroupService(context).countAllMatchedGroups(matchFields, context);
         }
     }
 
@@ -381,32 +361,27 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
-     * @param withdetails indicate if the methods return {@link List} or {@link String} or
-     *            {@link List} of {@link XWikiDocument}.
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or {@link List} of
+     *            {@link XWikiDocument}.
      * @param limit the maximum number of result to return and index of the first element.
      * @param order the fields to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            </ul>
      * @param context the XWiki context.
-     * @return a {@link List} of {@link String} containing user or group name if
-     *         <code>withdetails</code> is false, otherwise a {@link List} of
-     *         {@link XWikiDocument} containing user or group.
+     * @return a {@link List} of {@link String} containing user or group name if <code>withdetails</code> is false,
+     *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields,
-        boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
-        throws XWikiException
+    public List< ? > getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
+        RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (context.isMainWiki()) {
-            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
-                context);
+            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
         }
 
         List<Object> userOrGroupList = new ArrayList<Object>();
@@ -417,8 +392,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         // Get global groups
         if (newstart < nbGlobalUsersOrGroups) {
-            userOrGroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields,
-                withdetails, new RequestLimit(limit.getNb(), newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedGlobalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(
+                limit.getNb(), newstart), order, context));
             newstart = 0;
         } else {
             newstart = newstart - nbGlobalUsersOrGroups;
@@ -426,13 +401,11 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         // Get local groups
         if (limit.getNb() > userOrGroupList.size()) {
-            userOrGroupList
-                .addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
-                    new RequestLimit(limit.getNb() - userOrGroupList.size(), newstart), order,
-                    context));
+            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(
+                limit.getNb() - userOrGroupList.size(), newstart), order, context));
         } else if (limit.getNb() <= 0) {
-            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails,
-                new RequestLimit(0, newstart), order, context));
+            userOrGroupList.addAll(getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, new RequestLimit(0,
+                newstart), order, context));
         }
 
         return userOrGroupList;
@@ -445,36 +418,31 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
-     * @param withdetails indicate if the methods return {@link List} or {@link String} or
-     *            {@link List} of {@link XWikiDocument}.
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or {@link List} of
+     *            {@link XWikiDocument}.
      * @param limit the maximum number of result to return and index of the first element.
      * @param order the fields to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            </ul>
      * @param context the XWiki context.
-     * @return a {@link List} of {@link String} containing user or group name if
-     *         <code>withdetails</code> is false, otherwise a {@link List} of
-     *         {@link XWikiDocument} containing user or group.
+     * @return a {@link List} of {@link String} containing user or group name if <code>withdetails</code> is false,
+     *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields,
-        boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
-        throws XWikiException
+    public List< ? > getAllMatchedGlobalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
+        RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (context.isMainWiki()) {
-            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
-                context);
+            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
         }
 
-        return getAllMatchedWikiUsersOrGroups(user, context.getMainXWiki(), matchFields,
-            withdetails, limit, order, context);
+        return getAllMatchedWikiUsersOrGroups(user, context.getMainXWiki(), matchFields, withdetails, limit, order,
+            context);
     }
 
     /**
@@ -485,32 +453,27 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
-     * @param withdetails indicate if the methods return {@link List} or {@link String} or
-     *            {@link List} of {@link XWikiDocument}.
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or {@link List} of
+     *            {@link XWikiDocument}.
      * @param limit the maximum number of result to return and index of the first element.
      * @param order the fields to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            </ul>
      * @param context the XWiki context.
-     * @return a {@link List} of {@link String} containing user or group name if
-     *         <code>withdetails</code> is false, otherwise a {@link List} of
-     *         {@link XWikiDocument} containing user or group.
+     * @return a {@link List} of {@link String} containing user or group name if <code>withdetails</code> is false,
+     *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedWikiUsersOrGroups(boolean user, String wikiName,
-        Object[][] matchFields, boolean withdetails, RequestLimit limit, Object[][] order,
-        XWikiContext context) throws XWikiException
+    public List< ? > getAllMatchedWikiUsersOrGroups(boolean user, String wikiName, Object[][] matchFields,
+        boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (context.isMainWiki()) {
-            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
-                context);
+            return getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
         }
 
         String database = context.getDatabase();
@@ -519,8 +482,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
             context.setDatabase(wikiName);
 
             List< ? > localGroupList =
-                getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order,
-                    context);
+                getAllMatchedLocalUsersOrGroups(user, matchFields, withdetails, limit, order, context);
 
             if (localGroupList != null && !withdetails) {
                 List<String> wikiGroupList = new ArrayList<String>(localGroupList.size());
@@ -544,35 +506,31 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
-     * @param withdetails indicate if the methods return {@link List} or {@link String} or
-     *            {@link List} of {@link XWikiDocument}.
+     * @param withdetails indicate if the methods return {@link List} or {@link String} or {@link List} of
+     *            {@link XWikiDocument}.
      * @param limit the maximum number of result to return and index of the first element.
      * @param order the fields to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            </ul>
      * @param context the XWiki context.
-     * @return a {@link List} of {@link String} containing user or group name if
-     *         <code>withdetails</code> is false, otherwise a {@link List} of
-     *         {@link XWikiDocument} containing user or group.
+     * @return a {@link List} of {@link String} containing user or group name if <code>withdetails</code> is false,
+     *         otherwise a {@link List} of {@link XWikiDocument} containing user or group.
      * @throws XWikiException error when searching from users or groups.
      */
-    public List< ? > getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields,
-        boolean withdetails, RequestLimit limit, Object[][] order, XWikiContext context)
-        throws XWikiException
+    public List< ? > getAllMatchedLocalUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails,
+        RequestLimit limit, Object[][] order, XWikiContext context) throws XWikiException
     {
         if (user) {
-            return context.getWiki().getGroupService(context).getAllMatchedUsers(matchFields,
-                withdetails, limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context).getAllMatchedUsers(matchFields, withdetails,
+                limit.getNb(), limit.getStart(), order, context);
         } else {
-            return context.getWiki().getGroupService(context).getAllMatchedGroups(matchFields,
-                withdetails, limit.getNb(), limit.getStart(), order, context);
+            return context.getWiki().getGroupService(context).getAllMatchedGroups(matchFields, withdetails,
+                limit.getNb(), limit.getStart(), order, context);
         }
     }
 
@@ -586,11 +544,10 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
+        throws XWikiException
     {
-        return context.getWiki().getGroupService(context).getAllGroupsNamesForMember(member, nb,
-            start, context);
+        return context.getWiki().getGroupService(context).getAllGroupsNamesForMember(member, nb, start, context);
     }
 
     /**
@@ -603,11 +560,10 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link Collection} of {@link String} containing user name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start,
-        XWikiContext context) throws XWikiException
+    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
+        throws XWikiException
     {
-        return context.getWiki().getGroupService(context).getAllMembersNamesForGroup(group, nb,
-            start, context);
+        return context.getWiki().getGroupService(context).getAllMembersNamesForGroup(group, nb, start, context);
     }
 
     /**
@@ -618,11 +574,9 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the number of groups.
      * @throws XWikiException error when getting number of users.
      */
-    public int countAllGroupsNamesForMember(String member, XWikiContext context)
-        throws XWikiException
+    public int countAllGroupsNamesForMember(String member, XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getGroupService(context).countAllGroupsNamesForMember(member,
-            context);
+        return context.getWiki().getGroupService(context).countAllGroupsNamesForMember(member, context);
     }
 
     /**
@@ -633,11 +587,9 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the number of members.
      * @throws XWikiException error when getting number of groups.
      */
-    public int countAllMembersNamesForGroup(String group, XWikiContext context)
-        throws XWikiException
+    public int countAllMembersNamesForGroup(String group, XWikiContext context) throws XWikiException
     {
-        return context.getWiki().getGroupService(context).countAllMembersNamesForGroup(group,
-            context);
+        return context.getWiki().getGroupService(context).countAllMembersNamesForGroup(group, context);
     }
 
     // Rights management
@@ -652,10 +604,10 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link Map} containing [levelname : {@link LevelTree}].
      * @throws XWikiException error when browsing rights preferences.
      */
-    private Map getLevelTreeMap(XWikiDocument preferences, List levelsToMatch, boolean global,
-        XWikiContext context) throws XWikiException
+    private Map<String, LevelTree> getLevelTreeMap(XWikiDocument preferences, List<String> levelsToMatch,
+        boolean global, XWikiContext context) throws XWikiException
     {
-        Map rightsMap = new HashMap();
+        Map<String, LevelTree> rightsMap = new HashMap<String, LevelTree>();
 
         fillLevelTreeMap(rightsMap, preferences, levelsToMatch, global, true, context);
 
@@ -671,13 +623,12 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link Map} containing [levelname : {@link LevelTree}].
      * @throws XWikiException error when browsing rights preferences.
      */
-    public Map getLevelTreeMap(String spaceOrPage, List levelsToMatch, XWikiContext context)
+    public Map<String, LevelTree> getLevelTreeMap(String spaceOrPage, List<String> levelsToMatch, XWikiContext context)
         throws XWikiException
     {
         XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
 
-        return getLevelTreeMap(preferences, levelsToMatch, isGlobal(preferences, spaceOrPage),
-            context);
+        return getLevelTreeMap(preferences, levelsToMatch, isGlobal(preferences, spaceOrPage), context);
     }
 
     /**
@@ -687,27 +638,21 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param levelInherited the levels names for which to find inheritance.
      * @param bobj the object containing rights preferences.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
-     * @param direct if true fill the {@link LevelTree#direct} field, otherwise fill the
-     *            {@link LevelTree#inherited}.
+     * @param direct if true fill the {@link LevelTree#direct} field, otherwise fill the {@link LevelTree#inherited}.
      * @param context the XWiki context.
      */
-    private void fillLevelTreeMap(Map rightsMap, List levelInherited, BaseObject bobj,
-        List levelsToMatch, boolean direct, XWikiContext context)
+    private void fillLevelTreeMap(Map<String, LevelTree> rightsMap, List<String> levelInherited, BaseObject bobj,
+        List<String> levelsToMatch, boolean direct, XWikiContext context)
     {
-        List users =
-            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_USERS),
-                RIGHTSLISTFIELD_SEP, false);
-        List groups =
-            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_GROUPS),
-                RIGHTSLISTFIELD_SEP, false);
-        List levels =
-            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS),
-                RIGHTSLISTFIELD_SEP, false);
+        List<String> users =
+            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_USERS), RIGHTSLISTFIELD_SEP, false);
+        List<String> groups =
+            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_GROUPS), RIGHTSLISTFIELD_SEP, false);
+        List<String> levels =
+            ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS), RIGHTSLISTFIELD_SEP, false);
         boolean allow = (bobj.getIntValue(RIGHTSFIELD_ALLOW) == 1);
 
-        for (Iterator itLevel = levels.iterator(); itLevel.hasNext();) {
-            String levelName = (String) itLevel.next();
-
+        for (String levelName : levels) {
             if (levelsToMatch == null || levelsToMatch.contains(levelName)) {
                 LevelTree level;
                 if (!rightsMap.containsKey(levelName)) {
@@ -753,11 +698,11 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @throws XWikiException error when browsing rights preferences.
      */
-    private void fillLevelTreeMapInherited(Map rightsMap, List levelInheritedIn,
-        XWikiDocument preferences, List levelsToMatch, boolean global, XWikiContext context)
+    private void fillLevelTreeMapInherited(Map<String, LevelTree> rightsMap, List<String> levelInheritedIn,
+        XWikiDocument preferences, List<String> levelsToMatch, boolean global, XWikiContext context)
         throws XWikiException
     {
-        List levelInherited = levelInheritedIn;
+        List<String> levelInherited = levelInheritedIn;
 
         // Get document containing inherited rights
         XWikiDocument parentPreferences = getParentPreference(preferences, global, context);
@@ -765,22 +710,18 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         if (parentPreferences != null) {
             // Fill levels where to find inheritance
             if (levelInherited == null) {
-                levelInherited = new ArrayList();
+                levelInherited = new ArrayList<String>();
             }
 
-            for (Iterator it = levelsToMatch.iterator(); it.hasNext();) {
-                String levelName = (String) it.next();
-
-                if (!rightsMap.containsKey(levelName)
-                    || ((LevelTree) rightsMap.get(levelName)).inherited == null) {
+            for (String levelName : levelsToMatch) {
+                if (!rightsMap.containsKey(levelName) || ((LevelTree) rightsMap.get(levelName)).inherited == null) {
                     levelInherited.add(levelName);
                 }
             }
 
             // Find inheritance if needed
             if (!levelInherited.isEmpty()) {
-                fillLevelTreeMap(rightsMap, parentPreferences, levelInherited, true, false,
-                    context);
+                fillLevelTreeMap(rightsMap, parentPreferences, levelInherited, true, false, context);
             }
         }
     }
@@ -792,34 +733,29 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param preferences the document containing rights preferences.
      * @param levelsToMatch the levels names to check ("view", "edit", etc.).
      * @param global indicate it is global rights (wiki or space) or document rights.
-     * @param direct if true fill the {@link LevelTree#direct} field, otherwise fill the
-     *            {@link LevelTree#inherited}.
+     * @param direct if true fill the {@link LevelTree#direct} field, otherwise fill the {@link LevelTree#inherited}.
      * @param context the XWiki context.
      * @throws XWikiException error when browsing rights preferences.
      */
-    private void fillLevelTreeMap(Map rightsMap, XWikiDocument preferences, List levelsToMatch,
-        boolean global, boolean direct, XWikiContext context) throws XWikiException
+    private void fillLevelTreeMap(Map<String, LevelTree> rightsMap, XWikiDocument preferences,
+        List<String> levelsToMatch, boolean global, boolean direct, XWikiContext context) throws XWikiException
     {
-        List levelInherited = null;
+        List<String> levelInherited = null;
         if (levelsToMatch == null) {
-            levelInherited = new ArrayList();
+            levelInherited = new ArrayList<String>();
         }
 
         if (!preferences.isNew()) {
             String rightsClass = global ? GLOBAL_RIGHTS_CLASS : RIGHTS_CLASS;
-            List vobj = preferences.getObjects(rightsClass);
+            List<BaseObject> vobj = preferences.getObjects(rightsClass);
             if (vobj != null) {
-                for (Iterator it = vobj.iterator(); it.hasNext();) {
-                    BaseObject bobj = (BaseObject) it.next();
-
-                    fillLevelTreeMap(rightsMap, levelInherited, bobj, levelsToMatch, direct,
-                        context);
+                for (BaseObject bobj : vobj) {
+                    fillLevelTreeMap(rightsMap, levelInherited, bobj, levelsToMatch, direct, context);
                 }
             }
         }
 
-        fillLevelTreeMapInherited(rightsMap, levelInherited, preferences, levelsToMatch, global,
-            context);
+        fillLevelTreeMapInherited(rightsMap, levelInherited, preferences, levelsToMatch, global, context);
     }
 
     /**
@@ -831,8 +767,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the document containing inherited rights of provided document.
      * @throws XWikiException error when browsing rights preferences.
      */
-    public XWikiDocument getParentPreference(XWikiDocument currentPreference,
-        boolean currentGlobal, XWikiContext context) throws XWikiException
+    public XWikiDocument getParentPreference(XWikiDocument currentPreference, boolean currentGlobal,
+        XWikiContext context) throws XWikiException
     {
         XWikiDocument parentPreferences = null;
 
@@ -840,17 +776,14 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
             if (currentPreference.getFullName().equals(WIKI_PREFERENCES)) {
                 if (!context.isMainWiki()) {
                     parentPreferences =
-                        context.getWiki()
-                            .getDocument(
-                                context.getMainXWiki() + WIKIFULLNAME_SEP + WIKI_PREFERENCES,
-                                context);
+                        context.getWiki().getDocument(context.getMainXWiki() + WIKIFULLNAME_SEP + WIKI_PREFERENCES,
+                            context);
                 }
             } else if (currentPreference.getName().equals(SPACE_PREFERENCES)) {
                 String parentspace = currentPreference.getStringValue(WIKI_PREFERENCES, "parent");
                 if (parentspace.trim().length() > 0) {
                     parentPreferences =
-                        context.getWiki().getDocument(
-                            parentspace + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
+                        context.getWiki().getDocument(parentspace + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
                 } else {
                     parentPreferences = context.getWiki().getDocument(WIKI_PREFERENCES, context);
                 }
@@ -861,10 +794,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
             }
         } else {
             parentPreferences =
-                context.getWiki()
-                    .getDocument(
-                        currentPreference.getSpace() + SPACEPAGENAME_SEP + SPACE_PREFERENCES,
-                        context);
+                context.getWiki().getDocument(currentPreference.getSpace() + SPACEPAGENAME_SEP + SPACE_PREFERENCES,
+                    context);
         }
 
         return parentPreferences;
@@ -878,8 +809,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the document containing inherited rights of provided document.
      * @throws XWikiException error when browsing rights preferences.
      */
-    public XWikiDocument getParentPreference(String spaceOrPage, XWikiContext context)
-        throws XWikiException
+    public XWikiDocument getParentPreference(String spaceOrPage, XWikiContext context) throws XWikiException
     {
         XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
 
@@ -898,17 +828,17 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link LevelTree}.
      * @throws XWikiException error when browsing rights preferences.
      */
-    private LevelTree getLevel(XWikiDocument doc, String levelName, boolean global,
-        XWikiContext context) throws XWikiException
+    private LevelTree getLevel(XWikiDocument doc, String levelName, boolean global, XWikiContext context)
+        throws XWikiException
     {
         if (doc.isNew()) {
             return null;
         }
 
-        List rights = new ArrayList();
-        rights.add(rights);
+        List<String> rights = new ArrayList<String>();
+        rights.add(levelName);
 
-        Map rightsMap = getLevelTreeMap(doc, rights, global, context);
+        Map<String, LevelTree> rightsMap = getLevelTreeMap(doc, rights, global, context);
 
         return (LevelTree) rightsMap.get(levelName);
     }
@@ -921,8 +851,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the document containing rights preferences.
      * @throws XWikiException error when getting document from database.
      */
-    private XWikiDocument getXWikiPreferencesDoc(String spaceOrPage, XWikiContext context)
-        throws XWikiException
+    private XWikiDocument getXWikiPreferencesDoc(String spaceOrPage, XWikiContext context) throws XWikiException
     {
         XWikiDocument xwikidoc = null;
 
@@ -930,9 +859,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
             xwikidoc = context.getWiki().getDocument(spaceOrPage, context);
 
             if (xwikidoc.isNew()) {
-                xwikidoc =
-                    context.getWiki().getDocument(
-                        spaceOrPage + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
+                xwikidoc = context.getWiki().getDocument(spaceOrPage + SPACEPAGENAME_SEP + SPACE_PREFERENCES, context);
             }
         } else {
             xwikidoc = context.getWiki().getDocument(WIKI_PREFERENCES, context);
@@ -962,8 +889,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @return the {@link LevelTree}.
      * @throws XWikiException error when browsing rights.
      */
-    public LevelTree getTreeLevel(String spaceOrPage, String levelName, XWikiContext context)
-        throws XWikiException
+    public LevelTree getTreeLevel(String spaceOrPage, String levelName, XWikiContext context) throws XWikiException
     {
         XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
 
@@ -982,9 +908,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @throws XWikiException error when browsing rights.
      */
-    public void removeUserOrGroupFromLevel(String spaceOrPage, String userOrGroup, boolean user,
-        String levelName, boolean allow, String comment, XWikiContext context)
-        throws XWikiException
+    public void removeUserOrGroupFromLevel(String spaceOrPage, String userOrGroup, boolean user, String levelName,
+        boolean allow, String comment, XWikiContext context) throws XWikiException
     {
         XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
 
@@ -997,13 +922,11 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         List<BaseObject> vobj = preferences.getObjects(rightsClass);
         if (vobj != null) {
             for (BaseObject bobj : vobj) {
-                List levels =
-                    ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS),
-                        RIGHTSLISTFIELD_SEP, false);
+                List<String> levels =
+                    ListClass.getListFromString(bobj.getStringValue(RIGHTSFIELD_LEVELS), RIGHTSLISTFIELD_SEP, false);
 
                 if (levels.contains(levelName)) {
-                    needUpdate |=
-                        removeUserOrGroupFromRight(bobj, null, null, userOrGroup, user, context);
+                    needUpdate |= removeUserOrGroupFromRight(bobj, null, null, userOrGroup, user, context);
                 }
             }
 
@@ -1024,35 +947,30 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @return true if user or group has been found and removed.
      */
-    public boolean removeUserOrGroupFromRight(BaseObject right, String userOrGroupWiki,
-        String userOrGroupSpace, String userOrGroupName, boolean user, XWikiContext context)
+    public boolean removeUserOrGroupFromRight(BaseObject right, String userOrGroupWiki, String userOrGroupSpace,
+        String userOrGroupName, boolean user, XWikiContext context)
     {
         boolean needUpdate = false;
 
         String userOrGroupField = user ? RIGHTSFIELD_USERS : RIGHTSFIELD_GROUPS;
 
-        List usersOrGroups =
-            ListClass.getListFromString(right.getStringValue(userOrGroupField),
-                RIGHTSLISTFIELD_SEP, false);
+        List<String> usersOrGroups =
+            ListClass.getListFromString(right.getStringValue(userOrGroupField), RIGHTSLISTFIELD_SEP, false);
 
         if (userOrGroupWiki != null) {
-            needUpdate |=
-                usersOrGroups.remove(userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName);
+            needUpdate |= usersOrGroups.remove(userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName);
         }
 
-        if (context.getDatabase() == null
-            || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
+        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
             needUpdate |= usersOrGroups.remove(userOrGroupName);
 
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
-                needUpdate |=
-                    usersOrGroups.remove(userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName);
+                needUpdate |= usersOrGroups.remove(userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName);
             }
         }
 
         if (needUpdate) {
-            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups.toArray(),
-                RIGHTSLISTFIELD_JOIN));
+            right.setStringValue(userOrGroupField, StringUtils.join(usersOrGroups.toArray(), RIGHTSLISTFIELD_JOIN));
         }
 
         return needUpdate;
@@ -1070,9 +988,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @return true if user or group has been found and removed.
      */
-    public boolean removeUserOrGroupFromRights(XWikiDocument rightsDocument,
-        String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName, boolean user,
-        boolean global, XWikiContext context)
+    public boolean removeUserOrGroupFromRights(XWikiDocument rightsDocument, String userOrGroupWiki,
+        String userOrGroupSpace, String userOrGroupName, boolean user, boolean global, XWikiContext context)
     {
         boolean needUpdate = false;
 
@@ -1085,8 +1002,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
                     continue;
                 }
                 needUpdate |=
-                    removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace,
-                        userOrGroupName, user, context);
+                    removeUserOrGroupFromRight(bobj, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user, context);
 
                 if (needUpdate && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0
                     && bobj.getStringValue(RIGHTSFIELD_USERS).trim().length() == 0) {
@@ -1109,14 +1025,13 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @return true if user or group has been found and removed.
      */
-    public boolean removeUserOrGroupFromAllRights(XWikiDocument rightsDocument,
-        String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName, boolean user,
-        XWikiContext context)
+    public boolean removeUserOrGroupFromAllRights(XWikiDocument rightsDocument, String userOrGroupWiki,
+        String userOrGroupSpace, String userOrGroupName, boolean user, XWikiContext context)
     {
-        return removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace,
-            userOrGroupName, user, true, context)
-            || removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace,
-                userOrGroupName, user, false, context);
+        return removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
+            true, context)
+            || removeUserOrGroupFromRights(rightsDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
+                false, context);
     }
 
     /**
@@ -1129,8 +1044,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @throws XWikiException error when browsing rights.
      */
-    public void removeUserOrGroupFromAllRights(String userOrGroupWiki, String userOrGroupSpace,
-        String userOrGroupName, boolean user, XWikiContext context) throws XWikiException
+    public void removeUserOrGroupFromAllRights(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
+        boolean user, XWikiContext context) throws XWikiException
     {
         List<String> parameterValues = new ArrayList<String>();
 
@@ -1144,12 +1059,10 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
         BaseClass rightClass = context.getWiki().getRightsClass(context);
         BaseClass globalRightClass = context.getWiki().getGlobalRightsClass(context);
 
-        String fieldTypeName =
-            ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
+        String fieldTypeName = ((PropertyClass) rightClass.get(fieldName)).newProperty().getClass().getSimpleName();
 
         StringBuffer where =
-            new StringBuffer(", BaseObject as obj" + ", " + fieldTypeName
-                + " as prop where doc.fullName=obj.name"
+            new StringBuffer(", BaseObject as obj" + ", " + fieldTypeName + " as prop where doc.fullName=obj.name"
                 + " and (obj.className=? or obj.className=?)");
         parameterValues.add(rightClass.getName());
         parameterValues.add(globalRightClass.getName());
@@ -1161,35 +1074,31 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
 
         where.append(" and prop.value like ?");
 
-        if (context.getDatabase() == null
-            || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
+        if (context.getDatabase() == null || context.getDatabase().equalsIgnoreCase(userOrGroupWiki)) {
             if (userOrGroupSpace == null || userOrGroupSpace.equals(DEFAULT_USERORGROUP_SPACE)) {
                 parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupName + HQLLIKE_ALL_SYMBOL);
             } else {
-                parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP
-                    + userOrGroupName + HQLLIKE_ALL_SYMBOL);
+                parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupSpace + SPACEPAGENAME_SEP + userOrGroupName
+                    + HQLLIKE_ALL_SYMBOL);
             }
         } else {
-            parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP
-                + userOrGroupName + HQLLIKE_ALL_SYMBOL);
+            parameterValues.add(HQLLIKE_ALL_SYMBOL + userOrGroupWiki + WIKIFULLNAME_SEP + userOrGroupName
+                + HQLLIKE_ALL_SYMBOL);
         }
 
-        List documentList =
-            context.getWiki().getStore().searchDocuments(where.toString(), parameterValues,
-                context);
+        List<XWikiDocument> documentList =
+            context.getWiki().getStore().searchDocuments(where.toString(), parameterValues, context);
 
-        for (Iterator it = documentList.iterator(); it.hasNext();) {
-            XWikiDocument groupDocument = (XWikiDocument) it.next();
-            if (removeUserOrGroupFromAllRights(groupDocument, userOrGroupWiki, userOrGroupSpace,
-                userOrGroupName, user, context)) {
+        for (XWikiDocument groupDocument : documentList) {
+            if (removeUserOrGroupFromAllRights(groupDocument, userOrGroupWiki, userOrGroupSpace, userOrGroupName, user,
+                context)) {
                 context.getWiki().saveDocument(groupDocument, context);
             }
         }
     }
 
     /**
-     * Remove "direct" rights for wiki, space or document. This means that after that inherited
-     * right will be used.
+     * Remove "direct" rights for wiki, space or document. This means that after that inherited right will be used.
      * 
      * @param spaceOrPage the space of page where to get XWikiRights. If null get wiki rights.
      * @param levelNames the levels names to check ("view", "edit", etc.).
@@ -1197,8 +1106,8 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * @param context the XWiki context.
      * @throws XWikiException error when browsing rights.
      */
-    public void removeDirectRights(String spaceOrPage, List levelNames, String comment,
-        XWikiContext context) throws XWikiException
+    public void removeDirectRights(String spaceOrPage, List<String> levelNames, String comment, XWikiContext context)
+        throws XWikiException
     {
         XWikiDocument preferences = getXWikiPreferencesDoc(spaceOrPage, context);
 
@@ -1218,30 +1127,28 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
      * 
      * @param groupName the group name where to search for member.
      * @param memberName the name of the member to find.
-     * @param groupCacheIn a map containing a set a group and its corresponding members already
-     *            retrieved.
+     * @param groupCacheIn a map containing a set a group and its corresponding members already retrieved.
      * @param context the XWiki context.
      * @return true if the member has been found, false otherwise.
      * @throws XWikiException error when browsing groups.
      */
-    public boolean groupContainsMember(String groupName, String memberName, Map groupCacheIn,
-        XWikiContext context) throws XWikiException
+    public boolean groupContainsMember(String groupName, String memberName,
+        Map<String, Collection<String>> groupCacheIn, XWikiContext context) throws XWikiException
     {
         boolean found = false;
 
-        Map groupCache = groupCacheIn;
+        Map<String, Collection<String>> groupCache = groupCacheIn;
         if (groupCache == null) {
-            groupCache = new Hashtable();
+            groupCache = new Hashtable<String, Collection<String>>();
         }
 
-        Collection memberList;
+        Collection<String> memberList;
 
         if (groupCache.containsKey(groupName)) {
-            memberList = (List) groupCache.get(groupName);
+            memberList = groupCache.get(groupName);
         } else {
             memberList =
-                context.getWiki().getGroupService(context).getAllMembersNamesForGroup(groupName,
-                    0, 0, context);
+                context.getWiki().getGroupService(context).getAllMembersNamesForGroup(groupName, 0, 0, context);
             groupCache.put(groupName, memberList);
         }
 
@@ -1249,9 +1156,7 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
             || memberList.contains(context.getDatabase() + WIKIFULLNAME_SEP + memberName)) {
             found = true;
         } else {
-            for (Iterator it = memberList.iterator(); it.hasNext();) {
-                String groupMemberName = (String) it.next();
-
+            for (String groupMemberName : memberList) {
                 if (groupContainsMember(groupMemberName, memberName, groupCache, context)) {
                     found = true;
                     break;

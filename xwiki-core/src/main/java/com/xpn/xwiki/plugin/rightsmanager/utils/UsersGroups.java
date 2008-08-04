@@ -14,18 +14,19 @@ public class UsersGroups
     /**
      * The collection of users.
      */
-    public Collection users = new HashSet();
-    
+    public Collection<String> users = new HashSet<String>();
+
     /**
      * The collection of groups.
      */
-    public Collection groups = new HashSet();
+    public Collection<String> groups = new HashSet<String>();
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();

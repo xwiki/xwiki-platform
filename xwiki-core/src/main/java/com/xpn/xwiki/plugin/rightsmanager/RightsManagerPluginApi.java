@@ -23,7 +23,6 @@ package com.xpn.xwiki.plugin.rightsmanager;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,20 +52,18 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
     public static final String CONTEXT_LASTEXCEPTION = "lastexception";
 
     /**
-     * The name of the property in {@link com.xpn.xwiki.XWikiConfig} indicating the user interface
-     * to use for rights management.
+     * The name of the property in {@link com.xpn.xwiki.XWikiConfig} indicating the user interface to use for rights
+     * management.
      */
     public static final String RIGHTS_UI_PROPERTY = "xwiki.rights.defaultui";
 
     /**
-     * The value of the {@link #RIGHTS_UI_PROPERTY} that indicate to use the stable/basic user
-     * interface.
+     * The value of the {@link #RIGHTS_UI_PROPERTY} that indicate to use the stable/basic user interface.
      */
     public static final String RIGHTS_UI_VALUE_STABLE = "stable";
 
     /**
-     * The value of the {@link #RIGHTS_UI_PROPERTY} that indicate to use the new experimental ajax
-     * user interface.
+     * The value of the {@link #RIGHTS_UI_PROPERTY} that indicate to use the new experimental ajax user interface.
      */
     public static final String RIGHTS_UI_VALUE_NEW = "new";
 
@@ -130,13 +127,12 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
     }
 
     /**
-     * Convert Map/List pattern matching parameter from Velocity to [][] used in
-     * {@link RightsManager}.
+     * Convert Map/List pattern matching parameter from Velocity to [][] used in {@link RightsManager}.
      * 
      * @param map a map of list from Velocity.
      * @return a table of table for {@link RightsManager} methods.
      */
-    static Object[][] createMatchingTable(Map map)
+    static Object[][] createMatchingTable(Map< ? , ? > map)
     {
         if (map == null || map.size() == 0) {
             return null;
@@ -145,13 +141,11 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
         Object[][] table = new Object[map.size()][3];
 
         int i = 0;
-        for (Iterator it = map.entrySet().iterator(); it.hasNext(); ++i) {
-            Map.Entry entry = (Map.Entry) it.next();
-
+        for (Map.Entry< ? , ? > entry : map.entrySet()) {
             table[i][0] = entry.getKey();
 
             if (entry.getValue() instanceof List) {
-                List typeValue = (List) entry.getValue();
+                List< ? > typeValue = (List< ? >) entry.getValue();
                 table[i][1] = typeValue.get(0);
                 if (typeValue.size() > 1) {
                     table[i][2] = typeValue.get(1);
@@ -159,6 +153,8 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
             } else {
                 table[i][2] = entry.getValue();
             }
+
+            ++i;
         }
 
         return table;
@@ -170,7 +166,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @param list a list of list from Velocity.
      * @return a table of table for {@link RightsManager} methods.
      */
-    static Object[][] createOrderTable(List list)
+    static Object[][] createOrderTable(List< ? > list)
     {
         if (list == null || list.size() == 0) {
             return null;
@@ -179,11 +175,9 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
         Object[][] table = new Object[list.size()][3];
 
         int i = 0;
-        for (Iterator it = list.iterator(); it.hasNext(); ++i) {
-            Object entry = it.next();
-
+        for (Object entry : list) {
             if (entry instanceof List) {
-                List fieldParams = (List) entry;
+                List< ? > fieldParams = (List< ? >) entry;
                 table[i][0] = fieldParams.get(0);
                 if (fieldParams.size() > 1) {
                     table[i][1] = fieldParams.get(1);
@@ -194,6 +188,8 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
             } else {
                 table[i][0] = entry.toString();
             }
+
+            ++i;
         }
 
         return table;
@@ -218,8 +214,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      */
     public String getDefaultUi()
     {
-        return this.context.getWiki().getConfig().getProperty(RIGHTS_UI_PROPERTY,
-            RIGHTS_UI_VALUE_NEW);
+        return this.context.getWiki().getConfig().getProperty(RIGHTS_UI_PROPERTY, RIGHTS_UI_VALUE_NEW);
     }
 
     // Groups management
@@ -231,20 +226,19 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @return the {@link Collection} of {@link String} containing group name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllGroupsNamesForMember(String member) throws XWikiException
+    public Collection<String> getAllGroupsNamesForMember(String member) throws XWikiException
     {
-        Collection userList = Collections.EMPTY_LIST;
+        Collection<String> memberList;
 
         try {
-            userList =
-                RightsManager.getInstance()
-                    .getAllGroupsNamesForMember(member, 0, 0, this.context);
+            memberList = RightsManager.getInstance().getAllGroupsNamesForMember(member, 0, 0, this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get all groups containing user [{0}]",
-                new Object[] {member}), e);
+            logError(MessageFormat.format("Try to get all groups containing user [{0}]", new Object[] {member}), e);
+
+            memberList = Collections.emptyList();
         }
 
-        return userList;
+        return memberList;
     }
 
     /**
@@ -254,7 +248,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllMembersNamesForGroup(String group) throws XWikiException
+    public Collection<String> getAllMembersNamesForGroup(String group) throws XWikiException
     {
         return getAllMembersNamesForGroup(group, 0, 0);
     }
@@ -268,21 +262,19 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      * @return the {@link Collection} of {@link String} containing member (user or group) name.
      * @throws XWikiException error when browsing groups.
      */
-    public Collection getAllMembersNamesForGroup(String group, int nb, int start)
-        throws XWikiException
+    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start) throws XWikiException
     {
-        Collection userList = Collections.EMPTY_LIST;
+        Collection<String> memberList;
 
         try {
-            userList =
-                RightsManager.getInstance().getAllMembersNamesForGroup(group, nb, start,
-                    this.context);
+            memberList = RightsManager.getInstance().getAllMembersNamesForGroup(group, nb, start, this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get all user group [{0}] contains",
-                new Object[] {group}), e);
+            logError(MessageFormat.format("Try to get all user group [{0}] contains", new Object[] {group}), e);
+
+            memberList = Collections.emptyList();
         }
 
-        return userList;
+        return memberList;
     }
 
     /**
@@ -297,8 +289,7 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
         int count = 0;
 
         try {
-            count =
-                RightsManager.getInstance().countAllGroupsNamesForMember(member, this.context);
+            count = RightsManager.getInstance().countAllGroupsNamesForMember(member, this.context);
         } catch (RightsManagerException e) {
             logError("Try to count groups containing provided user", e);
         }

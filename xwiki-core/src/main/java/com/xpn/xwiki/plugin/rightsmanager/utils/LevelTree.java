@@ -20,29 +20,30 @@ public class LevelTree
 
     /**
      * {@inheritDoc}
-     *
+     * 
      * @see java.lang.Object#toString()
      */
+    @Override
     public String toString()
     {
         StringBuilder sb = new StringBuilder();
 
-        if (inherited != null) {
-            String heritedString = inherited.toString();
+        if (this.inherited != null) {
+            String heritedString = this.inherited.toString();
             if (heritedString.length() > 0) {
                 sb.append('{');
                 sb.append("inherited : ");
-                sb.append(inherited);
+                sb.append(this.inherited);
                 sb.append('}');
             }
         }
 
-        if (direct != null) {
-            String directString = direct.toString();
+        if (this.direct != null) {
+            String directString = this.direct.toString();
             if (directString.length() > 0) {
                 sb.append('{');
                 sb.append("direct : ");
-                sb.append(direct);
+                sb.append(this.direct);
                 sb.append('}');
             }
         }

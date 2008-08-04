@@ -297,6 +297,13 @@
       <groupId>struts</groupId>
       <artifactId>struts</artifactId>
       <version>1.2.9</version>
+      <exclusions>
+        <!-- There is conflict with hibernate antlr-2.7.6 dependency -->
+        <exclusion>
+          <groupId>antlr</groupId>
+          <artifactId>antlr</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 
     <!-- Rendering -->
@@ -315,7 +322,7 @@
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate</artifactId>
-      <version>3.2.5.ga</version>
+      <version>3.2.6.ga</version>
     </dependency>
 
     <!-- Authentication -->

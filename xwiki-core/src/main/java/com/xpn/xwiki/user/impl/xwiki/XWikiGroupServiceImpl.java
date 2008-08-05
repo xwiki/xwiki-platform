@@ -47,6 +47,7 @@ import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.query.Query;
+import com.xpn.xwiki.store.query.QueryManager;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
 
@@ -169,11 +170,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 list = this.groupCache.get(key);
 
                 if (list == null) {
-                    list = context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser")
-                        .bindValue("username", username)
-                        .bindValue("shortname", shortname)
-                        .bindValue("veryshortname", veryshortname)
-                        .execute();
+                    list =
+                        context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser").bindValue(
+                            "username", username).bindValue("shortname", shortname).bindValue("veryshortname",
+                            veryshortname).execute();
                     this.groupCache.set(key, list);
                 }
             }
@@ -323,7 +323,6 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     public List<String> listMemberForGroup(String group, XWikiContext context) throws XWikiException
     {
         List<String> list = new ArrayList<String>();
-        String sql = "";
 
         try {
             if (group == null) {
@@ -398,8 +397,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      * @see com.xpn.xwiki.user.api.XWikiGroupService#getAllMatchedUsers(java.lang.Object[][], boolean, int, int,
      *      java.lang.Object[][], com.xpn.xwiki.XWikiContext)
      */
-    public List getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
-        XWikiContext context) throws XWikiException
+    public List< ? > getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start,
+        Object[][] order, XWikiContext context) throws XWikiException
     {
         return getAllMatchedUsersOrGroups(true, matchFields, withdetails, nb, start, order, context);
     }
@@ -410,8 +409,8 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      * @see com.xpn.xwiki.user.api.XWikiGroupService#getAllMatchedGroups(java.lang.Object[][], boolean, int, int,
      *      java.lang.Object[][], com.xpn.xwiki.XWikiContext)
      */
-    public List getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
-        XWikiContext context) throws XWikiException
+    public List< ? > getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start,
+        Object[][] order, XWikiContext context) throws XWikiException
     {
         return getAllMatchedUsersOrGroups(false, matchFields, withdetails, nb, start, order, context);
     }
@@ -425,7 +424,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      *            <li>fiedname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul>.
+     *            </ul> .
      * @param order the field to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
@@ -434,7 +433,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      * @param parameterValues the list of values to fill for use with HQL named request.
      * @return the formated HQL named request.
      */
-    protected String createWhereClause(boolean user, Object[][] matchFields, Object[][] order,
+    protected String createMatchUserOrGroupWhereClause(boolean user, Object[][] matchFields, Object[][] order,
         List<Object> parameterValues)
     {
         String documentClass = user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS;
@@ -533,7 +532,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      *            <li>fiedname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul>.
+     *            </ul> .
      * @param withdetails indicate if a {@link List} containing {@link String} names is returned or {@link List}
      *            containing {@link XWikiDocument}.
      * @param nb the maximum number od result to return.
@@ -549,14 +548,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      *             {@link XWikiStoreInterface#searchDocuments(String, int, int, List, XWikiContext)} or
      *             {@link XWikiStoreInterface#searchDocumentsNames(String, int, int, List, XWikiContext)}
      */
-    protected List getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails, int nb,
+    protected List< ? > getAllMatchedUsersOrGroups(boolean user, Object[][] matchFields, boolean withdetails, int nb,
         int start, Object[][] order, XWikiContext context) throws XWikiException
     {
-        List groups = null;
+        List< ? > groups = null;
 
         if (context.getWiki().getHibernateStore() != null) {
             List<Object> parameterValues = new ArrayList<Object>();
-            String where = createWhereClause(user, matchFields, order, parameterValues);
+            String where = createMatchUserOrGroupWhereClause(user, matchFields, order, parameterValues);
 
             if (withdetails) {
                 groups = context.getWiki().getStore().searchDocuments(where, nb, start, parameterValues, context);
@@ -570,11 +569,10 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 throw new NotImplementedException();
             }
 
-            groups = context.getWiki().getStore().getQueryManager().createQuery(
-                "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS) + "]/@fullName", 
-                Query.XPATH)
-                    .setLimit(nb).setOffset(start)
-                    .execute();
+            groups =
+                context.getWiki().getStore().getQueryManager().createQuery(
+                    "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS) + "]/@fullName",
+                    Query.XPATH).setLimit(nb).setOffset(start).execute();
         }
 
         return groups;
@@ -589,7 +587,7 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
      *            <li>fiedname : the name of the field</li>
      *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul>.
+     *            </ul> .
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user or group to return.
      * @param context the {@link XWikiContext}.
@@ -601,11 +599,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         throws XWikiException
     {
         List<Object> parameterValues = new ArrayList<Object>();
-        String where = createWhereClause(user, matchFields, null, parameterValues);
+        String where = createMatchUserOrGroupWhereClause(user, matchFields, null, parameterValues);
 
         String sql = "select count(distinct doc) from XWikiDocument doc" + where;
 
-        List list = context.getWiki().getStore().search(sql, 0, 0, parameterValues, context);
+        List< ? > list = context.getWiki().getStore().search(sql, 0, 0, parameterValues, context);
 
         if (list == null || list.size() == 0) {
             return 0;
@@ -634,6 +632,46 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     public int countAllMatchedGroups(Object[][] matchFields, XWikiContext context) throws XWikiException
     {
         return countAllMatchedUsersOrGroups(false, matchFields, context);
+    }
+
+    // ///////////////////////////////////////////////////////////////////
+    // Group members and member groups
+
+    /**
+     * Create a query to filter provided group members. Generate the entire HQL query except the select part.
+     * 
+     * @param groupFullName the fill wiki name of the group.
+     * @param matchField a string to search in result to filter.
+     * @param orderAsc if true, the result is ordered ascendent, if false it descendant. If null no order is applied.
+     * @param parameterValues the values to insert in names query.
+     * @return the HQL query.
+     * @since 1.6M1
+     */
+    protected String createMatchGroupMembersWhereClause(String groupFullName, String matchField, Boolean orderAsc,
+        Map<String, Object> parameterValues)
+    {
+        StringBuffer queryString = new StringBuffer();
+
+        // Add from clause
+        queryString.append(" FROM XWikiDocument as doc, BaseObject as obj, StringProperty as field");
+
+        // Add where clause
+        queryString
+            .append(" WHERE doc.fullName=:groupdocname and doc.fullName=obj.name and obj.className=:groupclassname and obj.id=field.id.id");
+        parameterValues.put("groupdocname", groupFullName);
+        parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);
+
+        if (matchField != null) {
+            queryString.append(" and lower(field.value) like :matchfield");
+            parameterValues.put("matchfield", HQLLIKE_ALL_SYMBOL + matchField.toLowerCase() + HQLLIKE_ALL_SYMBOL);
+        }
+
+        // Add order by clause
+        if (orderAsc != null) {
+            queryString.append(" ORDER BY field.value ").append(orderAsc == null || orderAsc ? "asc" : "desc");
+        }
+
+        return queryString.toString();
     }
 
     /**
@@ -669,18 +707,53 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
     public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
         throws XWikiException
     {
-        // TODO: improve using real request
-        List<String> userNameList = listMemberForGroup(group, context);
+        return getAllMatchedMembersNamesForGroup(group, null, nb, start, null, context);
+    }
 
-        if (nb == 0 && start == 0) {
-            return userNameList;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.user.api.XWikiGroupService#getAllMembersNamesForGroup(java.lang.String, java.lang.String, int,
+     *      int, java.lang.Boolean, com.xpn.xwiki.XWikiContext)
+     * @since 1.6M1
+     */
+    public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
+        Boolean orderAsc, XWikiContext context) throws XWikiException
+    {
+        // TODO: add cache mechanism.
+
+        XWikiDocument groupDocument = new XWikiDocument();
+        groupDocument.setFullName(group);
+
+        Map<String, Object> parameterValues = new HashMap<String, Object>();
+
+        // //////////////////////////////////////
+        // Create the query string
+
+        StringBuffer queryString = new StringBuffer("SELECT field.value");
+
+        queryString.append(' ').append(
+            createMatchGroupMembersWhereClause(groupDocument.getFullName(), matchField, orderAsc, parameterValues));
+
+        // //////////////////////////////////////
+        // Create the query
+
+        QueryManager qm = context.getWiki().getStore().getQueryManager();
+
+        Query query = qm.createQuery(queryString.toString(), Query.HQL);
+
+        for (Map.Entry<String, Object> entry : parameterValues.entrySet()) {
+            query.bindValue(entry.getKey(), entry.getValue());
         }
 
-        if (start + nb > userNameList.size()) {
-            return userNameList.subList(start, userNameList.size());
-        } else {
-            return userNameList.subList(start, start + nb);
+        query.setOffset(start);
+        query.setLimit(nb);
+
+        if (groupDocument.getDatabase() != null) {
+            query.setWiki(groupDocument.getDatabase());
         }
+
+        return query.execute();
     }
 
     /**

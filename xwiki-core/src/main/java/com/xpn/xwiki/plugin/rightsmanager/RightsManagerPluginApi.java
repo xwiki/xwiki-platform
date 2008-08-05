@@ -264,12 +264,32 @@ public class RightsManagerPluginApi extends PluginApi<RightsManagerPlugin>
      */
     public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start) throws XWikiException
     {
+        return getAllMatchedMembersNamesForGroup(group, null, nb, start, null);
+    }
+
+    /**
+     * Get members of provided group.
+     * 
+     * @param group the group.
+     * @param matchField a string to search in result to filter.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param orderAsc if true, the result is ordered ascendent, if false it descendant. If null no order is applied.
+     * @return the {@link Collection} of {@link String} containing member name.
+     * @throws XWikiException error when browsing groups.
+     * @since 1.6M1
+     */
+    public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
+        Boolean orderAsc) throws XWikiException
+    {
         Collection<String> memberList;
 
         try {
-            memberList = RightsManager.getInstance().getAllMembersNamesForGroup(group, nb, start, this.context);
+            memberList =
+                RightsManager.getInstance().getAllMatchedMembersNamesForGroup(group, matchField, nb, start, orderAsc,
+                    this.context);
         } catch (RightsManagerException e) {
-            logError(MessageFormat.format("Try to get all user group [{0}] contains", new Object[] {group}), e);
+            logError(MessageFormat.format("Try to get all matched member of group [{0}]", new Object[] {group}), e);
 
             memberList = Collections.emptyList();
         }

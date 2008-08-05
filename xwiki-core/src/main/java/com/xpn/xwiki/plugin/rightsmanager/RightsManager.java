@@ -567,6 +567,26 @@ public final class RightsManager implements XWikiDocChangeNotificationInterface
     }
 
     /**
+     * Get members of provided group.
+     * 
+     * @param group the group.
+     * @param matchField a string to search in result to filter.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param orderAsc if true, the result is ordered ascendent, if false it descendant. If null no order is applied.
+     * @param context the XWiki context.
+     * @return the {@link Collection} of {@link String} containing member name.
+     * @throws XWikiException error when browsing groups.
+     * @since 1.6M1
+     */
+    public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
+        Boolean orderAsc, XWikiContext context) throws XWikiException
+    {
+        return context.getWiki().getGroupService(context).getAllMatchedMembersNamesForGroup(group, matchField, nb,
+            start, orderAsc, context);
+    }
+
+    /**
      * Return the number of groups containing provided member.
      * 
      * @param member the name of the member (user or group).

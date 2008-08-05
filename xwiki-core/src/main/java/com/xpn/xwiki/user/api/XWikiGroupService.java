@@ -46,11 +46,9 @@ public interface XWikiGroupService
     /**
      * @deprecated Use {@link #getAllGroupsNamesForMember(String, int, int, XWikiContext)}.
      */
-    public Collection<String> listGroupsForUser(String username, XWikiContext context)
-        throws XWikiException;
+    public Collection<String> listGroupsForUser(String username, XWikiContext context) throws XWikiException;
 
-    public void addUserToGroup(String user, String database, String group, XWikiContext context)
-        throws XWikiException;
+    public void addUserToGroup(String user, String database, String group, XWikiContext context) throws XWikiException;
 
     /**
      * Remove user or group name from all groups.
@@ -62,8 +60,8 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace,
-        String userOrGroupName, XWikiContext context) throws XWikiException;
+    public void removeUserOrGroupFromAllGroups(String userOrGroupWiki, String userOrGroupSpace, String userOrGroupName,
+        XWikiContext context) throws XWikiException;
 
     /**
      * @deprecated Use {@link #getAllMembersNamesForGroup(String, int, int, XWikiContext)}.
@@ -71,8 +69,7 @@ public interface XWikiGroupService
     public List<String> listMemberForGroup(String s, XWikiContext context) throws XWikiException;
 
     /**
-     * @deprecated Use
-     *             {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
+     * @deprecated Use {@link #getAllMatchedGroups(Object[][], boolean, int, int, Object[][], XWikiContext)}.
      */
     public List<String> listAllGroups(XWikiContext context) throws XWikiException;
 
@@ -82,27 +79,25 @@ public interface XWikiGroupService
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
      *            </ul>
-     * @param withdetails indicate if a {@link List} containing {@link String} names is returned or
-     *            {@link List} containing {@link com.xpn.xwiki.doc.XWikiDocument}.
+     * @param withdetails indicate if a {@link List} containing {@link String} names is returned or {@link List}
+     *            containing {@link com.xpn.xwiki.doc.XWikiDocument}.
      * @param nb the maximum number od result to return.
      * @param start the index of the first found user to return.
      * @param order the fields to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            </ul>
      * @param context the {@link XWikiContext}.
      * @return the list of users.
      * @throws XWikiException error when getting users.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List< ? > getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start,
-        Object[][] order, XWikiContext context) throws XWikiException;
+    List< ? > getAllMatchedUsers(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
+        XWikiContext context) throws XWikiException;
 
     /**
      * Search for all groups with provided constraints and in a provided order.
@@ -110,27 +105,26 @@ public interface XWikiGroupService
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul>.
-     * @param withdetails indicate if a {@link List} containing {@link String} names is returned or
-     *            {@link List} containing {@link com.xpn.xwiki.doc.XWikiDocument}.
+     *            </ul>
+     *            .
+     * @param withdetails indicate if a {@link List} containing {@link String} names is returned or {@link List}
+     *            containing {@link com.xpn.xwiki.doc.XWikiDocument}.
      * @param nb the maximum number od result to return.
      * @param start the index of the first found group to return.
      * @param order the field to order from. It is a table of table with :
      *            <ul>
      *            <li>fieldname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            </ul>
      * @param context the {@link XWikiContext}.
      * @return the list of groups.
      * @throws XWikiException error when getting groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    List< ? > getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start,
-        Object[][] order, XWikiContext context) throws XWikiException;
+    List< ? > getAllMatchedGroups(Object[][] matchFields, boolean withdetails, int nb, int start, Object[][] order,
+        XWikiContext context) throws XWikiException;
 
     /**
      * Return number of users with provided constraints.
@@ -138,10 +132,10 @@ public interface XWikiGroupService
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul>.
+     *            </ul>
+     *            .
      * @param context the {@link XWikiContext}.
      * @return the of found users.
      * @throws XWikiException error when getting number of users.
@@ -155,10 +149,10 @@ public interface XWikiGroupService
      * @param matchFields the field to math with values. It is a table of table with :
      *            <ul>
      *            <li>fiedname : the name of the field</li>
-     *            <li>fieldtype : for example StringProperty. If null the field is considered as
-     *            document field</li>
+     *            <li>fieldtype : for example StringProperty. If null the field is considered as document field</li>
      *            <li>pattern matching : based on HQL "like" command</li>
-     *            </ul>.
+     *            </ul>
+     *            .
      * @param context the {@link XWikiContext}.
      * @return the of found groups.
      * @throws XWikiException error when getting number of groups.
@@ -177,8 +171,8 @@ public interface XWikiGroupService
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start,
-        XWikiContext context) throws XWikiException;
+    public Collection<String> getAllGroupsNamesForMember(String member, int nb, int start, XWikiContext context)
+        throws XWikiException;
 
     /**
      * Get all members provided group contains.
@@ -187,12 +181,28 @@ public interface XWikiGroupService
      * @param nb the maximum number of result to return.
      * @param start the index of the first found user to return.
      * @param context the XWiki context.
-     * @return the {@link Collection} of {@link String} containing user name.
+     * @return the {@link Collection} of {@link String} containing member name.
      * @throws XWikiException error when browsing groups.
      * @since XWiki Core 1.1.2, XWiki Core 1.2M2
      */
-    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start,
-        XWikiContext context) throws XWikiException;
+    public Collection<String> getAllMembersNamesForGroup(String group, int nb, int start, XWikiContext context)
+        throws XWikiException;
+
+    /**
+     * Get members of provided group.
+     * 
+     * @param group the group.
+     * @param matchField a string to search in result to filter.
+     * @param nb the maximum number of result to return.
+     * @param start the index of the first found user to return.
+     * @param orderAsc if true, the result is ordered ascendent, if false it descendant. If null no order is applied.
+     * @param context the XWiki context.
+     * @return the {@link Collection} of {@link String} containing member name.
+     * @throws XWikiException error when browsing groups.
+     * @since 1.6M1
+     */
+    public Collection<String> getAllMatchedMembersNamesForGroup(String group, String matchField, int nb, int start,
+        Boolean orderAsc, XWikiContext context) throws XWikiException;
 
     /**
      * Return the number of groups containing provided member.

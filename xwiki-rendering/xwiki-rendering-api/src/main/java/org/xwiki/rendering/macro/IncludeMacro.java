@@ -51,7 +51,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
 
     private static final String DESCRIPTION = "Include other pages into the current page.";
-    
+
     /**
      * Injected by the Component Manager.
      */
@@ -75,59 +75,62 @@ public class IncludeMacro extends AbstractMacro implements Initializable
     private DocumentManager documentManager;
 
     private Map<String, String> allowedParameters;
-    
-	/**
+
+    /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
-		// TODO: Use an I8N service to translate the descriptions in several languages
-		this.allowedParameters = new HashMap<String, String>();
-		this.allowedParameters.put("document", "The name of the document to include. For example: \"Space.Page\".");
-		this.allowedParameters.put("context", "Defines whether the included page is executed in its separated "
+        // TODO: Use an I8N service to translate the descriptions in several languages
+        this.allowedParameters = new HashMap<String, String>();
+        this.allowedParameters.put("document", "The name of the document to include. For example: \"Space.Page\".");
+        this.allowedParameters.put("context", "Defines whether the included page is executed in its separated "
             + "execution context or whether it's executed in the contex of the current page. If the value is \""
-            + CONTEXT_NEW + "\" then it's executed in its own context. If the value is \"" + CONTEXT_CURRENT 
+            + CONTEXT_NEW + "\" then it's executed in its own context. If the value is \"" + CONTEXT_CURRENT
             + "\" it's executed in the context of the current page. This affects for example whether the Velocity "
             + "variables of the current page will be visible in the included page or not.");
-	}
-
-	/**
-     * {@inheritDoc}
-     * @see Macro#getDescription()
-     */
-	public String getDescription()
-	{
-		// TODO: Use an I8N service to translate the description in several languages
-		return DESCRIPTION;
-	}
-
-    /**
-     * {@inheritDoc}
-     * @see Macro#getAllowedParameters()
-     */
-	public Map<String, String> getAllowedParameters()
-	{
-		// We send a copy of the map and not our map since we don't want it to be modified.
-		return new HashMap<String, String>(this.allowedParameters);
-	}
-
-	/**
-     * Allows overriding the Document Manager used (useful for unit tests).
-     *
-     * @param documentManager the new Document Manager to use
-     */
-    public void setDocumentManager(DocumentManager documentManager)
-    {
-        this.documentManager = documentManager;        
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see Macro#getDescription()
+     */
+    public String getDescription()
+    {
+        // TODO: Use an I8N service to translate the description in several languages
+        return DESCRIPTION;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Macro#getAllowedParameters()
+     */
+    public Map<String, String> getAllowedParameters()
+    {
+        // We send a copy of the map and not our map since we don't want it to be modified.
+        return new HashMap<String, String>(this.allowedParameters);
+    }
+
+    /**
+     * Allows overriding the Document Manager used (useful for unit tests).
+     * 
+     * @param documentManager the new Document Manager to use
+     */
+    public void setDocumentManager(DocumentManager documentManager)
+    {
+        this.documentManager = documentManager;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content,
-        XDOM dom) throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom) throws MacroExecutionException
     {
         List<Block> result;
 
@@ -150,8 +153,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
         // If the context value is invalid return an error
         if (!actualContext.equalsIgnoreCase(CONTEXT_CURRENT) && !actualContext.equalsIgnoreCase(CONTEXT_NEW)) {
             throw new MacroExecutionException("Invalid value [" + actualContext + "] for "
-                + "parameter \"context\". valid values are \"" + CONTEXT_CURRENT + "\" or \""
-                + CONTEXT_NEW + "\".");
+                + "parameter \"context\". valid values are \"" + CONTEXT_CURRENT + "\" or \"" + CONTEXT_NEW + "\".");
         }
 
         // Retrieve the included document's content
@@ -159,8 +161,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
         try {
             includedContent = this.documentManager.getDocumentContent(documentName);
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to get content for Document ["
-                + documentName + "]", e);
+            throw new MacroExecutionException("Failed to get content for Document [" + documentName + "]", e);
         }
 
         // Check the value of the "context" parameter.
@@ -230,8 +231,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
                 this.macroTransformation.transform(includedDom, SYNTAX);
             }
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to parse included page ["
-                + includedDocumentName + "]", e);
+            throw new MacroExecutionException("Failed to parse included page [" + includedDocumentName + "]", e);
         }
 
         return includedDom.getChildren();

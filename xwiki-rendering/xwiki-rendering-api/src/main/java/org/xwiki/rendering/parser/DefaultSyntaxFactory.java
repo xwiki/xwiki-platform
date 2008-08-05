@@ -45,6 +45,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
 
     /**
      * {@inheritDoc}
+     * 
      * @see Composable#compose(ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -54,6 +55,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -66,7 +68,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
             throw new InitializationException("Failed to lookup the list of available Syntaxes", e);
         }
 
-        for (Parser parser: parsers) {
+        for (Parser parser : parsers) {
             syntaxes.add(parser.getSyntax());
         }
 
@@ -101,7 +103,7 @@ public class DefaultSyntaxFactory extends AbstractLogEnabled implements SyntaxFa
         } else {
             StringBuffer sb = new StringBuffer();
             sb.append("Unknown Syntax id [").append(syntaxId).append("]. Valid syntaxes are [xwiki]");
-            for (SyntaxType type: SyntaxType.values()) {
+            for (SyntaxType type : SyntaxType.values()) {
                 if (type != SyntaxType.XWIKI) {
                     sb.append(", [").append(type.toIdString()).append("]");
                 }

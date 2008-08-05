@@ -20,10 +20,9 @@
 package org.xwiki.rendering;
 
 /**
- * Exposes methods for managing Documents. We're creating this abstraction here in the rendering
- * component for now since there's now such abstraction in the core for the moment. When it exists
- * replace it. Note that its replacement might well be the Wiki class of the new Model or spread
- * over several classes.
+ * Exposes methods for managing Documents. We're creating this abstraction here in the rendering component for now since
+ * there's now such abstraction in the core for the moment. When it exists replace it. Note that its replacement might
+ * well be the Wiki class of the new Model or spread over several classes.
  * 
  * @version $Id$
  * @since 1.5M2

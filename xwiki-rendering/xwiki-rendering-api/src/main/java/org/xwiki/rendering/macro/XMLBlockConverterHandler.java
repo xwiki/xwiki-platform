@@ -51,14 +51,13 @@ public class XMLBlockConverterHandler extends DefaultHandler
     private Parser parser;
 
     private boolean escapeWikiSyntax;
-    
+
     private Stack<Block> stack = new Stack<Block>();
-    
+
     /**
-     * SAX parsers are allowed to call the characters() method several times in a row.
-     * Some parsers have a buffer of 8K (Crimson), others of 16K (Xerces) and others can
-     * even call characters() for every single character! Thus we need to accumulate
-     * the characters in a buffer before we process them.
+     * SAX parsers are allowed to call the characters() method several times in a row. Some parsers have a buffer of 8K
+     * (Crimson), others of 16K (Xerces) and others can even call characters() for every single character! Thus we need
+     * to accumulate the characters in a buffer before we process them.
      */
     private StringBuffer accumulationBuffer = new StringBuffer();
 
@@ -76,12 +75,12 @@ public class XMLBlockConverterHandler extends DefaultHandler
         this.parser = parser;
         this.escapeWikiSyntax = escapeWikiSyntax;
     }
-    
+
     public Block getRootBlock()
     {
         return this.stack.peek();
     }
-    
+
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException
     {
@@ -116,7 +115,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
                     }
                 }
 
-                for (Block block: dom.getChildren()) {
+                for (Block block : dom.getChildren()) {
                     this.stack.push(block);
                 }
             }
@@ -124,8 +123,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
     }
 
     @Override
-    public void startElement(String uri, String localName, String name, Attributes attributes)
-        throws SAXException
+    public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
     {
         if (this.accumulationBuffer.length() > 0) {
             processCharacters(this.accumulationBuffer.toString().toCharArray(), 0, this.accumulationBuffer.length());

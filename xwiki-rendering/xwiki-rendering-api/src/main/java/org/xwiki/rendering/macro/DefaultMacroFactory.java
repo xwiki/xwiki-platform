@@ -38,13 +38,13 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
     private ComponentManager componentManager;
 
     /**
-     * Index is the syntax and value is a Map with an index being the macro name the value the 
-     * Macro.
+     * Index is the syntax and value is a Map with an index being the macro name the value the Macro.
      */
     private Map<String, Map<String, Macro>> macros;
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see Composable#compose(ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -54,6 +54,7 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -61,20 +62,20 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
         // Note that the lifecycle handler ensures that the initialize() method is called
         // after the compose() method.
         this.macros = new HashMap<String, Map<String, Macro>>();
-        
+
         Map<String, Macro> allMacros;
         try {
             allMacros = this.componentManager.lookupMap(Macro.ROLE);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to construct Macro cache", e);
         }
-        
-        for (String hint: allMacros.keySet()) {
+
+        for (String hint : allMacros.keySet()) {
             String[] hintParts = hint.split("/");
             // TODO: Add error handling and skip macro if invalid hint format
-            String macroName = hintParts[0]; 
+            String macroName = hintParts[0];
             String syntax = hintParts[1];
-            
+
             Map<String, Macro> macrosForSyntax = this.macros.get(syntax);
             if (macrosForSyntax == null) {
                 macrosForSyntax = new HashMap<String, Macro>();
@@ -86,10 +87,10 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
 
     /**
      * {@inheritDoc}
-     * @see MacroFactory#getMacro(String, org.xwiki.rendering.parser.Syntax) 
+     * 
+     * @see MacroFactory#getMacro(String, org.xwiki.rendering.parser.Syntax)
      */
-    public Macro getMacro(String macroName, Syntax syntax)
-        throws MacroNotFoundException
+    public Macro getMacro(String macroName, Syntax syntax) throws MacroNotFoundException
     {
         Macro macro;
         Map<String, Macro> macrosForSyntax = this.macros.get(syntax.getType().toIdString());
@@ -100,8 +101,7 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
                     + syntax.toString() + "]");
             }
         } else {
-            throw new MacroNotFoundException("No macro has been registered for syntax [" 
-                + syntax.toString() + "]");
+            throw new MacroNotFoundException("No macro has been registered for syntax [" + syntax.toString() + "]");
         }
         return macro;
     }

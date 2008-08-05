@@ -26,20 +26,21 @@ import java.util.Collections;
 
 /**
  * Contains the full tree of {@link Block} that represent a XWiki Document's content.
- *  
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public class XDOM extends AbstractFatherBlock
 {
     /**
-     * Constructs an empty XDOM. Useful for example when calling a macro that doesn't use the XDOM parameter
-     * passed to it.
+     * Constructs an empty XDOM. Useful for example when calling a macro that doesn't use the XDOM parameter passed to
+     * it.
      */
-    public static final XDOM EMPTY = new XDOM(Collections.<Block>emptyList());
+    public static final XDOM EMPTY = new XDOM(Collections.<Block> emptyList());
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
      */
     public XDOM(List<Block> childBlocks)
@@ -49,19 +50,21 @@ public class XDOM extends AbstractFatherBlock
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
      */
     public void before(Listener listener)
     {
-    	listener.beginDocument();
+        listener.beginDocument();
     }
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)   
+     * 
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)
      */
     public void after(Listener listener)
     {
-    	listener.endDocument();
+        listener.endDocument();
     }
 }

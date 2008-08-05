@@ -26,7 +26,8 @@ import org.xwiki.rendering.DocumentManager;
 /**
  * @version $Id: $
  * @since 1.5RC1
- */public class XHTMLLinkRenderer
+ */
+public class XHTMLLinkRenderer
 {
     private DocumentManager documentManager;
 
@@ -34,7 +35,7 @@ import org.xwiki.rendering.DocumentManager;
     {
         this.documentManager = documentManager;
     }
-    
+
     public String renderLink(Link link)
     {
         StringBuffer sb = new StringBuffer();
@@ -49,9 +50,9 @@ import org.xwiki.rendering.DocumentManager;
             }
             sb.append("\"");
             if (link.getTarget() != null) {
-                // We prefix with "_" since a target can be any token and we need to differentiate with 
-            	// other valid rel tokens.
-            	sb.append(" rel=\"_").append(link.getTarget()).append("\"");
+                // We prefix with "_" since a target can be any token and we need to differentiate with
+                // other valid rel tokens.
+                sb.append(" rel=\"_").append(link.getTarget()).append("\"");
             }
             sb.append(">");
             sb.append(getLinkLabelToPrint(link));
@@ -62,26 +63,26 @@ import org.xwiki.rendering.DocumentManager;
                 if (this.documentManager.exists(link.getReference())) {
                     sb.append("<span class=\"wikilink\">");
                     sb.append("<a href=\"");
-                    sb.append(this.documentManager.getURL(link.getReference(), "view", link.getQueryString(),
-                        link.getAnchor()));
+                    sb.append(this.documentManager.getURL(link.getReference(), "view", link.getQueryString(), link
+                        .getAnchor()));
                     sb.append("\"");
                     if (link.getTarget() != null) {
-                        // We prefix with "_" since a target can be any token and we need to differentiate with 
-                    	// other valid rel tokens.
-                    	sb.append(" rel=\"_").append(link.getTarget()).append("\"");
+                        // We prefix with "_" since a target can be any token and we need to differentiate with
+                        // other valid rel tokens.
+                        sb.append(" rel=\"_").append(link.getTarget()).append("\"");
                     }
                     sb.append(">");
                     sb.append(getLinkLabelToPrint(link));
                     sb.append("</a></span>");
                 } else {
                     sb.append("<a class=\"wikicreatelink\" href=\"");
-                    sb.append(this.documentManager.getURL(link.getReference(), "edit", link.getQueryString(), 
-                        link.getAnchor()));
+                    sb.append(this.documentManager.getURL(link.getReference(), "edit", link.getQueryString(), link
+                        .getAnchor()));
                     sb.append("\"");
                     if (link.getTarget() != null) {
-                        // We prefix with "_" since a target can be any token and we need to differentiate with 
-                    	// other valid rel tokens.
-                    	sb.append(" rel=\"_").append(link.getTarget()).append("\"");
+                        // We prefix with "_" since a target can be any token and we need to differentiate with
+                        // other valid rel tokens.
+                        sb.append(" rel=\"_").append(link.getTarget()).append("\"");
                     }
                     sb.append(">");
                     sb.append("<span class=\"wikicreatelinktext\">");

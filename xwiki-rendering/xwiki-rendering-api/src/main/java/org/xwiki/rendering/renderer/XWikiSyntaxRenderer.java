@@ -29,26 +29,25 @@ import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 
 /**
- * Generates XWiki Syntax from {@link org.xwiki.rendering.block.XDOM}. This is useful for example
- * to convert other wiki syntaxes to the XWiki syntax. It's also useful in our tests to verify
- * that round tripping from XWiki Syntax to the DOM and back to XWiki Syntax generates the same
- * content as the initial syntax.
- *
+ * Generates XWiki Syntax from {@link org.xwiki.rendering.block.XDOM}. This is useful for example to convert other wiki
+ * syntaxes to the XWiki syntax. It's also useful in our tests to verify that round tripping from XWiki Syntax to the
+ * DOM and back to XWiki Syntax generates the same content as the initial syntax.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public class XWikiSyntaxRenderer implements Renderer
 {
     private PrintWriter writer;
-    
+
     private StringBuffer listStyle = new StringBuffer();
-    
+
     private boolean needsLineBreakForList = false;
 
     private boolean isInsideMacroMarker = false;
-    
+
     private XWikiMacroPrinter macroPrinter;
-    
+
     public XWikiSyntaxRenderer(Writer writer)
     {
         this.writer = new PrintWriter(writer);
@@ -57,14 +56,14 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void beginDocument()
     {
-    	// Don't do anything
-	}
+        // Don't do anything
+    }
 
-	public void endDocument()
-	{
-    	// Don't do anything
-	}
-    
+    public void endDocument()
+    {
+        // Don't do anything
+    }
+
     public void onLink(Link link)
     {
         write("[[");
@@ -135,7 +134,7 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
-    	write(this.macroPrinter.print(name, parameters, content));
+        write(this.macroPrinter.print(name, parameters, content));
     }
 
     public void beginSection(SectionLevel level)
@@ -144,12 +143,24 @@ public class XWikiSyntaxRenderer implements Renderer
 
         addLineBreak();
         switch (level) {
-            case LEVEL1: prefix = "1"; break; 
-            case LEVEL2: prefix = "1.1"; break; 
-            case LEVEL3: prefix = "1.1.1"; break; 
-            case LEVEL4: prefix = "1.1.1.1"; break; 
-            case LEVEL5: prefix = "1.1.1.1.1"; break; 
-            default: prefix = "1.1.1.1.1.1"; break; 
+            case LEVEL1:
+                prefix = "1";
+                break;
+            case LEVEL2:
+                prefix = "1.1";
+                break;
+            case LEVEL3:
+                prefix = "1.1.1";
+                break;
+            case LEVEL4:
+                prefix = "1.1.1.1";
+                break;
+            case LEVEL5:
+                prefix = "1.1.1.1.1";
+                break;
+            default:
+                prefix = "1.1.1.1.1.1";
+                break;
         }
         write(prefix + " ");
     }
@@ -194,9 +205,9 @@ public class XWikiSyntaxRenderer implements Renderer
             write("\n");
             this.needsLineBreakForList = false;
         }
-        
+
         if (listType == ListType.BULLETED) {
-            this.listStyle.append("*"); 
+            this.listStyle.append("*");
         } else {
             this.listStyle.append("1");
         }
@@ -205,7 +216,7 @@ public class XWikiSyntaxRenderer implements Renderer
     public void beginListItem()
     {
         this.needsLineBreakForList = true;
-        
+
         write(this.listStyle.toString());
         if (this.listStyle.charAt(0) == '1') {
             write(".");
@@ -264,7 +275,7 @@ public class XWikiSyntaxRenderer implements Renderer
             this.needsLineBreakForList = true;
         }
     }
-    
+
     private void addLineBreak()
     {
         if (this.needsLineBreakForList) {

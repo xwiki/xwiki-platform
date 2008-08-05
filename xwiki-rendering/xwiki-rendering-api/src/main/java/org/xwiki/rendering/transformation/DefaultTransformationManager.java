@@ -42,6 +42,7 @@ public class DefaultTransformationManager implements TransformationManager, Comp
 
     /**
      * {@inheritDoc}
+     * 
      * @see Composable#compose(ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -51,6 +52,7 @@ public class DefaultTransformationManager implements TransformationManager, Comp
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
@@ -64,11 +66,10 @@ public class DefaultTransformationManager implements TransformationManager, Comp
         Collections.sort(txs);
         this.transformations = txs;
     }
-    
-    public void performTransformations(XDOM dom, Syntax syntax)
-        throws TransformationException
+
+    public void performTransformations(XDOM dom, Syntax syntax) throws TransformationException
     {
-        for (Transformation transformation: this.transformations) {
+        for (Transformation transformation : this.transformations) {
             transformation.transform(dom, syntax);
         }
     }

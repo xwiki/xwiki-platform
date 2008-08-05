@@ -26,19 +26,19 @@ package org.xwiki.rendering.listener;
 public enum SectionLevel
 {
     LEVEL1(1), LEVEL2(2), LEVEL3(3), LEVEL4(4), LEVEL5(5), LEVEL6(6);
-    
+
     private int value;
-    
+
     private SectionLevel(int value)
     {
         this.value = value;
     }
-    
+
     public int getAsInt()
     {
         return this.value;
     }
-    
+
     public String toString()
     {
         return "" + getAsInt();
@@ -48,15 +48,26 @@ public enum SectionLevel
     {
         SectionLevel result;
         switch (value) {
-            case 1: result = SectionLevel.LEVEL1; break;
-            case 2: result = SectionLevel.LEVEL2; break;
-            case 3: result = SectionLevel.LEVEL3; break;
-            case 4: result = SectionLevel.LEVEL4; break;
-            case 5: result = SectionLevel.LEVEL5; break;
-            case 6: result = SectionLevel.LEVEL6; break;
+            case 1:
+                result = SectionLevel.LEVEL1;
+                break;
+            case 2:
+                result = SectionLevel.LEVEL2;
+                break;
+            case 3:
+                result = SectionLevel.LEVEL3;
+                break;
+            case 4:
+                result = SectionLevel.LEVEL4;
+                break;
+            case 5:
+                result = SectionLevel.LEVEL5;
+                break;
+            case 6:
+                result = SectionLevel.LEVEL6;
+                break;
             default:
-                throw new IllegalArgumentException("Invalid level [" + value 
-                    + "]. Only levels 1 to 6 are allowed.");
+                throw new IllegalArgumentException("Invalid level [" + value + "]. Only levels 1 to 6 are allowed.");
         }
         return result;
     }

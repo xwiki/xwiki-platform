@@ -28,7 +28,7 @@ import org.xwiki.rendering.listener.Listener;
 public class SpaceBlock extends AbstractBlock
 {
     public static final SpaceBlock SPACE_BLOCK = new SpaceBlock();
-    
+
     private SpaceBlock()
     {
     }

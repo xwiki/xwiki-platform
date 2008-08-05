@@ -20,8 +20,7 @@
 package org.xwiki.rendering.parser;
 
 /**
- * Represents a wiki syntax. For example the XWiki 1.0 syntax, the XWiki 2.0
- * syntax, the Confluence 1.0 syntax, etc.
+ * Represents a wiki syntax. For example the XWiki 1.0 syntax, the XWiki 2.0 syntax, the Confluence 1.0 syntax, etc.
  * 
  * @version $Id$
  * @since 1.5M2
@@ -31,18 +30,18 @@ public class Syntax
     private SyntaxType type;
 
     private String version;
-    
+
     public Syntax(SyntaxType type, String version)
     {
         this.type = type;
         this.version = version;
     }
-    
+
     public SyntaxType getType()
     {
         return this.type;
     }
-    
+
     public String getVersion()
     {
         return this.version;
@@ -55,6 +54,7 @@ public class Syntax
 
     /**
      * {@inheritDoc}
+     * 
      * @see Object#toString()
      */
     public String toString()
@@ -64,6 +64,7 @@ public class Syntax
 
     /**
      * {@inheritDoc}
+     * 
      * @see Object#hashCode()
      */
     public int hashCode()
@@ -78,6 +79,7 @@ public class Syntax
 
     /**
      * {@inheritDoc}
+     * 
      * @see Object#equals(Object)
      */
     public boolean equals(Object object)
@@ -85,17 +87,18 @@ public class Syntax
         boolean result;
 
         // See http://www.geocities.com/technofundo/tech/java/equalhash.html for the detail of this algorithm.
-        if(this == object) {
+        if (this == object) {
             result = true;
         } else {
-            if((object == null) || (object.getClass() != this.getClass())) {
+            if ((object == null) || (object.getClass() != this.getClass())) {
                 result = false;
             } else {
                 // object must be Syntax at this point
                 Syntax syntax = (Syntax) object;
-                result = (getType() == syntax.getType() || (getType() != null && getType().equals(syntax.getType())))
-                    && (getVersion() == syntax.getVersion() ||
-                        (getVersion() != null && getVersion().equals(syntax.getVersion())));
+                result =
+                    (getType() == syntax.getType() || (getType() != null && getType().equals(syntax.getType())))
+                        && (getVersion() == syntax.getVersion() || (getVersion() != null && getVersion().equals(
+                            syntax.getVersion())));
             }
         }
         return result;

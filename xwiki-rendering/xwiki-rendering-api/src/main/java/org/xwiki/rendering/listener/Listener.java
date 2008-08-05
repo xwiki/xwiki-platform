@@ -27,16 +27,16 @@ import java.util.Map;
  */
 public interface Listener
 {
-	/**
-	 * First event generated representing the start of the document.
-	 */
-	void beginDocument();
+    /**
+     * First event generated representing the start of the document.
+     */
+    void beginDocument();
 
-	/**
-	 * Last event generated representing the end of the document.
-	 */
-	void endDocument();
-	
+    /**
+     * Last event generated representing the end of the document.
+     */
+    void endDocument();
+
     void beginBold();
 
     void endBold();
@@ -50,47 +50,47 @@ public interface Listener
     void endParagraph();
 
     void beginList(ListType listType);
-    
+
     void endList(ListType listType);
-    
+
     void beginListItem();
-    
+
     void endListItem();
-    
+
     void beginSection(SectionLevel level);
-    
+
     void endSection(SectionLevel level);
-    
+
     void beginXMLElement(String name, Map<String, String> attributes);
-    
+
     void endXMLElement(String name, Map<String, String> attributes);
 
     /**
-     * A special event that Macro Blocks emits when they are executed so that it's possible to reconstruct
-     * the initial syntax even after Macros have been executed.
+     * A special event that Macro Blocks emits when they are executed so that it's possible to reconstruct the initial
+     * syntax even after Macros have been executed.
      */
     void beginMacroMarker(String name, Map<String, String> parameters, String content);
 
     /**
-     * A special event that Macro Blocks emits when they are executed so that it's possible to reconstruct
-     * the initial syntax even after Macros have been executed.
+     * A special event that Macro Blocks emits when they are executed so that it's possible to reconstruct the initial
+     * syntax even after Macros have been executed.
      */
     void endMacroMarker(String name, Map<String, String> parameters, String content);
 
     /**
-     * Represents an explicit line break specified in the wiki syntax. For example for XWiki this
-     * would be "\\". Note that this is different from a new line which is triggered when the new
-     * line character is found ("\n") and which generates an onNewLine() event.
+     * Represents an explicit line break specified in the wiki syntax. For example for XWiki this would be "\\". Note
+     * that this is different from a new line which is triggered when the new line character is found ("\n") and which
+     * generates an onNewLine() event.
      */
     void onLineBreak();
 
     /**
-     * Represents an implicit new line triggered when the new line character is found ("\n"). Note
-     * that this is different from a line break which is explicitely specified in wiki syntax, and
-     * which generates a onLineBreak() event.
+     * Represents an implicit new line triggered when the new line character is found ("\n"). Note that this is
+     * different from a line break which is explicitely specified in wiki syntax, and which generates a onLineBreak()
+     * event.
      */
     void onNewLine();
-    
+
     void onLink(Link link);
 
     void onMacro(String name, Map<String, String> parameters, String content);
@@ -98,13 +98,12 @@ public interface Listener
     void onWord(String word);
 
     void onSpace();
-    
+
     void onSpecialSymbol(String symbol);
 
     /**
-     * Represents a string that is escaped, ie which contains special characters that should not be
-     * transformed.
-     *
+     * Represents a string that is escaped, ie which contains special characters that should not be transformed.
+     * 
      * @param escapedString the string to keep as is
      * @since 1.5RC1
      */

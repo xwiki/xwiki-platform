@@ -53,54 +53,56 @@ public class VelocityMacro extends AbstractMacro
     private Parser parser;
 
     private Map<String, String> allowedParameters;
-    
-	/**
+
+    /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
-		// TODO: Use an I8N service to translate the descriptions in several languages
-		this.allowedParameters = new HashMap<String, String>();
-	}
+        // TODO: Use an I8N service to translate the descriptions in several languages
+        this.allowedParameters = new HashMap<String, String>();
+    }
 
-	/**
+    /**
      * {@inheritDoc}
+     * 
      * @see Macro#getDescription()
      */
-	public String getDescription()
-	{
-		// TODO: Use an I8N service to translate the description in several languages
-		return DESCRIPTION;
-	}
+    public String getDescription()
+    {
+        // TODO: Use an I8N service to translate the description in several languages
+        return DESCRIPTION;
+    }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Macro#getAllowedParameters()
      */
-	public Map<String, String> getAllowedParameters()
-	{
-		// We send a copy of the map and not our map since we don't want it to be modified.
-		return new HashMap<String, String>(this.allowedParameters);
-	}
-	
+    public Map<String, String> getAllowedParameters()
+    {
+        // We send a copy of the map and not our map since we don't want it to be modified.
+        return new HashMap<String, String>(this.allowedParameters);
+    }
+
     /**
      * {@inheritDoc}
+     * 
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom)
-        throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom) throws MacroExecutionException
     {
         // 1) Run Velocity on macro block content
         StringWriter writer = new StringWriter();
 
         try {
-            this.velocityManager.getVelocityEngine().evaluate(
-                this.velocityManager.getVelocityContext(), writer, "velocity macro", content);
+            this.velocityManager.getVelocityEngine().evaluate(this.velocityManager.getVelocityContext(), writer,
+                "velocity macro", content);
 
         } catch (XWikiVelocityException e) {
-            throw new MacroExecutionException("Failed to evaluate Velocity Macro for content ["
-                + content + "]", e);
+            throw new MacroExecutionException("Failed to evaluate Velocity Macro for content [" + content + "]", e);
         }
 
         String velocityResult = writer.toString();
@@ -110,8 +112,8 @@ public class VelocityMacro extends AbstractMacro
         try {
             parsedDom = this.parser.parse(new StringReader(velocityResult));
         } catch (ParseException e) {
-            throw new MacroExecutionException("Failed to parse content [" + velocityResult
-                + "] with Syntax parser [" + this.parser.getSyntax() + "]", e);
+            throw new MacroExecutionException("Failed to parse content [" + velocityResult + "] with Syntax parser ["
+                + this.parser.getSyntax() + "]", e);
         }
 
         return parsedDom.getChildren();

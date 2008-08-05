@@ -26,15 +26,15 @@ import java.util.List;
 
 /**
  * Default implementation for {@link FatherBlock}.
- *
+ * 
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractFatherBlock extends AbstractBlock implements FatherBlock 
+public abstract class AbstractFatherBlock extends AbstractBlock implements FatherBlock
 {
     /**
      * Constructs a block with children blocks.
-     *
+     * 
      * @param childrenBlocks the list of children blocks of the block to construct
      */
     public AbstractFatherBlock(List<Block> childrenBlocks)
@@ -44,8 +44,8 @@ public abstract class AbstractFatherBlock extends AbstractBlock implements Fathe
 
     /**
      * Helper constructor to construct a block with a single child block.
-     *
-     * @param childBlock the single child block to add 
+     * 
+     * @param childBlock the single child block to add
      */
     public AbstractFatherBlock(Block childBlock)
     {
@@ -54,13 +54,14 @@ public abstract class AbstractFatherBlock extends AbstractBlock implements Fathe
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
      */
     public void traverse(Listener listener)
     {
         before(listener);
 
-        for (Block block: getChildren()) {
+        for (Block block : getChildren()) {
             block.traverse(listener);
         }
 

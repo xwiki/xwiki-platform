@@ -43,58 +43,61 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     private static final String DESCRIPTION = "Inserts XHTML code into the page.";
 
     private static final String PARAMETER_ESCAPE_WIKI_SYNTAX = "escapeWikiSyntax";
-    
+
     /**
      * Injected by the Component Manager.
      */
     private Parser parser;
 
     /**
-     * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally.
-     * Injected by the Component Manager.
+     * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally. Injected by
+     * the Component Manager.
      */
     private EntityResolver entityResolver;
-    
+
     private Map<String, String> allowedParameters;
 
     /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
-		// TODO: Use an I8N service to translate the descriptions in several languages
-		this.allowedParameters = new HashMap<String, String>();
+        // TODO: Use an I8N service to translate the descriptions in several languages
+        this.allowedParameters = new HashMap<String, String>();
         this.allowedParameters.put("escapeWikiSyntax", "If true then the XHTML element contents won't be rendered "
             + "even if they contain valid wiki syntax.");
-	}
+    }
 
-	/**
+    /**
      * {@inheritDoc}
+     * 
      * @see Macro#getDescription()
      */
-	public String getDescription()
-	{
-		// TODO: Use an I8N service to translate the description in several languages
-		return DESCRIPTION;
-	}
+    public String getDescription()
+    {
+        // TODO: Use an I8N service to translate the description in several languages
+        return DESCRIPTION;
+    }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Macro#getAllowedParameters()
      */
-	public Map<String, String> getAllowedParameters()
-	{
-		// We send a copy of the map and not our map since we don't want it to be modified.
-		return new HashMap<String, String>(this.allowedParameters);
-	}
-	
+    public Map<String, String> getAllowedParameters()
+    {
+        // We send a copy of the map and not our map since we don't want it to be modified.
+        return new HashMap<String, String>(this.allowedParameters);
+    }
+
     /**
      * {@inheritDoc}
+     * 
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom)
-        throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom) throws MacroExecutionException
     {
         // Parse the XHTML using an XML Parser and Wrap the XML elements in XMLBlock(s).
         // For each XML element's text, run it through the main Parser.
@@ -115,19 +118,18 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
 
             // Since XML can only have a single root node and since we want to allow users to put
             // content such as the following, we need to wrap the content in a root node:
-            //   <tag1>
-            //     ..
-            //   </tag1>
-            //   <tag2>
-            //   </tag2>
-            String normalizedContent = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
-                + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n"
-                + "<root>" + content + "</root>";
+            // <tag1>
+            // ..
+            // </tag1>
+            // <tag2>
+            // </tag2>
+            String normalizedContent =
+                "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n"
+                    + "\"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n" + "<root>" + content + "</root>";
 
             xr.parse(new InputSource(new StringReader(normalizedContent)));
         } catch (Exception e) {
-            throw new MacroExecutionException("Failed to parse content as XML ["
-                + content + "]", e);
+            throw new MacroExecutionException("Failed to parse content as XML [" + content + "]", e);
         }
 
         return handler.getRootBlock().getChildren();

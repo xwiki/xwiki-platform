@@ -4,145 +4,145 @@ import java.util.Map;
 
 public class ListenerDelegate implements Listener
 {
-	private Listener listener;
+    private Listener listener;
 
-	public void setWrappedListener(Listener listener)
-	{
-		this.listener = listener;
-	}
-	
-	public Listener getWrappedListener()
-	{
-		return this.listener;
-	}
-	
-	public void beginDocument()
-	{
-		this.listener.beginDocument();
-	}
+    public void setWrappedListener(Listener listener)
+    {
+        this.listener = listener;
+    }
 
-	public void endDocument()
-	{
-		this.listener.endDocument();
-	}
+    public Listener getWrappedListener()
+    {
+        return this.listener;
+    }
 
-	public void beginBold()
-	{
-		this.listener.beginBold();
-	}
+    public void beginDocument()
+    {
+        this.listener.beginDocument();
+    }
 
-	public void beginItalic()
-	{
-		this.listener.beginItalic();
-	}
+    public void endDocument()
+    {
+        this.listener.endDocument();
+    }
 
-	public void beginList(ListType listType)
-	{
-		this.listener.beginList(listType);
-	}
+    public void beginBold()
+    {
+        this.listener.beginBold();
+    }
 
-	public void beginListItem()
-	{
-		this.listener.beginListItem();
-	}
+    public void beginItalic()
+    {
+        this.listener.beginItalic();
+    }
 
-	public void beginMacroMarker(String name, Map<String, String> parameters, String content)
-	{
-		this.listener.beginMacroMarker(name, parameters, content);
-	}
+    public void beginList(ListType listType)
+    {
+        this.listener.beginList(listType);
+    }
 
-	public void beginParagraph()
-	{
-		this.listener.beginParagraph();
-	}
+    public void beginListItem()
+    {
+        this.listener.beginListItem();
+    }
 
-	public void beginSection(SectionLevel level)
-	{
-		this.listener.beginSection(level);
-	}
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        this.listener.beginMacroMarker(name, parameters, content);
+    }
 
-	public void beginXMLElement(String name, Map<String, String> attributes)
-	{
-		this.listener.beginXMLElement(name, attributes);
-	}
+    public void beginParagraph()
+    {
+        this.listener.beginParagraph();
+    }
 
-	public void endBold()
-	{
-		this.listener.endBold();
-	}
+    public void beginSection(SectionLevel level)
+    {
+        this.listener.beginSection(level);
+    }
 
-	public void endItalic()
-	{
-		this.listener.endItalic();
-	}
+    public void beginXMLElement(String name, Map<String, String> attributes)
+    {
+        this.listener.beginXMLElement(name, attributes);
+    }
 
-	public void endList(ListType listType)
-	{
-		this.listener.endList(listType);
-	}
+    public void endBold()
+    {
+        this.listener.endBold();
+    }
 
-	public void endListItem()
-	{
-		this.listener.endListItem();
-	}
+    public void endItalic()
+    {
+        this.listener.endItalic();
+    }
 
-	public void endMacroMarker(String name, Map<String, String> parameters, String content)
-	{
-		this.listener.endMacroMarker(name, parameters, content);
-	}
+    public void endList(ListType listType)
+    {
+        this.listener.endList(listType);
+    }
 
-	public void endParagraph()
-	{
-		this.listener.endParagraph();
-	}
+    public void endListItem()
+    {
+        this.listener.endListItem();
+    }
 
-	public void endSection(SectionLevel level)
-	{
-		this.listener.endSection(level);
-	}
+    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        this.listener.endMacroMarker(name, parameters, content);
+    }
 
-	public void endXMLElement(String name, Map<String, String> attributes)
-	{
-		this.listener.endXMLElement(name, attributes);
-	}
+    public void endParagraph()
+    {
+        this.listener.endParagraph();
+    }
 
-	public void onEscape(String escapedString)
-	{
-		this.listener.onEscape(escapedString);
-	}
+    public void endSection(SectionLevel level)
+    {
+        this.listener.endSection(level);
+    }
 
-	public void onLineBreak()
-	{
-		this.listener.onLineBreak();
-	}
+    public void endXMLElement(String name, Map<String, String> attributes)
+    {
+        this.listener.endXMLElement(name, attributes);
+    }
 
-	public void onLink(Link link)
-	{
-		this.listener.onLink(link);
-	}
+    public void onEscape(String escapedString)
+    {
+        this.listener.onEscape(escapedString);
+    }
 
-	public void onMacro(String name, Map<String, String> parameters, String content)
-	{
-		this.listener.onMacro(name, parameters, content);
-	}
+    public void onLineBreak()
+    {
+        this.listener.onLineBreak();
+    }
 
-	public void onNewLine()
-	{
-		this.listener.onNewLine();
-	}
+    public void onLink(Link link)
+    {
+        this.listener.onLink(link);
+    }
 
-	public void onSpace()
-	{
-		this.listener.onSpace();
-	}
+    public void onMacro(String name, Map<String, String> parameters, String content)
+    {
+        this.listener.onMacro(name, parameters, content);
+    }
 
-	public void onSpecialSymbol(String symbol)
-	{
-		this.listener.onSpecialSymbol(symbol);
-	}
+    public void onNewLine()
+    {
+        this.listener.onNewLine();
+    }
 
-	public void onWord(String word)
-	{
-		this.listener.onWord(word);
-	}
+    public void onSpace()
+    {
+        this.listener.onSpace();
+    }
+
+    public void onSpecialSymbol(String symbol)
+    {
+        this.listener.onSpecialSymbol(symbol);
+    }
+
+    public void onWord(String word)
+    {
+        this.listener.onWord(word);
+    }
 }

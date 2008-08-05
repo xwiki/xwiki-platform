@@ -34,7 +34,7 @@ import org.xwiki.rendering.DocumentManager;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
- *
+ * 
  * @version $Id$
  * @since 1.5M2
  */
@@ -45,30 +45,29 @@ public class XHTMLRenderer implements Renderer
     private DocumentManager documentManager;
 
     /**
-     * A temporary service offering methods manipulating XWiki Documents that are needed to output the 
-     * correct XHTML. For example this is used to verify if a document exists when computing the HREF 
-     * attribute for a link. It's temporary because the current Document services have not yet been 
-     * rewritten with the new architecture. This bridge allows us to be independent of the XWiki Core 
-     * module, thus preventing a cyclic dependency.
+     * A temporary service offering methods manipulating XWiki Documents that are needed to output the correct XHTML.
+     * For example this is used to verify if a document exists when computing the HREF attribute for a link. It's
+     * temporary because the current Document services have not yet been rewritten with the new architecture. This
+     * bridge allows us to be independent of the XWiki Core module, thus preventing a cyclic dependency.
      */
     private XHTMLLinkRenderer linkRenderer;
 
     private AnchorIdGenerator idGenerator;
-    
+
     /**
-     * Used to save the original Writer when we redirect all outputs to a new writer to compute a 
-     * section title. We need to do this since the XHTML we generate for a section title contains
-     * a unique id that we generate based on the section title and the events for the section
-     * title are generated after the beginSection() event.
+     * Used to save the original Writer when we redirect all outputs to a new writer to compute a section title. We need
+     * to do this since the XHTML we generate for a section title contains a unique id that we generate based on the
+     * section title and the events for the section title are generated after the beginSection() event.
      */
     private PrintWriter originalWriter;
 
     /**
      * The temporary writer used to redirect all outputs when computing the section title.
+     * 
      * @see #originalWriter
      */
     private Writer sectionTitleWriter;
-    
+
     /**
      * @param writer the stream to write the XHTML output to
      * @param documentManager see {@link #documentManager}
@@ -82,35 +81,39 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#beginDocument()
      */
     public void beginDocument()
     {
-    	// Use a new generator for each document being processed since the id generator is stateful and 
-    	// remembers the generated ids.
+        // Use a new generator for each document being processed since the id generator is stateful and
+        // remembers the generated ids.
         this.idGenerator = new AnchorIdGenerator();
-	}
+    }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#endDocument()
      */
-	public void endDocument()
-	{
-    	// Don't do anything
-	}
+    public void endDocument()
+    {
+        // Don't do anything
+    }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#beginBold()
      */
-	public void beginBold()
+    public void beginBold()
     {
         write("<strong>");
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#beginItalic()
      */
     public void beginItalic()
@@ -120,6 +123,7 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#beginParagraph()
      */
     public void beginParagraph()
@@ -129,6 +133,7 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#endBold()
      */
     public void endBold()
@@ -138,6 +143,7 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#endItalic()
      */
     public void endItalic()
@@ -147,6 +153,7 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#endParagraph()
      */
     public void endParagraph()
@@ -156,6 +163,7 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#onLineBreak()
      */
     public void onLineBreak()
@@ -165,6 +173,7 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#onNewLine()
      */
     public void onNewLine()
@@ -174,6 +183,7 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see Renderer#onLink(Link)
      */
     public void onLink(Link link)
@@ -189,15 +199,15 @@ public class XHTMLRenderer implements Renderer
 
     public void beginSection(SectionLevel level)
     {
-    	// Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
-    	// Thus we're doing the output in the endSection() event.
+        // Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
+        // Thus we're doing the output in the endSection() event.
 
-    	// Redirect all output to our writer
-    	this.originalWriter = getWriter();
-    	this.sectionTitleWriter = new StringWriter();
-    	this.setWriter(new PrintWriter(this.sectionTitleWriter));
+        // Redirect all output to our writer
+        this.originalWriter = getWriter();
+        this.sectionTitleWriter = new StringWriter();
+        this.setWriter(new PrintWriter(this.sectionTitleWriter));
     }
-    
+
     private void processBeginSection(SectionLevel level, String sectionTitle)
     {
         int levelAsInt = level.getAsInt();
@@ -209,20 +219,20 @@ public class XHTMLRenderer implements Renderer
 
     public void endSection(SectionLevel level)
     {
-    	String sectionTitle = this.sectionTitleWriter.toString();
-    	getWriter().close();
-    	setWriter(this.originalWriter);
-    	processBeginSection(level, sectionTitle);
-    	write(sectionTitle);
+        String sectionTitle = this.sectionTitleWriter.toString();
+        getWriter().close();
+        setWriter(this.originalWriter);
+        processBeginSection(level, sectionTitle);
+        write(sectionTitle);
 
-    	int levelAsInt = level.getAsInt();
+        int levelAsInt = level.getAsInt();
         write("</span>");
         write("</h" + levelAsInt + ">");
     }
 
     public void onWord(String word)
     {
-		write(word);
+        write(word);
     }
 
     public void onSpace()
@@ -271,11 +281,11 @@ public class XHTMLRenderer implements Renderer
     {
         write("</li>");
     }
-    
+
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
         write("<" + name);
-        for (String attributeName: attributes.keySet()) {
+        for (String attributeName : attributes.keySet()) {
             write(" " + attributeName + "=\"" + attributes.get(attributeName) + "\"");
         }
         write(">");
@@ -303,12 +313,12 @@ public class XHTMLRenderer implements Renderer
 
     private PrintWriter getWriter()
     {
-    	return this.writer;
+        return this.writer;
     }
-    
+
     private void setWriter(PrintWriter writer)
     {
-    	this.writer = writer;
+        this.writer = writer;
     }
-    
+
 }

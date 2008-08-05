@@ -23,54 +23,55 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance
- * of it should be used for each document.
+ * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance of it
+ * should be used for each document.
  * 
  * @version $Id: $
  * @since 1.6M1
  */
 public class AnchorIdGenerator
 {
-	private List<String> generatedIds = new ArrayList<String>();
-	
+    private List<String> generatedIds = new ArrayList<String>();
+
     /**
-     * Generate a unique id attribute using the passed text as the seed value. The generated id complies
-     * with the XHTML specification.
-     * Extract from <a href="http://www.devguru.com/technologies/xhtml/QuickRef/xhtml_attribute_id.html">DevGuru</a>:
-     * <p><quote> 
-     *   "The id attribute is used to assign a identifier value to a tag. Each id must be unique within the document 
+     * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML
+     * specification. Extract from <a
+     * href="http://www.devguru.com/technologies/xhtml/QuickRef/xhtml_attribute_id.html">DevGuru</a>:
+     * <p>
+     * <quote>
+     * "The id attribute is used to assign a identifier value to a tag. Each id must be unique within the document 
      *   and each element can only have one id.
-     *	 In XHTML, the id attribute has essentially replaced the use of the name attribute. The value of the id must 
-	 *   start with an alphabetic letter or an underscore. The rest of the value can contain any alpha/numeric 
+     *   In XHTML, the id attribute has essentially replaced the use of the name attribute. The value of the id must 
+     *   start with an alphabetic letter or an underscore. The rest of the value can contain any alpha/numeric 
      *   character."
      * </quote></p> 
-	 * 
-	 * @param text the text used to generate the unique id. For example "Hello" will generate "HHello".
-	 * @return the unique id
+     * 
+     * @param text the text used to generate the unique id. For example "Hello" will generate "HHello".
+     * @return the unique id
      */
-	public String generateUniqueId(String text)
-	{
-		// Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
-		String idPrefix = "H" + text.replaceAll("[^a-zA-Z0-9]", "");
+    public String generateUniqueId(String text)
+    {
+        // Remove all non alpha numeric characters to make a nice compact id which respect the XHTML specification.
+        String idPrefix = "H" + text.replaceAll("[^a-zA-Z0-9]", "");
 
-		int occurence = 0;
-		String id = idPrefix;
-		while (this.generatedIds.contains(id)) {
-			occurence++;
-			id = idPrefix + "-" + occurence;
-		}
+        int occurence = 0;
+        String id = idPrefix;
+        while (this.generatedIds.contains(id)) {
+            occurence++;
+            id = idPrefix + "-" + occurence;
+        }
 
-		// Save the generated id so that the next call to this method will not generate the same id.
-		this.generatedIds.add(id);
-		
-		return id;
-	}
+        // Save the generated id so that the next call to this method will not generate the same id.
+        this.generatedIds.add(id);
 
-	/**
-	 * Reset the known generated ids.
-	 */
-	public void reset()
-	{
-		this.generatedIds.clear();
-	}
+        return id;
+    }
+
+    /**
+     * Reset the known generated ids.
+     */
+    public void reset()
+    {
+        this.generatedIds.clear();
+    }
 }

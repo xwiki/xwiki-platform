@@ -35,29 +35,30 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
- * Look for all {@link MacroBlock} blocks in the passed Document and iteratively execute
- * each Macro in the correct order. Macros can:
+ * Look for all {@link MacroBlock} blocks in the passed Document and iteratively execute each Macro in the correct
+ * order. Macros can:
  * <ul>
- *   <li>provide a hint specifying when they should run (priority)</li>
- *   <li>generate other Macros</li>
+ * <li>provide a hint specifying when they should run (priority)</li>
+ * <li>generate other Macros</li>
  * </ul>
- *
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public class MacroTransformation extends AbstractTransformation implements Composable
 {
     /**
-     * Number of macro executions allowed when rendering the current content before considering
-     * that we are in a loop. Such a loop can happen if a macro generates itself for example. 
+     * Number of macro executions allowed when rendering the current content before considering that we are in a loop.
+     * Such a loop can happen if a macro generates itself for example.
      */
     private int maxMacroExecutions = 1000;
-    
+
     private ComponentManager componentManager;
 
     private class MacroHolder implements Comparable<MacroHolder>
     {
         Macro macro;
+
         MacroBlock macroBlock;
 
         public MacroHolder(Macro macro, MacroBlock macroBlock)
@@ -71,9 +72,10 @@ public class MacroTransformation extends AbstractTransformation implements Compo
             return macro.compareTo(holder.macro);
         }
     }
-    
+
     /**
      * {@inheritDoc}
+     * 
      * @see Composable#compose(ComponentManager)
      */
     public void compose(ComponentManager componentManager)
@@ -83,10 +85,10 @@ public class MacroTransformation extends AbstractTransformation implements Compo
 
     /**
      * {@inheritDoc}
+     * 
      * @see Transformation#transform(org.xwiki.rendering.block.XDOM , org.xwiki.rendering.parser.Syntax)
      */
-    public void transform(XDOM dom, Syntax syntax)
-        throws TransformationException
+    public void transform(XDOM dom, Syntax syntax) throws TransformationException
     {
         // Counter to prevent infinite recursion if a macro generates the same macro for example.
         int executions = 0;
@@ -98,37 +100,38 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         }
     }
 
-    private void transformOnce(List<MacroBlock> macroBlocks, XDOM dom, Syntax syntax)
-        throws TransformationException
+    private void transformOnce(List<MacroBlock> macroBlocks, XDOM dom, Syntax syntax) throws TransformationException
     {
         List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
 
         // 1) Sort the macros by priority to find the highest priority macro to execute
-        for (MacroBlock macroBlock: dom.getChildrenByType(MacroBlock.class)) {
+        for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class)) {
             String hintName = macroBlock.getName() + "/" + syntax.getType().toIdString();
             try {
                 Macro macro = (Macro) this.componentManager.lookup(Macro.ROLE, hintName);
                 macroHolders.add(new MacroHolder(macro, macroBlock));
             } catch (ComponentLookupException e) {
-            	// TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load it again
-            	// and 2) the user can clearly see that it failed to be executed.
-                getLogger().warn("Failed to find macro [" + macroBlock.getName() + "] for hint [" + hintName
-                    + "]. Ignoring it");
+                // TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load
+                // it again
+                // and 2) the user can clearly see that it failed to be executed.
+                getLogger().warn(
+                    "Failed to find macro [" + macroBlock.getName() + "] for hint [" + hintName + "]. Ignoring it");
             }
         }
         // If no macros were found, return with no changes. This can happen if the macros fail to be found.
         if (macroHolders.isEmpty()) {
-        	return;
+            return;
         }
         // Sort the Macros by priority
         Collections.sort(macroHolders);
-        
+
         // 2) Execute the highest priority macro
         MacroHolder macroHolder = macroHolders.get(0);
         List<Block> newBlocks;
         try {
-            newBlocks = macroHolder.macro.execute(macroHolder.macroBlock.getParameters(),
-                macroHolder.macroBlock.getContent(), dom);
+            newBlocks =
+                macroHolder.macro.execute(macroHolder.macroBlock.getParameters(), macroHolder.macroBlock.getContent(),
+                    dom);
         } catch (MacroExecutionException e) {
             throw new TransformationException("Failed to perform transformation for macro ["
                 + macroHolder.macroBlock.getName() + "]", e);
@@ -143,14 +146,15 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         if (MacroMarkerBlock.class.isAssignableFrom(macroHolder.macroBlock.getParent().getClass())) {
             resultBlocks = newBlocks;
         } else {
-            resultBlocks = Collections.singletonList((Block) new MacroMarkerBlock(macroHolder.macroBlock.getName(),
-                macroHolder.macroBlock.getParameters(), macroHolder.macroBlock.getContent(), newBlocks));
+            resultBlocks =
+                Collections.singletonList((Block) new MacroMarkerBlock(macroHolder.macroBlock.getName(),
+                    macroHolder.macroBlock.getParameters(), macroHolder.macroBlock.getContent(), newBlocks));
         }
 
         // 3) Replace the MacroBlock by the Blocks generated by the execution of the Macro
         List<Block> childrenBlocks = macroHolder.macroBlock.getParent().getChildren();
         int pos = childrenBlocks.indexOf(macroHolder.macroBlock);
-        for (Block block: resultBlocks) {
+        for (Block block : resultBlocks) {
             block.setParent(macroHolder.macroBlock.getParent());
         }
         childrenBlocks.addAll(pos, resultBlocks);

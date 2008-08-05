@@ -24,14 +24,14 @@ import java.util.Map;
 
 /**
  * Generates XWiki Syntax for a Macro Block.
- *
+ * 
  * @version $Id: $
  * @since 1.5RC1
  */
 public class XWikiMacroPrinter
 {
-	public String print(String name, Map<String, String> parameters, String content)
-	{
+    public String print(String name, Map<String, String> parameters, String content)
+    {
         StringBuffer buffer = new StringBuffer();
         buffer.append("{{").append(name);
         if (!parameters.isEmpty()) {
@@ -51,7 +51,7 @@ public class XWikiMacroPrinter
             buffer.append(content);
             buffer.append("{{/").append(name).append("}}");
         }
-        
+
         return buffer.toString();
-	}
+    }
 }

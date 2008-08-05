@@ -32,7 +32,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public abstract class AbstractBlock implements Block
 {
     private List<Block> childrenBlocks = new ArrayList<Block>();
-    
+
     private Block parentBlock;
 
     public void addChild(Block block)
@@ -42,9 +42,9 @@ public abstract class AbstractBlock implements Block
         block.setParent(this);
     }
 
-    public void addChildren(List<? extends Block> blocks)
+    public void addChildren(List< ? extends Block> blocks)
     {
-        for (Block block: blocks) {
+        for (Block block : blocks) {
             this.addChild(block);
         }
     }
@@ -66,17 +66,19 @@ public abstract class AbstractBlock implements Block
 
     public Block getRoot()
     {
-        Block block = getParent();
+        Block block = this;
+
         while (block.getParent() != null) {
             block = block.getParent();
         }
+
         return block;
     }
 
     public <T extends Block> List<T> getChildrenByType(Class<T> blockClass)
     {
         List<Block> typedBlocks = new ArrayList<Block>();
-        for (Block block: getChildren()) {
+        for (Block block : getChildren()) {
             if (blockClass.isAssignableFrom(block.getClass())) {
                 typedBlocks.add(block);
             }
@@ -84,20 +86,22 @@ public abstract class AbstractBlock implements Block
                 typedBlocks.addAll(block.getChildrenByType(blockClass));
             }
         }
-        return (List<T>)typedBlocks;
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see EqualsBuilder#reflectionEquals(Object, Object)
-     */
-    public boolean equals(Object obj)
-    {
-        return EqualsBuilder.reflectionEquals(this, obj);        
+        return (List<T>) typedBlocks;
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see EqualsBuilder#reflectionEquals(Object, Object)
+     */
+    public boolean equals(Object obj)
+    {
+        return EqualsBuilder.reflectionEquals(this, obj);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see HashCodeBuilder#reflectionHashCode(Object)
      */
     public int hashCode()

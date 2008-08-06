@@ -342,3 +342,86 @@ function createAccordion(params)
     });
     acc.activate($$('#'+params.div+' .accordionTabTitleBar')[params.no]);
 }
+
+function displayDocExtra(extraID, extraTemplate, scrollToAnchor)
+{
+
+  // Nested function: hides the previously displayed extra pane (window.activeDocExtraPane)
+  // and display the one that is passed as an argument (extraID).
+  var dhtmlSwitch = function(extraID) {
+    var tab = document.getElementById(extraID + "tab");
+    var pane = document.getElementById(extraID + "pane");
+    if (window.activeDocExtraTab != null) {
+      window.activeDocExtraTab.className="";
+      window.activeDocExtraPane.className="hidden";
+    }
+    window.activeDocExtraTab = tab;
+    window.activeDocExtraPane = pane;
+    window.activeDocExtraTab.className="active";
+    window.activeDocExtraPane.className="";
+    tab.blur();
+  };
+
+  // Nested function: insert a save button near a tages input field if the extra pane
+  // passed as an argument (extraID) is the doc information pane.
+  var insertTagSaveButton = function(extraID) {
+  	if (extraID == "Information") {
+    	$('tageditsavewrapper').className = "buttonwrapper";
+    	Event.observe($('tageditsave'), 'click', function() {
+ 			new Ajax.Request(
+ 				window.docsaveurl,
+ 				{
+ 					method: 'post',
+ 					postBody: "tags=" + $('tags').value,
+ 					onSuccess: function() { $('tageditsavesuccess').className=''; $('tageditsaveerror').className='hidden'; },
+ 					onError: function() { $('tageditsavesuccess').className='hidden'; $('tageditsaveerror').className=''; }
+ 				});
+ 			return false;
+  		} , false);
+    }
+  };
+
+  // Use Ajax.Updater to display the requested pane (extraID) : comments, attachments, etc.
+  // On complete :
+  //   1. Call insertTagSaveButton()
+  //   2. Call dhtmlSwitch()
+  //   3. If the function call has been triggered by an event : reset location.href to #extraID
+  //      (because when the link has been first clicked the anchor was not loaded)
+  if ($(extraID + "pane").className.indexOf("empty") != -1) {
+  	if (window.activeDocExtraPane != null) {
+  	  window.activeDocExtraPane.className="invisible";
+  	}
+	$("docextrapanes").className="loading";
+    new Ajax.Updater(
+      extraID + "pane",
+      window.docviewurl + '?xpage=xpart&vm=' + extraTemplate,
+      {
+        method: 'post',
+        evalScripts: true,
+        onComplete: function(){
+        	insertTagSaveButton(extraID);
+        	$("docextrapanes").className="";
+        	dhtmlSwitch(extraID);
+        	if (scrollToAnchor) {
+        		// Yes, this is a POJW (Plain Old JavaScript Ha^Wworkaround) which
+        		// prevents the anchor 'jump' after a click event but enable it
+        		// when the user is arriving from a direct /Space/Page#Section URL
+    			$(extraID + 'anchor').id = extraID;
+        		location.href='#' + extraID;
+        		$(extraID).id = extraID + 'anchor';
+        	}
+        }
+      });
+  } else {
+  	dhtmlSwitch(extraID);
+  	if (scrollToAnchor) {
+      $(extraID + 'anchor').id = extraID;
+      location.href='#' + extraID;
+      $(extraID).id = extraID + 'anchor';
+    }
+  }
+}
+
+
+
+

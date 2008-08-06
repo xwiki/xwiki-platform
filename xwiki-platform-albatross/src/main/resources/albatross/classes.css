@@ -5,7 +5,15 @@
   clear: both;
 }
 .none, .hidden {
-  display: none;
+  display: none !important;
+}
+.invisible {
+	visibility: hidden !important;
+}
+.loading {
+    background-image: url(icons/spinner.gif);
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 .currentspace{
   font-weight: 900;

@@ -185,8 +185,11 @@ shortcut = {
 					//e.cancelBubble is supported by IE - this will kill the bubbling process.
 					e.cancelBubble = true;
 					e.returnValue = false;
+
                     // XWIKI : added to force Alt+key events not to be propagated to IE7
-                    e.keyCode = 0;
+                    if (document.all && !window.opera && window.XMLHttpRequest) {
+                      e.keyCode = 0;
+                    }
 
                     //e.stopPropagation works in Firefox.
 					if (e.stopPropagation) {

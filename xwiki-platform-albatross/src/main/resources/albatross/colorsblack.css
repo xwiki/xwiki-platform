@@ -13,7 +13,7 @@ h1, h2, h3, h4 {
 	border: 2px solid #474f57;
 }
 
-  
+
 #xwikimaincontainerinner{
 	background-color: transparent;
 	border: 1px solid #444B53;
@@ -102,7 +102,7 @@ Content
 
 /*
 ---------------------------------------
-Zone for Comments, attachments, History... 
+Zone for Comments, attachments, History...
 ---------------------------------------
 */
 ul.xwikiintra{
@@ -156,19 +156,19 @@ Menu
   border-color:  #333;
 }
 .rightmenu a, .rightmenu a:link.rightmenu a:visited,.rightmenu a:active{
-	  border-color: #333; 
-	  background:transparent;  
-	  color:#333; 
+	  border-color: #333;
+	  background:transparent;
+	  color:#333;
 }
 .topmenuentry{
-   border-color: #333; 
+   border-color: #333;
    background: transparent right top no-repeat;
 }
 .tme{
   background: transparent url("icons/black-arrow-ab.png") right center no-repeat;
 }
 .topmenuentry a, .topmenuentry a:link, .topmenuentry a:visited, .topmenuentry a:active, .rightmenu a, .rightmenu a:hover {
-	color:#333; 
+	color:#333;
 }
 .topmenuentry:hover, .rightmenu:hover {
   background-image: url("actionbar-bg2.png") !important;
@@ -247,7 +247,7 @@ Menu
   border-color: #000;
 }
 .submenuitem a, .submenuitem a:link, .submenuitem a:visited, .submenuitem a:active  {
-color:#333; 
+color:#333;
 }
 
 .submenuitem a:hover {
@@ -749,7 +749,6 @@ a.deletelink:hover{
 }
 .about{
   color: #888;
-  clear:both;
 }
 .about a{
   color: #333;

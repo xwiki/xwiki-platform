@@ -3,24 +3,132 @@
 ## Extra data: comments, attachments ...
 ##
 <div id="xwikidata" class="layoutsubsection">
-#set($inline = true)
-#set($show = $!request.getParameter("show"))
-#if(!$show || ($show != "comments" && $show != "attachments" && $show != "history" && $show != "attributes"))
-#set($show = "comments")
+##
+## Build the list of documents extras to display, if it does not exist (default).
+## List format : ["ExtraAnchor", "ExtraName", "ExtraTabText", ExtraNumberOfItems, "extratemplate.vm", "keyboardShortcut"]
+##
+#if (!$docextras)
+  #if(!$showcomments)
+    #set($showcomments = $xwiki.getWebPreference("showcomments"))
+  #end
+  #if(!$showattachments)
+    #set($showattachments = $xwiki.getWebPreference("showattachments"))
+  #end
+  #if(!$showhistory)
+    #set($showhistory = $xwiki.getWebPreference("showhistory"))
+  #end
+  #if(!$showinformation)
+    #set($showinformation = $xwiki.getWebPreference("showinformation"))
+  #end
+  #set($docextras = $util.arrayList)
+  #if($showcomments!="no")
+    #set ($discard = $docextras.add(["Comments", "comments", $msg.get("docextra.comments"), $doc.getObjects("XWiki.XWikiComments").size(), "commentsinline.vm", $msg.get("core.shortcuts.view.comments")]))
+  #end
+  #if($showattachments!="no")
+    #set ($discard = $docextras.add(["Attachments", "attachments", $msg.get("docextra.attachments"), $doc.getAttachmentList().size(), "attachmentsinline.vm",$msg.get("core.shortcuts.view.attachments")]))
+  #end
+  #if($showhistory!="no")
+    #set ($discard = $docextras.add(["History", "history", $msg.get("docextra.history"), -1, "historyinline.vm", $msg.get("core.shortcuts.view.history")]))
+  #end
+  #if($showinformation!="no")
+    #set ($discard = $docextras.add(["Information", "information", $msg.get("docextra.information"), -1, "informationinline.vm", $msg.get("core.shortcuts.view.information")]))
+  #end
 #end
-<h3 class="hidden">$msg.get("docdata")</h3>
-<div id="xwikidatacontents">
-#if(!$showcomments)
-#set($showcomments = $xwiki.getWebPreference("showcomments"))
+##
+## Put anchors before the footer, otherwise the top of each section would be hidden by the floating topmenu
+##
+#if($docextras.size() > 0)
+<div id="docextraanchors" name="docextraanchors" class="invisible">
+#foreach($docextra in $docextras)<span id="${listtool.get($docextra, 0)}anchor">&nbsp;</span>#end
+</div>
 #end
-#if($showcomments!="no")
-#template("commentsinline.vm")
+#macro(docabout)
+<div class="about">
+##
+## Last modification
+##
+<span id="aboutauthor">$msg.get("lastmodifiedby") $xwiki.getLocalUserName($tdoc.author)</span>
+<span id="aboutdate">$msg.get("lastmodifiedon") $!xwiki.formatDate($tdoc.date, "dd/MM/yyyy") $msg.get("at") $!xwiki.formatDate($tdoc.date, "HH:mm")</span>
+</div>
 #end
-#if(!$showattachments)
-#set($showattachments = $xwiki.getWebPreference("showattachments"))
+#if($docextras.size() < 1)
+  #docabout()
 #end
-#if($showattachments!="no")
-#template("attachmentsinline.vm")
+##
+## Display tabs
+##
+#if($docextras.size() > 0)
+  <div id="xwikidatacontents">
+    <div class="floatcontainer" id="docExtraTabs">
+      <ul class="xwikitabbar" id="docExtrasTabsUl">
+        #foreach($docextra in $docextras)
+          #set ($extraAnchor = $listtool.get($docextra, 0))
+          #set ($extraName = $listtool.get($docextra, 1))
+          #set ($extraTabText = $listtool.get($docextra, 2))
+          #set ($extraNbOfItems = $listtool.get($docextra, 3))
+          <li id="${extraAnchor}tab">
+            #set ($args = "viewer=${extraName}")
+            <a id="${extraAnchor}link" href="$doc.getURL('view', $args)">
+              $extraTabText #if($extraNbOfItems >= 0) $msg.get("docextra.extranb", [$extraNbOfItems]) #end
+            </a>
+          </li>
+        #end
+      </ul>
+      #docabout()
+    </div>
+    ##
+    ## Display panes (AJAX placeholders)
+    ##
+    <div id="docextrapanes">
+      #foreach($docextra in $docextras)
+        #set ($extraAnchor = $listtool.get($docextra, 0))
+        <div id="${extraAnchor}pane" class="hidden empty"></div>
+      #end
+    </div>
+    ##
+    ## JavaScript code generation
+    ##
+    <script type="text/javascript">
+      window.docviewurl = "${doc.getURL('view')}";
+      window.docsaveurl = "${doc.getURL('save')}";
+      var hashviewer = self.document.location.hash.substring(1);
+      #foreach($docextra in $docextras)
+        #set ($extraAnchor = $listtool.get($docextra, 0))
+        #set ($extraTemplate = $listtool.get($docextra, 4))
+        #set ($extraShortcut = $listtool.get($docextra, 5))
+        ##
+        ## Set the extra to load
+        ##
+        #if ($velocityCount == 1)
+          var extraInit = function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", false) };
+        #end
+        if (hashviewer == "${extraAnchor}") {
+          var extraInit = function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", true) };
+        }
+        ##
+        ## Replace tab link
+        ##
+        if ($("${extraAnchor}link") != null) {
+          $("${extraAnchor}link").href="#${extraAnchor}";
+          Event.observe($("${extraAnchor}link"), "click", function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", false); }, false);
+        }
+        ##
+        ## Replace top menu link (if any)
+        ##
+        if ($("tmShow${extraAnchor}") != null) {
+          $("tmShow${extraAnchor}").href="#${extraAnchor}";
+          Event.observe($("tmShow${extraAnchor}"), "click", function(){ displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, false);
+        }
+        ##
+        ## Override keyboard shortcut (if any)
+        ##
+        #if ($keyboardShortcutsEnabled && "$!extraShortcut" != "")
+          shortcut.remove("$extraShortcut");
+          shortcut.add("$extraShortcut", function() { displayDocExtra("${extraAnchor}", "${extraTemplate}", true); }, { 'type':'keypress', 'propagate':false, 'disable_in_input':true });
+        #end
+      #end
+      Event.observe(window, "load", extraInit, false);
+    </script>
+  </div> ## xwikidatacontents
 #end
-</div> ## xwikidatacontents
 </div>  ## xwikidata

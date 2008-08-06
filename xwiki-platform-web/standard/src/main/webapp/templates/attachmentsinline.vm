@@ -16,23 +16,19 @@ ${Msz}Mb
 ###
 ### TODO: web service?
 ###
-## #if(!$showattachments)
-## #set($showattachments = $xwiki.getWebPreference("showattachments"))
-## #end
-## #if($showattachments!="no")
 #if($request.xredirect)
 #set( $redirect = $request.xredirect)
 #else
-#set( $redirect = $xwiki.getRequestURL().replaceAll("&", "&amp;"))
+#set( $redirect = "${doc.getURL()}#Attachments")
 #end
 #set($showactions = 0)
 #set($attachments = $doc.attachmentList)
     <div id="attachmentscontent" class="xwikiintracontent">
     <div id="attw">
 #if($inline && ($inline == true))
-    <div class="xwikititlewrapper" onclick="toggleClass($('attachments'), 'hidden'); toggleClass($('attachmentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("attachments")<span class="hidden">:</span> <span class="attachmentsno">$attachments.size()</span></h3></div>
+    ##<div class="xwikititlewrapper" onclick="toggleClass($('attachments'), 'hidden'); toggleClass($('attachmentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("attachments")<span class="hidden">:</span> <span class="attachmentsno">$attachments.size()</span></h3></div>
 #end
-      <div id="attachments">
+      <div id="_attachments">
 #if($attachments.size()>0)
 #foreach ($attach in $attachments)
         <div class="attachment #if($velocityCount % 2 == 0) even #else odd #end">
@@ -57,7 +53,7 @@ ${Msz}Mb
 #if($hasEdit || $hasAdmin)
       <form action="$doc.getURL("upload")" enctype="multipart/form-data" method="post">
 <div>
-<input type="hidden" name="xredirect" value="$xwiki.getFormEncoded($redirect)" />
+<input type="hidden" name="xredirect" value="${xwiki.getFormEncoded($redirect)}" />
 <fieldset class="expanded" id="attachform">
         <legend onclick="toggleForm(this.form)">$msg.get("addattachment")<span class="expands">...</span></legend>
      <!--  <div><label id="xwikiuploadnamelabel" for="xwikiuploadname">$msg.get("choosetargetfilename"):</label></div> -->
@@ -75,14 +71,3 @@ ${Msz}Mb
       </div> ## attachments
       </div> ## attw
     </div> ## attachmentscontent
-#if($inline && ($inline == true))
-<script type="text/javascript">
-//<![CDATA[
-#if($hasEdit || $hasAdmin)
-document.getElementById("attachform").className = "collapsed";
-#end
-document.getElementById("attachments").className = "hidden";
-//]]>
-</script>
-#end
-## #end

@@ -62,4 +62,5 @@
 #elseif($languageparams != "")
 #set($docvariant = "$languageparams")
 #end
+#set ($keyboardShortcutsEnabled = $isAdvancedUser)
 #template("deprecatedVars.vm")

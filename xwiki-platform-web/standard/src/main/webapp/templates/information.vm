@@ -1,0 +1,2 @@
+<h2>$xwiki.parseMessage("viewinformationtitle")</h2>
+#template("informationinline.vm")

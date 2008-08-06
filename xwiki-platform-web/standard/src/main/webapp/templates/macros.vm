@@ -87,7 +87,7 @@ $xwiki.includeForm($topic)
 <!-- including $url -->
 $xwiki.invokeServletAndReturnAsString($url)
 <!-- included $url -->
-#end 
+#end
 ##
 ##
 ## #versions()
@@ -135,7 +135,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 ##
 ##
 ## #jabber("jabberId")
-## Displays the status for the given Jabber id 
+## Displays the status for the given Jabber id
 ##
 #macro(jabber $id)
 <img src="http://edgar.netflint.net/status.php?jid=${id}&amp;type=image&amp;iconset=phpbb" alt="jabber $id" />
@@ -143,7 +143,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 ##
 ##
 ## #skype("skypeId")
-## Displays the status for the given Skype id 
+## Displays the status for the given Skype id
 ##
 #macro(skype $id)
 <a href="skype:${id}?call"><img width="182" height="44" src="http://mystatus.skype.com/bigclassic/${id}" style="border: none;"></a>
@@ -151,7 +151,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 ##
 ##
 ## #yahoo("yahooId")
-## Displays the status for the given Yahoo! id 
+## Displays the status for the given Yahoo! id
 ##
 #macro(yahoo $id)
 <img border="0" src="http://opi.yahoo.com/online?u=${id}&amp;m=g&amp;t=1" alt="yahoo $id" />
@@ -159,7 +159,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 ##
 ##
 ## #aim("aimId")
-## Displays the status for the given AIM id 
+## Displays the status for the given AIM id
 ##
 #macro(aim $id)
 #set($onurl = "${request.scheme}://${request.serverName}${xwiki.getSkinFile('aimonline.gif')}")
@@ -169,7 +169,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 ##
 ##
 ## #msn("msnId")
-## Displays the status for the given MSN id 
+## Displays the status for the given MSN id
 ##
 #macro(msn $id)
 #set($onurl = "${request.serverName}${xwiki.getSkinFile('msnonline.gif')}")
@@ -180,7 +180,7 @@ $xwiki.invokeServletAndReturnAsString($url)
 ##
 ## #im("XWiki.Username")
 ## Displays the instant messaging account status of the given user. The IM network and the account
-## name are taken from the user profile.  
+## name are taken from the user profile.
 ##
 #macro(im $user)
 #set($userdoc = $xwiki.getDocument($user))
@@ -697,7 +697,7 @@ $fn
 ### Macros for "foot notes"
 ###
 ### TODO:
-###       Make Radeox macros 
+###       Make Radeox macros
 ###       Support in wysiwyg
 ###
 ###
@@ -1033,8 +1033,8 @@ $doc.display("content", $obj)
 ### @param actionurl The URL this entry points to
 ### @param linktext The menu item text
 ###
-#macro(submenuitem $actionurl $linktext) 
-<span class="submenuitem"><a href="$actionurl">$linktext</a></span>
+#macro(submenuitem $actionurl $linktext $linkid)
+<span class="submenuitem"><a href="$actionurl" id="$linkid">$linktext</a></span>
 #end
 
 ###

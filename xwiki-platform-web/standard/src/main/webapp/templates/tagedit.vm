@@ -93,7 +93,7 @@
     #set($seps = $xwiki.getDocument("XWiki.TagClass").xWikiClass.tags.getProperty('separators').value)
     <dl>
     <dt><label for="tags">$msg.get("core.tagedit.title")</label></dt>
-    <dd><input type="text" id="tags" name="tags" onfocus="new ajaxSuggest(this, {script:'$script', varname: 'input', seps:'$seps', offsety: 13} );" value="$!tdoc.tags"/></dd>
+    <dd><input type="text" id="tags" name="tags" onfocus="new ajaxSuggest(this, {script:'$script', varname: 'input', seps:'$seps', offsety: 13} );" value="$!tdoc.tags"/><!-- the following code can be used by javascript to display a save button along with the tags input --><span id="tageditsavewrapper" class="buttonwrapper hidden"><a id="tageditsave" href="#" onclick="return false;">$msg.get("tags.save")</a></span><span id="tageditsavesuccess" class="hidden">$msg.get("tags.save.success")</span><span id="tageditsaveerror" class="hidden">$msg.get("tags.save.error")</span></dd>
     </dl>
   #end
 #end

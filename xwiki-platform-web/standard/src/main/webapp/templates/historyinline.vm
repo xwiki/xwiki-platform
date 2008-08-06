@@ -12,7 +12,7 @@
   #set($criteria = $xwiki.criteriaService.revisionCriteriaFactory.createRevisionCriteria("", $minorVersions))
   #set($totalVersions = $tdoc.getRevisions($criteria).size())
 ## This will fill in $startAt, $endAt and the variables needed later by #printPagedViewLinks
-  #preparePagedViewParams($totalVersions, $xwiki.getXWikiPreferenceAsInt("web_history_versionsPerPage", 50))
+  #preparePagedViewParams($totalVersions, $xwiki.getXWikiPreferenceAsInt("web_history_versionsPerPage", 20))
 ## Since we're displaying revisions starting from the last one, we need to mirror the range inside
 ## the total versions range.
   #set($startAt = $totalVersions - $startAt)
@@ -29,12 +29,9 @@
 ## Preamble, output some HTML.
 ##
   <div id="historycontent" class="xwikiintracontent">
-## If this is displayed inside the document "extra" area, along with the comments and the
-## attachments, then this toggle header must be displayed.
-#if($inline && ($inline == true))    <div class="xwikititlewrapper" onclick="toggleClass($('history'), 'hidden'); toggleClass($('historycontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("history")</h3></div>#end
-    <form id="history" action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
+    <form id="historyform" action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
       #set($formname="history")
-      <div id="history">
+      <div id="_history">
       <div class="centered">
       <table class="xwikidatatable" summary="$msg.get(document) ${doc.displayTitle} &mdash; $msg.get("history")">
 ## Print the table header

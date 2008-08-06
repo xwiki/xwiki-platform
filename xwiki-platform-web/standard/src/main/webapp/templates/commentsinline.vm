@@ -9,8 +9,7 @@
 #set($comments = $doc.getComments(false))
 #end
   <div id="commentscontent" class="xwikiintracontent">
-#if($inline && ($inline == true))    <div class="xwikititlewrapper" onclick="toggleClass($('comments'), 'hidden'); toggleClass($('commentscontent'), 'exp')"><h3 class="xwikiintratitle">$msg.get("comments")<span class="hidden">:</span> <span class="commentsno"><span>$comments.size()</span></span></h3></div>#end
-    <div id="comments">
+    <div id="_comments">
 #if($comments.size()>0)
 #foreach($comment in $comments)
 #if($velocityCount > 1)    <hr class="commentspacer"/>
@@ -21,7 +20,7 @@
 ## #set($date = $doc.display("date","view",$comment))
 #set($date = $comment.getProperty("date").value)
 #if($date)
- | <span class="commentdate">$xwiki.formatDate($date, "dd.MM.yyyy") $msg.get("at") $xwiki.formatDate($date, "hh:mm a")</span>
+ | <span class="commentdate">$!xwiki.formatDate($date, "dd/MM/yyyy") $msg.get("at") $!xwiki.formatDate($date, "HH:mm")</span>
 #end
 #if($hasEdit) <span class="commentdelete"><a class="commentremove" href="$doc.getURL("objectremove" , "classname=XWiki.XWikiComments&amp;classid=${comment.number}&amp;xredirect=${request.getRequestURL()}")"
     onclick="return confirm('$msg.get("confirmcommentremove")')">[$msg.get("removethiscomment")]</a></span>#end
@@ -38,7 +37,7 @@ $msg.get("nocomments")
       <form action="$doc.getURL("commentadd")" method="post">
         <fieldset class="expanded" id="commentform">
         <legend onclick="toggleForm(this.form)">$msg.get("addcomment")<span class="expands">...</span></legend>
-        <input type="hidden" name="xredirect" value="${doc.getURL("view")}" />
+        <input type="hidden" name="xredirect" value="${doc.getURL("view")}#Comments" />
         <input type="hidden" name="XWiki.XWikiComments_author" value="$context.user"/>
         <input type="hidden" name="XWiki.XWikiComments_date" value=""/>
         <div><textarea id='XWiki.XWikiComments_comment' rows='5' cols="80" name='XWiki.XWikiComments_comment' style="width: 100%;"></textarea></div>
@@ -51,13 +50,3 @@ $msg.get("nocomments")
 #end
     </div> ## comments
   </div> ## commentscontent
-#if($inline && ($inline == true))
-      <script type="text/javascript">
-//<![CDATA[
-if(document.getElementById("commentform")) {
-  document.getElementById("commentform").className = "collapsed";
-}
-document.getElementById("comments").className += " hidden";
-//]]>
-      </script>
-#end

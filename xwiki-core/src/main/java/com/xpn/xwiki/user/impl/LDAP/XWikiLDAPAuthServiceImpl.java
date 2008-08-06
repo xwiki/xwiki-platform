@@ -813,6 +813,9 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
                 // We only allow empty password from users having a XWikiUsers object.
                 if (doc.getObject(userClass.getName()) != null) {
                     dn = doc.getStringValue(userClass.getName(), "ldap_dn");
+                    if (dn != null && dn.trim().length() == 0) {
+                        dn = null;
+                    }
                 }
             }
         } catch (Exception e) {

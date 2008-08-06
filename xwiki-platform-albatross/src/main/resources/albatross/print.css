@@ -18,3 +18,15 @@
 	text-align: justify;
 	float: none !important;
 }
+#rightPanels, #leftPanels, #actionmenu {
+    display: none;
+}
+#globallinks {
+    display: none;
+}
+#headerspace {
+    margin:0 !important;
+}
+#contentcolumn .main {
+    margin:0 !important;
+}

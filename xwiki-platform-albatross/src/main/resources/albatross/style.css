@@ -170,3 +170,61 @@ div.panellayoutcontainer-1col,div.panellayoutcontainer-2col,div.panellayoutconta
 	{
 	color: #fff;
 }
+
+
+/*
+** Doc extra
+*/
+
+#docExtraTabs {
+  border: 0px !important;
+  background-color: white;
+}
+
+#docExtrasTabsUl {
+  float: left;
+}
+
+#docExtraTabs ul.xwikitabbar {
+  width: auto;
+  padding: 0;
+}
+
+#docextrapanes {
+  border : solid 1px #3280CC;
+  background-color: #E4F6FF;
+  padding: 10px;
+  clear: both;
+}
+
+#docextraanchors {
+  height: 2em;
+}
+
+#_information dd, #_information dt {
+  padding-top: 4px;
+  padding-bottom: 4px;
+  clear: both;
+}
+
+#_information #tags {
+  width: 400px;
+  font-size: 110%;
+  float:left;
+}
+
+#tageditsavewrapper {
+  display:inline;
+  margin:0 0 10px 10px;
+}
+
+#tageditsavesuccess {
+	color: green;
+	margin-left: 6px;
+}
+
+#tageditsaveerror {
+	color: red;
+	margin-left: 6px;
+}
+

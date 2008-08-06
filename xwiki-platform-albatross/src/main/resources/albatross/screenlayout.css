@@ -6,7 +6,7 @@ for @media screen displays
 **/
 
 body#body{
-  width: 100%; 
+  width: 100%;
   padding: 0;
   margin: 0 ;  /* padding et margin nul pour emulation min width*/
   min-width: 760px;
@@ -73,7 +73,7 @@ Global header
 
 .editbody #headerglobal{
   border-right:310px solid ;
-}  
+}
 .editbody #globallinks{
   width: 310px;
   margin-right: -310px;
@@ -235,21 +235,25 @@ Content
   font-style: italic;
   margin-bottom: 10px;
   padding-bottom: 10px;
-  clear: both;
 }
 
+.about {
+  float:right;
+  text-align:right;
+  width:230px;
+  overflow:hidden;
+  height: 30px;
+  line-height: 15px;
+}
 
 /*
 ---------------------------------------
-Zone for Comments, attachments, History... 
+Zone for Comments, attachments, History...
 ---------------------------------------
 */
 #xwikidata{
   padding: 0px;
   border: none;
-}
-#xwikidatacontents{
-  margin: 24px;
 }
 .xwikiintratitle{
 }
@@ -315,7 +319,6 @@ Comments
 
 #xwikidata #commentscontent{
   background: #E5F0FE url("icons/black-bg-comments-left.png") left top no-repeat;
-  border-bottom: 1px solid #000;
 }
 #comments, #attachments {
   padding: 0px 20px;
@@ -453,7 +456,7 @@ Menu
 ---------------------------------------
 */
 #actionmenu {
-  position: absolute; 
+  position: absolute;
   /*width: expression(document.body.offsetWidth  + "px");*/
   height: 2em;
   top: 0px;
@@ -485,11 +488,11 @@ html > body #actionmenu{
   float: left;
   width: 200px;
   text-align: center;
-  border:1px solid; 
-  border-width:0px 1px;  
+  border:1px solid;
+  border-width:0px 1px;
   margin-right: -1px;
   font-size:1em;
-  text-decoration:none; 
+  text-decoration:none;
   height:2em;
   line-height:1.9em;
 }
@@ -510,8 +513,8 @@ html > body #actionmenu{
   width: 7em;
   height: 2em;
   text-align: center;
-  border:1px solid ; 
-  border-width:0px 1px;  
+  border:1px solid ;
+  border-width:0px 1px;
   margin-right: -1px;
 }
 .topmenuentry strong{
@@ -524,23 +527,23 @@ html > body #actionmenu{
   position: absolute;
   margin-top: -1px;
   margin-left: 0px;
-  
+
 }
 
 .topmenuentry a, .topmenuentry a:link, .topmenuentry a:visited, .topmenuentry a:active{
 display:block;
 font-size:1em;
-text-decoration:none; 
-width:7em; 
-height:2em; 
+text-decoration:none;
+width:7em;
+height:2em;
 line-height:1.9em;
 }
 
 .rightmenu a{
-height:2em; 
+height:2em;
 line-height:1.9em;
 font-size:1em;
-text-decoration:none; 
+text-decoration:none;
 }
 
 .submenu .submenuitem{
@@ -554,7 +557,7 @@ text-decoration:none;
   display: block;
   font-size: 1px;
   line-height: 1px;
-  border-top: 1px solid ;  
+  border-top: 1px solid ;
 }
 
 .submenu.hidden{
@@ -565,8 +568,8 @@ display:block;
 width: auto;
 font-size:0.8em;
 font-weight: bold;
-text-decoration:none; 
-height:auto; 
+text-decoration:none;
+height:auto;
 padding:1px 3px;
 line-height:1.5em;
 
@@ -737,8 +740,8 @@ Scriptaculous Acordeon
 ----------------------------------
 */
 #xwikisyntaxhelp {
-  margin-top:6px; 
-  border-top-width:1px; 
+  margin-top:6px;
+  border-top-width:1px;
   border-top-style:solid;
   border: none;
 }
@@ -1081,10 +1084,10 @@ div.attachment {
   font-size: 130%;
   padding: 4px 10px;
 }
-	
+
 .mceEditorContainer {
 	display: block;
-	height: 100% !important;	
+	height: 100% !important;
 	position: relative;
 }
 

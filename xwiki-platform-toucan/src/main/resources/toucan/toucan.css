@@ -105,7 +105,17 @@ body.editbody .clearfloats {
 }
 
 .hidden {
-    display: none;
+    display: none !important;
+}
+
+.invisible {
+	visibility: hidden !important;
+}
+
+.loading {
+    background-image: url(icons/spinner.gif);
+    background-position: center center;
+    background-repeat: no-repeat;
 }
 
 a img {
@@ -148,7 +158,8 @@ strong, .strong {
     margin: 0 0 30px 0;
 }
 
-h1 span, h2 span, h3 span, h4 span {
+.heading-1 span, .heading-1-1 span,
+    .heading-1-1-1 span, .heading-1-1-1-1 span {
     display: block;
     position: relative;
     color: #000;
@@ -158,7 +169,8 @@ h1 span, h2 span, h3 span, h4 span {
     border-bottom: 1px solid #ccc;
 }
 
-h1 span span, h2 span span, h3 span span, h4 span span {
+.heading-1 span span, .heading-1-1 span span,
+    .heading-1-1-1 span span, .heading-1-1-1-1 span span {
     display: inline;
     color: #000;
     background-color: inherit;
@@ -1239,14 +1251,14 @@ Content
 }
 
 .layoutsubsection .about {
-    clear: both;
-    border: none;
-    text-align: right;
-    font-size: 0.9em;
-    margin: 1em 0;
-    padding: 5px 10px;
-    background-color: #F9F9F9;
-    color: #888;
+	border:medium none;
+	color:#888888;
+	float:right;
+    width: 230px;
+    overflow: hidden;
+	font-size:0.9em;
+	margin-top:-4px;
+	text-align:right;
 }
 
 /* @end */
@@ -1333,11 +1345,6 @@ Zone for Comments, attachments, History...
     border: none;
 }
 
-#xwikidatacontents {
-    background-color: #eee;
-    margin-top: 2em;
-}
-
 .xwikiintratitle {
 }
 
@@ -1353,14 +1360,14 @@ Comments
 ----------------------------------------------
 */
 .xwikicomment {
-}
-
-#xwikidata #commentscontent {
-    border-bottom: 1px solid #bbb;
+	border-bottom:2px solid white;
+	overflow:hidden;
+	padding:10px 0px;
+	position:relative;
 }
 
 #comments, #attachments {
-    padding: 0 20px 20px 20px;
+	padding:0pt 10px 20px;
 }
 
 #xwikidata .xwikititlewrapper {
@@ -1384,11 +1391,6 @@ h3.xwikiintratitle {
 
 .xwikiintratitle span.hidden {
     display: inline;
-    border-bottom: none;
-}
-
-#xwikidata #attachmentscontent {
-    border-top: 1px solid #EEE;
 }
 
 #attachmentscontent table {
@@ -1400,21 +1402,13 @@ h3.xwikiintratitle {
 }
 
 .xwikicomment {
-    padding: 10px 24px;
+    padding: 10px 0px;
     position: relative;
     overflow: hidden;
 }
 
 .commentspacer {
     display: none;
-}
-
-#comments .odd {
-    background-color: #FFF;
-}
-
-#comments .even {
-    background-color: #E5F0FE;
 }
 
 .commentavatar {
@@ -1445,6 +1439,8 @@ h3.xwikiintratitle {
 }
 
 .commentcontent {
+	border-left:5px solid #CCCCCC;
+	padding:3px 0px 0px 6px;
 }
 
 table.xwikidatatable {
@@ -1463,11 +1459,9 @@ table.xwikidatatable td {
 }
 
 .xwikiintracontent fieldset {
-    border: none;
-    background-color: #F6F6FC;
-    border-top: 3em solid #F6F6FC;
-    padding: 8px 8px;
-    margin-top: 5px;
+	background-color:#F9F9F9;
+	margin-top:10px;
+	padding:8px;
 }
 
 .xwikiintracontent legend {
@@ -1505,8 +1499,6 @@ html > body .xwikiintracontent legend {
 }
 
 .commentsno, .attachmentsno {
-    display: inline;
-    border-bottom: none;
 }
 
 .attachmentsno {
@@ -1730,15 +1722,16 @@ ul.xwikitabbar {
 }
 
 .xwikitabbar li a {
-    display: block;
-    height: 30px;
-    padding: 0 3px;
-    font-weight: normal;
-    font-size: 0.85em;
-    line-height: 30px !important;
-    letter-spacing: -0.5px;
-    text-decoration: none;
-    background: transparent url( images/tab.png ) top left no-repeat;
+	background:transparent url(images/tab.png) no-repeat scroll left top;
+	display:block;
+	font-size:0.85em;
+	font-weight:normal;
+	height:30px;
+	letter-spacing:-0.5px;
+	line-height:34px !important;
+	margin-top:0px;
+	padding:0pt 3px;
+	text-decoration:none;
 }
 
 .xwikitabbar li a:hover {
@@ -1758,6 +1751,7 @@ ul.xwikitabbar {
 
 .xwikitabbar li.active a {
     color: #333;
+    font-weight: bold;
 }
 
 .xwikitabbar li {
@@ -2626,12 +2620,9 @@ Attachments
 div.attachment {
     overflow: hidden;
     clear: both;
-    padding: 3px 5px;
+    padding: 10px 0px;
     font-size: 85%;
-}
-
-div#attachments .odd {
-    background-color: #F6F6FC;
+    border-bottom: solid 2px white;
 }
 
 .attachment .mime {
@@ -2783,29 +2774,29 @@ div#xwikiclassproperties.accordion
     width: 100%;
 }
 
-#history .centered {
+#_history .centered {
     margin: 0;
 }
 
-#history table {
+#_history table {
     margin: 0 0 1em 0;
     border-top: none;
     border-collapse: collapse;
     width: 100%;
 }
 
-#history table th {
+#_history table th {
     padding: 5px;
     background-color: #f0f0ee;
     text-align: center;
     font-weight: bold;
 }
 
-#history table tr.row.even {
+#_history table tr.row.even {
     background-color: #f0f4fa;
 }
 
-#history table td {
+#_history table td {
     padding: 5px;
     border: 1px solid #ccc;
     text-align: center;
@@ -3645,4 +3636,51 @@ div.panellayoutcontainer-1col, div.panellayoutcontainer-2col, div.panellayoutcon
 
 .rsschanneltitle {
     background-color: #f4f9fe;
+}
+
+/*
+** Doc extra
+*/
+
+#docExtraTabs {
+  border: 0px !important;
+  background-color: white;
+}
+
+#docExtrasTabsUl {
+  float: left;
+}
+
+#docExtraTabs ul.xwikitabbar {
+  width: auto;
+}
+
+#docextrapanes {
+  border : solid 1px #CCC;
+  background-color: #F9F9F9;
+  padding: 10px;
+  clear: both;
+}
+
+#docextraanchors {
+  height: 2em;
+}
+
+#_information dd, #_information dt {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+input#tags {
+	width: 400px;
+}
+
+#tageditsavesuccess {
+	color: green;
+	margin-left: 6px;
+}
+
+#tageditsaveerror {
+	color: red;
+	margin-left: 6px;
 }

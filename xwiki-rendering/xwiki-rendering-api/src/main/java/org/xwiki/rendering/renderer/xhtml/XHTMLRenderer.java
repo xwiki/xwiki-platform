@@ -285,8 +285,8 @@ public class XHTMLRenderer implements Renderer
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
         write("<" + name);
-        for (String attributeName : attributes.keySet()) {
-            write(" " + attributeName + "=\"" + attributes.get(attributeName) + "\"");
+        for (Map.Entry<String, String> entry : attributes.entrySet()) {
+            write(" " + entry.getKey() + "=\"" + entry.getValue() + "\"");
         }
         write(">");
     }

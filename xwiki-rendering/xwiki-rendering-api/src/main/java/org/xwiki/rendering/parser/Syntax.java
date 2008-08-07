@@ -49,7 +49,7 @@ public class Syntax
 
     public String toIdString()
     {
-        return getType().toIdString() + "/" + getVersion().toString().toLowerCase();
+        return getType().toIdString() + "/" + getVersion().toLowerCase();
     }
 
     /**
@@ -59,7 +59,7 @@ public class Syntax
      */
     public String toString()
     {
-        return getType().toString() + " " + getVersion().toString();
+        return getType().toString() + " " + getVersion();
     }
 
     /**

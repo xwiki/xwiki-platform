@@ -70,8 +70,8 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
             throw new InitializationException("Failed to construct Macro cache", e);
         }
 
-        for (String hint : allMacros.keySet()) {
-            String[] hintParts = hint.split("/");
+        for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {
+            String[] hintParts = entry.getKey().split("/");
             // TODO: Add error handling and skip macro if invalid hint format
             String macroName = hintParts[0];
             String syntax = hintParts[1];
@@ -81,7 +81,7 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
                 macrosForSyntax = new HashMap<String, Macro>();
                 this.macros.put(syntax, macrosForSyntax);
             }
-            macrosForSyntax.put(macroName, allMacros.get(hint));
+            macrosForSyntax.put(macroName, entry.getValue());
         }
     }
 

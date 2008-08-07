@@ -25,8 +25,7 @@ package org.xwiki.rendering.macro;
  * @version $Id$
  * @since 1.5M2
  */
-public class MacroExecutionException
-    extends Exception
+public class MacroExecutionException extends Exception
 {
     /**
      * Class ID for serialization.
@@ -35,6 +34,7 @@ public class MacroExecutionException
 
     /**
      * {@inheritDoc}
+     * 
      * @see Exception#Exception(String)
      */
     public MacroExecutionException(String message)
@@ -44,6 +44,7 @@ public class MacroExecutionException
 
     /**
      * {@inheritDoc}
+     * 
      * @see Exception#Exception(String, Throwable)
      */
     public MacroExecutionException(String message, Throwable throwable)

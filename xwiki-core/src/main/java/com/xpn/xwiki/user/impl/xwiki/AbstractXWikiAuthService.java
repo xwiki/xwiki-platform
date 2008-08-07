@@ -28,7 +28,7 @@ import org.securityfilter.realm.SimplePrincipal;
 
 /**
  * Common methods useful to all Authentication services implementations.
- *
+ * 
  * @version $Id$
  */
 public abstract class AbstractXWikiAuthService implements XWikiAuthService
@@ -44,9 +44,9 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
     private static final String SUPERADMIN_PASSWORD_CONFIG = "xwiki.superadminpassword";
 
     /**
-     * The Superadmin Principal.
+     * The Superadmin full name.
      */
-    private static final Principal SUPERADMIN_PRINCIPAL = new SimplePrincipal("XWiki.superadmin");
+    private static final String SUPERADMIN_FULLNAME = "XWiki.superadmin";
 
     /**
      * @param username the username to check for superadmin access
@@ -58,11 +58,9 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
     }
 
     /**
-     * @param password the superadmin password to check against the superadmin password located
-     *        in XWiki's config file
+     * @param password the superadmin password to check against the superadmin password located in XWiki's config file
      * @param context the XWiki context object, allowing access to XWiki's config
-     * @return a null Principal is the user hasn't been validated as Superadmin or a Super Admin
-     *         Principal otherwise         
+     * @return a null Principal is the user hasn't been validated as Superadmin or a Super Admin Principal otherwise
      */
     protected Principal authenticateSuperAdmin(String password, XWikiContext context)
     {
@@ -72,7 +70,7 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         // super admin password is configured in XWiki's configuration.
         String superadminpassword = context.getWiki().Param(SUPERADMIN_PASSWORD_CONFIG);
         if ((superadminpassword != null) && (superadminpassword.equals(password))) {
-            principal = SUPERADMIN_PRINCIPAL;
+            principal = new SimplePrincipal(context.getMainXWiki() + ":" + SUPERADMIN_FULLNAME);
         } else {
             principal = null;
             context.put("message", "wrongpassword");

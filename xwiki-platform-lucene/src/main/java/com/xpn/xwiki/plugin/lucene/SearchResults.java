@@ -212,6 +212,7 @@ public class SearchResults extends Api
 
             return relResults;
         } else {
+            resultcount = getRelevantResults().size();
             return getRelevantResults().subList(listStartIndex,
                 listEndIndex < resultcount ? listEndIndex : resultcount);
         }

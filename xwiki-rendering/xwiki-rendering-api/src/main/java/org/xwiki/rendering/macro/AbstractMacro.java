@@ -31,14 +31,24 @@ public abstract class AbstractMacro extends AbstractLogEnabled implements Macro
      * Injected by the Component Manager.
      */
     private int priority = 1000;
-    
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.Macro#getPriority()
+     */
     public int getPriority()
     {
         return this.priority;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Comparable#compareTo(java.lang.Object)
+     */
     public int compareTo(Macro macro)
     {
-        return getPriority() - macro.getPriority(); 
+        return getPriority() - macro.getPriority();
     }
 }

@@ -32,7 +32,7 @@ public class XWikiServletRequestStub implements XWikiRequest
 {
     public XWikiServletRequestStub()
     {
-        this.host = new String();
+        this.host = "";
     }
 
     private String host;
@@ -47,12 +47,12 @@ public class XWikiServletRequestStub implements XWikiRequest
         if (s.equals("x-forwarded-host")) {
             return this.host;
         }
-        return new String();
+        return "";
     }
 
     public String get(String name)
     {
-        return new String();
+        return "";
     }
 
     public HttpServletRequest getHttpServletRequest()
@@ -172,7 +172,7 @@ public class XWikiServletRequestStub implements XWikiRequest
 
     public String getQueryString()
     {
-        return new String();
+        return "";
     }
 
     public String getRemoteUser()

@@ -30,12 +30,13 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
 
 public class TestRecursiveMacro extends AbstractMacro
 {
-    public Map<String, String> getAllowedParameters()
+    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
     {
-		return new HashMap<String, String>();
+		return new HashMap<String, MacroParameterClass< ? >>();
 	}
 
 	public String getDescription()

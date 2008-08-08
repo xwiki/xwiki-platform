@@ -20,7 +20,6 @@
 package org.xwiki.rendering.macro;
 
 import java.io.StringReader;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +31,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
 import org.xwiki.rendering.parser.Parser;
 
 /**
@@ -42,7 +42,10 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
 {
     private static final String DESCRIPTION = "Inserts XHTML code into the page.";
 
-    private static final String PARAMETER_ESCAPE_WIKI_SYNTAX = "escapeWikiSyntax";
+    /**
+     * The TOC macro parameters manager.
+     */
+    private XHTMLMacroParameterCollection macroParameters = new XHTMLMacroParameterCollection();
 
     /**
      * Injected by the Component Manager.
@@ -55,8 +58,6 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
      */
     private EntityResolver entityResolver;
 
-    private Map<String, String> allowedParameters;
-
     /**
      * {@inheritDoc}
      * 
@@ -65,9 +66,6 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     public void initialize() throws InitializationException
     {
         // TODO: Use an I8N service to translate the descriptions in several languages
-        this.allowedParameters = new HashMap<String, String>();
-        this.allowedParameters.put("escapeWikiSyntax", "If true then the XHTML element contents won't be rendered "
-            + "even if they contain valid wiki syntax.");
     }
 
     /**
@@ -86,10 +84,10 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
      * 
      * @see Macro#getAllowedParameters()
      */
-    public Map<String, String> getAllowedParameters()
+    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
     {
         // We send a copy of the map and not our map since we don't want it to be modified.
-        return new HashMap<String, String>(this.allowedParameters);
+        return this.macroParameters.getParametersClasses();
     }
 
     /**
@@ -102,11 +100,10 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
         // Parse the XHTML using an XML Parser and Wrap the XML elements in XMLBlock(s).
         // For each XML element's text, run it through the main Parser.
 
+        this.macroParameters.load(parameters);
+
         // Check if the user has asked to escape wiki syntax or not
-        boolean escapeWikiSyntax = false;
-        if (parameters.containsKey(PARAMETER_ESCAPE_WIKI_SYNTAX)) {
-            escapeWikiSyntax = Boolean.parseBoolean(parameters.get(PARAMETER_ESCAPE_WIKI_SYNTAX));
-        }
+        boolean escapeWikiSyntax = this.macroParameters.isEscapeWikiSyntax();
 
         XMLBlockConverterHandler handler;
         try {

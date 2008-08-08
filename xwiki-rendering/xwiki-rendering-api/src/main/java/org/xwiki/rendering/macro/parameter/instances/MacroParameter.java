@@ -17,45 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.parameter.instances;
 
-import java.util.List;
-import java.util.Map;
-
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
 
 /**
- * @version $Id$
- * @since 1.5M2
+ * Macro parameters String values converter.
+ * 
+ * @param <T> the type of the value after conversion.
+ * @version $Id: $
  */
-public interface Macro extends Comparable<Macro>
+public interface MacroParameter<T>
 {
     /**
-     * This component's role, used when code needs to look it up.
+     * @return parameterClass the macro parameter descriptor.
      */
-    String ROLE = Macro.class.getName();
+    MacroParameterClass<T> getParameterClass();
 
     /**
-     * The priority of execution relative to the other Macros. The lowest values have the highest priorities
-     * and execute first. For example a Macro with a priority of 100 will execute before one with a priority
-     * of 500. 
-     *
-     * @return the execution priority
+     * @return the value as String from parser.
      */
-    int getPriority();
+    String getValueAsString();
 
     /**
-     * @return the Macro's description
+     * Convert the String value.
+     * <p>
+     * The calculation is done only once.
+     * 
+     * @return the converted value.
+     * @throws MacroParameterException error when converting value.
      */
-    String getDescription();
-
-    /**
-     * @return the Macro's allowed parameter names and their descriptions
-     */
-    Map<String, MacroParameterClass< ? >> getAllowedParameters();
-    
-    List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
-        throws MacroExecutionException;
+    T getValue() throws MacroParameterException;
 }

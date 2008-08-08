@@ -1,0 +1,87 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package org.xwiki.rendering.macro.parameter.instances;
+
+import org.xwiki.rendering.macro.parameter.MacroParameterException;
+import org.xwiki.rendering.macro.parameter.classes.NumberMacroParameterClass;
+
+/**
+ * Base class for converting parameter String value to number.
+ * 
+ * @param <T> the type of number.
+ * @version $Id: $
+ */
+public abstract class AbstractNumberMacroParameter<T extends Number> extends AbstractMacroParameter<T>
+{
+    /**
+     * @param parameterClass the macro parameter descriptor.
+     * @param stringValue the value as String from parser.
+     */
+    public AbstractNumberMacroParameter(NumberMacroParameterClass<T> parameterClass, String stringValue)
+    {
+        super(parameterClass, stringValue);
+    }
+
+    /**
+     * @return the macro parameter descriptor.
+     */
+    public NumberMacroParameterClass<T> getNumberParameterClass()
+    {
+        return (NumberMacroParameterClass<T>) getParameterClass();
+    }
+
+    /**
+     * Generate and register error exception.
+     */
+    protected void setErrorInvalid()
+    {
+        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+
+        errorMessage.append(" The value must be a number.");
+
+        this.error = new MacroParameterException(generateInvalidErrorMessage());
+    }
+
+    /**
+     * Generate and register error exception.
+     */
+    protected void setErrorTooHigh()
+    {
+        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+
+        errorMessage.append(" The value is too high. The highest valid value is "
+            + getNumberParameterClass().getMaxValue());
+
+        this.error = new MacroParameterException(generateInvalidErrorMessage());
+    }
+
+    /**
+     * Generate and register error exception.
+     */
+    protected void setErrorTooLow()
+    {
+        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+
+        errorMessage.append(" The value is too low. The lowest valid value is "
+            + getNumberParameterClass().getMinValue());
+
+        this.error = new MacroParameterException(generateInvalidErrorMessage());
+    }
+}

@@ -19,6 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.velocity.XWikiVelocityException;
@@ -52,8 +54,6 @@ public class VelocityMacro extends AbstractMacro
      */
     private Parser parser;
 
-    private Map<String, String> allowedParameters;
-
     /**
      * {@inheritDoc}
      * 
@@ -62,7 +62,6 @@ public class VelocityMacro extends AbstractMacro
     public void initialize() throws InitializationException
     {
         // TODO: Use an I8N service to translate the descriptions in several languages
-        this.allowedParameters = new HashMap<String, String>();
     }
 
     /**
@@ -81,10 +80,10 @@ public class VelocityMacro extends AbstractMacro
      * 
      * @see Macro#getAllowedParameters()
      */
-    public Map<String, String> getAllowedParameters()
+    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
     {
         // We send a copy of the map and not our map since we don't want it to be modified.
-        return new HashMap<String, String>(this.allowedParameters);
+        return Collections.emptyMap();
     }
 
     /**

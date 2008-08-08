@@ -19,14 +19,21 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.HashMap;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.BulletedListBlock;
+import org.xwiki.rendering.block.ListBLock;
+import org.xwiki.rendering.block.ListItemBlock;
+import org.xwiki.rendering.block.NumberedListBlock;
+import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.macro.TocMacroParameterCollection.Scope;
+import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
 
 /**
  * @version $Id$
@@ -34,43 +41,55 @@ import org.xwiki.rendering.block.XDOM;
  */
 public class TocMacro extends AbstractMacro
 {
+    /**
+     * The description of the TOC macro.
+     */
     private static final String DESCRIPTION = "Generates a Table Of Contents.";
 
-    private boolean isNumbered;
+    /**
+     * The TOC macro parameters manager.
+     */
+    private TocMacroParameterCollection macroParameters = new TocMacroParameterCollection();
 
-    private Map<String, String> allowedParameters;
-    
-	/**
+    /**
      * {@inheritDoc}
+     * 
      * @see Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
-		// TODO: Use an I8N service to translate the descriptions in several languages
-		this.allowedParameters = new HashMap<String, String>();
-	}
-
-	/**
-     * {@inheritDoc}
-     * @see Macro#getDescription()
-     */
-	public String getDescription()
-	{
-		// TODO: Use an I8N service to translate the description in several languages
-		return DESCRIPTION;
-	}
+        // TODO: Use an I8N service to translate the descriptions in several languages
+    }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see Macro#getDescription()
+     */
+    public String getDescription()
+    {
+        // TODO: Use an I8N service to translate the description in several languages
+        return DESCRIPTION;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see Macro#getAllowedParameters()
      */
-	public Map<String, String> getAllowedParameters()
-	{
-		// We send a copy of the map and not our map since we don't want it to be modified.
-		return new HashMap<String, String>(this.allowedParameters);
-	}
-	
+    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
+    {
+        // We send a copy of the map and not our map since we don't want it to be modified.
+        return this.macroParameters.getParametersClasses();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String, org.xwiki.rendering.block.XDOM)
+     */
     public List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
+        throws MacroExecutionException
     {
         // Example:
         // 1 Section1
@@ -78,57 +97,88 @@ public class TocMacro extends AbstractMacro
         // 1.1 Section3
         // 1 Section4
         // 1.1.1 Section5
-        
+
         // Generates:
         // ListBlock
-        //  |_ ListItemBlock (TextBlock: Section1)
-        //  |_ ListItemBlock (TextBlock: Section2)
-        //    |_ ListBlock
-        //      |_ ListItemBlock (TextBlock: Section3)
-        //  |_ ListItemBlock (TextBlock: Section4)
-        //    |_ ListBlock
-        //      |_ ListBlock
-        //        |_ ListItemBlock (TextBlock: Section5)
-        
-        // Look for all Section blocks
-/*        
-        BulletedListBlock listBlock = null;
-        int depth = 0;
-        for (Iterator it = dom.getBlocksByType(SectionBlock.class).iterator(); it.hasNext();) {
-            SectionBlock sectionBlock = (SectionBlock) it.next();
-            TextBlock textBlock = new TextBlock(sectionBlock.getTitle());
-            ListItemBlock itemBlock = new ListItemBlock(textBlock);
-            // Is the current list block at the correct depth?
-            int levelDiff = sectionBlock.getLevel().getAsInt() - depth;
-            if (levelDiff == 0) {
-                // Simply add the list item to the list
-                listBlock.addChildBlock(itemBlock);
-            } else if (levelDiff > 0) {
-                BulletedListBlock diffList = new BulletedListBlock(itemBlock);
-                BulletedListBLock newList = diffList;
-                for (int i = 0; i < levelDiff - 1; i++) {
-                    diffList = new BulletedListBlock(diffList);
-                }
-                if (listBlock == null) {
-                    listBlock = diffList;
-                } else {
-                    listBlock.addChildBlock(diffList);
-                }
-                depth = sectionBlock.getLevel().getAsInt();
-            }
-            
-            if ((listBlock == null) || 
-            
+        // |_ ListItemBlock (TextBlock: Section1)
+        // |_ ListItemBlock (TextBlock: Section2)
+        // ...|_ ListBlock
+        // ......|_ ListItemBlock (TextBlock: Section3)
+        // |_ ListItemBlock (TextBlock: Section4)
+        // ...|_ ListBlock
+        // ......|_ ListBlock
+        // .........|_ ListItemBlock (TextBlock: Section5)
+
+        this.macroParameters.load(parameters);
+
+        // Get the root block from scope parameter
+
+        Block root;
+
+        if (this.macroParameters.getScope() == Scope.LOCAL) {
+            // FIXME: need to be able to know where is the macro block to support this option
+            root = dom;
+        } else {
+            root = dom;
         }
-        
-        l = new List()
-        diffLevel = sectionLevel - l.depth;
-        List listToAttach = findList(diffLevel);
-        listToAttach.add(l);
-        */
-        
-        
-        return null;
+
+        // Get the list of sections in the scope
+
+        List<SectionBlock> sections = root.getChildrenByType(SectionBlock.class);
+
+        // Construct table of content from sections list
+        Block rootBlock =
+            generateTree(sections, this.macroParameters.getStart(), this.macroParameters.getDepth(),
+                this.macroParameters.numbered());
+
+        return Arrays.asList(rootBlock);
     }
 
+    /**
+     * Convert sections into list block tree.
+     * 
+     * @param sections the sections to convert.
+     * @param start the "start" parameter value.
+     * @param depth the "depth" parameter value.
+     * @param numbered the "numbered" parameter value.
+     * @return the root block of generated block tree.
+     */
+    private Block generateTree(List<SectionBlock> sections, int start, int depth, boolean numbered)
+    {
+        int currentLevel = 0;
+        Block currentBlock = null;
+        for (SectionBlock section : sections) {
+            int level = section.getLevel().getAsInt();
+
+            if (level >= start && level <= depth) {
+                // TODO: insert title in a local link pointing on section
+
+                ListItemBlock itemBlock = new ListItemBlock(section.getChildren());
+
+                if (currentLevel < level) {
+                    while (currentLevel < level) {
+                        ListBLock childListBlock =
+                            numbered ? new NumberedListBlock(Collections.<Block> emptyList()) : new BulletedListBlock(
+                                Collections.<Block> emptyList());
+
+                        if (currentBlock != null) {
+                            currentBlock.addChild(childListBlock);
+                        }
+
+                        currentBlock = childListBlock;
+                        ++currentLevel;
+                    }
+                } else if (currentLevel > level) {
+                    while (currentLevel > level) {
+                        currentBlock = currentBlock.getParent();
+                        --currentLevel;
+                    }
+                }
+
+                currentBlock.addChild(itemBlock);
+            }
+        }
+
+        return currentBlock.getRoot();
+    }
 }

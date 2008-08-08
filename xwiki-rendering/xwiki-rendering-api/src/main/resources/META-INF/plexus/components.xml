@@ -102,5 +102,14 @@
       <implementation>org.xwiki.rendering.parser.XWikiLinkParser</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>toc/xwiki</role-hint>
+      <implementation>org.xwiki.rendering.macro.TocMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <priority>2000</priority>
+      </configuration>
+    </component>
   </components>
 </component-set>

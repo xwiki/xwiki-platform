@@ -24,15 +24,16 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.EscapeBlock;
+import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
 
+import java.util.Collections;
 import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Arrays;
 
 /**
  * Prevents wiki syntax rendering.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
@@ -40,20 +41,19 @@ public class NoWikiMacro extends AbstractMacro implements Initializable
 {
     private static final String DESCRIPTION = "Wiki syntax inside this macro is not rendered.";
 
-    private Map<String, String> allowedParameters;
-
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
         // TODO: Use an I8N service to translate the descriptions in several languages
-        this.allowedParameters = new HashMap<String, String>();
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Macro#getDescription()
      */
     public String getDescription()
@@ -64,20 +64,21 @@ public class NoWikiMacro extends AbstractMacro implements Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see Macro#getAllowedParameters()
      */
-    public Map<String, String> getAllowedParameters()
+    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
     {
         // We send a copy of the map and not our map since we don't want it to be modified.
-        return new HashMap<String, String>(this.allowedParameters);
+        return Collections.emptyMap();
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom)
-        throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom) throws MacroExecutionException
     {
         return Arrays.asList((Block) new EscapeBlock(content));
     }

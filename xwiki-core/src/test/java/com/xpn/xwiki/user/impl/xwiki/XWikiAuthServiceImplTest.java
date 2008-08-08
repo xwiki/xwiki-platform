@@ -23,7 +23,6 @@ import org.jmock.cglib.MockObjectTestCase;
 import org.jmock.Mock;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiConfig;
 
 import java.security.Principal;
 
@@ -76,5 +75,18 @@ public class XWikiAuthServiceImplTest extends MockObjectTestCase
         this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(returnValue(null));
         Principal principal = this.authService.authenticate(" superadmin ", "whatever", this.context);
         assertNull(principal);
+    }
+
+    /**
+     * Test that superadmin is authenticated as superadmin whatever the case.
+     */
+    public void testAuthenticateWithSuperAdminWithDifferentCase() throws Exception
+    {
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(returnValue("pass"));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
+
+        Principal principal = this.authService.authenticate("SuperaDmin ", "pass", this.context);
+        assertNotNull(principal);
+        assertEquals("XWiki.superadmin", principal.getName());
     }
 }

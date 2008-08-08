@@ -661,6 +661,9 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         parameterValues.put("groupdocname", groupFullName);
         parameterValues.put("groupclassname", CLASS_XWIKIGROUPS);
 
+        queryString.append(" and trim(field.value)<>:emptystring");
+        parameterValues.put("emptystring", "");
+        
         if (matchField != null) {
             queryString.append(" and lower(field.value) like :matchfield");
             parameterValues.put("matchfield", HQLLIKE_ALL_SYMBOL + matchField.toLowerCase() + HQLLIKE_ALL_SYMBOL);

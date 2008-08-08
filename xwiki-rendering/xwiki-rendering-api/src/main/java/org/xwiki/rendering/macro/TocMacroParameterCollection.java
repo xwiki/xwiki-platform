@@ -174,7 +174,7 @@ public class TocMacroParameterCollection extends AbstractMacroParameterCollectio
      */
     public int getStart() throws MacroParameterException
     {
-        return getParameterValue(PARAM_START);
+        return this.<Integer> getParameterValue(PARAM_START);
     }
 
     /**
@@ -183,7 +183,7 @@ public class TocMacroParameterCollection extends AbstractMacroParameterCollectio
      */
     public int getDepth() throws MacroParameterException
     {
-        return getParameterValue(PARAM_DEPTH);
+        return this.<Integer> getParameterValue(PARAM_DEPTH);
     }
 
     /**
@@ -202,6 +202,6 @@ public class TocMacroParameterCollection extends AbstractMacroParameterCollectio
      */
     public boolean numbered() throws MacroParameterException
     {
-        return getParameterValue(PARAM_NUMBERED);
+        return this.<Boolean> getParameterValue(PARAM_NUMBERED);
     }
 }

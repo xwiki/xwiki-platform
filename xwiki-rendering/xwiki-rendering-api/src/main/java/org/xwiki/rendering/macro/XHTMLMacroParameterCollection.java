@@ -83,6 +83,6 @@ public class XHTMLMacroParameterCollection extends AbstractMacroParameterCollect
      */
     public boolean isEscapeWikiSyntax() throws MacroParameterException
     {
-        return getParameterValue(PARAM_ESCAPEWIKISYNTAX);
+        return this.<Boolean> getParameterValue(PARAM_ESCAPEWIKISYNTAX);
     }
 }

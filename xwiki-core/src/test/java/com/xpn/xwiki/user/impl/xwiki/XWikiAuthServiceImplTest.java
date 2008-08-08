@@ -84,4 +84,17 @@ public class XWikiAuthServiceImplTest extends MockObjectTestCase
             this.context);
         assertNull(principal);
     }
+    
+    public void testAuthenticateWithSuperAdminWithDifferentCase()
+        throws Exception
+    {
+        this.mockXWiki.stubs().method("Param").with(eq("xwiki.superadminpassword")).will(
+            returnValue("pass"));
+        this.mockXWiki.stubs().method("isVirtualMode").will(returnValue(false));
+        
+        Principal principal = this.authService.authenticate("SuperaDmin ", "pass",
+            this.context);
+        assertNotNull(principal);
+        assertEquals("XWiki.superadmin", principal.getName());
+    }
 }

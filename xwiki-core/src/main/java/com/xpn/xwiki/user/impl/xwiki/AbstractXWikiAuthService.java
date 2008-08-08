@@ -50,11 +50,13 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
 
     /**
      * @param username the username to check for superadmin access
-     * @return true if the username is that of the superadmin or false otherwise
+     * @return true if the username is that of the superadmin (whatever the case) or false otherwise
      */
     protected boolean isSuperAdmin(String username)
     {
-        return (username.equals(SUPERADMIN) || username.endsWith("." + SUPERADMIN));
+        String lowerUserName = username.toLowerCase();
+
+        return (lowerUserName.equals(SUPERADMIN) || lowerUserName.endsWith("." + SUPERADMIN));
     }
 
     /**
@@ -70,7 +72,11 @@ public abstract class AbstractXWikiAuthService implements XWikiAuthService
         // super admin password is configured in XWiki's configuration.
         String superadminpassword = context.getWiki().Param(SUPERADMIN_PASSWORD_CONFIG);
         if ((superadminpassword != null) && (superadminpassword.equals(password))) {
-            principal = new SimplePrincipal(context.getMainXWiki() + ":" + SUPERADMIN_FULLNAME);
+            if (context.isMainWiki()) {
+                principal = new SimplePrincipal(SUPERADMIN_FULLNAME);
+            } else {
+                principal = new SimplePrincipal(context.getMainXWiki() + ":" + SUPERADMIN_FULLNAME);
+            }
         } else {
             principal = null;
             context.put("message", "wrongpassword");

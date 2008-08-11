@@ -36,18 +36,18 @@ public class TestSimpleMacro extends AbstractMacro
 {
     public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
-		return new HashMap<String, MacroParameterDescriptor< ? >>();
-	}
+        return new HashMap<String, MacroParameterDescriptor< ? >>();
+    }
 
-	public String getDescription()
-	{
-		return "Simple Macro";
-	}
-
-	public List<Block> execute(Map<String, String> parameters, String content,
-        XDOM dom) throws MacroExecutionException
+    public String getDescription()
     {
-        int wordCount = dom.getChildrenByType(WordBlock.class).size();
+        return "Simple Macro";
+    }
+
+    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
+    {
+        int wordCount = context.getXDOM().getChildrenByType(WordBlock.class).size();
         return Arrays.asList(new Block[] {new ParagraphBlock(new WordBlock("simplemacro" + wordCount))});
     }
 }

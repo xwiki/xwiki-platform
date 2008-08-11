@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -36,16 +35,16 @@ public class TestPriorityMacro extends AbstractMacro
 {
     public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
-		return new HashMap<String, MacroParameterDescriptor< ? >>();
-	}
+        return new HashMap<String, MacroParameterDescriptor< ? >>();
+    }
 
-	public String getDescription()
-	{
-		return "Priority Macro";
-	}
+    public String getDescription()
+    {
+        return "Priority Macro";
+    }
 
-	public List<Block> execute(Map<String, String> parameters, String content,
-        XDOM dom) throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         return Arrays.asList(new Block[] {new ParagraphBlock(new WordBlock("word"))});
     }

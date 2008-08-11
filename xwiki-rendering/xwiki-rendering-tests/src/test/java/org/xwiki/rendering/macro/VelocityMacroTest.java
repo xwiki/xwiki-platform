@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 
@@ -53,7 +54,7 @@ public class VelocityMacroTest extends AbstractRenderingTestCase
             + "endDocument\n";
 
         Macro macro = (Macro) getComponentManager().lookup(VelocityMacro.ROLE, "velocity/xwiki");
-        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, content, XDOM.EMPTY);
+        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, content, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }

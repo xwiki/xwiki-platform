@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.DocumentManager;
@@ -55,7 +56,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "current");
 
-        List<Block> blocks = macro.execute(properties, null, XDOM.EMPTY);
+        List<Block> blocks = macro.execute(properties, null, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -88,7 +89,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "new");
 
-        List<Block> blocks = macro.execute(properties, null, XDOM.EMPTY);
+        List<Block> blocks = macro.execute(properties, null, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }

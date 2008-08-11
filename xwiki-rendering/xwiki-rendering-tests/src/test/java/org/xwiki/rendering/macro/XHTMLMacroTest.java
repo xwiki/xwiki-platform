@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.HashMap;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 
@@ -61,7 +62,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endDocument\n";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, XDOM.EMPTY);
+        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -78,7 +79,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endDocument\n";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, XDOM.EMPTY);
+        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -97,7 +98,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("escapeWikiSyntax", "true");
-        List<Block> blocks = macro.execute(parameters, html, XDOM.EMPTY);
+        List<Block> blocks = macro.execute(parameters, html, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -120,7 +121,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endDocument\n";
 
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, XDOM.EMPTY);
+        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }

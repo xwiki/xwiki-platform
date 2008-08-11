@@ -33,6 +33,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * @version $Id$
@@ -86,8 +87,7 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
      */
     public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
-        // We send a copy of the map and not our map since we don't want it to be modified.
-        return this.macroParameters.getParametersClasses();
+        return this.macroParameters.getParametersDescriptorMap();
     }
 
     /**
@@ -95,7 +95,8 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
      * 
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom) throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         // Parse the XHTML using an XML Parser and Wrap the XML elements in XMLBlock(s).
         // For each XML element's text, run it through the main Parser.

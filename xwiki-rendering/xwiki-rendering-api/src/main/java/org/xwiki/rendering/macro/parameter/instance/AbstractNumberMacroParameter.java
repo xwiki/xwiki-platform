@@ -31,20 +31,20 @@ import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescri
 public abstract class AbstractNumberMacroParameter<T extends Number> extends AbstractMacroParameter<T>
 {
     /**
-     * @param parameterClass the macro parameter descriptor.
+     * @param parameterDescriptor the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public AbstractNumberMacroParameter(NumberMacroParameterDescriptor<T> parameterClass, String stringValue)
+    public AbstractNumberMacroParameter(NumberMacroParameterDescriptor<T> parameterDescriptor, String stringValue)
     {
-        super(parameterClass, stringValue);
+        super(parameterDescriptor, stringValue);
     }
 
     /**
      * @return the macro parameter descriptor.
      */
-    public NumberMacroParameterDescriptor<T> getNumberParameterClass()
+    public NumberMacroParameterDescriptor<T> getNumberParameterDescriptor()
     {
-        return (NumberMacroParameterDescriptor<T>) getParameterClass();
+        return (NumberMacroParameterDescriptor<T>) getParameterDescriptor();
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
         StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
 
         errorMessage.append(" The value is too high. The highest valid value is "
-            + getNumberParameterClass().getMaxValue());
+            + getNumberParameterDescriptor().getMaxValue());
 
         this.error = new MacroParameterException(generateInvalidErrorMessage());
     }
@@ -80,7 +80,7 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
         StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
 
         errorMessage.append(" The value is too low. The lowest valid value is "
-            + getNumberParameterClass().getMinValue());
+            + getNumberParameterDescriptor().getMinValue());
 
         this.error = new MacroParameterException(generateInvalidErrorMessage());
     }

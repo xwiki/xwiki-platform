@@ -34,11 +34,11 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
      * Indicate if the value conversion failed.
      */
     protected MacroParameterException error;
-    
+
     /**
      * The macro parameter descriptor.
      */
-    private MacroParameterDescriptor<T> parameterClass;
+    private MacroParameterDescriptor<T> parameterDescriptor;
 
     /**
      * The value as String from parser.
@@ -51,12 +51,12 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
     private T value;
 
     /**
-     * @param parameterClass the macro parameter descriptor.
+     * @param parameterDescriptor the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public AbstractMacroParameter(MacroParameterDescriptor<T> parameterClass, String stringValue)
+    public AbstractMacroParameter(MacroParameterDescriptor<T> parameterDescriptor, String stringValue)
     {
-        this.parameterClass = parameterClass;
+        this.parameterDescriptor = parameterDescriptor;
         this.stringValue = stringValue;
 
         this.value = parseValue();
@@ -65,11 +65,11 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.instance.MacroParameter#getParameterClass()
+     * @see org.xwiki.rendering.macro.parameter.instance.MacroParameter#getParameterDescriptor()
      */
-    public MacroParameterDescriptor<T> getParameterClass()
+    public MacroParameterDescriptor<T> getParameterDescriptor()
     {
-        return this.parameterClass;
+        return this.parameterDescriptor;
     }
 
     /**
@@ -96,7 +96,7 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
      */
     public T getValue() throws MacroParameterException
     {
-        if (this.error != null && getParameterClass().isValueHasToBeValid()) {
+        if (this.error != null && getParameterDescriptor().isValueHasToBeValid()) {
             throw error;
         }
 
@@ -108,6 +108,6 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
      */
     protected String generateInvalidErrorMessage()
     {
-        return "Invalid value [" + getValueAsString() + "] for " + "parameter \"" + getParameterClass() + "\"";
+        return "Invalid value [" + getValueAsString() + "] for " + "parameter \"" + getParameterDescriptor() + "\"";
     }
 }

@@ -30,12 +30,12 @@ import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescri
 public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
 {
     /**
-     * @param parameterClass the macro parameter descriptor.
+     * @param parameterDescriptor the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public IntegerMacroParameter(NumberMacroParameterDescriptor<Integer> parameterClass, String stringValue)
+    public IntegerMacroParameter(NumberMacroParameterDescriptor<Integer> parameterDescriptor, String stringValue)
     {
-        super(parameterClass, stringValue);
+        super(parameterDescriptor, stringValue);
     }
 
     /**
@@ -47,8 +47,8 @@ public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
     {
         int value;
 
-        NumberMacroParameterDescriptor<Integer> parameterClass = getNumberParameterClass();
-        
+        NumberMacroParameterDescriptor<Integer> parameterClass = getNumberParameterDescriptor();
+
         Integer def = parameterClass.getDefaultValue();
 
         try {

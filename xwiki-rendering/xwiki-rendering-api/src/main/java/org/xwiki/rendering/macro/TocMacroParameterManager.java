@@ -19,11 +19,15 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.macro.parameter.AbstractMacroParameterManager;
+import java.util.Map;
+
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
+import org.xwiki.rendering.macro.parameter.MacroParameterManager;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Parse and convert TOC macro parameters values into more readable java values (like boolean, int etc.).
@@ -32,7 +36,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescr
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class TocMacroParameterManager extends AbstractMacroParameterManager
+public class TocMacroParameterManager
 {
     /**
      * @version $Id: $
@@ -115,6 +119,11 @@ public class TocMacroParameterManager extends AbstractMacroParameterManager
     private static final boolean PARAM_NUMBERED_DEF = false;
 
     /**
+     * The macro parameters manager. Parse and transform string value to java objects.
+     */
+    private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();
+
+    /**
      * Set the macro parameters class list.
      */
     public TocMacroParameterManager()
@@ -122,21 +131,40 @@ public class TocMacroParameterManager extends AbstractMacroParameterManager
         IntegerMacroParameterDescriptor startParamClass =
             new IntegerMacroParameterDescriptor(PARAM_START, PARAM_START_DESC, PARAM_START_DEF);
         startParamClass.setMinValue(1);
-        register(startParamClass);
+        this.macroParameterManager.registerParameterDescriptor(startParamClass);
 
         IntegerMacroParameterDescriptor depthParamClass =
             new IntegerMacroParameterDescriptor(PARAM_DEPTH, PARAM_DEPTH_DESC, PARAM_DEPTH_DEF);
         depthParamClass.setMinValue(1);
-        register(depthParamClass);
+        this.macroParameterManager.registerParameterDescriptor(depthParamClass);
 
         EnumMacroParameterDescriptor<Scope> scopeParamClass =
             new EnumMacroParameterDescriptor<Scope>(PARAM_SCOPE, PARAM_SCOPE_DESC, PARAM_SCOPE_DEF);
-        register(scopeParamClass);
+        this.macroParameterManager.registerParameterDescriptor(scopeParamClass);
 
         BooleanMacroParameterDescriptor numberedParamClass =
             new BooleanMacroParameterDescriptor(PARAM_NUMBERED, PARAM_NUMBERED_DESC, PARAM_NUMBERED_DEF);
-        register(numberedParamClass);
+        this.macroParameterManager.registerParameterDescriptor(numberedParamClass);
     }
+
+    /**
+     * @return the list of parameters descriptors.
+     */
+    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
+    {
+        return this.macroParameterManager.getParametersDescriptorMap();
+    }
+
+    /**
+     * @param parameters load parameters from parser as parameters objects list.
+     */
+    public void load(Map<String, String> parameters)
+    {
+        this.macroParameterManager.load(parameters);
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Parameters
 
     /**
      * @return the minimum section level. For example if 2 then level 1 sections will not be listed.
@@ -144,7 +172,7 @@ public class TocMacroParameterManager extends AbstractMacroParameterManager
      */
     public int getStart() throws MacroParameterException
     {
-        return this.<Integer> getParameterValue(PARAM_START);
+        return this.macroParameterManager.<Integer> getParameterValue(PARAM_START);
     }
 
     /**
@@ -153,7 +181,7 @@ public class TocMacroParameterManager extends AbstractMacroParameterManager
      */
     public int getDepth() throws MacroParameterException
     {
-        return this.<Integer> getParameterValue(PARAM_DEPTH);
+        return this.macroParameterManager.<Integer> getParameterValue(PARAM_DEPTH);
     }
 
     /**
@@ -163,7 +191,7 @@ public class TocMacroParameterManager extends AbstractMacroParameterManager
      */
     public Scope getScope() throws MacroParameterException
     {
-        return getParameterValue(PARAM_SCOPE);
+        return this.macroParameterManager.getParameterValue(PARAM_SCOPE);
     }
 
     /**
@@ -172,6 +200,6 @@ public class TocMacroParameterManager extends AbstractMacroParameterManager
      */
     public boolean numbered() throws MacroParameterException
     {
-        return this.<Boolean> getParameterValue(PARAM_NUMBERED);
+        return this.macroParameterManager.<Boolean> getParameterValue(PARAM_NUMBERED);
     }
 }

@@ -33,7 +33,7 @@ public interface MacroParameter<T>
     /**
      * @return parameterClass the macro parameter descriptor.
      */
-    MacroParameterDescriptor<T> getParameterClass();
+    MacroParameterDescriptor<T> getParameterDescriptor();
 
     /**
      * @return the value as String from parser.

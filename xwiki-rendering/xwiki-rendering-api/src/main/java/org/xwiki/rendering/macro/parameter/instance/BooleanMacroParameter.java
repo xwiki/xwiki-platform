@@ -30,12 +30,12 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
 {
     /**
-     * @param parameterClass the macro parameter descriptor.
+     * @param parameterDescriptor the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public BooleanMacroParameter(MacroParameterDescriptor<Boolean> parameterClass, String stringValue)
+    public BooleanMacroParameter(MacroParameterDescriptor<Boolean> parameterDescriptor, String stringValue)
     {
-        super(parameterClass, stringValue);
+        super(parameterDescriptor, stringValue);
     }
 
     /**
@@ -54,7 +54,7 @@ public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
         } else {
             setErrorInvalid();
 
-            bValue = getParameterClass().getDefaultValue();
+            bValue = getParameterDescriptor().getDefaultValue();
         }
 
         return bValue;

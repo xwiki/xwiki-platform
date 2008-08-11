@@ -19,9 +19,13 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.macro.parameter.AbstractMacroParameterManager;
+import java.util.Map;
+
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
+import org.xwiki.rendering.macro.parameter.MacroParameterManager;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
 /**
@@ -31,7 +35,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescri
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class IncludeMacroParameterManager extends AbstractMacroParameterManager
+public class IncludeMacroParameterManager
 {
     /**
      * @version $Id: $
@@ -86,6 +90,11 @@ public class IncludeMacroParameterManager extends AbstractMacroParameterManager
     private static final Context PARAM_CONTEXT_DEF = Context.NEW;
 
     /**
+     * The macro parameters manager. Parse and transform string value to java objects.
+     */
+    private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();
+
+    /**
      * Set the macro parameters class list.
      */
     public IncludeMacroParameterManager()
@@ -93,12 +102,31 @@ public class IncludeMacroParameterManager extends AbstractMacroParameterManager
         StringMacroParameterDescriptor documentParamClass =
             new StringMacroParameterDescriptor(PARAM_DOCUMENT, PARAM_DOCUMENT_DESC, PARAM_DOCUMENT_DEF);
         documentParamClass.setRequired(true);
-        register(documentParamClass);
+        this.macroParameterManager.registerParameterDescriptor(documentParamClass);
 
         EnumMacroParameterDescriptor<Context> contextParamClass =
             new EnumMacroParameterDescriptor<Context>(PARAM_CONTEXT, PARAM_CONTEXT_DESC, PARAM_CONTEXT_DEF);
-        register(contextParamClass);
+        this.macroParameterManager.registerParameterDescriptor(contextParamClass);
     }
+
+    /**
+     * @return the list of parameters descriptors.
+     */
+    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
+    {
+        return this.macroParameterManager.getParametersDescriptorMap();
+    }
+
+    /**
+     * @param parameters load parameters from parser as parameters objects list.
+     */
+    public void load(Map<String, String> parameters)
+    {
+        this.macroParameterManager.load(parameters);
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Parameters
 
     /**
      * @return the name of the document to include.
@@ -106,7 +134,7 @@ public class IncludeMacroParameterManager extends AbstractMacroParameterManager
      */
     public String getDocument() throws MacroParameterException
     {
-        return getParameterValue(PARAM_DOCUMENT);
+        return this.macroParameterManager.getParameterValue(PARAM_DOCUMENT);
     }
 
     /**
@@ -116,6 +144,6 @@ public class IncludeMacroParameterManager extends AbstractMacroParameterManager
      */
     public Context getContext() throws MacroParameterException
     {
-        return getParameterValue(PARAM_CONTEXT);
+        return this.macroParameterManager.getParameterValue(PARAM_CONTEXT);
     }
 }

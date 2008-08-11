@@ -31,12 +31,12 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParameter<T>
 {
     /**
-     * @param parameterClass the macro parameter descriptor.
+     * @param parameterDescriptor the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public EnumMacroParameter(MacroParameterDescriptor<T> parameterClass, String stringValue)
+    public EnumMacroParameter(MacroParameterDescriptor<T> parameterDescriptor, String stringValue)
     {
-        super(parameterClass, stringValue);
+        super(parameterDescriptor, stringValue);
     }
 
     /**
@@ -44,7 +44,7 @@ public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParamete
      */
     protected T parseValue()
     {
-        T def = getParameterClass().getDefaultValue();
+        T def = getParameterDescriptor().getDefaultValue();
         
         T[] values = ((Class<T>) def.getClass()).getEnumConstants();
 
@@ -70,7 +70,7 @@ public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParamete
         errorMessage.append(" Valid values are ");
 
         StringBuffer valueList = new StringBuffer();
-        for (T value : ((Class<T>) getParameterClass().getDefaultValue().getClass()).getEnumConstants()) {
+        for (T value : ((Class<T>) getParameterDescriptor().getDefaultValue().getClass()).getEnumConstants()) {
             if (valueList.length() > 0) {
                 valueList.append(" or ");
             }

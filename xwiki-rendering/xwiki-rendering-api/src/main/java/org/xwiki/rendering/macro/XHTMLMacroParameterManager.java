@@ -19,9 +19,13 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.macro.parameter.AbstractMacroParameterManager;
+import java.util.Map;
+
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
+import org.xwiki.rendering.macro.parameter.MacroParameterManager;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Parse and convert XHTML macro parameters values into more readable java values (like boolean, int etc.).
@@ -30,7 +34,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescr
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class XHTMLMacroParameterManager extends AbstractMacroParameterManager
+public class XHTMLMacroParameterManager
 {
     /**
      * The name of the macro parameter "escapeWikiSyntax".
@@ -49,6 +53,11 @@ public class XHTMLMacroParameterManager extends AbstractMacroParameterManager
     private static final boolean PARAM_ESCAPEWIKISYNTAX_DEF = false;
 
     /**
+     * The macro parameters manager. Parse and transform string value to java objects.
+     */
+    private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();
+
+    /**
      * Set the macro parameters class list.
      */
     public XHTMLMacroParameterManager()
@@ -57,8 +66,27 @@ public class XHTMLMacroParameterManager extends AbstractMacroParameterManager
             new BooleanMacroParameterDescriptor(PARAM_ESCAPEWIKISYNTAX, PARAM_ESCAPEWIKISYNTAX_DESC,
                 PARAM_ESCAPEWIKISYNTAX_DEF);
         escapeWikiSyntaxParamClass.setValueHasToBeValid(false);
-        register(escapeWikiSyntaxParamClass);
+        this.macroParameterManager.registerParameterDescriptor(escapeWikiSyntaxParamClass);
     }
+
+    /**
+     * @return the list of parameters descriptors.
+     */
+    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
+    {
+        return this.macroParameterManager.getParametersDescriptorMap();
+    }
+
+    /**
+     * @param parameters load parameters from parser as parameters objects list.
+     */
+    public void load(Map<String, String> parameters)
+    {
+        this.macroParameterManager.load(parameters);
+    }
+
+    // /////////////////////////////////////////////////////////////////////
+    // Parameters
 
     /**
      * @return indicate if the user has asked to escape wiki syntax or not.
@@ -66,6 +94,6 @@ public class XHTMLMacroParameterManager extends AbstractMacroParameterManager
      */
     public boolean isEscapeWikiSyntax() throws MacroParameterException
     {
-        return this.<Boolean> getParameterValue(PARAM_ESCAPEWIKISYNTAX);
+        return this.macroParameterManager.<Boolean> getParameterValue(PARAM_ESCAPEWIKISYNTAX);
     }
 }

@@ -90,22 +90,27 @@ public class MacroTransformation extends AbstractTransformation implements Compo
      */
     public void transform(XDOM dom, Syntax syntax) throws TransformationException
     {
+        MacroTransformationContext context = new MacroTransformationContext();
+
+        context.setDom(dom);
+
         // Counter to prevent infinite recursion if a macro generates the same macro for example.
         int executions = 0;
         List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class);
         while (!macroBlocks.isEmpty() && executions < this.maxMacroExecutions) {
-            transformOnce(macroBlocks, dom, syntax);
+            transformOnce(macroBlocks, context, syntax);
             macroBlocks = dom.getChildrenByType(MacroBlock.class);
             executions++;
         }
     }
 
-    private void transformOnce(List<MacroBlock> macroBlocks, XDOM dom, Syntax syntax) throws TransformationException
+    private void transformOnce(List<MacroBlock> macroBlocks, MacroTransformationContext context, Syntax syntax)
+        throws TransformationException
     {
         List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
 
         // 1) Sort the macros by priority to find the highest priority macro to execute
-        for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class)) {
+        for (MacroBlock macroBlock : context.getDom().getChildrenByType(MacroBlock.class)) {
             String hintName = macroBlock.getName() + "/" + syntax.getType().toIdString();
             try {
                 Macro macro = (Macro) this.componentManager.lookup(Macro.ROLE, hintName);
@@ -129,9 +134,10 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         MacroHolder macroHolder = macroHolders.get(0);
         List<Block> newBlocks;
         try {
+            context.setCurrentMacroBlock(macroHolder.macroBlock);
             newBlocks =
                 macroHolder.macro.execute(macroHolder.macroBlock.getParameters(), macroHolder.macroBlock.getContent(),
-                    dom);
+                    context);
         } catch (MacroExecutionException e) {
             throw new TransformationException("Failed to perform transformation for macro ["
                 + macroHolder.macroBlock.getName() + "]", e);

@@ -25,6 +25,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.EscapeBlock;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import java.util.Collections;
 import java.util.Map;
@@ -78,7 +79,8 @@ public class NoWikiMacro extends AbstractMacro implements Initializable
      * 
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom) throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         return Arrays.asList((Block) new EscapeBlock(content));
     }

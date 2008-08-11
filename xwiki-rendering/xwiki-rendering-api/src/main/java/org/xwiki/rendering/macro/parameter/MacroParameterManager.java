@@ -32,25 +32,35 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 public interface MacroParameterManager
 {
     /**
-     * @return the list of parameters descriptors.
+     * @param parameterDescriptor a descriptor of a macro parameter.
      */
-    Map<String, MacroParameterDescriptor< ? >> getParametersClasses();
+    void registerParameterDescriptor(MacroParameterDescriptor< ? > parameterDescriptor);
 
     /**
-     * @param <P> the type of MacroParameter child class to return.
+     * @return the list of parameters descriptors.
+     */
+    Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap();
+
+    /**
+     * @param parameters load parameters from parser as parameters objects list.
+     */
+    void load(Map<String, String> parameters);
+
+    /**
+     * @param <I> the type of MacroParameter child class to return.
      * @param name the name of the parameter.
      * @return the parameter object.
      * @throws MacroParameterException error when trying to get macro parameter object.
      */
-    <P extends MacroParameter< ? >> P getParameter(String name) throws MacroParameterException;
+    <I extends MacroParameter< ? >> I getParameter(String name) throws MacroParameterException;
 
     /**
-     * @param <C> the type of MacroParameterClass child class to return.
+     * @param <D> the type of MacroParameterClass child class to return.
      * @param name the name of the parameter.
      * @return the parameter class.
      * @throws MacroParameterException error when trying to get macro parameter class.
      */
-    <C extends MacroParameterDescriptor< ? >> C getParameterClass(String name) throws MacroParameterException;
+    <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name) throws MacroParameterException;
 
     /**
      * @param <T> the type of value returned by parameter object.

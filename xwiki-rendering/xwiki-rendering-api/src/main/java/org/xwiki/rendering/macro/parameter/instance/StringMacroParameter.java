@@ -10,12 +10,12 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 public class StringMacroParameter extends AbstractMacroParameter<String>
 {
     /**
-     * @param parameterClass the macro parameter descriptor.
+     * @param parameterDescriptor the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public StringMacroParameter(MacroParameterDescriptor<String> parameterClass, String stringValue)
+    public StringMacroParameter(MacroParameterDescriptor<String> parameterDescriptor, String stringValue)
     {
-        super(parameterClass, stringValue);
+        super(parameterDescriptor, stringValue);
     }
 
     /**

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * @version $Id$
@@ -38,10 +39,9 @@ public interface Macro extends Comparable<Macro>
     String ROLE = Macro.class.getName();
 
     /**
-     * The priority of execution relative to the other Macros. The lowest values have the highest priorities
-     * and execute first. For example a Macro with a priority of 100 will execute before one with a priority
-     * of 500. 
-     *
+     * The priority of execution relative to the other Macros. The lowest values have the highest priorities and execute
+     * first. For example a Macro with a priority of 100 will execute before one with a priority of 500.
+     * 
      * @return the execution priority
      */
     int getPriority();
@@ -55,7 +55,7 @@ public interface Macro extends Comparable<Macro>
      * @return the Macro's allowed parameter names and their descriptions
      */
     Map<String, MacroParameterDescriptor< ? >> getAllowedParameters();
-    
-    List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
+
+    List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException;
 }

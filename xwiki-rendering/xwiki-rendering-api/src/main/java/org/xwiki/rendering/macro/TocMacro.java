@@ -31,9 +31,9 @@ import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.SectionBlock;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.TocMacroParameterManager.Scope;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * @version $Id$
@@ -79,8 +79,7 @@ public class TocMacro extends AbstractMacro
      */
     public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
-        // We send a copy of the map and not our map since we don't want it to be modified.
-        return this.macroParameters.getParametersClasses();
+        return this.macroParameters.getParametersDescriptorMap();
     }
 
     /**
@@ -88,7 +87,7 @@ public class TocMacro extends AbstractMacro
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
+    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext macroContexte)
         throws MacroExecutionException
     {
         // Example:
@@ -117,9 +116,9 @@ public class TocMacro extends AbstractMacro
 
         if (this.macroParameters.getScope() == Scope.LOCAL) {
             // FIXME: need to be able to know where is the macro block to support this option
-            root = dom;
+            root = macroContexte.getCurrentMacroBlock().getParent();
         } else {
-            root = dom;
+            root = macroContexte.getDom();
         }
 
         // Get the list of sections in the scope

@@ -33,6 +33,7 @@ import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.velocity.XWikiVelocityException;
 import org.xwiki.velocity.VelocityManager;
 
@@ -91,7 +92,8 @@ public class VelocityMacro extends AbstractMacro
      * 
      * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, XDOM dom) throws MacroExecutionException
+    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         // 1) Run Velocity on macro block content
         StringWriter writer = new StringWriter();

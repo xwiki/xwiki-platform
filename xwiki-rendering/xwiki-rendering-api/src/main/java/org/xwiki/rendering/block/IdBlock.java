@@ -39,7 +39,7 @@ public class IdBlock extends AbstractBlock
 
     public void traverse(Listener listener)
     {
-        listener.onWord(getName());
+        listener.onId(getName());
     }
     
     public String getName()

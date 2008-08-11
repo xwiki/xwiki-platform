@@ -269,7 +269,7 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onId(String name)
     {
-        write("{{id name=" + name + "}}");
+        write("{{id name=\"" + name + "\"}}");
     }
 
     private void write(String text)

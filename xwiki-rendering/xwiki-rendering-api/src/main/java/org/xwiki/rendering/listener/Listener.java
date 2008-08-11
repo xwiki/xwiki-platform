@@ -108,4 +108,6 @@ public interface Listener
      * @since 1.5RC1
      */
     void onEscape(String escapedString);
+    
+    void onId(String name);
 }

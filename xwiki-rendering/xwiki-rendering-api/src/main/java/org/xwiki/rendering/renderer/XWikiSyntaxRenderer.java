@@ -267,6 +267,11 @@ public class XWikiSyntaxRenderer implements Renderer
         onMacro(name, parameters, content);
     }
 
+    public void onId(String name)
+    {
+        write("{{id name=" + name + "}}");
+    }
+
     private void write(String text)
     {
         if (!this.isInsideMacroMarker) {

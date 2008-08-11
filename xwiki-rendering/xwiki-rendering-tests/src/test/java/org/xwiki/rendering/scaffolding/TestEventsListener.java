@@ -32,7 +32,7 @@ import org.xwiki.rendering.listener.Link;
 public class TestEventsListener implements Listener
 {
     private PrintWriter writer;
-    
+
     public TestEventsListener(Writer writer)
     {
         this.writer = new PrintWriter(writer);
@@ -40,15 +40,15 @@ public class TestEventsListener implements Listener
 
     public void beginDocument()
     {
-    	write("beginDocument");
-	}
+        write("beginDocument");
+    }
 
-	public void endDocument()
-	{
-		write("endDocument");
-	}
+    public void endDocument()
+    {
+        write("endDocument");
+    }
 
-	public void beginBold()
+    public void beginBold()
     {
         write("beginBold");
     }
@@ -168,6 +168,11 @@ public class TestEventsListener implements Listener
         writeMacroData("endMacroMarker", name, parameters, content);
     }
 
+    public void onId(String name)
+    {
+        write("onId: [" + name + "]");
+    }
+
     private StringBuffer toStringXMLElement(Map<String, String> attributes)
     {
         StringBuffer buffer = new StringBuffer();
@@ -180,7 +185,7 @@ public class TestEventsListener implements Listener
         }
         return buffer;
     }
-    
+
     private void write(String text)
     {
         this.writer.write(text + "\n");

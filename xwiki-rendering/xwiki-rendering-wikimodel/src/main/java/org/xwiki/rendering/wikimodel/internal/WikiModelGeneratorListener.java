@@ -42,148 +42,153 @@ import org.xwiki.rendering.listener.SectionLevel;
  */
 public class WikiModelGeneratorListener implements Listener
 {
-	private IWemListener wikimodelListener;
-	
-	public WikiModelGeneratorListener(IWemListener wikimodelListener)
-	{
-		this.wikimodelListener = wikimodelListener;
-	}
-	
-	public void beginDocument()
-	{
-		this.wikimodelListener.beginDocument();
-	}
+    private IWemListener wikimodelListener;
 
-	public void endDocument()
-	{
-		this.wikimodelListener.endDocument();
-	}
+    public WikiModelGeneratorListener(IWemListener wikimodelListener)
+    {
+        this.wikimodelListener = wikimodelListener;
+    }
 
-	public void beginBold()
-	{
-		this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRONG));
-	}
+    public void beginDocument()
+    {
+        this.wikimodelListener.beginDocument();
+    }
 
-	public void beginItalic()
-	{
-		this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM));
-	}
+    public void endDocument()
+    {
+        this.wikimodelListener.endDocument();
+    }
 
-	public void beginList(ListType listType)
-	{
-		this.wikimodelListener.beginList(null, false);
-	}
+    public void beginBold()
+    {
+        this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRONG));
+    }
 
-	public void beginListItem()
-	{
-		this.wikimodelListener.beginListItem();
-	}
+    public void beginItalic()
+    {
+        this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM));
+    }
 
-	public void beginMacroMarker(String name, Map<String, String> parameters, String content)
-	{
-		// Don't do anything since there's no notion of Macro marker in WikiModel and anyway
-		// there's nothing to render for a marker...
-	}
+    public void beginList(ListType listType)
+    {
+        this.wikimodelListener.beginList(null, false);
+    }
 
-	public void beginParagraph()
-	{
-		this.wikimodelListener.beginParagraph(null);
-	}
+    public void beginListItem()
+    {
+        this.wikimodelListener.beginListItem();
+    }
 
-	public void beginSection(SectionLevel level)
-	{
-		this.wikimodelListener.beginHeader(level.getAsInt(), null);
-	}
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        // Don't do anything since there's no notion of Macro marker in WikiModel and anyway
+        // there's nothing to render for a marker...
+    }
 
-	public void beginXMLElement(String name, Map<String, String> attributes)
-	{
-		// TODO: Find what to do... For now don't render XML elements
-	}
+    public void beginParagraph()
+    {
+        this.wikimodelListener.beginParagraph(null);
+    }
 
-	public void endBold()
-	{
-		this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG));
-	}
+    public void beginSection(SectionLevel level)
+    {
+        this.wikimodelListener.beginHeader(level.getAsInt(), null);
+    }
 
-	public void endItalic()
-	{
-		this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM));
-	}
+    public void beginXMLElement(String name, Map<String, String> attributes)
+    {
+        // TODO: Find what to do... For now don't render XML elements
+    }
 
-	public void endList(ListType listType)
-	{
-		this.wikimodelListener.endList(null, false);
-	}
+    public void endBold()
+    {
+        this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG));
+    }
 
-	public void endListItem()
-	{
-		this.wikimodelListener.endListItem();
-	}
+    public void endItalic()
+    {
+        this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM));
+    }
 
-	public void endMacroMarker(String name, Map<String, String> parameters, String content)
-	{
-		// Don't do anything since there's no notion of Macro marker in WikiModel and anyway
-		// there's nothing to render for a marker...
-	}
+    public void endList(ListType listType)
+    {
+        this.wikimodelListener.endList(null, false);
+    }
 
-	public void endParagraph()
-	{
-		this.wikimodelListener.endParagraph(null);
-	}
+    public void endListItem()
+    {
+        this.wikimodelListener.endListItem();
+    }
 
-	public void endSection(SectionLevel level)
-	{
-		this.wikimodelListener.endHeader(level.getAsInt(), null);
-	}
+    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        // Don't do anything since there's no notion of Macro marker in WikiModel and anyway
+        // there's nothing to render for a marker...
+    }
 
-	public void endXMLElement(String name, Map<String, String> attributes)
-	{
-		// TODO: Find what to do... For now don't render XML elements
-	}
+    public void endParagraph()
+    {
+        this.wikimodelListener.endParagraph(null);
+    }
 
-	public void onEscape(String escapedString)
-	{
-		this.wikimodelListener.onEscape(escapedString);
-	}
+    public void endSection(SectionLevel level)
+    {
+        this.wikimodelListener.endHeader(level.getAsInt(), null);
+    }
 
-	public void onLineBreak()
-	{
-		this.wikimodelListener.onLineBreak();
-	}
+    public void endXMLElement(String name, Map<String, String> attributes)
+    {
+        // TODO: Find what to do... For now don't render XML elements
+    }
 
-	public void onLink(Link link)
-	{
-		List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
-		wikiParams.add(new WikiParameter("", ""));
-		WikiParameters linkParameters = new WikiParameters(wikiParams);
-		
-		WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(), linkParameters);
-		this.wikimodelListener.onReference(wikiReference);
-	}
+    public void onEscape(String escapedString)
+    {
+        this.wikimodelListener.onEscape(escapedString);
+    }
 
-	public void onMacro(String name, Map<String, String> parameters, String content)
-	{
-		// Don't do anything since macros have already been transformed so this method 
-		// should not be called.
-	}
+    public void onLineBreak()
+    {
+        this.wikimodelListener.onLineBreak();
+    }
 
-	public void onNewLine()
-	{
-		this.wikimodelListener.onNewLine();
-	}
+    public void onLink(Link link)
+    {
+        List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
+        wikiParams.add(new WikiParameter("", ""));
+        WikiParameters linkParameters = new WikiParameters(wikiParams);
 
-	public void onSpace()
-	{
-		this.wikimodelListener.onSpace(" ");
-	}
+        WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(), linkParameters);
+        this.wikimodelListener.onReference(wikiReference);
+    }
 
-	public void onSpecialSymbol(String symbol)
-	{
-		this.wikimodelListener.onSpecialSymbol(symbol);
-	}
+    public void onMacro(String name, Map<String, String> parameters, String content)
+    {
+        // Don't do anything since macros have already been transformed so this method
+        // should not be called.
+    }
 
-	public void onWord(String word)
-	{
-		this.wikimodelListener.onWord(word);
-	}
+    public void onNewLine()
+    {
+        this.wikimodelListener.onNewLine();
+    }
+
+    public void onSpace()
+    {
+        this.wikimodelListener.onSpace(" ");
+    }
+
+    public void onSpecialSymbol(String symbol)
+    {
+        this.wikimodelListener.onSpecialSymbol(symbol);
+    }
+
+    public void onWord(String word)
+    {
+        this.wikimodelListener.onWord(word);
+    }
+
+    public void onId(String name)
+    {
+        // TODO: Find what to do...
+    }
 }

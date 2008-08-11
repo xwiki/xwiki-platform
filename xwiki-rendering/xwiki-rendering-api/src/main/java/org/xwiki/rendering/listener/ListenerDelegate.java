@@ -145,4 +145,9 @@ public class ListenerDelegate implements Listener
     {
         this.listener.onWord(word);
     }
+
+    public void onId(String name)
+    {
+        this.listener.onId(name);
+    }
 }

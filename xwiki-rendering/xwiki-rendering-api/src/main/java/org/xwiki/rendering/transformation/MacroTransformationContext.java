@@ -44,7 +44,7 @@ public class MacroTransformationContext
     /**
      * The complete {@link XDOM} of the page currently being transformed.
      */
-    private XDOM dom;
+    private XDOM xdom;
 
     /**
      * Default constructor.
@@ -56,12 +56,12 @@ public class MacroTransformationContext
 
     /**
      * @param currentMacroBlock the macro currently processed.
-     * @param dom the complete {@link XDOM} of the page currently being transformed.
+     * @param xdom the complete {@link XDOM} of the page currently being transformed.
      */
-    public MacroTransformationContext(MacroBlock currentMacroBlock, XDOM dom)
+    public MacroTransformationContext(MacroBlock currentMacroBlock, XDOM xdom)
     {
         setCurrentMacroBlock(currentMacroBlock);
-        setDom(dom);
+        setXDOM(xdom);
     }
 
     /**
@@ -81,18 +81,18 @@ public class MacroTransformationContext
     }
 
     /**
-     * @param dom the complete {@link XDOM} of the page currently being transformed.
+     * @param xdom the complete {@link XDOM} of the page currently being transformed.
      */
-    void setDom(XDOM dom)
+    void setXDOM(XDOM xdom)
     {
-        this.dom = dom;
+        this.xdom = xdom;
     }
 
     /**
      * @return the complete {@link XDOM} of the page currently being transformed.
      */
-    public XDOM getDom()
+    public XDOM getXDOM()
     {
-        return this.dom;
+        return this.xdom;
     }
 }

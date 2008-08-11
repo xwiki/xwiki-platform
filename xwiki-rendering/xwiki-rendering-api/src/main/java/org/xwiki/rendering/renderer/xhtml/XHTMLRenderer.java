@@ -305,6 +305,11 @@ public class XHTMLRenderer implements Renderer
         // Ignore macro markers, nothing to do.
     }
 
+    public void onId(String name)
+    {
+        write("<a id=\"" + name + "\" name=\"" + name + "\"/>");
+    }
+
     protected void write(String text)
     {
         this.writer.write(text);

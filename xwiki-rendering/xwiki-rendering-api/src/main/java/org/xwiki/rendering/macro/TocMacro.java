@@ -87,7 +87,7 @@ public class TocMacro extends AbstractMacro
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String, org.xwiki.rendering.block.XDOM)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext macroContexte)
+    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext macroContext)
         throws MacroExecutionException
     {
         // Example:
@@ -116,9 +116,9 @@ public class TocMacro extends AbstractMacro
 
         if (this.macroParameters.getScope() == Scope.LOCAL) {
             // FIXME: need to be able to know where is the macro block to support this option
-            root = macroContexte.getCurrentMacroBlock().getParent();
+            root = macroContext.getCurrentMacroBlock().getParent();
         } else {
-            root = macroContexte.getDom();
+            root = macroContext.getDom();
         }
 
         // Get the list of sections in the scope

@@ -77,7 +77,8 @@ public class NoWikiMacro extends AbstractMacro implements Initializable
     /**
      * {@inheritDoc}
      * 
-     * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
+     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
+     *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException

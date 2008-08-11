@@ -85,7 +85,8 @@ public class TocMacro extends AbstractMacro
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String, org.xwiki.rendering.block.XDOM)
+     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
+     *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException

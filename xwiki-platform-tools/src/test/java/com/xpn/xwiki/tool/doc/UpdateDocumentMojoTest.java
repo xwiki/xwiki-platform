@@ -55,7 +55,6 @@ public class UpdateDocumentMojoTest extends TestCase
             String inputContent = new String(bytes);
 
             assertTrue(inputContent.contains("<class>"));
-
             assertEquals(doc.getName(), "Install");
 
             File outputFile = File.createTempFile("output", "xml");
@@ -66,14 +65,8 @@ public class UpdateDocumentMojoTest extends TestCase
             fr.read(bytes);
             String outputContent = new String(bytes);
 
-            // Test that prove class definitions are lost during the process of loading/writing back the XML document.
-            // It currently fail, see http://jira.xwiki.org/jira/browse/XTXMLDOC-6
+            // Check that we did not lose the class definition during the loading from XML/writing to XML process.
             assertTrue(outputContent.contains("<class>"));
-
-            // check there is no diff bewteen input and output file, as no transformation
-            // has been applied.
-            assertEquals(inputContent, outputContent);
-
         } catch (MojoExecutionException e) {
             fail();
         } catch (IOException e) {

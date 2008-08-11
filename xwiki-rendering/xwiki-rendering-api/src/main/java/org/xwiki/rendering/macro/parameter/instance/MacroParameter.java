@@ -17,48 +17,36 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.classes;
+package org.xwiki.rendering.macro.parameter.instance;
 
-import org.xwiki.rendering.macro.parameter.instances.MacroParameter;
+import org.xwiki.rendering.macro.parameter.MacroParameterException;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
- * Macro parameter descriptor.
+ * Macro parameters String values converter.
  * 
  * @param <T> the type of the value after conversion.
  * @version $Id: $
  */
-public interface MacroParameterClass<T>
+public interface MacroParameter<T>
 {
     /**
-     * @return the name of the parameter.
+     * @return parameterClass the macro parameter descriptor.
      */
-    String getName();
+    MacroParameterDescriptor<T> getParameterClass();
 
     /**
-     * @return the description of the parameter.
+     * @return the value as String from parser.
      */
-    String getDescription();
+    String getValueAsString();
 
     /**
-     * @return the default value.
-     */
-    T getDefaultValue();
-
-    /**
-     * @return indicate the parameter has to be specified.
-     */
-    boolean isRequired();
-
-    /**
-     * @return indicate if the macro parameter object has to throw exception when value is invalid.
-     */
-    boolean isValueHasToBeValid();
-
-    /**
-     * Create a new instance of the corresponding parameter object.
+     * Convert the String value.
+     * <p>
+     * The calculation is done only once.
      * 
-     * @param value the value to convert.
-     * @return the parameter.
+     * @return the converted value.
+     * @throws MacroParameterException error when converting value.
      */
-    MacroParameter<T> newInstance(String value);
+    T getValue() throws MacroParameterException;
 }

@@ -19,13 +19,9 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.AbstractMacroParameterCollection;
+import org.xwiki.rendering.macro.parameter.AbstractMacroParameterManager;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.classes.BooleanMacroParameterClass;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
 
 /**
  * Parse and convert XHTML macro parameters values into more readable java values (like boolean, int etc.).
@@ -34,7 +30,7 @@ import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class XHTMLMacroParameterCollection extends AbstractMacroParameterCollection
+public class XHTMLMacroParameterManager extends AbstractMacroParameterManager
 {
     /**
      * The name of the macro parameter "escapeWikiSyntax".
@@ -53,28 +49,15 @@ public class XHTMLMacroParameterCollection extends AbstractMacroParameterCollect
     private static final boolean PARAM_ESCAPEWIKISYNTAX_DEF = false;
 
     /**
-     * The unique list of macro parameters descriptors of the TOC macro.
-     */
-    private static Map<String, MacroParameterClass< ? >> parametersClasses =
-        new HashMap<String, MacroParameterClass< ? >>();
-
-    /**
-     * The unique macro parameter descriptor the parameter "escapeWikiSyntax".
-     */
-    private static final BooleanMacroParameterClass escapeWikiSyntaxParamClass =
-        new BooleanMacroParameterClass(PARAM_ESCAPEWIKISYNTAX, PARAM_ESCAPEWIKISYNTAX_DESC, PARAM_ESCAPEWIKISYNTAX_DEF);
-
-    static {
-        escapeWikiSyntaxParamClass.setValueHasToBeValid(false);
-        parametersClasses.put(PARAM_ESCAPEWIKISYNTAX, escapeWikiSyntaxParamClass);
-    }
-
-    /**
      * Set the macro parameters class list.
      */
-    public XHTMLMacroParameterCollection()
+    public XHTMLMacroParameterManager()
     {
-        super(parametersClasses);
+        BooleanMacroParameterDescriptor escapeWikiSyntaxParamClass =
+            new BooleanMacroParameterDescriptor(PARAM_ESCAPEWIKISYNTAX, PARAM_ESCAPEWIKISYNTAX_DESC,
+                PARAM_ESCAPEWIKISYNTAX_DEF);
+        escapeWikiSyntaxParamClass.setValueHasToBeValid(false);
+        register(escapeWikiSyntaxParamClass);
     }
 
     /**

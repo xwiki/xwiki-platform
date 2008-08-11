@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.classes;
+package org.xwiki.rendering.macro.parameter.descriptor;
 
 /**
  * Base class for macro parameter descriptor.
@@ -25,7 +25,7 @@ package org.xwiki.rendering.macro.parameter.classes;
  * @param <T> the type of the value after conversion.
  * @version $Id: $
  */
-public abstract class AbstractMacroParameterClass<T> implements MacroParameterClass<T>
+public abstract class AbstractMacroParameterDescriptor<T> implements MacroParameterDescriptor<T>
 {
     /**
      * The name of the parameter.
@@ -57,7 +57,7 @@ public abstract class AbstractMacroParameterClass<T> implements MacroParameterCl
      * @param description the description of the parameter.
      * @param def the default value.
      */
-    public AbstractMacroParameterClass(String name, String description, T def)
+    public AbstractMacroParameterDescriptor(String name, String description, T def)
     {
         this.name = name;
         this.description = description;
@@ -67,7 +67,7 @@ public abstract class AbstractMacroParameterClass<T> implements MacroParameterCl
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.MacroParameterClass#getName()
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#getName()
      */
     public String getName()
     {
@@ -77,7 +77,7 @@ public abstract class AbstractMacroParameterClass<T> implements MacroParameterCl
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.MacroParameterClass#getDescription()
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#getDescription()
      */
     public String getDescription()
     {
@@ -87,7 +87,7 @@ public abstract class AbstractMacroParameterClass<T> implements MacroParameterCl
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.MacroParameterClass#getDefaultValue()
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#getDefaultValue()
      */
     public T getDefaultValue()
     {
@@ -97,7 +97,7 @@ public abstract class AbstractMacroParameterClass<T> implements MacroParameterCl
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.MacroParameterClass#isRequired()
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#isRequired()
      */
     public boolean isRequired()
     {
@@ -115,7 +115,7 @@ public abstract class AbstractMacroParameterClass<T> implements MacroParameterCl
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.MacroParameterClass#isValueHasToBeValid()
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#isValueHasToBeValid()
      */
     public boolean isValueHasToBeValid()
     {

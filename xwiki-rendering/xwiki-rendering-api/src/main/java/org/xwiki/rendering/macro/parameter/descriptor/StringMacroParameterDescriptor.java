@@ -17,36 +17,35 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.instances;
+package org.xwiki.rendering.macro.parameter.descriptor;
 
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
+import org.xwiki.rendering.macro.parameter.instance.StringMacroParameter;
 
 /**
- * Macro parameters String values converter.
+ * Describe a macro parameter that can be a String.
  * 
- * @param <T> the type of the value after conversion.
  * @version $Id: $
  */
-public interface MacroParameter<T>
+public class StringMacroParameterDescriptor extends AbstractMacroParameterDescriptor<String>
 {
     /**
-     * @return parameterClass the macro parameter descriptor.
+     * @param name the name of the parameter.
+     * @param descritpion the description of the parameter.
+     * @param def the default value.
      */
-    MacroParameterClass<T> getParameterClass();
+    public StringMacroParameterDescriptor(String name, String descritpion, String def)
+    {
+        super(name, descritpion, def);
+    }
 
     /**
-     * @return the value as String from parser.
-     */
-    String getValueAsString();
-
-    /**
-     * Convert the String value.
-     * <p>
-     * The calculation is done only once.
+     * {@inheritDoc}
      * 
-     * @return the converted value.
-     * @throws MacroParameterException error when converting value.
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#newInstance(java.lang.String)
      */
-    T getValue() throws MacroParameterException;
+    public MacroParameter<String> newInstance(String value)
+    {
+        return new StringMacroParameter(this, value);
+    }
 }

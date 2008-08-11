@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.instances;
+package org.xwiki.rendering.macro.parameter.instance;
 
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.classes.NumberMacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescriptor;
 
 /**
  * Base class for converting parameter String value to number.
@@ -34,7 +34,7 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
      * @param parameterClass the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public AbstractNumberMacroParameter(NumberMacroParameterClass<T> parameterClass, String stringValue)
+    public AbstractNumberMacroParameter(NumberMacroParameterDescriptor<T> parameterClass, String stringValue)
     {
         super(parameterClass, stringValue);
     }
@@ -42,9 +42,9 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
     /**
      * @return the macro parameter descriptor.
      */
-    public NumberMacroParameterClass<T> getNumberParameterClass()
+    public NumberMacroParameterDescriptor<T> getNumberParameterClass()
     {
-        return (NumberMacroParameterClass<T>) getParameterClass();
+        return (NumberMacroParameterDescriptor<T>) getParameterClass();
     }
 
     /**

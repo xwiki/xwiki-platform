@@ -30,13 +30,13 @@ import org.xwiki.rendering.block.ParagraphBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 public class TestPriorityMacro extends AbstractMacro
 {
-    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
+    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
-		return new HashMap<String, MacroParameterClass< ? >>();
+		return new HashMap<String, MacroParameterDescriptor< ? >>();
 	}
 
 	public String getDescription()

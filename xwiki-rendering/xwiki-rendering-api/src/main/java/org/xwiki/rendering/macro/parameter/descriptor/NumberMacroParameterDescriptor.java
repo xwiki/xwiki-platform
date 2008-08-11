@@ -1,4 +1,4 @@
-package org.xwiki.rendering.macro.parameter.classes;
+package org.xwiki.rendering.macro.parameter.descriptor;
 
 /**
  * Describe a macro parameter that can be a number.
@@ -6,7 +6,7 @@ package org.xwiki.rendering.macro.parameter.classes;
  * @param <T> the type of number.
  * @version $Id: $
  */
-public interface NumberMacroParameterClass<T> extends MacroParameterClass<T>
+public interface NumberMacroParameterDescriptor<T> extends MacroParameterDescriptor<T>
 {
     /**
      * @return the lowest possible value of the parameter.

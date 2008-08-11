@@ -17,35 +17,48 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.classes;
+package org.xwiki.rendering.macro.parameter.descriptor;
 
-import org.xwiki.rendering.macro.parameter.instances.BooleanMacroParameter;
-import org.xwiki.rendering.macro.parameter.instances.MacroParameter;
+import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
 /**
- * Describe a macro parameter that can be true or false.
+ * Macro parameter descriptor.
  * 
+ * @param <T> the type of the value after conversion.
  * @version $Id: $
  */
-public class BooleanMacroParameterClass extends AbstractMacroParameterClass<Boolean>
+public interface MacroParameterDescriptor<T>
 {
     /**
-     * @param name the name of the parameter.
-     * @param descritpion the description of the parameter.
-     * @param def the default value.
+     * @return the name of the parameter.
      */
-    public BooleanMacroParameterClass(String name, String descritpion, boolean def)
-    {
-        super(name, descritpion, def);
-    }
+    String getName();
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.parameter.classes.MacroParameterClass#newInstance(java.lang.String)
+     * @return the description of the parameter.
      */
-    public MacroParameter<Boolean> newInstance(String value)
-    {
-        return new BooleanMacroParameter(this, value);
-    }
+    String getDescription();
+
+    /**
+     * @return the default value.
+     */
+    T getDefaultValue();
+
+    /**
+     * @return indicate the parameter has to be specified.
+     */
+    boolean isRequired();
+
+    /**
+     * @return indicate if the macro parameter object has to throw exception when value is invalid.
+     */
+    boolean isValueHasToBeValid();
+
+    /**
+     * Create a new instance of the corresponding parameter object.
+     * 
+     * @param value the value to convert.
+     * @return the parameter.
+     */
+    MacroParameter<T> newInstance(String value);
 }

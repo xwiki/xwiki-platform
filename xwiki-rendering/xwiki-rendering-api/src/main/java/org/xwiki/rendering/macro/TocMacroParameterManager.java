@@ -19,15 +19,11 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.AbstractMacroParameterCollection;
+import org.xwiki.rendering.macro.parameter.AbstractMacroParameterManager;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.classes.BooleanMacroParameterClass;
-import org.xwiki.rendering.macro.parameter.classes.EnumMacroParameterClass;
-import org.xwiki.rendering.macro.parameter.classes.IntegerMacroParameterClass;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescriptor;
 
 /**
  * Parse and convert TOC macro parameters values into more readable java values (like boolean, int etc.).
@@ -36,7 +32,7 @@ import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class TocMacroParameterCollection extends AbstractMacroParameterCollection
+public class TocMacroParameterManager extends AbstractMacroParameterManager
 {
     /**
      * @version $Id: $
@@ -119,53 +115,27 @@ public class TocMacroParameterCollection extends AbstractMacroParameterCollectio
     private static final boolean PARAM_NUMBERED_DEF = false;
 
     /**
-     * The unique list of macro parameters descriptors of the TOC macro.
-     */
-    private static Map<String, MacroParameterClass< ? >> parametersClasses =
-        new HashMap<String, MacroParameterClass< ? >>();
-
-    /**
-     * The unique macro parameter descriptor the parameter "start".
-     */
-    private static IntegerMacroParameterClass startParamClass =
-        new IntegerMacroParameterClass(PARAM_START, PARAM_START_DESC, PARAM_START_DEF);
-
-    /**
-     * The unique macro parameter descriptor the parameter "depth".
-     */
-    private static IntegerMacroParameterClass depthParamClass =
-        new IntegerMacroParameterClass(PARAM_DEPTH, PARAM_DEPTH_DESC, PARAM_DEPTH_DEF);
-
-    /**
-     * The unique macro parameter descriptor the parameter "scope".
-     */
-    private static EnumMacroParameterClass<Scope> scopeParamClass =
-        new EnumMacroParameterClass<Scope>(PARAM_SCOPE, PARAM_SCOPE_DESC, PARAM_SCOPE_DEF);
-
-    /**
-     * The unique macro parameter descriptor the parameter "numbered".
-     */
-    private static BooleanMacroParameterClass numberedParamClass =
-        new BooleanMacroParameterClass(PARAM_NUMBERED, PARAM_NUMBERED_DESC, PARAM_NUMBERED_DEF);
-
-    static {
-        startParamClass.setMinValue(1);
-        parametersClasses.put(PARAM_START, startParamClass);
-
-        depthParamClass.setMinValue(1);
-        parametersClasses.put(PARAM_DEPTH, depthParamClass);
-
-        parametersClasses.put(PARAM_SCOPE, scopeParamClass);
-
-        parametersClasses.put(PARAM_NUMBERED, numberedParamClass);
-    }
-
-    /**
      * Set the macro parameters class list.
      */
-    public TocMacroParameterCollection()
+    public TocMacroParameterManager()
     {
-        super(parametersClasses);
+        IntegerMacroParameterDescriptor startParamClass =
+            new IntegerMacroParameterDescriptor(PARAM_START, PARAM_START_DESC, PARAM_START_DEF);
+        startParamClass.setMinValue(1);
+        register(startParamClass);
+
+        IntegerMacroParameterDescriptor depthParamClass =
+            new IntegerMacroParameterDescriptor(PARAM_DEPTH, PARAM_DEPTH_DESC, PARAM_DEPTH_DEF);
+        depthParamClass.setMinValue(1);
+        register(depthParamClass);
+
+        EnumMacroParameterDescriptor<Scope> scopeParamClass =
+            new EnumMacroParameterDescriptor<Scope>(PARAM_SCOPE, PARAM_SCOPE_DESC, PARAM_SCOPE_DEF);
+        register(scopeParamClass);
+
+        BooleanMacroParameterDescriptor numberedParamClass =
+            new BooleanMacroParameterDescriptor(PARAM_NUMBERED, PARAM_NUMBERED_DESC, PARAM_NUMBERED_DEF);
+        register(numberedParamClass);
     }
 
     /**

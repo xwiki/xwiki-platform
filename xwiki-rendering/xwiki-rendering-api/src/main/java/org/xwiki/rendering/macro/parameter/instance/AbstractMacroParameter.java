@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.instances;
+package org.xwiki.rendering.macro.parameter.instance;
 
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Base class for macro parameters String values converter.
@@ -38,7 +38,7 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
     /**
      * The macro parameter descriptor.
      */
-    private MacroParameterClass<T> parameterClass;
+    private MacroParameterDescriptor<T> parameterClass;
 
     /**
      * The value as String from parser.
@@ -54,7 +54,7 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
      * @param parameterClass the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public AbstractMacroParameter(MacroParameterClass<T> parameterClass, String stringValue)
+    public AbstractMacroParameter(MacroParameterDescriptor<T> parameterClass, String stringValue)
     {
         this.parameterClass = parameterClass;
         this.stringValue = stringValue;
@@ -65,9 +65,9 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.instances.MacroParameter#getParameterClass()
+     * @see org.xwiki.rendering.macro.parameter.instance.MacroParameter#getParameterClass()
      */
-    public MacroParameterClass<T> getParameterClass()
+    public MacroParameterDescriptor<T> getParameterClass()
     {
         return this.parameterClass;
     }
@@ -75,7 +75,7 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.instances.MacroParameter#getValueAsString()
+     * @see org.xwiki.rendering.macro.parameter.instance.MacroParameter#getValueAsString()
      */
     public String getValueAsString()
     {
@@ -92,7 +92,7 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.instances.AbstractMacroParameter#getValue()
+     * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#getValue()
      */
     public T getValue() throws MacroParameterException
     {

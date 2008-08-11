@@ -17,9 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.instances;
+package org.xwiki.rendering.macro.parameter.instance;
 
-import org.xwiki.rendering.macro.parameter.classes.NumberMacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescriptor;
 
 /**
  * Convert parameter String value to <code>int</code>, <code>long</code>, <code>float</code> or
@@ -33,7 +33,7 @@ public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
      * @param parameterClass the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public IntegerMacroParameter(NumberMacroParameterClass<Integer> parameterClass, String stringValue)
+    public IntegerMacroParameter(NumberMacroParameterDescriptor<Integer> parameterClass, String stringValue)
     {
         super(parameterClass, stringValue);
     }
@@ -41,13 +41,13 @@ public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.instances.AbstractMacroParameter#parseValue()
+     * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#parseValue()
      */
     protected Integer parseValue()
     {
         int value;
 
-        NumberMacroParameterClass<Integer> parameterClass = getNumberParameterClass();
+        NumberMacroParameterDescriptor<Integer> parameterClass = getNumberParameterClass();
         
         Integer def = parameterClass.getDefaultValue();
 

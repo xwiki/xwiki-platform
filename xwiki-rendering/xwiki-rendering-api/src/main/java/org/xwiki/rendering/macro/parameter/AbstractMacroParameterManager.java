@@ -22,15 +22,15 @@ package org.xwiki.rendering.macro.parameter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
-import org.xwiki.rendering.macro.parameter.instances.MacroParameter;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
 /**
  * Base class to parse and convert macro parameters values into more readable java values (like boolean, int etc.).
  * 
  * @version $Id: $
  */
-public abstract class AbstractMacroParameterCollection implements MacroParameterCollection
+public abstract class AbstractMacroParameterManager implements MacroParameterManager
 {
     /**
      * The list of parameters objects containing parameters values.
@@ -40,38 +40,25 @@ public abstract class AbstractMacroParameterCollection implements MacroParameter
     /**
      * The list of parameters descriptors of the macro.
      */
-    private Map<String, MacroParameterClass< ? >> parametersClasses = new HashMap<String, MacroParameterClass< ? >>();
+    private Map<String, MacroParameterDescriptor< ? >> parametersClasses =
+        new HashMap<String, MacroParameterDescriptor< ? >>();
 
     /**
-     * @param parametersClasses the list of parameters descriptors of the macro.
+     * @param parameterClass add parameter descriptor to the macro parameters manager.
      */
-    public AbstractMacroParameterCollection(Map<String, MacroParameterClass< ? >> parametersClasses)
+    public void register(MacroParameterDescriptor< ? > parameterClass)
     {
-        for (Map.Entry<String, MacroParameterClass< ? >> entry : parametersClasses.entrySet()) {
-            this.parametersClasses.put(entry.getKey().toLowerCase(), entry.getValue());
-        }
-    }
-
-    /**
-     * @param parametersClasses the list of parameters descriptors of the macro.
-     * @param parameters the list of macro parameters to convert to parameters objects.
-     */
-    public AbstractMacroParameterCollection(Map<String, MacroParameterClass< ? >> parametersClasses,
-        Map<String, String> parameters)
-    {
-        this(parametersClasses);
-
-        load(parameters);
+        this.parametersClasses.put(parameterClass.getName().toLowerCase(), parameterClass);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterCollection#getParametersClasses()
+     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParametersClasses()
      */
-    public Map<String, MacroParameterClass< ? >> getParametersClasses()
+    public Map<String, MacroParameterDescriptor< ? >> getParametersClasses()
     {
-        return new HashMap<String, MacroParameterClass< ? >>(this.parametersClasses);
+        return new HashMap<String, MacroParameterDescriptor< ? >>(this.parametersClasses);
     }
 
     /**
@@ -82,7 +69,7 @@ public abstract class AbstractMacroParameterCollection implements MacroParameter
         this.parameters.clear();
 
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            MacroParameterClass< ? > parameterClass = this.parametersClasses.get(entry.getKey());
+            MacroParameterDescriptor< ? > parameterClass = this.parametersClasses.get(entry.getKey());
 
             if (parameterClass != null) {
                 this.parameters.put(entry.getKey().toLowerCase(), parameterClass.newInstance(entry.getValue()));
@@ -95,7 +82,7 @@ public abstract class AbstractMacroParameterCollection implements MacroParameter
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterCollection#getParameter(java.lang.String)
+     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParameter(java.lang.String)
      */
     public <P extends MacroParameter< ? >> P getParameter(String name) throws MacroParameterException
     {
@@ -105,9 +92,9 @@ public abstract class AbstractMacroParameterCollection implements MacroParameter
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterCollection#getParameterClass(java.lang.String)
+     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParameterClass(java.lang.String)
      */
-    public <C extends MacroParameterClass< ? >> C getParameterClass(String name) throws MacroParameterException
+    public <C extends MacroParameterDescriptor< ? >> C getParameterClass(String name) throws MacroParameterException
     {
         return (C) this.parametersClasses.get(name.toLowerCase());
     }
@@ -115,7 +102,7 @@ public abstract class AbstractMacroParameterCollection implements MacroParameter
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterCollection#getParameterValue(java.lang.String)
+     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParameterValue(java.lang.String)
      */
     public <T> T getParameterValue(String name) throws MacroParameterException
     {
@@ -124,7 +111,7 @@ public abstract class AbstractMacroParameterCollection implements MacroParameter
         MacroParameter<T> parameter = getParameter(name);
 
         if (parameter == null) {
-            MacroParameterClass<T> pclass = getParameterClass(name);
+            MacroParameterDescriptor<T> pclass = getParameterClass(name);
 
             if (pclass != null) {
                 if (pclass.isRequired()) {

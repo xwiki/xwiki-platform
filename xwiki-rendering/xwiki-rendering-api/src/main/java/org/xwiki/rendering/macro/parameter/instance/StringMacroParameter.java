@@ -1,6 +1,6 @@
-package org.xwiki.rendering.macro.parameter.instances;
+package org.xwiki.rendering.macro.parameter.instance;
 
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Macro parameter with String value.
@@ -13,7 +13,7 @@ public class StringMacroParameter extends AbstractMacroParameter<String>
      * @param parameterClass the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public StringMacroParameter(MacroParameterClass<String> parameterClass, String stringValue)
+    public StringMacroParameter(MacroParameterDescriptor<String> parameterClass, String stringValue)
     {
         super(parameterClass, stringValue);
     }
@@ -21,7 +21,7 @@ public class StringMacroParameter extends AbstractMacroParameter<String>
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.instances.AbstractMacroParameter#parseValue()
+     * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#parseValue()
      */
     protected String parseValue()
     {

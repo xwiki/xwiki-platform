@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * @version $Id$
@@ -54,7 +54,7 @@ public interface Macro extends Comparable<Macro>
     /**
      * @return the Macro's allowed parameter names and their descriptions
      */
-    Map<String, MacroParameterClass< ? >> getAllowedParameters();
+    Map<String, MacroParameterDescriptor< ? >> getAllowedParameters();
     
     List<Block> execute(Map<String, String> parameters, String content, final XDOM dom)
         throws MacroExecutionException;

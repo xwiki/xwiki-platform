@@ -32,8 +32,8 @@ import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.TocMacroParameterCollection.Scope;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.TocMacroParameterManager.Scope;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * @version $Id$
@@ -49,7 +49,7 @@ public class TocMacro extends AbstractMacro
     /**
      * The TOC macro parameters manager.
      */
-    private TocMacroParameterCollection macroParameters = new TocMacroParameterCollection();
+    private TocMacroParameterManager macroParameters = new TocMacroParameterManager();
 
     /**
      * {@inheritDoc}
@@ -77,7 +77,7 @@ public class TocMacro extends AbstractMacro
      * 
      * @see Macro#getAllowedParameters()
      */
-    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
+    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
         // We send a copy of the map and not our map since we don't want it to be modified.
         return this.macroParameters.getParametersClasses();

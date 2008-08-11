@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.utils;
+package org.xwiki.rendering.renderer.xhtml;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ import java.util.List;
  * @version $Id: $
  * @since 1.6M1
  */
-public class AnchorIdGenerator
+public class XHTMLIdGenerator
 {
     private List<String> generatedIds = new ArrayList<String>();
 

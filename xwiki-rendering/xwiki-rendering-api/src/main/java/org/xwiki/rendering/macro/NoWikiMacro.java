@@ -24,7 +24,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.EscapeBlock;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 import java.util.Collections;
 import java.util.Map;
@@ -67,7 +67,7 @@ public class NoWikiMacro extends AbstractMacro implements Initializable
      * 
      * @see Macro#getAllowedParameters()
      */
-    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
+    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
         // We send a copy of the map and not our map since we don't want it to be modified.
         return Collections.emptyMap();

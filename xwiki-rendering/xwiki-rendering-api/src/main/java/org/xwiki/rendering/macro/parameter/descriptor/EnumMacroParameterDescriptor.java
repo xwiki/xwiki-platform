@@ -17,34 +17,42 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.classes;
+package org.xwiki.rendering.macro.parameter.descriptor;
 
-import org.xwiki.rendering.macro.parameter.instances.IntegerMacroParameter;
+import java.security.InvalidParameterException;
+
+import org.xwiki.rendering.macro.parameter.instance.EnumMacroParameter;
+import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
 /**
- * Describe a macro parameter that can be a number.
+ * Describe a macro parameter that can be one of the value of the provided Enum class.
  * 
+ * @param <T> the type of the Enum.
  * @version $Id: $
  */
-public class IntegerMacroParameterClass extends AbstractNumberMacroParameterClass<Integer>
+public class EnumMacroParameterDescriptor<T extends Enum<T>> extends AbstractMacroParameterDescriptor<T>
 {
     /**
      * @param name the name of the parameter.
      * @param descritpion the description of the parameter.
-     * @param def the default value. Have to be not null.
+     * @param def the default value.
      */
-    public IntegerMacroParameterClass(String name, String descritpion, int def)
+    public EnumMacroParameterDescriptor(String name, String descritpion, T def)
     {
         super(name, descritpion, def);
+
+        if (def == null) {
+            throw new InvalidParameterException("The default value can't be null");
+        }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.MacroParameterClass#newInstance(java.lang.String)
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#newInstance(java.lang.String)
      */
-    public IntegerMacroParameter newInstance(String value)
+    public MacroParameter<T> newInstance(String value)
     {
-        return new IntegerMacroParameter(this, value);
+        return new EnumMacroParameter<T>(this, value);
     }
 }

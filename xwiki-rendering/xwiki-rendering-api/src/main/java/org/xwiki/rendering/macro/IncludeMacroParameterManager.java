@@ -19,14 +19,10 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.AbstractMacroParameterCollection;
+import org.xwiki.rendering.macro.parameter.AbstractMacroParameterManager;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.classes.EnumMacroParameterClass;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
-import org.xwiki.rendering.macro.parameter.classes.StringMacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
 /**
  * Parse and convert INCLUDE macro parameters values into more readable java values (like boolean, int etc.).
@@ -35,7 +31,7 @@ import org.xwiki.rendering.macro.parameter.classes.StringMacroParameterClass;
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class IncludeMacroParameterCollection extends AbstractMacroParameterCollection
+public class IncludeMacroParameterManager extends AbstractMacroParameterManager
 {
     /**
      * @version $Id: $
@@ -90,37 +86,18 @@ public class IncludeMacroParameterCollection extends AbstractMacroParameterColle
     private static final Context PARAM_CONTEXT_DEF = Context.NEW;
 
     /**
-     * The unique list of macro parameters descriptors of the TOC macro.
-     */
-    private static Map<String, MacroParameterClass< ? >> parametersClasses =
-        new HashMap<String, MacroParameterClass< ? >>();
-
-    /**
-     * The unique macro parameter descriptor the parameter "document".
-     */
-    private static final StringMacroParameterClass documentParamClass =
-        new StringMacroParameterClass(PARAM_DOCUMENT, PARAM_DOCUMENT_DESC, PARAM_DOCUMENT_DEF);
-
-    /**
-     * The unique macro parameter descriptor the parameter "context".
-     */
-    private static final EnumMacroParameterClass<Context> contextParamClass =
-        new EnumMacroParameterClass<Context>(PARAM_CONTEXT, PARAM_CONTEXT_DESC, PARAM_CONTEXT_DEF);
-
-    static {
-
-        documentParamClass.setRequired(true);
-        parametersClasses.put(PARAM_DOCUMENT, documentParamClass);
-
-        parametersClasses.put(PARAM_CONTEXT, contextParamClass);
-    }
-
-    /**
      * Set the macro parameters class list.
      */
-    public IncludeMacroParameterCollection()
+    public IncludeMacroParameterManager()
     {
-        super(parametersClasses);
+        StringMacroParameterDescriptor documentParamClass =
+            new StringMacroParameterDescriptor(PARAM_DOCUMENT, PARAM_DOCUMENT_DESC, PARAM_DOCUMENT_DEF);
+        documentParamClass.setRequired(true);
+        register(documentParamClass);
+
+        EnumMacroParameterDescriptor<Context> contextParamClass =
+            new EnumMacroParameterDescriptor<Context>(PARAM_CONTEXT, PARAM_CONTEXT_DESC, PARAM_CONTEXT_DEF);
+        register(contextParamClass);
     }
 
     /**

@@ -21,8 +21,8 @@ package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.IncludeMacroParameterCollection.Context;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.IncludeMacroParameterManager.Context;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -52,7 +52,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
     /**
      * The TOC macro parameters manager.
      */
-    private IncludeMacroParameterCollection macroParameters = new IncludeMacroParameterCollection();
+    private IncludeMacroParameterManager macroParameters = new IncludeMacroParameterManager();
 
     /**
      * Injected by the Component Manager.
@@ -102,7 +102,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
      * 
      * @see Macro#getAllowedParameters()
      */
-    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
+    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
         // We send a copy of the map and not our map since we don't want it to be modified.
         return this.macroParameters.getParametersClasses();

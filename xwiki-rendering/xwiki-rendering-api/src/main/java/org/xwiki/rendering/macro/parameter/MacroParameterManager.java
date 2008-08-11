@@ -21,20 +21,20 @@ package org.xwiki.rendering.macro.parameter;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
-import org.xwiki.rendering.macro.parameter.instances.MacroParameter;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
 /**
  * Parse and convert macro parameters values into more readable java values (like boolean, int etc.).
  * 
  * @version $Id: $
  */
-public interface MacroParameterCollection
+public interface MacroParameterManager
 {
     /**
      * @return the list of parameters descriptors.
      */
-    Map<String, MacroParameterClass< ? >> getParametersClasses();
+    Map<String, MacroParameterDescriptor< ? >> getParametersClasses();
 
     /**
      * @param <P> the type of MacroParameter child class to return.
@@ -50,7 +50,7 @@ public interface MacroParameterCollection
      * @return the parameter class.
      * @throws MacroParameterException error when trying to get macro parameter class.
      */
-    <C extends MacroParameterClass< ? >> C getParameterClass(String name) throws MacroParameterException;
+    <C extends MacroParameterDescriptor< ? >> C getParameterClass(String name) throws MacroParameterException;
 
     /**
      * @param <T> the type of value returned by parameter object.

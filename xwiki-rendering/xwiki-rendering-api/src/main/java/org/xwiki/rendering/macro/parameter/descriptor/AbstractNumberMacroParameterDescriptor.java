@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.classes;
+package org.xwiki.rendering.macro.parameter.descriptor;
 
 /**
  * Describe a macro parameter that can be a number.
@@ -25,8 +25,8 @@ package org.xwiki.rendering.macro.parameter.classes;
  * @param <T> the type of number.
  * @version $Id: $
  */
-public abstract class AbstractNumberMacroParameterClass<T extends Number> extends AbstractMacroParameterClass<T>
-    implements NumberMacroParameterClass<T>
+public abstract class AbstractNumberMacroParameterDescriptor<T extends Number> extends
+    AbstractMacroParameterDescriptor<T> implements NumberMacroParameterDescriptor<T>
 {
     /**
      * The lowest possible value of the parameter.
@@ -48,7 +48,7 @@ public abstract class AbstractNumberMacroParameterClass<T extends Number> extend
      * @param descritpion the description of the parameter.
      * @param def the default value. Have to be not null.
      */
-    public AbstractNumberMacroParameterClass(String name, String descritpion, T def)
+    public AbstractNumberMacroParameterDescriptor(String name, String descritpion, T def)
     {
         super(name, descritpion, def);
     }
@@ -80,7 +80,7 @@ public abstract class AbstractNumberMacroParameterClass<T extends Number> extend
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.NumberMacroParameterClass#getMaxValue()
+     * @see org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescriptor#getMaxValue()
      */
     public T getMaxValue()
     {
@@ -99,7 +99,7 @@ public abstract class AbstractNumberMacroParameterClass<T extends Number> extend
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.classes.NumberMacroParameterClass#isNormalized()
+     * @see org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescriptor#isNormalized()
      */
     public boolean isNormalized()
     {

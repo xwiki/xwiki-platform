@@ -17,10 +17,10 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.instances;
+package org.xwiki.rendering.macro.parameter.instance;
 
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Convert parameter String value to <code>boolean</code>.
@@ -33,7 +33,7 @@ public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
      * @param parameterClass the macro parameter descriptor.
      * @param stringValue the value as String from parser.
      */
-    public BooleanMacroParameter(MacroParameterClass<Boolean> parameterClass, String stringValue)
+    public BooleanMacroParameter(MacroParameterDescriptor<Boolean> parameterClass, String stringValue)
     {
         super(parameterClass, stringValue);
     }

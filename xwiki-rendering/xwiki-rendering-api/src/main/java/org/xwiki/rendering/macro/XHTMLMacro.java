@@ -31,7 +31,7 @@ import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.parameter.classes.MacroParameterClass;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.parser.Parser;
 
 /**
@@ -45,7 +45,7 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     /**
      * The TOC macro parameters manager.
      */
-    private XHTMLMacroParameterCollection macroParameters = new XHTMLMacroParameterCollection();
+    private XHTMLMacroParameterManager macroParameters = new XHTMLMacroParameterManager();
 
     /**
      * Injected by the Component Manager.
@@ -84,7 +84,7 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
      * 
      * @see Macro#getAllowedParameters()
      */
-    public Map<String, MacroParameterClass< ? >> getAllowedParameters()
+    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
     {
         // We send a copy of the map and not our map since we don't want it to be modified.
         return this.macroParameters.getParametersClasses();

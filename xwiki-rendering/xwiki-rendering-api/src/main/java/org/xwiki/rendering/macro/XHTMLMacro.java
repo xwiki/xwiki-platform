@@ -30,7 +30,6 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -93,7 +92,7 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     /**
      * {@inheritDoc}
      * 
-     * @see Macro#execute(Map, String, org.xwiki.rendering.block.XDOM)
+     * @see Macro#execute(Map, String, MacroTransformationContext)
      */
     public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
@@ -104,7 +103,7 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
         this.macroParameters.load(parameters);
 
         // Check if the user has asked to escape wiki syntax or not
-        boolean escapeWikiSyntax = this.macroParameters.isEscapeWikiSyntax();
+        boolean escapeWikiSyntax = this.macroParameters.isWikiSyntaxEscaped();
 
         XMLBlockConverterHandler handler;
         try {

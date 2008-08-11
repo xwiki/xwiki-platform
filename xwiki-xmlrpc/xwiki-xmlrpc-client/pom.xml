@@ -33,23 +33,6 @@
   <name>XWiki Platform - Core - XMLRPC client</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - XMLRPC client</description>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <!-- These classes do not contain tests. But since they have the word 'Test' in their name
-                 Surefire tries to launch them. We have to explicitly tell him to exclude them. -->
-          <excludes>
-            <exclude>**/AbstractXWikiXmlRpcTest.java</exclude>
-            <exclude>**/TestUtils.java</exclude>
-            <exclude>**/TestConstants.java</exclude>
-          </excludes>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <dependencies>
     <dependency>
       <groupId>org.codehaus.swizzle</groupId>

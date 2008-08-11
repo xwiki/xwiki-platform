@@ -92,7 +92,7 @@ public class XHTMLMacroParameterManager
      * @return indicate if the user has asked to escape wiki syntax or not.
      * @exception MacroParameterException error when converting value.
      */
-    public boolean isEscapeWikiSyntax() throws MacroParameterException
+    public boolean isWikiSyntaxEscaped() throws MacroParameterException
     {
         return this.macroParameterManager.<Boolean> getParameterValue(PARAM_ESCAPEWIKISYNTAX);
     }

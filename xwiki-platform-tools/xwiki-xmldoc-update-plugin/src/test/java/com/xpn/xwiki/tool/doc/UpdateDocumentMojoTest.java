@@ -21,58 +21,48 @@ package com.xpn.xwiki.tool.doc;
 
 import java.io.File;
 import java.io.FileReader;
-import java.io.IOException;
 import java.net.URL;
-
-import org.apache.maven.plugin.MojoExecutionException;
 
 import com.xpn.xwiki.doc.XWikiDocument;
 
 import junit.framework.TestCase;
 
 /**
- * Test for {@link AbstractDocumentMojo}
+ * Tests for {@link AbstractDocumentMojo}.
  * 
  * @version $Id: $
  */
 public class UpdateDocumentMojoTest extends TestCase
 {
-
     /**
      * Test that a document loaded in memory from XML by the mojo then written back to XML does not lose any
      * information/is not affected by the process
      */
-    public void testXMLDocumentLoading()
+    public void testXMLDocumentLoading() throws Exception
     {
         AttachMojo mojo = new AttachMojo();
+
         URL resURL = this.getClass().getResource("/SampleWikiXMLDocument.input");
-        try {
-            File resourceFile = new File(resURL.getPath());
-            XWikiDocument doc = mojo.loadFromXML(resourceFile);
-            FileReader fr = new FileReader(resourceFile);
-            char[] bytes = new char[(int) resourceFile.length()];
-            fr.read(bytes);
-            String inputContent = new String(bytes);
+        File resourceFile = new File(resURL.getPath());
+        FileReader fr = new FileReader(resourceFile);
+        char[] bytes = new char[(int) resourceFile.length()];
+        fr.read(bytes);
+        String inputContent = new String(bytes);
 
-            assertTrue(inputContent.contains("<class>"));
-            assertEquals(doc.getName(), "Install");
+        assertTrue(inputContent.contains("<class>"));
 
-            File outputFile = File.createTempFile("output", "xml");
-            mojo.writeToXML(doc, outputFile);
+        XWikiDocument doc = mojo.loadFromXML(resourceFile);
+        assertEquals(doc.getName(), "Install");
 
-            fr = new FileReader(outputFile);
-            bytes = new char[(int) outputFile.length()];
-            fr.read(bytes);
-            String outputContent = new String(bytes);
+        File outputFile = File.createTempFile("output", "xml");
+        mojo.writeToXML(doc, outputFile);
 
-            // Check that we did not lose the class definition during the loading from XML/writing to XML process.
-            assertTrue(outputContent.contains("<class>"));
-        } catch (MojoExecutionException e) {
-            fail();
-        } catch (IOException e) {
-            fail("Could not load wiki xml document resource file.");
-        }
+        fr = new FileReader(outputFile);
+        bytes = new char[(int) outputFile.length()];
+        fr.read(bytes);
+        String outputContent = new String(bytes);
 
+        // Check that we did not lose the class definition during the loading from XML/writing to XML process.
+        assertTrue(outputContent.contains("<class>"));
     }
-
 }

@@ -49,10 +49,5 @@
       <artifactId>doxia-module-twiki</artifactId>
       <version>1.0-alpha-11</version>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.doxia</groupId>
-      <artifactId>doxia-module-itext</artifactId>
-      <version>1.0-alpha-11</version>
-    </dependency>
   </dependencies>
 </project>

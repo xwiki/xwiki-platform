@@ -58,9 +58,8 @@ public interface MacroParameterManager
      * @param <D> the type of MacroParameterClass child class to return.
      * @param name the name of the parameter.
      * @return the parameter class.
-     * @throws MacroParameterException error when trying to get macro parameter class.
      */
-    <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name) throws MacroParameterException;
+    <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name);
 
     /**
      * @param <T> the type of value returned by parameter object.

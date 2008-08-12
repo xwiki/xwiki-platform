@@ -71,7 +71,7 @@ public class DefaultMacroParameterManager implements MacroParameterManager
         this.parameterMap.clear();
 
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            MacroParameterDescriptor< ? > parameterClass = this.parameterDescriptorMap.get(entry.getKey());
+            MacroParameterDescriptor< ? > parameterClass = getParameterDescriptor(entry.getKey());
 
             if (parameterClass != null) {
                 this.parameterMap.put(entry.getKey().toLowerCase(), parameterClass.newInstance(entry.getValue()));
@@ -97,7 +97,6 @@ public class DefaultMacroParameterManager implements MacroParameterManager
      * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParameterDescriptor(java.lang.String)
      */
     public <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name)
-        throws MacroParameterException
     {
         return (D) this.parameterDescriptorMap.get(name.toLowerCase());
     }

@@ -19,7 +19,9 @@
  */
 package org.xwiki.rendering.block;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.rendering.block.Block;
@@ -38,16 +40,58 @@ public class BlockTest extends TestCase
 {
     public void testGetBlocksByType()
     {
-        ParagraphBlock pb1 = new ParagraphBlock(new SectionBlock(
-            Arrays.asList(new Block[] {new WordBlock("title1")}), SectionLevel.LEVEL1));
-        ParagraphBlock pb2 = new ParagraphBlock(new SectionBlock(
-            Arrays.asList(new Block[] {new WordBlock("title2")}), SectionLevel.LEVEL2));
+        ParagraphBlock pb1 =
+            new ParagraphBlock(new SectionBlock(Arrays.asList(new Block[] {new WordBlock("title1")}),
+                SectionLevel.LEVEL1));
+        ParagraphBlock pb2 =
+            new ParagraphBlock(new SectionBlock(Arrays.asList(new Block[] {new WordBlock("title2")}),
+                SectionLevel.LEVEL2));
         ParagraphBlock pb3 = new ParagraphBlock(Arrays.asList(new Block[] {pb1, pb2}));
-        
+
         List<SectionBlock> results = pb1.getChildrenByType(SectionBlock.class);
         assertEquals(1, results.size());
 
         results = pb3.getChildrenByType(SectionBlock.class);
         assertEquals(2, results.size());
+    }
+
+    public void testAddChildAfter()
+    {
+        Block wb1 = new WordBlock("block1");
+        Block wb2 = new WordBlock("block2");
+        
+        List<Block> children = new ArrayList<Block>();
+        children.add(wb1);
+        children.add(wb2);
+        
+        ParagraphBlock pb = new ParagraphBlock(children);
+        
+        Block wb = new WordBlock("block");
+        
+        pb.addChildAfter(wb, wb1);
+        assertSame(wb, pb.getChildren().get(1));
+        
+        pb.addChildAfter(wb, wb2);
+        assertSame(wb, pb.getChildren().get(3));
+    }
+    
+    public void testAddChildBefore()
+    {
+        Block wb1 = new WordBlock("block1");
+        Block wb2 = new WordBlock("block2");
+        
+        List<Block> children = new ArrayList<Block>();
+        children.add(wb1);
+        children.add(wb2);
+        
+        ParagraphBlock pb = new ParagraphBlock(children);
+        
+        Block wb = new WordBlock("block");
+        
+        pb.addChildBefore(wb, wb1);
+        assertSame(wb, pb.getChildren().get(0));
+        
+        pb.addChildBefore(wb, wb2);
+        assertSame(wb, pb.getChildren().get(2));
     }
 }

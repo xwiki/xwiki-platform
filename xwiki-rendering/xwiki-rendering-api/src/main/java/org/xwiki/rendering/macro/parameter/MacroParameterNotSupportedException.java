@@ -3,7 +3,7 @@ package org.xwiki.rendering.macro.parameter;
 /**
  * Encapsulate macro parameter error when using to get not not supported parameter in the current macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class MacroParameterNotSupportedException extends MacroParameterException

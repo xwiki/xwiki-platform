@@ -28,7 +28,7 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 /**
  * Base class to parse and convert macro parameters values into more readable java values (like boolean, int etc.).
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class DefaultMacroParameterManager implements MacroParameterManager
 {

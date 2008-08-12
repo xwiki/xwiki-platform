@@ -4,7 +4,7 @@ package org.xwiki.rendering.macro.parameter.descriptor;
  * Describe a macro parameter that can be a number.
  * 
  * @param <T> the type of number.
- * @version $Id: $
+ * @version $Id$
  */
 public interface NumberMacroParameterDescriptor<T> extends MacroParameterDescriptor<T>
 {

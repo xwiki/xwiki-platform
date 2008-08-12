@@ -24,7 +24,7 @@ import org.xwiki.rendering.macro.parameter.instance.IntegerMacroParameter;
 /**
  * Describe a macro parameter that can be a number.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class IntegerMacroParameterDescriptor extends AbstractNumberMacroParameterDescriptor<Integer>
 {

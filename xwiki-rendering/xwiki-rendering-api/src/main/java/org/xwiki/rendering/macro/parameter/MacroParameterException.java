@@ -5,7 +5,7 @@ import org.xwiki.rendering.macro.MacroExecutionException;
 /**
  * Encapsulate macro parameter error.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class MacroParameterException extends MacroExecutionException

@@ -32,14 +32,14 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 /**
  * Parse and convert TOC macro parameters values into more readable java values (like boolean, int etc.).
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
 public class TocMacroParameterManager
 {
     /**
-     * @version $Id: $
+     * @version $Id$
      */
     public enum Scope
     {

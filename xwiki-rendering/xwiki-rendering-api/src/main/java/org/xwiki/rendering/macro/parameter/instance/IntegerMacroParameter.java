@@ -25,7 +25,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescri
  * Convert parameter String value to <code>int</code>, <code>long</code>, <code>float</code> or
  * <code>double</code>.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
 {

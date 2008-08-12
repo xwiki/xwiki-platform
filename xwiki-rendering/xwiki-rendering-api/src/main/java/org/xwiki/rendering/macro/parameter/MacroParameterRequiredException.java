@@ -3,7 +3,7 @@ package org.xwiki.rendering.macro.parameter;
 /**
  * Encapsulate macro parameter error when can't found a required parameter.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class MacroParameterRequiredException extends MacroParameterException

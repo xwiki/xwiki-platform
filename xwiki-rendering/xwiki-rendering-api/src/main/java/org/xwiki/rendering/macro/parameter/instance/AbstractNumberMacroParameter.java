@@ -26,7 +26,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescri
  * Base class for converting parameter String value to number.
  * 
  * @param <T> the type of number.
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractNumberMacroParameter<T extends Number> extends AbstractMacroParameter<T>
 {

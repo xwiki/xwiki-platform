@@ -23,7 +23,7 @@ package org.xwiki.rendering.macro.parameter.descriptor;
  * Base class for macro parameter descriptor.
  * 
  * @param <T> the type of the value after conversion.
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractMacroParameterDescriptor<T> implements MacroParameterDescriptor<T>
 {

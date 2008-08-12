@@ -26,7 +26,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
  * Base class for macro parameters String values converter.
  * 
  * @param <T> the type of the value after conversion.
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
 {

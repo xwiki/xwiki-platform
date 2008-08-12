@@ -25,7 +25,7 @@ import org.xwiki.rendering.macro.parameter.instance.StringMacroParameter;
 /**
  * Describe a macro parameter that can be a String.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class StringMacroParameterDescriptor extends AbstractMacroParameterDescriptor<String>
 {

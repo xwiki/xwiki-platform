@@ -23,7 +23,7 @@ package org.xwiki.rendering.macro.parameter.descriptor;
  * Describe a macro parameter that can be a number.
  * 
  * @param <T> the type of number.
- * @version $Id: $
+ * @version $Id$
  */
 public abstract class AbstractNumberMacroParameterDescriptor<T extends Number> extends
     AbstractMacroParameterDescriptor<T> implements NumberMacroParameterDescriptor<T>

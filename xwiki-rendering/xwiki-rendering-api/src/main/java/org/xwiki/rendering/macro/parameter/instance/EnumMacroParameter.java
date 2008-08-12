@@ -26,7 +26,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
  * Convert parameter String value to provided Enum class entry.
  * 
  * @param <T> the type of the Enum.
- * @version $Id: $
+ * @version $Id$
  */
 public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParameter<T>
 {

@@ -25,7 +25,7 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
  * Macro parameter descriptor.
  * 
  * @param <T> the type of the value after conversion.
- * @version $Id: $
+ * @version $Id$
  */
 public interface MacroParameterDescriptor<T>
 {

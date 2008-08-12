@@ -5,7 +5,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 /**
  * Macro parameter with String value.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class StringMacroParameter extends AbstractMacroParameter<String>
 {

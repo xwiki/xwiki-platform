@@ -25,7 +25,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 /**
  * Convert parameter String value to <code>boolean</code>.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
 {

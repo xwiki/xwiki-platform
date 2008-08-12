@@ -25,7 +25,7 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 /**
  * Describe a macro parameter that can be true or false.
  * 
- * @version $Id: $
+ * @version $Id$
  */
 public class BooleanMacroParameterDescriptor extends AbstractMacroParameterDescriptor<Boolean>
 {

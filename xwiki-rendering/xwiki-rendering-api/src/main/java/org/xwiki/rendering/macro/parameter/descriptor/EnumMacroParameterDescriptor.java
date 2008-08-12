@@ -28,7 +28,7 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
  * Describe a macro parameter that can be one of the value of the provided Enum class.
  * 
  * @param <T> the type of the Enum.
- * @version $Id: $
+ * @version $Id$
  */
 public class EnumMacroParameterDescriptor<T extends Enum<T>> extends AbstractMacroParameterDescriptor<T>
 {

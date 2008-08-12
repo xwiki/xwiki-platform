@@ -23,14 +23,20 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
+import org.xwiki.rendering.block.IdBlock;
+import org.xwiki.rendering.block.LinkBlock;
 import org.xwiki.rendering.block.ListBLock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.SectionBlock;
+import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.TocMacroParameterManager.Scope;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -134,6 +140,33 @@ public class TocMacro extends AbstractMacro
     }
 
     /**
+     * @return e new {@link IdBlock} with a unique name.
+     */
+    private IdBlock newUniqueIdBlock()
+    {
+        return new IdBlock("I" + UUID.randomUUID().toString());
+    }
+
+    /**
+     * @param blocks the block to convert.
+     * @return a merge of the provided list of blocks as String.
+     */
+    // TODO: remove this when LinkBlock will support children blocks as label
+    private String getLabelFromChildren(List<Block> blocks)
+    {
+        StringBuffer label = new StringBuffer();
+        for (Block block : blocks) {
+            if (block instanceof WordBlock) {
+                label.append(((WordBlock) block).getWord());
+            } else if (block instanceof SpaceBlock) {
+                label.append(' ');
+            }
+        }
+
+        return label.toString();
+    }
+
+    /**
      * Convert sections into list block tree.
      * 
      * @param sections the sections to convert.
@@ -146,13 +179,23 @@ public class TocMacro extends AbstractMacro
     {
         int currentLevel = 0;
         Block currentBlock = null;
-        for (SectionBlock section : sections) {
-            int level = section.getLevel().getAsInt();
+        for (SectionBlock sectionBlock : sections) {
+            int level = sectionBlock.getLevel().getAsInt();
 
             if (level >= start && level <= depth) {
-                // TODO: insert title in a local link pointing on section
+                IdBlock idBlock = newUniqueIdBlock();
+                sectionBlock.getParent().insertChildBefore(idBlock, sectionBlock);
 
-                ListItemBlock itemBlock = new ListItemBlock(section.getChildren());
+                Link link = new Link();
+                link.setAnchor(idBlock.getName());
+                LinkBlock linkBlock = new LinkBlock(link);
+
+                linkBlock.addChildren(sectionBlock.getChildren());
+
+                // TODO: remove this when LinkBlock will support children blocks as label
+                link.setLabel(getLabelFromChildren(sectionBlock.getChildren()));
+
+                ListItemBlock itemBlock = new ListItemBlock(linkBlock);
 
                 if (currentLevel < level) {
                     while (currentLevel < level) {

@@ -21,10 +21,17 @@
 
 package com.xpn.xwiki.objects;
 
+import com.xpn.xwiki.XWikiContext;
+
 import java.io.Serializable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
-public abstract class BaseElement implements ElementInterface, Serializable {
+public abstract class BaseElement implements ElementInterface, Serializable
+{
+    private static final Log LOG = LogFactory.getLog(BaseElement.class);
+
     private String name;
     private String prettyName;
     private String wiki;
@@ -44,7 +51,7 @@ public abstract class BaseElement implements ElementInterface, Serializable {
     public void setPrettyName(String name) {
         this.prettyName = name;
     }
-    
+
     /**
      * @return the name of the wiki where this element is stored. If null, the context's wiki is used.
      */
@@ -117,4 +124,20 @@ public abstract class BaseElement implements ElementInterface, Serializable {
         return null;
     }
 
+    /**
+     * @return the syntax id of the document containing this element. If an error occurs while retrieving the
+     *         document a syntax id of "xwiki/1.0" is assumed.
+     */
+    public String getDocumentSyntaxId(XWikiContext context)
+    {
+        String syntaxId;
+        try {
+            syntaxId = context.getWiki().getDocument(getName(), context).getSyntaxId();
+        } catch (Exception e) {
+            LOG.warn("Error while getting the syntax corresponding to object [" + getName()
+                + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
+            syntaxId = "xwiki/1.0";
+        }
+        return syntaxId;
+    }
 }

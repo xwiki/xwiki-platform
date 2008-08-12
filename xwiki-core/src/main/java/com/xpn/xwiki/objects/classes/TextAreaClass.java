@@ -23,8 +23,6 @@ package com.xpn.xwiki.objects.classes;
 
 import org.apache.ecs.xhtml.textarea;
 import org.apache.velocity.VelocityContext;
-import org.apache.commons.logging.LogFactory;
-import org.apache.commons.logging.Log;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.objects.BaseCollection;
@@ -34,8 +32,6 @@ import com.xpn.xwiki.objects.meta.PropertyMetaClass;
 
 public class TextAreaClass extends StringClass
 {
-    private static final Log LOG = LogFactory.getLog(TextAreaClass.class);
-
     public TextAreaClass(PropertyMetaClass wclass) {
         super("textarea", "Text Area", wclass);
         setSize(40);
@@ -149,32 +145,29 @@ public class TextAreaClass extends StringClass
         buffer.append(textarea.toString());
     }
 
-    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context) {
-        // String editor = getEditor();
+    public void displayView(StringBuffer buffer, String name, String prefix, BaseCollection object, XWikiContext context)
+    {
         String contentType = getContentType();
         XWikiDocument doc = context.getDoc();
 
         if ((contentType != null) && (doc != null) && (contentType.equals("puretext"))) {
             super.displayView(buffer, name, prefix, object, context);
         } else if ((contentType != null) && (context.getWiki() != null) && (contentType.equals("velocitycode"))) {
-            StringBuffer sbuf = new StringBuffer();
-            super.displayView(sbuf, name, prefix, object, context);
-            buffer.append(context.getWiki().parseContent(sbuf.toString(), context));
-        } else {
-            StringBuffer sbuf = new StringBuffer();
-            super.displayView(sbuf, name, prefix, object, context);
-            if (doc != null) {
-                String syntaxId;
-                try {
-                    syntaxId = context.getWiki().getDocument(object.getName(), context).getSyntaxId();
-                } catch (Exception e) {
-                    LOG.warn("Error while getting the syntax corresponding to object [" + object.getClassName()
-                        + "]. Defaulting to using XWiki 1.0 syntax. Internal error [" + e.getMessage() + "]");
-                    syntaxId = "xwiki/1.0";
-                }
-                buffer.append(doc.getRenderedContent(sbuf.toString(), syntaxId, context));
+            StringBuffer result = new StringBuffer();
+            super.displayView(result, name, prefix, object, context);
+            if (object.getDocumentSyntaxId(context).equals("xwiki/1.0")) {
+                buffer.append(context.getWiki().parseContent(result.toString(), context));
             } else {
-                buffer.append(sbuf.toString());
+                // Don't do anything since this mode is deprecated and not supported in the new rendering.
+                buffer.append(result);
+            }
+        } else {
+            StringBuffer result = new StringBuffer();
+            super.displayView(result, name, prefix, object, context);
+            if (doc != null) {
+                buffer.append(doc.getRenderedContent(result.toString(), object.getDocumentSyntaxId(context), context));
+            } else {
+                buffer.append(result);
             }
         }
     }

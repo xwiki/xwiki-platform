@@ -51,7 +51,7 @@ public class IncludeMacro extends AbstractMacro implements Initializable
     private static final String DESCRIPTION = "Include other pages into the current page.";
 
     /**
-     * The TOC macro parameters manager.
+     * Handles parameters for this macro.
      */
     private IncludeMacroParameterManager macroParameters = new IncludeMacroParameterManager();
 
@@ -176,6 +176,8 @@ public class IncludeMacro extends AbstractMacro implements Initializable
             ExecutionContext ec = new ExecutionContext();
             this.executionContextInitializerManager.initialize(ec);
             this.execution.pushContext(ec);
+            // TODO: Need to set the current document, space and wiki. This is required for wiki syntax acting on
+            // documents. For example if a link says "WebHome" it should point to the webhome of the current space.
             result = generateIncludedPageDOM(includedDocumentName, includedContent, true);
         } catch (ExecutionContextInitializerException e) {
             throw new MacroExecutionException("Failed to create new Execution Context for included page ["

@@ -1479,10 +1479,9 @@ public class XWikiDocument
                 pclass.displayView(result, fieldname, prefix, obj, context);
             } else if (type.equals("rendered")) {
                 String fcontent = pclass.displayView(fieldname, prefix, obj, context);
-                // TODO: There's a problem in that the TextAreaClass does rendering in its displayView method
-                // and thus if we render again here then the text is going to be rendered twice. This was working ok
-                // with the 1.0 syntac but it's not with the 2.0 syntax thus make sure to render only once with the
-                // 2.0 syntax.
+                // This mode is deprecated for the new rendering and should also be removed for the old rendering
+                // since the way to implement this now is to choose the type of rendering to do in the class itself.
+                // Thus for the new renderinfg we simply make this mode work like the "view" mode.
                 if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
                     result.append(getRenderedContent(fcontent, getSyntaxId(), context));
                 } else {
@@ -1491,8 +1490,8 @@ public class XWikiDocument
             } else if (type.equals("edit")) {
                 context.addDisplayedField(fieldname);
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
-                // rendering using the pre macro. In the new rendering system it's the user who decides what he wants
-                // by using either the nowiki macro or the xhtml macro with escapeWikiSyntax set to true or false.
+                // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
+                // escaping. For example for a textarea check the TextAreaClass class.
                 if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
                     result.append("{pre}");
                 }
@@ -1502,8 +1501,8 @@ public class XWikiDocument
                 }
             } else if (type.equals("hidden")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
-                // rendering using the pre macro. In the new rendering system it's the user who decides what he wants
-                // by using either the nowiki macro or the xhtml macro with escapeWikiSyntax set to true or false.
+                // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
+                // escaping. For example for a textarea check the TextAreaClass class.
                 if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
                     result.append("{pre}");
                 }
@@ -1513,8 +1512,8 @@ public class XWikiDocument
                 }
             } else if (type.equals("search")) {
                 // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem and prevent wiki syntax
-                // rendering using the pre macro. In the new rendering system it's the user who decides what he wants
-                // by using either the nowiki macro or the xhtml macro with escapeWikiSyntax set to true or false.
+                // rendering using the pre macro. In the new rendering system it's the XWiki Class itself that does the
+                // escaping. For example for a textarea check the TextAreaClass class.
                 if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
                     result.append("{pre}");
                 }

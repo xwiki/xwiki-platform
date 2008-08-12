@@ -22,8 +22,7 @@ package org.xwiki.rendering.macro;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.EscapeBlock;
+import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -83,6 +82,6 @@ public class NoWikiMacro extends AbstractMacro implements Initializable
     public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Arrays.asList((Block) new EscapeBlock(content));
+        return Arrays.asList((Block) new WordBlock(content));
     }
 }

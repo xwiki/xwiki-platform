@@ -307,7 +307,7 @@ public class XHTMLRenderer implements Renderer
 
     public void onId(String name)
     {
-        write("<a id=\"" + name + "\" name=\"" + name + "\"/>");
+        write("<a id=\"" + name + "\" name=\"" + name + "\"></a>");
     }
 
     protected void write(String text)

@@ -22,7 +22,6 @@ package org.xwiki.rendering.macro;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 
 import java.util.List;
 import java.util.Collections;

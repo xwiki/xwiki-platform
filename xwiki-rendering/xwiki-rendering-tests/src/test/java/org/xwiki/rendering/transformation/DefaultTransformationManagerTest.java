@@ -19,10 +19,7 @@
  */
 package org.xwiki.rendering.transformation;
 
-import java.util.Collections;
-
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
-import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;

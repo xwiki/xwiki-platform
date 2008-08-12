@@ -22,20 +22,18 @@ package org.xwiki.rendering.macro;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.DocumentManager;
 import org.xwiki.velocity.VelocityManager;
 import org.jmock.Mock;
 
 import java.util.List;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.io.StringWriter;
 
 /**
  * Unit tests for {@link IncludeMacro}.
- *
+ * 
  * @version $Id$
  * @since 1.5M2
  */

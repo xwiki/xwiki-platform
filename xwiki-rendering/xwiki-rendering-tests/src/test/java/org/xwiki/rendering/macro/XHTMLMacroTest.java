@@ -27,7 +27,6 @@ import java.util.HashMap;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.macro.XHTMLMacro}.
@@ -62,7 +61,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endDocument\n";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, MacroTransformationContext.EMPTY);
+        List<Block> blocks = macro.execute(Collections.<String, String> emptyMap(), html, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -79,7 +78,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endDocument\n";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, MacroTransformationContext.EMPTY);
+        List<Block> blocks = macro.execute(Collections.<String, String> emptyMap(), html, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -121,7 +120,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endDocument\n";
 
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks = macro.execute(Collections.EMPTY_MAP, html, MacroTransformationContext.EMPTY);
+        List<Block> blocks = macro.execute(Collections.<String, String> emptyMap(), html, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }

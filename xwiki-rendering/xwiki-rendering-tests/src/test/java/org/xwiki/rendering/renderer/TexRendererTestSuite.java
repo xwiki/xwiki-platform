@@ -25,7 +25,6 @@ import junit.framework.TestCase;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.scaffolding.ParserListenerTestSuite;
-import org.xwiki.rendering.wikimodel.renderer.TexRenderer;
 
 /**
  * @version $Id: $

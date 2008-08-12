@@ -66,7 +66,7 @@ public interface Block
      * @param nextBlock the child block that will be just after the added block
      * @since 1.6M1
      */
-    void insertChildBefore(Block blocToInsert, Block nextBlock);
+    void insertChildBefore(Block blockToInsert, Block nextBlock);
 
     /**
      * Helper method to add a single child block to the current block after the provided existing child block. For

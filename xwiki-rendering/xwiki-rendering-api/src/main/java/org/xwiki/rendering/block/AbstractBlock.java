@@ -63,14 +63,14 @@ public abstract class AbstractBlock implements Block
      * @see org.xwiki.rendering.block.Block#insertChildBefore(org.xwiki.rendering.block.Block,
      *      org.xwiki.rendering.block.Block)
      */
-    public void insertChildBefore(Block blocToInsert, Block nextBlock)
+    public void insertChildBefore(Block blockToInsert, Block nextBlock)
     {
-        blocToInsert.setParent(this);
+        blockToInsert.setParent(this);
 
         if (nextBlock == null) {
-            this.childrenBlocks.add(blocToInsert);
+            this.childrenBlocks.add(blockToInsert);
         } else {
-            this.childrenBlocks.add(this.childrenBlocks.indexOf(nextBlock), blocToInsert);
+            this.childrenBlocks.add(this.childrenBlocks.indexOf(nextBlock), blockToInsert);
         }
     }
 
@@ -80,14 +80,14 @@ public abstract class AbstractBlock implements Block
      * @see org.xwiki.rendering.block.Block#insertChildAfter(org.xwiki.rendering.block.Block,
      *      org.xwiki.rendering.block.Block)
      */
-    public void insertChildAfter(Block blocToInsert, Block previousBlock)
+    public void insertChildAfter(Block blockToInsert, Block previousBlock)
     {
-        blocToInsert.setParent(this);
+        blockToInsert.setParent(this);
 
         if (previousBlock == null) {
-            this.childrenBlocks.add(blocToInsert);
+            this.childrenBlocks.add(blockToInsert);
         } else {
-            this.childrenBlocks.add(this.childrenBlocks.indexOf(previousBlock) + 1, blocToInsert);
+            this.childrenBlocks.add(this.childrenBlocks.indexOf(previousBlock) + 1, blockToInsert);
         }
     }
 

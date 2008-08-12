@@ -730,6 +730,24 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>clover</id>
+      <build>
+        <plugins>
+          <!-- We need to skip AspectJ execution when Clover is executed since AspectJ doesn't like
+               clovered code -->
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>aspectj-maven-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/*.*</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 </project>
 

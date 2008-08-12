@@ -43,40 +43,40 @@ public interface Block
     void traverse(Listener listener);
 
     /**
-     * Helper method to add a single child block to the current block. For adding several blocks at once use
-     * {@link #addChildren(java.util.List)}.
+     * Helper method to add a single child block to the end of the children list of the current block. For adding
+     * several blocks at once use {@link #addChildren(java.util.List)}.
      * 
-     * @param block the child block to add
+     * @param blockToAdd the child block to add
      */
-    void addChild(Block block);
+    void addChild(Block blockToAdd);
 
     /**
-     * Adds several children blocks to the current block. For example a bold sentence is made up of a Bold block to
-     * which the different words making up the text have been added to.
+     * Adds several children blocks to the end of the children list of the current block. For example a bold sentence is
+     * made up of a Bold block to which the different words making up the text have been added to.
      * 
-     * @param blocks the children blocks to add
+     * @param blocksToAdd the children blocks to add
      */
-    void addChildren(List< ? extends Block> blocks);
+    void addChildren(List< ? extends Block> blocksToAdd);
 
     /**
      * Helper method to add a single child block to the current block before the provided existing child block. For
      * adding several blocks at once use {@link #addChildren(java.util.List)}.
      * 
-     * @param block the child block to add
+     * @param blocToInsert the child block to add
      * @param nextBlock the child block that will be just after the added block
      * @since 1.6M1
      */
-    void addChildBefore(Block block, Block nextBlock);
+    void insertChildBefore(Block blocToInsert, Block nextBlock);
 
     /**
      * Helper method to add a single child block to the current block after the provided existing child block. For
      * adding several blocks at once use {@link #addChildren(java.util.List)}.
      * 
-     * @param block the child block to add
+     * @param blockToInsert the child block to add
      * @param previousBlock the child block that will be just before the added block
      * @since 1.6M1
      */
-    void addChildAfter(Block block, Block previousBlock);
+    void insertChildAfter(Block blockToInsert, Block previousBlock);
 
     /**
      * Get the parent block. All blocks have a parent and the top level parent is the {@link XDOM} object.

@@ -40,9 +40,9 @@ public abstract class AbstractBlock implements Block
      * 
      * @see org.xwiki.rendering.block.Block#addChild(org.xwiki.rendering.block.Block)
      */
-    public void addChild(Block block)
+    public void addChild(Block blockToAdd)
     {
-        addChildAfter(block, null);
+        insertChildAfter(blockToAdd, null);
     }
 
     /**
@@ -50,44 +50,44 @@ public abstract class AbstractBlock implements Block
      * 
      * @see org.xwiki.rendering.block.Block#addChildren(java.util.List)
      */
-    public void addChildren(List< ? extends Block> blocks)
+    public void addChildren(List< ? extends Block> blocksToAdd)
     {
-        for (Block block : blocks) {
-            this.addChild(block);
+        for (Block blockToAdd : blocksToAdd) {
+            this.addChild(blockToAdd);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.Block#addChildBefore(org.xwiki.rendering.block.Block,
+     * @see org.xwiki.rendering.block.Block#insertChildBefore(org.xwiki.rendering.block.Block,
      *      org.xwiki.rendering.block.Block)
      */
-    public void addChildBefore(Block block, Block nextBlock)
+    public void insertChildBefore(Block blocToInsert, Block nextBlock)
     {
-        block.setParent(this);
+        blocToInsert.setParent(this);
 
         if (nextBlock == null) {
-            this.childrenBlocks.add(block);
+            this.childrenBlocks.add(blocToInsert);
         } else {
-            this.childrenBlocks.add(this.childrenBlocks.indexOf(nextBlock), block);
+            this.childrenBlocks.add(this.childrenBlocks.indexOf(nextBlock), blocToInsert);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.Block#addChildAfter(org.xwiki.rendering.block.Block,
+     * @see org.xwiki.rendering.block.Block#insertChildAfter(org.xwiki.rendering.block.Block,
      *      org.xwiki.rendering.block.Block)
      */
-    public void addChildAfter(Block block, Block previousBlock)
+    public void insertChildAfter(Block blocToInsert, Block previousBlock)
     {
-        block.setParent(this);
+        blocToInsert.setParent(this);
 
         if (previousBlock == null) {
-            this.childrenBlocks.add(block);
+            this.childrenBlocks.add(blocToInsert);
         } else {
-            this.childrenBlocks.add(this.childrenBlocks.indexOf(previousBlock) + 1, block);
+            this.childrenBlocks.add(this.childrenBlocks.indexOf(previousBlock) + 1, blocToInsert);
         }
     }
 

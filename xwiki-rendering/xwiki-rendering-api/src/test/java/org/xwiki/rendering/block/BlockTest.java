@@ -55,7 +55,7 @@ public class BlockTest extends TestCase
         assertEquals(2, results.size());
     }
 
-    public void testAddChildAfter()
+    public void testInsertChildAfter()
     {
         Block wb1 = new WordBlock("block1");
         Block wb2 = new WordBlock("block2");
@@ -68,14 +68,14 @@ public class BlockTest extends TestCase
         
         Block wb = new WordBlock("block");
         
-        pb.addChildAfter(wb, wb1);
+        pb.insertChildAfter(wb, wb1);
         assertSame(wb, pb.getChildren().get(1));
         
-        pb.addChildAfter(wb, wb2);
+        pb.insertChildAfter(wb, wb2);
         assertSame(wb, pb.getChildren().get(3));
     }
     
-    public void testAddChildBefore()
+    public void testInsertChildBefore()
     {
         Block wb1 = new WordBlock("block1");
         Block wb2 = new WordBlock("block2");
@@ -88,10 +88,10 @@ public class BlockTest extends TestCase
         
         Block wb = new WordBlock("block");
         
-        pb.addChildBefore(wb, wb1);
+        pb.insertChildBefore(wb, wb1);
         assertSame(wb, pb.getChildren().get(0));
         
-        pb.addChildBefore(wb, wb2);
+        pb.insertChildBefore(wb, wb2);
         assertSame(wb, pb.getChildren().get(2));
     }
 }

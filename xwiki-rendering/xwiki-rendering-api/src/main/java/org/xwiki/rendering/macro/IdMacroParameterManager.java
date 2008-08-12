@@ -24,7 +24,6 @@ import java.util.Map;
 import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.MacroParameterManager;
-import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
@@ -38,56 +37,24 @@ import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescri
 public class IdMacroParameterManager
 {
     /**
-     * @version $Id$
-     */
-    public enum Context
-    {
-        /**
-         * Macro executed in its own context.
-         */
-        NEW,
-
-        /**
-         * Macro executed in the context of the current page.
-         */
-        CURRENT;
-    };
-
-    /**
      * The name of the macro parameter "document".
      */
-    private static final String PARAM_DOCUMENT = "document";
+    private static final String PARAM_NAME = "name";
 
     /**
      * The description of the macro parameter "document".
      */
-    private static final String PARAM_DOCUMENT_DESC =
-        "The name of the document to include. For example: \"Space.Page\".";
+    private static final String PARAM_NAME_DESC = "Insert a block with a id that can be targeted.";
 
     /**
      * The default value of the macro parameter "document".
      */
-    private static final String PARAM_DOCUMENT_DEF = null;
+    private static final String PARAM_NAME_DEF = null;
 
     /**
      * The name of the macro parameter "context".
      */
     private static final String PARAM_CONTEXT = "context";
-
-    /**
-     * The description of the macro parameter "context".
-     */
-    private static final String PARAM_CONTEXT_DESC =
-        "Defines whether the included page is executed in its separated "
-            + "execution context or whether it's executed in the contex of the current page. If the value is \""
-            + Context.NEW + "\" then it's executed in its own context. If the value is \"" + Context.CURRENT
-            + "\" it's executed in the context of the current page. This affects for example whether the Velocity "
-            + "variables of the current page will be visible in the included page or not.";
-
-    /**
-     * The default value of the macro parameter "context".
-     */
-    private static final Context PARAM_CONTEXT_DEF = Context.NEW;
 
     /**
      * The macro parameters manager. Parse and transform string value to java objects.
@@ -99,14 +66,10 @@ public class IdMacroParameterManager
      */
     public IdMacroParameterManager()
     {
-        StringMacroParameterDescriptor documentParamClass =
-            new StringMacroParameterDescriptor(PARAM_DOCUMENT, PARAM_DOCUMENT_DESC, PARAM_DOCUMENT_DEF);
-        documentParamClass.setRequired(true);
-        this.macroParameterManager.registerParameterDescriptor(documentParamClass);
-
-        EnumMacroParameterDescriptor<Context> contextParamClass =
-            new EnumMacroParameterDescriptor<Context>(PARAM_CONTEXT, PARAM_CONTEXT_DESC, PARAM_CONTEXT_DEF);
-        this.macroParameterManager.registerParameterDescriptor(contextParamClass);
+        StringMacroParameterDescriptor nameParamClass =
+            new StringMacroParameterDescriptor(PARAM_NAME, PARAM_NAME_DESC, PARAM_NAME_DEF);
+        nameParamClass.setRequired(true);
+        this.macroParameterManager.registerParameterDescriptor(nameParamClass);
     }
 
     /**
@@ -129,21 +92,11 @@ public class IdMacroParameterManager
     // Parameters
 
     /**
-     * @return the name of the document to include.
+     * @return the unique name of the id.
      * @exception MacroParameterException error when converting value.
      */
     public String getName() throws MacroParameterException
     {
-        return this.macroParameterManager.getParameterValue(PARAM_DOCUMENT);
-    }
-
-    /**
-     * @return defines whether the included page is executed in its separated execution context or whether it's executed
-     *         in the contex of the current page.
-     * @exception MacroParameterException error when converting value.
-     */
-    public Context getContext() throws MacroParameterException
-    {
-        return this.macroParameterManager.getParameterValue(PARAM_CONTEXT);
+        return this.macroParameterManager.getParameterValue(PARAM_NAME);
     }
 }

@@ -120,7 +120,7 @@ public class XWikiLDAPUtils
      */
     public String getUidAttributeName()
     {
-        return uidAttributeName;
+        return this.uidAttributeName;
     }
 
     /**
@@ -136,7 +136,7 @@ public class XWikiLDAPUtils
      */
     public Collection<String> getGroupClasses()
     {
-        return groupClasses;
+        return this.groupClasses;
     }
 
     /**
@@ -152,7 +152,7 @@ public class XWikiLDAPUtils
      */
     public Collection<String> getGroupMemberFields()
     {
-        return groupMemberFields;
+        return this.groupMemberFields;
     }
 
     /**
@@ -169,8 +169,8 @@ public class XWikiLDAPUtils
         Cache<Map<String, String>> cache;
 
         String cacheKey =
-            getUidAttributeName() + "." + connection.getConnection().getHost() + ":"
-                + connection.getConnection().getPort();
+            getUidAttributeName() + "." + this.connection.getConnection().getHost() + ":"
+                + this.connection.getConnection().getPort();
 
         Map<String, Cache<Map<String, String>>> cacheMap;
 
@@ -196,7 +196,7 @@ public class XWikiLDAPUtils
      */
     public XWikiLDAPConnection getConnection()
     {
-        return connection;
+        return this.connection;
     }
 
     /**

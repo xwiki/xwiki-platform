@@ -6281,6 +6281,8 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     // time
                     try {
                         correctAttach = rolledbackAttach.getAttachmentRevision(rolledbackAttach.getVersion(), context);
+                        correctAttach.loadContent(context);
+                        correctAttach.loadArchive(context);
                     } catch (Exception e) {
                     }
                 }
@@ -6296,7 +6298,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     XWikiAttachment firstAttach = rolledbackAttach.getAttachmentRevision("1.1", context);
                     firstAttach.setVersion(attach.getVersion());
                     XWikiAttachmentArchive firstArchive =
-                        (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
+                        (XWikiAttachmentArchive) rolledbackAttach.loadArchive(context).clone();
                     firstArchive.setAttachment(firstAttach);
                     firstAttach.setAttachment_archive(firstArchive);
                     rolledbackAttachList.add(firstAttach);
@@ -6305,7 +6307,7 @@ public class XWiki implements XWikiDocChangeNotificationInterface
                     // we need to update the version
                     correctAttach.setVersion(attach.getVersion());
                     XWikiAttachmentArchive correctArchive =
-                        (XWikiAttachmentArchive) rolledbackAttach.getAttachment_archive().clone();
+                        (XWikiAttachmentArchive) rolledbackAttach.loadArchive(context).clone();
                     correctArchive.setAttachment(correctAttach);
                     correctAttach.setAttachment_archive(correctArchive);
                     toRollbackMap.put(rolledbackAttach.getFilename(), correctAttach);

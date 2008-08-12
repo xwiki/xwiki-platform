@@ -64,6 +64,7 @@ public interface Block
      * 
      * @param block the child block to add
      * @param nextBlock the child block that will be just after the added block
+     * @since 1.6M1
      */
     void addChildBefore(Block block, Block nextBlock);
 
@@ -73,6 +74,7 @@ public interface Block
      * 
      * @param block the child block to add
      * @param previousBlock the child block that will be just before the added block
+     * @since 1.6M1
      */
     void addChildAfter(Block block, Block previousBlock);
 

@@ -89,6 +89,32 @@ public class TocMacro extends AbstractMacro
     }
 
     /**
+     * Look forward to find in which section the provided block is. This because all the sections are at the same tree
+     * level and not section level 2 child of section level 1.
+     * 
+     * @param block the block from where to search.
+     * @return the parent section.
+     */
+    private SectionBlock getPreviousSectionBlock(Block block)
+    {
+        if (block.getParent() == null) {
+            return null;
+        }
+
+        List<Block> blocks = block.getParent().getChildren();
+        int index = blocks.indexOf(block);
+
+        for (int i = index - 1; i >= 0; --i) {
+            Block previousBlock = blocks.get(i);
+            if (previousBlock instanceof SectionBlock) {
+                return (SectionBlock) previousBlock;
+            }
+        }
+
+        return getPreviousSectionBlock(block.getParent());
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
@@ -120,9 +146,11 @@ public class TocMacro extends AbstractMacro
         // Get the root block from scope parameter
 
         Block root;
+        SectionBlock rootSectionBlock = null;
 
         if (this.macroParameters.getScope() == Scope.LOCAL && context.getCurrentMacroBlock() != null) {
             root = context.getCurrentMacroBlock().getParent();
+            rootSectionBlock = getPreviousSectionBlock(context.getCurrentMacroBlock());
         } else {
             root = context.getXDOM();
         }
@@ -134,7 +162,7 @@ public class TocMacro extends AbstractMacro
         // Construct table of content from sections list
         Block rootBlock =
             generateTree(sections, this.macroParameters.getStart(), this.macroParameters.getDepth(),
-                this.macroParameters.numbered());
+                this.macroParameters.numbered(), rootSectionBlock);
 
         return Arrays.asList(rootBlock);
     }
@@ -173,48 +201,44 @@ public class TocMacro extends AbstractMacro
      * @param start the "start" parameter value.
      * @param depth the "depth" parameter value.
      * @param numbered the "numbered" parameter value.
+     * @param rootSectionBlock the section where the toc macro search for children sections.
      * @return the root block of generated block tree.
      */
-    private Block generateTree(List<SectionBlock> sections, int start, int depth, boolean numbered)
+    private Block generateTree(List<SectionBlock> sections, int start, int depth, boolean numbered,
+        SectionBlock rootSectionBlock)
     {
+        int rootSectionLevel = rootSectionBlock != null ? rootSectionBlock.getLevel().getAsInt() : 0;
+        boolean rootSectionFound = false;
+
         int currentLevel = 0;
         Block currentBlock = null;
         for (SectionBlock sectionBlock : sections) {
-            int level = sectionBlock.getLevel().getAsInt();
+            int sectionLevel = sectionBlock.getLevel().getAsInt();
 
-            if (level >= start && level <= depth) {
-                IdBlock idBlock = newUniqueIdBlock();
-                sectionBlock.getParent().insertChildBefore(idBlock, sectionBlock);
+            if (rootSectionBlock != null) {
+                if (rootSectionBlock == sectionBlock) {
+                    rootSectionFound = true;
+                    continue;
+                } else if (rootSectionBlock.getParent() == sectionBlock.getParent()
+                    && sectionLevel <= rootSectionLevel) {
+                    break;
+                }
+            } else {
+                rootSectionFound = true;
+            }
 
-                Link link = new Link();
-                link.setAnchor(idBlock.getName());
-                LinkBlock linkBlock = new LinkBlock(link);
+            if (rootSectionFound && sectionLevel >= start && sectionLevel <= depth) {
+                ListItemBlock itemBlock = newTocEntry(sectionBlock);
 
-                linkBlock.addChildren(sectionBlock.getChildren());
+                // Move to next section in toc tree
 
-                // TODO: remove this when LinkBlock will support children blocks as label
-                link.setLabel(getLabelFromChildren(sectionBlock.getChildren()));
-
-                ListItemBlock itemBlock = new ListItemBlock(linkBlock);
-
-                if (currentLevel < level) {
-                    while (currentLevel < level) {
-                        ListBLock childListBlock =
-                            numbered ? new NumberedListBlock(Collections.<Block> emptyList()) : new BulletedListBlock(
-                                Collections.<Block> emptyList());
-
-                        if (currentBlock != null) {
-                            currentBlock.addChild(childListBlock);
-                        }
-
-                        currentBlock = childListBlock;
-                        ++currentLevel;
-                    }
-                } else if (currentLevel > level) {
-                    while (currentLevel > level) {
-                        currentBlock = currentBlock.getParent();
-                        --currentLevel;
-                    }
+                while (currentLevel < sectionLevel) {
+                    currentBlock = newChildListBlock(numbered, currentBlock);
+                    ++currentLevel;
+                }
+                while (currentLevel > sectionLevel) {
+                    currentBlock = currentBlock.getParent();
+                    --currentLevel;
                 }
 
                 currentBlock.addChild(itemBlock);
@@ -222,5 +246,47 @@ public class TocMacro extends AbstractMacro
         }
 
         return currentBlock.getRoot();
+    }
+
+    /**
+     * Create a new toc list itam based on section title.
+     * 
+     * @param sectionBlock the {@link SectionBlock}.
+     * @return the new list item block.
+     */
+    private ListItemBlock newTocEntry(SectionBlock sectionBlock)
+    {
+        IdBlock idBlock = newUniqueIdBlock();
+        sectionBlock.getParent().insertChildBefore(idBlock, sectionBlock);
+
+        Link link = new Link();
+        link.setAnchor(idBlock.getName());
+        LinkBlock linkBlock = new LinkBlock(link);
+
+        linkBlock.addChildren(sectionBlock.getChildren());
+        // TODO: remove this when LinkBlock will support children blocks as label
+        link.setLabel(getLabelFromChildren(sectionBlock.getChildren()) + " (" + sectionBlock.getLevel() + ")");
+
+        return new ListItemBlock(linkBlock);
+    }
+
+    /**
+     * Create a new ListBlock and add it in the provided parent block.
+     * 
+     * @param numbered indicate if the list has to be numbered or with bullets
+     * @param parentBlock the block where to add the new list block.
+     * @return the new list block.
+     */
+    private ListBLock newChildListBlock(boolean numbered, Block parentBlock)
+    {
+        ListBLock childListBlock =
+            numbered ? new NumberedListBlock(Collections.<Block> emptyList()) : new BulletedListBlock(Collections
+                .<Block> emptyList());
+
+        if (parentBlock != null) {
+            parentBlock.addChild(childListBlock);
+        }
+
+        return childListBlock;
     }
 }

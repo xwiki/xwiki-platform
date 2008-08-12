@@ -35,13 +35,21 @@ public abstract class AbstractBlock implements Block
 
     private Block parentBlock;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#addChild(org.xwiki.rendering.block.Block)
+     */
     public void addChild(Block block)
     {
-        block.setParent(this);
-        this.childrenBlocks.add(block);
-        block.setParent(this);
+        addChildAfter(block, null);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#addChildren(java.util.List)
+     */
     public void addChildren(List< ? extends Block> blocks)
     {
         for (Block block : blocks) {
@@ -49,21 +57,75 @@ public abstract class AbstractBlock implements Block
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#addChildBefore(org.xwiki.rendering.block.Block,
+     *      org.xwiki.rendering.block.Block)
+     */
+    public void addChildBefore(Block block, Block nextBlock)
+    {
+        block.setParent(this);
+
+        if (nextBlock == null) {
+            this.childrenBlocks.add(block);
+        } else {
+            this.childrenBlocks.add(this.childrenBlocks.indexOf(nextBlock), block);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#addChildAfter(org.xwiki.rendering.block.Block,
+     *      org.xwiki.rendering.block.Block)
+     */
+    public void addChildAfter(Block block, Block previousBlock)
+    {
+        block.setParent(this);
+
+        if (previousBlock == null) {
+            this.childrenBlocks.add(block);
+        } else {
+            this.childrenBlocks.add(this.childrenBlocks.indexOf(previousBlock) + 1, block);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#getChildren()
+     */
     public List<Block> getChildren()
     {
         return this.childrenBlocks;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#getParent()
+     */
     public Block getParent()
     {
         return this.parentBlock;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#setParent(org.xwiki.rendering.block.Block)
+     */
     public void setParent(Block parentBlock)
     {
         this.parentBlock = parentBlock;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#getRoot()
+     */
     public Block getRoot()
     {
         Block block = this;
@@ -75,6 +137,11 @@ public abstract class AbstractBlock implements Block
         return block;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#getChildrenByType(java.lang.Class)
+     */
     public <T extends Block> List<T> getChildrenByType(Class<T> blockClass)
     {
         List<Block> typedBlocks = new ArrayList<Block>();

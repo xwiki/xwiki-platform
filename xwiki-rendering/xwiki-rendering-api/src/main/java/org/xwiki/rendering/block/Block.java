@@ -59,6 +59,24 @@ public interface Block
     void addChildren(List< ? extends Block> blocks);
 
     /**
+     * Helper method to add a single child block to the current block before the provided existing child block. For
+     * adding several blocks at once use {@link #addChildren(java.util.List)}.
+     * 
+     * @param block the child block to add
+     * @param nextBlock the child block that will be just after the added block
+     */
+    void addChildBefore(Block block, Block nextBlock);
+
+    /**
+     * Helper method to add a single child block to the current block after the provided existing child block. For
+     * adding several blocks at once use {@link #addChildren(java.util.List)}.
+     * 
+     * @param block the child block to add
+     * @param previousBlock the child block that will be just before the added block
+     */
+    void addChildAfter(Block block, Block previousBlock);
+
+    /**
      * Get the parent block. All blocks have a parent and the top level parent is the {@link XDOM} object.
      * 
      * @return the parent block

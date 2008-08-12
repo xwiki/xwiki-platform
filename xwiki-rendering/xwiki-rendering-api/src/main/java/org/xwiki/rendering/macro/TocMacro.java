@@ -228,12 +228,12 @@ public class TocMacro extends AbstractMacro
             }
 
             if (rootSectionFound && sectionLevel >= start && sectionLevel <= depth) {
-                ListItemBlock itemBlock = newTocEntry(sectionBlock);
+                ListItemBlock itemBlock = createTocEntry(sectionBlock);
 
                 // Move to next section in toc tree
 
                 while (currentLevel < sectionLevel) {
-                    currentBlock = newChildListBlock(numbered, currentBlock);
+                    currentBlock = createChildListBlock(numbered, currentBlock);
                     ++currentLevel;
                 }
                 while (currentLevel > sectionLevel) {
@@ -254,7 +254,7 @@ public class TocMacro extends AbstractMacro
      * @param sectionBlock the {@link SectionBlock}.
      * @return the new list item block.
      */
-    private ListItemBlock newTocEntry(SectionBlock sectionBlock)
+    private ListItemBlock createTocEntry(SectionBlock sectionBlock)
     {
         IdBlock idBlock = newUniqueIdBlock();
         sectionBlock.getParent().insertChildBefore(idBlock, sectionBlock);
@@ -277,7 +277,7 @@ public class TocMacro extends AbstractMacro
      * @param parentBlock the block where to add the new list block.
      * @return the new list block.
      */
-    private ListBLock newChildListBlock(boolean numbered, Block parentBlock)
+    private ListBLock createChildListBlock(boolean numbered, Block parentBlock)
     {
         ListBLock childListBlock =
             numbered ? new NumberedListBlock(Collections.<Block> emptyList()) : new BulletedListBlock(Collections

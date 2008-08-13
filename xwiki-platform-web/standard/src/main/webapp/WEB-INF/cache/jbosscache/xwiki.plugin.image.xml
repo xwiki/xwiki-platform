@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ===================================================================== -->
+<!--                                                                       -->
+<!--  Sample JBoss Cache Service Configuration                             -->
+<!--                                                                       -->
+<!-- ===================================================================== -->
+
+<server>
+	<mbean code="org.jboss.cache.jmx.CacheJmxWrapper" name="jboss.cache:service=Cache">
+		<!-- Specific eviction policy configurations. This is LRU -->
+		<attribute name="EvictionConfig">
+			<config>
+				<attribute name="wakeUpIntervalSeconds">5</attribute>
+				<attribute name="policyClass">org.jboss.cache.eviction.LRUPolicy</attribute>
+
+				<!-- Cache wide default -->
+				<region name="/xwiki">
+					<attribute name="maxNodes">10000</attribute>
+					<attribute name="timeToLiveSeconds">0</attribute>
+				</region>
+
+				<cacheloader>
+					<class>org.jboss.cache.loader.FileCacheLoader</class>
+				</cacheloader>
+			</config>
+		</attribute>
+	</mbean>
+</server>

@@ -32,7 +32,7 @@ import junit.framework.TestCase;
  * 
  * @version $Id: $
  */
-public class AbstractDocumentMojoTest extends TestCase
+public class DocumentUpdateMojoTest extends TestCase
 {
     /**
      * Test that a document loaded in memory from XML by the mojo then written back to XML does not lose any

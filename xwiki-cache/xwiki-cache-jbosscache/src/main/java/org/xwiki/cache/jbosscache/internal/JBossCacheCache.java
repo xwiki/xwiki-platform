@@ -173,7 +173,8 @@ public class JBossCacheCache<T> extends AbstractCache<T>
         String key = event.getFqn().getLastElementAsString();
 
         if (!event.isPre()) {
-            // Trying to get the evicted value disrupt eviction process
+            // FIXME: Trying to get the evicted value using public api disrupt JBoss eviction process so I can't return
+            // and destroy it
             cacheEntryRemoved(key, null);
         }
     }

@@ -578,7 +578,7 @@
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-cache-oscache</artifactId>
+      <artifactId>xwiki-core-cache-jbosscache</artifactId>
       <version>${pom.version}</version>
     </dependency>
     <dependency>

@@ -31,6 +31,7 @@ import org.apache.commons.logging.LogFactory;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.util.AbstractCacheConfigurationLoader;
 import org.xwiki.container.Container;
 
 import com.opensymphony.oscache.base.algorithm.LRUCache;
@@ -42,7 +43,7 @@ import com.opensymphony.oscache.plugins.diskpersistence.HashDiskPersistenceListe
  * 
  * @version $Id: $
  */
-public class OSCacheCacheConfiguration
+public class OSCacheCacheConfiguration extends AbstractCacheConfigurationLoader
 {
     /**
      * The logging tool.
@@ -63,21 +64,6 @@ public class OSCacheCacheConfiguration
      * The name of the cache.path property in OSCache configuration.
      */
     private static final String CONFOC_CACHE_PATH = "cache.path";
-
-    /**
-     * The name of the cache.path property in XWiki configuration.
-     */
-    private static final String CONFX_CACHE_PATH = CONFOC_CACHE_PATH;
-
-    /**
-     * The default configuration identifier used to load cache configuration file.
-     */
-    protected String defaultPropsId = "default";
-
-    /**
-     * The XWiki cache API configuration.
-     */
-    private CacheConfiguration configuration;
 
     /**
      * The OSCAche configuration.
@@ -106,19 +92,11 @@ public class OSCacheCacheConfiguration
      */
     public OSCacheCacheConfiguration(Container container, CacheConfiguration configuration, String defaultPropsId)
     {
+        super(configuration, defaultPropsId);
+
         this.container = container;
-        this.configuration = configuration;
-        this.defaultPropsId = defaultPropsId;
 
         load();
-    }
-
-    /**
-     * @return the XWiki cache API configuration.
-     */
-    public CacheConfiguration getCacheConfiguration()
-    {
-        return this.configuration;
     }
 
     /**
@@ -155,9 +133,9 @@ public class OSCacheCacheConfiguration
         EntryEvictionConfiguration ec = null;
 
         try {
-            this.oscacheConfiguration = getConfig(this.configuration.getConfigurationId());
+            this.oscacheConfiguration = getConfig(getCacheConfiguration().getConfigurationId());
         } catch (Exception e) {
-            for (Map.Entry<String, Object> entry : this.configuration.entrySet()) {
+            for (Map.Entry<String, Object> entry : getCacheConfiguration().entrySet()) {
                 if (entry.getKey() == EntryEvictionConfiguration.CONFIGURATIONID) {
                     ec = (EntryEvictionConfiguration) entry.getValue();
 
@@ -176,7 +154,7 @@ public class OSCacheCacheConfiguration
             timeToLive = ec.getTimeToLive();
         }
 
-        this.name = this.configuration.getConfigurationId();
+        this.name = getCacheConfiguration().getConfigurationId();
 
         if (this.name != null) {
             this.oscacheConfiguration.setProperty("cache.key", this.name);
@@ -195,22 +173,7 @@ public class OSCacheCacheConfiguration
             && this.oscacheConfiguration.getProperty(CONFOC_CACHE_PATH) == null
             && (HashDiskPersistenceListener.class.getName().equals(persistanceListener) || DiskPersistenceListener.class
                 .getName().equals(persistanceListener))) {
-
-            String path = (String) this.configuration.get(CONFX_CACHE_PATH);
-
-            if (path == null) {
-                path = System.getProperty("java.io.tmpdir") + File.separator + "xwiki";
-                if (this.configuration.getConfigurationId() == null) {
-                    path += File.separator + this.configuration.getConfigurationId() + File.separator;
-                }
-
-                File tempDir = new File(path);
-                if (!tempDir.exists()) {
-                    tempDir.mkdirs();
-                }
-            }
-
-            this.oscacheConfiguration.setProperty(CONFX_CACHE_PATH, path);
+            this.oscacheConfiguration.setProperty(CONFOC_CACHE_PATH, createTempDir());
         }
     }
 
@@ -222,7 +185,7 @@ public class OSCacheCacheConfiguration
         Properties defaultConfig = new Properties();
 
         try {
-            loadConfig(defaultConfig, this.defaultPropsId);
+            loadConfig(defaultConfig, getDefaultPropsId());
         } catch (PropertiesLoadingCacheException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Could not load default cache properties", e);

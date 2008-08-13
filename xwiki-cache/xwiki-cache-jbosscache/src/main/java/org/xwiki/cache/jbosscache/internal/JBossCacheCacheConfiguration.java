@@ -28,15 +28,19 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.jboss.cache.config.CacheLoaderConfig;
 import org.jboss.cache.config.Configuration;
 import org.jboss.cache.config.EvictionConfig;
 import org.jboss.cache.config.EvictionRegionConfig;
+import org.jboss.cache.config.CacheLoaderConfig.IndividualCacheLoaderConfig;
 import org.jboss.cache.eviction.LRUConfiguration;
 import org.jboss.cache.eviction.LRUPolicy;
 import org.jboss.cache.factories.XmlConfigurationParser;
+import org.jboss.cache.loader.FileCacheLoaderConfig;
 import org.xwiki.cache.config.CacheConfiguration;
 import org.xwiki.cache.eviction.EntryEvictionConfiguration;
 import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+import org.xwiki.cache.util.AbstractCacheConfigurationLoader;
 import org.xwiki.container.Container;
 
 /**
@@ -44,7 +48,7 @@ import org.xwiki.container.Container;
  * 
  * @version $Id: $
  */
-public class JBossCacheCacheConfiguration
+public class JBossCacheCacheConfiguration extends AbstractCacheConfigurationLoader
 {
     /**
      * The name of the field containing the wakeup interval to set to {@link EvictionConfig}.
@@ -72,16 +76,6 @@ public class JBossCacheCacheConfiguration
     private static final int DEFAULT_WAKEUPINTERVAL = 5;
 
     /**
-     * The default configuration identifier used to load cache configuration file.
-     */
-    protected String defaultPropsId = "default";
-
-    /**
-     * The XWiki cache API configuration.
-     */
-    private CacheConfiguration configuration;
-
-    /**
      * The JBossCache configuration.
      */
     private Configuration jbossConfiguration;
@@ -98,19 +92,11 @@ public class JBossCacheCacheConfiguration
      */
     public JBossCacheCacheConfiguration(Container container, CacheConfiguration configuration, String defaultPropsId)
     {
+        super(configuration, defaultPropsId);
+
         this.container = container;
-        this.configuration = configuration;
-        this.defaultPropsId = defaultPropsId;
 
         load();
-    }
-
-    /**
-     * @return the XWiki cache API configuration.
-     */
-    public CacheConfiguration getCacheConfiguration()
-    {
-        return this.configuration;
     }
 
     /**
@@ -126,7 +112,7 @@ public class JBossCacheCacheConfiguration
      */
     private void load()
     {
-        this.jbossConfiguration = loadConfig(configuration.getConfigurationId());
+        this.jbossConfiguration = loadConfig(getCacheConfiguration().getConfigurationId());
 
         if (this.jbossConfiguration == null) {
             this.jbossConfiguration = getDefaultConfig();
@@ -136,7 +122,7 @@ public class JBossCacheCacheConfiguration
             }
 
             EntryEvictionConfiguration eec =
-                (EntryEvictionConfiguration) this.configuration.get(EntryEvictionConfiguration.CONFIGURATIONID);
+                (EntryEvictionConfiguration) getCacheConfiguration().get(EntryEvictionConfiguration.CONFIGURATIONID);
 
             if (eec != null && eec.getAlgorithm() == EntryEvictionConfiguration.Algorithm.LRU) {
                 EvictionConfig ec = this.jbossConfiguration.getEvictionConfig();
@@ -169,7 +155,9 @@ public class JBossCacheCacheConfiguration
             }
         }
 
-        this.jbossConfiguration.setClusterName(this.configuration.getConfigurationId());
+        this.jbossConfiguration.setClusterName(getCacheConfiguration().getConfigurationId());
+
+        completeCacheLoaderConfiguration();
     }
 
     /**
@@ -201,11 +189,31 @@ public class JBossCacheCacheConfiguration
     }
 
     /**
+     * Add missing configuration needed by some JBossCache {@link CacheLoader} implementations.
+     */
+    private void completeCacheLoaderConfiguration()
+    {
+        CacheLoaderConfig config = this.jbossConfiguration.getCacheLoaderConfig();
+
+        if (config != null) {
+            for (IndividualCacheLoaderConfig iconfig : config.getIndividualCacheLoaderConfigs()) {
+                if (iconfig instanceof FileCacheLoaderConfig) {
+                    FileCacheLoaderConfig ficonfig = (FileCacheLoaderConfig) iconfig;
+
+                    if (ficonfig.getLocation() == null || ficonfig.getLocation().trim().length() == 0) {
+                        ficonfig.setLocation(createTempDir());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * @return the default JBossCache configuration.
      */
     protected Configuration getDefaultConfig()
     {
-        return loadConfig(defaultPropsId);
+        return loadConfig(getDefaultPropsId());
     }
 
     /**

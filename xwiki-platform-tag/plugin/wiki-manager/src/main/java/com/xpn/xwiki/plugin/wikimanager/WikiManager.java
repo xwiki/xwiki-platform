@@ -474,14 +474,6 @@ final class WikiManager
             // Return to root database
             context.setDatabase(context.getMainXWiki());
 
-            XWikiDocument userdoc = getDocument(xwiki.getDatabase(), userWikiSuperDoc.getOwner(), context);
-
-            // User does not exist
-            if (userdoc.isNew()) {
-                throw new WikiManagerException(WikiManagerException.ERROR_XWIKI_USERDOESNOTEXIST, msg.get(
-                    WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, userWikiSuperDoc.getOwner()));
-            }
-
             // Wiki name forbidden
             String wikiForbiddenList = xwiki.Param("xwiki.virtual.reserved_wikis");
             if (Util.contains(newWikiName, wikiForbiddenList, ", ")) {
@@ -491,6 +483,12 @@ final class WikiManager
 
             // Update or create wiki descriptor document that will be save at and of wiki creation.
             XWikiServer wikiSuperDocToSave = getWikiDescriptorToSave(userWikiSuperDoc, failOnExist, context);
+
+            // Check owner
+            if (getDocument(xwiki.getDatabase(), wikiSuperDocToSave.getOwner(), context).isNew()) {
+                LOG.warn(msg.get(WikiManagerMessageTool.ERROR_USERDOESNOTEXIST, wikiSuperDocToSave.getOwner()));
+                wikiSuperDocToSave.setOwner("");
+            }
 
             // Create wiki database/schema
             createWikiDatabase(newWikiName, context);

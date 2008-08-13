@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
@@ -21,6 +24,11 @@ import com.xpn.xwiki.plugin.wikimanager.WikiManagerMessageTool;
  */
 public class Wiki extends Document
 {
+    /**
+     * The logging tool.
+     */
+    protected static final Log LOG = LogFactory.getLog(Wiki.class);
+
     /**
      * Create instance of wiki descriptor.
      * 
@@ -59,7 +67,11 @@ public class Wiki extends Document
         }
 
         if (hasAdminRights()) {
-            this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
+            try {
+                this.context.getWiki().getStore().deleteWiki(wikiName, this.context);
+            } catch (XWikiException e) {
+                LOG.error("Failed to delete wiki from database", e);
+            }
             this.context.getWiki().getVirtualWikiList().remove(wikiName);
         } else {
             throw new WikiManagerException(XWikiException.ERROR_XWIKI_ACCESS_DENIED, WikiManagerMessageTool.getDefault(

@@ -9,6 +9,6 @@
   <artifactId>xwiki-application-officeimporter</artifactId>
   <packaging>xar</packaging>
   <name>XWiki Platform - Applications - Office Importer</name>
-  <version>1.0-SNAPSHOT</version>
-  <description>An XWiki application used to transform office documents into wiki pages.</description>
+  <version>0.0.1-SNAPSHOT</version>
+  <description>import office documents such as MS word to xwiki page</description>
 </project>

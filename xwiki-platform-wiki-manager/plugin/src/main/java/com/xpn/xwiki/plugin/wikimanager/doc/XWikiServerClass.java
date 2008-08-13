@@ -184,7 +184,7 @@ public class XWikiServerClass extends AbstractXClassManager<XWikiServer>
      * Pretty name of field <code>homepage</code> for the XWiki class XWiki.XWikiServerClass.
      */
     public static final String FIELDPN_HOMEPAGE = "Home page";
-    
+
     /**
      * The full name of the default home page of a newly created wiki.
      */

@@ -160,7 +160,8 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
+     *         failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */
@@ -596,7 +597,8 @@ public class WikiManagerPluginApi extends PluginApi<WikiManagerPlugin>
      *         <li>{@link WikiManagerException#ERROR_WM_UPDATEDATABASE}: error occurred when updating database.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEDOESNOTEXISTS}: attached package does not exists.</li>
      *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEIMPORT}: package loading failed.</li>
-     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database failed.</li>
+     *         <li>{@link WikiManagerException#ERROR_WM_PACKAGEINSTALL}: loaded package insertion into database
+     *         failed.</li>
      *         </ul>
      * @throws XWikiException critical error in xwiki engine.
      */

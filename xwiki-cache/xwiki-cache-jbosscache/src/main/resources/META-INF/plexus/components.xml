@@ -15,7 +15,7 @@
     <component>
       <role>org.xwiki.cache.CacheFactory</role>
       <role-hint>jbosscache/local</role-hint>
-      <implementation>org.xwiki.cache.jbosscache.internal.JBossCacheLocalCacheFactory</implementation>
+      <implementation>org.xwiki.cache.jbosscache.internal.JBossCacheCacheFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
@@ -23,6 +23,9 @@
           <role-hint>default</role-hint>
         </requirement>
       </requirements>
+      <configuration>
+        <defaultPropsId>default-local</defaultPropsId>
+      </configuration>
     </component>
   </components>
 </component-set>

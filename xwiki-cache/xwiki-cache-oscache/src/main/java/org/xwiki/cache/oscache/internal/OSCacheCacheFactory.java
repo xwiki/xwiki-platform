@@ -49,6 +49,21 @@ public class OSCacheCacheFactory implements CacheFactory
     private Container container;
 
     /**
+     * The default configuration identifier used to load cache configuration file.
+     */
+    private String defaultPropsId;
+
+    /**
+     * Default constructor.
+     */
+    public OSCacheCacheFactory()
+    {
+        if (this.defaultPropsId == null) {
+            this.defaultPropsId = "default";
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
@@ -60,7 +75,7 @@ public class OSCacheCacheFactory implements CacheFactory
         }
 
         OSCacheCache<T> cache = new OSCacheCache<T>();
-        cache.initialize(new OSCacheCacheConfiguration(this.container, configuration, "default"));
+        cache.initialize(new OSCacheCacheConfiguration(this.container, configuration, this.defaultPropsId));
 
         if (LOG.isInfoEnabled()) {
             LOG.info("End OScache cache initialisation");

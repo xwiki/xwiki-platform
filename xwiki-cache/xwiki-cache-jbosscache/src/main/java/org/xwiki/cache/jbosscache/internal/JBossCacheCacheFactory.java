@@ -49,6 +49,21 @@ public class JBossCacheCacheFactory implements CacheFactory
     private Container container;
 
     /**
+     * The default configuration identifier used to load cache configuration file.
+     */
+    private String defaultPropsId;
+
+    /**
+     * Default constructor.
+     */
+    public JBossCacheCacheFactory()
+    {
+        if (this.defaultPropsId == null) {
+            this.defaultPropsId = "default";
+        }
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.cache.CacheFactory#newCache(org.xwiki.cache.config.CacheConfiguration)
@@ -60,7 +75,7 @@ public class JBossCacheCacheFactory implements CacheFactory
         }
 
         JBossCacheCache<T> cache = new JBossCacheCache<T>();
-        cache.initialize(new JBossCacheCacheConfiguration(this.container, configuration, "default-local"));
+        cache.initialize(new JBossCacheCacheConfiguration(this.container, configuration, this.defaultPropsId));
 
         if (LOG.isInfoEnabled()) {
             LOG.info("End JBoss cache initialisation");

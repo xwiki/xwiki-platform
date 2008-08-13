@@ -20,6 +20,7 @@
 package org.xwiki.cache.jbosscache.internal;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -36,6 +37,7 @@ import org.jboss.cache.Cache;
 import org.jboss.cache.CacheFactory;
 import org.jboss.cache.DefaultCacheFactory;
 import org.jboss.cache.Fqn;
+import org.xwiki.cache.DisposableCacheValue;
 import org.xwiki.cache.jbosscache.internal.event.JBossCacheCacheEntryEvent;
 import org.xwiki.cache.util.AbstractCache;
 
@@ -74,6 +76,12 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     private Cache<String, T> cache;
 
     /**
+     * Only store object implementing {@link DisposableCacheValue} objects to be able to dispose them when evicted.
+     * Note: can't find how to get the value to be able to destroy it when eviction event is raised.
+     */
+    private Map<String, T> cachedObjects = new HashMap<String, T>();
+
+    /**
      * The state of the node before modification.
      */
     private ConcurrentMap<String, Map<String, T>> preEventData = new ConcurrentHashMap<String, Map<String, T>>();
@@ -99,6 +107,26 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     }
 
     /**
+     * @param key the key used to access the value in the cache.
+     * @param obj the value stored in the cache.
+     */
+    private void pushDisposableCacheValue(String key, T obj)
+    {
+        if (obj instanceof DisposableCacheValue) {
+            this.cachedObjects.put(key, obj);
+        }
+    }
+
+    /**
+     * @param key the key used to access the value in the cache.
+     * @return the value to store in the cache, or null if no value is found.
+     */
+    private T popDisposableCacheValue(String key)
+    {
+        return this.cachedObjects.remove(key);
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.cache.Cache#remove(java.lang.String)
@@ -116,6 +144,8 @@ public class JBossCacheCache<T> extends AbstractCache<T>
     public void set(String key, T obj)
     {
         this.cache.put(new Fqn<String>(ROOT_FQN, key), DATA_KEY, obj);
+
+        pushDisposableCacheValue(key, obj);
     }
 
     /**
@@ -173,8 +203,6 @@ public class JBossCacheCache<T> extends AbstractCache<T>
         String key = event.getFqn().getLastElementAsString();
 
         if (!event.isPre()) {
-            // FIXME: Trying to get the evicted value using public api disrupt JBoss eviction process so I can't return
-            // and destroy it
             cacheEntryRemoved(key, null);
         }
     }
@@ -240,8 +268,14 @@ public class JBossCacheCache<T> extends AbstractCache<T>
      */
     private void cacheEntryRemoved(String key, T value)
     {
+        T obj = popDisposableCacheValue(key);
+
+        if (obj == null) {
+            obj = value;
+        }
+
         JBossCacheCacheEntryEvent<T> event =
-            new JBossCacheCacheEntryEvent<T>(new JBossCacheCacheEntry<T>(this, key, value));
+            new JBossCacheCacheEntryEvent<T>(new JBossCacheCacheEntry<T>(this, key, obj));
 
         sendEntryRemovedEvent(event);
     }

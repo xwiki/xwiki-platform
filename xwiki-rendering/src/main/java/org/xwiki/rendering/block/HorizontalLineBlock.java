@@ -21,26 +21,22 @@ package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
 
-import java.util.List;
-
 /**
- * @version $Id$
- * @since 1.5M2
+ * Represents a Horizontal line.
+ * 
+ * @version $Id:$
+ * @since 1.6M1
  */
-public class ItalicBlock extends AbstractFatherBlock
+public class HorizontalLineBlock extends AbstractBlock
 {
-    public ItalicBlock(List<Block> childBlocks)
+    public static final HorizontalLineBlock HORIZONTAL_LINE_BLOCK = new HorizontalLineBlock();
+
+    private HorizontalLineBlock()
     {
-        super(childBlocks);
     }
 
-    public void before(Listener listener)
+    public void traverse(Listener listener)
     {
-        listener.beginItalic();
-    }
-
-    public void after(Listener listener)
-    {
-        listener.endItalic();
+        listener.onHorizontalLine();
     }
 }

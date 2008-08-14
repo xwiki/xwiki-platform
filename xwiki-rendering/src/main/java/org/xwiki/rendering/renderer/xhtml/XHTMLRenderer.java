@@ -28,6 +28,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.renderer.Renderer;
 import org.xwiki.rendering.DocumentManager;
 
@@ -103,21 +104,49 @@ public class XHTMLRenderer implements Renderer
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#beginBold()
+     * @see Renderer#beginFormat(org.xwiki.rendering.listener.Format)
      */
-    public void beginBold()
+    public void beginFormat(Format format)
     {
-        write("<strong>");
+        switch(format)
+        {
+            case BOLD:
+                write("<strong>");
+                break;
+            case ITALIC:
+                write("<em class=\"italic\">");
+                break;
+            case STRIKEDOUT:
+                write("<del>");
+                break;
+            case UNDERLINED:
+                write("<u>");
+                break;
+        }
     }
 
     /**
      * {@inheritDoc}
-     * 
-     * @see Renderer#beginItalic()
+     *
+     * @see Renderer#endFormat(org.xwiki.rendering.listener.Format) 
      */
-    public void beginItalic()
+    public void endFormat(Format format)
     {
-        write("<em class=\"italic\">");
+        switch(format)
+        {
+            case BOLD:
+                write("</strong>");
+                break;
+            case ITALIC:
+                write("</em>");
+                break;
+            case STRIKEDOUT:
+                write("</del>");
+                break;
+            case UNDERLINED:
+                write("</u>");
+                break;
+        }
     }
 
     /**
@@ -128,46 +157,6 @@ public class XHTMLRenderer implements Renderer
     public void beginParagraph()
     {
         write("<p>");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Renderer#endBold()
-     */
-    public void endBold()
-    {
-        write("</strong>");
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Renderer#endItalic()
-     */
-    public void endItalic()
-    {
-        write("</em>");
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.renderer.Renderer#beginUnderline()
-     */
-    public void beginUnderline()
-    {
-        write("<u>");
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.renderer.Renderer#endUnderline()
-     */
-    public void endUnderline()
-    {
-        write("</u>");
     }
 
     /**
@@ -328,6 +317,15 @@ public class XHTMLRenderer implements Renderer
     public void onId(String name)
     {
         write("<a id=\"" + name + "\" name=\"" + name + "\"></a>");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine() 
+     */
+    public void onHorizontalLine()
+    {
+        write("<hr/>");
     }
 
     protected void write(String text)

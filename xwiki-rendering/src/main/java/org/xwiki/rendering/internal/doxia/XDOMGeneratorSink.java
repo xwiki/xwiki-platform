@@ -29,10 +29,8 @@ import java.util.regex.Pattern;
 import org.apache.maven.doxia.sink.Sink;
 import org.xwiki.rendering.block.AbstractBlock;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.BoldBlock;
 import org.xwiki.rendering.block.BulletedListBlock;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.block.ItalicBlock;
 import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.ParagraphBlock;
@@ -40,8 +38,11 @@ import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.block.HorizontalLineBlock;
+import org.xwiki.rendering.block.FormatBlock;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.Format;
 
 /**
  * @version $Id$
@@ -111,7 +112,7 @@ public class XDOMGeneratorSink implements Sink
 
     public void bold_()
     {
-        this.stack.push(new BoldBlock(generateListFromStack()));
+        this.stack.push(new FormatBlock(generateListFromStack(), Format.BOLD));
     }
 
     public void close()
@@ -228,10 +229,13 @@ public class XDOMGeneratorSink implements Sink
 
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.apache.maven.doxia.sink.Sink#horizontalRule() 
+     */
     public void horizontalRule()
     {
-        // TODO Auto-generated method stub
-
+        this.stack.push(HorizontalLineBlock.HORIZONTAL_LINE_BLOCK);
     }
 
     public void italic()
@@ -241,7 +245,7 @@ public class XDOMGeneratorSink implements Sink
 
     public void italic_()
     {
-        this.stack.push(new ItalicBlock(generateListFromStack()));
+        this.stack.push(new FormatBlock(generateListFromStack(), Format.ITALIC));
     }
 
     public void lineBreak()

@@ -33,6 +33,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.Format;
 
 /**
  * Map XWiki Listener events on to WikiModel events.
@@ -59,14 +60,54 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endDocument();
     }
 
-    public void beginBold()
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void beginFormat(Format format)
     {
-        this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRONG));
+        switch(format)
+        {
+            case BOLD:
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRONG));
+                break;
+            case ITALIC:
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM));
+                break;
+            case STRIKEDOUT:
+                this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.STRIKE));
+                break;
+            case UNDERLINED:
+                // TODO: Not supported by wikimodel yet.
+                // See http://code.google.com/p/wikimodel/issues/detail?id=31
+                break;
+        }
     }
 
-    public void beginItalic()
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void endFormat(Format format)
     {
-        this.wikimodelListener.beginFormat(new WikiFormat(IWemConstants.EM));
+        switch(format)
+        {
+            case BOLD:
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG));
+                break;
+            case ITALIC:
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM));
+                break;
+            case STRIKEDOUT:
+                this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRIKE));
+                break;
+            case UNDERLINED:
+                // TODO: Not supported by wikimodel yet.
+                // See http://code.google.com/p/wikimodel/issues/detail?id=31
+                break;
+        }
     }
 
     public void beginList(ListType listType)
@@ -98,28 +139,6 @@ public class WikiModelGeneratorListener implements Listener
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
         // TODO: Find what to do... For now don't render XML elements
-    }
-
-    public void endBold()
-    {
-        this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.STRONG));
-    }
-
-    public void endItalic()
-    {
-        this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM));
-    }
-
-    public void beginUnderline()
-    {
-        // TODO: Not supported by wikimodel yet.
-        // See http://code.google.com/p/wikimodel/issues/detail?id=31
-    }
-
-    public void endUnderline()
-    {
-        // TODO: Not supported by wikimodel yet.
-        // See http://code.google.com/p/wikimodel/issues/detail?id=31
     }
 
     public void endList(ListType listType)
@@ -202,5 +221,14 @@ public class WikiModelGeneratorListener implements Listener
     public void onId(String name)
     {
         // TODO: Find what to do...
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine() 
+     */
+    public void onHorizontalLine()
+    {
+        this.wikimodelListener.onHorizontalLine();
     }
 }

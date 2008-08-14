@@ -28,6 +28,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.Format;
 
 public class TestEventsListener implements Listener
 {
@@ -48,14 +49,52 @@ public class TestEventsListener implements Listener
         write("endDocument");
     }
 
-    public void beginBold()
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void beginFormat(Format format)
     {
-        write("beginBold");
+        switch(format)
+        {
+            case BOLD:
+                write("beginBold");
+                break;
+            case ITALIC:
+                write("beginItalic");
+                break;
+            case STRIKEDOUT:
+                write("beginStrikedOut");
+                break;
+            case UNDERLINED:
+                write("beginUnderline");
+                break;
+        }
     }
 
-    public void beginItalic()
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void endFormat(Format format)
     {
-        write("beginItalic");
+        switch(format)
+        {
+            case BOLD:
+                write("endBold");
+                break;
+            case ITALIC:
+                write("endItalic");
+                break;
+            case STRIKEDOUT:
+                write("endStrikedOut");
+                break;
+            case UNDERLINED:
+                write("endUnderline");
+                break;
+        }
     }
 
     public void beginParagraph()
@@ -63,29 +102,9 @@ public class TestEventsListener implements Listener
         write("beginParagraph");
     }
 
-    public void endBold()
-    {
-        write("endBold");
-    }
-
-    public void endItalic()
-    {
-        write("endItalic");
-    }
-
     public void endParagraph()
     {
         write("endParagraph");
-    }
-
-    public void beginUnderline()
-    {
-        write("beginUnderline");
-    }
-
-    public void endUnderline()
-    {
-        write("endUnderline");
     }
 
     public void onLineBreak()
@@ -181,6 +200,15 @@ public class TestEventsListener implements Listener
     public void onId(String name)
     {
         write("onId: [" + name + "]");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine() 
+     */
+    public void onHorizontalLine()
+    {
+        write("onHorizontalLine");
     }
 
     private StringBuffer toStringXMLElement(Map<String, String> attributes)

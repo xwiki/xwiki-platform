@@ -17,30 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.block;
-
-import org.xwiki.rendering.listener.Listener;
-
-import java.util.List;
+package org.xwiki.rendering.listener;
 
 /**
- * @version $Id$
- * @since 1.5M2
+ * Represents a text formatting (bold, italic, etc).
+ *
+ * @version $Id: $
+ * @since 1.6M1
  */
-public class BoldBlock extends AbstractFatherBlock
+public enum Format
 {
-    public BoldBlock(List<Block> childBlocks)
-    {
-        super(childBlocks);
-    }
-
-    public void before(Listener listener)
-    {
-        listener.beginBold();
-    }
-
-    public void after(Listener listener)
-    {
-        listener.endBold();
-    }
+    BOLD,
+    ITALIC,
+    UNDERLINED,
+    STRIKEDOUT
 }

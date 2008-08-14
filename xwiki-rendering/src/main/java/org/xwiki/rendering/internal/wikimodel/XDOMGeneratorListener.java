@@ -36,6 +36,7 @@ import org.xwiki.rendering.block.*;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 
@@ -180,9 +181,11 @@ public class XDOMGeneratorListener implements IWemListener
         // underline is implemented and generate an UnderlineBlock when it is...
         
         if (format.hasStyle(IWemConstants.STRONG)) {
-          this.stack.push(new BoldBlock(generateListFromStack()));
+          this.stack.push(new FormatBlock(generateListFromStack(), Format.BOLD));
         } else if (format.hasStyle(IWemConstants.EM)) {
-            this.stack.push(new ItalicBlock(generateListFromStack()));
+            this.stack.push(new FormatBlock(generateListFromStack(), Format.ITALIC));
+        } else if (format.hasStyle(IWemConstants.STRIKE)) {
+            this.stack.push(new FormatBlock(generateListFromStack(), Format.STRIKEDOUT));
         } else {
             // WikiModel generate begin/endFormat events even for simple text with no style
             // so we need to remove our marker
@@ -287,10 +290,13 @@ public class XDOMGeneratorListener implements IWemListener
 
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.wikimodel.wem.IWemListener#onHorizontalLine() 
+     */
     public void onHorizontalLine()
     {
-        // TODO Auto-generated method stub
-
+        this.stack.push(HorizontalLineBlock.HORIZONTAL_LINE_BLOCK);
     }
 
     /**

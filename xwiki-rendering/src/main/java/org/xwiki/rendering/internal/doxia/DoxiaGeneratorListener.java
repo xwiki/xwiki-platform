@@ -26,6 +26,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.listener.Format;
 
 public class DoxiaGeneratorListener implements Listener
 {
@@ -36,19 +37,59 @@ public class DoxiaGeneratorListener implements Listener
 		this.sink = sink;
 	}
 
-	public void beginBold()
-	{
-		this.sink.bold();
-	}
+    /**
+     * {@inheritDoc}
+     * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void beginFormat(Format format)
+    {
+        switch(format)
+        {
+            case BOLD:
+                this.sink.bold();
+                break;
+            case ITALIC:
+                this.sink.italic();
+                break;
+            case STRIKEDOUT:
+                // TODO: Implement when we move to Doxia 1.0 beta 1.
+                // See http://jira.codehaus.org/browse/DOXIA-204
+                break;
+            case UNDERLINED:
+                // TODO: Implement when we move to Doxia 1.0 beta 1.
+                // See http://jira.codehaus.org/browse/DOXIA-204
+                break;
+        }
+    }
 
-	public void beginDocument()
+    /**
+     * {@inheritDoc}
+     * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void endFormat(Format format)
+    {
+        switch(format)
+        {
+            case BOLD:
+                this.sink.bold_();
+                break;
+            case ITALIC:
+                this.sink.italic_();
+                break;
+            case STRIKEDOUT:
+                // TODO: Implement when we move to Doxia 1.0 beta 1.
+                // See http://jira.codehaus.org/browse/DOXIA-204
+                break;
+            case UNDERLINED:
+                // TODO: Implement when we move to Doxia 1.0 beta 1.
+                // See http://jira.codehaus.org/browse/DOXIA-204
+                break;
+        }
+    }
+    
+    public void beginDocument()
 	{
 		this.sink.body();
-	}
-
-	public void beginItalic()
-	{
-		this.sink.italic();
 	}
 
 	public void beginList(ListType listType)
@@ -65,18 +106,6 @@ public class DoxiaGeneratorListener implements Listener
 	{
 		this.sink.listItem();
 	}
-
-    public void beginUnderline()
-    {
-        // TODO: Implement when we move to Doxia 1.0 beta 1.
-        // See http://jira.codehaus.org/browse/DOXIA-204
-    }
-
-    public void endUnderline()
-    {
-        // TODO: Implement when we move to Doxia 1.0 beta 1.
-        // See http://jira.codehaus.org/browse/DOXIA-204
-    }
 
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
 	{
@@ -112,19 +141,9 @@ public class DoxiaGeneratorListener implements Listener
 		// TODO: Find out what to do...
 	}
 
-	public void endBold()
-	{
-		this.sink.bold_();
-	}
-
 	public void endDocument()
 	{
 		this.sink.body_();
-	}
-
-	public void endItalic()
-	{
-		this.sink.italic_();
 	}
 
 	public void endList(ListType listType)
@@ -225,4 +244,13 @@ public class DoxiaGeneratorListener implements Listener
 	{
 	 // TODO: Find out what to do...
 	}
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine() 
+     */
+    public void onHorizontalLine()
+    {
+        this.sink.horizontalRule();
+    }
 }

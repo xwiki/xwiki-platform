@@ -37,17 +37,19 @@ public interface Listener
      */
     void endDocument();
 
-    void beginBold();
+    /**
+     * Represents the start of a text formatting block (bold, italic, etc).
+     * @param format the formatting type
+     * @see Format
+     */
+    void beginFormat(Format format);
 
-    void endBold();
-
-    void beginItalic();
-
-    void endItalic();
-
-    void beginUnderline();
-
-    void endUnderline();
+    /**
+     * Represents the end of a text formatting block (bold, italic, etc).
+     * @param format the formatting type
+     * @see Format
+     */
+    void endFormat(Format format);
 
     void beginParagraph();
 
@@ -112,6 +114,18 @@ public interface Listener
      * @since 1.5RC1
      */
     void onEscape(String escapedString);
-    
+
+    /**
+     * Represents a reference/location in a page. In HTML for example this is called an Anchor. It allows pointing
+     * to that location, for example in links.
+     *
+     * @param name the location name.
+     */
     void onId(String name);
+
+    /**
+     * Represents an horizontal line.
+     */
+    void onHorizontalLine();
+
 }

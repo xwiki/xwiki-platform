@@ -26,14 +26,13 @@ public class ListenerDelegate implements Listener
         this.listener.endDocument();
     }
 
-    public void beginBold()
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginFormat(Format)
+     */
+    public void beginFormat(Format format)
     {
-        this.listener.beginBold();
-    }
-
-    public void beginItalic()
-    {
-        this.listener.beginItalic();
+        this.listener.beginFormat(format);
     }
 
     public void beginList(ListType listType)
@@ -66,24 +65,13 @@ public class ListenerDelegate implements Listener
         this.listener.beginXMLElement(name, attributes);
     }
 
-    public void endBold()
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endFormat(Format) 
+     */
+    public void endFormat(Format format)
     {
-        this.listener.endBold();
-    }
-
-    public void endItalic()
-    {
-        this.listener.endItalic();
-    }
-
-    public void beginUnderline()
-    {
-        this.listener.beginUnderline();
-    }
-
-    public void endUnderline()
-    {
-        this.listener.endUnderline();
+        this.listener.endFormat(format);
     }
 
     public void endList(ListType listType)
@@ -159,5 +147,14 @@ public class ListenerDelegate implements Listener
     public void onId(String name)
     {
         this.listener.onId(name);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
+     */
+    public void onHorizontalLine()
+    {
+        this.listener.onHorizontalLine();
     }
 }

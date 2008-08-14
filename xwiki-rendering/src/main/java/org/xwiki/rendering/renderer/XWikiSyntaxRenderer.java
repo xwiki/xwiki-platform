@@ -27,6 +27,7 @@ import org.xwiki.rendering.internal.XWikiMacroPrinter;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.Format;
 
 /**
  * Generates XWiki Syntax from {@link org.xwiki.rendering.block.XDOM}. This is useful for example to convert other wiki
@@ -91,40 +92,58 @@ public class XWikiSyntaxRenderer implements Renderer
         write("]]");
     }
 
-    public void beginBold()
+    /**
+     * {@inheritDoc}
+     *
+     * @see Renderer#beginFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void beginFormat(Format format)
     {
-        write("**");
+        switch(format)
+        {
+            case BOLD:
+                write("**");
+                break;
+            case ITALIC:
+                write("~~");
+                break;
+            case STRIKEDOUT:
+                write("--");
+                break;
+            case UNDERLINED:
+                write("__");
+                break;
+        }
     }
 
-    public void beginItalic()
+    /**
+     * {@inheritDoc}
+     *
+     * @see Renderer#endFormat(org.xwiki.rendering.listener.Format)
+     */
+    public void endFormat(Format format)
     {
-        write("~~");
+        switch(format)
+        {
+            case BOLD:
+                write("**");
+                break;
+            case ITALIC:
+                write("~~");
+                break;
+            case STRIKEDOUT:
+                write("--");
+                break;
+            case UNDERLINED:
+                write("__");
+                break;
+        }
     }
 
     public void beginParagraph()
     {
         addLineBreak();
         addLineBreak();
-    }
-
-    public void endBold()
-    {
-        write("**");
-    }
-
-    public void endItalic()
-    {
-        write("~~");
-    }
-
-    public void beginUnderline()
-    {
-        write("__");
-    }
-
-    public void endUnderline()
-    {
-        write("__");
     }
 
     public void endParagraph()
@@ -280,6 +299,15 @@ public class XWikiSyntaxRenderer implements Renderer
     public void onId(String name)
     {
         write("{{id name=\"" + name + "\"}}");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine() 
+     */
+    public void onHorizontalLine()
+    {
+        write("----");
     }
 
     private void write(String text)

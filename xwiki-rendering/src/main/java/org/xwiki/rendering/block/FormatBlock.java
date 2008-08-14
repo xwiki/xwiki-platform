@@ -19,28 +19,39 @@
  */
 package org.xwiki.rendering.block;
 
+import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Listener;
 
 import java.util.List;
 
 /**
- * @version $Id: $
+ * Represents a text formatting block (bold, italic, etc).
+ * 
+ * @version ëd: $
  * @since 1.6M1
  */
-public class UnderlineBlock extends AbstractFatherBlock
+public class FormatBlock extends AbstractFatherBlock
 {
-    public UnderlineBlock(List<Block> childBlocks)
+    private Format format;
+
+    public FormatBlock(List<Block> childBlocks, Format format)
     {
         super(childBlocks);
+        this.format = format;
+    }
+
+    public Format getFormat()
+    {
+        return this.format;
     }
 
     public void before(Listener listener)
     {
-        listener.beginUnderline();
+        listener.beginFormat(getFormat());
     }
 
     public void after(Listener listener)
     {
-        listener.endUnderline();
+        listener.endFormat(getFormat());
     }
 }

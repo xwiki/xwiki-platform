@@ -31,22 +31,109 @@
   </parent>
   <groupId>org.xwiki.platform</groupId>
   <artifactId>xwiki-core-rendering</artifactId>
-  <name>XWiki Platform - Core - Rendering - Parent POM</name>
-  <packaging>pom</packaging>
-  <description>XWiki Platform - Core - Rendering - Parent POM</description>
+  <name>XWiki Platform - Core - Rendering</name>
+  <packaging>jar</packaging>
+  <description>XWiki Platform - Core - Rendering</description>
   <dependencies>
+    <dependency>
+      <groupId>commons-lang</groupId>
+      <artifactId>commons-lang</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-container-api</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-context</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-velocity</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
+    <!-- Required for the XHTML macro -->
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-xml</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.wikimodel</groupId>
+      <artifactId>org.wikimodel.wem</artifactId>
+      <version>2.0.7-20080727</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-module-confluence</artifactId>
+      <version>1.0-alpha-11</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-module-twiki</artifactId>
+      <version>1.0-alpha-11</version>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-plexus</artifactId>
+      <version>${pom.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <artifactId>xwiki-shared-tests</artifactId>
+      <version>${platform.tool.test.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
-  <modules>
-    <module>xwiki-rendering-api</module>
-    <module>xwiki-rendering-xwiki</module>
-    <module>xwiki-rendering-wikimodel</module>
-    <module>xwiki-rendering-doxia</module>
-    <module>xwiki-rendering-tests</module>
-  </modules>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>**/*TestSuite.java</include>
+            <include>**/*Test.java</include>
+          </includes>
+          <excludes>
+            <exclude>**/scaffolding/**.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.2</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <repositories>
+    <!-- Repository hosting wikimodel jars -->
+    <repository>
+      <id>semweb4j</id>
+      <name>Semweb4j.org Maven Remote Repository</name>
+      <url>http://semweb4j.org/repo</url>
+    </repository>
+  </repositories>
 </project>
-       

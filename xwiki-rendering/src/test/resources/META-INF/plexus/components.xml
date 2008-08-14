@@ -1,0 +1,50 @@
+<component-set>
+  <components>
+    <!-- Components used for testing -->
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testsimplemacro/xwiki</role-hint>
+      <implementation>org.xwiki.rendering.transformation.TestSimpleMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testnestedmacro/xwiki</role-hint>
+      <implementation>org.xwiki.rendering.transformation.TestNestedMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testrecursivemacro/xwiki</role-hint>
+      <implementation>org.xwiki.rendering.transformation.TestRecursiveMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>testprioritymacro/xwiki</role-hint>
+      <implementation>org.xwiki.rendering.transformation.TestPriorityMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <configuration>
+        <!-- Ensure that this macro gets executed before the other macros for testing priorities -->
+        <priority>500</priority>
+      </configuration>
+    </component>
+
+    <!-- Override default Velocity Manager component implementation for testing -->
+    <component>
+      <role>org.xwiki.velocity.VelocityManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.macro.MockVelocityManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+
+    <!-- Override default Document Manager component implementation for testing -->
+    <component>
+      <role>org.xwiki.rendering.DocumentManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.MockDocumentManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+
+  </components>
+</component-set>

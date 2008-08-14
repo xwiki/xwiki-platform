@@ -43,7 +43,7 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
     private static final String DESCRIPTION = "Inserts XHTML code into the page.";
 
     /**
-     * The TOC macro parameters manager.
+     * The macro parameters manager.
      */
     private XHTMLMacroParameterManager macroParameters = new XHTMLMacroParameterManager();
 

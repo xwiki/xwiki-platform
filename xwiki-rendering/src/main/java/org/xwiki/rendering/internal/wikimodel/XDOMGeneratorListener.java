@@ -138,20 +138,17 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginTable(WikiParameters params)
     {
-        // TODO Auto-generated method stub
-        System.out.println("beginTable");
+        // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
     public void beginTableCell(boolean tableHead, WikiParameters params)
     {
-        // TODO Auto-generated method stub
-        System.out.println("beginTableCell");
+        // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
     public void beginTableRow(WikiParameters params)
     {
-        // TODO Auto-generated method stub
-        System.out.println("beginTableRow");
+        // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
     public void endDefinitionDescription()
@@ -254,20 +251,17 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endTable(WikiParameters params)
     {
-        // TODO Auto-generated method stub
-
+        // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
     public void endTableCell(boolean tableHead, WikiParameters params)
     {
-        // TODO Auto-generated method stub
-
+        // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
     public void endTableRow(WikiParameters params)
     {
-        // TODO Auto-generated method stub
-
+        // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
     public void onEmptyLines(int count)
@@ -383,8 +377,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void onTableCaption(String str)
     {
-        // TODO Auto-generated method stub
-
+        // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
     public void onVerbatimBlock(String str)

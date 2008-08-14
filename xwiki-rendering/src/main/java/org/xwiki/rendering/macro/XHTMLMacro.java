@@ -27,8 +27,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.helpers.XMLReaderFactory;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.parser.Parser;
@@ -38,7 +36,7 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
-public class XHTMLMacro extends AbstractMacro implements Initializable
+public class XHTMLMacro extends AbstractMacro
 {
     private static final String DESCRIPTION = "Inserts XHTML code into the page.";
 
@@ -57,16 +55,6 @@ public class XHTMLMacro extends AbstractMacro implements Initializable
      * the Component Manager.
      */
     private EntityResolver entityResolver;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        // TODO: Use an I8N service to translate the descriptions in several languages
-    }
 
     /**
      * {@inheritDoc}

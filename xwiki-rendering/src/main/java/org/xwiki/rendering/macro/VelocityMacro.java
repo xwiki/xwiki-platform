@@ -20,14 +20,11 @@
 package org.xwiki.rendering.macro;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.io.StringWriter;
 import java.io.StringReader;
 
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
@@ -54,16 +51,6 @@ public class VelocityMacro extends AbstractMacro
      * Injected by the Component Manager.
      */
     private Parser parser;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
-    {
-        // TODO: Use an I8N service to translate the descriptions in several languages
-    }
 
     /**
      * {@inheritDoc}

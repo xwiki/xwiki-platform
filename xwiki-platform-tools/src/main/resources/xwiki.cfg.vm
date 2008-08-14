@@ -179,11 +179,11 @@ xwiki.authentication.ldap.trylocal=1
 #-# [SINCE 1.5M2]
 #-# The cache component implementation to use as "normal" (can be local or distributed depending on the implementation)
 #-# cache component.
-xwiki.cache.cachefactory.hint=oscache
+# xwiki.cache.cachefactory.hint=jbosscache
 
 #-# [SINCE 1.5M2]
 #-# The cache component to use as local cache component. 
-xwiki.cache.cachefactory.local.hint=oscache/local
+# xwiki.cache.cachefactory.local.hint=jbosscache/local
 
 #-------------------------------------------------------------------------------------
 

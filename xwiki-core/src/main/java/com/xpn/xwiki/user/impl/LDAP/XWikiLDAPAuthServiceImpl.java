@@ -313,7 +313,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             if (ldapUtils.isUserInGroup(ldapUserName, excludeGroupDN, context) != null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
                     "LDAP user {0} should not belong to LDAP group {1}.", null, new Object[] {ldapUserName,
-                    filterGroupDN});
+                        filterGroupDN});
             }
         }
 
@@ -335,19 +335,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // if we still don't have a dn, search for it. Also get the attributes, we might need
         // them
         if (userDN == null) {
-            String uidAttributeName = config.getLDAPParam(XWikiLDAPConfig.PREF_LDAP_UID, LDAP_DEFAULT_UID, context);
-
-            // search for the user in LDAP
-            String query = MessageFormat.format("({0}={1})", new Object[] {uidAttributeName, ldapUserName});
-            String baseDN = config.getLDAPParam("ldap_base_DN", "", context);
-
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Searching for the user in LDAP: user:" + ldapUserName + " base:" + baseDN + " query:"
-                    + query + " uid:" + uidAttributeName);
-            }
-
             searchAttributes =
-                connector.searchLDAP(baseDN, query, getAttributeNameTable(context), LDAPConnection.SCOPE_SUB);
+                ldapUtils.searchUserAttributesByUid(ldapUserName, getAttributeNameTable(context), context);
 
             for (XWikiLDAPSearchAttribute searchAttribute : searchAttributes) {
                 if ("dn".equals(searchAttribute.name)) {
@@ -413,7 +402,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
      * @param context the XWiki context.
      * @return the LDAP user attributes names.
      */
-    protected String[] getAttributeNameTable(XWikiContext context)
+    public String[] getAttributeNameTable(XWikiContext context)
     {
         String[] attributeNameTable = null;
 
@@ -653,7 +642,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Finished adding user {0} to xwiki group {1}", new Object[] {userName,
-                groupName}));
+                    groupName}));
             }
 
         } catch (Exception e) {

@@ -104,6 +104,24 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
+      <role-hint>html/xwiki</role-hint>
+      <implementation>org.xwiki.rendering.macro.HTMLMacro</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.macro.Macro</role>
+          <role-hint>xhtml/xwiki</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.xml.html.HTMLCleaner</role>
+        </requirement>
+      </requirements>
+      <configuration>
+        <priority>1000</priority>
+      </configuration>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>velocity/xwiki</role-hint>
       <implementation>org.xwiki.rendering.macro.VelocityMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

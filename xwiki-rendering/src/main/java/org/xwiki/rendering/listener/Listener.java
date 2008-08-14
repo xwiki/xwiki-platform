@@ -45,6 +45,10 @@ public interface Listener
 
     void endItalic();
 
+    void beginUnderline();
+
+    void endUnderline();
+
     void beginParagraph();
 
     void endParagraph();

@@ -152,6 +152,26 @@ public class XHTMLRenderer implements Renderer
 
     /**
      * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.Renderer#beginUnderline()
+     */
+    public void beginUnderline()
+    {
+        write("<u>");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.Renderer#endUnderline()
+     */
+    public void endUnderline()
+    {
+        write("</u>");
+    }
+
+    /**
+     * {@inheritDoc}
      * 
      * @see Renderer#endParagraph()
      */

@@ -78,6 +78,16 @@ public class TestEventsListener implements Listener
         write("endParagraph");
     }
 
+    public void beginUnderline()
+    {
+        write("beginUnderline");
+    }
+
+    public void endUnderline()
+    {
+        write("endUnderline");
+    }
+
     public void onLineBreak()
     {
         write("onLineBreak");

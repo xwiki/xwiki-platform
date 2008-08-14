@@ -117,6 +117,16 @@ public class XWikiSyntaxRenderer implements Renderer
         write("~~");
     }
 
+    public void beginUnderline()
+    {
+        write("__");
+    }
+
+    public void endUnderline()
+    {
+        write("__");
+    }
+
     public void endParagraph()
     {
         // Nothing to do

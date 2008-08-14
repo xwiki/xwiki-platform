@@ -179,6 +179,9 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endFormat(WikiFormat format)
     {
+        // TODO: Follow http://code.google.com/p/wikimodel/issues/detail?id=31 to check when
+        // underline is implemented and generate an UnderlineBlock when it is...
+        
         if (format.hasStyle(IWemConstants.STRONG)) {
           this.stack.push(new BoldBlock(generateListFromStack()));
         } else if (format.hasStyle(IWemConstants.EM)) {

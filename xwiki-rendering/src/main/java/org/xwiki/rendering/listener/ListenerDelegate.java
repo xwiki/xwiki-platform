@@ -76,6 +76,16 @@ public class ListenerDelegate implements Listener
         this.listener.endItalic();
     }
 
+    public void beginUnderline()
+    {
+        this.listener.beginUnderline();
+    }
+
+    public void endUnderline()
+    {
+        this.listener.endUnderline();
+    }
+
     public void endList(ListType listType)
     {
         this.listener.endList(listType);

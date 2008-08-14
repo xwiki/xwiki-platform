@@ -110,6 +110,18 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endFormat(new WikiFormat(IWemConstants.EM));
     }
 
+    public void beginUnderline()
+    {
+        // TODO: Not supported by wikimodel yet.
+        // See http://code.google.com/p/wikimodel/issues/detail?id=31
+    }
+
+    public void endUnderline()
+    {
+        // TODO: Not supported by wikimodel yet.
+        // See http://code.google.com/p/wikimodel/issues/detail?id=31
+    }
+
     public void endList(ListType listType)
     {
         this.wikimodelListener.endList(null, false);

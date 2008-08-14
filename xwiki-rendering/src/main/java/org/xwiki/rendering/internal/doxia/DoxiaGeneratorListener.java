@@ -66,7 +66,19 @@ public class DoxiaGeneratorListener implements Listener
 		this.sink.listItem();
 	}
 
-	public void beginMacroMarker(String name, Map<String, String> parameters, String content)
+    public void beginUnderline()
+    {
+        // TODO: Implement when we move to Doxia 1.0 beta 1.
+        // See http://jira.codehaus.org/browse/DOXIA-204
+    }
+
+    public void endUnderline()
+    {
+        // TODO: Implement when we move to Doxia 1.0 beta 1.
+        // See http://jira.codehaus.org/browse/DOXIA-204
+    }
+
+    public void beginMacroMarker(String name, Map<String, String> parameters, String content)
 	{
 		// Don't do anything since Doxia doesn't have macro markers and anyway we shouldn't
 		// do anything.

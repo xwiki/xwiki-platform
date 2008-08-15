@@ -95,14 +95,6 @@
       <version>2.8.1</version>
       <scope>test</scope>
     </dependency>
-<!--
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <version>5.1.5</version>
-      <scope>test</scope>
-    </dependency>
--->
     <dependency>
       <!-- Needed for the tests to run, otherwise a NoClassDefFoundError occurs -->
       <groupId>javax.servlet</groupId>
@@ -124,19 +116,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-<!--  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-checkstyle-plugin</artifactId>
-        <dependencies>
-          <dependency>
-            <groupId>com.xpn.xwiki.platform.tools</groupId>
-            <artifactId>xwiki-verification-resources</artifactId>
-            <version>${platform.tool.verification.version}</version>
-          </dependency>
-        </dependencies>
-      </plugin>
-    </plugins>
-  </build>
---></project>
+</project>

@@ -120,7 +120,9 @@ public class XHTMLRenderer implements Renderer
                 write("<del>");
                 break;
             case UNDERLINED:
-                write("<u>");
+                // Note: XHTML has deprecated the usage of <u> in favor of style sheets.
+                // Thus we use a class instead so that it can be styled using CSS.
+                write("<span class='underline'>");
                 break;
         }
     }
@@ -144,7 +146,9 @@ public class XHTMLRenderer implements Renderer
                 write("</del>");
                 break;
             case UNDERLINED:
-                write("</u>");
+                // Note: XHTML has deprecated the usage of <u> in favor of style sheets.
+                // Thus we use a class instead so that it can be styled using CSS.
+                write("</span>");
                 break;
         }
     }

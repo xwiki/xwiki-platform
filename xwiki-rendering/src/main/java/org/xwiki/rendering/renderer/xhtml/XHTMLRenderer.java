@@ -203,12 +203,20 @@ public class XHTMLRenderer implements Renderer
         write(this.linkRenderer.renderLink(link));
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onMacro(String, java.util.Map, String)  
+     */
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
         // Do nothing since macro output depends on Macro execution which transforms the macro
         // into a set of other events.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#beginSection(org.xwiki.rendering.listener.SectionLevel)  
+     */
     public void beginSection(SectionLevel level)
     {
         // Don't output anything yet since we need the section title to generate the unique XHTML id attribute.
@@ -229,6 +237,10 @@ public class XHTMLRenderer implements Renderer
         write("<span>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#endSection(org.xwiki.rendering.listener.SectionLevel)  
+     */
     public void endSection(SectionLevel level)
     {
         String sectionTitle = this.sectionTitleWriter.toString();
@@ -242,21 +254,37 @@ public class XHTMLRenderer implements Renderer
         write("</h" + levelAsInt + ">");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onWord(String)  
+     */
     public void onWord(String word)
     {
         write(word);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onSpace()
+     */
     public void onSpace()
     {
         write(" ");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onSpecialSymbol(String)
+     */
     public void onSpecialSymbol(String symbol)
     {
         write(StringEscapeUtils.escapeHtml(symbol));
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onEscape(String)
+     */
     public void onEscape(String escapedString)
     {
         // Note: for single character escapes it would have been nicer to use XML entites. However
@@ -266,6 +294,10 @@ public class XHTMLRenderer implements Renderer
         write("<pre><![CDATA[" + escapedString + "]]></pre>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#beginList(org.xwiki.rendering.listener.ListType)  
+     */
     public void beginList(ListType listType)
     {
         if (listType == ListType.BULLETED) {
@@ -275,11 +307,19 @@ public class XHTMLRenderer implements Renderer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#beginListItem()
+     */
     public void beginListItem()
     {
         write("<li>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType)
+     */
     public void endList(ListType listType)
     {
         if (listType == ListType.BULLETED) {
@@ -289,11 +329,19 @@ public class XHTMLRenderer implements Renderer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#endListItem()
+     */
     public void endListItem()
     {
         write("</li>");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#beginXMLElement(String, java.util.Map)
+     */
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
         write("<" + name);
@@ -303,21 +351,37 @@ public class XHTMLRenderer implements Renderer
         write(">");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#endXMLElement(String, java.util.Map)  
+     */
     public void endXMLElement(String name, Map<String, String> attributes)
     {
         write("</" + name + ">");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#beginMacroMarker(String, java.util.Map, String)
+     */
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
         // Ignore macro markers, nothing to do.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#endMacroMarker(String, java.util.Map, String)
+     */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
         // Ignore macro markers, nothing to do.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onId(String)  
+     */
     public void onId(String name)
     {
         write("<a id=\"" + name + "\" name=\"" + name + "\"></a>");

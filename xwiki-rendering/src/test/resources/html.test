@@ -1,0 +1,46 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+This is <a href="url">some HTML</a>.
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+onSpecialSymbol: [<]
+onWord: [a]
+onSpace
+onWord: [href]
+onSpecialSymbol: [=]
+onSpecialSymbol: ["]
+onWord: [url]
+onSpecialSymbol: ["]
+onSpecialSymbol: [>]
+onWord: [some]
+onSpace
+onWord: [HTML]
+onSpecialSymbol: [<]
+onSpecialSymbol: [/]
+onWord: [a]
+onSpecialSymbol: [>]
+onSpecialSymbol: [.]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>This is &lt;a href=&quot;url&quot;&gt;some HTML&lt;/a&gt;.</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+This is <a href="url">some HTML</a>.
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: Quote is not considered as special symbol by WikiModel XHTML parser
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=37
+<html><p>This is &lt;a href=&quot;url&quot;&gt;some HTML&lt;/a&gt;.</p></html>

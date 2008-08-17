@@ -17,30 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.renderer;
+package org.xwiki.rendering.internal.wikimodel;
 
-import org.wikimodel.wem.tex.TexSerializer;
-import org.xwiki.rendering.listener.ListenerDelegate;
-import org.xwiki.rendering.internal.wikimodel.WikiModelGeneratorListener;
-import org.xwiki.rendering.internal.wikimodel.WikiModelPrinterAdapter;
+import org.wikimodel.wem.IWikiPrinter;
+import org.xwiki.rendering.renderer.WikiPrinter;
 
-public class TexRenderer extends ListenerDelegate implements PrintRenderer
+/**
+ * Bridge so that WikiModel listeners can be used and so that they output their results to a XWiki
+ * {@link WikiPrinter} instance.
+ *
+ * @version $Id: $
+ * @since 1.5M1
+ */
+public class WikiModelPrinterAdapter implements IWikiPrinter
 {
-    private WikiPrinter printer;
-
-	public TexRenderer(WikiPrinter printer)
+	private WikiPrinter printer;
+	
+	public WikiModelPrinterAdapter(WikiPrinter printer)
 	{
-        this.printer = printer;
-        setWrappedListener(new WikiModelGeneratorListener(
-				new TexSerializer(new WikiModelPrinterAdapter(getPrinter()))));
+		this.printer = printer;
+	}
+	
+	public void print(String text)
+	{
+		this.printer.print(text);
 	}
 
-    /**
-     * {@inheritDoc}
-     * @see PrintRenderer#getPrinter()
-     */
-    public WikiPrinter getPrinter()
-    {
-        return this.printer;
-    }
+	public void println(String text)
+	{
+		this.printer.println(text);
+	}
 }

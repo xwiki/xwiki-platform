@@ -1,0 +1,34 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{testsimplemacro param1="value1" param2="value2"}}
+content
+{{/testsimplemacro}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onMacro: [testsimplemacro] [param1=value1|param2=value2] [
+content
+]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+.#-----------------------------------------------------
+.expect|wysiwyg|skip
+.#-----------------------------------------------------
+.# TODO: Make it work...
+<span class="macro-code"><![CDATA[{{testsimplemacro:param1=value1|param2=value2}}
+content
+{{/testsimplemacro}}]]></span><span class="macro-output"><p>simplemacro0</p></span>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+{{testsimplemacro:param1=value1|param2=value2}}
+content
+{{/testsimplemacro}}
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: Find ways to transform XHTML comments representing a macro 

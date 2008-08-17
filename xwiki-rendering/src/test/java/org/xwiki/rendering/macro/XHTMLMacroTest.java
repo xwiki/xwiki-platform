@@ -58,7 +58,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "endXMLElement: [td] []\n"
             + "endXMLElement: [tr] []\n"
             + "endXMLElement: [table] [border=1]\n"
-            + "endDocument\n";
+            + "endDocument";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         List<Block> blocks = macro.execute(Collections.<String, String> emptyMap(), html, MacroTransformationContext.EMPTY);
@@ -75,7 +75,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
 
         String expected = "beginDocument\n"
             + "onWord: [" + ((char) 160) + "]\n"
-            + "endDocument\n";
+            + "endDocument";
         
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         List<Block> blocks = macro.execute(Collections.<String, String> emptyMap(), html, MacroTransformationContext.EMPTY);
@@ -92,7 +92,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
 
         String expected = "beginDocument\n"
             + "onWord: [**some escaped text**]\n"
-            + "endDocument\n";
+            + "endDocument";
 
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         Map<String, String> parameters = new HashMap<String, String>();
@@ -117,7 +117,7 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "onWord: [text]\n"
             + "endXMLElement: [span] []\n"
             + "endXMLElement: [p] []\n"
-            + "endDocument\n";
+            + "endDocument";
 
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         List<Block> blocks = macro.execute(Collections.<String, String> emptyMap(), html, MacroTransformationContext.EMPTY);

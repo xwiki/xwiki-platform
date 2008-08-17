@@ -1,4 +1,0 @@
-{{nowiki}}* this is not a list and this is not **bold**
-[[not a link]]
-\\ <-- not a newline
-{{/nowiki}}{{nowiki}}*{{/nowiki}}

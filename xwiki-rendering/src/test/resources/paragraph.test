@@ -1,0 +1,40 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+hello ~~beautiful~~ **world**
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [hello]
+onSpace
+beginItalic
+onWord: [beautiful]
+endItalic
+onSpace
+beginBold
+onWord: [world]
+endBold
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>hello <em class="italic">beautiful</em> <strong>world</strong></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+hello ~~beautiful~~ **world**
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>hello <em class="italic">beautiful</em> <strong>world</strong></p></html>
+.#-----------------------------------------------------
+.input|confluence/1.0
+.#-----------------------------------------------------
+hello _beautiful_ *world*
+.#-----------------------------------------------------
+.expect|tex|skip
+.#-----------------------------------------------------
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=24

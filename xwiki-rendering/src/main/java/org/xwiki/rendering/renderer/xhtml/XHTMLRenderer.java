@@ -19,9 +19,6 @@
  */
 package org.xwiki.rendering.renderer.xhtml;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -30,6 +27,9 @@ import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.renderer.Renderer;
+import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.DocumentManager;
 
 /**
@@ -38,10 +38,8 @@ import org.xwiki.rendering.DocumentManager;
  * @version $Id$
  * @since 1.5M2
  */
-public class XHTMLRenderer implements Renderer
+public class XHTMLRenderer extends AbstractPrintRenderer
 {
-    private PrintWriter writer;
-
     private DocumentManager documentManager;
 
     /**
@@ -55,26 +53,26 @@ public class XHTMLRenderer implements Renderer
     private XHTMLIdGenerator idGenerator;
 
     /**
-     * Used to save the original Writer when we redirect all outputs to a new writer to compute a section title. We need
-     * to do this since the XHTML we generate for a section title contains a unique id that we generate based on the
-     * section title and the events for the section title are generated after the beginSection() event.
+     * Used to save the original Printer when we redirect all outputs to a new Printer to compute a section title.
+     * We need to do this since the XHTML we generate for a section title contains a unique id that we generate based
+     * on the section title and the events for the section title are generated after the beginSection() event.
      */
-    private PrintWriter originalWriter;
+    private WikiPrinter originalPrinter;
 
     /**
-     * The temporary writer used to redirect all outputs when computing the section title.
+     * The temporary Printer used to redirect all outputs when computing the section title.
      * 
-     * @see #originalWriter
+     * @see #originalPrinter
      */
-    private Writer sectionTitleWriter;
+    private WikiPrinter sectionTitlePrinter;
 
     /**
-     * @param writer the stream to write the XHTML output to
+     * @param printer the object to which to write the XHTML output to
      * @param documentManager see {@link #documentManager}
      */
-    public XHTMLRenderer(Writer writer, DocumentManager documentManager)
+    public XHTMLRenderer(WikiPrinter printer, DocumentManager documentManager)
     {
-        this.writer = new PrintWriter(writer);
+        super(printer);
         this.documentManager = documentManager;
         this.linkRenderer = new XHTMLLinkRenderer(documentManager);
     }
@@ -111,18 +109,18 @@ public class XHTMLRenderer implements Renderer
         switch(format)
         {
             case BOLD:
-                write("<strong>");
+                print("<strong>");
                 break;
             case ITALIC:
-                write("<em class=\"italic\">");
+                print("<em class=\"italic\">");
                 break;
             case STRIKEDOUT:
-                write("<del>");
+                print("<del>");
                 break;
             case UNDERLINED:
                 // Note: XHTML has deprecated the usage of <u> in favor of style sheets.
                 // Thus we use a class instead so that it can be styled using CSS.
-                write("<span class=\"underline\">");
+                print("<span class=\"underline\">");
                 break;
         }
     }
@@ -137,18 +135,18 @@ public class XHTMLRenderer implements Renderer
         switch(format)
         {
             case BOLD:
-                write("</strong>");
+                print("</strong>");
                 break;
             case ITALIC:
-                write("</em>");
+                print("</em>");
                 break;
             case STRIKEDOUT:
-                write("</del>");
+                print("</del>");
                 break;
             case UNDERLINED:
                 // Note: XHTML has deprecated the usage of <u> in favor of style sheets.
                 // Thus we use a class instead so that it can be styled using CSS.
-                write("</span>");
+                print("</span>");
                 break;
         }
     }
@@ -160,7 +158,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void beginParagraph()
     {
-        write("<p>");
+        print("<p>");
     }
 
     /**
@@ -170,7 +168,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void endParagraph()
     {
-        write("</p>");
+        print("</p>");
     }
 
     /**
@@ -180,7 +178,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void onLineBreak()
     {
-        write("<br/>");
+        print("<br/>");
     }
 
     /**
@@ -200,7 +198,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void onLink(Link link)
     {
-        write(this.linkRenderer.renderLink(link));
+        print(this.linkRenderer.renderLink(link));
     }
 
     /**
@@ -223,18 +221,18 @@ public class XHTMLRenderer implements Renderer
         // Thus we're doing the output in the endSection() event.
 
         // Redirect all output to our writer
-        this.originalWriter = getWriter();
-        this.sectionTitleWriter = new StringWriter();
-        this.setWriter(new PrintWriter(this.sectionTitleWriter));
+        this.originalPrinter = getPrinter();
+        this.sectionTitlePrinter = new DefaultWikiPrinter();
+        this.setPrinter(this.sectionTitlePrinter);
     }
 
     private void processBeginSection(SectionLevel level, String sectionTitle)
     {
         int levelAsInt = level.getAsInt();
-        write("<h" + levelAsInt + " id=\"" + this.idGenerator.generateUniqueId(sectionTitle) + "\">");
+        print("<h" + levelAsInt + " id=\"" + this.idGenerator.generateUniqueId(sectionTitle) + "\">");
         // We generate a span so that CSS rules have a hook to perform some magic that wouldn't work on just a H
         // element. Like some IE6 magic and others.
-        write("<span>");
+        print("<span>");
     }
 
     /**
@@ -243,15 +241,14 @@ public class XHTMLRenderer implements Renderer
      */
     public void endSection(SectionLevel level)
     {
-        String sectionTitle = this.sectionTitleWriter.toString();
-        getWriter().close();
-        setWriter(this.originalWriter);
+        String sectionTitle = this.sectionTitlePrinter.toString();
+        setPrinter(this.originalPrinter);
         processBeginSection(level, sectionTitle);
-        write(sectionTitle);
+        print(sectionTitle);
 
         int levelAsInt = level.getAsInt();
-        write("</span>");
-        write("</h" + levelAsInt + ">");
+        print("</span>");
+        print("</h" + levelAsInt + ">");
     }
 
     /**
@@ -260,7 +257,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void onWord(String word)
     {
-        write(word);
+        print(word);
     }
 
     /**
@@ -269,7 +266,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void onSpace()
     {
-        write(" ");
+        print(" ");
     }
 
     /**
@@ -278,7 +275,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void onSpecialSymbol(String symbol)
     {
-        write(StringEscapeUtils.escapeHtml(symbol));
+        print(StringEscapeUtils.escapeHtml(symbol));
     }
 
     /**
@@ -291,7 +288,7 @@ public class XHTMLRenderer implements Renderer
         // Wikimodel doesn't support that since its XHTML parser uses a XML parser and entities are
         // resolved internally by XML parsers so there's no way for wikimodel to know about them.
         // TODO: The syntax below is yet to be confirmed and should be considered temporary for now
-        write("<pre><![CDATA[" + escapedString + "]]></pre>");
+        print("<pre><![CDATA[" + escapedString + "]]></pre>");
     }
 
     /**
@@ -301,9 +298,9 @@ public class XHTMLRenderer implements Renderer
     public void beginList(ListType listType)
     {
         if (listType == ListType.BULLETED) {
-            write("<ul class=\"star\">");
+            print("<ul class=\"star\">");
         } else {
-            write("<ol>");
+            print("<ol>");
         }
     }
 
@@ -313,7 +310,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void beginListItem()
     {
-        write("<li>");
+        print("<li>");
     }
 
     /**
@@ -323,9 +320,9 @@ public class XHTMLRenderer implements Renderer
     public void endList(ListType listType)
     {
         if (listType == ListType.BULLETED) {
-            write("</ul>");
+            print("</ul>");
         } else {
-            write("</ol>");
+            print("</ol>");
         }
     }
 
@@ -335,7 +332,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void endListItem()
     {
-        write("</li>");
+        print("</li>");
     }
 
     /**
@@ -344,11 +341,11 @@ public class XHTMLRenderer implements Renderer
      */
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
-        write("<" + name);
+        print("<" + name);
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
-            write(" " + entry.getKey() + "=\"" + entry.getValue() + "\"");
+            print(" " + entry.getKey() + "=\"" + entry.getValue() + "\"");
         }
-        write(">");
+        print(">");
     }
 
     /**
@@ -357,7 +354,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void endXMLElement(String name, Map<String, String> attributes)
     {
-        write("</" + name + ">");
+        print("</" + name + ">");
     }
 
     /**
@@ -384,7 +381,7 @@ public class XHTMLRenderer implements Renderer
      */
     public void onId(String name)
     {
-        write("<a id=\"" + name + "\" name=\"" + name + "\"></a>");
+        print("<a id=\"" + name + "\" name=\"" + name + "\"></a>");
     }
 
     /**
@@ -393,22 +390,6 @@ public class XHTMLRenderer implements Renderer
      */
     public void onHorizontalLine()
     {
-        write("<hr/>");
+        print("<hr/>");
     }
-
-    protected void write(String text)
-    {
-        this.writer.write(text);
-    }
-
-    private PrintWriter getWriter()
-    {
-        return this.writer;
-    }
-
-    private void setWriter(PrintWriter writer)
-    {
-        this.writer = writer;
-    }
-
 }

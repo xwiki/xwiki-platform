@@ -1,7 +1,0 @@
-beginDocument
-beginParagraph
-onEscape: [*]
-onWord: [hello]
-onEscape: [*]
-endParagraph
-endDocument

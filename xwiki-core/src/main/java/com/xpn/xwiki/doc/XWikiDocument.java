@@ -71,6 +71,8 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
 import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
+import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.transformation.TransformationManager;
 import org.xwiki.rendering.DocumentManager;
 import com.xpn.xwiki.XWiki;
@@ -484,7 +486,6 @@ public class XWikiDocument
     private String getRenderedContentUsingNewRenderingModule(String content)
     	throws XWikiException
     {
-        StringWriter writer = new StringWriter();
         TransformationManager transformations =
             (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
         XDOM dom;
@@ -498,9 +499,10 @@ public class XWikiDocument
                 "Failed to render content using new rendering system", e);
         }
         DocumentManager documentManager = (DocumentManager) Utils.getComponent(DocumentManager.ROLE);
-        dom.traverse(new XHTMLRenderer(writer, documentManager));
+        WikiPrinter printer = new DefaultWikiPrinter();
+        dom.traverse(new XHTMLRenderer(printer, documentManager));
 
-        return writer.toString();
+        return printer.toString();
     }
 
     public String getEscapedContent(XWikiContext context) throws XWikiException

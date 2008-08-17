@@ -50,7 +50,7 @@ public class VelocityMacroTest extends AbstractRenderingTestCase
             + "onWord: [two]\n"
             + "endListItem\n"
             + "endList: [BULLETED]\n"
-            + "endDocument\n";
+            + "endDocument";
 
         Macro macro = (Macro) getComponentManager().lookup(VelocityMacro.ROLE, "velocity/xwiki");
         List<Block> blocks = macro.execute(Collections.EMPTY_MAP, content, MacroTransformationContext.EMPTY);

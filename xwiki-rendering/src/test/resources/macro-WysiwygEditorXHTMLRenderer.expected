@@ -1,3 +1,0 @@
-<span class="macro-code"><![CDATA[{{testsimplemacro:param1=value1|param2=value2}}
-content
-{{/testsimplemacro}}]]></span><span class="macro-output"><p>simplemacro0</p></span>

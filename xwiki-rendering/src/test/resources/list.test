@@ -1,0 +1,126 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+1. Item 1
+11. Item 2
+11*. Item 3
+11. Item 4
+1. Item 5
+* Item 1
+** Item 2
+*** Item 3
+** Item 4
+* Item 5
+* Item 6
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginList: [NUMBERED]
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [1]
+beginList: [NUMBERED]
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [2]
+beginList: [BULLETED]
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [3]
+endListItem
+endList: [BULLETED]
+endListItem
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [4]
+endListItem
+endList: [NUMBERED]
+endListItem
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [5]
+endListItem
+endList: [NUMBERED]
+beginList: [BULLETED]
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [1]
+beginList: [BULLETED]
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [2]
+beginList: [BULLETED]
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [3]
+endListItem
+endList: [BULLETED]
+endListItem
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [4]
+endListItem
+endList: [BULLETED]
+endListItem
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [5]
+endListItem
+beginListItem
+onWord: [Item]
+onSpace
+onWord: [6]
+endListItem
+endList: [BULLETED]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<ol><li>Item 1<ol><li>Item 2<ul class="star"><li>Item 3</li></ul></li><li>Item 4</li></ol></li><li>Item 5</li></ol><ul class="star"><li>Item 1<ul class="star"><li>Item 2<ul class="star"><li>Item 3</li></ul></li><li>Item 4</li></ul></li><li>Item 5</li><li>Item 6</li></ul>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+1. Item 1
+11. Item 2
+11*. Item 3
+11. Item 4
+1. Item 5
+* Item 1
+** Item 2
+*** Item 3
+** Item 4
+* Item 5
+* Item 6
+.# TODO: We need to fix the XWikiSyntaxRenderer so that a new line is not added
+
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=22
+<html><ol><li>Item 1<ol><li>Item 2<ul class="star"><li>Item 3</li></ul></li><li>Item 4</li></ol></li><li>Item 5</li></ol><ul class="star"><li>Item 1<ul class="star"><li>Item 2<ul class="star"><li>Item 3</li></ul></li><li>Item 4</li></ul></li><li>Item 5</li><li>Item 6</li></ul></html>
+.#-----------------------------------------------------
+.input|confluence/1.0|skip
+.#-----------------------------------------------------
+.# TODO: See http://jira.codehaus.org/browse/DOXIA-232
+# Item 1
+## Item 2
+##* Item 3
+## Item 4
+# Item 5
+* Item 1
+** Item 2
+*** Item 3
+** Item 4
+* Item 5
+* Item 6

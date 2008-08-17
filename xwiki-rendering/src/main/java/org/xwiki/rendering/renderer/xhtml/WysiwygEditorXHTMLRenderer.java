@@ -19,34 +19,34 @@
  */
 package org.xwiki.rendering.renderer.xhtml;
 
-import java.io.Writer;
 import java.util.Map;
 
 import org.xwiki.rendering.DocumentManager;
+import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.internal.XWikiMacroPrinter;
 
 public class WysiwygEditorXHTMLRenderer extends XHTMLRenderer
 {
     private XWikiMacroPrinter macroPrinter;
 
-    public WysiwygEditorXHTMLRenderer(Writer writer, DocumentManager documentManager)
+    public WysiwygEditorXHTMLRenderer(WikiPrinter printer, DocumentManager documentManager)
     {
-        super(writer, documentManager);
+        super(printer, documentManager);
         this.macroPrinter = new XWikiMacroPrinter();
     }
 
     @Override
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        write("<span class=\"macro-code\"><![CDATA[");
-        // Write the source of the macro
-        write(this.macroPrinter.print(name, parameters, content));
-        write("]]></span><span class=\"macro-output\">");
+        print("<span class=\"macro-code\"><![CDATA[");
+        // Print the source of the macro
+        print(this.macroPrinter.print(name, parameters, content));
+        print("]]></span><span class=\"macro-output\">");
     }
 
     @Override
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
-        write("</span>");
+        print("</span>");
     }
 }

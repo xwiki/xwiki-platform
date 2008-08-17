@@ -1,5 +1,0 @@
-beginDocument
-onMacro: [testsimplemacro] [param1=value1|param2=value2] [
-content
-]
-endDocument

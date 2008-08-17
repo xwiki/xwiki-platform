@@ -43,7 +43,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     {
         String expected = "beginDocument\n"
         	+ "onMacro: [someMacro] [] []\n"
-        	+ "endDocument\n";
+        	+ "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
         Mock mockDocumentManager = mock(DocumentManager.class);
@@ -68,7 +68,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             + "onWord: [myvar]\n"
             + "endParagraph\n"
             + "endMacroMarker: [velocity] [] [$myvar]\n"
-            + "endDocument\n";
+            + "endDocument";
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.

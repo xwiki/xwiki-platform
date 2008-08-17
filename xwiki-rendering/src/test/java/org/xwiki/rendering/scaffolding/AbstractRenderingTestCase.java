@@ -21,21 +21,32 @@ package org.xwiki.rendering.scaffolding;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.renderer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.WikiPrinter;
 
 import java.util.List;
-import java.io.StringWriter;
 
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTestCase
 {
+    public AbstractRenderingTestCase()
+    {
+        super();
+    }
+
+    public AbstractRenderingTestCase(String testName)
+    {
+        super(testName);
+    }
+
     protected void assertBlocks(String expected, List<Block> blocks)
     {
-        // Assert the result by parsing it through the TestEventsListener to generate easily
+        // Assert the result by parsing it through the TestEventsRenderer to generate easily
         // assertable events.
         XDOM dom = new XDOM(blocks);
-        StringWriter sw = new StringWriter();
-        dom.traverse(new TestEventsListener(sw));
-        assertEquals(expected, sw.toString());
+        WikiPrinter printer = new DefaultWikiPrinter();
+        dom.traverse(new TestEventsRenderer(printer));
+        assertEquals(expected, printer.toString());
     }
 }

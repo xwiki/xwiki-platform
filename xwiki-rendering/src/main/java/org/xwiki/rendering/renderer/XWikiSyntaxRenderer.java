@@ -19,8 +19,6 @@
  */
 package org.xwiki.rendering.renderer;
 
-import java.io.PrintWriter;
-import java.io.Writer;
 import java.util.Map;
 
 import org.xwiki.rendering.internal.XWikiMacroPrinter;
@@ -37,10 +35,8 @@ import org.xwiki.rendering.listener.Format;
  * @version $Id$
  * @since 1.5M2
  */
-public class XWikiSyntaxRenderer implements Renderer
+public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 {
-    private PrintWriter writer;
-
     private StringBuffer listStyle = new StringBuffer();
 
     private boolean needsLineBreakForList = false;
@@ -49,9 +45,9 @@ public class XWikiSyntaxRenderer implements Renderer
 
     private XWikiMacroPrinter macroPrinter;
 
-    public XWikiSyntaxRenderer(Writer writer)
+    public XWikiSyntaxRenderer(WikiPrinter printer)
     {
-        this.writer = new PrintWriter(writer);
+        super(printer);
         this.macroPrinter = new XWikiMacroPrinter();
     }
 
@@ -67,29 +63,29 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onLink(Link link)
     {
-        write("[[");
+        print("[[");
         if (link.getLabel() != null) {
-            write(link.getLabel());
-            write(">");
+            print(link.getLabel());
+            print(">");
         }
-        write(link.getReference());
+        print(link.getReference());
         if (link.getAnchor() != null) {
-            write("#");
-            write(link.getAnchor());
+            print("#");
+            print(link.getAnchor());
         }
         if (link.getQueryString() != null) {
-            write("?");
-            write(link.getQueryString());
+            print("?");
+            print(link.getQueryString());
         }
         if (link.getInterWikiAlias() != null) {
-            write("@");
-            write(link.getInterWikiAlias());
+            print("@");
+            print(link.getInterWikiAlias());
         }
         if (link.getTarget() != null) {
-            write(">");
-            write(link.getTarget());
+            print(">");
+            print(link.getTarget());
         }
-        write("]]");
+        print("]]");
     }
 
     /**
@@ -102,16 +98,16 @@ public class XWikiSyntaxRenderer implements Renderer
         switch(format)
         {
             case BOLD:
-                write("**");
+                print("**");
                 break;
             case ITALIC:
-                write("~~");
+                print("~~");
                 break;
             case STRIKEDOUT:
-                write("--");
+                print("--");
                 break;
             case UNDERLINED:
-                write("__");
+                print("__");
                 break;
         }
     }
@@ -126,16 +122,16 @@ public class XWikiSyntaxRenderer implements Renderer
         switch(format)
         {
             case BOLD:
-                write("**");
+                print("**");
                 break;
             case ITALIC:
-                write("~~");
+                print("~~");
                 break;
             case STRIKEDOUT:
-                write("--");
+                print("--");
                 break;
             case UNDERLINED:
-                write("__");
+                print("__");
                 break;
         }
     }
@@ -153,17 +149,17 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onLineBreak()
     {
-        write("\n");
+        print("\n");
     }
 
     public void onNewLine()
     {
-        write("\\");
+        print("\\");
     }
 
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
-        write(this.macroPrinter.print(name, parameters, content));
+        print(this.macroPrinter.print(name, parameters, content));
     }
 
     public void beginSection(SectionLevel level)
@@ -191,7 +187,7 @@ public class XWikiSyntaxRenderer implements Renderer
                 prefix = "1.1.1.1.1.1";
                 break;
         }
-        write(prefix + " ");
+        print(prefix + " ");
     }
 
     public void endSection(SectionLevel level)
@@ -201,17 +197,17 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onWord(String word)
     {
-        write(word);
+        print(word);
     }
 
     public void onSpace()
     {
-        write(" ");
+        print(" ");
     }
 
     public void onSpecialSymbol(String symbol)
     {
-        write(symbol);
+        print(symbol);
     }
 
     public void onEscape(String escapedString)
@@ -222,16 +218,16 @@ public class XWikiSyntaxRenderer implements Renderer
         // For single char escapes use the "\" notation and for more than 1 char use the
         // nowiki macro.
         if (escapedString.length() == 1) {
-            write("\\" + escapedString);
+            print("\\" + escapedString);
         } else {
-            write("{{nowiki}}" + escapedString + "{{/nowiki}}");
+            print("{{nowiki}}" + escapedString + "{{/nowiki}}");
         }
     }
 
     public void beginList(ListType listType)
     {
         if (this.needsLineBreakForList) {
-            write("\n");
+            print("\n");
             this.needsLineBreakForList = false;
         }
 
@@ -246,17 +242,17 @@ public class XWikiSyntaxRenderer implements Renderer
     {
         this.needsLineBreakForList = true;
 
-        write(this.listStyle.toString());
+        print(this.listStyle.toString());
         if (this.listStyle.charAt(0) == '1') {
-            write(".");
+            print(".");
         }
-        write(" ");
+        print(" ");
     }
 
     public void endList(ListType listType)
     {
         if (this.needsLineBreakForList) {
-            write("\n");
+            print("\n");
             this.needsLineBreakForList = false;
         }
 
@@ -266,7 +262,7 @@ public class XWikiSyntaxRenderer implements Renderer
     public void endListItem()
     {
         if (this.needsLineBreakForList) {
-            write("\n");
+            print("\n");
             this.needsLineBreakForList = false;
         }
     }
@@ -298,7 +294,7 @@ public class XWikiSyntaxRenderer implements Renderer
 
     public void onId(String name)
     {
-        write("{{id name=\"" + name + "\"}}");
+        print("{{id name=\"" + name + "\"}}");
     }
 
     /**
@@ -307,13 +303,13 @@ public class XWikiSyntaxRenderer implements Renderer
      */
     public void onHorizontalLine()
     {
-        write("----");
+        print("----");
     }
 
-    private void write(String text)
+    protected void print(String text)
     {
         if (!this.isInsideMacroMarker) {
-            this.writer.write(text);
+            super.print(text);
             // The first text written shouldn't have a linebreak added.
             this.needsLineBreakForList = true;
         }
@@ -322,7 +318,7 @@ public class XWikiSyntaxRenderer implements Renderer
     private void addLineBreak()
     {
         if (this.needsLineBreakForList) {
-            write("\n");
+            print("\n");
         }
     }
 }

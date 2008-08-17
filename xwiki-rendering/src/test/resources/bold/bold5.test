@@ -1,0 +1,44 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+** This is a level 2 list
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginList: [BULLETED]
+beginListItem
+beginList: [BULLETED]
+beginListItem
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+onWord: [a]
+onSpace
+onWord: [level]
+onSpace
+onWord: [2]
+onSpace
+onWord: [list]
+endListItem
+endList: [BULLETED]
+endListItem
+endList: [BULLETED]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<ul class="star"><li><ul class="star"><li>This is a level 2 list</li></ul></li></ul>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+* 
+** This is a level 2 list
+.# TODO: We need to fix the XWikiSyntaxRenderer so that a new line is not added
+
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.# TODO: This is failing. See http://code.google.com/p/wikimodel/issues/detail?id=22 
+.#-----------------------------------------------------
+<ul class="star"><li><ul class="star"><li>This is a level 2 list</li></ul></li></ul>

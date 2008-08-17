@@ -1,0 +1,39 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+This is **bold ** not bold** bold
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+beginBold
+onWord: [bold]
+onSpace
+endBold
+onSpace
+onWord: [not]
+onSpace
+onWord: [bold]
+beginBold
+onSpace
+onWord: [bold]
+endBold
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>This is <strong>bold </strong> not bold<strong> bold</strong></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+This is **bold ** not bold** bold**
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>This is <strong>bold </strong> not bold<strong> bold</strong></p></html>

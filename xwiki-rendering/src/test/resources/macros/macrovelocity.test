@@ -1,0 +1,23 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{velocity}}{{xhtml}}
+<div>
+  #set ($name = "John")
+  #set ($list = ['one', 'two'])
+  <h1>Hello $name</h1>
+  <table>
+    #foreach ($item in $list)
+      <tr>
+        <td>
+          * item
+        </td>
+      </tr>
+    #end
+  </table>
+</div>
+{{/xhtml}}{{/velocity}}
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<div> <h1>Hello John</h1> <table><tr><td><ul class="star"><li>item<br/> </li></ul></td></tr><tr><td><ul class="star"><li>item<br/> </li></ul></td></tr></table></div>

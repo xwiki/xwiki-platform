@@ -19,17 +19,18 @@
  */
 package org.xwiki.rendering.transformation;
 
-import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.Collections;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
-import org.xwiki.rendering.scaffolding.TestEventsListener;
+import org.xwiki.rendering.scaffolding.TestEventsRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 
 public class MacroTransformationTest extends AbstractRenderingTestCase
 {
@@ -54,16 +55,16 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "onWord: [simplemacro0]\n"
             + "endParagraph\n"
             + "endMacroMarker: [testsimplemacro] [] [null]\n"
-            + "endDocument\n";
+            + "endDocument";
 
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testsimplemacro",
             Collections.<String, String>emptyMap())));
         
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
-        StringWriter sw = new StringWriter();
-        dom.traverse(new TestEventsListener(sw));
-        assertEquals(expected, sw.toString());
+        WikiPrinter printer = new DefaultWikiPrinter();
+        dom.traverse(new TestEventsRenderer(printer));
+        assertEquals(expected, printer.toString());
     }
 
     /**
@@ -77,16 +78,16 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "onWord: [simplemacro0]\n"
             + "endParagraph\n"
             + "endMacroMarker: [testnestedmacro] [] [null]\n"
-            + "endDocument\n";
+            + "endDocument";
 
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testnestedmacro",
             Collections.<String, String>emptyMap())));
     
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
-        StringWriter sw = new StringWriter();
-        dom.traverse(new TestEventsListener(sw));
-        assertEquals(expected, sw.toString());
+        WikiPrinter printer = new DefaultWikiPrinter();
+        dom.traverse(new TestEventsRenderer(printer));
+        assertEquals(expected, printer.toString());
     }
     
     /**
@@ -98,16 +99,16 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         	+ "beginMacroMarker: [testrecursivemacro] [] [null]\n"
             + "onMacro: [testrecursivemacro] [] [null]\n"
             + "endMacroMarker: [testrecursivemacro] [] [null]\n"
-            + "endDocument\n";
+            + "endDocument";
         
         XDOM dom = new XDOM(Arrays.asList((Block) new MacroBlock("testrecursivemacro",
             Collections.<String, String>emptyMap())));
     
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
-        StringWriter sw = new StringWriter();
-        dom.traverse(new TestEventsListener(sw));
-        assertEquals(expected, sw.toString());
+        WikiPrinter printer = new DefaultWikiPrinter();
+        dom.traverse(new TestEventsRenderer(printer));
+        assertEquals(expected, printer.toString());
     }
     
     /**
@@ -126,7 +127,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
             + "onWord: [word]\n"
             + "endParagraph\n"
             + "endMacroMarker: [testprioritymacro] [] [null]\n"
-            + "endDocument\n";
+            + "endDocument";
 
         XDOM dom = new XDOM(Arrays.asList(
             (Block) new MacroBlock("testsimplemacro", Collections.<String, String>emptyMap()),
@@ -134,9 +135,9 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
 
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
-        StringWriter sw = new StringWriter();
-        dom.traverse(new TestEventsListener(sw));
-        assertEquals(expected, sw.toString());
+        WikiPrinter printer = new DefaultWikiPrinter();
+        dom.traverse(new TestEventsRenderer(printer));
+        assertEquals(expected, printer.toString());
     }
     
 }

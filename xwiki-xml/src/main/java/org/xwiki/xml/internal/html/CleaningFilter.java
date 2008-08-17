@@ -16,24 +16,19 @@
  * License along with this software; if not, write to the Free
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ *
  */
-package org.xwiki.xml.html;
+package org.xwiki.xml.internal.html;
 
-import org.w3c.dom.Document;
+import org.htmlcleaner.TagNode;
 
 /**
- * Transforms any HTML content into valid XHTML that can be feed to the XHTML Parser for example.
+ * Clean some XML node processed by HTML Cleaner.
  *
  * @version $Id: $
  * @since 1.6M1
  */
-public interface HTMLCleaner
+public interface CleaningFilter
 {
-    /**
-     * Transforms any HTML content into valid XHTML that can be fed to the XHTML Parser for example.
-     * 
-     * @param originalHtmlContent the original content (HTML) to clean
-     * @return the cleaned HTML as a w3c DOM (this allows further transformations if needed)
-     */
-    Document clean(String originalHtmlContent);
+    void filter(TagNode node);
 }

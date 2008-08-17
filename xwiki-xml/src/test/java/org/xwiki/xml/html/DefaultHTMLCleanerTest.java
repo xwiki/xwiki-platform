@@ -21,6 +21,7 @@
 package org.xwiki.xml.html;
 
 import junit.framework.TestCase;
+import org.xwiki.xml.XMLUtils;
 
 /**
  * Unit tests for {@link org.xwiki.xml.html.DefaultHTMLCleaner}.
@@ -39,6 +40,6 @@ public class DefaultHTMLCleanerTest extends TestCase
 
     public void testCloseUnbalancedTags()
     {
-        assertEquals("<p>hello</p>", this.cleaner.clean("<p>hello"));
+        assertEquals("<p>hello</p>", XMLUtils.toString(this.cleaner.clean("<p>hello")));
     }
 }

@@ -23,6 +23,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.xml.html.HTMLCleaner;
+import org.xwiki.xml.XMLUtils;
 
 import java.util.Map;
 import java.util.Collections;
@@ -79,6 +80,6 @@ public class HTMLMacro extends AbstractMacro
     public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return this.xhtmlMacro.execute(parameters, this.htmlCleaner.clean(content), context);
+        return this.xhtmlMacro.execute(parameters, XMLUtils.toString(this.htmlCleaner.clean(content)), context);
     }
 }

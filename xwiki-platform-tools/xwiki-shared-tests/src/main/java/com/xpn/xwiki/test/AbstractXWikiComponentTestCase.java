@@ -22,13 +22,6 @@ package com.xpn.xwiki.test;
 
 import org.jmock.cglib.MockObjectTestCase;
 import org.xwiki.component.manager.ComponentManager;
-import org.xwiki.plexus.manager.PlexusComponentManager;
-import org.xwiki.context.ExecutionContextInitializerManager;
-import org.xwiki.context.Execution;
-import org.xwiki.context.ExecutionContext;
-import org.codehaus.plexus.DefaultPlexusContainer;
-import org.codehaus.plexus.DefaultContainerConfiguration;
-import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 
 /**
  * Tests which needs to have XWiki Components set up should extend this class which makes the Component Manager
@@ -36,25 +29,26 @@ import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLoc
  */
 public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 {
-    private ComponentManager componentManager;
-    
+    XWikiComponentInitializer initializer = new XWikiComponentInitializer();
+
+    public AbstractXWikiComponentTestCase()
+    {
+        super();
+    }
+
+    public AbstractXWikiComponentTestCase(String testName)
+    {
+        super(testName);
+    }
+
     protected void setUp() throws Exception
     {
-        // Initialize the Execution Context
-        ExecutionContextInitializerManager ecim =
-            (ExecutionContextInitializerManager) getComponentManager().lookup(ExecutionContextInitializerManager.ROLE);
-        Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
-
-        ExecutionContext ec = new ExecutionContext();
-
-        ecim.initialize(ec);
-        execution.setContext(ec);
+        this.initializer.initialize();
     }
 
     protected void tearDown() throws Exception
     {
-        Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
-        execution.removeContext();
+        this.initializer.shutdown();
     }
     
     /**
@@ -63,14 +57,6 @@ public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
      */
     public ComponentManager getComponentManager() throws Exception
     {
-        if (this.componentManager == null) {
-            DefaultContainerConfiguration configuration = new DefaultContainerConfiguration();
-            configuration.setContainerConfiguration("/plexus.xml");
-            DefaultPlexusContainer container = new DefaultPlexusContainer(configuration);
-            PlexusContainerLocator locator = new PlexusContainerLocator(container);
-            this.componentManager = new PlexusComponentManager(locator);
-        }
-
-        return this.componentManager;
+        return this.initializer.getComponentManager();
     }
 }

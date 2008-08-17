@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.scaffolding;
 
-
 import java.util.Iterator;
 import java.util.Map;
 
@@ -31,6 +30,10 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.renderer.WikiPrinter;
 
+/**
+ * @version $Id$
+ * @since 1.5M1
+ */
 public class TestEventsRenderer extends AbstractPrintRenderer
 {
     public TestEventsRenderer(WikiPrinter printer)

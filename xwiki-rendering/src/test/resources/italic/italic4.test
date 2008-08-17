@@ -1,0 +1,39 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+This is ~~italic ~~ not italic~~ italic
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+beginItalic
+onWord: [italic]
+onSpace
+endItalic
+onSpace
+onWord: [not]
+onSpace
+onWord: [italic]
+beginItalic
+onSpace
+onWord: [italic]
+endItalic
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>This is <em class="italic">italic </em> not italic<em class="italic"> italic</em></p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+This is ~~italic ~~ not italic~~ italic~~
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>This is <em class="italic">italic </em> not italic<em class="italic"> italic</em></p></html>

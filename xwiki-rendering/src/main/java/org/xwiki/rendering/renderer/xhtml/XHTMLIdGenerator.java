@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.renderer.xhtml;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Stateful generator of id attributes. It's stateful since it remembers the generated ids. Thus a new instance of it
@@ -31,7 +31,7 @@ import java.util.List;
  */
 public class XHTMLIdGenerator
 {
-    private List<String> generatedIds = new ArrayList<String>();
+    private Set<String> generatedIds = new HashSet<String>();
 
     /**
      * Generate a unique id attribute using the passed text as the seed value. The generated id complies with the XHTML

@@ -106,6 +106,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macroxhtml", true);
         suite.addTestsFromResource("paragraph", false);
         suite.addTestsFromResource("section", false);
+        suite.addTestsFromResource("macros/macroid", true);
 
         return suite;
     }

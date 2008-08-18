@@ -44,7 +44,7 @@ public class XWikiMacroPrinter
                 }
             }
         }
-        if (content == null) {
+        if ((content == null) || (content.length() == 0)) {
             buffer.append("/}}");
         } else {
             buffer.append("}}");

@@ -45,7 +45,6 @@ public class XMLUtils
         StreamResult result;
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             result = new StreamResult(new StringWriter());
             DOMSource source = new DOMSource(document);
             transformer.transform(source, result);

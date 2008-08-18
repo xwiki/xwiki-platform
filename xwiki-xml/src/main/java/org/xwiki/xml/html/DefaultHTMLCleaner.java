@@ -62,8 +62,6 @@ public class DefaultHTMLCleaner implements HTMLCleaner
         HtmlCleaner cleaner = new HtmlCleaner();
 
         CleanerProperties props = cleaner.getProperties();
-        props.setOmitXmlDeclaration(true);
-        props.setOmitHtmlEnvelope(true);
         props.setOmitUnknownTags(true);
 
         TagNode cleanedNode;

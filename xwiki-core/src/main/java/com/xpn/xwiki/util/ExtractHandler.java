@@ -27,7 +27,21 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * Extracts a well-formed XML fragment by listening to SAX events.
+ * <p>
+ * Extracts a well-formed XML fragment by listening to SAX events. The result has the following semantic:<br/>
+ * <code>xmlInput.dropAllTags().substring(start, length).unDropAssociatedTags()</code>
+ * </p>
+ * <p>
+ * So basically we would create an instance like <code>new ExtractHandler(0, 400)</code> in order to obtain an XML
+ * fragment with its inner text length of at most 400 characters, starting at position (character) 0 in the source
+ * (input) XML's inner text. The ExtractHandler is used in feed plug-in to obtain a preview of an XML (HTML, to be more
+ * specific). Another use case could be to paginate an XML source (keeping pages well-formed).
+ * </p>
+ * <p>
+ * As an example, the result of applying an <code>ExtractHandler(3, 13)</code> to:<br/>
+ * <code>&lt;p&gt;click &lt;a href="realyLongURL" title="Here"&gt;here&lt;/a&gt; to view the result&lt;/p&gt;</code><br/>
+ * is:<br/> <code>&lt;p&gt;ck &lt;a href="realyLongURL" title="Here"&gt;here&lt;/a&gt; to&lt;/p&gt;</code>
+ * </p>
  */
 public class ExtractHandler extends DefaultHandler
 {

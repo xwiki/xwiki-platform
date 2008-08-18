@@ -107,6 +107,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("paragraph", false);
         suite.addTestsFromResource("section", false);
         suite.addTestsFromResource("macros/macroid", true);
+        suite.addTestsFromResource("macros/toc/macrotoc1", true);
+        suite.addTestsFromResource("macros/toc/macrotoc2", true);
+        suite.addTestsFromResource("macros/toc/macrotoc3", true);
 
         return suite;
     }

@@ -45,6 +45,14 @@
       <implementation>org.xwiki.rendering.MockDocumentManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    
+    <!-- Override default Id Generator component implementation for testing -->
+    <component>
+      <role>org.xwiki.rendering.util.IdGenerator</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.util.MockIdGenerator</implementation>
+      <instantiation-strategy>per-lookup</instantiation-strategy>
+    </component>
 
   </components>
 </component-set>

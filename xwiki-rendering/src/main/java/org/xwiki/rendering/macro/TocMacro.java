@@ -23,7 +23,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
@@ -35,11 +34,13 @@ import org.xwiki.rendering.block.ListItemBlock;
 import org.xwiki.rendering.block.NumberedListBlock;
 import org.xwiki.rendering.block.SectionBlock;
 import org.xwiki.rendering.block.SpaceBlock;
+import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.TocMacroParameterManager.Scope;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
  * @version $Id$
@@ -51,6 +52,11 @@ public class TocMacro extends AbstractMacro
      * The description of the TOC macro.
      */
     private static final String DESCRIPTION = "Generates a Table Of Contents.";
+
+    /**
+     * The id generator.
+     */
+    private IdGenerator idGenerator;
 
     /**
      * The TOC macro parameters manager.
@@ -172,7 +178,7 @@ public class TocMacro extends AbstractMacro
      */
     private IdBlock newUniqueIdBlock()
     {
-        return new IdBlock("I" + UUID.randomUUID().toString());
+        return new IdBlock(this.idGenerator.generateRandomUniqueId());
     }
 
     /**
@@ -188,6 +194,8 @@ public class TocMacro extends AbstractMacro
                 label.append(((WordBlock) block).getWord());
             } else if (block instanceof SpaceBlock) {
                 label.append(' ');
+            } else if (block instanceof SpecialSymbolBlock) {
+                label.append(((SpecialSymbolBlock) block).getSymbol());
             }
         }
 
@@ -219,8 +227,7 @@ public class TocMacro extends AbstractMacro
                 if (rootSectionBlock == sectionBlock) {
                     rootSectionFound = true;
                     continue;
-                } else if (rootSectionBlock.getParent() == sectionBlock.getParent()
-                    && sectionLevel <= rootSectionLevel) {
+                } else if (rootSectionBlock.getParent() == sectionBlock.getParent() && sectionLevel <= rootSectionLevel) {
                     break;
                 }
             } else {
@@ -265,7 +272,7 @@ public class TocMacro extends AbstractMacro
 
         linkBlock.addChildren(sectionBlock.getChildren());
         // TODO: remove this when LinkBlock will support children blocks as label
-        link.setLabel(getLabelFromChildren(sectionBlock.getChildren()) + " (" + sectionBlock.getLevel() + ")");
+        link.setLabel(getLabelFromChildren(sectionBlock.getChildren()));
 
         return new ListItemBlock(linkBlock);
     }

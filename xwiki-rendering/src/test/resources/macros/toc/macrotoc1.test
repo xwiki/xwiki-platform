@@ -1,0 +1,51 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+1 Title1
+{{toc start="1" depth="6" numbered="true" scope="local" /}}
+1.1 Title1.1
+1.1.1.1 Title1.1.1.1
+1 Title2
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginSection: [1]
+onWord: [Title1]
+endSection: [1]
+beginMacroMarker: [toc] [start=1|depth=6|numbered=true|scope=local] []
+beginList: [NUMBERED]
+beginList: [NUMBERED]
+beginListItem
+onLink: [Label = [Title1.1] Anchor = [Htestid]]
+endListItem
+beginList: [NUMBERED]
+beginList: [NUMBERED]
+beginListItem
+onLink: [Label = [Title1.1.1.1] Anchor = [Htestid-1]]
+endListItem
+endList: [NUMBERED]
+endList: [NUMBERED]
+endList: [NUMBERED]
+endList: [NUMBERED]
+endMacroMarker: [toc] [start=1|depth=6|numbered=true|scope=local] []
+onId: [Htestid]
+beginSection: [2]
+onWord: [Title1]
+onSpecialSymbol: [.]
+onWord: [1]
+endSection: [2]
+onId: [Htestid-1]
+beginSection: [4]
+onWord: [Title1]
+onSpecialSymbol: [.]
+onWord: [1]
+onSpecialSymbol: [.]
+onWord: [1]
+onSpecialSymbol: [.]
+onWord: [1]
+endSection: [4]
+beginSection: [1]
+onWord: [Title2]
+endSection: [1]
+endDocument

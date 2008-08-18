@@ -83,6 +83,14 @@
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
 
+    <!-- Utils -->
+    <component>
+      <role>org.xwiki.rendering.util.IdGenerator</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.util.DefaultIdGenerator</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+
     <!-- Macros -->
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
@@ -179,6 +187,11 @@
       <role-hint>toc/xwiki</role-hint>
       <implementation>org.xwiki.rendering.macro.TocMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.rendering.util.IdGenerator</role>
+        </requirement>
+      </requirements>
       <configuration>
         <priority>2000</priority>
       </configuration>

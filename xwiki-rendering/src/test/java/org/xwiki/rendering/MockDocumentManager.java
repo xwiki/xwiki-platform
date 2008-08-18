@@ -40,7 +40,7 @@ public class MockDocumentManager implements DocumentManager
 
     public String getURL(String documentName, String action, String queryString, String anchor) throws Exception
     {
-        String result = "/xwiki/bin/view/" + documentName.replace(".", "/");
+        String result = "/xwiki/bin/view/" + (documentName == null ? "currentdoc" : documentName.replace(".", "/"));
         if (anchor != null) {
             result = result + "#" + anchor;
         }

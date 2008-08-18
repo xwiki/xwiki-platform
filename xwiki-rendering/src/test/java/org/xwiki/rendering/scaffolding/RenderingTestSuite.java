@@ -30,6 +30,7 @@ import java.io.InputStreamReader;
 
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRenderer;
+
 import com.xpn.xwiki.test.XWikiComponentInitializer;
 
 /**
@@ -45,12 +46,14 @@ public class RenderingTestSuite extends TestSuite
     private class Data
     {
         public Map<Parser, String> inputs = new HashMap<Parser, String>();
+
         public Map<String, String> expectations = new HashMap<String, String>();
     }
 
     public RenderingTestSuite(String name, Map<String, PrintRendererFactory> rendererFactories) throws Exception
     {
         super(name);
+
         this.initializer = new XWikiComponentInitializer();
         this.initializer.initialize();
         this.rendererFactories = rendererFactories;
@@ -63,18 +66,18 @@ public class RenderingTestSuite extends TestSuite
 
         // Create a test case for each input and for each expectation so that each test is executed separately
         // and reported separately by the JUnit test runner.
-        for (Parser parser: data.inputs.keySet()) {
-            for (String rendererId: data.expectations.keySet()) {
+        for (Parser parser : data.inputs.keySet()) {
+            for (String rendererId : data.expectations.keySet()) {
                 PrintRenderer renderer = this.rendererFactories.get(rendererId).createRenderer();
-                addTest(new RenderingTestCase(computeTestName(testResourceName, parser, renderer),
-                    data.inputs.get(parser), data.expectations.get(rendererId), parser, renderer, runTransformations));
+                addTest(new RenderingTestCase(computeTestName(testResourceName, parser, renderer), data.inputs
+                    .get(parser), data.expectations.get(rendererId), parser, renderer, runTransformations));
             }
         }
     }
 
     public Parser getParserFromString(String parserId) throws Exception
     {
-        return (Parser) this.initializer.getComponentManager().lookup(Parser.ROLE, parserId);        
+        return (Parser) this.initializer.getComponentManager().lookup(Parser.ROLE, parserId);
     }
 
     /**
@@ -141,7 +144,7 @@ public class RenderingTestSuite extends TestSuite
             if (!skip) {
                 saveBuffer(buffer, map, data.inputs, keyName);
             }
-            
+
         } finally {
             reader.close();
         }
@@ -149,8 +152,7 @@ public class RenderingTestSuite extends TestSuite
         return data;
     }
 
-    private void saveBuffer(StringBuffer buffer, Map map, Map<Parser, String> inputs, String keyName)
-        throws Exception
+    private void saveBuffer(StringBuffer buffer, Map map, Map<Parser, String> inputs, String keyName) throws Exception
     {
         // Remove the last newline since our test format forces an additional new lines
         // at the end of input texts.

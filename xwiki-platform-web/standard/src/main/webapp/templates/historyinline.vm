@@ -29,8 +29,8 @@
 ## Preamble, output some HTML.
 ##
   <div id="historycontent" class="xwikiintracontent">
-    <form id="historyform" action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
-      #set($formname="historyform")
+    #set($formname="historyform")
+    <form id="$formname" action="$doc.getURL("view", "viewer=changes&amp;$docvariant")" method="post">
       <div id="_history">
       <div class="centered">
       <table class="xwikidatatable" summary="$msg.get(document) ${doc.displayTitle} &mdash; $msg.get("history")">

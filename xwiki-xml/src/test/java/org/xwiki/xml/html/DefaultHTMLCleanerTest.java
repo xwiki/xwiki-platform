@@ -31,15 +31,11 @@ import org.xwiki.xml.XMLUtils;
  */
 public class DefaultHTMLCleanerTest extends TestCase
 {
-    private static final String HEADER = "<html>\n"
-        + "<head>\n"
-        + "<META http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">\n"
-        + "</head>\n"
-        + "<body>\n";
+    private static final String HEADER =
+        "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        + "<html><head /><body>";
 
-    private static final String FOOTER = "\n"
-        + "</body>\n"
-        + "</html>\n";
+    private static final String FOOTER = "</body></html>\n";
 
     private HTMLCleaner cleaner;
 
@@ -50,9 +46,9 @@ public class DefaultHTMLCleanerTest extends TestCase
 
     public void testCloseUnbalancedTags()
     {
-        assertHTML("<p>hello</p>", XMLUtils.toString(this.cleaner.clean("<p>hello")));
+        assertHTML("<hr /><p>hello</p>", XMLUtils.toString(this.cleaner.clean("<hr><p>hello")));
     }
-
+    
     private void assertHTML(String expected, String actual)
     {
         assertEquals(HEADER + expected + FOOTER, actual);

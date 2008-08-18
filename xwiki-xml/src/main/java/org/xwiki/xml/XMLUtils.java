@@ -20,13 +20,9 @@
 package org.xwiki.xml;
 
 import org.w3c.dom.Document;
-
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.transform.dom.DOMSource;
-import java.io.StringWriter;
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format;
 
 /**
  * XML Utility methods.
@@ -42,15 +38,17 @@ public class XMLUtils
      */
     public static String toString(Document document)
     {
-        StreamResult result;
-        try {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            result = new StreamResult(new StringWriter());
-            DOMSource source = new DOMSource(document);
-            transformer.transform(source, result);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to transform XML Document into a String", e); 
-        }
-        return result.getWriter().toString();
+        // Note: We don't use javax.xml.transform.Transformer since it prints our valid XHTML as HTML which is not
+        // XHTML compliant. For example it transforms our "<hr/>" into "<hr>.
+        DOMBuilder builder = new DOMBuilder();
+        org.jdom.Document jdomDoc = builder.build(document);
+
+        Format format = Format.getRawFormat();
+        // Force newlines to use \n since otherwise the default is \n\r.
+        // See http://www.jdom.org/docs/apidocs/org/jdom/output/Format.html#setLineSeparator(java.lang.String)
+        format.setLineSeparator("\n");
+
+        XMLOutputter outputter = new XMLOutputter(format);
+        return outputter.outputString(jdomDoc);
     }
 }

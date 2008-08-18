@@ -60,7 +60,7 @@ public class XHTMLLinkRenderer
         } else {
             // This is a document link. Check for document existence.
             try {
-                if (this.documentManager.exists(link.getReference())) {
+                if (link.getReference() == null || this.documentManager.exists(link.getReference())) {
                     sb.append("<span class=\"wikilink\">");
                     sb.append("<a href=\"");
                     sb.append(this.documentManager.getURL(link.getReference(), "view", link.getQueryString(), link

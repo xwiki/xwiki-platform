@@ -24,10 +24,9 @@ import org.xwiki.rendering.DocumentManager;
 import com.xpn.xwiki.XWikiContext;
 
 /**
- * Temporary class used as a bridge between the old architecture and the new component-based and
- * module-separated one. This is temporary till we remodel the Model classes and the Document
- * services. It's used by the Rendering module.
- *
+ * Temporary class used as a bridge between the old architecture and the new component-based and module-separated one.
+ * This is temporary till we remodel the Model classes and the Document services. It's used by the Rendering module.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
@@ -51,6 +50,8 @@ public class DefaultDocumentManager implements DocumentManager
     public String getURL(String documentName, String action, String queryString, String anchor) throws Exception
     {
         XWikiContext xcontext = (XWikiContext) this.execution.getContext().getProperty("xwikicontext");
-        return xcontext.getWiki().getDocument(documentName, xcontext).getURL(action, queryString, anchor, xcontext);
+        return xcontext.getWiki().getDocument(
+            documentName == null && anchor != null ? xcontext.getDoc().getFullName() : documentName, xcontext).getURL(
+            action, queryString, anchor, xcontext);
     }
 }

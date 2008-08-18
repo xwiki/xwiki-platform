@@ -254,7 +254,9 @@ public class SyndEntryDocumentSource implements SyndEntrySource
 
         // test access rights
         if (!doc.hasAccessLevel("view")) {
-            throw new XWikiException();
+            throw new XWikiException(XWikiException.MODULE_XWIKI_ACCESS,
+                XWikiException.ERROR_XWIKI_ACCESS_DENIED,
+                "Access denied in view mode!");
         }
 
         // prepare parameters (overwrite instance parameters)

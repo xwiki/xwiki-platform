@@ -164,16 +164,8 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
 
     protected BaseClass initArticleClass() throws XWikiException
     {
-        XWikiDocument doc;
-        boolean needsUpdate = false;
-
-        try {
-            doc = getContext().getWiki().getDocument(ARTICLE_CLASS_NAME, getContext());
-        } catch (Exception e) {
-            doc = new XWikiDocument();
-            doc.setFullName(ARTICLE_CLASS_NAME);
-            needsUpdate = true;
-        }
+        XWikiDocument doc = getContext().getWiki().getDocument(ARTICLE_CLASS_NAME, getContext());
+        boolean needsUpdate = doc.isNew();
 
         BaseClass bclass = doc.getxWikiClass();
         bclass.setName(ARTICLE_CLASS_NAME);
@@ -181,12 +173,6 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
         needsUpdate |= bclass.addTextField("title", "Title", 64);
         needsUpdate |= bclass.addTextAreaField("content", "Content", 45, 4);
         needsUpdate |= bclass.addTextField("category", "Category", 64);
-
-        String content = doc.getContent();
-        if ((content == null) || (content.equals(""))) {
-            needsUpdate = true;
-            doc.setContent("1 XWiki.ArticleClass");
-        }
 
         if (needsUpdate) {
             getContext().getWiki().saveDocument(doc, getContext());
@@ -245,25 +231,24 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
 
     /**
      * Tests if the source method obeys the access rights.
+     * 
+     * @throws XWikiException
      */
-    public void testSourceAccessRights()
+    public void testSourceAccessRights() throws XWikiException
     {
         // odd user name length implies no access rights
         getContext().setUser("XWiki.Albatross");
         try {
             source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, getContext());
-            assertTrue(ACCESS_RIGHTS_VIOLATED, false);
-        } catch (XWikiException e) {
+            fail(ACCESS_RIGHTS_VIOLATED);
+        } catch (XWikiException expected) {
             // we should get an exception
+            assertEquals(XWikiException.ERROR_XWIKI_ACCESS_DENIED, expected.getCode());
         }
         // even user name length implies all access rights
         getContext().setUser("Condor");
-        try {
-            source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, getContext());
-            // we shouldn't get an exception
-        } catch (XWikiException e) {
-            assertTrue(ACCESS_RIGHTS_VIOLATED, false);
-        }
+        source.source(new SyndEntryImpl(), doc, Collections.EMPTY_MAP, getContext());
+        // we shouldn't get an exception
     }
 
     /**

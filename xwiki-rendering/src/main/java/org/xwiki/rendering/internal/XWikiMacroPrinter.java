@@ -35,12 +35,12 @@ public class XWikiMacroPrinter
         StringBuffer buffer = new StringBuffer();
         buffer.append("{{").append(name);
         if (!parameters.isEmpty()) {
-            buffer.append(':');
+            buffer.append(' ');
             for (Iterator<String> paramsIt = parameters.keySet().iterator(); paramsIt.hasNext();) {
                 String paramName = paramsIt.next();
-                buffer.append(paramName).append("=").append(parameters.get(paramName));
+                buffer.append(paramName).append('=').append('\"').append(parameters.get(paramName)).append('\"');
                 if (paramsIt.hasNext()) {
-                    buffer.append("|");
+                    buffer.append(' ');
                 }
             }
         }

@@ -34,13 +34,6 @@
   <name>XWiki Platform - Core - Cache - Parent POM</name>
   <packaging>pom</packaging>
   <description>XWiki Platform - Core - Cache - Parent POM</description>
-  <dependencies>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-url</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-  </dependencies>
   <modules>
     <module>xwiki-cache-api</module>
     <module>xwiki-cache-tests</module>

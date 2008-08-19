@@ -76,7 +76,7 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
     /**
      * Validate that an exception is raised when trying to get a not supported parameter.
      */
-    public void testMacroParameterNotSupportedException() throws MacroParameterException
+    public void testGetParameterValueWhenNotSupportedParameter() throws MacroParameterException
     {
         try {
             this.dmpm.getParameterValue("notsupported");
@@ -90,7 +90,7 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
     /**
      * Validate that an exception is raised when trying to get a required parameter not loaded.
      */
-    public void testMacroParameterRequiredException() throws MacroParameterException
+    public void testGetParameterValueWhenRequiredParameterMissing() throws MacroParameterException
     {
         try {
             assertEquals(this.dmpm.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
@@ -104,7 +104,7 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
     /**
      * Validate that the default value is returned for a not required parameter not loaded.
      */
-    public void testDefaultValue() throws MacroParameterException
+    public void testGetParameterValueWhenParameterMissing() throws MacroParameterException
     {
         assertEquals(this.dmpm.<Integer> getParameterValue("int1"), Integer.valueOf(5));
     }

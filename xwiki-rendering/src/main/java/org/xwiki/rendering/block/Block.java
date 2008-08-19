@@ -62,7 +62,7 @@ public interface Block
      * Helper method to add a single child block to the current block before the provided existing child block. For
      * adding several blocks at once use {@link #addChildren(java.util.List)}.
      * 
-     * @param blocToInsert the child block to add
+     * @param blockToInsert the child block to add
      * @param nextBlock the child block that will be just after the added block
      * @since 1.6M1
      */

@@ -1,6 +1,5 @@
 package org.xwiki.rendering.parameter;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,6 +13,11 @@ import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescr
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
+/**
+ * Validate {@link DefaultMacroParameterManager}.
+ * 
+ * @version $Id$
+ */
 public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
 {
     DefaultMacroParameterManager dmpm = new DefaultMacroParameterManager();
@@ -23,8 +27,16 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
         VALUE1, value2, Value3
     }
 
-    public DefaultMacroParameterManagerTest()
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     */
+    @Override
+    protected void setUp() throws Exception
     {
+        super.setUp();
+
         IntegerMacroParameterDescriptor int1ParamClass = new IntegerMacroParameterDescriptor("int1", "int1 desc", 5);
         this.dmpm.registerParameterDescriptor(int1ParamClass);
 
@@ -59,7 +71,13 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
         assertEquals(this.dmpm.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
         assertEquals(this.dmpm.<Boolean> getParameterValue("boolean1"), Boolean.valueOf(false));
         assertEquals(this.dmpm.<String> getParameterValue("strIng1"), "string1 value");
+    }
 
+    /**
+     * Validate that an exception is raised when trying to get a not supported parameter.
+     */
+    public void testMacroParameterNotSupportedException() throws MacroParameterException
+    {
         try {
             this.dmpm.getParameterValue("notsupported");
 
@@ -67,11 +85,13 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
         } catch (MacroParameterNotSupportedException e) {
             // should throw MacroParameterNotSupportedException exception
         }
+    }
 
-        this.dmpm.load(Collections.<String, String> emptyMap());
-
-        assertEquals(this.dmpm.<Integer> getParameterValue("int1"), Integer.valueOf(5));
-
+    /**
+     * Validate that an exception is raised when trying to get a required parameter not loaded.
+     */
+    public void testMacroParameterRequiredException() throws MacroParameterException
+    {
         try {
             assertEquals(this.dmpm.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
 
@@ -79,5 +99,13 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
         } catch (MacroParameterRequiredException e) {
             // should throw MacroParameterRequiredException exception
         }
+    }
+
+    /**
+     * Validate that the default value is returned for a not required parameter not loaded.
+     */
+    public void testDefaultValue() throws MacroParameterException
+    {
+        assertEquals(this.dmpm.<Integer> getParameterValue("int1"), Integer.valueOf(5));
     }
 }

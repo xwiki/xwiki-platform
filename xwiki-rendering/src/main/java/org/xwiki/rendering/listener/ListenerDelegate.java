@@ -28,6 +28,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#beginFormat(Format)
      */
     public void beginFormat(Format format)
@@ -67,7 +68,8 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#endFormat(Format) 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#endFormat(Format)
      */
     public void endFormat(Format format)
     {
@@ -151,6 +153,7 @@ public class ListenerDelegate implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
      */
     public void onHorizontalLine()

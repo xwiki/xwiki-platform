@@ -51,12 +51,12 @@ import org.xwiki.rendering.listener.Format;
 public class XDOMGeneratorSink implements Sink
 {
     private Stack<Block> stack = new Stack<Block>();
-    
+
     private final MarkerBlock marker = new MarkerBlock();
-    
+
     private static final Pattern SPLIT_TEXT_PATTERN =
         Pattern.compile("(\\w+)?([ <>=.\"\\?\\*!#\\$%'\\(\\)\\+,/:;@\\[\\]\\\\^_`\\{\\}\\|~])?");
-    
+
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -231,7 +231,8 @@ public class XDOMGeneratorSink implements Sink
 
     /**
      * {@inheritDoc}
-     * @see org.apache.maven.doxia.sink.Sink#horizontalRule() 
+     * 
+     * @see org.apache.maven.doxia.sink.Sink#horizontalRule()
      */
     public void horizontalRule()
     {
@@ -608,22 +609,22 @@ public class XDOMGeneratorSink implements Sink
     public void comment(String comment)
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void section_(int arg0)
     {
         // TODO Auto-generated method stub
-        
+
     }
 
     public void sectionTitle_(int arg0)
     {
         // TODO Auto-generated method stub
-        
+
     }
 
-    private List<Block> generateListFromStack() 
+    private List<Block> generateListFromStack()
     {
         List<Block> blocks = new ArrayList<Block>();
         while (!this.stack.empty()) {

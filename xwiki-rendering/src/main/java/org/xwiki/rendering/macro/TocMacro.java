@@ -227,7 +227,8 @@ public class TocMacro extends AbstractMacro
                 if (rootSectionBlock == sectionBlock) {
                     rootSectionFound = true;
                     continue;
-                } else if (rootSectionBlock.getParent() == sectionBlock.getParent() && sectionLevel <= rootSectionLevel) {
+                } else if (rootSectionBlock.getParent() == sectionBlock.getParent()
+                    && sectionLevel <= rootSectionLevel) {
                     break;
                 }
             } else {

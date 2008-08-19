@@ -67,6 +67,12 @@ public class DefaultTransformationManager implements TransformationManager, Comp
         this.transformations = txs;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.transformation.TransformationManager#performTransformations(org.xwiki.rendering.block.XDOM,
+     *      org.xwiki.rendering.parser.Syntax)
+     */
     public void performTransformations(XDOM dom, Syntax syntax) throws TransformationException
     {
         for (Transformation transformation : this.transformations) {

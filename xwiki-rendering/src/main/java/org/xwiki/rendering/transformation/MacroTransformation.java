@@ -69,7 +69,7 @@ public class MacroTransformation extends AbstractTransformation implements Compo
 
         public int compareTo(MacroHolder holder)
         {
-            return macro.compareTo(holder.macro);
+            return this.macro.compareTo(holder.macro);
         }
     }
 

@@ -23,28 +23,28 @@ import org.wikimodel.wem.IWikiPrinter;
 import org.xwiki.rendering.renderer.WikiPrinter;
 
 /**
- * Bridge so that WikiModel listeners can be used and so that they output their results to a XWiki
- * {@link WikiPrinter} instance.
- *
+ * Bridge so that WikiModel listeners can be used and so that they output their results to a XWiki {@link WikiPrinter}
+ * instance.
+ * 
  * @version $Id: $
  * @since 1.5M1
  */
 public class WikiModelPrinterAdapter implements IWikiPrinter
 {
-	private WikiPrinter printer;
-	
-	public WikiModelPrinterAdapter(WikiPrinter printer)
-	{
-		this.printer = printer;
-	}
-	
-	public void print(String text)
-	{
-		this.printer.print(text);
-	}
+    private WikiPrinter printer;
 
-	public void println(String text)
-	{
-		this.printer.println(text);
-	}
+    public WikiModelPrinterAdapter(WikiPrinter printer)
+    {
+        this.printer = printer;
+    }
+
+    public void print(String text)
+    {
+        this.printer.print(text);
+    }
+
+    public void println(String text)
+    {
+        this.printer.println(text);
+    }
 }

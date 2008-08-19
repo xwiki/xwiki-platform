@@ -192,6 +192,7 @@ public class Link
      * The output is syntax independent since this class is used for all syntaxes. Specific syntaxes should extend this
      * class and override this method to perform syntax-dependent formatting.
      */
+    @Override
     public String toString()
     {
         boolean shouldAddSpace = false;

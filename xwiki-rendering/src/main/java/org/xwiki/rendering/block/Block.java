@@ -110,6 +110,7 @@ public interface Block
     /**
      * Gets all the Blocks in the tree which are of the passed Block class.
      * 
+     * @param <T> the class of the Blocks to return
      * @param blockClass the block class to look for
      * @return all the matching blocks
      */

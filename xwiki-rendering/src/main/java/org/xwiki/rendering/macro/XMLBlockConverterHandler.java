@@ -81,6 +81,11 @@ public class XMLBlockConverterHandler extends DefaultHandler
         return this.stack.peek();
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.helpers.DefaultHandler#characters(char[], int, int)
+     */
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException
     {
@@ -124,6 +129,11 @@ public class XMLBlockConverterHandler extends DefaultHandler
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     */
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException
     {
@@ -154,6 +164,11 @@ public class XMLBlockConverterHandler extends DefaultHandler
         this.stack.push(this.marker);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xml.sax.helpers.DefaultHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+     */
     @Override
     public void endElement(String uri, String localName, String name) throws SAXException
     {

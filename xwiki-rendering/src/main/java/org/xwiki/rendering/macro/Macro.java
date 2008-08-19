@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 

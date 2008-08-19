@@ -30,21 +30,21 @@ import org.xwiki.rendering.listener.Format;
 
 public class DoxiaGeneratorListener implements Listener
 {
-	private Sink sink;
-	
-	public DoxiaGeneratorListener(Sink sink)
-	{
-		this.sink = sink;
-	}
+    private Sink sink;
+
+    public DoxiaGeneratorListener(Sink sink)
+    {
+        this.sink = sink;
+    }
 
     /**
      * {@inheritDoc}
+     * 
      * @see Listener#beginFormat(org.xwiki.rendering.listener.Format)
      */
     public void beginFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 this.sink.bold();
                 break;
@@ -64,12 +64,12 @@ public class DoxiaGeneratorListener implements Listener
 
     /**
      * {@inheritDoc}
+     * 
      * @see Listener#endFormat(org.xwiki.rendering.listener.Format)
      */
     public void endFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 this.sink.bold_();
                 break;
@@ -86,168 +86,169 @@ public class DoxiaGeneratorListener implements Listener
                 break;
         }
     }
-    
+
     public void beginDocument()
-	{
-		this.sink.body();
-	}
+    {
+        this.sink.body();
+    }
 
-	public void beginList(ListType listType)
-	{
-		if (listType == ListType.BULLETED) {
-			this.sink.list();
-		} else {
-			// TODO: Handle other numerotations (Roman, etc)
-			this.sink.numberedList(Sink.NUMBERING_DECIMAL);
-		}
-	}
+    public void beginList(ListType listType)
+    {
+        if (listType == ListType.BULLETED) {
+            this.sink.list();
+        } else {
+            // TODO: Handle other numerotations (Roman, etc)
+            this.sink.numberedList(Sink.NUMBERING_DECIMAL);
+        }
+    }
 
-	public void beginListItem()
-	{
-		this.sink.listItem();
-	}
+    public void beginListItem()
+    {
+        this.sink.listItem();
+    }
 
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
-	{
-		// Don't do anything since Doxia doesn't have macro markers and anyway we shouldn't
-		// do anything.
-	}
+    {
+        // Don't do anything since Doxia doesn't have macro markers and anyway we shouldn't
+        // do anything.
+    }
 
-	public void beginParagraph()
-	{
-		this.sink.paragraph();
-	}
+    public void beginParagraph()
+    {
+        this.sink.paragraph();
+    }
 
-	public void beginSection(SectionLevel level)
-	{
-		if (level == SectionLevel.LEVEL1) {
-			this.sink.section1();
-		} else if (level == SectionLevel.LEVEL2) {
-			this.sink.section2();
-		} else if (level == SectionLevel.LEVEL3) {
-			this.sink.section3();
-		} else if (level == SectionLevel.LEVEL4) {
-			this.sink.section4();
-		} else if (level == SectionLevel.LEVEL5) {
-			this.sink.section5();
-		} else if (level == SectionLevel.LEVEL6) {
-			// There's no level 6 in Doxia!
-			this.sink.section5();
-		}
-	}
+    public void beginSection(SectionLevel level)
+    {
+        if (level == SectionLevel.LEVEL1) {
+            this.sink.section1();
+        } else if (level == SectionLevel.LEVEL2) {
+            this.sink.section2();
+        } else if (level == SectionLevel.LEVEL3) {
+            this.sink.section3();
+        } else if (level == SectionLevel.LEVEL4) {
+            this.sink.section4();
+        } else if (level == SectionLevel.LEVEL5) {
+            this.sink.section5();
+        } else if (level == SectionLevel.LEVEL6) {
+            // There's no level 6 in Doxia!
+            this.sink.section5();
+        }
+    }
 
-	public void beginXMLElement(String name, Map<String, String> attributes)
-	{
-		// TODO: Find out what to do...
-	}
+    public void beginXMLElement(String name, Map<String, String> attributes)
+    {
+        // TODO: Find out what to do...
+    }
 
-	public void endDocument()
-	{
-		this.sink.body_();
-	}
+    public void endDocument()
+    {
+        this.sink.body_();
+    }
 
-	public void endList(ListType listType)
-	{
-		if (listType == ListType.BULLETED) {
-			this.sink.list_();
-		} else {
-			this.sink.numberedList_();
-		}
-	}
+    public void endList(ListType listType)
+    {
+        if (listType == ListType.BULLETED) {
+            this.sink.list_();
+        } else {
+            this.sink.numberedList_();
+        }
+    }
 
-	public void endListItem()
-	{
-		this.sink.listItem_();
-	}
+    public void endListItem()
+    {
+        this.sink.listItem_();
+    }
 
-	public void endMacroMarker(String name, Map<String, String> parameters, String content)
-	{
-		// Don't do anything since Doxia doesn't have macro markers and anyway we shouldn't
-		// do anything.
-	}
+    public void endMacroMarker(String name, Map<String, String> parameters, String content)
+    {
+        // Don't do anything since Doxia doesn't have macro markers and anyway we shouldn't
+        // do anything.
+    }
 
-	public void endParagraph()
-	{
-		this.sink.paragraph_();
-	}
+    public void endParagraph()
+    {
+        this.sink.paragraph_();
+    }
 
-	public void endSection(SectionLevel level)
-	{
-		if (level == SectionLevel.LEVEL1) {
-			this.sink.section1_();
-		} else if (level == SectionLevel.LEVEL2) {
-			this.sink.section2_();
-		} else if (level == SectionLevel.LEVEL3) {
-			this.sink.section3_();
-		} else if (level == SectionLevel.LEVEL4) {
-			this.sink.section4_();
-		} else if (level == SectionLevel.LEVEL5) {
-			this.sink.section5_();
-		} else if (level == SectionLevel.LEVEL6) {
-			// There's no level 6 in Doxia!
-			this.sink.section5_();
-		}
-	}
+    public void endSection(SectionLevel level)
+    {
+        if (level == SectionLevel.LEVEL1) {
+            this.sink.section1_();
+        } else if (level == SectionLevel.LEVEL2) {
+            this.sink.section2_();
+        } else if (level == SectionLevel.LEVEL3) {
+            this.sink.section3_();
+        } else if (level == SectionLevel.LEVEL4) {
+            this.sink.section4_();
+        } else if (level == SectionLevel.LEVEL5) {
+            this.sink.section5_();
+        } else if (level == SectionLevel.LEVEL6) {
+            // There's no level 6 in Doxia!
+            this.sink.section5_();
+        }
+    }
 
-	public void endXMLElement(String name, Map<String, String> attributes)
-	{
-		// TODO: Find out what to do...
-	}
+    public void endXMLElement(String name, Map<String, String> attributes)
+    {
+        // TODO: Find out what to do...
+    }
 
-	public void onEscape(String escapedString)
-	{
-		// TODO: Doxia doesn't have any escape so we need to find some equivalent...
-		this.sink.rawText(escapedString);
-	}
+    public void onEscape(String escapedString)
+    {
+        // TODO: Doxia doesn't have any escape so we need to find some equivalent...
+        this.sink.rawText(escapedString);
+    }
 
-	public void onLineBreak()
-	{
-		this.sink.lineBreak();
-	}
+    public void onLineBreak()
+    {
+        this.sink.lineBreak();
+    }
 
-	public void onLink(Link link)
-	{
-		// TODO: Finish the implementation
-		this.sink.link(link.getReference());
-	}
+    public void onLink(Link link)
+    {
+        // TODO: Finish the implementation
+        this.sink.link(link.getReference());
+    }
 
-	public void onMacro(String name, Map<String, String> parameters, String content)
-	{
-		// Don't do anything since macros have already been transformed so this method 
-		// should not be called.
-	}
+    public void onMacro(String name, Map<String, String> parameters, String content)
+    {
+        // Don't do anything since macros have already been transformed so this method
+        // should not be called.
+    }
 
-	public void onNewLine()
-	{
-		// Since there's no On NewLine event in Doxia we simply generate text
-		this.sink.rawText("\n");
-	}
+    public void onNewLine()
+    {
+        // Since there's no On NewLine event in Doxia we simply generate text
+        this.sink.rawText("\n");
+    }
 
-	public void onSpace()
-	{
-		// Since there's no On Space event in Doxia we simply generate text
-		this.sink.rawText(" ");
-	}
+    public void onSpace()
+    {
+        // Since there's no On Space event in Doxia we simply generate text
+        this.sink.rawText(" ");
+    }
 
-	public void onSpecialSymbol(String symbol)
-	{
-		// Since there's no On Special Symbol event in Doxia we simply generate text
-		this.sink.rawText(symbol);
-	}
+    public void onSpecialSymbol(String symbol)
+    {
+        // Since there's no On Special Symbol event in Doxia we simply generate text
+        this.sink.rawText(symbol);
+    }
 
-	public void onWord(String word)
-	{
-		this.sink.rawText(word);
-	}
-	
-	public void onId(String name)
-	{
-	 // TODO: Find out what to do...
-	}
+    public void onWord(String word)
+    {
+        this.sink.rawText(word);
+    }
+
+    public void onId(String name)
+    {
+        // TODO: Find out what to do...
+    }
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine() 
+     * 
+     * @see org.xwiki.rendering.listener.Listener#onHorizontalLine()
      */
     public void onHorizontalLine()
     {

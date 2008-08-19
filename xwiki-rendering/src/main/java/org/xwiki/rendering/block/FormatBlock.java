@@ -27,7 +27,7 @@ import java.util.List;
 /**
  * Represents a text formatting block (bold, italic, etc).
  * 
- * @version ëd: $
+ * @version Id: $
  * @since 1.6M1
  */
 public class FormatBlock extends AbstractFatherBlock

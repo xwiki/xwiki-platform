@@ -52,11 +52,6 @@ public class IdMacroParameterManager
     private static final String PARAM_NAME_DEF = null;
 
     /**
-     * The name of the macro parameter "context".
-     */
-    private static final String PARAM_CONTEXT = "context";
-
-    /**
      * The macro parameters manager. Parse and transform string value to java objects.
      */
     private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();

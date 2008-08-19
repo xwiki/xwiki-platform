@@ -43,7 +43,7 @@ import org.xwiki.rendering.parser.ParseException;
 public class XDOMGeneratorListener implements IWemListener
 {
     private Stack<Block> stack = new Stack<Block>();
-    
+
     private final MarkerBlock marker = new MarkerBlock();
 
     private LinkParser linkParser;
@@ -179,9 +179,9 @@ public class XDOMGeneratorListener implements IWemListener
     {
         // TODO: Follow http://code.google.com/p/wikimodel/issues/detail?id=31 to check when
         // underline is implemented and generate an UnderlineBlock when it is...
-        
+
         if (format.hasStyle(IWemConstants.STRONG)) {
-          this.stack.push(new FormatBlock(generateListFromStack(), Format.BOLD));
+            this.stack.push(new FormatBlock(generateListFromStack(), Format.BOLD));
         } else if (format.hasStyle(IWemConstants.EM)) {
             this.stack.push(new FormatBlock(generateListFromStack(), Format.ITALIC));
         } else if (format.hasStyle(IWemConstants.STRIKE)) {
@@ -189,7 +189,7 @@ public class XDOMGeneratorListener implements IWemListener
         } else {
             // WikiModel generate begin/endFormat events even for simple text with no style
             // so we need to remove our marker
-            for (Block block: generateListFromStack()) {
+            for (Block block : generateListFromStack()) {
                 this.stack.push(block);
             }
         }
@@ -292,7 +292,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     * @see org.wikimodel.wem.IWemListener#onHorizontalLine() 
+     * 
+     * @see org.wikimodel.wem.IWemListener#onHorizontalLine()
      */
     public void onHorizontalLine()
     {
@@ -310,10 +311,10 @@ public class XDOMGeneratorListener implements IWemListener
     public void onMacroBlock(String macroName, WikiParameters params, String content)
     {
         Map<String, String> xwikiParams = new LinkedHashMap<String, String>();
-        for (WikiParameter wikiParameter: params.toList()) {
+        for (WikiParameter wikiParameter : params.toList()) {
             xwikiParams.put(wikiParameter.getKey(), wikiParameter.getValue());
         }
-        
+
         this.stack.push(new MacroBlock(macroName, xwikiParams, content));
     }
 
@@ -331,8 +332,8 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Called when WikiModel finds an inline reference such as a URI located directly in the
-     * text, as opposed to a link inside wiki link syntax delimiters.
+     * Called when WikiModel finds an inline reference such as a URI located directly in the text, as opposed to a link
+     * inside wiki link syntax delimiters.
      */
     public void onReference(String ref)
     {
@@ -348,8 +349,8 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
-	public void onReference(WikiReference ref)
-	{
+    public void onReference(WikiReference ref)
+    {
         // If there's no link parser defined, don't handle links...
         // TODO: Generate some output log
         if (this.linkParser != null) {
@@ -371,7 +372,7 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
-	public void onSpace(String str)
+    public void onSpace(String str)
     {
         this.stack.push(SpaceBlock.SPACE_BLOCK);
     }
@@ -403,7 +404,7 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(new WordBlock(str));
     }
 
-    private List<Block> generateListFromStack() 
+    private List<Block> generateListFromStack()
     {
         List<Block> blocks = new ArrayList<Block>();
         while (!this.stack.empty()) {

@@ -41,21 +41,6 @@
       <version>${pom.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-api</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-container-servlet</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-action</artifactId>
-      <version>${pom.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-servlet</artifactId>
       <version>1.0-beta-9</version>

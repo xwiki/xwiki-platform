@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class DefaultURLFactory implements URLFactory, Initializable
+public class RegexURLFactory implements URLFactory, Initializable
 {
     private String pattern;
 
@@ -62,9 +62,9 @@ public class DefaultURLFactory implements URLFactory, Initializable
             url.setSpace(space);
 
             // Find the document part in the URL
-            String document =
-                matcher.group(Integer.parseInt((String) regexMappings.get("document")));
-            url.setDocument(space);
+            String page =
+                matcher.group(Integer.parseInt((String) regexMappings.get("page")));
+            url.setPage(page);
 
             // Find the query string if any and transform it into a parameter Map for easy access
             String queryString =

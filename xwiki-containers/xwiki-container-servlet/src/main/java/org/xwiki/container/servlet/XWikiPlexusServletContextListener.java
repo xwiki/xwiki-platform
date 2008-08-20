@@ -18,13 +18,12 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.plexus;
+package org.xwiki.container.servlet;
 
 import org.codehaus.plexus.servlet.PlexusServletContextListener;
 import org.codehaus.plexus.servlet.PlexusServletUtils;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.PlexusContainerLocator;
 import org.codehaus.plexus.PlexusContainer;
-import org.xwiki.container.servlet.ServletContainerInitializer;
 import org.xwiki.plexus.manager.PlexusComponentManager;
 
 import javax.servlet.ServletContextEvent;

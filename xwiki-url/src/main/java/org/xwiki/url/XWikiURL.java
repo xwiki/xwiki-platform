@@ -21,16 +21,24 @@
 package org.xwiki.url;
 
 import java.util.Map;
+import java.util.HashMap;
 
+/**
+ * Represents a XWiki URL.
+ *
+ * @version $Id$
+ */
 public class XWikiURL
 {
     private String action;
 
     private String space;
 
-    private String document;
+    private String page;
 
-    private Map parameters;
+    private String wiki;
+
+    private Map<String, String> parameters = new HashMap<String, String>();
 
     public String getAction()
     {
@@ -52,14 +60,14 @@ public class XWikiURL
         this.space = space;
     }
 
-    public String getDocument()
+    public String getPage()
     {
-        return this.document;
+        return this.page;
     }
 
-    public void setDocument(String document)
+    public void setPage(String page)
     {
-        this.document = document;
+        this.page = page;
     }
 
     public void addParameter(String name, String value)
@@ -69,6 +77,16 @@ public class XWikiURL
 
     public String getParameter(String name)
     {
-        return (String) this.parameters.get(name);
+        return this.parameters.get(name);
+    }
+
+    public void setWiki(String wiki)
+    {
+        this.wiki = wiki;
+    }
+
+    public String getWiki()
+    {
+        return this.wiki;
     }
 }

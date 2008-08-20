@@ -3,16 +3,17 @@
     <component>
       <role>org.xwiki.url.URLFactory</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.url.DefaultURLFactory</implementation>
+      <implementation>org.xwiki.url.RegexURLFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <!-- The configuration below allows customizing the XWiki URL format to any syntax the user
            wants -->
       <configuration>
-        <pattern>http[s]?://\w*[:]?\d*/\w*/(\w*)/(\w*)/?(\w*)\??(.*)</pattern>
+        <pattern>http[s]?://\w*[:]?\d*/\w*/\w*/(\w*)/(\w*)/?(\w*)\??(.*)</pattern>
+        <!-- Mapping between regex capture groups and XWiki URL elements -->
         <regexMappings>
           <action>1</action>
           <space>2</space>
-          <document>3</document>
+          <page>3</page>
           <queryString>4</queryString>
         </regexMappings>
       </configuration>

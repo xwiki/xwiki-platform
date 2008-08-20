@@ -117,10 +117,10 @@ public class XHTMLMacro extends AbstractMacro
     }
 
     /**
-     * Create a SAX {@link org.xml.sax.ContentHandler} to parse the passed XML
-     *
-     * @param parameters the macro parameters since the behavior of the content handler depend on them. For example
-     *        the rendering of XML text as wiki syntax depends on such a parameter.
+     * Create a SAX {@link org.xml.sax.ContentHandler} to parse the passed XML.
+     * 
+     * @param parameters the macro parameters since the behavior of the content handler depend on them. For example the
+     *            rendering of XML text as wiki syntax depends on such a parameter.
      * @return the content handler to use
      * @throws MacroExecutionException if the passed parameter is invalid for some reason
      */

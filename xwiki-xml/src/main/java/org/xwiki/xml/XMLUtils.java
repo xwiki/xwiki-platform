@@ -20,6 +20,8 @@
 package org.xwiki.xml;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.output.Format;
@@ -50,5 +52,44 @@ public class XMLUtils
 
         XMLOutputter outputter = new XMLOutputter(format);
         return outputter.outputString(jdomDoc);
+    }
+
+    /**
+     * Strip the HTML envelope if it exists. Precisely this means removig the head tag and move all tags in
+     * the body tag directly under the html element. This is useful for example if you wish to insert an HTML
+     * fragment into an existing HTML page.
+     *  
+     * @param document the w3c Document to strip
+     */
+    public static void stripHTMLEnvelope(Document document)
+    {
+        org.w3c.dom.Element root = document.getDocumentElement();
+        if (root.getNodeName().equalsIgnoreCase("html")) {
+            // Look for a head element below the root element and for a body element
+            Node bodyNode = null;
+            Node headNode = null;
+            NodeList nodes = root.getChildNodes();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Node node = nodes.item(i);
+                if (node.getNodeName().equalsIgnoreCase("head")) {
+                    headNode = node;
+                } else if (node.getNodeName().equalsIgnoreCase("body")) {
+                    bodyNode = node;
+                }
+            }
+
+            if (headNode != null) {
+                root.removeChild(headNode);
+            }
+
+            if (bodyNode != null) {
+                // Move all children of body node under the root element
+                NodeList bodyChildrenNodes = bodyNode.getChildNodes();
+                while (bodyChildrenNodes.getLength() > 0) {
+                    root.insertBefore(bodyChildrenNodes.item(0), null);
+                }
+                root.removeChild(bodyNode);
+            }
+        }
     }
 }

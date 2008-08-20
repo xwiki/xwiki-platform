@@ -40,6 +40,12 @@ import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
 
+/**
+ * Transforms WikiModel events into XWiki Rendering events.
+ *
+ * @version $Id$
+ * @since 1.5M1
+ */
 public class XDOMGeneratorListener implements IWemListener
 {
     private Stack<Block> stack = new Stack<Block>();
@@ -65,10 +71,18 @@ public class XDOMGeneratorListener implements IWemListener
         return new XDOM(generateListFromStack());
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.wikimodel.wem.IWemListener#beginDefinitionDescription()
+     */
     public void beginDefinitionDescription()
     {
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.wikimodel.wem.IWemListener#beginDefinitionList(org.wikimodel.wem.WikiParameters)  
+     */
     public void beginDefinitionList(WikiParameters params)
     {
     }

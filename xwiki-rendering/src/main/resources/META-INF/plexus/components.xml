@@ -117,11 +117,14 @@
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
-          <role>org.xwiki.rendering.macro.Macro</role>
-          <role-hint>xhtml/xwiki</role-hint>
+          <role>org.xwiki.xml.html.HTMLCleaner</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.xml.html.HTMLCleaner</role>
+          <role>org.xwiki.rendering.parser.Parser</role>
+          <role-hint>xwiki/2.0</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.xml.sax.EntityResolver</role>
         </requirement>
       </requirements>
       <configuration>

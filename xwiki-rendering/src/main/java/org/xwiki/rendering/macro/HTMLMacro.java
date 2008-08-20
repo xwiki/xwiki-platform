@@ -24,6 +24,10 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.xml.XMLUtils;
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.SAXOutputter;
+import org.jdom.JDOMException;
+import org.w3c.dom.Document;
 
 import java.util.Map;
 import java.util.Collections;
@@ -35,14 +39,9 @@ import java.util.List;
  * @version $Id: $
  * @since 1.6M1
  */
-public class HTMLMacro extends AbstractMacro
+public class HTMLMacro extends XHTMLMacro
 {
     private static final String DESCRIPTION = "Inserts HTML code into the page.";
-
-    /**
-     * Injected by the Component Manager.
-     */
-    private Macro xhtmlMacro;
 
     /**
      * Injected by the Component Manager.
@@ -80,6 +79,26 @@ public class HTMLMacro extends AbstractMacro
     public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return this.xhtmlMacro.execute(parameters, XMLUtils.toString(this.htmlCleaner.clean(content)), context);
+        DOMBuilder builder = new DOMBuilder();
+
+        // clean the HTML to transform it into valid XHTML
+        Document document = this.htmlCleaner.clean(content);
+
+        // Remove the HMTL envelope since this macro is only a fragment of a page which will already have an
+        // HTML envelope when rendered.
+        XMLUtils.stripHTMLEnvelope(document);
+
+        org.jdom.Document jdomDoc = builder.build(document);
+
+        XMLBlockConverterHandler handler = createContentHandler(parameters);
+
+        SAXOutputter outputter = new SAXOutputter(handler, handler, null, this.entityResolver);
+        try {
+            outputter.output(jdomDoc);
+        } catch (JDOMException e) {
+            throw new MacroExecutionException("Failed to parse content as XML [" + content + "]", e);
+        }
+
+        return handler.getRootBlock().getChildren();
     }
 }

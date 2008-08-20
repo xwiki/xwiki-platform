@@ -54,7 +54,7 @@ public class XHTMLMacro extends AbstractMacro
      * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally. Injected by
      * the Component Manager.
      */
-    private EntityResolver entityResolver;
+    protected EntityResolver entityResolver;
 
     /**
      * {@inheritDoc}
@@ -89,15 +89,10 @@ public class XHTMLMacro extends AbstractMacro
         // Parse the XHTML using an XML Parser and Wrap the XML elements in XMLBlock(s).
         // For each XML element's text, run it through the main Parser.
 
-        this.macroParameters.load(parameters);
+        XMLBlockConverterHandler handler = createContentHandler(parameters);
 
-        // Check if the user has asked to escape wiki syntax or not
-        boolean escapeWikiSyntax = this.macroParameters.isWikiSyntaxEscaped();
-
-        XMLBlockConverterHandler handler;
         try {
             XMLReader xr = XMLReaderFactory.createXMLReader();
-            handler = new XMLBlockConverterHandler(this.parser, escapeWikiSyntax);
             xr.setContentHandler(handler);
             xr.setErrorHandler(handler);
             xr.setEntityResolver(this.entityResolver);
@@ -121,4 +116,22 @@ public class XHTMLMacro extends AbstractMacro
         return handler.getRootBlock().getChildren();
     }
 
+    /**
+     * Create a SAX {@link org.xml.sax.ContentHandler} to parse the passed XML
+     *
+     * @param parameters the macro parameters since the behavior of the content handler depend on them. For example
+     *        the rendering of XML text as wiki syntax depends on such a parameter.
+     * @return the content handler to use
+     * @throws MacroExecutionException if the passed parameter is invalid for some reason
+     */
+    protected XMLBlockConverterHandler createContentHandler(Map<String, String> parameters)
+        throws MacroExecutionException
+    {
+        this.macroParameters.load(parameters);
+
+        // Check if the user has asked to escape wiki syntax or not
+        boolean escapeWikiSyntax = this.macroParameters.isWikiSyntaxEscaped();
+
+        return new XMLBlockConverterHandler(this.parser, escapeWikiSyntax);
+    }
 }

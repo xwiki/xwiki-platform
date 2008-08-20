@@ -1,14 +1,14 @@
 <component-set>
   <components>
     <component>
-      <role>org.xwiki.url.URLFactory</role>
+      <role>org.xwiki.url.XWikiURLFactory</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.url.RegexURLFactory</implementation>
+      <implementation>org.xwiki.url.RegexXWikiURLFactory</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <!-- The configuration below allows customizing the XWiki URL format to any syntax the user
            wants -->
       <configuration>
-        <pattern>http[s]?://\w*[:]?\d*/\w*/\w*/(\w*)/(\w*)/?(\w*)\??(.*)</pattern>
+        <pattern>(?:http[s]?://\w*[:]?\d*)?/\w*/\w*/(\w*)/(\w*)/?(\w*)\??(.*)</pattern>
         <!-- Mapping between regex capture groups and XWiki URL elements -->
         <regexMappings>
           <action>1</action>

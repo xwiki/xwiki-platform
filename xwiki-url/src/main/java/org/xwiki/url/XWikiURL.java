@@ -22,6 +22,7 @@ package org.xwiki.url;
 
 import java.util.Map;
 import java.util.HashMap;
+import java.util.Collections;
 
 /**
  * Represents a XWiki URL.
@@ -32,6 +33,7 @@ public class XWikiURL
 {
     private String action;
 
+    // TODO: Replace space/page/wiki and parameters by a DocumentName
     private String space;
 
     private String page;
@@ -75,7 +77,12 @@ public class XWikiURL
         this.parameters.put(name, value);
     }
 
-    public String getParameter(String name)
+    public Map<String, String> getParameters()
+    {
+        return Collections.unmodifiableMap(this.parameters);
+    }
+
+    public String getParameterValue(String name)
     {
         return this.parameters.get(name);
     }

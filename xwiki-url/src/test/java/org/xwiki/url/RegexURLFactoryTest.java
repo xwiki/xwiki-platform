@@ -23,20 +23,34 @@ package org.xwiki.url;
 import com.xpn.xwiki.test.AbstractXWikiComponentTestCase;
 
 /**
- * Unit tests for {@link org.xwiki.url.RegexURLFactory}.
+ * Unit tests for {@link RegexXWikiURLFactory}.
  *
  * @version $Id: $
  * @since 1.6M1
  */
 public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
 {
+    private XWikiURLFactory factory;
+
+    protected void setUp() throws Exception
+    {
+        this.factory = (XWikiURLFactory) getComponentManager().lookup(XWikiURLFactory.ROLE);
+    }
+
     public void testCreateURL() throws Exception
     {
-        URLFactory factory = (URLFactory) getComponentManager().lookup(URLFactory.ROLE);
-        XWikiURL url = factory.createURL("http://localhost:8080/xwiki/bin/view/Main/WebHome?language=fr");
+        XWikiURL url = this.factory.createURL("http://localhost:8080/xwiki/bin/view/Main/WebHome?language=fr");
         assertEquals("view", url.getAction());
         assertEquals("WebHome", url.getPage());
         assertEquals("Main", url.getSpace());
-        assertEquals("fr", url.getParameter("language"));
+        assertEquals("fr", url.getParameterValue("language"));
+    }
+
+    public void testCreateURLWhenURI() throws Exception
+    {
+        XWikiURL url = this.factory.createURL("/xwiki/bin/view/Main/WebHome");
+        assertEquals("view", url.getAction());
+        assertEquals("WebHome", url.getPage());
+        assertEquals("Main", url.getSpace());
     }
 }

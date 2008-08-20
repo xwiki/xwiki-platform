@@ -47,9 +47,9 @@ public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
     {
         boolean bValue;
 
-        if (getValueAsString().equalsIgnoreCase("true") || getValueAsString().equals("0")) {
+        if (getValueAsString().equalsIgnoreCase("true") || getValueAsString().equals("1")) {
             bValue = true;
-        } else if (getValueAsString().equalsIgnoreCase("false") || getValueAsString().equals("1")) {
+        } else if (getValueAsString().equalsIgnoreCase("false") || getValueAsString().equals("0")) {
             bValue = false;
         } else {
             setErrorInvalid();

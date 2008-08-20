@@ -134,12 +134,17 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
         return servletPath;
     }
 
-    private URL getServerURL(XWikiContext context) throws MalformedURLException
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiURLFactory#getServerURL(com.xpn.xwiki.XWikiContext)
+     */
+    public URL getServerURL(XWikiContext context) throws MalformedURLException
     {
         return getServerURL(context.getDatabase(), context);
     }
 
-    private URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
+    public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
     {
         URL serverURL = this.serverURL;
         if (context.getRequest() != null) { // necessary to the tests

@@ -23,6 +23,7 @@ package com.xpn.xwiki.web;
 
 import com.xpn.xwiki.XWikiContext;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 
 public interface XWikiURLFactory {
@@ -47,4 +48,13 @@ public interface XWikiURLFactory {
     public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring, String xwikidb, XWikiContext context);
     public URL getRequestURL(XWikiContext context);
     public String getURL(URL url, XWikiContext context);
+    
+    /**
+     * Generate the base external URL to access this server.
+     * 
+     * @param context the XWiki context.
+     * @return the URL of the server.
+     * @throws MalformedURLException error when creating the {@link URL}.
+     */
+    public URL getServerURL(XWikiContext context) throws MalformedURLException;
 }

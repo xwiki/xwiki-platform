@@ -26,6 +26,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.portlet.PortletURL;
+
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
@@ -152,4 +154,14 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
         return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiServletURLFactory#getServerURL(java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public URL getServerURL(String xwikidb, XWikiContext context) throws MalformedURLException
+    {
+        return this.serverURL;
+    }
 }

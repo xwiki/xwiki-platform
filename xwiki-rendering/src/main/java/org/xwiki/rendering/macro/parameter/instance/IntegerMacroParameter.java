@@ -64,7 +64,7 @@ public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
                 value = parameterClass.isNormalized() ? parameterClass.getMaxValue().intValue() : def;
             }
         } catch (NumberFormatException e) {
-            setErrorInvalid();
+            setErrorInvalid(e);
 
             value = def;
         }

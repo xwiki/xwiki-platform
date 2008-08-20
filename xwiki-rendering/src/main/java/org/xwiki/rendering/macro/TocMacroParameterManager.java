@@ -128,23 +128,23 @@ public class TocMacroParameterManager
      */
     public TocMacroParameterManager()
     {
-        IntegerMacroParameterDescriptor startParamClass =
+        IntegerMacroParameterDescriptor startParamDescriptor =
             new IntegerMacroParameterDescriptor(PARAM_START, PARAM_START_DESC, PARAM_START_DEF);
-        startParamClass.setMinValue(1);
-        this.macroParameterManager.registerParameterDescriptor(startParamClass);
+        startParamDescriptor.setMinValue(1);
+        this.macroParameterManager.registerParameterDescriptor(startParamDescriptor);
 
-        IntegerMacroParameterDescriptor depthParamClass =
+        IntegerMacroParameterDescriptor depthParamDescriptor =
             new IntegerMacroParameterDescriptor(PARAM_DEPTH, PARAM_DEPTH_DESC, PARAM_DEPTH_DEF);
-        depthParamClass.setMinValue(1);
-        this.macroParameterManager.registerParameterDescriptor(depthParamClass);
+        depthParamDescriptor.setMinValue(1);
+        this.macroParameterManager.registerParameterDescriptor(depthParamDescriptor);
 
-        EnumMacroParameterDescriptor<Scope> scopeParamClass =
+        EnumMacroParameterDescriptor<Scope> scopeParamDescriptor =
             new EnumMacroParameterDescriptor<Scope>(PARAM_SCOPE, PARAM_SCOPE_DESC, PARAM_SCOPE_DEF);
-        this.macroParameterManager.registerParameterDescriptor(scopeParamClass);
+        this.macroParameterManager.registerParameterDescriptor(scopeParamDescriptor);
 
-        BooleanMacroParameterDescriptor numberedParamClass =
+        BooleanMacroParameterDescriptor numberedParamDescriptor =
             new BooleanMacroParameterDescriptor(PARAM_NUMBERED, PARAM_NUMBERED_DESC, PARAM_NUMBERED_DEF);
-        this.macroParameterManager.registerParameterDescriptor(numberedParamClass);
+        this.macroParameterManager.registerParameterDescriptor(numberedParamDescriptor);
     }
 
     /**

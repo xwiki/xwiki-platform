@@ -52,11 +52,21 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
      */
     protected void setErrorInvalid()
     {
+        setErrorInvalid(null);
+    }
+
+    /**
+     * Generate and register error exception.
+     * 
+     * @param e the error.
+     */
+    protected void setErrorInvalid(Throwable e)
+    {
         StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
 
         errorMessage.append(" The value must be a number.");
 
-        this.error = new MacroParameterException(generateInvalidErrorMessage());
+        this.error = new MacroParameterException(generateInvalidErrorMessage(), e);
     }
 
     /**

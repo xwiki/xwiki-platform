@@ -99,14 +99,14 @@ public class IncludeMacroParameterManager
      */
     public IncludeMacroParameterManager()
     {
-        StringMacroParameterDescriptor documentParamClass =
+        StringMacroParameterDescriptor documentParamDescriptor =
             new StringMacroParameterDescriptor(PARAM_DOCUMENT, PARAM_DOCUMENT_DESC, PARAM_DOCUMENT_DEF);
-        documentParamClass.setRequired(true);
-        this.macroParameterManager.registerParameterDescriptor(documentParamClass);
+        documentParamDescriptor.setRequired(true);
+        this.macroParameterManager.registerParameterDescriptor(documentParamDescriptor);
 
-        EnumMacroParameterDescriptor<Context> contextParamClass =
+        EnumMacroParameterDescriptor<Context> contextParamDescriptor =
             new EnumMacroParameterDescriptor<Context>(PARAM_CONTEXT, PARAM_CONTEXT_DESC, PARAM_CONTEXT_DEF);
-        this.macroParameterManager.registerParameterDescriptor(contextParamClass);
+        this.macroParameterManager.registerParameterDescriptor(contextParamDescriptor);
     }
 
     /**

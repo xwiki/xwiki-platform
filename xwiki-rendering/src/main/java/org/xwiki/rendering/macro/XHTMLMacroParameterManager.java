@@ -62,11 +62,11 @@ public class XHTMLMacroParameterManager
      */
     public XHTMLMacroParameterManager()
     {
-        BooleanMacroParameterDescriptor escapeWikiSyntaxParamClass =
+        BooleanMacroParameterDescriptor escapeWikiSyntaxParamDescriptor =
             new BooleanMacroParameterDescriptor(PARAM_ESCAPEWIKISYNTAX, PARAM_ESCAPEWIKISYNTAX_DESC,
                 PARAM_ESCAPEWIKISYNTAX_DEF);
-        escapeWikiSyntaxParamClass.setValueHasToBeValid(false);
-        this.macroParameterManager.registerParameterDescriptor(escapeWikiSyntaxParamClass);
+        escapeWikiSyntaxParamDescriptor.setValueHasToBeValid(false);
+        this.macroParameterManager.registerParameterDescriptor(escapeWikiSyntaxParamDescriptor);
     }
 
     /**

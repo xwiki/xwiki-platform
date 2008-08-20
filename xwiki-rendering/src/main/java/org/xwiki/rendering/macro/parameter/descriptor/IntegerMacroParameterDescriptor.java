@@ -30,12 +30,12 @@ public class IntegerMacroParameterDescriptor extends AbstractNumberMacroParamete
 {
     /**
      * @param name the name of the parameter.
-     * @param descritpion the description of the parameter.
+     * @param description the description of the parameter.
      * @param def the default value. Have to be not null.
      */
-    public IntegerMacroParameterDescriptor(String name, String descritpion, int def)
+    public IntegerMacroParameterDescriptor(String name, String description, int def)
     {
-        super(name, descritpion, def);
+        super(name, description, def);
     }
 
     /**

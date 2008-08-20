@@ -45,8 +45,8 @@ import com.xpn.xwiki.plugin.XWikiDefaultPlugin;
 import com.xpn.xwiki.plugin.XWikiPluginInterface;
 
 /**
- * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and
- * preserved as a list of {@link FileItem}s.
+ * Plugin that offers access to uploaded files. The uploaded files are automatically parsed and preserved as a list of
+ * {@link FileItem}s.
  * 
  * @version $Id$
  */
@@ -60,20 +60,20 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     public static final String PLUGIN_NAME = "fileupload";
 
     /**
-     * The context name of the uploaded file list. It can be used to retrieve the list of uploaded
-     * files from the context.
+     * The context name of the uploaded file list. It can be used to retrieve the list of uploaded files from the
+     * context.
      */
     public static final String FILE_LIST_KEY = "fileuploadlist";
 
     /**
-     * The name of the parameter that can be set in the global XWiki preferences to override the
-     * default maximum file size.
+     * The name of the parameter that can be set in the global XWiki preferences to override the default maximum file
+     * size.
      */
     public static final String UPLOAD_MAXSIZE_PARAMETER = "upload_maxsize";
 
     /**
-     * The name of the parameter that can be set in the global XWiki preferences to override the
-     * default size threshold for on-disk storage.
+     * The name of the parameter that can be set in the global XWiki preferences to override the default size threshold
+     * for on-disk storage.
      */
     public static final String UPLOAD_SIZETHRESHOLD_PARAMETER = "upload_sizethreshold";
 
@@ -83,15 +83,15 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     private static final Log LOG = LogFactory.getLog(FileUploadPlugin.class);
 
     /**
-     * The default maximum size for uploaded documents. This limit can be changed using the
-     * <tt>upload_maxsize</tt> XWiki preference.
+     * The default maximum size for uploaded documents. This limit can be changed using the <tt>upload_maxsize</tt>
+     * XWiki preference.
      */
     private static final long UPLOAD_DEFAULT_MAXSIZE = 33554432L;
 
     /**
-     * The default maximum size for in-memory stored uploaded documents. If a file is larger than
-     * this limit, it will be stored on disk until the current request finishes. This limit can be
-     * changed using the <tt>upload_sizethreshold</tt> XWiki preference.
+     * The default maximum size for in-memory stored uploaded documents. If a file is larger than this limit, it will be
+     * stored on disk until the current request finishes. This limit can be changed using the
+     * <tt>upload_sizethreshold</tt> XWiki preference.
      */
     private static final long UPLOAD_DEFAULT_SIZETHRESHOLD = 100000L;
 
@@ -110,6 +110,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getName()
      */
+    @Override
     public String getName()
     {
         return PLUGIN_NAME;
@@ -120,6 +121,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#init(XWikiContext)
      */
+    @Override
     public void init(XWikiContext context)
     {
         super.init(context);
@@ -130,6 +132,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#virtualInit(XWikiContext)
      */
+    @Override
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
@@ -140,16 +143,16 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * 
      * @see com.xpn.xwiki.plugin.XWikiDefaultPlugin#getPluginApi(XWikiPluginInterface, XWikiContext)
      */
+    @Override
     public Api getPluginApi(XWikiPluginInterface plugin, XWikiContext context)
     {
         return new FileUploadPluginApi((FileUploadPlugin) plugin, context);
     }
 
     /**
-     * {@inheritDoc}
-     * 
-     * Make sure we don't leave files in temp directories and in memory.
+     * {@inheritDoc} Make sure we don't leave files in temp directories and in memory.
      */
+    @Override
     public void endRendering(XWikiContext context)
     {
         // we used to call cleanFileList here but we should not anymore as endRendering is called to
@@ -166,11 +169,11 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     public void cleanFileList(XWikiContext context)
     {
         LOG.debug("Cleaning uploaded files");
-        List fileuploadlist = (List) context.get(FILE_LIST_KEY);
+
+        List<FileItem> fileuploadlist = getFileItems(context);
         if (fileuploadlist != null) {
-            for (int i = 0; i < fileuploadlist.size(); i++) {
+            for (FileItem item : fileuploadlist) {
                 try {
-                    FileItem item = (FileItem) fileuploadlist.get(i);
                     item.delete();
                 } catch (Exception ex) {
                     LOG.warn("Exception cleaning uploaded files", ex);
@@ -190,35 +193,32 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
     public void loadFileList(XWikiContext context) throws XWikiException
     {
         XWiki xwiki = context.getWiki();
-        loadFileList(xwiki.getXWikiPreferenceAsLong(
-            UPLOAD_MAXSIZE_PARAMETER,
-            UPLOAD_DEFAULT_MAXSIZE, context),
-            (int) xwiki.getXWikiPreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER,
-                UPLOAD_DEFAULT_SIZETHRESHOLD, context),
-            xwiki.Param("xwiki.upload.tempdir"),
-            context);
+        loadFileList(xwiki.getXWikiPreferenceAsLong(UPLOAD_MAXSIZE_PARAMETER, UPLOAD_DEFAULT_MAXSIZE, context),
+            (int) xwiki
+                .getXWikiPreferenceAsLong(UPLOAD_SIZETHRESHOLD_PARAMETER, UPLOAD_DEFAULT_SIZETHRESHOLD, context),
+            xwiki.Param("xwiki.upload.tempdir"), context);
     }
 
     /**
      * Loads the list of uploaded files in the context if there are any uploaded files.
      * 
      * @param uploadMaxSize Maximum size of the uploaded files.
-     * @param uploadSizeThreashold Threashold over which the file data should be stored on disk, and
-     *            not in memory.
+     * @param uploadSizeThreashold Threashold over which the file data should be stored on disk, and not in memory.
      * @param tempdir Temporary directory to store the uploaded files that are not kept in memory.
      * @param context Context of the request.
-     * @throws XWikiException if the request could not be parsed, or the maximum file size was
-     *             reached.
+     * @throws XWikiException if the request could not be parsed, or the maximum file size was reached.
      * @see FileUploadPluginApi#loadFileList(long, int, String)
      */
-    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir,
-        XWikiContext context) throws XWikiException
+    public void loadFileList(long uploadMaxSize, int uploadSizeThreashold, String tempdir, XWikiContext context)
+        throws XWikiException
     {
         LOG.debug("Loading uploaded files");
+
         // If we already have a file list then loadFileList was already called
         // Continuing would empty the list.. We need to stop.
         if (context.get(FILE_LIST_KEY) != null) {
             LOG.debug("Called loadFileList twice");
+
             return;
         }
 
@@ -235,13 +235,12 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
 
         // TODO: Does this work in portlet mode, or we must use PortletFileUpload?
         FileUpload fileupload = new ServletFileUpload(factory);
-        RequestContext reqContext =
-            new ServletRequestContext(context.getRequest().getHttpServletRequest());
+        RequestContext reqContext = new ServletRequestContext(context.getRequest().getHttpServletRequest());
         fileupload.setSizeMax(uploadMaxSize);
         // context.put("fileupload", fileupload);
 
         try {
-            List list = fileupload.parseRequest(reqContext);
+            List<FileItem> list = fileupload.parseRequest(reqContext);
             if (list.size() > 0) {
                 LOG.info("Loaded " + list.size() + " uploaded files");
             }
@@ -249,13 +248,10 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
             context.put(FILE_LIST_KEY, list);
         } catch (FileUploadBase.SizeLimitExceededException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE,
-                "Exception uploaded file");
+                XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE, "Exception uploaded file");
         } catch (FileUploadException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION,
-                "Exception while parsing uploaded file",
-                e);
+                XWikiException.ERROR_XWIKI_APP_UPLOAD_PARSE_EXCEPTION, "Exception while parsing uploaded file", e);
         }
     }
 
@@ -267,14 +263,14 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * @return A list of FileItem elements.
      * @see FileUploadPluginApi#getFileItems()
      */
-    public List getFileItems(XWikiContext context)
+    public List<FileItem> getFileItems(XWikiContext context)
     {
-        return (List) context.get(FILE_LIST_KEY);
+        return (List<FileItem>) context.get(FILE_LIST_KEY);
     }
 
     /**
-     * Allows to retrieve the contents of an uploaded file as a sequence of bytes.
-     * {@link #loadFileList(XWikiContext)} needs to be called beforehand.
+     * Allows to retrieve the contents of an uploaded file as a sequence of bytes. {@link #loadFileList(XWikiContext)}
+     * needs to be called beforehand.
      * 
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
@@ -282,8 +278,7 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * @throws XWikiException if the data could not be read.
      * @see FileUploadPluginApi#getFileItemData(String)
      */
-    public byte[] getFileItemData(String formfieldName, XWikiContext context)
-        throws XWikiException
+    public byte[] getFileItemData(String formfieldName, XWikiContext context) throws XWikiException
     {
         FileItem fileitem = getFile(formfieldName, context);
 
@@ -299,22 +294,20 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
                 fileis.close();
             }
         } catch (java.lang.OutOfMemoryError e) {
-            throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
-                "Java Heap Space, Out of memory exception",
-                e);
+            throw new XWikiException(XWikiException.MODULE_XWIKI_APP, XWikiException.ERROR_XWIKI_APP_JAVA_HEAP_SPACE,
+                "Java Heap Space, Out of memory exception", e);
         } catch (IOException ie) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION,
-                "Exception while reading uploaded parsed file",
+                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",
                 ie);
         }
+
         return data;
     }
 
     /**
-     * Allows to retrieve the contents of an uploaded file as a string.
-     * {@link #loadFileList(XWikiContext)} needs to be called beforehand.
+     * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList(XWikiContext)} needs to be
+     * called beforehand.
      * 
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
@@ -322,52 +315,51 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * @throws XWikiException if the data could not be read.
      * @see FileUploadPluginApi#getFileItemAsString(String)
      */
-    public String getFileItemAsString(String formfieldName, XWikiContext context)
-        throws XWikiException
+    public String getFileItemAsString(String formfieldName, XWikiContext context) throws XWikiException
     {
         byte[] data = getFileItemData(formfieldName, context);
         if (data == null) {
             return null;
         }
+
         return new String(data);
     }
 
     /**
-     * Allows to retrieve the contents of an uploaded file as a string.
-     * {@link #loadFileList(XWikiContext)} needs to be called beforehand.
+     * Allows to retrieve the contents of an uploaded file as a string. {@link #loadFileList(XWikiContext)} needs to be
+     * called beforehand.
      * 
-     * @deprecated not well named, use
-     *             {@link #getFileItemAsString(String, com.xpn.xwiki.XWikiContext)}
+     * @deprecated not well named, use {@link #getFileItemAsString(String, com.xpn.xwiki.XWikiContext)}
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
      * @return The contents of the file.
      * @throws XWikiException Exception is thrown if the data could not be read.
      * @see FileUploadPluginApi#getFileItemAsString(String)
      */
+    @Deprecated
     public String getFileItem(String formfieldName, XWikiContext context) throws XWikiException
     {
         return getFileItemAsString(formfieldName, context);
     }
 
     /**
-     * Retrieves the list of FileItem names. {@link #loadFileList(XWikiContext)} needs to be called
-     * beforehand.
+     * Retrieves the list of FileItem names. {@link #loadFileList(XWikiContext)} needs to be called beforehand.
      * 
      * @param context Context of the request
      * @return List of strings of the item names
      */
-    public List getFileItemNames(XWikiContext context)
+    public List<String> getFileItemNames(XWikiContext context)
     {
-        List itemnames = new ArrayList();
-        List fileuploadlist = getFileItems(context);
+        List<String> itemnames = new ArrayList<String>();
+        List<FileItem> fileuploadlist = getFileItems(context);
         if (fileuploadlist == null) {
             return itemnames;
         }
 
-        for (int i = 0; i < fileuploadlist.size(); i++) {
-            FileItem item = (FileItem) fileuploadlist.get(i);
+        for (FileItem item : fileuploadlist) {
             itemnames.add(item.getFieldName());
         }
+
         return itemnames;
     }
 
@@ -390,20 +382,19 @@ public class FileUploadPlugin extends XWikiDefaultPlugin implements XWikiPluginI
      * 
      * @param formfieldName The name of the form field.
      * @param context Context of the request.
-     * @return The corresponding FileItem, or <tt>null</tt> if no file was uploaded for that form
-     *         field.
+     * @return The corresponding FileItem, or <tt>null</tt> if no file was uploaded for that form field.
      */
     public FileItem getFile(String formfieldName, XWikiContext context)
     {
         LOG.debug("Searching file uploaded for field " + formfieldName);
-        List fileuploadlist = getFileItems(context);
+
+        List<FileItem> fileuploadlist = getFileItems(context);
         if (fileuploadlist == null) {
             return null;
         }
 
         FileItem fileitem = null;
-        for (int i = 0; i < fileuploadlist.size(); i++) {
-            FileItem item = (FileItem) fileuploadlist.get(i);
+        for (FileItem item : fileuploadlist) {
             if (formfieldName.equals(item.getFieldName())) {
                 fileitem = item;
                 LOG.debug("Found uploaded file!");

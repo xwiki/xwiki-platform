@@ -29,7 +29,6 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -171,21 +170,21 @@ public class Utils
 
     public static String getRedirect(XWikiRequest request, String defaultRedirect)
     {
-        String redirect;
-        redirect = request.getParameter("xredirect");
+        String redirect = request.getParameter("xredirect");
         if ((redirect == null) || (redirect.equals(""))) {
             redirect = defaultRedirect;
         }
+
         return redirect;
     }
 
     public static String getRedirect(String action, String params, XWikiContext context)
     {
-        String redirect;
-        redirect = context.getRequest().getParameter("xredirect");
+        String redirect = context.getRequest().getParameter("xredirect");
         if (StringUtils.isBlank(redirect)) {
             redirect = context.getDoc().getURL(action, params, true, context);
         }
+
         return redirect;
     }
 
@@ -196,19 +195,18 @@ public class Utils
 
     public static String getPage(XWikiRequest request, String defaultpage)
     {
-        String page;
-        page = request.getParameter("xpage");
+        String page = request.getParameter("xpage");
         if ((page == null) || (page.equals(""))) {
             page = defaultpage;
         }
+
         return page;
     }
 
-    public static String getFileName(List filelist, String name)
+    public static String getFileName(List<FileItem> filelist, String name)
     {
         FileItem fileitem = null;
-        for (int i = 0; i < filelist.size(); i++) {
-            FileItem item = (FileItem) filelist.get(i);
+        for (FileItem item : filelist) {
             if (name.equals(item.getFieldName())) {
                 fileitem = item;
                 break;
@@ -222,11 +220,10 @@ public class Utils
         return fileitem.getName();
     }
 
-    public static byte[] getContent(List filelist, String name) throws XWikiException
+    public static byte[] getContent(List<FileItem> filelist, String name) throws XWikiException
     {
         FileItem fileitem = null;
-        for (int i = 0; i < filelist.size(); i++) {
-            FileItem item = (FileItem) filelist.get(i);
+        for (FileItem item : filelist) {
             if (name.equals(item.getFieldName())) {
                 fileitem = item;
                 break;
@@ -245,8 +242,10 @@ public class Utils
             fileis.close();
         } catch (IOException e) {
             throw new XWikiException(XWikiException.MODULE_XWIKI_APP,
-                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file", e);
+                XWikiException.ERROR_XWIKI_APP_UPLOAD_FILE_EXCEPTION, "Exception while reading uploaded parsed file",
+                e);
         }
+
         return data;
     }
 
@@ -293,7 +292,7 @@ public class Utils
 
         // Statically store the component manager in {@link Utils} to be able to access it without
         // the context.
-        Utils.setComponentManager(componentManager);
+        setComponentManager(componentManager);
 
         return context;
     }
@@ -389,6 +388,7 @@ public class Utils
                 putMapEntry(map, key, value);
             }
         }
+
         return map;
     }
 
@@ -408,6 +408,7 @@ public class Utils
         if ((b >= 'A') && (b <= 'F')) {
             return (byte) (b - 'A' + 10);
         }
+
         return 0;
     }
 
@@ -447,9 +448,8 @@ public class Utils
         }
     }
 
-    // TODO: Duplicate of Util.encodeURI(). Keep only one
     /**
-     * @deprecated replaced by Util#encodeURI since 1.3M2
+     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#encodeURI(String, XWikiContext)} since 1.3M2
      */
     @Deprecated
     public static String encode(String name, XWikiContext context)
@@ -461,9 +461,8 @@ public class Utils
         }
     }
 
-    // TODO: Duplicate of Util.decodeURI(). Keep only one
     /**
-     * @deprecated replaced by Util#decodeURI since 1.3M2
+     * @deprecated replaced by {@link com.xpn.xwiki.util.Util#decodeURI(String, XWikiContext)} since 1.3M2
      */
     @Deprecated
     public static String decode(String name, XWikiContext context)
@@ -494,9 +493,8 @@ public class Utils
                 fileupload.loadFileList(context);
                 context.put("fileuploadplugin", fileupload);
                 MultipartRequestWrapper mpreq = (MultipartRequestWrapper) request;
-                List fileItems = fileupload.getFileItems(context);
-                for (Iterator iter = fileItems.iterator(); iter.hasNext();) {
-                    FileItem item = (FileItem) iter.next();
+                List<FileItem> fileItems = fileupload.getFileItems(context);
+                for (FileItem item : fileItems) {
                     if (item.isFormField()) {
                         String sName = item.getFieldName();
                         String sValue = item.getString();
@@ -506,8 +504,7 @@ public class Utils
             }
         } catch (Exception e) {
             if ((e instanceof XWikiException)
-                && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE))
-            {
+                && (((XWikiException) e).getCode() == XWikiException.ERROR_XWIKI_APP_FILE_EXCEPTION_MAXSIZE)) {
                 context.put("exception", e);
             } else {
                 e.printStackTrace();
@@ -530,7 +527,7 @@ public class Utils
      */
     public static ComponentManager getComponentManager()
     {
-        return Utils.componentManager;
+        return componentManager;
     }
 
     /**
@@ -577,7 +574,8 @@ public class Utils
     public static boolean arePlaceholdersEnabled(XWikiContext context)
     {
         Boolean enabled = (Boolean) context.get(PLACEHOLDERS_ENABLED_CONTEXT_KEY);
-        return enabled != null && enabled.booleanValue();
+
+        return enabled != null && enabled;
     }
 
     /**
@@ -611,7 +609,6 @@ public class Utils
      * @param context The current context.
      * @return The key to be used instead of the value.
      */
-    @SuppressWarnings("unchecked")
     public static String createPlaceholder(String value, XWikiContext context)
     {
         if (!arePlaceholdersEnabled(context)) {
@@ -623,6 +620,7 @@ public class Utils
             key = "KEY" + RandomStringUtils.randomAlphanumeric(10) + "KEY";
         } while (renderingKeys.containsKey(key));
         renderingKeys.put(key, value);
+
         return key;
     }
 
@@ -633,17 +631,18 @@ public class Utils
      * @param context The current context.
      * @return The content with all placeholders replaced with the real values.
      */
-    @SuppressWarnings("unchecked")
     public static String replacePlaceholders(String content, XWikiContext context)
     {
         if (!arePlaceholdersEnabled(context)) {
             return content;
         }
+
         String result = content;
         Map<String, String> renderingKeys = (Map<String, String>) context.get(PLACEHOLDERS_CONTEXT_KEY);
         for (Entry<String, String> e : renderingKeys.entrySet()) {
             result = result.replace(e.getKey(), e.getValue());
         }
+
         return result;
     }
 }

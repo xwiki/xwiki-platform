@@ -78,13 +78,13 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class Util
 {
+    private static final Log LOG = LogFactory.getLog(Util.class);
+
     private static PatternCache patterns = new PatternCacheLRU(200);
 
     private Perl5Matcher matcher = new Perl5Matcher();
 
     private Perl5Util p5util = new Perl5Util(getPatterns());
-
-    private static final Log log = LogFactory.getLog(Util.class);
 
     public String substitute(String pattern, String text)
     {
@@ -118,8 +118,7 @@ public class Util
         return p5util;
     }
 
-    public List<String> getAllMatches(String content, String spattern, int group)
-        throws MalformedPatternException
+    public List<String> getAllMatches(String content, String spattern, int group) throws MalformedPatternException
     {
         List<String> list = new ArrayList<String>();
         PatternMatcherInput input = new PatternMatcherInput(content);
@@ -129,11 +128,11 @@ public class Util
             String smatch = result.group(group);
             list.add(smatch);
         }
+
         return list;
     }
 
-    public List<String> getUniqueMatches(String content, String spattern, int group)
-        throws MalformedPatternException
+    public List<String> getUniqueMatches(String content, String spattern, int group) throws MalformedPatternException
     {
         // Remove duplicate entries
         Set<String> uniqueMatches = new HashSet<String>();
@@ -148,8 +147,8 @@ public class Util
     /**
      * @deprecated use {@link #getUniqueMatches(String, String, int)} instead
      */
-    public List<String> getMatches(String content, String spattern, int group)
-        throws MalformedPatternException
+    @Deprecated
+    public List<String> getMatches(String content, String spattern, int group) throws MalformedPatternException
     {
         return getUniqueMatches(content, spattern, group);
     }
@@ -162,6 +161,7 @@ public class Util
         value = StringUtils.replace(value, "\r", "\n");
         value = StringUtils.replace(value, "\n", "%_N_%");
         value = StringUtils.replace(value, "\"", "%_Q_%");
+
         return value;
     }
 
@@ -169,21 +169,19 @@ public class Util
     {
         value = StringUtils.replace(value, "%_N_%", "\n");
         value = StringUtils.replace(value, "%_Q_%", "\"");
+
         return value;
     }
 
     /**
-     * Create a Map from a string holding a space separated list of key=value pairs. If keys or
-     * values must contain spaces, they can be placed inside quotes, like
-     * <code>"this key"="a larger value"</code>. To use a quote as part of a key/value, use
-     * <code>%_Q_%</code>.
+     * Create a Map from a string holding a space separated list of key=value pairs. If keys or values must contain
+     * spaces, they can be placed inside quotes, like <code>"this key"="a larger value"</code>. To use a quote as
+     * part of a key/value, use <code>%_Q_%</code>.
      * 
      * @param mapString The string that must be parsed.
-     * @return A Map containing the keys and values. If a key is defined more than once, the last
-     *         value is used.
+     * @return A Map containing the keys and values. If a key is defined more than once, the last value is used.
      */
-    public static Hashtable<String, String> keyValueToHashtable(String mapString)
-        throws IOException
+    public static Hashtable<String, String> keyValueToHashtable(String mapString) throws IOException
     {
         Hashtable<String, String> result = new Hashtable<String, String>();
         StreamTokenizer st = new StreamTokenizer(new BufferedReader(new StringReader(mapString)));
@@ -207,7 +205,6 @@ public class Util
         return patterns;
     }
 
-    @SuppressWarnings("unchecked")
     public static Map<String, String[]> getObject(XWikiRequest request, String prefix)
     {
         return getSubMap(request.getParameterMap(), prefix);
@@ -224,12 +221,14 @@ public class Util
                 result.put("", map.get(name));
             }
         }
+
         return result;
     }
 
     public static String getWeb(String fullname)
     {
         int i = fullname.lastIndexOf(".");
+
         return fullname.substring(0, i);
     }
 
@@ -237,6 +236,7 @@ public class Util
     {
         Vector<String> results = new Vector<String>();
         getP5util().split(results, pattern, text);
+
         return results;
     }
 
@@ -254,6 +254,7 @@ public class Util
         while (true) {
             if (line == null) {
                 fr.close();
+
                 return content.toString();
             }
             content.append(line);
@@ -276,12 +277,14 @@ public class Util
         while ((nb = bis.read(data)) > 0) {
             baos.write(data, 0, nb);
         }
+
         return baos.toByteArray();
     }
 
     public static boolean contains(String name, String list, String sep)
     {
         String[] sarray = StringUtils.split(list, sep);
+
         return ArrayUtils.contains(sarray, name);
     }
 
@@ -567,6 +570,7 @@ public class Util
         temp = temp.replaceAll("\u017c", "z");
         temp = temp.replaceAll("\u017e", "z");
         temp = temp.replaceAll("\u00df", "ss");
+
         return temp;
     }
 
@@ -583,10 +587,11 @@ public class Util
             return name;
         }
 
-        if (name.indexOf(".") != -1)
+        if (name.indexOf(".") != -1) {
             return name;
-        else
+        } else {
             return "XWiki." + name;
+        }
     }
 
     public static String getName(String name, XWikiContext context)
@@ -599,12 +604,14 @@ public class Util
             context.setDatabase(database);
             return name;
         }
+
         // This does not make sense
         // context.setDatabase(context.getWiki().getDatabase());
-        if (name.indexOf(".") != -1)
+        if (name.indexOf(".") != -1) {
             return name;
-        else
+        } else {
             return "XWiki." + name;
+        }
     }
 
     public static Cookie getCookie(String cookieName, XWikiContext context)
@@ -616,13 +623,13 @@ public class Util
     {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
-            for (int i = 0; i < cookies.length; i++) {
-                Cookie cookie = cookies[i];
+            for (Cookie cookie : cookies) {
                 if (cookieName.equals(cookie.getName())) {
                     return (cookie);
                 }
             }
         }
+
         return null;
     }
 
@@ -633,14 +640,15 @@ public class Util
         title = xe.getMessage();
         text = com.xpn.xwiki.XWiki.getFormEncoded(xe.getFullMessage());
         String id = (String) context.get("xwikierrorid");
-        if (id == null)
+        if (id == null) {
             id = "1";
-        else
+        } else {
             id = "" + (Integer.parseInt(id) + 1);
+        }
 
         return "<a href=\"\" onclick=\"document.getElementById('xwikierror" + id
-            + "').style.display='block'; return false;\">" + title + "</a><div id=\"xwikierror"
-            + id + "\" style=\"display: none;\"><pre>\n" + text + "</pre></div>";
+            + "').style.display='block'; return false;\">" + title + "</a><div id=\"xwikierror" + id
+            + "\" style=\"display: none;\"><pre>\n" + text + "</pre></div>";
     }
 
     public static String secureLaszloCode(String laszlocode) throws XWikiException
@@ -652,17 +660,15 @@ public class Util
             StringReader in = new StringReader(laszlocode);
             domdoc = reader.read(in);
         } catch (DocumentException e) {
-            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO,
-                XWikiException.ERROR_LASZLO_INVALID_XML,
-                "Invalid Laszlo XML",
-                e);
+            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_XML,
+                "Invalid Laszlo XML", e);
         }
 
         String code = domdoc.asXML();
-        if (code.indexOf("..") != -1)
-            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO,
-                XWikiException.ERROR_LASZLO_INVALID_DOTDOT,
+        if (code.indexOf("..") != -1) {
+            throw new XWikiException(XWikiException.MODULE_PLUGIN_LASZLO, XWikiException.ERROR_LASZLO_INVALID_DOTDOT,
                 "Invalid content in Laszlo XML");
+        }
 
         return laszlocode;
     }
@@ -670,8 +676,9 @@ public class Util
     public static MonitorPlugin getMonitorPlugin(XWikiContext context)
     {
         try {
-            if ((context == null) || (context.getWiki() == null))
+            if ((context == null) || (context.getWiki() == null)) {
                 return null;
+            }
 
             return (MonitorPlugin) context.getWiki().getPlugin("monitor", context);
         } catch (Exception e) {
@@ -691,12 +698,13 @@ public class Util
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(
                 new InputSource(new StringReader(str)));
         } catch (SAXException ex) {
-            log.warn("Cannot parse string:" + str, ex);
+            LOG.warn("Cannot parse string:" + str, ex);
         } catch (IOException ex) {
-            log.warn("Cannot parse string:" + str, ex);
+            LOG.warn("Cannot parse string:" + str, ex);
         } catch (ParserConfigurationException ex) {
-            log.warn("Cannot parse string:" + str, ex);
+            LOG.warn("Cannot parse string:" + str, ex);
         }
+
         return null;
     }
 
@@ -710,8 +718,9 @@ public class Util
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
         } catch (ParserConfigurationException ex) {
-            log.warn("Cannot create DOM tree", ex);
+            LOG.warn("Cannot create DOM tree", ex);
         }
+
         return null;
     }
 
@@ -733,6 +742,7 @@ public class Util
         text = text.replaceAll("\\{", "&#123;");
         text = text.replaceAll("\\}", "&#125;");
         text = text.replaceAll("\\1", "&#49;");
+
         return text;
     }
 
@@ -755,6 +765,7 @@ public class Util
             url = url.replaceAll("-", "%2D");
             url = url.replaceAll("\\*", "%2A");
         }
+
         return url;
     }
 
@@ -801,8 +812,8 @@ public class Util
     }
 
     /**
-     * Removes all non alpha numerical characters from the passed text. First tries to convert
-     * accented chars to their alpha numeric representation.
+     * Removes all non alpha numerical characters from the passed text. First tries to convert accented chars to their
+     * alpha numeric representation.
      * 
      * @param text the text to convert
      * @return the alpha numeric equivalent
@@ -815,17 +826,20 @@ public class Util
         // Now remove all non alphanumeric chars
         StringBuffer result = new StringBuffer(textNoAccents.length());
         char[] testChars = textNoAccents.toCharArray();
-        for (int i = 0; i < testChars.length; i++) {
-            if (Character.isLetterOrDigit(testChars[i])) {
-                result.append(testChars[i]);
+        for (char testChar : testChars) {
+            if (Character.isLetterOrDigit(testChar)) {
+                result.append(testChar);
             }
         }
+
         return result.toString();
     }
 
-    public static Date getFileLastModificationDate(String path) {
+    public static Date getFileLastModificationDate(String path)
+    {
         try {
             File f = new File(path);
+
             return (new Date(f.lastModified()));
         } catch (Exception ex) {
             return new Date();
@@ -850,15 +864,13 @@ public class Util
             || !elementName.matches("(^[a-zA-Z\\-\\_]+[\\w\\.\\-\\_\\:]*$)")) {
             return false;
         }
+
         return true;
     }
 
     /**
-     * Load resources from:
-     * 1. FileSystem
-     * 2. ServletContext
-     * 3. ClassPath
-     * in this order.
+     * Load resources from: 1. FileSystem 2. ServletContext 3. ClassPath in this order.
+     * 
      * @param resource resource path to load
      * @return InputStream of resource or null if not found
      */
@@ -871,17 +883,18 @@ public class Util
             }
         } catch (Exception e) {
             // Probably running under -security, which prevents calling File.exists()
-            log.debug("Failed load resource ["+resource+"] using a file path");
+            LOG.debug("Failed load resource [" + resource + "] using a file path");
         }
         try {
             Container container = (Container) Utils.getComponent(Container.ROLE);
             InputStream res = container.getApplicationContext().getResourceAsStream(resource);
-            if (res!=null) {
+            if (res != null) {
                 return res;
             }
         } catch (Exception e) {
-            log.debug("Failed load resource ["+resource+"] using a application context");
+            LOG.debug("Failed load resource [" + resource + "] using a application context");
         }
+
         return Thread.currentThread().getContextClassLoader().getResourceAsStream(resource);
     }
 }

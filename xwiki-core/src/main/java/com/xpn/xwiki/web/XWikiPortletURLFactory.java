@@ -31,11 +31,18 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Map;
 
-public class XWikiPortletURLFactory extends XWikiServletURLFactory {
+public class XWikiPortletURLFactory extends XWikiServletURLFactory
+{
+    private static final Log LOG = LogFactory.getLog(XWikiPortletURLFactory.class);
 
-    private static final Log log = LogFactory.getLog(XWikiPortletURLFactory.class);
-
-    public void init(XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiServletURLFactory#init(com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public void init(XWikiContext context)
+    {
         URL url = context.getURL();
 
         try {
@@ -47,12 +54,27 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
         servletPath = "bin/";
     }
 
-    public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb, XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiDefaultURLFactory#createAttachmentURL(java.lang.String, java.lang.String,
+     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public URL createAttachmentURL(String filename, String web, String name, String action, String xwikidb,
+        XWikiContext context)
+    {
         try {
             XWikiResponse response = context.getResponse();
             PortletURL purl;
-            if (action.equals("download"))
-                return super.createAttachmentURL(filename, web, name, action, xwikidb, context);    //To change body of overridden methods use File | Settings | File Templates.
+            if (action.equals("download")) {
+                return super.createAttachmentURL(filename, web, name, action, xwikidb, context); // To change body of
+            }
+
+            // overridden
+            // methods use File
+            // | Settings | File
+            // Templates.
             else if (action.equals("viewattachrev")) {
                 purl = response.createRenderURL();
                 purl.setParameter("filename", filename);
@@ -65,51 +87,63 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
                 purl.setParameter("action", action);
             }
 
-            if (log.isDebugEnabled())
-                log.debug("Generated URL is: " + purl.toString());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Generated URL is: " + purl.toString());
+            }
 
             return new URL(serverURL, purl.toString());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb, XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String,
+     *      java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
+        XWikiContext context)
+    {
         try {
-            if (log.isDebugEnabled())
-                log.debug("Generating URL for: " + xwikidb + ":" + web + "." + name + " for action " + action
-                        + " with querystring " + querystring + " and anchor " + anchor);
+            if (LOG.isDebugEnabled())
+                LOG.debug("Generating URL for: " + xwikidb + ":" + web + "." + name + " for action " + action
+                    + " with querystring " + querystring + " and anchor " + anchor);
 
             XWikiResponse response = context.getResponse();
             PortletURL purl;
 
             // Action and Query String transformers
-            if ((action.equals("view"))&&(context.getLinksAction()!=null)) {
+            if ((action.equals("view")) && (context.getLinksAction() != null)) {
                 action = context.getLinksAction();
             }
-            if (context.getLinksQueryString()!=null) {
-                if (querystring==null)
-                 querystring = context.getLinksQueryString();
-                else
-                 querystring = querystring + "&" + context.getLinksQueryString();
+
+            if (context.getLinksQueryString() != null) {
+                if (querystring == null) {
+                    querystring = context.getLinksQueryString();
+                } else {
+                    querystring = querystring + "&" + context.getLinksQueryString();
+                }
             }
 
-            if (action.equals("view") || action.equals("viewrev") || action.equals("attach") || action.equals("download") || action.equals("downloadrev") || action.equals("viewattachrev") || action.equals("skin") || action.equals("dot"))
+            if (action.equals("view") || action.equals("viewrev") || action.equals("attach")
+                || action.equals("download") || action.equals("downloadrev") || action.equals("viewattachrev")
+                || action.equals("skin") || action.equals("dot")) {
                 purl = response.createRenderURL();
-            else
-            if (action.equals("save") || action.equals("cancel") || action.equals("delete") || action.equals("propupdate")
-                    || action.equals("propadd") || action.equals("propdelete")
-                    || action.equals("objectadd") || action.equals("objectremove")
-                    || action.equals("commentadd") || action.equals("editprefs")
-                    || action.equals("upload") || action.equals("delattachment")
-                    || action.equals("login") || action.equals("logout"))
+            } else if (action.equals("save") || action.equals("cancel") || action.equals("delete")
+                || action.equals("propupdate") || action.equals("propadd") || action.equals("propdelete")
+                || action.equals("objectadd") || action.equals("objectremove") || action.equals("commentadd")
+                || action.equals("editprefs") || action.equals("upload") || action.equals("delattachment")
+                || action.equals("login") || action.equals("logout")) {
                 purl = response.createActionURL();
-            else
+            } else {
                 purl = response.createRenderURL();
+            }
 
-            Map map = null;
+            Map<String, String[]> map = null;
 
             try {
                 map = Utils.parseParameters(querystring, "UTF-8");
@@ -120,37 +154,53 @@ public class XWikiPortletURLFactory extends XWikiServletURLFactory {
             purl.setParameter("topic", web + "." + name);
             purl.setParameter("action", action);
 
-            if (log.isDebugEnabled())
-                log.debug("Generated URL is: " + purl.toString());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Generated URL is: " + purl.toString());
+            }
 
             return new URL(serverURL, purl.toString());
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createURL(java.lang.String, java.lang.String, java.lang.String,
+     *      boolean, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context)
+    {
         if (redirect == false)
             return createURL(web, name, action, context);
 
         try {
-            if (log.isDebugEnabled())
-                log.debug("Generating Redirect URL for: " + web + "." + name + " for action " + action);
+            if (LOG.isDebugEnabled())
+                LOG.debug("Generating Redirect URL for: " + web + "." + name + " for action " + action);
 
             XWikiResponse response = context.getResponse();
             response.setRenderParameter("topic", web + "." + name);
             response.setRenderParameter("action", action);
             return null;
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public URL createExternalURL(String web, String name, String action, String querystring, String anchor, String xwikidb, XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.web.XWikiServletURLFactory#createExternalURL(java.lang.String, java.lang.String,
+     *      java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.xpn.xwiki.XWikiContext)
+     */
+    @Override
+    public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
+        String xwikidb, XWikiContext context)
+    {
         return super.createURL(web, name, action, querystring, anchor, xwikidb, context);
     }
 

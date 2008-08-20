@@ -26,29 +26,50 @@ import com.xpn.xwiki.XWikiContext;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public interface XWikiURLFactory {
+public interface XWikiURLFactory
+{
     public void init(XWikiContext context);
+
     public URL createURL(String web, String name, XWikiContext context);
+
     public URL createURL(String web, String name, String action, XWikiContext context);
+
     public URL createURL(String web, String name, String action, boolean redirect, XWikiContext context);
+
     public URL createURL(String web, String name, String action, String querystring, String anchor,
-                         XWikiContext context);
+        XWikiContext context);
+
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
-                         XWikiContext context);
-    public URL createURL(String web, String name, String action, String querystring, String anchor,
-                         String xwikidb, XWikiContext context);
+        XWikiContext context);
+
+    public URL createURL(String web, String name, String action, String querystring, String anchor, String xwikidb,
+        XWikiContext context);
+
     public URL createExternalURL(String web, String name, String action, String querystring, String anchor,
-                         String xwikidb, XWikiContext context);
+        String xwikidb, XWikiContext context);
+
     public URL createSkinURL(String filename, String skin, XWikiContext context);
+
     public URL createSkinURL(String filename, String web, String name, XWikiContext context);
+
     public URL createSkinURL(String filename, String web, String name, String xwikidb, XWikiContext context);
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring, XWikiContext context);
-    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring, String xwikidb, XWikiContext context);
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring, XWikiContext context);
-    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision, String querystring, String xwikidb, XWikiContext context);
+
+    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+        XWikiContext context);
+
+    public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
+        String xwikidb, XWikiContext context);
+
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+        String querystring, XWikiContext context);
+
+    public URL createAttachmentRevisionURL(String filename, String web, String name, String revision,
+        String querystring, String xwikidb, XWikiContext context);
+
     public URL getRequestURL(XWikiContext context);
+
     public String getURL(URL url, XWikiContext context);
-    
+
     /**
      * Generate the base external URL to access this server.
      * 

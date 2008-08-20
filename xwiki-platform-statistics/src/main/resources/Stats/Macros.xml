@@ -59,20 +59,19 @@ $!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th class="numeric"&gt;Hits&lt;/th&gt;
-&lt;th&gt;Page&lt;/th&gt;
-&lt;th&gt;Space&lt;/th&gt;
+&lt;th class="numeric" style="width:20%"&gt;Hits&lt;/th&gt;
+&lt;th style="width:40%"&gt;Page&lt;/th&gt;
+&lt;th style="width:40%"&gt;Space&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
 #foreach($item in $stats)
 #set($docStats = $xwiki.getDocument($item.name))
 #if ($docStats)
-#set($title = $docStats.displayTitle)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;[$docStats.name&amp;gt;${docStats.space}.$docStats.name.replaceAll("@","%40")]#if ($title != $docStats.name) - &lt;em&gt;$title&lt;/em&gt;#end&lt;/td&gt;
-&lt;td&gt;[$docStats.space&amp;gt;${docStats.space}.WebHome]&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$docStats.name"&gt;[$docStats.name&amp;gt;${docStats.web}.$docStats.name.replaceAll("@","%40")]&lt;/div&gt;&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$docStats.web"&gt;[$docStats.web&amp;gt;${docStats.web}.WebHome]&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
 #end
 #end
@@ -84,14 +83,14 @@ $!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th class="numeric"&gt;Hits&lt;/th&gt;
-&lt;th&gt;Space&lt;/th&gt;
+&lt;th class="numeric" style="width:20%"&gt;Hits&lt;/th&gt;
+&lt;th style="width:80%"&gt;Space&lt;/th&gt;
 &lt;/tr&gt;&lt;/thead&gt;
 &lt;tbody&gt;
 #foreach($item in $stats)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;[$item.name&amp;gt;${item.name}.WebHome]&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$item.name"&gt;[$item.name&amp;gt;${item.name}.WebHome]&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
 #end
 &lt;/tbody&gt;
@@ -102,17 +101,18 @@ $!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th class="numeric"&gt;Changes&lt;/th&gt;
-&lt;th&gt;User&lt;/th&gt;
+&lt;th class="numeric" style="width:20%"&gt;Changes&lt;/th&gt;
+&lt;th style="width:80%"&gt;User&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
 #foreach($item in $stats)
-#set($userName = $xwiki.getUserName($item.name))
-#if($userName)
+#set($userNameLink = $xwiki.getUserName($item.name))
+#set($userName = $xwiki.getUserName($item.name, false))
+#if($userNameLink)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageSaves&lt;/td&gt;
-&lt;td&gt;$userName&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$userName"&gt;$userNameLink&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
 #end
 #end
@@ -124,15 +124,15 @@ $!xwiki.ssx.use("Stats.Style")
 &lt;table class="stats" cellspacing="0" cellpadding="0"&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th class="numeric"&gt;Sources&lt;/th&gt;
-&lt;th&gt;Referrer&lt;/th&gt;
+&lt;th class="numeric" style="width:20%"&gt;Sources&lt;/th&gt;
+&lt;th style="width:80%"&gt;Referrer&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 &lt;tbody&gt;
 #foreach($item in $stats)
 &lt;tr&gt;
 &lt;td class="numeric"&gt;$item.pageViews&lt;/td&gt;
-&lt;td&gt;&lt;a href="$item.referer" title="$item.URL.host"&gt;$item.URL.host&lt;/td&gt;
+&lt;td&gt;&lt;div class="ellipsis" title="$item.URL.host"&gt;&lt;a href="$item.referer"&gt;$item.URL.host&lt;/a&gt;&lt;/div&gt;&lt;/td&gt;
 &lt;/tr&gt;
 #end
 &lt;/tbody&gt;

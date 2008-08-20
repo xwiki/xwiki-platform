@@ -22,14 +22,13 @@ package org.xwiki.rendering.parameter.instance;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.instance.BooleanMacroParameter;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Validate {@link BooleanMacroParameter}.
  * 
  * @version $Id: $
  */
-public class BooleanMacroParameterTest extends AbstractRenderingTestCase
+public class BooleanMacroParameterTest extends AbstractMacroParameterTest<BooleanMacroParameterDescriptor>
 {
     BooleanMacroParameterDescriptor intDesc;
 
@@ -46,6 +45,17 @@ public class BooleanMacroParameterTest extends AbstractRenderingTestCase
         this.intDesc = new BooleanMacroParameterDescriptor("name", "desc", true);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parameter.instance.AbstractMacroParameterTest#generateInvalidErrorMessage(java.lang.String)
+     */
+    protected String generateInvalidErrorMessage(String stringValue)
+    {
+        return "Invalid value [" + stringValue + "] for parameter \"name\"."
+            + " Valid values are \"true\" and \"false\" (case insensitive) or \"0\" and \"1\".";
+    }
+
     public void testGetValue() throws MacroParameterException
     {
         BooleanMacroParameter param = new BooleanMacroParameter(this.intDesc, "faLSe");
@@ -59,7 +69,7 @@ public class BooleanMacroParameterTest extends AbstractRenderingTestCase
         param = new BooleanMacroParameter(this.intDesc, "0");
 
         assertEquals(Boolean.FALSE, param.getValue());
-        
+
         param = new BooleanMacroParameter(this.intDesc, "1");
 
         assertEquals(Boolean.TRUE, param.getValue());
@@ -74,7 +84,7 @@ public class BooleanMacroParameterTest extends AbstractRenderingTestCase
         assertEquals(Boolean.TRUE, param.getValue());
     }
 
-    public void testGetValueWhenValueInvalidButHasTo()
+    public void testGetValueWhenValueInvalidButHasToBeValid()
     {
         this.intDesc.setValueHasToBeValid(true);
 
@@ -84,8 +94,8 @@ public class BooleanMacroParameterTest extends AbstractRenderingTestCase
             param.getValue();
 
             fail("Should throw " + MacroParameterException.class + " exception");
-        } catch (MacroParameterException e) {
-            // should throw MacroParameterException exception
+        } catch (MacroParameterException expected) {
+            assertErrorMessageInvalid("a", expected);
         }
     }
 }

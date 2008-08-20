@@ -22,21 +22,19 @@ package org.xwiki.rendering.parameter.instance;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.instance.EnumMacroParameter;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Validate {@link EnumMacroParameter}.
  * 
  * @version $Id: $
  */
-public class EnumMacroParameterTest extends AbstractRenderingTestCase
+public class EnumMacroParameterTest extends
+    AbstractMacroParameterTest<EnumMacroParameterDescriptor<EnumMacroParameterTest.TestEnum>>
 {
     public enum TestEnum
     {
         VALUE1, value2, Value3
     }
-
-    EnumMacroParameterDescriptor<TestEnum> intDesc;
 
     /**
      * {@inheritDoc}
@@ -48,37 +46,48 @@ public class EnumMacroParameterTest extends AbstractRenderingTestCase
     {
         super.setUp();
 
-        this.intDesc = new EnumMacroParameterDescriptor<TestEnum>("name", "desc", TestEnum.VALUE1);
+        this.desc = new EnumMacroParameterDescriptor<TestEnum>("name", "desc", TestEnum.VALUE1);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.parameter.instance.AbstractMacroParameterTest#generateInvalidErrorMessage(java.lang.String)
+     */
+    protected String generateInvalidErrorMessage(String stringValue)
+    {
+        return "Invalid value [" + stringValue + "] for parameter \"name\"."
+            + " Valid values are (case insensitive) \"VALUE1\", \"value2\" or \"Value3\".";
     }
 
     public void testGetValue() throws MacroParameterException
     {
-        EnumMacroParameter<TestEnum> param = new EnumMacroParameter<TestEnum>(this.intDesc, "value3");
+        EnumMacroParameter<TestEnum> param = new EnumMacroParameter<TestEnum>(this.desc, "value3");
 
         assertEquals(TestEnum.Value3, param.getValue());
     }
 
     public void testGetValueWhenValueInvalid() throws MacroParameterException
     {
-        this.intDesc.setValueHasToBeValid(false);
+        this.desc.setValueHasToBeValid(false);
 
-        EnumMacroParameter<TestEnum> param = new EnumMacroParameter<TestEnum>(this.intDesc, "a");
+        EnumMacroParameter<TestEnum> param = new EnumMacroParameter<TestEnum>(this.desc, "a");
 
         assertEquals(TestEnum.VALUE1, param.getValue());
     }
 
-    public void testGetValueWhenValueInvalidButHasTo()
+    public void testGetValueWhenValueInvalidButHasToBeValid()
     {
-        this.intDesc.setValueHasToBeValid(true);
+        this.desc.setValueHasToBeValid(true);
 
-        EnumMacroParameter<TestEnum> param = new EnumMacroParameter<TestEnum>(this.intDesc, "a");
+        EnumMacroParameter<TestEnum> param = new EnumMacroParameter<TestEnum>(this.desc, "a");
 
         try {
             param.getValue();
 
             fail("Should throw " + MacroParameterException.class + " exception");
-        } catch (MacroParameterException e) {
-            // should throw MacroParameterException exception
+        } catch (MacroParameterException expected) {
+            assertErrorMessageInvalid("a", expected);
         }
     }
 }

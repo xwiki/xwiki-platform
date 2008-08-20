@@ -19,34 +19,26 @@
  */
 package org.xwiki.rendering.parameter.instance;
 
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
-import org.xwiki.rendering.macro.parameter.instance.StringMacroParameter;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
- * Validate {@link StringMacroParameter}.
+ * Base class to validate {@link MacroParameter} implementations.
  * 
  * @version $Id: $
  */
-public class StringMacroParameterTest extends AbstractMacroParameterTest<StringMacroParameterDescriptor>
+public abstract class AbstractMacroParameterTest<T extends MacroParameterDescriptor> extends AbstractRenderingTestCase
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
-     */
-    @Override
-    protected void setUp() throws Exception
-    {
-        super.setUp();
+    protected T desc;
 
-        this.desc = new StringMacroParameterDescriptor("name", "desc", "default string");
+    protected String generateInvalidErrorMessage(String stringValue)
+    {
+        return "Invalid value [" + stringValue + "] for parameter \"name\".";
     }
 
-    public void testGetValue() throws MacroParameterException
+    protected void assertErrorMessageInvalid(String stringValue, Throwable expected)
     {
-        StringMacroParameter param = new StringMacroParameter(this.desc, "some stRing");
-
-        assertEquals("some stRing", param.getValue());
+        assertEquals(generateInvalidErrorMessage(stringValue), expected.getMessage());
     }
 }

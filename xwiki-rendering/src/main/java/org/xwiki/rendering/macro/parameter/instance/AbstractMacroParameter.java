@@ -108,6 +108,29 @@ public abstract class AbstractMacroParameter<T> implements MacroParameter<T>
      */
     protected String generateInvalidErrorMessage()
     {
-        return "Invalid value [" + getValueAsString() + "] for " + "parameter \"" + getParameterDescriptor() + "\"";
+        return "Invalid value [" + getValueAsString() + "] for parameter \"" + getParameterDescriptor().getName()
+            + "\".";
+    }
+
+    /**
+     * Generate and register error exception.
+     */
+    protected void setErrorInvalid()
+    {
+        setErrorInvalid(null);
+    }
+
+    /**
+     * Generate and register error exception.
+     * 
+     * @param e the error.
+     */
+    protected void setErrorInvalid(Throwable e)
+    {
+        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+
+        errorMessage.append(" The value must be a number.");
+
+        this.error = new MacroParameterException(generateInvalidErrorMessage(), e);
     }
 }

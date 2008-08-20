@@ -22,17 +22,14 @@ package org.xwiki.rendering.parameter.instance;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.instance.IntegerMacroParameter;
-import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
  * Validate {@link IntegerMacroParameter}.
  * 
  * @version $Id: $
  */
-public class IntegerMacroParameterTest extends AbstractRenderingTestCase
+public class IntegerMacroParameterTest extends AbstractNumberMacroParameterTest<IntegerMacroParameterDescriptor>
 {
-    IntegerMacroParameterDescriptor intDesc;
-
     /**
      * {@inheritDoc}
      * 
@@ -43,52 +40,84 @@ public class IntegerMacroParameterTest extends AbstractRenderingTestCase
     {
         super.setUp();
 
-        this.intDesc = new IntegerMacroParameterDescriptor("name", "desc", 5);
+        this.desc = new IntegerMacroParameterDescriptor("name", "desc", 5);
     }
 
     public void testGetValue() throws MacroParameterException
     {
-        IntegerMacroParameter param = new IntegerMacroParameter(this.intDesc, "42");
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "42");
 
         assertEquals(Integer.valueOf(42), param.getValue());
     }
 
     public void testGetValueWhenValueInvalid() throws MacroParameterException
     {
-        this.intDesc.setValueHasToBeValid(false);
+        this.desc.setValueHasToBeValid(false);
 
-        IntegerMacroParameter param = new IntegerMacroParameter(this.intDesc, "a");
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "a");
 
         assertEquals(Integer.valueOf(5), param.getValue());
     }
 
-    public void testGetValueWhenValueInvalidButHasTo()
+    public void testGetValueWhenValueInvalidButHasToBeValid()
     {
-        this.intDesc.setValueHasToBeValid(true);
+        this.desc.setValueHasToBeValid(true);
 
-        IntegerMacroParameter param = new IntegerMacroParameter(this.intDesc, "a");
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "a");
 
         try {
             param.getValue();
 
             fail("Should throw " + MacroParameterException.class + " exception");
-        } catch (MacroParameterException e) {
-            // should throw MacroParameterException exception
+        } catch (MacroParameterException expected) {
+            assertErrorMessageInvalid("a", expected);
+        }
+    }
+
+    public void testGetValueWhenValueTooLowButHasToBeValid()
+    {
+        this.desc.setValueHasToBeValid(true);
+        this.desc.setMinValue(2);
+
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "1");
+
+        try {
+            param.getValue();
+
+            fail("Should throw " + MacroParameterException.class + " exception");
+        } catch (MacroParameterException expected) {
+            assertErrorMessageTooLow("1", expected);
+        }
+    }
+
+    public void testGetValueWhenValueTooHighButHasToBeValid()
+    {
+        this.desc.setValueHasToBeValid(true);
+        this.desc.setMaxValue(6);
+
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "7");
+
+        try {
+            param.getValue();
+
+            fail("Should throw " + MacroParameterException.class + " exception");
+        } catch (MacroParameterException expected) {
+            assertErrorMessageTooHigh("7", expected);
         }
     }
 
     public void testGetValueWhenValueInvalidAndNormalized() throws MacroParameterException
     {
-        this.intDesc.setValueHasToBeValid(false);
-        this.intDesc.setNormalized(true);
-        this.intDesc.setMaxValue(6);
-        this.intDesc.setMinValue(2);
+        this.desc.setValueHasToBeValid(false);
+        this.desc.setNormalized(true);
+        this.desc.setMinValue(2);
+        this.desc.setMaxValue(6);
 
-        IntegerMacroParameter param = new IntegerMacroParameter(this.intDesc, "1");
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "1");
 
         assertEquals(Integer.valueOf(2), param.getValue());
 
-        param = new IntegerMacroParameter(this.intDesc, "7");
+        param = new IntegerMacroParameter(this.desc, "7");
 
         assertEquals(Integer.valueOf(6), param.getValue());
     }

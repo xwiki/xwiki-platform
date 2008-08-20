@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.parameter.instance;
 
+import java.text.MessageFormat;
+
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescriptor;
 
@@ -48,25 +50,17 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
     }
 
     /**
-     * Generate and register error exception.
-     */
-    protected void setErrorInvalid()
-    {
-        setErrorInvalid(null);
-    }
-
-    /**
-     * Generate and register error exception.
+     * {@inheritDoc}
      * 
-     * @param e the error.
+     * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#generateInvalidErrorMessage()
      */
-    protected void setErrorInvalid(Throwable e)
+    protected String generateInvalidErrorMessage()
     {
-        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+        StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());
 
         errorMessage.append(" The value must be a number.");
 
-        this.error = new MacroParameterException(generateInvalidErrorMessage(), e);
+        return errorMessage.toString();
     }
 
     /**
@@ -74,12 +68,12 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
      */
     protected void setErrorTooHigh()
     {
-        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+        StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());
 
-        errorMessage.append(" The value is too high. The highest valid value is "
-            + getNumberParameterDescriptor().getMaxValue());
+        errorMessage.append(MessageFormat.format(" The value is too high. The highest valid value is {0}.",
+            getNumberParameterDescriptor().getMaxValue()));
 
-        this.error = new MacroParameterException(generateInvalidErrorMessage());
+        this.error = new MacroParameterException(errorMessage.toString());
     }
 
     /**
@@ -87,11 +81,11 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
      */
     protected void setErrorTooLow()
     {
-        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+        StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());
 
-        errorMessage.append(" The value is too low. The lowest valid value is "
-            + getNumberParameterDescriptor().getMinValue());
+        errorMessage.append(MessageFormat.format(" The value is too low. The lowest valid value is {0}.",
+            getNumberParameterDescriptor().getMinValue()));
 
-        this.error = new MacroParameterException(generateInvalidErrorMessage());
+        this.error = new MacroParameterException(errorMessage.toString());
     }
 }

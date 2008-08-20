@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro.parameter.instance;
 
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
@@ -61,14 +60,16 @@ public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
     }
 
     /**
-     * Generate and register error exception.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#generateInvalidErrorMessage()
      */
-    protected void setErrorInvalid()
+    protected String generateInvalidErrorMessage()
     {
-        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+        StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());
 
-        errorMessage.append(" Valid values are \"true\" and \"false\" in any case or \"0\" and \"1\"");
+        errorMessage.append(" Valid values are \"true\" and \"false\" (case insensitive) or \"0\" and \"1\".");
 
-        this.error = new MacroParameterException(errorMessage.toString());
+        return errorMessage.toString();
     }
 }

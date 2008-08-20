@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro.parameter.instance;
 
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
@@ -45,7 +44,7 @@ public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParamete
     protected T parseValue()
     {
         T def = getParameterDescriptor().getDefaultValue();
-        
+
         T[] values = ((Class<T>) def.getClass()).getEnumConstants();
 
         String valueAsString = getValueAsString();
@@ -61,18 +60,27 @@ public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParamete
     }
 
     /**
-     * Generate and register error exception.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#generateInvalidErrorMessage()
      */
-    protected void setErrorInvalid()
+    protected String generateInvalidErrorMessage()
     {
-        StringBuffer errorMessage = new StringBuffer(generateInvalidErrorMessage());
+        StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());
 
-        errorMessage.append(" Valid values are ");
+        errorMessage.append(" Valid values are (case insensitive) ");
 
         StringBuffer valueList = new StringBuffer();
-        for (T value : ((Class<T>) getParameterDescriptor().getDefaultValue().getClass()).getEnumConstants()) {
+        T[] constants = ((Class<T>) getParameterDescriptor().getDefaultValue().getClass()).getEnumConstants();
+
+        int index = 1;
+        for (T value : constants) {
             if (valueList.length() > 0) {
-                valueList.append(" or ");
+                if (++index == constants.length) {
+                    valueList.append(" or ");
+                } else {
+                    valueList.append(", ");
+                }
             }
 
             valueList.append('"');
@@ -83,6 +91,6 @@ public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParamete
         errorMessage.append(valueList);
         errorMessage.append('.');
 
-        this.error = new MacroParameterException(errorMessage.toString());
+        return errorMessage.toString();
     }
 }

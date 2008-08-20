@@ -55,7 +55,7 @@
   <!-- Initializes Plexus and puts a reference to the Plexus Component Manager in the Servlet
        Context. Also initializes the Container Manager component with the Servlet Context. -->
   <listener>
-    <listener-class>org.xwiki.plexus.XWikiPlexusServletContextListener</listener-class>
+    <listener-class>org.xwiki.container.servlet.XWikiPlexusServletContextListener</listener-class>
   </listener>
 
   <!-- Main Plexus Servlet receiving all requests. For now this is mapped to some unused URL
@@ -63,7 +63,7 @@
        and be replaced by XWiki's own Action component. -->
   <servlet>
     <servlet-name>PlexusServlet</servlet-name>
-    <servlet-class>org.xwiki.plexus.XWikiPlexusServlet</servlet-class>
+    <servlet-class>org.xwiki.container.servlet.XWikiPlexusServlet</servlet-class>
   </servlet>
 
   <servlet>

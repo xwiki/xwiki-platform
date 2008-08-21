@@ -57,6 +57,10 @@ public class RegexXWikiURLFactory implements XWikiURLFactory, Initializable
         Matcher matcher = this.regexPattern.matcher(urlAsString);
         if (matcher.matches()) {
 
+            // Find the wiki part in the URL
+            String wiki = matcher.group(Integer.parseInt((String) this.regexMappings.get("wiki")));
+            url.setWiki(wiki);
+            
             // Find the action part in the URL
             String action = matcher.group(Integer.parseInt((String) this.regexMappings.get("action")));
             url.setAction(action);

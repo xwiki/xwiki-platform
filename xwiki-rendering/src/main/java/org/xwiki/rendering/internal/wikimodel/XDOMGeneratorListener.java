@@ -39,6 +39,10 @@ import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.parser.LinkParser;
 import org.xwiki.rendering.parser.ParseException;
+import org.xwiki.url.XWikiURLFactory;
+import org.xwiki.url.XWikiURL;
+import org.xwiki.url.InvalidURLException;
+import org.xwiki.url.serializer.DocumentNameSerializer;
 
 /**
  * Transforms WikiModel events into XWiki Rendering events.
@@ -54,6 +58,8 @@ public class XDOMGeneratorListener implements IWemListener
 
     private LinkParser linkParser;
 
+    private XWikiURLFactory urlFactory;
+
     private class MarkerBlock extends AbstractBlock
     {
         public void traverse(Listener listener)
@@ -61,9 +67,10 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
-    public XDOMGeneratorListener(LinkParser linkParser)
+    public XDOMGeneratorListener(LinkParser linkParser, XWikiURLFactory urlFactory)
     {
         this.linkParser = linkParser;
+        this.urlFactory = urlFactory;
     }
 
     public XDOM getDocument()
@@ -380,6 +387,26 @@ public class XDOMGeneratorListener implements IWemListener
             // Right now WikiModel puts any target element as the first element of the WikiParameters
             if (ref.getParameters().getSize() > 0) {
                 link.setTarget(ref.getParameters().getParameter(0).getKey());
+            }
+
+            // Check if the reference in the link is an relative URI. If that's the case transform it into
+            // a document name sincce all relative URIs should point to wiki documents.
+            if (link.getReference().startsWith("/")) {
+                try {
+                    XWikiURL url = this.urlFactory.createURL(link.getReference());
+                    link.setReference(new DocumentNameSerializer().serialize(url));
+
+                    // If the label is the same as the reference then remove it. This to prevent having the following
+                    // use case: [[Space.Page]] --HTML--> <a href="/xwiki/bin/view/Space/Page>Space.Page</a>
+                    // --XWIKI--> [[Space.Page>Space.Page]]
+                    if (link.getLabel().equalsIgnoreCase(link.getReference())) {
+                        link.setLabel(null);
+                    }
+
+                } catch (InvalidURLException e) {
+                    // If it fails it means this was not a link pointing to a xwiki document after all so we just
+                    // leave it as is.
+                }
             }
 
             this.stack.push(new LinkBlock(link));

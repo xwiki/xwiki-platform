@@ -39,10 +39,11 @@ public class RegexURLFactoryTest extends AbstractXWikiComponentTestCase
 
     public void testCreateURL() throws Exception
     {
-        XWikiURL url = this.factory.createURL("http://localhost:8080/xwiki/bin/view/Main/WebHome?language=fr");
+        XWikiURL url = this.factory.createURL("http://wiki.domain.com:8080/xwiki/bin/view/Main/WebHome?language=fr");
         assertEquals("view", url.getAction());
         assertEquals("WebHome", url.getPage());
         assertEquals("Main", url.getSpace());
+        assertEquals("wiki", url.getWiki());
         assertEquals("fr", url.getParameterValue("language"));
     }
 

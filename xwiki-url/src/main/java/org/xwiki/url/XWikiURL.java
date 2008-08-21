@@ -33,11 +33,14 @@ public class XWikiURL
 {
     private String action;
 
-    // TODO: Replace space/page/wiki and parameters by a DocumentName
     private String space;
 
     private String page;
 
+    /**
+     * Short name of a wiki. For example a URL of http://enterprise.xwiki.org would lead to a wiki name of
+     * "enterprise.
+     */
     private String wiki;
 
     private Map<String, String> parameters = new HashMap<String, String>();

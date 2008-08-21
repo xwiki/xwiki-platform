@@ -8,13 +8,14 @@
       <!-- The configuration below allows customizing the XWiki URL format to any syntax the user
            wants -->
       <configuration>
-        <pattern>(?:http[s]?://\w*[:]?\d*)?/\w*/\w*/(\w*)/(\w*)/?(\w*)\??(.*)</pattern>
+        <pattern>(?:http[s]?://([a-zA-Z-]*)[a-zA-Z-.]*[:]?\d*)?/\w*/\w*/(\w*)/(\w*)/?(\w*)\??(.*)</pattern>
         <!-- Mapping between regex capture groups and XWiki URL elements -->
         <regexMappings>
-          <action>1</action>
-          <space>2</space>
-          <page>3</page>
-          <queryString>4</queryString>
+          <wiki>1</wiki>
+          <action>2</action>
+          <space>3</space>
+          <page>4</page>
+          <queryString>5</queryString>
         </regexMappings>
       </configuration>
     </component>

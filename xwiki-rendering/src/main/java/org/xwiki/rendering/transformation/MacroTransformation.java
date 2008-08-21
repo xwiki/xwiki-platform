@@ -32,6 +32,7 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
@@ -57,11 +58,11 @@ public class MacroTransformation extends AbstractTransformation implements Compo
 
     private class MacroHolder implements Comparable<MacroHolder>
     {
-        Macro macro;
+        Macro< ? , ? > macro;
 
         MacroBlock macroBlock;
 
-        public MacroHolder(Macro macro, MacroBlock macroBlock)
+        public MacroHolder(Macro< ? , ? > macro, MacroBlock macroBlock)
         {
             this.macro = macro;
             this.macroBlock = macroBlock;
@@ -113,7 +114,7 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         for (MacroBlock macroBlock : context.getXDOM().getChildrenByType(MacroBlock.class, true)) {
             String hintName = macroBlock.getName() + "/" + syntax.getType().toIdString();
             try {
-                Macro macro = (Macro) this.componentManager.lookup(Macro.ROLE, hintName);
+                Macro< ? , ? > macro = (Macro< ? , ? >) this.componentManager.lookup(Macro.ROLE, hintName);
                 macroHolders.add(new MacroHolder(macro, macroBlock));
             } catch (ComponentLookupException e) {
                 // TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load
@@ -135,9 +136,13 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         List<Block> newBlocks;
         try {
             context.setCurrentMacroBlock(macroHolder.macroBlock);
+
+            MacroParameters macroParameters =
+                macroHolder.macro.getMacroDescriptor().createMacroParameters(macroHolder.macroBlock.getParameters());
+
             newBlocks =
-                macroHolder.macro.execute(macroHolder.macroBlock.getParameters(), macroHolder.macroBlock.getContent(),
-                    context);
+                ((Macro<MacroParameters, ? >) macroHolder.macro).execute(macroParameters, macroHolder.macroBlock
+                    .getContent(), context);
         } catch (MacroExecutionException e) {
             throw new TransformationException("Failed to perform transformation for macro ["
                 + macroHolder.macroBlock.getName() + "]", e);

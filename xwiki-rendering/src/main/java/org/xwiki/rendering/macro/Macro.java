@@ -20,17 +20,16 @@
 package org.xwiki.rendering.macro;
 
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public interface Macro extends Comparable<Macro>
+public interface Macro<P extends MacroParameters, D extends MacroDescriptor<P>> extends Comparable<Macro< ? , ? >>
 {
     /**
      * This component's role, used when code needs to look it up.
@@ -45,16 +44,8 @@ public interface Macro extends Comparable<Macro>
      */
     int getPriority();
 
-    /**
-     * @return the Macro's description
-     */
-    String getDescription();
+    D getMacroDescriptor();
 
-    /**
-     * @return the Macro's allowed parameter names and their descriptions
-     */
-    Map<String, MacroParameterDescriptor< ? >> getAllowedParameters();
-
-    List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+    List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException;
 }

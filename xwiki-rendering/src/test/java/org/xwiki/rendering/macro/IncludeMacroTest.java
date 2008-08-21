@@ -42,8 +42,8 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     public void testIncludeMacroWithCurrentContext() throws Exception
     {
         String expected = "beginDocument\n"
-        	+ "onMacro: [someMacro] [] []\n"
-        	+ "endDocument";
+            + "onMacro: [someMacro] [] []\n"
+            + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
         Mock mockDocumentManager = mock(DocumentManager.class);
@@ -54,7 +54,9 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "current");
 
-        List<Block> blocks = macro.execute(properties, null, MacroTransformationContext.EMPTY);
+        List<Block> blocks =
+            macro.execute(macro.getMacroDescriptor().createMacroParameters(properties), null,
+                MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -62,13 +64,11 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     public void testIncludeMacroWithNewContext() throws Exception
     {
         String expected = "beginDocument\n"
-        	+ "beginMacroMarker: [velocity] [] [$myvar]\n"
+            + "beginMacroMarker: [velocity] [] [$myvar]\n"
             + "beginParagraph\n"
-            + "onSpecialSymbol: [$]\n"
-            + "onWord: [myvar]\n"
+            + "onSpecialSymbol: [$]\n" + "onWord: [myvar]\n"
             + "endParagraph\n"
-            + "endMacroMarker: [velocity] [] [$myvar]\n"
-            + "endDocument";
+            + "endMacroMarker: [velocity] [] [$myvar]\n" + "endDocument";
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.
@@ -87,7 +87,9 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("document", "wiki:Space.Page");
         properties.put("context", "new");
 
-        List<Block> blocks = macro.execute(properties, null, MacroTransformationContext.EMPTY);
+        List<Block> blocks =
+            macro.execute(macro.getMacroDescriptor().createMacroParameters(properties), null,
+                MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }

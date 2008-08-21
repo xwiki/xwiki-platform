@@ -40,7 +40,7 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
     /**
      * Index is the syntax and value is a Map with an index being the macro name the value the Macro.
      */
-    private Map<String, Map<String, Macro>> macros;
+    private Map<String, Map<String, Macro< ? , ? >>> macros;
 
     /**
      * {@inheritDoc}
@@ -61,24 +61,24 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
     {
         // Note that the lifecycle handler ensures that the initialize() method is called
         // after the compose() method.
-        this.macros = new HashMap<String, Map<String, Macro>>();
+        this.macros = new HashMap<String, Map<String, Macro< ? , ? >>>();
 
-        Map<String, Macro> allMacros;
+        Map<String, Macro< ? , ? >> allMacros;
         try {
             allMacros = this.componentManager.lookupMap(Macro.ROLE);
         } catch (ComponentLookupException e) {
             throw new InitializationException("Failed to construct Macro cache", e);
         }
 
-        for (Map.Entry<String, Macro> entry : allMacros.entrySet()) {
+        for (Map.Entry<String, Macro< ? , ? >> entry : allMacros.entrySet()) {
             String[] hintParts = entry.getKey().split("/");
             // TODO: Add error handling and skip macro if invalid hint format
             String macroName = hintParts[0];
             String syntax = hintParts[1];
 
-            Map<String, Macro> macrosForSyntax = this.macros.get(syntax);
+            Map<String, Macro< ? , ? >> macrosForSyntax = this.macros.get(syntax);
             if (macrosForSyntax == null) {
-                macrosForSyntax = new HashMap<String, Macro>();
+                macrosForSyntax = new HashMap<String, Macro< ? , ? >>();
                 this.macros.put(syntax, macrosForSyntax);
             }
             macrosForSyntax.put(macroName, entry.getValue());
@@ -90,10 +90,10 @@ public class DefaultMacroFactory implements MacroFactory, Composable, Initializa
      * 
      * @see MacroFactory#getMacro(String, org.xwiki.rendering.parser.Syntax)
      */
-    public Macro getMacro(String macroName, Syntax syntax) throws MacroNotFoundException
+    public Macro< ? , ? > getMacro(String macroName, Syntax syntax) throws MacroNotFoundException
     {
-        Macro macro;
-        Map<String, Macro> macrosForSyntax = this.macros.get(syntax.getType().toIdString());
+        Macro< ? , ? > macro;
+        Map<String, Macro< ? , ? >> macrosForSyntax = this.macros.get(syntax.getType().toIdString());
         if (macrosForSyntax != null) {
             macro = macrosForSyntax.get(macroName);
             if (macro == null) {

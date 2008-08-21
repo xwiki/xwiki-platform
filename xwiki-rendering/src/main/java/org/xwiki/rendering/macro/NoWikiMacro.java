@@ -19,15 +19,11 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.component.phase.InitializationException;
-import org.xwiki.component.phase.Initializable;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.List;
 import java.util.Arrays;
 
@@ -37,49 +33,28 @@ import java.util.Arrays;
  * @version $Id: $
  * @since 1.6M1
  */
-public class NoWikiMacro extends AbstractMacro implements Initializable
+public class NoWikiMacro extends AbstractNoParametersMacro
 {
+    /**
+     * The description of the macro.
+     */
     private static final String DESCRIPTION = "Wiki syntax inside this macro is not rendered.";
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.component.phase.Initializable#initialize()
+     * Create and initialize the descriptor of the macro.
      */
-    public void initialize() throws InitializationException
+    public NoWikiMacro()
     {
-        // TODO: Use an I8N service to translate the descriptions in several languages
+        super(DESCRIPTION);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Macro#getDescription()
+     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public String getDescription()
-    {
-        // TODO: Use an I8N service to translate the description in several languages
-        return DESCRIPTION;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Macro#getAllowedParameters()
-     */
-    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
-    {
-        // We send a copy of the map and not our map since we don't want it to be modified.
-        return Collections.emptyMap();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+    public List<Block> execute(MacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         return Arrays.asList((Block) new WordBlock(content));

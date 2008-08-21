@@ -20,17 +20,26 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.rendering.macro.parameter.MacroParameters;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractMacro extends AbstractLogEnabled implements Macro
+public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDescriptor<P>> extends
+    AbstractLogEnabled implements Macro<P, D>
 {
+    private D macroDescriptor;
+
     /**
      * Injected by the Component Manager.
      */
     private int priority = 1000;
+
+    public AbstractMacro(D macroDescriptor)
+    {
+        this.macroDescriptor = macroDescriptor;
+    }
 
     /**
      * {@inheritDoc}
@@ -45,9 +54,19 @@ public abstract class AbstractMacro extends AbstractLogEnabled implements Macro
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.macro.Macro#getMacroDescriptor()
+     */
+    public D getMacroDescriptor()
+    {
+        return this.macroDescriptor;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Macro macro)
+    public int compareTo(Macro< ? , ? > macro)
     {
         return getPriority() - macro.getPriority();
     }

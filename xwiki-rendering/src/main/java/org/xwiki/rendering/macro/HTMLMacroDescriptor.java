@@ -19,38 +19,28 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.IdBlock;
-import org.xwiki.rendering.transformation.MacroTransformationContext;
-
-import java.util.Collections;
-import java.util.List;
-
 /**
- * @version $Id$
+ * Parse and convert XHTML macro parameters values into more readable java values (like boolean, int etc.).
+ * 
+ * @version $Id: $
  * @since 1.6M1
  */
-public class IdMacro extends AbstractMacro<IdMacroDescriptor.Parameters, IdMacroDescriptor>
+// TODO: Use an I8N service to translate the descriptions in several languages
+public class HTMLMacroDescriptor extends XHTMLMacroDescriptor
 {
     /**
-     * Create and initialize the descriptor of the macro.
+     * The description of the macro.
      */
-    public IdMacro()
-    {
-        super(new IdMacroDescriptor());
-    }
+    private static final String DESCRIPTION = "Inserts XHTML code into the page.";
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.XHTMLMacroDescriptor#getDescription()
      */
-    public List<Block> execute(IdMacroDescriptor.Parameters parameters, String content,
-        MacroTransformationContext context) throws MacroExecutionException
+    @Override
+    public String getDescription()
     {
-        IdBlock idBlock = new IdBlock(parameters.getName());
-
-        return Collections.singletonList((Block) idBlock);
+        return DESCRIPTION;
     }
 }

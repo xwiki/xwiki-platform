@@ -54,6 +54,7 @@ public class EnumMacroParameterTest extends
      * 
      * @see org.xwiki.rendering.parameter.instance.AbstractMacroParameterTest#generateInvalidErrorMessage(java.lang.String)
      */
+    @Override
     protected String generateInvalidErrorMessage(String stringValue)
     {
         return "Invalid value [" + stringValue + "] for parameter \"name\"."

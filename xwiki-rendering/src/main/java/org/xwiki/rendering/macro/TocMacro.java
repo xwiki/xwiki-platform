@@ -22,9 +22,7 @@ package org.xwiki.rendering.macro;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
 import org.xwiki.rendering.block.IdBlock;
@@ -37,8 +35,7 @@ import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.macro.TocMacroParameterManager.Scope;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.TocMacroDescriptor.Scope;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 
@@ -46,12 +43,8 @@ import org.xwiki.rendering.util.IdGenerator;
  * @version $Id$
  * @since 1.5M2
  */
-public class TocMacro extends AbstractMacro
+public class TocMacro extends AbstractMacro<TocMacroDescriptor.Parameters, TocMacroDescriptor>
 {
-    /**
-     * The description of the TOC macro.
-     */
-    private static final String DESCRIPTION = "Generates a Table Of Contents.";
 
     /**
      * The id generator.
@@ -59,39 +52,11 @@ public class TocMacro extends AbstractMacro
     private IdGenerator idGenerator;
 
     /**
-     * The TOC macro parameters manager.
+     * Create and initialize the descriptor of the macro.
      */
-    private TocMacroParameterManager macroParameters = new TocMacroParameterManager();
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
+    public TocMacro()
     {
-        // TODO: Use an I8N service to translate the descriptions in several languages
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Macro#getDescription()
-     */
-    public String getDescription()
-    {
-        // TODO: Use an I8N service to translate the description in several languages
-        return DESCRIPTION;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Macro#getAllowedParameters()
-     */
-    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
-    {
-        return this.macroParameters.getParametersDescriptorMap();
+        super(new TocMacroDescriptor());
     }
 
     /**
@@ -100,8 +65,8 @@ public class TocMacro extends AbstractMacro
      * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(TocMacroDescriptor.Parameters parameters, String content,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         // Example:
         // 1 Section1
@@ -121,14 +86,12 @@ public class TocMacro extends AbstractMacro
         // ......|_ ListBlock
         // .........|_ ListItemBlock (TextBlock: Section5)
 
-        this.macroParameters.load(parameters);
-
         // Get the root block from scope parameter
 
         Block root;
         SectionBlock rootSectionBlock = null;
 
-        if (this.macroParameters.getScope() == Scope.LOCAL && context.getCurrentMacroBlock() != null) {
+        if (parameters.getScope() == Scope.LOCAL && context.getCurrentMacroBlock() != null) {
             root = context.getCurrentMacroBlock().getParent();
             rootSectionBlock = context.getCurrentMacroBlock().getPreviousBlockByType(SectionBlock.class, true);
         } else {
@@ -141,8 +104,8 @@ public class TocMacro extends AbstractMacro
 
         // Construct table of content from sections list
         Block rootBlock =
-            generateTree(sections, this.macroParameters.getStart(), this.macroParameters.getDepth(),
-                this.macroParameters.numbered(), rootSectionBlock);
+            generateTree(sections, parameters.getStart(), parameters.getDepth(), parameters.numbered(),
+                rootSectionBlock);
 
         return Arrays.asList(rootBlock);
     }

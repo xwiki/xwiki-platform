@@ -21,14 +21,12 @@ package org.xwiki.rendering.macro;
 
 import java.io.StringReader;
 import java.util.List;
-import java.util.Map;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -36,20 +34,8 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
-public class XHTMLMacro extends AbstractMacro
+public class XHTMLMacro extends AbstractMacro<XHTMLMacroDescriptor.Parameters, XHTMLMacroDescriptor>
 {
-    private static final String DESCRIPTION = "Inserts XHTML code into the page.";
-
-    /**
-     * The macro parameters manager.
-     */
-    private XHTMLMacroParameterManager macroParameters = new XHTMLMacroParameterManager();
-
-    /**
-     * Injected by the Component Manager.
-     */
-    private Parser parser;
-
     /**
      * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally. Injected by
      * the Component Manager.
@@ -57,34 +43,34 @@ public class XHTMLMacro extends AbstractMacro
     protected EntityResolver entityResolver;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see Macro#getDescription()
+     * Injected by the Component Manager.
      */
-    public String getDescription()
+    private Parser parser;
+
+    /**
+     * Create and initialize the descriptor of the macro.
+     */
+    public XHTMLMacro()
     {
-        // TODO: Use an I8N service to translate the description in several languages
-        return DESCRIPTION;
+        super(new XHTMLMacroDescriptor());
+    }
+
+    /**
+     * @param descriptor the descriptor of the macro.
+     */
+    protected XHTMLMacro(XHTMLMacroDescriptor descriptor)
+    {
+        super(descriptor);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Macro#getAllowedParameters()
+     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
-    {
-        return this.macroParameters.getParametersDescriptorMap();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(XHTMLMacroDescriptor.Parameters parameters, String content,
+        MacroTransformationContext context) throws MacroExecutionException
     {
         // Parse the XHTML using an XML Parser and Wrap the XML elements in XMLBlock(s).
         // For each XML element's text, run it through the main Parser.
@@ -119,18 +105,16 @@ public class XHTMLMacro extends AbstractMacro
     /**
      * Create a SAX {@link org.xml.sax.ContentHandler} to parse the passed XML.
      * 
-     * @param parameters the macro parameters since the behavior of the content handler depend on them. For example the
-     *            rendering of XML text as wiki syntax depends on such a parameter.
+     * @param xhtmlParameters the macro parameters since the behavior of the content handler depend on them. For example
+     *            the rendering of XML text as wiki syntax depends on such a parameter.
      * @return the content handler to use
      * @throws MacroExecutionException if the passed parameter is invalid for some reason
      */
-    protected XMLBlockConverterHandler createContentHandler(Map<String, String> parameters)
+    protected XMLBlockConverterHandler createContentHandler(XHTMLMacroDescriptor.Parameters xhtmlParameters)
         throws MacroExecutionException
     {
-        this.macroParameters.load(parameters);
-
         // Check if the user has asked to escape wiki syntax or not
-        boolean escapeWikiSyntax = this.macroParameters.isWikiSyntaxEscaped();
+        boolean escapeWikiSyntax = xhtmlParameters.isWikiSyntaxEscaped();
 
         return new XMLBlockConverterHandler(this.parser, escapeWikiSyntax);
     }

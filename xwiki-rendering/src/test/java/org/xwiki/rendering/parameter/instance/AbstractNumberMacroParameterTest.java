@@ -27,8 +27,8 @@ import org.xwiki.rendering.macro.parameter.descriptor.NumberMacroParameterDescri
  * 
  * @version $Id: $
  */
-public abstract class AbstractNumberMacroParameterTest<T extends NumberMacroParameterDescriptor> extends
-    AbstractMacroParameterTest<T>
+public abstract class AbstractNumberMacroParameterTest<T extends NumberMacroParameterDescriptor< ? extends Number>>
+    extends AbstractMacroParameterTest<T>
 {
     protected T desc;
 
@@ -37,6 +37,7 @@ public abstract class AbstractNumberMacroParameterTest<T extends NumberMacroPara
      * 
      * @see org.xwiki.rendering.parameter.instance.AbstractMacroParameterTest#generateInvalidErrorMessage(java.lang.String)
      */
+    @Override
     protected String generateInvalidErrorMessage(String stringValue)
     {
         return "Invalid value [" + stringValue + "] for parameter \"name\". The value must be a number.";

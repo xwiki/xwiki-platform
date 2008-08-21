@@ -39,6 +39,12 @@ public enum SectionLevel
         return this.value;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see java.lang.Enum#toString()
+     */
+    @Override
     public String toString()
     {
         return "" + getAsInt();

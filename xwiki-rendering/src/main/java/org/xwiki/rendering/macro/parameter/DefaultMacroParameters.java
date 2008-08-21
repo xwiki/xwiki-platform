@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro.parameter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.xwiki.rendering.macro.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
@@ -30,48 +31,44 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
  * 
  * @version $Id$
  */
-public class DefaultMacroParameterManager implements MacroParameterManager
+public class DefaultMacroParameters implements MacroParameters
 {
+    private MacroDescriptor< ? extends MacroParameters> macroDescriptor;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.parameter.MacroParameters#getMacroDescriptor()
+     */
+    public MacroDescriptor< ? extends MacroParameters> getMacroDescriptor()
+    {
+        return this.macroDescriptor;
+    }
+
     /**
      * The list of parameters objects containing parameters values.
      */
     private Map<String, MacroParameter< ? >> parameterMap = new HashMap<String, MacroParameter< ? >>();
 
-    /**
-     * The list of parameters descriptors of the macro.
-     */
-    private Map<String, MacroParameterDescriptor< ? >> parameterDescriptorMap =
-        new HashMap<String, MacroParameterDescriptor< ? >>();
-
-    /**
-     * @param parameterDescriptor add parameter descriptor to the macro parameters manager.
-     */
-    public void registerParameterDescriptor(MacroParameterDescriptor< ? > parameterDescriptor)
+    public DefaultMacroParameters(Map<String, String> parameters,
+        MacroDescriptor< ? extends MacroParameters> macroDescriptor)
     {
-        this.parameterDescriptorMap.put(parameterDescriptor.getName().toLowerCase(), parameterDescriptor);
+        this.macroDescriptor = macroDescriptor;
+
+        load(parameters);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParametersDescriptorMap()
+     * @see org.xwiki.rendering.macro.parameter.MacroParameters#load(java.util.Map)
      */
-    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
-    {
-        return new HashMap<String, MacroParameterDescriptor< ? >>(this.parameterDescriptorMap);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#load(java.util.Map)
-     */
-    public void load(Map<String, String> parameters)
+    protected void load(Map<String, String> parameters)
     {
         this.parameterMap.clear();
 
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            MacroParameterDescriptor< ? > parameterClass = getParameterDescriptor(entry.getKey());
+            MacroParameterDescriptor< ? > parameterClass = this.macroDescriptor.getParameterDescriptor(entry.getKey());
 
             if (parameterClass != null) {
                 this.parameterMap.put(entry.getKey().toLowerCase(), parameterClass.newInstance(entry.getValue()));
@@ -84,7 +81,7 @@ public class DefaultMacroParameterManager implements MacroParameterManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParameter(java.lang.String)
+     * @see org.xwiki.rendering.macro.parameter.MacroParameters#getParameter(java.lang.String)
      */
     public <I extends MacroParameter< ? >> I getParameter(String name) throws MacroParameterException
     {
@@ -94,17 +91,7 @@ public class DefaultMacroParameterManager implements MacroParameterManager
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParameterDescriptor(java.lang.String)
-     */
-    public <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name)
-    {
-        return (D) this.parameterDescriptorMap.get(name.toLowerCase());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameterManager#getParameterValue(java.lang.String)
+     * @see org.xwiki.rendering.macro.parameter.MacroParameters#getParameterValue(java.lang.String)
      */
     public <T> T getParameterValue(String name) throws MacroParameterException
     {
@@ -113,7 +100,7 @@ public class DefaultMacroParameterManager implements MacroParameterManager
         MacroParameter<T> parameter = getParameter(name);
 
         if (parameter == null) {
-            MacroParameterDescriptor<T> pclass = getParameterDescriptor(name);
+            MacroParameterDescriptor<T> pclass = this.macroDescriptor.getParameterDescriptor(name);
 
             if (pclass != null) {
                 if (pclass.isRequired()) {

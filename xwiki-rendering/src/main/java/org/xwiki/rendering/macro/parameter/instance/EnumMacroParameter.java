@@ -41,6 +41,7 @@ public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParamete
     /**
      * @return the value as provided Enum class entry.
      */
+    @Override
     protected T parseValue()
     {
         T def = getParameterDescriptor().getDefaultValue();
@@ -64,6 +65,7 @@ public class EnumMacroParameter<T extends Enum<T>> extends AbstractMacroParamete
      * 
      * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#generateInvalidErrorMessage()
      */
+    @Override
     protected String generateInvalidErrorMessage()
     {
         StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());

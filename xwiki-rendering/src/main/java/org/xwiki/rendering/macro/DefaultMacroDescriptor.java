@@ -17,34 +17,38 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.transformation;
+package org.xwiki.rendering.macro;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractNoParametersMacro;
-import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
-public class TestRecursiveMacro extends AbstractNoParametersMacro
+/**
+ * Parse and convert ID macro parameters values into more readable java values (like boolean, int etc.).
+ * 
+ * @version $Id: IdMacroParameterManager.java 11899 2008-08-19 13:27:50Z tmortagne $
+ * @since 1.6M1
+ */
+public class DefaultMacroDescriptor extends AbstractMacroDescriptor<MacroParameters>
 {
-    public TestRecursiveMacro()
+    /**
+     * The description of the macro.
+     */
+    private String description;
+
+    /**
+     * @param description the description of the macro.
+     */
+    public DefaultMacroDescriptor(String description)
     {
-        super("Recursive Macro");
+        this.description = description;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.MacroDescriptor#getDescription()
      */
-    public List<Block> execute(MacroParameters parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    public String getDescription()
     {
-        return Arrays.asList((Block) new MacroBlock("testrecursivemacro", Collections.<String, String> emptyMap()));
+        return description;
     }
 }

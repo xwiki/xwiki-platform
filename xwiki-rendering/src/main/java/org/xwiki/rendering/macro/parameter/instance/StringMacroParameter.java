@@ -23,6 +23,7 @@ public class StringMacroParameter extends AbstractMacroParameter<String>
      * 
      * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#parseValue()
      */
+    @Override
     protected String parseValue()
     {
         return getValueAsString();

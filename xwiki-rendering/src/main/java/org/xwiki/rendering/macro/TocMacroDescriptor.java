@@ -21,13 +21,11 @@ package org.xwiki.rendering.macro;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.MacroParameterManager;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescriptor;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Parse and convert TOC macro parameters values into more readable java values (like boolean, int etc.).
@@ -36,8 +34,13 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class TocMacroParameterManager
+public class TocMacroDescriptor extends AbstractMacroDescriptor<TocMacroDescriptor.Parameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Generates a Table Of Contents.";
+
     /**
      * @version $Id$
      */
@@ -119,87 +122,95 @@ public class TocMacroParameterManager
     private static final boolean PARAM_NUMBERED_DEF = false;
 
     /**
-     * The macro parameters manager. Parse and transform string value to java objects.
-     */
-    private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();
-
-    /**
      * Set the macro parameters class list.
      */
-    public TocMacroParameterManager()
+    public TocMacroDescriptor()
     {
         IntegerMacroParameterDescriptor startParamDescriptor =
             new IntegerMacroParameterDescriptor(PARAM_START, PARAM_START_DESC, PARAM_START_DEF);
         startParamDescriptor.setMinValue(1);
-        this.macroParameterManager.registerParameterDescriptor(startParamDescriptor);
+        registerParameterDescriptor(startParamDescriptor);
 
         IntegerMacroParameterDescriptor depthParamDescriptor =
             new IntegerMacroParameterDescriptor(PARAM_DEPTH, PARAM_DEPTH_DESC, PARAM_DEPTH_DEF);
         depthParamDescriptor.setMinValue(1);
-        this.macroParameterManager.registerParameterDescriptor(depthParamDescriptor);
+        registerParameterDescriptor(depthParamDescriptor);
 
         EnumMacroParameterDescriptor<Scope> scopeParamDescriptor =
             new EnumMacroParameterDescriptor<Scope>(PARAM_SCOPE, PARAM_SCOPE_DESC, PARAM_SCOPE_DEF);
-        this.macroParameterManager.registerParameterDescriptor(scopeParamDescriptor);
+        registerParameterDescriptor(scopeParamDescriptor);
 
         BooleanMacroParameterDescriptor numberedParamDescriptor =
             new BooleanMacroParameterDescriptor(PARAM_NUMBERED, PARAM_NUMBERED_DESC, PARAM_NUMBERED_DEF);
-        this.macroParameterManager.registerParameterDescriptor(numberedParamDescriptor);
+        registerParameterDescriptor(numberedParamDescriptor);
     }
 
     /**
-     * @return the list of parameters descriptors.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.MacroDescriptor#getDescription()
      */
-    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
+    public String getDescription()
     {
-        return this.macroParameterManager.getParametersDescriptorMap();
+        return DESCRIPTION;
     }
 
     /**
-     * @param parameters load parameters from parser as parameters objects list.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
      */
-    public void load(Map<String, String> parameters)
+    @Override
+    public TocMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
     {
-        this.macroParameterManager.load(parameters);
+        return new Parameters(parameters, this);
     }
 
     // /////////////////////////////////////////////////////////////////////
     // Parameters
 
-    /**
-     * @return the minimum section level. For example if 2 then level 1 sections will not be listed.
-     * @exception MacroParameterException error when converting value.
-     */
-    public int getStart() throws MacroParameterException
+    public class Parameters extends DefaultMacroParameters
     {
-        return this.macroParameterManager.<Integer> getParameterValue(PARAM_START);
-    }
+        public Parameters(Map<String, String> parameters, TocMacroDescriptor macroDescriptor)
+        {
+            super(parameters, macroDescriptor);
+        }
 
-    /**
-     * @return the maximum section level. For example if 3 then all section levels from 4 will not be listed.
-     * @exception MacroParameterException error when converting value.
-     */
-    public int getDepth() throws MacroParameterException
-    {
-        return this.macroParameterManager.<Integer> getParameterValue(PARAM_DEPTH);
-    }
+        /**
+         * @return the minimum section level. For example if 2 then level 1 sections will not be listed.
+         * @exception MacroParameterException error when converting value.
+         */
+        public int getStart() throws MacroParameterException
+        {
+            return this.<Integer> getParameterValue(PARAM_START);
+        }
 
-    /**
-     * @return local or page. If local only section in the current scope will be listed. For example if the macro is
-     *         written in a section, only subsections of this section will be listed.
-     * @exception MacroParameterException error when converting value.
-     */
-    public Scope getScope() throws MacroParameterException
-    {
-        return this.macroParameterManager.getParameterValue(PARAM_SCOPE);
-    }
+        /**
+         * @return the maximum section level. For example if 3 then all section levels from 4 will not be listed.
+         * @exception MacroParameterException error when converting value.
+         */
+        public int getDepth() throws MacroParameterException
+        {
+            return this.<Integer> getParameterValue(PARAM_DEPTH);
+        }
 
-    /**
-     * @return true or false. If true the section title number is printed.
-     * @exception MacroParameterException error when converting value.
-     */
-    public boolean numbered() throws MacroParameterException
-    {
-        return this.macroParameterManager.<Boolean> getParameterValue(PARAM_NUMBERED);
+        /**
+         * @return local or page. If local only section in the current scope will be listed. For example if the macro is
+         *         written in a section, only subsections of this section will be listed.
+         * @exception MacroParameterException error when converting value.
+         */
+        public Scope getScope() throws MacroParameterException
+        {
+            return getParameterValue(PARAM_SCOPE);
+        }
+
+        /**
+         * @return true or false. If true the section title number is printed.
+         * @exception MacroParameterException error when converting value.
+         */
+        public boolean numbered() throws MacroParameterException
+        {
+            return this.<Boolean> getParameterValue(PARAM_NUMBERED);
+        }
     }
 }

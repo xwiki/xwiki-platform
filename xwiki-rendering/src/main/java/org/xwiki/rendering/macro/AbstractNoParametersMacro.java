@@ -17,34 +17,22 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.transformation;
+package org.xwiki.rendering.macro;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractNoParametersMacro;
-import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
-public class TestRecursiveMacro extends AbstractNoParametersMacro
+/**
+ * @version $Id: $
+ * @since 1.6M1
+ */
+public abstract class AbstractNoParametersMacro extends
+    AbstractMacro<MacroParameters, MacroDescriptor<MacroParameters>>
 {
-    public TestRecursiveMacro()
-    {
-        super("Recursive Macro");
-    }
-
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     * Create and initialize the descriptor of the macro.
      */
-    public List<Block> execute(MacroParameters parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    public AbstractNoParametersMacro(String description)
     {
-        return Arrays.asList((Block) new MacroBlock("testrecursivemacro", Collections.<String, String> emptyMap()));
+        super(new DefaultMacroDescriptor(description));
     }
 }

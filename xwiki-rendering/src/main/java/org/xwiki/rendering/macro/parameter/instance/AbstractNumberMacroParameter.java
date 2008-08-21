@@ -54,6 +54,7 @@ public abstract class AbstractNumberMacroParameter<T extends Number> extends Abs
      * 
      * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#generateInvalidErrorMessage()
      */
+    @Override
     protected String generateInvalidErrorMessage()
     {
         StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());

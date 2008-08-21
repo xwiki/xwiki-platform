@@ -19,9 +19,7 @@
  */
 package org.xwiki.rendering.macro.parameter;
 
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
 /**
@@ -29,22 +27,12 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
  * 
  * @version $Id$
  */
-public interface MacroParameterManager
+public interface MacroParameters
 {
     /**
-     * @param parameterDescriptor a descriptor of a macro parameter.
+     * @return the descriptor of the macro.
      */
-    void registerParameterDescriptor(MacroParameterDescriptor< ? > parameterDescriptor);
-
-    /**
-     * @return the list of parameters descriptors.
-     */
-    Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap();
-
-    /**
-     * @param parameters load parameters from parser as parameters objects list.
-     */
-    void load(Map<String, String> parameters);
+    MacroDescriptor< ? extends MacroParameters> getMacroDescriptor();
 
     /**
      * @param <I> the type of MacroParameter child class to return.
@@ -53,13 +41,6 @@ public interface MacroParameterManager
      * @throws MacroParameterException error when trying to get macro parameter object.
      */
     <I extends MacroParameter< ? >> I getParameter(String name) throws MacroParameterException;
-
-    /**
-     * @param <D> the type of MacroParameterClass child class to return.
-     * @param name the name of the parameter.
-     * @return the parameter class.
-     */
-    <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name);
 
     /**
      * @param <T> the type of value returned by parameter object.

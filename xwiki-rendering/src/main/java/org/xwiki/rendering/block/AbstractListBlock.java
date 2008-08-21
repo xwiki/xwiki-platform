@@ -39,7 +39,7 @@ public abstract class AbstractListBlock extends AbstractFatherBlock implements L
 
     public void merge(ListBLock listBlock)
     {
-        for (java.util.Iterator it = getChildren().iterator(); it.hasNext();) {
+        for (Block block : getChildren()) {
 
         }
 

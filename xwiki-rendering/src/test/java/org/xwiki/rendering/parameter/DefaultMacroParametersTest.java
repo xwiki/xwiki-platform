@@ -19,13 +19,16 @@
  */
 package org.xwiki.rendering.parameter;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
+import org.xwiki.rendering.macro.AbstractMacroDescriptor;
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.MacroParameterNotSupportedException;
 import org.xwiki.rendering.macro.parameter.MacroParameterRequiredException;
+import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescriptor;
@@ -34,13 +37,13 @@ import org.xwiki.rendering.parameter.instance.EnumMacroParameterTest.TestEnum;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 
 /**
- * Validate {@link DefaultMacroParameterManager}.
+ * Validate {@link DefaultMacroParameters}.
  * 
  * @version $Id$
  */
-public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
+public class DefaultMacroParametersTest extends AbstractRenderingTestCase
 {
-    DefaultMacroParameterManager dmpm = new DefaultMacroParameterManager();
+    private TestMacroDescriptor macroDescriptor = new TestMacroDescriptor();
 
     /**
      * {@inheritDoc}
@@ -52,25 +55,10 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
     {
         super.setUp();
 
-        IntegerMacroParameterDescriptor int1ParamClass = new IntegerMacroParameterDescriptor("int1", "int1 desc", 5);
-        this.dmpm.registerParameterDescriptor(int1ParamClass);
-
-        EnumMacroParameterDescriptor<TestEnum> enumParamClass =
-            new EnumMacroParameterDescriptor<TestEnum>("enum1", "enum1 desc", TestEnum.VALUE1);
-        enumParamClass.setRequired(true);
-        this.dmpm.registerParameterDescriptor(enumParamClass);
-
-        BooleanMacroParameterDescriptor booleanParamClass =
-            new BooleanMacroParameterDescriptor("boolean1", "boolean1 desc", true);
-        this.dmpm.registerParameterDescriptor(booleanParamClass);
-
-        StringMacroParameterDescriptor stringParamClass =
-            new StringMacroParameterDescriptor("string1", "string1 desc", "string1");
-        stringParamClass.setRequired(true);
-        this.dmpm.registerParameterDescriptor(stringParamClass);
+        this.macroDescriptor = new TestMacroDescriptor();
     }
 
-    public void testLoad() throws MacroParameterException
+    public void testCreateMacroParameters() throws MacroParameterException
     {
         Map<String, String> parameters = new HashMap<String, String>();
 
@@ -80,12 +68,12 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
         parameters.put("string1", "string1 value");
         parameters.put("notsupported", "notsupported value");
 
-        this.dmpm.load(parameters);
+        MacroParameters macroParameters = this.macroDescriptor.createMacroParameters(parameters);
 
-        assertEquals(this.dmpm.<Integer> getParameterValue("int1"), Integer.valueOf(3));
-        assertEquals(this.dmpm.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
-        assertEquals(this.dmpm.<Boolean> getParameterValue("boolean1"), Boolean.valueOf(false));
-        assertEquals(this.dmpm.<String> getParameterValue("strIng1"), "string1 value");
+        assertEquals(macroParameters.<Integer> getParameterValue("int1"), Integer.valueOf(3));
+        assertEquals(macroParameters.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
+        assertEquals(macroParameters.<Boolean> getParameterValue("boolean1"), Boolean.valueOf(false));
+        assertEquals(macroParameters.<String> getParameterValue("strIng1"), "string1 value");
     }
 
     /**
@@ -93,8 +81,11 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
      */
     public void testGetParameterValueWhenNotSupportedParameter() throws MacroParameterException
     {
+        MacroParameters macroParameters =
+            this.macroDescriptor.createMacroParameters(Collections.<String, String> emptyMap());
+
         try {
-            this.dmpm.getParameterValue("notsupported");
+            macroParameters.getParameterValue("notsupported");
 
             fail("Should throw " + MacroParameterNotSupportedException.class + " exception");
         } catch (MacroParameterNotSupportedException e) {
@@ -107,8 +98,11 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
      */
     public void testGetParameterValueWhenRequiredParameterMissing() throws MacroParameterException
     {
+        MacroParameters macroParameters =
+            this.macroDescriptor.createMacroParameters(Collections.<String, String> emptyMap());
+
         try {
-            assertEquals(this.dmpm.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
+            assertEquals(macroParameters.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
 
             fail("Should throw " + MacroParameterRequiredException.class + " exception");
         } catch (MacroParameterRequiredException e) {
@@ -121,6 +115,37 @@ public class DefaultMacroParameterManagerTest extends AbstractRenderingTestCase
      */
     public void testGetParameterValueWhenParameterMissing() throws MacroParameterException
     {
-        assertEquals(this.dmpm.<Integer> getParameterValue("int1"), Integer.valueOf(5));
+        MacroParameters macroParameters =
+            this.macroDescriptor.createMacroParameters(Collections.<String, String> emptyMap());
+
+        assertEquals(macroParameters.<Integer> getParameterValue("int1"), Integer.valueOf(5));
+    }
+}
+
+class TestMacroDescriptor extends AbstractMacroDescriptor<MacroParameters>
+{
+    public TestMacroDescriptor()
+    {
+        IntegerMacroParameterDescriptor int1ParamClass = new IntegerMacroParameterDescriptor("int1", "int1 desc", 5);
+        registerParameterDescriptor(int1ParamClass);
+
+        EnumMacroParameterDescriptor<TestEnum> enumParamClass =
+            new EnumMacroParameterDescriptor<TestEnum>("enum1", "enum1 desc", TestEnum.VALUE1);
+        enumParamClass.setRequired(true);
+        registerParameterDescriptor(enumParamClass);
+
+        BooleanMacroParameterDescriptor booleanParamClass =
+            new BooleanMacroParameterDescriptor("boolean1", "boolean1 desc", true);
+        registerParameterDescriptor(booleanParamClass);
+
+        StringMacroParameterDescriptor stringParamClass =
+            new StringMacroParameterDescriptor("string1", "string1 desc", "string1");
+        stringParamClass.setRequired(true);
+        registerParameterDescriptor(stringParamClass);
+    }
+
+    public String getDescription()
+    {
+        return "test macro descriptor";
     }
 }

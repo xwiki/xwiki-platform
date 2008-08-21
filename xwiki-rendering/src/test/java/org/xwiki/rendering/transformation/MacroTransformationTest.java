@@ -36,6 +36,12 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
 {
     private MacroTransformation transformation;
     
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.test.AbstractXWikiComponentTestCase#setUp()
+     */
+    @Override
     protected void setUp() throws Exception
     {
         super.setUp();

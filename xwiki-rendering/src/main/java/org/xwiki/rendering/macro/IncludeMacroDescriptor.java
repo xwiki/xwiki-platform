@@ -21,11 +21,9 @@ package org.xwiki.rendering.macro;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.MacroParameterManager;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
 /**
@@ -35,8 +33,13 @@ import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescri
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class IncludeMacroParameterManager
+public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacroDescriptor.Parameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Include other pages into the current page.";
+
     /**
      * @version $Id: $
      */
@@ -90,60 +93,68 @@ public class IncludeMacroParameterManager
     private static final Context PARAM_CONTEXT_DEF = Context.NEW;
 
     /**
-     * The macro parameters manager. Parse and transform string value to java objects.
-     */
-    private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();
-
-    /**
      * Set the macro parameters class list.
      */
-    public IncludeMacroParameterManager()
+    public IncludeMacroDescriptor()
     {
         StringMacroParameterDescriptor documentParamDescriptor =
             new StringMacroParameterDescriptor(PARAM_DOCUMENT, PARAM_DOCUMENT_DESC, PARAM_DOCUMENT_DEF);
         documentParamDescriptor.setRequired(true);
-        this.macroParameterManager.registerParameterDescriptor(documentParamDescriptor);
+        registerParameterDescriptor(documentParamDescriptor);
 
         EnumMacroParameterDescriptor<Context> contextParamDescriptor =
             new EnumMacroParameterDescriptor<Context>(PARAM_CONTEXT, PARAM_CONTEXT_DESC, PARAM_CONTEXT_DEF);
-        this.macroParameterManager.registerParameterDescriptor(contextParamDescriptor);
+        registerParameterDescriptor(contextParamDescriptor);
     }
 
     /**
-     * @return the list of parameters descriptors.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.MacroDescriptor#getDescription()
      */
-    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
+    public String getDescription()
     {
-        return this.macroParameterManager.getParametersDescriptorMap();
+        return DESCRIPTION;
     }
 
     /**
-     * @param parameters load parameters from parser as parameters objects list.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
      */
-    public void load(Map<String, String> parameters)
+    @Override
+    public IncludeMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
     {
-        this.macroParameterManager.load(parameters);
+        return new Parameters(parameters, this);
     }
 
     // /////////////////////////////////////////////////////////////////////
     // Parameters
 
-    /**
-     * @return the name of the document to include.
-     * @exception MacroParameterException error when converting value.
-     */
-    public String getDocument() throws MacroParameterException
+    public class Parameters extends DefaultMacroParameters
     {
-        return this.macroParameterManager.getParameterValue(PARAM_DOCUMENT);
-    }
+        public Parameters(Map<String, String> parameters, IncludeMacroDescriptor macroDescriptor)
+        {
+            super(parameters, macroDescriptor);
+        }
 
-    /**
-     * @return defines whether the included page is executed in its separated execution context or whether it's executed
-     *         in the contex of the current page.
-     * @exception MacroParameterException error when converting value.
-     */
-    public Context getContext() throws MacroParameterException
-    {
-        return this.macroParameterManager.getParameterValue(PARAM_CONTEXT);
+        /**
+         * @return the name of the document to include.
+         * @exception MacroParameterException error when converting value.
+         */
+        public String getDocument() throws MacroParameterException
+        {
+            return getParameterValue(PARAM_DOCUMENT);
+        }
+
+        /**
+         * @return defines whether the included page is executed in its separated execution context or whether it's
+         *         executed in the contex of the current page.
+         * @exception MacroParameterException error when converting value.
+         */
+        public Context getContext() throws MacroParameterException
+        {
+            return getParameterValue(PARAM_CONTEXT);
+        }
     }
 }

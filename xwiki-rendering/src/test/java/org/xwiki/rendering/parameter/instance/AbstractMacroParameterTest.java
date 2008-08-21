@@ -28,7 +28,8 @@ import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
  * 
  * @version $Id: $
  */
-public abstract class AbstractMacroParameterTest<T extends MacroParameterDescriptor> extends AbstractRenderingTestCase
+public abstract class AbstractMacroParameterTest<T extends MacroParameterDescriptor< ? >> extends
+    AbstractRenderingTestCase
 {
     protected T desc;
 

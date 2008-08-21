@@ -43,6 +43,7 @@ public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
      * 
      * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#parseValue()
      */
+    @Override
     protected Integer parseValue()
     {
         int value;

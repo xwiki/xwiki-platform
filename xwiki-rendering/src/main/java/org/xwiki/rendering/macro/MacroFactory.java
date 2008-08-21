@@ -31,18 +31,16 @@ public interface MacroFactory
      * This component's role, used when code needs to look it up.
      */
     String ROLE = MacroFactory.class.getName();
-    
+
     /**
-     * Look up for a Macro component matching the macro name passed as a parameter +
-     * the syntax type (eg "xwiki", "confluence", etc). The format is
-     * <code>macroname-syntaxtype</code>. The reason for this is that different syntax
-     * types can have different Macros (eg the XWiki {html} macro vs the Confluence
-     * {html} macro).
+     * Look up for a Macro component matching the macro name passed as a parameter + the syntax type (eg "xwiki",
+     * "confluence", etc). The format is <code>macroname-syntaxtype</code>. The reason for this is that different
+     * syntax types can have different Macros (eg the XWiki {html} macro vs the Confluence {html} macro).
      * 
      * @param macroName the macro name for the macro to return
      * @param syntax the syntax for which to find the corresponding macro
      * @return the matching macro or null if not found
      * @throws MacroNotFoundException if the macro cannot be found
      */
-    Macro getMacro(String macroName, Syntax syntax) throws MacroNotFoundException;
+    Macro< ? , ? > getMacro(String macroName, Syntax syntax) throws MacroNotFoundException;
 }

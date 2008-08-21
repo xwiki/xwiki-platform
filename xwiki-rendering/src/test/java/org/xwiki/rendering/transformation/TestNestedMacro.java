@@ -21,29 +21,28 @@ package org.xwiki.rendering.transformation;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.AbstractNoParametersMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.MacroParameters;
 
-public class TestNestedMacro extends AbstractMacro
+public class TestNestedMacro extends AbstractNoParametersMacro
 {
-    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
+    public TestNestedMacro()
     {
-        return new HashMap<String, MacroParameterDescriptor< ? >>();
+        super("Nested Macro");
     }
 
-    public String getDescription()
-    {
-        return "Nested Macro";
-    }
-
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     */
+    public List<Block> execute(MacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         return Arrays.asList((Block) new MacroBlock("testsimplemacro", Collections.<String, String> emptyMap()));

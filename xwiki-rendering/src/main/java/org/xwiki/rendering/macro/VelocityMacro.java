@@ -19,15 +19,13 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.io.StringWriter;
 import java.io.StringReader;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -38,7 +36,7 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 1.5M2
  */
-public class VelocityMacro extends AbstractMacro
+public class VelocityMacro extends AbstractNoParametersMacro
 {
     private static final String DESCRIPTION = "Executes a Velocity script.";
 
@@ -52,35 +50,18 @@ public class VelocityMacro extends AbstractMacro
      */
     private Parser parser;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Macro#getDescription()
-     */
-    public String getDescription()
+    public VelocityMacro()
     {
-        // TODO: Use an I8N service to translate the description in several languages
-        return DESCRIPTION;
+        super(DESCRIPTION);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Macro#getAllowedParameters()
+     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
-    {
-        // We send a copy of the map and not our map since we don't want it to be modified.
-        return Collections.emptyMap();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
+    public List<Block> execute(MacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         // 1) Run Velocity on macro block content

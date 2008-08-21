@@ -21,10 +21,8 @@ package org.xwiki.rendering.macro;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.MacroParameterManager;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
 /**
@@ -34,8 +32,13 @@ import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescri
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class IdMacroParameterManager
+public class IdMacroDescriptor extends AbstractMacroDescriptor<IdMacroDescriptor.Parameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Include other pages into the current page.";
+
     /**
      * The name of the macro parameter "document".
      */
@@ -52,46 +55,51 @@ public class IdMacroParameterManager
     private static final String PARAM_NAME_DEF = null;
 
     /**
-     * The macro parameters manager. Parse and transform string value to java objects.
-     */
-    private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();
-
-    /**
      * Set the macro parameters class list.
      */
-    public IdMacroParameterManager()
+    public IdMacroDescriptor()
     {
         StringMacroParameterDescriptor nameParamClass =
             new StringMacroParameterDescriptor(PARAM_NAME, PARAM_NAME_DESC, PARAM_NAME_DEF);
         nameParamClass.setRequired(true);
-        this.macroParameterManager.registerParameterDescriptor(nameParamClass);
+        registerParameterDescriptor(nameParamClass);
     }
 
     /**
-     * @return the list of parameters descriptors.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.MacroDescriptor#getDescription()
      */
-    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
+    public String getDescription()
     {
-        return this.macroParameterManager.getParametersDescriptorMap();
+        return DESCRIPTION;
     }
 
     /**
-     * @param parameters load parameters from parser as parameters objects list.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
      */
-    public void load(Map<String, String> parameters)
+    @Override
+    public IdMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
     {
-        this.macroParameterManager.load(parameters);
+        return new Parameters(parameters, this);
     }
 
     // /////////////////////////////////////////////////////////////////////
     // Parameters
 
-    /**
-     * @return the unique name of the id.
-     * @exception MacroParameterException error when converting value.
-     */
-    public String getName() throws MacroParameterException
+    public class Parameters extends DefaultMacroParameters
     {
-        return this.macroParameterManager.getParameterValue(PARAM_NAME);
+        public Parameters(Map<String, String> parameters, IdMacroDescriptor macroDescriptor)
+        {
+            super(parameters, macroDescriptor);
+        }
+
+        public String getName() throws MacroParameterException
+        {
+            return getParameterValue(PARAM_NAME);
+        }
+
     }
 }

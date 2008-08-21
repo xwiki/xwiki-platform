@@ -21,39 +21,28 @@ package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.IncludeMacroParameterManager.Context;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+import org.xwiki.rendering.macro.IncludeMacroDescriptor.Context;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
 import org.xwiki.rendering.DocumentManager;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.ExecutionContextInitializerManager;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.Execution;
 
 import java.util.List;
-import java.util.Map;
 import java.io.StringReader;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacro extends AbstractMacro implements Initializable
+public class IncludeMacro extends AbstractMacro<IncludeMacroDescriptor.Parameters, IncludeMacroDescriptor>
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
-
-    private static final String DESCRIPTION = "Include other pages into the current page.";
-
-    /**
-     * Handles parameters for this macro.
-     */
-    private IncludeMacroParameterManager macroParameters = new IncludeMacroParameterManager();
 
     /**
      * Injected by the Component Manager.
@@ -77,35 +66,9 @@ public class IncludeMacro extends AbstractMacro implements Initializable
 
     private DocumentManager documentManager;
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Initializable#initialize()
-     */
-    public void initialize() throws InitializationException
+    public IncludeMacro()
     {
-        // TODO: Use an I8N service to translate the descriptions in several languages
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Macro#getDescription()
-     */
-    public String getDescription()
-    {
-        // TODO: Use an I8N service to translate the description in several languages
-        return DESCRIPTION;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see Macro#getAllowedParameters()
-     */
-    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
-    {
-        return this.macroParameters.getParametersDescriptorMap();
+        super(new IncludeMacroDescriptor());
     }
 
     /**
@@ -124,13 +87,11 @@ public class IncludeMacro extends AbstractMacro implements Initializable
      * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
      *      org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
+    public List<Block> execute(IncludeMacroDescriptor.Parameters parameters, String content,
+        MacroTransformationContext context) throws MacroExecutionException
     {
-        this.macroParameters.load(parameters);
-
-        String documentName = this.macroParameters.getDocument();
-        Context actualContext = this.macroParameters.getContext();
+        String documentName = parameters.getDocument();
+        Context actualContext = parameters.getContext();
 
         // Retrieve the included document's content
         String includedContent = null;

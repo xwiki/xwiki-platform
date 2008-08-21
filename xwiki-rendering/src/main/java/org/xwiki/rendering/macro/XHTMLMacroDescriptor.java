@@ -21,11 +21,9 @@ package org.xwiki.rendering.macro;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameterManager;
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.MacroParameterManager;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Parse and convert XHTML macro parameters values into more readable java values (like boolean, int etc.).
@@ -34,8 +32,13 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class XHTMLMacroParameterManager
+public class XHTMLMacroDescriptor extends AbstractMacroDescriptor<XHTMLMacroDescriptor.Parameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Inserts XHTML code into the page.";
+
     /**
      * The name of the macro parameter "escapeWikiSyntax".
      */
@@ -53,47 +56,55 @@ public class XHTMLMacroParameterManager
     private static final boolean PARAM_ESCAPEWIKISYNTAX_DEF = false;
 
     /**
-     * The macro parameters manager. Parse and transform string value to java objects.
-     */
-    private MacroParameterManager macroParameterManager = new DefaultMacroParameterManager();
-
-    /**
      * Set the macro parameters class list.
      */
-    public XHTMLMacroParameterManager()
+    public XHTMLMacroDescriptor()
     {
         BooleanMacroParameterDescriptor escapeWikiSyntaxParamDescriptor =
             new BooleanMacroParameterDescriptor(PARAM_ESCAPEWIKISYNTAX, PARAM_ESCAPEWIKISYNTAX_DESC,
                 PARAM_ESCAPEWIKISYNTAX_DEF);
         escapeWikiSyntaxParamDescriptor.setValueHasToBeValid(false);
-        this.macroParameterManager.registerParameterDescriptor(escapeWikiSyntaxParamDescriptor);
+        registerParameterDescriptor(escapeWikiSyntaxParamDescriptor);
     }
 
     /**
-     * @return the list of parameters descriptors.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.MacroDescriptor#getDescription()
      */
-    public Map<String, MacroParameterDescriptor< ? >> getParametersDescriptorMap()
+    public String getDescription()
     {
-        return this.macroParameterManager.getParametersDescriptorMap();
+        return DESCRIPTION;
     }
 
     /**
-     * @param parameters load parameters from parser as parameters objects list.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
      */
-    public void load(Map<String, String> parameters)
+    @Override
+    public XHTMLMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
     {
-        this.macroParameterManager.load(parameters);
+        return new Parameters(parameters, this);
     }
 
     // /////////////////////////////////////////////////////////////////////
     // Parameters
 
-    /**
-     * @return indicate if the user has asked to escape wiki syntax or not.
-     * @exception MacroParameterException error when converting value.
-     */
-    public boolean isWikiSyntaxEscaped() throws MacroParameterException
+    public class Parameters extends DefaultMacroParameters
     {
-        return this.macroParameterManager.<Boolean> getParameterValue(PARAM_ESCAPEWIKISYNTAX);
+        public Parameters(Map<String, String> parameters, XHTMLMacroDescriptor macroDescriptor)
+        {
+            super(parameters, macroDescriptor);
+        }
+
+        /**
+         * @return indicate if the user has asked to escape wiki syntax or not.
+         * @exception MacroParameterException error when converting value.
+         */
+        public boolean isWikiSyntaxEscaped() throws MacroParameterException
+        {
+            return this.<Boolean> getParameterValue(PARAM_ESCAPEWIKISYNTAX);
+        }
     }
 }

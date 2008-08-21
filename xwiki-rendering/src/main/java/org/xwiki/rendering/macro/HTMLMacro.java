@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -29,56 +28,41 @@ import org.jdom.output.SAXOutputter;
 import org.jdom.JDOMException;
 import org.w3c.dom.Document;
 
-import java.util.Map;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Allows inserting HTML in wiki pages. Allows the HTML to be non XHTML and transforms it into valid XHTML.
- *
+ * 
  * @version $Id: $
  * @since 1.6M1
  */
 public class HTMLMacro extends XHTMLMacro
 {
-    private static final String DESCRIPTION = "Inserts HTML code into the page.";
-
     /**
      * Injected by the Component Manager.
      */
     private HTMLCleaner htmlCleaner;
-    
+
     /**
-     * {@inheritDoc}
-     *
-     * @see Macro#getDescription()
+     * Create and initialize the descriptor of the macro.
      */
-    public String getDescription()
+    public HTMLMacro()
     {
-        // TODO: Use an I8N service to translate the description in several languages
-        return DESCRIPTION;
+        super(new HTMLMacroDescriptor());
     }
 
     /**
      * {@inheritDoc}
-     *
-     * @see Macro#getAllowedParameters()
+     * 
+     * @see org.xwiki.rendering.macro.XHTMLMacro#execute(org.xwiki.rendering.macro.XHTMLMacroDescriptor.Parameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public Map<String, MacroParameterDescriptor< ? >> getAllowedParameters()
+    @Override
+    public List<Block> execute(HTMLMacroDescriptor.Parameters parameters, String content,
+        MacroTransformationContext context) throws MacroExecutionException
     {
-        // We send a copy of the map and not our map since we don't want it to be modified.
-        return Collections.emptyMap();
-    }
+        HTMLMacroDescriptor.Parameters htmlParameters = (HTMLMacroDescriptor.Parameters) parameters;
 
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
-    public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
-    {
         DOMBuilder builder = new DOMBuilder();
 
         // clean the HTML to transform it into valid XHTML
@@ -90,7 +74,7 @@ public class HTMLMacro extends XHTMLMacro
 
         org.jdom.Document jdomDoc = builder.build(document);
 
-        XMLBlockConverterHandler handler = createContentHandler(parameters);
+        XMLBlockConverterHandler handler = createContentHandler(htmlParameters);
 
         SAXOutputter outputter = new SAXOutputter(handler, handler, null, this.entityResolver);
         try {

@@ -17,34 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.transformation;
+package org.xwiki.rendering.macro;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.Map;
 
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractNoParametersMacro;
-import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
-public class TestRecursiveMacro extends AbstractNoParametersMacro
+/**
+ * 
+ * @param <P>
+ * @version $Id: $
+ * @since 1.6M1
+ */
+public interface MacroDescriptor<P extends MacroParameters>
 {
-    public TestRecursiveMacro()
-    {
-        super("Recursive Macro");
-    }
+    /**
+     * @return the description of the macro.
+     */
+    String getDescription();
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @param <D> the type of MacroParameterClass child class to return.
+     * @param name the name of the parameter.
+     * @return the parameter class.
      */
-    public List<Block> execute(MacroParameters parameters, String content, MacroTransformationContext context)
-        throws MacroExecutionException
-    {
-        return Arrays.asList((Block) new MacroBlock("testrecursivemacro", Collections.<String, String> emptyMap()));
-    }
+    <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name);
+
+    /**
+     * Create a new {@link MacroParameters} which parse provided parameters to transform it in more java usable types
+     * (line int, boolean, etc.).
+     * 
+     * @param parameters the prameters to parse.
+     * @return a new {@link MacroParameters}.
+     */
+    P createMacroParameters(Map<String, String> parameters);
 }

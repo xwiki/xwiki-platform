@@ -42,6 +42,7 @@ public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
      * 
      * @return the value as <code>boolean</code>.
      */
+    @Override
     protected Boolean parseValue()
     {
         boolean bValue;
@@ -64,6 +65,7 @@ public class BooleanMacroParameter extends AbstractMacroParameter<Boolean>
      * 
      * @see org.xwiki.rendering.macro.parameter.instance.AbstractMacroParameter#generateInvalidErrorMessage()
      */
+    @Override
     protected String generateInvalidErrorMessage()
     {
         StringBuffer errorMessage = new StringBuffer(super.generateInvalidErrorMessage());

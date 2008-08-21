@@ -95,32 +95,6 @@ public class TocMacro extends AbstractMacro
     }
 
     /**
-     * Look forward to find in which section the provided block is. This because all the sections are at the same tree
-     * level and not section level 2 child of section level 1.
-     * 
-     * @param block the block from where to search.
-     * @return the parent section.
-     */
-    private SectionBlock getPreviousSectionBlock(Block block)
-    {
-        if (block.getParent() == null) {
-            return null;
-        }
-
-        List<Block> blocks = block.getParent().getChildren();
-        int index = blocks.indexOf(block);
-
-        for (int i = index - 1; i >= 0; --i) {
-            Block previousBlock = blocks.get(i);
-            if (previousBlock instanceof SectionBlock) {
-                return (SectionBlock) previousBlock;
-            }
-        }
-
-        return getPreviousSectionBlock(block.getParent());
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
@@ -156,14 +130,14 @@ public class TocMacro extends AbstractMacro
 
         if (this.macroParameters.getScope() == Scope.LOCAL && context.getCurrentMacroBlock() != null) {
             root = context.getCurrentMacroBlock().getParent();
-            rootSectionBlock = getPreviousSectionBlock(context.getCurrentMacroBlock());
+            rootSectionBlock = context.getCurrentMacroBlock().getPreviousBlockByType(SectionBlock.class, true);
         } else {
             root = context.getXDOM();
         }
 
         // Get the list of sections in the scope
 
-        List<SectionBlock> sections = root.getChildrenByType(SectionBlock.class);
+        List<SectionBlock> sections = root.getChildrenByType(SectionBlock.class, true);
 
         // Construct table of content from sections list
         Block rootBlock =

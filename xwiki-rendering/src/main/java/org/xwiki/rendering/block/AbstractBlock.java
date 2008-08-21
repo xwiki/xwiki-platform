@@ -146,21 +146,45 @@ public abstract class AbstractBlock implements Block
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.block.Block#getChildrenByType(java.lang.Class)
+     * @see org.xwiki.rendering.block.Block#getChildrenByType(java.lang.Class, boolean)
      */
-    public <T extends Block> List<T> getChildrenByType(Class<T> blockClass)
+    public <T extends Block> List<T> getChildrenByType(Class<T> blockClass, boolean recurse)
     {
         List<Block> typedBlocks = new ArrayList<Block>();
         for (Block block : getChildren()) {
             if (blockClass.isAssignableFrom(block.getClass())) {
                 typedBlocks.add(block);
             }
-            if (!block.getChildren().isEmpty()) {
-                typedBlocks.addAll(block.getChildrenByType(blockClass));
+            if (recurse && !block.getChildren().isEmpty()) {
+                typedBlocks.addAll(block.getChildrenByType(blockClass, true));
             }
         }
 
         return (List<T>) typedBlocks;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.block.Block#getPreviousBlockByType(java.lang.Class, boolean)
+     */
+    public <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse)
+    {
+        if (getParent() == null) {
+            return null;
+        }
+
+        List<Block> blocks = getParent().getChildren();
+        int index = blocks.indexOf(this);
+
+        for (int i = index - 1; i >= 0; --i) {
+            Block previousBlock = blocks.get(i);
+            if (previousBlock instanceof SectionBlock) {
+                return (T) previousBlock;
+            }
+        }
+
+        return getParent().getPreviousBlockByType(blockClass, true);
     }
 
     /**

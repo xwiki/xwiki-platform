@@ -46,7 +46,7 @@ public class TestSimpleMacro extends AbstractMacro
     public List<Block> execute(Map<String, String> parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        int wordCount = context.getXDOM().getChildrenByType(WordBlock.class).size();
+        int wordCount = context.getXDOM().getChildrenByType(WordBlock.class, true).size();
         return Arrays.asList(new Block[] {new ParagraphBlock(new WordBlock("simplemacro" + wordCount))});
     }
 }

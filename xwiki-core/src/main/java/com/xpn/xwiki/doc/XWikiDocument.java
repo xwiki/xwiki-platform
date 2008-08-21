@@ -2808,7 +2808,7 @@ public class XWikiDocument
             }
 
             List<String> result = new ArrayList<String>();
-            for (MacroBlock macroBlock: dom.getChildrenByType(MacroBlock.class)) {
+            for (MacroBlock macroBlock: dom.getChildrenByType(MacroBlock.class, true)) {
                 if (macroBlock.getName().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("document");
                     if (documentName.indexOf(".") == -1) {

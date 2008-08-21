@@ -48,10 +48,10 @@ public class BlockTest extends TestCase
                 SectionLevel.LEVEL2));
         ParagraphBlock pb3 = new ParagraphBlock(Arrays.asList(new Block[] {pb1, pb2}));
 
-        List<SectionBlock> results = pb1.getChildrenByType(SectionBlock.class);
+        List<SectionBlock> results = pb1.getChildrenByType(SectionBlock.class, true);
         assertEquals(1, results.size());
 
-        results = pb3.getChildrenByType(SectionBlock.class);
+        results = pb3.getChildrenByType(SectionBlock.class, true);
         assertEquals(2, results.size());
     }
 

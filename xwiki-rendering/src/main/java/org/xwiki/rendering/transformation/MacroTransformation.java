@@ -96,10 +96,10 @@ public class MacroTransformation extends AbstractTransformation implements Compo
 
         // Counter to prevent infinite recursion if a macro generates the same macro for example.
         int executions = 0;
-        List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class);
+        List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
         while (!macroBlocks.isEmpty() && executions < this.maxMacroExecutions) {
             transformOnce(macroBlocks, context, syntax);
-            macroBlocks = dom.getChildrenByType(MacroBlock.class);
+            macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
             executions++;
         }
     }
@@ -110,7 +110,7 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
 
         // 1) Sort the macros by priority to find the highest priority macro to execute
-        for (MacroBlock macroBlock : context.getXDOM().getChildrenByType(MacroBlock.class)) {
+        for (MacroBlock macroBlock : context.getXDOM().getChildrenByType(MacroBlock.class, true)) {
             String hintName = macroBlock.getName() + "/" + syntax.getType().toIdString();
             try {
                 Macro macro = (Macro) this.componentManager.lookup(Macro.ROLE, hintName);

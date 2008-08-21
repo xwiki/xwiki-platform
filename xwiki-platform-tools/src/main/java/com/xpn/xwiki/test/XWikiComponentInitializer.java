@@ -49,6 +49,11 @@ public class XWikiComponentInitializer
     {
         Execution execution = (Execution) getComponentManager().lookup(Execution.ROLE);
         execution.removeContext();
+
+        // Make sure we mark the component manager for garbage collection as otherwise each JUnit test will
+        // have an instance of the Component Manager (will all the components it's holding), leading to
+        // out of memory errors when there are lots of tests...
+        this.componentManager = null;
     }
 
     /**

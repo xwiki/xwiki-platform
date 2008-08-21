@@ -55,7 +55,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("context", "current");
 
         List<Block> blocks =
-            macro.execute(macro.getMacroDescriptor().createMacroParameters(properties), null,
+            macro.execute(macro.getDescriptor().createMacroParameters(properties), null,
                 MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
@@ -88,7 +88,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         properties.put("context", "new");
 
         List<Block> blocks =
-            macro.execute(macro.getMacroDescriptor().createMacroParameters(properties), null,
+            macro.execute(macro.getDescriptor().createMacroParameters(properties), null,
                 MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);

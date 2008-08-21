@@ -54,9 +54,9 @@ public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDe
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#getMacroDescriptor()
+     * @see org.xwiki.rendering.macro.Macro#getDescriptor()
      */
-    public D getMacroDescriptor()
+    public D getDescriptor()
     {
         return this.macroDescriptor;
     }

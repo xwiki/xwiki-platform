@@ -54,7 +54,7 @@ public class VelocityMacroTest extends AbstractRenderingTestCase
 
         Macro macro = (Macro) getComponentManager().lookup(VelocityMacro.ROLE, "velocity/xwiki");
         List<Block> blocks =
-            macro.execute(macro.getMacroDescriptor().createMacroParameters(Collections.<String, String> emptyMap()),
+            macro.execute(macro.getDescriptor().createMacroParameters(Collections.<String, String> emptyMap()),
                 content, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);

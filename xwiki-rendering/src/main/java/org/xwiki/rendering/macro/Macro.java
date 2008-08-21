@@ -44,7 +44,7 @@ public interface Macro<P extends MacroParameters, D extends MacroDescriptor<P>> 
      */
     int getPriority();
 
-    D getMacroDescriptor();
+    D getDescriptor();
 
     List<Block> execute(P parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException;

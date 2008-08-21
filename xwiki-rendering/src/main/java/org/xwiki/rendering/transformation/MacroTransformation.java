@@ -138,7 +138,7 @@ public class MacroTransformation extends AbstractTransformation implements Compo
             context.setCurrentMacroBlock(macroHolder.macroBlock);
 
             MacroParameters macroParameters =
-                macroHolder.macro.getMacroDescriptor().createMacroParameters(macroHolder.macroBlock.getParameters());
+                macroHolder.macro.getDescriptor().createMacroParameters(macroHolder.macroBlock.getParameters());
 
             newBlocks =
                 ((Macro<MacroParameters, ? >) macroHolder.macro).execute(macroParameters, macroHolder.macroBlock

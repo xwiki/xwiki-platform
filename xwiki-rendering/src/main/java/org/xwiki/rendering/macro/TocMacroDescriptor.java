@@ -19,11 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.Map;
-
 import org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor;
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescriptor;
@@ -35,7 +31,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.IntegerMacroParameterDescr
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class TocMacroDescriptor extends AbstractMacroDescriptor<TocMacroDescriptor.Parameters>
+public class TocMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
      * The description of the macro.
@@ -61,7 +57,7 @@ public class TocMacroDescriptor extends AbstractMacroDescriptor<TocMacroDescript
     /**
      * The name of the macro parameter "start".
      */
-    private static final String PARAM_START = "start";
+    public static final String PARAM_START = "start";
 
     /**
      * The description of the macro parameter "start".
@@ -77,7 +73,7 @@ public class TocMacroDescriptor extends AbstractMacroDescriptor<TocMacroDescript
     /**
      * The name of the macro parameter "depth".
      */
-    private static final String PARAM_DEPTH = "depth";
+    public static final String PARAM_DEPTH = "depth";
 
     /**
      * The description of the macro parameter "depth".
@@ -93,7 +89,7 @@ public class TocMacroDescriptor extends AbstractMacroDescriptor<TocMacroDescript
     /**
      * The name of the macro parameter "scope".
      */
-    private static final String PARAM_SCOPE = "scope";
+    public static final String PARAM_SCOPE = "scope";
 
     /**
      * The description of the macro parameter "scope".
@@ -110,7 +106,7 @@ public class TocMacroDescriptor extends AbstractMacroDescriptor<TocMacroDescript
     /**
      * The name of the macro parameter "numbered".
      */
-    private static final String PARAM_NUMBERED = "numbered";
+    public static final String PARAM_NUMBERED = "numbered";
 
     /**
      * The description of the macro parameter "numbered".
@@ -154,64 +150,5 @@ public class TocMacroDescriptor extends AbstractMacroDescriptor<TocMacroDescript
     public String getDescription()
     {
         return DESCRIPTION;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public TocMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new Parameters(parameters, this);
-    }
-
-    // /////////////////////////////////////////////////////////////////////
-    // Parameters
-
-    public class Parameters extends DefaultMacroParameters
-    {
-        public Parameters(Map<String, String> parameters, TocMacroDescriptor macroDescriptor)
-        {
-            super(parameters, macroDescriptor);
-        }
-
-        /**
-         * @return the minimum section level. For example if 2 then level 1 sections will not be listed.
-         * @exception MacroParameterException error when converting value.
-         */
-        public int getStart() throws MacroParameterException
-        {
-            return this.<Integer> getParameterValue(PARAM_START);
-        }
-
-        /**
-         * @return the maximum section level. For example if 3 then all section levels from 4 will not be listed.
-         * @exception MacroParameterException error when converting value.
-         */
-        public int getDepth() throws MacroParameterException
-        {
-            return this.<Integer> getParameterValue(PARAM_DEPTH);
-        }
-
-        /**
-         * @return local or page. If local only section in the current scope will be listed. For example if the macro is
-         *         written in a section, only subsections of this section will be listed.
-         * @exception MacroParameterException error when converting value.
-         */
-        public Scope getScope() throws MacroParameterException
-        {
-            return getParameterValue(PARAM_SCOPE);
-        }
-
-        /**
-         * @return true or false. If true the section title number is printed.
-         * @exception MacroParameterException error when converting value.
-         */
-        public boolean numbered() throws MacroParameterException
-        {
-            return this.<Boolean> getParameterValue(PARAM_NUMBERED);
-        }
     }
 }

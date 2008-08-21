@@ -68,7 +68,7 @@ public class DefaultMacroParametersTest extends AbstractRenderingTestCase
         parameters.put("string1", "string1 value");
         parameters.put("notsupported", "notsupported value");
 
-        MacroParameters macroParameters = this.macroDescriptor.createMacroParameters(parameters);
+        MacroParameters macroParameters = new DefaultMacroParameters(parameters, this.macroDescriptor);
 
         assertEquals(macroParameters.<Integer> getParameterValue("int1"), Integer.valueOf(3));
         assertEquals(macroParameters.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
@@ -82,7 +82,7 @@ public class DefaultMacroParametersTest extends AbstractRenderingTestCase
     public void testGetParameterValueWhenNotSupportedParameter() throws MacroParameterException
     {
         MacroParameters macroParameters =
-            this.macroDescriptor.createMacroParameters(Collections.<String, String> emptyMap());
+            new DefaultMacroParameters(Collections.<String, String> emptyMap(), this.macroDescriptor);
 
         try {
             macroParameters.getParameterValue("notsupported");
@@ -99,7 +99,7 @@ public class DefaultMacroParametersTest extends AbstractRenderingTestCase
     public void testGetParameterValueWhenRequiredParameterMissing() throws MacroParameterException
     {
         MacroParameters macroParameters =
-            this.macroDescriptor.createMacroParameters(Collections.<String, String> emptyMap());
+            new DefaultMacroParameters(Collections.<String, String> emptyMap(), this.macroDescriptor);
 
         try {
             assertEquals(macroParameters.<TestEnum> getParameterValue("enum1"), TestEnum.Value3);
@@ -116,13 +116,13 @@ public class DefaultMacroParametersTest extends AbstractRenderingTestCase
     public void testGetParameterValueWhenParameterMissing() throws MacroParameterException
     {
         MacroParameters macroParameters =
-            this.macroDescriptor.createMacroParameters(Collections.<String, String> emptyMap());
+            new DefaultMacroParameters(Collections.<String, String> emptyMap(), this.macroDescriptor);
 
         assertEquals(macroParameters.<Integer> getParameterValue("int1"), Integer.valueOf(5));
     }
 }
 
-class TestMacroDescriptor extends AbstractMacroDescriptor<MacroParameters>
+class TestMacroDescriptor extends AbstractMacroDescriptor
 {
     public TestMacroDescriptor()
     {
@@ -144,6 +144,11 @@ class TestMacroDescriptor extends AbstractMacroDescriptor<MacroParameters>
         registerParameterDescriptor(stringParamClass);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#getDescription()
+     */
     public String getDescription()
     {
         return "test macro descriptor";

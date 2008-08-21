@@ -27,8 +27,7 @@ import org.xwiki.rendering.macro.parameter.MacroParameters;
  * @version $Id$
  * @since 1.6M1
  */
-public abstract class AbstractNoParametersMacro extends
-    AbstractMacro<MacroParameters, MacroDescriptor<MacroParameters>>
+public abstract class AbstractNoParametersMacro extends AbstractMacro<MacroParameters, MacroDescriptor>
 {
     /**
      * Create and initialize the descriptor of the macro.

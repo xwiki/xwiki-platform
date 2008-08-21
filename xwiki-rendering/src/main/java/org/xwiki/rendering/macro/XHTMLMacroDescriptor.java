@@ -19,11 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.Map;
-
 import org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor;
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescriptor;
 
 /**
@@ -33,7 +29,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescr
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class XHTMLMacroDescriptor extends AbstractMacroDescriptor<XHTMLMacroDescriptor.Parameters>
+public class XHTMLMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
      * The description of the macro.
@@ -43,7 +39,7 @@ public class XHTMLMacroDescriptor extends AbstractMacroDescriptor<XHTMLMacroDesc
     /**
      * The name of the macro parameter "escapeWikiSyntax".
      */
-    private static final String PARAM_ESCAPEWIKISYNTAX = "escapeWikiSyntax";
+    public static final String PARAM_ESCAPEWIKISYNTAX = "escapeWikiSyntax";
 
     /**
      * The description of the macro parameter "escapeWikiSyntax".
@@ -76,36 +72,5 @@ public class XHTMLMacroDescriptor extends AbstractMacroDescriptor<XHTMLMacroDesc
     public String getDescription()
     {
         return DESCRIPTION;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public XHTMLMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new Parameters(parameters, this);
-    }
-
-    // /////////////////////////////////////////////////////////////////////
-    // Parameters
-
-    public class Parameters extends DefaultMacroParameters
-    {
-        public Parameters(Map<String, String> parameters, XHTMLMacroDescriptor macroDescriptor)
-        {
-            super(parameters, macroDescriptor);
-        }
-
-        /**
-         * @return indicate if the user has asked to escape wiki syntax or not.
-         * @exception MacroParameterException error when converting value.
-         */
-        public boolean isWikiSyntaxEscaped() throws MacroParameterException
-        {
-            return this.<Boolean> getParameterValue(PARAM_ESCAPEWIKISYNTAX);
-        }
     }
 }

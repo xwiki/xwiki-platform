@@ -34,13 +34,14 @@ import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.Execution;
 
 import java.util.List;
+import java.util.Map;
 import java.io.StringReader;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacro extends AbstractMacro<IncludeMacroDescriptor.Parameters, IncludeMacroDescriptor>
+public class IncludeMacro extends AbstractMacro<IncludeMacroParameters, IncludeMacroDescriptor>
 {
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
 
@@ -72,6 +73,17 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroDescriptor.Parameter
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.AbstractMacro#createMacroParameters(java.util.Map)
+     */
+    @Override
+    public IncludeMacroParameters createMacroParameters(Map<String, String> parameters)
+    {
+        return new IncludeMacroParameters(parameters, getDescriptor());
+    }
+
+    /**
      * Allows overriding the Document Manager used (useful for unit tests).
      * 
      * @param documentManager the new Document Manager to use
@@ -84,11 +96,11 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroDescriptor.Parameter
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public List<Block> execute(IncludeMacroDescriptor.Parameters parameters, String content,
-        MacroTransformationContext context) throws MacroExecutionException
+    public List<Block> execute(IncludeMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         String documentName = parameters.getDocument();
         Context actualContext = parameters.getContext();

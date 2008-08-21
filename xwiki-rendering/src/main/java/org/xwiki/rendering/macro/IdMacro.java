@@ -25,12 +25,13 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @version $Id$
  * @since 1.6M1
  */
-public class IdMacro extends AbstractMacro<IdMacroDescriptor.Parameters, IdMacroDescriptor>
+public class IdMacro extends AbstractMacro<IdMacroParameters, IdMacroDescriptor>
 {
     /**
      * Create and initialize the descriptor of the macro.
@@ -43,11 +44,22 @@ public class IdMacro extends AbstractMacro<IdMacroDescriptor.Parameters, IdMacro
     /**
      * {@inheritDoc}
      * 
+     * @see org.xwiki.rendering.macro.AbstractMacro#createMacroParameters(java.util.Map)
+     */
+    @Override
+    public IdMacroParameters createMacroParameters(Map<String, String> parameters)
+    {
+        return new IdMacroParameters(parameters, getDescriptor());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
      *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
-    public List<Block> execute(IdMacroDescriptor.Parameters parameters, String content,
-        MacroTransformationContext context) throws MacroExecutionException
+    public List<Block> execute(IdMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         IdBlock idBlock = new IdBlock(parameters.getName());
 

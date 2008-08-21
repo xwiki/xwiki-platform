@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro;
 
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
@@ -30,12 +31,21 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
-public interface Macro<P extends MacroParameters, D extends MacroDescriptor<P>> extends Comparable<Macro< ? , ? >>
+public interface Macro<P extends MacroParameters, D extends MacroDescriptor> extends Comparable<Macro< ? , ? >>
 {
     /**
      * This component's role, used when code needs to look it up.
      */
     String ROLE = Macro.class.getName();
+
+    /**
+     * Create a new {@link MacroParameters} which parse provided parameters to transform it in more java usable types
+     * (line int, boolean, etc.).
+     * 
+     * @param parameters the prameters to parse.
+     * @return a new {@link MacroParameters}.
+     */
+    P createMacroParameters(Map<String, String> parameters);
 
     /**
      * The priority of execution relative to the other Macros. The lowest values have the highest priorities and execute

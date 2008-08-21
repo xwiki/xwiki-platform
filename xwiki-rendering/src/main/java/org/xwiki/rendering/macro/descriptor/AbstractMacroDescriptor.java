@@ -22,18 +22,15 @@ package org.xwiki.rendering.macro.descriptor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
  * Describe the macro.
  * 
- * @param <P>
  * @version $Id$
  * @since 1.6M1
  */
-public abstract class AbstractMacroDescriptor<P extends MacroParameters> implements MacroDescriptor<P>
+public abstract class AbstractMacroDescriptor implements MacroDescriptor
 {
     /**
      * The list of parameters descriptors of the macro.
@@ -61,15 +58,5 @@ public abstract class AbstractMacroDescriptor<P extends MacroParameters> impleme
     public <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name)
     {
         return (D) this.parameterDescriptorMap.get(name.toLowerCase());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#createMacroParameters(java.util.Map)
-     */
-    public P createMacroParameters(Map<String, String> parameters)
-    {
-        return (P) new DefaultMacroParameters(parameters, this);
     }
 }

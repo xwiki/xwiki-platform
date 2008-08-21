@@ -19,11 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.Map;
-
 import org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor;
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
 /**
@@ -33,7 +29,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescri
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class IdMacroDescriptor extends AbstractMacroDescriptor<IdMacroDescriptor.Parameters>
+public class IdMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
      * The description of the macro.
@@ -41,17 +37,17 @@ public class IdMacroDescriptor extends AbstractMacroDescriptor<IdMacroDescriptor
     private static final String DESCRIPTION = "Include other pages into the current page.";
 
     /**
-     * The name of the macro parameter "document".
+     * The name of the macro parameter "name".
      */
-    private static final String PARAM_NAME = "name";
+    public static final String PARAM_NAME = "name";
 
     /**
-     * The description of the macro parameter "document".
+     * The description of the macro parameter "name".
      */
     private static final String PARAM_NAME_DESC = "Insert a block with a id that can be targeted.";
 
     /**
-     * The default value of the macro parameter "document".
+     * The default value of the macro parameter "name".
      */
     private static final String PARAM_NAME_DEF = null;
 
@@ -74,33 +70,5 @@ public class IdMacroDescriptor extends AbstractMacroDescriptor<IdMacroDescriptor
     public String getDescription()
     {
         return DESCRIPTION;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public IdMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new Parameters(parameters, this);
-    }
-
-    // /////////////////////////////////////////////////////////////////////
-    // Parameters
-
-    public class Parameters extends DefaultMacroParameters
-    {
-        public Parameters(Map<String, String> parameters, IdMacroDescriptor macroDescriptor)
-        {
-            super(parameters, macroDescriptor);
-        }
-
-        public String getName() throws MacroParameterException
-        {
-            return getParameterValue(PARAM_NAME);
-        }
-
     }
 }

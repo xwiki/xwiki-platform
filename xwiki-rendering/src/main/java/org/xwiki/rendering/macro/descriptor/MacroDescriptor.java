@@ -19,9 +19,6 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
@@ -30,7 +27,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
  * @version $Id$
  * @since 1.6M1
  */
-public interface MacroDescriptor<P extends MacroParameters>
+public interface MacroDescriptor
 {
     /**
      * @return the description of the macro.
@@ -43,13 +40,4 @@ public interface MacroDescriptor<P extends MacroParameters>
      * @return the parameter class.
      */
     <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name);
-
-    /**
-     * Create a new {@link MacroParameters} which parse provided parameters to transform it in more java usable types
-     * (line int, boolean, etc.).
-     * 
-     * @param parameters the prameters to parse.
-     * @return a new {@link MacroParameters}.
-     */
-    P createMacroParameters(Map<String, String> parameters);
 }

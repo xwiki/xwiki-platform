@@ -19,15 +19,13 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
-import org.xwiki.rendering.macro.parameter.MacroParameters;
-
 /**
  * Describe the macro.
  * 
  * @version $Id$
  * @since 1.6M1
  */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor<MacroParameters>
+public class DefaultMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
      * The description of the macro.

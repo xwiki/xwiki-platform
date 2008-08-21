@@ -19,11 +19,7 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.Map;
-
 import org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor;
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
@@ -34,7 +30,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescri
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
-public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacroDescriptor.Parameters>
+public class IncludeMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
      * The description of the macro.
@@ -60,7 +56,7 @@ public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacro
     /**
      * The name of the macro parameter "document".
      */
-    private static final String PARAM_DOCUMENT = "document";
+    public static final String PARAM_DOCUMENT = "document";
 
     /**
      * The description of the macro parameter "document".
@@ -76,7 +72,7 @@ public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacro
     /**
      * The name of the macro parameter "context".
      */
-    private static final String PARAM_CONTEXT = "context";
+    public static final String PARAM_CONTEXT = "context";
 
     /**
      * The description of the macro parameter "context".
@@ -116,46 +112,5 @@ public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacro
     public String getDescription()
     {
         return DESCRIPTION;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public IncludeMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new Parameters(parameters, this);
-    }
-
-    // /////////////////////////////////////////////////////////////////////
-    // Parameters
-
-    public class Parameters extends DefaultMacroParameters
-    {
-        public Parameters(Map<String, String> parameters, IncludeMacroDescriptor macroDescriptor)
-        {
-            super(parameters, macroDescriptor);
-        }
-
-        /**
-         * @return the name of the document to include.
-         * @exception MacroParameterException error when converting value.
-         */
-        public String getDocument() throws MacroParameterException
-        {
-            return getParameterValue(PARAM_DOCUMENT);
-        }
-
-        /**
-         * @return defines whether the included page is executed in its separated execution context or whether it's
-         *         executed in the contex of the current page.
-         * @exception MacroParameterException error when converting value.
-         */
-        public Context getContext() throws MacroParameterException
-        {
-            return getParameterValue(PARAM_CONTEXT);
-        }
     }
 }

@@ -33,27 +33,29 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
  */
 public class DefaultMacroParameters implements MacroParameters
 {
-    private MacroDescriptor< ? extends MacroParameters> macroDescriptor;
-
     /**
-     * @return the descriptor of the macro.
+     * The descriptor of the macro.
      */
-    public MacroDescriptor< ? extends MacroParameters> getMacroDescriptor()
-    {
-        return this.macroDescriptor;
-    }
+    private MacroDescriptor macroDescriptor;
 
     /**
      * The list of parameters objects containing parameters values.
      */
     private Map<String, MacroParameter< ? >> parameterMap = new HashMap<String, MacroParameter< ? >>();
 
-    public DefaultMacroParameters(Map<String, String> parameters,
-        MacroDescriptor< ? extends MacroParameters> macroDescriptor)
+    public DefaultMacroParameters(Map<String, String> parameters, MacroDescriptor macroDescriptor)
     {
         this.macroDescriptor = macroDescriptor;
 
         load(parameters);
+    }
+
+    /**
+     * @return the descriptor of the macro.
+     */
+    public MacroDescriptor getMacroDescriptor()
+    {
+        return this.macroDescriptor;
     }
 
     /**

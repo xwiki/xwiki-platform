@@ -19,17 +19,23 @@
  */
 package org.xwiki.rendering.macro;
 
+import java.util.Map;
+
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
+import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDescriptor<P>> extends
-    AbstractLogEnabled implements Macro<P, D>
+public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDescriptor> extends AbstractLogEnabled
+    implements Macro<P, D>
 {
+    /**
+     * The descriptor of the macro.
+     */
     private D macroDescriptor;
 
     /**
@@ -40,6 +46,16 @@ public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDe
     public AbstractMacro(D macroDescriptor)
     {
         this.macroDescriptor = macroDescriptor;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.Macro#createMacroParameters(java.util.Map)
+     */
+    public P createMacroParameters(Map<String, String> parameters)
+    {
+        return (P) new DefaultMacroParameters(parameters, getDescriptor());
     }
 
     /**

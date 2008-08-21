@@ -28,7 +28,7 @@ import java.util.Collections;
 
 /**
  * Unit tests for {@link org.xwiki.rendering.macro.VelocityMacro}.
- *
+ * 
  * @version $Id$
  * @since 1.5M2
  */
@@ -36,26 +36,16 @@ public class VelocityMacroTest extends AbstractRenderingTestCase
 {
     public void testMacro() throws Exception
     {
-        String content = "#set ($list = ['one', 'two'])\n"
-            + "#foreach ($item in $list)\n"
-            + "* $item\n"
-            + "#end";
-        
-        String expected = "beginDocument\n"
-        	+ "beginList: [BULLETED]\n"
-            + "beginListItem\n"
-            + "onWord: [one]\n"
-            + "endListItem\n"
-            + "beginListItem\n"
-            + "onWord: [two]\n"
-            + "endListItem\n"
-            + "endList: [BULLETED]\n"
-            + "endDocument";
+        String content = "#set ($list = ['one', 'two'])\n" + "#foreach ($item in $list)\n" + "* $item\n" + "#end";
+
+        String expected =
+            "beginDocument\n" + "beginList: [BULLETED]\n" + "beginListItem\n" + "onWord: [one]\n" + "endListItem\n"
+                + "beginListItem\n" + "onWord: [two]\n" + "endListItem\n" + "endList: [BULLETED]\n" + "endDocument";
 
         Macro macro = (Macro) getComponentManager().lookup(VelocityMacro.ROLE, "velocity/xwiki");
         List<Block> blocks =
-            macro.execute(macro.getDescriptor().createMacroParameters(Collections.<String, String> emptyMap()),
-                content, MacroTransformationContext.EMPTY);
+            macro.execute(macro.createMacroParameters(Collections.<String, String> emptyMap()), content,
+                MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }

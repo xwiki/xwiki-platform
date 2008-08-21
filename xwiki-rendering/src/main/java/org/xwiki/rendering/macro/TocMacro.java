@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
@@ -43,7 +44,7 @@ import org.xwiki.rendering.util.IdGenerator;
  * @version $Id$
  * @since 1.5M2
  */
-public class TocMacro extends AbstractMacro<TocMacroDescriptor.Parameters, TocMacroDescriptor>
+public class TocMacro extends AbstractMacro<TocMacroParameters, TocMacroDescriptor>
 {
 
     /**
@@ -62,11 +63,22 @@ public class TocMacro extends AbstractMacro<TocMacroDescriptor.Parameters, TocMa
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(java.util.Map, java.lang.String,
-     *      org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.AbstractMacro#createMacroParameters(java.util.Map)
      */
-    public List<Block> execute(TocMacroDescriptor.Parameters parameters, String content,
-        MacroTransformationContext context) throws MacroExecutionException
+    @Override
+    public TocMacroParameters createMacroParameters(Map<String, String> parameters)
+    {
+        return new TocMacroParameters(parameters, getDescriptor());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
+     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     */
+    public List<Block> execute(TocMacroParameters parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
         // Example:
         // 1 Section1

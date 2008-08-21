@@ -94,6 +94,16 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("italic/italic5", false);
         suite.addTestsFromResource("italic/italic6", false);
         suite.addTestsFromResource("italic/italic7", false);
+        suite.addTestsFromResource("underline/underline1", false);
+        suite.addTestsFromResource("underline/underline2", false);
+        suite.addTestsFromResource("strikedout/strikedout1", false);
+        suite.addTestsFromResource("strikedout/strikedout2", false);
+        suite.addTestsFromResource("strikedout/strikedout3", false);
+        suite.addTestsFromResource("superscript/superscript1", false);
+        suite.addTestsFromResource("subscript/subscript1", false);
+        suite.addTestsFromResource("monospace/monospace1", false);
+        suite.addTestsFromResource("paragraph", false);
+
         suite.addTestsFromResource("escape", false);
         suite.addTestsFromResource("horizontalline", false);
         suite.addTestsFromResource("html", false);
@@ -104,7 +114,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macronowiki", true);
         suite.addTestsFromResource("macros/macrovelocity", true);
         suite.addTestsFromResource("macros/macroxhtml", true);
-        suite.addTestsFromResource("paragraph", false);
         suite.addTestsFromResource("section", false);
         suite.addTestsFromResource("macros/macroid", true);
         suite.addTestsFromResource("macros/toc/macrotoc1", true);

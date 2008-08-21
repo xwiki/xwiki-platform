@@ -122,6 +122,15 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                 // Thus we use a class instead so that it can be styled using CSS.
                 print("<span class=\"underline\">");
                 break;
+            case SUPERSCRIPT:
+                print("<sup>");
+                break;
+            case SUBSCRIPT:
+                print("<sub>");
+                break;
+            case MONOSPACE:
+                print("<tt>");
+                break;
         }
     }
 
@@ -147,6 +156,15 @@ public class XHTMLRenderer extends AbstractPrintRenderer
                 // Note: XHTML has deprecated the usage of <u> in favor of style sheets.
                 // Thus we use a class instead so that it can be styled using CSS.
                 print("</span>");
+                break;
+            case SUPERSCRIPT:
+                print("</sup>");
+                break;
+            case SUBSCRIPT:
+                print("</sub>");
+                break;
+            case MONOSPACE:
+                print("</tt>");
                 break;
         }
     }

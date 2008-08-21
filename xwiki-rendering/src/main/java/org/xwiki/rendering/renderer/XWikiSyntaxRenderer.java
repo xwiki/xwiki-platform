@@ -109,6 +109,15 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             case UNDERLINED:
                 print("__");
                 break;
+            case SUPERSCRIPT:
+                print("^^");
+                break;
+            case SUBSCRIPT:
+                print(",,");
+                break;
+            case MONOSPACE:
+                print("##");
+                break;
         }
     }
 
@@ -132,6 +141,15 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
                 break;
             case UNDERLINED:
                 print("__");
+                break;
+            case SUPERSCRIPT:
+                print("^^");
+                break;
+            case SUBSCRIPT:
+                print(",,");
+                break;
+            case MONOSPACE:
+                print("##");
                 break;
         }
     }

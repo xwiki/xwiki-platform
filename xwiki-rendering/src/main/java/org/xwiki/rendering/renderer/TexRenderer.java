@@ -32,7 +32,7 @@ public class TexRenderer extends ListenerDelegate implements PrintRenderer
 	{
         this.printer = printer;
         setWrappedListener(new WikiModelGeneratorListener(
-				new TexSerializer(new WikiModelPrinterAdapter(getPrinter()))));
+				new TexSerializer(new WikiModelPrinterAdapter(getPrinter()), null, null, null)));
 	}
 
     /**

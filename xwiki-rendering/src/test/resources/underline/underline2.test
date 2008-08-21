@@ -1,0 +1,18 @@
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+beginUnderline
+onWord: [underline]
+endUnderline
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>This is <ins>underline</ins></p></html>

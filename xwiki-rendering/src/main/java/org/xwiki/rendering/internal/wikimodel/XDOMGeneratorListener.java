@@ -88,7 +88,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     * @see org.wikimodel.wem.IWemListener#beginDefinitionList(org.wikimodel.wem.WikiParameters)  
+     * @see org.wikimodel.wem.IWemListener#beginDefinitionList(org.wikimodel.wem.WikiParameters)
      */
     public void beginDefinitionList(WikiParameters params)
     {
@@ -207,6 +207,14 @@ public class XDOMGeneratorListener implements IWemListener
             this.stack.push(new FormatBlock(generateListFromStack(), Format.ITALIC));
         } else if (format.hasStyle(IWemConstants.STRIKE)) {
             this.stack.push(new FormatBlock(generateListFromStack(), Format.STRIKEDOUT));
+        } else if (format.hasStyle(IWemConstants.INS)) {
+            this.stack.push(new FormatBlock(generateListFromStack(), Format.UNDERLINED));
+        } else if (format.hasStyle(IWemConstants.SUP)) {
+            this.stack.push(new FormatBlock(generateListFromStack(), Format.SUPERSCRIPT));
+        } else if (format.hasStyle(IWemConstants.SUB)) {
+            this.stack.push(new FormatBlock(generateListFromStack(), Format.SUBSCRIPT));
+        } else if (format.hasStyle(IWemConstants.MONO)) {
+            this.stack.push(new FormatBlock(generateListFromStack(), Format.MONOSPACE));
         } else {
             // WikiModel generate begin/endFormat events even for simple text with no style
             // so we need to remove our marker
@@ -313,7 +321,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see org.wikimodel.wem.IWemListener#onHorizontalLine()
      */
     public void onHorizontalLine()

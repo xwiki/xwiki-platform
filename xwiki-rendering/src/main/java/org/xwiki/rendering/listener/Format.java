@@ -30,5 +30,8 @@ public enum Format
     BOLD,
     ITALIC,
     UNDERLINED,
-    STRIKEDOUT
+    STRIKEDOUT,
+    SUPERSCRIPT,
+    SUBSCRIPT,
+    MONOSPACE
 }

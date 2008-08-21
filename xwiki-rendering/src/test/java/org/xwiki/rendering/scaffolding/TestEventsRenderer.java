@@ -72,6 +72,15 @@ public class TestEventsRenderer extends AbstractPrintRenderer
             case UNDERLINED:
                 println("beginUnderline");
                 break;
+            case SUPERSCRIPT:
+                println("beginSuperscript");
+                break;
+            case SUBSCRIPT:
+                println("beginSubscript");
+                break;
+            case MONOSPACE:
+                println("beginMonospace");
+                break;
         }
     }
 
@@ -95,6 +104,15 @@ public class TestEventsRenderer extends AbstractPrintRenderer
                 break;
             case UNDERLINED:
                 println("endUnderline");
+                break;
+            case SUPERSCRIPT:
+                println("endSuperscript");
+                break;
+            case SUBSCRIPT:
+                println("endSubscript");
+                break;
+            case MONOSPACE:
+                println("endMonospace");
                 break;
         }
     }

@@ -159,6 +159,7 @@ public abstract class AbstractBlock implements Block
                 typedBlocks.addAll(block.getChildrenByType(blockClass));
             }
         }
+
         return (List<T>) typedBlocks;
     }
 

@@ -31,8 +31,14 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  */
 public abstract class AbstractBlock implements Block
 {
+    /**
+     * The Blocks this Block contains.
+     */
     private List<Block> childrenBlocks = new ArrayList<Block>();
 
+    /**
+     * The Block containing this Block.
+     */
     private Block parentBlock;
 
     /**
@@ -161,6 +167,7 @@ public abstract class AbstractBlock implements Block
      * 
      * @see EqualsBuilder#reflectionEquals(Object, Object)
      */
+    @Override
     public boolean equals(Object obj)
     {
         return EqualsBuilder.reflectionEquals(this, obj);
@@ -171,6 +178,7 @@ public abstract class AbstractBlock implements Block
      * 
      * @see HashCodeBuilder#reflectionHashCode(Object)
      */
+    @Override
     public int hashCode()
     {
         return HashCodeBuilder.reflectionHashCode(this);

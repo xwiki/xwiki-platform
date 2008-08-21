@@ -114,6 +114,7 @@ public interface Block
      * @param blockClass the block class to look for
      * @param recurse if true also search recursively children
      * @return all the matching blocks
+     * @since 1.6M1
      */
     <T extends Block> List<T> getChildrenByType(Class<T> blockClass, boolean recurse);
 
@@ -124,6 +125,7 @@ public interface Block
      * @param blockClass the block class to look for
      * @param recurse if true also search in parents levels
      * @return the found block, null if nothing is found
+     * @since 1.6M1
      */
     <T extends Block> T getPreviousBlockByType(Class<T> blockClass, boolean recurse);
 }

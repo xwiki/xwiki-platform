@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro;
 
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
 /**

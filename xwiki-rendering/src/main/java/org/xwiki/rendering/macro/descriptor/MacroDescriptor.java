@@ -17,38 +17,39 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.descriptor;
+
+import java.util.Map;
 
 import org.xwiki.rendering.macro.parameter.MacroParameters;
+import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
- * Parse and convert ID macro parameters values into more readable java values (like boolean, int etc.).
  * 
- * @version $Id: IdMacroParameterManager.java 11899 2008-08-19 13:27:50Z tmortagne $
+ * @param <P>
+ * @version $Id: $
  * @since 1.6M1
  */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor<MacroParameters>
+public interface MacroDescriptor<P extends MacroParameters>
 {
     /**
-     * The description of the macro.
+     * @return the description of the macro.
      */
-    private String description;
+    String getDescription();
 
     /**
-     * @param description the description of the macro.
+     * @param <D> the type of MacroParameterClass child class to return.
+     * @param name the name of the parameter.
+     * @return the parameter class.
      */
-    public DefaultMacroDescriptor(String description)
-    {
-        this.description = description;
-    }
+    <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name);
 
     /**
-     * {@inheritDoc}
+     * Create a new {@link MacroParameters} which parse provided parameters to transform it in more java usable types
+     * (line int, boolean, etc.).
      * 
-     * @see org.xwiki.rendering.macro.MacroDescriptor#getDescription()
+     * @param parameters the prameters to parse.
+     * @return a new {@link MacroParameters}.
      */
-    public String getDescription()
-    {
-        return description;
-    }
+    P createMacroParameters(Map<String, String> parameters);
 }

@@ -21,6 +21,7 @@ package org.xwiki.rendering.macro;
 
 import java.util.Map;
 
+import org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor;
 import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescriptor;
@@ -110,7 +111,7 @@ public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacro
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.MacroDescriptor#getDescription()
+     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#getDescription()
      */
     public String getDescription()
     {
@@ -120,7 +121,7 @@ public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacro
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
+     * @see org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor#createMacroParameters(java.util.Map)
      */
     @Override
     public IncludeMacroDescriptor.Parameters createMacroParameters(Map<String, String> parameters)

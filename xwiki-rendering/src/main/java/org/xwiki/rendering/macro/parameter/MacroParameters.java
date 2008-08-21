@@ -19,7 +19,6 @@
  */
 package org.xwiki.rendering.macro.parameter;
 
-import org.xwiki.rendering.macro.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
 /**
@@ -29,11 +28,6 @@ import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
  */
 public interface MacroParameters
 {
-    /**
-     * @return the descriptor of the macro.
-     */
-    MacroDescriptor< ? extends MacroParameters> getMacroDescriptor();
-
     /**
      * @param <I> the type of MacroParameter child class to return.
      * @param name the name of the parameter.

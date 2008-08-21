@@ -22,6 +22,7 @@ package org.xwiki.rendering.macro;
 import java.util.List;
 
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 

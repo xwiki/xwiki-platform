@@ -20,6 +20,7 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
 /**

@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.rendering.macro.AbstractMacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.AbstractMacroDescriptor;
 import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.macro.parameter.MacroParameterNotSupportedException;

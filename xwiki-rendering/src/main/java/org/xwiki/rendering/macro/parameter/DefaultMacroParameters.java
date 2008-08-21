@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro.parameter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.xwiki.rendering.macro.MacroDescriptor;
+import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
@@ -36,9 +36,7 @@ public class DefaultMacroParameters implements MacroParameters
     private MacroDescriptor< ? extends MacroParameters> macroDescriptor;
 
     /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameters#getMacroDescriptor()
+     * @return the descriptor of the macro.
      */
     public MacroDescriptor< ? extends MacroParameters> getMacroDescriptor()
     {

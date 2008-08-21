@@ -29,7 +29,7 @@ import org.xwiki.component.manager.ComponentManager;
  */
 public abstract class AbstractXWikiComponentTestCase extends MockObjectTestCase
 {
-    XWikiComponentInitializer initializer = new XWikiComponentInitializer();
+    private XWikiComponentInitializer initializer = new XWikiComponentInitializer();
 
     public AbstractXWikiComponentTestCase()
     {

@@ -36,12 +36,4 @@ public abstract class AbstractListBlock extends AbstractFatherBlock implements L
     {
         super(childrenBlock);
     }
-
-    public void merge(ListBLock listBlock)
-    {
-        for (Block block : getChildren()) {
-
-        }
-
-    }
 }

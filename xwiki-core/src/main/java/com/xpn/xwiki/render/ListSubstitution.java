@@ -27,34 +27,53 @@ import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.PatternMatcherInput;
 
-public class ListSubstitution  extends WikiSubstitution {
+public class ListSubstitution extends WikiSubstitution
+{
     private static final int TYPE_DL = 1;
+
     private static final int TYPE_UL1 = 2;
+
     private static final int TYPE_UL2 = 3;
+
     private static final int TYPE_OL = 4;
 
     private static final String dlpattern = "^(\\t+)(\\S+?):\\s";
+
     private static final String ulpattern1 = "^(\\t+)\\* ";
+
     private static final String ulpattern2 = "^((\\s\\s\\s)+)\\* ";
+
     private static final String olpattern = "^(\\t+)\\d+\\.?";
 
     private boolean finished = false;
+
     private int currenttype = 0;
+
     private String currentline = null;
+
     private StringBuffer currentList = new StringBuffer();
 
-    public ListSubstitution(Util util) {
+    public ListSubstitution(Util util)
+    {
         super(util);
     }
 
-    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i, PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.WikiSubstitution#appendSubstitution(java.lang.StringBuffer, org.apache.oro.text.regex.MatchResult, int, org.apache.oro.text.regex.PatternMatcherInput, org.apache.oro.text.regex.PatternMatcher, org.apache.oro.text.regex.Pattern)
+     */
+    @Override
+    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,
+        PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern)
+    {
         setSubstitution(" ");
-        super.appendSubstitution(stringBuffer,matchResult, i, minput, patternMatcher, pattern);
+        super.appendSubstitution(stringBuffer, matchResult, i, minput, patternMatcher, pattern);
         int length;
-        if (currenttype==TYPE_UL2)
-           length = matchResult.group(1).length() / 3;
+        if (currenttype == TYPE_UL2)
+            length = matchResult.group(1).length() / 3;
         else
-           length = matchResult.group(1).length();
+            length = matchResult.group(1).length();
 
         String text = currentline.substring(matchResult.endOffset(0));
         String itemdelim = "li";
@@ -69,10 +88,10 @@ public class ListSubstitution  extends WikiSubstitution {
                 break;
         }
 
-        for (int nb=0;nb<length;nb++)  {
-         currentList.append("<");
-         currentList.append(groupdelim);
-         currentList.append(">");
+        for (int nb = 0; nb < length; nb++) {
+            currentList.append("<");
+            currentList.append(groupdelim);
+            currentList.append(">");
         }
         currentList.append("<");
         currentList.append(itemdelim);
@@ -81,7 +100,7 @@ public class ListSubstitution  extends WikiSubstitution {
         currentList.append("</");
         currentList.append(itemdelim);
         currentList.append(">\n");
-        for (int nb=0;nb<length;nb++)  {
+        for (int nb = 0; nb < length; nb++) {
             currentList.append("</");
             currentList.append(groupdelim);
             currentList.append(">");
@@ -90,7 +109,8 @@ public class ListSubstitution  extends WikiSubstitution {
         currentline = null;
     }
 
-    public String substitute(String line, int type) {
+    public String substitute(String line, int type)
+    {
         this.currenttype = type;
         switch (type) {
             case TYPE_DL:
@@ -106,41 +126,45 @@ public class ListSubstitution  extends WikiSubstitution {
                 setPattern(olpattern);
                 break;
         }
-        return super.substitute(line);    //To change body of overriden methods use Options | File Templates.
+        return super.substitute(line); // To change body of overriden methods use Options | File Templates.
     }
 
+    public String handleList(String line)
+    {
+        Util util = getUtil();
+        line = util.substitute("s/^\\s*$/<p \\/> /o", line);
+        if (util.matched())
+            finished = true;
+        if (util.match("m/^(\\S+?)/", line))
+            finished = true;
 
-    public String handleList(String line) {
-       Util util = getUtil();
-       line = util.substitute("s/^\\s*$/<p \\/> /o", line);
-       if (util.matched())
-           finished = true;
-       if (util.match("m/^(\\S+?)/", line))
-           finished = true;
-
-       // Handle the lists
-       currentline = line;
-       if (currentline!=null) substitute(currentline, TYPE_DL);
-       if (currentline!=null) substitute(currentline, TYPE_UL1);
-       if (currentline!=null) substitute(currentline, TYPE_UL2);
-       if (currentline!=null) substitute(currentline, TYPE_OL);
-       return currentline;
+        // Handle the lists
+        currentline = line;
+        if (currentline != null)
+            substitute(currentline, TYPE_DL);
+        if (currentline != null)
+            substitute(currentline, TYPE_UL1);
+        if (currentline != null)
+            substitute(currentline, TYPE_UL2);
+        if (currentline != null)
+            substitute(currentline, TYPE_OL);
+        return currentline;
     }
 
-    public String dumpCurrentList(StringBuffer output, boolean force) {
-        if ((currentList.length()!=0)&&(force||finished)) {
+    public String dumpCurrentList(StringBuffer output, boolean force)
+    {
+        if ((currentList.length() != 0) && (force || finished)) {
             Util util = getUtil();
             String list = currentList.toString();
-            list = util.substitute("s/<\\/dl><dl>//go",list);
-            list = util.substitute("s/<\\/ul><ul>//go",list);
-            list = util.substitute("s/<\\/ol><ol>//go",list);
+            list = util.substitute("s/<\\/dl><dl>//go", list);
+            list = util.substitute("s/<\\/ul><ul>//go", list);
+            list = util.substitute("s/<\\/ol><ol>//go", list);
             output.append(list);
             output.append("\n");
             currentList = new StringBuffer();
             finished = false;
             return list;
-        }
-        else
+        } else
             return "";
     }
 }

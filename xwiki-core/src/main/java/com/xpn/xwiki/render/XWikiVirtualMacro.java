@@ -25,96 +25,119 @@ import org.apache.commons.lang.StringUtils;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class XWikiVirtualMacro {
+public class XWikiVirtualMacro
+{
     private String name;
+
     private String language;
+
     private String functionName;
+
     private boolean multiLine = false;
-    private List params = new ArrayList();
-    private HashMap paramsTypes = new HashMap();
 
-    public XWikiVirtualMacro(String mapping) {
+    private List<String> params = new ArrayList<String>();
+
+    private Map<String, String> paramsTypes = new HashMap<String, String>();
+
+    public XWikiVirtualMacro(String mapping)
+    {
         String[] mapping1 = StringUtils.split(mapping, "=");
-        name = mapping1[0];
+        this.name = mapping1[0];
         String[] map = StringUtils.split(mapping1[1], ":");
-        language = map[0];
-        functionName = map[1];
-        if (map.length!=2) {
-        String[] aparams = StringUtils.split(map[2], ",");
-        if (aparams.length>0) {
-            for (int i=0;i<aparams.length;i++) {
-                String[] param = StringUtils.split(aparams[i], "|");
-                String pname = param[0];
-                params.add(pname);
-                if (param.length>1) {
-                    String ptype = param[1];
-                    paramsTypes.put(pname, ptype);
-                } else {
-                    paramsTypes.put(pname, "string");
-                }
+        this.language = map[0];
+        this.functionName = map[1];
+        if (map.length != 2) {
+            String[] aparams = StringUtils.split(map[2], ",");
+            if (aparams.length > 0) {
+                for (int i = 0; i < aparams.length; i++) {
+                    String[] param = StringUtils.split(aparams[i], "|");
+                    String pname = param[0];
+                    this.params.add(pname);
+                    if (param.length > 1) {
+                        String ptype = param[1];
+                        this.paramsTypes.put(pname, ptype);
+                    } else {
+                        this.paramsTypes.put(pname, "string");
+                    }
 
+                }
+            }
+
+            if (map.length == 4) {
+                this.multiLine = true;
             }
         }
-
-        if (map.length==4)
-            multiLine = true;
-        }
     }
 
-    public String getName() {
-        return name;
+    public String getName()
+    {
+        return this.name;
     }
 
-    public void setName(String name) {
+    public void setName(String name)
+    {
         this.name = name;
     }
 
-    public String getLanguage() {
-        return language;
+    public String getLanguage()
+    {
+        return this.language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(String language)
+    {
         this.language = language;
     }
 
-    public String getFunctionName() {
-        return functionName;
+    public String getFunctionName()
+    {
+        return this.functionName;
     }
 
-    public void setFunctionName(String functionName) {
+    public void setFunctionName(String functionName)
+    {
         this.functionName = functionName;
     }
 
-    public boolean isSingleLine() {
-        return !multiLine;
+    public boolean isSingleLine()
+    {
+        return !this.multiLine;
     }
 
-    public void setSingleLine(boolean singleLine) {
+    public void setSingleLine(boolean singleLine)
+    {
         this.multiLine = !singleLine;
     }
 
-    public boolean isMultiLine() {
-        return multiLine;
+    public boolean isMultiLine()
+    {
+        return this.multiLine;
     }
 
-    public void setMultiLine(boolean multiLine) {
+    public void setMultiLine(boolean multiLine)
+    {
         this.multiLine = !multiLine;
     }
 
-    public List getParams() {
-        return params;
+    public List<String> getParams()
+    {
+        return this.params;
     }
 
-    public void setParams(List params) {
+    public void setParams(List<String> params)
+    {
         this.params = params;
     }
 
-    public HashMap getParamsTypes() {
-        return paramsTypes;
+    public Map<String, String> getParamsTypes()
+    {
+        return this.paramsTypes;
     }
 
-    public void setParamsTypes(HashMap paramsTypes) {
+    public void setParamsTypes(Map<String, String> paramsTypes)
+    {
         this.paramsTypes = paramsTypes;
     }
 }

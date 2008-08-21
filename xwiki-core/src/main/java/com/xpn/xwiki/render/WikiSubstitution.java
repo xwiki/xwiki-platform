@@ -24,74 +24,97 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.util.Util;
 import org.apache.oro.text.regex.*;
 
-public class WikiSubstitution extends Perl5Substitution {
+public class WikiSubstitution extends Perl5Substitution
+{
 
     private Pattern pattern;
+
     private Util util;
 
-    public WikiSubstitution(com.xpn.xwiki.util.Util util) {
+    public WikiSubstitution(com.xpn.xwiki.util.Util util)
+    {
         setUtil(util);
         setSubstitution("$&");
     }
 
-    public WikiSubstitution(Util util, String patternparam) {
+    public WikiSubstitution(Util util, String patternparam)
+    {
         setUtil(util);
         setPattern(makePattern(patternparam));
         setSubstitution("$&");
     }
 
-    public WikiSubstitution(Util util, String[] patternparam) {
-       this.setPattern(Util.getPatterns().getPattern(makePattern(patternparam)));
-       setSubstitution("$&");
+    public WikiSubstitution(Util util, String[] patternparam)
+    {
+        this.setPattern(Util.getPatterns().getPattern(makePattern(patternparam)));
+        setSubstitution("$&");
     }
 
-    public void setPattern(String patternparam) {
+    public void setPattern(String patternparam)
+    {
         setPattern(Util.getPatterns().getPattern(makePattern(patternparam)));
     }
 
-    public void setPattern(String patternparam, int options) {
+    public void setPattern(String patternparam, int options)
+    {
         setPattern(Util.getPatterns().getPattern(makePattern(patternparam), options));
     }
 
-    public String makePattern(String patternparam) {
+    public String makePattern(String patternparam)
+    {
         return patternparam;
     }
 
-
-    public String makePattern(String[] patternparam) {
+    public String makePattern(String[] patternparam)
+    {
         return patternparam.toString();
     }
 
-    public String substitute(String line) {
-        return org.apache.oro.text.regex.Util.substitute(getMatcher(), getPattern(), this, line, org.apache.oro.text.regex.Util.SUBSTITUTE_ALL);
+    public String substitute(String line)
+    {
+        return org.apache.oro.text.regex.Util.substitute(getMatcher(), getPattern(), this, line,
+            org.apache.oro.text.regex.Util.SUBSTITUTE_ALL);
     }
 
-    public Perl5Matcher getMatcher() {
+    public Perl5Matcher getMatcher()
+    {
         return util.getMatcher();
     }
 
-    public Pattern getPattern() {
+    public Pattern getPattern()
+    {
         return pattern;
     }
 
-    public void setPattern(Pattern pattern) {
+    public void setPattern(Pattern pattern)
+    {
         this.pattern = pattern;
     }
 
-    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,  PatternMatcherInput minput,
-                                   PatternMatcher patternMatcher, Pattern pattern) {
-      prepareSubstitution(matchResult);
-      super.appendSubstitution(stringBuffer,matchResult, i, minput, patternMatcher, pattern);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.apache.oro.text.regex.Perl5Substitution#appendSubstitution(java.lang.StringBuffer, org.apache.oro.text.regex.MatchResult, int, org.apache.oro.text.regex.PatternMatcherInput, org.apache.oro.text.regex.PatternMatcher, org.apache.oro.text.regex.Pattern)
+     */
+    @Override
+    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,
+        PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern)
+    {
+        prepareSubstitution(matchResult);
+        super.appendSubstitution(stringBuffer, matchResult, i, minput, patternMatcher, pattern);
     }
 
-    public void prepareSubstitution(MatchResult matchResult) {
+    public void prepareSubstitution(MatchResult matchResult)
+    {
     }
 
-    public com.xpn.xwiki.util.Util getUtil() {
+    public com.xpn.xwiki.util.Util getUtil()
+    {
         return util;
     }
 
-    public void setUtil(com.xpn.xwiki.util.Util util) {
+    public void setUtil(com.xpn.xwiki.util.Util util)
+    {
         this.util = util;
     }
 }

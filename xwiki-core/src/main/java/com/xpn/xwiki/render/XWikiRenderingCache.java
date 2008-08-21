@@ -22,53 +22,67 @@ package com.xpn.xwiki.render;
 
 import java.util.Date;
 
-public class XWikiRenderingCache {
+public class XWikiRenderingCache
+{
     private String key;
+
     private String content;
+
     private int cacheDuration;
+
     private Date date;
 
-    public XWikiRenderingCache(String key, String content, int cacheDuration, Date date) {
-        this.setKey(key);
-        this.setContent(content);
-        this.setCacheDuration(cacheDuration);
-        this.setDate(date);
+    public XWikiRenderingCache(String key, String content, int cacheDuration, Date date)
+    {
+        setKey(key);
+        setContent(content);
+        setCacheDuration(cacheDuration);
+        setDate(date);
     }
 
-    public String getKey() {
-        return key;
+    public String getKey()
+    {
+        return this.key;
     }
 
-    public void setKey(String key) {
+    public void setKey(String key)
+    {
         this.key = key;
     }
 
-    public String getContent() {
-        return content;
+    public String getContent()
+    {
+        return this.content;
     }
 
-    public void setContent(String content) {
+    public void setContent(String content)
+    {
         this.content = content;
     }
 
-    public int getCacheDuration() {
-        return cacheDuration;
+    public int getCacheDuration()
+    {
+        return this.cacheDuration;
     }
 
-    public void setCacheDuration(int cacheDuration) {
+    public void setCacheDuration(int cacheDuration)
+    {
         this.cacheDuration = cacheDuration;
     }
 
-    public Date getDate() {
-        return date;
+    public Date getDate()
+    {
+        return this.date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(Date date)
+    {
         this.date = date;
     }
 
-    public boolean isValid() {
+    public boolean isValid()
+    {
         Date cdate = new Date();
-        return ((cdate.getTime() - getDate().getTime())<cacheDuration*1000);
+        return ((cdate.getTime() - getDate().getTime()) < this.cacheDuration * 1000);
     }
 }

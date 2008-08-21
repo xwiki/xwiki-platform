@@ -32,58 +32,64 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChangeNotificationInterface {
+public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChangeNotificationInterface
+{
     private static final Log log = LogFactory.getLog(XWikiMacrosMappingRenderer.class);
 
     /**
      * Regex pattern for matching macros that are written on single line.
      */
-    private static final Pattern SINGLE_LINE_MACRO_PATTERN =
-        Pattern.compile("\\{(\\w+)(:(.+))?\\}");
+    private static final Pattern SINGLE_LINE_MACRO_PATTERN = Pattern.compile("\\{(\\w+)(:(.+))?\\}");
 
     /**
-     * Regex pattern for matching macros that span several lines (i.e. macros that have a body
-     * block). Note that we're using the {@link Pattern#DOTALL} flag to tell the compiler that
-     * "." should match any characters, including new lines.
+     * Regex pattern for matching macros that span several lines (i.e. macros that have a body block). Note that we're
+     * using the {@link Pattern#DOTALL} flag to tell the compiler that "." should match any characters, including new
+     * lines.
      */
     private static final Pattern MULTI_LINE_MACRO_PATTERN =
         Pattern.compile("\\{(\\w+)(:(.+?))?\\}(.+?)\\{\\1\\}", Pattern.DOTALL);
 
-    protected HashMap macros_libraries = null;
-    protected HashMap macros_mappings = null;
+    protected Map<String, String> macros_libraries = null;
 
-    public XWikiMacrosMappingRenderer(XWiki xwiki, XWikiContext context) {
+    protected Map<String, XWikiVirtualMacro> macros_mappings = null;
+
+    public XWikiMacrosMappingRenderer(XWiki xwiki, XWikiContext context)
+    {
         loadPreferences(xwiki, context);
 
         // Add a notification rule if the preference property plugin is modified
-        context.getWiki().getNotificationManager().addNamedRule("XWiki.XWikiPreferences",
-                new DocChangeRule(this));
+        context.getWiki().getNotificationManager().addNamedRule("XWiki.XWikiPreferences", new DocChangeRule(this));
     }
 
-    public void loadPreferences(XWiki xwiki, XWikiContext context) {
-        macros_libraries = new HashMap();
-        macros_mappings = new HashMap();
+    public void loadPreferences(XWiki xwiki, XWikiContext context)
+    {
+        this.macros_libraries = new HashMap<String, String>();
+        this.macros_mappings = new HashMap<String, XWikiVirtualMacro>();
 
-        if ((xwiki!=null)&&(context!=null)) {
-            String[] macrolanguages = StringUtils.split(xwiki.getXWikiPreference("macros_languages", "velocity,groovy", context), ", ");
-            for (int i=0;i<macrolanguages.length;i++) {
+        if ((xwiki != null) && (context != null)) {
+            String[] macrolanguages =
+                StringUtils.split(xwiki.getXWikiPreference("macros_languages", "velocity,groovy", context), ", ");
+            for (int i = 0; i < macrolanguages.length; i++) {
                 String language = macrolanguages[i];
-                macros_libraries.put(language, xwiki.getXWikiPreference("macros_" + language, "XWiki." + language.substring(0,1).toUpperCase() + language.substring(1) + "Macros", context));
+                this.macros_libraries.put(language, xwiki.getXWikiPreference("macros_" + language, "XWiki."
+                    + language.substring(0, 1).toUpperCase() + language.substring(1) + "Macros", context));
             }
 
             String macrosmapping = xwiki.getMacroList(context);
             String[] mappings = StringUtils.split(macrosmapping, "\r\n");
-            for (int i=0;i<mappings.length;i++) {
+            for (int i = 0; i < mappings.length; i++) {
                 try {
                     XWikiVirtualMacro macro = new XWikiVirtualMacro(mappings[i]);
                     if (!macro.getName().equals("")) {
-                        if (!macro.getFunctionName().equals(""))
-                            macros_mappings.put(macro.getName(), macro);
-                        else
-                            macros_mappings.remove(macro.getName());
+                        if (!macro.getFunctionName().equals("")) {
+                            this.macros_mappings.put(macro.getName(), macro);
+                        } else {
+                            this.macros_mappings.remove(macro.getName());
+                        }
                     }
                 } catch (Exception e) {
                     log.error("Error reading macro mapping " + mappings[i], e);
@@ -92,16 +98,26 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
         }
     }
 
-    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context) {
-        if (macros_libraries==null)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#render(java.lang.String, com.xpn.xwiki.doc.XWikiDocument,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.XWikiContext)
+     */
+    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
+    {
+        if (this.macros_libraries == null) {
             loadPreferences(context.getWiki(), context);
+        }
 
         content = convertSingleLines(content, context);
         content = convertMultiLines(content, context);
+
         return content;
     }
 
-    private String convertSingleLines(String content, XWikiContext context) {
+    private String convertSingleLines(String content, XWikiContext context)
+    {
         StringBuffer result = new StringBuffer();
         Matcher m = SINGLE_LINE_MACRO_PATTERN.matcher(content);
         int current = 0;
@@ -112,20 +128,25 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
             String params = m.group(3);
             String allcontent = m.group(0);
 
-            XWikiVirtualMacro macro = (XWikiVirtualMacro) macros_mappings.get(macroname);
-            if ((macro!=null)&&(macro.isSingleLine()))
-                result.append(context.getWiki().getRenderingEngine().convertSingleLine(macroname, params, allcontent, macro, context));
-            else
+            XWikiVirtualMacro macro = (XWikiVirtualMacro) this.macros_mappings.get(macroname);
+            if ((macro != null) && (macro.isSingleLine())) {
+                result.append(context.getWiki().getRenderingEngine().convertSingleLine(macroname, params, allcontent,
+                    macro, context));
+            } else {
                 result.append(allcontent);
+            }
         }
-        if (current==0)
+        if (current == 0) {
             return content;
+        }
 
         result.append(content.substring(current));
+
         return result.toString();
     }
 
-    private String convertMultiLines(String content, XWikiContext context) {
+    private String convertMultiLines(String content, XWikiContext context)
+    {
         StringBuffer result = new StringBuffer();
         Matcher m = MULTI_LINE_MACRO_PATTERN.matcher(content);
         int current = 0;
@@ -137,36 +158,69 @@ public class XWikiMacrosMappingRenderer implements XWikiRenderer, XWikiDocChange
             String data = m.group(4);
             String allcontent = m.group(0);
 
-            XWikiVirtualMacro macro = (XWikiVirtualMacro) macros_mappings.get(macroname);
-            if ((macro!=null)&&(macro.isMultiLine()))
-                result.append(context.getWiki().getRenderingEngine().convertMultiLine(macroname, params, data, allcontent, macro, context));
-            else
+            XWikiVirtualMacro macro = (XWikiVirtualMacro) this.macros_mappings.get(macroname);
+            if ((macro != null) && (macro.isMultiLine())) {
+                result.append(context.getWiki().getRenderingEngine().convertMultiLine(macroname, params, data,
+                    allcontent, macro, context));
+            } else {
                 result.append(allcontent);
+            }
         }
-        if (current==0)
+        if (current == 0) {
             return content;
+        }
 
         result.append(content.substring(current));
+
         return result.toString();
     }
 
-    public void flushCache() {
-        macros_libraries = null;
-        macros_mappings = null;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#flushCache()
+     */
+    public void flushCache()
+    {
+        this.macros_libraries = null;
+        this.macros_mappings = null;
     }
 
-    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#convertMultiLine(java.lang.String, java.lang.String, java.lang.String,
+     *      java.lang.String, com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
+     */
+    public String convertMultiLine(String macroname, String params, String data, String allcontent,
+        XWikiVirtualMacro macro, XWikiContext context)
+    {
         return allcontent;
     }
 
-    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.XWikiRenderer#convertSingleLine(java.lang.String, java.lang.String, java.lang.String,
+     *      com.xpn.xwiki.render.XWikiVirtualMacro, com.xpn.xwiki.XWikiContext)
+     */
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context)
+    {
         return allcontent;
     }
 
-    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event, XWikiContext context) {
-            if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
-                loadPreferences(context.getWiki(), context);
-            }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.notify.XWikiDocChangeNotificationInterface#notify(com.xpn.xwiki.notify.XWikiNotificationRule,
+     *      com.xpn.xwiki.doc.XWikiDocument, com.xpn.xwiki.doc.XWikiDocument, int, com.xpn.xwiki.XWikiContext)
+     */
+    public void notify(XWikiNotificationRule rule, XWikiDocument newdoc, XWikiDocument olddoc, int event,
+        XWikiContext context)
+    {
+        if (newdoc.getFullName().equals("XWiki.XWikiPreferences")) {
+            loadPreferences(context.getWiki(), context);
+        }
     }
 }
-

@@ -46,7 +46,7 @@ import com.xpn.xwiki.web.XWikiRequest;
 
 public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 {
-    private static final Log log = LogFactory.getLog(XWikiRenderingEngine.class);
+    private static final Log LOG = LogFactory.getLog(XWikiRenderingEngine.class);
 
     private List<XWikiRenderer> renderers = new ArrayList<XWikiRenderer>();
 
@@ -56,7 +56,6 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
 
     public DefaultXWikiRenderingEngine(XWiki xwiki, XWikiContext context) throws XWikiException
     {
-
         if (xwiki.Param("xwiki.render.macromapping", "1").equals("1")) {
             addRenderer("mapping", new XWikiMacrosMappingRenderer(xwiki, context));
         }
@@ -202,8 +201,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
         return renderText(text, false, contentdoc, includingdoc, context);
     }
 
-    private String renderText(String text, boolean onlyInterpret, XWikiDocument contentdoc, XWikiDocument includingdoc,
-        XWikiContext context)
+    private String renderText(String text, boolean onlyInterpret, XWikiDocument contentdoc,
+        XWikiDocument includingdoc, XWikiContext context)
     {
         String key = getKey(text, contentdoc, includingdoc, context);
         int currentCacheDuration = context.getCacheDuration();
@@ -237,8 +236,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             MonitorPlugin monitor = Util.getMonitorPlugin(context);
             try {
                 // We need to make sure we don't use the cache duretion currently in the system
-                context
-                    .setCacheDuration((int) context.getWiki().ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
+                context.setCacheDuration((int) context.getWiki()
+                    .ParamAsLong("xwiki.rendering.defaultCacheDuration", 0));
                 // Start monitoring timer
                 if (monitor != null) {
                     monitor.startTimer("rendering");
@@ -272,8 +271,8 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                                 content = renderer.render(content, contentdoc, includingdoc, context);
                             }
                         } else {
-                            if (log.isDebugEnabled()) {
-                                log.debug("skip renderer: " + rendererName + " for the document "
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("skip renderer: " + rendererName + " for the document "
                                     + contentdoc.getFullName());
                             }
                         }
@@ -305,7 +304,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
                         this.cache.set(key, cacheObject);
                     }
                 } catch (Exception e) {
-                    log.error("cache exception", e);
+                    LOG.error("cache exception", e);
                 }
                 return content;
             } finally {
@@ -336,7 +335,7 @@ public class DefaultXWikiRenderingEngine implements XWikiRenderingEngine
             }
             return true;
         } catch (Exception e) {
-            log.error("Error in the function shouldRender", e);
+            LOG.error("Error in the function shouldRender", e);
             return true;
         }
     }

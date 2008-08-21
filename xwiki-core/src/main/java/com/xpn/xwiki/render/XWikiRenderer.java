@@ -25,14 +25,13 @@ import com.xpn.xwiki.doc.XWikiDocument;
 
 public interface XWikiRenderer
 {
-    String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc,
-        XWikiContext context);
+    String render(String content, XWikiDocument contentdoc, XWikiDocument contextdoc, XWikiContext context);
 
     void flushCache();
 
-    String convertMultiLine(String macroname, String params, String data, String allcontent,
-        XWikiVirtualMacro macro, XWikiContext context);
+    String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context);
 
-    String convertSingleLine(String macroname, String params, String allcontent,
-        XWikiVirtualMacro macro, XWikiContext context);
+    String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context);
 }

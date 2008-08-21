@@ -27,21 +27,33 @@ import org.apache.oro.text.regex.Pattern;
 import org.apache.oro.text.regex.PatternMatcher;
 import org.apache.oro.text.regex.PatternMatcherInput;
 
-public class HeadingSubstitution extends WikiSubstitution {
+public class HeadingSubstitution extends WikiSubstitution
+{
     public static final int HT = 0;
+
     public static final int DA = 1;
 
     private int type;
 
-     public HeadingSubstitution(Util util, String patternparam, int type) {
-       super(util, patternparam);
-       this.type = type;
+    public HeadingSubstitution(Util util, String patternparam, int type)
+    {
+        super(util, patternparam);
+        this.type = type;
     }
 
-    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i, PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern) {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see com.xpn.xwiki.render.WikiSubstitution#appendSubstitution(java.lang.StringBuffer, org.apache.oro.text.regex.MatchResult, int, org.apache.oro.text.regex.PatternMatcherInput, org.apache.oro.text.regex.PatternMatcher, org.apache.oro.text.regex.Pattern)
+     */
+    @Override
+    public void appendSubstitution(StringBuffer stringBuffer, MatchResult matchResult, int i,
+        PatternMatcherInput minput, PatternMatcher patternMatcher, Pattern pattern)
+    {
         switch (type) {
             case HeadingSubstitution.DA:
-                XWikiWikiBaseRenderer.makeHeading(stringBuffer, "" + matchResult.group(1).length(), matchResult.group(2), getUtil());
+                XWikiWikiBaseRenderer.makeHeading(stringBuffer, "" + matchResult.group(1).length(), matchResult
+                    .group(2), getUtil());
                 break;
             case HeadingSubstitution.HT:
                 XWikiWikiBaseRenderer.makeHeading(stringBuffer, matchResult.group(1), matchResult.group(2), getUtil());
@@ -52,8 +64,9 @@ public class HeadingSubstitution extends WikiSubstitution {
         }
     }
 
-    public static String substitute(Util util, String pattern, int type, String line) {
-     return (new HeadingSubstitution(util, pattern, type)).substitute(line);
+    public static String substitute(Util util, String pattern, int type, String line)
+    {
+        return (new HeadingSubstitution(util, pattern, type)).substitute(line);
     }
 
 }

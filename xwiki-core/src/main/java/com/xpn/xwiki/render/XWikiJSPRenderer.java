@@ -24,23 +24,31 @@ package com.xpn.xwiki.render;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.doc.XWikiDocument;
 
-public class XWikiJSPRenderer implements XWikiRenderer {
-    public XWikiJSPRenderer() {
+public class XWikiJSPRenderer implements XWikiRenderer
+{
+    public XWikiJSPRenderer()
+    {
     }
 
-    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc,  XWikiContext context) {
+    public String render(String content, XWikiDocument contentdoc, XWikiDocument doc, XWikiContext context)
+    {
         return content;
     }
 
-    public void flushCache() {
-        //To change body of implemented methods use File | Settings | File Templates.
+    public void flushCache()
+    {
+        // To change body of implemented methods use File | Settings | File Templates.
     }
 
-    public String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+    public String convertMultiLine(String macroname, String params, String data, String allcontent,
+        XWikiVirtualMacro macro, XWikiContext context)
+    {
         return allcontent;
     }
 
-    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro, XWikiContext context) {
+    public String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context)
+    {
         return allcontent;
-    }    
+    }
 }

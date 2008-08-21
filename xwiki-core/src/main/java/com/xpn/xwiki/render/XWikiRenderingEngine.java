@@ -33,27 +33,25 @@ public interface XWikiRenderingEngine
 
     XWikiRenderer getRenderer(String name);
 
-    List getRendererList();
+    List<XWikiRenderer> getRendererList();
 
-    List getRendererNames();
+    List<String> getRendererNames();
 
     String renderDocument(XWikiDocument doc, XWikiContext context) throws XWikiException;
 
-    String renderDocument(XWikiDocument doc, XWikiDocument includingdoc, XWikiContext context)
-        throws XWikiException;
+    String renderDocument(XWikiDocument doc, XWikiDocument includingdoc, XWikiContext context) throws XWikiException;
 
     String renderText(String text, XWikiDocument includingdoc, XWikiContext context);
 
     String interpretText(String text, XWikiDocument includingdoc, XWikiContext context);
 
-    String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc,
-        XWikiContext context);
+    String renderText(String text, XWikiDocument contentdoc, XWikiDocument includingdoc, XWikiContext context);
 
     void flushCache();
 
-    String convertMultiLine(String macroname, String params, String data, String allcontent,
-        XWikiVirtualMacro macro, XWikiContext context);
+    String convertMultiLine(String macroname, String params, String data, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context);
 
-    String convertSingleLine(String macroname, String params, String allcontent,
-        XWikiVirtualMacro macro, XWikiContext context);
+    String convertSingleLine(String macroname, String params, String allcontent, XWikiVirtualMacro macro,
+        XWikiContext context);
 }

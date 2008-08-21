@@ -61,8 +61,6 @@ public class HTMLMacro extends XHTMLMacro
     public List<Block> execute(HTMLMacroDescriptor.Parameters parameters, String content,
         MacroTransformationContext context) throws MacroExecutionException
     {
-        HTMLMacroDescriptor.Parameters htmlParameters = (HTMLMacroDescriptor.Parameters) parameters;
-
         DOMBuilder builder = new DOMBuilder();
 
         // clean the HTML to transform it into valid XHTML
@@ -74,7 +72,7 @@ public class HTMLMacro extends XHTMLMacro
 
         org.jdom.Document jdomDoc = builder.build(document);
 
-        XMLBlockConverterHandler handler = createContentHandler(htmlParameters);
+        XMLBlockConverterHandler handler = createContentHandler(parameters);
 
         SAXOutputter outputter = new SAXOutputter(handler, handler, null, this.entityResolver);
         try {

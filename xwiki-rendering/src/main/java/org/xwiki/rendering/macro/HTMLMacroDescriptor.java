@@ -20,7 +20,7 @@
 package org.xwiki.rendering.macro;
 
 /**
- * Parse and convert XHTML macro parameters values into more readable java values (like boolean, int etc.).
+ * Describe the macro.
  * 
  * @version $Id: $
  * @since 1.6M1

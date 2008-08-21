@@ -27,7 +27,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.EnumMacroParameterDescript
 import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescriptor;
 
 /**
- * Parse and convert INCLUDE macro parameters values into more readable java values (like boolean, int etc.).
+ * Describe the macro.
  * 
  * @version $Id: $
  * @since 1.6M1

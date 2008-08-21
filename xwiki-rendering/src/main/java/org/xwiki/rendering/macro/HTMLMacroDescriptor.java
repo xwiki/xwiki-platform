@@ -22,7 +22,7 @@ package org.xwiki.rendering.macro;
 /**
  * Describe the macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages

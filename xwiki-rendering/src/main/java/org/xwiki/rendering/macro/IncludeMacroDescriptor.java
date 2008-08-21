@@ -30,7 +30,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.StringMacroParameterDescri
 /**
  * Describe the macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages
@@ -42,7 +42,7 @@ public class IncludeMacroDescriptor extends AbstractMacroDescriptor<IncludeMacro
     private static final String DESCRIPTION = "Include other pages into the current page.";
 
     /**
-     * @version $Id: $
+     * @version $Id$
      */
     public enum Context
     {

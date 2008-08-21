@@ -33,7 +33,7 @@ import java.util.List;
 /**
  * Allows inserting HTML in wiki pages. Allows the HTML to be non XHTML and transforms it into valid XHTML.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public class HTMLMacro extends XHTMLMacro

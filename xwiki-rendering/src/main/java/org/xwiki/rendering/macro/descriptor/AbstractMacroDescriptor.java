@@ -27,9 +27,10 @@ import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
+ * Describe the macro.
  * 
  * @param <P>
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public abstract class AbstractMacroDescriptor<P extends MacroParameters> implements MacroDescriptor<P>

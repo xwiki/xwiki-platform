@@ -24,7 +24,7 @@ import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
 /**
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 public abstract class AbstractNoParametersMacro extends

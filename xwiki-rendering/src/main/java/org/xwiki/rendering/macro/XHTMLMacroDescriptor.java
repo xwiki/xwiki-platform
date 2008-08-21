@@ -29,7 +29,7 @@ import org.xwiki.rendering.macro.parameter.descriptor.BooleanMacroParameterDescr
 /**
  * Describe the macro.
  * 
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M1
  */
 // TODO: Use an I8N service to translate the descriptions in several languages

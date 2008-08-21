@@ -22,9 +22,9 @@ package org.xwiki.rendering.macro.descriptor;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
 /**
- * Parse and convert ID macro parameters values into more readable java values (like boolean, int etc.).
+ * Describe the macro.
  * 
- * @version $Id: IdMacroParameterManager.java 11899 2008-08-19 13:27:50Z tmortagne $
+ * @version $Id$
  * @since 1.6M1
  */
 public class DefaultMacroDescriptor extends AbstractMacroDescriptor<MacroParameters>

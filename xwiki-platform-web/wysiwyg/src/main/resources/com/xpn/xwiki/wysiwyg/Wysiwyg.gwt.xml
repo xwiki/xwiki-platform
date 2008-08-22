@@ -1,0 +1,23 @@
+<module>
+  <inherits name='com.google.gwt.user.User' />
+  <inherits name="com.xpn.xwiki.gwt.api.Api" />
+  <inherits name="com.google.gwt.i18n.I18N" />
+  <inherits name="com.google.gwt.http.HTTP" />
+  <inherits name="com.google.gwt.junit.JUnit" />
+  <servlet path="/WysiwygService" class="com.xpn.xwiki.wysiwyg.server.WysiwygServiceImpl" />
+  <entry-point class="com.xpn.xwiki.wysiwyg.client.Wysiwyg" />
+  <stylesheet src="Wysiwyg.css" />
+
+  <!-- Fall through to this rule if the browser isn't IE -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.ParamFilter">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.ParamFilter" />
+  </replace-with>
+
+  <!-- IE has some differences in the implementation of ParamFilter -->
+  <replace-with class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.ParamFilter">
+    <when-type-is class="com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.ParamFilterIE" />
+    <any>
+      <when-property-is name="user.agent" value="ie6" />
+    </any>
+  </replace-with>
+</module>

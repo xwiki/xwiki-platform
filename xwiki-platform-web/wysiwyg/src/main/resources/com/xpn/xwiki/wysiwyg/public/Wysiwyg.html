@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <title>Wysiwyg Application</title>
+  <meta name="gwt:property" content="locale=en" />
+  <link rel="stylesheet" href="Wysiwyg.css" />
+</head>
+<body>
+  <script language="javascript" src="com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
+  <iframe src="javascript:''" id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
+  <form id="edit" method="post" action="/xwiki/bin/view/Wysiwyg/Foo" >
+    <input type="submit" name="submit" value="Preview" />
+    <input type="button" value="Show HTML" onclick="alert(document.getElementById('content').value);"/>
+  	<textarea id="content" name="content" rows="25" cols="80">foo bar</textarea>
+  </form>
+  <!------- Code for creating a WYSIWYG instance ------->
+  <script language="javascript">
+    var Wysiwyg0 = {
+      hookId: 'content'
+    };
+  </script>
+  <!---------------------------------------------------->
+</body>
+</html>

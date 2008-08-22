@@ -1,0 +1,354 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  *
+  * See the NOTICE file distributed with this work for additional
+  * information regarding copyright ownership.
+  *
+  * This is free software; you can redistribute it and/or modify it
+  * under the terms of the GNU Lesser General Public License as
+  * published by the Free Software Foundation; either version 2.1 of
+  * the License, or (at your option) any later version.
+  *
+  * This software is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+  * Lesser General Public License for more details.
+  *
+  * You should have received a copy of the GNU Lesser General Public
+  * License along with this software; if not, write to the Free
+  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+  *
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.xpn.xwiki.platform</groupId>
+    <artifactId>xwiki-web</artifactId>
+    <version>1.6-SNAPSHOT</version>
+  </parent>
+  <artifactId>xwiki-web-wysiwyg</artifactId>
+  <name>XWiki Platform - Web - WYSIWYG</name>
+  <packaging>war</packaging>
+  <description>XWiki's What You See Is What You Get editor</description>
+  <version>0.1-SNAPSHOT</version>
+  <properties>
+    <gwtHome>${java.io.tmpdir}/xwiki/gwt/${gwtArtifactId}-${gwtVersion}</gwtHome>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-servlet</artifactId>
+      <version>${gwtVersion}</version>
+      <!-- Included in xwiki-web-standard -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>${gwtVersion}</version>
+      <!-- This JAR is used to generate JS files and shouldn't be included in the server side
+        WAR. However an issue in the GWT maven plugin prevents it from working with
+        "provided" scope. See http://code.google.com/p/gwt-maven/issues/detail?id=46. When
+        it's fixed, add a <scope>provided</scope> element. -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-dev</artifactId>
+      <version>1.5-RC1</version>
+      <classifier>${os}</classifier>
+      <!-- <scope>provided</scope> -->
+      <!-- We load this library this way because GWT looks for SWT libraries in the same folder -->
+      <scope>system</scope>
+      <systemPath>${gwtHome}/gwt-dev-${os}.jar</systemPath>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt</artifactId>
+      <version>${pom.parent.version}</version>
+      <!-- Included in xwiki-web-standard -->
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-web-gwt</artifactId>
+      <version>${pom.parent.version}</version>
+      <!-- We need the sources for debugging in hosted mode -->
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-core</artifactId>
+      <version>${pom.parent.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <!-- We need to clean the editor's HTML output before converting it to wiki syntax.
+        HTMLCleaner is our first option, though currently it cannot clean HTML to XHTML. -->
+      <groupId>net.sourceforge.htmlcleaner</groupId>
+      <artifactId>htmlcleaner</artifactId>
+      <version>2.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
+      http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
+      allow a release (this is for reproducibility). Thus we've had to upload JTidy into
+      our custom repository -->
+    <dependency>
+      <!-- We need to clean the editor's HTML output before converting it to wiki syntax. 
+        JTidy is our second option; it can clean HTML to XHTML but the project is abandoned.
+        We should drop it if we decide on HTMLCleaner. -->
+      <groupId>jtidy</groupId>
+      <artifactId>jtidy</artifactId>
+      <version>8.0-20060801.131059-3-dev</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform.tools</groupId>
+      <artifactId>xwiki-shared-tests</artifactId>
+      <version>1.12-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>3.8.1</version>
+      <!-- I can't restrict the scope because maven-googlewebtoolkit2-plugin fails 
+        to compile the sources. We shouldn't have this artifact in the final lib directory. -->
+      <!-- <scope>test</scope> -->
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jmock</groupId>
+      <artifactId>jmock-cglib</artifactId>
+      <version>1.1.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <!-- Added only for debugging the new rendering module -->
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-rendering</artifactId>
+      <version>${pom.parent.version}</version>
+      <classifier>tests</classifier>
+      <!-- We suppose it will be available while debugging. 
+        This way we avoid including lots of transitive dependencies -->
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <!-- Download and unpack the GWT compiler -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unzip-gwt-compiler</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.google.gwt</groupId>
+                  <artifactId>${gwtArtifactId}</artifactId>
+                  <version>${gwtVersion}</version>
+                  <type>zip</type>
+                </artifactItem>
+              </artifactItems>
+              <outputDirectory>${java.io.tmpdir}/xwiki/gwt</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>compile</phase>
+            <configuration>
+              <source>1.5</source>
+              <target>1.5</target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>com.totsp.gwt</groupId>
+        <artifactId>maven-googlewebtoolkit2-plugin</artifactId>
+        <version>1.5.3-SNAPSHOT</version>
+        <configuration>
+          <logLevel>WARN</logLevel><!-- ERROR, WARN, INFO, TRACE, DEBUG, SPAM, ALL -->
+          <style>DETAILED</style><!-- OBF[USCATED], PRETTY, DETAILED -->
+          <runTarget>com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.html</runTarget>
+          <gwtHome>${gwtHome}</gwtHome>
+          <compileTarget>
+            <value>com.xpn.xwiki.wysiwyg.Wysiwyg</value>
+          </compileTarget>
+          <extraJvmArgs>-Xmx1024m</extraJvmArgs>
+        </configuration>
+        <!-- The GWT plugin is adding quotes around the path to compensate for the fact that old
+          versions of plexus utils were not adding them. Now that plexus utils is adding them
+          this is failing since they're added twice. We should try to move to version 2.x of
+          the GWT plugin since it may have been fixed there. In the meantime we force an old
+          version of plexus utils to be used.
+          See http://jira.codehaus.org/browse/MNG-3414 for more details -->
+        <dependencies>
+          <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-utils</artifactId>
+            <version>1.4.2</version>
+            <scope>provided</scope>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <goals>
+              <goal>mergewebxml</goal><!-- needed by GWT hosted browser -->
+              <goal>compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- GWT's hosted browser needs client sources. We include all the 
+          sources for now because we cannot filter server sources. -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <!-- We bind this plugin to the test phase because we need to include the sources jar 
+              in the final war, so the jar must be created before the war is assembled. -->
+            <phase>test</phase>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <!-- The sources jar is not meant to be installed but to be included in the war -->
+              <attach>false</attach>
+              <!-- Resources are includes in the classes jar -->
+              <excludeResources>true</excludeResources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <dependentWarExcludes></dependentWarExcludes>
+          <archiveClasses>true</archiveClasses>
+          <webResources>
+            <resource>
+              <directory>target</directory>
+              <targetPath>WEB-INF</targetPath>
+              <includes>
+                <!-- generated by mergewebxml goal -->
+                <include>web.xml</include>
+              </includes>
+            </resource>
+            <resource>
+              <!-- needed by GWT hosted browser -->
+              <directory>target</directory>
+              <targetPath>WEB-INF/lib</targetPath>
+              <includes>
+                <!-- generated by maven-source-plugin -->
+                <include>${pom.artifactId}-${pom.version}-sources.jar</include>
+              </includes>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- We skip tests because we could not integrate the GWTTestCase derived tests 
+            with Maven. The main problem is that these tests need the hosted browser which 
+            in turn needs a 32-bit JRE. We could not find a way to specify the JRE to be used 
+            when running the tests. -->
+          <skip>true</skip>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <profiles>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <name>linux</name>
+        </os>
+      </activation>
+      <properties>
+        <gwtArtifactId>gwt-linux</gwtArtifactId>
+        <os>linux</os>
+      </properties>
+    </profile>
+    <profile>
+      <id>solaris</id>
+      <activation>
+        <os>
+          <name>SunOS</name>
+        </os>
+      </activation>
+      <properties>
+        <gwtArtifactId>gwt-linux</gwtArtifactId>
+        <os>linux</os>
+      </properties>
+    </profile>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os>
+          <name>mac os x</name>
+        </os>
+      </activation>
+      <properties>
+        <gwtArtifactId>gwt-mac</gwtArtifactId>
+        <os>mac</os>
+      </properties>
+    </profile>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <name>windows</name>
+        </os>
+      </activation>
+      <properties>
+        <gwtArtifactId>gwt-windows</gwtArtifactId>
+        <os>windows</os>
+      </properties>
+    </profile>
+  </profiles>
+  <repositories>
+    <repository>
+      <id>gwt-maven</id>
+      <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>gwt-maven</id>
+      <url>http://gwt-maven.googlecode.com/svn/trunk/mavenrepo</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

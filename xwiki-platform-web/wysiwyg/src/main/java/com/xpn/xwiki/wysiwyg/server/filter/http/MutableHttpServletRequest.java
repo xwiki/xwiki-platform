@@ -1,0 +1,105 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package com.xpn.xwiki.wysiwyg.server.filter.http;
+
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
+
+import com.xpn.xwiki.wysiwyg.server.filter.MutableServletRequest;
+
+public class MutableHttpServletRequest extends HttpServletRequestWrapper implements MutableServletRequest
+{
+    private final Map<String, String[]> params = new HashMap<String, String[]>();
+
+    public MutableHttpServletRequest(HttpServletRequest request)
+    {
+        super(request);
+
+        params.putAll(request.getParameterMap());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MutableServletRequest#setParameter(String, String)
+     */
+    public String setParameter(String name, String value)
+    {
+        String[] previousValues = params.put(name, new String[] {value});
+        return (previousValues == null || previousValues.length == 0) ? null : previousValues[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see MutableServletRequest#setParameterValues(String, String[])
+     */
+    public String[] setParameterValues(String name, String[] values)
+    {
+        return params.put(name, values);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ServletRequest#getParameter(String)
+     */
+    public String getParameter(String name)
+    {
+        String[] values = params.get(name);
+        return (values == null || values.length == 0) ? null : values[0];
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ServletRequest#getParameterMap()
+     */
+    public Map<String, String[]> getParameterMap()
+    {
+        return Collections.unmodifiableMap(params);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ServletRequest#getParameterNames()
+     */
+    public Enumeration<String> getParameterNames()
+    {
+        return Collections.enumeration(params.keySet());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ServletRequest#getParameterValues(String)
+     */
+    public String[] getParameterValues(String name)
+    {
+        return params.get(name);
+    }
+}

@@ -39,6 +39,8 @@
     <url>http://svn.xwiki.org/svnroot/xwiki/platform/web/trunk</url>
   </scm>
   <properties>
+    <!-- Used by gwt and wysiwyg modules -->
+    <gwtVersion>1.5.0-rc1</gwtVersion>
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.15-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>1.6-SNAPSHOT</platform.core.version>
@@ -53,6 +55,7 @@
       </activation>
       <modules>
         <module>gwt</module>
+        <module>wysiwyg</module>
         <module>standard</module>
         <module>exo</module>
       </modules>
@@ -62,6 +65,7 @@
       <id>xe</id>
       <modules>
         <module>gwt</module>
+        <module>wysiwyg</module>
         <module>standard</module>
       </modules>
     </profile>
@@ -70,6 +74,7 @@
       <id>xem</id>
       <modules>
         <module>gwt</module>
+        <module>wysiwyg</module>
         <module>standard</module>
       </modules>
     </profile>

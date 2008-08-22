@@ -1,0 +1,245 @@
+/*
+ * See the NOTICE file distributed with this work for additional
+ * information regarding copyright ownership.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+package com.xpn.xwiki.wysiwyg.client.plugin.text;
+
+import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.KeyboardListener;
+import com.google.gwt.user.client.ui.ToggleButton;
+import com.google.gwt.user.client.ui.Widget;
+import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
+import com.xpn.xwiki.wysiwyg.client.plugin.Config;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.StatefulPlugin;
+import com.xpn.xwiki.wysiwyg.client.ui.Images;
+import com.xpn.xwiki.wysiwyg.client.ui.Strings;
+import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.ui.XRichTextEditor;
+import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
+import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKeyFactory;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+
+/**
+ * {@link XRichTextEditor} plug-in for making text bold, italic, underline or strike through. It installs four toggle
+ * buttons on the tool bar and updates their status depending on the current cursor position and the direction of the
+ * navigation using the arrow keys. For instance, if you navigate from a bold region to an italic one and you type a
+ * character it will be bold.<br/> <b>Known issues:</b> When you navigate backwards, from right to left, using the
+ * arrow keys, the status of the toggle buttons is not synchronized with the text area. The text area behaves properly
+ * though.
+ */
+public class TextPlugin extends StatefulPlugin
+{
+    private ToggleButton bold;
+
+    private XShortcutKey boldKey;
+
+    private ToggleButton italic;
+
+    private XShortcutKey italicKey;
+
+    private ToggleButton underline;
+
+    private XShortcutKey underlineKey;
+
+    private ToggleButton strikeThrough;
+
+    private final FocusWidgetUIExtension toolBarExtension = new FocusWidgetUIExtension("toolbar");
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractPlugin#init(Wysiwyg, XRichTextArea, Config)
+     */
+    public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    {
+        super.init(wysiwyg, textArea, config);
+
+        if (getTextArea().getCommandManager().queryCommandSupported(Command.BOLD)) {
+            bold = new ToggleButton(Images.INSTANCE.bold().createImage(), this);
+            bold.setTitle(Strings.INSTANCE.bold());
+            boldKey = XShortcutKeyFactory.createCtrlShortcutKey('B');
+            getTextArea().addShortcutKey(boldKey);
+            toolBarExtension.addFeature("bold", bold);
+        }
+
+        if (getTextArea().getCommandManager().queryCommandSupported(Command.ITALIC)) {
+            italic = new ToggleButton(Images.INSTANCE.italic().createImage(), this);
+            italic.setTitle(Strings.INSTANCE.italic());
+            italicKey = XShortcutKeyFactory.createCtrlShortcutKey('I');
+            getTextArea().addShortcutKey(italicKey);
+            toolBarExtension.addFeature("italic", italic);
+        }
+
+        if (getTextArea().getCommandManager().queryCommandSupported(Command.UNDERLINE)) {
+            underline = new ToggleButton(Images.INSTANCE.underline().createImage(), this);
+            underline.setTitle(Strings.INSTANCE.underline());
+            underlineKey = XShortcutKeyFactory.createCtrlShortcutKey('U');
+            getTextArea().addShortcutKey(underlineKey);
+            toolBarExtension.addFeature("underline", underline);
+        }
+
+        if (getTextArea().getCommandManager().queryCommandSupported(Command.STRIKE_THROUGH)) {
+            strikeThrough = new ToggleButton(Images.INSTANCE.strikeThrough().createImage(), this);
+            strikeThrough.setTitle(Strings.INSTANCE.strikeThrough());
+            toolBarExtension.addFeature("strikethrough", strikeThrough);
+        }
+
+        if (toolBarExtension.getFeatures().length > 0) {
+            getTextArea().addKeyboardListener(this);
+            getTextArea().addClickListener(this);
+            getTextArea().getCommandManager().addCommandListener(this);
+            getUIExtensionList().add(toolBarExtension);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractPlugin#destroy()
+     */
+    public void destroy()
+    {
+        if (bold != null) {
+            bold.removeFromParent();
+            bold.removeClickListener(this);
+            bold = null;
+            getTextArea().removeShortcutKey(boldKey);
+        }
+
+        if (italic != null) {
+            italic.removeFromParent();
+            italic.removeClickListener(this);
+            italic = null;
+            getTextArea().removeShortcutKey(italicKey);
+        }
+
+        if (underline != null) {
+            underline.removeFromParent();
+            underline.removeClickListener(this);
+            underline = null;
+            getTextArea().removeShortcutKey(underlineKey);
+        }
+
+        if (strikeThrough != null) {
+            strikeThrough.removeFromParent();
+            strikeThrough.removeClickListener(this);
+            strikeThrough = null;
+        }
+
+        if (toolBarExtension.getFeatures().length > 0) {
+            getTextArea().removeClickListener(this);
+            getTextArea().removeKeyboardListener(this);
+            getTextArea().getCommandManager().removeCommandListener(this);
+            toolBarExtension.clearFeatures();
+        }
+
+        super.destroy();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ClickListener#onClick(Widget)
+     */
+    public void onClick(Widget sender)
+    {
+        if (sender == bold) {
+            onBold();
+        } else if (sender == italic) {
+            onItalic();
+        } else if (sender == underline) {
+            onUnderline();
+        } else if (sender == strikeThrough) {
+            onStrikeThrough();
+        } else {
+            super.onClick(sender);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see KeyboardListener#onKeyUp(Widget, char, int)
+     */
+    public void onKeyUp(Widget sender, char keyCode, int modifiers)
+    {
+        if (sender == getTextArea()) {
+            if ((modifiers & KeyboardListener.MODIFIER_CTRL) != 0) {
+                if (keyCode == boldKey.getKeyCode()) {
+                    onBold();
+                } else if (keyCode == italicKey.getKeyCode()) {
+                    onItalic();
+                } else if (keyCode == underlineKey.getKeyCode()) {
+                    onUnderline();
+                }
+            }
+            onUpdate();
+        }
+    }
+
+    public void onBold()
+    {
+        if (bold.isEnabled()) {
+            getTextArea().getCommandManager().execCommand(Command.BOLD);
+        }
+    }
+
+    public void onItalic()
+    {
+        if (italic.isEnabled()) {
+            getTextArea().getCommandManager().execCommand(Command.ITALIC);
+        }
+    }
+
+    public void onUnderline()
+    {
+        if (underline.isEnabled()) {
+            getTextArea().getCommandManager().execCommand(Command.UNDERLINE);
+        }
+    }
+
+    public void onStrikeThrough()
+    {
+        if (strikeThrough.isEnabled()) {
+            getTextArea().getCommandManager().execCommand(Command.STRIKE_THROUGH);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see StatefulPlugin#onUpdate()
+     */
+    public void onUpdate()
+    {
+        if (bold != null) {
+            bold.setDown(getTextArea().getCommandManager().queryCommandState(Command.BOLD));
+        }
+        if (italic != null) {
+            italic.setDown(getTextArea().getCommandManager().queryCommandState(Command.ITALIC));
+        }
+        if (underline != null) {
+            underline.setDown(getTextArea().getCommandManager().queryCommandState(Command.UNDERLINE));
+        }
+        if (strikeThrough != null) {
+            strikeThrough.setDown(getTextArea().getCommandManager().queryCommandState(Command.STRIKE_THROUGH));
+        }
+    }
+}

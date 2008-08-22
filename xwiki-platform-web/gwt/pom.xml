@@ -31,9 +31,6 @@
   <name>XWiki Platform - Web - GWT API</name>
   <packaging>jar</packaging>
   <description>The Common GWT API XWiki JAR</description>
-  <properties>
-    <gwtVersion>1.4.61</gwtVersion>
-  </properties>
   <dependencies>
     <dependency>
       <groupId>com.google.gwt</groupId>

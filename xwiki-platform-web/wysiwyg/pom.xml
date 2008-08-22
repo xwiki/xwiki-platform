@@ -35,7 +35,7 @@
   <name>XWiki Platform - Web - WYSIWYG</name>
   <packaging>war</packaging>
   <description>XWiki's What You See Is What You Get editor</description>
-  <version>0.1-SNAPSHOT</version>
+  <version>${pom.parent.version}</version>
   <properties>
     <gwtHome>${java.io.tmpdir}/xwiki/gwt/${gwtArtifactId}-${gwtVersion}</gwtHome>
   </properties>

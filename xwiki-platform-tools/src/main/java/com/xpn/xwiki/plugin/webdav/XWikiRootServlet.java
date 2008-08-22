@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class XWikiDispatcherServlet extends HttpServlet
+public class XWikiRootServlet extends HttpServlet
 {
     private static final long serialVersionUID = -4907199005755391420L;    
 

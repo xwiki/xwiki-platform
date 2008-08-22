@@ -29,6 +29,7 @@ import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.renderer.WikiPrinter;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @version $Id$
@@ -159,7 +160,25 @@ public class TestEventsRenderer extends AbstractPrintRenderer
 
     public void onWord(String word)
     {
-        println("onWord: [" + word + "]");
+        String printableWord;
+
+        // If the word has any non printable character use the "(((char value)))" notation
+        if (StringUtils.isAsciiPrintable(word)) {
+            printableWord = word;
+        } else {
+            StringBuffer buffer = new StringBuffer();
+            for (int i = 0; i < word.length(); i++) {
+                char c = word.charAt(i);
+                if (c > 126) {
+                    buffer.append("(((").append((int) c).append(")))");
+                } else {
+                    buffer.append(c);
+                }
+            }
+            printableWord = buffer.toString();
+        }
+
+        println("onWord: [" + printableWord + "]");
     }
 
     public void beginList(ListType listType)

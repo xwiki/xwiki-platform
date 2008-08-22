@@ -103,6 +103,9 @@
 ###
 ###
 &lt;ul&gt;
+#if($doc.getSyntaxId() == "xwiki/2.0" &amp;&amp; $xwiki.wysiwyg.enabled)
+&lt;li id="xwikieditwysiwygnew"#if($editor &amp;&amp; $editor == "wysiwygnew") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=wysiwygnew&amp;amp;$param")" onclick="if (checkAdvancedContent('$msg.get("checkadvancedcontent")')==false) return false; return Try.these(function() {document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwygnew&amp;amp;$languageparams&amp;amp;$param")'; document.forms.${formname}.submit(); return false;});"&gt;NEW WYSIWYG&lt;/a&gt;&lt;/li&gt;
+#end
 &lt;li id="xwikieditwysiwyg"#if($editor &amp;&amp; $editor == "wysiwyg") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=wysiwyg&amp;amp;$param")" onclick="if (checkAdvancedContent('$msg.get("checkadvancedcontent")')==false) return false; return Try.these(function() {document.forms.${formname}.action='$doc.getURL("edit", "editor=wysiwyg&amp;amp;$languageparams&amp;amp;$param")'; document.forms.${formname}.submit(); return false;});"&gt;$msg.get("editVisual")&lt;/a&gt;&lt;/li&gt;
 &lt;li id="xwikieditwiki"#if($editor &amp;&amp; $editor == "wiki") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=wiki&amp;amp;$param")" onclick="return Try.these(function() {document.forms.${formname}.action='$doc.getURL("edit", "editor=wiki&amp;amp;$languageparams&amp;amp;$param")'; document.forms.${formname}.submit(); return false;});"&gt;$msg.get("editWiki")&lt;/a&gt;&lt;/li&gt;
 #if($isAdvancedUser)&lt;li id="xwikieditobject"#if($editor &amp;&amp; $editor == "object") class="active"#end&gt;&lt;a href="$doc.getURL("edit", "editor=object&amp;amp;$param")"&gt;$msg.get("editObject")&lt;/a&gt;&lt;/li&gt; #end

@@ -39,7 +39,7 @@ public abstract class AbstractNumberMacroParameterDescriptor<T extends Number> e
     private T maxValue;
 
     /**
-     * True if the value has to be normalize. If false the default value is used when value is too low or too high.
+     * True if the value has to be normalized. If false the default value is used when value is too low or too high.
      */
     private boolean normalized = true;
 

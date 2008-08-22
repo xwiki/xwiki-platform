@@ -22,7 +22,8 @@ package org.xwiki.rendering.macro.parameter.descriptor;
 import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
 
 /**
- * Macro parameter descriptor.
+ * Describe a Macro parameter (parameter name, description, default value, whather it's a mandator parameter or not,
+ * whether there's validation done on user's provided values for this parameter). 
  * 
  * @param <T> the type of the value after conversion.
  * @version $Id$
@@ -61,10 +62,10 @@ public interface MacroParameterDescriptor<T>
      * @return the parameter.
      */
     MacroParameter<T> newInstance(String value);
-    
+
     /**
      * Create a new instance of the corresponding parameter object.
-     * 
+     *
      * @param value the value.
      * @return the parameter.
      */

@@ -22,9 +22,9 @@ package org.xwiki.rendering.scaffolding;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.rendering.util.IdGenerator;
-import org.xwiki.rendering.util.MockIdGenerator;
 import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.component.manager.ComponentManager;
+import org.jmock.cglib.MockObjectTestCase;
 
 import java.io.StringReader;
 
@@ -32,26 +32,28 @@ import java.io.StringReader;
  * @version $Id: $
  * @since 1.6M1
  */
-public class RenderingTestCase extends AbstractRenderingTestCase
+public class RenderingTestCase extends MockObjectTestCase
 {
+    private ComponentManager componentManager;
+
     private String input;
 
     private String expected;
 
-    private Parser parser;
+    private String parserId;
 
     private PrintRenderer renderer;
 
     private boolean runTransformations;
 
-    public RenderingTestCase(String testName, String input, String expected, Parser parser, PrintRenderer renderer,
+    public RenderingTestCase(String testName, String input, String expected, String parserId, PrintRenderer renderer,
         boolean runTransformations)
     {
         super(testName);
 
         this.input = input;
         this.expected = expected;
-        this.parser = parser;
+        this.parserId = parserId;
         this.renderer = renderer;
         this.runTransformations = runTransformations;
     }
@@ -59,18 +61,27 @@ public class RenderingTestCase extends AbstractRenderingTestCase
     @Override
     protected void runTest() throws Throwable
     {
-        ((MockIdGenerator) getComponentManager().lookup(IdGenerator.ROLE)).reset();
-
-        XDOM dom = this.parser.parse(new StringReader(this.input));
+        Parser parser = (Parser) getComponentManager().lookup(Parser.ROLE, this.parserId);
+        XDOM dom = parser.parse(new StringReader(this.input));
 
         if (this.runTransformations) {
             TransformationManager transformationManager =
                 (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
-            transformationManager.performTransformations(dom, this.parser.getSyntax());
+            transformationManager.performTransformations(dom, parser.getSyntax());
         }
 
         dom.traverse(this.renderer);
 
         assertEquals(this.expected, this.renderer.getPrinter().toString());
+    }
+
+    public void setComponentManager(ComponentManager componentManager)
+    {
+        this.componentManager = componentManager;
+    }
+
+    public ComponentManager getComponentManager()
+    {
+        return this.componentManager;
     }
 }

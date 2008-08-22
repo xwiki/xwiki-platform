@@ -19,15 +19,12 @@
  */
 package org.xwiki.rendering.util;
 
-import org.xwiki.rendering.renderer.xhtml.XHTMLIdGenerator;
-import org.xwiki.rendering.util.IdGenerator;
-
 /**
  * Default implementation of {@link IdGenerator}.
  * 
  * @version $Id: $
  */
-public class MockIdGenerator extends XHTMLIdGenerator implements IdGenerator
+public class MockIdGenerator implements IdGenerator
 {
     /**
      * {@inheritDoc}
@@ -36,6 +33,6 @@ public class MockIdGenerator extends XHTMLIdGenerator implements IdGenerator
      */
     public String generateRandomUniqueId()
     {
-        return generateUniqueId("testid");
+        return "testid";
     }
 }

@@ -30,10 +30,11 @@ import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.TexRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
 import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
-import org.xwiki.rendering.MockDocumentManager;
 
 import java.util.Map;
 import java.util.HashMap;
+
+import com.xpn.xwiki.test.PlexusTestSetup;
 
 /**
  * All Rendering integration tests.
@@ -128,7 +129,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("links", false);
         suite.addTestsFromResource("list", false);
         suite.addTestsFromResource("section", false);
-        
-        return suite;
+
+        return new PlexusTestSetup(suite);
     }
 }

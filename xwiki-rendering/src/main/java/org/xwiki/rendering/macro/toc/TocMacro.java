@@ -37,19 +37,19 @@ import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.toc.TocMacroDescriptor.Scope;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 
 /**
+ * Generate a Table Of Contents based on the document sections.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public class TocMacro extends AbstractMacro<TocMacroParameters, TocMacroDescriptor>
 {
-
     /**
      * The id generator.
      */

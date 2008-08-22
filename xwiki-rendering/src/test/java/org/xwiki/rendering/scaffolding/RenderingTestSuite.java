@@ -28,10 +28,7 @@ import java.io.InputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
-import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.PrintRenderer;
-
-import com.xpn.xwiki.test.XWikiComponentInitializer;
 
 /**
  * @version $Id: $
@@ -39,13 +36,11 @@ import com.xpn.xwiki.test.XWikiComponentInitializer;
  */
 public class RenderingTestSuite extends TestSuite
 {
-    private XWikiComponentInitializer initializer;
-
     private Map<String, PrintRendererFactory> rendererFactories;
 
     private class Data
     {
-        public Map<Parser, String> inputs = new HashMap<Parser, String>();
+        public Map<String, String> inputs = new HashMap<String, String>();
 
         public Map<String, String> expectations = new HashMap<String, String>();
     }
@@ -53,9 +48,6 @@ public class RenderingTestSuite extends TestSuite
     public RenderingTestSuite(String name, Map<String, PrintRendererFactory> rendererFactories) throws Exception
     {
         super(name);
-
-        this.initializer = new XWikiComponentInitializer();
-        this.initializer.initialize();
         this.rendererFactories = rendererFactories;
     }
 
@@ -66,18 +58,15 @@ public class RenderingTestSuite extends TestSuite
 
         // Create a test case for each input and for each expectation so that each test is executed separately
         // and reported separately by the JUnit test runner.
-        for (Parser parser : data.inputs.keySet()) {
+        for (String parserId : data.inputs.keySet()) {
             for (String rendererId : data.expectations.keySet()) {
                 PrintRenderer renderer = this.rendererFactories.get(rendererId).createRenderer();
-                addTest(new RenderingTestCase(computeTestName(testResourceName, parser, renderer), data.inputs
-                    .get(parser), data.expectations.get(rendererId), parser, renderer, runTransformations));
+                RenderingTestCase testCase = new RenderingTestCase(computeTestName(testResourceName, parserId,
+                    renderer), data.inputs.get(parserId), data.expectations.get(rendererId), parserId, renderer,
+                    runTransformations);
+                addTest(testCase);
             }
         }
-    }
-
-    public Parser getParserFromString(String parserId) throws Exception
-    {
-        return (Parser) this.initializer.getComponentManager().lookup(Parser.ROLE, parserId);
     }
 
     /**
@@ -152,7 +141,7 @@ public class RenderingTestSuite extends TestSuite
         return data;
     }
 
-    private void saveBuffer(StringBuffer buffer, Map map, Map<Parser, String> inputs, String keyName) throws Exception
+    private void saveBuffer(StringBuffer buffer, Map map, Map<String, String> inputs, String keyName) throws Exception
     {
         // Remove the last newline since our test format forces an additional new lines
         // at the end of input texts.
@@ -160,20 +149,17 @@ public class RenderingTestSuite extends TestSuite
             buffer.setLength(buffer.length() - 1);
         }
         if (map == inputs) {
-            map.put(getParserFromString(keyName), buffer.toString());
+            map.put(keyName, buffer.toString());
         } else {
             map.put(keyName, buffer.toString());
         }
     }
 
-    private String computeTestName(String prefix, Parser parser, PrintRenderer renderer)
+    private String computeTestName(String prefix, String parserId, PrintRenderer renderer)
     {
-        String parserName = parser.getClass().getName();
-        String parserShortName = parserName.substring(parserName.lastIndexOf(".") + 1);
-
         String rendererName = renderer.getClass().getName();
         String rendererShortName = rendererName.substring(rendererName.lastIndexOf(".") + 1);
 
-        return prefix + " (" + parserShortName + ", " + rendererShortName + ")";
+        return prefix + " (" + parserId + ", " + rendererShortName + ")";
     }
 }

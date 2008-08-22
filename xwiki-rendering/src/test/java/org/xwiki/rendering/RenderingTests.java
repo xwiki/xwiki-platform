@@ -111,7 +111,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macronowiki", true);
         suite.addTestsFromResource("macros/velocity/macrovelocity1", true);
         suite.addTestsFromResource("macros/velocity/macrovelocity2", true);
-        suite.addTestsFromResource("macros/macroxhtml", true);
+        suite.addTestsFromResource("macros/xhtml/macroxhtml1", true);
+        suite.addTestsFromResource("macros/xhtml/macroxhtml2", true);
+        suite.addTestsFromResource("macros/xhtml/macroxhtml3", true);
+        suite.addTestsFromResource("macros/xhtml/macroxhtml4", true);
         suite.addTestsFromResource("macros/macroid", true);
         suite.addTestsFromResource("macros/toc/macrotoc1", true);
         suite.addTestsFromResource("macros/toc/macrotoc2", true);

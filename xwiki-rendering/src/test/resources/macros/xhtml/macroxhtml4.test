@@ -1,0 +1,25 @@
+.#-------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify that if there's a space before an XML element it's correctly preserved.
+.#-------------------------------------------------------------------------------
+{{xhtml}}
+<p>Some <span>text</span></p>
+{{/xhtml}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker: [xhtml] [] [
+<p>Some <span>text</span></p>
+]
+beginXMLElement: [p] []
+onWord: [Some]
+onSpace
+beginXMLElement: [span] []
+onWord: [text]
+endXMLElement: [span] []
+endXMLElement: [p] []
+endMacroMarker: [xhtml] [] [
+<p>Some <span>text</span></p>
+]
+endDocument

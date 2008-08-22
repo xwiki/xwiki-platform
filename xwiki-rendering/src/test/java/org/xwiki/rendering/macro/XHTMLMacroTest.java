@@ -21,8 +21,6 @@ package org.xwiki.rendering.macro;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -36,38 +34,6 @@ import org.xwiki.rendering.block.Block;
  */
 public class XHTMLMacroTest extends AbstractRenderingTestCase
 {
-    public void testMacro() throws Exception
-    {
-        String html = "<table border=\"1\">\n"
-            + "<tr>\n"
-            + "<td>\n"
-            + "* listitem\n"
-            + "</td>\n"
-            + "</tr>\n"
-            + "</table>";
-
-        String expected = "beginDocument\n"
-        	+ "beginXMLElement: [table] [border=1]\n"
-            + "beginXMLElement: [tr] []\n"
-            + "beginXMLElement: [td] []\n"
-            + "beginList: [BULLETED]\n"
-            + "beginListItem\n"
-            + "onWord: [listitem]\n"
-            + "endListItem\n"
-            + "endList: [BULLETED]\n"
-            + "endXMLElement: [td] []\n"
-            + "endXMLElement: [tr] []\n"
-            + "endXMLElement: [table] [border=1]\n"
-            + "endDocument";
-        
-        Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks =
-            macro.execute(macro.createMacroParameters(Collections.<String, String> emptyMap()), html,
-                MacroTransformationContext.EMPTY);
-
-        assertBlocks(expected, blocks);
-    }
-
     /**
      * Verify that XHTML entities are supported and can be parsed.
      */
@@ -79,51 +45,6 @@ public class XHTMLMacroTest extends AbstractRenderingTestCase
             + "onWord: [" + ((char) 160) + "]\n"
             + "endDocument";
         
-        Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        List<Block> blocks =
-            macro.execute(macro.createMacroParameters(Collections.<String, String> emptyMap()), html,
-                MacroTransformationContext.EMPTY);
-
-        assertBlocks(expected, blocks);
-    }
-
-    /**
-     * Verify that the escapeWikiSyntax parameter works and escapes wiki syntax.
-     */
-    public void testMacroEscapeWikiSyntax() throws Exception
-    {
-        String html = "**some escaped text**";
-
-        String expected = "beginDocument\n"
-            + "onWord: [**some escaped text**]\n"
-            + "endDocument";
-
-        Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put("escapeWikiSyntax", "true");
-        List<Block> blocks =
-            macro.execute(macro.createMacroParameters(parameters), html, MacroTransformationContext.EMPTY);
-
-        assertBlocks(expected, blocks);
-    }
-
-    /**
-     * Verify that if there's a space before an XML element it's correctly preserved.
-     */
-    public void testMacroWhenWhiteSpaces() throws Exception
-    {
-        String html = "<p>Some <span>text</span></p>";
-
-        String expected = "beginDocument\n"
-            + "beginXMLElement: [p] []\n"
-            + "onWord: [Some]\n"
-            + "onSpace\n"
-            + "beginXMLElement: [span] []\n"
-            + "onWord: [text]\n"
-            + "endXMLElement: [span] []\n"
-            + "endXMLElement: [p] []\n"
-            + "endDocument";
-
         Macro macro = (Macro) getComponentManager().lookup(XHTMLMacro.ROLE, "xhtml/xwiki");
         List<Block> blocks =
             macro.execute(macro.createMacroParameters(Collections.<String, String> emptyMap()), html,

@@ -1,0 +1,46 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{xhtml}}
+<table>
+<tr>
+<td>
+* listitem
+</td>
+</tr>
+</table>
+{{/xhtml}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker: [xhtml] [] [
+<table>
+<tr>
+<td>
+* listitem
+</td>
+</tr>
+</table>
+]
+beginXMLElement: [table] []
+beginXMLElement: [tr] []
+beginXMLElement: [td] []
+beginList: [BULLETED]
+beginListItem
+onWord: [listitem]
+endListItem
+endList: [BULLETED]
+endXMLElement: [td] []
+endXMLElement: [tr] []
+endXMLElement: [table] []
+endMacroMarker: [xhtml] [] [
+<table>
+<tr>
+<td>
+* listitem
+</td>
+</tr>
+</table>
+]
+endDocument

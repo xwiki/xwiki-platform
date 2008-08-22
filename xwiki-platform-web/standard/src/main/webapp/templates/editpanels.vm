@@ -1,8 +1,8 @@
 ## This template is necessary so that different skins can use different edit Panels.
 ## Thus each skin is allowed to override the editpanelsvars.vm file.
 #template("editpanelsvars.vm")
-#set($wysiwygNewReady = ($editor == "wysiwygnew") && ($doc.getSyntaxId() == "xwiki/2.0") && $xwiki.wysiwyg.enabled)
-#if($editor == "wiki" || $editor == "wysiwyg" || $wysiwygNewReady)
+#set($isNewWysiwygActive = ($editor == "wysiwygnew") && ($doc.getSyntaxId() == "xwiki/2.0") && $xwiki.wysiwyg.enabled)
+#if($editor == "wiki" || $editor == "wysiwyg" || $isNewWysiwygActive)
   #set($editorPanels = $editorPanelsWiki)
 #elseif($editor == "wysiwyg")
   #set($editorPanels = $editorPanelsWysiwyg)
@@ -21,7 +21,7 @@
   #displaypanel($panel)
 #end
 </div>
-#if($editor == "wysiwyg" || $wysiwygNewReady)
+#if($editor == "wysiwyg" || $isNewWysiwygActive)
 <script type="text/javascript">
 //<![CDATA[
   if (browser.isIE || browser.isMozilla || browser.isGecko  || browser.isSafari) {

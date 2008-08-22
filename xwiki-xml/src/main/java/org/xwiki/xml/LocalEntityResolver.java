@@ -31,6 +31,13 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+/**
+ * Entity resolver that resolves entities using entity files (like xhtml-symbol.ent, xhtml-special.ent,
+ * xhtml-lat1.ent) located on the file system (in the classpath). This allows an XML parser that uses this
+ * entity resolver to work even when there's no internet connection. It also speeds up the entity resolution.
+ *  
+ * @version $Id$
+ */
 public class LocalEntityResolver extends AbstractLogEnabled implements EntityResolver
 {
     /**
@@ -70,8 +77,8 @@ public class LocalEntityResolver extends AbstractLogEnabled implements EntityRes
                 if (istream != null) {
                     source = new InputSource(istream);
                 } else {
-                    getLogger().warn("Failed to load resource [" + filename
-                        + "] locally. Will try to get it online at [" + systemId + "]");
+                    getLogger().warn(String.format("Failed to load resource [%s] locally. "
+                        + "Will try to get it online at [%s]", filename, systemId));
                 }
             } else {
                 // As there's no scheme we'll assume that it's an already resolved systemId that is
@@ -81,9 +88,9 @@ public class LocalEntityResolver extends AbstractLogEnabled implements EntityRes
                 // xhtml1-symbol.ent relatively. Normally these relative declarations generate a
                 // URL with a "file" scheme but apparently there are some cases when the raw
                 // entity file names is passed to this resolveEntity method...
-                getLogger().debug("Unknown URI scheme [" + uri.getScheme() + "] for entity ["
-                    + systemId + "]. Assuming the entity is already resolved and looking for it "
-                    + "in the file system.");
+                getLogger().debug(String.format("Unknown URI scheme [%s] for entity [%s]. "
+                    + "Assuming the entity is already resolved and looking for it in the file system.",
+                    uri.getScheme(), systemId));
                 InputStream istream = getClass().getClassLoader().getResourceAsStream(systemId);
                 if (istream != null) {
                     source = new InputSource(istream);
@@ -92,7 +99,7 @@ public class LocalEntityResolver extends AbstractLogEnabled implements EntityRes
                 }
             }
         } catch (URISyntaxException e) {
-            getLogger().warn("Invalid URI [" + systemId + "].", e);
+            getLogger().warn(String.format("Invalid URI [%s]", systemId), e);
         }
         // Returning null causes the caller to try accessing the entity online
         return source;

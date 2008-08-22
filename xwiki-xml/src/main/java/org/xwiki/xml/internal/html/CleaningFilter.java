@@ -30,5 +30,11 @@ import org.htmlcleaner.TagNode;
  */
 public interface CleaningFilter
 {
+    /**
+     * Filter the passed <a href="http://htmlcleaner.sourceforge.net/">HTML Cleaner</a>
+     * {@link TagNode}.
+     * 
+     * @param node the node to filter
+     */
     void filter(TagNode node);
 }

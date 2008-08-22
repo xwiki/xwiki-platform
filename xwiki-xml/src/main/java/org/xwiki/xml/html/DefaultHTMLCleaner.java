@@ -48,6 +48,9 @@ public class DefaultHTMLCleaner implements HTMLCleaner
      */
     private List<CleaningFilter> filters;
 
+    /**
+     * Default constructor.
+     */
     public DefaultHTMLCleaner()
     {
         this.filters = new ArrayList<CleaningFilter>();

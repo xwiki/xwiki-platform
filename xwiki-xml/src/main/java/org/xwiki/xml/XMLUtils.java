@@ -32,8 +32,16 @@ import org.jdom.output.Format;
  * @version $Id: $
  * @since 1.6M1
  */
-public class XMLUtils
+public final class XMLUtils
 {
+    /**
+     * Private constructor since this is a utility class that shouldn't be instantiated (all
+     * methods are static).
+     */
+    private XMLUtils()
+    {
+        // Nothing to do
+    }
     /**
      * @param document the W3C Document to transform into a String
      * @return the XML as a String

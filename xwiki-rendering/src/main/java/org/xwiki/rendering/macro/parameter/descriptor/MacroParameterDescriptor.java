@@ -61,4 +61,12 @@ public interface MacroParameterDescriptor<T>
      * @return the parameter.
      */
     MacroParameter<T> newInstance(String value);
+    
+    /**
+     * Create a new instance of the corresponding parameter object.
+     * 
+     * @param value the value.
+     * @return the parameter.
+     */
+    MacroParameter<T> newInstance(T value);
 }

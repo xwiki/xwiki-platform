@@ -59,22 +59,33 @@ public class DefaultMacroParameters implements MacroParameters
     }
 
     /**
-     * {@inheritDoc}
+     * Validate and store all passed parameters into typed Objects.
      * 
-     * @see org.xwiki.rendering.macro.parameter.MacroParameters#load(java.util.Map)
+     * @param parameters the parameters to validate and store
      */
     protected void load(Map<String, String> parameters)
     {
         this.parameterMap.clear();
 
         for (Map.Entry<String, String> entry : parameters.entrySet()) {
-            MacroParameterDescriptor< ? > parameterClass = this.macroDescriptor.getParameterDescriptor(entry.getKey());
+            load(entry.getKey(), entry.getValue());
+        }
+    }
 
-            if (parameterClass != null) {
-                this.parameterMap.put(entry.getKey().toLowerCase(), parameterClass.newInstance(entry.getValue()));
-            } else {
-                // TODO: add debug log here
-            }
+    /**
+     * Validate and store passed parameter into typed Objects.
+     * 
+     * @param parameterName the name of the parameter
+     * @param parameterValue the value of the parameter in {@link String}
+     */
+    protected void load(String parameterName, String parameterValue)
+    {
+        MacroParameterDescriptor< ? > parameterClass = this.macroDescriptor.getParameterDescriptor(parameterName);
+
+        if (parameterClass != null) {
+            this.parameterMap.put(parameterName.toLowerCase(), parameterClass.newInstance(parameterValue));
+        } else {
+            // TODO: add debug log here
         }
     }
 

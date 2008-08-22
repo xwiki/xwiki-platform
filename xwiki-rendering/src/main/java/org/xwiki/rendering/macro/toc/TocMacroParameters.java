@@ -1,10 +1,10 @@
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.toc;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.TocMacroDescriptor.Scope;
 import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
+import org.xwiki.rendering.macro.toc.TocMacroDescriptor.Scope;
 
 public class TocMacroParameters extends DefaultMacroParameters
 {

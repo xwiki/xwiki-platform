@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro.parameter.descriptor;
 
+import org.xwiki.rendering.macro.parameter.instance.MacroParameter;
+
 /**
  * Base class for macro parameter descriptor.
  * 
@@ -128,5 +130,15 @@ public abstract class AbstractMacroParameterDescriptor<T> implements MacroParame
     public void setValueHasToBeValid(boolean isValueHasToBeValid)
     {
         this.valueHasToBeValid = isValueHasToBeValid;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#newInstance(java.lang.Object)
+     */
+    public MacroParameter<T> newInstance(T value)
+    {
+        return newInstance(value.toString());
     }
 }

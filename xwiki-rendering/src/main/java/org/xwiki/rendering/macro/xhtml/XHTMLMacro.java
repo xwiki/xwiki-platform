@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.xhtml;
 
 import java.io.StringReader;
 import java.util.List;
@@ -28,6 +28,9 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 

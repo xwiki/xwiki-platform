@@ -17,7 +17,7 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.toc;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -36,7 +36,10 @@ import org.xwiki.rendering.block.SpaceBlock;
 import org.xwiki.rendering.block.SpecialSymbolBlock;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.macro.TocMacroDescriptor.Scope;
+import org.xwiki.rendering.macro.AbstractMacro;
+import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.toc.TocMacroDescriptor.Scope;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 

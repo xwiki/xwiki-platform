@@ -17,7 +17,9 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.html;
+
+import org.xwiki.rendering.macro.xhtml.XHTMLMacroDescriptor;
 
 /**
  * Describe the macro.
@@ -36,7 +38,7 @@ public class HTMLMacroDescriptor extends XHTMLMacroDescriptor
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.XHTMLMacroDescriptor#getDescription()
+     * @see org.xwiki.rendering.macro.xhtml.XHTMLMacroDescriptor#getDescription()
      */
     @Override
     public String getDescription()

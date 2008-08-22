@@ -19,6 +19,8 @@
  */
 package org.xwiki.rendering.macro;
 
+import org.xwiki.rendering.macro.include.IncludeMacro;
+import org.xwiki.rendering.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;

@@ -1,8 +1,8 @@
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.include;
 
 import java.util.Map;
 
-import org.xwiki.rendering.macro.IncludeMacroDescriptor.Context;
+import org.xwiki.rendering.macro.include.IncludeMacroDescriptor.Context;
 import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 

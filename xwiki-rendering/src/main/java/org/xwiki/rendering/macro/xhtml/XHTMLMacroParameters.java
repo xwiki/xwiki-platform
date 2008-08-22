@@ -1,4 +1,4 @@
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.xhtml;
 
 import java.util.Map;
 

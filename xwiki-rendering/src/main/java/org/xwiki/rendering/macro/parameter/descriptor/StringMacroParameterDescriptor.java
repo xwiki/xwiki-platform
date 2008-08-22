@@ -44,6 +44,7 @@ public class StringMacroParameterDescriptor extends AbstractMacroParameterDescri
      * 
      * @see org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor#newInstance(java.lang.String)
      */
+    @Override
     public MacroParameter<String> newInstance(String value)
     {
         return new StringMacroParameter(this, value);

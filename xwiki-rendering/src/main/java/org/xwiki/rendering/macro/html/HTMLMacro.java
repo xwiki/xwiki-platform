@@ -17,8 +17,12 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.html;
 
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.xhtml.XHTMLMacro;
+import org.xwiki.rendering.macro.xhtml.XHTMLMacroParameters;
+import org.xwiki.rendering.macro.xhtml.XMLBlockConverterHandler;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.xml.html.HTMLCleaner;
@@ -54,7 +58,7 @@ public class HTMLMacro extends XHTMLMacro
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.XHTMLMacro#execute(org.xwiki.rendering.macro.XHTMLMacroParameters,
+     * @see org.xwiki.rendering.macro.xhtml.XHTMLMacro#execute(org.xwiki.rendering.macro.xhtml.XHTMLMacroParameters,
      *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
      */
     @Override

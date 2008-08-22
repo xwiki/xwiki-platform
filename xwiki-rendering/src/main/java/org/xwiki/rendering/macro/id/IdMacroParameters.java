@@ -1,4 +1,4 @@
-package org.xwiki.rendering.macro;
+package org.xwiki.rendering.macro.id;
 
 import java.util.Map;
 

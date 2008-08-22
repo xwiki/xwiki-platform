@@ -20,12 +20,12 @@
 package org.xwiki.rendering.macro.descriptor;
 
 /**
- * Describe the macro.
+ * Describe a macro with no parameters.
  * 
  * @version $Id$
  * @since 1.6M1
  */
-public class DefaultMacroDescriptor extends AbstractMacroDescriptor
+public class NoParameterMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
      * The description of the macro.
@@ -35,7 +35,7 @@ public class DefaultMacroDescriptor extends AbstractMacroDescriptor
     /**
      * @param description the description of the macro.
      */
-    public DefaultMacroDescriptor(String description)
+    public NoParameterMacroDescriptor(String description)
     {
         this.description = description;
     }
@@ -47,6 +47,6 @@ public class DefaultMacroDescriptor extends AbstractMacroDescriptor
      */
     public String getDescription()
     {
-        return description;
+        return this.description;
     }
 }

@@ -25,8 +25,7 @@ import java.io.StringReader;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.macro.AbstractNoParametersMacro;
-import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.parser.Parser;
@@ -39,7 +38,7 @@ import org.xwiki.velocity.VelocityManager;
  * @version $Id$
  * @since 1.5M2
  */
-public class VelocityMacro extends AbstractNoParametersMacro
+public class VelocityMacro extends AbstractNoParameterMacro
 {
     private static final String DESCRIPTION = "Executes a Velocity script.";
 

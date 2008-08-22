@@ -25,7 +25,7 @@ import java.util.Map;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
- * Describe the macro.
+ * Describe a macro.
  * 
  * @version $Id$
  * @since 1.6M1
@@ -37,10 +37,6 @@ public abstract class AbstractMacroDescriptor implements MacroDescriptor
      */
     private Map<String, MacroParameterDescriptor< ? >> parameterDescriptorMap =
         new HashMap<String, MacroParameterDescriptor< ? >>();
-
-    public AbstractMacroDescriptor()
-    {
-    }
 
     /**
      * @param parameterDescriptor add parameter descriptor to the macro parameters manager.

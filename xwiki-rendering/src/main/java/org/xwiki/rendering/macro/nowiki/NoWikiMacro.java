@@ -21,8 +21,7 @@ package org.xwiki.rendering.macro.nowiki;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
-import org.xwiki.rendering.macro.AbstractNoParametersMacro;
-import org.xwiki.rendering.macro.Macro;
+import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -36,7 +35,7 @@ import java.util.Arrays;
  * @version $Id$
  * @since 1.6M1
  */
-public class NoWikiMacro extends AbstractNoParametersMacro
+public class NoWikiMacro extends AbstractNoParameterMacro
 {
     /**
      * The description of the macro.

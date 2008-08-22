@@ -25,11 +25,11 @@ import java.util.List;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.MacroBlock;
-import org.xwiki.rendering.macro.AbstractNoParametersMacro;
+import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.parameter.MacroParameters;
 
-public class TestNestedMacro extends AbstractNoParametersMacro
+public class TestNestedMacro extends AbstractNoParameterMacro
 {
     public TestNestedMacro()
     {

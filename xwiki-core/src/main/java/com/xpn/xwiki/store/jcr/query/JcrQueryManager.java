@@ -19,30 +19,52 @@
  */
 package com.xpn.xwiki.store.jcr.query;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.Map.Entry;
 
-import org.apache.commons.lang.NotImplementedException;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.Value;
+import javax.jcr.query.Row;
+import javax.jcr.query.RowIterator;
+
+import org.apache.commons.lang.StringUtils;
 import org.xwiki.context.Execution;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.store.jcr.JcrUtil;
+import com.xpn.xwiki.store.jcr.XWikiJcrSession;
+import com.xpn.xwiki.store.jcr.XWikiJcrStore;
+import com.xpn.xwiki.store.jcr.XWikiJcrBaseStore.JcrCallBack;
 import com.xpn.xwiki.store.query.AbstractQueryManager;
 import com.xpn.xwiki.store.query.Query;
+import com.xpn.xwiki.store.query.QueryException;
+import com.xpn.xwiki.store.query.QueryExecutor;
 
 /**
  * QueryManager implementation for Java Content Repository v1.0.
  * @version $Id$
  * @since 1.6M1
  */
-public class JcrQueryManager extends AbstractQueryManager
+public class JcrQueryManager extends AbstractQueryManager implements QueryExecutor
 {
     /**
      * Used for get named queries.
      */
-    ResourceBundle queriesBundle = ResourceBundle.getBundle("JcrQueries");
+    private ResourceBundle queriesBundle = ResourceBundle.getBundle("JcrQueries");
 
     /**
      * Used for creating JcrQuery.
      */
-    Execution execution;
+    private Execution execution;
+
+    /**
+     * Store component for execute the query.
+     */
+    private XWikiJcrStore store;
 
     /**
      * @return Execution object, used for access to store system.
@@ -50,6 +72,16 @@ public class JcrQueryManager extends AbstractQueryManager
     protected Execution getExecution()
     {
         return execution;
+    }
+
+    protected XWikiJcrStore getStore()
+    {
+        return store;
+    }
+
+    protected XWikiContext getContext()
+    {
+        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 
     /**
@@ -63,21 +95,91 @@ public class JcrQueryManager extends AbstractQueryManager
     /**
      * {@inheritDoc}
      */
-    public Query createQuery(String statement, String language)
+    public Query getNamedQuery(String queryName) throws QueryException
     {
-        if (hasLanguage(language)) {
-            return new JcrQuery(statement, language, getExecution());
-        } else {
-            throw new NotImplementedException();
+        try {
+            String statement = this.queriesBundle.getString(queryName);
+            return createQuery(statement, Query.XPATH);
+        } catch (MissingResourceException e) {
+            throw new QueryException("Cannot find the query with name = ["+queryName+"]", null, e);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public Query getNamedQuery(String queryName)
+    @SuppressWarnings("unchecked")
+    public <T> List<T> execute(final Query query) throws QueryException
     {
-        String statement = this.queriesBundle.getString(queryName);
-        return createQuery(statement, Query.XPATH);
+        String olddatabase = getContext().getDatabase();
+        try {
+            if (query.getWiki()!=null) {
+                getContext().setDatabase(query.getWiki());
+            }
+            return (List<T>) store.executeRead(getContext(), new JcrCallBack() {
+                public Object doInJcr(XWikiJcrSession session) throws Exception
+                {
+                    javax.jcr.query.Query jcrquery = createQuery(query, session.getJcrSession());
+                    RowIterator ri = jcrquery.execute().getRows();
+                    if (query.getOffset()>0)
+                        ri.skip(query.getOffset());
+                    int size = query.getLimit() > 0 ? query.getLimit() : Integer.MAX_VALUE;
+                    List<T> result = new ArrayList<T>();
+                    while (ri.hasNext() && size > 0) {
+                        Row row = ri.nextRow();
+                        Value[] values = row.getValues();
+                        Object[] el = new Object[values.length]; 
+                        for (int i=0; i<values.length; i++) {
+                            el[i] = JcrUtil.fromValue( values[i] );
+                        }
+                        if (values.length==1) {
+                            result.add((T) el[0]);
+                        } else {
+                            result.add((T) el);
+                        }
+                        size--;
+                    }
+                    return result;
+                }
+            });
+        } catch (Exception e) {
+            throw new QueryException("Exception while excecute the query", query, e);
+        } finally {
+            getContext().setDatabase(olddatabase);
+        }
+    }
+
+    /**
+     * Substitute query parameters to its values.
+     * TODO: Use PreparedQuery from JCRv2.
+     * @param query 
+     * @return clear query statement without parameters
+     */
+    protected String createNativeStatement(Query query) {
+        int n = query.getParameters().size();
+        String[] vars = new String[n];
+        String[] vals = new String[n];
+        int count = 0;
+        for (Entry<String, Object> e : query.getParameters().entrySet()) {
+            vars[count] = ":{"+e.getKey()+"}";
+            vals[count] = getValueAsString(e.getValue());
+            ++count;
+        }
+        return StringUtils.replaceEach(query.getStatement(), vars, vals);
+    }
+
+    protected String getValueAsString(Object val) {
+        return "'"+val.toString()+"'";
+    }
+
+    protected javax.jcr.query.Query createQuery(Query query, Session session) throws RepositoryException
+    {
+        return session.getWorkspace().getQueryManager().createQuery(createNativeStatement(query), query.getLanguage());
+    }
+
+    @Override
+    protected QueryExecutor getExecutor(String language)
+    {
+        return this;
     }
 }

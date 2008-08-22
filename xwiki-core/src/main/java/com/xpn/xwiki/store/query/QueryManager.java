@@ -19,7 +19,7 @@
  */
 package com.xpn.xwiki.store.query;
 
-import java.util.Collection;
+import java.util.Set;
 
 /**
  * This interface encapsulates methods for the management of search queries.
@@ -41,13 +41,14 @@ public interface QueryManager
      * @param statement query statement.
      * @param language language of the query. Must be one of {@link #getLanguages()}. Use {@link Query}.LANGUAGE for indication.
      * @return a Query object.
+     * @throws QueryException if language is not supported 
      */
-    Query createQuery(String statement, String language);
+    Query createQuery(String statement, String language) throws QueryException;
 
     /**
      * @return supported languages.
      */
-    Collection<String> getLanguages();
+    Set<String> getLanguages();
 
     /**
      * @param language language to check.
@@ -58,6 +59,7 @@ public interface QueryManager
     /**
      * @param queryName name of named query.
      * @return Query object.
+     * @throws QueryException if there is no query with that name
      */
-    Query getNamedQuery(String queryName);
+    Query getNamedQuery(String queryName) throws QueryException;
 }

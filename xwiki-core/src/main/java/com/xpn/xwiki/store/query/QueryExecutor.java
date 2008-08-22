@@ -17,34 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.store.hibernate.query;
+package com.xpn.xwiki.store.query;
 
-import org.hibernate.Query;
-import org.hibernate.Session;
-import org.xwiki.context.Execution;
+import java.util.List;
 
 /**
- * Query implementation for named queries in Hibernate Store.
+ * Interface for execute a queries.
+ * @see Query
  * @version $Id$
  * @since 1.6M1
  */
-public class HibernateNamedQuery extends HqlQuery
+public interface QueryExecutor
 {
     /**
-     * @param queryName name of named query
-     * @param execution Executon object for access to store system
+     * @param <T> expected type of elements in the result list
+     * @param query query to execute
+     * @return result list of the query
+     * @throws QueryException if something goes wrong
+     * @see Query#execute()
      */
-    public HibernateNamedQuery(String queryName, Execution execution)
-    {
-        super(queryName, execution);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected Query createQuery(Session session)
-    {
-        return session.getNamedQuery(getStatement());
-    }
+    <T> List<T> execute(Query query) throws QueryException;
 }

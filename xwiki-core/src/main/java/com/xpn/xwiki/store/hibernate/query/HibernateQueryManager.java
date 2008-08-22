@@ -19,14 +19,23 @@
  */
 package com.xpn.xwiki.store.hibernate.query;
 
-import org.apache.commons.lang.NotImplementedException;
+import java.util.List;
+import java.util.Map.Entry;
+
+import org.hibernate.Session;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.xwiki.context.Execution;
 
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.store.XWikiHibernateStore;
+import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
 import com.xpn.xwiki.store.query.AbstractQueryManager;
 import com.xpn.xwiki.store.query.Query;
+import com.xpn.xwiki.store.query.QueryException;
+import com.xpn.xwiki.store.query.QueryExecutor;
 import com.xpn.xwiki.util.Util;
 
 /**
@@ -34,7 +43,7 @@ import com.xpn.xwiki.util.Util;
  * @version $Id$
  * @since 1.6M1
  */
-public class HibernateQueryManager extends AbstractQueryManager implements Initializable
+public class HibernateQueryManager extends AbstractQueryManager implements Initializable, QueryExecutor
 {
     /**
      * Session factory needed for register named queries mapping.
@@ -49,7 +58,7 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
     private String mappingPath = "queries.hbm.xml";
 
     /**
-     * Used for access to store system
+     * Used for access to XWikiContext.
      * Injected via component manager.
      */
     private Execution execution;
@@ -71,30 +80,60 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
     }
 
     /**
-     * @return Execution object for access to environment
+     * {@inheritDoc}
      */
-    protected Execution getExecution()
+    protected QueryExecutor getExecutor(String language)
     {
-        return execution;
+        return this;
     }
 
     /**
      * {@inheritDoc}
      */
-    public Query createQuery(String statement, String language)
+    public <T> List<T> execute(final Query query) throws QueryException
     {
-        if (Query.HQL.equals(language)) {
-            return new HqlQuery(statement, getExecution());
-        } else {
-            throw new NotImplementedException();
+        String olddatabase = getContext().getDatabase();
+        try {
+            if (query.getWiki() != null) {
+                getContext().setDatabase(query.getWiki());
+            }
+            return getStore().executeRead(getContext(), true, new HibernateCallback<List<T>>() {
+                @SuppressWarnings("unchecked")
+                public List<T> doInHibernate(Session session) {
+                    org.hibernate.Query hquery = query.isNamed()
+                        ? session.getNamedQuery(query.getStatement())
+                        : session.createQuery(query.getStatement());
+                    if (query.getOffset() > 0) {
+                        hquery.setFirstResult(query.getOffset());
+                    }
+                    if (query.getLimit() > 0) {
+                        hquery.setMaxResults(query.getLimit());
+                    }
+                    for (Entry<String, Object> e : query.getParameters().entrySet()) {
+                        hquery.setParameter(e.getKey(), e.getValue());
+                    }
+                    return hquery.list();                
+                }
+            });
+        } catch (XWikiException e) {
+            throw new QueryException("Exception while execute query", query, e);
+        } finally {
+            getContext().setDatabase(olddatabase);
         }
     }
 
     /**
-     * {@inheritDoc}
+     * @return Store component
      */
-    public Query getNamedQuery(String queryName)
+    protected XWikiHibernateStore getStore()
     {
-        return new HibernateNamedQuery(queryName, getExecution());
+        return getContext().getWiki().getHibernateStore();
+    }
+
+    /**
+     * @return XWiki Context
+     */
+    protected XWikiContext getContext() {
+        return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 }

@@ -19,14 +19,12 @@
  */
 package com.xpn.xwiki.store.query;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
  * This is abstract QueryManager implementation.
- * Named queries are not implemented here because they are storage-specific.
  * 
  * @version $Id$
  * @since 1.6M1
@@ -41,9 +39,9 @@ public abstract class AbstractQueryManager implements QueryManager
     /**
      * {@inheritDoc}
      */
-    public Collection<String> getLanguages()
+    public Set<String> getLanguages()
     {
-        return Collections.unmodifiableCollection(this.languages);
+        return Collections.unmodifiableSet(this.languages);
     }
 
     /**
@@ -51,6 +49,32 @@ public abstract class AbstractQueryManager implements QueryManager
      */
     public boolean hasLanguage(String language)
     {
-        return this.languages.contains(language);
+        return getLanguages().contains(language);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Query createQuery(String statement, String language) throws QueryException
+    {
+        if (hasLanguage(language)) {
+            return new QueryImpl(statement, language, getExecutor(language));
+        } else {
+            throw new QueryException("Language [" + language + "] is not supported", null, null);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Query getNamedQuery(String queryName) throws QueryException
+    {
+        return new QueryImpl(queryName, getExecutor(null));
+    }
+
+    /**
+     * @param language query language
+     * @return QueryExecutor for this language
+     */
+    protected abstract QueryExecutor getExecutor(String language);
 }

@@ -20,14 +20,15 @@
 package com.xpn.xwiki.store.query;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
- * AbstractQuery stores all information needed for execute a query.
+ * QueryImpl stores all information needed for execute a query.
  * @version $Id$
  * @since 1.6M1
  */
-public abstract class AbstractQuery implements Query
+public class QueryImpl implements Query
 {
     /** 
      * field for {@link Query#getStatement()}.
@@ -60,13 +61,39 @@ public abstract class AbstractQuery implements Query
     private int offset;
 
     /**
+     * field for {@link #isNamed()}.
+     */
+    private boolean isNamed;
+
+    /**
+     * field for {@link #getExecuter()}.
+     */
+    private QueryExecutor executer;
+    
+    /**
+     * Create a Query.
      * @param statement query statement
      * @param language query language
+     * @param executor QueryExecutor component for execute the query.
      */
-    public AbstractQuery(String statement, String language)
+    public QueryImpl(String statement, String language, QueryExecutor executor)
     {
         this.statement = statement;
         this.language = language;
+        this.executer = executor;
+        this.isNamed = false;
+    }
+
+    /**
+     * Create a named Query.
+     * @param queryName name of the query.
+     * @param executor QueryExecutor component for execute the query.
+     */
+    public QueryImpl(String queryName, QueryExecutor executor)
+    {
+        this.statement = queryName;
+        this.executer = executor;
+        this.isNamed = true;
     }
 
     /**
@@ -88,9 +115,25 @@ public abstract class AbstractQuery implements Query
     /**
      * {@inheritDoc}
      */
+    public boolean isNamed()
+    {
+        return isNamed;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public void setWiki(String wiki)
     {
         this.wiki = wiki;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public String getWiki()
+    {
+        return wiki;
     }
 
     /**
@@ -103,19 +146,17 @@ public abstract class AbstractQuery implements Query
     }
 
     /**
-     * @return limit of result list
-     * @see Query#setLimit(int)
+     * {@inheritDoc}
      */
-    protected int getLimit()
+    public int getLimit()
     {
         return limit;
     }
 
     /**
-     * @return offset of query result
-     * @see Query#setOffset(int)
+     * {@inheritDoc}
      */
-    protected int getOffset()
+    public int getOffset()
     {
         return offset;
     }
@@ -139,18 +180,26 @@ public abstract class AbstractQuery implements Query
     }
 
     /**
-     * @return map from query parameters to values.
+     * {@inheritDoc}
      */
-    protected Map<String, Object> getParameters()
+    public Map<String, Object> getParameters()
     {
         return parameters;
     }
-    
+
     /**
-     * @return virtual wiki to run the query. null is current wiki.
+     * {@inheritDoc}
      */
-    protected String getWiki()
+    public <T> List<T> execute() throws QueryException
     {
-        return wiki;
+        return getExecuter().execute(this);
+    }
+
+    /**
+     * @return QueryExecutor interface for execute the query.
+     */
+    protected QueryExecutor getExecuter()
+    {
+        return executer;
     }
 }

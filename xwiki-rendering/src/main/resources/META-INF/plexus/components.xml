@@ -107,7 +107,7 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>xhtml/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.macro.XHTMLMacro</implementation>
+      <implementation>org.xwiki.rendering.macro.xhtml.XHTMLMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
@@ -125,7 +125,7 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>html/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.macro.HTMLMacro</implementation>
+      <implementation>org.xwiki.rendering.macro.html.HTMLMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
@@ -146,7 +146,7 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>velocity/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.macro.VelocityMacro</implementation>
+      <implementation>org.xwiki.rendering.macro.velocity.VelocityMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
@@ -164,7 +164,7 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>include/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.macro.IncludeMacro</implementation>
+      <implementation>org.xwiki.rendering.macro.include.IncludeMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
@@ -194,13 +194,13 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>nowiki/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.macro.NoWikiMacro</implementation>
+      <implementation>org.xwiki.rendering.macro.nowiki.NoWikiMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>toc/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.macro.TocMacro</implementation>
+      <implementation>org.xwiki.rendering.macro.toc.TocMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <requirements>
         <requirement>
@@ -214,7 +214,7 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>id/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.macro.IdMacro</implementation>
+      <implementation>org.xwiki.rendering.macro.id.IdMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <priority>20</priority>

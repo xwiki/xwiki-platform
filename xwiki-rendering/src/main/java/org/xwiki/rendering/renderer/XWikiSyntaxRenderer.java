@@ -51,16 +51,28 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         this.macroPrinter = new XWikiMacroPrinter();
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#beginDocument()
+     */
     public void beginDocument()
     {
         // Don't do anything
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#endDocument() 
+     */
     public void endDocument()
     {
         // Don't do anything
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#onLink(org.xwiki.rendering.listener.Link)
+     */
     public void onLink(Link link)
     {
         print("[[");
@@ -154,32 +166,56 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#beginParagraph()
+     */
     public void beginParagraph()
     {
         addLineBreak();
         addLineBreak();
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#endParagraph()
+     */
     public void endParagraph()
     {
         // Nothing to do
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#onLineBreak()
+     */
     public void onLineBreak()
     {
         print("\n");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#onNewLine()
+     */
     public void onNewLine()
     {
         print("\\");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#onMacro(String, java.util.Map, String)
+     */
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
         print(this.macroPrinter.print(name, parameters, content));
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#beginSection(org.xwiki.rendering.listener.SectionLevel)
+     */
     public void beginSection(SectionLevel level)
     {
         String prefix;
@@ -208,26 +244,46 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         print(prefix + " ");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#endSection(org.xwiki.rendering.listener.SectionLevel)
+     */
     public void endSection(SectionLevel level)
     {
         // Nothing to do
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#onWord(String)
+     */
     public void onWord(String word)
     {
         print(word);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#onSpace()
+     */
     public void onSpace()
     {
         print(" ");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#onSpecialSymbol(String)
+     */
     public void onSpecialSymbol(String symbol)
     {
         print(symbol);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#onEscape(String)
+     */
     public void onEscape(String escapedString)
     {
         // Note: If an EscapeBlock was found inside a Macro Marker block then the code below will not
@@ -242,6 +298,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#beginList(org.xwiki.rendering.listener.ListType)
+     */
     public void beginList(ListType listType)
     {
         if (this.needsLineBreakForList) {
@@ -256,6 +316,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#beginListItem()
+     */
     public void beginListItem()
     {
         this.needsLineBreakForList = true;
@@ -267,6 +331,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         print(" ");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#endList(org.xwiki.rendering.listener.ListType)
+     */
     public void endList(ListType listType)
     {
         if (this.needsLineBreakForList) {
@@ -277,6 +345,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         this.listStyle.setLength(this.listStyle.length() - 1);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.PrintRenderer#endListItem()
+     */
     public void endListItem()
     {
         if (this.needsLineBreakForList) {
@@ -285,18 +357,30 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#beginXMLElement(String, java.util.Map)
+     */
     public void beginXMLElement(String name, Map<String, String> attributes)
     {
         // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
         // any XML element events.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#endXMLElement(String, java.util.Map)
+     */
     public void endXMLElement(String name, Map<String, String> attributes)
     {
         // There's no xwiki wiki syntax for writing HTML (we have to use Macros for that). Hence discard
         // any XML element events.
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#beginMacroMarker(String, java.util.Map, String)
+     */
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
     {
         // When we encounter a macro marker we ignore all other blocks inside since we're going to use the macro
@@ -304,12 +388,20 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         this.isInsideMacroMarker = true;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#endMacroMarker(String, java.util.Map, String)
+     */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
         this.isInsideMacroMarker = false;
         onMacro(name, parameters, content);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#onId(String)
+     */
     public void onId(String name)
     {
         print("{{id name=\"" + name + "\"}}");

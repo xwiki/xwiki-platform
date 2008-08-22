@@ -5,7 +5,7 @@
 	<servlet>		
 		<servlet-name>XWikiDispatcherServlet</servlet-name>
 		<servlet-class>
-			com.xpn.xwiki.plugin.webdav.XWikiDispatcherServlet
+			com.xpn.xwiki.XWikiRootServlet
 		</servlet-class>
 	</servlet>
 	<servlet-mapping>

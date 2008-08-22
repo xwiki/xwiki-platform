@@ -1,4 +1,4 @@
-package com.xpn.xwiki.plugin.webdav;
+package com.xpn.xwiki;
 
 import java.io.IOException;
 

@@ -79,6 +79,7 @@ public class RenderingTests extends TestCase
 
         RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers", factories);
 
+        // Text formatting
         suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("bold/bold2", false);
         suite.addTestsFromResource("bold/bold3", false);
@@ -104,22 +105,26 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("monospace/monospace1", false);
         suite.addTestsFromResource("paragraph", false);
 
-        suite.addTestsFromResource("escape", false);
-        suite.addTestsFromResource("horizontalline", false);
-        suite.addTestsFromResource("html", false);
-        suite.addTestsFromResource("links", false);
-        suite.addTestsFromResource("list", false);
+        // Macros
         suite.addTestsFromResource("macros/macro", false);
         suite.addTestsFromResource("macros/macrohtml", true);
         suite.addTestsFromResource("macros/macronowiki", true);
-        suite.addTestsFromResource("macros/macrovelocity", true);
+        suite.addTestsFromResource("macros/velocity/macrovelocity1", true);
+        suite.addTestsFromResource("macros/velocity/macrovelocity2", true);
         suite.addTestsFromResource("macros/macroxhtml", true);
-        suite.addTestsFromResource("section", false);
         suite.addTestsFromResource("macros/macroid", true);
         suite.addTestsFromResource("macros/toc/macrotoc1", true);
         suite.addTestsFromResource("macros/toc/macrotoc2", true);
         suite.addTestsFromResource("macros/toc/macrotoc3", true);
 
+        // Other
+        suite.addTestsFromResource("escape", false);
+        suite.addTestsFromResource("horizontalline", false);
+        suite.addTestsFromResource("html", false);
+        suite.addTestsFromResource("links", false);
+        suite.addTestsFromResource("list", false);
+        suite.addTestsFromResource("section", false);
+        
         return suite;
     }
 }

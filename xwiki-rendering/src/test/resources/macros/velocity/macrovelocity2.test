@@ -1,0 +1,34 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+{{velocity}}
+#set ($list = ['one', 'two'])
+#foreach ($item in $list)
+* $item
+#end
+{{/velocity}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginMacroMarker: [velocity] [] [
+#set ($list = ['one', 'two'])
+#foreach ($item in $list)
+* $item
+#end
+]
+beginList: [BULLETED]
+beginListItem
+onWord: [one]
+endListItem
+beginListItem
+onWord: [two]
+endListItem
+endList: [BULLETED]
+endMacroMarker: [velocity] [] [
+#set ($list = ['one', 'two'])
+#foreach ($item in $list)
+* $item
+#end
+]
+endDocument

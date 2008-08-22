@@ -22,8 +22,8 @@ package org.xwiki.rendering.macro.descriptor;
 import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 
 /**
- * 
- * @param <P>
+ * Describe a Macro (macro description and macro parameters description).
+ *
  * @version $Id$
  * @since 1.6M1
  */

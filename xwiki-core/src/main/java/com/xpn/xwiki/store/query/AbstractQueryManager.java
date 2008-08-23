@@ -58,7 +58,7 @@ public abstract class AbstractQueryManager implements QueryManager
     public Query createQuery(String statement, String language) throws QueryException
     {
         if (hasLanguage(language)) {
-            return new QueryImpl(statement, language, getExecutor(language));
+            return new DefaultQuery(statement, language, getExecutor(language));
         } else {
             throw new QueryException("Language [" + language + "] is not supported", null, null);
         }
@@ -69,7 +69,7 @@ public abstract class AbstractQueryManager implements QueryManager
      */
     public Query getNamedQuery(String queryName) throws QueryException
     {
-        return new QueryImpl(queryName, getExecutor(null));
+        return new DefaultQuery(queryName, getExecutor(null));
     }
 
     /**

@@ -24,11 +24,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * QueryImpl stores all information needed for execute a query.
+ * Stores all information needed for execute a query.
  * @version $Id$
  * @since 1.6M1
  */
-public class QueryImpl implements Query
+public class DefaultQuery implements Query
 {
     /** 
      * field for {@link Query#getStatement()}.
@@ -76,7 +76,7 @@ public class QueryImpl implements Query
      * @param language query language
      * @param executor QueryExecutor component for execute the query.
      */
-    public QueryImpl(String statement, String language, QueryExecutor executor)
+    public DefaultQuery(String statement, String language, QueryExecutor executor)
     {
         this.statement = statement;
         this.language = language;
@@ -89,7 +89,7 @@ public class QueryImpl implements Query
      * @param queryName name of the query.
      * @param executor QueryExecutor component for execute the query.
      */
-    public QueryImpl(String queryName, QueryExecutor executor)
+    public DefaultQuery(String queryName, QueryExecutor executor)
     {
         this.statement = queryName;
         this.executer = executor;

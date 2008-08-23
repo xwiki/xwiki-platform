@@ -57,9 +57,7 @@ public class IntegerMacroParameter extends AbstractNumberMacroParameter<Integer>
 
             if (parameterClass.getMinValue() != null && value < parameterClass.getMinValue().intValue()) {
                 setErrorTooLow();
-                if (parameterClass.isNormalized()) {
-                    value = parameterClass.getMinValue();
-                }
+                value = parameterClass.isNormalized() ? parameterClass.getMinValue().intValue() : def;
             } else if (parameterClass.getMaxValue() != null && value > parameterClass.getMaxValue().intValue()) {
                 setErrorTooHigh();
                 value = parameterClass.isNormalized() ? parameterClass.getMaxValue().intValue() : def;

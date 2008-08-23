@@ -73,6 +73,16 @@ public class IntegerMacroParameterTest extends AbstractNumberMacroParameterTest<
             assertErrorMessageInvalid("a", expected);
         }
     }
+    
+    public void testGetValueWhenValueTooLow() throws MacroParameterException
+    {
+        this.desc.setValueHasToBeValid(false);
+        this.desc.setMinValue(2);
+
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "1");
+
+        assertEquals(Integer.valueOf(2), param.getValue());
+    }
 
     public void testGetValueWhenValueTooLowButHasToBeValid()
     {
@@ -90,6 +100,16 @@ public class IntegerMacroParameterTest extends AbstractNumberMacroParameterTest<
         }
     }
 
+    public void testGetValueWhenValueTooHigh() throws MacroParameterException
+    {
+        this.desc.setValueHasToBeValid(false);
+        this.desc.setMaxValue(6);
+
+        IntegerMacroParameter param = new IntegerMacroParameter(this.desc, "7");
+
+        assertEquals(Integer.valueOf(6), param.getValue());
+    }
+    
     public void testGetValueWhenValueTooHighButHasToBeValid()
     {
         this.desc.setValueHasToBeValid(true);

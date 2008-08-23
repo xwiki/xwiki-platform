@@ -252,7 +252,7 @@ public class SyndEntryDocumentSourceTest extends AbstractBridgedXWikiComponentTe
     }
 
     /**
-     * Tests if {@link SyndEntryDocumentSource.CONTENT_TYPE} parameter is used correctly.
+     * Tests if {@link SyndEntryDocumentSource#CONTENT_TYPE} parameter is used correctly.
      */
     public void testSourceContentType()
     {

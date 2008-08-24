@@ -24,22 +24,46 @@ import org.xwiki.rendering.listener.Listener;
 import java.util.Map;
 
 /**
+ * Represents a Macro defined in a page.
+ *
  * @version $Id$
  * @since 1.5M2
  */
 public class MacroBlock extends AbstractBlock
 {
+    /**
+     * The macro name.
+     */
     private String name;
 
+    /**
+     * The macro parameters.
+     */
     private Map<String, String> parameters;
 
+    /**
+     * The macro content for macro that have content. Otherwise it's null.
+     */
     private String content;
 
+    /**
+     * Construct a Macro block for a Macro that has no content.
+     *
+     * @param name the macro name
+     * @param parameters the macro parameters
+     */
     public MacroBlock(String name, Map<String, String> parameters)
     {
         this(name, parameters, null);
     }
     
+    /**
+     * Construct a Macro block for a Macro that has content.
+     *
+     * @param name the macro name
+     * @param parameters the macro parameters
+     * @param content the macro content 
+     */
     public MacroBlock(String name, Map<String, String> parameters, String content)
     {
         this.name = name;
@@ -47,6 +71,34 @@ public class MacroBlock extends AbstractBlock
         this.content = content;
     }
 
+    /**
+     * @return the macro name
+     */
+    public String getName()
+    {
+        return this.name;
+    }
+
+    /**
+     * @return the macro parameters
+     */
+    public Map<String, String> getParameters()
+    {
+        return this.parameters;
+    }
+
+    /**
+     * @return the macro content
+     */
+    public String getContent()
+    {
+        return this.content;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         // Don't do anything here since we want the Macro Transformer component to take in charge
@@ -63,20 +115,5 @@ public class MacroBlock extends AbstractBlock
         // In practice as described above this method will never get called when the whole rendering
         // process is executed. This does get called during our unit tests though.
         listener.onMacro(getName(), getParameters(), getContent());
-    }
-
-    public String getName()
-    {
-        return this.name;
-    }
-
-    public Map<String, String> getParameters()
-    {
-        return this.parameters;
-    }
-
-    public String getContent()
-    {
-        return this.content;
     }
 }

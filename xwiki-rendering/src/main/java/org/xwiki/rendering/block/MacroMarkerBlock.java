@@ -25,8 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * A special block that Macro Blocks emits when they are executed so that it's possible to reconstruct
- * the initial syntax even after Macros have been executed.
+ * A special block that Macro Blocks generate when they are executed so that it's possible to reconstruct
+ * the initial syntax even after Macros have been executed. For example this is important in a WYSWIYG editor
+ * where you want to show the Macro's rendered result and also let users modify the macro content.
  *
  * @version $Id$
  * @since 1.5M2
@@ -75,12 +76,20 @@ public class MacroMarkerBlock extends AbstractFatherBlock
     {
         return this.content;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginMacroMarker(getName(), getParameters(), getContent());
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)  
+     */
     public void after(Listener listener)
     {
         listener.endMacroMarker(getName(), getParameters(), getContent());

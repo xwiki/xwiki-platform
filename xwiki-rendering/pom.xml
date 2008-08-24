@@ -154,6 +154,8 @@
             **/block/LinkBlock.java
             **/block/ListItemBlock.java
             **/block/NewLineBlock.java
+            **/block/MacroBlock.java
+            **/block/XDOM.java
           </includes>
         </configuration>
       </plugin>

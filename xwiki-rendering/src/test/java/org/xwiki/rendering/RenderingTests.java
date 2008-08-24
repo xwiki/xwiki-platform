@@ -22,7 +22,7 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.rendering.scaffolding.TestEventsRenderer;
+import org.xwiki.rendering.scaffolding.EventsRenderer;
 import org.xwiki.rendering.scaffolding.PrintRendererFactory;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.PrintRenderer;
@@ -56,7 +56,7 @@ public class RenderingTests extends TestCase
         factories.put("event", new PrintRendererFactory() {
             public PrintRenderer createRenderer()
             {
-                return new TestEventsRenderer(new DefaultWikiPrinter());
+                return new EventsRenderer(new DefaultWikiPrinter());
             }
         });
         factories.put("xhtml", new PrintRendererFactory() {

@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
-import org.xwiki.rendering.scaffolding.TestEventsRenderer;
+import org.xwiki.rendering.scaffolding.EventsRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
@@ -69,7 +69,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new TestEventsRenderer(printer));
+        dom.traverse(new EventsRenderer(printer));
         assertEquals(expected, printer.toString());
     }
 
@@ -92,7 +92,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new TestEventsRenderer(printer));
+        dom.traverse(new EventsRenderer(printer));
         assertEquals(expected, printer.toString());
     }
     
@@ -113,7 +113,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new TestEventsRenderer(printer));
+        dom.traverse(new EventsRenderer(printer));
         assertEquals(expected, printer.toString());
     }
     
@@ -142,7 +142,7 @@ public class MacroTransformationTest extends AbstractRenderingTestCase
         this.transformation.transform(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new TestEventsRenderer(printer));
+        dom.traverse(new EventsRenderer(printer));
         assertEquals(expected, printer.toString());
     }
     

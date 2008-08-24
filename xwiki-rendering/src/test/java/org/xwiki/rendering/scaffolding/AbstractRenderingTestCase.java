@@ -42,11 +42,11 @@ public abstract class AbstractRenderingTestCase extends AbstractXWikiComponentTe
 
     protected void assertBlocks(String expected, List<Block> blocks)
     {
-        // Assert the result by parsing it through the TestEventsRenderer to generate easily
+        // Assert the result by parsing it through the EventsRenderer to generate easily
         // assertable events.
         XDOM dom = new XDOM(blocks);
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new TestEventsRenderer(printer));
+        dom.traverse(new EventsRenderer(printer));
         assertEquals(expected, printer.toString());
     }
 }

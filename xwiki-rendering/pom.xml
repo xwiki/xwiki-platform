@@ -141,6 +141,11 @@
         <configuration>
           <includes>
             **/Listener.java
+            **/block/Block.java
+            **/block/FatherBlock.java
+            **/block/AbstractBlock.java
+            **/block/AbstractFatherBlock.java
+            **/block/*ListBlock.java
           </includes>
         </configuration>
       </plugin>

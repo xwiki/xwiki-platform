@@ -26,6 +26,8 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
+ * Implementation for Block operations. All blocks should extend this class.
+ * 
  * @version $Id$
  * @since 1.5M2
  */

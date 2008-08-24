@@ -25,26 +25,44 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.Listener;
 
 /**
+ * Represents a Bulleted list.
+ *
  * @version $Id$
  * @since 1.5M2
  */
-public class BulletedListBlock extends AbstractListBlock
+public class BulletedListBlock extends AbstractFatherBlock implements ListBLock
 {
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     */
     public BulletedListBlock(List<Block> childrenBlocks)
     {
         super(childrenBlocks);
     }
 
-    public BulletedListBlock(Block childrenBlock)
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(Block)
+     */
+    public BulletedListBlock(Block childBlock)
     {
-        super(childrenBlock);
+        super(childBlock);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginList(ListType.BULLETED);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)   
+     */
     public void after(Listener listener)
     {
         listener.endList(ListType.BULLETED);

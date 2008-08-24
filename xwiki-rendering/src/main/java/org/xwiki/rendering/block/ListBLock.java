@@ -20,10 +20,12 @@
 package org.xwiki.rendering.block;
 
 /**
+ * Represents any type of Lists (numbered list, bulleted list, etc).
+ *
  * @version $Id$
  * @since 1.5M2
  */
 public interface ListBLock extends Block
 {
-
+    // This is currently only a tagging interface and thus it has no methods.
 }

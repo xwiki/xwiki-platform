@@ -22,28 +22,42 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 /**
+ * A reference/location in a page. In HTML for example this is called an Anchor. It allows pointing
+ * to that location, for example in links.
+ *
  * @version $Id$
  * @since 1.6M1
+ * @see Listener#onId(String) 
  */
 public class IdBlock extends AbstractBlock
 {
     /**
-     * The unique name.
+     * The unique name for the reference/location.
      */
     private String name;
 
+    /**
+     * @param name the unique name for the reference/location.
+     */
     public IdBlock(String name)
     {
         this.name = name;
     }
 
-    public void traverse(Listener listener)
-    {
-        listener.onId(getName());
-    }
-    
+    /**
+     * @return the reference/location name
+     */
     public String getName()
     {
         return this.name;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
+    public void traverse(Listener listener)
+    {
+        listener.onId(getName());
     }
 }

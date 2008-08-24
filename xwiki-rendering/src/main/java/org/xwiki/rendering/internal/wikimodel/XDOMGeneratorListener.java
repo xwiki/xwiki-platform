@@ -334,7 +334,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onLineBreak()
     {
-        this.stack.push(new LineBreakBlock());
+        this.stack.push(LineBreakBlock.LINE_BREAK_BLOCK);
     }
 
     public void onMacroBlock(String macroName, WikiParameters params, String content)

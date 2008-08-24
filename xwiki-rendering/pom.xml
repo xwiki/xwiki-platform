@@ -148,6 +148,9 @@
             **/block/*ListBlock.java
             **/block/FormatBlock.java
             **/block/EscapeBlock.java
+            **/block/HorizontalLineBlock.java
+            **/block/IdBlock.java
+            **/block/LineBreakBlock.java
           </includes>
         </configuration>
       </plugin>

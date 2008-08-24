@@ -31,6 +31,24 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class LineBreakBlock extends AbstractBlock
 {
+    /**
+     * The single instance for a horizontal block. There's no need for more than one instance since there's
+     * no state in the horizontal block.
+     */
+    public static final LineBreakBlock LINE_BREAK_BLOCK = new LineBreakBlock();
+
+    /**
+     * Private constructor to prevent instantiation. Instead use {@link #LINE_BREAK_BLOCK}.
+     */
+    private LineBreakBlock()
+    {
+        // Voluntarily empty
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onLineBreak();

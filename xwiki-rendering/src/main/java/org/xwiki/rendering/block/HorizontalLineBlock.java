@@ -29,12 +29,24 @@ import org.xwiki.rendering.listener.Listener;
  */
 public class HorizontalLineBlock extends AbstractBlock
 {
+    /**
+     * The single instance for a horizontal block. There's no need for more than one instance since there's
+     * no state in the horizontal block.
+     */
     public static final HorizontalLineBlock HORIZONTAL_LINE_BLOCK = new HorizontalLineBlock();
 
+    /**
+     * Private constructor to prevent instantiation. Instead use {@link #HORIZONTAL_LINE_BLOCK}.
+     */
     private HorizontalLineBlock()
     {
+        // Voluntarily empty
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onHorizontalLine();

@@ -357,7 +357,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onNewLine()
     {
-        this.stack.push(new NewLineBlock());
+        this.stack.push(NewLineBlock.NEW_LINE_BLOCK);
     }
 
     /**

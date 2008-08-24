@@ -23,23 +23,39 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.Link;
 
 /**
+ * Represents a Link element in a page.
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public class LinkBlock extends AbstractBlock
 {
+    /**
+     * A link. See {@link Link} for more details.
+     */
     private Link link;
 
-    public LinkBlock(Link link) throws IllegalArgumentException
+    /**
+     * @param link the link
+     */
+    public LinkBlock(Link link)
     {
         this.link = link;
     }
 
+    /**
+     * @return the link
+     * @see Link
+     */
     public Link getLink()
     {
         return this.link;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onLink(getLink());

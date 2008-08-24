@@ -24,26 +24,44 @@ import java.util.List;
 import org.xwiki.rendering.listener.Listener;
 
 /**
+ * Represents a List item element in a page.
+ *
  * @version $Id$
  * @since 1.5M2
  */
 public class ListItemBlock extends AbstractFatherBlock
 {
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(java.util.List)
+     */
     public ListItemBlock(List<Block> childrenBlocks)
     {
         super(childrenBlocks);
     }
 
-    public ListItemBlock(Block childrenBlock)
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#AbstractFatherBlock(Block)
+     */
+    public ListItemBlock(Block childBlock)
     {
-        super(childrenBlock);
+        super(childBlock);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginListItem();
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)   
+     */
     public void after(Listener listener)
     {
         listener.endListItem();

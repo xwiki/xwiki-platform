@@ -151,6 +151,9 @@
             **/block/HorizontalLineBlock.java
             **/block/IdBlock.java
             **/block/LineBreakBlock.java
+            **/block/LinkBlock.java
+            **/block/ListItemBlock.java
+            **/block/NewLineBlock.java
           </includes>
         </configuration>
       </plugin>

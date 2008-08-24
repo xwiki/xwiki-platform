@@ -32,8 +32,8 @@ import org.xwiki.rendering.listener.Listener;
 public class LineBreakBlock extends AbstractBlock
 {
     /**
-     * The single instance for a horizontal block. There's no need for more than one instance since there's
-     * no state in the horizontal block.
+     * The single instance for a line break block. There's no need for more than one instance since there's
+     * no state in the line break block.
      */
     public static final LineBreakBlock LINE_BREAK_BLOCK = new LineBreakBlock();
 

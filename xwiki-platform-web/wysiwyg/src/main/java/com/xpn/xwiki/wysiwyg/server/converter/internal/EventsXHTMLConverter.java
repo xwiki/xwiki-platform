@@ -26,7 +26,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.WikiPrinter;
-import org.xwiki.rendering.scaffolding.TestEventsRenderer;
+import org.xwiki.rendering.scaffolding.EventsRenderer;
 
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter;
@@ -45,7 +45,7 @@ public class EventsXHTMLConverter implements XHTMLConverter
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
             XDOM dom = parser.parse(new StringReader(xhtml));
             WikiPrinter printer = new DefaultWikiPrinter();
-            TestEventsRenderer eventsRenderer = new TestEventsRenderer(printer);
+            EventsRenderer eventsRenderer = new EventsRenderer(printer);
             dom.traverse(eventsRenderer);
             return printer.toString();
         } catch (ParseException e) {

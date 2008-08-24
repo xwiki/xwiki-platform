@@ -22,23 +22,39 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 /**
+ * Represents some string escape, i.e. for which there's no wiki syntax interpretation.
+ * 
  * @version $Id:$
  * @since 1.5RC1
+ * @see Listener#onEscape(String)
  */
 public class EscapeBlock extends AbstractBlock
 {
+    /**
+     * The string to escape.
+     */
     private String escapedString;
 
+    /**
+     * @param escapedString the string to escape
+     */
     public EscapeBlock(String escapedString)
     {
         this.escapedString = escapedString;
     }
 
+    /**
+     * @return the string to escape
+     */
     public String getEscapedString()
     {
         return this.escapedString;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     */
     public void traverse(Listener listener)
     {
         listener.onEscape(getEscapedString());

@@ -32,24 +32,42 @@ import java.util.List;
  */
 public class FormatBlock extends AbstractFatherBlock
 {
+    /**
+     * The formatting to apply to the children blocks.
+     */
     private Format format;
 
+    /**
+     * @param childBlocks the nested children blocks
+     * @param format the formatting to apply to the children blocks
+     */
     public FormatBlock(List<Block> childBlocks, Format format)
     {
         super(childBlocks);
         this.format = format;
     }
 
+    /**
+     * @return the formatting to apply to the children blocks
+     */
     public Format getFormat()
     {
         return this.format;
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#before(org.xwiki.rendering.listener.Listener)
+     */
     public void before(Listener listener)
     {
         listener.beginFormat(getFormat());
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractFatherBlock#after(org.xwiki.rendering.listener.Listener)  
+     */
     public void after(Listener listener)
     {
         listener.endFormat(getFormat());

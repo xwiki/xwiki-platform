@@ -146,6 +146,8 @@
             **/block/AbstractBlock.java
             **/block/AbstractFatherBlock.java
             **/block/*ListBlock.java
+            **/block/FormatBlock.java
+            **/block/EscapeBlock.java
           </includes>
         </configuration>
       </plugin>

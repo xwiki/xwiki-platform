@@ -63,6 +63,7 @@
         <module>lucene</module>
         <module>activitystream</module>
         <module>invitationmanager</module>
+        <module>wysiwyg</module>
       </modules>
     </profile>
     <profile>

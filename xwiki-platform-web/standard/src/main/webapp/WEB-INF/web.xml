@@ -140,15 +140,15 @@
   <!-- This is the entry pointy for the new WYSIWYG's GWT services -->
   <servlet>
     <servlet-name>WysiwygService</servlet-name>
-    <servlet-class>com.xpn.xwiki.wysiwyg.server.WysiwygServiceImpl</servlet-class>
+    <servlet-class>com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService</servlet-class>
   </servlet>
 
   <!-- This is needed for debuging the new WYSIWYG in hosted mode -->
   <servlet>
     <servlet-name>
-      com.xpn.xwiki.wysiwyg.server.WysiwygServiceImpl/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService
+      com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService
     </servlet-name>
-    <servlet-class>com.xpn.xwiki.wysiwyg.server.WysiwygServiceImpl</servlet-class>
+    <servlet-class>com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService</servlet-class>
   </servlet>
 
   <!-- Unused mapping for now. In the future the correct mapping will be /* when the action servlet
@@ -195,7 +195,7 @@
 
   <servlet-mapping>
     <servlet-name>
-      com.xpn.xwiki.wysiwyg.server.WysiwygServiceImpl/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService
+      com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService
     </servlet-name>
     <url-pattern>/com.xpn.xwiki.wysiwyg.Wysiwyg/WysiwygService</url-pattern>
   </servlet-mapping>

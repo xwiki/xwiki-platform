@@ -31,7 +31,7 @@ public class XWikiSyntaxValidator extends DefaultSyntaxValidator
         super("xwiki/2.0");
 
         // add XWiki specific validation rules
-        addValidationRule(new DisablingRule(new String[] {"subscript", "superscript", "justifyfull"}));
+        // addValidationRule(new DisablingRule(new String[] {"subscript", "superscript", "justifyfull"}));
         addValidationRule(new DisableListInHeader());
     }
 }

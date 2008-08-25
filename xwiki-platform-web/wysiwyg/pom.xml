@@ -212,6 +212,21 @@
         </executions>
       </plugin>
       <plugin>
+        <!-- We make the sources available -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <classifier>classes</classifier>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <!-- GWT's hosted browser needs client sources. We include all the 
           sources for now because we cannot filter server sources. -->
         <groupId>org.apache.maven.plugins</groupId>

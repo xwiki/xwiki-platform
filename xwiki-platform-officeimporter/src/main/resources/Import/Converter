@@ -82,16 +82,12 @@
 #if(!$space || !$pagename || !$filename)
 	#error("Please [back&gt;Import.WebHome] to correct input.")
 #else
-        #set($toXWikiSyntax=false)
-        #if($request.format == "xwiki")
-               #set($toXWikiSyntax=true)
-        #end
 	#set($sourceFileBytes=$fileUpload.getFileItemData("filepath"))
 	* Sourec file name: $filename
 	* target space: $space
 	* target page name: $pagename
 	#set($officeconverter=$xwiki.officeconverter)
-	$officeconverter.convert($sourceFileBytes, $filename, $space, $pagename, $toXWikiSyntax)
+	$officeconverter.convert($sourceFileBytes, $filename, $space, $pagename)
 	Conversion succeed. You can go to see the *[result&gt;$space.$pagename]*, or you can [go back&gt;Import.WebHome] to convert another document.
 #end</content>
 </xwikidoc>

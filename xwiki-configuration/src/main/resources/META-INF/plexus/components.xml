@@ -1,0 +1,21 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.xwiki.configuration.ConfigurationManager</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.configuration.internal.DefaultConfigurationManager</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.configuration.ConfigurationSourceCollection</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.configuration.internal.DefaultConfigurationSourceCollection</implementation>
+      <instantiation-strategy>singleton</instantiation-strategy>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.container.Container</role>
+        </requirement>
+      </requirements>
+    </component>
+  </components>
+</component-set>

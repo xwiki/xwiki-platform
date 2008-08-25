@@ -146,7 +146,7 @@
       <classifier>tests</classifier>
       <!-- We suppose it will be available while debugging. 
         This way we avoid including lots of transitive dependencies -->
-      <!--scope>provided</scope-->
+      <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

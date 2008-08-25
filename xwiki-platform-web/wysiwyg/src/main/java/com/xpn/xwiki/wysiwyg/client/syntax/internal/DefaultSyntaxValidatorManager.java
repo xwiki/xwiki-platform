@@ -28,7 +28,7 @@ import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 /**
  * The default implementation for the {@link SyntaxValidatorManager}. We don't plan to provide another implementation.
  */
-public class SyntaxValidatorManagerImpl implements SyntaxValidatorManager
+public class DefaultSyntaxValidatorManager implements SyntaxValidatorManager
 {
     private final Map<String, SyntaxValidator> validators = new HashMap<String, SyntaxValidator>();
 

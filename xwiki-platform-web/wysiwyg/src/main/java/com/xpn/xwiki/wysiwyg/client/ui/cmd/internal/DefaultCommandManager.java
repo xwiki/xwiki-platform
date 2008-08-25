@@ -22,11 +22,11 @@ package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.ui.FocusWidget;
 
-public class CommandManagerImpl extends AbstractCommandManager
+public class DefaultCommandManager extends AbstractCommandManager
 {
     public final Element target;
 
-    public CommandManagerImpl(FocusWidget widget)
+    public DefaultCommandManager(FocusWidget widget)
     {
         super(widget);
         target = widget.getElement();
@@ -39,7 +39,7 @@ public class CommandManagerImpl extends AbstractCommandManager
      */
     protected native boolean execCommandAssumingFocus(String cmd, String param) /*-{
         try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.CommandManagerImpl::target.contentWindow.document.execCommand(cmd, false, param);
+            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.execCommand(cmd, false, param);
         } catch(e) {
             return false;
         }
@@ -52,7 +52,7 @@ public class CommandManagerImpl extends AbstractCommandManager
      */
     protected native boolean queryCommandEnabledAssumingFocus(String cmd) /*-{
         try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.CommandManagerImpl::target.contentWindow.document.queryCommandEnabled(cmd);
+            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandEnabled(cmd);
         } catch(e) {
             return false;
         }
@@ -65,7 +65,7 @@ public class CommandManagerImpl extends AbstractCommandManager
      */
     protected native boolean queryCommandIndetermAssumingFocus(String cmd) /*-{
         try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.CommandManagerImpl::target.contentWindow.document.queryCommandIndeterm(cmd);
+            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandIndeterm(cmd);
         } catch(e) {
             return true;
         }
@@ -78,7 +78,7 @@ public class CommandManagerImpl extends AbstractCommandManager
      */
     protected native boolean queryCommandStateAssumingFocus(String cmd) /*-{
         try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.CommandManagerImpl::target.contentWindow.document.queryCommandState(cmd);
+            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandState(cmd);
         } catch(e) {
             return false;
         }
@@ -91,7 +91,7 @@ public class CommandManagerImpl extends AbstractCommandManager
      */
     protected native boolean queryCommandSupportedAssumingFocus(String cmd) /*-{
         try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.CommandManagerImpl::target.contentWindow.document.queryCommandSupported(cmd);
+            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandSupported(cmd);
         } catch(e) {
             return true;
         }
@@ -104,7 +104,7 @@ public class CommandManagerImpl extends AbstractCommandManager
      */
     protected native String queryCommandValueAssumingFocus(String cmd) /*-{
         try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.CommandManagerImpl::target.contentWindow.document.queryCommandValue(cmd);
+            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandValue(cmd);
         } catch(e) {
             return null;
         }

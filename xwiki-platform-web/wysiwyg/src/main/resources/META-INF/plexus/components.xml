@@ -1,51 +1,26 @@
 <component-set>
   <components>
     <component>
-      <role>com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter</role>
-      <role-hint>xhtml</role-hint>
+      <role>com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter</role>
+      <role-hint>html</role-hint>
       <implementation>
-        com.xpn.xwiki.wysiwyg.server.converter.internal.FakeXHTMLConverter
+        com.xpn.xwiki.wysiwyg.server.converter.internal.FakeHTMLConverter
       </implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
-      <role>com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter</role>
-      <role-hint>xwiki/1.0</role-hint>
-      <implementation>
-        com.xpn.xwiki.wysiwyg.server.converter.internal.RadeoxXWikiXHTMLConverter
-      </implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter</role>
+      <role>com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter</role>
       <role-hint>xwiki/2.0</role-hint>
       <implementation>
-        com.xpn.xwiki.wysiwyg.server.converter.internal.XWikiXHTMLConverter
+        com.xpn.xwiki.wysiwyg.server.converter.internal.XWikiHTMLConverter
       </implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
-      <role>com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter</role>
+      <role>com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter</role>
       <role-hint>events</role-hint>
       <implementation>
-        com.xpn.xwiki.wysiwyg.server.converter.internal.EventsXHTMLConverter
-      </implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-
-    <component>
-      <role>com.xpn.xwiki.wysiwyg.server.cleaner.XHTMLCleaner</role>
-      <role-hint>jtidy</role-hint>
-      <implementation>
-        com.xpn.xwiki.wysiwyg.server.cleaner.internal.JTidyXHTMLCleaner
-      </implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>com.xpn.xwiki.wysiwyg.server.cleaner.XHTMLCleaner</role>
-      <role-hint>vnikic</role-hint>
-      <implementation>
-        com.xpn.xwiki.wysiwyg.server.cleaner.internal.VnikicXHTMLCleaner
+        com.xpn.xwiki.wysiwyg.server.converter.internal.EventsHTMLConverter
       </implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>

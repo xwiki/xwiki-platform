@@ -17,33 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.server.converter.internal;
+package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter;
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverterException;
+import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
+import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManagerTest;
 
 /**
- * Fake XHTML converter that doesn't change the input string at all.
+ * Unit test for {@link DefaultSyntaxValidatorManager}.
  */
-public class FakeXHTMLConverter implements XHTMLConverter
+public class DefaultSyntaxValidatorManagerTest extends SyntaxValidatorManagerTest
 {
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XHTMLConverter#fromXHTML(String)
-     */
-    public String fromXHTML(String xhtml) throws XHTMLConverterException
+    protected SyntaxValidatorManager newSyntaxValidatorManager()
     {
-        return xhtml;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see XHTMLConverter#toXHTML(String)
-     */
-    public String toXHTML(String source) throws XHTMLConverterException
-    {
-        return source;
+        return new DefaultSyntaxValidatorManager();
     }
 }

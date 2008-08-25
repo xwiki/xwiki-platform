@@ -18,7 +18,7 @@
   <!-- This is the entry pointy for the new WYSIWYG's GWT services -->
   <servlet>
     <servlet-name>WysiwygService</servlet-name>
-    <servlet-class>com.xpn.xwiki.wysiwyg.server.WysiwygServiceImpl</servlet-class>
+    <servlet-class>com.xpn.xwiki.wysiwyg.server.DefaultWysiwygService</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>WysiwygService</servlet-name>

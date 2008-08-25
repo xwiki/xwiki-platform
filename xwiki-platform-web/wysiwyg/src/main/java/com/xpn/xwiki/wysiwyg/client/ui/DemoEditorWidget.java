@@ -184,7 +184,7 @@ public class DemoEditorWidget extends Composite
         convertedTextArea.setText(editor1.getTextArea().getHTML());
         convertedTextArea2.setText(editor1.getTextArea().getHTML());
 
-        WysiwygService.Singleton.getInstance().fromXHTML(editor1.getTextArea().getHTML(), "xwiki/2.0",
+        WysiwygService.Singleton.getInstance().fromHTML(editor1.getTextArea().getHTML(), "xwiki/2.0",
             new XWikiAsyncCallback(wysiwyg)
             {
                 public void onSuccess(Object result)

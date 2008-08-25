@@ -34,9 +34,9 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
 
     private TextArea wikiTextArea;
 
-    private TextArea dirtyXHTMLTextArea;
+    private TextArea dirtyHTMLTextArea;
 
-    private TextArea cleanXHTMLTextArea;
+    private TextArea cleanHTMLTextArea;
 
     private TextArea eventsTextArea;
 
@@ -50,15 +50,15 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
         panel.setWidth("100%");
         panel.add(editor.getUI());
 
-        dirtyXHTMLTextArea = new TextArea();
-        dirtyXHTMLTextArea.setWidth("400px");
-        dirtyXHTMLTextArea.setHeight("220px");
-        panel.add(dirtyXHTMLTextArea);
+        dirtyHTMLTextArea = new TextArea();
+        dirtyHTMLTextArea.setWidth("400px");
+        dirtyHTMLTextArea.setHeight("220px");
+        panel.add(dirtyHTMLTextArea);
 
-        cleanXHTMLTextArea = new TextArea();
-        cleanXHTMLTextArea.setWidth("400px");
-        cleanXHTMLTextArea.setHeight("220px");
-        panel.add(cleanXHTMLTextArea);
+        cleanHTMLTextArea = new TextArea();
+        cleanHTMLTextArea.setWidth("400px");
+        cleanHTMLTextArea.setHeight("220px");
+        panel.add(cleanHTMLTextArea);
 
         wikiTextArea = new TextArea();
         wikiTextArea.setWidth("400px");
@@ -71,7 +71,7 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
         panel.add(eventsTextArea);
 
         // get the transformed HTML Content
-        dirtyXHTMLTextArea.setText(editor.getUI().getTextArea().getHTML());
+        dirtyHTMLTextArea.setText(editor.getUI().getTextArea().getHTML());
 
         initWidget(panel);
 
@@ -82,23 +82,23 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
 
     public void refreshData()
     {
-        dirtyXHTMLTextArea.setText(editor.getUI().getTextArea().getHTML());
+        dirtyHTMLTextArea.setText(editor.getUI().getTextArea().getHTML());
 
-        WysiwygService.Singleton.getInstance().cleanXHTML(editor.getUI().getTextArea().getHTML(),
+        WysiwygService.Singleton.getInstance().cleanHTML(editor.getUI().getTextArea().getHTML(),
             new AsyncCallback<String>()
             {
                 public void onFailure(Throwable caught)
                 {
-                    cleanXHTMLTextArea.setText(caught.toString());
+                    cleanHTMLTextArea.setText(caught.toString());
                 }
 
                 public void onSuccess(String result)
                 {
-                    cleanXHTMLTextArea.setText(result);
+                    cleanHTMLTextArea.setText(result);
                 }
             });
 
-        WysiwygService.Singleton.getInstance().fromXHTML(editor.getUI().getTextArea().getHTML(), editor.getSyntax(),
+        WysiwygService.Singleton.getInstance().fromHTML(editor.getUI().getTextArea().getHTML(), editor.getSyntax(),
             new AsyncCallback<String>()
             {
                 public void onFailure(Throwable caught)
@@ -112,7 +112,7 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
                 }
             });
 
-        WysiwygService.Singleton.getInstance().fromXHTML(editor.getUI().getTextArea().getHTML(), "events",
+        WysiwygService.Singleton.getInstance().fromHTML(editor.getUI().getTextArea().getHTML(), "events",
             new AsyncCallback<String>()
             {
                 public void onFailure(Throwable caught)

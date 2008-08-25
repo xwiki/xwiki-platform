@@ -26,11 +26,11 @@ import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 
 public interface WysiwygServiceAsync extends XWikiServiceAsync
 {
-    void fromXHTML(String xhtml, String syntax, AsyncCallback<String> async);
+    void fromHTML(String html, String syntax, AsyncCallback<String> async);
 
-    void toXHTML(String source, String syntax, AsyncCallback<String> async);
+    void toHTML(String source, String syntax, AsyncCallback<String> async);
 
-    void cleanXHTML(String dirtyXHTML, AsyncCallback<String> async);
+    void cleanHTML(String dirtyHTML, AsyncCallback<String> async);
 
     void syncEditorContent(Revision syncedRevision, String pageName, int version, AsyncCallback<SyncResult> async);
 }

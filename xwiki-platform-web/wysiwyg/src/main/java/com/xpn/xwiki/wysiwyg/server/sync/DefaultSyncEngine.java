@@ -29,7 +29,7 @@ import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncTools;
 
-public class SyncEngineImpl implements SyncEngine
+public class DefaultSyncEngine implements SyncEngine
 {
     private Map<String, SyncStatus> syncMap = new HashMap<String, SyncStatus>();
 

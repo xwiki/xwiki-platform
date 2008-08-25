@@ -34,7 +34,7 @@ import com.xpn.xwiki.gwt.api.client.XWikiServiceAsync;
 import com.xpn.xwiki.gwt.api.client.app.XWikiAsyncCallback;
 import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.wysiwyg.client.plugin.Config;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.ConfigImpl;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultConfig;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditor;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorFactory;
 
@@ -179,7 +179,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
             }
 
             // Fill the initial content
-            WysiwygService.Singleton.getInstance().toXHTML(value, editor.getSyntax(), new AsyncCallback<String>()
+            WysiwygService.Singleton.getInstance().toHTML(value, editor.getSyntax(), new AsyncCallback<String>()
             {
                 public void onFailure(Throwable t)
                 {
@@ -215,7 +215,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         Dictionary dictionary = null;
         try {
             dictionary = Dictionary.getDictionary("Wysiwyg" + String.valueOf(index));
-            return new ConfigImpl(dictionary);
+            return new DefaultConfig(dictionary);
         } catch (MissingResourceException e) {
             return null;
         }

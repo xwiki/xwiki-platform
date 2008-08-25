@@ -29,24 +29,24 @@ import com.xpn.xwiki.wysiwyg.client.plugin.Config;
  * The default implementation of {@link Config} interface. We don't plan to provide another implementation. This
  * implementation wraps a {@link Dictionary} instance build from a JavaScript object in the container HTML page.
  */
-public final class ConfigImpl implements Config
+public final class DefaultConfig implements Config
 {
     /**
      * Empty configuration.
      */
-    public static final ConfigImpl DEFAULT = new ConfigImpl();
+    public static final DefaultConfig DEFAULT = new DefaultConfig();
 
     /**
      * This is build from a JavaScript object in the container HTML page.
      */
     private final Dictionary params;
 
-    private ConfigImpl()
+    private DefaultConfig()
     {
         params = null;
     }
 
-    public ConfigImpl(Dictionary params)
+    public DefaultConfig(Dictionary params)
     {
         this.params = params;
     }

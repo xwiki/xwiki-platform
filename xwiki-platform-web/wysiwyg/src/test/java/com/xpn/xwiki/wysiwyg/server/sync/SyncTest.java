@@ -42,7 +42,7 @@ public class SyncTest extends MockObjectTestCase
     public void setUp() throws Exception
     {
         super.setUp();
-        this.syncEngine = new SyncEngineImpl();
+        this.syncEngine = new DefaultSyncEngine();
     }
 
     public void testSimpleChanges() throws XWikiGWTException, SyncException, PatchFailedException,

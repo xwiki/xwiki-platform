@@ -17,13 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.server.converter;
+package com.xpn.xwiki.wysiwyg.server.converter.internal;
 
-public interface XHTMLConverter
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverterException;
+
+/**
+ * Fake HTML converter that doesn't change the input string at all.
+ */
+public class FakeHTMLConverter implements HTMLConverter
 {
-    String ROLE = XHTMLConverter.class.getName();
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HTMLConverter#fromHTML(String)
+     */
+    public String fromHTML(String html) throws HTMLConverterException
+    {
+        return html;
+    }
 
-    String toXHTML(String source) throws XHTMLConverterException;
-
-    String fromXHTML(String xhtml) throws XHTMLConverterException;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see HTMLConverter#toHTML(String)
+     */
+    public String toHTML(String source) throws HTMLConverterException
+    {
+        return source;
+    }
 }

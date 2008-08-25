@@ -20,12 +20,12 @@
 package com.xpn.xwiki.wysiwyg.client.syntax.internal;
 
 /**
- * Validator for the <em>xhtml</em> syntax.
+ * Validator for the <em>html</em> syntax.
  */
 public class XHTMLSyntaxValidator extends DefaultSyntaxValidator
 {
     public XHTMLSyntaxValidator()
     {
-        super("xhtml");
+        super("html");
     }
 }

@@ -17,18 +17,17 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.syntax.internal;
+package com.xpn.xwiki.wysiwyg.server.converter;
 
-import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
-import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManagerTest;
-
-/**
- * Unit test for {@link SyntaxValidatorManagerImpl}.
- */
-public class SyntaxValidatorManagerImplTest extends SyntaxValidatorManagerTest
+public class HTMLConverterException extends Exception
 {
-    protected SyntaxValidatorManager newSyntaxValidatorManager()
+    public HTMLConverterException(String message)
     {
-        return new SyntaxValidatorManagerImpl();
+        super(message);
+    }
+
+    public HTMLConverterException(String message, Throwable throwable)
+    {
+        super(message, throwable);
     }
 }

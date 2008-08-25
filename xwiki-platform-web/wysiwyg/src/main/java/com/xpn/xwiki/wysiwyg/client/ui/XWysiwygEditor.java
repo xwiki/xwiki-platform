@@ -30,7 +30,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.PluginManagerImpl;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginManager;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
@@ -65,7 +65,7 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
         String syntax = config.getParameter("syntax", DEFAULT_SYNTAX);
         sv = svm.getSyntaxValidator(syntax);
 
-        pm = new PluginManagerImpl(wysiwyg, ui.getTextArea(), config);
+        pm = new DefaultPluginManager(wysiwyg, ui.getTextArea(), config);
         pm.setPluginFactoryManager(pfm);
 
         String[] pluginNames = config.getParameter("plugins", DEFAULT_PLUGINS).split("\\s+");

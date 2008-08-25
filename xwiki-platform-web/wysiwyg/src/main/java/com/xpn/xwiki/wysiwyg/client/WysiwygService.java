@@ -53,11 +53,11 @@ public interface WysiwygService extends XWikiService
         }
     }
 
-    String fromXHTML(String xhtml, String syntax) throws XWikiGWTException;
+    String fromHTML(String html, String syntax) throws XWikiGWTException;
 
-    String toXHTML(String source, String syntax) throws XWikiGWTException;
+    String toHTML(String source, String syntax) throws XWikiGWTException;
 
-    String cleanXHTML(String dirtyXHTML) throws XWikiGWTException;
+    String cleanHTML(String dirtyHTML) throws XWikiGWTException;
 
     SyncResult syncEditorContent(Revision syncedRevision, String pageName, int version) throws XWikiGWTException;
 }

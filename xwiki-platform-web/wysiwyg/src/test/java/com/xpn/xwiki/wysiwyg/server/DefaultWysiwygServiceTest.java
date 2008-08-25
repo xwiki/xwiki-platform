@@ -39,9 +39,9 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 import com.xpn.xwiki.web.XWikiServletResponse;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 
-public class WysiwygServiceTest extends AbstractXWikiComponentTestCase
+public class DefaultWysiwygServiceTest extends AbstractXWikiComponentTestCase
 {
-    WysiwygServiceImpl ws;
+    DefaultWysiwygService ws;
 
     private Mock mockXWiki;
 
@@ -83,7 +83,7 @@ public class WysiwygServiceTest extends AbstractXWikiComponentTestCase
         this.mockEngine.stubs().method("getAttribute").with(eq("org.xwiki.component.manager.ComponentManager")).will(
             returnValue(null));
 
-        ws = new WysiwygServiceImpl();
+        ws = new DefaultWysiwygService();
     }
 
     // non working test to test a sync session in gwt

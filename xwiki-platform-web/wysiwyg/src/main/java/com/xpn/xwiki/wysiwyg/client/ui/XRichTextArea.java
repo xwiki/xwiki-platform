@@ -39,7 +39,7 @@ import com.google.gwt.user.client.ui.SourcesFocusEvents;
 import com.google.gwt.user.client.ui.SourcesMouseEvents;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
-import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.CommandManagerImpl;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager;
 import com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea;
 
 public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEvents, SourcesClickEvents,
@@ -76,7 +76,7 @@ public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEve
         xRichTextAreas.setName("xRichTextAreas");
         xRichTextAreas.setDefaultValue("");
 
-        cm = new CommandManagerImpl(rta);
+        cm = new DefaultCommandManager(rta);
 
         FlowPanel container = new FlowPanel();
         container.add(xRichTextArea);

@@ -28,7 +28,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
 /**
  * Default implementation of the {@link PluginFactoryManager}. We don't plan to provide another implementation.
  */
-public final class PluginFactoryManagerImpl implements PluginFactoryManager
+public final class DefaultPluginFactoryManager implements PluginFactoryManager
 {
     /**
      * The map of registered factories. The key is the name of the plug-in, as returned by

@@ -34,36 +34,36 @@ import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
 import org.xwiki.rendering.transformation.TransformationManager;
 
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter;
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverterException;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverterException;
 
-public class XWikiXHTMLConverter implements XHTMLConverter
+public class XWikiHTMLConverter implements HTMLConverter
 {
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLConverter#fromXHTML(String)
+     * @see HTMLConverter#fromHTML(String)
      */
-    public String fromXHTML(String xhtml) throws XHTMLConverterException
+    public String fromHTML(String html) throws HTMLConverterException
     {
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
-            XDOM dom = parser.parse(new StringReader(xhtml));
+            XDOM dom = parser.parse(new StringReader(html));
             WikiPrinter printer = new DefaultWikiPrinter();
             XWikiSyntaxRenderer renderer = new XWikiSyntaxRenderer(printer);
             dom.traverse(renderer);
             return printer.toString();
         } catch (ParseException e) {
-            throw new XHTMLConverterException("Exception while parsing HTML", e);
+            throw new HTMLConverterException("Exception while parsing HTML", e);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLConverter#toXHTML(String)
+     * @see HTMLConverter#toHTML(String)
      */
-    public String toXHTML(String source) throws XHTMLConverterException
+    public String toHTML(String source) throws HTMLConverterException
     {
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xwiki/2.0");
@@ -78,7 +78,7 @@ public class XWikiXHTMLConverter implements XHTMLConverter
             dom.traverse(renderer);
             return printer.toString();
         } catch (Throwable t) {
-            throw new XHTMLConverterException("Exception while parsing XWiki", t);
+            throw new HTMLConverterException("Exception while parsing XWiki", t);
         }
     }
 }

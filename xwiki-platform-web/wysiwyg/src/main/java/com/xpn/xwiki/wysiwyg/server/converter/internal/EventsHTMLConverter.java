@@ -29,36 +29,36 @@ import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.scaffolding.EventsRenderer;
 
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter;
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverterException;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverterException;
 
-public class EventsXHTMLConverter implements XHTMLConverter
+public class EventsHTMLConverter implements HTMLConverter
 {
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLConverter#fromXHTML(String)
+     * @see HTMLConverter#fromHTML(String)
      */
-    public String fromXHTML(String xhtml) throws XHTMLConverterException
+    public String fromHTML(String html) throws HTMLConverterException
     {
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, "xhtml/1.0");
-            XDOM dom = parser.parse(new StringReader(xhtml));
+            XDOM dom = parser.parse(new StringReader(html));
             WikiPrinter printer = new DefaultWikiPrinter();
             EventsRenderer eventsRenderer = new EventsRenderer(printer);
             dom.traverse(eventsRenderer);
             return printer.toString();
         } catch (ParseException e) {
-            throw new XHTMLConverterException("Exception while parsing HTML", e);
+            throw new HTMLConverterException("Exception while parsing HTML", e);
         }
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see XHTMLConverter#toXHTML(String)
+     * @see HTMLConverter#toHTML(String)
      */
-    public String toXHTML(String source) throws XHTMLConverterException
+    public String toHTML(String source) throws HTMLConverterException
     {
         return null;
     }

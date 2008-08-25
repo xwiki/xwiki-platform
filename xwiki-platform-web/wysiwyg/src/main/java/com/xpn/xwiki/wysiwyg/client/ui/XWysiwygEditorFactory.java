@@ -26,7 +26,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.color.ColorPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.font.FontPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.format.FormatPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.indent.IndentPluginFactory;
-import com.xpn.xwiki.wysiwyg.client.plugin.internal.PluginFactoryManagerImpl;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultPluginFactoryManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.justify.JustifyPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.list.ListPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.separator.SeparatorPluginFactory;
@@ -35,7 +35,7 @@ import com.xpn.xwiki.wysiwyg.client.plugin.text.TextPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.undo.UndoPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.plugin.valign.VerticalAlignPluginFactory;
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidatorManager;
-import com.xpn.xwiki.wysiwyg.client.syntax.internal.SyntaxValidatorManagerImpl;
+import com.xpn.xwiki.wysiwyg.client.syntax.internal.DefaultSyntaxValidatorManager;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XHTMLSyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.internal.XWikiSyntaxValidator;
 
@@ -49,12 +49,12 @@ public class XWysiwygEditorFactory
 
     private XWysiwygEditorFactory()
     {
-        svm = new SyntaxValidatorManagerImpl();
+        svm = new DefaultSyntaxValidatorManager();
         svm.addSyntaxValidator(new XHTMLSyntaxValidator());
         svm.addSyntaxValidator(new XWikiSyntaxValidator());
         // add additional SyntaxValidator for other syntaxes
 
-        pfm = new PluginFactoryManagerImpl();
+        pfm = new DefaultPluginFactoryManager();
         pfm.addPluginFactory(SeparatorPluginFactory.getInstance());
         pfm.addPluginFactory(TextPluginFactory.getInstance());
         pfm.addPluginFactory(VerticalAlignPluginFactory.getInstance());

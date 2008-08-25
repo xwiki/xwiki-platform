@@ -31,10 +31,11 @@ import javax.servlet.ServletResponse;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleaner;
 
 import com.xpn.xwiki.web.Utils;
-import com.xpn.xwiki.wysiwyg.server.cleaner.XHTMLCleaner;
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
 /**
  * This filter is used to convert the values of request parameters that hold WYSIWYG output from HTML to XWiki syntax.
@@ -68,8 +69,8 @@ public class ConversionFilter implements Filter
     {
         String[] xRichTextAreas = req.getParameterValues("xRichTextAreas");
         if (xRichTextAreas != null) {
-            XHTMLCleaner cleaner = (XHTMLCleaner) Utils.getComponent(XHTMLCleaner.ROLE, "vnikic");
-            XHTMLConverter converter = (XHTMLConverter) Utils.getComponent(XHTMLConverter.ROLE, "xwiki/2.0");
+            HTMLCleaner cleaner = (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
+            HTMLConverter converter = (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, "xwiki/2.0");
             MutableServletRequestFactory mreqFactory =
                 (MutableServletRequestFactory) Utils.getComponent(MutableServletRequestFactory.ROLE, req.getProtocol());
             MutableServletRequest mreq = mreqFactory.newInstance(req);
@@ -81,7 +82,7 @@ public class ConversionFilter implements Filter
                 String oldValue = req.getParameter(xRichTextArea);
                 String newValue = oldValue;
                 try {
-                    newValue = converter.fromXHTML(cleaner.clean(oldValue));
+                    newValue = converter.fromHTML(XMLUtils.toString(cleaner.clean(oldValue)));
                 } catch (Throwable t) {
                     LOG.error(t.getMessage(), t);
                 }

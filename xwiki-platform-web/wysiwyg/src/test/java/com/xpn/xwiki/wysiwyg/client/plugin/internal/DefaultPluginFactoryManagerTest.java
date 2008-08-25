@@ -17,17 +17,18 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.server.converter;
+package com.xpn.xwiki.wysiwyg.client.plugin.internal;
 
-public class XHTMLConverterException extends Exception
+import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManager;
+import com.xpn.xwiki.wysiwyg.client.plugin.PluginFactoryManagerTest;
+
+/**
+ * Unit tests for {@link DefaultPluginFactoryManager}.
+ */
+public class DefaultPluginFactoryManagerTest extends PluginFactoryManagerTest
 {
-    public XHTMLConverterException(String message)
+    protected PluginFactoryManager newPluginFactoryManager()
     {
-        super(message);
-    }
-
-    public XHTMLConverterException(String message, Throwable throwable)
-    {
-        super(message, throwable);
+        return new DefaultPluginFactoryManager();
     }
 }

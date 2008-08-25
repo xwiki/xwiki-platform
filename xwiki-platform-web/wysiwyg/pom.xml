@@ -69,47 +69,32 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${pom.version}</version>
       <!-- Included in xwiki-web-standard -->
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-gwt</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${pom.version}</version>
       <!-- We need the sources for debugging in hosted mode -->
       <classifier>sources</classifier>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${pom.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-xml</artifactId>
+      <version>${pom.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <!-- We need to clean the editor's HTML output before converting it to wiki syntax.
-        HTMLCleaner is our first option, though currently it cannot clean HTML to XHTML. -->
-      <groupId>net.sourceforge.htmlcleaner</groupId>
-      <artifactId>htmlcleaner</artifactId>
-      <version>2.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <!-- JTidy hasn't been released for ages (since 2001). A snapshot version exists at
-      http://jtidy.sourceforge.net/snapshots/ but Maven requires non-snapshots in order to
-      allow a release (this is for reproducibility). Thus we've had to upload JTidy into
-      our custom repository -->
-    <dependency>
-      <!-- We need to clean the editor's HTML output before converting it to wiki syntax. 
-        JTidy is our second option; it can clean HTML to XHTML but the project is abandoned.
-        We should drop it if we decide on HTMLCleaner. -->
-      <groupId>jtidy</groupId>
-      <artifactId>jtidy</artifactId>
-      <version>8.0-20060801.131059-3-dev</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -142,7 +127,7 @@
       <!-- Added only for debugging the new rendering module -->
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering</artifactId>
-      <version>${pom.parent.version}</version>
+      <version>${pom.version}</version>
       <classifier>tests</classifier>
       <!-- We suppose it will be available while debugging. 
         This way we avoid including lots of transitive dependencies -->

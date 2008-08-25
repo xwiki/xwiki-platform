@@ -19,6 +19,9 @@
  */
 package com.xpn.xwiki.wysiwyg.server;
 
+import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.html.HTMLCleaner;
+
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.gwt.api.client.XWikiGWTException;
 import com.xpn.xwiki.gwt.api.server.XWikiServiceImpl;
@@ -27,43 +30,41 @@ import com.xpn.xwiki.wysiwyg.client.WysiwygService;
 import com.xpn.xwiki.wysiwyg.client.diff.Revision;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncResult;
 import com.xpn.xwiki.wysiwyg.client.sync.SyncStatus;
-import com.xpn.xwiki.wysiwyg.server.cleaner.XHTMLCleaner;
-import com.xpn.xwiki.wysiwyg.server.converter.XHTMLConverter;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.server.sync.SyncEngine;
-import com.xpn.xwiki.wysiwyg.server.sync.SyncEngineImpl;
+import com.xpn.xwiki.wysiwyg.server.sync.DefaultSyncEngine;
 
-public class WysiwygServiceImpl extends XWikiServiceImpl implements WysiwygService
+public class DefaultWysiwygService extends XWikiServiceImpl implements WysiwygService
 {
     private SyncEngine syncEngine;
 
-    public WysiwygServiceImpl()
+    public DefaultWysiwygService()
     {
         super();
 
-        syncEngine = new SyncEngineImpl();
+        syncEngine = new DefaultSyncEngine();
     }
 
-    private XHTMLCleaner getXHTMLCleaner()
+    private HTMLCleaner getHTMLCleaner()
     {
-        return (XHTMLCleaner) Utils.getComponent(XHTMLCleaner.ROLE, "vnikic");
-        // return (XHTMLCleaner) Utils.getComponent(XHTMLCleaner.ROLE, "jtidy");
+        return (HTMLCleaner) Utils.getComponent(HTMLCleaner.ROLE);
     }
 
-    private XHTMLConverter getXHTMLConverter(String syntax)
+    private HTMLConverter getHTMLConverter(String syntax)
     {
-        return (XHTMLConverter) Utils.getComponent(XHTMLConverter.ROLE, syntax);
+        return (HTMLConverter) Utils.getComponent(HTMLConverter.ROLE, syntax);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#fromXHTML(String)
+     * @see WysiwygService#fromHTML(String)
      */
-    public String fromXHTML(String xhtml, String syntax) throws XWikiGWTException
+    public String fromHTML(String html, String syntax) throws XWikiGWTException
     {
         try {
-            // We need to clean the editor's output because it isn't always XHTML-valid
-            return getXHTMLConverter(syntax).fromXHTML(cleanXHTML(xhtml));
+            // We need to clean the editor's output because it isn't always HTML-valid
+            return getHTMLConverter(syntax).fromHTML(cleanHTML(html));
         } catch (Exception e) {
             throw getXWikiGWTException(e);
         }
@@ -72,12 +73,12 @@ public class WysiwygServiceImpl extends XWikiServiceImpl implements WysiwygServi
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#toXHTML(String)
+     * @see WysiwygService#toHTML(String)
      */
-    public String toXHTML(String source, String syntax) throws XWikiGWTException
+    public String toHTML(String source, String syntax) throws XWikiGWTException
     {
         try {
-            return getXHTMLConverter(syntax).toXHTML(source);
+            return getHTMLConverter(syntax).toHTML(source);
         } catch (Exception e) {
             throw getXWikiGWTException(e);
         }
@@ -86,12 +87,12 @@ public class WysiwygServiceImpl extends XWikiServiceImpl implements WysiwygServi
     /**
      * {@inheritDoc}
      * 
-     * @see WysiwygService#cleanXHTML(String)
+     * @see WysiwygService#cleanHTML(String)
      */
-    public String cleanXHTML(String dirtyXHTML) throws XWikiGWTException
+    public String cleanHTML(String dirtyHTML) throws XWikiGWTException
     {
         try {
-            return getXHTMLCleaner().clean(dirtyXHTML);
+            return XMLUtils.toString(getHTMLCleaner().clean(dirtyHTML));
         } catch (Exception e) {
             throw getXWikiGWTException(e);
         }
@@ -109,7 +110,7 @@ public class WysiwygServiceImpl extends XWikiServiceImpl implements WysiwygServi
             SyncStatus syncStatus = syncEngine.getSyncStatus(pageName);
             if (syncStatus == null) {
                 XWikiDocument doc = getXWikiContext().getWiki().getDocument(pageName, getXWikiContext());
-                syncStatus = new SyncStatus(pageName, toXHTML(doc.getContent(), "xwiki/2.0"));
+                syncStatus = new SyncStatus(pageName, toHTML(doc.getContent(), "xwiki/2.0"));
                 syncEngine.setSyncStatus(pageName, syncStatus);
             }
             return syncEngine.sync(syncStatus, revision, version);

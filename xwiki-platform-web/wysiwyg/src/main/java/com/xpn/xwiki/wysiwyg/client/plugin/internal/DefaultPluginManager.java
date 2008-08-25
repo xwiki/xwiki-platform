@@ -34,7 +34,7 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 /**
  * Default implementation of the {@link PluginManager} interface. We don't plan to provide another implementation.
  */
-public class PluginManagerImpl implements PluginManager
+public class DefaultPluginManager implements PluginManager
 {
     /**
      * The map of loaded plug-ins. The key is the name of the plug-in, as returned by
@@ -57,7 +57,7 @@ public class PluginManagerImpl implements PluginManager
 
     private PluginFactoryManager pfm;
 
-    public PluginManagerImpl(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
+    public DefaultPluginManager(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
     {
         this.wysiwyg = wysiwyg;
         this.textArea = textArea;

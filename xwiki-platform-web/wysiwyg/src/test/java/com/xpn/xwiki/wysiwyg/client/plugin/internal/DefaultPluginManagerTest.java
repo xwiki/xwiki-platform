@@ -23,12 +23,12 @@ import com.xpn.xwiki.wysiwyg.client.plugin.PluginManager;
 import com.xpn.xwiki.wysiwyg.client.plugin.PluginManagerTest;
 
 /**
- * Unit tests for {@link PluginManagerImpl}.
+ * Unit tests for {@link DefaultPluginManager}.
  */
-public class PluginManagerImplTest extends PluginManagerTest
+public class DefaultPluginManagerTest extends PluginManagerTest
 {
     protected PluginManager newPluginManager()
     {
-        return new PluginManagerImpl(null, null, null);
+        return new DefaultPluginManager(null, null, null);
     }
 }

@@ -19,21 +19,19 @@
  */
 package org.xwiki.rendering.macro;
 
-import org.xwiki.rendering.macro.descriptor.NoParameterMacroDescriptor;
-import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.macro.parameter.MacroParameters;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 
 /**
  * @version $Id$
  * @since 1.6M1
  */
-public abstract class AbstractNoParameterMacro extends AbstractMacro<MacroParameters, MacroDescriptor>
+public abstract class AbstractNoParameterMacro extends AbstractMacro<Object>
 {
     /**
      * Create and initialize a descriptor with no parameters.
      */
     public AbstractNoParameterMacro(String description)
     {
-        super(new NoParameterMacroDescriptor(description));
+        super(new DefaultMacroDescriptor(description));
     }
 }

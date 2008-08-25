@@ -19,11 +19,6 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
-
 /**
  * Describe a macro.
  * 
@@ -33,26 +28,30 @@ import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
 public abstract class AbstractMacroDescriptor implements MacroDescriptor
 {
     /**
-     * The list of parameters descriptors of the macro.
+     * The description of the macro.
      */
-    private Map<String, MacroParameterDescriptor< ? >> parameterDescriptorMap =
-        new HashMap<String, MacroParameterDescriptor< ? >>();
+    private String description;
 
-    /**
-     * @param parameterDescriptor add parameter descriptor to the macro parameters manager.
-     */
-    protected void registerParameterDescriptor(MacroParameterDescriptor< ? > parameterDescriptor)
+    private Class< ? > parametersBeanClass;
+
+    public AbstractMacroDescriptor(String description, Class< ? > parametersBeanClass)
     {
-        this.parameterDescriptorMap.put(parameterDescriptor.getName().toLowerCase(), parameterDescriptor);
+        this.description = description;
+        this.parametersBeanClass = parametersBeanClass;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#getParameterDescriptor(java.lang.String)
+     * @see org.xwiki.rendering.macro.descriptor.MacroDescriptor#getDescription()
      */
-    public <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name)
+    public String getDescription()
     {
-        return (D) this.parameterDescriptorMap.get(name.toLowerCase());
+        return this.description;
+    }
+
+    public Class< ? > getParametersBeanClass()
+    {
+        return this.parametersBeanClass;
     }
 }

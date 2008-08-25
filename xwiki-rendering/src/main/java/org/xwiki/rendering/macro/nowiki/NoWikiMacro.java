@@ -23,7 +23,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.parameter.MacroParameters;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import java.util.List;
@@ -50,13 +49,7 @@ public class NoWikiMacro extends AbstractNoParameterMacro
         super(DESCRIPTION);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
-     */
-    public List<Block> execute(MacroParameters parameters, String content, MacroTransformationContext context)
+    public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
         return Arrays.asList((Block) new WordBlock(content));

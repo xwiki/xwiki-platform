@@ -17,36 +17,33 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.parameter.instance;
-
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
+package org.xwiki.rendering.macro.descriptor;
 
 /**
- * Macro parameters String values converter.
+ * Describe a macro with no parameters.
  * 
- * @param <T> the type of the value after conversion.
  * @version $Id$
+ * @since 1.6M1
  */
-public interface MacroParameter<T>
+public class DefaultMacroDescriptor extends AbstractMacroDescriptor
 {
     /**
-     * @return parameterClass the macro parameter descriptor.
+     * @param description the description of the macro.
      */
-    MacroParameterDescriptor<T> getParameterDescriptor();
+    public DefaultMacroDescriptor(String description)
+    {
+        super(description, NoParameter.class);
+    }
 
     /**
-     * @return the value as String from parser.
+     * @param description the description of the macro.
      */
-    String getValueAsString();
+    public DefaultMacroDescriptor(String description, Class< ? > parametersBeanClass)
+    {
+        super(description, parametersBeanClass);
+    }
 
-    /**
-     * Convert the String value.
-     * <p>
-     * The calculation is done only once.
-     * 
-     * @return the converted value.
-     * @throws MacroParameterException error when converting value.
-     */
-    T getValue() throws MacroParameterException;
+    public static class NoParameter
+    {
+    }
 }

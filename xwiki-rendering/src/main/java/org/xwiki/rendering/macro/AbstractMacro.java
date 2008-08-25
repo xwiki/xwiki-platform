@@ -19,43 +19,36 @@
  */
 package org.xwiki.rendering.macro;
 
-import java.util.Map;
-
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.Converter;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameters;
+import org.xwiki.rendering.macro.toc.TocMacroParameters;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDescriptor> extends AbstractLogEnabled
-    implements Macro<P, D>
+public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Macro<P>
 {
     /**
      * The descriptor of the macro.
      */
-    private D macroDescriptor;
+    private MacroDescriptor macroDescriptor;
 
     /**
      * Injected by the Component Manager.
      */
     private int priority = 1000;
 
-    public AbstractMacro(D macroDescriptor)
+    public AbstractMacro(MacroDescriptor macroDescriptor)
     {
         this.macroDescriptor = macroDescriptor;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#createMacroParameters(java.util.Map)
-     */
-    public P createMacroParameters(Map<String, String> parameters)
+    protected void registerConverter(Converter converter, Class< ? > clazz)
     {
-        return (P) new DefaultMacroParameters(parameters, getDescriptor());
+        ConvertUtils.register(converter, clazz);
     }
 
     /**
@@ -73,7 +66,7 @@ public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDe
      * 
      * @see org.xwiki.rendering.macro.Macro#getDescriptor()
      */
-    public D getDescriptor()
+    public MacroDescriptor getDescriptor()
     {
         return this.macroDescriptor;
     }
@@ -83,7 +76,7 @@ public abstract class AbstractMacro<P extends MacroParameters, D extends MacroDe
      * 
      * @see java.lang.Comparable#compareTo(java.lang.Object)
      */
-    public int compareTo(Macro< ? , ? > macro)
+    public int compareTo(Macro< ? > macro)
     {
         return getPriority() - macro.getPriority();
     }

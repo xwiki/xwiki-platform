@@ -1,34 +1,51 @@
 package org.xwiki.rendering.macro.include;
 
-import java.util.Map;
-
-import org.xwiki.rendering.macro.include.IncludeMacroDescriptor.Context;
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
-
-public class IncludeMacroParameters extends DefaultMacroParameters
+public class IncludeMacroParameters
 {
-    public IncludeMacroParameters(Map<String, String> parameters, IncludeMacroDescriptor macroDescriptor)
+    /**
+     * @version $Id$
+     */
+    public enum Context
     {
-        super(parameters, macroDescriptor);
-    }
+        /**
+         * Macro executed in its own context.
+         */
+        NEW,
+
+        /**
+         * Macro executed in the context of the current page.
+         */
+        CURRENT;
+    };
+
+    private String document;
+
+    private Context context;
 
     /**
      * @return the name of the document to include.
-     * @exception MacroParameterException error when converting value.
      */
-    public String getDocument() throws MacroParameterException
+    public String getDocument()
     {
-        return getParameterValue(IncludeMacroDescriptor.PARAM_DOCUMENT);
+        return this.document;
+    }
+
+    public void setDocument(String document)
+    {
+        this.document = document;
     }
 
     /**
      * @return defines whether the included page is executed in its separated execution context or whether it's executed
      *         in the contex of the current page.
-     * @exception MacroParameterException error when converting value.
      */
-    public Context getContext() throws MacroParameterException
+    public Context getContext()
     {
-        return getParameterValue(IncludeMacroDescriptor.PARAM_CONTEXT);
+        return this.context;
+    }
+
+    public void setContext(Context context)
+    {
+        this.context = context;
     }
 }

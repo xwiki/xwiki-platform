@@ -42,5 +42,5 @@ public interface MacroFactory
      * @return the matching macro or null if not found
      * @throws MacroNotFoundException if the macro cannot be found
      */
-    Macro< ? , ? > getMacro(String macroName, Syntax syntax) throws MacroNotFoundException;
+    Macro< ? > getMacro(String macroName, Syntax syntax) throws MacroNotFoundException;
 }

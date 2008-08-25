@@ -21,7 +21,6 @@ package org.xwiki.rendering.macro.xhtml;
 
 import java.io.StringReader;
 import java.util.List;
-import java.util.Map;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -29,8 +28,8 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.helpers.XMLReaderFactory;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
@@ -38,8 +37,13 @@ import org.xwiki.rendering.transformation.MacroTransformationContext;
  * @version $Id$
  * @since 1.5M2
  */
-public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters, XHTMLMacroDescriptor>
+public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Inserts XHTML code into the page.";
+
     /**
      * In order to speed up DTD loading/validation we use an entity resolver that can resolve DTDs locally. Injected by
      * the Component Manager.
@@ -56,26 +60,15 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters, XHTMLMacroDe
      */
     public XHTMLMacro()
     {
-        super(new XHTMLMacroDescriptor());
+        this(DESCRIPTION);
     }
 
     /**
      * @param descriptor the descriptor of the macro.
      */
-    protected XHTMLMacro(XHTMLMacroDescriptor descriptor)
+    protected XHTMLMacro(String description)
     {
-        super(descriptor);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.AbstractMacro#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public XHTMLMacroParameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new XHTMLMacroParameters(parameters, getDescriptor());
+        super(new DefaultMacroDescriptor(description, XHTMLMacroParameters.class));
     }
 
     /**
@@ -129,7 +122,7 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters, XHTMLMacroDe
         throws MacroExecutionException
     {
         // Check if the user has asked to escape wiki syntax or not
-        boolean escapeWikiSyntax = xhtmlParameters.isWikiSyntaxEscaped();
+        boolean escapeWikiSyntax = xhtmlParameters.isEscapeWikiSyntax();
 
         return new XMLBlockConverterHandler(this.parser, escapeWikiSyntax);
     }

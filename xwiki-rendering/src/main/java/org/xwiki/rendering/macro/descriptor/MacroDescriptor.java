@@ -19,11 +19,9 @@
  */
 package org.xwiki.rendering.macro.descriptor;
 
-import org.xwiki.rendering.macro.parameter.descriptor.MacroParameterDescriptor;
-
 /**
  * Describe a Macro (macro description and macro parameters description).
- *
+ * 
  * @version $Id$
  * @since 1.6M1
  */
@@ -34,10 +32,5 @@ public interface MacroDescriptor
      */
     String getDescription();
 
-    /**
-     * @param <D> the type of MacroParameterClass child class to return.
-     * @param name the name of the parameter.
-     * @return the parameter class.
-     */
-    <D extends MacroParameterDescriptor< ? >> D getParameterDescriptor(String name);
+    Class< ? > getParametersBeanClass();
 }

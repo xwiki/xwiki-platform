@@ -1,19 +1,16 @@
 package org.xwiki.rendering.macro.id;
 
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
-
-public class IdMacroParameters extends DefaultMacroParameters
+public class IdMacroParameters
 {
-    public IdMacroParameters(Map<String, String> parameters, IdMacroDescriptor macroDescriptor)
+    private String name;
+
+    public String getName()
     {
-        super(parameters, macroDescriptor);
+        return this.name;
     }
 
-    public String getName() throws MacroParameterException
+    public void setName(String name)
     {
-        return getParameterValue(IdMacroDescriptor.PARAM_NAME);
+        this.name = name;
     }
 }

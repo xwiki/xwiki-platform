@@ -1,23 +1,25 @@
 package org.xwiki.rendering.macro.xhtml;
 
-import java.util.Map;
-
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
-
-public class XHTMLMacroParameters extends DefaultMacroParameters
+public class XHTMLMacroParameters
 {
-    public XHTMLMacroParameters(Map<String, String> parameters, XHTMLMacroDescriptor macroDescriptor)
-    {
-        super(parameters, macroDescriptor);
-    }
+    /**
+     * Indicate if the user has asked to escape wiki syntax or not.
+     */
+    boolean escapeWikiSyntax;
 
     /**
      * @return indicate if the user has asked to escape wiki syntax or not.
-     * @exception MacroParameterException error when converting value.
      */
-    public boolean isWikiSyntaxEscaped() throws MacroParameterException
+    public boolean isEscapeWikiSyntax()
     {
-        return this.<Boolean> getParameterValue(XHTMLMacroDescriptor.PARAM_ESCAPEWIKISYNTAX);
+        return this.escapeWikiSyntax;
+    }
+
+    /**
+     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
+     */
+    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
+    {
+        this.escapeWikiSyntax = escapeWikiSyntax;
     }
 }

@@ -22,37 +22,30 @@ package org.xwiki.rendering.macro.id;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.IdBlock;
 import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @version $Id$
  * @since 1.6M1
  */
-public class IdMacro extends AbstractMacro<IdMacroParameters, IdMacroDescriptor>
+public class IdMacro extends AbstractMacro<IdMacroParameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Include other pages into the current page.";
+
     /**
      * Create and initialize the descriptor of the macro.
      */
     public IdMacro()
     {
-        super(new IdMacroDescriptor());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.AbstractMacro#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public IdMacroParameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new IdMacroParameters(parameters, getDescriptor());
+        super(new DefaultMacroDescriptor(DESCRIPTION, IdMacroParameters.class));
     }
 
     /**

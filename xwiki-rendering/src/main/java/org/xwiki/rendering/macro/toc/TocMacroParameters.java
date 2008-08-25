@@ -19,53 +19,92 @@
  */
 package org.xwiki.rendering.macro.toc;
 
-import java.util.Map;
+import org.xwiki.rendering.macro.parameter.ParameterValueTooLowException;
 
-import org.xwiki.rendering.macro.parameter.DefaultMacroParameters;
-import org.xwiki.rendering.macro.parameter.MacroParameterException;
-import org.xwiki.rendering.macro.toc.TocMacroDescriptor.Scope;
-
-public class TocMacroParameters extends DefaultMacroParameters
+public class TocMacroParameters
 {
-    public TocMacroParameters(Map<String, String> parameters, TocMacroDescriptor macroDescriptor)
+    /**
+     * @version $Id: TocMacroDescriptor.java 11982 2008-08-22 17:49:14Z tmortagne $
+     */
+    public enum Scope
     {
-        super(parameters, macroDescriptor);
-    }
+        /**
+         * List section starting where macro block is located in the XDOM.
+         */
+        LOCAL,
+
+        /**
+         * List the sections of the whole page.
+         */
+        PAGE;
+    };
+
+    private int start;
+
+    private int depth;
+
+    private Scope scope;
+
+    private boolean numbered;
 
     /**
      * @return the minimum section level. For example if 2 then level 1 sections will not be listed.
-     * @exception MacroParameterException error when converting value.
      */
-    public int getStart() throws MacroParameterException
+    public int getStart()
     {
-        return this.<Integer> getParameterValue(TocMacroDescriptor.PARAM_START);
+        return this.start;
+    }
+
+    public void setStart(int start) throws ParameterValueTooLowException
+    {
+        if (start < 1) {
+            throw new ParameterValueTooLowException(1);
+        }
+
+        this.start = start;
     }
 
     /**
      * @return the maximum section level. For example if 3 then all section levels from 4 will not be listed.
-     * @exception MacroParameterException error when converting value.
      */
-    public int getDepth() throws MacroParameterException
+    public int getDepth()
     {
-        return this.<Integer> getParameterValue(TocMacroDescriptor.PARAM_DEPTH);
+        return this.depth;
+    }
+
+    public void setDepth(int depth) throws ParameterValueTooLowException
+    {
+        if (depth < 1) {
+            throw new ParameterValueTooLowException(1);
+        }
+
+        this.depth = depth;
     }
 
     /**
      * @return local or page. If local only section in the current scope will be listed. For example if the macro is
      *         written in a section, only subsections of this section will be listed.
-     * @exception MacroParameterException error when converting value.
      */
-    public Scope getScope() throws MacroParameterException
+    public Scope getScope()
     {
-        return getParameterValue(TocMacroDescriptor.PARAM_SCOPE);
+        return this.scope;
+    }
+
+    public void setScope(Scope scope)
+    {
+        this.scope = scope;
     }
 
     /**
      * @return true or false. If true the section title number is printed.
-     * @exception MacroParameterException error when converting value.
      */
-    public boolean numbered() throws MacroParameterException
+    public boolean numbered()
     {
-        return this.<Boolean> getParameterValue(TocMacroDescriptor.PARAM_NUMBERED);
+        return this.numbered;
+    }
+
+    public void setNumbered(boolean numbered)
+    {
+        this.numbered = numbered;
     }
 }

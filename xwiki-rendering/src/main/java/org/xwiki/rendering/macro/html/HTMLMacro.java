@@ -43,6 +43,11 @@ import java.util.List;
 public class HTMLMacro extends XHTMLMacro
 {
     /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Inserts XHTML code into the page.";
+
+    /**
      * Injected by the Component Manager.
      */
     private HTMLCleaner htmlCleaner;
@@ -52,7 +57,7 @@ public class HTMLMacro extends XHTMLMacro
      */
     public HTMLMacro()
     {
-        super(new HTMLMacroDescriptor());
+        super(DESCRIPTION);
     }
 
     /**

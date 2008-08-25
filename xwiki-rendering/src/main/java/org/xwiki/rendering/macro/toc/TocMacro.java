@@ -22,7 +22,6 @@ package org.xwiki.rendering.macro.toc;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.BulletedListBlock;
@@ -38,7 +37,9 @@ import org.xwiki.rendering.block.WordBlock;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.toc.TocMacroDescriptor.Scope;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.macro.parameter.EnumConverter;
+import org.xwiki.rendering.macro.toc.TocMacroParameters.Scope;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.util.IdGenerator;
 
@@ -48,8 +49,13 @@ import org.xwiki.rendering.util.IdGenerator;
  * @version $Id$
  * @since 1.5M2
  */
-public class TocMacro extends AbstractMacro<TocMacroParameters, TocMacroDescriptor>
+public class TocMacro extends AbstractMacro<TocMacroParameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Generates a Table Of Contents.";
+
     /**
      * The id generator.
      */
@@ -60,18 +66,9 @@ public class TocMacro extends AbstractMacro<TocMacroParameters, TocMacroDescript
      */
     public TocMacro()
     {
-        super(new TocMacroDescriptor());
-    }
+        super(new DefaultMacroDescriptor(DESCRIPTION, TocMacroParameters.class));
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.AbstractMacro#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public TocMacroParameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new TocMacroParameters(parameters, getDescriptor());
+        registerConverter(new EnumConverter(), Scope.class);
     }
 
     /**

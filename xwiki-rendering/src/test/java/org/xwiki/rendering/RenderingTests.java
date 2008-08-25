@@ -38,40 +38,45 @@ import com.xpn.xwiki.test.PlexusTestSetup;
 
 /**
  * All Rendering integration tests.
- *
+ * 
  * @version $Id: $
- * @since 1.6M1 
+ * @since 1.6M1
  */
 public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
         Map<String, PrintRendererFactory> factories = new HashMap<String, PrintRendererFactory>();
-        factories.put("xwiki", new PrintRendererFactory() {
+        factories.put("xwiki", new PrintRendererFactory()
+        {
             public PrintRenderer createRenderer()
             {
                 return new XWikiSyntaxRenderer(new DefaultWikiPrinter());
             }
         });
-        factories.put("event", new PrintRendererFactory() {
+        factories.put("event", new PrintRendererFactory()
+        {
             public PrintRenderer createRenderer()
             {
                 return new EventsRenderer(new DefaultWikiPrinter());
             }
         });
-        factories.put("xhtml", new PrintRendererFactory() {
+        factories.put("xhtml", new PrintRendererFactory()
+        {
             public PrintRenderer createRenderer()
             {
                 return new XHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager());
             }
         });
-        factories.put("wysiwyg", new PrintRendererFactory() {
+        factories.put("wysiwyg", new PrintRendererFactory()
+        {
             public PrintRenderer createRenderer()
             {
                 return new WysiwygEditorXHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager());
             }
         });
-        factories.put("tex", new PrintRendererFactory() {
+        factories.put("tex", new PrintRendererFactory()
+        {
             public PrintRenderer createRenderer()
             {
                 return new TexRenderer(new DefaultWikiPrinter());

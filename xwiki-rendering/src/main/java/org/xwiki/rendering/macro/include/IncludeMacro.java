@@ -22,9 +22,10 @@ package org.xwiki.rendering.macro.include;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
-import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.include.IncludeMacroDescriptor.Context;
+import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
+import org.xwiki.rendering.macro.parameter.EnumConverter;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
@@ -37,15 +38,19 @@ import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.Execution;
 
 import java.util.List;
-import java.util.Map;
 import java.io.StringReader;
 
 /**
  * @version $Id$
  * @since 1.5M2
  */
-public class IncludeMacro extends AbstractMacro<IncludeMacroParameters, IncludeMacroDescriptor>
+public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
 {
+    /**
+     * The description of the macro.
+     */
+    private static final String DESCRIPTION = "Include other pages into the current page.";
+
     private static final Syntax SYNTAX = new Syntax(SyntaxType.XWIKI, "2.0");
 
     /**
@@ -72,18 +77,9 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters, IncludeM
 
     public IncludeMacro()
     {
-        super(new IncludeMacroDescriptor());
-    }
+        super(new DefaultMacroDescriptor(DESCRIPTION, IncludeMacroParameters.class));
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.AbstractMacro#createMacroParameters(java.util.Map)
-     */
-    @Override
-    public IncludeMacroParameters createMacroParameters(Map<String, String> parameters)
-    {
-        return new IncludeMacroParameters(parameters, getDescriptor());
+        registerConverter(new EnumConverter(), Context.class);
     }
 
     /**

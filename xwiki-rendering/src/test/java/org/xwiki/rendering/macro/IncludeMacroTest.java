@@ -20,6 +20,8 @@
 package org.xwiki.rendering.macro;
 
 import org.xwiki.rendering.macro.include.IncludeMacro;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters;
+import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
@@ -29,8 +31,6 @@ import org.xwiki.velocity.VelocityManager;
 import org.jmock.Mock;
 
 import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
 import java.io.StringWriter;
 
 /**
@@ -50,12 +50,11 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         mockDocumentManager.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
         macro.setDocumentManager((DocumentManager) mockDocumentManager.proxy());
 
-        Map<String, String> properties = new HashMap<String, String>();
-        properties.put("document", "wiki:Space.Page");
-        properties.put("context", "current");
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setDocument("wiki:Space.Page");
+        parameters.setContext(Context.CURRENT);
 
-        List<Block> blocks =
-            macro.execute(macro.createMacroParameters(properties), null, MacroTransformationContext.EMPTY);
+        List<Block> blocks = macro.execute(parameters, null, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }
@@ -80,12 +79,11 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             returnValue("{{velocity}}$myvar{{/velocity}}"));
         macro.setDocumentManager((DocumentManager) mockDocumentManager.proxy());
 
-        Map<String, String> properties = new HashMap<String, String>();
-        properties.put("document", "wiki:Space.Page");
-        properties.put("context", "new");
+        IncludeMacroParameters parameters = new IncludeMacroParameters();
+        parameters.setDocument("wiki:Space.Page");
+        parameters.setContext(Context.NEW);
 
-        List<Block> blocks =
-            macro.execute(macro.createMacroParameters(properties), null, MacroTransformationContext.EMPTY);
+        List<Block> blocks = macro.execute(parameters, null, MacroTransformationContext.EMPTY);
 
         assertBlocks(expected, blocks);
     }

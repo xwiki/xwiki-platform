@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.ConvertUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
@@ -32,7 +34,8 @@ import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.parameter.MacroParameters;
+import org.xwiki.rendering.macro.parameter.EnumConverter;
+import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
@@ -58,14 +61,16 @@ public class MacroTransformation extends AbstractTransformation implements Compo
 
     private class MacroHolder implements Comparable<MacroHolder>
     {
-        Macro< ? , ? > macro;
+        Macro< ? > macro;
 
         MacroBlock macroBlock;
 
-        public MacroHolder(Macro< ? , ? > macro, MacroBlock macroBlock)
+        public MacroHolder(Macro< ? > macro, MacroBlock macroBlock)
         {
             this.macro = macro;
             this.macroBlock = macroBlock;
+            
+            //ConvertUtils.register(new EnumConverter(), Enum.class);
         }
 
         public int compareTo(MacroHolder holder)
@@ -114,7 +119,7 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         for (MacroBlock macroBlock : context.getXDOM().getChildrenByType(MacroBlock.class, true)) {
             String hintName = macroBlock.getName() + "/" + syntax.getType().toIdString();
             try {
-                Macro< ? , ? > macro = (Macro< ? , ? >) this.componentManager.lookup(Macro.ROLE, hintName);
+                Macro< ? > macro = (Macro< ? >) this.componentManager.lookup(Macro.ROLE, hintName);
                 macroHolders.add(new MacroHolder(macro, macroBlock));
             } catch (ComponentLookupException e) {
                 // TODO: When a macro fails to be loaded replace it with an Error Block so that 1) we don't try to load
@@ -137,12 +142,17 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         try {
             context.setCurrentMacroBlock(macroHolder.macroBlock);
 
-            MacroParameters macroParameters =
-                macroHolder.macro.createMacroParameters(macroHolder.macroBlock.getParameters());
+            Object macroParameters;
+            try {
+                macroParameters = macroHolder.macro.getDescriptor().getParametersBeanClass().newInstance();
+                BeanUtils.populate(macroParameters, macroHolder.macroBlock.getParameters());
+            } catch (Exception e) {
+                throw new MacroParameterException("Failed to parse parameters", e);
+            }
 
             newBlocks =
-                ((Macro<MacroParameters, ? >) macroHolder.macro).execute(macroParameters, macroHolder.macroBlock
-                    .getContent(), context);
+                ((Macro<Object>) macroHolder.macro).execute(macroParameters, macroHolder.macroBlock.getContent(),
+                    context);
         } catch (MacroExecutionException e) {
             throw new TransformationException("Failed to perform transformation for macro ["
                 + macroHolder.macroBlock.getName() + "]", e);

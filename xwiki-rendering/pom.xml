@@ -40,6 +40,10 @@
       <artifactId>commons-lang</artifactId>
     </dependency>
     <dependency>
+      <groupId>commons-beanutils</groupId>
+      <artifactId>commons-beanutils</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-container-api</artifactId>
       <version>${pom.version}</version>

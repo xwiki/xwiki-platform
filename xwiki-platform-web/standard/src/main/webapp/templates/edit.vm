@@ -29,8 +29,7 @@
 #template("htmlheader.vm")
 #template("header.vm")
 #template("menuedit.vm")
-#set($isNewWysiwygActive = ($editor == "wysiwygnew") && ($doc.getSyntaxId() == "xwiki/2.0") && $xwiki.wysiwyg.enabled)
-#if($editor == "wiki" || $editor == "wysiwyg" || $isNewWysiwygActive)
+#if($editor == "wiki" || $editor == "wysiwyg" || $editor == "wysiwygnew")
 <form id="edit" method="post" action="$doc.getURL("preview")" >
 #end
 ##
@@ -49,7 +48,7 @@
 <div class="leftsidecolumns">
 <div id="editcolumn" class="editor">
 <div class="alleditcontent">
-#if($editor == "wiki" || $editor == "wysiwyg" || $isNewWysiwygActive)
+#if($editor == "wiki" || $editor == "wysiwyg" || $editor == "wysiwygnew")
 <label>$msg.get("titlefield"):
 <input type="text" id="xwikidoctitleinput" name="title" value="$!tdoc.title"/></label>
 #end
@@ -67,7 +66,7 @@
 ## Footer
 ##
 </div> ## xwikieditor
-#if($editor == "wiki" || $editor == "wysiwyg" || $isNewWysiwygActive)
+#if($editor == "wiki" || $editor == "wysiwyg" || $editor == "wysiwygnew")
 </form>
 #end
 #template("footer.vm")

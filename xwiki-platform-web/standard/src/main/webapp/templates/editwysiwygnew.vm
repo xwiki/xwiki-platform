@@ -1,10 +1,6 @@
-#if($doc.getSyntaxId() == "xwiki/2.0" && $xwiki.wysiwyg.enabled)
 #set($formname = "edit")
 #set($saveaction = "save")
 #set($previewenabled = true)
-<link rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.css" />
-<script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
-<iframe src="javascript:''" id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
 #set($xredirect=$!request.getParameter("xredirect"))
 ## <form id="edit" method="post" action="$doc.getURL("preview")">
 ## #set($editactions = "top")
@@ -20,22 +16,28 @@
 </div>
 <div id="xwikitext">
 <div id="xwikieditcontent">
+#if($xwiki.wysiwyg.enabled && $xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
+## We should definitely find a better way of including the style sheet and the JavaScript code!
+<link rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.css" />
+<script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
+<iframe src="javascript:''" id="__gwt_historyFrame" style="width:0;height:0;border:0"></iframe>
 $xwiki.getTextArea($tdoc.content)
+<script type="text/javascript">
+//<![CDATA[
+    var Wysiwyg0 = {
+      hookId: 'content',
+      syntax: "$doc.syntaxId"
+    };
+//]]>
+</script>
+#elseif(!$xwiki.wysiwyg.enabled)
+#warning("The new GWT-based WYSIWYG editor is disabled. To enable it please set <strong>xwiki.wysiwygnew</strong> to <strong>1</strong> in xwiki's configuration file.")
+#else
+#warning("The new GWT-based WYSIWYG editor doesn't support the syntax of the current document: <em>$doc.syntaxId</em>.")
+#end
 </div>
 </div>
 </div>
 #set($editactions = "bottom")
 <div class="bottombuttons">#template("editactions.vm")</div>
 ## </form>
-<script type="text/javascript">
-//<![CDATA[
-    var Wysiwyg0 = {
-      hookId: 'content'
-    };
-//]]>
-</script>
-#elseif($xwiki.wysiwyg.enabled)
-The new GWT-based WYSIWYG editor is disabled. To enable it please set xwiki.wysiwygnew to 1 in xwiki's configuration file.
-#else
-The new GWT-based WYSIWYG editor is available only for pages having <em>xwiki/2.0</em> syntax.
-#end

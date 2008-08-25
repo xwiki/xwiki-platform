@@ -42,5 +42,12 @@
       <version>1.6-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>com.xpn.xwiki.platform</groupId>
+      <artifactId>xwiki-web-wysiwyg</artifactId>
+      <version>1.6-SNAPSHOT</version>
+      <classifier>classes</classifier>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 </project>

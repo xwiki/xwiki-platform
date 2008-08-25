@@ -21,6 +21,8 @@ package com.xpn.xwiki.plugin.wysiwyg;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.api.Api;
+import com.xpn.xwiki.web.Utils;
+import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 
 /**
  * Api for the WysiwygPlugin.
@@ -58,10 +60,24 @@ public class WysiwygPluginApi extends Api
     }
 
     /**
-     * @return true if the new WYSIWYG is enabled.
+     * @return true if the editor is enabled.
      */
     public boolean isEnabled()
     {
         return getXWikiContext().getWiki().Param("xwiki.wysiwygnew", "1").equals("1");
+    }
+
+    /**
+     * @param syntaxId The syntax identifier, like "xwiki/2.0".
+     * @return true if the specified syntax is currently supported by the editor.
+     */
+    public boolean isSyntaxSupported(String syntaxId)
+    {
+        try {
+            Utils.getComponent(HTMLConverter.ROLE, syntaxId);
+            return true;
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 }

@@ -37,26 +37,39 @@ public class DefaultHTMLCleanerTest extends TestCase
 
     private static final String FOOTER = "</body></html>\n";
 
-    private HTMLCleaner cleaner;
+    private DefaultHTMLCleaner cleaner;
 
-    protected void setUp()
+    protected void setUp() throws Exception
     {
         this.cleaner = new DefaultHTMLCleaner();
+        this.cleaner.initialize();
     }
 
     public void testCloseUnbalancedTags()
     {
-        assertHTML("<hr /><p>hello</p>", XMLUtils.toString(this.cleaner.clean("<hr><p>hello")));
+        assertHTML("<hr /><p>hello</p>", "<hr><p>hello");
     }
 
     public void testConversionsFromHTML()
     {
-        assertHTML("<strong>bold</strong>", XMLUtils.toString(this.cleaner.clean("<b>bold</b>")));
-        assertHTML("<em>italic</em>", XMLUtils.toString(this.cleaner.clean("<i>italic</i>")));
+        assertHTML("<strong>bold</strong>", "<b>bold</b>");
+        assertHTML("<em>italic</em>", "<i>italic</i>");
+    }
+
+    public void testCleanNonXHTMLLists()
+    {
+        assertHTML("<ul><li>item1<ul><li>item2</li></ul></li></ul>", "<ul><li>item1</li><ul><li>item2</li></ul></ul>");
+        assertHTML("<ul><li>item1<ul><li>item2<ul><li>item3</li></ul></li></ul></li></ul>",
+            "<ul><li>item1</li><ul><li>item2</li><ul><li>item3</li></ul></ul></ul>");
+        assertHTML("<ul><li><ul><li>item</li></ul></li></ul>", "<ul><ul><li>item</li></ul></ul>");
+        assertHTML("<ul><li>item1<ol><li>item2</li></ol></li></ul>", "<ul><li>item1</li><ol><li>item2</li></ol></ul>");
+        assertHTML("<ol><li>item1<ol><li>item2<ol><li>item3</li></ol></li></ol></li></ol>",
+            "<ol><li>item1</li><ol><li>item2</li><ol><li>item3</li></ol></ol></ol>");
+        assertHTML("<ol><li><ol><li>item</li></ol></li></ol>", "<ol><ol><li>item</li></ol></ol>");
     }
 
     private void assertHTML(String expected, String actual)
     {
-        assertEquals(HEADER + expected + FOOTER, actual);
+        assertEquals(HEADER + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(actual)));
     }
 }

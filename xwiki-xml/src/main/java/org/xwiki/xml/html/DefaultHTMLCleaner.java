@@ -26,6 +26,9 @@ import org.htmlcleaner.CleanerProperties;
 import org.htmlcleaner.JDomSerializer;
 import org.xwiki.xml.internal.html.CleaningFilter;
 import org.xwiki.xml.internal.html.TagSwapCleaningFilter;
+import org.xwiki.xml.internal.html.ListCleaningFilter;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.output.DOMOutputter;
@@ -41,7 +44,7 @@ import java.util.ArrayList;
  * @version $Id: $
  * @since 1.6M1
  */
-public class DefaultHTMLCleaner implements HTMLCleaner
+public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 {
     /**
      * List of default cleaning filters to call when cleaning code with HTML Cleaner. This is for cases when
@@ -51,12 +54,14 @@ public class DefaultHTMLCleaner implements HTMLCleaner
     private List<CleaningFilter> filters;
 
     /**
-     * Default constructor.
+     * {@inheritDoc}
+     * @see org.xwiki.component.phase.Initializable#initialize()
      */
-    public DefaultHTMLCleaner()
+    public void initialize() throws InitializationException
     {
         this.filters = new ArrayList<CleaningFilter>();
         this.filters.add(new TagSwapCleaningFilter());
+        this.filters.add(new ListCleaningFilter());
     }
 
     /**

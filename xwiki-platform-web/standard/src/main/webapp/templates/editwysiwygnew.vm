@@ -26,7 +26,8 @@ $xwiki.getTextArea($tdoc.content)
 //<![CDATA[
     var Wysiwyg0 = {
       hookId: 'content',
-      syntax: "$doc.syntaxId"
+      syntax: "$doc.syntaxId",
+      debug: #if($request.debug)'true'#else'false'#end
     };
 //]]>
 </script>

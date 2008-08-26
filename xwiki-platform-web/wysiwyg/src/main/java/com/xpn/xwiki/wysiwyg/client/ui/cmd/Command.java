@@ -256,6 +256,11 @@ public class Command
      */
     public static final Command UNLINK = new Command("unlink");
 
+    /**
+     * @see #STYLE_WITH_CSS
+     */
+    public static final Command USE_CSS = new Command("useCSS");
+
     protected String name;
 
     public Command(String name)

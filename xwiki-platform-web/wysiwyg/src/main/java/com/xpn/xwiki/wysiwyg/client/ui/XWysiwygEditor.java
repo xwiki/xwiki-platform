@@ -55,6 +55,8 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
 
     private final Set<String> toolBarFeatures;
 
+    private boolean loaded = false;
+
     public XWysiwygEditor(Wysiwyg wysiwyg, Config config, SyntaxValidatorManager svm, PluginFactoryManager pfm)
     {
         ui = new XRichTextEditor();
@@ -142,6 +144,15 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
 
     public void onUpdate()
     {
+        if (!loaded) {
+            loaded = true;
+
+            // Make sure the editor uses formatting tags instead of CSS.
+            // This is a requirement for HTML to wiki conversion.
+            getUI().getTextArea().getCommandManager().execCommand(Command.USE_CSS, true);
+            getUI().getTextArea().getCommandManager().execCommand(Command.STYLE_WITH_CSS, false);
+        }
+
         for (String feature : toolBarFeatures) {
             UIExtension uie = pm.getUIExtension("toolbar", feature);
             uie.setEnabled(feature, sv.isValid(feature, ui.getTextArea()));

@@ -63,8 +63,7 @@ public class HTMLMacro extends XHTMLMacro
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.xhtml.XHTMLMacro#execute(org.xwiki.rendering.macro.xhtml.XHTMLMacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
     @Override
     public List<Block> execute(XHTMLMacroParameters parameters, String content, MacroTransformationContext context)

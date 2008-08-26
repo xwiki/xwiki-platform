@@ -56,7 +56,7 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
     private Parser parser;
 
     /**
-     * Create and initialize the descriptor of the macro.
+     * Create and initialize the description of the macro.
      */
     public XHTMLMacro()
     {
@@ -64,7 +64,7 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
     }
 
     /**
-     * @param descriptor the descriptor of the macro.
+     * @param description the macro description.
      */
     protected XHTMLMacro(String description)
     {
@@ -73,9 +73,8 @@ public class XHTMLMacro extends AbstractMacro<XHTMLMacroParameters>
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     *
+     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
     public List<Block> execute(XHTMLMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException

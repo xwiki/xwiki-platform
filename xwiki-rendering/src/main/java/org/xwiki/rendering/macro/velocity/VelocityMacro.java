@@ -56,6 +56,11 @@ public class VelocityMacro extends AbstractNoParameterMacro
         super(DESCRIPTION);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
+     */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {

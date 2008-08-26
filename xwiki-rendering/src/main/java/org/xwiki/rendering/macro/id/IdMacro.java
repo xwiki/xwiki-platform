@@ -50,9 +50,8 @@ public class IdMacro extends AbstractMacro<IdMacroParameters>
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     *
+     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext)
      */
     public List<Block> execute(IdMacroParameters parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException

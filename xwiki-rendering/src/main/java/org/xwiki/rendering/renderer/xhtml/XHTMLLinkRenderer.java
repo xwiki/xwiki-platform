@@ -22,6 +22,7 @@ package org.xwiki.rendering.renderer.xhtml;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
 import org.xwiki.rendering.DocumentManager;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
  * @version $Id: $
@@ -31,9 +32,12 @@ public class XHTMLLinkRenderer
 {
     private DocumentManager documentManager;
 
-    public XHTMLLinkRenderer(DocumentManager documentManager)
+    private RenderingConfiguration configuration;
+
+    public XHTMLLinkRenderer(DocumentManager documentManager, RenderingConfiguration configuration)
     {
         this.documentManager = documentManager;
+        this.configuration = configuration;
     }
 
     public String renderLink(Link link)
@@ -105,6 +109,8 @@ public class XHTMLLinkRenderer
         if (link.getLabel() != null) {
             labelToPrint = link.getLabel();
         } else {
+            // TODO we need to use a DocumentName and DocumentNameFactory to transform a reference as a String
+            // Then use the LinkLabelResolver 
             labelToPrint = link.getReference();
         }
 

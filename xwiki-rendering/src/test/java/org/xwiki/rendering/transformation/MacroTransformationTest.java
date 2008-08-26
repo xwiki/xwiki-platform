@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
-import org.xwiki.rendering.scaffolding.EventsRenderer;
+import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;

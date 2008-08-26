@@ -500,7 +500,7 @@ public class XWikiDocument
         }
         DocumentManager documentManager = (DocumentManager) Utils.getComponent(DocumentManager.ROLE);
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new XHTMLRenderer(printer, documentManager));
+        dom.traverse(new XHTMLRenderer(printer, documentManager, null));
 
         return printer.toString();
     }
@@ -4142,8 +4142,22 @@ public class XWikiDocument
         return true;
     }
 
-    // This method to split section according to title .
-    public List<DocumentSection> getSplitSectionsAccordingToTitle() throws XWikiException
+    /**
+     * @return the sections in the current document
+     */
+    public List<DocumentSection> getSections()
+    {
+        return getSplitSectionsAccordingToTitle();
+    }
+
+    /**
+     * This method to split section according to title.
+     *
+     * @return the sections in the current document
+     * @throws XWikiException
+     * @deprecated use {@link #getSections()} instead, since 1.6M1
+     */
+    public List<DocumentSection> getSplitSectionsAccordingToTitle()
     {
         // Pattern to match the title. Matches only level 1 and level 2 headings.
         Pattern headingPattern = Pattern.compile("^[ \\t]*+(1(\\.1){0,1}+)[ \\t]++(.++)$", Pattern.MULTILINE);

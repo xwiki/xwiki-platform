@@ -23,6 +23,7 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.EventsRenderer;
 
 import java.util.List;
 

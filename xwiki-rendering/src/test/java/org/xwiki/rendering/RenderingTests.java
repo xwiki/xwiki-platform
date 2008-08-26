@@ -22,7 +22,7 @@ package org.xwiki.rendering;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.rendering.scaffolding.EventsRenderer;
+import org.xwiki.rendering.renderer.EventsRenderer;
 import org.xwiki.rendering.scaffolding.PrintRendererFactory;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
 import org.xwiki.rendering.renderer.PrintRenderer;
@@ -65,14 +65,14 @@ public class RenderingTests extends TestCase
         {
             public PrintRenderer createRenderer()
             {
-                return new XHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager());
+                return new XHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager(), null);
             }
         });
         factories.put("wysiwyg", new PrintRendererFactory()
         {
             public PrintRenderer createRenderer()
             {
-                return new WysiwygEditorXHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager());
+                return new WysiwygEditorXHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager(), null);
             }
         });
         factories.put("tex", new PrintRendererFactory()

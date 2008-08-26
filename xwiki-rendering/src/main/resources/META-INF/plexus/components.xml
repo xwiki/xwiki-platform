@@ -102,6 +102,21 @@
       <implementation>org.xwiki.rendering.util.DefaultIdGenerator</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
+    <component>
+      <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.configuration.DefaultRenderingConfiguraton</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.configuration.ConfigurationManager</role>
+          <role-hint>default</role-hint>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.configuration.ConfigurationSourceCollection</role>
+          <role-hint>default</role-hint>
+        </requirement>
+      </requirements>
+    </component>
 
     <!-- Macros -->
     <component>

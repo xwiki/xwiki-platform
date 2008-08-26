@@ -31,6 +31,7 @@ import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.DocumentManager;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
@@ -42,6 +43,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 {
     private DocumentManager documentManager;
 
+    private RenderingConfiguration configuration;
+    
     /**
      * A temporary service offering methods manipulating XWiki Documents that are needed to output the correct XHTML.
      * For example this is used to verify if a document exists when computing the HREF attribute for a link. It's
@@ -70,11 +73,12 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * @param printer the object to which to write the XHTML output to
      * @param documentManager see {@link #documentManager}
      */
-    public XHTMLRenderer(WikiPrinter printer, DocumentManager documentManager)
+    public XHTMLRenderer(WikiPrinter printer, DocumentManager documentManager, RenderingConfiguration configuration)
     {
         super(printer);
         this.documentManager = documentManager;
-        this.linkRenderer = new XHTMLLinkRenderer(documentManager);
+        this.linkRenderer = new XHTMLLinkRenderer(documentManager, configuration);
+        this.configuration = configuration;
     }
 
     /**

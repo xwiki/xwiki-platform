@@ -22,6 +22,7 @@ package org.xwiki.rendering.renderer.xhtml;
 import java.util.Map;
 
 import org.xwiki.rendering.DocumentManager;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.internal.XWikiMacroPrinter;
 
@@ -29,9 +30,10 @@ public class WysiwygEditorXHTMLRenderer extends XHTMLRenderer
 {
     private XWikiMacroPrinter macroPrinter;
 
-    public WysiwygEditorXHTMLRenderer(WikiPrinter printer, DocumentManager documentManager)
+    public WysiwygEditorXHTMLRenderer(WikiPrinter printer, DocumentManager documentManager,
+        RenderingConfiguration configuration)
     {
-        super(printer, documentManager);
+        super(printer, documentManager, configuration);
         this.macroPrinter = new XWikiMacroPrinter();
     }
 

@@ -123,16 +123,6 @@
       <version>1.1.0</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <!-- Added only for debugging the new rendering module -->
-      <groupId>org.xwiki.platform</groupId>
-      <artifactId>xwiki-core-rendering</artifactId>
-      <version>${pom.version}</version>
-      <classifier>tests</classifier>
-      <!-- We suppose it will be available while debugging. 
-        This way we avoid including lots of transitive dependencies -->
-      <scope>provided</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

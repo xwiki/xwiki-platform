@@ -74,7 +74,7 @@ public class XWikiHTMLConverter implements HTMLConverter
 
             WikiPrinter printer = new DefaultWikiPrinter();
             DocumentManager docManager = (DocumentManager) Utils.getComponent(DocumentManager.ROLE);
-            WysiwygEditorXHTMLRenderer renderer = new WysiwygEditorXHTMLRenderer(printer, docManager);
+            WysiwygEditorXHTMLRenderer renderer = new WysiwygEditorXHTMLRenderer(printer, docManager, null);
             dom.traverse(renderer);
             return printer.toString();
         } catch (Throwable t) {

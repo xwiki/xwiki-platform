@@ -26,8 +26,7 @@ import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.WikiPrinter;
-import org.xwiki.rendering.scaffolding.EventsRenderer;
-
+import org.xwiki.rendering.renderer.EventsRenderer;
 import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter;
 import com.xpn.xwiki.wysiwyg.server.converter.HTMLConverterException;

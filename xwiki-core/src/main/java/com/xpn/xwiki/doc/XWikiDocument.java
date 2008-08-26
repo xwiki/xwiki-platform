@@ -31,6 +31,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -39,7 +40,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
-import java.util.Collections;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -66,15 +66,16 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
-import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.DocumentManager;
 import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.parser.SyntaxFactory;
-import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.WikiPrinter;
+import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
 import org.xwiki.rendering.transformation.TransformationManager;
-import org.xwiki.rendering.DocumentManager;
+
 import com.xpn.xwiki.XWiki;
 import com.xpn.xwiki.XWikiConstant;
 import com.xpn.xwiki.XWikiContext;
@@ -432,11 +433,10 @@ public class XWikiDocument
         if (getSyntaxId().equalsIgnoreCase("xwiki/1.0")) {
             renderedContent = context.getWiki().getRenderingEngine().renderDocument(this, context);
         } else {
-        	renderedContent = getRenderedContentUsingNewRenderingModule(this.content);
+            renderedContent = getRenderedContentUsingNewRenderingModule(this.content);
         }
         return renderedContent;
     }
-
 
     /**
      * @param text the text to render
@@ -454,15 +454,15 @@ public class XWikiDocument
             setAsContextDoc(context);
             // If the Syntax id is "xwiki/1.0" then use the old rendering subsystem. Otherwise use the new one.
             if (syntaxId.equalsIgnoreCase("xwiki/1.0")) {
-            	result = context.getWiki().getRenderingEngine().renderText(text, this, context);
+                result = context.getWiki().getRenderingEngine().renderText(text, this, context);
             } else {
-            	result = getRenderedContentUsingNewRenderingModule(text);
+                result = getRenderedContentUsingNewRenderingModule(text);
             }
         } catch (XWikiException e) {
-        	// Failed to render for some reason. This method should normally throw an exception but this
-        	// requires changing the signature of calling methods too.
-        	log.warn(e);
-        	result = "";
+            // Failed to render for some reason. This method should normally throw an exception but this
+            // requires changing the signature of calling methods too.
+            log.warn(e);
+            result = "";
         } finally {
             restoreContext(backup, context);
         }
@@ -475,6 +475,7 @@ public class XWikiDocument
      * @return the given text rendered in the context of this document
      * @deprecated since 1.6M1 use {@link #getRenderedContent(String, String, com.xpn.xwiki.XWikiContext)}
      */
+    @Deprecated
     public String getRenderedContent(String text, XWikiContext context)
     {
         return getRenderedContent(text, "xwiki/1.0", context);
@@ -483,11 +484,9 @@ public class XWikiDocument
     /**
      * Renders the passed content using the new Rendering architecture.
      */
-    private String getRenderedContentUsingNewRenderingModule(String content)
-    	throws XWikiException
+    private String getRenderedContentUsingNewRenderingModule(String content) throws XWikiException
     {
-        TransformationManager transformations =
-            (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
+        TransformationManager transformations = (TransformationManager) Utils.getComponent(TransformationManager.ROLE);
         XDOM dom;
         try {
             Parser parser = (Parser) Utils.getComponent(Parser.ROLE, getSyntaxId());
@@ -867,8 +866,9 @@ public class XWikiDocument
 
     public String getURL(String action, String querystring, String anchor, XWikiContext context)
     {
-        URL url = context.getURLFactory().createURL(getSpace(), getName(), action, querystring, anchor, getDatabase(),
-            context);
+        URL url =
+            context.getURLFactory().createURL(getSpace(), getName(), action, querystring, anchor, getDatabase(),
+                context);
         return context.getURLFactory().getURL(url, context);
     }
 
@@ -1054,7 +1054,8 @@ public class XWikiDocument
                 if (criteria.getAuthor().equals("") || criteria.getAuthor().equals(nodeinfo.getAuthor())) {
                     // Date range matching
                     if (nodeinfo.getDate().after(criteria.getMinDate())
-                        && nodeinfo.getDate().before(criteria.getMaxDate())) {
+                        && nodeinfo.getDate().before(criteria.getMaxDate()))
+                    {
                         results.add(nodeinfo.getVersion().toString());
                     }
                 }
@@ -2808,7 +2809,7 @@ public class XWikiDocument
             }
 
             List<String> result = new ArrayList<String>();
-            for (MacroBlock macroBlock: dom.getChildrenByType(MacroBlock.class, true)) {
+            for (MacroBlock macroBlock : dom.getChildrenByType(MacroBlock.class, true)) {
                 if (macroBlock.getName().equalsIgnoreCase("include")) {
                     String documentName = macroBlock.getParameters().get("document");
                     if (documentName.indexOf(".") == -1) {
@@ -3301,12 +3302,7 @@ public class XWikiDocument
 
     public String getRealLanguage(XWikiContext context) throws XWikiException
     {
-        String lang = getLanguage();
-        if ((lang.equals("") || lang.equals("default"))) {
-            return getDefaultLanguage();
-        } else {
-            return lang;
-        }
+        return getRealLanguage();
     }
 
     public String getRealLanguage()
@@ -4152,11 +4148,12 @@ public class XWikiDocument
 
     /**
      * This method to split section according to title.
-     *
+     * 
      * @return the sections in the current document
      * @throws XWikiException
      * @deprecated use {@link #getSections()} instead, since 1.6M1
      */
+    @Deprecated
     public List<DocumentSection> getSplitSectionsAccordingToTitle()
     {
         // Pattern to match the title. Matches only level 1 and level 2 headings.

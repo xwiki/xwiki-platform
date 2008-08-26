@@ -22,21 +22,22 @@ package org.xwiki.rendering.transformation;
 import org.xwiki.component.logging.AbstractLogEnabled;
 
 /**
- * Code common to all Transformation and base implementation of priorities
- * (see {@link Transformation#getPriority()}).
- *
+ * Code common to all Transformation and base implementation of priorities (see {@link Transformation#getPriority()}).
+ * 
  * @version $Id$
  * @since 1.5M2
  */
 public abstract class AbstractTransformation extends AbstractLogEnabled implements Transformation
 {
     /**
-     * Injected by the Component Manager.
+     * Execution order priority. Transformations with smaller values are executed sooner. Injected by the Component
+     * Manager.
      */
     private int priority = 1000;
 
     /**
      * {@inheritDoc}
+     * 
      * @see Transformation#getPriority()
      */
     public int getPriority()
@@ -46,10 +47,11 @@ public abstract class AbstractTransformation extends AbstractLogEnabled implemen
 
     /**
      * {@inheritDoc}
-     * @see Transformation#compareTo(Object) 
+     * 
+     * @see Transformation#compareTo(Object)
      */
     public int compareTo(Transformation transformation)
     {
-        return getPriority() - transformation.getPriority(); 
+        return getPriority() - transformation.getPriority();
     }
 }

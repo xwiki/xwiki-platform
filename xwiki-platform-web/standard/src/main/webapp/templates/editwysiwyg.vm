@@ -1,3 +1,4 @@
+#if($doc.syntaxId == "xwiki/1.0")
 #set($formname = "edit")
 #set($saveaction = "save")
 #set($previewenabled = true)
@@ -53,3 +54,6 @@ $xwiki.getTextArea($tdoc.content)
 <script type="text/javascript">
 Event.observe(window, "load", function() {fullscreenEdit('wysiwyg'); }, true);
 </script>
+#else ## doc.syntaxId != "xwiki/1.0"
+#template("editwysiwygnew.vm")
+#end

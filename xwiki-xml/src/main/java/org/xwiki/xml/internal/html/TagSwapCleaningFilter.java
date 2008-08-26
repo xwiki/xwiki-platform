@@ -33,13 +33,26 @@ import java.util.Iterator;
  */
 public class TagSwapCleaningFilter implements CleaningFilter
 {
+    /**
+     * {@inheritDoc}
+     * Replaces deprecated tags in HTML by their XHTML equivalent (b with strong, i with em, etc).
+     *
+     * @see org.xwiki.xml.internal.html.CleaningFilter#filter(org.jdom.Document)
+     */
     public void filter(Document document)
     {
         swapTag(document, "b", "strong");
         swapTag(document, "i", "em");
     }
 
-    protected void swapTag(Document document, String sourceTag, String newTag)
+    /**
+     * Replace one tag by another.
+     *
+     * @param document the document to clean
+     * @param sourceTag the tag name to modify
+     * @param newTag the new tag name
+     */
+    private void swapTag(Document document, String sourceTag, String newTag)
     {
         Iterator descendants = document.getDescendants(new ElementFilter(sourceTag));
         while (descendants.hasNext()) {

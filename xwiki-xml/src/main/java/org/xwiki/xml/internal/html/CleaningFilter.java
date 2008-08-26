@@ -30,5 +30,10 @@ import org.jdom.Document;
  */
 public interface CleaningFilter
 {
+    /**
+     * Filters the passed XML document to generate valid and clean XHTML.
+     *
+     * @param document the document to clean
+     */
     void filter(Document document);
 }

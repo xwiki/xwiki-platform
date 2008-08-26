@@ -23,6 +23,10 @@ import org.xwiki.component.phase.InitializationException;
 
 import java.util.List;
 
+/**
+ * @version $Id: $
+ * @since 1.6M1
+ */
 public interface ConfigurationManager
 {
     void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources,

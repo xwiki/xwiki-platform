@@ -22,7 +22,13 @@ package org.xwiki.configuration;
 import java.util.List;
 
 /**
- * Contains a list of {@link ConfigurationSource}s.
+ * Contains a list of {@link ConfigurationSource}s that can be used by modules requiring a configuration. The idea
+ * is to offer a default list of sources that all modules can use and share in order to have some centralized
+ * configuration sources. However since this is implemented as a component it's also possible for a user to override
+ * the component implementation and replace it by theirs thus effectively changing the sources of configuration data. 
+ *
+ * @version $Id: $
+ * @since 1.6M1
  */
 public interface ConfigurationSourceCollection
 {

@@ -31,6 +31,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * @version $Id: $
+ * @since 1.6M1
+ */
 public class DefaultConfigurationManager implements ConfigurationManager
 {
     public void initializeConfiguration(Object configurationBean, List<ConfigurationSource> sources,

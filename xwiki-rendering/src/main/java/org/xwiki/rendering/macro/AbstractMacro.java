@@ -78,6 +78,9 @@ public abstract class AbstractMacro<P> extends AbstractLogEnabled implements Mac
      */
     public int compareTo(Macro< ? > macro)
     {
-        return getPriority() - macro.getPriority();
+        if (getPriority() != macro.getPriority()) {
+            return getPriority() - macro.getPriority();
+        }
+        return this.getClass().getSimpleName().compareTo(macro.getClass().getSimpleName());
     }
 }

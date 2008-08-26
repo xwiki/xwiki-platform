@@ -42,6 +42,8 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
 
     private Timer timer;
 
+    private String previousHTML = "";
+
     public XWysiwygEditorDebugger(XWysiwygEditor editor)
     {
         this.editor = editor;
@@ -82,49 +84,52 @@ public class XWysiwygEditorDebugger extends Composite implements TimerListener
 
     public void refreshData()
     {
-        dirtyHTMLTextArea.setText(editor.getUI().getTextArea().getHTML());
+        String currentHTML = editor.getUI().getTextArea().getHTML();
+        if (previousHTML.equals(currentHTML)) {
+            return;
+        }
+        previousHTML = currentHTML;
 
-        WysiwygService.Singleton.getInstance().cleanHTML(editor.getUI().getTextArea().getHTML(),
-            new AsyncCallback<String>()
+        dirtyHTMLTextArea.setText(currentHTML);
+
+        WysiwygService.Singleton.getInstance().cleanHTML(currentHTML, new AsyncCallback<String>()
+        {
+            public void onFailure(Throwable caught)
             {
-                public void onFailure(Throwable caught)
-                {
-                    cleanHTMLTextArea.setText(caught.toString());
-                }
+                cleanHTMLTextArea.setText(caught.toString());
+            }
 
-                public void onSuccess(String result)
-                {
-                    cleanHTMLTextArea.setText(result);
-                }
-            });
-
-        WysiwygService.Singleton.getInstance().fromHTML(editor.getUI().getTextArea().getHTML(), editor.getSyntax(),
-            new AsyncCallback<String>()
+            public void onSuccess(String result)
             {
-                public void onFailure(Throwable caught)
-                {
-                    wikiTextArea.setText(caught.toString());
-                }
+                cleanHTMLTextArea.setText(result);
+            }
+        });
 
-                public void onSuccess(String result)
-                {
-                    wikiTextArea.setText(result);
-                }
-            });
-
-        WysiwygService.Singleton.getInstance().fromHTML(editor.getUI().getTextArea().getHTML(), "events",
-            new AsyncCallback<String>()
+        WysiwygService.Singleton.getInstance().fromHTML(currentHTML, editor.getSyntax(), new AsyncCallback<String>()
+        {
+            public void onFailure(Throwable caught)
             {
-                public void onFailure(Throwable caught)
-                {
-                    eventsTextArea.setText(caught.toString());
-                }
+                wikiTextArea.setText(caught.toString());
+            }
 
-                public void onSuccess(String result)
-                {
-                    eventsTextArea.setText(result);
-                }
-            });
+            public void onSuccess(String result)
+            {
+                wikiTextArea.setText(result);
+            }
+        });
+
+        WysiwygService.Singleton.getInstance().fromHTML(currentHTML, "events", new AsyncCallback<String>()
+        {
+            public void onFailure(Throwable caught)
+            {
+                eventsTextArea.setText(caught.toString());
+            }
+
+            public void onSuccess(String result)
+            {
+                eventsTextArea.setText(result);
+            }
+        });
     }
 
     /**

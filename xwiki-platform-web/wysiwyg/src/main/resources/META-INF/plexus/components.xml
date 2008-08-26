@@ -2,7 +2,7 @@
   <components>
     <component>
       <role>com.xpn.xwiki.wysiwyg.server.converter.HTMLConverter</role>
-      <role-hint>html</role-hint>
+      <role-hint>xhtml/1.0</role-hint>
       <implementation>
         com.xpn.xwiki.wysiwyg.server.converter.internal.FakeHTMLConverter
       </implementation>

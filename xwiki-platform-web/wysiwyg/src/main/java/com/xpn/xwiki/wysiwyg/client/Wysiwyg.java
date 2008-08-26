@@ -36,6 +36,7 @@ import com.xpn.xwiki.gwt.api.client.app.XWikiGWTDefaultApp;
 import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.DefaultConfig;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditor;
+import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorDebugger;
 import com.xpn.xwiki.wysiwyg.client.ui.XWysiwygEditorFactory;
 
 public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
@@ -146,7 +147,7 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
         }
 
         // Launch the UI
-        for (Config config : getConfigs()) {
+        for (final Config config : getConfigs()) {
             String hookId = config.getParameter("hookId");
             if (hookId == null) {
                 continue;
@@ -191,8 +192,11 @@ public class Wysiwyg extends XWikiGWTDefaultApp implements EntryPoint
                     editor.getUI().getTextArea().setHTML(result);
 
                     // Insert the WYSIWYG Editor
-                    // RootPanel.get(containerId).add(new XWysiwygEditorDebugger(editor));
-                    RootPanel.get(containerId).add(editor.getUI());
+                    if ("true".equals(config.getParameter("debug", "false"))) {
+                        RootPanel.get(containerId).add(new XWysiwygEditorDebugger(editor));
+                    } else {
+                        RootPanel.get(containerId).add(editor.getUI());
+                    }
                 }
             });
         }

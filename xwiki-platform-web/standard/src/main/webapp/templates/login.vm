@@ -43,6 +43,10 @@ $response.sendRedirect($xwiki.getURL("XWiki.XWikiLogin", "login", $qs))
 #end
 </table>
 <div class="buttons"><input type="submit" class="button" value="$msg.get("login")"/></div>
+## TODO: Replace this with an interface extension once IX are implemented
+#if($xwiki.exists("XWiki.ResetPassword"))
+  <div style="font-size: 70%; margin-top: 2em;">Forgot your <a href="$xwiki.getURL('XWiki.ForgotUsername')">username</a> or <a href="$xwiki.getURL('XWiki.ResetPassword')">password</a>?</div>
+#end
 #xwikimessageboxend()
 </form>
 </div>

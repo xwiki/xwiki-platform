@@ -48,7 +48,13 @@ public class DefaultHTMLCleanerTest extends TestCase
     {
         assertHTML("<hr /><p>hello</p>", XMLUtils.toString(this.cleaner.clean("<hr><p>hello")));
     }
-    
+
+    public void testConversionsFromHTML()
+    {
+        assertHTML("<strong>bold</strong>", XMLUtils.toString(this.cleaner.clean("<b>bold</b>")));
+        assertHTML("<em>italic</em>", XMLUtils.toString(this.cleaner.clean("<i>italic</i>")));
+    }
+
     private void assertHTML(String expected, String actual)
     {
         assertEquals(HEADER + expected + FOOTER, actual);

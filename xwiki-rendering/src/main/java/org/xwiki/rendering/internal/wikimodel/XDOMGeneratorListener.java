@@ -296,10 +296,21 @@ public class XDOMGeneratorListener implements IWemListener
         // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
+    /**
+     * Called by wikimodel when there's more than 1 empty lines between blocks. For example the following will
+     * generate a call to <code>onEmptyLines(2)</code>:
+     * <code><pre>
+     * {{macro/}}
+     * ... empty line 1...
+     * ... empty line 2...
+     * {{macro/}}
+     * </pre></code
+     *
+     * @param count the number of empty lines separating the two blocks
+     */
     public void onEmptyLines(int count)
     {
-        // TODO Auto-generated method stub
-
+        // TODO: Handle. Note that this event is not yet sent by wikimodel by the wikimodel XWiki parser.
     }
 
     public void onEscape(String str)
@@ -337,6 +348,11 @@ public class XDOMGeneratorListener implements IWemListener
         this.stack.push(LineBreakBlock.LINE_BREAK_BLOCK);
     }
 
+    /**
+     * A macro block was found and it's separated at least by one new line from the next block. If there's no
+     * new line with the next block then wikimodel calls
+     * {@link #onMacroInline(String, org.wikimodel.wem.WikiParameters, String)} instead. 
+     */
     public void onMacroBlock(String macroName, WikiParameters params, String content)
     {
         Map<String, String> xwikiParams = new LinkedHashMap<String, String>();
@@ -344,9 +360,14 @@ public class XDOMGeneratorListener implements IWemListener
             xwikiParams.put(wikiParameter.getKey(), wikiParameter.getValue());
         }
 
+        // TODO: Handle the fact that there's a newline between this block and the next one. We need to register this
+        // somewhere in the XWiki blocks.
         this.stack.push(new MacroBlock(macroName, xwikiParams, content));
     }
 
+    /**
+     * @see #onMacroBlock(String, org.wikimodel.wem.WikiParameters, String)
+     */
     public void onMacroInline(String macroName, WikiParameters params, String content)
     {
         onMacroBlock(macroName, params, content);

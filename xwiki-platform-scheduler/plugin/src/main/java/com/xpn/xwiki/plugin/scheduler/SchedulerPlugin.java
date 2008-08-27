@@ -49,7 +49,7 @@ import com.xpn.xwiki.web.XWikiServletRequest;
 
 /**
  * See {@link com.xpn.xwiki.plugin.scheduler.SchedulerPluginApi} for documentation.
- * 
+ *
  * @version $Id$
  */
 public class SchedulerPlugin extends XWikiDefaultPlugin
@@ -71,7 +71,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Default plugin constructor.
-     * 
+     *
      * @see XWikiDefaultPlugin#XWikiDefaultPlugin(String,String,com.xpn.xwiki.XWikiContext)
      */
     public SchedulerPlugin(String name, String className, XWikiContext context)
@@ -81,7 +81,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see com.xpn.xwiki.plugin.XWikiPluginInterface#init(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -142,7 +142,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see com.xpn.xwiki.plugin.XWikiPluginInterface#virtualInit(com.xpn.xwiki.XWikiContext)
      */
     @Override
@@ -156,7 +156,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * fields "contextUser", "contextLang", "contextDatabase". If one of this field is empty (this would typically
      * happen on the first schedule operation), it is instead retrieved from the passed context, and the job object is
      * updated with this value. This mean that this method may modify the passed object.
-     * 
+     *
      * @param job the job for which the context will be prepared
      * @param context the XWikiContext at preparation time. This is a real context associated with a servlet request
      * @return the stub context prepared with job datas.
@@ -206,6 +206,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
         // lets now build the stub context
         XWikiContext scontext = (XWikiContext) context.clone();
         scontext.setWiki(context.getWiki());
+        context.getWiki().getStore().cleanUp(context);
 
         // We are sure the context request is a real servlet request
         // So we force the dummy request with the current host
@@ -250,7 +251,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * stored status. If a Job is stored with the status "Normal", it is just scheduled If a Job is stored with the
      * status "Paused", then it is both scheduled and paused Jobs with other status (None, Complete) are not
      * rescheduled.
-     * 
+     *
      * @param context The XWikiContext when initializing the plugin
      */
     private void restoreExistingJobs(XWikiContext context) throws SchedulerPluginException
@@ -287,7 +288,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * Retrieve the job's status of a given {@link com.xpn.xwiki.plugin.scheduler.SchedulerPlugin#XWIKI_JOB_CLASS} job
      * XObject, by asking the actual job status to the quartz scheduler instance. It's the actual status, as the one
      * stored in the XObject may be changed manually by users.
-     * 
+     *
      * @param object the XObject to give the status of
      * @return the status of the Job inside the quartz scheduler, as {@link com.xpn.xwiki.plugin.scheduler.JobState}
      *         instance
@@ -372,7 +373,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Pause the job with the given name by pausing all of its current triggers.
-     * 
+     *
      * @param object the non-wrapped XObject Job to be paused
      */
     public void pauseJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -391,7 +392,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Resume the job with the given name (un-pause)
-     * 
+     *
      * @param object the non-wrapped XObject Job to be resumed
      */
     public void resumeJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -410,7 +411,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Unschedule the given job
-     * 
+     *
      * @param object the unwrapped XObject job to be unscheduled
      */
     public void unscheduleJob(BaseObject object, XWikiContext context) throws SchedulerPluginException
@@ -429,7 +430,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Get Trigger object of the given job
-     * 
+     *
      * @param object the unwrapped XObject to be retrieve the trigger for
      * @return the trigger object of the given job
      */
@@ -453,7 +454,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Get the next fire time for the given job name SchedulerJob
-     * 
+     *
      * @param object unwrapped XObject job for which the next fire time will be given
      * @return the next Date the job will be fired at
      */
@@ -499,7 +500,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     /**
      * @return the default Scheduler instance
      * @throws SchedulerPluginException if the default Scheduler instance failed to be retrieved for any reason. Note
-     *             that on the first call the default scheduler is also initialized.
+     * that on the first call the default scheduler is also initialized.
      */
     private synchronized Scheduler getDefaultSchedulerInstance() throws SchedulerPluginException
     {
@@ -515,7 +516,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
 
     /**
      * Associates the scheduler with a StatusListener
-     * 
+     *
      * @throws SchedulerPluginException if the status listener failed to be set properly
      */
     private void setStatusListener() throws SchedulerPluginException
@@ -543,7 +544,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
      * Compute a cross-document unique {@link com.xpn.xwiki.objects.BaseObject} id, by concatenating its name (it's
      * document holder full name, such as "SomeSpace.SomeDoc") and it's instance number inside this document. <p/> The
      * scheduler uses this unique object id to assure the unicity of jobs
-     * 
+     *
      * @return a unique String that can identify the object
      */
     private String getObjectUniqueId(BaseObject object, XWikiContext context)
@@ -554,7 +555,7 @@ public class SchedulerPlugin extends XWikiDefaultPlugin
     /**
      * Creates the XWiki SchedulerJob XClass if it does not exist in the wiki. Update it if it exists but is missing
      * some properties.
-     * 
+     *
      * @param context the XWiki context
      * @throws SchedulerPluginException if the updated SchedulerJob XClass failed to be saved
      */

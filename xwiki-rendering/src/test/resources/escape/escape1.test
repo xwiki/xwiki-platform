@@ -1,26 +1,30 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-\*hello\*
+\*\*hello\*\*
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
 onEscape: [*]
+onEscape: [*]
 onWord: [hello]
+onEscape: [*]
 onEscape: [*]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p><pre><![CDATA[*]]></pre>hello<pre><![CDATA[*]]></pre></p>
+<p><pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre>hello<pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre></p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-\*hello\*
+\*\*hello\*\*
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
-.# TODO: Not defined yet....
+.# TODO: Wikimodel XHTML parser doesn't recognize escapes yet
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=44
+<html><p><pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre>hello<pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre></p></html>

@@ -129,7 +129,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/toc/macrotoc3", true);
 
         // Other
-        suite.addTestsFromResource("escape", false);
+        suite.addTestsFromResource("escape/escape1", false);
         suite.addTestsFromResource("horizontalline", false);
         suite.addTestsFromResource("html", false);
         suite.addTestsFromResource("links", false);

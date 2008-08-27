@@ -99,6 +99,13 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     public void virtualInit(XWikiContext context)
     {
         super.virtualInit(context);
+        try {
+            initWatchListClass(context);
+            sanitizeWatchlists(context);
+        } catch (XWikiException e) {
+            log.error("virtualInit", e);
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -115,7 +122,7 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
             initWatchlistJobs(context);
             sanitizeWatchlists(context);
         } catch (XWikiException e) {
-            log.error("virtualInit", e);
+            log.error("init", e);
             e.printStackTrace();
         }
     }
@@ -476,6 +483,40 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
     }
 
     /**
+     * Transforms a list of wiki:space in a lucene query
+     */
+    private String getLuceneQuery(String[] docs, String replaceString)
+    {
+        List query = new ArrayList();
+
+        for (int i = 0; i < docs.length; i++) {
+            if ((docs[i] != null) && (!docs[i].trim().equals(""))) {
+                query.add(docs[i].replaceAll("(.*):(.*)", replaceString));
+            }
+        }
+
+        return StringUtils.join(query, " OR ");
+    }
+
+    /**
+     * Transforms a list of wiki:space in a lucene query
+     */
+    private String getLuceneQuery(String documents, String spaces)
+    {
+        String watchedDocuments = getLuceneQuery(documents.split(","), "(wiki:$1 AND fullname:$2)");
+        String watchedSpaces = getLuceneQuery(spaces.trim().split(","), "(wiki:$1 AND web:$2)");
+        String request = null;
+        if (!StringUtils.isBlank(watchedSpaces) && !StringUtils.isBlank(watchedDocuments)) {
+            request = "(" + watchedSpaces + " OR " + watchedDocuments + ") AND type:wikipage";
+        } else if (StringUtils.isBlank(watchedSpaces) && !StringUtils.isBlank(watchedDocuments)) {
+            request = "(" + watchedDocuments + ") AND type:wikipage";
+        } else if (!StringUtils.isBlank(watchedSpaces) && StringUtils.isBlank(watchedDocuments)) {
+            request = "(" + watchedSpaces + ") AND type:wikipage";
+        }
+        return request;
+    }
+
+    /**
      * Get the list of the elements watched by user ordered by last modification date, descending
      *
      * @param user XWiki User
@@ -490,20 +531,9 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
 
         if (context.getWiki().isVirtualMode()) {
             // In virtual mode RSS feeds are generated from a Lucene query
-            String watchedDocuments = watchListObject.getLargeStringValue("documents").trim()
-                .replaceFirst("^,", "").replaceFirst("^(.*):(.*)", "(wiki:$1 AND fullname:$2)")
-                .replaceAll(",(.*):(.*)", " OR (wiki:$1 AND fullname:$2)");
-            String watchedSpaces = watchListObject.getLargeStringValue("spaces").trim()
-                .replaceFirst("^,", "").replaceFirst("^(.*):(.*)", "(wiki:$1 AND web:$2)")
-                .replaceAll(",(.*):(.*)", " OR (wiki:$1 AND web:$2)");
-            String request = null;
-            if (!StringUtils.isBlank(watchedSpaces) && !StringUtils.isBlank(watchedDocuments)) {
-                request = "(" + watchedSpaces + " OR " + watchedDocuments + ") AND type:wikipage";
-            } else if (StringUtils.isBlank(watchedSpaces) && !StringUtils.isBlank(watchedDocuments)) {
-                request = watchedDocuments + " AND type:wikipage";
-            } else if (!StringUtils.isBlank(watchedSpaces) && StringUtils.isBlank(watchedDocuments)) {
-                request = watchedSpaces + " AND type:wikipage";
-            }
+            String documents = watchListObject.getLargeStringValue("documents").trim();
+            String spaces = watchListObject.getLargeStringValue("spaces");
+            String request = getLuceneQuery(documents, spaces);
 
             if (!StringUtils.isBlank(request)) {
                 String language = StringUtils.isBlank(context.getLanguage()) ? "default" : context.getLanguage();
@@ -559,6 +589,10 @@ public class WatchListPlugin extends XWikiDefaultPlugin implements XWikiPluginIn
         } else {
             wikiServers = new ArrayList();
             wikiServers.add(context.getMainXWiki());
+        }
+
+        if (log.isInfoEnabled()) {
+            log.info("WatchList checking subscribers in wikis: " + StringUtils.join(wikiServers, ","));
         }
 
         try {

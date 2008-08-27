@@ -365,7 +365,7 @@ function displayDocExtra(extraID, extraTemplate, scrollToAnchor)
   // Nested function: insert a save button near a tages input field if the extra pane
   // passed as an argument (extraID) is the doc information pane.
   var insertTagSaveButton = function(extraID) {
-  	if (extraID == "Information") {
+  	if (extraID == "Information" && $('tageditsavewrapper') != null) {
     	$('tageditsavewrapper').className = "buttonwrapper";
     	Event.observe($('tageditsave'), 'click', function() {
  			new Ajax.Request(

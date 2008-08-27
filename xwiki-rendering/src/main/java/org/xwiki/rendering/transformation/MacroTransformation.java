@@ -104,14 +104,16 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         int executions = 0;
         List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
         while (!macroBlocks.isEmpty() && executions < this.maxMacroExecutions) {
-            transformOnce(macroBlocks, context, syntax);
+            if (!transformOnce(macroBlocks, context, syntax)) {
+                break;
+            }
             // TODO: Make this less inefficient by caching the blocks list.
             macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
             executions++;
         }
     }
 
-    private void transformOnce(List<MacroBlock> macroBlocks, MacroTransformationContext context, Syntax syntax)
+    private boolean transformOnce(List<MacroBlock> macroBlocks, MacroTransformationContext context, Syntax syntax)
         throws TransformationException
     {
         List<MacroHolder> macroHolders = new ArrayList<MacroHolder>();
@@ -132,7 +134,7 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         }
         // If no macros were found, return with no changes. This can happen if the macros fail to be found.
         if (macroHolders.isEmpty()) {
-            return;
+            return false;
         }
         // Sort the Macros by priority
         Collections.sort(macroHolders);
@@ -181,5 +183,6 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         }
         childrenBlocks.addAll(pos, resultBlocks);
         childrenBlocks.remove(pos + resultBlocks.size());
+        return true;
     }
 }

@@ -19,6 +19,14 @@
  */
 package org.xwiki.rendering.macro.include;
 
+import java.io.StringReader;
+import java.util.List;
+
+import org.xwiki.context.Execution;
+import org.xwiki.context.ExecutionContext;
+import org.xwiki.context.ExecutionContextInitializerException;
+import org.xwiki.context.ExecutionContextInitializerManager;
+import org.xwiki.rendering.DocumentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -31,14 +39,6 @@ import org.xwiki.rendering.parser.Syntax;
 import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
 import org.xwiki.rendering.transformation.Transformation;
-import org.xwiki.rendering.DocumentManager;
-import org.xwiki.context.ExecutionContextInitializerManager;
-import org.xwiki.context.ExecutionContext;
-import org.xwiki.context.ExecutionContextInitializerException;
-import org.xwiki.context.Execution;
-
-import java.util.List;
-import java.io.StringReader;
 
 /**
  * @version $Id$

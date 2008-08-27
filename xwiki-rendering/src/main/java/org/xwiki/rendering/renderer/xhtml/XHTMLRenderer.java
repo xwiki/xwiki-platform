@@ -22,16 +22,16 @@ package org.xwiki.rendering.renderer.xhtml;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.xwiki.rendering.listener.ListType;
-import org.xwiki.rendering.listener.SectionLevel;
-import org.xwiki.rendering.listener.Link;
-import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.renderer.Renderer;
-import org.xwiki.rendering.renderer.WikiPrinter;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.AbstractPrintRenderer;
 import org.xwiki.rendering.DocumentManager;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
+import org.xwiki.rendering.listener.Format;
+import org.xwiki.rendering.listener.Link;
+import org.xwiki.rendering.listener.ListType;
+import org.xwiki.rendering.listener.SectionLevel;
+import org.xwiki.rendering.renderer.AbstractPrintRenderer;
+import org.xwiki.rendering.renderer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.Renderer;
+import org.xwiki.rendering.renderer.WikiPrinter;
 
 /**
  * Generates XHTML from a {@link org.xwiki.rendering.block.XDOM} object being traversed.
@@ -44,7 +44,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     private DocumentManager documentManager;
 
     private RenderingConfiguration configuration;
-    
+
     /**
      * A temporary service offering methods manipulating XWiki Documents that are needed to output the correct XHTML.
      * For example this is used to verify if a document exists when computing the HREF attribute for a link. It's
@@ -56,9 +56,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     private XHTMLIdGenerator idGenerator;
 
     /**
-     * Used to save the original Printer when we redirect all outputs to a new Printer to compute a section title.
-     * We need to do this since the XHTML we generate for a section title contains a unique id that we generate based
-     * on the section title and the events for the section title are generated after the beginSection() event.
+     * Used to save the original Printer when we redirect all outputs to a new Printer to compute a section title. We
+     * need to do this since the XHTML we generate for a section title contains a unique id that we generate based on
+     * the section title and the events for the section title are generated after the beginSection() event.
      */
     private WikiPrinter originalPrinter;
 
@@ -73,7 +73,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      * @param printer the object to which to write the XHTML output to
      * @param documentManager see {@link #documentManager}
      */
-    public XHTMLRenderer(WikiPrinter printer, DocumentManager documentManager, RenderingConfiguration configuration)
+    public XHTMLRenderer(WikiPrinter printer, DocumentManager documentManager,
+        RenderingConfiguration configuration)
     {
         super(printer);
         this.documentManager = documentManager;
@@ -110,8 +111,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void beginFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 print("<strong>");
                 break;
@@ -140,13 +140,12 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     *
-     * @see Renderer#endFormat(org.xwiki.rendering.listener.Format) 
+     * 
+     * @see Renderer#endFormat(org.xwiki.rendering.listener.Format)
      */
     public void endFormat(Format format)
     {
-        switch(format)
-        {
+        switch (format) {
             case BOLD:
                 print("</strong>");
                 break;
@@ -225,7 +224,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#onMacro(String, java.util.Map, String)  
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#onMacro(String, java.util.Map, String)
      */
     public void onMacro(String name, Map<String, String> parameters, String content)
     {
@@ -235,7 +235,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#beginSection(org.xwiki.rendering.listener.SectionLevel)  
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#beginSection(org.xwiki.rendering.listener.SectionLevel)
      */
     public void beginSection(SectionLevel level)
     {
@@ -259,7 +260,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#endSection(org.xwiki.rendering.listener.SectionLevel)  
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#endSection(org.xwiki.rendering.listener.SectionLevel)
      */
     public void endSection(SectionLevel level)
     {
@@ -275,7 +277,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#onWord(String)  
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#onWord(String)
      */
     public void onWord(String word)
     {
@@ -284,6 +287,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onSpace()
      */
     public void onSpace()
@@ -293,6 +297,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onSpecialSymbol(String)
      */
     public void onSpecialSymbol(String symbol)
@@ -302,6 +307,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#onEscape(String)
      */
     public void onEscape(String escapedString)
@@ -315,7 +321,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#beginList(org.xwiki.rendering.listener.ListType)  
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#beginList(org.xwiki.rendering.listener.ListType)
      */
     public void beginList(ListType listType)
     {
@@ -328,6 +335,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#beginListItem()
      */
     public void beginListItem()
@@ -337,6 +345,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#endList(org.xwiki.rendering.listener.ListType)
      */
     public void endList(ListType listType)
@@ -350,6 +359,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#endListItem()
      */
     public void endListItem()
@@ -359,6 +369,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#beginXMLElement(String, java.util.Map)
      */
     public void beginXMLElement(String name, Map<String, String> attributes)
@@ -372,7 +383,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#endXMLElement(String, java.util.Map)  
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#endXMLElement(String, java.util.Map)
      */
     public void endXMLElement(String name, Map<String, String> attributes)
     {
@@ -381,6 +393,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#beginMacroMarker(String, java.util.Map, String)
      */
     public void beginMacroMarker(String name, Map<String, String> parameters, String content)
@@ -390,6 +403,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.rendering.renderer.Renderer#endMacroMarker(String, java.util.Map, String)
      */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
@@ -399,7 +413,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#onId(String)  
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#onId(String)
      */
     public void onId(String name)
     {
@@ -408,7 +423,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine() 
+     * 
+     * @see org.xwiki.rendering.renderer.Renderer#onHorizontalLine()
      */
     public void onHorizontalLine()
     {

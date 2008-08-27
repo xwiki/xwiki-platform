@@ -19,20 +19,21 @@
  */
 package org.xwiki.rendering;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import junit.framework.Test;
 import junit.framework.TestCase;
-import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.rendering.renderer.EventsRenderer;
-import org.xwiki.rendering.scaffolding.PrintRendererFactory;
-import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.TexRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
-import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
 
-import java.util.Map;
-import java.util.HashMap;
+import org.xwiki.rendering.renderer.DefaultWikiPrinter;
+import org.xwiki.rendering.renderer.EventsRenderer;
+import org.xwiki.rendering.renderer.PrintRenderer;
+import org.xwiki.rendering.renderer.TexRenderer;
+import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
+import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
+import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
+import org.xwiki.rendering.scaffolding.PrintRendererFactory;
+import org.xwiki.rendering.scaffolding.RenderingTestSuite;
 
 import com.xpn.xwiki.test.PlexusTestSetup;
 

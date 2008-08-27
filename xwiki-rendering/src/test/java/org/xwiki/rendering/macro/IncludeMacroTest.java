@@ -19,19 +19,21 @@
  */
 package org.xwiki.rendering.macro;
 
+import java.io.StringWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.jmock.Mock;
+import org.xwiki.rendering.DocumentManager;
+import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.include.IncludeMacro;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters.Context;
 import org.xwiki.rendering.macro.velocity.VelocityMacro;
 import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
 import org.xwiki.rendering.transformation.MacroTransformationContext;
-import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.DocumentManager;
 import org.xwiki.velocity.VelocityManager;
-import org.jmock.Mock;
-
-import java.util.List;
-import java.io.StringWriter;
 
 /**
  * Unit tests for {@link IncludeMacro}.

@@ -29,9 +29,9 @@ import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
+import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.parameter.EnumConverter;
@@ -105,6 +105,7 @@ public class MacroTransformation extends AbstractTransformation implements Compo
         List<MacroBlock> macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
         while (!macroBlocks.isEmpty() && executions < this.maxMacroExecutions) {
             transformOnce(macroBlocks, context, syntax);
+            // TODO: Make this less inefficient by caching the blocks list.
             macroBlocks = dom.getChildrenByType(MacroBlock.class, true);
             executions++;
         }

@@ -21,6 +21,7 @@ package com.xpn.xwiki.plugin.watchlist;
 
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.api.Object;
 import com.xpn.xwiki.api.Context;
@@ -38,7 +39,12 @@ import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.xwiki.context.Execution;
+import org.xwiki.container.servlet.ServletContainerInitializer;
+import org.xwiki.container.servlet.ServletContainerException;
+import org.xwiki.container.Container;
 
+import javax.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -69,21 +75,60 @@ public class WatchListJob implements Job
 
     protected String logprefix;
 
+    protected Execution execution = null;
+
     /**
      * Sets objects required by the Job : XWiki, XWikiContext, WatchListPlugin, etc
      *
      * @param jobContext Context of the request
      */
-    public void init(JobExecutionContext jobContext) throws XWikiException
+    public void init(JobExecutionContext jobContext) throws Exception
     {
         JobDataMap data = jobContext.getJobDetail().getJobDataMap();
-        context = (XWikiContext) data.get("context");
+        // clone the context to make sure we have a new one per run
+        context = (XWikiContext) ((XWikiContext) data.get("context")).clone();
+        // clean up the database connections
+        context.getWiki().getStore().cleanUp(context);
         plugin = (WatchListPlugin) context.getWiki().getPlugin(WatchListPlugin.ID, context);
         xjob = (BaseObject) data.get("xjob");
         jobMailTemplate = xjob.getLargeStringValue("script").trim();
         // retreive the interval from job name (1=hourly, 2=daily, etc)
         interval = Integer.parseInt(xjob.getName().substring(xjob.getName().length() - 1));
         logprefix = "WatchList job " + context.getDatabase() + ":" + xjob.getName() + " ";
+    }
+
+    protected void initializeContainerComponent(XWikiContext context) throws ServletException
+    {
+        // Initialize the Container fields (request, response, session).
+        // Note that this is a bridge between the old core and the component architecture.
+        // In the new component architecture we use ThreadLocal to transport the request,
+        // response and session to components which require them.
+        // In the future this Servlet will be replaced by the XWikiPlexusServlet Servlet.
+        ServletContainerInitializer containerInitializer =
+            (ServletContainerInitializer) Utils.getComponent(ServletContainerInitializer.ROLE);
+
+        try {
+            containerInitializer.initializeRequest(context.getRequest().getHttpServletRequest(),
+                context);
+            containerInitializer.initializeResponse(context.getResponse()
+                .getHttpServletResponse());
+            containerInitializer.initializeSession(context.getRequest().getHttpServletRequest());
+        } catch (ServletContainerException e) {
+            throw new ServletException("Failed to initialize Request/Response or Session", e);
+        }
+    }
+
+    protected void cleanupComponents()
+    {
+        Container container = (Container) Utils.getComponent(Container.ROLE);
+        Execution execution = (Execution) Utils.getComponent(Execution.ROLE);
+
+        // We must ensure we clean the ThreadLocal variables located in the Container and Execution
+        // components as otherwise we will have a potential memory leak.
+        container.removeRequest();
+        container.removeResponse();
+        container.removeSession();
+        execution.removeContext();
     }
 
     /**
@@ -94,8 +139,14 @@ public class WatchListJob implements Job
     public void execute(JobExecutionContext jobContext) throws JobExecutionException
     {
         try {
-            // Set required objects
-            init(jobContext);
+            try {
+                // Set required objects
+                init(jobContext);
+                // init components (needed for velocity to work)
+                initializeContainerComponent(this.context);
+            } catch (Exception e) {
+                LOG.error(logprefix + "exception while initializing watchlist job", e);
+            }
 
             // Retreive notification subscribers (all wikis)
             Collection subscribers = retrieveNotificationSubscribers();
@@ -109,6 +160,8 @@ public class WatchListJob implements Job
                         // Retreive WatchList Object for each subscribers
                         Document subscriber = new Document(
                             context.getWiki().getDocument((String) it.next(), context), context);
+                        LOG.info(logprefix + "checkingDocumentsForUser " +
+                            subscriber.getFullName());
                         Object userObj = subscriber.getObject("XWiki.XWikiUsers");
                         Object notificationCriteria =
                             subscriber.getObject(WatchListPlugin.WATCHLIST_CLASS);
@@ -127,19 +180,34 @@ public class WatchListJob implements Job
                             try {
                                 sendNotificationMessage(subscriber, matchingDocuments);
                             } catch (Exception e) {
-                                LOG.error(logprefix + "exception while sending email to " +
-                                    subscriber.display("email", "view") + " with " +
-                                    matchingDocuments.size() + " matching documents");
-                                e.printStackTrace();
+                                if (LOG.isErrorEnabled()) {
+                                    LOG.error(logprefix + "exception while sending email to " +
+                                        subscriber.getValue("email") + " with " +
+                                        matchingDocuments.size() + " matching documents", e);
+                                }
                             }
                         }
                     } catch (XWikiException e) {
-                        e.printStackTrace();
+                        if (LOG.isErrorEnabled()) {
+                            LOG.error("Exception while running job for one user", e);
+                        }
                     }
                 }
             }
         } catch (XWikiException e) {
-            // We're in a job, don't throw it   
+            // We're in a job, don't throw it
+            if (LOG.isErrorEnabled()) {
+                LOG.error("Exception while running job", e);
+            }
+        } finally {
+            // give back execution context
+            try {
+                cleanupComponents();
+            } catch (Throwable e) {
+                // Don't throw anything to be sure that the finally will continue
+            }
+            // cleanup use database connections
+            context.getWiki().getStore().cleanUp(context);
         }
     }
 
@@ -154,9 +222,9 @@ public class WatchListJob implements Job
     private List filter(List updatedDocuments,
         Object notificationCriteria, String subscriber) throws XWikiException
     {
-        String spaceCriterion = (String) notificationCriteria.display("spaces", "view");
-        String documentCriterion = (String) notificationCriteria.display("documents", "view");
-        String query = (String) notificationCriteria.display("query", "view");
+        String spaceCriterion = (String) notificationCriteria.getProperty("spaces").getValue();
+        String documentCriterion = (String) notificationCriteria.getProperty("documents").getValue();
+        String query = (String) notificationCriteria.getProperty("query").getValue();
 
         List watchedDocuments = new ArrayList();
         if (spaceCriterion.length() == 0 && documentCriterion.length() == 0
@@ -188,14 +256,28 @@ public class WatchListJob implements Job
                 updatedDocument.getWiki() + ":" + updatedDocument.getSpace();
             boolean documentAdded = false;
 
-            for (int i = 0; i < watchedSpaces.length; i++) {
-                if (updatedDocumentSpace.equals(watchedSpaces[i])
-                    && context.getWiki().getRightService()
-                    .hasAccessLevel("view", subscriber, updatedDocumentName, context))
-                {
-                    filteredDocumentList.add(updatedDocumentName);
-                    documentAdded = true;
-                    break;
+            if (watchedSpaces != null) {
+                for (int i = 0; i < watchedSpaces.length; i++) {
+                    if (updatedDocumentSpace.equals(watchedSpaces[i])) {
+                        String origDatabase = context.getDatabase();
+                        try {
+                            context.setDatabase(updatedDocument.getWiki());
+                            if (context.getWiki().getRightService()
+                                .hasAccessLevel("view", subscriber, updatedDocumentName, context))
+                            {
+                                filteredDocumentList.add(updatedDocumentName);
+                                documentAdded = true;
+                                break;
+                            } else {
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info("Matching doc " + updatedDocumentName + " for subscriber " + subscriber +
+                                        " missing rights in context " + context.getDatabase());
+                                }
+                            }
+                        } finally {
+                            context.setDatabase(origDatabase);
+                        }
+                    }
                 }
             }
 
@@ -205,12 +287,25 @@ public class WatchListJob implements Job
                 Iterator watchedDocumentIt = watchedDocuments.iterator();
                 while (watchedDocumentIt.hasNext()) {
                     String watchedDocumentName = (String) watchedDocumentIt.next();
-                    if (updatedDocumentName.equals(watchedDocumentName)
-                        && context.getWiki().getRightService()
-                        .hasAccessLevel("view", subscriber, updatedDocumentName, context))
-                    {
-                        filteredDocumentList.add(updatedDocumentName);
-                        break;
+                    if (updatedDocumentName.equals(watchedDocumentName)) {
+                        String origDatabase = context.getDatabase();
+                        try {
+                            context.setDatabase(updatedDocument.getWiki());
+                            if (context.getWiki().getRightService()
+                                .hasAccessLevel("view", subscriber, updatedDocumentName, context))
+                            {
+                                filteredDocumentList.add(updatedDocumentName);
+                                documentAdded = true;
+                                break;
+                            } else {
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info("Matching doc " + updatedDocumentName + " for subscriber " + subscriber +
+                                        " missing rights in context " + context.getDatabase());
+                                }
+                            }
+                        } finally {
+                            context.setDatabase(origDatabase);
+                        }
                     }
                 }
             }
@@ -281,7 +376,7 @@ public class WatchListJob implements Job
     {
         // Get user email
         Object userObj = subscriber.getObject("XWiki.XWikiUsers");
-        String emailAddr = (String) userObj.display("email", "view");
+        String emailAddr = (String) userObj.getProperty("email").getValue();
         if (emailAddr == null || emailAddr.length() == 0 || emailAddr.indexOf("@") < 0) {
             // Invalid email
             return;
@@ -289,7 +384,7 @@ public class WatchListJob implements Job
 
         // Prepare email template (wiki page) context
         VelocityContext vcontext = new VelocityContext();
-        vcontext.put("pseudo", userObj.display("first_name", "view"));
+        vcontext.put("pseudo", userObj.getProperty("first_name").getValue());
         vcontext.put("documents", updatedDocuments);
         vcontext.put("interval", new Integer(interval));
         vcontext.put("xwiki", new com.xpn.xwiki.api.XWiki(context.getWiki(), context));

@@ -52,7 +52,7 @@ public class DefaultHTMLCleanerTest extends TestCase
 
     public void testConversionsFromHTML()
     {
-        assertHTML("<strong>bold</strong>", "<b>bold</b>");
+        assertHTML("this <strong>is</strong> bold", "this <b>is</b> bold");
         assertHTML("<em>italic</em>", "<i>italic</i>");
     }
 

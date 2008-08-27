@@ -53,7 +53,7 @@ public final class XMLUtils
         DOMBuilder builder = new DOMBuilder();
         org.jdom.Document jdomDoc = builder.build(document);
 
-        Format format = Format.getCompactFormat();
+        Format format = Format.getRawFormat();
         // Force newlines to use \n since otherwise the default is \n\r.
         // See http://www.jdom.org/docs/apidocs/org/jdom/output/Format.html#setLineSeparator(java.lang.String)
         format.setLineSeparator("\n");

@@ -39,9 +39,19 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 {
     private StringBuffer listStyle = new StringBuffer();
 
-    private boolean needsLineBreakForList = false;
+    private boolean needsNewLine = false;
 
     private boolean isInsideMacroMarker = false;
+
+    private boolean isLastElementAParagraph = false;
+
+    private boolean isBeginListItemFound = false;
+
+    private boolean isEndListItemFound = false;
+
+    private int listDepth = 0;
+
+    private boolean isLastElementAList = false;
 
     private XWikiMacroPrinter macroPrinter;
 
@@ -172,8 +182,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginParagraph()
     {
-        addLineBreak();
-        addLineBreak();
+        if (this.isLastElementAParagraph) {
+            print("\n");
+        } else if (this.isLastElementAList) {
+            print("\n");
+            print("\n");
+        }
     }
 
     /**
@@ -182,7 +196,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endParagraph()
     {
-        // Nothing to do
+        this.needsNewLine = true;
+        this.isLastElementAParagraph = true;
     }
 
     /**
@@ -220,7 +235,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     {
         String prefix;
 
-        addLineBreak();
         switch (level) {
             case LEVEL1:
                 prefix = "1";
@@ -250,7 +264,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endSection(SectionLevel level)
     {
-        // Nothing to do
+        this.needsNewLine = true;
     }
 
     /**
@@ -304,9 +318,11 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginList(ListType listType)
     {
-        if (this.needsLineBreakForList) {
+        this.listDepth++;
+
+        if (this.isBeginListItemFound && !this.isEndListItemFound) {
             print("\n");
-            this.needsLineBreakForList = false;
+            this.isBeginListItemFound = false;
         }
 
         if (listType == ListType.BULLETED) {
@@ -322,7 +338,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginListItem()
     {
-        this.needsLineBreakForList = true;
+        if (this.isEndListItemFound) {
+            print("\n");
+            this.isEndListItemFound = false;
+            this.isBeginListItemFound = false;
+        }
+        this.isBeginListItemFound = true;
 
         print(this.listStyle.toString());
         if (this.listStyle.charAt(0) == '1') {
@@ -337,12 +358,11 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endList(ListType listType)
     {
-        if (this.needsLineBreakForList) {
-            print("\n");
-            this.needsLineBreakForList = false;
-        }
-
         this.listStyle.setLength(this.listStyle.length() - 1);
+
+        // Set a flag so that we can output 2 new lines if the next element is a paragraph.
+        this.isLastElementAList = true;
+        this.listDepth--;
     }
 
     /**
@@ -351,10 +371,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void endListItem()
     {
-        if (this.needsLineBreakForList) {
-            print("\n");
-            this.needsLineBreakForList = false;
-        }
+        this.isEndListItemFound = true;
     }
 
     /**
@@ -414,21 +431,21 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void onHorizontalLine()
     {
         print("----");
+        this.needsNewLine = true;
     }
 
     protected void print(String text)
     {
         if (!this.isInsideMacroMarker) {
+            if (this.needsNewLine) {
+                super.print("\n");
+            }
+            this.needsNewLine = false;
+            this.isLastElementAParagraph = false;
+            if (this.listDepth == 0) {
+                this.isLastElementAList = false;
+            }
             super.print(text);
-            // The first text written shouldn't have a linebreak added.
-            this.needsLineBreakForList = true;
-        }
-    }
-
-    private void addLineBreak()
-    {
-        if (this.needsLineBreakForList) {
-            print("\n");
         }
     }
 }

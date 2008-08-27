@@ -1,39 +1,38 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# This is a list since there's a space after the list symbol
 .#-----------------------------------------------------
-* * item
-1. 1. item
+* Item
+This is not a paragraph
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginList: [BULLETED]
 beginListItem
-onSpecialSymbol: [*]
+onWord: [Item]
+onLineBreak
+onWord: [This]
 onSpace
-onWord: [item]
+onWord: [is]
+onSpace
+onWord: [not]
+onSpace
+onWord: [a]
+onSpace
+onWord: [paragraph]
 endListItem
 endList: [BULLETED]
-beginList: [NUMBERED]
-beginListItem
-onWord: [1]
-onSpecialSymbol: [.]
-onSpace
-onWord: [item]
-endListItem
-endList: [NUMBERED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<ul class="star"><li>* item</li></ul><ol><li>1. item</li></ol>
+<ul class="star"><li>Item<br/>This is not a paragraph</li></ul>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-* * item
-1. 1. item
+* Item
+This is not a paragraph
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><ul class="star"><li>* item</li></ul><ol><li>1. item</li></ol></html>
+<html><ul class="star"><li>Item<br/>This is not a paragraph</li></ul></html>

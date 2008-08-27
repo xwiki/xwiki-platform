@@ -111,6 +111,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("monospace/monospace1", false);
         suite.addTestsFromResource("paragraph/paragraph1", false);
         suite.addTestsFromResource("paragraph/paragraph2", false);
+        suite.addTestsFromResource("paragraph/paragraph3", false);
 
         // Macros
         suite.addTestsFromResource("macros/macro", false);
@@ -136,6 +137,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/list1", false);
         suite.addTestsFromResource("list/list2", false);
         suite.addTestsFromResource("list/list3", false);
+        suite.addTestsFromResource("list/list4", false);
+        suite.addTestsFromResource("list/list5", false);
         suite.addTestsFromResource("section", false);
 
         return new PlexusTestSetup(suite);

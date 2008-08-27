@@ -102,8 +102,6 @@ endDocument
 ** Item 4
 * Item 5
 * Item 6
-.# TODO: We need to fix the XWikiSyntaxRenderer so that a new line is not added
-
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------

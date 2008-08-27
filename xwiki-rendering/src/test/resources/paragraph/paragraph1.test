@@ -1,40 +1,45 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-hello ~~beautiful~~ **world**
+this is one
+paragraph
+
+this is another one
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onWord: [hello]
+onWord: [this]
 onSpace
-beginItalic
-onWord: [beautiful]
-endItalic
+onWord: [is]
 onSpace
-beginBold
-onWord: [world]
-endBold
+onWord: [one]
+onLineBreak
+onWord: [paragraph]
+endParagraph
+beginParagraph
+onWord: [this]
+onSpace
+onWord: [is]
+onSpace
+onWord: [another]
+onSpace
+onWord: [one]
 endParagraph
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>hello <em class="italic">beautiful</em> <strong>world</strong></p>
+<p>this is one<br/>paragraph</p><p>this is another one</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-hello ~~beautiful~~ **world**
+this is one
+paragraph
+
+this is another one
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>hello <em class="italic">beautiful</em> <strong>world</strong></p></html>
-.#-----------------------------------------------------
-.input|confluence/1.0
-.#-----------------------------------------------------
-hello _beautiful_ *world*
-.#-----------------------------------------------------
-.expect|tex|skip
-.#-----------------------------------------------------
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=24
+<html><p>this is one<br/>paragraph</p><p>this is another one</p></html>

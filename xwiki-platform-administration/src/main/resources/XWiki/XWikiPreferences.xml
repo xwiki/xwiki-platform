@@ -1969,7 +1969,7 @@ Hello $xwiki.getUserName("XWiki.$xwikiname", false),
 This email address was used to register a new account on ${wikiname}. If you did not make the request, please ignore this message.
 
 In order to activate your account, please follow this link:
-$xwiki.getDocument("XWiki.AccountValidation").getExternalURL("view", "validkey=${validkey}&xwikiname=${xwikiname}")</validation_email_content>
+$xwiki.getDocument("XWiki.AccountValidation").getExternalURL("view", "validkey=${validkey}&amp;xwikiname=${xwikiname}")</validation_email_content>
 </property>
 <property>
 <version>XWiki Enterprise $xwiki.getVersion() - &lt;a onclick="openURL('http://enterprise.xwiki.org/xwiki/bin/view/Main/Documentation', '_blank'); return false;" href="http://www.xwiki.org/xwiki/bin/view/Main/Documentation"&gt;Documentation&lt;/a&gt;</version>

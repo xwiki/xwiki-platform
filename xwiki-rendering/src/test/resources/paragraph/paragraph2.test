@@ -1,0 +1,21 @@
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.# Testing with a full XHTML header since apparently
+.# this was causing some problem.
+.#-----------------------------------------------------
+.# TODO: Bug in wikimodel XHTML parser
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=45
+<?xml version="1.0" encoding="UTF-8"?>
+<html><head /><body>one two three</body></html>
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [one]
+onSpace
+onWord: [two]
+onSpace
+onWord: [three]
+endParagraph
+endDocument

@@ -110,7 +110,8 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("superscript/superscript1", false);
         suite.addTestsFromResource("subscript/subscript1", false);
         suite.addTestsFromResource("monospace/monospace1", false);
-        suite.addTestsFromResource("paragraph", false);
+        suite.addTestsFromResource("paragraph/paragraph1", false);
+        suite.addTestsFromResource("paragraph/paragraph2", false);
 
         // Macros
         suite.addTestsFromResource("macros/macro", false);

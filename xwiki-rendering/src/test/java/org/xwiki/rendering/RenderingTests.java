@@ -94,7 +94,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("bold/bold5", false);
         suite.addTestsFromResource("bold/bold6", false);
         suite.addTestsFromResource("bold/bold7", false);
-        suite.addTestsFromResource("bold/bold1", false);
         suite.addTestsFromResource("italic/italic1", false);
         suite.addTestsFromResource("italic/italic2", false);
         suite.addTestsFromResource("italic/italic3", false);
@@ -134,7 +133,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("horizontalline", false);
         suite.addTestsFromResource("html", false);
         suite.addTestsFromResource("links", false);
-        suite.addTestsFromResource("list", false);
+        suite.addTestsFromResource("list/list1", false);
+        suite.addTestsFromResource("list/list2", false);
+        suite.addTestsFromResource("list/list3", false);
         suite.addTestsFromResource("section", false);
 
         return new PlexusTestSetup(suite);

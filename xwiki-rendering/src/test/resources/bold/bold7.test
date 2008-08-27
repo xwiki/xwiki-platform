@@ -1,21 +1,33 @@
 .#-----------------------------------------------------
-.input|xwiki/2.0|skip
+.input|xwiki/2.0
+.# This is actually an empty bold (****) which is discarded by WikiModel
 .#-----------------------------------------------------
-This is ***** bold
+This is ***** not bold
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
-.# TODO: Wikimodel doesn't generate a valid result.
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=36
+beginDocument
+beginParagraph
+onWord: [This]
+onSpace
+onWord: [is]
+onSpace
+onSpecialSymbol: [*]
+onSpace
+onWord: [not]
+onSpace
+onWord: [bold]
+endParagraph
+endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-.# TODO: Add expected result when we know it...
+<p>This is * not bold</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-.# TODO: Add expected result when we know it...
+This is * not bold
 .#-----------------------------------------------------
-.input|xhtml/1.0|skip
+.input|xhtml/1.0
 .#-----------------------------------------------------
-.# TODO: Add input when we know it...
+<html><p>This is * not bold</p></html>

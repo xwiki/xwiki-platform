@@ -457,12 +457,14 @@ public class XDOMGeneratorListener implements IWemListener
         // There's no XWiki syntax for tables. Instead there's a table macro.
     }
 
+    // Equivalent of <pre>
     public void onVerbatimBlock(String str)
     {
         // TODO Auto-generated method stub
 
     }
 
+    // Equivalent of <tt>
     public void onVerbatimInline(String str)
     {
         // TODO Auto-generated method stub

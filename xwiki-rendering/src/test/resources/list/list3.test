@@ -1,40 +1,41 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Note that we're testing here the bold syntax at the beginning of a line. We want to verify it's not
-.# mistaken for a list.
+.# This is a list since there's a space after the list symbol
 .#-----------------------------------------------------
-**This is bold and not a list
+* * item
+1. 1. item
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-beginParagraph
-beginBold
-onWord: [This]
+beginList: [BULLETED]
+beginListItem
+onSpecialSymbol: [*]
 onSpace
-onWord: [is]
+onWord: [item]
+endListItem
+endList: [BULLETED]
+beginList: [NUMBERED]
+beginListItem
+onWord: [1]
+onSpecialSymbol: [.]
 onSpace
-onWord: [bold]
-onSpace
-onWord: [and]
-onSpace
-onWord: [not]
-onSpace
-onWord: [a]
-onSpace
-onWord: [list]
-endBold
-endParagraph
+onWord: [item]
+endListItem
+endList: [NUMBERED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p><strong>This is bold and not a list</strong></p>
+<ul class="star"><li>* item</li></ul><ol><li>1. item</li></ol>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-**This is bold and not a list**
+* * item
+1. 1. item
+.# TODO: We need to fix the XWikiSyntaxRenderer so that a new line is not added       
+
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><strong>This is bold and not a list</strong></p></html>
+<html><ul class="star"><li>* item</li></ul><ol><li>1. item</li></ol></html>

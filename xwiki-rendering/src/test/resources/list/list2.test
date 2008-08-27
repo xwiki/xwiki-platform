@@ -1,40 +1,40 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# Note that we're testing here the bold syntax at the beginning of a line. We want to verify it's not
-.# mistaken for a list.
+.# This is not a list since lists must have at least one space after the list symbol
 .#-----------------------------------------------------
-**This is bold and not a list
+*Not a list
+1.Not a list
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-beginBold
-onWord: [This]
-onSpace
-onWord: [is]
-onSpace
-onWord: [bold]
-onSpace
-onWord: [and]
-onSpace
-onWord: [not]
+onSpecialSymbol: [*]
+onWord: [Not]
 onSpace
 onWord: [a]
 onSpace
 onWord: [list]
-endBold
 endParagraph
+beginSection: [1]
+onSpecialSymbol: [.]
+onWord: [Not]
+onSpace
+onWord: [a]
+onSpace
+onWord: [list]
+endSection: [1]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p><strong>This is bold and not a list</strong></p>
+<p>*Not a list</p><h1 id="HNotalist"><span>.Not a list</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-**This is bold and not a list**
+*Not a list
+1 .Not a list
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p><strong>This is bold and not a list</strong></p></html>
+<html><p>*Not a list</p><h1 id="HNotalist"><span>.Not a list</span></h1></html>

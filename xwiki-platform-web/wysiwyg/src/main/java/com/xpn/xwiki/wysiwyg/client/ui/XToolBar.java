@@ -22,7 +22,6 @@ package com.xpn.xwiki.wysiwyg.client.ui;
 import java.util.Iterator;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HasWidgets;
@@ -56,7 +55,7 @@ public class XToolBar extends Composite implements HasWidgets, IndexedPanel
     public void add(Widget w)
     {
         clearFloats.removeFromParent();
-        if ("div".equals(DOM.getElementProperty(w.getElement(), "tagName").toLowerCase())) {
+        if ("div".equals(w.getElement().getTagName().toLowerCase())) {
             panel.add(w);
         } else {
             FlowPanel toolBarItem = new FlowPanel();

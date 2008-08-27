@@ -19,20 +19,29 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.separator;
 
+import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.user.client.ui.PushButton;
+import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.Wysiwyg;
 import com.xpn.xwiki.wysiwyg.client.plugin.Config;
 import com.xpn.xwiki.wysiwyg.client.plugin.internal.AbstractPlugin;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.CompositeUIExtension;
+import com.xpn.xwiki.wysiwyg.client.plugin.internal.FocusWidgetUIExtension;
+import com.xpn.xwiki.wysiwyg.client.ui.Images;
+import com.xpn.xwiki.wysiwyg.client.ui.Strings;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 
 /**
  * Utility plug-in for separating tool bar entries, menu entries and so on.
  */
-public class SeparatorPlugin extends AbstractPlugin
+public class SeparatorPlugin extends AbstractPlugin implements ClickListener
 {
-    /**
-     * User interface extension that provides ways of separating tool bar entries.
-     */
-    private ToolBarSeparator tbs = new ToolBarSeparator();
+    private PushButton hr;
+
+    private final FocusWidgetUIExtension toolBarFocusWidgets = new FocusWidgetUIExtension("toolbar");
+
+    private final CompositeUIExtension toolBarExtension = new CompositeUIExtension("toolbar");
 
     /**
      * {@inheritDoc}
@@ -42,6 +51,57 @@ public class SeparatorPlugin extends AbstractPlugin
     public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
-        getUIExtensionList().add(tbs);
+
+        // User interface extension that provides ways of separating tool bar entries.
+        toolBarExtension.addUIExtension(new ToolBarSeparator());
+        // User interface extension for separator widgets that can be focused.
+        toolBarExtension.addUIExtension(toolBarFocusWidgets);
+
+        if (getTextArea().getCommandManager().queryCommandSupported(Command.INSERT_HORIZONTAL_RULE)) {
+            hr = new PushButton(Images.INSTANCE.hr().createImage(), this);
+            hr.setTitle(Strings.INSTANCE.hr());
+            toolBarFocusWidgets.addFeature("hr", hr);
+        }
+
+        if (toolBarExtension.getFeatures().length > 0) {
+            getUIExtensionList().add(toolBarExtension);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see AbstractPlugin#destroy()
+     */
+    public void destroy()
+    {
+        if (hr != null) {
+            hr.removeFromParent();
+            hr.removeClickListener(this);
+            hr = null;
+        }
+
+        toolBarFocusWidgets.clearFeatures();
+
+        super.destroy();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ClickListener#onClick(Widget)
+     */
+    public void onClick(Widget sender)
+    {
+        if (sender == hr) {
+            onHorizontalRule();
+        }
+    }
+
+    public void onHorizontalRule()
+    {
+        if (hr.isEnabled()) {
+            getTextArea().getCommandManager().execCommand(Command.INSERT_HORIZONTAL_RULE);
+        }
     }
 }

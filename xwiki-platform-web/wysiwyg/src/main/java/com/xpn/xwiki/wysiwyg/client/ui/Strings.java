@@ -102,6 +102,8 @@ public interface Strings extends Constants
 
     String sync();
 
+    String teletype();
+
     String ul();
 
     String underline();

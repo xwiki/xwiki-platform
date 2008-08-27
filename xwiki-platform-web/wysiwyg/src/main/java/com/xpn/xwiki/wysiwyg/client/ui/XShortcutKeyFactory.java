@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui;
 
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.KeyboardListener;
 
@@ -27,12 +26,12 @@ public class XShortcutKeyFactory
 {
     public static XShortcutKey createShortcutKey(Event event)
     {
-        int keyCode = DOM.eventGetKeyCode(event);
+        int keyCode = event.getKeyCode();
         int modifiers = 0;
-        modifiers |= DOM.eventGetAltKey(event) ? KeyboardListener.MODIFIER_ALT : 0;
-        modifiers |= DOM.eventGetCtrlKey(event) ? KeyboardListener.MODIFIER_CTRL : 0;
-        modifiers |= DOM.eventGetMetaKey(event) ? KeyboardListener.MODIFIER_META : 0;
-        modifiers |= DOM.eventGetShiftKey(event) ? KeyboardListener.MODIFIER_SHIFT : 0;
+        modifiers |= event.getAltKey() ? KeyboardListener.MODIFIER_ALT : 0;
+        modifiers |= event.getCtrlKey() ? KeyboardListener.MODIFIER_CTRL : 0;
+        modifiers |= event.getMetaKey() ? KeyboardListener.MODIFIER_META : 0;
+        modifiers |= event.getShiftKey() ? KeyboardListener.MODIFIER_SHIFT : 0;
         return new XShortcutKey(keyCode, modifiers);
     }
 

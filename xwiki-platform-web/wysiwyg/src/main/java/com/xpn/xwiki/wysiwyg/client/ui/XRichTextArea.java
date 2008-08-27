@@ -45,21 +45,21 @@ import com.xpn.xwiki.wysiwyg.client.ui.wrap.WrappedRichTextArea;
 public class XRichTextArea extends Composite implements HasHTML, SourcesMouseEvents, SourcesClickEvents,
     SourcesFocusEvents, HasFocus, ClickListener, FocusListener, KeyboardListener, MouseListener, HasName
 {
-    protected WrappedRichTextArea rta;
+    protected final WrappedRichTextArea rta;
 
-    protected Hidden xRichTextArea;
+    protected final Hidden xRichTextArea;
 
-    protected Hidden xRichTextAreas;
+    protected final Hidden xRichTextAreas;
 
     protected CommandManager cm;
 
-    protected ClickListenerCollection clickListeners = new ClickListenerCollection();
+    protected final ClickListenerCollection clickListeners = new ClickListenerCollection();
 
-    protected FocusListenerCollection focusListeners = new FocusListenerCollection();
+    protected final FocusListenerCollection focusListeners = new FocusListenerCollection();
 
-    protected KeyboardListenerCollection keyboardListeners = new KeyboardListenerCollection();
+    protected final KeyboardListenerCollection keyboardListeners = new KeyboardListenerCollection();
 
-    protected MouseListenerCollection mouseListeners = new MouseListenerCollection();
+    protected final MouseListenerCollection mouseListeners = new MouseListenerCollection();
 
     public XRichTextArea()
     {

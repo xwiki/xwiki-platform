@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.RichTextArea;
 import com.xpn.xwiki.wysiwyg.client.ui.XShortcutKey;
@@ -62,9 +61,9 @@ public class WrappedRichTextArea extends RichTextArea
      */
     public void onBrowserEvent(Event event)
     {
-        if (DOM.eventGetType(event) == Event.ONKEYDOWN
+        if (event.getTypeInt() == Event.ONKEYDOWN
             && shortcutKeys.contains(XShortcutKeyFactory.createShortcutKey(event))) {
-            DOM.eventPreventDefault(event);
+            event.preventDefault();
         }
         super.onBrowserEvent(event);
     }

@@ -32,8 +32,6 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 
 public class MiscPlugin extends AbstractPlugin implements ClickListener
 {
-    private PushButton hr;
-
     private PushButton unformat;
 
     private PushButton charmap;
@@ -48,10 +46,6 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
     public void init(Wysiwyg wysiwyg, XRichTextArea textArea, Config config)
     {
         super.init(wysiwyg, textArea, config);
-
-        hr = new PushButton(Images.INSTANCE.hr().createImage(), this);
-        hr.setTitle(Strings.INSTANCE.hr());
-        toolBarExtension.addFeature("hr", hr);
 
         unformat = new PushButton(Images.INSTANCE.removeFormat().createImage(), this);
         unformat.setTitle(Strings.INSTANCE.removeFormat());
@@ -71,10 +65,6 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
      */
     public void destroy()
     {
-        hr.removeFromParent();
-        hr.removeClickListener(this);
-        hr = null;
-
         unformat.removeFromParent();
         unformat.removeClickListener(this);
         unformat = null;
@@ -95,18 +85,11 @@ public class MiscPlugin extends AbstractPlugin implements ClickListener
      */
     public void onClick(Widget sender)
     {
-        if (sender == hr) {
-            onHorizontalRule();
-        } else if (sender == unformat) {
+        if (sender == unformat) {
             onUnformat();
         } else if (sender == charmap) {
             onCharMap();
         }
-    }
-
-    public void onHorizontalRule()
-    {
-        // TODO
     }
 
     public void onUnformat()

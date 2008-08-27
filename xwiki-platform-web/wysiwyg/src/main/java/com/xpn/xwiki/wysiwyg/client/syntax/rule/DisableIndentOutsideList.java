@@ -17,23 +17,32 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.wysiwyg.client.syntax.internal;
+package com.xpn.xwiki.wysiwyg.client.syntax.rule;
 
-import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableIndentOutsideList;
-import com.xpn.xwiki.wysiwyg.client.syntax.rule.DisableListInHeader;
+import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
+import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 
-/**
- * Validator for the <em>xwiki/2.0</em> syntax.
- */
-public class XWikiSyntaxValidator extends DefaultSyntaxValidator
+public class DisableIndentOutsideList implements ValidationRule
 {
-    public XWikiSyntaxValidator()
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ValidationRule#areValid(XRichTextArea)
+     */
+    public boolean areValid(XRichTextArea textArea)
     {
-        super("xwiki/2.0");
+        return textArea.getCommandManager().queryCommandState(Command.INSERT_UNORDERED_LIST)
+            || textArea.getCommandManager().queryCommandState(Command.INSERT_ORDERED_LIST);
+    }
 
-        // add XWiki specific validation rules
-        addValidationRule(new DisablingRule(new String[] {"justifyfull"}));
-        addValidationRule(new DisableListInHeader());
-        addValidationRule(new DisableIndentOutsideList());
+    /**
+     * {@inheritDoc}
+     * 
+     * @see ValidationRule#getFeatures()
+     */
+    public String[] getFeatures()
+    {
+        return new String[] {"indent", "outdent"};
     }
 }

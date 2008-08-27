@@ -188,6 +188,11 @@ public interface Images extends ImageBundle
     AbstractImagePrototype sync();
 
     /**
+     * @gwt.resource tt.gif
+     */
+    AbstractImagePrototype teletype();
+
+    /**
      * @gwt.resource ul.gif
      */
     AbstractImagePrototype ul();

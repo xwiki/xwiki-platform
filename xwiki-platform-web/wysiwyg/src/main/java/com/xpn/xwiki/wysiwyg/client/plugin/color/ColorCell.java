@@ -19,7 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.plugin.color;
 
-import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.ui.FlowPanel;
 
@@ -34,7 +33,7 @@ public class ColorCell extends FlowPanel
         super();
 
         this.color = color;
-        DOM.setStyleAttribute(getElement(), "backgroundColor", color);
+        getElement().getStyle().setProperty("backgroundColor", color);
         addStyleName("colorCell");
 
         sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT);
@@ -65,9 +64,9 @@ public class ColorCell extends FlowPanel
 
     public void onBrowserEvent(Event event)
     {
-        if (DOM.eventGetType(event) == Event.ONMOUSEOVER) {
+        if (event.getTypeInt() == Event.ONMOUSEOVER) {
             addStyleName("colorCell-hover");
-        } else if (DOM.eventGetType(event) == Event.ONMOUSEOUT) {
+        } else if (event.getTypeInt() == Event.ONMOUSEOUT) {
             removeStyleName("colorCell-hover");
         }
         super.onBrowserEvent(event);

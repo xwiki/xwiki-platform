@@ -19,18 +19,25 @@
  */
 package org.xwiki.rendering;
 
+import org.xwiki.bridge.DocumentAccessBridge;
+
 /**
- * Mock DocumentManager implementation used for testing, since we don't want to pull any dependency
- * on the Model/Skin/etc for the Rendering module's unit tests.
- *
+ * Mock {@link DocumentAccessBridge} implementation used for testing, since we don't want to pull any dependency on the
+ * Model/Skin/etc for the Rendering module's unit tests.
+ * 
  * @version $Id: MockVelocityManager.java 10176 2008-06-09 16:11:28Z vmassol $
  * @since 1.6M1
  */
-public class MockDocumentManager implements DocumentManager
+public class MockDocumentAccessBridge implements DocumentAccessBridge
 {
     public String getDocumentContent(String documentName) throws Exception
     {
         return "Some content";
+    }
+
+    public String getDocumentContent(String documentName, String language) throws Exception
+    {
+        return "Some translated content";
     }
 
     public boolean exists(String documentName) throws Exception
@@ -48,5 +55,26 @@ public class MockDocumentManager implements DocumentManager
             result = result + "?" + queryString;
         }
         return result;
+    }
+
+    public String getProperty(String documentName, String className, int objectNumber, String propertyName)
+        throws Exception
+    {
+        return "Property value";
+    }
+
+    public String getProperty(String documentName, String className, String propertyName) throws Exception
+    {
+        return "Property value";
+    }
+
+    public String getProperty(String documentName, String propertyName) throws Exception
+    {
+        return "Property value";
+    }
+
+    public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
+    {
+        return null;
     }
 }

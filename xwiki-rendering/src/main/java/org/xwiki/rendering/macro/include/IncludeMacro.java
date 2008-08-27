@@ -22,11 +22,11 @@ package org.xwiki.rendering.macro.include;
 import java.io.StringReader;
 import java.util.List;
 
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.context.Execution;
 import org.xwiki.context.ExecutionContext;
 import org.xwiki.context.ExecutionContextInitializerException;
 import org.xwiki.context.ExecutionContextInitializerManager;
-import org.xwiki.rendering.DocumentManager;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.macro.AbstractMacro;
@@ -73,7 +73,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
      */
     private ExecutionContextInitializerManager executionContextInitializerManager;
 
-    private DocumentManager documentManager;
+    private DocumentAccessBridge documentAccessBridge;
 
     public IncludeMacro()
     {
@@ -83,13 +83,13 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
     }
 
     /**
-     * Allows overriding the Document Manager used (useful for unit tests).
+     * Allows overriding the Document Access Bridge used (useful for unit tests).
      * 
-     * @param documentManager the new Document Manager to use
+     * @param documentAccessBridge the new Document Access Bridge to use
      */
-    public void setDocumentManager(DocumentManager documentManager)
+    public void setDocumentAccessBridge(DocumentAccessBridge documentAccessBridge)
     {
-        this.documentManager = documentManager;
+        this.documentAccessBridge = documentAccessBridge;
     }
 
     /**
@@ -106,7 +106,7 @@ public class IncludeMacro extends AbstractMacro<IncludeMacroParameters>
         // Retrieve the included document's content
         String includedContent = null;
         try {
-            includedContent = this.documentManager.getDocumentContent(documentName);
+            includedContent = this.documentAccessBridge.getDocumentContent(documentName);
         } catch (Exception e) {
             throw new MacroExecutionException("Failed to get content for Document [" + documentName + "]", e);
         }

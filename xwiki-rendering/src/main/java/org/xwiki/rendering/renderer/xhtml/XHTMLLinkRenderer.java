@@ -19,10 +19,10 @@
  */
 package org.xwiki.rendering.renderer.xhtml;
 
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.LinkType;
-import org.xwiki.rendering.DocumentManager;
-import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
  * @version $Id: $
@@ -30,13 +30,13 @@ import org.xwiki.rendering.configuration.RenderingConfiguration;
  */
 public class XHTMLLinkRenderer
 {
-    private DocumentManager documentManager;
+    private DocumentAccessBridge documentAccessBridge;
 
     private RenderingConfiguration configuration;
 
-    public XHTMLLinkRenderer(DocumentManager documentManager, RenderingConfiguration configuration)
+    public XHTMLLinkRenderer(DocumentAccessBridge documentAccessBridge, RenderingConfiguration configuration)
     {
-        this.documentManager = documentManager;
+        this.documentAccessBridge = documentAccessBridge;
         this.configuration = configuration;
     }
 
@@ -64,10 +64,10 @@ public class XHTMLLinkRenderer
         } else {
             // This is a document link. Check for document existence.
             try {
-                if (link.getReference() == null || this.documentManager.exists(link.getReference())) {
+                if (link.getReference() == null || this.documentAccessBridge.exists(link.getReference())) {
                     sb.append("<span class=\"wikilink\">");
                     sb.append("<a href=\"");
-                    sb.append(this.documentManager.getURL(link.getReference(), "view", link.getQueryString(), link
+                    sb.append(this.documentAccessBridge.getURL(link.getReference(), "view", link.getQueryString(), link
                         .getAnchor()));
                     sb.append("\"");
                     if (link.getTarget() != null) {
@@ -80,7 +80,7 @@ public class XHTMLLinkRenderer
                     sb.append("</a></span>");
                 } else {
                     sb.append("<a class=\"wikicreatelink\" href=\"");
-                    sb.append(this.documentManager.getURL(link.getReference(), "edit", link.getQueryString(), link
+                    sb.append(this.documentAccessBridge.getURL(link.getReference(), "edit", link.getQueryString(), link
                         .getAnchor()));
                     sb.append("\"");
                     if (link.getTarget() != null) {
@@ -110,7 +110,7 @@ public class XHTMLLinkRenderer
             labelToPrint = link.getLabel();
         } else {
             // TODO we need to use a DocumentName and DocumentNameFactory to transform a reference as a String
-            // Then use the LinkLabelResolver 
+            // Then use the LinkLabelResolver
             labelToPrint = link.getReference();
         }
 

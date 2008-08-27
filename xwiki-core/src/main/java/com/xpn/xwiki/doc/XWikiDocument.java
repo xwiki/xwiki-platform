@@ -66,7 +66,8 @@ import org.suigeneris.jrcs.diff.Revision;
 import org.suigeneris.jrcs.diff.delta.Delta;
 import org.suigeneris.jrcs.rcs.Version;
 import org.suigeneris.jrcs.util.ToString;
-import org.xwiki.rendering.DocumentManager;
+import org.xwiki.bridge.DocumentAccessBridge;
+import org.xwiki.bridge.DocumentModelBridge;
 import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.Parser;
@@ -112,7 +113,7 @@ import com.xpn.xwiki.web.Utils;
 import com.xpn.xwiki.web.XWikiMessageTool;
 import com.xpn.xwiki.web.XWikiRequest;
 
-public class XWikiDocument
+public class XWikiDocument implements DocumentModelBridge
 {
     private static final Log log = LogFactory.getLog(XWikiDocument.class);
 
@@ -497,9 +498,10 @@ public class XWikiDocument
             throw new XWikiException(XWikiException.MODULE_XWIKI_RENDERING, XWikiException.ERROR_XWIKI_UNKNOWN,
                 "Failed to render content using new rendering system", e);
         }
-        DocumentManager documentManager = (DocumentManager) Utils.getComponent(DocumentManager.ROLE);
+        DocumentAccessBridge documentAccessBridge =
+            (DocumentAccessBridge) Utils.getComponent(DocumentAccessBridge.ROLE);
         WikiPrinter printer = new DefaultWikiPrinter();
-        dom.traverse(new XHTMLRenderer(printer, documentManager, null));
+        dom.traverse(new XHTMLRenderer(printer, documentAccessBridge, null));
 
         return printer.toString();
     }

@@ -38,14 +38,14 @@
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
 
-    <!-- Override default Document Manager component implementation for testing -->
+    <!-- Override default Document Access Bridge component implementation for testing -->
     <component>
-      <role>org.xwiki.rendering.DocumentManager</role>
+      <role>org.xwiki.bridge.DocumentAccessBridge</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.MockDocumentManager</implementation>
+      <implementation>org.xwiki.rendering.MockDocumentAccessBridge</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
-    
+
     <!-- Override default Id Generator component implementation for testing -->
     <component>
       <role>org.xwiki.rendering.util.IdGenerator</role>

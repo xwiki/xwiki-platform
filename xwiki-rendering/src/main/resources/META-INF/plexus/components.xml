@@ -189,7 +189,7 @@
           <role>org.xwiki.context.ExecutionContextInitializerManager</role>
         </requirement>
         <requirement>
-          <role>org.xwiki.rendering.DocumentManager</role>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
         </requirement>
         <requirement>
           <role>org.xwiki.rendering.parser.Parser</role>

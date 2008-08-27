@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.jmock.Mock;
-import org.xwiki.rendering.DocumentManager;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.include.IncludeMacro;
 import org.xwiki.rendering.macro.include.IncludeMacroParameters;
@@ -48,9 +48,9 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
         String expected = "beginDocument\n" + "onMacro: [someMacro] [] []\n" + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
-        Mock mockDocumentManager = mock(DocumentManager.class);
-        mockDocumentManager.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
-        macro.setDocumentManager((DocumentManager) mockDocumentManager.proxy());
+        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
+        mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(returnValue("{{someMacro/}}"));
+        macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:Space.Page");
@@ -76,10 +76,10 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
             "#set ($myvar = 'hello')");
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
-        Mock mockDocumentManager = mock(DocumentManager.class);
-        mockDocumentManager.expects(once()).method("getDocumentContent").will(
+        Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
+        mockDocumentAccessBridge.expects(once()).method("getDocumentContent").will(
             returnValue("{{velocity}}$myvar{{/velocity}}"));
-        macro.setDocumentManager((DocumentManager) mockDocumentManager.proxy());
+        macro.setDocumentAccessBridge((DocumentAccessBridge) mockDocumentAccessBridge.proxy());
 
         IncludeMacroParameters parameters = new IncludeMacroParameters();
         parameters.setDocument("wiki:Space.Page");

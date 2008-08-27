@@ -22,7 +22,7 @@ package org.xwiki.rendering.renderer.xhtml;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.xwiki.rendering.DocumentManager;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 import org.xwiki.rendering.listener.Format;
 import org.xwiki.rendering.listener.Link;
@@ -41,7 +41,7 @@ import org.xwiki.rendering.renderer.WikiPrinter;
  */
 public class XHTMLRenderer extends AbstractPrintRenderer
 {
-    private DocumentManager documentManager;
+    private DocumentAccessBridge documentAccessBridge;
 
     private RenderingConfiguration configuration;
 
@@ -71,14 +71,14 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * @param printer the object to which to write the XHTML output to
-     * @param documentManager see {@link #documentManager}
+     * @param documentAccessBridge see {@link #documentAccessBridge}
      */
-    public XHTMLRenderer(WikiPrinter printer, DocumentManager documentManager,
+    public XHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
         RenderingConfiguration configuration)
     {
         super(printer);
-        this.documentManager = documentManager;
-        this.linkRenderer = new XHTMLLinkRenderer(documentManager, configuration);
+        this.documentAccessBridge = documentAccessBridge;
+        this.linkRenderer = new XHTMLLinkRenderer(documentAccessBridge, configuration);
         this.configuration = configuration;
     }
 

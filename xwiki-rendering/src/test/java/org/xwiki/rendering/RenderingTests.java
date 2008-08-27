@@ -66,14 +66,14 @@ public class RenderingTests extends TestCase
         {
             public PrintRenderer createRenderer()
             {
-                return new XHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager(), null);
+                return new XHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentAccessBridge(), null);
             }
         });
         factories.put("wysiwyg", new PrintRendererFactory()
         {
             public PrintRenderer createRenderer()
             {
-                return new WysiwygEditorXHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentManager(), null);
+                return new WysiwygEditorXHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentAccessBridge(), null);
             }
         });
         factories.put("tex", new PrintRendererFactory()

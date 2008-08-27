@@ -21,19 +21,19 @@ package org.xwiki.rendering.renderer.xhtml;
 
 import java.util.Map;
 
-import org.xwiki.rendering.DocumentManager;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.internal.XWikiMacroPrinter;
+import org.xwiki.rendering.renderer.WikiPrinter;
 
 public class WysiwygEditorXHTMLRenderer extends XHTMLRenderer
 {
     private XWikiMacroPrinter macroPrinter;
 
-    public WysiwygEditorXHTMLRenderer(WikiPrinter printer, DocumentManager documentManager,
+    public WysiwygEditorXHTMLRenderer(WikiPrinter printer, DocumentAccessBridge documentAccessBridge,
         RenderingConfiguration configuration)
     {
-        super(printer, documentManager, configuration);
+        super(printer, documentAccessBridge, configuration);
         this.macroPrinter = new XWikiMacroPrinter();
     }
 

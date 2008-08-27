@@ -21,7 +21,7 @@ package com.xpn.xwiki.wysiwyg.server.converter.internal;
 
 import java.io.StringReader;
 
-import org.xwiki.rendering.DocumentManager;
+import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -73,8 +73,8 @@ public class XWikiHTMLConverter implements HTMLConverter
             txManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
             WikiPrinter printer = new DefaultWikiPrinter();
-            DocumentManager docManager = (DocumentManager) Utils.getComponent(DocumentManager.ROLE);
-            WysiwygEditorXHTMLRenderer renderer = new WysiwygEditorXHTMLRenderer(printer, docManager, null);
+            DocumentAccessBridge docAccessBridge = (DocumentAccessBridge) Utils.getComponent(DocumentAccessBridge.ROLE);
+            WysiwygEditorXHTMLRenderer renderer = new WysiwygEditorXHTMLRenderer(printer, docAccessBridge, null);
             dom.traverse(renderer);
             return printer.toString();
         } catch (Throwable t) {

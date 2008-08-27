@@ -58,6 +58,10 @@ public final class XMLUtils
         // See http://www.jdom.org/docs/apidocs/org/jdom/output/Format.html#setLineSeparator(java.lang.String)
         format.setLineSeparator("\n");
 
+        // TODO: Remove this line (I think we want to have XML declaration) when Wikimodel has fixed this issue:
+        // http://code.google.com/p/wikimodel/issues/detail?id=45
+        format.setOmitDeclaration(true);
+
         XMLOutputter outputter = new XMLOutputter(format);
         return outputter.outputString(jdomDoc);
     }

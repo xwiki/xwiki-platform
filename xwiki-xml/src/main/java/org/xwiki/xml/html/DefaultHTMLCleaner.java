@@ -96,7 +96,8 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
             DOMOutputter outputter = new DOMOutputter();
             result = outputter.output(document);
         } catch (JDOMException e) {
-            throw new RuntimeException("Failed to convert JDOM Document to W3C Document", e);
+            throw new RuntimeException("Failed to convert JDOM Document to W3C Document for content ["
+                + originalHtmlContent + "]", e);
         }
 
         return result;

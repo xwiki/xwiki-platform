@@ -28,7 +28,7 @@ $xwiki.getTextArea($tdoc.content)
       hookId: 'content',
       syntax: "$doc.syntaxId",
       plugins: 'separator text valign list indent undo format',
-      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format',
+      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr',
       debug: #if($request.debug)'true'#else'false'#end
     };
 //]]>

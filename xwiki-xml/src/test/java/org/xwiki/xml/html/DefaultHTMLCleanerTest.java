@@ -60,6 +60,7 @@ public class DefaultHTMLCleanerTest extends TestCase
         assertHTML("<ul><li>item1<ul><li>item2<ul><li>item3</li></ul></li></ul></li></ul>",
             "<ul><li>item1</li><ul><li>item2</li><ul><li>item3</li></ul></ul></ul>");
         assertHTML("<ul><li><ul><li>item</li></ul></li></ul>", "<ul><ul><li>item</li></ul></ul>");
+        assertHTML("<ul> <li><ul><li>item</li></ul></li></ul>", "<ul> <ul><li>item</li></ul></ul>");
         assertHTML("<ul><li>item1<ol><li>item2</li></ol></li></ul>", "<ul><li>item1</li><ol><li>item2</li></ol></ul>");
         assertHTML("<ol><li>item1<ol><li>item2<ol><li>item3</li></ol></li></ol></li></ol>",
             "<ol><li>item1</li><ol><li>item2</li><ol><li>item3</li></ol></ol></ol>");

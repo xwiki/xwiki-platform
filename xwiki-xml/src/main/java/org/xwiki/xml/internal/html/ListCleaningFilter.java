@@ -115,16 +115,29 @@ public class ListCleaningFilter implements CleaningFilter
 
         for (Element element : elementsToModify) {
             Element parent = element.getParentElement();
-            // Move it inside the previous sibling
-            int pos = parent.getContent().indexOf(element) - 1;
-            if (pos > -1) {
-                Element li = (Element) parent.getContent(pos);
-                li.addContent(element.detach());
-            } else {
+            // Look for the previous sibling that is an Element. If there are none it means we're in the following
+            // situation "<ul><ul>" and we need to insert a <li> element to generate "<ul><li><ul>".
+            // If there's one check that it's a <li>. It means that we're in the following situation "<ul><li/><ul>"
+            // and we need to move the <ul> inside the <li>.
+            Element previousElement = null;
+            List contentList = parent.getContent();
+            for (int i = contentList.indexOf(element) - 1; i > -1; i--) {
+                if ((previousElement == null)
+                    && contentList.get(i).getClass().isAssignableFrom(Element.class))
+                {
+                    previousElement = (Element) contentList.get(i);
+                    break;
+                }
+            }
+
+            if (previousElement == null) {
                 // This means we have <ul><ul>. We need to insert a <li> element.
                 Element li = new Element(LI);
                 li.addContent(element.detach());
                 parent.addContent(li);
+            } else {
+                // Move it inside the previous sibling
+                previousElement.addContent(element.detach());
             }
         }
     }

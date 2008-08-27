@@ -303,7 +303,7 @@ Modifications on page objects or class
 <language>en</language>
 </property>
 <property>
-<subject>XWiki : Watchlist Updates, #set($format="dd/MM/yyyy")#if ($interval == 1)#set($format="${format} hh:mm")#end$xwiki.formatDate($xwiki.date, $format)</subject>
+<subject>XWiki : Watchlist Updates, #set($format="dd/MM/yyyy")#if ($interval == 1)#set($format="${format} hh:mm")#end$xwiki.formatDate($util.date, $format)</subject>
 </property>
 <property>
 <text>Hello $pseudo,

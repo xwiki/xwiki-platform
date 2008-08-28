@@ -67,6 +67,11 @@ public class DefaultHTMLCleanerTest extends TestCase
         assertHTML("<ol><li><ol><li>item</li></ol></li></ol>", "<ol><ol><li>item</li></ol></ol>");
     }
 
+    public void testPruneTags()
+    {
+        assertHTML("<p>hello</p>", "<script>whatever</script><p>hello</p>");    
+    }
+
     private void assertHTML(String expected, String actual)
     {
         assertEquals(HEADER + expected + FOOTER, XMLUtils.toString(this.cleaner.clean(actual)));

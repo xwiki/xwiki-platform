@@ -77,6 +77,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         this.cleaner = new HtmlCleaner();
         this.cleanerProperties = this.cleaner.getProperties();
         this.cleanerProperties.setOmitUnknownTags(true);
+        this.cleanerProperties.setPruneTags("script,style");
     }
 
     /**

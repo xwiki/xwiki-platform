@@ -54,6 +54,16 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     private List<CleaningFilter> filters;
 
     /**
+     * The HTML Cleaner instance we used for cleaning HTML.
+     */
+    private HtmlCleaner cleaner;
+
+    /**
+     * The HTML Cleaner properties we use for each cleaning.
+     */
+    private CleanerProperties cleanerProperties;
+
+    /**
      * {@inheritDoc}
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
@@ -62,6 +72,11 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         this.filters = new ArrayList<CleaningFilter>();
         this.filters.add(new TagSwapCleaningFilter());
         this.filters.add(new ListCleaningFilter());
+
+        // Initialize Cleaner objects once.
+        this.cleaner = new HtmlCleaner();
+        this.cleanerProperties = this.cleaner.getProperties();
+        this.cleanerProperties.setOmitUnknownTags(true);
     }
 
     /**
@@ -71,21 +86,17 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
     public org.w3c.dom.Document clean(String originalHtmlContent)
     {
         org.w3c.dom.Document result;
-        HtmlCleaner cleaner = new HtmlCleaner();
-
-        CleanerProperties props = cleaner.getProperties();
-        props.setOmitUnknownTags(true);
 
         TagNode cleanedNode;
         try {
-            cleanedNode = cleaner.clean(originalHtmlContent);
+            cleanedNode = this.cleaner.clean(originalHtmlContent);
         } catch (IOException e) {
             // This shouldn't happen since we're not doing any IO... I consider this a flaw in the
             // design of HTML Cleaner.
             throw new RuntimeException("Unhandled error when cleaning HTML [" + originalHtmlContent + "]", e);
         }
 
-        Document document = new JDomSerializer(props).createJDom(cleanedNode);
+        Document document = new JDomSerializer(this.cleanerProperties).createJDom(cleanedNode);
 
         // Perform other cleaning operation this time using the W3C Document interface.
         for (CleaningFilter filter : this.filters) {

@@ -721,9 +721,9 @@
   </profiles>
 
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/branches/xwiki-core-1.5-curriki</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/branches/xwiki-core-1.5-curriki</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/xwiki-platform/core/branches/xwiki-core-1.5-curriki</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5-curriki</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5-curriki</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/core/branches/xwiki-core-1.5-curriki</url>
   </scm>
 </project>
 

@@ -30,7 +30,7 @@
     <version>1.5</version>
   </parent>
   <artifactId>xwiki-core</artifactId>
-  <version>1.5</version>
+  <version>1.5-curriki-SNAPSHOT</version>
   <name>XWiki Platform - Core - Core</name>
   <packaging>jar</packaging>
   <description>XWiki Platform - Core - Core</description>
@@ -528,52 +528,52 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-component</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-observation</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-velocity</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-context</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-container-portlet</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-xmlrpc-model</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-wikimodel</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-rendering-doxia</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-cache-api</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-cache-oscache</artifactId>
-      <version>${pom.version}</version>
+      <version>1.5</version>
     </dependency>
 
     <!-- Build tools -->
@@ -681,6 +681,7 @@
               **/XWikiPatchUtils.java,
               **/XWikiRCSArchive.java,
               **/XWikiHibernateRecycleBinStore.java,
+              **/HibernateAttachmentVersioningStore.java,
               **/migration/AbstractXWikiMigrationManager.java
           </excludes>
         </configuration>

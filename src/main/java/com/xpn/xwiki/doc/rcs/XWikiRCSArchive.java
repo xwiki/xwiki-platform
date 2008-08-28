@@ -73,10 +73,10 @@ public class XWikiRCSArchive extends Archive
                 XWikiJRCSNode node = new XWikiJRCSNode(nodeInfo.getId().getVersion(), null);
                 node.setAuthor(nodeInfo.getAuthor());
                 node.setDate(nodeInfo.getDate());
-                node.setLog(nodeInfo.getComment());
-                node.setDiff(nodeInfo.isDiff());
+                node.setLog(nodeInfo.getComment());                
                 XWikiRCSNodeContent content = nodeInfo.getContent(context);
                 node.setText(content.getPatch().getContent());
+                node.setDiff(nodeInfo.isDiff());
                 nodes.put(node.getVersion(), node);
             }
             XWikiJRCSNode last = null;
@@ -184,11 +184,19 @@ public class XWikiRCSArchive extends Archive
         }
         /** @return is this node store diff or full version */
         public boolean isDiff() {
-            // we need something filed in Node. locker is free
-            return !sfullVersion.equals(getState());            
+            boolean isdiff = !sfullVersion.equals(getState());
+            if (getTextString()!=null && isdiff != !getTextString().startsWith("<")) {
+                LOG.warn("isDiff: Archive is inconsistent. Text and diff field are contradicting. version=" + getVersion());
+                isdiff = !isdiff;
+            }
+            return isdiff;
         }
         /** @param isdiff - true if node stores a diff, false - if full version */
-        public void setDiff(boolean isdiff) {            
+        public void setDiff(boolean isdiff) {
+            if (getTextString()!=null && isdiff != !getTextString().startsWith("<")) {
+                LOG.warn("setDiff: Archive is inconsistent. Text and diff field are contradicting. version=" + getVersion());
+                isdiff = !isdiff;
+            }
             setState(isdiff ? sdiffVersion : sfullVersion);
         }
         /** @return is this revision has old format. (xwiki-core<1.2, without author,comment,state fields)*/

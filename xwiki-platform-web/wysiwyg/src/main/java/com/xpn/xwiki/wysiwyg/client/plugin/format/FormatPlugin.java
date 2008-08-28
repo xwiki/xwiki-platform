@@ -36,8 +36,8 @@ import com.xpn.xwiki.wysiwyg.client.ui.XRichTextEditor;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 
 /**
- * {@link XRichTextEditor} plug-in for formatting text. It can be used to format text as heading 1 to 5 or as code. It
- * installs a select on the tool bar and updates its status depending on the current cursor position.
+ * {@link XRichTextEditor} plug-in for formatting text. It can be used to format text as heading 1 to 5. It installs a
+ * select on the tool bar and updates its status depending on the current cursor position.
  */
 public class FormatPlugin extends StatefulPlugin implements ChangeListener
 {
@@ -56,7 +56,6 @@ public class FormatPlugin extends StatefulPlugin implements ChangeListener
         INDEX.put("h3", new Integer(i++));
         INDEX.put("h4", new Integer(i++));
         INDEX.put("h5", new Integer(i++));
-        INDEX.put("pre", new Integer(i++));
     }
 
     /**
@@ -80,7 +79,6 @@ public class FormatPlugin extends StatefulPlugin implements ChangeListener
             levels.addItem(Strings.INSTANCE.h3(), "h3");
             levels.addItem(Strings.INSTANCE.h4(), "h4");
             levels.addItem(Strings.INSTANCE.h5(), "h5");
-            levels.addItem(Strings.INSTANCE.code(), "pre");
 
             toolBarExtension.addFeature("format", levels);
             getUIExtensionList().add(toolBarExtension);

@@ -222,9 +222,19 @@ public class WatchListJob implements Job
     private List filter(List updatedDocuments,
         Object notificationCriteria, String subscriber) throws XWikiException
     {
-        String spaceCriterion = (String) notificationCriteria.getProperty("spaces").getValue();
-        String documentCriterion = (String) notificationCriteria.getProperty("documents").getValue();
-        String query = (String) notificationCriteria.getProperty("query").getValue();
+        String spaceCriterion = "";
+        // Since BaseObject.getProperty("foo") may return null we need those tests to avoid NPEs.
+        if (notificationCriteria.getProperty("spaces") != null) {
+            spaceCriterion = (String) notificationCriteria.getProperty("spaces").getValue();
+        }
+        String documentCriterion = "";
+        if (notificationCriteria.getProperty("documents") != null) {
+            documentCriterion = (String) notificationCriteria.getProperty("documents").getValue();
+        }
+        String query = "";
+        if (notificationCriteria.getProperty("query") != null) {
+            query = (String) notificationCriteria.getProperty("query").getValue();
+        }
 
         List watchedDocuments = new ArrayList();
         if (spaceCriterion.length() == 0 && documentCriterion.length() == 0

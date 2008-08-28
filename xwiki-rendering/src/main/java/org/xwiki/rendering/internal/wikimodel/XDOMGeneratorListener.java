@@ -20,7 +20,6 @@
 package org.xwiki.rendering.internal.wikimodel;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -84,6 +83,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void beginDefinitionDescription()
     {
+        System.out.println("beginDefinitionDescription (not handled yet)");
     }
 
     /**
@@ -92,14 +92,17 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void beginDefinitionList(WikiParameters params)
     {
+        System.out.println("beginDefinitionList(" + params + ") (not handled yet)");
     }
 
     public void beginDefinitionTerm()
     {
+        System.out.println("beginDefinitionTerm (not handled yet)");
     }
 
     public void beginDocument()
     {
+        // Don't do anything since there's no notion of Document block in XWiki rendering.
     }
 
     /**
@@ -117,6 +120,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginInfoBlock(char infoType, WikiParameters params)
     {
+        System.out.println("beginInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
     }
 
     public void beginList(WikiParameters params, boolean ordered)
@@ -136,71 +140,61 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginPropertyBlock(String propertyUri, boolean doc)
     {
-        // TODO Auto-generated method stub
-        System.out.println("beginPropertyBlock");
+        System.out.println("beginPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
     }
 
     public void beginPropertyInline(String str)
     {
-        // TODO Auto-generated method stub
-        System.out.println("beginPropertyInline");
+        System.out.println("beginPropertyInline(" + str + ") (not handled yet)");
     }
 
     public void beginQuotation(WikiParameters params)
     {
-        // TODO Auto-generated method stub
-        System.out.println("beginQuotation");
+        System.out.println("beginQuotation(" + params + ") (not handled yet)");
     }
 
     public void beginQuotationLine()
     {
-        // TODO Auto-generated method stub
-        System.out.println("beginQuotationLine");
+        System.out.println("beginQuotationLine (not handled yet)");
     }
 
     public void beginTable(WikiParameters params)
     {
-        // There's no XWiki syntax for tables. Instead there's a table macro.
+        System.out.println("beginTable(" + params + ") (not handled yet)");
     }
 
     public void beginTableCell(boolean tableHead, WikiParameters params)
     {
-        // There's no XWiki syntax for tables. Instead there's a table macro.
+        System.out.println("beginTableCell(" + tableHead + ", " + params + ") (not handled yet)");
     }
 
     public void beginTableRow(WikiParameters params)
     {
-        // There's no XWiki syntax for tables. Instead there's a table macro.
+        System.out.println("beginTableRow(" + params + ") (not handled yet)");
     }
 
     public void endDefinitionDescription()
     {
-        // TODO Auto-generated method stub
-        System.out.println("endDefinitionDescription");
+        System.out.println("endDefinitionDescription (not handled yet)");
     }
 
     public void endDefinitionList(WikiParameters params)
     {
-        // TODO Auto-generated method stub
-        System.out.println("endDefinitionList");
+        System.out.println("endDefinitionList(" + params + ") (not handled yet)");
     }
 
     public void endDefinitionTerm()
     {
-        // TODO Auto-generated method stub
-        System.out.println("endDefinitionTerm");
+        System.out.println("endDefinitionTerm (not handled yet)");
     }
 
     public void endDocument()
     {
-        // Voluntarily don't do anything here for now.
+        // Don't do anything since there's no notion of Document block in XWiki rendering.
     }
 
     public void endFormat(WikiFormat format)
     {
-        // TODO: Follow http://code.google.com/p/wikimodel/issues/detail?id=31 to check when
-        // underline is implemented and generate an UnderlineBlock when it is...
-
         if (format.hasStyle(IWemConstants.STRONG)) {
             this.stack.push(new FormatBlock(generateListFromStack(), Format.BOLD));
         } else if (format.hasStyle(IWemConstants.EM)) {
@@ -231,8 +225,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endInfoBlock(char infoType, WikiParameters params)
     {
-        // TODO Auto-generated method stub
-        System.out.println("endInfoBlock");
+        System.out.println("endInfoBlock(" + infoType + ", " + params + ") (not handled yet)");
     }
 
     public void endList(WikiParameters params, boolean ordered)
@@ -259,41 +252,37 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endPropertyBlock(String propertyUri, boolean doc)
     {
-        // TODO Auto-generated method stub
-        System.out.println("endPropertyBlock");
+        System.out.println("endPropertyBlock(" + propertyUri + ", " + doc + ") (not handled yet)");
     }
 
     public void endPropertyInline(String inlineProperty)
     {
-        // TODO Auto-generated method stub
-        System.out.println("endPropertyInline");
+        System.out.println("endPropertyInline(" + inlineProperty + ") (not handled yet)");
     }
 
     public void endQuotation(WikiParameters params)
     {
-        // TODO Auto-generated method stub
-        System.out.println("endQuotation");
+        System.out.println("endQuotation(" + params + ") (not handled yet)");
     }
 
     public void endQuotationLine()
     {
-        // TODO Auto-generated method stub
-        System.out.println("endQuotationLine");
+        System.out.println("endQuotationLine (not handled yet)");
     }
 
     public void endTable(WikiParameters params)
     {
-        // There's no XWiki syntax for tables. Instead there's a table macro.
+        System.out.println("endTable(" + params + ") (not handled yet)");
     }
 
     public void endTableCell(boolean tableHead, WikiParameters params)
     {
-        // There's no XWiki syntax for tables. Instead there's a table macro.
+        System.out.println("endTableCell(" + tableHead + ", " + params + ") (not handled yet)");
     }
 
     public void endTableRow(WikiParameters params)
     {
-        // There's no XWiki syntax for tables. Instead there's a table macro.
+        System.out.println("endTableRow(" + params + ") (not handled yet)");
     }
 
     /**
@@ -311,6 +300,7 @@ public class XDOMGeneratorListener implements IWemListener
     public void onEmptyLines(int count)
     {
         // TODO: Handle. Note that this event is not yet sent by wikimodel by the wikimodel XWiki parser.
+        System.out.println("onEmptyLines(" + count + ") (not handled yet)");
     }
 
     public void onEscape(String str)
@@ -320,14 +310,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void onExtensionBlock(String extensionName, WikiParameters params)
     {
-        // TODO Auto-generated method stub
-
+        System.out.println("onExtensionBlock(" + extensionName + ", " + params + ") (not handled yet)");
     }
 
     public void onExtensionInline(String extensionName, WikiParameters params)
     {
-        // TODO Auto-generated method stub
-
+        System.out.println("onExtensionInline(" + extensionName + ", " + params + ") (not handled yet)");
     }
 
     /**
@@ -454,21 +442,19 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void onTableCaption(String str)
     {
-        // There's no XWiki syntax for tables. Instead there's a table macro.
+        System.out.println("onTableCaption(" + str + ") (not handled yet)");
     }
 
     // Equivalent of <pre>
     public void onVerbatimBlock(String str)
     {
-        // TODO Auto-generated method stub
-
+        System.out.println("onVerbatimBlock(" + str + ") (not handled yet)");
     }
 
     // Equivalent of <tt>
     public void onVerbatimInline(String str)
     {
-        // TODO Auto-generated method stub
-
+        System.out.println("onVerbatimInline(" + str + ") (not handled yet)");
     }
 
     public void onWord(String str)

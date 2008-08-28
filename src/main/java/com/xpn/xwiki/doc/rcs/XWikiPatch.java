@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.suigeneris.jrcs.util.ToString;
 
 import com.xpn.xwiki.XWikiContext;
@@ -38,6 +40,9 @@ import com.xpn.xwiki.doc.XWikiDocument;
  */
 public class XWikiPatch
 {
+    /** Logger. */
+    private static final Log LOG = LogFactory.getLog(XWikiPatch.class);
+
     /** string serialization for patch. */
     private String content;
 
@@ -76,10 +81,24 @@ public class XWikiPatch
     }
 
     /**
+     * @return is content a difference. using content field to determine.
+     */
+    private boolean isContentDiff()
+    {
+        return !content.startsWith("<");
+    }
+
+    /**
      * @return is content a difference, or full version
      */
     public boolean isDiff()
     {
+        if (content != null) {
+            if (isDiff != isContentDiff()) {
+                LOG.warn("isDiff: Patch is inconsistent. Content and diff field are contradicting");
+                return isContentDiff();
+            }
+        }
         return isDiff;
     }
 
@@ -88,6 +107,13 @@ public class XWikiPatch
      */
     public void setDiff(boolean isDiff)
     {
+        if (content != null) {
+            if (isDiff != isContentDiff()) {
+                LOG.warn("setDiff: Patch is inconsistent. Content and diff field are contradicting");
+                this.isDiff = isContentDiff();
+                return;
+            }
+        }
         this.isDiff = isDiff;
     }
 
@@ -114,8 +140,8 @@ public class XWikiPatch
      */
     public XWikiPatch setFullVersion(String versionXml) throws XWikiException
     {
-        setDiff(false);
         setContent(versionXml);
+        setDiff(false);
         return this;
     }
 
@@ -167,11 +193,11 @@ public class XWikiPatch
      */
     public XWikiPatch setDiffVersion(String originalVersionXml, String newVersionXml,
         String docName) throws XWikiException
-    {
-        setDiff(true);
+    {        
         try {
             // The history keeps reversed patches, from the most recent to the previous version.
             setContent(XWikiPatchUtils.getDiff(newVersionXml, originalVersionXml));
+            setDiff(true);
         } catch (Exception e) {
             Object[] args = {docName};
             throw new XWikiException(XWikiException.MODULE_XWIKI_DIFF,

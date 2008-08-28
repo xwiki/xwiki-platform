@@ -184,7 +184,10 @@ public class DefaultVelocityManager implements VelocityManager, Composable
         } else {
             // Gather the global Velocity macros that we want to have. These are skin dependent.
             Properties properties = new Properties();
-            String macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey);
+            String macroList = xcontext.getWiki().Param("xwiki.render.velocity.macrolist", "");
+            if (macroList.equals("")) {
+                macroList = "/templates/macros.vm" + (cacheKey.equals("default") ? "" : "," + cacheKey);
+            }
             properties.put(RuntimeConstants.VM_LIBRARY, macroList);
             velocityEngine = velocityFactory.createVelocityEngine(cacheKey, properties);
         }

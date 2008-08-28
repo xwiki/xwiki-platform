@@ -324,7 +324,7 @@ public class XWikiLDAPUtils
 
         List<XWikiLDAPSearchAttribute> searchAttributeList = searchGroupsMembers(groupDN);
 
-        if (searchAttributeList != null) {
+        if (searchAttributeList == null) {
             // maybe groupDN is a UID so trying to search for it
             searchAttributeList =
                 searchUserAttributesByUid(groupDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()}, context);

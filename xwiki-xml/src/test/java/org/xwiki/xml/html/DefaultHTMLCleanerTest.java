@@ -31,7 +31,8 @@ import org.xwiki.xml.XMLUtils;
  */
 public class DefaultHTMLCleanerTest extends TestCase
 {
-    private static final String HEADER = "<html><head /><body>";
+    private static final String HEADER = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        + "<html><head /><body>";
 
     private static final String FOOTER = "</body></html>\n";
 

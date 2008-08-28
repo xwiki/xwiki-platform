@@ -388,6 +388,10 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.wikimodel.wem.IWemListener#onReference(String) 
+     */
     public void onReference(WikiReference ref)
     {
         // If there's no link parser defined, don't handle links...
@@ -431,33 +435,60 @@ public class XDOMGeneratorListener implements IWemListener
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.wikimodel.wem.IWemListener#onSpace(String)
+     */
     public void onSpace(String str)
     {
         this.stack.push(SpaceBlock.SPACE_BLOCK);
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.wikimodel.wem.IWemListener#onSpecialSymbol(String)  
+     */
     public void onSpecialSymbol(String symbol)
     {
         this.stack.push(new SpecialSymbolBlock(symbol));
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.wikimodel.wem.IWemListener#onTableCaption(String)
+     */
     public void onTableCaption(String str)
     {
         System.out.println("onTableCaption(" + str + ") (not handled yet)");
     }
 
-    // Equivalent of <pre>
+    /**
+     * {@inheritDoc}
+     * This event is the equivalent of &lt;pre&gt; for HTML.
+     *
+     * @see org.wikimodel.wem.IWemListener#onVerbatimBlock(String)
+     */
     public void onVerbatimBlock(String str)
     {
         System.out.println("onVerbatimBlock(" + str + ") (not handled yet)");
     }
 
-    // Equivalent of <tt>
+    /**
+     * {@inheritDoc}
+     * This event is the equivalent of &lt;tt&gt; for HTML.
+     *
+     * @see org.wikimodel.wem.IWemListener#onVerbatimInline(String) 
+     */
     public void onVerbatimInline(String str)
     {
         System.out.println("onVerbatimInline(" + str + ") (not handled yet)");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.wikimodel.wem.IWemListener#onWord(String) 
+     */
     public void onWord(String str)
     {
         this.stack.push(new WordBlock(str));

@@ -38,6 +38,7 @@ public class XMLUtilsTest extends TestCase
         cleaner.initialize();
         Document document = cleaner.clean("<html><head/><body><p>test1</p><p>test2</p></body></html>");
         XMLUtils.stripHTMLEnvelope(document);
-        assertEquals("<html><p>test1</p><p>test2</p></html>\n", XMLUtils.toString(document));
+        assertEquals("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<html><p>test1</p><p>test2</p></html>\n",
+            XMLUtils.toString(document));
     }
 }

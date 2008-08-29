@@ -167,9 +167,9 @@ public class ExtractHandler extends DefaultHandler
      */
     private void openTag(String qName, Attributes atts)
     {
-        result.append("<" + qName);
+        result.append('<').append(qName);
         for (int i = 0; i < atts.getLength(); i++) {
-            result.append(" " + atts.getQName(i) + "=\"" + atts.getValue(i) + "\"");
+            result.append(' ').append(atts.getQName(i)).append("=\"").append(atts.getValue(i)).append('\"');
         }
         result.append('>');
     }
@@ -205,7 +205,7 @@ public class ExtractHandler extends DefaultHandler
      */
     private void closeTag(String qName)
     {
-        result.append("</" + qName + ">");
+        result.append("</").append(qName).append('>');
     }
 
     /**

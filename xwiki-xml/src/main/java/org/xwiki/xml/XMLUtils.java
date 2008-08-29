@@ -19,12 +19,17 @@
  */
 package org.xwiki.xml;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.jdom.input.DOMBuilder;
-import org.jdom.output.XMLOutputter;
-import org.jdom.output.Format;
 
 /**
  * XML Utility methods.
@@ -35,13 +40,13 @@ import org.jdom.output.Format;
 public final class XMLUtils
 {
     /**
-     * Private constructor since this is a utility class that shouldn't be instantiated (all
-     * methods are static).
+     * Private constructor since this is a utility class that shouldn't be instantiated (all methods are static).
      */
     private XMLUtils()
     {
         // Nothing to do
     }
+
     /**
      * @param document the W3C Document to transform into a String
      * @return the XML as a String
@@ -63,10 +68,10 @@ public final class XMLUtils
     }
 
     /**
-     * Strip the HTML envelope if it exists. Precisely this means removig the head tag and move all tags in
-     * the body tag directly under the html element. This is useful for example if you wish to insert an HTML
-     * fragment into an existing HTML page.
-     *  
+     * Strip the HTML envelope if it exists. Precisely this means removig the head tag and move all tags in the body tag
+     * directly under the html element. This is useful for example if you wish to insert an HTML fragment into an
+     * existing HTML page.
+     * 
      * @param document the w3c Document to strip
      */
     public static void stripHTMLEnvelope(Document document)
@@ -97,6 +102,32 @@ public final class XMLUtils
                     root.insertBefore(bodyChildrenNodes.item(0), null);
                 }
                 root.removeChild(bodyNode);
+            }
+        }
+    }
+
+    /**
+     * Extracts a well-formed XML fragment from the given DOM tree.
+     * 
+     * @param node the root of the DOM tree where the extraction takes place
+     * @param start the index of the first character
+     * @param length the maximum number of characters in text nodes to include in the returned fragment
+     * @return a well-formed XML fragment starting at the given character index and having up to the specified length,
+     *         summing only the characters in text nodes
+     */
+    public static String extractXML(Node node, int start, int length)
+    {
+        ExtractHandler handler = null;
+        try {
+            handler = new ExtractHandler(start, length);
+            Transformer xformer = TransformerFactory.newInstance().newTransformer();
+            xformer.transform(new DOMSource(node), new SAXResult(handler));
+            return handler.getResult();
+        } catch (Throwable t) {
+            if (handler != null && handler.isFinished()) {
+                return handler.getResult();
+            } else {
+                throw new RuntimeException(t);
             }
         }
     }

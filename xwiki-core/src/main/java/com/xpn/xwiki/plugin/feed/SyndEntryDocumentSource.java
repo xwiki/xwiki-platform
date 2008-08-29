@@ -39,6 +39,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.w3c.dom.Node;
 import org.w3c.tidy.Tidy;
+import org.xwiki.xml.XMLUtils;
 
 import com.sun.syndication.feed.synd.SyndContent;
 import com.sun.syndication.feed.synd.SyndContentImpl;
@@ -48,7 +49,6 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.api.Document;
 import com.xpn.xwiki.doc.XWikiDocument;
-import com.xpn.xwiki.util.ExtractHandler;
 import com.xpn.xwiki.util.TidyMessageLogger;
 
 /**
@@ -624,32 +624,6 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     }
 
     /**
-     * Extracts a well-formed XML fragment from the given DOM tree.
-     * 
-     * @param node the root of the DOM tree where the extraction takes place
-     * @param start the index of the first character
-     * @param length the maximum number of characters in text nodes to include in the returned fragment
-     * @return a well-formed XML fragment starting at the given character index and having up to the specified length,
-     *         summing only the characters in text nodes
-     */
-    public static String extractXML(Node node, int start, int length) throws XWikiException
-    {
-        ExtractHandler handler = null;
-        try {
-            handler = new ExtractHandler(start, length);
-            Transformer xformer = TransformerFactory.newInstance().newTransformer();
-            xformer.transform(new DOMSource(node), new SAXResult(handler));
-            return handler.getResult();
-        } catch (Throwable t) {
-            if (handler != null && handler.isFinished()) {
-                return handler.getResult();
-            } else {
-                throw new XWikiException();
-            }
-        }
-    }
-
-    /**
      * Extracts the first characters of the given XML fragment, up to the given length limit, adding only characters in
      * XML text nodes. The XML fragment is cleaned up before extracting the prefix to be sure that the result is
      * well-formed.
@@ -662,8 +636,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
     public static String getXMLPreview(String xmlFragment, int previewLength)
     {
         try {
-            return extractXML(tidy(xmlFragment, TIDY_XML_CONFIG), 0, previewLength);
-        } catch (XWikiException e) {
+            return XMLUtils.extractXML(tidy(xmlFragment, TIDY_XML_CONFIG), 0, previewLength);
+        } catch (RuntimeException e) {
             return getPlainPreview(xmlFragment, previewLength);
         }
     }
@@ -684,8 +658,8 @@ public class SyndEntryDocumentSource implements SyndEntrySource
         try {
             org.w3c.dom.Document html = tidy(htmlFragment, TIDY_HTML_CONFIG);
             Node body = html.getElementsByTagName("body").item(0);
-            return extractXML(body.getFirstChild(), 0, previewLength);
-        } catch (XWikiException e) {
+            return XMLUtils.extractXML(body.getFirstChild(), 0, previewLength);
+        } catch (RuntimeException e) {
             return getPlainPreview(htmlFragment, previewLength);
         }
     }

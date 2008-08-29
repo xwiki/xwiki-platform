@@ -17,9 +17,8 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package com.xpn.xwiki.util;
+package org.xwiki.xml;
 
-import java.util.Iterator;
 import java.util.Stack;
 
 import org.xml.sax.Attributes;
@@ -39,29 +38,53 @@ import org.xml.sax.helpers.DefaultHandler;
  * </p>
  * <p>
  * As an example, the result of applying an <code>ExtractHandler(3, 13)</code> to:<br/>
- * <code>&lt;p&gt;click &lt;a href="realyLongURL" title="Here"&gt;here&lt;/a&gt; to view the result&lt;/p&gt;</code><br/>
- * is:<br/> <code>&lt;p&gt;ck &lt;a href="realyLongURL" title="Here"&gt;here&lt;/a&gt; to&lt;/p&gt;</code>
+ * <code>&lt;p&gt;click &lt;a href="realyLongURL" title="Here"&gt;here&lt;/a&gt; to view the result&lt;/p&gt;</code>
+ * <br/>is:<br/> <code>&lt;p&gt;ck &lt;a href="realyLongURL" title="Here"&gt;here&lt;/a&gt; to&lt;/p&gt;</code>
  * </p>
+ * 
+ * @version $Id: $
+ * @since 1.6M2
  */
 public class ExtractHandler extends DefaultHandler
 {
+    /**
+     * A simple utility bean for representing an XML tag.
+     */
     private static class XMLTag
     {
+        /**
+         * Tag's qualified name.
+         */
         private String qName;
 
+        /**
+         * Tag's attributes.
+         */
         private Attributes atts;
 
+        /**
+         * Constructs a new XML tag with the given qualified name and attributes.
+         * 
+         * @param qName Tag's qualified name.
+         * @param atts Tag's attributes.
+         */
         public XMLTag(String qName, Attributes atts)
         {
             this.qName = qName;
             this.atts = atts;
         }
 
+        /**
+         * @return Tag's qualified name.
+         */
         public String getQName()
         {
             return qName;
         }
 
+        /**
+         * @return Tag's attributes.
+         */
         public Attributes getAtts()
         {
             return atts;
@@ -69,28 +92,28 @@ public class ExtractHandler extends DefaultHandler
     }
 
     /**
-     * the number of characters, in text nodes, that have to be read before starting the extraction
+     * The number of characters, in text nodes, that have to be read before starting the extraction.
      */
     private int lowerBound;
 
     /**
-     * the maximum number of characters that may be read during the parsing process
+     * The maximum number of characters that may be read during the parsing process.
      */
     private int upperBound;
 
     /**
-     * the number of characters read so far
+     * The number of characters read so far.
      */
     private int counter;
 
     /**
-     * the stack of open tags; when the lower bound is reached all the tags in the stack must be opened; when the upper
+     * The stack of open tags; when the lower bound is reached all the tags in the stack must be opened; when the upper
      * bound is reached all the tags in the stack must be closed.
      */
-    private Stack openTags = new Stack();
+    private Stack<XMLTag> openTags = new Stack<XMLTag>();
 
     /**
-     * the fragment that is extracted during the parsing process
+     * The fragment that is extracted during the parsing process.
      */
     private StringBuffer result;
 
@@ -98,8 +121,15 @@ public class ExtractHandler extends DefaultHandler
      * <code>true</code> if the extraction was successful. The parsing process throws an exception when the upper
      * bound is reached; this flag is useful to distinguish between this exception and the others.
      */
-    private boolean finished = false;
+    private boolean finished;
 
+    /**
+     * Creates a new instance.
+     * 
+     * @param start The character index from where to start the extraction.
+     * @param length The number of plain text characters to extract.
+     * @throws SAXException if start is less than zero or length is less than or equal to zero.
+     */
     public ExtractHandler(int start, int length) throws SAXException
     {
         super();
@@ -113,47 +143,74 @@ public class ExtractHandler extends DefaultHandler
         upperBound = lowerBound + length;
     }
 
+    /**
+     * @return The extracted text.
+     */
     public String getResult()
     {
         return result.toString();
     }
 
+    /**
+     * @return true if the extraction process has succeeded; false if an exception occurred during the process.
+     */
     public boolean isFinished()
     {
         return finished;
     }
 
+    /**
+     * Append an open tag with the given specification to the result buffer.
+     * 
+     * @param qName Tag's qualified name.
+     * @param atts Tag's attributes.
+     */
     private void openTag(String qName, Attributes atts)
     {
         result.append("<" + qName);
         for (int i = 0; i < atts.getLength(); i++) {
             result.append(" " + atts.getQName(i) + "=\"" + atts.getValue(i) + "\"");
         }
-        result.append(">");
+        result.append('>');
     }
 
+    /**
+     * Open all pending tags.
+     * 
+     * @see #openTag(String, Attributes)
+     */
     private void openTags()
     {
-        Iterator it = openTags.iterator();
-        while (it.hasNext()) {
-            XMLTag tag = (XMLTag) it.next();
+        for (XMLTag tag : openTags) {
             openTag(tag.getQName(), tag.getAtts());
         }
     }
 
+    /**
+     * Close all pending tags.
+     * 
+     * @see #closeTag(String)
+     */
     private void closeTags()
     {
         while (!openTags.isEmpty()) {
-            XMLTag tag = (XMLTag) openTags.pop();
-            closeTag(tag.getQName());
+            closeTag(openTags.pop().getQName());
         }
     }
 
+    /**
+     * Append a closed tag with the given qualified name to the result buffer.
+     * 
+     * @param qName Tag's qualified name.
+     */
     private void closeTag(String qName)
     {
         result.append("</" + qName + ">");
     }
 
+    /**
+     * @return true if the start point has been passed but the length limit hasn't been reached.
+     */
     private boolean isExtracting()
     {
         return lowerBound <= counter && counter <= upperBound;
@@ -193,15 +250,16 @@ public class ExtractHandler extends DefaultHandler
      */
     public void characters(char[] ch, int start, int length) throws SAXException
     {
-        if (counter < lowerBound) {
-            if (counter + length < lowerBound) {
+        int offset = lowerBound - counter;
+        if (offset > 0) {
+            if (offset > length) {
                 counter += length;
                 return;
             } else {
-                start += lowerBound - counter;
-                length -= lowerBound - counter;
                 counter = lowerBound;
                 openTags();
+                characters(ch, start + offset, length - offset);
+                return;
             }
         }
         int remainingLength = upperBound - counter;

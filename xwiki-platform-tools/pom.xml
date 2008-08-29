@@ -27,23 +27,23 @@
   <parent>
     <groupId>com.xpn.xwiki.platform</groupId>
     <artifactId>xwiki</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>17</version>
     <relativePath>../pom</relativePath>
   </parent>
   <groupId>com.xpn.xwiki.platform.tools</groupId>
   <artifactId>xwiki-tools</artifactId>
   <name>XWiki Platform - Tools - Parent POM</name>
-  <version>11-SNAPSHOT</version>
+  <version>11</version>
   <packaging>pom</packaging>
   <description>XWiki Tools</description>
   <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/trunk</url>
+    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-tools-11</connection>
+    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-tools-11</developerConnection>
+    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-tools-11</url>
   </scm>
   <properties>
     <!-- Versions of XWiki dependencies used in Core modules -->
-    <platform.tool.verification.version>1.12-SNAPSHOT</platform.tool.verification.version>
+    <platform.tool.verification.version>1.11</platform.tool.verification.version>
   </properties>
   <modules>
     <module>xwiki-license-resources</module>

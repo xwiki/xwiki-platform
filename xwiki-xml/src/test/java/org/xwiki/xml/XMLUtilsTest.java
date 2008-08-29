@@ -21,7 +21,7 @@
 package org.xwiki.xml;
 
 import junit.framework.TestCase;
-import org.xwiki.xml.html.DefaultHTMLCleaner;
+import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 import org.w3c.dom.Document;
 
 /**

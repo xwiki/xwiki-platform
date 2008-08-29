@@ -9,7 +9,7 @@
     <component>
       <role>org.xwiki.xml.html.HTMLCleaner</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.xml.html.DefaultHTMLCleaner</implementation>
+      <implementation>org.xwiki.xml.internal.html.DefaultHTMLCleaner</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
   </components>

@@ -18,7 +18,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.xml.html;
+package org.xwiki.xml.internal.html;
 
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -27,6 +27,7 @@ import org.htmlcleaner.JDomSerializer;
 import org.xwiki.xml.internal.html.CleaningFilter;
 import org.xwiki.xml.internal.html.TagSwapCleaningFilter;
 import org.xwiki.xml.internal.html.ListCleaningFilter;
+import org.xwiki.xml.html.HTMLCleaner;
 import org.xwiki.component.phase.Initializable;
 import org.xwiki.component.phase.InitializationException;
 import org.jdom.Document;
@@ -38,7 +39,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 /**
- * Default implementation for {@link HTMLCleaner} using the
+ * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the
  * <a href="HTML Cleaner framework>http://htmlcleaner.sourceforge.net/</a>.
  * 
  * @version $Id: $

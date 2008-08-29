@@ -18,13 +18,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  *
  */
-package org.xwiki.xml.html;
+package org.xwiki.xml.internal.html;
 
 import junit.framework.TestCase;
 import org.xwiki.xml.XMLUtils;
+import org.xwiki.xml.internal.html.DefaultHTMLCleaner;
 
 /**
- * Unit tests for {@link org.xwiki.xml.html.DefaultHTMLCleaner}.
+ * Unit tests for {@link org.xwiki.xml.internal.html.DefaultHTMLCleaner}.
  *
  * @version $Id: $
  * @since 1.6M1

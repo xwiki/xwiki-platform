@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-application-administration</artifactId>
   <name>XWiki Platform - Applications - Administration</name>
-  <version>1.4-SNAPSHOT</version>
+  <version>1.3-SNAPSHOT</version>
   <packaging>xar</packaging>
   <description>Application for administrating wiki features like users, groups, rights etc.</description>
 

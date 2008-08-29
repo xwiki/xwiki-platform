@@ -1,22 +1,31 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
 .#-----------------------------------------------------
-----
+paragraph
+* Item
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onHorizontalLine
+beginParagraph
+onWord: [paragraph]
+endParagraph
+beginList: [BULLETED]
+beginListItem
+onWord: [Item]
+endListItem
+endList: [BULLETED]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<hr/>
+<p>paragraph</p><ul class="star"><li>Item</li></ul>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-----
+paragraph
+* Item
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><hr/></html>
+<html><p>paragraph</p><ul class="star"><li>Item</li></ul></html>

@@ -147,6 +147,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/list3", false);
         suite.addTestsFromResource("list/list4", false);
         suite.addTestsFromResource("list/list5", false);
+        suite.addTestsFromResource("list/list6", false);
         suite.addTestsFromResource("section", false);
 
         return new PlexusTestSetup(suite);

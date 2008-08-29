@@ -64,7 +64,7 @@ public class XWikiTestSetup extends TestSetup
     private static final boolean DEBUG =
         System.getProperty("debug", "false").equalsIgnoreCase("true");
 
-    private static final int TIMEOUT_SECONDS = 60;
+    private static final int TIMEOUT_SECONDS = 120;
 
     private Project project;
 

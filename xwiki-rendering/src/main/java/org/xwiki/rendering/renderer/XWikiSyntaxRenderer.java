@@ -21,7 +21,7 @@ package org.xwiki.rendering.renderer;
 
 import java.util.Map;
 
-import org.xwiki.rendering.internal.XWikiMacroPrinter;
+import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
 import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;

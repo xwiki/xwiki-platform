@@ -23,7 +23,7 @@ import java.util.Map;
 
 import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
-import org.xwiki.rendering.internal.XWikiMacroPrinter;
+import org.xwiki.rendering.internal.renderer.XWikiMacroPrinter;
 import org.xwiki.rendering.renderer.WikiPrinter;
 
 public class WysiwygEditorXHTMLRenderer extends XHTMLRenderer

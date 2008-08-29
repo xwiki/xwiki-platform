@@ -21,7 +21,7 @@ package org.xwiki.rendering.parser;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.doxia.XDOMGeneratorSink;
+import org.xwiki.rendering.internal.parser.doxia.XDOMGeneratorSink;
 
 import java.io.Reader;
 

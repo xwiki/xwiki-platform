@@ -21,7 +21,7 @@ package org.xwiki.rendering.parser;
 
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.block.XDOM;
-import org.xwiki.rendering.internal.wikimodel.XDOMGeneratorListener;
+import org.xwiki.rendering.internal.parser.wikimodel.XDOMGeneratorListener;
 import org.xwiki.url.XWikiURLFactory;
 import org.wikimodel.wem.IWikiParser;
 

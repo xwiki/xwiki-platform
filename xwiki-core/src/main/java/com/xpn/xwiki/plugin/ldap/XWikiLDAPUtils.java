@@ -316,22 +316,27 @@ public class XWikiLDAPUtils
         XWikiContext context)
     {
         boolean isGroup = false;
+        String fixedDN = groupDN;
 
         // break out if there is a look of groups
-        if (subgroups != null && subgroups.contains(groupDN)) {
+        if (subgroups != null && subgroups.contains(fixedDN)) {
             return true;
         }
 
-        List<XWikiLDAPSearchAttribute> searchAttributeList = searchGroupsMembers(groupDN);
+        List<XWikiLDAPSearchAttribute> searchAttributeList = searchGroupsMembers(fixedDN);
 
         if (searchAttributeList == null) {
             // maybe groupDN is a UID so trying to search for it
             searchAttributeList =
-                searchUserAttributesByUid(groupDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()}, context);
+                searchUserAttributesByUid(fixedDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()}, context);
+
+            if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
+                fixedDN = searchAttributeList.get(0).value;
+            }
         }
 
         if (searchAttributeList != null) {
-            isGroup = getGroupMembers(groupDN, memberMap, subgroups, searchAttributeList, context);
+            isGroup = getGroupMembers(fixedDN, memberMap, subgroups, searchAttributeList, context);
         }
 
         return isGroup;

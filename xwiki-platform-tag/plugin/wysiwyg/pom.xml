@@ -3,7 +3,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>10</version>
+    <version>11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-wysiwyg</artifactId>
   <name>XWiki Platform - Plugins - WYSIWYG</name>
@@ -13,13 +13,13 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>1.6-milestone-1</version>
+      <version>1.6-SNAPSHOT</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-web-wysiwyg</artifactId>
-      <version>1.6-milestone-1</version>
+      <version>1.6-SNAPSHOT</version>
       <classifier>classes</classifier>
       <scope>provided</scope>
     </dependency>

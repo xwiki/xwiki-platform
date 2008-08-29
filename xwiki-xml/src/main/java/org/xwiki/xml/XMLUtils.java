@@ -114,6 +114,7 @@ public final class XMLUtils
      * @param length the maximum number of characters in text nodes to include in the returned fragment
      * @return a well-formed XML fragment starting at the given character index and having up to the specified length,
      *         summing only the characters in text nodes
+     * @since 1.6M2
      */
     public static String extractXML(Node node, int start, int length)
     {
@@ -127,7 +128,7 @@ public final class XMLUtils
             if (handler != null && handler.isFinished()) {
                 return handler.getResult();
             } else {
-                throw new RuntimeException(t);
+                throw new RuntimeException("Failed to extract XML", t);
             }
         }
     }

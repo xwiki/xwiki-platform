@@ -112,6 +112,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("paragraph/paragraph1", false);
         suite.addTestsFromResource("paragraph/paragraph2", false);
         suite.addTestsFromResource("paragraph/paragraph3", false);
+        suite.addTestsFromResource("paragraph/paragraph4", false);
 
         // Macros
         suite.addTestsFromResource("macros/macro1", false);
@@ -135,7 +136,10 @@ public class RenderingTests extends TestCase
 
         // Other
         suite.addTestsFromResource("escape/escape1", false);
-        suite.addTestsFromResource("horizontalline", false);
+        suite.addTestsFromResource("horizontalline/horizontalline1", false);
+        suite.addTestsFromResource("horizontalline/horizontalline2", false);
+        suite.addTestsFromResource("horizontalline/horizontalline3", false);
+        suite.addTestsFromResource("horizontalline/horizontalline4", false);
         suite.addTestsFromResource("html", false);
         suite.addTestsFromResource("links", false);
         suite.addTestsFromResource("list/list1", false);

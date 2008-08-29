@@ -37,23 +37,24 @@ import org.xwiki.rendering.listener.Format;
  */
 public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 {
+    /**
+     * Top level elements.
+     */
+    private enum Element {
+        DOCUMENT, PARAGRAPH, HORIZONTALLINE, LIST, MACRO, SECTION
+    }
+
     private StringBuffer listStyle = new StringBuffer();
 
     private boolean needsNewLine = false;
 
+    private Element currentElement;
+    
     private boolean isInsideMacroMarker = false;
 
     private boolean isBeginListItemFound = false;
 
     private boolean isEndListItemFound = false;
-
-    private boolean isDocumentStart = false;
-
-    /**
-     * Whether the first element has not yet been printed or not. This is to handle the fact that we shouldn't
-     * print a new line before the first element.
-     */
-    private boolean isFirstElement = true;
 
     private int listDepth = 0;
 
@@ -71,7 +72,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginDocument()
     {
-        this.isDocumentStart = true;
+        this.currentElement = Element.DOCUMENT;
     }
 
     /**
@@ -186,9 +187,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginParagraph()
     {
-        if (!this.isFirstElement) {
+        if ((this.currentElement != Element.DOCUMENT) && (this.currentElement != Element.HORIZONTALLINE)
+            && (this.currentElement != Element.MACRO))
+        {
             print("\n");
         }
+        this.currentElement = Element.PARAGRAPH;
     }
 
     /**
@@ -198,7 +202,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endParagraph()
     {
         this.needsNewLine = true;
-        this.isFirstElement = false;
     }
 
     /**
@@ -234,10 +237,14 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
-        if (!this.isDocumentStart) {
+        if ((this.currentElement != Element.DOCUMENT)
+            // Don't print a new line since the paragraph already adds a new line by default after itself
+            && (this.currentElement != Element.PARAGRAPH))
+        {
             print("\n");
         }
         print(this.macroPrinter.print(name, parameters, content));
+        this.currentElement = Element.MACRO;
     }
 
     /**
@@ -269,6 +276,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
                 break;
         }
         print(prefix + " ");
+        this.currentElement = Element.SECTION;
     }
 
     /**
@@ -342,6 +350,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             this.listStyle.append("1");
         }
         this.listDepth++;
+        this.currentElement = Element.LIST;
     }
 
     /**
@@ -376,7 +385,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             this.isBeginListItemFound = false;
             this.isEndListItemFound = false;
             this.needsNewLine = true;
-            this.isFirstElement = false;
         }
     }
 
@@ -446,6 +454,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void onHorizontalLine()
     {
         print("----");
+        this.needsNewLine = true;
+        this.currentElement = Element.HORIZONTALLINE;
     }
 
     /**
@@ -467,7 +477,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             if (this.needsNewLine) {
                 super.print("\n");
             }
-            this.isDocumentStart = false;
             this.needsNewLine = false;
             super.print(text);
         }

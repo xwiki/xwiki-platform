@@ -31,7 +31,7 @@
   </parent>
   <artifactId>xwiki-xar-plugin</artifactId>
   <name>XWiki Platform - Tools - XAR Plugin</name>
-  <version>1.11</version>
+  <version>1.12-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
   <description>XWiki Platform - Tools - XAR Plugin</description>
   <dependencies>
@@ -99,10 +99,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-xar-plugin-1.11</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-xar-plugin-1.11</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-tools/tags/xwiki-xar-plugin-1.11</url>
-  </scm>
 </project>

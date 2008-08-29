@@ -106,7 +106,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform.tools</groupId>
       <artifactId>xwiki-shared-tests</artifactId>
-      <version>1.12-SNAPSHOT</version>
+      <version>1.12</version>
       <scope>test</scope>
     </dependency>
     <dependency>

@@ -83,7 +83,7 @@
     <dependency>
       <groupId>com.xpn.xwiki.platform</groupId>
       <artifactId>xwiki-core</artifactId>
-      <version>${pom.version}</version>
+      <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

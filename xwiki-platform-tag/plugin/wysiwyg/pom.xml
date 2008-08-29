@@ -7,7 +7,7 @@
   </parent>
   <artifactId>xwiki-plugin-wysiwyg</artifactId>
   <name>XWiki Platform - Plugins - WYSIWYG</name>
-  <version>1.0</version>
+  <version>1.1-SNAPSHOT</version>
   <description>XWiki Platform - Plugins - WYSIWYG</description>
   <dependencies>
     <dependency>
@@ -24,10 +24,4 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <scm>
-    <connection>scm:svn:http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-wysiwyg-1.0</connection>
-    <developerConnection>scm:svn:https://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-wysiwyg-1.0</developerConnection>
-    <url>http://svn.xwiki.org/svnroot/xwiki/platform/xwiki-plugins/tags/xwiki-plugin-wysiwyg-1.0</url>
-  </scm>
 </project>

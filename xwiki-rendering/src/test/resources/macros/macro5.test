@@ -1,0 +1,23 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+Two inline {{macro/}}{{macro/}} macros
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [Two]
+onSpace
+onWord: [inline]
+onSpace
+onInlineMacro: [macro] [] []
+onInlineMacro: [macro] [] []
+onSpace
+onWord: [macros]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+Two inline {{macro/}}{{macro/}} macros

@@ -20,9 +20,7 @@
 package org.xwiki.rendering.macro;
 
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.jmock.Mock;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -45,7 +43,9 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 {
     public void testIncludeMacroWithCurrentContext() throws Exception
     {
-        String expected = "beginDocument\n" + "onMacro: [someMacro] [] []\n" + "endDocument";
+        String expected = "beginDocument\n"
+            + "onStandaloneMacro: [someMacro] [] []\n"
+            + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");
         Mock mockDocumentAccessBridge = mock(DocumentAccessBridge.class);
@@ -63,10 +63,14 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
 
     public void testIncludeMacroWithNewContext() throws Exception
     {
-        String expected =
-            "beginDocument\n" + "beginMacroMarker: [velocity] [] [$myvar]\n" + "beginParagraph\n"
-                + "onSpecialSymbol: [$]\n" + "onWord: [myvar]\n" + "endParagraph\n"
-                + "endMacroMarker: [velocity] [] [$myvar]\n" + "endDocument";
+        String expected = "beginDocument\n"
+            + "beginMacroMarker: [velocity] [] [$myvar]\n"
+            + "beginParagraph\n"
+            + "onSpecialSymbol: [$]\n"
+            + "onWord: [myvar]\n"
+            + "endParagraph\n"
+            + "endMacroMarker: [velocity] [] [$myvar]\n"
+            + "endDocument";
 
         // Since it's not in the same context, we verify that a Velocity variable set in the including page is not
         // seen in the included page.

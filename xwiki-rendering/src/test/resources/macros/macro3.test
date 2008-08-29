@@ -1,0 +1,18 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test when there's no linebreak between macros
+.#-----------------------------------------------------
+{{macro/}}{{macro/}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onStandaloneMacro: [macro] [] []
+beginParagraph
+onInlineMacro: [macro] [] []
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+{{macro/}}{{macro/}}

@@ -211,7 +211,13 @@ public class DoxiaGeneratorListener implements Listener
         this.sink.link(link.getReference());
     }
 
-    public void onMacro(String name, Map<String, String> parameters, String content)
+    public void onInlineMacro(String name, Map<String, String> parameters, String content)
+    {
+        // Don't do anything since macros have already been transformed so this method
+        // should not be called.
+    }
+
+    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
         // Don't do anything since macros have already been transformed so this method
         // should not be called.
@@ -253,5 +259,15 @@ public class DoxiaGeneratorListener implements Listener
     public void onHorizontalLine()
     {
         this.sink.horizontalRule();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
+     */
+    public void onEmptyLines(int count)
+    {
+        // TODO: Find what to do...
     }
 }

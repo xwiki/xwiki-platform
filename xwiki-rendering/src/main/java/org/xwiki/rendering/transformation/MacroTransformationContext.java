@@ -19,8 +19,8 @@
  */
 package org.xwiki.rendering.transformation;
 
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.MacroBlock;
 
 /**
  * The context of the macro transformation process. Contains information such as the current XWiki DOM for the

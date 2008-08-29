@@ -24,7 +24,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
+import org.xwiki.rendering.block.StandaloneMacroBlock;
 import org.xwiki.rendering.macro.AbstractNoParameterMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 
@@ -38,12 +38,11 @@ public class TestRecursiveMacro extends AbstractNoParameterMacro
     /**
      * {@inheritDoc}
      * 
-     * @see org.xwiki.rendering.macro.Macro#execute(org.xwiki.rendering.macro.parameter.MacroParameters,
-     *      java.lang.String, org.xwiki.rendering.transformation.MacroTransformationContext)
+     * @see org.xwiki.rendering.macro.Macro#execute(Object, String, MacroTransformationContext) 
      */
     public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
         throws MacroExecutionException
     {
-        return Arrays.asList((Block) new MacroBlock("testrecursivemacro", Collections.<String, String> emptyMap()));
+        return Arrays.asList((Block) new StandaloneMacroBlock("testrecursivemacro", Collections.<String, String> emptyMap()));
     }
 }

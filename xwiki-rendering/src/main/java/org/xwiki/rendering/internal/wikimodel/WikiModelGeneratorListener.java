@@ -192,7 +192,13 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.onReference(wikiReference);
     }
 
-    public void onMacro(String name, Map<String, String> parameters, String content)
+    public void onInlineMacro(String name, Map<String, String> parameters, String content)
+    {
+        // Don't do anything since macros have already been transformed so this method
+        // should not be called.
+    }
+
+    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
         // Don't do anything since macros have already been transformed so this method
         // should not be called.
@@ -230,5 +236,14 @@ public class WikiModelGeneratorListener implements Listener
     public void onHorizontalLine()
     {
         this.wikimodelListener.onHorizontalLine();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)
+     */
+    public void onEmptyLines(int count)
+    {
+        this.wikimodelListener.onEmptyLines(count);
     }
 }

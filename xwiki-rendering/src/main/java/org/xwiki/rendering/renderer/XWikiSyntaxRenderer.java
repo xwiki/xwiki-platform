@@ -43,15 +43,19 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     private boolean isInsideMacroMarker = false;
 
-    private boolean isLastElementAParagraph = false;
-
     private boolean isBeginListItemFound = false;
 
     private boolean isEndListItemFound = false;
 
-    private int listDepth = 0;
+    private boolean isDocumentStart = false;
 
-    private boolean isLastElementAList = false;
+    /**
+     * Whether the first element has not yet been printed or not. This is to handle the fact that we shouldn't
+     * print a new line before the first element.
+     */
+    private boolean isFirstElement = true;
+
+    private int listDepth = 0;
 
     private XWikiMacroPrinter macroPrinter;
 
@@ -67,7 +71,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginDocument()
     {
-        // Don't do anything
+        this.isDocumentStart = true;
     }
 
     /**
@@ -182,10 +186,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginParagraph()
     {
-        if (this.isLastElementAParagraph) {
-            print("\n");
-        } else if (this.isLastElementAList) {
-            print("\n");
+        if (!this.isFirstElement) {
             print("\n");
         }
     }
@@ -197,7 +198,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endParagraph()
     {
         this.needsNewLine = true;
-        this.isLastElementAParagraph = true;
+        this.isFirstElement = false;
     }
 
     /**
@@ -220,10 +221,22 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#onMacro(String, java.util.Map, String)
+     * @see PrintRenderer#onInlineMacro(String, java.util.Map, String)
      */
-    public void onMacro(String name, Map<String, String> parameters, String content)
+    public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
+        print(this.macroPrinter.print(name, parameters, content));
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see PrintRenderer#onStandaloneMacro(String, java.util.Map, String)
+     */
+    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    {
+        if (!this.isDocumentStart) {
+            print("\n");
+        }
         print(this.macroPrinter.print(name, parameters, content));
     }
 
@@ -318,8 +331,6 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginList(ListType listType)
     {
-        this.listDepth++;
-
         if (this.isBeginListItemFound && !this.isEndListItemFound) {
             print("\n");
             this.isBeginListItemFound = false;
@@ -330,6 +341,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         } else {
             this.listStyle.append("1");
         }
+        this.listDepth++;
     }
 
     /**
@@ -359,10 +371,13 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endList(ListType listType)
     {
         this.listStyle.setLength(this.listStyle.length() - 1);
-
-        // Set a flag so that we can output 2 new lines if the next element is a paragraph.
-        this.isLastElementAList = true;
         this.listDepth--;
+        if (this.listDepth == 0) {
+            this.isBeginListItemFound = false;
+            this.isEndListItemFound = false;
+            this.needsNewLine = true;
+            this.isFirstElement = false;
+        }
     }
 
     /**
@@ -407,12 +422,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see PrintRenderer#endMacroMarker(String, java.util.Map, String)
+     * @see PrintRenderer#endMacroMarker(String, java.util.Map, String) 
      */
     public void endMacroMarker(String name, Map<String, String> parameters, String content)
     {
         this.isInsideMacroMarker = false;
-        onMacro(name, parameters, content);
+        print(this.macroPrinter.print(name, parameters, content));
     }
 
     /**
@@ -431,7 +446,19 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void onHorizontalLine()
     {
         print("----");
-        this.needsNewLine = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onEmptyLines(int)
+     */
+    public void onEmptyLines(int count)
+    {
+        if (count > 1) {
+            for (int i = 0; i < count; i++) {
+                print("\n");
+            }
+        }
     }
 
     protected void print(String text)
@@ -440,11 +467,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
             if (this.needsNewLine) {
                 super.print("\n");
             }
+            this.isDocumentStart = false;
             this.needsNewLine = false;
-            this.isLastElementAParagraph = false;
-            if (this.listDepth == 0) {
-                this.isLastElementAList = false;
-            }
             super.print(text);
         }
     }

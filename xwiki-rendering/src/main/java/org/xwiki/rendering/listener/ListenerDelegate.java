@@ -121,9 +121,14 @@ public class ListenerDelegate implements Listener
         this.listener.onLink(link);
     }
 
-    public void onMacro(String name, Map<String, String> parameters, String content)
+    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
-        this.listener.onMacro(name, parameters, content);
+        this.listener.onStandaloneMacro(name, parameters, content);
+    }
+
+    public void onInlineMacro(String name, Map<String, String> parameters, String content)
+    {
+        this.listener.onInlineMacro(name, parameters, content);
     }
 
     public void onNewLine()
@@ -159,5 +164,15 @@ public class ListenerDelegate implements Listener
     public void onHorizontalLine()
     {
         this.listener.onHorizontalLine();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int) 
+     */
+    public void onEmptyLines(int count)
+    {
+        this.listener.onEmptyLines(count);
     }
 }

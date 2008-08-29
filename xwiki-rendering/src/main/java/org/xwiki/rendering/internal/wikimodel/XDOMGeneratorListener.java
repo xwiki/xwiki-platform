@@ -287,7 +287,7 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Called by wikimodel when there's more than 1 empty lines between blocks. For example the following will
+     * Called by wikimodel when there are 2 or more empty lines between blocks. For example the following will
      * generate a call to <code>onEmptyLines(2)</code>:
      * <code><pre>
      * {{macro/}}
@@ -300,8 +300,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onEmptyLines(int count)
     {
-        // TODO: Handle. Note that this event is not yet sent by wikimodel by the wikimodel XWiki parser.
-        System.out.println("onEmptyLines(" + count + ") (not handled yet)");
+        this.stack.push(new EmptyLinesBlock(count));
     }
 
     public void onEscape(String str)
@@ -340,18 +339,17 @@ public class XDOMGeneratorListener implements IWemListener
     /**
      * A macro block was found and it's separated at least by one new line from the next block. If there's no
      * new line with the next block then wikimodel calls
-     * {@link #onMacroInline(String, org.wikimodel.wem.WikiParameters, String)} instead. 
+     * {@link #onMacroInline(String, org.wikimodel.wem.WikiParameters, String)} instead.
+     * </p>
+     * In wikimodel block elements can be:
+     * <ul>
+     *   <li>at the very beginning  of the document (no "\n")</li>
+     *   <li>just after at least one "\n"</li>
+     * </ul>
      */
     public void onMacroBlock(String macroName, WikiParameters params, String content)
     {
-        Map<String, String> xwikiParams = new LinkedHashMap<String, String>();
-        for (WikiParameter wikiParameter : params.toList()) {
-            xwikiParams.put(wikiParameter.getKey(), wikiParameter.getValue());
-        }
-
-        // TODO: Handle the fact that there's a newline between this block and the next one. We need to register this
-        // somewhere in the XWiki blocks.
-        this.stack.push(new MacroBlock(macroName, xwikiParams, content));
+        this.stack.push(new StandaloneMacroBlock(macroName, convertParameters(params), content));
     }
 
     /**
@@ -359,7 +357,17 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onMacroInline(String macroName, WikiParameters params, String content)
     {
-        onMacroBlock(macroName, params, content);
+        this.stack.push(new InlineMacroBlock(macroName, convertParameters(params), content));
+    }
+
+    private Map<String, String> convertParameters(WikiParameters params)
+    {
+        Map<String, String> xwikiParams = new LinkedHashMap<String, String>();
+        for (WikiParameter wikiParameter : params.toList()) {
+            xwikiParams.put(wikiParameter.getKey(), wikiParameter.getValue());
+        }
+
+        return xwikiParams;
     }
 
     /**
@@ -371,7 +379,7 @@ public class XDOMGeneratorListener implements IWemListener
     }
 
     /**
-     * Called when WikiModel finds an inline reference such as a URI located directly in the text, as opposed to a link
+     * Called when WikiModel finds an reference such as a URI located directly in the text, as opposed to a link
      * inside wiki link syntax delimiters.
      */
     public void onReference(String ref)

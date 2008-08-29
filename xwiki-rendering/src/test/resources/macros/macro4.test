@@ -1,0 +1,26 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Test that several linebreaks between macros are preserved
+.#-----------------------------------------------------
+{{macro/}}
+
+
+
+{{macro/}}
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onStandaloneMacro: [macro] [] []
+onEmptyLines: [2]
+onStandaloneMacro: [macro] [] []
+endDocument
+.#-----------------------------------------------------
+.expect|xwiki|skip
+.#-----------------------------------------------------
+.# TODO: Bug in wikimodel, see http://code.google.com/p/wikimodel/issues/detail?id=49
+{{macro/}}
+
+
+
+{{macro/}}

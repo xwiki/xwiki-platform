@@ -19,28 +19,34 @@
  */
 package org.xwiki.rendering.block;
 
-import java.util.Map;
+import org.xwiki.rendering.listener.Listener;
 
 /**
- * Represents a Macro (standalone or inline) defined in a page.
+ * Represents an empty line between 2 standalone Blocks. A standalone block is block that is not included in
+ * another block. Standalone blocks are Paragraph, Standalone Macro, Lists, Table, etc.
  *
- * @version $Id$
- * @since 1.5M2
+ * @version $Id: $
+ * @since 1.6M2
  */
-public interface MacroBlock extends Block
+public class EmptyLinesBlock  extends AbstractBlock
 {
     /**
-     * @return the macro name
+     * Number of empty lines between 2 standalone Blocks.
      */
-    String getName();
+    private int count;
 
-    /**
-     * @return the macro parameters
-     */
-    Map<String, String> getParameters();
+    public EmptyLinesBlock(int count)
+    {
+        this.count = count;
+    }
 
-    /**
-     * @return the macro content
-     */
-    String getContent();
+    public int getEmptyLinesCount()
+    {
+        return this.count;
+    }
+
+    public void traverse(Listener listener)
+    {
+        listener.onEmptyLines(getEmptyLinesCount());
+    }
 }

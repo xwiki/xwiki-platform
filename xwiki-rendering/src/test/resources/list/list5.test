@@ -13,6 +13,7 @@ beginListItem
 onWord: [Item]
 endListItem
 endList: [BULLETED]
+onEmptyLines: [1]
 beginParagraph
 onWord: [This]
 onSpace
@@ -34,6 +35,7 @@ endDocument
 
 This is a paragraph
 .#-----------------------------------------------------
-.input|xhtml/1.0
+.input|xhtml/1.0|skip
 .#-----------------------------------------------------
+.# TODO: Bug in wikimodel, see http://code.google.com/p/wikimodel/issues/detail?id=48 
 <html><ul class="star"><li>Item</li></ul><p>This is a paragraph</p></html>

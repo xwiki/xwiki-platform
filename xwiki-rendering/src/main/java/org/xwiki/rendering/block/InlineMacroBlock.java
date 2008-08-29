@@ -19,28 +19,37 @@
  */
 package org.xwiki.rendering.block;
 
+import org.xwiki.rendering.listener.Listener;
+
 import java.util.Map;
 
 /**
- * Represents a Macro (standalone or inline) defined in a page.
+ * Represents an inline Macro defined in a page (ie a Macro located inside another Block, for example a Macro located
+ * inside a Paragraph Block).
  *
- * @version $Id$
- * @since 1.5M2
+ * @version $Id: $
+ * @since 1.6M2
  */
-public interface MacroBlock extends Block
+public class InlineMacroBlock extends AbstractMacroBlock
 {
-    /**
-     * @return the macro name
-     */
-    String getName();
+    public InlineMacroBlock(String name, Map<String, String> parameters)
+    {
+        super(name, parameters);
+    }
+
+    public InlineMacroBlock(String name, Map<String, String> parameters, String content)
+    {
+        super(name, parameters, content);
+    }
 
     /**
-     * @return the macro parameters
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
      */
-    Map<String, String> getParameters();
+    public void traverse(Listener listener)
+    {
+        // See org.xwiki.rendering.block.StandaloneMacroBlock for explanations.
+        listener.onInlineMacro(getName(), getParameters(), getContent());
+    }
 
-    /**
-     * @return the macro content
-     */
-    String getContent();
 }

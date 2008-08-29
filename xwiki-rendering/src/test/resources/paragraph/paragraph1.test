@@ -18,6 +18,7 @@ onWord: [one]
 onLineBreak
 onWord: [paragraph]
 endParagraph
+onEmptyLines: [1]
 beginParagraph
 onWord: [this]
 onSpace
@@ -40,6 +41,7 @@ paragraph
 
 this is another one
 .#-----------------------------------------------------
-.input|xhtml/1.0
+.input|xhtml/1.0|skip
 .#-----------------------------------------------------
+.# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=48
 <html><p>this is one<br/>paragraph</p><p>this is another one</p></html>

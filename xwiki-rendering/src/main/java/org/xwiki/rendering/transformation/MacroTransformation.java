@@ -24,23 +24,21 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.beanutils.BeanUtils;
-import org.apache.commons.beanutils.ConvertUtils;
 import org.xwiki.component.manager.ComponentLookupException;
 import org.xwiki.component.manager.ComponentManager;
 import org.xwiki.component.phase.Composable;
 import org.xwiki.rendering.block.Block;
-import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.block.MacroMarkerBlock;
 import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.block.MacroBlock;
 import org.xwiki.rendering.macro.Macro;
 import org.xwiki.rendering.macro.MacroExecutionException;
-import org.xwiki.rendering.macro.parameter.EnumConverter;
 import org.xwiki.rendering.macro.parameter.MacroParameterException;
 import org.xwiki.rendering.parser.Syntax;
 
 /**
- * Look for all {@link MacroBlock} blocks in the passed Document and iteratively execute each Macro in the correct
- * order. Macros can:
+ * Look for all {@link org.xwiki.rendering.block.MacroBlock} blocks in the passed Document and iteratively execute each
+ * Macro in the correct order. Macros can:
  * <ul>
  * <li>provide a hint specifying when they should run (priority)</li>
  * <li>generate other Macros</li>

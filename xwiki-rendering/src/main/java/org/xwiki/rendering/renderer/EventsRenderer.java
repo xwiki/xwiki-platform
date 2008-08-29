@@ -27,8 +27,6 @@ import org.xwiki.rendering.listener.Listener;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
-import org.xwiki.rendering.renderer.AbstractPrintRenderer;
-import org.xwiki.rendering.renderer.WikiPrinter;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -143,9 +141,14 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onLink: [" + link + "]");
     }
 
-    public void onMacro(String name, Map<String, String> parameters, String content)
+    public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
-        printMacroData("onMacro", name, parameters, content);
+        printMacroData("onInlineMacro", name, parameters, content);
+    }
+
+    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
+    {
+        printMacroData("onStandaloneMacro", name, parameters, content);
     }
 
     public void beginSection(SectionLevel level)
@@ -248,6 +251,15 @@ public class EventsRenderer extends AbstractPrintRenderer
     public void onHorizontalLine()
     {
         println("onHorizontalLine");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onEmptyLines(int)  
+     */
+    public void onEmptyLines(int count)
+    {
+        println("onEmptyLines: [" + count + "]");
     }
 
     private StringBuffer toStringXMLElement(Map<String, String> attributes)

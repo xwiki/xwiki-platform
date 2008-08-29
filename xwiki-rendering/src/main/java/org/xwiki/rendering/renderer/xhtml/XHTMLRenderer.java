@@ -224,10 +224,21 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * 
-     * @see org.xwiki.rendering.renderer.Renderer#onMacro(String, java.util.Map, String)
+     *
+     * @see org.xwiki.rendering.renderer.Renderer#onInlineMacro(String, java.util.Map, String)
      */
-    public void onMacro(String name, Map<String, String> parameters, String content)
+    public void onInlineMacro(String name, Map<String, String> parameters, String content)
+    {
+        // Do nothing since macro output depends on Macro execution which transforms the macro
+        // into a set of other events.
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.Renderer#onStandaloneMacro(String, java.util.Map, String)
+     */
+    public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
         // Do nothing since macro output depends on Macro execution which transforms the macro
         // into a set of other events.
@@ -430,5 +441,15 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void onHorizontalLine()
     {
         print("<hr/>");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.Renderer#onEmptyLines(int)
+     */
+    public void onEmptyLines(int count)
+    {
+        // TODO: Don't know yet how to represent thisin HTML...
     }
 }

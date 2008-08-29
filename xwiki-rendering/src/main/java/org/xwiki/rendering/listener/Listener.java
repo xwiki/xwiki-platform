@@ -148,7 +148,8 @@ public interface Listener
      * @param name the macro name
      * @param parameters the macro parameters
      * @param content the macro content
-     * @see #onMacro(String, java.util.Map, String)
+     * @see #onStandaloneMacro(String, java.util.Map, String)
+     * @see #onInlineMacro(String, java.util.Map, String)
      */
     void beginMacroMarker(String name, Map<String, String> parameters, String content);
 
@@ -158,7 +159,7 @@ public interface Listener
      * @param name the macro name
      * @param parameters the macro parameters
      * @param content the macro content
-     * @see #beginMacroMarker(String, java.util.Map, String)  
+     * @see #beginMacroMarker(String, java.util.Map, String)
      */
     void endMacroMarker(String name, Map<String, String> parameters, String content);
 
@@ -185,13 +186,25 @@ public interface Listener
     void onLink(Link link);
 
     /**
-     * A macro.
-     *  
+     * A {@link org.xwiki.rendering.macro.Macro} located inside another Block. For example a Macro inside a Paragraph
+     * Block.
+     *
      * @param name the macro name
      * @param parameters the macro parameters
      * @param content the macro content
+     * @since 1.6M2
      */
-    void onMacro(String name, Map<String, String> parameters, String content);
+    void onInlineMacro(String name, Map<String, String> parameters, String content);
+
+    /**
+     * A {@link org.xwiki.rendering.macro.Macro} by itself on a line (ie not inside another Block).
+     *
+     * @param name the macro name
+     * @param parameters the macro parameters
+     * @param content the macro content
+     * @since 1.6M2
+     */
+    void onStandaloneMacro(String name, Map<String, String> parameters, String content);
 
     /**
      * A word. Note that sentences ar broken into different events: word events, special symbols events, space
@@ -237,4 +250,12 @@ public interface Listener
      * @since 1.6M1
      */
     void onHorizontalLine();
+
+    /**
+     * Represents an empty line between 2 standalone Blocks. A standalone block is block that is not included in
+     * another block. Standalone blocks are Paragraph, Standalone Macro, Lists, Table, etc.
+     *
+     * @param count the number of empty lines between 2 standalone Blocks
+     */
+    void onEmptyLines(int count);
 }

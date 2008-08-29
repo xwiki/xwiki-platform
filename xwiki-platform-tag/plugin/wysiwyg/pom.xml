@@ -29,7 +29,7 @@
   <parent>
     <artifactId>xwiki-plugins</artifactId>
     <groupId>com.xpn.xwiki.platform.plugins</groupId>
-    <version>10-SNAPSHOT</version>
+    <version>11-SNAPSHOT</version>
   </parent>
   <artifactId>xwiki-plugin-wysiwyg</artifactId>
   <name>XWiki Platform - Plugins - WYSIWYG</name>

@@ -17,34 +17,37 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.xhtml;
+package org.xwiki.rendering.internal.parser;
+
+import org.apache.maven.doxia.module.confluence.ConfluenceParser;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.internal.parser.doxia.AbstractDoxiaParser;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro} Macro.
- *
  * @version $Id$
- * @since 1.6M1
+ * @since 1.5M2
  */
-public class XHTMLMacroParameters
+public class DoxiaConfluenceParser extends AbstractDoxiaParser
 {
-    /**
-     * Indicate if the user has asked to escape wiki syntax or not.
-     */
-    boolean escapeWikiSyntax;
+    private static final Syntax SYNTAX = new Syntax(SyntaxType.CONFLUENCE, "1.0");
 
     /**
-     * @return indicate if the user has asked to escape wiki syntax or not.
+     * {@inheritDoc}
+     * @see Parser#getSyntax()
      */
-    public boolean isEscapeWikiSyntax()
+    public Syntax getSyntax()
     {
-        return this.escapeWikiSyntax;
+        return SYNTAX;
     }
 
     /**
-     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
+     * {@inheritDoc}
+     * @see AbstractDoxiaParser#createDoxiaParser()
      */
-    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
+    public org.apache.maven.doxia.parser.Parser createDoxiaParser()
     {
-        this.escapeWikiSyntax = escapeWikiSyntax;
+        return new ConfluenceParser();
     }
 }

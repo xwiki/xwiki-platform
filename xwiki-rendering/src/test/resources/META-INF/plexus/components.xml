@@ -4,25 +4,25 @@
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>testsimplemacro/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.transformation.TestSimpleMacro</implementation>
+      <implementation>org.xwiki.rendering.internal.transformation.TestSimpleMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>testnestedmacro/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.transformation.TestNestedMacro</implementation>
+      <implementation>org.xwiki.rendering.internal.transformation.TestNestedMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>testrecursivemacro/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.transformation.TestRecursiveMacro</implementation>
+      <implementation>org.xwiki.rendering.internal.transformation.TestRecursiveMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>testprioritymacro/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.transformation.TestPriorityMacro</implementation>
+      <implementation>org.xwiki.rendering.internal.transformation.TestPriorityMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
       <configuration>
         <!-- Ensure that this macro gets executed before the other macros for testing priorities -->
@@ -34,7 +34,7 @@
     <component>
       <role>org.xwiki.velocity.VelocityManager</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.macro.MockVelocityManager</implementation>
+      <implementation>org.xwiki.rendering.internal.macro.MockVelocityManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
 
@@ -42,7 +42,7 @@
     <component>
       <role>org.xwiki.bridge.DocumentAccessBridge</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.MockDocumentAccessBridge</implementation>
+      <implementation>org.xwiki.rendering.internal.MockDocumentAccessBridge</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
 
@@ -50,7 +50,7 @@
     <component>
       <role>org.xwiki.rendering.util.IdGenerator</role>
       <role-hint>default</role-hint>
-      <implementation>org.xwiki.rendering.util.MockIdGenerator</implementation>
+      <implementation>org.xwiki.rendering.internal.util.MockIdGenerator</implementation>
       <instantiation-strategy>per-lookup</instantiation-strategy>
     </component>
 

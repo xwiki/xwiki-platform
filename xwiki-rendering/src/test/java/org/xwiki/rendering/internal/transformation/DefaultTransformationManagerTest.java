@@ -17,34 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.xhtml;
+package org.xwiki.rendering.internal.transformation;
 
-/**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro} Macro.
- *
- * @version $Id$
- * @since 1.6M1
- */
-public class XHTMLMacroParameters
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.transformation.TransformationManager;
+
+public class DefaultTransformationManagerTest extends AbstractRenderingTestCase
 {
-    /**
-     * Indicate if the user has asked to escape wiki syntax or not.
-     */
-    boolean escapeWikiSyntax;
-
-    /**
-     * @return indicate if the user has asked to escape wiki syntax or not.
-     */
-    public boolean isEscapeWikiSyntax()
+    public void testTransformations() throws Exception 
     {
-        return this.escapeWikiSyntax;
-    }
-
-    /**
-     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
-     */
-    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
-    {
-        this.escapeWikiSyntax = escapeWikiSyntax;
+        TransformationManager manager =
+            (TransformationManager) getComponentManager().lookup(TransformationManager.ROLE);
+         manager.performTransformations(XDOM.EMPTY, new Syntax(SyntaxType.XWIKI, "2.0"));
     }
 }

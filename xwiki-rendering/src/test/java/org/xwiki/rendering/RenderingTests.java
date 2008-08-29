@@ -34,7 +34,7 @@ import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
 import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
 import org.xwiki.rendering.scaffolding.PrintRendererFactory;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-
+import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import com.xpn.xwiki.test.PlexusTestSetup;
 
 /**

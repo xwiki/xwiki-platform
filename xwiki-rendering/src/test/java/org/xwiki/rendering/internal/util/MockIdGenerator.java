@@ -17,34 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.xhtml;
+package org.xwiki.rendering.internal.util;
+
+import org.xwiki.rendering.util.IdGenerator;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro} Macro.
- *
- * @version $Id$
- * @since 1.6M1
+ * Default implementation of {@link org.xwiki.rendering.util.IdGenerator}.
+ * 
+ * @version $Id: $
  */
-public class XHTMLMacroParameters
+public class MockIdGenerator implements IdGenerator
 {
     /**
-     * Indicate if the user has asked to escape wiki syntax or not.
+     * {@inheritDoc}
+     * 
+     * @see org.xwiki.rendering.util.IdGenerator#generateRandomUniqueId()
      */
-    boolean escapeWikiSyntax;
-
-    /**
-     * @return indicate if the user has asked to escape wiki syntax or not.
-     */
-    public boolean isEscapeWikiSyntax()
+    public String generateRandomUniqueId()
     {
-        return this.escapeWikiSyntax;
-    }
-
-    /**
-     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
-     */
-    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
-    {
-        this.escapeWikiSyntax = escapeWikiSyntax;
+        return "testid";
     }
 }

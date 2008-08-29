@@ -67,7 +67,7 @@ public class MacroTransformationContext
     /**
      * @param currentMacroBlock the macro currently being processed.
      */
-    void setCurrentMacroBlock(MacroBlock currentMacroBlock)
+    public void setCurrentMacroBlock(MacroBlock currentMacroBlock)
     {
         this.currentMacroBlock = currentMacroBlock;
     }
@@ -83,7 +83,7 @@ public class MacroTransformationContext
     /**
      * @param xdom the complete {@link XDOM} of the page currently being transformed.
      */
-    void setXDOM(XDOM xdom)
+    public void setXDOM(XDOM xdom)
     {
         this.xdom = xdom;
     }

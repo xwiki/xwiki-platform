@@ -17,25 +17,34 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.id;
+package org.xwiki.rendering.internal.parser.doxia;
+
+import org.xwiki.component.logging.AbstractLogEnabled;
+import org.xwiki.rendering.block.XDOM;
+import org.xwiki.rendering.internal.parser.doxia.XDOMGeneratorSink;
+import org.xwiki.rendering.parser.Parser;
+import org.xwiki.rendering.parser.ParseException;
+
+import java.io.Reader;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.id.IdMacro} Macro.
- * 
  * @version $Id$
- * @since 1.6M1
+ * @since 1.5M2
  */
-public class IdMacroParameters
+public abstract class AbstractDoxiaParser extends AbstractLogEnabled implements Parser
 {
-    private String name;
+    public abstract org.apache.maven.doxia.parser.Parser createDoxiaParser();
 
-    public String getName()
+    public XDOM parse(Reader source) throws ParseException
     {
-        return this.name;
-    }
+        org.apache.maven.doxia.parser.Parser parser = createDoxiaParser();
+        XDOMGeneratorSink sink = new XDOMGeneratorSink();
 
-    public void setName(String name)
-    {
-        this.name = name;
+        try {
+            parser.parse(source, sink);
+        } catch (org.apache.maven.doxia.parser.ParseException e) {
+            throw new ParseException("Failed to parse input source", e);
+        }
+        return sink.getDOM();
     }
 }

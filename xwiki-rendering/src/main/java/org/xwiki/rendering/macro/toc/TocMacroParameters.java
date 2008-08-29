@@ -21,6 +21,12 @@ package org.xwiki.rendering.macro.toc;
 
 import org.xwiki.rendering.macro.parameter.ParameterValueTooLowException;
 
+/**
+ * Parameters for the {@link org.xwiki.rendering.internal.macro.toc.TocMacro} Macro.
+ *
+ * @version $Id: $
+ * @since 1.6M1
+ */
 public class TocMacroParameters
 {
     /**

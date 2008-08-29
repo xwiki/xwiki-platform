@@ -17,34 +17,24 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.xhtml;
+package org.xwiki.rendering.internal.macro;
+
+import org.xwiki.rendering.scaffolding.AbstractRenderingTestCase;
+import org.xwiki.rendering.parser.Syntax;
+import org.xwiki.rendering.parser.SyntaxType;
+import org.xwiki.rendering.macro.MacroFactory;
 
 /**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro} Macro.
+ * Unit tests for {@link org.xwiki.rendering.internal.macro.DefaultMacroFactory}.
  *
  * @version $Id$
- * @since 1.6M1
+ * @since 1.5M2
  */
-public class XHTMLMacroParameters
+public class DefaultMacroFactoryTest extends AbstractRenderingTestCase
 {
-    /**
-     * Indicate if the user has asked to escape wiki syntax or not.
-     */
-    boolean escapeWikiSyntax;
-
-    /**
-     * @return indicate if the user has asked to escape wiki syntax or not.
-     */
-    public boolean isEscapeWikiSyntax()
+    public void testGetExistingMacro() throws Exception
     {
-        return this.escapeWikiSyntax;
-    }
-
-    /**
-     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
-     */
-    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
-    {
-        this.escapeWikiSyntax = escapeWikiSyntax;
+        MacroFactory factory = (MacroFactory) getComponentManager().lookup(MacroFactory.ROLE);
+        factory.getMacro("xhtml", new Syntax(SyntaxType.XWIKI, "2.0"));
     }
 }

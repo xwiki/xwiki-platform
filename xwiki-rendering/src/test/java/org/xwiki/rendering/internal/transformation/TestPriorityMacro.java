@@ -17,34 +17,28 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.macro.xhtml;
+package org.xwiki.rendering.internal.transformation;
 
-/**
- * Parameters for the {@link org.xwiki.rendering.internal.macro.xhtml.XHTMLMacro} Macro.
- *
- * @version $Id$
- * @since 1.6M1
- */
-public class XHTMLMacroParameters
+import java.util.Arrays;
+import java.util.List;
+
+import org.xwiki.rendering.block.Block;
+import org.xwiki.rendering.block.ParagraphBlock;
+import org.xwiki.rendering.block.WordBlock;
+import org.xwiki.rendering.macro.AbstractNoParameterMacro;
+import org.xwiki.rendering.macro.MacroExecutionException;
+import org.xwiki.rendering.transformation.MacroTransformationContext;
+
+public class TestPriorityMacro extends AbstractNoParameterMacro
 {
-    /**
-     * Indicate if the user has asked to escape wiki syntax or not.
-     */
-    boolean escapeWikiSyntax;
-
-    /**
-     * @return indicate if the user has asked to escape wiki syntax or not.
-     */
-    public boolean isEscapeWikiSyntax()
+    public TestPriorityMacro()
     {
-        return this.escapeWikiSyntax;
+        super("Priority Macro");
     }
 
-    /**
-     * @param escapeWikiSyntax indicate if the user has asked to escape wiki syntax or not.
-     */
-    public void setEscapeWikiSyntax(boolean escapeWikiSyntax)
+    public List<Block> execute(Object parameters, String content, MacroTransformationContext context)
+        throws MacroExecutionException
     {
-        this.escapeWikiSyntax = escapeWikiSyntax;
+        return Arrays.asList(new Block[] {new ParagraphBlock(new WordBlock("word"))});
     }
 }

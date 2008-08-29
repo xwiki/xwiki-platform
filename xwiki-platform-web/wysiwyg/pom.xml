@@ -89,13 +89,13 @@
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-xml</artifactId>
-      <version>${pom.version}</version>
+      <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.xwiki.platform</groupId>
       <artifactId>xwiki-core-bridge</artifactId>
-      <version>${pom.version}</version>
+      <version>${platform.core.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -173,7 +173,7 @@
       <plugin>
         <groupId>com.totsp.gwt</groupId>
         <artifactId>maven-googlewebtoolkit2-plugin</artifactId>
-        <version>1.5.3-SNAPSHOT</version>
+        <version>1.5.3</version>
         <configuration>
           <logLevel>WARN</logLevel><!-- ERROR, WARN, INFO, TRACE, DEBUG, SPAM, ALL -->
           <style>DETAILED</style><!-- OBF[USCATED], PRETTY, DETAILED -->

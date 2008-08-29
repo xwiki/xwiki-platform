@@ -134,10 +134,10 @@ public class ExtractHandler extends DefaultHandler
     {
         super();
         if (start < 0) {
-            throw new SAXException("start must be greater than or equal to 0");
+            throw new SAXException("Start must be greater than or equal to 0");
         }
         if (length <= 0) {
-            throw new SAXException("length must be greater than 0");
+            throw new SAXException("Length must be greater than 0");
         }
         lowerBound = start;
         upperBound = lowerBound + length;
@@ -277,7 +277,7 @@ public class ExtractHandler extends DefaultHandler
                 result.append(content);
             }
             endDocument();
-            throw new SAXException("length limit reached");
+            throw new SAXException("Length limit reached");
         } else {
             counter += length;
             result.append(ch, start, length);

@@ -1775,9 +1775,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return links;
     }
 
-    public List<XWikiLink> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
+    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
     {
-        List<XWikiLink> backlinks = new ArrayList<XWikiLink>();
+        List backlinks = new ArrayList();
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1858,7 +1858,6 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     link.setDocId(doc.getId());
                     link.setLink((String) links.get(i));
                     link.setFullName(doc.getFullName());
-                    link.setLanguage(doc.getLanguage());
                     session.save(link);
                 }
             }

@@ -94,7 +94,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private static final Log log = LogFactory.getLog(XWikiHibernateStore.class);
 
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
-    
+
     /**
      * QueryManager for this store.
      * Injected via component manager.
@@ -1775,9 +1775,9 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
         return links;
     }
 
-    public List loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
+    public List<XWikiLink> loadBacklinks(String fullName, XWikiContext context, boolean bTransaction) throws XWikiException
     {
-        List backlinks = new ArrayList();
+        List<XWikiLink> backlinks = new ArrayList<XWikiLink>();
         try {
             if (bTransaction) {
                 checkHibernate(context);
@@ -1858,6 +1858,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
                     link.setDocId(doc.getId());
                     link.setLink((String) links.get(i));
                     link.setFullName(doc.getFullName());
+                    link.setLanguage(doc.getLanguage());
                     session.save(link);
                 }
             }

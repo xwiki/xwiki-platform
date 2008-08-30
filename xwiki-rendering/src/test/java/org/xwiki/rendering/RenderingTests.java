@@ -19,22 +19,10 @@
  */
 package org.xwiki.rendering;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 
-import org.xwiki.rendering.renderer.DefaultWikiPrinter;
-import org.xwiki.rendering.renderer.EventsRenderer;
-import org.xwiki.rendering.renderer.PrintRenderer;
-import org.xwiki.rendering.renderer.TexRenderer;
-import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
-import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
-import org.xwiki.rendering.renderer.xhtml.XHTMLRenderer;
-import org.xwiki.rendering.scaffolding.PrintRendererFactory;
 import org.xwiki.rendering.scaffolding.RenderingTestSuite;
-import org.xwiki.rendering.internal.MockDocumentAccessBridge;
 import com.xpn.xwiki.test.PlexusTestSetup;
 
 /**
@@ -47,44 +35,7 @@ public class RenderingTests extends TestCase
 {
     public static Test suite() throws Exception
     {
-        Map<String, PrintRendererFactory> factories = new HashMap<String, PrintRendererFactory>();
-        factories.put("xwiki", new PrintRendererFactory()
-        {
-            public PrintRenderer createRenderer()
-            {
-                return new XWikiSyntaxRenderer(new DefaultWikiPrinter());
-            }
-        });
-        factories.put("event", new PrintRendererFactory()
-        {
-            public PrintRenderer createRenderer()
-            {
-                return new EventsRenderer(new DefaultWikiPrinter());
-            }
-        });
-        factories.put("xhtml", new PrintRendererFactory()
-        {
-            public PrintRenderer createRenderer()
-            {
-                return new XHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentAccessBridge(), null);
-            }
-        });
-        factories.put("wysiwyg", new PrintRendererFactory()
-        {
-            public PrintRenderer createRenderer()
-            {
-                return new WysiwygEditorXHTMLRenderer(new DefaultWikiPrinter(), new MockDocumentAccessBridge(), null);
-            }
-        });
-        factories.put("tex", new PrintRendererFactory()
-        {
-            public PrintRenderer createRenderer()
-            {
-                return new TexRenderer(new DefaultWikiPrinter());
-            }
-        });
-
-        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers", factories);
+        RenderingTestSuite suite = new RenderingTestSuite("Test all Parsers/Renderers");
 
         // Text formatting
         suite.addTestsFromResource("bold/bold1", false);

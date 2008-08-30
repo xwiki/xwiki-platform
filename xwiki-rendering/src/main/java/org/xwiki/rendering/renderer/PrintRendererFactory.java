@@ -17,36 +17,20 @@
  * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
-package org.xwiki.rendering.parser;
-
-import org.wikimodel.wem.IWikiParser;
-import org.wikimodel.wem.mediawiki.MediaWikiParser;
-import org.xwiki.rendering.parser.Syntax;
-import org.xwiki.rendering.parser.SyntaxType;
+package org.xwiki.rendering.renderer;
 
 /**
- * @version $Id$
- * @since 1.5M2
+ * Make it easy to create {@link PrintRenderer}. The main reason is because Print renderers cannot be components
+ * since they have some state (the {@link WikiPrinter}). Thus all dependent components required to construct
+ * a Print renderer have to be passed manually to its constructor. Since the implementation of this interface is a
+ * component it's automatically injected all components required to construct the Print renderers.
+ *
+ * @version $Id: $
+ * @since 1.6M2
  */
-public class WikiModelMediaWikiParser extends AbstractWikiModelParser
+public interface PrintRendererFactory
 {
-    private static final Syntax SYNTAX = new Syntax(SyntaxType.MEDIAWIKI, "1.0");
-
-    /**
-     * {@inheritDoc}
-     * @see org.xwiki.rendering.parser.Parser#getSyntax()
-     */
-    public Syntax getSyntax()
-    {
-        return SYNTAX;
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see AbstractWikiModelParser#createWikiModelParser()
-     */
-    public IWikiParser createWikiModelParser()
-    {
-        return new MediaWikiParser();
-    }
+    String ROLE = PrintRendererFactory.class.getName();
+    
+    PrintRenderer createRenderer(PrintRendererType type, WikiPrinter printer);
 }

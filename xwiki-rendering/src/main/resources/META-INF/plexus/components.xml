@@ -69,7 +69,7 @@
       <instantiation-strategy>singleton</instantiation-strategy>
     </component>
 
-    <!-- Managers -->
+    <!-- Others -->
     <component>
       <role>org.xwiki.rendering.transformation.Transformation</role>
       <role-hint>macro</role-hint>
@@ -93,6 +93,19 @@
       <role-hint>default</role-hint>
       <implementation>org.xwiki.rendering.internal.transformation.DefaultTransformationManager</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>
+    </component>
+    <component>
+      <role>org.xwiki.rendering.renderer.PrintRendererFactory</role>
+      <role-hint>default</role-hint>
+      <implementation>org.xwiki.rendering.internal.renderer.DefaultPrintRendererFactory</implementation>
+      <requirements>
+        <requirement>
+          <role>org.xwiki.bridge.DocumentAccessBridge</role>
+        </requirement>
+        <requirement>
+          <role>org.xwiki.rendering.configuration.RenderingConfiguration</role>
+        </requirement>
+      </requirements>
     </component>
 
     <!-- Utils -->

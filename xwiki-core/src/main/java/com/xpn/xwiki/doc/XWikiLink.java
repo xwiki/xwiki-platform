@@ -31,6 +31,12 @@ public class XWikiLink extends Object implements Serializable
 
     private String fullName;
 
+    /**
+     * Language of the document containing the link. We need this since we want to be able to find backlinks for
+     * the same document but in different languages.
+     */
+    private String language;
+
     public XWikiLink()
     {
         this.setDocId(0);
@@ -78,9 +84,19 @@ public class XWikiLink extends Object implements Serializable
         this.fullName = fullName;
     }
 
+    public void setLanguage(String language)
+    {
+        this.language = language;
+    }
+
+    public String getLanguage()
+    {
+        return this.language;
+    }
+
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see Object#equals(Object)
      */
     @Override
@@ -92,7 +108,7 @@ public class XWikiLink extends Object implements Serializable
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * @see Object#hashCode()
      */
     @Override

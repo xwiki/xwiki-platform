@@ -21,7 +21,6 @@ package com.xpn.xwiki.wysiwyg.server.converter.internal;
 
 import java.io.StringReader;
 
-import org.xwiki.bridge.DocumentAccessBridge;
 import org.xwiki.rendering.block.XDOM;
 import org.xwiki.rendering.parser.ParseException;
 import org.xwiki.rendering.parser.Parser;
@@ -30,6 +29,8 @@ import org.xwiki.rendering.parser.SyntaxType;
 import org.xwiki.rendering.renderer.DefaultWikiPrinter;
 import org.xwiki.rendering.renderer.WikiPrinter;
 import org.xwiki.rendering.renderer.XWikiSyntaxRenderer;
+import org.xwiki.rendering.renderer.PrintRendererFactory;
+import org.xwiki.rendering.renderer.PrintRendererType;
 import org.xwiki.rendering.renderer.xhtml.WysiwygEditorXHTMLRenderer;
 import org.xwiki.rendering.transformation.TransformationManager;
 
@@ -73,9 +74,11 @@ public class XWikiHTMLConverter implements HTMLConverter
             txManager.performTransformations(dom, new Syntax(SyntaxType.XWIKI, "2.0"));
 
             WikiPrinter printer = new DefaultWikiPrinter();
-            DocumentAccessBridge docAccessBridge = (DocumentAccessBridge) Utils.getComponent(DocumentAccessBridge.ROLE);
-            WysiwygEditorXHTMLRenderer renderer = new WysiwygEditorXHTMLRenderer(printer, docAccessBridge, null);
+            PrintRendererFactory factory = (PrintRendererFactory) Utils.getComponent(PrintRendererFactory.ROLE);
+            WysiwygEditorXHTMLRenderer renderer = (WysiwygEditorXHTMLRenderer) factory.createRenderer(
+                PrintRendererType.WYSIWYG, printer);
             dom.traverse(renderer);
+
             return printer.toString();
         } catch (Throwable t) {
             throw new HTMLConverterException("Exception while parsing XWiki", t);

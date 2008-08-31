@@ -20,7 +20,11 @@
 package org.xwiki.rendering.configuration;
 
 /**
- * Configuration options for the Rendering module.
+ * Configuration properties for the Rendering module.
+ * <p>
+ * You can override the default values for each of the configuration properties below by defining them in XWiki's
+ * global configuration file using a prefix of "rendering" followed by the property name. For example:
+ * <code>rendering.linkLabelFormat = %s.%p</code>
  *
  * @version $Id: $
  * @since 1.6M1

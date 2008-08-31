@@ -20,10 +20,15 @@
 package org.xwiki.rendering.configuration;
 
 /**
+ * Configuration options for the Rendering module.
+ *
+ * @version $Id: $
  * @since 1.6M1
  */
 public interface RenderingConfiguration
 {
+    String ROLE = RenderingConfiguration.class.getName();
+    
     /**
      * A link label format is the format used to decide how to display links that have no label.
      * By default the page name is displayed. However it's possible to customize it using the

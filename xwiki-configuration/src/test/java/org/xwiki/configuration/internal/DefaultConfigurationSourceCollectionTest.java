@@ -46,7 +46,7 @@ public class DefaultConfigurationSourceCollectionTest extends AbstractXWikiCompo
         Container container = (Container) getComponentManager().lookup(Container.ROLE);
 
         Mock mockApplicationContext = mock(ApplicationContext.class);
-        mockApplicationContext.expects(once()).method("getResource").with(eq("xwiki.properties")).will(
+        mockApplicationContext.expects(once()).method("getResource").with(contains("xwiki.properties")).will(
             returnValue(this.getClass().getClassLoader().getResource("xwiki.properties")));
         container.setApplicationContext((ApplicationContext) mockApplicationContext.proxy());
 

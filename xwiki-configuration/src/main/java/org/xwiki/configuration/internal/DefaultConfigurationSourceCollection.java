@@ -43,7 +43,7 @@ import java.net.MalformedURLException;
  */
 public class DefaultConfigurationSourceCollection implements ConfigurationSourceCollection, Initializable
 {
-    private static final String XWIKI_PROPERTIES_FILE = "xwiki.properties";
+    private static final String XWIKI_PROPERTIES_FILE = "/WEB-INF/xwiki.properties";
 
     /**
      * Injected by the Component Manager.

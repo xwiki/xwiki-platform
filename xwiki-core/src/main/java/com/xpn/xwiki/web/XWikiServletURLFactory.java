@@ -369,7 +369,7 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public URL createAttachmentURL(String filename, String web, String name, String action, String querystring,
         String xwikidb, XWikiContext context)
     {
-        if ((context != null) && "viewrev".equals(context.getAction())) {
+        if ((context != null) && "viewrev".equals(context.getAction()) && context.get("rev") != null) {
             try {
                 String docRevision = context.get("rev").toString();
                 XWikiAttachment attachment =

@@ -21,22 +21,22 @@
 
 package com.xpn.xwiki.web;
 
-import com.xpn.xwiki.XWiki;
-import com.xpn.xwiki.XWikiContext;
-import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.util.Util;
-import com.xpn.xwiki.doc.DeletedAttachment;
-import com.xpn.xwiki.doc.XWikiAttachment;
-import com.xpn.xwiki.doc.XWikiDocument;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Collections;
-import java.util.List;
+import com.xpn.xwiki.XWiki;
+import com.xpn.xwiki.XWikiContext;
+import com.xpn.xwiki.XWikiException;
+import com.xpn.xwiki.doc.DeletedAttachment;
+import com.xpn.xwiki.doc.XWikiAttachment;
+import com.xpn.xwiki.doc.XWikiDocument;
+import com.xpn.xwiki.util.Util;
 
 public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 {
@@ -155,12 +155,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             if (host != null) {
                 int comaind = host.indexOf(',');
                 final String host1 = comaind > 0 ? host.substring(0, comaind) : host;
-                if (!host1.equals(""))
+                if (!host1.equals("")) {
                     serverURL = new URL(context.getRequest().getScheme() + "://" + host1);
+                }
             }
         }
-        if (xwikidb == null)
+        if (xwikidb == null) {
             return serverURL;
+        }
 
         if (xwikidb.equals(context.getOriginalDatabase())) {
             return serverURL;
@@ -168,8 +170,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
 
         if (xwikidb.equals("xwiki")) {
             String surl = context.getWiki().Param("xwiki.home", "");
-            if (!surl.equals(""))
+            if (!surl.equals("")) {
                 return new URL(surl);
+            }
         }
 
         URL url = context.getWiki().getServerURL(xwikidb, context);
@@ -205,10 +208,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             action = context.getLinksAction();
         }
         if (context.getLinksQueryString() != null) {
-            if (querystring == null)
+            if (querystring == null) {
                 querystring = context.getLinksQueryString();
-            else
+            } else {
                 querystring = querystring + "&" + context.getLinksQueryString();
+            }
         }
 
         StringBuffer newpath = new StringBuffer(this.contextPath);
@@ -263,7 +267,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     {
         XWiki xwiki = context.getWiki();
         if ((xwiki.useDefaultAction(context))
-            || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action)))) {
+            || (!name.equals(xwiki.getDefaultPage(context)) || (!"view".equals(action))))
+        {
             newpath.append(encode(name, context));
         }
     }
@@ -276,10 +281,11 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     protected void addFileName(StringBuffer newpath, String filename, boolean encode, XWikiContext context)
     {
         newpath.append("/");
-        if (encode)
+        if (encode) {
             newpath.append(encode(filename, context).replaceAll("\\+", "%20"));
-        else
+        } else {
             newpath.append(filename);
+        }
     }
 
     private String encode(String name, XWikiContext context)
@@ -376,8 +382,9 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
                         querystring, xwikidb, context);
                 }
             } catch (XWikiException e) {
-                if (LOG.isErrorEnabled())
+                if (LOG.isErrorEnabled()) {
                     LOG.error("Exception while trying to get attachment version !", e);
+                }
             }
         }
 
@@ -450,13 +457,14 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
     public String getURL(URL url, XWikiContext context)
     {
         try {
-            if (url == null)
+            if (url == null) {
                 return "";
+            }
 
             String surl = url.toString();
-            if (!surl.startsWith(this.serverURL.toString()))
+            if (!surl.startsWith(this.serverURL.toString())) {
                 return surl;
-            else {
+            } else {
                 StringBuffer sbuf = new StringBuffer(url.getPath());
                 String querystring = url.getQuery();
                 if ((querystring != null) && (!querystring.equals(""))) {
@@ -519,8 +527,8 @@ public class XWikiServletURLFactory extends XWikiDefaultURLFactory
             attachment = rdoc.getAttachment(filename);
             if (attachment != null) {
                 List<DeletedAttachment> deleted =
-                    context.getWiki().getAttachmentRecycleBinStore().getAllDeletedAttachments(attachment, context,
-                        true);
+                    context.getWiki().getAttachmentRecycleBinStore()
+                        .getAllDeletedAttachments(attachment, context, true);
                 Collections.reverse(deleted);
                 for (DeletedAttachment entry : deleted) {
                     if (entry.getDate().after(rdoc.getDate())) {

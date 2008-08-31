@@ -160,6 +160,7 @@
               <includes>
                 <include>hibernate.cfg.xml</include>
                 <include>xwiki.cfg</include>
+                <include>xwiki.properties</include>
               </includes>
             </resource>
             <!-- Include License resources -->

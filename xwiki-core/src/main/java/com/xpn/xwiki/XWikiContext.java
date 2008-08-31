@@ -43,115 +43,159 @@ import com.xpn.xwiki.web.XWikiRequest;
 import com.xpn.xwiki.web.XWikiResponse;
 import com.xpn.xwiki.web.XWikiURLFactory;
 
-public class XWikiContext extends Hashtable<Object, Object> {
+public class XWikiContext extends Hashtable<Object, Object>
+{
+    public static final int MODE_SERVLET = 0;
 
-   public static final int MODE_SERVLET = 0;
-   public static final int MODE_PORTLET = 1;
-   public static final int MODE_XMLRPC = 2;
-   public static final int MODE_ATOM = 3;
-   public static final int MODE_PDF = 4;
-   public static final int MODE_GWT = 5;
-   public static final int MODE_GWT_DEBUG = 6;
+    public static final int MODE_PORTLET = 1;
 
-   private boolean finished = false;
-   private XWiki wiki;
-   private XWikiEngineContext engine_context;
-   private XWikiRequest request;
-   private XWikiResponse response;
-   private XWikiForm form;
-   private String action;
-   private String orig_database;
-   private String database;
-   private XWikiUser user;
-   private String language;
-   private String interfaceLanguage;
-   private int mode;
-   private URL url;
-   private XWikiURLFactory URLFactory;
-   private XmlRpcServer xmlRpcServer;
-   private String wikiOwner;
-   private XWikiDocument wikiServer;
-   private int cacheDuration = 0;
-   private int classCacheSize = 20;
-   private int archiveCacheSize = 20;
+    public static final int MODE_XMLRPC = 2;
 
-   // Used to avoid recursive loading of documents if there are recursives usage of classes
-   private Map<String, BaseClass> classCache = new LRUMap(classCacheSize);
-   // Used to avoid reloading archives in the same request
-   private Map<String, XWikiDocumentArchive> archiveCache = new LRUMap(archiveCacheSize);
+    public static final int MODE_ATOM = 3;
 
-   private List<String> displayedFields = new ArrayList<String>();
+    public static final int MODE_PDF = 4;
 
-   public XWikiContext() {
-   }
+    public static final int MODE_GWT = 5;
 
-   public XWiki getWiki() {
-       return wiki;
-   }
+    public static final int MODE_GWT_DEBUG = 6;
 
-   public Util getUtil() {
-       Util util = (Util) this.get("util");
-       if (util==null) {
-           util = new Util();
-           this.put("util", util);
-       }
-       return util;
+    private boolean finished = false;
+
+    private XWiki wiki;
+
+    private XWikiEngineContext engine_context;
+
+    private XWikiRequest request;
+
+    private XWikiResponse response;
+
+    private XWikiForm form;
+
+    private String action;
+
+    private String orig_database;
+
+    private String database;
+
+    private XWikiUser user;
+
+    private String language;
+
+    private String interfaceLanguage;
+
+    private int mode;
+
+    private URL url;
+
+    private XWikiURLFactory URLFactory;
+
+    private XmlRpcServer xmlRpcServer;
+
+    private String wikiOwner;
+
+    private XWikiDocument wikiServer;
+
+    private int cacheDuration = 0;
+
+    private int classCacheSize = 20;
+
+    private int archiveCacheSize = 20;
+
+    // Used to avoid recursive loading of documents if there are recursives usage of classes
+    private Map<String, BaseClass> classCache = new LRUMap(classCacheSize);
+
+    // Used to avoid reloading archives in the same request
+    private Map<String, XWikiDocumentArchive> archiveCache = new LRUMap(archiveCacheSize);
+
+    private List<String> displayedFields = new ArrayList<String>();
+
+    public XWikiContext()
+    {
     }
 
-    public void setWiki(XWiki wiki) {
+    public XWiki getWiki()
+    {
+        return wiki;
+    }
+
+    public Util getUtil()
+    {
+        Util util = (Util) this.get("util");
+        if (util == null) {
+            util = new Util();
+            this.put("util", util);
+        }
+        return util;
+    }
+
+    public void setWiki(XWiki wiki)
+    {
         this.wiki = wiki;
     }
 
-    public XWikiEngineContext getEngineContext() {
+    public XWikiEngineContext getEngineContext()
+    {
         return engine_context;
     }
 
-    public void setEngineContext(XWikiEngineContext engine_context) {
+    public void setEngineContext(XWikiEngineContext engine_context)
+    {
         this.engine_context = engine_context;
     }
 
-    public XWikiRequest getRequest() {
+    public XWikiRequest getRequest()
+    {
         return request;
     }
 
-    public void setRequest(XWikiRequest request) {
+    public void setRequest(XWikiRequest request)
+    {
         this.request = request;
     }
 
-    public String getAction() {
+    public String getAction()
+    {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setAction(String action)
+    {
         this.action = action;
     }
 
-    public XWikiResponse getResponse() {
+    public XWikiResponse getResponse()
+    {
         return response;
     }
 
-    public void setResponse(XWikiResponse response) {
+    public void setResponse(XWikiResponse response)
+    {
         this.response = response;
     }
 
-    public String getDatabase() {
+    public String getDatabase()
+    {
         return database;
     }
 
-    public void setDatabase(String database) {
+    public void setDatabase(String database)
+    {
         this.database = database;
-        if (orig_database==null)
+        if (orig_database == null) {
             orig_database = database;
+        }
     }
 
-    public String getOriginalDatabase() {
+    public String getOriginalDatabase()
+    {
         return orig_database;
     }
 
-    public void setOriginalDatabase(String database) {
+    public void setOriginalDatabase(String database)
+    {
         this.orig_database = database;
     }
-    
+
     /**
      * @return true it's main wiki's context, false otherwise.
      */
@@ -159,7 +203,7 @@ public class XWikiContext extends Hashtable<Object, Object> {
     {
         return isMainWiki(getDatabase());
     }
-    
+
     /**
      * @param wikiName the name of the wiki.
      * @return true it's main wiki's context, false otherwise.
@@ -167,208 +211,255 @@ public class XWikiContext extends Hashtable<Object, Object> {
     public boolean isMainWiki(String wikiName)
     {
         return !getWiki().isVirtualMode()
-            || (wikiName == null ? getMainXWiki() == null : wikiName.equalsIgnoreCase(
-                getMainXWiki()));
+            || (wikiName == null ? getMainXWiki() == null : wikiName.equalsIgnoreCase(getMainXWiki()));
     }
 
-    public XWikiDocument getDoc() {
+    public XWikiDocument getDoc()
+    {
         return (XWikiDocument) get("doc");
     }
 
-    public void setDoc(XWikiDocument doc) {
+    public void setDoc(XWikiDocument doc)
+    {
         put("doc", doc);
     }
 
-    public void setUser(String user, boolean main) {
+    public void setUser(String user, boolean main)
+    {
         this.user = new XWikiUser(user, main);
     }
 
-    public void setUser(String user) {
+    public void setUser(String user)
+    {
         this.user = new XWikiUser(user);
     }
 
-    public String getUser() {
-        if (user!=null)
-         return user.getUser();
-        else
-         return "XWiki.XWikiGuest";
+    public String getUser()
+    {
+        if (user != null) {
+            return user.getUser();
+        } else {
+            return "XWiki.XWikiGuest";
+        }
     }
 
-    public String getLocalUser() {
+    public String getLocalUser()
+    {
         String username = getUser();
         return username.substring(username.indexOf(":") + 1);
     }
 
-    public XWikiUser getXWikiUser() {
+    public XWikiUser getXWikiUser()
+    {
         return user;
     }
 
-    public String getLanguage() {
+    public String getLanguage()
+    {
         return language;
     }
 
-    public void setLanguage(String language) {
+    public void setLanguage(String language)
+    {
         this.language = language;
     }
 
-    public String getInterfaceLanguage() {
+    public String getInterfaceLanguage()
+    {
         return interfaceLanguage;
     }
 
-    public void setInterfaceLanguage(String interfaceLanguage) {
+    public void setInterfaceLanguage(String interfaceLanguage)
+    {
         this.interfaceLanguage = interfaceLanguage;
     }
 
-    public int getMode() {
+    public int getMode()
+    {
         return mode;
     }
 
-    public void setMode(int mode) {
+    public void setMode(int mode)
+    {
         this.mode = mode;
     }
 
-    public URL getURL() {
+    public URL getURL()
+    {
         return url;
     }
 
-    public void setURL(URL url) {
+    public void setURL(URL url)
+    {
         this.url = url;
     }
 
-    public XWikiURLFactory getURLFactory() {
+    public XWikiURLFactory getURLFactory()
+    {
         return URLFactory;
     }
 
-    public void setURLFactory(XWikiURLFactory URLFactory) {
+    public void setURLFactory(XWikiURLFactory URLFactory)
+    {
         this.URLFactory = URLFactory;
     }
 
-    public XWikiForm getForm() {
+    public XWikiForm getForm()
+    {
         return form;
     }
 
-    public void setForm(XWikiForm form) {
+    public void setForm(XWikiForm form)
+    {
         this.form = form;
     }
 
-    public boolean isFinished() {
+    public boolean isFinished()
+    {
         return this.finished;
     }
 
-    public void setFinished(boolean finished) {
+    public void setFinished(boolean finished)
+    {
         this.finished = finished;
     }
 
-    public XmlRpcServer getXMLRPCServer() {
+    public XmlRpcServer getXMLRPCServer()
+    {
         return xmlRpcServer;
     }
 
-    public void setXMLRPCServer(XmlRpcServer xmlRpcServer) {
+    public void setXMLRPCServer(XmlRpcServer xmlRpcServer)
+    {
         this.xmlRpcServer = xmlRpcServer;
     }
 
-    public void setWikiOwner(String wikiOwner) {
+    public void setWikiOwner(String wikiOwner)
+    {
         this.wikiOwner = wikiOwner;
     }
 
-    public String getWikiOwner() {
+    public String getWikiOwner()
+    {
         return wikiOwner;
     }
 
-    public void setWikiServer(XWikiDocument doc) {
+    public void setWikiServer(XWikiDocument doc)
+    {
         wikiServer = doc;
     }
 
-    public XWikiDocument getWikiServer() {
+    public XWikiDocument getWikiServer()
+    {
         return wikiServer;
     }
 
-    public int getCacheDuration() {
+    public int getCacheDuration()
+    {
         return cacheDuration;
     }
 
-    public void setCacheDuration(int cacheDuration) {
+    public void setCacheDuration(int cacheDuration)
+    {
         this.cacheDuration = cacheDuration;
     }
 
-    public String getMainXWiki() {
-        return (String ) get("mainxwiki");
+    public String getMainXWiki()
+    {
+        return (String) get("mainxwiki");
     }
 
-    public void setMainXWiki(String str) {
+    public void setMainXWiki(String str)
+    {
         put("mainxwiki", str);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public void addBaseClass(BaseClass bclass) {
+    public void addBaseClass(BaseClass bclass)
+    {
         classCache.put(bclass.getName(), bclass);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public BaseClass getBaseClass(String name) {
+    public BaseClass getBaseClass(String name)
+    {
         return classCache.get(name);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public void addDocumentArchive(String  key, XWikiDocumentArchive obj) {
+    public void addDocumentArchive(String key, XWikiDocumentArchive obj)
+    {
         archiveCache.put(key, obj);
     }
 
     // Used to avoid recursive loading of documents if there are recursives usage of classes
-    public XWikiDocumentArchive getDocumentArchive(String key) {
+    public XWikiDocumentArchive getDocumentArchive(String key)
+    {
         return archiveCache.get(key);
     }
 
-    public void setLinksAction(String action) {
+    public void setLinksAction(String action)
+    {
         put("links_action", action);
     }
 
-    public void unsetLinksAction() {
+    public void unsetLinksAction()
+    {
         remove("links_action");
     }
 
-    public String getLinksAction() {
+    public String getLinksAction()
+    {
         return (String) get("links_action");
     }
 
-    public void setLinksQueryString(String value) {
+    public void setLinksQueryString(String value)
+    {
         put("links_qs", value);
     }
 
-    public void unsetLinksQueryString() {
+    public void unsetLinksQueryString()
+    {
         remove("links_qs");
     }
 
-    public String getLinksQueryString() {
+    public String getLinksQueryString()
+    {
         return (String) get("links_qs");
     }
 
-    public XWikiMessageTool getMessageTool() {
-      XWikiMessageTool msg = ((XWikiMessageTool) get("msg"));
-      if (msg == null) {
-          getWiki().prepareResources(this);
-          msg = ((XWikiMessageTool) get("msg"));
-      }
-      return msg;
+    public XWikiMessageTool getMessageTool()
+    {
+        XWikiMessageTool msg = ((XWikiMessageTool) get("msg"));
+        if (msg == null) {
+            getWiki().prepareResources(this);
+            msg = ((XWikiMessageTool) get("msg"));
+        }
+        return msg;
     }
 
-    public XWikiValidationStatus getValidationStatus() {
+    public XWikiValidationStatus getValidationStatus()
+    {
         return (XWikiValidationStatus) get("validation_status");
     }
 
-    public void setValidationStatus(XWikiValidationStatus status) {
+    public void setValidationStatus(XWikiValidationStatus status)
+    {
         put("validation_status", status);
     }
 
-    public void addDisplayedField(String fieldname) {
+    public void addDisplayedField(String fieldname)
+    {
         displayedFields.add(fieldname);
     }
 
-    public List<String> getDisplayedFields() {
+    public List<String> getDisplayedFields()
+    {
         return displayedFields;
     }
 
-    public String getEditorWysiwyg() {
+    public String getEditorWysiwyg()
+    {
         return (String) get("editor_wysiwyg");
     }
 }

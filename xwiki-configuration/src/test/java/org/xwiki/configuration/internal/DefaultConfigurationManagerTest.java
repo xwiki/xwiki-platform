@@ -27,6 +27,12 @@ import org.xwiki.configuration.ConfigurationSource;
 
 import java.util.Arrays;
 
+/**
+ * Unit tests for {@link org.xwiki.configuration.internal.DefaultConfigurationManagerTest}.
+ *
+ * @version $Id: $
+ * @since 1.6M1
+ */
 public class DefaultConfigurationManagerTest extends TestCase
 {
     public class TestConfiguration

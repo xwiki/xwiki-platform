@@ -35,14 +35,13 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 /**
- * Default list of {@link org.xwiki.configuration.ConfigurationSource}s that contain the default global XWiki configuration
- * file (xwiki.properties).
+ * Default list of {@link org.xwiki.configuration.ConfigurationSource}s that contain the default global XWiki
+ * configuration file (xwiki.properties).
  *
  * @version $Id: $
  * @since 1.6M1
  */
-public class DefaultConfigurationSourceCollection implements ConfigurationSourceCollection,
-    Initializable
+public class DefaultConfigurationSourceCollection implements ConfigurationSourceCollection, Initializable
 {
     private static final String XWIKI_PROPERTIES_FILE = "xwiki.properties";
 
@@ -61,16 +60,13 @@ public class DefaultConfigurationSourceCollection implements ConfigurationSource
         // in the XWiki path somewhere.
         URL xwikiPropertiesUrl = null;
         try {
-            xwikiPropertiesUrl =
-                this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
+            xwikiPropertiesUrl = this.container.getApplicationContext().getResource(XWIKI_PROPERTIES_FILE);
         } catch (MalformedURLException e) {
-            throw new InitializationException("Failed to locate property file ["
-                + XWIKI_PROPERTIES_FILE + "]", e);
+            throw new InitializationException("Failed to locate property file [" + XWIKI_PROPERTIES_FILE + "]", e);
         }
 
         try {
-            this.sources.add(
-                new CommonsConfigurationSource(new PropertiesConfiguration(xwikiPropertiesUrl)));
+            this.sources.add(new CommonsConfigurationSource(new PropertiesConfiguration(xwikiPropertiesUrl)));
         } catch (ConfigurationException e) {
             throw new InitializationException("Failed to load property file ["
                 + XWIKI_PROPERTIES_FILE + "]", e);

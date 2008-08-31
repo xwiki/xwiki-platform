@@ -1,0 +1,5 @@
+# This is the new XWiki configuration file. In the future it'll replace the old
+# xwiki.cfg file. However right now it's only used by some XWiki components.
+# As time progresses more and more component will get their configurations from
+# this file.
+

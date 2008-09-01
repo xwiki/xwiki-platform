@@ -16,7 +16,7 @@
 </div>
 <div id="xwikitext">
 <div id="xwikieditcontent">
-#if($xwiki.wysiwyg.enabled && $xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
+#if($xwiki.wysiwyg.isSyntaxSupported($doc.syntaxId))
 ## We should definitely find a better way of including the style sheet and the JavaScript code!
 <link rel="stylesheet" href="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/Wysiwyg.css" />
 <script type="text/javascript" src="${request.contextPath}/com.xpn.xwiki.wysiwyg.Wysiwyg/com.xpn.xwiki.wysiwyg.Wysiwyg.nocache.js"></script>
@@ -33,8 +33,6 @@ $xwiki.getTextArea($tdoc.content)
     };
 //]]>
 </script>
-#elseif(!$xwiki.wysiwyg.enabled)
-#warning("The new GWT-based WYSIWYG editor is disabled. To enable it please set <strong>xwiki.wysiwygnew</strong> to <strong>1</strong> in xwiki's configuration file.")
 #else
 #warning("The new GWT-based WYSIWYG editor doesn't support the syntax of the current document: <em>$doc.syntaxId</em>.")
 #end

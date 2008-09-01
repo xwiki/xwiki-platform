@@ -12,13 +12,12 @@
 .#-----------------------------------------------------
 beginDocument
 onStandaloneMacro: [macro] [] []
-onEmptyLines: [2]
+onEmptyLines: [3]
 onStandaloneMacro: [macro] [] []
 endDocument
 .#-----------------------------------------------------
-.expect|xwiki|skip
+.expect|xwiki
 .#-----------------------------------------------------
-.# TODO: Bug in wikimodel, see http://code.google.com/p/wikimodel/issues/detail?id=49
 {{macro/}}
 
 

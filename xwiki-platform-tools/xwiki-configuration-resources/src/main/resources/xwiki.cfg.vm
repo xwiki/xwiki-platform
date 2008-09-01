@@ -236,9 +236,4 @@ xwiki.defaultbaseskin=$xwikiCfgDefaultBaseSkin
 #-# Add a prefix to all databases names of the wikis in virtual mode and to the wiki name in non virtual mode
 # xwiki.db.prefix=
 
-#-# [SINCE 1.6M1]
-#-# Enable the new, experimental, GWT-based WYSIWYG editor. 
-#-# It will be accessible by having 'editor=wysiwygnew' in the query string of the edit URL.
-xwiki.wysiwygnew=1
-
 $!xwikiCfgAdditionalProperties

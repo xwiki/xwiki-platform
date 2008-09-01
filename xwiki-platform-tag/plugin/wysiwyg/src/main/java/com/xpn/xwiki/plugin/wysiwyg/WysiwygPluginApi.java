@@ -60,14 +60,6 @@ public class WysiwygPluginApi extends Api
     }
 
     /**
-     * @return true if the editor is enabled.
-     */
-    public boolean isEnabled()
-    {
-        return getXWikiContext().getWiki().Param("xwiki.wysiwygnew", "1").equals("1");
-    }
-
-    /**
      * @param syntaxId The syntax identifier, like "xwiki/2.0".
      * @return true if the specified syntax is currently supported by the editor.
      */

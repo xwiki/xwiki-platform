@@ -70,7 +70,7 @@
         </property>
 
         <property name="content"  type="string">
-            <column name="XWD_CONTENT" length="200000" not-null="true" sql-type="clob"/>
+            <column name="XWD_CONTENT" length="200000" not-null="false" sql-type="clob"/>
         </property>
 
         <property name="version" type="string">

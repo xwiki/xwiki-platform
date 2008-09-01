@@ -34,6 +34,7 @@ import com.xpn.xwiki.objects.BaseProperty;
 import com.xpn.xwiki.objects.PropertyInterface;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.objects.classes.ListItem;
+import com.xpn.xwiki.objects.classes.PasswordClass;
 import com.xpn.xwiki.objects.classes.StaticListClass;
 
 /**
@@ -111,7 +112,10 @@ public class ObjectData extends IndexData
                 for (int i = 0; i < propertyNames.length; i++) {
                     BaseProperty baseProperty = (BaseProperty) baseObject.getField((String) propertyNames[i]);
                     if ((baseProperty != null) && (baseProperty.getValue() != null)) {
-                        contentText.append(baseProperty.getValue().toString());
+                        PropertyInterface prop = baseObject.getxWikiClass(context).getField((String) propertyNames[i]);
+                        if (!(prop instanceof PasswordClass)) {
+                            contentText.append(baseProperty.getValue().toString());
+                        }
                     }
                     contentText.append(" ");
                 }
@@ -152,10 +156,12 @@ public class ObjectData extends IndexData
         BaseClass bClass = baseObject.getxWikiClass(context);
         PropertyInterface prop = bClass.getField(propertyName);
 
-        if (prop instanceof StaticListClass && ((StaticListClass) prop).isMultiSelect()) {
+        if (prop instanceof PasswordClass) {
+            // Do not index passwords
+        } else if (prop instanceof StaticListClass && ((StaticListClass) prop).isMultiSelect()) {
             indexStaticList(luceneDoc, baseObject, (StaticListClass) prop, propertyName, context);
         } else {
-            final String ft = getContentAsText(baseObject, propertyName);
+            final String ft = getContentAsText(baseObject, propertyName, context);
             if (ft != null) {
                 luceneDoc.add(new Field(fieldFullName, ft, Field.Store.YES, Field.Index.TOKENIZED));
             }
@@ -190,17 +196,20 @@ public class ObjectData extends IndexData
 
     public String getFullText(XWikiDocument doc, BaseObject baseObject, String property, XWikiContext context)
     {
-        return getContentAsText(baseObject, property);
+        return getContentAsText(baseObject, property, context);
     }
 
-    private String getContentAsText(BaseObject baseObject, String property)
+    private String getContentAsText(BaseObject baseObject, String property, XWikiContext context)
     {
         StringBuffer contentText = new StringBuffer();
         try {
             BaseProperty baseProperty;
             baseProperty = (BaseProperty) baseObject.getField(property);
             if (baseProperty.getValue() != null) {
-                contentText.append(baseProperty.getValue().toString());
+                PropertyInterface prop = baseObject.getxWikiClass(context).getField(property);
+                if (!(prop instanceof PasswordClass)) {
+                    contentText.append(baseProperty.getValue().toString());
+                }
             }
         } catch (Exception e) {
             LOG.error("error getting content from  XWiki Objects ", e);

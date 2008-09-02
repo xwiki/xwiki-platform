@@ -17,7 +17,7 @@ endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p><pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre>hello<pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre></p>
+<p>**hello**</p>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
@@ -25,6 +25,5 @@ endDocument
 .#-----------------------------------------------------
 .input|xhtml/1.0|skip
 .#-----------------------------------------------------
-.# TODO: Wikimodel XHTML parser doesn't recognize escapes yet
-.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=44
-<html><p><pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre>hello<pre><![CDATA[*]]></pre><pre><![CDATA[*]]></pre></p></html>
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=52
+<html><p>**hello**</p></html>

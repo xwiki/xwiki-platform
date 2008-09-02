@@ -323,12 +323,8 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onEscape(String escapedString)
     {
-        // Note: for single character escapes it would have been nicer to use XML entites. However
-        // Wikimodel doesn't support that since its XHTML parser uses a XML parser and entities are
-        // resolved internally by XML parsers so there's no way for wikimodel to know about them.
-        // TODO: The syntax below is yet to be confirmed and should be considered temporary for now. It's
-        // currently not recognized by WikiModel's XHTML parser.
-        print("<pre><![CDATA[" + escapedString + "]]></pre>");
+        // Print characters as is, except for special characters which need to be HTML-escaped.
+        onSpecialSymbol(escapedString);
     }
 
     /**

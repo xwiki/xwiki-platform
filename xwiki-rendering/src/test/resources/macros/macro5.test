@@ -11,8 +11,8 @@ onWord: [Two]
 onSpace
 onWord: [inline]
 onSpace
-onInlineMacro: [macro] [] []
-onInlineMacro: [macro] [] []
+onMacroInline: [macro] [] []
+onMacroInline: [macro] [] []
 onSpace
 onWord: [macros]
 endParagraph

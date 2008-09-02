@@ -264,12 +264,12 @@ public interface Listener
      *  
      * @param protectedString the string to protected from rendering
      */
-    void onInlineVerbatim(String protectedString);
+    void onVerbatimInline(String protectedString);
 
     /**
      * A portion of text that shouldn't be rendered and that is located on one or several lines by itself.
      *
      * @param protectedString the string to protected from rendering
      */
-    void onStandaloneVerbatim(String protectedString);
+    void onVerbatimStandalone(String protectedString);
 }

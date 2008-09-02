@@ -44,7 +44,7 @@ public class IncludeMacroTest extends AbstractRenderingTestCase
     public void testIncludeMacroWithCurrentContext() throws Exception
     {
         String expected = "beginDocument\n"
-            + "onStandaloneMacro: [someMacro] [] []\n"
+            + "onMacroStandalone: [someMacro] [] []\n"
             + "endDocument";
 
         IncludeMacro macro = (IncludeMacro) getComponentManager().lookup(VelocityMacro.ROLE, "include/xwiki");

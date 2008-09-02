@@ -446,9 +446,9 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.renderer.Renderer#onInlineVerbatim(String)
+     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimInline(String)
      */
-    public void onInlineVerbatim(String protectedString)
+    public void onVerbatimInline(String protectedString)
     {
         print("<pre>" + protectedString + "</pre>");
     }
@@ -456,11 +456,11 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      *
-     * @see org.xwiki.rendering.renderer.Renderer#onStandaloneVerbatim(String)
+     * @see org.xwiki.rendering.renderer.Renderer#onVerbatimStandalone(String)
      */
-    public void onStandaloneVerbatim(String protectedString)
+    public void onVerbatimStandalone(String protectedString)
     {
-        onInlineVerbatim(protectedString);
+        onVerbatimInline(protectedString);
     }
 
     /**

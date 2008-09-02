@@ -8,8 +8,8 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onStandaloneMacro: [macro] [] []
-onStandaloneMacro: [macro] [] []
+onMacroStandalone: [macro] [] []
+onMacroStandalone: [macro] [] []
 endDocument
 .#-----------------------------------------------------
 .expect|xwiki

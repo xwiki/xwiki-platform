@@ -30,14 +30,14 @@ import java.util.Map;
  * @version $Id: $
  * @since 1.6M2
  */
-public class StandaloneMacroBlock extends AbstractMacroBlock
+public class MacroStandaloneBlock extends AbstractMacroBlock
 {
-    public StandaloneMacroBlock(String name, Map<String, String> parameters)
+    public MacroStandaloneBlock(String name, Map<String, String> parameters)
     {
         super(name, parameters);
     }
 
-    public StandaloneMacroBlock(String name, Map<String, String> parameters, String content)
+    public MacroStandaloneBlock(String name, Map<String, String> parameters, String content)
     {
         super(name, parameters, content);
     }

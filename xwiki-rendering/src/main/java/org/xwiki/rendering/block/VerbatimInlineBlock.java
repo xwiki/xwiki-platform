@@ -27,13 +27,13 @@ import org.xwiki.rendering.listener.Listener;
  * @version $Id: $
  * @since 1.6M2
  */
-public class InlineVerbatimBlock extends AbstractVerbatimBlock
+public class VerbatimInlineBlock extends AbstractVerbatimBlock
 {
     /**
      * {@inheritDoc}
      * @see org.xwiki.rendering.block.AbstractVerbatimBlock#AbstractVerbatimBlock(String)
      */
-    public InlineVerbatimBlock(String protectedString)
+    public VerbatimInlineBlock(String protectedString)
     {
         super(protectedString);
     }
@@ -44,6 +44,6 @@ public class InlineVerbatimBlock extends AbstractVerbatimBlock
      */
     public void traverse(Listener listener)
     {
-        listener.onInlineVerbatim(getProtectedString());
+        listener.onVerbatimInline(getProtectedString());
     }
 }

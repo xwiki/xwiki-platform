@@ -21,35 +21,29 @@ package org.xwiki.rendering.block;
 
 import org.xwiki.rendering.listener.Listener;
 
-import java.util.Map;
-
 /**
- * Represents an inline Macro defined in a page (ie a Macro located inside another Block, for example a Macro located
- * inside a Paragraph Block).
+ * A Verbatim block not located inside another block (on a line by itself).
  *
  * @version $Id: $
  * @since 1.6M2
  */
-public class InlineMacroBlock extends AbstractMacroBlock
+public class VerbatimStandaloneBlock extends AbstractVerbatimBlock
 {
-    public InlineMacroBlock(String name, Map<String, String> parameters)
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.block.AbstractVerbatimBlock#AbstractVerbatimBlock(String)
+     */
+    public VerbatimStandaloneBlock(String protectedString)
     {
-        super(name, parameters);
-    }
-
-    public InlineMacroBlock(String name, Map<String, String> parameters, String content)
-    {
-        super(name, parameters, content);
+        super(protectedString);
     }
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.block.AbstractBlock#traverse(org.xwiki.rendering.listener.Listener)
+     * @see org.xwiki.rendering.block.AbstractVerbatimBlock#traverse(org.xwiki.rendering.listener.Listener)
      */
     public void traverse(Listener listener)
     {
-        // See org.xwiki.rendering.block.StandaloneMacroBlock for explanations.
-        listener.onInlineMacro(getName(), getParameters(), getContent());
+        listener.onVerbatimStandalone(getProtectedString());
     }
-
 }

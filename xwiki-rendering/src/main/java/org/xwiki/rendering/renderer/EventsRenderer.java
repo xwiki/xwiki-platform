@@ -143,12 +143,12 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     public void onInlineMacro(String name, Map<String, String> parameters, String content)
     {
-        printMacroData("onInlineMacro", name, parameters, content);
+        printMacroData("onMacroInline", name, parameters, content);
     }
 
     public void onStandaloneMacro(String name, Map<String, String> parameters, String content)
     {
-        printMacroData("onStandaloneMacro", name, parameters, content);
+        printMacroData("onMacroStandalone", name, parameters, content);
     }
 
     public void beginSection(SectionLevel level)
@@ -264,20 +264,20 @@ public class EventsRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#onInlineVerbatim(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatimInline(String)
      */
-    public void onInlineVerbatim(String protectedString)
+    public void onVerbatimInline(String protectedString)
     {
-        println("onInlineVerbatim: [" + protectedString + "]");
+        println("onVerbatimInline: [" + protectedString + "]");
     }
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.listener.Listener#onStandaloneVerbatim(String)
+     * @see org.xwiki.rendering.listener.Listener#onVerbatimStandalone(String)
      */
-    public void onStandaloneVerbatim(String protectedString)
+    public void onVerbatimStandalone(String protectedString)
     {
-        println("onStandaloneVerbatim: [" + protectedString + "]");
+        println("onVerbatimStandalone: [" + protectedString + "]");
     }
 
     private StringBuffer toStringXMLElement(Map<String, String> attributes)

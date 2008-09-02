@@ -10,7 +10,7 @@ beginDocument
 beginParagraph
 onWord: [paragraph]
 endParagraph
-onStandaloneMacro: [macro] [] []
+onMacroStandalone: [macro] [] []
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml

@@ -7,9 +7,9 @@
 .expect|event
 .#-----------------------------------------------------
 beginDocument
-onStandaloneMacro: [macro] [] []
+onMacroStandalone: [macro] [] []
 beginParagraph
-onInlineMacro: [macro] [] []
+onMacroInline: [macro] [] []
 endParagraph
 endDocument
 .#-----------------------------------------------------

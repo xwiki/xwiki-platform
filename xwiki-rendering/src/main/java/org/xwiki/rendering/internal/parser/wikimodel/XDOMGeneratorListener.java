@@ -349,7 +349,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onMacroBlock(String macroName, WikiParameters params, String content)
     {
-        this.stack.push(new StandaloneMacroBlock(macroName, convertParameters(params), content));
+        this.stack.push(new MacroStandaloneBlock(macroName, convertParameters(params), content));
     }
 
     /**
@@ -357,7 +357,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onMacroInline(String macroName, WikiParameters params, String content)
     {
-        this.stack.push(new InlineMacroBlock(macroName, convertParameters(params), content));
+        this.stack.push(new MacroInlineBlock(macroName, convertParameters(params), content));
     }
 
     private Map<String, String> convertParameters(WikiParameters params)
@@ -477,7 +477,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onVerbatimBlock(String protectedString)
     {
-        this.stack.push(new StandaloneVerbatimBlock(protectedString));
+        this.stack.push(new VerbatimStandaloneBlock(protectedString));
     }
 
     /**
@@ -487,7 +487,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void onVerbatimInline(String protectedString)
     {
-        this.stack.push(new InlineVerbatimBlock(protectedString));
+        this.stack.push(new VerbatimInlineBlock(protectedString));
     }
 
     /**

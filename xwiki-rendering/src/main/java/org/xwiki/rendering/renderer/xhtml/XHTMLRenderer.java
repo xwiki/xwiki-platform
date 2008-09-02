@@ -446,7 +446,12 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onVerbatimInline(String protectedString)
     {
-        print("<pre>" + protectedString + "</pre>");
+        // Note: We generate a tt element rather than a pre element since pre elements cannot be located inside
+        // paragraphs for example. There also no tag in XHTML that has a semantic of preserving inline content so
+        // tt is the closed to pre for inline.
+        // The class is what is expected by wikimodel to understand the tt as meaning a verbatim and not a Monospace
+        // element.
+        print("<tt class=\"wikimodel-verbatim\">" + protectedString + "</tt>");
     }
 
     /**
@@ -456,7 +461,7 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onVerbatimStandalone(String protectedString)
     {
-        onVerbatimInline(protectedString);
+        print("<pre>" + protectedString + "</pre>");
     }
 
     /**

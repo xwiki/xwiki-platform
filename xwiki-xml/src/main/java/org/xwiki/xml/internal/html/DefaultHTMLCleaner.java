@@ -20,24 +20,26 @@
  */
 package org.xwiki.xml.internal.html;
 
-import org.htmlcleaner.HtmlCleaner;
-import org.htmlcleaner.TagNode;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.htmlcleaner.CleanerProperties;
+import org.htmlcleaner.CleanerTransformations;
+import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.JDomSerializer;
-import org.xwiki.xml.html.HTMLCleaner;
-import org.xwiki.component.phase.Initializable;
-import org.xwiki.component.phase.InitializationException;
+import org.htmlcleaner.TagNode;
+import org.htmlcleaner.TagTransformation;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.output.DOMOutputter;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.ArrayList;
+import org.xwiki.component.phase.Initializable;
+import org.xwiki.component.phase.InitializationException;
+import org.xwiki.xml.html.HTMLCleaner;
 
 /**
- * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the
- * <a href="HTML Cleaner framework>http://htmlcleaner.sourceforge.net/</a>.
+ * Default implementation for {@link org.xwiki.xml.html.HTMLCleaner} using the <a href="HTML Cleaner
+ * framework>http://htmlcleaner.sourceforge.net/</a>.
  * 
  * @version $Id: $
  * @since 1.6M1
@@ -45,9 +47,8 @@ import java.util.ArrayList;
 public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 {
     /**
-     * List of default cleaning filters to call when cleaning code with HTML Cleaner. This is for cases when
-     * there are no <a href="http://htmlcleaner.sourceforge.net/parameters.php">properties</a> defined in HTML
-     * Cleaner.
+     * List of default cleaning filters to call when cleaning code with HTML Cleaner. This is for cases when there are
+     * no <a href="http://htmlcleaner.sourceforge.net/parameters.php">properties</a> defined in HTML Cleaner.
      */
     private List<CleaningFilter> filters;
 
@@ -63,16 +64,18 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.component.phase.Initializable#initialize()
      */
     public void initialize() throws InitializationException
     {
         this.filters = new ArrayList<CleaningFilter>();
-        this.filters.add(new TagSwapCleaningFilter());
+        // this.filters.add(new TagSwapCleaningFilter());
         this.filters.add(new ListCleaningFilter());
 
         // Initialize Cleaner objects once.
         this.cleaner = new HtmlCleaner();
+        this.cleaner.setTransformations(getCleaningTransformations());
         this.cleanerProperties = this.cleaner.getProperties();
         this.cleanerProperties.setOmitUnknownTags(true);
         this.cleanerProperties.setPruneTags("script,style");
@@ -80,6 +83,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.xwiki.xml.html.HTMLCleaner#clean(String)
      */
     public org.w3c.dom.Document clean(String originalHtmlContent)
@@ -111,5 +115,40 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         }
 
         return result;
+    }
+
+    /**
+     * @return the cleaning transformations to perform on tags, in addition to the base transformations done by
+     *         HTML Cleaner
+     */
+    private CleanerTransformations getCleaningTransformations()
+    {
+        CleanerTransformations transformations = new CleanerTransformations();
+
+        TagTransformation tt = new TagTransformation(HTMLConstants.B, HTMLConstants.STRONG, false);
+        transformations.addTransformation(tt);
+
+        tt = new TagTransformation(HTMLConstants.I, HTMLConstants.EM, false);
+        transformations.addTransformation(tt);
+
+        tt = new TagTransformation(HTMLConstants.U, HTMLConstants.INS, false);
+        transformations.addTransformation(tt);
+
+        tt = new TagTransformation(HTMLConstants.S, HTMLConstants.DEL, false);
+        transformations.addTransformation(tt);
+
+        tt = new TagTransformation(HTMLConstants.STRIKE, HTMLConstants.DEL, false);
+        transformations.addTransformation(tt);
+
+        tt = new TagTransformation(HTMLConstants.CENTRE, HTMLConstants.P, false);
+        tt.addAttributeTransformation(HTMLConstants.STYLE_ATTRIBUTE, "text-align:center");
+        transformations.addTransformation(tt);
+
+        tt = new TagTransformation(HTMLConstants.FONT, HTMLConstants.SPAN, false);
+        tt.addAttributeTransformation(HTMLConstants.STYLE_ATTRIBUTE,
+            "color:${color};font-family=${face};font-size=${size}pt;");
+        transformations.addTransformation(tt);
+
+        return transformations;
     }
 }

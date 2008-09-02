@@ -54,6 +54,12 @@ public class DefaultHTMLCleanerTest extends TestCase
     {
         assertHTML("this <strong>is</strong> bold", "this <b>is</b> bold");
         assertHTML("<em>italic</em>", "<i>italic</i>");
+        assertHTML("<del>strike</del>", "<strike>strike</strike>");
+        assertHTML("<del>strike</del>", "<s>strike</s>");
+        assertHTML("<ins>strike</ins>", "<u>strike</u>");
+        assertHTML("<p style=\"text-align:center\">centre</p>", "<centre>centre</centre>");
+        assertHTML("<span style=\"color:red;font-family=arial;font-size=3pt;\">This is some text!</span>",
+            "<font face=\"arial\" size=\"3\" color=\"red\">This is some text!</font>");
     }
 
     public void testCleanNonXHTMLLists()
@@ -71,7 +77,7 @@ public class DefaultHTMLCleanerTest extends TestCase
 
     public void testPruneTags()
     {
-        assertHTML("<p>hello</p>", "<script>whatever</script><p>hello</p>");    
+        assertHTML("<p>hello</p>", "<script>whatever</script><p>hello</p>");
     }
 
     private void assertHTML(String expected, String actual)

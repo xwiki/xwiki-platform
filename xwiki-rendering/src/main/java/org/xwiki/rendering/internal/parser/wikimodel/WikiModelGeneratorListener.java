@@ -246,4 +246,22 @@ public class WikiModelGeneratorListener implements Listener
     {
         this.wikimodelListener.onEmptyLines(count);
     }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onInlineVerbatim(String)
+     */
+    public void onInlineVerbatim(String protectedString)
+    {
+        this.wikimodelListener.onVerbatimInline(protectedString);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onStandaloneVerbatim(String)
+     */
+    public void onStandaloneVerbatim(String protectedString)
+    {
+        this.wikimodelListener.onVerbatimBlock(protectedString);
+    }
 }

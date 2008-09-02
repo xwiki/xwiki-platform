@@ -196,8 +196,9 @@ public class DoxiaGeneratorListener implements Listener
 
     public void onEscape(String escapedString)
     {
-        // TODO: Doxia doesn't have any escape so we need to find some equivalent...
-        this.sink.rawText(escapedString);
+        // Note: Doxia doesn't differentiate between escape and verbatim.
+        // TODO: Add a jira issue for Doxia to differentiate between both
+        onInlineVerbatim(escapedString);
     }
 
     public void onLineBreak()
@@ -269,5 +270,27 @@ public class DoxiaGeneratorListener implements Listener
     public void onEmptyLines(int count)
     {
         // TODO: Find what to do...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onInlineVerbatim(String)
+     */
+    public void onInlineVerbatim(String protectedString)
+    {
+        this.sink.verbatim(false);
+        this.sink.rawText(protectedString);
+        this.sink.verbatim_();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onStandaloneVerbatim(String)
+     */
+    public void onStandaloneVerbatim(String protectedString)
+    {
+        onInlineVerbatim(protectedString);
     }
 }

@@ -22,7 +22,11 @@ package org.xwiki.rendering.block;
 import org.xwiki.rendering.listener.Listener;
 
 /**
- * Represents some string escape, i.e. for which there's no wiki syntax interpretation.
+ * Represents some string escape, i.e. for which there's no wiki syntax interpretation. Note that this is slightly
+ * different from a {@link VerbatimBlock} in that an escape block is usually meant to replace a single character
+ * being escaped while a verbatim block is meant to not render a longer text portion. Both have a different wiki
+ * syntax hence making it easy for users to choose one of the other. For example in XWiki syntax to escape a quote
+ * you use <code>\"</code> while a verbatim block would be for example {{{this is "verbatim"}}}. 
  * 
  * @version $Id:$
  * @since 1.5RC1

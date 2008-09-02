@@ -258,4 +258,18 @@ public interface Listener
      * @param count the number of empty lines between 2 standalone Blocks
      */
     void onEmptyLines(int count);
+
+    /**
+     * A portion of text that shouldn't be rendered and that is located inside another Block.
+     *  
+     * @param protectedString the string to protected from rendering
+     */
+    void onInlineVerbatim(String protectedString);
+
+    /**
+     * A portion of text that shouldn't be rendered and that is located on one or several lines by itself.
+     *
+     * @param protectedString the string to protected from rendering
+     */
+    void onStandaloneVerbatim(String protectedString);
 }

@@ -65,6 +65,9 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("paragraph/paragraph3", false);
         suite.addTestsFromResource("paragraph/paragraph4", false);
         suite.addTestsFromResource("paragraph/paragraph5", false);
+        suite.addTestsFromResource("verbatim/verbatim1", false);
+        suite.addTestsFromResource("verbatim/verbatim2", false);
+        suite.addTestsFromResource("verbatim/verbatim3", false);
 
         // Macros
         suite.addTestsFromResource("macros/macro1", false);
@@ -73,7 +76,6 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("macros/macro4", false);
         suite.addTestsFromResource("macros/macro5", false);
         suite.addTestsFromResource("macros/macrohtml", true);
-        suite.addTestsFromResource("macros/macronowiki", true);
         suite.addTestsFromResource("macros/velocity/macrovelocity1", true);
         suite.addTestsFromResource("macros/velocity/macrovelocity2", true);
         suite.addTestsFromResource("macros/xhtml/macroxhtml1", true);

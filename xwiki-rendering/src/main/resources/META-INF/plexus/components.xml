@@ -221,12 +221,6 @@
     </component>
     <component>
       <role>org.xwiki.rendering.macro.Macro</role>
-      <role-hint>nowiki/xwiki</role-hint>
-      <implementation>org.xwiki.rendering.internal.macro.nowiki.NoWikiMacro</implementation>
-      <instantiation-strategy>singleton</instantiation-strategy>
-    </component>
-    <component>
-      <role>org.xwiki.rendering.macro.Macro</role>
       <role-hint>toc/xwiki</role-hint>
       <implementation>org.xwiki.rendering.internal.macro.toc.TocMacro</implementation>
       <instantiation-strategy>singleton</instantiation-strategy>

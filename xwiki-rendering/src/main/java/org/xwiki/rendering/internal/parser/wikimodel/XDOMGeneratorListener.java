@@ -472,24 +472,22 @@ public class XDOMGeneratorListener implements IWemListener
 
     /**
      * {@inheritDoc}
-     * This event is the equivalent of &lt;pre&gt; for HTML.
      *
      * @see org.wikimodel.wem.IWemListener#onVerbatimBlock(String)
      */
-    public void onVerbatimBlock(String str)
+    public void onVerbatimBlock(String protectedString)
     {
-        System.out.println("onVerbatimBlock(" + str + ") (not handled yet)");
+        this.stack.push(new StandaloneVerbatimBlock(protectedString));
     }
 
     /**
      * {@inheritDoc}
-     * This event is the equivalent of &lt;tt&gt; for HTML.
      *
      * @see org.wikimodel.wem.IWemListener#onVerbatimInline(String) 
      */
-    public void onVerbatimInline(String str)
+    public void onVerbatimInline(String protectedString)
     {
-        System.out.println("onVerbatimInline(" + str + ") (not handled yet)");
+        this.stack.push(new InlineVerbatimBlock(protectedString));
     }
 
     /**

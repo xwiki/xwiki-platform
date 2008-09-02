@@ -175,4 +175,24 @@ public class ListenerDelegate implements Listener
     {
         this.listener.onEmptyLines(count);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onInlineVerbatim(String)
+     */
+    public void onInlineVerbatim(String protectedString)
+    {
+        this.listener.onInlineVerbatim(protectedString);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#onStandaloneVerbatim(String)
+     */
+    public void onStandaloneVerbatim(String protectedString)
+    {
+        this.listener.onStandaloneVerbatim(protectedString);
+    }
 }

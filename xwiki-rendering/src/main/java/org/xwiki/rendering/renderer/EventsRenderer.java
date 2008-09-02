@@ -262,6 +262,24 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onEmptyLines: [" + count + "]");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onInlineVerbatim(String)
+     */
+    public void onInlineVerbatim(String protectedString)
+    {
+        println("onInlineVerbatim: [" + protectedString + "]");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#onStandaloneVerbatim(String)
+     */
+    public void onStandaloneVerbatim(String protectedString)
+    {
+        println("onStandaloneVerbatim: [" + protectedString + "]");
+    }
+
     private StringBuffer toStringXMLElement(Map<String, String> attributes)
     {
         StringBuffer buffer = new StringBuffer();

@@ -1,0 +1,32 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+Paragraph1
+{{{verbatim}}}
+Paragraph2
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [Paragraph1]
+endParagraph
+onStandaloneVerbatim: [verbatim]
+beginParagraph
+onWord: [Paragraph2]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>Paragraph1</p><pre>verbatim</pre><p>Paragraph2</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+Paragraph1
+{{{verbatim}}}
+Paragraph2
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><p>Paragraph1</p><pre>verbatim</pre><p>Paragraph2</p></html>

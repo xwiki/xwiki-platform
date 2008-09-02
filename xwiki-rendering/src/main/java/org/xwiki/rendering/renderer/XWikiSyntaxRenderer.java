@@ -321,15 +321,8 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void onEscape(String escapedString)
     {
-        // Note: If an EscapeBlock was found inside a Macro Marker block then the code below will not
-        // generate any output since it'll be the beginMacroMarker that'll generate the original macro content.
-
-        // For single char escapes use the "\" notation and for more than 1 char use the
-        // nowiki macro.
-        if (escapedString.length() == 1) {
-            print("\\" + escapedString);
-        } else {
-            print("{{nowiki}}" + escapedString + "{{/nowiki}}");
+        for (int i = 0; i < escapedString.length(); i++) {
+            print("\\" + escapedString.charAt(i));
         }
     }
 
@@ -456,6 +449,24 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
         print("----");
         this.needsNewLine = true;
         this.currentElement = Element.HORIZONTALLINE;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onInlineVerbatim(String)
+     */
+    public void onInlineVerbatim(String protectedString)
+    {
+        print("{{{" + protectedString + "}}}");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.renderer.Renderer#onStandaloneVerbatim(String)
+     */
+    public void onStandaloneVerbatim(String protectedString)
+    {
+        onInlineVerbatim(protectedString);
     }
 
     /**

@@ -446,6 +446,26 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     /**
      * {@inheritDoc}
      *
+     * @see org.xwiki.rendering.renderer.Renderer#onInlineVerbatim(String)
+     */
+    public void onInlineVerbatim(String protectedString)
+    {
+        print("<pre>" + protectedString + "</pre>");
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.renderer.Renderer#onStandaloneVerbatim(String)
+     */
+    public void onStandaloneVerbatim(String protectedString)
+    {
+        onInlineVerbatim(protectedString);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
      * @see org.xwiki.rendering.renderer.Renderer#onEmptyLines(int)
      */
     public void onEmptyLines(int count)

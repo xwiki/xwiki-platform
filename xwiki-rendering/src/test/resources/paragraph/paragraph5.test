@@ -1,40 +1,29 @@
 .#-----------------------------------------------------
 .input|xwiki/2.0
-.# This is not a list since lists must have at least one space after the list symbol
 .#-----------------------------------------------------
-*Not a list
-1.Not a list
+Paragraph
+1 Header
 .#-----------------------------------------------------
 .expect|event
 .#-----------------------------------------------------
 beginDocument
 beginParagraph
-onSpecialSymbol: [*]
-onWord: [Not]
-onSpace
-onWord: [a]
-onSpace
-onWord: [list]
-onLineBreak
-onWord: [1]
-onSpecialSymbol: [.]
-onWord: [Not]
-onSpace
-onWord: [a]
-onSpace
-onWord: [list]
+onWord: [Paragraph]
 endParagraph
+beginSection: [1]
+onWord: [Header]
+endSection: [1]
 endDocument
 .#-----------------------------------------------------
 .expect|xhtml
 .#-----------------------------------------------------
-<p>*Not a list<br/>1.Not a list</p>
+<p>Paragraph</p><h1 id="HHeader"><span>Header</span></h1>
 .#-----------------------------------------------------
 .expect|xwiki
 .#-----------------------------------------------------
-*Not a list
-1.Not a list
+Paragraph
+1 Header
 .#-----------------------------------------------------
 .input|xhtml/1.0
 .#-----------------------------------------------------
-<html><p>*Not a list<br/>1.Not a list</p></html>
+<html><p>Paragraph</p><h1 id="HHeader"><span>Header</span></h1></html>

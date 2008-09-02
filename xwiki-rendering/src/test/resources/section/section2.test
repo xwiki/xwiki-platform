@@ -1,0 +1,19 @@
+.#---------------------------------------------------------------------------------------------------
+.input|xwiki/2.0
+.# Verify we can 2 section headers with the same text and that it'll generate a different id in XHTML
+.#---------------------------------------------------------------------------------------------------
+1 Title level 1
+1 Title level 1
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+1 Title level 1
+1 Title level 1
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><h1 id="HTitlelevel1"><span>Title level 1</span></h1><h1 id="HTitlelevel1-1"><span>Title level 1</span></h1></html>

@@ -64,6 +64,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("paragraph/paragraph2", false);
         suite.addTestsFromResource("paragraph/paragraph3", false);
         suite.addTestsFromResource("paragraph/paragraph4", false);
+        suite.addTestsFromResource("paragraph/paragraph5", false);
 
         // Macros
         suite.addTestsFromResource("macros/macro1", false);
@@ -99,7 +100,10 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("list/list4", false);
         suite.addTestsFromResource("list/list5", false);
         suite.addTestsFromResource("list/list6", false);
-        suite.addTestsFromResource("section", false);
+        suite.addTestsFromResource("section/section1", false);
+        suite.addTestsFromResource("section/section2", false);
+        suite.addTestsFromResource("section/section3", false);
+        suite.addTestsFromResource("section/section4", false);
 
         return new PlexusTestSetup(suite);
     }

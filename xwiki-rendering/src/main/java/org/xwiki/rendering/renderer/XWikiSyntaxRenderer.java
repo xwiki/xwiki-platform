@@ -188,7 +188,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void beginParagraph()
     {
         if ((this.currentElement != Element.DOCUMENT) && (this.currentElement != Element.HORIZONTALLINE)
-            && (this.currentElement != Element.MACRO))
+            && (this.currentElement != Element.MACRO) && (this.currentElement != Element.SECTION))
         {
             print("\n");
         }

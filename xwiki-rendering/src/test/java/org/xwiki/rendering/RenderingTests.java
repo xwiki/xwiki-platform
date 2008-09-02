@@ -68,6 +68,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("verbatim/verbatim1", false);
         suite.addTestsFromResource("verbatim/verbatim2", false);
         suite.addTestsFromResource("verbatim/verbatim3", false);
+        suite.addTestsFromResource("verbatim/verbatim4", false);
 
         // Macros
         suite.addTestsFromResource("macros/macro1", false);

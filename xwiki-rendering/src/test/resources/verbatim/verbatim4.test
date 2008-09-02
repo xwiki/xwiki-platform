@@ -1,0 +1,28 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify that nested {{{ }}} are ignored.
+.#-----------------------------------------------------
+before{{{abc{{{123}}}cde}}}after
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [before]
+onVerbatimInline: [abc{{{123}}}cde]
+onWord: [after]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>before<pre>abc{{{123}}}cde</pre>after</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+before{{{abc{{{123}}}cde}}}after
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=51
+<html><p>before<pre>abc{{{123}}}cde</pre>after</p></html>

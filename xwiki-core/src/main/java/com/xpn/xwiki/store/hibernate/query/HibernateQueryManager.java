@@ -40,26 +40,24 @@ import com.xpn.xwiki.util.Util;
 
 /**
  * QueryManager implementation for Hibernate Store.
+ * 
  * @version $Id$
  * @since 1.6M1
  */
 public class HibernateQueryManager extends AbstractQueryManager implements Initializable, QueryExecutor
 {
     /**
-     * Session factory needed for register named queries mapping.
-     * Injected via component manager.
+     * Session factory needed for register named queries mapping. Injected via component manager.
      */
     private HibernateSessionFactory sessionFactory;
 
     /**
-     * Path to hibernate mapping with named queries.
-     * Configured via component manager.
+     * Path to hibernate mapping with named queries. Configured via component manager.
      */
     private String mappingPath = "queries.hbm.xml";
 
     /**
-     * Used for access to XWikiContext.
-     * Injected via component manager.
+     * Used for access to XWikiContext. Injected via component manager.
      */
     private Execution execution;
 
@@ -82,6 +80,7 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
     /**
      * {@inheritDoc}
      */
+    @Override
     protected QueryExecutor getExecutor(String language)
     {
         return this;
@@ -97,12 +96,14 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
             if (query.getWiki() != null) {
                 getContext().setDatabase(query.getWiki());
             }
-            return getStore().executeRead(getContext(), true, new HibernateCallback<List<T>>() {
+            return getStore().executeRead(getContext(), true, new HibernateCallback<List<T>>()
+            {
                 @SuppressWarnings("unchecked")
-                public List<T> doInHibernate(Session session) {
-                    org.hibernate.Query hquery = query.isNamed()
-                        ? session.getNamedQuery(query.getStatement())
-                        : session.createQuery(query.getStatement());
+                public List<T> doInHibernate(Session session)
+                {
+                    org.hibernate.Query hquery =
+                        query.isNamed() ? session.getNamedQuery(query.getStatement()) : session.createQuery(query
+                            .getStatement());
                     if (query.getOffset() > 0) {
                         hquery.setFirstResult(query.getOffset());
                     }
@@ -112,7 +113,7 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
                     for (Entry<String, Object> e : query.getParameters().entrySet()) {
                         hquery.setParameter(e.getKey(), e.getValue());
                     }
-                    return hquery.list();                
+                    return hquery.list();
                 }
             });
         } catch (XWikiException e) {
@@ -133,7 +134,8 @@ public class HibernateQueryManager extends AbstractQueryManager implements Initi
     /**
      * @return XWiki Context
      */
-    protected XWikiContext getContext() {
+    protected XWikiContext getContext()
+    {
         return (XWikiContext) execution.getContext().getProperty("xwikicontext");
     }
 }

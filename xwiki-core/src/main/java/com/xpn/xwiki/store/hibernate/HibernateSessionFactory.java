@@ -28,8 +28,7 @@ import org.hibernate.cfg.Configuration;
 import com.xpn.xwiki.util.Util;
 
 /**
- * Class used by hibernate stores for obtain sessions.
- * Simple holder for real sessionFactory and configuration for now.
+ * Class used by hibernate stores for obtain sessions. Simple holder for real sessionFactory and configuration for now.
  * 
  * @version $Id$
  * @since 1.6M1
@@ -44,16 +43,17 @@ public class HibernateSessionFactory
     /**
      * Hibernate configuration object.
      */
-    private Configuration configuration = new Configuration() {
+    private Configuration configuration = new Configuration()
+    {
         private static final long serialVersionUID = 1L;
+
         // there is no #configure(InputStream) so we use #configure(String) and override #getConfigurationInputStream
         @Override
-        protected InputStream getConfigurationInputStream(String resource)
-            throws HibernateException
+        protected InputStream getConfigurationInputStream(String resource) throws HibernateException
         {
             InputStream stream = Util.getResourceAsStream(resource);
-            if (stream==null) {
-                throw new HibernateException("Can't find ["+resource+"] for hibernate configuration");
+            if (stream == null) {
+                throw new HibernateException("Can't find [" + resource + "] for hibernate configuration");
             }
             return stream;
         }

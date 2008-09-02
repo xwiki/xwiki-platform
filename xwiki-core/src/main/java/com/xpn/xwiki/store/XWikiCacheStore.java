@@ -21,22 +21,22 @@
 
 package com.xpn.xwiki.store;
 
+import java.util.List;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.xwiki.cache.Cache;
+import org.xwiki.cache.CacheException;
+import org.xwiki.cache.CacheFactory;
+import org.xwiki.cache.config.CacheConfiguration;
+import org.xwiki.cache.eviction.LRUEvictionConfiguration;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
 import com.xpn.xwiki.store.query.QueryManager;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.xwiki.cache.CacheFactory;
-import org.xwiki.cache.Cache;
-import org.xwiki.cache.CacheException;
-import org.xwiki.cache.config.CacheConfiguration;
-import org.xwiki.cache.eviction.LRUEvictionConfiguration;
-
-import java.util.List;
 
 /**
  * A proxy store implementation that caches Documents when they are first fetched and subsequently return them from a
@@ -69,14 +69,16 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
         if ((cache == null) || (pageExistCache == null)) {
             try {
                 String capacity = context.getWiki().Param("xwiki.store.cache.capacity");
-                if (capacity != null)
+                if (capacity != null) {
                     cacheCapacity = Integer.parseInt(capacity);
+                }
             } catch (Exception e) {
             }
             try {
                 String capacity = context.getWiki().Param("xwiki.store.cache.pageexistcapacity");
-                if (capacity != null)
+                if (capacity != null) {
                     pageExistCacheCapacity = Integer.parseInt(capacity);
+                }
             } catch (Exception e) {
             }
             initCache(cacheCapacity, pageExistCacheCapacity, context);
@@ -86,7 +88,7 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
     public void initCache(int capacity, int pageExistCacheCapacity, XWikiContext context) throws XWikiException
     {
         CacheFactory cacheFactory = context.getWiki().getCacheFactory();
-        
+
         try {
             CacheConfiguration cacheConfiguration = new CacheConfiguration();
             cacheConfiguration.setConfigurationId("xwiki.store.pagecache");
@@ -164,20 +166,23 @@ public class XWikiCacheStore implements XWikiCacheStoreInterface
     public String getKey(String fullName, String language, XWikiContext context)
     {
         String db = context.getDatabase();
-        if (db == null)
+        if (db == null) {
             db = "";
+        }
         String key = db + ":" + fullName;
-        if ("".equals(language))
+        if ("".equals(language)) {
             return key;
-        else
+        } else {
             return key + ":" + language;
+        }
     }
 
     public XWikiDocument loadXWikiDoc(XWikiDocument doc, XWikiContext context) throws XWikiException
     {
         String key = getKey(doc, context);
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("Cache: begin for doc " + key + " in cache");
+        }
 
         // Make sure cache is initialized
         initCache(context);

@@ -24,9 +24,13 @@ package com.xpn.xwiki.store;
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 
-public interface XWikiCacheStoreInterface extends XWikiStoreInterface {
+public interface XWikiCacheStoreInterface extends XWikiStoreInterface
+{
     public XWikiStoreInterface getStore();
+
     public void setStore(XWikiStoreInterface store);
+
     public void flushCache();
+
     public void initCache(int capacity, int pageExistCapacity, XWikiContext context) throws XWikiException;
 }

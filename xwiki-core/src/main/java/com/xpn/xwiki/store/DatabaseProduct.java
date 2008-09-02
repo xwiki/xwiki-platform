@@ -21,14 +21,13 @@
 package com.xpn.xwiki.store;
 
 /**
- * Represent a Database Product name as returned by
- * {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
- * <p>Ideally we shouldn't have to take care of Database specificities since we're using Hibernate
- * to abstract ourselves from Databases. However it happens that Hibernate doesn't support
- * setting Catalogs on some databases and instead we need to use our own tricks to do that and these
- * tricks depend on the database. Hence the need to differentiate them and hence the need for this
- * class.
- *
+ * Represent a Database Product name as returned by {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
+ * <p>
+ * Ideally we shouldn't have to take care of Database specificities since we're using Hibernate to abstract ourselves
+ * from Databases. However it happens that Hibernate doesn't support setting Catalogs on some databases and instead we
+ * need to use our own tricks to do that and these tricks depend on the database. Hence the need to differentiate them
+ * and hence the need for this class.
+ * 
  * @version $Id$
  */
 public class DatabaseProduct
@@ -54,15 +53,15 @@ public class DatabaseProduct
     public static final DatabaseProduct UNKNOWN = new DatabaseProduct("Unknown");
 
     /**
-     * @see #getProductName() 
+     * @see #getProductName()
      */
     private String productName;
 
     /**
      * Private constructor to prevent instantiations.
-     *
+     * 
      * @param productName the database product name as returned by
-     *        {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
+     *            {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
      */
     private DatabaseProduct(String productName)
     {
@@ -70,8 +69,8 @@ public class DatabaseProduct
     }
 
     /**
-     * @return the database product name. Example: "Oracle". The returned value should correspond
-     *         to the value returned by {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
+     * @return the database product name. Example: "Oracle". The returned value should correspond to the value returned
+     *         by {@link java.sql.DatabaseMetaData#getDatabaseProductName()}.
      */
     public String getProductName()
     {
@@ -80,16 +79,16 @@ public class DatabaseProduct
 
     /**
      * {@inheritDoc}
+     * 
      * @see Object#equals(Object)
      */
+    @Override
     public boolean equals(Object object)
     {
         boolean result = false;
-        if ((object != null) && (object instanceof DatabaseProduct))
-        {
+        if ((object != null) && (object instanceof DatabaseProduct)) {
             DatabaseProduct product = (DatabaseProduct) object;
-            if (product.getProductName().equals(getProductName()))
-            {
+            if (product.getProductName().equals(getProductName())) {
                 result = true;
             }
         }
@@ -99,27 +98,20 @@ public class DatabaseProduct
 
     /**
      * Transform a product name represented as a string into a {@link DatabaseProduct} object.
-     *
+     * 
      * @param productNameAsString the string to transform
      * @return the {@link DatabaseProduct} object
      */
     public static DatabaseProduct toProduct(String productNameAsString)
     {
         DatabaseProduct product;
-        if (productNameAsString.equalsIgnoreCase(ORACLE.getProductName()))
-        {
+        if (productNameAsString.equalsIgnoreCase(ORACLE.getProductName())) {
             product = ORACLE;
-        }
-        else if (productNameAsString.equalsIgnoreCase(DERBY.getProductName()))
-        {
+        } else if (productNameAsString.equalsIgnoreCase(DERBY.getProductName())) {
             product = DERBY;
-        }
-        else if (productNameAsString.equalsIgnoreCase(HSQLDB.getProductName()))
-        {
+        } else if (productNameAsString.equalsIgnoreCase(HSQLDB.getProductName())) {
             product = HSQLDB;
-        }
-        else
-        {
+        } else {
             product = UNKNOWN;
         }
 
@@ -128,8 +120,10 @@ public class DatabaseProduct
 
     /**
      * {@inheritDoc}
+     * 
      * @see Object#hashCode()
      */
+    @Override
     public int hashCode()
     {
         return getProductName().hashCode();

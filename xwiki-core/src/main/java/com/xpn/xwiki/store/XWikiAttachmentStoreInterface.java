@@ -19,29 +19,42 @@
  */
 package com.xpn.xwiki.store;
 
+import java.util.List;
+
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiAttachment;
 import com.xpn.xwiki.doc.XWikiDocument;
-
-import java.util.List;
 
 /**
  * Interface for Attachment store system.
  * 
  * @version $Id$
  */
-public interface XWikiAttachmentStoreInterface {
+public interface XWikiAttachmentStoreInterface
+{
     /**
      * This component's role, used when code needs to look it up.
      */
     String ROLE = XWikiAttachmentStoreInterface.class.getName();
 
-    void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc, boolean bParentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
-    void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context, boolean bTransaction) throws XWikiException;
+    void saveAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
+
+    void saveAttachmentContent(XWikiAttachment attachment, boolean bParentUpdate, XWikiContext context,
+        boolean bTransaction) throws XWikiException;
+
+    void saveAttachmentsContent(List<XWikiAttachment> attachments, XWikiDocument doc, boolean bParentUpdate,
+        XWikiContext context, boolean bTransaction) throws XWikiException;
+
+    void loadAttachmentContent(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
+
+    void deleteXWikiAttachment(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
+
+    void deleteXWikiAttachment(XWikiAttachment attachment, boolean parentUpdate, XWikiContext context,
+        boolean bTransaction) throws XWikiException;
+
     void cleanUp(XWikiContext context);
 }

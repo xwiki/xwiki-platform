@@ -39,32 +39,33 @@ public interface AttachmentVersioningStore
 
     /**
      * Load attachment archive from store.
+     * 
      * @return attachment archive. not null. return empty archive if it is not exist in store.
-     * @param attachment    The attachment of archive.
-     * @param context       The current context.
-     * @param bTransaction  Should use old transaction (false) or create new (true).
+     * @param attachment The attachment of archive.
+     * @param context The current context.
+     * @param bTransaction Should use old transaction (false) or create new (true).
      * @throws XWikiException If an error occurs.
      */
-    XWikiAttachmentArchive loadArchive(XWikiAttachment attachment, XWikiContext context, 
-        boolean bTransaction) throws XWikiException;
-    
-    /**
-     * Save or update attachment archive.
-     * @param archive       The attachment archive to save.
-     * @param context       The current context.
-     * @param bTransaction  Should use old transaction (false) or create new (true).
-     * @throws XWikiException If an error occurs.
-     */
-    void saveArchive(XWikiAttachmentArchive archive, XWikiContext context, boolean bTransaction)
+    XWikiAttachmentArchive loadArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
         throws XWikiException;
 
     /**
-     * Permanently delete attachment archive.
-     * @param attachment    The attachment to delete.
-     * @param context       The current context.
-     * @param bTransaction  Should use old transaction (false) or create new (true).
+     * Save or update attachment archive.
+     * 
+     * @param archive The attachment archive to save.
+     * @param context The current context.
+     * @param bTransaction Should use old transaction (false) or create new (true).
      * @throws XWikiException If an error occurs.
      */
-    void deleteArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction)
-        throws XWikiException;
+    void saveArchive(XWikiAttachmentArchive archive, XWikiContext context, boolean bTransaction) throws XWikiException;
+
+    /**
+     * Permanently delete attachment archive.
+     * 
+     * @param attachment The attachment to delete.
+     * @param context The current context.
+     * @param bTransaction Should use old transaction (false) or create new (true).
+     * @throws XWikiException If an error occurs.
+     */
+    void deleteArchive(XWikiAttachment attachment, XWikiContext context, boolean bTransaction) throws XWikiException;
 }

@@ -96,8 +96,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
     private Map<String, String[]> validTypesMap = new HashMap<String, String[]>();
 
     /**
-     * QueryManager for this store.
-     * Injected via component manager.
+     * QueryManager for this store. Injected via component manager.
      */
     private QueryManager queryManager;
 
@@ -109,6 +108,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @param context
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.ROLE) instead.
      */
+    @Deprecated
     public XWikiHibernateStore(XWiki xwiki, XWikiContext context)
     {
         super(xwiki, context);
@@ -121,6 +121,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @param hibpath
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.ROLE) instead.
      */
+    @Deprecated
     public XWikiHibernateStore(String hibpath)
     {
         super(hibpath);
@@ -131,6 +132,7 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
      * @see #XWikiHibernateStore(XWiki, XWikiContext)
      * @deprecated 1.6M1. Use ComponentManager.lookup(XWikiStoreInterface.ROLE) instead.
      */
+    @Deprecated
     public XWikiHibernateStore(XWikiContext context)
     {
         this(context.getWiki(), context);
@@ -1305,8 +1307,8 @@ public class XWikiHibernateStore extends XWikiHibernateBaseStore implements XWik
              * potential mess // This code is only called if the tables are in an incoherent state // (Example: data in
              * xwikiproperties and no data in xwikiintegers or vice-versa) // TODO: verify of the code works with longer
              * transactions BaseProperty prop2; // Depending on save/update there is too much data either // in the
-             * BaseProperty table or in the inheritated property table // We need to delete this data if (isSave) prop2 =
-             * (BaseProperty) property; else prop2 = new BaseProperty(); prop2.setName(property.getName());
+             * BaseProperty table or in the inheritated property table // We need to delete this data if (isSave) prop2
+             * = (BaseProperty) property; else prop2 = new BaseProperty(); prop2.setName(property.getName());
              * prop2.setObject(property.getObject()); ltransaction.rollback(); // We need to run the delete in a
              * separate session // This is not a problem since this is cleaning up Session session2 =
              * getSessionFactory().openSession(); Transaction transaction2 = session2.beginTransaction();

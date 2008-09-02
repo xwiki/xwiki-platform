@@ -20,26 +20,35 @@
  */
 package com.xpn.xwiki.store;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class XWikiBatcherStats {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+public class XWikiBatcherStats
+{
     private static final Log log = LogFactory.getLog(XWikiBatcherStats.class);
 
     private List sqlList = new ArrayList();
+
     private List recentSqlList = new ArrayList();
+
     private boolean resetOnNextSQL = false;
+
     private int preparedSQLCounter = 0;
+
     private int executeBatchCounter = 0;
+
     private int abortBatchCounter = 0;
+
     private int resultSetCounter = 0;
+
     private int addToBatchCounter = 0;
 
-    public void resetStats() {
+    public void resetStats()
+    {
         sqlList = new ArrayList();
         preparedSQLCounter = 0;
         executeBatchCounter = 0;
@@ -48,19 +57,23 @@ public class XWikiBatcherStats {
         addToBatchCounter = 0;
     }
 
-    public List getSqlList() {
+    public List getSqlList()
+    {
         return sqlList;
     }
 
-    public List getRecentSqlList() {
+    public List getRecentSqlList()
+    {
         return recentSqlList;
     }
 
-    public void resetRecentSqlList() {
+    public void resetRecentSqlList()
+    {
         recentSqlList = new ArrayList();
     }
 
-    public void addToSqlList(String sql) {
+    public void addToSqlList(String sql)
+    {
         if (resetOnNextSQL) {
             resetRecentSqlList();
             resetOnNextSQL = false;
@@ -69,63 +82,77 @@ public class XWikiBatcherStats {
         this.sqlList.add(sql);
     }
 
-    public void resetOnNextSQL() {
+    public void resetOnNextSQL()
+    {
         resetOnNextSQL = true;
     }
 
-    public int getPreparedSQLCounter() {
+    public int getPreparedSQLCounter()
+    {
         return preparedSQLCounter;
     }
 
-    public void incrementPreparedSQLCounter() {
+    public void incrementPreparedSQLCounter()
+    {
         this.preparedSQLCounter++;
     }
 
-    public int getExecuteBatchCounter() {
+    public int getExecuteBatchCounter()
+    {
         return executeBatchCounter;
     }
 
-    public void incrementExecuteBatchCounter() {
+    public void incrementExecuteBatchCounter()
+    {
         this.executeBatchCounter++;
     }
 
-    public int getAbortBatchCounter() {
+    public int getAbortBatchCounter()
+    {
         return abortBatchCounter;
     }
 
-    public void incrementAbortBatchCounter() {
+    public void incrementAbortBatchCounter()
+    {
         this.abortBatchCounter++;
     }
 
-    public int getResultSetCounter() {
+    public int getResultSetCounter()
+    {
         return resultSetCounter;
     }
 
-    public void incrementResultSetCounter() {
+    public void incrementResultSetCounter()
+    {
         this.resultSetCounter++;
     }
 
-    public int getAddToBatchCounter() {
+    public int getAddToBatchCounter()
+    {
         return addToBatchCounter;
     }
 
-    public void incrementAddToBatchCounter() {
+    public void incrementAddToBatchCounter()
+    {
         this.addToBatchCounter++;
     }
 
-    public void printSQLList(PrintStream out) {
+    public void printSQLList(PrintStream out)
+    {
         out.println("SQL: number of queries " + sqlList.size());
-        for (int i=0;i<sqlList.size();i++) {
-           out.println("SQL: " + sqlList.get(i));
+        for (int i = 0; i < sqlList.size(); i++) {
+            out.println("SQL: " + sqlList.get(i));
         }
         out.flush();
     }
 
-    public void logSQLList() {
+    public void logSQLList()
+    {
         if (log.isDebugEnabled()) {
-        log.debug("SQL: number of queries " + sqlList.size());
-        for (int i=0;i<sqlList.size();i++)
-           log.debug("SQL: " + sqlList.get(i));
+            log.debug("SQL: number of queries " + sqlList.size());
+            for (int i = 0; i < sqlList.size(); i++) {
+                log.debug("SQL: " + sqlList.get(i));
+            }
         }
     }
 }

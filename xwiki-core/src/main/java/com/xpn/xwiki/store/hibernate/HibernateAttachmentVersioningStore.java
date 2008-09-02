@@ -38,8 +38,7 @@ import com.xpn.xwiki.store.XWikiHibernateBaseStore;
  * @version $Id$
  * @since 1.4M2
  */
-public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements
-    AttachmentVersioningStore
+public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore implements AttachmentVersioningStore
 {
     /** logger. */
     private static final Log LOG = LogFactory.getLog(HibernateAttachmentVersioningStore.class);
@@ -48,6 +47,7 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
      * @param context the current context.
      * @deprecated 1.6M1. Use ComponentManager.lookup(AttachmentVersioningStore.ROLE) instead.
      */
+    @Deprecated
     public HibernateAttachmentVersioningStore(XWikiContext context)
     {
         super(context.getWiki(), context);
@@ -57,50 +57,49 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
      * Empty constructor needed for component manager.
      */
     public HibernateAttachmentVersioningStore()
-    { }
+    {
+    }
 
     /**
      * {@inheritDoc}
      */
-    public XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, 
-        XWikiContext context, boolean bTransaction) throws XWikiException
-    {                
+    public XWikiAttachmentArchive loadArchive(final XWikiAttachment attachment, XWikiContext context,
+        boolean bTransaction) throws XWikiException
+    {
         try {
             final XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
             archive.setAttachment(attachment);
-            executeRead(context, bTransaction,
-                new HibernateCallback<Object>() {
-                    public Object doInHibernate(Session session)
-                        throws HibernateException
-                    {
-                        try {
-                            session.load(archive, archive.getId());
-                        } catch (ObjectNotFoundException e) {
-                            // if none found then return empty created archive
-                        }
-                        return null;                        
+            executeRead(context, bTransaction, new HibernateCallback<Object>()
+            {
+                public Object doInHibernate(Session session) throws HibernateException
+                {
+                    try {
+                        session.load(archive, archive.getId());
+                    } catch (ObjectNotFoundException e) {
+                        // if none found then return empty created archive
                     }
-                });
+                    return null;
+                }
+            });
             attachment.setAttachment_archive(archive);
             return archive;
         } catch (Exception e) {
             Object[] args = {attachment.getFilename(), attachment.getDoc().getFullName()};
             throw new XWikiException(XWikiException.MODULE_XWIKI_STORE,
                 XWikiException.ERROR_XWIKI_STORE_HIBERNATE_LOADING_ATTACHMENT,
-                "Exception while loading attachment archive {0} of document {1}",
-                e, args);
+                "Exception while loading attachment archive {0} of document {1}", e, args);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void saveArchive(final XWikiAttachmentArchive archive, XWikiContext context,
-        boolean bTransaction) throws XWikiException
+    public void saveArchive(final XWikiAttachmentArchive archive, XWikiContext context, boolean bTransaction)
+        throws XWikiException
     {
-        executeWrite(context, bTransaction, new HibernateCallback<Object>() {
-            public Object doInHibernate(Session session) throws HibernateException,
-                XWikiException
+        executeWrite(context, bTransaction, new HibernateCallback<Object>()
+        {
+            public Object doInHibernate(Session session) throws HibernateException, XWikiException
             {
                 session.saveOrUpdate(archive);
                 return null;
@@ -111,13 +110,13 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
     /**
      * {@inheritDoc}
      */
-    public void deleteArchive(final XWikiAttachment attachment, final XWikiContext context,
-        boolean bTransaction) throws XWikiException
+    public void deleteArchive(final XWikiAttachment attachment, final XWikiContext context, boolean bTransaction)
+        throws XWikiException
     {
         try {
-            executeWrite(context, bTransaction, new HibernateCallback<Object>() {
-                public Object doInHibernate(Session session) throws HibernateException,
-                    XWikiException
+            executeWrite(context, bTransaction, new HibernateCallback<Object>()
+            {
+                public Object doInHibernate(Session session) throws HibernateException, XWikiException
                 {
                     XWikiAttachmentArchive archive = new XWikiAttachmentArchive();
                     archive.setAttachment(attachment);
@@ -127,8 +126,8 @@ public class HibernateAttachmentVersioningStore extends XWikiHibernateBaseStore 
             });
         } catch (Exception e) {
             if (LOG.isWarnEnabled()) {
-                LOG.warn(String.format("Error deleting attachment archive [%s] of doc [%s]",
-                    attachment.getFilename(), attachment.getDoc().getFullName()), e);
+                LOG.warn(String.format("Error deleting attachment archive [%s] of doc [%s]", attachment.getFilename(),
+                    attachment.getDoc().getFullName()), e);
             }
         }
     }

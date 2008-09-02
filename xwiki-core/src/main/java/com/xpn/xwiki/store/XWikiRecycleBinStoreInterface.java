@@ -25,8 +25,10 @@ import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDeletedDocument;
 import com.xpn.xwiki.doc.XWikiDocument;
+
 /**
  * Interface for RecycleBin feature (XWIKI-543) store system.
+ * 
  * @version $Id$
  * @since 1.2M1
  */
@@ -39,15 +41,16 @@ public interface XWikiRecycleBinStoreInterface
 
     /**
      * Save document to recycle bin.
+     * 
      * @param doc - document to save
      * @param deleter - the user which delete document
      * @param date - date of delete action
      * @param bTransaction - should use old transaction(false) or create new (true)
-     * @param context - used while saving 
-     * @throws XWikiException if error in saving 
+     * @param context - used while saving
+     * @throws XWikiException if error in saving
      */
-    void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, XWikiContext context, 
-        boolean bTransaction) throws XWikiException;
+    void saveToRecycleBin(XWikiDocument doc, String deleter, Date date, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
 
     /**
      * @return restored document from recycle bin
@@ -57,8 +60,8 @@ public interface XWikiRecycleBinStoreInterface
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if error while loading
      */
-    XWikiDocument restoreFromRecycleBin(XWikiDocument doc, long index, XWikiContext context,
-        boolean bTransaction) throws XWikiException;
+    XWikiDocument restoreFromRecycleBin(XWikiDocument doc, long index, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
 
     /**
      * @return specified deleted document from recycle bin. null if not found.
@@ -68,8 +71,8 @@ public interface XWikiRecycleBinStoreInterface
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if error while loading
      */
-    XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, long index, XWikiContext context,
-        boolean bTransaction) throws XWikiException;
+    XWikiDeletedDocument getDeletedDocument(XWikiDocument doc, long index, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
 
     /**
      * @return infos about all delete actions of specific document. sorted by date.
@@ -78,17 +81,18 @@ public interface XWikiRecycleBinStoreInterface
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException - if error in loading
      */
-    XWikiDeletedDocument[] getAllDeletedDocuments(XWikiDocument doc, XWikiContext context, 
-        boolean bTransaction) throws XWikiException;
+    XWikiDeletedDocument[] getAllDeletedDocuments(XWikiDocument doc, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
 
     /**
      * Permanently delete document from recycle bin.
+     * 
      * @param doc - document to delete
      * @param index - which instance document in recycle bin to delete
      * @param context - used for environment
      * @param bTransaction - should use old transaction(false) or create new (true)
      * @throws XWikiException if eny error
      */
-    void deleteFromRecycleBin(XWikiDocument doc, long index, XWikiContext context,
-        boolean bTransaction) throws XWikiException;
+    void deleteFromRecycleBin(XWikiDocument doc, long index, XWikiContext context, boolean bTransaction)
+        throws XWikiException;
 }

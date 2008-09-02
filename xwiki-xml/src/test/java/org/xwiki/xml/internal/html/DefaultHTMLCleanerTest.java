@@ -57,7 +57,7 @@ public class DefaultHTMLCleanerTest extends TestCase
         assertHTML("<del>strike</del>", "<strike>strike</strike>");
         assertHTML("<del>strike</del>", "<s>strike</s>");
         assertHTML("<ins>strike</ins>", "<u>strike</u>");
-        assertHTML("<p style=\"text-align:center\">centre</p>", "<centre>centre</centre>");
+        assertHTML("<p style=\"text-align:center\">center</p>", "<center>center</center>");
         assertHTML("<span style=\"color:red;font-family=arial;font-size=3pt;\">This is some text!</span>",
             "<font face=\"arial\" size=\"3\" color=\"red\">This is some text!</font>");
     }

@@ -140,7 +140,7 @@ public class DefaultHTMLCleaner implements HTMLCleaner, Initializable
         tt = new TagTransformation(HTMLConstants.STRIKE, HTMLConstants.DEL, false);
         transformations.addTransformation(tt);
 
-        tt = new TagTransformation(HTMLConstants.CENTRE, HTMLConstants.P, false);
+        tt = new TagTransformation(HTMLConstants.CENTER, HTMLConstants.P, false);
         tt.addAttributeTransformation(HTMLConstants.STYLE_ATTRIBUTE, "text-align:center");
         transformations.addTransformation(tt);
 

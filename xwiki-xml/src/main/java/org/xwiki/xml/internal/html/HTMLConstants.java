@@ -84,9 +84,9 @@ public interface HTMLConstants
     String SPAN = "span";
 
     /**
-     * HTML &lt;centre&gt; tag name.
+     * HTML &lt;center&gt; tag name.
      */
-    String CENTRE = "centre";
+    String CENTER = "center";
 
     /**
      * HTML &lt;font&gt; tag name.

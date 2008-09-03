@@ -96,6 +96,14 @@ public interface DocumentAccessBridge
     String getProperty(String documentName, String propertyName) throws Exception;
 
     /**
+     * @param className The name of the class.
+     * @param propertyName The name of the property.
+     * @return class name of the property object or null if property is not found. For example StringProperty, IntegerProperty.
+     * @throws Exception if class cannot be accessed
+     */
+    String getPropertyType(String className, String propertyName) throws Exception;
+
+    /**
      * Returns the content of a document attachment.
      * 
      * @param documentName The name of the document to access.

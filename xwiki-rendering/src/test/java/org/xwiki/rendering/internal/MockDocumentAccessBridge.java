@@ -73,6 +73,11 @@ public class MockDocumentAccessBridge implements DocumentAccessBridge
         return "Property value";
     }
 
+    public String getPropertyType(String className, String propertyName) throws Exception
+    {
+        return null;
+    }
+
     public byte[] getAttachmentContent(String documentName, String attachmentName) throws Exception
     {
         return null;

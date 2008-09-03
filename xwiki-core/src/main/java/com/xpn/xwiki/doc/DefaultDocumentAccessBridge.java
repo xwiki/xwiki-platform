@@ -24,6 +24,7 @@ import org.xwiki.context.Execution;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.objects.BaseProperty;
+import com.xpn.xwiki.objects.classes.PropertyClass;
 
 /**
  * Exposes methods for accessing Document data. This is temporary until we remodel the Model classes and the Document
@@ -128,6 +129,18 @@ public class DefaultDocumentAccessBridge implements DocumentAccessBridge
         } catch (Exception ex) {
             return null;
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see DocumentAccessBridge#getPropertyType(String, String)
+     */
+    public String getPropertyType(String className, String propertyName) throws Exception
+    {
+        XWikiContext xcontext = getContext();
+        PropertyClass pc = xcontext.getWiki().getPropertyClassFromName(className+"_"+propertyName, xcontext);
+        return pc.newProperty().getClass().getName();
     }
 
     /**

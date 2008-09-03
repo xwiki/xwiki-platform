@@ -69,5 +69,6 @@
     <module>xwiki-bridge</module>
     <module>xwiki-rendering</module>
     <module>xwiki-configuration</module>
+    <module>xwiki-query</module>
   </modules>
 </project>

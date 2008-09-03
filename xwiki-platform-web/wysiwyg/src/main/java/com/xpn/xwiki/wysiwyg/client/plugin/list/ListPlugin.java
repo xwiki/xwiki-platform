@@ -54,13 +54,13 @@ public class ListPlugin extends StatefulPlugin
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.INSERT_ORDERED_LIST)) {
+        if (getTextArea().getCommandManager().isSupported(Command.INSERT_ORDERED_LIST)) {
             ol = new ToggleButton(Images.INSTANCE.ol().createImage(), this);
             ol.setTitle(Strings.INSTANCE.ol());
             toolBarExtension.addFeature("orderedlist", ol);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.INSERT_UNORDERED_LIST)) {
+        if (getTextArea().getCommandManager().isSupported(Command.INSERT_UNORDERED_LIST)) {
             ul = new ToggleButton(Images.INSTANCE.ul().createImage(), this);
             ul.setTitle(Strings.INSTANCE.ul());
             toolBarExtension.addFeature("unorderedlist", ul);
@@ -122,14 +122,14 @@ public class ListPlugin extends StatefulPlugin
     public void onOrderedList()
     {
         if (ol.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.INSERT_ORDERED_LIST);
+            getTextArea().getCommandManager().execute(Command.INSERT_ORDERED_LIST);
         }
     }
 
     public void onUnorderedList()
     {
         if (ul.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.INSERT_UNORDERED_LIST);
+            getTextArea().getCommandManager().execute(Command.INSERT_UNORDERED_LIST);
         }
     }
 
@@ -141,10 +141,10 @@ public class ListPlugin extends StatefulPlugin
     public void onUpdate()
     {
         if (ol != null) {
-            ol.setDown(getTextArea().getCommandManager().queryCommandState(Command.INSERT_ORDERED_LIST));
+            ol.setDown(getTextArea().getCommandManager().isExecuted(Command.INSERT_ORDERED_LIST));
         }
         if (ul != null) {
-            ul.setDown(getTextArea().getCommandManager().queryCommandState(Command.INSERT_UNORDERED_LIST));
+            ul.setDown(getTextArea().getCommandManager().isExecuted(Command.INSERT_UNORDERED_LIST));
         }
     }
 }

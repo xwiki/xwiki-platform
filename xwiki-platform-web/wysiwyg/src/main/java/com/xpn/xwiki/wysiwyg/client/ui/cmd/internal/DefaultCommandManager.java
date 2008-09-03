@@ -19,94 +19,143 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.user.client.Element;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.FocusWidget;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.Executable;
 
 public class DefaultCommandManager extends AbstractCommandManager
 {
-    public final Element target;
+    protected FocusWidget widget;
+
+    private final Map<Command, Executable> executables;
+
+    public final static Map<Command, Executable> EXECUTABLES;
+
+    static {
+        EXECUTABLES = new HashMap<Command, Executable>();
+        EXECUTABLES.put(Command.BACK_COLOR, (Executable) GWT.create(BackColorExecutable.class));
+        EXECUTABLES.put(Command.BOLD, new DefaultExecutable(Command.BOLD.toString()));
+        EXECUTABLES.put(Command.FONT_NAME, new DefaultExecutable(Command.FONT_NAME.toString()));
+        EXECUTABLES.put(Command.FONT_SIZE, new DefaultExecutable(Command.FONT_SIZE.toString()));
+        EXECUTABLES.put(Command.FORE_COLOR, new DefaultExecutable(Command.FORE_COLOR.toString()));
+        EXECUTABLES.put(Command.FORMAT_BLOCK, (Executable) GWT.create(FormatBlockExecutable.class));
+        EXECUTABLES.put(Command.INDENT, new DefaultExecutable(Command.INDENT.toString()));
+        EXECUTABLES.put(Command.INSERT_BR_ON_RETURN, new DefaultExecutable(Command.INSERT_BR_ON_RETURN.toString()));
+        EXECUTABLES.put(Command.INSERT_HORIZONTAL_RULE,
+            new DefaultExecutable(Command.INSERT_HORIZONTAL_RULE.toString()));
+        EXECUTABLES.put(Command.INSERT_HTML, (Executable) GWT.create(InsertHTMLExecutable.class));
+        EXECUTABLES.put(Command.INSERT_IMAGE, new DefaultExecutable(Command.INSERT_IMAGE.toString()));
+        EXECUTABLES.put(Command.INSERT_ORDERED_LIST, new DefaultExecutable(Command.INSERT_ORDERED_LIST.toString()));
+        EXECUTABLES.put(Command.INSERT_PARAGRAPH, new DefaultExecutable(Command.INSERT_PARAGRAPH.toString()));
+        EXECUTABLES.put(Command.INSERT_UNORDERED_LIST, new DefaultExecutable(Command.INSERT_UNORDERED_LIST.toString()));
+        EXECUTABLES.put(Command.ITALIC, new DefaultExecutable(Command.ITALIC.toString()));
+        EXECUTABLES.put(Command.JUSTIFY_CENTER, new DefaultExecutable(Command.JUSTIFY_CENTER.toString()));
+        EXECUTABLES.put(Command.JUSTIFY_FULL, new DefaultExecutable(Command.JUSTIFY_FULL.toString()));
+        EXECUTABLES.put(Command.JUSTIFY_LEFT, new DefaultExecutable(Command.JUSTIFY_LEFT.toString()));
+        EXECUTABLES.put(Command.JUSTIFY_RIGHT, new DefaultExecutable(Command.JUSTIFY_RIGHT.toString()));
+        EXECUTABLES.put(Command.OUTDENT, new DefaultExecutable(Command.OUTDENT.toString()));
+        EXECUTABLES.put(Command.REDO, new DefaultExecutable(Command.REDO.toString()));
+        EXECUTABLES.put(Command.REMOVE_FORMAT, new DefaultExecutable(Command.REMOVE_FORMAT.toString()));
+        EXECUTABLES.put(Command.STRIKE_THROUGH, new DefaultExecutable(Command.STRIKE_THROUGH.toString()));
+        EXECUTABLES.put(Command.STYLE_WITH_CSS, (Executable) GWT.create(StyleWithCssExecutable.class));
+        EXECUTABLES.put(Command.SUB_SCRIPT, new DefaultExecutable(Command.SUB_SCRIPT.toString()));
+        EXECUTABLES.put(Command.SUPER_SCRIPT, new DefaultExecutable(Command.SUPER_SCRIPT.toString()));
+        EXECUTABLES.put(Command.UNDERLINE, new DefaultExecutable(Command.UNDERLINE.toString()));
+        EXECUTABLES.put(Command.UNDO, new DefaultExecutable(Command.UNDO.toString()));
+    }
 
     public DefaultCommandManager(FocusWidget widget)
     {
-        super(widget);
-        target = widget.getElement();
+        this(widget, EXECUTABLES);
+    }
+
+    public DefaultCommandManager(FocusWidget widget, Map<Command, Executable> executables)
+    {
+        this.widget = widget;
+        this.executables = executables;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#execCommandAssumingFocus(String, String)
+     * @see CommandManager#execute(Command, String)
      */
-    protected native boolean execCommandAssumingFocus(String cmd, String param) /*-{
-        try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.execCommand(cmd, false, param);
-        } catch(e) {
+    public boolean execute(Command cmd, String param)
+    {
+        Executable executable = executables.get(cmd);
+        if (executable == null) {
             return false;
         }
-    }-*/;
+        widget.setFocus(true);
+        boolean success = executable.execute(widget.getElement(), param);
+        if (success) {
+            commandListeners.fireCommand(this, cmd, param);
+        }
+        return success;
+    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandEnabledAssumingFocus(String)
+     * @see CommandManager#isEnabled(Command)
      */
-    protected native boolean queryCommandEnabledAssumingFocus(String cmd) /*-{
-        try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandEnabled(cmd);
-        } catch(e) {
+    public boolean isEnabled(Command cmd)
+    {
+        Executable executable = executables.get(cmd);
+        if (executable == null) {
             return false;
         }
-    }-*/;
+        widget.setFocus(true);
+        return executable.isEnabled(widget.getElement());
+    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandIndetermAssumingFocus(String)
+     * @see CommandManager#isExecuted(Command)
      */
-    protected native boolean queryCommandIndetermAssumingFocus(String cmd) /*-{
-        try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandIndeterm(cmd);
-        } catch(e) {
-            return true;
-        }
-    }-*/;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#queryCommandStateAssumingFocus(String)
-     */
-    protected native boolean queryCommandStateAssumingFocus(String cmd) /*-{
-        try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandState(cmd);
-        } catch(e) {
+    public boolean isExecuted(Command cmd)
+    {
+        Executable executable = executables.get(cmd);
+        if (executable == null) {
             return false;
         }
-    }-*/;
+        widget.setFocus(true);
+        return executable.isExecuted(widget.getElement());
+    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandSupportedAssumingFocus(String)
+     * @see CommandManager#isSupported(Command)
      */
-    protected native boolean queryCommandSupportedAssumingFocus(String cmd) /*-{
-        try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandSupported(cmd);
-        } catch(e) {
-            return true;
+    public boolean isSupported(Command cmd)
+    {
+        Executable executable = executables.get(cmd);
+        if (executable == null) {
+            return false;
         }
-    }-*/;
+        widget.setFocus(true);
+        return executable.isSupported(widget.getElement());
+    }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandValueAssumingFocus(String)
+     * @see CommandManager#getStringValue(Command)
      */
-    protected native String queryCommandValueAssumingFocus(String cmd) /*-{
-        try{
-            return this.@com.xpn.xwiki.wysiwyg.client.ui.cmd.internal.DefaultCommandManager::target.contentWindow.document.queryCommandValue(cmd);
-        } catch(e) {
+    public String getStringValue(Command cmd)
+    {
+        Executable executable = executables.get(cmd);
+        if (executable == null) {
             return null;
         }
-    }-*/;
+        widget.setFocus(true);
+        return executable.getParameter(widget.getElement());
+    }
 }

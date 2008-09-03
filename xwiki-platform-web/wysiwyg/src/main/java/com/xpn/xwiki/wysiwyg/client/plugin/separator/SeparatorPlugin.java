@@ -57,7 +57,7 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
         // User interface extension for separator widgets that can be focused.
         toolBarExtension.addUIExtension(toolBarFocusWidgets);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.INSERT_HORIZONTAL_RULE)) {
+        if (getTextArea().getCommandManager().isSupported(Command.INSERT_HORIZONTAL_RULE)) {
             hr = new PushButton(Images.INSTANCE.hr().createImage(), this);
             hr.setTitle(Strings.INSTANCE.hr());
             toolBarFocusWidgets.addFeature("hr", hr);
@@ -101,7 +101,7 @@ public class SeparatorPlugin extends AbstractPlugin implements ClickListener
     public void onHorizontalRule()
     {
         if (hr.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.INSERT_HORIZONTAL_RULE);
+            getTextArea().getCommandManager().execute(Command.INSERT_HORIZONTAL_RULE);
         }
     }
 }

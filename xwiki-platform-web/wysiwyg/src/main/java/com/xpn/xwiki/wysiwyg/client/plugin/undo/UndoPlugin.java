@@ -58,13 +58,13 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.UNDO)) {
+        if (getTextArea().getCommandManager().isSupported(Command.UNDO)) {
             undo = new PushButton(Images.INSTANCE.undo().createImage(), this);
             undo.setTitle(Strings.INSTANCE.undo());
             toolBarExtension.addFeature("undo", undo);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.REDO)) {
+        if (getTextArea().getCommandManager().isSupported(Command.REDO)) {
             redo = new PushButton(Images.INSTANCE.redo().createImage(), this);
             redo.setTitle(Strings.INSTANCE.redo());
             redoKey = XShortcutKeyFactory.createCtrlShortcutKey('Y');
@@ -156,14 +156,14 @@ public class UndoPlugin extends AbstractPlugin implements ClickListener, Keyboar
     public void onUndo()
     {
         if (undo.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.UNDO);
+            getTextArea().getCommandManager().execute(Command.UNDO);
         }
     }
 
     public void onRedo()
     {
         if (redo.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.REDO);
+            getTextArea().getCommandManager().execute(Command.REDO);
         }
     }
 }

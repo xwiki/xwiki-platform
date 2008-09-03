@@ -22,29 +22,27 @@ package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.google.gwt.user.client.ui.Button;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
+import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandManager;
 
 /**
  * Mock command manager to be used on unit tests.
  */
 public class MockCommandManager extends AbstractCommandManager
 {
-    private final Map<String, String> history;
+    private final Map<Command, String> history;
 
     public MockCommandManager()
     {
-        super(new Button("fakeTextArea"));
-
-        history = new HashMap<String, String>();
+        history = new HashMap<Command, String>();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#execCommandAssumingFocus(String, String)
+     * @see CommandManager#execute(Command, String)
      */
-    protected boolean execCommandAssumingFocus(String cmd, String param)
+    public boolean execute(Command cmd, String param)
     {
         history.put(cmd, param);
         return true;
@@ -53,12 +51,12 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandEnabledAssumingFocus(String)
+     * @see CommandManager#isEnabled(Command)
      */
-    protected boolean queryCommandEnabledAssumingFocus(String cmd)
+    public boolean isEnabled(Command cmd)
     {
-        if (Command.OUTDENT.toString().equals(cmd)) {
-            return history.containsKey(Command.INDENT.toString());
+        if (Command.OUTDENT.equals(cmd)) {
+            return history.containsKey(Command.INDENT);
         }
         return true;
     }
@@ -66,19 +64,9 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandIndetermAssumingFocus(String)
+     * @see CommandManager#isExecuted(Command)
      */
-    protected boolean queryCommandIndetermAssumingFocus(String cmd)
-    {
-        return !history.containsKey(cmd);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see AbstractCommandManager#queryCommandStateAssumingFocus(String)
-     */
-    protected boolean queryCommandStateAssumingFocus(String cmd)
+    public boolean isExecuted(Command cmd)
     {
         return history.containsKey(cmd);
     }
@@ -86,9 +74,9 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandSupportedAssumingFocus(String)
+     * @see CommandManager#isSupported(Command)
      */
-    protected boolean queryCommandSupportedAssumingFocus(String cmd)
+    public boolean isSupported(Command cmd)
     {
         return true;
     }
@@ -96,9 +84,9 @@ public class MockCommandManager extends AbstractCommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see AbstractCommandManager#queryCommandValueAssumingFocus(String)
+     * @see CommandManager#getStringValue(Command)
      */
-    protected String queryCommandValueAssumingFocus(String cmd)
+    public String getStringValue(Command cmd)
     {
         return history.get(cmd);
     }

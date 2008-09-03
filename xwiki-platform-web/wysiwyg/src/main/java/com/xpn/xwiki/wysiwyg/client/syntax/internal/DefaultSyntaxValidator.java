@@ -26,7 +26,6 @@ import java.util.Map;
 
 import com.xpn.xwiki.wysiwyg.client.syntax.SyntaxValidator;
 import com.xpn.xwiki.wysiwyg.client.syntax.ValidationRule;
-import com.xpn.xwiki.wysiwyg.client.syntax.rule.BackColorRule;
 import com.xpn.xwiki.wysiwyg.client.ui.XRichTextArea;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 
@@ -64,7 +63,7 @@ public abstract class DefaultSyntaxValidator implements SyntaxValidator
         addValidationRule(new DefaultValidationRule("fontname", Command.FONT_NAME));
         addValidationRule(new DefaultValidationRule("fontsize", Command.FONT_SIZE));
         addValidationRule(new DefaultValidationRule("forecolor", Command.FORE_COLOR));
-        addValidationRule(new BackColorRule());
+        addValidationRule(new DefaultValidationRule("backcolor", Command.BACK_COLOR));
     }
 
     private List<ValidationRule> getValidationRules(String feature)

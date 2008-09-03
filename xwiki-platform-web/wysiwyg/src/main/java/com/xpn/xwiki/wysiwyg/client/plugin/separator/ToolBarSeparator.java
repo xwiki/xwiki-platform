@@ -20,11 +20,9 @@
 package com.xpn.xwiki.wysiwyg.client.plugin.separator;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.xpn.xwiki.wysiwyg.client.plugin.UIExtension;
-import com.xpn.xwiki.wysiwyg.client.ui.Images;
 
 /**
  * User interface extension that provides ways of separating tool bar entries. We currently support a vertical bar
@@ -66,13 +64,9 @@ public class ToolBarSeparator extends AbstractSeparator
 
     public Widget newVerticalBar()
     {
-        Image separator = Images.INSTANCE.spacer().createImage();
+        FlowPanel separator = new FlowPanel();
         separator.addStyleName("separator");
-        separator.setHeight("");
-        separator.setWidth("");
-        FlowPanel container = new FlowPanel();
-        container.add(separator);
-        return container;
+        return separator;
     }
 
     public Widget newLineBreak()

@@ -67,7 +67,7 @@ public class FormatPlugin extends StatefulPlugin implements ChangeListener
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.FORMAT_BLOCK)) {
+        if (getTextArea().getCommandManager().isSupported(Command.FORMAT_BLOCK)) {
             levels = new ListBox(false);
             levels.addChangeListener(this);
             levels.setVisibleItemCount(1);
@@ -127,7 +127,7 @@ public class FormatPlugin extends StatefulPlugin implements ChangeListener
     {
         if (levels.isEnabled()) {
             String level = levels.getValue(levels.getSelectedIndex());
-            getTextArea().getCommandManager().execCommand(Command.FORMAT_BLOCK, level);
+            getTextArea().getCommandManager().execute(Command.FORMAT_BLOCK, level);
         }
     }
 
@@ -139,7 +139,7 @@ public class FormatPlugin extends StatefulPlugin implements ChangeListener
     public void onUpdate()
     {
         if (levels != null) {
-            String level = getTextArea().getCommandManager().queryCommandStringValue(Command.FORMAT_BLOCK);
+            String level = getTextArea().getCommandManager().getStringValue(Command.FORMAT_BLOCK);
             boolean failSafe = true;
             if (level != null) {
                 Integer index = INDEX.get(level);

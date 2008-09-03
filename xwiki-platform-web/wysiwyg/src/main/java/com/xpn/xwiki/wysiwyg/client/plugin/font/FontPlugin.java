@@ -65,7 +65,7 @@ public class FontPlugin extends StatefulPlugin implements ChangeListener
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.FONT_NAME)) {
+        if (getTextArea().getCommandManager().isSupported(Command.FONT_NAME)) {
             families = new ListBox(false);
             families.addChangeListener(this);
             families.setVisibleItemCount(1);
@@ -78,7 +78,7 @@ public class FontPlugin extends StatefulPlugin implements ChangeListener
             toolBarExtension.addFeature("fontname", families);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.FONT_SIZE)) {
+        if (getTextArea().getCommandManager().isSupported(Command.FONT_SIZE)) {
             sizes = new ListBox(false);
             sizes.addChangeListener(this);
             sizes.setVisibleItemCount(1);
@@ -150,7 +150,7 @@ public class FontPlugin extends StatefulPlugin implements ChangeListener
     {
         if (families.isEnabled()) {
             String selectedFamily = FAMILIES[families.getSelectedIndex()].getStringValue();
-            getTextArea().getCommandManager().execCommand(Command.FONT_NAME, selectedFamily);
+            getTextArea().getCommandManager().execute(Command.FONT_NAME, selectedFamily);
         }
     }
 
@@ -158,7 +158,7 @@ public class FontPlugin extends StatefulPlugin implements ChangeListener
     {
         if (sizes.isEnabled()) {
             int size = sizes.getSelectedIndex() + 1;
-            getTextArea().getCommandManager().execCommand(Command.FONT_SIZE, size);
+            getTextArea().getCommandManager().execute(Command.FONT_SIZE, size);
         }
     }
 
@@ -170,7 +170,7 @@ public class FontPlugin extends StatefulPlugin implements ChangeListener
     public void onUpdate()
     {
         if (families != null) {
-            String family = getTextArea().getCommandManager().queryCommandStringValue(Command.FONT_NAME);
+            String family = getTextArea().getCommandManager().getStringValue(Command.FONT_NAME);
             int index = indexOfFamily(family);
             if (index < 0) {
                 // We cannot detect the default font name (before font name command is executed) so we suppose
@@ -183,7 +183,7 @@ public class FontPlugin extends StatefulPlugin implements ChangeListener
         }
 
         if (sizes != null) {
-            Integer size = getTextArea().getCommandManager().queryCommandIntegerValue(Command.FONT_SIZE);
+            Integer size = getTextArea().getCommandManager().getIntegerValue(Command.FONT_SIZE);
             if (size != null && size.intValue() > 0 && size.intValue() < 8) {
                 sizes.setSelectedIndex(size.intValue() - 1);
             } else {

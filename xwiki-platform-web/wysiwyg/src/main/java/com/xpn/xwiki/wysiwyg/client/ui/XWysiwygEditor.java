@@ -149,11 +149,10 @@ public class XWysiwygEditor implements ClickListener, KeyboardListener, CommandL
 
             // Make sure the editor uses formatting tags instead of CSS.
             // This is a requirement for HTML to wiki conversion.
-            getUI().getTextArea().getCommandManager().execCommand(Command.USE_CSS, true);
-            getUI().getTextArea().getCommandManager().execCommand(Command.STYLE_WITH_CSS, false);
+            getUI().getTextArea().getCommandManager().execute(Command.STYLE_WITH_CSS, false);
 
             // Make sure pressing return generates a new paragraph.
-            getUI().getTextArea().getCommandManager().execCommand(Command.INSERT_BR_ON_RETURN, false);
+            getUI().getTextArea().getCommandManager().execute(Command.INSERT_BR_ON_RETURN, false);
         }
 
         for (String feature : toolBarFeatures) {

@@ -29,17 +29,17 @@ public interface CommandManager extends SourcesCommandEvents
      *            command.
      * @return <code>true</code> if the command is successful.
      */
-    boolean execCommand(Command cmd, String param);
+    boolean execute(Command cmd, String param);
 
     /**
-     * @see #execCommand(Command, String)
+     * @see #execute(Command, String)
      */
-    boolean execCommand(Command cmd, int param);
+    boolean execute(Command cmd, int param);
 
     /**
-     * @see #execCommand(Command, String)
+     * @see #execute(Command, String)
      */
-    boolean execCommand(Command cmd, boolean param);
+    boolean execute(Command cmd, boolean param);
 
     /**
      * Executes a command on the current document, current selection, or the given range.
@@ -47,24 +47,16 @@ public interface CommandManager extends SourcesCommandEvents
      * @param cmd The command to execute.
      * @return <code>true</code> if the command is successful.
      */
-    boolean execCommand(Command cmd);
+    boolean execute(Command cmd);
 
     /**
      * Returns a boolean value that indicates whether a specified command can be successfully executed using
-     * {@link #execCommand(Command, String)}, given the current state of the document.
+     * {@link #execute(Command, String)}, given the current state of the document.
      * 
      * @param cmd The command to test.
      * @return <code>true</code> if the command is enabled.
      */
-    boolean queryCommandEnabled(Command cmd);
-
-    /**
-     * Returns a boolean value that indicates whether the specified command is in the indeterminate state.
-     * 
-     * @param cmd The command to test
-     * @return <code>true</code> if the command is in the indeterminate state.
-     */
-    boolean queryCommandIndeterm(Command cmd);
+    boolean isEnabled(Command cmd);
 
     /**
      * Returns a boolean value that indicates the current state of the command.
@@ -72,7 +64,7 @@ public interface CommandManager extends SourcesCommandEvents
      * @param cmd The command to test.
      * @return <code>true</code> if the given command has been executed on the object.
      */
-    boolean queryCommandState(Command cmd);
+    boolean isExecuted(Command cmd);
 
     /**
      * Returns a boolean value that indicates whether the current command is supported on the current range.
@@ -80,7 +72,7 @@ public interface CommandManager extends SourcesCommandEvents
      * @param cmd The command to test
      * @return <code>true</code> if the command is supported.
      */
-    boolean queryCommandSupported(Command cmd);
+    boolean isSupported(Command cmd);
 
     /**
      * Returns the current value of the document, range, or current selection for the given command.
@@ -89,15 +81,15 @@ public interface CommandManager extends SourcesCommandEvents
      * @return the command value for the document, range, or current selection, if supported. Possible values depend on
      *         the given command.
      */
-    String queryCommandStringValue(Command cmd);
+    String getStringValue(Command cmd);
 
     /**
-     * @see #queryCommandStringValue(Command)
+     * @see #getStringValue(Command)
      */
-    Integer queryCommandIntegerValue(Command cmd);
+    Integer getIntegerValue(Command cmd);
 
     /**
-     * @see #queryCommandStringValue(Command)
+     * @see #getStringValue(Command)
      */
-    Boolean queryCommandBooleanValue(Command cmd);
+    Boolean getBooleanValue(Command cmd);
 }

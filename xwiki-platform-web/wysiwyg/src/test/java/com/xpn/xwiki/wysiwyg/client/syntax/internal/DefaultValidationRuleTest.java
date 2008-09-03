@@ -38,8 +38,8 @@ public class DefaultValidationRuleTest extends WysiwygClientTest
 
         assertFalse(outdentRule.areValid(textArea));
 
-        textArea.getCommandManager().execCommand(Command.INDENT);
-        assertTrue(textArea.getCommandManager().queryCommandState(Command.INDENT));
+        textArea.getCommandManager().execute(Command.INDENT);
+        assertTrue(textArea.getCommandManager().isExecuted(Command.INDENT));
         assertTrue(outdentRule.areValid(textArea));
     }
 }

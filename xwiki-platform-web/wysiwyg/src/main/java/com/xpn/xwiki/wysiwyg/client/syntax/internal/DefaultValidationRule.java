@@ -46,7 +46,7 @@ public class DefaultValidationRule implements ValidationRule
      */
     public boolean areValid(XRichTextArea textArea)
     {
-        return textArea.getCommandManager().queryCommandEnabled(command);
+        return textArea.getCommandManager().isEnabled(command);
     }
 
     /**

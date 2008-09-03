@@ -53,13 +53,13 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.INDENT)) {
+        if (getTextArea().getCommandManager().isSupported(Command.INDENT)) {
             indent = new PushButton(Images.INSTANCE.indent().createImage(), this);
             indent.setTitle(Strings.INSTANCE.indent());
             toolBarExtension.addFeature("indent", indent);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.OUTDENT)) {
+        if (getTextArea().getCommandManager().isSupported(Command.OUTDENT)) {
             outdent = new PushButton(Images.INSTANCE.outdent().createImage(), this);
             outdent.setTitle(Strings.INSTANCE.outdent());
             toolBarExtension.addFeature("outdent", outdent);
@@ -111,14 +111,14 @@ public class IndentPlugin extends AbstractPlugin implements ClickListener
     public void onIndent()
     {
         if (indent.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.INDENT);
+            getTextArea().getCommandManager().execute(Command.INDENT);
         }
     }
 
     public void onOutdent()
     {
         if (outdent.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.OUTDENT);
+            getTextArea().getCommandManager().execute(Command.OUTDENT);
         }
     }
 }

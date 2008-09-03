@@ -59,25 +59,25 @@ public class JustifyPlugin extends StatefulPlugin
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.JUSTIFY_LEFT)) {
+        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_LEFT)) {
             left = new ToggleButton(Images.INSTANCE.justifyLeft().createImage(), this);
             left.setTitle(Strings.INSTANCE.justifyLeft());
             toolBarExtension.addFeature("justifyleft", left);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.JUSTIFY_CENTER)) {
+        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_CENTER)) {
             center = new ToggleButton(Images.INSTANCE.justifyCenter().createImage(), this);
             center.setTitle(Strings.INSTANCE.justifyCenter());
             toolBarExtension.addFeature("justifycenter", center);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.JUSTIFY_RIGHT)) {
+        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_RIGHT)) {
             right = new ToggleButton(Images.INSTANCE.justifyRight().createImage(), this);
             right.setTitle(Strings.INSTANCE.justifyRight());
             toolBarExtension.addFeature("justifyright", right);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.JUSTIFY_FULL)) {
+        if (getTextArea().getCommandManager().isSupported(Command.JUSTIFY_FULL)) {
             full = new ToggleButton(Images.INSTANCE.justifyFull().createImage(), this);
             full.setTitle(Strings.INSTANCE.justifyFull());
             toolBarExtension.addFeature("justifyfull", full);
@@ -155,28 +155,28 @@ public class JustifyPlugin extends StatefulPlugin
     public void onJustifyLeft()
     {
         if (left.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.JUSTIFY_LEFT);
+            getTextArea().getCommandManager().execute(Command.JUSTIFY_LEFT);
         }
     }
 
     public void onJustifyCenter()
     {
         if (center.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.JUSTIFY_CENTER);
+            getTextArea().getCommandManager().execute(Command.JUSTIFY_CENTER);
         }
     }
 
     public void onJustifyRight()
     {
         if (right.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.JUSTIFY_RIGHT);
+            getTextArea().getCommandManager().execute(Command.JUSTIFY_RIGHT);
         }
     }
 
     public void onJustifyFull()
     {
         if (full.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.JUSTIFY_FULL);
+            getTextArea().getCommandManager().execute(Command.JUSTIFY_FULL);
         }
     }
 
@@ -188,16 +188,16 @@ public class JustifyPlugin extends StatefulPlugin
     public void onUpdate()
     {
         if (left != null) {
-            left.setDown(getTextArea().getCommandManager().queryCommandState(Command.JUSTIFY_LEFT));
+            left.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_LEFT));
         }
         if (center != null) {
-            center.setDown(getTextArea().getCommandManager().queryCommandState(Command.JUSTIFY_CENTER));
+            center.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_CENTER));
         }
         if (right != null) {
-            right.setDown(getTextArea().getCommandManager().queryCommandState(Command.JUSTIFY_RIGHT));
+            right.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_RIGHT));
         }
         if (full != null) {
-            full.setDown(getTextArea().getCommandManager().queryCommandState(Command.JUSTIFY_FULL));
+            full.setDown(getTextArea().getCommandManager().isExecuted(Command.JUSTIFY_FULL));
         }
     }
 }

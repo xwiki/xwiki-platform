@@ -32,8 +32,8 @@ public class DisableIndentOutsideList implements ValidationRule
      */
     public boolean areValid(XRichTextArea textArea)
     {
-        return textArea.getCommandManager().queryCommandState(Command.INSERT_UNORDERED_LIST)
-            || textArea.getCommandManager().queryCommandState(Command.INSERT_ORDERED_LIST);
+        return textArea.getCommandManager().isExecuted(Command.INSERT_UNORDERED_LIST)
+            || textArea.getCommandManager().isExecuted(Command.INSERT_ORDERED_LIST);
     }
 
     /**

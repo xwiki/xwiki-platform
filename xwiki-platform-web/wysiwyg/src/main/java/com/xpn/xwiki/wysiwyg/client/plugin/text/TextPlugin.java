@@ -71,7 +71,7 @@ public class TextPlugin extends StatefulPlugin
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.BOLD)) {
+        if (getTextArea().getCommandManager().isSupported(Command.BOLD)) {
             bold = new ToggleButton(Images.INSTANCE.bold().createImage(), this);
             bold.setTitle(Strings.INSTANCE.bold());
             boldKey = XShortcutKeyFactory.createCtrlShortcutKey('B');
@@ -79,7 +79,7 @@ public class TextPlugin extends StatefulPlugin
             toolBarExtension.addFeature("bold", bold);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.ITALIC)) {
+        if (getTextArea().getCommandManager().isSupported(Command.ITALIC)) {
             italic = new ToggleButton(Images.INSTANCE.italic().createImage(), this);
             italic.setTitle(Strings.INSTANCE.italic());
             italicKey = XShortcutKeyFactory.createCtrlShortcutKey('I');
@@ -87,7 +87,7 @@ public class TextPlugin extends StatefulPlugin
             toolBarExtension.addFeature("italic", italic);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.UNDERLINE)) {
+        if (getTextArea().getCommandManager().isSupported(Command.UNDERLINE)) {
             underline = new ToggleButton(Images.INSTANCE.underline().createImage(), this);
             underline.setTitle(Strings.INSTANCE.underline());
             underlineKey = XShortcutKeyFactory.createCtrlShortcutKey('U');
@@ -95,7 +95,7 @@ public class TextPlugin extends StatefulPlugin
             toolBarExtension.addFeature("underline", underline);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.STRIKE_THROUGH)) {
+        if (getTextArea().getCommandManager().isSupported(Command.STRIKE_THROUGH)) {
             strikeThrough = new ToggleButton(Images.INSTANCE.strikeThrough().createImage(), this);
             strikeThrough.setTitle(Strings.INSTANCE.strikeThrough());
             toolBarExtension.addFeature("strikethrough", strikeThrough);
@@ -197,28 +197,28 @@ public class TextPlugin extends StatefulPlugin
     public void onBold()
     {
         if (bold.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.BOLD);
+            getTextArea().getCommandManager().execute(Command.BOLD);
         }
     }
 
     public void onItalic()
     {
         if (italic.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.ITALIC);
+            getTextArea().getCommandManager().execute(Command.ITALIC);
         }
     }
 
     public void onUnderline()
     {
         if (underline.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.UNDERLINE);
+            getTextArea().getCommandManager().execute(Command.UNDERLINE);
         }
     }
 
     public void onStrikeThrough()
     {
         if (strikeThrough.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.STRIKE_THROUGH);
+            getTextArea().getCommandManager().execute(Command.STRIKE_THROUGH);
         }
     }
 
@@ -230,16 +230,16 @@ public class TextPlugin extends StatefulPlugin
     public void onUpdate()
     {
         if (bold != null) {
-            bold.setDown(getTextArea().getCommandManager().queryCommandState(Command.BOLD));
+            bold.setDown(getTextArea().getCommandManager().isExecuted(Command.BOLD));
         }
         if (italic != null) {
-            italic.setDown(getTextArea().getCommandManager().queryCommandState(Command.ITALIC));
+            italic.setDown(getTextArea().getCommandManager().isExecuted(Command.ITALIC));
         }
         if (underline != null) {
-            underline.setDown(getTextArea().getCommandManager().queryCommandState(Command.UNDERLINE));
+            underline.setDown(getTextArea().getCommandManager().isExecuted(Command.UNDERLINE));
         }
         if (strikeThrough != null) {
-            strikeThrough.setDown(getTextArea().getCommandManager().queryCommandState(Command.STRIKE_THROUGH));
+            strikeThrough.setDown(getTextArea().getCommandManager().isExecuted(Command.STRIKE_THROUGH));
         }
     }
 }

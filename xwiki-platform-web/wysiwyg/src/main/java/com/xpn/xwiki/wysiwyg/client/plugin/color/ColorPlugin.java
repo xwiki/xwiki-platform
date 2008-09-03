@@ -44,8 +44,6 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
 
     private ColorPicker backColorPicker;
 
-    private Command backColorCmd;
-
     private PushButton foreColor;
 
     private ColorPicker foreColorPicker;
@@ -61,7 +59,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.FORE_COLOR)) {
+        if (getTextArea().getCommandManager().isSupported(Command.FORE_COLOR)) {
             foreColor = new PushButton(Images.INSTANCE.foreColor().createImage(), this);
             foreColor.setTitle(Strings.INSTANCE.foreColor());
             toolBarExtension.addFeature("forecolor", foreColor);
@@ -70,15 +68,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
             foreColorPicker.addPopupListener(this);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.HILITE_COLOR)) {
-            backColorCmd = Command.HILITE_COLOR;
-        } else if (getTextArea().getCommandManager().queryCommandSupported(Command.BACK_COLOR)) {
-            backColorCmd = Command.BACK_COLOR;
-        } else {
-            backColorCmd = null;
-        }
-
-        if (backColorCmd != null) {
+        if (getTextArea().getCommandManager().isSupported(Command.BACK_COLOR)) {
             backColor = new PushButton(Images.INSTANCE.backColor().createImage(), this);
             backColor.setTitle(Strings.INSTANCE.backColor());
             toolBarExtension.addFeature("backcolor", backColor);
@@ -164,7 +154,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     public void onForeColor(boolean show)
     {
         if (show) {
-            String color = getTextArea().getCommandManager().queryCommandStringValue(Command.FORE_COLOR);
+            String color = getTextArea().getCommandManager().getStringValue(Command.FORE_COLOR);
             foreColorPicker.setColor(color);
 
             int left = foreColor.getAbsoluteLeft();
@@ -175,7 +165,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
         } else {
             String color = foreColorPicker.getColor();
             if (color != null) {
-                getTextArea().getCommandManager().execCommand(Command.FORE_COLOR, color);
+                getTextArea().getCommandManager().execute(Command.FORE_COLOR, color);
             }
         }
     }
@@ -183,7 +173,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
     public void onBackColor(boolean show)
     {
         if (show) {
-            String color = getTextArea().getCommandManager().queryCommandStringValue(backColorCmd);
+            String color = getTextArea().getCommandManager().getStringValue(Command.BACK_COLOR);
             backColorPicker.setColor(color);
 
             int left = backColor.getAbsoluteLeft();
@@ -194,7 +184,7 @@ public class ColorPlugin extends AbstractPlugin implements ClickListener, PopupL
         } else {
             String color = backColorPicker.getColor();
             if (color != null) {
-                getTextArea().getCommandManager().execCommand(backColorCmd, color);
+                getTextArea().getCommandManager().execute(Command.BACK_COLOR, color);
             }
         }
     }

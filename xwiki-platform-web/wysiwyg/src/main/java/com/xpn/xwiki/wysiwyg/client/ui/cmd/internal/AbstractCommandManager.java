@@ -19,8 +19,6 @@
  */
 package com.xpn.xwiki.wysiwyg.client.ui.cmd.internal;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.FocusWidget;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.Command;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListener;
 import com.xpn.xwiki.wysiwyg.client.ui.cmd.CommandListenerCollection;
@@ -29,139 +27,51 @@ import com.xpn.xwiki.wysiwyg.client.ui.cmd.SourcesCommandEvents;
 
 public abstract class AbstractCommandManager implements CommandManager
 {
-    protected FocusWidget widget;
+    protected final CommandListenerCollection commandListeners;
 
-    protected ParamFilter filter;
-
-    private final CommandListenerCollection commandListeners;
-
-    public AbstractCommandManager(FocusWidget widget)
+    public AbstractCommandManager()
     {
-        this.widget = widget;
-        filter = (ParamFilter) GWT.create(ParamFilter.class);
         commandListeners = new CommandListenerCollection();
     }
 
-    protected abstract boolean execCommandAssumingFocus(String cmd, String param);
-
-    protected abstract boolean queryCommandEnabledAssumingFocus(String cmd);
-
-    protected abstract boolean queryCommandIndetermAssumingFocus(String cmd);
-
-    protected abstract boolean queryCommandStateAssumingFocus(String cmd);
-
-    protected abstract boolean queryCommandSupportedAssumingFocus(String cmd);
-
-    protected abstract String queryCommandValueAssumingFocus(String cmd);
-
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#execCommand(Command, String)
+     * @see CommandManager#execute(Command, int)
      */
-    public boolean execCommand(Command cmd, String param)
+    public boolean execute(Command cmd, int param)
     {
-        widget.setFocus(true);
-        boolean success = execCommandAssumingFocus(cmd.toString(), filter.encode(cmd, param));
-        if (success) {
-            commandListeners.fireCommand(this, cmd, param);
-        }
-        return success;
+        return execute(cmd, String.valueOf(param));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#execCommand(Command, int)
+     * @see CommandManager#execute(Command, boolean)
      */
-    public boolean execCommand(Command cmd, int param)
+    public boolean execute(Command cmd, boolean param)
     {
-        return execCommand(cmd, String.valueOf(param));
+        return execute(cmd, String.valueOf(param));
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#execCommand(Command, boolean)
+     * @see CommandManager#execute(Command)
      */
-    public boolean execCommand(Command cmd, boolean param)
+    public boolean execute(Command cmd)
     {
-        return execCommand(cmd, String.valueOf(param));
+        return execute(cmd, null);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#execCommand(Command)
+     * @see CommandManager#getIntegerValue(Command)
      */
-    public boolean execCommand(Command cmd)
+    public Integer getIntegerValue(Command cmd)
     {
-        return execCommand(cmd, null);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#queryCommandEnabled(Command)
-     */
-    public boolean queryCommandEnabled(Command cmd)
-    {
-        widget.setFocus(true);
-        return queryCommandEnabledAssumingFocus(cmd.toString());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#queryCommandIndeterm(Command)
-     */
-    public boolean queryCommandIndeterm(Command cmd)
-    {
-        widget.setFocus(true);
-        return queryCommandIndetermAssumingFocus(cmd.toString());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#queryCommandState(Command)
-     */
-    public boolean queryCommandState(Command cmd)
-    {
-        widget.setFocus(true);
-        return queryCommandStateAssumingFocus(cmd.toString());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#queryCommandSupported(Command)
-     */
-    public boolean queryCommandSupported(Command cmd)
-    {
-        widget.setFocus(true);
-        return queryCommandSupportedAssumingFocus(cmd.toString());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#queryCommandValue(Command)
-     */
-    public String queryCommandStringValue(Command cmd)
-    {
-        widget.setFocus(true);
-        return filter.decode(cmd, queryCommandValueAssumingFocus(cmd.toString()));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see CommandManager#queryCommandIntValue(Command)
-     */
-    public Integer queryCommandIntegerValue(Command cmd)
-    {
-        String sValue = queryCommandStringValue(cmd);
+        String sValue = getStringValue(cmd);
         if (sValue != null) {
             try {
                 return Integer.valueOf(sValue);
@@ -175,11 +85,11 @@ public abstract class AbstractCommandManager implements CommandManager
     /**
      * {@inheritDoc}
      * 
-     * @see CommandManager#queryCommandBooleanValue(Command)
+     * @see CommandManager#getBooleanValue(Command)
      */
-    public Boolean queryCommandBooleanValue(Command cmd)
+    public Boolean getBooleanValue(Command cmd)
     {
-        String sValue = queryCommandStringValue(cmd);
+        String sValue = getStringValue(cmd);
         if (sValue != null) {
             return Boolean.valueOf(sValue);
         } else {

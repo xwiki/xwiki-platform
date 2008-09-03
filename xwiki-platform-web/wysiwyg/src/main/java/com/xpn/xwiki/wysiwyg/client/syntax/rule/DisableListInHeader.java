@@ -32,11 +32,11 @@ public class DisableListInHeader implements ValidationRule
      */
     public boolean areValid(XRichTextArea textArea)
     {
-        String level = textArea.getCommandManager().queryCommandStringValue(Command.FORMAT_BLOCK);
+        String level = textArea.getCommandManager().getStringValue(Command.FORMAT_BLOCK);
         if (level != null && level.startsWith("h")) {
             return false;
         }
-        return !textArea.getCommandManager().queryCommandState(Command.HEADING);
+        return true;
     }
 
     /**

@@ -34,41 +34,6 @@ public class Command
     public static final Command BOLD = new Command("bold");
 
     /**
-     * This command will make the editor readonly (true) or editable (false). Anticipated usage is for temporarily
-     * disabling input while something else is occurring elsewhere in the web page.
-     */
-    public static final Command CONTENT_READ_ONLY = new Command("contentReadOnly");
-
-    /**
-     * If there is a selection, this command will copy the selection to the clipboard. If there isn't a selection,
-     * nothing will happen.
-     */
-    public static final Command COPY = new Command("copy");
-
-    /**
-     * This command will not do anything if no selection is made. If there is a selection, a link will be inserted
-     * around the selection with the url parameter as the href of the link.
-     */
-    public static final Command CREATE_LINK = new Command("createlink");
-
-    /**
-     * If there is a selection, this command will copy the selection to the clipboard and remove the selection from the
-     * edit control. If there isn't a selection, nothing will happen.
-     */
-    public static final Command CUT = new Command("cut");
-
-    /**
-     * This command will add a <code>&lt;small&gt;</code> tag around selection or at insertion point.
-     */
-    public static final Command DECREASE_FONT_SIZE = new Command("decreasefontsize");
-
-    /**
-     * This command will delete all text and objects that are selected. If no text is selected it deletes one character
-     * to the right. This is similar to the Delete button on the keyboard.
-     */
-    public static final Command DELETE = new Command("delete");
-
-    /**
      * This command will set the font face for a selection or at the insertion point if there is no selection.<br/>The
      * given string is such as would be used in the "name" attribute of the font tag.
      */
@@ -91,22 +56,6 @@ public class Command
      * (Internet Explorer supports only heading tags H1 - H6, ADDRESS, and PRE.)
      */
     public static final Command FORMAT_BLOCK = new Command("formatblock");
-
-    /**
-     * Selected block will be formatted as the given type of heading.
-     */
-    public static final Command HEADING = new Command("heading");
-
-    /**
-     * This command will set the hilite color of the selection or at the insertion point. It only works with
-     * styleWithCSS enabled.
-     */
-    public static final Command HILITE_COLOR = new Command("hilitecolor");
-
-    /**
-     * This command will add a <code>&lt;big&gt;</code> tag around selection or at insertion point.
-     */
-    public static final Command INCREASE_FONT_SIZE = new Command("increasefontsize");
 
     /**
      * Indent the block where the caret is located. If the caret is inside a list, that item becomes a sub-item one
@@ -188,12 +137,6 @@ public class Command
     public static final Command OUTDENT = new Command("outdent");
 
     /**
-     * This command will paste the contents of the clipboard at the location of the caret. If there is a selection, it
-     * will be deleted prior to the insertion of the clipboard's contents.
-     */
-    public static final Command PASTE = new Command("paste");
-
-    /**
      * This command will redo the previous undo action. If undo was not the most recent action, this command will have
      * no effect.
      */
@@ -203,11 +146,6 @@ public class Command
      * Removes inline formatting from the current selection.
      */
     public static final Command REMOVE_FORMAT = new Command("removeformat");
-
-    /**
-     * This command will select all of the contents within the editable area.
-     */
-    public static final Command SELECT_ALL = new Command("selectall");
 
     /**
      * If there is no selection, the insertion point will set strikethrough for subsequently typed characters.<br/>If
@@ -250,17 +188,6 @@ public class Command
      */
     public static final Command UNDO = new Command("undo");
 
-    /**
-     * If the insertion point is within a link or if the current selection contains a link, the link will be removed and
-     * the text will remain.
-     */
-    public static final Command UNLINK = new Command("unlink");
-
-    /**
-     * @see #STYLE_WITH_CSS
-     */
-    public static final Command USE_CSS = new Command("useCSS");
-
     protected String name;
 
     public Command(String name)
@@ -276,5 +203,39 @@ public class Command
     public String toString()
     {
         return name;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#hashCode()
+     */
+    public int hashCode()
+    {
+        return name == null ? super.hashCode() : name.hashCode();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see Object#equals(Object)
+     */
+    public boolean equals(Object obj)
+    {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || !(obj instanceof Command)) {
+            return false;
+        }
+        final Command other = (Command) obj;
+        if (name == null) {
+            if (other.name != null) {
+                return false;
+            }
+        } else if (!name.equals(other.name)) {
+            return false;
+        }
+        return true;
     }
 }

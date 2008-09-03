@@ -57,13 +57,13 @@ public class VerticalAlignPlugin extends StatefulPlugin
     {
         super.init(wysiwyg, textArea, config);
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.SUPER_SCRIPT)) {
+        if (getTextArea().getCommandManager().isSupported(Command.SUPER_SCRIPT)) {
             superScript = new ToggleButton(Images.INSTANCE.superscript().createImage(), this);
             superScript.setTitle(Strings.INSTANCE.superscript());
             toolBarExtension.addFeature("superscript", superScript);
         }
 
-        if (getTextArea().getCommandManager().queryCommandSupported(Command.SUB_SCRIPT)) {
+        if (getTextArea().getCommandManager().isSupported(Command.SUB_SCRIPT)) {
             subScript = new ToggleButton(Images.INSTANCE.subscript().createImage(), this);
             subScript.setTitle(Strings.INSTANCE.subscript());
             toolBarExtension.addFeature("subscript", subScript);
@@ -125,14 +125,14 @@ public class VerticalAlignPlugin extends StatefulPlugin
     public void onSuperScript()
     {
         if (superScript.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.SUPER_SCRIPT);
+            getTextArea().getCommandManager().execute(Command.SUPER_SCRIPT);
         }
     }
 
     public void onSubScript()
     {
         if (subScript.isEnabled()) {
-            getTextArea().getCommandManager().execCommand(Command.SUB_SCRIPT);
+            getTextArea().getCommandManager().execute(Command.SUB_SCRIPT);
         }
     }
 
@@ -144,10 +144,10 @@ public class VerticalAlignPlugin extends StatefulPlugin
     public void onUpdate()
     {
         if (superScript != null) {
-            superScript.setDown(getTextArea().getCommandManager().queryCommandState(Command.SUPER_SCRIPT));
+            superScript.setDown(getTextArea().getCommandManager().isExecuted(Command.SUPER_SCRIPT));
         }
         if (subScript != null) {
-            subScript.setDown(getTextArea().getCommandManager().queryCommandState(Command.SUB_SCRIPT));
+            subScript.setDown(getTextArea().getCommandManager().isExecuted(Command.SUB_SCRIPT));
         }
     }
 }

@@ -591,6 +591,11 @@
       <artifactId>xwiki-core-xml</artifactId>
       <version>${pom.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.xwiki.platform</groupId>
+      <artifactId>xwiki-core-query-manager</artifactId>
+      <version>${pom.version}</version>
+    </dependency>
 
     <!-- Build tools -->
     <!-- Needed for backward compatibility Aspects -->
@@ -689,7 +694,6 @@
               **/*AttachmentVersioningStore.java,
               **/api/StatsService.java,
               **/stats/**/*.java,
-              **/store/query/*.java,
               **/store/hibernate/query/*.java
           </includes>
           <excludes>
@@ -755,4 +759,3 @@
     </profile>
   </profiles>
 </project>
-

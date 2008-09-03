@@ -138,7 +138,6 @@ import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiRecycleBinStoreInterface;
 import com.xpn.xwiki.store.XWikiStoreInterface;
 import com.xpn.xwiki.store.XWikiVersioningStoreInterface;
-import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.store.migration.AbstractXWikiMigrationManager;
 import com.xpn.xwiki.user.api.XWikiAuthService;
 import com.xpn.xwiki.user.api.XWikiGroupService;
@@ -160,6 +159,7 @@ import com.xpn.xwiki.web.XWikiURLFactory;
 import com.xpn.xwiki.web.XWikiURLFactoryService;
 import com.xpn.xwiki.web.XWikiURLFactoryServiceImpl;
 import com.xpn.xwiki.web.includeservletasstring.IncludeServletAsString;
+import org.xwiki.query.QueryException;
 
 public class XWiki implements XWikiDocChangeNotificationInterface
 {
@@ -5318,12 +5318,20 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public List<String> getSpaces(XWikiContext context) throws XWikiException
     {
-        return getStore().getQueryManager().getNamedQuery("getSpaces").execute();
+        try {
+            return getStore().getQueryManager().getNamedQuery("getSpaces").execute();
+        } catch (QueryException ex) {
+            throw new XWikiException(0, 0, ex.getMessage(), ex);
+        }
     }
 
     public List<String> getSpaceDocsName(String spaceName, XWikiContext context) throws XWikiException
     {
-        return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).execute();
+        try {
+            return getStore().getQueryManager().getNamedQuery("getSpaceDocsName").bindValue("space", spaceName).execute();
+        } catch (QueryException ex) {
+            throw new XWikiException(0, 0, ex.getMessage(), ex);
+        }
     }
 
     public List<String> getIncludedMacros(String defaultweb, String content, XWikiContext context)
@@ -5402,11 +5410,15 @@ public class XWiki implements XWikiDocChangeNotificationInterface
 
     public void refreshLinks(XWikiContext context) throws XWikiException
     {
-        // refreshes all Links of each doc of the wiki
-        List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments").execute();
-        for (int i = 0; i < docs.size(); i++) {
-            XWikiDocument myDoc = this.getDocument(docs.get(i), context);
-            myDoc.getStore().saveLinks(myDoc, context, true);
+        try {
+            // refreshes all Links of each doc of the wiki
+            List<String> docs = getStore().getQueryManager().getNamedQuery("getAllDocuments").execute();
+            for (int i = 0; i < docs.size(); i++) {
+                XWikiDocument myDoc = this.getDocument(docs.get(i), context);
+                myDoc.getStore().saveLinks(myDoc, context, true);
+            }
+        } catch (QueryException ex) {
+            throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
     }
 

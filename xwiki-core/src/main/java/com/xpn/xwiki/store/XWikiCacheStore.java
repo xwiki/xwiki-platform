@@ -36,7 +36,7 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.doc.XWikiDocument;
 import com.xpn.xwiki.doc.XWikiLock;
 import com.xpn.xwiki.objects.classes.BaseClass;
-import com.xpn.xwiki.store.query.QueryManager;
+import org.xwiki.query.QueryManager;
 
 /**
  * A proxy store implementation that caches Documents when they are first fetched and subsequently return them from a

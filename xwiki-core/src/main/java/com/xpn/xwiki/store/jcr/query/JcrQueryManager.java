@@ -39,10 +39,10 @@ import com.xpn.xwiki.store.jcr.JcrUtil;
 import com.xpn.xwiki.store.jcr.XWikiJcrSession;
 import com.xpn.xwiki.store.jcr.XWikiJcrStore;
 import com.xpn.xwiki.store.jcr.XWikiJcrBaseStore.JcrCallBack;
-import com.xpn.xwiki.store.query.AbstractQueryManager;
-import com.xpn.xwiki.store.query.Query;
-import com.xpn.xwiki.store.query.QueryException;
-import com.xpn.xwiki.store.query.QueryExecutor;
+import org.xwiki.query.AbstractQueryManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutor;
 
 /**
  * QueryManager implementation for Java Content Repository v1.0.

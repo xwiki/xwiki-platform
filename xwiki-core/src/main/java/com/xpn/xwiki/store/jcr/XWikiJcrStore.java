@@ -84,7 +84,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
     /**
      * QueryManager for this store. Injected via component manager.
      */
-    com.xpn.xwiki.store.query.QueryManager queryManager;
+    org.xwiki.query.QueryManager queryManager;
 
     public XWikiJcrStore(XWiki xwiki, XWikiContext context) throws SecurityException, IllegalArgumentException,
         NoSuchMethodException, ClassNotFoundException, InstantiationException, IllegalAccessException,
@@ -1024,7 +1024,7 @@ public class XWikiJcrStore extends XWikiJcrBaseStore implements XWikiStoreInterf
     /**
      * {@inheritDoc}
      */
-    public com.xpn.xwiki.store.query.QueryManager getQueryManager()
+    public org.xwiki.query.QueryManager getQueryManager()
     {
         return queryManager;
     }

@@ -40,7 +40,7 @@
       <implementation>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</implementation>
     </component>
     <component>
-      <role>com.xpn.xwiki.store.query.QueryManager</role>
+      <role>org.xwiki.query.QueryManager</role>
       <implementation>com.xpn.xwiki.store.hibernate.query.HibernateQueryManager</implementation>
       <requirements>
         <requirement>
@@ -59,7 +59,7 @@
           <role>com.xpn.xwiki.store.hibernate.HibernateSessionFactory</role>
         </requirement>
         <requirement>
-          <role>com.xpn.xwiki.store.query.QueryManager</role>
+          <role>org.xwiki.query.QueryManager</role>
         </requirement>
       </requirements>
     </component>

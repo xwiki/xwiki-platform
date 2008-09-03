@@ -84,7 +84,7 @@ import com.xpn.xwiki.objects.classes.StringClass;
 import com.xpn.xwiki.objects.classes.TextAreaClass;
 import com.xpn.xwiki.render.XWikiRenderer;
 import com.xpn.xwiki.stats.impl.XWikiStats;
-import com.xpn.xwiki.store.query.QueryManager;
+import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.Utils;
 

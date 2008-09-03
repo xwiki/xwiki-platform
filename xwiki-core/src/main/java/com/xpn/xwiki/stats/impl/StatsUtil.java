@@ -39,8 +39,8 @@ import org.apache.commons.logging.LogFactory;
 
 import com.xpn.xwiki.XWikiContext;
 import com.xpn.xwiki.XWikiException;
-import com.xpn.xwiki.store.query.Query;
-import com.xpn.xwiki.store.query.QueryManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.util.Util;
 import com.xpn.xwiki.web.XWikiRequest;
 

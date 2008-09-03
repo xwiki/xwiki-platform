@@ -46,8 +46,9 @@ import com.xpn.xwiki.notify.XWikiNotificationRule;
 import com.xpn.xwiki.objects.BaseObject;
 import com.xpn.xwiki.objects.classes.ListClass;
 import com.xpn.xwiki.store.XWikiStoreInterface;
-import com.xpn.xwiki.store.query.Query;
-import com.xpn.xwiki.store.query.QueryManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryManager;
 import com.xpn.xwiki.user.api.XWikiGroupService;
 import com.xpn.xwiki.util.Util;
 
@@ -170,10 +171,14 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
                 list = this.groupCache.get(key);
 
                 if (list == null) {
-                    list =
-                        context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser").bindValue(
-                            "username", username).bindValue("shortname", shortname).bindValue("veryshortname",
-                            veryshortname).execute();
+                    try {
+                        list =
+                            context.getWiki().getStore().getQueryManager().getNamedQuery("listGroupsForUser").bindValue(
+                                "username", username).bindValue("shortname", shortname).bindValue("veryshortname",
+                                veryshortname).execute();
+                    } catch (QueryException ex) {
+                        throw new XWikiException(0, 0, ex.getMessage(), ex);
+                    }
                     this.groupCache.set(key, list);
                 }
             }
@@ -326,7 +331,11 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
 
         try {
             if (group == null) {
-                return context.getWiki().getStore().getQueryManager().getNamedQuery("getAllUsers").execute();
+                try {
+                    return context.getWiki().getStore().getQueryManager().getNamedQuery("getAllUsers").execute();
+                } catch (QueryException ex) {
+                    throw new XWikiException(0, 0, ex.getMessage(), ex);
+                }
             } else {
                 String gshortname = Util.getName(group, context);
                 XWikiDocument docgroup = context.getWiki().getDocument(gshortname, context);
@@ -564,15 +573,18 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
             }
         } else if (context.getWiki().getStore().getQueryManager().hasLanguage(Query.XPATH)) {
             // TODO : fully implement this methods for XPATH platform
-
             if ((matchFields != null && matchFields.length > 0) || withdetails) {
                 throw new NotImplementedException();
             }
 
-            groups =
-                context.getWiki().getStore().getQueryManager().createQuery(
-                    "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS) + "]/@fullName",
-                    Query.XPATH).setLimit(nb).setOffset(start).execute();
+            try {
+                groups =
+                    context.getWiki().getStore().getQueryManager().createQuery(
+                        "/*/*[obj/XWiki/" + (user ? CLASS_SUFFIX_XWIKIUSERS : CLASS_SUFFIX_XWIKIGROUPS) + "]/@fullName",
+                        Query.XPATH).setLimit(nb).setOffset(start).execute();
+            } catch (QueryException ex) {
+                throw new XWikiException(0, 0, ex.getMessage(), ex);
+            }
         }
 
         return groups;
@@ -724,39 +736,38 @@ public class XWikiGroupServiceImpl implements XWikiGroupService, XWikiDocChangeN
         Boolean orderAsc, XWikiContext context) throws XWikiException
     {
         // TODO: add cache mechanism.
-
         XWikiDocument groupDocument = new XWikiDocument();
         groupDocument.setFullName(group);
-
         Map<String, Object> parameterValues = new HashMap<String, Object>();
-
         // //////////////////////////////////////
         // Create the query string
-
         StringBuffer queryString = new StringBuffer("SELECT field.value");
 
         queryString.append(' ').append(
             createMatchGroupMembersWhereClause(groupDocument.getFullName(), matchField, orderAsc, parameterValues));
 
-        // //////////////////////////////////////
-        // Create the query
+        try {
+            // //////////////////////////////////////
+            // Create the query
+            QueryManager qm = context.getWiki().getStore().getQueryManager();
 
-        QueryManager qm = context.getWiki().getStore().getQueryManager();
+            Query query = qm.createQuery(queryString.toString(), Query.HQL);
 
-        Query query = qm.createQuery(queryString.toString(), Query.HQL);
+            for (Map.Entry<String, Object> entry : parameterValues.entrySet()) {
+                query.bindValue(entry.getKey(), entry.getValue());
+            }
 
-        for (Map.Entry<String, Object> entry : parameterValues.entrySet()) {
-            query.bindValue(entry.getKey(), entry.getValue());
+            query.setOffset(start);
+            query.setLimit(nb);
+
+            if (groupDocument.getDatabase() != null) {
+                query.setWiki(groupDocument.getDatabase());
+            }
+
+            return query.execute();
+        } catch (QueryException ex) {
+            throw new XWikiException(0, 0, ex.getMessage(), ex);
         }
-
-        query.setOffset(start);
-        query.setLimit(nb);
-
-        if (groupDocument.getDatabase() != null) {
-            query.setWiki(groupDocument.getDatabase());
-        }
-
-        return query.execute();
     }
 
     /**

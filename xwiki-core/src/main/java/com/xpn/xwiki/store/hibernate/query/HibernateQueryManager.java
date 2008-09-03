@@ -32,10 +32,10 @@ import com.xpn.xwiki.XWikiException;
 import com.xpn.xwiki.store.XWikiHibernateStore;
 import com.xpn.xwiki.store.XWikiHibernateBaseStore.HibernateCallback;
 import com.xpn.xwiki.store.hibernate.HibernateSessionFactory;
-import com.xpn.xwiki.store.query.AbstractQueryManager;
-import com.xpn.xwiki.store.query.Query;
-import com.xpn.xwiki.store.query.QueryException;
-import com.xpn.xwiki.store.query.QueryExecutor;
+import org.xwiki.query.AbstractQueryManager;
+import org.xwiki.query.Query;
+import org.xwiki.query.QueryException;
+import org.xwiki.query.QueryExecutor;
 import com.xpn.xwiki.util.Util;
 
 /**

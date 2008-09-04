@@ -362,8 +362,8 @@ public class XWikiLDAPUtils
             LOG.error("Unknown error with cache", e);
         }
 
-        if (LOG.isInfoEnabled()) {
-            LOG.info("Found goup (" + groupDN + ") members :" + groupMembers);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Found group [" + groupDN + "] members :" + groupMembers);
         }
 
         return groupMembers;

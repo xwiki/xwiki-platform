@@ -362,6 +362,10 @@ public class XWikiLDAPUtils
             LOG.error("Unknown error with cache", e);
         }
 
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Found goup (" + groupDN + ") members :" + groupMembers);
+        }
+
         return groupMembers;
     }
 

@@ -47,6 +47,11 @@
 			<systemPath>${gwtHome}/gwt-dev-${os}.jar</systemPath>
 		</dependency>
 		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>incubator-glasspanel</artifactId>
+			<version>r729</version>
+		</dependency>
+		<dependency>
 			<groupId>com.xpn.xwiki.platform</groupId>
 			<artifactId>xwiki-web-gwt</artifactId>
 			<version>${pom.version}</version>

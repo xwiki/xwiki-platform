@@ -38,6 +38,11 @@ public interface Images extends ImageBundle
     AbstractImagePrototype copy();
 
     /**
+     * @gwt.resource close.gif
+     */
+    AbstractImagePrototype close();
+
+    /**
      * @gwt.resource cut.gif
      */
     AbstractImagePrototype cut();

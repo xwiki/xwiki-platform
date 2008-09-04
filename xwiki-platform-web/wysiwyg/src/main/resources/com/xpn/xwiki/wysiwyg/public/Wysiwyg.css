@@ -130,3 +130,77 @@
   margin:0px;
   border:1px solid white;
 }
+
+.xSymbolPalette {  
+  border:1px solid #EFEFEF;  
+  cursor:pointer; 
+}
+
+.xSymbolPalette td {
+  border-left:1px solid #EFEFEF;
+  border-top:1px solid #EFEFEF;
+  height:17px;
+  width:17px;
+  margin:2pt;
+  padding:0px;
+}
+
+.xSymbolPalette .symbolCell {
+  height:15px;
+  width:15px;
+  padding:2px;
+  margin:0px;
+  font-size:90%;  
+  text-align:center;
+  vertical-align:middle;
+  horizontal-align:middle;
+  background-color: #FFFFFF;
+  color: #191970;  
+  cursor: default;
+}
+
+.xSymbolPalette .symbolCell-hover {  
+  background-color:#778899;
+  cursor:default;
+}
+
+.xSymbolPicker {
+  border:1px solid #B5B6B5;
+  background-color:#FFFFFF;
+  cursor:default;
+}
+
+.xDialogBox {
+  border:1px solid black;
+}
+.xDialogBox .xCaption{
+  border-bottom:1px solid black;	
+  padding-right:16px;
+  background-color:#FFA500;
+  white-space:nowrap;
+  line-height:16px;
+  cursor:move;
+}
+.xDialogBox .xTitleBar {
+  position:relative;
+  text-align:center;
+  width:100%;
+}
+
+.xDialogBox .xTitleBar .gwt-PushButton {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  border-left: 1px solid black;
+  border-bottom: 1px solid black;
+  background-color: #FF0000;
+}
+.xDialogBox .xTitleBar .gwt-PushButton .gwt-Image {
+  vertical-align: middle;
+}
+.xDialogBox-dragging {
+  background-color:#6666FF !important;
+  border-style:dashed;
+  filter:alpha(opacity = 50) !important; /* IE */
+  opacity:0.5 !important; /* non-IE */	
+}

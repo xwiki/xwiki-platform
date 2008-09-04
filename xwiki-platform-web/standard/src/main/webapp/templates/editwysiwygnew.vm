@@ -27,8 +27,8 @@ $xwiki.getTextArea($tdoc.content)
     var Wysiwyg0 = {
       hookId: 'content',
       syntax: "$doc.syntaxId",
-      plugins: 'separator text valign list indent undo format',
-      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr',
+      plugins: 'separator text valign list indent undo format symbol',
+      toolbar: 'bold italic underline strikethrough | subscript superscript | unorderedlist orderedlist | outdent indent | undo redo | format | hr symbol',
       debug: #if($request.debug)'true'#else'false'#end
     };
 //]]>

@@ -45,3 +45,11 @@ this is another one
 .#-----------------------------------------------------
 .# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=48
 <html><p>this is one<br/>paragraph</p><p>this is another one</p></html>
+.#-----------------------------------------------------
+.input|mediawiki/1.0|skip
+.#-----------------------------------------------------
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=59
+this is one
+paragraph
+
+this is another one

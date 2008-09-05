@@ -254,12 +254,14 @@ public class XWikiLDAPConnection
     {
         List<XWikiLDAPSearchAttribute> searchAttributeList = null;
 
+        LDAPSearchResults searchResults = null;
+
         try {
             LDAPSearchConstraints cons = new LDAPSearchConstraints();
             cons.setTimeLimit(1000);
 
             // filter return all attributes return attrs and values time out value
-            LDAPSearchResults searchResults = this.connection.search(baseDN, ldapScope, query, attr, false, cons);
+            searchResults = this.connection.search(baseDN, ldapScope, query, attr, false, cons);
 
             if (!searchResults.hasMore()) {
                 return null;
@@ -290,6 +292,16 @@ public class XWikiLDAPConnection
         } catch (LDAPException e) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("LDAP Search failed", e);
+            }
+        } finally {
+            if (searchResults != null) {
+                try {
+                    this.connection.abandon(searchResults);
+                } catch (LDAPException e) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("LDAP Search clean up failed", e);
+                    }
+                }
             }
         }
 

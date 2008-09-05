@@ -184,11 +184,7 @@ public class WikiModelGeneratorListener implements Listener
 
     public void onLink(Link link)
     {
-        List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
-        wikiParams.add(new WikiParameter("", ""));
-        WikiParameters linkParameters = new WikiParameters(wikiParams);
-
-        WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(), linkParameters);
+        WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(), createEmptyParameters());
         this.wikimodelListener.onReference(wikiReference);
     }
 
@@ -263,5 +259,75 @@ public class WikiModelGeneratorListener implements Listener
     public void onVerbatimStandalone(String protectedString)
     {
         this.wikimodelListener.onVerbatimBlock(protectedString);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @since 1.6M2
+     */
+    public void beginDefinitionList()
+    {
+        this.wikimodelListener.beginDefinitionList(createEmptyParameters());
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     * @since 1.6M2
+     */
+    public void endDefinitionList()
+    {
+        this.wikimodelListener.endDefinitionList(createEmptyParameters());
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void beginDefinitionTerm()
+    {
+        this.wikimodelListener.beginDefinitionTerm();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
+     * @since 1.6M2
+     */
+    public void beginDefinitionDescription()
+    {
+        this.wikimodelListener.beginDefinitionDescription();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void endDefinitionTerm()
+    {
+        this.wikimodelListener.endDefinitionTerm();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription()
+     * @since 1.6M2
+     */
+    public void endDefinitionDescription()
+    {
+        this.wikimodelListener.endDefinitionDescription();
+    }
+
+    /**
+     * @return an empty Wikimodel WikiParamaters object
+     */
+    private WikiParameters createEmptyParameters()
+    {
+        List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
+        wikiParams.add(new WikiParameter("", ""));
+        return new WikiParameters(wikiParams);
     }
 }

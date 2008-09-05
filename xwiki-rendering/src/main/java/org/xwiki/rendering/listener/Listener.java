@@ -86,6 +86,12 @@ public interface Listener
     void beginList(ListType listType);
 
     /**
+     * Start of a definition list. For example in HTML this is the equivalent of &lt;dl&gt;.
+     * @since 1.6M2
+     */
+    void beginDefinitionList();
+
+    /**
      * End of a list.
      *
      * @param listType the type of list (bulleted, numbered, etc)
@@ -94,15 +100,45 @@ public interface Listener
     void endList(ListType listType);
 
     /**
+     * End of a definition list. For example in HTML this is the equivalent of &lt;/dl&gt;.
+     * @since 1.6M2
+     */
+    void endDefinitionList();
+    
+    /**
      * Start of a list item.
      */
     void beginListItem();
+
+    /**
+     * Start of a definition list term. For example in HTML this is the equivalent of &lt;dt&gt;.
+     * @since 1.6M2
+     */
+    void beginDefinitionTerm();
+
+    /**
+     * Start of a definition list description. For example in HTML this is the equivalent of &lt;dd&gt;.
+     * @since 1.6M2
+     */
+    void beginDefinitionDescription();
 
     /**
      * End of a list item.
      */
     void endListItem();
 
+    /**
+     * End of a definition list term. For example in HTML this is the equivalent of &lt;/dt&gt;.
+     * @since 1.6M2
+     */
+    void endDefinitionTerm();
+
+    /**
+     * End of a definition list description. For example in HTML this is the equivalent of &lt;/dd&gt;.
+     * @since 1.6M2
+     */
+    void endDefinitionDescription();
+    
     /**
      * Start of a section.
      *

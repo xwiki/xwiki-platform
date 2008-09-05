@@ -1,0 +1,37 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+*** Item
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginList: [BULLETED]
+beginListItem
+beginList: [BULLETED]
+beginListItem
+beginList: [BULLETED]
+beginListItem
+onWord: [Item]
+endListItem
+endList: [BULLETED]
+endListItem
+endList: [BULLETED]
+endListItem
+endList: [BULLETED]
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<ul class="star"><li><ul class="star"><li><ul class="star"><li>Item</li></ul></li></ul></li></ul>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+* 
+** 
+*** Item
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=22
+<html><ul class="star"><li><ul class="star"><li><ul class="star"><li>Item</li></ul></li></ul></li></ul></html>

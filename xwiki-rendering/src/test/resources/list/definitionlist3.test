@@ -1,0 +1,52 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.# Verify that a paragrpah before a definition list doesn't include the definition list
+.# and that a definition can be on several lines and that it requires 2 newlines to get
+.# out of the definition list.
+.#-----------------------------------------------------
+paragraph1
+; title
+: definition1
+definition2
+
+paragraph2
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onWord: [paragraph1]
+endParagraph
+beginDefinitionList
+beginDefinitionTerm
+onWord: [title]
+endDefinitionTerm
+beginDefinitionDescription
+onWord: [definition1]
+onLineBreak
+onWord: [definition2]
+endDefinitionDescription
+endDefinitionList
+onEmptyLines: [1]
+beginParagraph
+onWord: [paragraph2]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><p>paragraph2</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+paragraph1
+; title
+: definition1
+definition2
+
+paragraph2
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=48
+<html><p>paragraph1</p><dl><dt>title</dt><dd>definition1<br/>definition2</dd></dl><p>paragraph2</p></html>

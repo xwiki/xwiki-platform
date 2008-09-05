@@ -280,6 +280,66 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("onVerbatimStandalone: [" + protectedString + "]");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @since 1.6M2
+     */
+    public void beginDefinitionList()
+    {
+        println("beginDefinitionList");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     * @since 1.6M2
+     */
+    public void endDefinitionList()
+    {
+        println("endDefinitionList");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void beginDefinitionTerm()
+    {
+        println("beginDefinitionTerm");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
+     * @since 1.6M2
+     */
+    public void beginDefinitionDescription()
+    {
+        println("beginDefinitionDescription");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void endDefinitionTerm()
+    {
+        println("endDefinitionTerm");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription() 
+     * @since 1.6M2
+     */
+    public void endDefinitionDescription()
+    {
+        println("endDefinitionDescription");
+    }
+
     private StringBuffer toStringXMLElement(Map<String, String> attributes)
     {
         StringBuffer buffer = new StringBuffer();

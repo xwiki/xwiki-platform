@@ -1,0 +1,37 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+----
+; title1
+: definition1
+----
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+onHorizontalLine
+beginDefinitionList
+beginDefinitionTerm
+onWord: [title1]
+endDefinitionTerm
+beginDefinitionDescription
+onWord: [definition1]
+endDefinitionDescription
+endDefinitionList
+onHorizontalLine
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<hr/><dl><dt>title1</dt><dd>definition1</dd></dl><hr/>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+----
+; title1
+: definition1
+----
+.#-----------------------------------------------------
+.input|xhtml/1.0
+.#-----------------------------------------------------
+<html><hr/><dl><dt>title1</dt><dd>definition1</dd></dl><hr/></html>

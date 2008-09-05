@@ -293,4 +293,70 @@ public class DoxiaGeneratorListener implements Listener
     {
         onVerbatimInline(protectedString);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @since 1.6M2
+     */
+    public void beginDefinitionList()
+    {
+        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     * @since 1.6M2
+     */
+    public void endDefinitionList()
+    {
+        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void beginDefinitionTerm()
+    {
+        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
+     * @since 1.6M2
+     */
+    public void beginDefinitionDescription()
+    {
+        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void endDefinitionTerm()
+    {
+        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription() 
+     * @since 1.6M2
+     */
+    public void endDefinitionDescription()
+    {
+        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+    }
 }

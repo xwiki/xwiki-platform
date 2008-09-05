@@ -195,4 +195,70 @@ public class ListenerDelegate implements Listener
     {
         this.listener.onVerbatimStandalone(protectedString);
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @since 1.6M2
+     */
+    public void beginDefinitionList()
+    {
+        this.listener.beginDefinitionList();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     * @since 1.6M2
+     */
+    public void endDefinitionList()
+    {
+        this.listener.endDefinitionList();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#beginDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void beginDefinitionTerm()
+    {
+        this.listener.beginDefinitionTerm();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#beginDefinitionDescription()
+     * @since 1.6M2
+     */
+    public void beginDefinitionDescription()
+    {
+        this.listener.beginDefinitionDescription();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#endDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void endDefinitionTerm()
+    {
+        this.listener.endDefinitionTerm();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#endDefinitionDescription()   
+     * @since 1.6M2
+     */
+    public void endDefinitionDescription()
+    {
+        this.listener.endDefinitionDescription();
+    }
 }

@@ -84,7 +84,7 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void beginDefinitionDescription()
     {
-        System.out.println("beginDefinitionDescription (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     /**
@@ -93,12 +93,12 @@ public class XDOMGeneratorListener implements IWemListener
      */
     public void beginDefinitionList(WikiParameters params)
     {
-        System.out.println("beginDefinitionList(" + params + ") (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     public void beginDefinitionTerm()
     {
-        System.out.println("beginDefinitionTerm (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     public void beginDocument()
@@ -176,17 +176,17 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endDefinitionDescription()
     {
-        System.out.println("endDefinitionDescription (not handled yet)");
+        this.stack.push(new DefinitionDescriptionBlock(generateListFromStack()));
     }
 
     public void endDefinitionList(WikiParameters params)
     {
-        System.out.println("endDefinitionList(" + params + ") (not handled yet)");
+        this.stack.push(new DefinitionListBlock(generateListFromStack()));
     }
 
     public void endDefinitionTerm()
     {
-        System.out.println("endDefinitionTerm (not handled yet)");
+        this.stack.push(new DefinitionTermBlock(generateListFromStack()));
     }
 
     public void endDocument()

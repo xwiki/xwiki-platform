@@ -471,6 +471,36 @@ public class XHTMLRenderer extends AbstractPrintRenderer
      */
     public void onEmptyLines(int count)
     {
-        // TODO: Don't know yet how to represent thisin HTML...
+        // TODO: Don't know yet how to represent this in HTML...
+    }
+
+    public void beginDefinitionList()
+    {
+        print("<dl>");
+    }
+
+    public void endDefinitionList()
+    {
+        print("</dl>");
+    }
+
+    public void beginDefinitionTerm()
+    {
+        print("<dt>");
+    }
+
+    public void beginDefinitionDescription()
+    {
+        print("<dd>");
+    }
+
+    public void endDefinitionTerm()
+    {
+        print("</dt>");
+    }
+
+    public void endDefinitionDescription()
+    {
+        print("</dd>");
     }
 }

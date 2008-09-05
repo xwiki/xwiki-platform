@@ -26,6 +26,7 @@ import org.xwiki.rendering.listener.ListType;
 import org.xwiki.rendering.listener.SectionLevel;
 import org.xwiki.rendering.listener.Link;
 import org.xwiki.rendering.listener.Format;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Generates XWiki Syntax from {@link org.xwiki.rendering.block.XDOM}. This is useful for example to convert other wiki
@@ -41,10 +42,12 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      * Top level elements.
      */
     private enum Element {
-        DOCUMENT, PARAGRAPH, HORIZONTALLINE, LIST, MACRO, SECTION
+        DOCUMENT, PARAGRAPH, HORIZONTALLINE, LIST, MACRO, SECTION, DEFINITIONLIST
     }
 
     private StringBuffer listStyle = new StringBuffer();
+
+    int definitionListDepth = 0;
 
     private boolean needsNewLine = false;
 
@@ -55,6 +58,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     private boolean isBeginListItemFound = false;
 
     private boolean isEndListItemFound = false;
+
+    private boolean isBeginDefinitionListItemFound = false;
+
+    private boolean isEndDefinitionListItemFound = false;
 
     private int listDepth = 0;
 
@@ -352,7 +359,7 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      */
     public void beginListItem()
     {
-        if (this.isEndListItemFound) {
+        if (this.isEndListItemFound && (this.currentElement != Element.DEFINITIONLIST)) {
             print("\n");
             this.isEndListItemFound = false;
             this.isBeginListItemFound = false;
@@ -480,6 +487,115 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
                 print("\n");
             }
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionList()
+     * @since 1.6M2
+     */
+    public void beginDefinitionList()
+    {
+        // Print a new line when:
+        // - the previous element was a defintion list
+        if (this.currentElement == Element.DEFINITIONLIST) {
+            print("\n");
+        // - we are inside an existing list
+        } else if (this.isBeginListItemFound && !this.isEndListItemFound) {
+            print("\n");
+            // - we are inside an existing definition list
+        } else if (this.isBeginDefinitionListItemFound && !this.isEndDefinitionListItemFound) {
+            print("\n");
+            this.isBeginDefinitionListItemFound = false;
+        }
+
+        this.definitionListDepth++;
+        this.currentElement = Element.DEFINITIONLIST;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionList()
+     * @since 1.6M2
+     */
+    public void endDefinitionList()
+    {
+        this.definitionListDepth--;
+        if (this.definitionListDepth == 0) {
+            this.isBeginDefinitionListItemFound = false;
+            this.isEndDefinitionListItemFound = false;
+            this.needsNewLine = true;
+            this.isBeginListItemFound = false;
+            this.isEndDefinitionListItemFound = false;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void beginDefinitionTerm()
+    {
+        if (this.isEndDefinitionListItemFound) {
+            print("\n");
+            this.isEndDefinitionListItemFound = false;
+            this.isBeginDefinitionListItemFound = false;
+        }
+        this.isBeginDefinitionListItemFound = true;
+
+        if (this.listStyle.length() > 0) {
+            print(this.listStyle.toString());
+            if (this.listStyle.charAt(0) == '1') {
+                print(".");
+            }
+        }
+        print(StringUtils.repeat(":", this.definitionListDepth - 1));
+        print("; ");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginDefinitionDescription()
+     * @since 1.6M2
+     */
+    public void beginDefinitionDescription()
+    {
+        if (this.isEndDefinitionListItemFound) {
+            print("\n");
+            this.isEndDefinitionListItemFound = false;
+            this.isBeginDefinitionListItemFound = false;
+        }
+        this.isBeginDefinitionListItemFound = true;
+
+        if (this.listStyle.length() > 0) {
+            print(this.listStyle.toString());
+            if (this.listStyle.charAt(0) == '1') {
+                print(".");
+            }
+        }
+        print(StringUtils.repeat(":", this.definitionListDepth - 1));
+        print(": ");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionTerm()
+     * @since 1.6M2
+     */
+    public void endDefinitionTerm()
+    {
+        this.isEndDefinitionListItemFound = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endDefinitionDescription() 
+     * @since 1.6M2
+     */
+    public void endDefinitionDescription()
+    {
+        this.isEndDefinitionListItemFound = true;
     }
 
     protected void print(String text)

@@ -1,0 +1,60 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+: indent1
+
+:: indent2
+
+::: indent3
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginDefinitionList
+beginDefinitionDescription
+onWord: [indent1]
+endDefinitionDescription
+endDefinitionList
+beginDefinitionList
+beginDefinitionDescription
+beginDefinitionList
+beginDefinitionDescription
+onWord: [indent2]
+endDefinitionDescription
+endDefinitionList
+endDefinitionDescription
+endDefinitionList
+beginDefinitionList
+beginDefinitionDescription
+beginDefinitionList
+beginDefinitionDescription
+beginDefinitionList
+beginDefinitionDescription
+onWord: [indent3]
+endDefinitionDescription
+endDefinitionList
+endDefinitionDescription
+endDefinitionList
+endDefinitionDescription
+endDefinitionList
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<dl><dd>indent1</dd></dl><dl><dd><dl><dd>indent2</dd></dl></dd></dl><dl><dd><dl><dd><dl><dd>indent3</dd></dl></dd></dl></dd></dl>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+: indent1
+
+: 
+:: indent2
+
+: 
+:: 
+::: indent3
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: See http://code.google.com/p/wikimodel/issues/detail?id=60
+<html><dl><dd>indent1</dd></dl><dl><dd><dl><dd>indent2</dd></dl></dd></dl><dl><dd><dl><dd><dl><dd>indent3</dd></dl></dd></dl></dd></dl></html>

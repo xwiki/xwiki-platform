@@ -1,0 +1,93 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+; title: not definition
+
+;: empty definition
+
+; just term
+
+; uri:not definition
+
+;title: not definition
+
+not ;definition: something
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginDefinitionList
+beginDefinitionTerm
+onWord: [title]
+onSpecialSymbol: [:]
+onSpace
+onWord: [not]
+onSpace
+onWord: [definition]
+endDefinitionTerm
+endDefinitionList
+beginDefinitionList
+beginDefinitionDescription
+onWord: [empty]
+onSpace
+onWord: [definition]
+endDefinitionDescription
+endDefinitionList
+beginDefinitionList
+beginDefinitionTerm
+onWord: [just]
+onSpace
+onWord: [term]
+endDefinitionTerm
+endDefinitionList
+beginDefinitionList
+beginDefinitionTerm
+onLink: [Reference = [uri:not]]
+onSpace
+onWord: [definition]
+endDefinitionTerm
+endDefinitionList
+onEmptyLines: [1]
+beginParagraph
+onSpecialSymbol: [;]
+onWord: [title]
+onSpecialSymbol: [:]
+onSpace
+onWord: [not]
+onSpace
+onWord: [definition]
+endParagraph
+onEmptyLines: [1]
+beginParagraph
+onWord: [not]
+onSpace
+onSpecialSymbol: [;]
+onWord: [definition]
+onSpecialSymbol: [:]
+onSpace
+onWord: [something]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><a class="wikicreatelink" href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+; title: not definition
+
+: empty definition
+
+; just term
+
+; [[uri:not]] definition
+
+;title: not definition
+
+not ;definition: something
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: see http://code.google.com/p/wikimodel/issues/detail?id=48
+<html><dl><dt>title: not definition</dt></dl><dl><dd>empty definition</dd></dl><dl><dt>just term</dt></dl><dl><dt><a class="wikicreatelink" href="/xwiki/bin/view/uri:not"><span class="wikicreatelinktext">uri:not</span><span class="wikicreatelinkqm">?</span></a> definition</dt></dl><p>;title: not definition</p><p>not ;definition: something</p></html>

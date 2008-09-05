@@ -340,6 +340,46 @@ public class EventsRenderer extends AbstractPrintRenderer
         println("endDefinitionDescription");
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void beginQuotation(Map<String, String> parameters)
+    {
+        printParameters("beginQuotation", parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void endQuotation(Map<String, String> parameters)
+    {
+        printParameters("endQuotation", parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     * @since 1.6M2
+     */
+    public void beginQuotationLine()
+    {
+        println("beginQuotationLine");
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()  
+     * @since 1.6M2
+     */
+    public void endQuotationLine()
+    {
+        println("endQuotationLine");
+    }
+
     private StringBuffer toStringXMLElement(Map<String, String> attributes)
     {
         StringBuffer buffer = new StringBuffer();

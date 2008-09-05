@@ -261,4 +261,48 @@ public class ListenerDelegate implements Listener
     {
         this.listener.endDefinitionDescription();
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#beginQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void beginQuotation(Map<String, String> parameters)
+    {
+        this.listener.beginQuotation(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see Listener#endQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void endQuotation(Map<String, String> parameters)
+    {
+        this.listener.endQuotation(parameters);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     * @since 1.6M2
+     */
+    public void beginQuotationLine()
+    {
+        this.listener.beginQuotationLine();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()    
+     * @since 1.6M2
+     */
+    public void endQuotationLine()
+    {
+        this.listener.endQuotationLine();
+    }
 }

@@ -20,7 +20,6 @@
 package org.xwiki.rendering.renderer.xhtml;
 
 import java.util.Map;
-import java.util.Iterator;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -510,5 +509,25 @@ public class XHTMLRenderer extends AbstractPrintRenderer
     public void endDefinitionDescription()
     {
         print("</dd>");
+    }
+
+    public void beginQuotation(Map<String, String> parameters)
+    {
+        print("<blockquote>");
+    }
+
+    public void endQuotation(Map<String, String> parameters)
+    {
+        print("</blockquote>");
+    }
+
+    public void beginQuotationLine()
+    {
+        // Nothing to do
+    }
+
+    public void endQuotationLine()
+    {
+        // Nothing to do
     }
 }

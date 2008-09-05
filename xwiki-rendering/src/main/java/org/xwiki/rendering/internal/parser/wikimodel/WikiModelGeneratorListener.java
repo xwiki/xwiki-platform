@@ -22,6 +22,7 @@ package org.xwiki.rendering.internal.parser.wikimodel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Collections;
 
 import org.wikimodel.wem.IWemConstants;
 import org.wikimodel.wem.IWemListener;
@@ -184,7 +185,8 @@ public class WikiModelGeneratorListener implements Listener
 
     public void onLink(Link link)
     {
-        WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(), createEmptyParameters());
+        WikiReference wikiReference = new WikiReference(link.getReference(), link.getLabel(),
+            createWikiParameters(Collections.<String, String>emptyMap()));
         this.wikimodelListener.onReference(wikiReference);
     }
 
@@ -268,7 +270,7 @@ public class WikiModelGeneratorListener implements Listener
      */
     public void beginDefinitionList()
     {
-        this.wikimodelListener.beginDefinitionList(createEmptyParameters());
+        this.wikimodelListener.beginDefinitionList(createWikiParameters(Collections.<String, String>emptyMap()));
     }
 
     /**
@@ -278,7 +280,7 @@ public class WikiModelGeneratorListener implements Listener
      */
     public void endDefinitionList()
     {
-        this.wikimodelListener.endDefinitionList(createEmptyParameters());
+        this.wikimodelListener.endDefinitionList(createWikiParameters(Collections.<String, String>emptyMap()));
     }
 
     /**
@@ -321,6 +323,46 @@ public class WikiModelGeneratorListener implements Listener
         this.wikimodelListener.endDefinitionDescription();
     }
 
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void beginQuotation(Map<String, String> parameters)
+    {
+        this.wikimodelListener.beginQuotation(createWikiParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void endQuotation(Map<String, String> parameters)
+    {
+        this.wikimodelListener.endQuotation(createWikiParameters(parameters));
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     * @since 1.6M2
+     */
+    public void beginQuotationLine()
+    {
+        this.wikimodelListener.beginQuotationLine();
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine() 
+     * @since 1.6M2
+     */
+    public void endQuotationLine()
+    {
+        this.wikimodelListener.endQuotationLine();
+    }
+
     private WikiParameters createWikiParameters(Map<String, String> parameters)
     {
         List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
@@ -328,15 +370,5 @@ public class WikiModelGeneratorListener implements Listener
             wikiParams.add(new WikiParameter(key, parameters.get(key)));
         }
         return new WikiParameters(wikiParams);        
-    }
-
-    /**
-     * @return an empty Wikimodel WikiParamaters object
-     */
-    private WikiParameters createEmptyParameters()
-    {
-        List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
-        wikiParams.add(new WikiParameter("", ""));
-        return new WikiParameters(wikiParams);
     }
 }

@@ -1,0 +1,39 @@
+.#-----------------------------------------------------
+.input|xwiki/2.0
+.#-----------------------------------------------------
+ >line
+
+one > two
+.#-----------------------------------------------------
+.expect|event
+.#-----------------------------------------------------
+beginDocument
+beginParagraph
+onSpace
+onSpecialSymbol: [>]
+onWord: [line]
+endParagraph
+onEmptyLines: [1]
+beginParagraph
+onWord: [one]
+onSpace
+onSpecialSymbol: [>]
+onSpace
+onWord: [two]
+endParagraph
+endDocument
+.#-----------------------------------------------------
+.expect|xhtml
+.#-----------------------------------------------------
+<p> &gt;line</p><p>one &gt; two</p>
+.#-----------------------------------------------------
+.expect|xwiki
+.#-----------------------------------------------------
+ >line
+
+one > two
+.#-----------------------------------------------------
+.input|xhtml/1.0|skip
+.#-----------------------------------------------------
+.# TODO: Wikimodel bug, see http://code.google.com/p/wikimodel/issues/detail?id=48
+<html><p> &gt;line</p><p>one &gt; two</p></html>

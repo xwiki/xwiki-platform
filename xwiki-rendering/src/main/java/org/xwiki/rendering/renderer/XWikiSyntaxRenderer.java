@@ -42,12 +42,10 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
      * Top level elements.
      */
     private enum Element {
-        DOCUMENT, PARAGRAPH, HORIZONTALLINE, LIST, MACRO, SECTION, DEFINITIONLIST
+        DOCUMENT, PARAGRAPH, HORIZONTALLINE, LIST, MACRO, SECTION, DEFINITIONLIST, QUOTATION
     }
 
     private StringBuffer listStyle = new StringBuffer();
-
-    int definitionListDepth = 0;
 
     private boolean needsNewLine = false;
 
@@ -63,8 +61,16 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     private boolean isEndDefinitionListItemFound = false;
 
+    private boolean isBeginQuotationLineFound = false;
+
+    private boolean isEndQuotationLineFound = false;
+
     private int listDepth = 0;
 
+    private int definitionListDepth = 0;
+
+    private int quotationDepth = 0;
+    
     private XWikiMacroPrinter macroPrinter;
 
     public XWikiSyntaxRenderer(WikiPrinter printer)
@@ -606,6 +612,64 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
     public void endDefinitionDescription()
     {
         this.isEndDefinitionListItemFound = true;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void beginQuotation(Map<String, String> parameters)
+    {
+        if (this.isBeginQuotationLineFound && !this.isEndQuotationLineFound) {
+            print("\n");
+            this.isBeginQuotationLineFound = false;
+        }
+
+        this.quotationDepth++;
+        this.currentElement = Element.QUOTATION;
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void endQuotation(Map<String, String> parameters)
+    {
+        this.quotationDepth--;
+        if (this.quotationDepth == 0) {
+            this.isBeginQuotationLineFound = false;
+            this.isEndQuotationLineFound = false;
+            this.needsNewLine = true;
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     * @since 1.6M2
+     */
+    public void beginQuotationLine()
+    {
+        if (this.isEndQuotationLineFound) {
+            print("\n");
+            this.isEndQuotationLineFound = false;
+            this.isBeginQuotationLineFound = false;
+        }
+        this.isBeginQuotationLineFound = true;
+
+        print(StringUtils.repeat(">", this.quotationDepth));
+    }
+
+    /**
+     * {@inheritDoc}
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()  
+     * @since 1.6M2
+     */
+    public void endQuotationLine()
+    {
+        this.isEndQuotationLineFound = true;
     }
 
     protected void print(String text)

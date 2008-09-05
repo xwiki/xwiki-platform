@@ -151,12 +151,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void beginQuotation(WikiParameters params)
     {
-        System.out.println("beginQuotation(" + params + ") (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     public void beginQuotationLine()
     {
-        System.out.println("beginQuotationLine (not handled yet)");
+        this.stack.push(this.marker);
     }
 
     public void beginTable(WikiParameters params)
@@ -263,12 +263,12 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endQuotation(WikiParameters params)
     {
-        System.out.println("endQuotation(" + params + ") (not handled yet)");
+        this.stack.push(new QuotationBlock(generateListFromStack(), convertParameters(params)));
     }
 
     public void endQuotationLine()
     {
-        System.out.println("endQuotationLine (not handled yet)");
+        this.stack.push(new QuotationLineBlock(generateListFromStack()));
     }
 
     public void endTable(WikiParameters params)

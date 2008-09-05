@@ -302,7 +302,7 @@ public class DoxiaGeneratorListener implements Listener
      */
     public void beginDefinitionList()
     {
-        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+        this.sink.definitionList();
     }
 
     /**
@@ -313,7 +313,7 @@ public class DoxiaGeneratorListener implements Listener
      */
     public void endDefinitionList()
     {
-        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+        this.sink.definitionList_();
     }
 
     /**
@@ -324,7 +324,7 @@ public class DoxiaGeneratorListener implements Listener
      */
     public void beginDefinitionTerm()
     {
-        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+        this.sink.definedTerm();
     }
 
     /**
@@ -335,7 +335,7 @@ public class DoxiaGeneratorListener implements Listener
      */
     public void beginDefinitionDescription()
     {
-        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+        this.sink.definition();
     }
 
     /**
@@ -346,7 +346,7 @@ public class DoxiaGeneratorListener implements Listener
      */
     public void endDefinitionTerm()
     {
-        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+        this.sink.definedTerm_();
     }
 
     /**
@@ -357,6 +357,50 @@ public class DoxiaGeneratorListener implements Listener
      */
     public void endDefinitionDescription()
     {
-        // TODO: Find out what to do... There doesn't seem to be definition list support in Doxia...
+        this.sink.definition_();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void beginQuotation(Map<String, String> parameters)
+    {
+        // TODO: Doxia doesn't seem to have support for quotation... Find out what to do...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endQuotation(java.util.Map)
+     * @since 1.6M2
+     */
+    public void endQuotation(Map<String, String> parameters)
+    {
+        // TODO: Doxia doesn't seem to have support for quotation... Find out what to do...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#beginQuotationLine()
+     * @since 1.6M2
+     */
+    public void beginQuotationLine()
+    {
+        // TODO: Doxia doesn't seem to have support for quotation... Find out what to do...
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @see org.xwiki.rendering.listener.Listener#endQuotationLine()  
+     * @since 1.6M2
+     */
+    public void endQuotationLine()
+    {
+        // TODO: Doxia doesn't seem to have support for quotation... Find out what to do...
     }
 }

@@ -69,6 +69,9 @@ public interface Listener
 
     /**
      * Start of a paragraph.
+     *
+     * @param parameters a generic list of parameters for the paragraph.
+     *        Example: "style"/"background-color: blue" 
      */
     void beginParagraph(Map<String, String> parameters);
 
@@ -199,6 +202,32 @@ public interface Listener
      */
     void endMacroMarker(String name, Map<String, String> parameters, String content);
 
+    /**
+     * Start of a quotation. There are one or several quotation lines inside a quotation block.
+     *
+     * @param parameters a generic list of parameters for the quotation.
+     *        Example: "style"/"background-color: blue"
+     */
+    void beginQuotation(Map<String, String> parameters);
+
+    /**
+     * End of a quotation.
+     *
+     * @param parameters a generic list of parameters for the quotation.
+     *        Example: "style"/"background-color: blue"
+     */
+    void endQuotation(Map<String, String> parameters);
+
+    /**
+     * Start of a quotation line. There can be several quotation lines in a quotation block.
+     */
+    void beginQuotationLine();
+
+    /**
+     * End of a quotation line.
+     */
+    void endQuotationLine();
+    
     /**
      * An explicit line break specified in the wiki syntax. For example for XWiki this would be "\\". Note
      * that this is different from a new line which is triggered when the new line character is found ("\n") and which

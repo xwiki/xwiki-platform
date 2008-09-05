@@ -294,8 +294,8 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             if (userDN == null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
-                    "LDAP user {0} does not belong to LDAP group {1}.", null,
-                    new Object[] {ldapUserName, filterGroupDN});
+                    "LDAP user {0} does not belong to LDAP group {1}.", null, new Object[] {ldapUserName,
+                    filterGroupDN});
             }
         }
 
@@ -313,7 +313,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
             if (ldapUtils.isUserInGroup(ldapUserName, excludeGroupDN, context) != null) {
                 throw new XWikiException(XWikiException.MODULE_XWIKI_USER, XWikiException.ERROR_XWIKI_USER_INIT,
                     "LDAP user {0} should not belong to LDAP group {1}.", null, new Object[] {ldapUserName,
-                        filterGroupDN});
+                    filterGroupDN});
             }
         }
 
@@ -335,8 +335,7 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
         // if we still don't have a dn, search for it. Also get the attributes, we might need
         // them
         if (userDN == null) {
-            searchAttributes =
-                ldapUtils.searchUserAttributesByUid(ldapUserName, getAttributeNameTable(context), context);
+            searchAttributes = ldapUtils.searchUserAttributesByUid(ldapUserName, getAttributeNameTable(context));
 
             for (XWikiLDAPSearchAttribute searchAttribute : searchAttributes) {
                 if ("dn".equals(searchAttribute.name)) {
@@ -642,12 +641,12 @@ public class XWikiLDAPAuthServiceImpl extends XWikiAuthServiceImpl
 
             if (LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Finished adding user {0} to xwiki group {1}", new Object[] {userName,
-                    groupName}));
+                groupName}));
             }
 
         } catch (Exception e) {
-            LOG.error(String.format("Failed to add a user [{0}] to a group [{1}]", new Object[] {userName, groupName}),
-                e);
+            LOG.error(
+                String.format("Failed to add a user [{0}] to a group [{1}]", new Object[] {userName, groupName}), e);
         }
     }
 

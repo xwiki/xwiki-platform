@@ -78,8 +78,7 @@ public class XWikiLDAPConnection
      * @return true if connection succeed, false otherwise.
      * @throws XWikiLDAPException error when trying to open connection.
      */
-    public boolean open(String ldapUserName, String password, XWikiContext context)
-        throws XWikiLDAPException
+    public boolean open(String ldapUserName, String password, XWikiContext context) throws XWikiLDAPException
     {
         XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
 
@@ -124,8 +123,8 @@ public class XWikiLDAPConnection
      * @return true if the connection succeed, false otherwise.
      * @throws XWikiLDAPException error when trying to open connection.
      */
-    public boolean open(String ldapHost, int ldapPort, String loginDN, String password,
-        String pathToKeys, boolean ssl, XWikiContext context) throws XWikiLDAPException
+    public boolean open(String ldapHost, int ldapPort, String loginDN, String password, String pathToKeys,
+        boolean ssl, XWikiContext context) throws XWikiLDAPException
     {
         boolean succeed = false;
 
@@ -172,8 +171,7 @@ public class XWikiLDAPConnection
             this.connection.bind(ldapVersion, loginDN, password.getBytes("UTF8"));
 
             succeed =
-                this.connection.isConnected() && this.connection.isConnectionAlive()
-                    && this.connection.isBound();
+                this.connection.isConnected() && this.connection.isConnectionAlive() && this.connection.isBound();
         } catch (UnsupportedEncodingException e) {
             throw new XWikiLDAPException("LDAP bind failed with UnsupportedEncodingException.", e);
         } catch (LDAPException e) {
@@ -231,8 +229,7 @@ public class XWikiLDAPConnection
                 }
             } else if (e.getResultCode() == LDAPException.NO_SUCH_ATTRIBUTE) {
                 if (LOG.isDebugEnabled()) {
-                    LOG.debug(
-                        "Unable to verify password because userPassword attribute not found.", e);
+                    LOG.debug("Unable to verify password because userPassword attribute not found.", e);
                 }
             } else {
                 if (LOG.isDebugEnabled()) {
@@ -253,19 +250,16 @@ public class XWikiLDAPConnection
      * @param ldapScope {@link LDAPConnection#SCOPE_SUB} oder {@link LDAPConnection#SCOPE_BASE}.
      * @return the found LDAP attributes.
      */
-    public List<XWikiLDAPSearchAttribute> searchLDAP(String baseDN, String query, String[] attr,
-        int ldapScope)
+    public List<XWikiLDAPSearchAttribute> searchLDAP(String baseDN, String query, String[] attr, int ldapScope)
     {
-        List<XWikiLDAPSearchAttribute> searchAttributeList =
-            new ArrayList<XWikiLDAPSearchAttribute>();
+        List<XWikiLDAPSearchAttribute> searchAttributeList = null;
 
         try {
             LDAPSearchConstraints cons = new LDAPSearchConstraints();
             cons.setTimeLimit(1000);
 
             // filter return all attributes return attrs and values time out value
-            LDAPSearchResults searchResults =
-                this.connection.search(baseDN, ldapScope, query, attr, false, cons);
+            LDAPSearchResults searchResults = this.connection.search(baseDN, ldapScope, query, attr, false, cons);
 
             if (!searchResults.hasMore()) {
                 return null;
@@ -273,6 +267,9 @@ public class XWikiLDAPConnection
 
             LDAPEntry nextEntry = searchResults.next();
             String foundDN = nextEntry.getDN();
+
+            searchAttributeList = new ArrayList<XWikiLDAPSearchAttribute>();
+
             searchAttributeList.add(new XWikiLDAPSearchAttribute("dn", foundDN));
 
             LDAPAttributeSet attributeSet = nextEntry.getAttributeSet();
@@ -285,10 +282,8 @@ public class XWikiLDAPConnection
 
                 if (allValues != null) {
                     while (allValues.hasMoreElements()) {
-
                         String value = (String) allValues.nextElement();
-                        searchAttributeList
-                            .add(new XWikiLDAPSearchAttribute(attributeName, value));
+                        searchAttributeList.add(new XWikiLDAPSearchAttribute(attributeName, value));
                     }
                 }
             }

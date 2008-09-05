@@ -104,6 +104,11 @@ public class XWikiLDAPUtils
     private Collection<String> groupMemberFields = XWikiLDAPConfig.DEFAULT_GROUP_MEMBERFIELDS;
 
     /**
+     * The LDAP base DN from where to executes LDAP queries.
+     */
+    private String baseDN = "";
+
+    /**
      * Create an instance of {@link XWikiLDAPUtils}.
      * 
      * @param connection the XWiki LDAP connection tool.
@@ -127,6 +132,22 @@ public class XWikiLDAPUtils
     public String getUidAttributeName()
     {
         return this.uidAttributeName;
+    }
+
+    /**
+     * @param baseDN the LDAP base DN from where to executes LDAP queries.
+     */
+    public void setBaseDN(String baseDN)
+    {
+        this.baseDN = baseDN;
+    }
+
+    /**
+     * @return the LDAP base DN from where to executes LDAP queries.
+     */
+    public String getBaseDN()
+    {
+        return this.baseDN;
     }
 
     /**
@@ -328,7 +349,7 @@ public class XWikiLDAPUtils
         if (searchAttributeList == null) {
             // maybe groupDN is a UID so trying to search for it
             searchAttributeList =
-                searchUserAttributesByUid(fixedDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()}, context);
+                searchUserAttributesByUid(fixedDN, new String[] {LDAP_FIELD_DN, getUidAttributeName()});
 
             if (searchAttributeList != null && !searchAttributeList.isEmpty()) {
                 fixedDN = searchAttributeList.get(0).value;
@@ -470,39 +491,32 @@ public class XWikiLDAPUtils
     /**
      * @param uid the unique identifier of the user in the LDAP server.
      * @param attributeNameTable the names of the LDAP user attributes to query.
-     * @param context the XWiki context.
      * @return the found LDAP attributes.
-     * @since 1.6M1
+     * @since 1.6M2
      */
-    public List<XWikiLDAPSearchAttribute> searchUserAttributesByUid(String uid, String[] attributeNameTable,
-        XWikiContext context)
+    public List<XWikiLDAPSearchAttribute> searchUserAttributesByUid(String uid, String[] attributeNameTable)
     {
-        XWikiLDAPConfig config = XWikiLDAPConfig.getInstance();
-
         // search for the user in LDAP
         String query = MessageFormat.format("({0}={1})", new Object[] {this.uidAttributeName, uid});
-        String baseDN = config.getLDAPParam("ldap_base_DN", "", context);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Searching for the user in LDAP: user:" + uid + " base:" + baseDN + " query:" + query + " uid:"
-                + uidAttributeName);
+            LOG.debug("Searching for the user in LDAP: user:" + uid + " base:" + this.baseDN + " query:" + query
+                + " uid:" + uidAttributeName);
         }
 
-        return this.connection.searchLDAP(baseDN, query, attributeNameTable, LDAPConnection.SCOPE_SUB);
+        return this.connection.searchLDAP(this.baseDN, query, attributeNameTable, LDAPConnection.SCOPE_SUB);
     }
 
     /**
      * @param uid the unique identifier of the user in the LDAP server.
-     * @param context the XWiki context.
      * @return the user DN, return null if no user was found.
-     * @since 1.6M1
+     * @since 1.6M2
      */
-    public String searchUserDNByUid(String uid, XWikiContext context)
+    public String searchUserDNByUid(String uid)
     {
         String userDN = null;
 
-        List<XWikiLDAPSearchAttribute> searchAttributes =
-            searchUserAttributesByUid(uid, new String[] {LDAP_FIELD_DN}, context);
+        List<XWikiLDAPSearchAttribute> searchAttributes = searchUserAttributesByUid(uid, new String[] {LDAP_FIELD_DN});
 
         if (searchAttributes != null && searchAttributes.size() > 0) {
             userDN = searchAttributes.get(0).value;

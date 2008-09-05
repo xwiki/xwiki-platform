@@ -42,7 +42,7 @@
     <!-- Versions of XWiki dependencies used in Platform/Web modules -->
     <platform.tool.configuration.version>1.15-SNAPSHOT</platform.tool.configuration.version>
     <platform.core.version>1.5-SNAPSHOT</platform.core.version>
-    <platform.skin.albatross.version>1.11-SNAPSHOT</platform.skin.albatross.version>
+    <platform.skin.albatross.version>1.10</platform.skin.albatross.version>
     <platform.skin.toucan.version>1.8-SNAPSHOT</platform.skin.toucan.version>
   </properties>
   <profiles>

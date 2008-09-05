@@ -126,9 +126,9 @@ public class WikiModelGeneratorListener implements Listener
         // there's nothing to render for a marker...
     }
 
-    public void beginParagraph()
+    public void beginParagraph(Map<String, String> parameters)
     {
-        this.wikimodelListener.beginParagraph(null);
+        this.wikimodelListener.beginParagraph(createWikiParameters(parameters));
     }
 
     public void beginSection(SectionLevel level)
@@ -157,9 +157,9 @@ public class WikiModelGeneratorListener implements Listener
         // there's nothing to render for a marker...
     }
 
-    public void endParagraph()
+    public void endParagraph(Map<String, String> parameters)
     {
-        this.wikimodelListener.endParagraph(null);
+        this.wikimodelListener.endParagraph(createWikiParameters(parameters));
     }
 
     public void endSection(SectionLevel level)
@@ -319,6 +319,15 @@ public class WikiModelGeneratorListener implements Listener
     public void endDefinitionDescription()
     {
         this.wikimodelListener.endDefinitionDescription();
+    }
+
+    private WikiParameters createWikiParameters(Map<String, String> parameters)
+    {
+        List<WikiParameter> wikiParams = new ArrayList<WikiParameter>();
+        for (String key: parameters.keySet()) {
+            wikiParams.add(new WikiParameter(key, parameters.get(key)));
+        }
+        return new WikiParameters(wikiParams);        
     }
 
     /**

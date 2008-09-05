@@ -65,6 +65,7 @@ public class RenderingTests extends TestCase
         suite.addTestsFromResource("paragraph/paragraph3", false);
         suite.addTestsFromResource("paragraph/paragraph4", false);
         suite.addTestsFromResource("paragraph/paragraph5", false);
+        suite.addTestsFromResource("paragraph/paragraph6", false);
         suite.addTestsFromResource("verbatim/verbatim1", false);
         suite.addTestsFromResource("verbatim/verbatim2", false);
         suite.addTestsFromResource("verbatim/verbatim3", false);

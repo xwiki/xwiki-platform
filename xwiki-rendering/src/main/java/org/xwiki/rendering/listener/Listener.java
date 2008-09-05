@@ -70,12 +70,12 @@ public interface Listener
     /**
      * Start of a paragraph.
      */
-    void beginParagraph();
+    void beginParagraph(Map<String, String> parameters);
 
     /**
      * End of a paragraph.
      */
-    void endParagraph();
+    void endParagraph(Map<String, String> parameters);
 
     /**
      * Start of a list.

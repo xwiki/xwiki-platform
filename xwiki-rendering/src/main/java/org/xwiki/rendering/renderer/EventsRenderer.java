@@ -116,14 +116,14 @@ public class EventsRenderer extends AbstractPrintRenderer
         }
     }
 
-    public void beginParagraph()
+    public void beginParagraph(Map<String, String> parameters)
     {
-        println("beginParagraph");
+        printParameters("beginParagraph", parameters);
     }
 
-    public void endParagraph()
+    public void endParagraph(Map<String, String> parameters)
     {
-        println("endParagraph");
+        printParameters("endParagraph", parameters);
     }
 
     public void onLineBreak()
@@ -364,5 +364,18 @@ public class EventsRenderer extends AbstractPrintRenderer
             }
         }
         println(eventName + ": [" + name + "] [" + buffer.toString() + "] [" + content + "]");
+    }
+
+    private void printParameters(String prefix, Map<String, String> parameters)
+    {
+        StringBuffer buffer = new StringBuffer(prefix);
+        if (!parameters.isEmpty()) {
+            buffer.append(": [");
+            for (String key: parameters.keySet()) {
+                buffer.append('[').append(key).append(']').append('=').append('[').append(parameters.get(key)).append(']');
+            }
+            buffer.append(']');
+        }
+        println(buffer.toString());
     }
 }

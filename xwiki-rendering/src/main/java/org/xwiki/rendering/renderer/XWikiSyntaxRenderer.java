@@ -190,23 +190,33 @@ public class XWikiSyntaxRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.PrintRenderer#beginParagraph()
+     * @see org.xwiki.rendering.renderer.PrintRenderer#beginParagraph(java.util.Map)
      */
-    public void beginParagraph()
+    public void beginParagraph(Map<String, String> parameters)
     {
         if ((this.currentElement != Element.DOCUMENT) && (this.currentElement != Element.HORIZONTALLINE)
             && (this.currentElement != Element.MACRO) && (this.currentElement != Element.SECTION))
         {
             print("\n");
         }
+
+        if (!parameters.isEmpty()) {
+            StringBuffer buffer = new StringBuffer("(%");
+            for (String key: parameters.keySet()) {
+                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
+            }
+            buffer.append(" %)\n");
+            print(buffer.toString());
+        }
+
         this.currentElement = Element.PARAGRAPH;
     }
 
     /**
      * {@inheritDoc}
-     * @see org.xwiki.rendering.renderer.PrintRenderer#endParagraph()
+     * @see org.xwiki.rendering.renderer.PrintRenderer#endParagraph(java.util.Map)
      */
-    public void endParagraph()
+    public void endParagraph(Map<String, String> parameters)
     {
         this.needsNewLine = true;
     }

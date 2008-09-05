@@ -51,9 +51,9 @@ public class ListenerDelegate implements Listener
         this.listener.beginMacroMarker(name, parameters, content);
     }
 
-    public void beginParagraph()
+    public void beginParagraph(Map<String, String> parameters)
     {
-        this.listener.beginParagraph();
+        this.listener.beginParagraph(parameters);
     }
 
     public void beginSection(SectionLevel level)
@@ -91,9 +91,9 @@ public class ListenerDelegate implements Listener
         this.listener.endMacroMarker(name, parameters, content);
     }
 
-    public void endParagraph()
+    public void endParagraph(Map<String, String> parameters)
     {
-        this.listener.endParagraph();
+        this.listener.endParagraph(parameters);
     }
 
     public void endSection(SectionLevel level)

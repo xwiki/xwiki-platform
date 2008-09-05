@@ -20,6 +20,7 @@
 package org.xwiki.rendering.renderer.xhtml;
 
 import java.util.Map;
+import java.util.Iterator;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.xwiki.bridge.DocumentAccessBridge;
@@ -174,20 +175,27 @@ public class XHTMLRenderer extends AbstractPrintRenderer
 
     /**
      * {@inheritDoc}
-     * 
-     * @see Renderer#beginParagraph()
+     *
+     * @see Renderer#beginParagraph(java.util.Map)
      */
-    public void beginParagraph()
+    public void beginParagraph(Map<String, String> parameters)
     {
-        print("<p>");
+        StringBuffer buffer = new StringBuffer("<p");
+        if (!parameters.isEmpty()) {
+            for (String key: parameters.keySet()) {
+                buffer.append(' ').append(key).append('=').append('\"').append(parameters.get(key)).append('\"');
+            }
+        }
+        buffer.append('>');
+        print(buffer.toString());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see Renderer#endParagraph()
+     * @see Renderer#endParagraph(java.util.Map)
      */
-    public void endParagraph()
+    public void endParagraph(Map<String, String> parameters)
     {
         print("</p>");
     }

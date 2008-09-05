@@ -248,7 +248,7 @@ public class XDOMGeneratorListener implements IWemListener
 
     public void endParagraph(WikiParameters params)
     {
-        this.stack.push(new ParagraphBlock(generateListFromStack()));
+        this.stack.push(new ParagraphBlock(generateListFromStack(), convertParameters(params)));
     }
 
     public void endPropertyBlock(String propertyUri, boolean doc)
@@ -358,16 +358,6 @@ public class XDOMGeneratorListener implements IWemListener
     public void onMacroInline(String macroName, WikiParameters params, String content)
     {
         this.stack.push(new MacroInlineBlock(macroName, convertParameters(params), content));
-    }
-
-    private Map<String, String> convertParameters(WikiParameters params)
-    {
-        Map<String, String> xwikiParams = new LinkedHashMap<String, String>();
-        for (WikiParameter wikiParameter : params.toList()) {
-            xwikiParams.put(wikiParameter.getKey(), wikiParameter.getValue());
-        }
-
-        return xwikiParams;
     }
 
     /**
@@ -513,5 +503,21 @@ public class XDOMGeneratorListener implements IWemListener
         }
         Collections.reverse(blocks);
         return blocks;
+    }
+
+    /**
+     * Convert Wikimodel parameters to XWiki parameters format.
+     *
+     * @param params the wikimodel parameters to convert
+     * @return the parameters in XWiki format
+     */
+    private Map<String, String> convertParameters(WikiParameters params)
+    {
+        Map<String, String> xwikiParams = new LinkedHashMap<String, String>();
+        for (WikiParameter wikiParameter : params.toList()) {
+            xwikiParams.put(wikiParameter.getKey(), wikiParameter.getValue());
+        }
+
+        return xwikiParams;
     }
 }

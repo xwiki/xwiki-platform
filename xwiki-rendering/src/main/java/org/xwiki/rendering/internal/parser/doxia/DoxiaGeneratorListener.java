@@ -113,7 +113,7 @@ public class DoxiaGeneratorListener implements Listener
         // do anything.
     }
 
-    public void beginParagraph()
+    public void beginParagraph(Map<String, String> parameters)
     {
         this.sink.paragraph();
     }
@@ -166,7 +166,7 @@ public class DoxiaGeneratorListener implements Listener
         // do anything.
     }
 
-    public void endParagraph()
+    public void endParagraph(Map<String, String> parameters)
     {
         this.sink.paragraph_();
     }

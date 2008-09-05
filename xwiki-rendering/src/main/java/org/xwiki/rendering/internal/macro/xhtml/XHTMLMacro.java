@@ -30,7 +30,6 @@ import org.xwiki.rendering.block.Block;
 import org.xwiki.rendering.macro.AbstractMacro;
 import org.xwiki.rendering.macro.MacroExecutionException;
 import org.xwiki.rendering.macro.xhtml.XHTMLMacroParameters;
-import org.xwiki.rendering.internal.macro.xhtml.XMLBlockConverterHandler;
 import org.xwiki.rendering.macro.descriptor.DefaultMacroDescriptor;
 import org.xwiki.rendering.parser.Parser;
 import org.xwiki.rendering.transformation.MacroTransformationContext;

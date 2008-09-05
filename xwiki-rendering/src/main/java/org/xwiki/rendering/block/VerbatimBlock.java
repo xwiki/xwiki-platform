@@ -22,7 +22,7 @@ package org.xwiki.rendering.block;
 /**
  * See {@link EscapeBlock} for the difference between a verbatim block and an escape block.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public interface VerbatimBlock extends Block

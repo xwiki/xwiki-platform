@@ -39,6 +39,9 @@ import org.xwiki.velocity.VelocityManager;
  */
 public class VelocityMacro extends AbstractNoParameterMacro
 {
+    /**
+     * The description of the macro.
+     */
     private static final String DESCRIPTION = "Executes a Velocity script.";
 
     /**

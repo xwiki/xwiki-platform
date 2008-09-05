@@ -26,6 +26,7 @@ import org.xwiki.configuration.ConfigurationSourceCollection;
 import org.xwiki.rendering.configuration.RenderingConfiguration;
 
 /**
+ * @version $Id: $
  * @since 1.6M1
  */
 public class DefaultRenderingConfiguration implements Initializable, RenderingConfiguration

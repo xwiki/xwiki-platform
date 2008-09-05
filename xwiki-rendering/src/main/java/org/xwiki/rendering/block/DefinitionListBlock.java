@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Represents a definition list. For exampe in HTML this is the equivalet of &lt;dl&gt;.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class DefinitionListBlock extends AbstractFatherBlock implements ListBLock

@@ -26,7 +26,7 @@ import java.util.List;
 /**
  * Represents a definition description. For exampe in HTML this is the equivalent of &lt;dt&gt;.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class DefinitionTermBlock extends AbstractFatherBlock

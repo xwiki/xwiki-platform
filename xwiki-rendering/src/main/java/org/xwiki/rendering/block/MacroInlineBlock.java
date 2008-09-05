@@ -27,7 +27,7 @@ import java.util.Map;
  * Represents an inline Macro defined in a page (ie a Macro located inside another Block, for example a Macro located
  * inside a Paragraph Block).
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class MacroInlineBlock extends AbstractMacroBlock

@@ -24,7 +24,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * A Verbatim block located inside another block.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class VerbatimInlineBlock extends AbstractVerbatimBlock

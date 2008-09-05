@@ -24,7 +24,7 @@ import org.xwiki.rendering.listener.Listener;
 /**
  * Represents a Horizontal line.
  * 
- * @version $Id:$
+ * @version $Id$
  * @since 1.6M1
  */
 public class HorizontalLineBlock extends AbstractBlock

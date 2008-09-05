@@ -31,6 +31,9 @@ package org.xwiki.rendering.configuration;
  */
 public interface RenderingConfiguration
 {
+    /**
+     * This component's role, used when code needs to look it up.
+     */
     String ROLE = RenderingConfiguration.class.getName();
     
     /**

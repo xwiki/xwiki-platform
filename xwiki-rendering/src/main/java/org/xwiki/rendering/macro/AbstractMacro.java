@@ -23,7 +23,6 @@ import org.apache.commons.beanutils.ConvertUtils;
 import org.apache.commons.beanutils.Converter;
 import org.xwiki.component.logging.AbstractLogEnabled;
 import org.xwiki.rendering.macro.descriptor.MacroDescriptor;
-import org.xwiki.rendering.macro.toc.TocMacroParameters;
 
 /**
  * @version $Id$

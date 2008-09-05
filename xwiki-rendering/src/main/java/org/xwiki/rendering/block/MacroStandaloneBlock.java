@@ -27,7 +27,7 @@ import java.util.Map;
  * Represents a standalone Macro defined in a page (ie a Macro defined at the beginning of a line without other
  * elements on the same line). 
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public class MacroStandaloneBlock extends AbstractMacroBlock

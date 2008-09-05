@@ -116,9 +116,7 @@ public class XMLBlockConverterHandler extends DefaultHandler
                 // For example we want to generate <h1>hello</h1> and not <h1><p>hello</p></h1>.
                 List<Block> children = dom.getChildren();
                 // We only remove the paragraph if there's only one top level element and if it's a paragraph.
-                if ((children.size() == 1)
-                    && ParagraphBlock.class.isAssignableFrom(children.get(0).getClass()))
-                {
+                if ((children.size() == 1) && ParagraphBlock.class.isAssignableFrom(children.get(0).getClass())) {
                     dom = new XDOM(children.get(0).getChildren());
                 }
 
@@ -132,7 +130,8 @@ public class XMLBlockConverterHandler extends DefaultHandler
     /**
      * {@inheritDoc}
      * 
-     * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * @see org.xml.sax.helpers.DefaultHandler#startElement(java.lang.String, java.lang.String, java.lang.String,
+     *      org.xml.sax.Attributes)
      */
     @Override
     public void startElement(String uri, String localName, String name, Attributes attributes) throws SAXException

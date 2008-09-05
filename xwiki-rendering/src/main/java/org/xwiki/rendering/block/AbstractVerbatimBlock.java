@@ -22,7 +22,7 @@ package org.xwiki.rendering.block;
 /**
  * Common implementation for standalone verbatim blocks and inline verbatim blocks.
  *
- * @version $Id: $
+ * @version $Id$
  * @since 1.6M2
  */
 public abstract class AbstractVerbatimBlock extends AbstractBlock implements VerbatimBlock
